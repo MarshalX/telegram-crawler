@@ -67,7 +67,6 @@ OUTPUT_FILENAME = os.environ.get('OUTPUT_FILENAME', 'tracked_links.txt')
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
-SESSION = aiohttp.ClientSession(connector=CONNECTOR)
 
 logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -152,7 +151,7 @@ def cleanup_links(links: set[str]) -> set[str]:
     return cleaned_links
 
 
-async def crawl(url: str):
+async def crawl(url: str, session: aiohttp.ClientSession):
     if url.endswith('/'):
         url = url[:-1:]
     if url in VISITED_LINKS or '"' in url:
@@ -161,7 +160,7 @@ async def crawl(url: str):
 
     try:
         logger.info(f'[{len(VISITED_LINKS)}] Process {url}')
-        async with SESSION.get(f'{PROTOCOL}{url}', allow_redirects=False) as response:
+        async with session.get(f'{PROTOCOL}{url}', allow_redirects=False) as response:
             status_code = response.status
             content_type = response.headers.get('content-type')
 
@@ -176,8 +175,7 @@ async def crawl(url: str):
                 relative_links = cleanup_links(find_relative_links(html, url))
 
                 sub_links = absolute_links | relative_links
-                for link in sub_links:
-                    await asyncio.create_task(crawl(link))
+                await asyncio.gather(*[crawl(url, session) for url in sub_links])
             elif 'application/javascript' in content_type:
                 LINKS_TO_TRACK.add(url)
             elif 'text/css' in content_type:
@@ -192,15 +190,14 @@ async def crawl(url: str):
 
 
 async def start(url_list: set[str]):
-    for url in url_list:
-        await asyncio.create_task(crawl(url))
+    async with aiohttp.ClientSession(connector=CONNECTOR) as session:
+        await asyncio.gather(*[crawl(url, session) for url in url_list])
 
 
 if __name__ == '__main__':
     HIDDEN_URLS.add(BASE_URL)
 
     asyncio.get_event_loop().run_until_complete(start(HIDDEN_URLS))
-    asyncio.get_event_loop().run_until_complete(SESSION.close())
 
     with open(OUTPUT_FILENAME, 'w') as f:
         f.write('\n'.join(sorted(LINKS_TO_TRACK)))
