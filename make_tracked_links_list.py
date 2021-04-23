@@ -157,7 +157,7 @@ async def main(url: str):
                 absolute_links = cleanup_links(find_absolute_links(html))
                 relative_links = cleanup_links(find_relative_links(html, url))
 
-                sub_links = absolute_links + relative_links
+                sub_links = absolute_links | relative_links
                 for link in sub_links:
                     await asyncio.create_task(main(link))
             elif 'application/javascript' in content_type:
