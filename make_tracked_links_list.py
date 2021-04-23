@@ -1,8 +1,9 @@
-import os
 import asyncio
 import logging
+import os
 import re
 from html import unescape
+from time import time
 from urllib.parse import unquote
 
 import aiohttp
@@ -186,7 +187,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                 # TODO track hashes of image/svg/video content types
                 logger.info(f'Unhandled type: {content_type}')
     except:
-        logger.error('Codec can\'t decode byte. So its was a tgs file')
+        logger.warning('Codec can\'t decode byte. So its was a tgs file')
 
 
 async def start(url_list: set[str]):
@@ -197,7 +198,10 @@ async def start(url_list: set[str]):
 if __name__ == '__main__':
     HIDDEN_URLS.add(BASE_URL)
 
+    logger.info('Start crawling...')
+    start_time = time()
     asyncio.get_event_loop().run_until_complete(start(HIDDEN_URLS))
+    logger.info(f'Stop crawling. {time() - start_time} sec.')
 
     with open(OUTPUT_FILENAME, 'w') as f:
         f.write('\n'.join(sorted(LINKS_TO_TRACK)))
