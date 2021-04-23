@@ -34,6 +34,7 @@ EXCLUDE_RULES = {
         'constructor/',
         'method/',
         'type/',
+        'api/',
     },
     'telegram.org': {
         'file/',
