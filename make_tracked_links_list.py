@@ -9,6 +9,14 @@ import aiohttp
 
 PROTOCOL = 'https://'
 BASE_URL = 'telegram.org'
+# its necessary to help crawler to find more links
+HIDDEN_URLS = {
+    'corefork.telegram.org',
+
+    'telegram.org/privacy/gmailbot',
+    'telegram.org/tos',
+    'telegram.org/tour'
+}
 BASE_URL_REGEX = r'telegram.org'
 
 EXCLUDE_RULES = {
@@ -25,6 +33,15 @@ EXCLUDE_RULES = {
         'templates/',
         'samples/',
         'contest/',
+    },
+    'corefork.telegram.org': {
+        'file/',
+
+        'tdlib/',
+
+        'constructor/',
+        'method/',
+        'type/',
     },
     'core.telegram.org': {
         'file/',
@@ -135,7 +152,7 @@ def cleanup_links(links: set[str]) -> set[str]:
     return cleaned_links
 
 
-async def main(url: str):
+async def crawl(url: str):
     if url.endswith('/'):
         url = url[:-1:]
     if url in VISITED_LINKS or '"' in url:
@@ -160,7 +177,7 @@ async def main(url: str):
 
                 sub_links = absolute_links | relative_links
                 for link in sub_links:
-                    await asyncio.create_task(main(link))
+                    await asyncio.create_task(crawl(link))
             elif 'application/javascript' in content_type:
                 LINKS_TO_TRACK.add(url)
             elif 'text/css' in content_type:
@@ -174,8 +191,15 @@ async def main(url: str):
         logger.error('Codec can\'t decode byte. So its was a tgs file')
 
 
+async def start(url_list: set[str]):
+    for url in url_list:
+        await asyncio.create_task(crawl(url))
+
+
 if __name__ == '__main__':
-    asyncio.get_event_loop().run_until_complete(main(BASE_URL))
+    HIDDEN_URLS.add(BASE_URL)
+
+    asyncio.get_event_loop().run_until_complete(start(HIDDEN_URLS))
     asyncio.get_event_loop().run_until_complete(SESSION.close())
 
     with open(OUTPUT_FILENAME, 'w') as f:
