@@ -1,3 +1,4 @@
+import os
 import asyncio
 import logging
 import re
@@ -45,7 +46,7 @@ RELATIVE_LINK_REGEX = r'\/([-a-zA-Z0-9\/@:%._\+~#]{0,249})'
 
 DOM_ATTRS = ['href', 'src']
 
-OUTPUT_FILENAME = 'tracked_links.txt'
+OUTPUT_FILENAME = os.environ.get('OUTPUT_FILENAME', 'tracked_links.txt')
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
