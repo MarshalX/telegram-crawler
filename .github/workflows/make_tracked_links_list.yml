@@ -1,0 +1,37 @@
+name: Generate or update list of tracked links
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  make_tracked_links_file:
+    name: Make tracked links file
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Clone.
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Setup Python.
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies.
+        run: |
+          pip install -r requirements.txt
+
+      - name: Generate/update file with links.
+        run: |
+          python make_tracked_links_list.py
+
+      - name: Commit and push changes.
+        run: |
+          git checkout data
+          git commit -am "Update tracked links"
+          git push
