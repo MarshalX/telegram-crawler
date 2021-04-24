@@ -13,12 +13,18 @@ from aiohttp import ClientConnectorError
 PROTOCOL = 'https://'
 ILLEGAL_PATH_CHARS = punctuation.replace('.', '') + whitespace
 
+DYNAMIC_PART_MOCK = 'telegram-crawler'
+
 INPUT_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_links.txt')
 OUTPUT_FOLDER = os.environ.get('OUTPUT_FOLDER', 'data/')
 
 PAGE_GENERATION_TIME_REGEX = r'<!-- page generated in .+ -->'
 PAGE_API_HASH_REGEX = r'\?hash=[a-z0-9]+'
-PAGE_API_HASH_TEMPLATE = '?hash=telegram-crawler'
+PAGE_API_HASH_TEMPLATE = f'?hash={DYNAMIC_PART_MOCK}'
+PASSPORT_SSID_REGEX = r'passport_ssid=[a-z0-9]+_[a-z0-9]+_[a-z0-9]+'
+PASSPORT_SSID_TEMPLATE = f'passport_ssid={DYNAMIC_PART_MOCK}'
+NONCE_REGEX = r'"nonce":"[a-z0-9]+_[a-z0-9]+_[a-z0-9]+'
+NONCE_TEMPLATE = f'"nonce":"{DYNAMIC_PART_MOCK}'
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
@@ -47,6 +53,8 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                 content = await response.text()
                 content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
                 content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
+                content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
+                content = re.sub(NONCE_REGEX, NONCE_TEMPLATE, content)
 
                 logger.info(f'Write to {filename}')
                 await f.write(content)
