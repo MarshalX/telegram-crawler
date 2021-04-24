@@ -17,6 +17,8 @@ INPUT_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_links.txt')
 OUTPUT_FOLDER = os.environ.get('OUTPUT_FOLDER', 'data/')
 
 PAGE_GENERATION_TIME_REGEX = r'<!-- page generated in .+ -->'
+PAGE_API_HASH_REGEX = r'api\?hash=.+",'
+PAGE_API_HASH_TEMPLATE = r'api?hash=telegram-crawler",'
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
@@ -44,6 +46,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             async with aiofiles.open(filename, 'w') as f:
                 content = await response.text()
                 content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
+                content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
 
                 logger.info(f'Write to {filename}')
                 await f.write(content)
