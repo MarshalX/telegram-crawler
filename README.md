@@ -55,7 +55,8 @@ Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-c
 ### TODO list
 
 - bug fixes;
-- alert system.
+- alert system;
+- add storing hashes of image, svg, video.
 
 ### Example of link crawler rules configuration
 

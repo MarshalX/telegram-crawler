@@ -77,8 +77,8 @@ CRAWL_RULES = {
 }
 
 DIRECT_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{0,249}' + BASE_URL_REGEX + r')'
-ABSOLUTE_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{1,249}' + BASE_URL_REGEX + r'\b[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)'
-RELATIVE_LINK_REGEX = r'\/([-a-zA-Z0-9\/@:%._\+~#]{0,249})'
+ABSOLUTE_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{0,248}' + BASE_URL_REGEX + r'\b[-a-zA-Z0-9@:%_\+.~#?&//=]*)'
+RELATIVE_LINK_REGEX = r'\/(?!\/)([-a-zA-Z0-9\/@:%._\+~#]{0,249})'
 
 DOM_ATTRS = ['href', 'src']
 
@@ -137,16 +137,9 @@ def find_relative_links(html: str, cur_link: str) -> set[str]:
         links = re.findall(regex, html)
 
         for link in links:
-            # bypass //www.apple and etc shit ;d
-            if link.startswith('/'):
-                # absolute links starting with double slash
-                if find_absolute_links(link):
-                    if not should_exclude(link[1::]):
-                        relative_links.add(link[1::])
-            else:
-                url = f'{direct_cur_link}/{link}'
-                if not should_exclude(url):
-                    relative_links.add(url)
+            url = f'{direct_cur_link}/{link}'
+            if not should_exclude(url):
+                relative_links.add(url)
 
     return relative_links
 
@@ -159,10 +152,16 @@ def cleanup_links(links: set[str]) -> set[str]:
         link = unescape(link)
         link = link.replace('www.', '')
         link = link.replace('http://', '').replace('https://', '')
+
         # skip anchor links
         if '#' in link:
             continue
 
+        # remove get params from link
+        if '?' in link:
+            link = ''.join(link.split('?')[:-1])
+
+        # skip mailto:
         link_parts = link.split('.')
         if '@' in link_parts[0]:
             continue
@@ -173,31 +172,15 @@ def cleanup_links(links: set[str]) -> set[str]:
 
 
 async def crawl(url: str, session: aiohttp.ClientSession):
-    # todo
-    if url.endswith('.'):
+    if url in VISITED_LINKS:
         return
-
-    without_trailing_slash = url[:-1:] if url.endswith('/') else url
-    if without_trailing_slash in VISITED_LINKS:
-        return
-    VISITED_LINKS.add(without_trailing_slash)
+    VISITED_LINKS.add(url)
 
     try:
         logger.info(f'[{len(VISITED_LINKS)}] Process {url}')
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False) as response:
             status_code = response.status
             content_type = response.headers.get('content-type')
-
-            # if it was redirect to link with trailing slash - handle this url
-            if 300 < status_code < 400:
-                location = response.headers.get('location', '')
-                # todo rewrite logic
-                if without_trailing_slash in location:
-                    if not should_exclude(location):
-                        # nice shit bro
-                        logger.info(f'Trailing slash. {location}')
-                        cleaned_link = list(cleanup_links({location}))[0]
-                        await asyncio.gather(crawl(cleaned_link, session))
 
             if status_code != 200:
                 return
@@ -220,9 +203,18 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             else:
                 # TODO track hashes of image/svg/video content types
                 logger.info(f'Unhandled type: {content_type}')
+
+            # telegram url can work with and without trailing slash (no redirect). P.S. not on every sub domain ;d
+            # so this is a problem when we have random behavior with link will be added
+            # this if resolve this issue. If available both link we prefer without trailing slash
+            without_trailing_slash = url[:-1:] if url.endswith('/') else url
+            if without_trailing_slash in LINKS_TO_TRACK and \
+                    f'{without_trailing_slash}/' in LINKS_TO_TRACK:
+                LINKS_TO_TRACK.remove(f'{without_trailing_slash}/')
     except UnicodeDecodeError:
         logger.warning('Codec can\'t decode byte. So its was a tgs file')
     except (TimeoutError, ClientConnectorError):
+        logger.warning(f'Retrying {url}')
         await asyncio.gather(crawl(url, session))
 
 
@@ -238,6 +230,16 @@ if __name__ == '__main__':
     start_time = time()
     asyncio.get_event_loop().run_until_complete(start(HIDDEN_URLS))
     logger.info(f'Stop crawling links. {time() - start_time} sec.')
+
+    try:
+        with open(OUTPUT_FILENAME, 'r') as f:
+            OLD_URL_LIST = set([l.replace('\n', '') for l in f.readlines()])
+
+        logger.info(f'Is equal: {OLD_URL_LIST == LINKS_TO_TRACK}')
+        logger.info(f'Deleted: {OLD_URL_LIST - LINKS_TO_TRACK}')
+        logger.info(f'Added: {LINKS_TO_TRACK - OLD_URL_LIST}')
+    except IOError:
+        pass
 
     with open(OUTPUT_FILENAME, 'w') as f:
         f.write('\n'.join(sorted(LINKS_TO_TRACK)))
