@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import re
 from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
 from time import time
@@ -14,6 +15,8 @@ ILLEGAL_PATH_CHARS = punctuation.replace('.', '') + whitespace
 
 INPUT_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_links.txt')
 OUTPUT_FOLDER = os.environ.get('OUTPUT_FOLDER', 'data/')
+
+PAGE_GENERATION_TIME_REGEX = r'<!-- page generated in .+ -->'
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
@@ -39,8 +42,10 @@ async def crawl(url: str, session: aiohttp.ClientSession):
 
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             async with aiofiles.open(filename, 'w') as f:
-                logger.info(f'Write to {filename}')
                 content = await response.text()
+                content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
+
+                logger.info(f'Write to {filename}')
                 await f.write(content)
     except (TimeoutError, ClientConnectorError):
         await asyncio.gather(crawl(url, session))
