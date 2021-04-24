@@ -4,9 +4,12 @@ This project is developed to automatically detect changes made
 to the official Telegram sites. This is necessary for anticipating
 future updates and other things (new vacancies, API updates).
 
-**– [![Fetch new content of tracked links to files](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_files_tree.yml/badge.svg?branch=data)](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_files_tree.yml) [Site updates tracker](https://github.com/MarshalX/telegram-crawler/commits/data)**
 
-**– [![Generate or update list of tracked links](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_tracked_links_list.yml/badge.svg?branch=data)](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_tracked_links_list.yml) [Site links tracker](https://github.com/MarshalX/telegram-crawler/commits/main/tracked_links.txt)**
+| Name | Commits  | Status |
+| -----| -------- | ------ |
+| Site updates tracker| [Commits](https://github.com/MarshalX/telegram-crawler/commits/data)  | ![Fetch new content of tracked links to files](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_files_tree.yml/badge.svg?branch=main)  |
+| Site links tracker | [Commits](https://github.com/MarshalX/telegram-crawler/commits/main/tracked_links.txt)  | ![Generate or update list of tracked links](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_tracked_links_list.yml/badge.svg?branch=main)  |
+
 
 ### How it should work in dreams
 
@@ -47,6 +50,46 @@ future updates and other things (new vacancies, API updates).
 
 - bug fixes;
 - alert system.
+
+### Example of link crawler rules configuration
+
+```python
+CRAWL_RULES = {
+    # every rule is regex
+    # empty string means match any url
+    # allow rules with high priority than deny
+    'translations.telegram.org': {
+        'allow': {
+            r'^[^/]*$',  # root
+            r'org/[^/]*/$',  # 1 lvl sub
+            r'/en/[a-z_]+/$'  # 1 lvl after /en/
+        },
+        'deny': {
+            '',  # all
+        }
+    },
+    'bugs.telegram.org': {
+        'deny': {
+            '',    # deny all sub domain
+        },
+    },
+}
+```
+
+### Current hidden urls list
+
+```python
+HIDDEN_URLS = {
+    # 'corefork.telegram.org', # disabled
+
+    'telegram.org/privacy/gmailbot',
+    'telegram.org/tos',
+    'telegram.org/tour',
+    'telegram.org/evolution',
+
+    'desktop.telegram.org/changelog',
+}
+```
 
 ### License
 
