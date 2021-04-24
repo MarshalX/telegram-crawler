@@ -10,6 +10,8 @@ future updates and other things (new vacancies, API updates).
 | Site updates tracker| [Commits](https://github.com/MarshalX/telegram-crawler/commits/data)  | ![Fetch new content of tracked links to files](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_files_tree.yml/badge.svg?branch=main)  |
 | Site links tracker | [Commits](https://github.com/MarshalX/telegram-crawler/commits/main/tracked_links.txt)  | ![Generate or update list of tracked links](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_tracked_links_list.yml/badge.svg?branch=main)  |
 
+* passing – new changes
+* failing – no changes
 
 ### How it should work in dreams
 
