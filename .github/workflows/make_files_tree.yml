@@ -1,15 +1,15 @@
-name: Generate or update list of tracked links
+name: Fetch new content of tracked links to files
 
 on:
   schedule:
     - cron: '0 * * * *'
   push:
     branches:
-      - main
+      - main-test
 
 jobs:
   make_tracked_links_file:
-    name: Make tracked links file
+    name: Make files tree
     runs-on: macos-10.15
 
     steps:
@@ -28,17 +28,19 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Generate/update file with links.
+      - name: Generate files tree.
         env:
-          OUTPUT_FILENAME: "tracked_links_ci.txt"
+          OUTPUT_FOLDER: "data_ci/"
         run: |
-          python make_tracked_links_list.py
+          python make_files_tree.py
 
       - name: Commit and push changes.
         run: |
           git pull
+          git checkout data
 
-          mv tracked_links_ci.txt tracked_links.txt
+          rm -rf data
+          mv data_ci data
 
           git config --global user.email "github-action@users.noreply.github.com"
           git config --global user.name "GitHub Action"

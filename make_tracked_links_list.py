@@ -19,6 +19,7 @@ HIDDEN_URLS = {
     'telegram.org/privacy/gmailbot',
     'telegram.org/tos',
     'telegram.org/tour',
+    'telegram.org/evolution',
 
     'desktop.telegram.org/changelog',
 }
@@ -171,6 +172,10 @@ def cleanup_links(links: set[str]) -> set[str]:
 
 
 async def crawl(url: str, session: aiohttp.ClientSession):
+    # todo
+    if url.endswith('.'):
+        return
+
     without_trailing_slash = url[:-1:] if url.endswith('/') else url
     if without_trailing_slash in VISITED_LINKS:
         return
@@ -228,10 +233,10 @@ async def start(url_list: set[str]):
 if __name__ == '__main__':
     HIDDEN_URLS.add(BASE_URL)
 
-    logger.info('Start crawling...')
+    logger.info('Start crawling links...')
     start_time = time()
     asyncio.get_event_loop().run_until_complete(start(HIDDEN_URLS))
-    logger.info(f'Stop crawling. {time() - start_time} sec.')
+    logger.info(f'Stop crawling links. {time() - start_time} sec.')
 
     with open(OUTPUT_FILENAME, 'w') as f:
         f.write('\n'.join(sorted(LINKS_TO_TRACK)))
