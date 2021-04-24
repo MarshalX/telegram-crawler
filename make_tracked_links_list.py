@@ -7,65 +7,59 @@ from time import time
 from urllib.parse import unquote
 
 import aiohttp
+from aiohttp import ClientConnectorError
 
 PROTOCOL = 'https://'
 BASE_URL = 'telegram.org'
 # its necessary to help crawler to find more links
 HIDDEN_URLS = {
-    'corefork.telegram.org',
+    # 'corefork.telegram.org',
 
     'telegram.org/privacy/gmailbot',
     'telegram.org/tos',
     'telegram.org/tour',
 
-    'translations.telegram.org',
-    'translations.telegram.org/en/android',
-    'translations.telegram.org/en/ios',
-    'translations.telegram.org/en/tdesktop',
-    'translations.telegram.org/en/macos',
-    'translations.telegram.org/en/android_x',
+    'desktop.telegram.org/changelog',
 }
 BASE_URL_REGEX = r'telegram.org'
 
-# disable crawling sub links for specific domains and url patches
-EXCLUDE_RULES = {
-    # '*' means exclude all
+# disable crawling sub links for specific domains and url patterns
+CRAWL_RULES = {
+    # every rule is regex
+    # empty string means match any url
+    # allow rules with high priority than deny
     'translations.telegram.org': {
-        # 'max_count_of_slashes': 3,
-        'patches': {
-            '*',
+        'allow': {
+            r'^[^/]*$',  # root
+            r'org/[^/]*/$',  # 1 lvl sub
+            r'/en/[a-z_]+/$'  # 1 lvl after /en/
+        },
+        'deny': {
+            '',  # all
         }
     },
-    'bugs.telegram.org': {
-        'patches': {
-            'c/',
+    'bugs.telegram.org': {  # crawl first page of cards sorted by rating
+        'deny': {
+            r'/c/[0-9]+/[0-9]+',  # disable comments
         },
     },
     'instantview.telegram.org': {
-        'patches': {
+        'allow': {
+            'contest/winners'
+        },
+        'deny': {
             'file/',
 
-            'templates/',
+            r'templates/.+',
             'samples/',
             'contest/',
         },
     },
-    'corefork.telegram.org': {
-        'patches': {
-            'file/',
-
-            'tdlib/docs/',
-
-            'constructor/',
-            'method/',
-            'type/',
-        },
-    },
     'core.telegram.org': {
-        'patches': {
+        'deny': {
             'file/',
 
-            'tdlib/docs/',
+            'tdlib/docs/classtd',
 
             'constructor/',
             'method/',
@@ -73,7 +67,7 @@ EXCLUDE_RULES = {
         },
     },
     'telegram.org': {
-        'patches': {
+        'deny': {
             'file/',
         },
     }
@@ -89,6 +83,7 @@ OUTPUT_FILENAME = os.environ.get('OUTPUT_FILENAME', 'tracked_links.txt')
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
+TIMEOUT = aiohttp.ClientTimeout(total=30)
 
 logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -97,25 +92,28 @@ VISITED_LINKS = set()
 LINKS_TO_TRACK = set()
 
 
-def should_exclude(url: str, direct_link=None) -> bool:
-    if not direct_link:
-        direct_link = re.findall(DIRECT_LINK_REGEX, url)[0]
-    domain_exclude_rules = EXCLUDE_RULES.get(direct_link, dict())
+def should_exclude(url: str) -> bool:
+    direct_link = re.findall(DIRECT_LINK_REGEX, url)[0]
+    domain_rules = CRAWL_RULES.get(direct_link)
+    if not domain_rules:
+        return False
 
-    max_count_of_slashes = domain_exclude_rules.get('max_count_of_slashes')
-    exclude_patches = domain_exclude_rules.get('patches', set())
+    allow_rules = domain_rules.get('allow', set())
+    deny_rules = domain_rules.get('deny', set())
 
-    if '*' in exclude_patches:
-        return True
+    exclude = False
 
-    if max_count_of_slashes and max_count_of_slashes < url.count('/'):
-        return True
+    for regex in deny_rules:
+        if re.search(regex, url):
+            exclude = True
+            break
 
-    for path in exclude_patches:
-        if path in url:
-            return True
+    for regex in allow_rules:
+        if re.search(regex, url):
+            exclude = False
+            break
 
-    return False
+    return exclude
 
 
 def find_absolute_links(html: str) -> set[str]:
@@ -136,17 +134,16 @@ def find_relative_links(html: str, cur_link: str) -> set[str]:
         links = re.findall(regex, html)
 
         for link in links:
-            if should_exclude(link, direct_cur_link):
-                continue
-
+            # bypass //www.apple and etc shit ;d
             if link.startswith('/'):
-                # bypass //www.apple and etc shit ;d
+                # absolute links starting with double slash
                 if find_absolute_links(link):
-                    # absolute links starting with double slash
-                    if not should_exclude(link):
+                    if not should_exclude(link[1::]):
                         relative_links.add(link[1::])
             else:
-                relative_links.add(f'{direct_cur_link}/{link}')
+                url = f'{direct_cur_link}/{link}'
+                if not should_exclude(url):
+                    relative_links.add(url)
 
     return relative_links
 
@@ -173,17 +170,27 @@ def cleanup_links(links: set[str]) -> set[str]:
 
 
 async def crawl(url: str, session: aiohttp.ClientSession):
-    if url.endswith('/'):
-        url = url[:-1:]
-    if url in VISITED_LINKS or '"' in url:
+    without_trailing_slash = url[:-1:] if url.endswith('/') else url
+    if without_trailing_slash in VISITED_LINKS:
         return
-    VISITED_LINKS.add(url)
+    VISITED_LINKS.add(without_trailing_slash)
 
     try:
         logger.info(f'[{len(VISITED_LINKS)}] Process {url}')
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False) as response:
             status_code = response.status
             content_type = response.headers.get('content-type')
+
+            # if it was redirect to link with trailing slash - handle this url
+            if 300 < status_code < 400:
+                location = response.headers.get('location', '')
+                # todo rewrite logic
+                if without_trailing_slash in location:
+                    if not should_exclude(location):
+                        # nice shit bro
+                        logger.info(f'Trailing slash. {location}')
+                        cleaned_link = list(cleanup_links({location}))[0]
+                        await asyncio.gather(crawl(cleaned_link, session))
 
             if status_code != 200:
                 return
@@ -206,8 +213,10 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             else:
                 # TODO track hashes of image/svg/video content types
                 logger.info(f'Unhandled type: {content_type}')
-    except:
-        logger.warning('Mb codec can\'t decode byte. So its was a tgs file')
+    except UnicodeDecodeError:
+        logger.warning('Codec can\'t decode byte. So its was a tgs file')
+    except ClientConnectorError:
+        await asyncio.gather(crawl(url, session))
 
 
 async def start(url_list: set[str]):
