@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import re
+from asyncio.exceptions import TimeoutError
 from html import unescape
 from time import time
 from urllib.parse import unquote
@@ -215,7 +216,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                 logger.info(f'Unhandled type: {content_type}')
     except UnicodeDecodeError:
         logger.warning('Codec can\'t decode byte. So its was a tgs file')
-    except ClientConnectorError:
+    except (TimeoutError, ClientConnectorError):
         await asyncio.gather(crawl(url, session))
 
 
