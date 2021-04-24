@@ -15,6 +15,8 @@ future updates and other things (new vacancies, API updates, etc).
 
 Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-crawler/tree/data/data)**.
 
+![GitHub pretty diff](https://i.imgur.com/BK8UAju.png)
+
 ### How it should work in dreams
 
 1. [Link crawling](make_tracked_links_list.py) runs once an hour. 
