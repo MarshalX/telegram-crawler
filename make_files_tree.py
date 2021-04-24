@@ -17,8 +17,8 @@ INPUT_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_links.txt')
 OUTPUT_FOLDER = os.environ.get('OUTPUT_FOLDER', 'data/')
 
 PAGE_GENERATION_TIME_REGEX = r'<!-- page generated in .+ -->'
-PAGE_API_HASH_REGEX = r'api\?hash=.+",'
-PAGE_API_HASH_TEMPLATE = r'api?hash=telegram-crawler",'
+PAGE_API_HASH_REGEX = r'?hash=([a-z0-9]+)",'
+PAGE_API_HASH_TEMPLATE = r'?hash=telegram-crawler",'
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
