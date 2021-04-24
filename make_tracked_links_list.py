@@ -42,7 +42,8 @@ CRAWL_RULES = {
     },
     'bugs.telegram.org': {  # crawl first page of cards sorted by rating
         'deny': {
-            r'/c/[0-9]+/[0-9]+',  # disable comments
+            # r'/c/[0-9]+/[0-9]+',  # disable comments
+            '',
         },
     },
     'instantview.telegram.org': {
