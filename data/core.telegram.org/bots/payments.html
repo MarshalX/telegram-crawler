@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Bot Payments API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="You can accept payments from Telegram users via Telegram Bots.
+Note: This article is intended for bot developers. If you&#39;re…">
+    <meta property="og:title" content="Bot Payments API">
+    <meta property="og:image" content="b92643c0c9a2612b36">
+    <meta property="og:description" content="You can accept payments from Telegram users via Telegram Bots.
+Note: This article is intended for bot developers. If you&#39;re…">
+    <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
+
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?212" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"></div>
+  <h1 id="dev_page_title">Bot Payments API</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<div class="dev_side_image">
+  <a href="/file/811140227/2/ZTXUngAbELM.193805/ba6aa233d1d4206207" target="_blank"><img src="/file/811140095/1/lfTvDVqVS8M.43169/1a191248e6cf027581" title="Payments API. Click for hi-res picture">
+</a></div>
+
+<p>You can accept payments from Telegram users via <a href="/bots">Telegram Bots</a>. </p>
+<blockquote>
+<p><strong>Note:</strong> This article is intended for bot developers. If you&#39;re looking for a general overview of Telegram Payments, check out the <a href="https://telegram.org/blog/payments">Telegram blog</a>.<br>Also, visit the <a href="/api/payments">MTProto payment documentation</a> for a technical overview of payments from the user&#39;s perspective.</p>
+</blockquote>
+<p>If you are new to Telegram bots and would like to learn how to create and set up a bot, please consult our <a href="https://core.telegram.org/bots"><strong>Introduction to Bots</strong></a> and <a href="/bots/faq"><strong>Bot FAQ</strong></a>.</p>
+<h3><a class="anchor" name="introducing-payments" href="#introducing-payments"><i class="anchor-icon"></i></a>Introducing Payments</h3>
+<p>Telegram bots can accept payments for goods and services from users as of <a href="/bots/api">Bot API v.3.0</a>. Users will need <a href="https://telegram.org/blog/payments">Telegram v.4.0</a> or higher to pay for your goods and services.</p>
+<h4><a class="anchor" name="how-does-this-work" href="#how-does-this-work"><i class="anchor-icon"></i></a>How does this work?</h4>
+<p>From the user&#39;s perspective the payments system is completely seamless. Merchant <strong>bots</strong> can send specially formatted <strong>invoice messages</strong> to users. Such invoice messages feature a photo and description of the product along with a prominent <strong>Pay</strong> button. Tapping this button opens a special payment interface in the Telegram app. In this interface, users are prompted for additional details like shipping info, phone number, or email address.</p>
+<p>Once they&#39;ve entered all the necessary info, it is forwarded to the merchant bot. The bot can offer several shipping options for physical goods based on the address. When ready, users can enter their credit card info or choose one of their saved cards — and pay for the product. Telegram also supports Apple Pay and Google Pay. Once the transaction is done, the merchant bot sends a <strong>receipt message</strong> that contains payment details along with shipping and delivery information.</p>
+<div class="smartphone_video_player_wrap">
+ <div class="smartphone_video_player_iphone">
+ <video class="smartphone_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" poster="YYY" autoplay loop controls muted>
+  <source src="/file/811140436/2/cxE7JK8NL-M.514213.mp4/2146f9b746ebb4fef4" type="video/mp4">
+ </video>
+ </div>
+ <br>
+</div>
+
+<h4><a class="anchor" name="how-do-you-process-payments" href="#how-do-you-process-payments"><i class="anchor-icon"></i></a>How do you process payments?</h4>
+<p>Telegram does not process payments from users and instead relies on different <strong>payment providers</strong> around the world. It is the payment providers that handle and store all sensitive information, like credit card details. Neither Telegram nor the bot developers have access to it. For the moment we support payments from more than 200 countries via the the following payment providers:</p>
+<ul>
+<li><a href="https://stripe.com">Stripe</a></li>
+<li><a href="https://yoomoney.ru/">YooMoney</a></li>
+<li><a href="https://www.sberbank.ru">Sberbank</a></li>
+<li><a href="https://tranzzo.com">Tranzzo</a></li>
+<li><a href="https://payme.uz/">Payme</a></li>
+<li><a href="http://click.uz/">CLICK</a></li>
+<li><a href="https://www.liqpay.ua/uk/">LiqPay</a></li>
+<li><a href="https://ecommpay.com/">ECOMMPAY</a></li>
+</ul>
+<p>More providers are coming, stay tuned to <a href="https://t.me/botnews">@BotNews</a> for updates.</p>
+<h4><a class="anchor" name="how-do-i-join-as-a-payment-provider" href="#how-do-i-join-as-a-payment-provider"><i class="anchor-icon"></i></a>How do I join as a payment provider?</h4>
+<p>If you work for a company that provides services similar to standalone accounts in <a href="https://stripe.com/connect">Stripe Connect</a>, please let us know via <a href="https://t.me/botsupport">@BotSupport</a> (kindly include the hashtag <code>#paymentsprovider</code> in your message).</p>
+<h4><a class="anchor" name="how-much-do-you-charge" href="#how-much-do-you-charge"><i class="anchor-icon"></i></a>How much do you charge?</h4>
+<p>Telegram does <strong>not</strong> charge any commission for using the Payments API. Note though, that most payment providers will have their own commissions. For example, Stripe in the US charges 2.9% + 30¢ per successful card charge (see the <a href="https://stripe.com/pricing">Stripe website</a> for more details on pricing).</p>
+<h4><a class="anchor" name="what-can-my-bot-sell" href="#what-can-my-bot-sell"><i class="anchor-icon"></i></a>What can my bot sell?</h4>
+<p>Telegram does not impose any limits on what products or services your bot can offer. But please note that you <strong>must</strong> comply with the rules of the payments provider you choose in our system. E.g., Stripe has a special page for <a href="https://stripe.com/us/prohibited-businesses">prohibited businesses</a> – you may want to consult that one before you start selling harvested organs.</p>
+<p><strong>Special Note:</strong> Due to Apple&#39;s limitations, bot developers are currently not allowed to accept payments for digital goods and virtual services from <strong>iOS users</strong>.</p>
+<h4><a class="anchor" name="how-are-disputes-handled" href="#how-are-disputes-handled"><i class="anchor-icon"></i></a>How are disputes handled?</h4>
+<p>Telegram acts as a messenger between the paying user, the bot developer, and their chosen payment system. The user sends their credit card details directly to the payment system. Then the payment system&#39;s response and the shipping details entered by the user are passed to the bot developer so that they can process the order.</p>
+<p>Since Telegram doesn‘t process the payments, we don’t store and can‘t access any sensitive data. Due to this structure, it is impossible for Telegram to handle complaints or cashbacks – any disputed payments are the responsibility of the bot developers, payment providers, and banks that participated in the exchange.</p>
+<blockquote>
+<p>See also: <a href="https://telegram.org/privacy#4-payment-information">Telegram Privacy Policy</a></p>
+</blockquote>
+<h3><a class="anchor" name="the-payments-api" href="#the-payments-api"><i class="anchor-icon"></i></a>The Payments API</h3>
+<p>Now let&#39;s look at payments via Telegram&#39;s Bot API in more detail. To start accepting payments, you need a Telegram bot, obviously. Have a chat with <a href="https://t.me/botfather">BotFather</a> to create a bot if you haven&#39;t got one already.</p>
+<h4><a class="anchor" name="connecting-payments" href="#connecting-payments"><i class="anchor-icon"></i></a>Connecting Payments</h4>
+<p>Now you have a merchant bot that wants to offer goods or services to Telegram users. Let&#39;s call it <code>@merchantbot</code> in this document. First stop is to choose and connect a payment provider, you can find the <a href="#how-do-you-process-payments">list of supported providers</a> above.</p>
+<h4><a class="anchor" name="getting-a-token" href="#getting-a-token"><i class="anchor-icon"></i></a>Getting a Token</h4>
+<p>Use the <code>/mybots</code> command in the chat with <a href="https://t.me/botfather">BotFather</a> and choose the <code>@merchantbot</code> that will be offering goods or services. Go to Bot Settings &gt; Payments. Choose a provider, and you will be redirected to the relevant bot. Enter the required details so that the payments provider is connected successfully, go back to the chat with Botfather. The message will now show available providers. Each will have a name, a <strong>token</strong>, and the date the provider was connected. You will use the <strong>token</strong> when working with the Bot API.</p>
+<h4><a class="anchor" name="testing-payments-the-39stripe-test-mode-39-provider" href="#testing-payments-the-39stripe-test-mode-39-provider"><i class="anchor-icon"></i></a>Testing Payments: the &#39;Stripe TEST MODE&#39; Provider</h4>
+<p>While you&#39;re still developing and testing payments for your bot, use the “Stripe TEST MODE” provider. When in this mode, you can make payments without actually billing any accounts. Real cards can&#39;t be used in test mode, but you can use test cards like <code>4242 4242 4242 4242</code> (<a href="https://stripe.com/docs/testing#cards">full list here</a>). You can switch between test mode and live mode as many times as you want, but please see the <a href="#going-live">live checklist</a> before you go live.</p>
+<p>Please note that when your merchant bot is working in test mode, it will only be able to send invoices to those Telegram users that are mutual contacts with the account of the bot&#39;s creator. So make sure that those who will help you test the payments functionality are in your contacts list.</p>
+<h3><a class="anchor" name="step-by-step-process" href="#step-by-step-process"><i class="anchor-icon"></i></a>Step-by-Step Process</h3>
+<h4><a class="anchor" name="1-create-invoice" href="#1-create-invoice"><i class="anchor-icon"></i></a>1. Create Invoice</h4>
+<p>The user contacts <code>@merchantbot</code> and requests to purchase something. The bot forms an invoice message with a description of the goods or service, amount to be paid, as well as requested shipping info.</p>
+<p>Use the <a href="/bots/api#sendinvoice">sendInvoice</a> method to do this. The <em>provider_token</em> parameter is where you put the <em>token</em> value that you&#39;ve <a href="#getting-a-token">obtained earlier via Botfather</a>. It is possible for one merchant bot to use several different tokens for different users or different goods and services.</p>
+<p>An invoice message with a <strong>pay</strong> button can only be sent to a private chat with the user. Groups and channels are not supported. The resulting invoice message will look like this:</p>
+ <div class="blog_image_wrap">
+    <a href="/file/811140042/1/EtNuS1A-4gQ.79672/e7f03d9d68034b1338" target="_blank"><img src="/file/811140042/1/EtNuS1A-4gQ.79672/e7f03d9d68034b1338" title="Join button"/></a>
+    <p>Invoice in Chat</p>  </div>
+
+<h4><a class="anchor" name="2-shipping-info-and-other-details-optional-step" href="#2-shipping-info-and-other-details-optional-step"><i class="anchor-icon"></i></a>2. Shipping info and other details (optional step)</h4>
+<p> The user specifies shipping information or other info requested by the bot. This could be the user&#39;s full name, an email address, a phone number in international format, or a full postal address for delivery.</p>
+ <div class="blog_image_wrap">
+    <a href="/file/811140229/1/O-BPJwFYRgA.77728/ba34746cad1fbfc373" target="_blank"><img src="/file/811140229/1/O-BPJwFYRgA.77728/ba34746cad1fbfc373" title="Shipping Info"/></a>
+    <p>Shipping Info</p>  </div>
+
+<h4><a class="anchor" name="3-offer-delivery-options-based-on-shipping-address-optional-step" href="#3-offer-delivery-options-based-on-shipping-address-optional-step"><i class="anchor-icon"></i></a>3. Offer delivery options based on shipping address (optional step)</h4>
+<p>If a shipping address was requested and you included the parameter <em>is_flexible</em>, the Bot API will send an <a href="/bots/api#update">Update</a> with a <em>shipping_query</em> field to the bot. The bot must respond using <a href="/bots/api#answershippingquery">answerShippingQuery</a> either with a list of possible delivery options and the relevant delivery prices, or with an error (for example, if delivery to the specified address is not possible).</p>
+<h4><a class="anchor" name="4-select-delivery-option-optional-step" href="#4-select-delivery-option-optional-step"><i class="anchor-icon"></i></a>4. Select delivery option (optional step)</h4>
+<p>The user selects a delivery option from the list (the overall amount to be paid may change at this point) and proceeds to checkout.</p>
+ <div class="blog_image_wrap">
+    <a href="/file/811140198/4/_WHWdvCzkUE.84075/d99695cbb744e22465" target="_blank"><img src="/file/811140198/4/_WHWdvCzkUE.84075/d99695cbb744e22465" title="Choose Delivery Option"/></a>
+    <p>Choose Delivery Option</p>  </div>
+
+<h4><a class="anchor" name="5-pre-checkout" href="#5-pre-checkout"><i class="anchor-icon"></i></a>5. Pre-Checkout</h4>
+<p>The user enters their payment information and presses the final pay button. At this moment the Bot API sends an <a href="/bots/api#update">Update</a> with the field <em>pre_checkout_query</em> to the bot that contains all the available information about the order. Your bot must reply using <a href="/bots/api#answerprecheckoutquery">answerPrecheckoutQuery</a> within <strong>10 seconds</strong> after receiving this update or the transaction is canceled.</p>
+<p>The bot may return an error if it can&#39;t process the order for any reason. We highly recommend specifying a reason for failure to complete the order in human readable form (e.g. &quot;Sorry, we&#39;re all out of rubber ducks! Would you be interested in a steel bear instead?&quot;). Telegram will display this reason to the user.</p>
+<h4><a class="anchor" name="6-checkout" href="#6-checkout"><i class="anchor-icon"></i></a>6. Checkout</h4>
+<p>In case the bot confirms the order, Telegram requests the payment provider to complete the transaction. If the payment information was entered correctly and the payment goes through, the API will send a receipt message of the type <a href="/bots/api#message"><em>successful_payment</em></a> from the user. Once your bot receives this message, it should proceed with delivering the goods or services purchased by the user.</p>
+<p>For the user, the Invoice message in the UI becomes a Receipt — they can open this receipt at any time and see all the details of the transaction:</p>
+ <div class="blog_image_wrap">
+    <a href="/file/811140104/2/VUOFvB0_Oic.125278/46af56d444c561b143" target="_blank"><img src="/file/811140104/2/VUOFvB0_Oic.125278/46af56d444c561b143" title="Receipt"/></a>
+    <p>Receipt</p>  </div>
+
+<p><strong> Going Viral: Deep Linking </strong></p>
+<p>Note the <strong>arrow button</strong> on the right of the receipt message on the screenshot above. This quick forwarding button allows the user to select multiple friends, groups, or channels and send the message to them immediately. Thanks to this button, your goods and services can spread virally — the resulting message will have a button that leads users to your bot and asks it to create a similar invoice.</p>
+<p>For the quick forwarding button to work correctly, all your invoice messages must contain a <em>start_parameter</em> for creating a new invoice. <a href="/bots#deep-linking">More info on Deep Linking »</a></p>
+<h3><a class="anchor" name="going-live" href="#going-live"><i class="anchor-icon"></i></a>Going Live</h3>
+<p>Once you&#39;ve tested everything and confirmed that your payments implementation works, you&#39;re ready to switch to LIVE MODE. To do this, go to BotFather &gt; /mybots &gt; select <code>@merchantbot</code> &gt; Bot Settings / Payments and enable Stripe LIVE MODE. You will get a token that has the string <code>:LIVE:</code> in the middle, e.g. <code>123:LIVE:XXXX</code>. Do not give this token to any third parties!</p>
+<p>Before your merchant bot goes into live mode, please ensure the following:</p>
+<h4><a class="anchor" name="live-checklist" href="#live-checklist"><i class="anchor-icon"></i></a>Live Checklist</h4>
+<ul>
+<li>We highly recommend turning on <a href="https://telegram.org/faq#q-how-does-2-step-verification-work">2-step verification</a> for the Telegram account that controls your bot. </li>
+<li>You as the bot owner have <strong>full responsibility</strong> in case any conflicts or disputes arise. You must be prepared to correctly process disputes and chargebacks (in the case of Stripe, see <a href="https://stripe.com/docs/disputes">here</a> and <a href="https://stripe.com/docs/disputes/faq">here</a>).</li>
+<li>To prevent any misunderstandings and possible legal issues, make sure your bot can respond to a /terms command (or offers a similarly easy way of accessing your Terms and Conditions). Your Terms and Conditions should be written in a clear way and easy to understand for your users. The users must confirm that they have read and agree to your terms before they make the purchase.</li>
+<li>Your bot must provide support for its customers, either by responding to a /support command or by some other clearly communicated means. Users must have a clear way of contacting you about their purchases and you must process their support requests in a timely fashion. You must notify your users that Telegram support or <a href="https://t.me/botsupport">bot support</a> will not able to help them with purchases made via your bot.</li>
+<li>Make sure that your server hardware and software is stable. Use backups to make sure that you don&#39;t lose data about your users&#39; payments.</li>
+<li>Make sure that you have completed the live checklist for your selected <strong>payments provider</strong> as well as this one. </li>
+</ul>
+<h3><a class="anchor" name="supported-currencies" href="#supported-currencies"><i class="anchor-icon"></i></a>Supported Currencies</h3>
+<p>Telegram payments currently support the currencies listed below (here&#39;s a <a href="https://core.telegram.org/bots/payments/currencies.json">JSON version</a> in case you need it).</p>
+<p>If you&#39;re using Stripe as the payments provider, supported currencies may vary depending on the country you have specified in your Stripe account (<a href="https://support.stripe.com/questions/which-currencies-does-stripe-support">more info</a>).</p>
+<p>The minimum and maximum amounts for each of the currencies roughly correspond to the limit of <code>US$ 1-10000</code>. The amount must be expressed in 12 digits or less, so the maximum value will be correspondingly lower for some lower-value currencies. Note that for each currency except USD these limits depend on exchange rates and may change over time (plan ahead for this when you implement limits in your code).</p>
+<p><table class="table table-hover table-bordered">
+<thead>
+<tr>
+  <th>Code</th>
+  <th>Title</th>
+  <th>Min amount</th>
+  <th>Max amount</th>
+</tr>
+</thead>
+<tbody><tr>
+  <td>AED</td>
+  <td>United Arab Emirates Dirham</td>
+  <td>AED 3.67</td>
+  <td>AED 36,732.04</td>
+</tr><tr>
+  <td>AFN</td>
+  <td>Afghan Afghani</td>
+  <td>AFN77.60</td>
+  <td>AFN776,039.91</td>
+</tr><tr>
+  <td>ALL</td>
+  <td>Albanian Lek</td>
+  <td>102,00ALL</td>
+  <td>1.020.003,68ALL</td>
+</tr><tr>
+  <td>AMD</td>
+  <td>Armenian Dram</td>
+  <td>521.89 AMD</td>
+  <td>5,218,904.03 AMD</td>
+</tr><tr>
+  <td>ARS</td>
+  <td>Argentine Peso</td>
+  <td>ARS 93,14</td>
+  <td>ARS 931.469,81</td>
+</tr><tr>
+  <td>AUD</td>
+  <td>Australian Dollar</td>
+  <td>AU$1.29</td>
+  <td>AU$12,924.14</td>
+</tr><tr>
+  <td>AZN</td>
+  <td>Azerbaijani Manat</td>
+  <td>1,70 AZN</td>
+  <td>17 039,70 AZN</td>
+</tr><tr>
+  <td>BAM</td>
+  <td>Bosnia & Herzegovina Convertible Mark</td>
+  <td>1,62 BAM</td>
+  <td>16.224,90 BAM</td>
+</tr><tr>
+  <td>BDT</td>
+  <td>Bangladeshi Taka</td>
+  <td>BDT 84.72</td>
+  <td>BDT 847,200.63</td>
+</tr><tr>
+  <td>BGN</td>
+  <td>Bulgarian Lev</td>
+  <td>1,61 BGN</td>
+  <td>16 178,50 BGN</td>
+</tr><tr>
+  <td>BND</td>
+  <td>Brunei Dollar</td>
+  <td>BND1,32</td>
+  <td>BND13.275,54</td>
+</tr><tr>
+  <td>BOB</td>
+  <td>Bolivian Boliviano</td>
+  <td>BOB 6,90</td>
+  <td>BOB 69.066,32</td>
+</tr><tr>
+  <td>BRL</td>
+  <td>Brazilian Real</td>
+  <td>R$ 5,47</td>
+  <td>R$ 54.760,00</td>
+</tr><tr>
+  <td>CAD</td>
+  <td>Canadian Dollar</td>
+  <td>CA$1.24</td>
+  <td>CA$12,475.10</td>
+</tr><tr>
+  <td>CHF</td>
+  <td>Swiss Franc</td>
+  <td>0.91 CHF</td>
+  <td>9'138.11 CHF</td>
+</tr><tr>
+  <td>CLP</td>
+  <td>Chilean Peso</td>
+  <td>CLP 713</td>
+  <td>CLP 7.134.039</td>
+</tr><tr>
+  <td>CNY</td>
+  <td>Chinese Renminbi Yuan</td>
+  <td>CN¥6.49</td>
+  <td>CN¥64,954.04</td>
+</tr><tr>
+  <td>COP</td>
+  <td>Colombian Peso</td>
+  <td>COP 3.629,00</td>
+  <td>COP 36.290.000,00</td>
+</tr><tr>
+  <td>CRC</td>
+  <td>Costa Rican Colón</td>
+  <td>CRC614,63</td>
+  <td>CRC6.146.335,39</td>
+</tr><tr>
+  <td>CZK</td>
+  <td>Czech Koruna</td>
+  <td>21,34 CZK</td>
+  <td>213 442,04 CZK</td>
+</tr><tr>
+  <td>DKK</td>
+  <td>Danish Krone</td>
+  <td>6,14 DKK</td>
+  <td>61472,50 DKK</td>
+</tr><tr>
+  <td>DOP</td>
+  <td>Dominican Peso</td>
+  <td>DOP56.90</td>
+  <td>DOP569,038.86</td>
+</tr><tr>
+  <td>DZD</td>
+  <td>Algerian Dinar</td>
+  <td>DZD 132.78</td>
+  <td>DZD 1,327,816.88</td>
+</tr><tr>
+  <td>EGP</td>
+  <td>Egyptian Pound</td>
+  <td>EGP 15.70</td>
+  <td>EGP 157,036.99</td>
+</tr><tr>
+  <td>EUR</td>
+  <td>Euro</td>
+  <td>0,82 €</td>
+  <td>8 266,41 €</td>
+</tr><tr>
+  <td>GBP</td>
+  <td>British Pound</td>
+  <td>£0.72</td>
+  <td>£7,204.61</td>
+</tr><tr>
+  <td>GEL</td>
+  <td>Georgian Lari</td>
+  <td>3,45 GEL</td>
+  <td>34 503,91 GEL</td>
+</tr><tr>
+  <td>GTQ</td>
+  <td>Guatemalan Quetzal</td>
+  <td>GTQ7.71</td>
+  <td>GTQ77,183.62</td>
+</tr><tr>
+  <td>HKD</td>
+  <td>Hong Kong Dollar</td>
+  <td>HK$7.75</td>
+  <td>HK$77,591.75</td>
+</tr><tr>
+  <td>HNL</td>
+  <td>Honduran Lempira</td>
+  <td>HNL 24.13</td>
+  <td>HNL 241,350.40</td>
+</tr><tr>
+  <td>HRK</td>
+  <td>Croatian Kuna</td>
+  <td>6,25 HRK</td>
+  <td>62.582,04 HRK</td>
+</tr><tr>
+  <td>HUF</td>
+  <td>Hungarian Forint</td>
+  <td>300,29 HUF</td>
+  <td>3 002 920,40 HUF</td>
+</tr><tr>
+  <td>IDR</td>
+  <td>Indonesian Rupiah</td>
+  <td>IDR14.514,85</td>
+  <td>IDR145.148.500,00</td>
+</tr><tr>
+  <td>ILS</td>
+  <td>Israeli New Sheqel</td>
+  <td>₪ 3.25</td>
+  <td>₪ 32,581.50</td>
+</tr><tr>
+  <td>INR</td>
+  <td>Indian Rupee</td>
+  <td>₹75.21</td>
+  <td>₹752,190.40</td>
+</tr><tr>
+  <td>ISK</td>
+  <td>Icelandic Króna</td>
+  <td>125 ISK</td>
+  <td>1.250.003 ISK</td>
+</tr><tr>
+  <td>JMD</td>
+  <td>Jamaican Dollar</td>
+  <td>JMD152.07</td>
+  <td>JMD1,520,710.11</td>
+</tr><tr>
+  <td>JPY</td>
+  <td>Japanese Yen</td>
+  <td>¥107</td>
+  <td>¥1,078,750</td>
+</tr><tr>
+  <td>KES</td>
+  <td>Kenyan Shilling</td>
+  <td>KES108.50</td>
+  <td>KES1,085,038.04</td>
+</tr><tr>
+  <td>KGS</td>
+  <td>Kyrgyzstani Som</td>
+  <td>84-78 KGS</td>
+  <td>847 860-40 KGS</td>
+</tr><tr>
+  <td>KRW</td>
+  <td>South Korean Won</td>
+  <td>₩1,115</td>
+  <td>₩11,151,303</td>
+</tr><tr>
+  <td>KZT</td>
+  <td>Kazakhstani Tenge</td>
+  <td>KZT430-49</td>
+  <td>KZT4 304 924-18</td>
+</tr><tr>
+  <td>LBP</td>
+  <td>Lebanese Pound</td>
+  <td>LBP 1,519.19</td>
+  <td>LBP 15,191,969.37</td>
+</tr><tr>
+  <td>LKR</td>
+  <td>Sri Lankan Rupee</td>
+  <td>LKR 194.54</td>
+  <td>LKR 1,945,460.20</td>
+</tr><tr>
+  <td>MAD</td>
+  <td>Moroccan Dirham</td>
+  <td>MAD 8.89</td>
+  <td>MAD 88,985.04</td>
+</tr><tr>
+  <td>MDL</td>
+  <td>Moldovan Leu</td>
+  <td>17.92 MDL</td>
+  <td>179,287.92 MDL</td>
+</tr><tr>
+  <td>MNT</td>
+  <td>Mongolian Tögrög</td>
+  <td>MNT2 850,65</td>
+  <td>MNT28 506 523,84</td>
+</tr><tr>
+  <td>MUR</td>
+  <td>Mauritian Rupee</td>
+  <td>MUR40.40</td>
+  <td>MUR404,062.11</td>
+</tr><tr>
+  <td>MVR</td>
+  <td>Maldivian Rufiyaa</td>
+  <td>15.45 MVR</td>
+  <td>154,503.78 MVR</td>
+</tr><tr>
+  <td>MXN</td>
+  <td>Mexican Peso</td>
+  <td>MX$19.84</td>
+  <td>MX$198,454.04</td>
+</tr><tr>
+  <td>MYR</td>
+  <td>Malaysian Ringgit</td>
+  <td>MYR4.10</td>
+  <td>MYR41,095.04</td>
+</tr><tr>
+  <td>MZN</td>
+  <td>Mozambican Metical</td>
+  <td>MZN55.59</td>
+  <td>MZN555,950.39</td>
+</tr><tr>
+  <td>NGN</td>
+  <td>Nigerian Naira</td>
+  <td>NGN381.50</td>
+  <td>NGN3,815,037.27</td>
+</tr><tr>
+  <td>NIO</td>
+  <td>Nicaraguan Córdoba</td>
+  <td>NIO 35.15</td>
+  <td>NIO 351,550.39</td>
+</tr><tr>
+  <td>NOK</td>
+  <td>Norwegian Krone</td>
+  <td>NOK 8,29</td>
+  <td>NOK 82 947,50</td>
+</tr><tr>
+  <td>NPR</td>
+  <td>Nepalese Rupee</td>
+  <td>NPR119.84</td>
+  <td>NPR1,198,423.83</td>
+</tr><tr>
+  <td>NZD</td>
+  <td>New Zealand Dollar</td>
+  <td>NZ$1.38</td>
+  <td>NZ$13,891.31</td>
+</tr><tr>
+  <td>PAB</td>
+  <td>Panamanian Balboa</td>
+  <td>PAB 1.00</td>
+  <td>PAB 10,002.89</td>
+</tr><tr>
+  <td>PEN</td>
+  <td>Peruvian Nuevo Sol</td>
+  <td>PEN 3.77</td>
+  <td>PEN 37,795.04</td>
+</tr><tr>
+  <td>PHP</td>
+  <td>Philippine Peso</td>
+  <td>PHP48.25</td>
+  <td>PHP482,510.34</td>
+</tr><tr>
+  <td>PKR</td>
+  <td>Pakistani Rupee</td>
+  <td>PKR153.85</td>
+  <td>PKR1,538,503.75</td>
+</tr><tr>
+  <td>PLN</td>
+  <td>Polish Złoty</td>
+  <td>3,76 PLN</td>
+  <td>37 660,50 PLN</td>
+</tr><tr>
+  <td>PYG</td>
+  <td>Paraguayan Guaraní</td>
+  <td>PYG 6.465</td>
+  <td>PYG 64.650.545</td>
+</tr><tr>
+  <td>QAR</td>
+  <td>Qatari Riyal</td>
+  <td>QAR 3.64</td>
+  <td>QAR 36,407.50</td>
+</tr><tr>
+  <td>RON</td>
+  <td>Romanian Leu</td>
+  <td>4,06 RON</td>
+  <td>40.682,03 RON</td>
+</tr><tr>
+  <td>RSD</td>
+  <td>Serbian Dinar</td>
+  <td>97,51 RSD</td>
+  <td>975.154,51 RSD</td>
+</tr><tr>
+  <td>RUB</td>
+  <td>Russian Ruble</td>
+  <td>74,87 RUB</td>
+  <td>748 721,04 RUB</td>
+</tr><tr>
+  <td>SAR</td>
+  <td>Saudi Riyal</td>
+  <td>SAR 3.75</td>
+  <td>SAR 37,504.47</td>
+</tr><tr>
+  <td>SEK</td>
+  <td>Swedish Krona</td>
+  <td>8,38 SEK</td>
+  <td>83.853,04 SEK</td>
+</tr><tr>
+  <td>SGD</td>
+  <td>Singapore Dollar</td>
+  <td>SGD1.32</td>
+  <td>SGD13,272.05</td>
+</tr><tr>
+  <td>THB</td>
+  <td>Thai Baht</td>
+  <td>฿31.42</td>
+  <td>฿314,250.38</td>
+</tr><tr>
+  <td>TJS</td>
+  <td>Tajikistani Somoni</td>
+  <td>11;40 TJS</td>
+  <td>114 047;04 TJS</td>
+</tr><tr>
+  <td>TRY</td>
+  <td>Turkish Lira</td>
+  <td>8,38 TRY</td>
+  <td>83.875,04 TRY</td>
+</tr><tr>
+  <td>TTD</td>
+  <td>Trinidad and Tobago Dollar</td>
+  <td>TTD6.79</td>
+  <td>TTD67,930.65</td>
+</tr><tr>
+  <td>TWD</td>
+  <td>New Taiwan Dollar</td>
+  <td>NT$28.04</td>
+  <td>NT$280,472.04</td>
+</tr><tr>
+  <td>TZS</td>
+  <td>Tanzanian Shilling</td>
+  <td>TZS2,319.00</td>
+  <td>TZS23,190,003.36</td>
+</tr><tr>
+  <td>UAH</td>
+  <td>Ukrainian Hryvnia</td>
+  <td>27,89UAH</td>
+  <td>278 984,31UAH</td>
+</tr><tr>
+  <td>UGX</td>
+  <td>Ugandan Shilling</td>
+  <td>UGX3,603</td>
+  <td>UGX36,038,823</td>
+</tr><tr>
+  <td>USD</td>
+  <td>United States Dollar</td>
+  <td>$1.00</td>
+  <td>$10,000.00</td>
+</tr><tr>
+  <td>UYU</td>
+  <td>Uruguayan Peso</td>
+  <td>UYU 44,20</td>
+  <td>UYU 442.050,69</td>
+</tr><tr>
+  <td>UZS</td>
+  <td>Uzbekistani Som</td>
+  <td>10 520,00 UZS</td>
+  <td>105 200 003,35 UZS</td>
+</tr><tr>
+  <td>VND</td>
+  <td>Vietnamese Đồng</td>
+  <td>23.071 ₫</td>
+  <td>230.710.000 ₫</td>
+</tr><tr>
+  <td>YER</td>
+  <td>Yemeni Rial</td>
+  <td>YER 250.40</td>
+  <td>YER 2,504,035.97</td>
+</tr><tr>
+  <td>ZAR</td>
+  <td>South African Rand</td>
+  <td>ZAR 14.29</td>
+  <td>ZAR 142,912.80</td>
+</tr></tbody>
+</table></p>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/blog">Blog</a></li>
+        <li><a href="//telegram.org/jobs">Jobs</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/dl/android">Android</a></li>
+        <li><a href="//telegram.org/dl/wp">Windows Phone</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)">Twitter</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?42"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+<!-- page generated in 31.91ms -->
