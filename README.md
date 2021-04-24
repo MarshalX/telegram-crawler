@@ -2,7 +2,7 @@
 
 This project is developed to automatically detect changes made 
 to the official Telegram sites. This is necessary for anticipating
-future updates and other things (new vacancies, API updates).
+future updates and other things (new vacancies, API updates, etc).
 
 
 | Name | Commits  | Status |
@@ -12,6 +12,8 @@ future updates and other things (new vacancies, API updates).
 
 * passing – new changes
 * failing – no changes
+
+Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-crawler/tree/data/data)**.
 
 ### How it should work in dreams
 
