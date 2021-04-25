@@ -20,12 +20,8 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Output head commit author
-        run: |
-          echo "${{ github.event.head_commit.author }}"
-
       - name: Install dependencies and send alert to Telegram channel.
-        if: ${{ github.event.head_commit.author == 'GitHub Action' }}
+        if: ${{ github.event.head_commit.author.name == 'GitHub Action' }}
         env:
           COMMIT_SHA: ${{ github.sha }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
