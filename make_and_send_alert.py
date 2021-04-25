@@ -4,13 +4,15 @@ import os
 
 import aiohttp
 
+COMMIT_SHA = os.environ['COMMIT_SHA']
+
 TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
 REPOSITORY = os.environ.get('REPOSITORY', 'MarshalX/telegram-crawler')
 CHAT_ID = os.environ.get('CHAT_ID', '@tgcrawl')
 ROOT_TREE_DIR = os.environ.get('ROOT_TREE_DIR', 'data')
 
 BASE_GITHUB_API = 'https://api.github.com/'
-GITHUB_LAST_COMMITS = 'repos/{repo}/commits'
+GITHUB_LAST_COMMITS = 'repos/{repo}/commits/{sha}'
 
 BASE_TELEGRAM_API = 'https://api.telegram.org/bot{token}/'
 TELEGRAM_SEND_MESSAGE = 'sendMessage'
@@ -26,21 +28,10 @@ STATUS_TO_EMOJI = {
 
 async def main():
     async with aiohttp.ClientSession() as session:
-        url = f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}'.format(repo=REPOSITORY)
-        params = {
-            'per_page': 1
-        }
-        async with session.get(url, params=params) as response:
-            commits = await response.json()
-            if not commits:
-                logger.error('No commits found')
-                return
-
-            last_commit = commits[0]
-            last_commit_url = last_commit['url']
-
         changes = []
-        async with session.get(last_commit_url) as response:
+
+        url = f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}'.format(repo=REPOSITORY, sha=COMMIT_SHA)
+        async with session.get(url) as response:
             json = await response.json()
 
             html_url = json['html_url']
