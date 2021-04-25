@@ -27,7 +27,7 @@ Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-c
    Writes a list of unique links for future content comparison. 
    Additionally, there is the ability to add links by hand to help the script 
    find more hidden (links to which no one refers) links. To manage exceptions,
-   there is a [system of rules](#Example of link crawler rules configuration)
+   there is a [system of rules](#example-of-link-crawler-rules-configuration)
    for the link crawler.
 
 2. [Content crawling](make_files_tree.py) is launched **as often as 
