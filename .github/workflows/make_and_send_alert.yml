@@ -1,0 +1,35 @@
+name: Send alert to Telegram channel
+
+on:
+  push:
+    branches:
+      - data
+
+jobs:
+  make_and_send_alert:
+    name: Send alert
+    runs-on: macos-10.15
+
+    steps:
+
+      - name: Clone.
+        uses: actions/checkout@v2
+
+      - name: Setup Python.
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies.
+        run: |
+          git pull
+          git checkout main
+          pip install -r requirements.txt
+
+      - name: Send alert to Telegram channel.
+        if: github.actor == 'github-action'
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python make_and_send_alert.py
