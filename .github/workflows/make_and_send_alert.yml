@@ -24,8 +24,12 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Inspect contexts.
+        run: |
+          echo "${{ toJson(github) }}"
+
       - name: Send alert to Telegram channel.
-        if: github.actor == 'github-action'
+        if: github.actor == 'GitHub-Action'
         env:
           COMMIT_SHA: ${{ github.sha }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
