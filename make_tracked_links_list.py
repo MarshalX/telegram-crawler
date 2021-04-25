@@ -179,7 +179,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
 
     try:
         logger.info(f'[{len(VISITED_LINKS)}] Process {url}')
-        async with session.get(f'{PROTOCOL}{url}', allow_redirects=False) as response:
+        async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
             status_code = response.status
             content_type = response.headers.get('content-type')
 
@@ -214,8 +214,11 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                 LINKS_TO_TRACK.remove(f'{without_trailing_slash}/')
     except UnicodeDecodeError:
         logger.warning('Codec can\'t decode byte. So its was a tgs file')
-    except (TimeoutError, ClientConnectorError):
+    except ClientConnectorError:
+        logger.warning(f'Wrong link: {url}')
+    except TimeoutError:
         logger.warning(f'Retrying {url}')
+        VISITED_LINKS.remove(url)
         await asyncio.gather(crawl(url, session))
 
 
