@@ -72,7 +72,7 @@ CRAWL_RULES = {
     'telegram.org': {
         'deny': {
             'file/',
-            # r'apps$'
+            r'apps$'
         },
     }
 }
