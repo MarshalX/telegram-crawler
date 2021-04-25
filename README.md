@@ -53,7 +53,6 @@ Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-c
   
 ### TODO list
 
-- alert system;
 - add storing history of content using hashes;
 - add storing hashes of image, svg, video.
 
