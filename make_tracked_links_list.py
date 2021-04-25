@@ -29,7 +29,7 @@ BASE_URL_REGEX = r'telegram.org'
 CRAWL_RULES = {
     # every rule is regex
     # empty string means match any url
-    # allow rules with high priority than deny
+    # allow rules with higher priority than deny
     'translations.telegram.org': {
         'allow': {
             r'^[^/]*$',  # root
