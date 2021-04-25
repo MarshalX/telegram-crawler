@@ -20,14 +20,15 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Install dependencies.
+      - name: Output head commit author
         run: |
-          pip install -r requirements.txt
+          echo "${{ github.event.head_commit.author }}"
 
-      - name: Send alert to Telegram channel.
+      - name: Install dependencies and send alert to Telegram channel.
         if: ${{ github.event.head_commit.author == 'GitHub Action' }}
         env:
           COMMIT_SHA: ${{ github.sha }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
+          pip install -r requirements.txt
           python make_and_send_alert.py
