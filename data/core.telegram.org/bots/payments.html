@@ -4,12 +4,10 @@
     <meta charset="utf-8">
     <title>Bot Payments API</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="You can accept payments from Telegram users via Telegram Bots.
-Note: This article is intended for bot developers. If you&#39;re…">
+    <meta property="description" content="Telegram Bot Payments are a free and open platform that allows sellers to accept payments for goods and services from Telegram…">
     <meta property="og:title" content="Bot Payments API">
     <meta property="og:image" content="b92643c0c9a2612b36">
-    <meta property="og:description" content="You can accept payments from Telegram users via Telegram Bots.
-Note: This article is intended for bot developers. If you&#39;re…">
+    <meta property="og:description" content="Telegram Bot Payments are a free and open platform that allows sellers to accept payments for goods and services from Telegram…">
     <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
 
     <link href="/css/bootstrap.min.css?3" rel="stylesheet">
@@ -47,30 +45,50 @@ Note: This article is intended for bot developers. If you&#39;re…">
   <a href="/file/811140227/2/ZTXUngAbELM.193805/ba6aa233d1d4206207" target="_blank"><img src="/file/811140095/1/lfTvDVqVS8M.43169/1a191248e6cf027581" title="Payments API. Click for hi-res picture">
 </a></div>
 
-<p>You can accept payments from Telegram users via <a href="/bots">Telegram Bots</a>. </p>
+<p><strong>Telegram Bot Payments</strong> are a free and open platform that allows sellers to accept payments for goods and services from Telegram users. Telegram doesn&#39;t collect payment information and takes <strong>no commission</strong>.</p>
 <blockquote>
-<p><strong>Note:</strong> This article is intended for bot developers. If you&#39;re looking for a general overview of Telegram Payments, check out the <a href="https://telegram.org/blog/payments">Telegram blog</a>.<br>Also, visit the <a href="/api/payments">MTProto payment documentation</a> for a technical overview of payments from the user&#39;s perspective.</p>
+<p><strong>Note:</strong> This article is intended for bot developers and store owners. If you&#39;re looking for a general overview of Telegram Payments, check out the <a href="https://telegram.org/blog/payments-2-0-scheduled-voice-chats#payments-2-0">Telegram blog</a>.</p>
 </blockquote>
 <p>If you are new to Telegram bots and would like to learn how to create and set up a bot, please consult our <a href="https://core.telegram.org/bots"><strong>Introduction to Bots</strong></a> and <a href="/bots/faq"><strong>Bot FAQ</strong></a>.</p>
-<h3><a class="anchor" name="introducing-payments" href="#introducing-payments"><i class="anchor-icon"></i></a>Introducing Payments</h3>
-<p>Telegram bots can accept payments for goods and services from users as of <a href="/bots/api">Bot API v.3.0</a>. Users will need <a href="https://telegram.org/blog/payments">Telegram v.4.0</a> or higher to pay for your goods and services.</p>
-<h4><a class="anchor" name="how-does-this-work" href="#how-does-this-work"><i class="anchor-icon"></i></a>How does this work?</h4>
-<p>From the user&#39;s perspective the payments system is completely seamless. Merchant <strong>bots</strong> can send specially formatted <strong>invoice messages</strong> to users. Such invoice messages feature a photo and description of the product along with a prominent <strong>Pay</strong> button. Tapping this button opens a special payment interface in the Telegram app. In this interface, users are prompted for additional details like shipping info, phone number, or email address.</p>
-<p>Once they&#39;ve entered all the necessary info, it is forwarded to the merchant bot. The bot can offer several shipping options for physical goods based on the address. When ready, users can enter their credit card info or choose one of their saved cards — and pay for the product. Telegram also supports Apple Pay and Google Pay. Once the transaction is done, the merchant bot sends a <strong>receipt message</strong> that contains payment details along with shipping and delivery information.</p>
-<div class="smartphone_video_player_wrap">
- <div class="smartphone_video_player_iphone">
- <video class="smartphone_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" poster="YYY" autoplay loop controls muted>
-  <source src="/file/811140436/2/cxE7JK8NL-M.514213.mp4/2146f9b746ebb4fef4" type="video/mp4">
+<h3><a class="anchor" name="introducing-payments-2-0" href="#introducing-payments-2-0"><i class="anchor-icon"></i></a>Introducing Payments 2.0</h3>
+<p><a href="https://telegram.org/blog/payments-2-0-scheduled-voice-chats">Payments 2.0</a> were added in April 2021 with <a href="/bots/api">Bot API v.5.2</a>. New features:</p>
+<ul>
+<li>Send invoices to <strong>any chat</strong>, including to groups and channels.</li>
+<li>Create invoices that can be <strong>forwarded</strong> and used by <strong>multiple buyers</strong> to order things.</li>
+<li>Use <a href="/bots/inline">inline mode</a> to help users show your goods and services to their friends and communities.</li>
+<li>Allow <strong>tips</strong> from users with preset and custom amounts.</li>
+<li>Accept payments from users on mobile or <strong>desktop apps</strong>.</li>
+<li>Try <a href="https://t.me/shopbot">@ShopBot</a> to create a test invoice – or start a message with <code>@ShopBot ...</code> in any chat for an <strong>inline invoice</strong>.</li>
+<li>Check out <a href="https://telegram.org/testshop">Demo Shop</a> for an example of a <a href="https://telegram.org/tour/channels">Telegram Channel</a> used as <strong>virtual storefront</strong>.</li>
+</ul>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/464001377/1/0o3vSvY22g8.123356/deb4ed6951d780f7b7" style="max-width: 400px;" title="If your pizza place can't deliver a clone army, you're buying pizza from the wrong shop." alt="Video: Ordering a pizza through a Telegram channel">
+  <source src="/file/464001705/2/Hg-klQnZ_n4.4889245.mp4/d324511ffdab7b4668" type="video/mp4">
  </video>
- </div>
- <br>
 </div>
 
-<h4><a class="anchor" name="how-do-you-process-payments" href="#how-do-you-process-payments"><i class="anchor-icon"></i></a>How do you process payments?</h4>
-<p>Telegram does not process payments from users and instead relies on different <strong>payment providers</strong> around the world. It is the payment providers that handle and store all sensitive information, like credit card details. Neither Telegram nor the bot developers have access to it. For the moment we support payments from more than 200 countries via the the following payment providers:</p>
+<blockquote>
+<p>Users need to update to <strong>Telegram 7.7</strong> or higher to use <strong>Payments 2.0</strong> (for <a href="https://desktop.telegram.org">Telegram Desktop</a>, <strong>2.7.2</strong> or higher). Older <em>mobile</em> apps released after <a href="https://telegram.org/blog/payments">May 2017</a> support basic payments in chats with bots.</p>
+</blockquote>
+<h4><a class="anchor" name="how-does-this-work" href="#how-does-this-work"><i class="anchor-icon"></i></a>How does this work?</h4>
+<p>You create a <strong>bot</strong> that offers goods and services to Telegram users. Merchant bots can send specially formatted <strong>invoice messages</strong> to users, groups or channels. If your bot supports <a href="/bots/inline">inline mode</a>, users can also send invoices to other chats <em>via the bot</em>, including to one-on-one chats with other users.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/464001600/2/IXTImgXeBro.46420/5033e3760756e2284e" style="max-width: 400px;" alt="Video: Paying for goods via an inline invoice">
+  <source src="/file/464001481/2/bb_UmSj3qrM.4966175.mp4/a7f302b6ffe844ec74" type="video/mp4">
+ </video>
+</div>
+
+<p>Invoice messages feature a <strong>photo</strong> and <strong>description</strong> of the product along with a prominent <strong>Pay</strong> button. Tapping this button opens a special payment interface in the Telegram app. In this interface, users can choose a <strong>tip amount</strong> (if allowed by the merchant) and enter additional details like shipping info, phone number, or email address.</p>
+<p>The bot can offer several shipping options for physical goods based on the delivery address. When ready, users enter their credit card info or choose a saved card — and pay for the product. Telegram also supports <em>Apple Pay</em> and <em>Google Pay</em>. Once the transaction is done, the merchant bot can send a <strong>receipt message</strong> with payment details, shipping and delivery information.</p>
+<blockquote>
+<p><a href="#the-payments-api">Detailed information</a> and <a href="#step-by-step-process">step-by-step instructions</a> are available below.</p>
+</blockquote>
+<h4><a class="anchor" name="supported-payment-providers" href="#supported-payment-providers"><i class="anchor-icon"></i></a>Supported Payment Providers</h4>
+<p>Telegram does <strong>not</strong> process payments from users and instead relies on different <strong>payment providers</strong> around the world. It is the payment providers that handle and store all sensitive information, like credit card details. Neither Telegram nor the bot developers have access to it.</p>
+<p>For the moment we support payments from more than <strong>200 countries</strong> via the the following payment providers:</p>
 <ul>
 <li><a href="https://stripe.com">Stripe</a></li>
-<li><a href="https://yoomoney.ru/">YooMoney</a></li>
+<li><a href="https://money.yandex.ru/new">Yandex.Money</a></li>
 <li><a href="https://www.sberbank.ru">Sberbank</a></li>
 <li><a href="https://tranzzo.com">Tranzzo</a></li>
 <li><a href="https://payme.uz/">Payme</a></li>
@@ -78,65 +96,96 @@ Note: This article is intended for bot developers. If you&#39;re…">
 <li><a href="https://www.liqpay.ua/uk/">LiqPay</a></li>
 <li><a href="https://ecommpay.com/">ECOMMPAY</a></li>
 </ul>
-<p>More providers are coming, stay tuned to <a href="https://t.me/botnews">@BotNews</a> for updates.</p>
-<h4><a class="anchor" name="how-do-i-join-as-a-payment-provider" href="#how-do-i-join-as-a-payment-provider"><i class="anchor-icon"></i></a>How do I join as a payment provider?</h4>
-<p>If you work for a company that provides services similar to standalone accounts in <a href="https://stripe.com/connect">Stripe Connect</a>, please let us know via <a href="https://t.me/botsupport">@BotSupport</a> (kindly include the hashtag <code>#paymentsprovider</code> in your message).</p>
-<h4><a class="anchor" name="how-much-do-you-charge" href="#how-much-do-you-charge"><i class="anchor-icon"></i></a>How much do you charge?</h4>
-<p>Telegram does <strong>not</strong> charge any commission for using the Payments API. Note though, that most payment providers will have their own commissions. For example, Stripe in the US charges 2.9% + 30¢ per successful card charge (see the <a href="https://stripe.com/pricing">Stripe website</a> for more details on pricing).</p>
-<h4><a class="anchor" name="what-can-my-bot-sell" href="#what-can-my-bot-sell"><i class="anchor-icon"></i></a>What can my bot sell?</h4>
-<p>Telegram does not impose any limits on what products or services your bot can offer. But please note that you <strong>must</strong> comply with the rules of the payments provider you choose in our system. E.g., Stripe has a special page for <a href="https://stripe.com/us/prohibited-businesses">prohibited businesses</a> – you may want to consult that one before you start selling harvested organs.</p>
-<p><strong>Special Note:</strong> Due to Apple&#39;s limitations, bot developers are currently not allowed to accept payments for digital goods and virtual services from <strong>iOS users</strong>.</p>
-<h4><a class="anchor" name="how-are-disputes-handled" href="#how-are-disputes-handled"><i class="anchor-icon"></i></a>How are disputes handled?</h4>
-<p>Telegram acts as a messenger between the paying user, the bot developer, and their chosen payment system. The user sends their credit card details directly to the payment system. Then the payment system&#39;s response and the shipping details entered by the user are passed to the bot developer so that they can process the order.</p>
-<p>Since Telegram doesn‘t process the payments, we don’t store and can‘t access any sensitive data. Due to this structure, it is impossible for Telegram to handle complaints or cashbacks – any disputed payments are the responsibility of the bot developers, payment providers, and banks that participated in the exchange.</p>
+<p>We continue expanding this list, follow <a href="https://t.me/botnews">@BotNews</a> for updates.</p>
 <blockquote>
-<p>See also: <a href="https://telegram.org/privacy#4-payment-information">Telegram Privacy Policy</a></p>
+<p>If you work for a company that provides services similar to standalone accounts in <a href="https://stripe.com/connect">Stripe Connect</a>, please let us know via <a href="https://t.me/botsupport">@BotSupport</a> (include the hashtag <code>#paymentsprovider</code> in your message).</p>
 </blockquote>
+<hr>
 <h3><a class="anchor" name="the-payments-api" href="#the-payments-api"><i class="anchor-icon"></i></a>The Payments API</h3>
-<p>Now let&#39;s look at payments via Telegram&#39;s Bot API in more detail. To start accepting payments, you need a Telegram bot, obviously. Have a chat with <a href="https://t.me/botfather">BotFather</a> to create a bot if you haven&#39;t got one already.</p>
+<p>This section explores payments via Telegram&#39;s Bot API in more detail.</p>
 <h4><a class="anchor" name="connecting-payments" href="#connecting-payments"><i class="anchor-icon"></i></a>Connecting Payments</h4>
-<p>Now you have a merchant bot that wants to offer goods or services to Telegram users. Let&#39;s call it <code>@merchantbot</code> in this document. First stop is to choose and connect a payment provider, you can find the <a href="#how-do-you-process-payments">list of supported providers</a> above.</p>
+<p>To start accepting payments, you need a <strong>Telegram bot</strong>. Use <a href="https://t.me/botfather">BotFather</a> to create a bot if you don&#39;t have one already.</p>
+<p>Now you have a merchant bot that can offer goods or services to Telegram users. Let&#39;s call it <code>@merchantbot</code> in this document. The first stop is to choose and <strong>connect a payment provider</strong>, you can find the <a href="#supported-payment-providers">list of supported providers</a> above.</p>
 <h4><a class="anchor" name="getting-a-token" href="#getting-a-token"><i class="anchor-icon"></i></a>Getting a Token</h4>
-<p>Use the <code>/mybots</code> command in the chat with <a href="https://t.me/botfather">BotFather</a> and choose the <code>@merchantbot</code> that will be offering goods or services. Go to Bot Settings &gt; Payments. Choose a provider, and you will be redirected to the relevant bot. Enter the required details so that the payments provider is connected successfully, go back to the chat with Botfather. The message will now show available providers. Each will have a name, a <strong>token</strong>, and the date the provider was connected. You will use the <strong>token</strong> when working with the Bot API.</p>
+<ul>
+<li>Use the <code>/mybots</code> command in the chat with <a href="https://t.me/botfather">BotFather</a> and choose the <code>@merchantbot</code> that will be offering goods or services.</li>
+<li>Go to <em>Bot Settings &gt; Payments</em>.</li>
+<li>Choose a provider, and you will be redirected to the relevant bot.</li>
+<li>Enter the required details so that the payments provider is connected successfully, go back to the chat with Botfather.</li>
+<li>The message will now show available providers. Each will have a name, a <strong>token</strong>, and the date the provider was connected.</li>
+<li>You will use the <strong>token</strong> when working with the Bot API.</li>
+</ul>
+<h4><a class="anchor" name="implementing-payments" href="#implementing-payments"><i class="anchor-icon"></i></a>Implementing Payments</h4>
+<p>You will find the necessary methods for building your payment implementation in the <a href="https://core.telegram.org/bots/api#payments">Payments Section of the Bot API Manual</a>.</p>
 <h4><a class="anchor" name="testing-payments-the-39stripe-test-mode-39-provider" href="#testing-payments-the-39stripe-test-mode-39-provider"><i class="anchor-icon"></i></a>Testing Payments: the &#39;Stripe TEST MODE&#39; Provider</h4>
-<p>While you&#39;re still developing and testing payments for your bot, use the “Stripe TEST MODE” provider. When in this mode, you can make payments without actually billing any accounts. Real cards can&#39;t be used in test mode, but you can use test cards like <code>4242 4242 4242 4242</code> (<a href="https://stripe.com/docs/testing#cards">full list here</a>). You can switch between test mode and live mode as many times as you want, but please see the <a href="#going-live">live checklist</a> before you go live.</p>
-<p>Please note that when your merchant bot is working in test mode, it will only be able to send invoices to those Telegram users that are mutual contacts with the account of the bot&#39;s creator. So make sure that those who will help you test the payments functionality are in your contacts list.</p>
+<p>While you&#39;re still developing and testing payments for your bot, use the “Stripe TEST MODE” provider. When in this mode, you can make payments without actually billing any accounts. Real cards can&#39;t be used in test mode, but you can use test cards like <code>4242 4242 4242 4242</code> (<a href="https://stripe.com/docs/testing#cards">full list here</a>). You can switch between test mode and live mode as many times as you want, but please see the <a href="#going-live">live checklist</a> <strong>before</strong> you go live.</p>
 <h3><a class="anchor" name="step-by-step-process" href="#step-by-step-process"><i class="anchor-icon"></i></a>Step-by-Step Process</h3>
+<blockquote>
+<p>See <a href="https://core.telegram.org/bots/api#payments">Bot API: Payments</a> for the complete list of available methods and objects.</p>
+</blockquote>
 <h4><a class="anchor" name="1-create-invoice" href="#1-create-invoice"><i class="anchor-icon"></i></a>1. Create Invoice</h4>
-<p>The user contacts <code>@merchantbot</code> and requests to purchase something. The bot forms an invoice message with a description of the goods or service, amount to be paid, as well as requested shipping info.</p>
-<p>Use the <a href="/bots/api#sendinvoice">sendInvoice</a> method to do this. The <em>provider_token</em> parameter is where you put the <em>token</em> value that you&#39;ve <a href="#getting-a-token">obtained earlier via Botfather</a>. It is possible for one merchant bot to use several different tokens for different users or different goods and services.</p>
-<p>An invoice message with a <strong>pay</strong> button can only be sent to a private chat with the user. Groups and channels are not supported. The resulting invoice message will look like this:</p>
+<p>The user contacts <code>@merchantbot</code> and requests to purchase something. The bot forms an invoice message with a description of the goods or service, amount to be paid, and requested shipping info. There are two ways of creating an invoice:</p>
+<h5><a class="anchor" name="a-bot-invoice" href="#a-bot-invoice"><i class="anchor-icon"></i></a>A. Bot Invoice</h5>
+<p>Use the <a href="/bots/api#sendinvoice">sendInvoice</a> method to generate an invoice and send it to a chat. The <em>provider_token</em> parameter is where you put the <em>token</em> value that you&#39;ve <a href="#getting-a-token">obtained earlier via Botfather</a>. It is possible for one merchant bot to use several different tokens for different users or different goods and services.</p>
+<p>As of <a href="#introducing-payments-2-0">Payments 2.0</a>, invoice messages with a pay button can be sent to <strong>chats of any type</strong>: private chats with the user, groups, or channels. The resulting invoice message will look like this:</p>
  <div class="blog_image_wrap">
-    <a href="/file/811140042/1/EtNuS1A-4gQ.79672/e7f03d9d68034b1338" target="_blank"><img src="/file/811140042/1/EtNuS1A-4gQ.79672/e7f03d9d68034b1338" title="Join button"/></a>
-    <p>Invoice in Chat</p>  </div>
+    <a href="/file/464001285/4/UBRF1ViiEOU.106159/0bbcdcb7f5af77a782" target="_blank"><img src="/file/464001285/4/UBRF1ViiEOU.106159/0bbcdcb7f5af77a782" title="Join button"/></a>
+    <p>Bot Invoice</p>  </div>
 
-<h4><a class="anchor" name="2-shipping-info-and-other-details-optional-step" href="#2-shipping-info-and-other-details-optional-step"><i class="anchor-icon"></i></a>2. Shipping info and other details (optional step)</h4>
+<h5><a class="anchor" name="b-inline-invoice" href="#b-inline-invoice"><i class="anchor-icon"></i></a>B. Inline Invoice</h5>
+<p>If <code>@merchantbot</code> supports <a href="/bots/inline">inline mode</a>, you can use <a href="/bots/api#inputinvoicemessagecontent">inputInvoiceMessageContent</a> to allow users to share invoices for your goods and services to their one-on-one chats with friends, or to their groups and channels. These invoices will have a <strong>Pay button</strong> that can be used multiple times.</p>
+<div class="blog_image_wrap">
+    <a href="/file/464001162/3/C2wdLOXaMA0.97425/32091afe52ef0e59f2" target="_blank"><img src="/file/464001162/3/C2wdLOXaMA0.97425/32091afe52ef0e59f2" title="Join button"/></a>
+    <p>Inline Invoice</p>  </div>
+
+<h4><a class="anchor" name="2-choose-forwarding-behavior" href="#2-choose-forwarding-behavior"><i class="anchor-icon"></i></a>2. Choose Forwarding Behavior</h4>
+<p>As of <a href="#introducing-payments-2-0">Payments 2.0</a> there are two ways for handling <strong>forwarded copies</strong> of your invoices, controlled by the parameter <em>start_parameter</em> in the <a href="/bots/api#sendinvoice">sendInvoice</a> method.</p>
+<ul>
+<li><strong>A. Multi-chat invoice.</strong> Forwarded copies show a <strong>Pay button</strong>, which multiple users can press and attempt to pay for the goods or services. <a href="#b-inline-invoice">Inline invoices</a> are always multi-chat invoices.</li>
+<li><strong>B. Single-chat invoice.</strong> Invoice can only be paid from the chat to which it was sent, <em>forwarded copies</em> show a <strong>URL button</strong> with a deep link to the bot. The deep link can be used to generate a similar invoice in the chat with the bot, to show an error message, or for other purposes. <a href="/bots#deep-linking">More info on Deep Linking »</a></li>
+</ul>
+<p>If a <em>single-chat invoice</em> is sent to the chat with <code>@merchantbot</code>, it can only be paid <strong>once</strong>. If a <em>single-chat invoice</em> is sent to any other chat, it can be paid <strong>many times</strong> by many users.</p>
+<blockquote>
+<p>To get a better understanding of how this works, try toggling the <em>“Pay from Forwards”</em> parameter when creating invoices with our demo <a href="https://t.me/shopbot">@ShopBot</a>.</p>
+</blockquote>
+<p>Regardless of whether or not the <strong>Pay</strong> button is available in an invoice, the merchant bot always has the power to decide whether or not to accept new payments for a particular invoice.</p>
+<h4><a class="anchor" name="3-tips-optional-step" href="#3-tips-optional-step"><i class="anchor-icon"></i></a>3. Tips (optional step)</h4>
+<p>If the <em>max_tip_amount</em> parameter is set to above <code>0</code>, users can add a tip to their payment. You can use the parameter <em>suggested_tip_amounts</em> to suggest particular amounts that you feel will be relevant for the invoice.</p>
+<div class="blog_image_wrap">
+    <a href="/file/464001701/6/-BJZJqe9VeA.70226/75a192d58d76dc96c1" target="_blank"><img src="/file/464001701/6/-BJZJqe9VeA.70226/75a192d58d76dc96c1" title="Join button"/></a>
+    <p>Adding Tips</p>  </div>
+
+<h4><a class="anchor" name="4-shipping-info-and-other-details-optional-step" href="#4-shipping-info-and-other-details-optional-step"><i class="anchor-icon"></i></a>4. Shipping info and other details (optional step)</h4>
 <p> The user specifies shipping information or other info requested by the bot. This could be the user&#39;s full name, an email address, a phone number in international format, or a full postal address for delivery.</p>
  <div class="blog_image_wrap">
-    <a href="/file/811140229/1/O-BPJwFYRgA.77728/ba34746cad1fbfc373" target="_blank"><img src="/file/811140229/1/O-BPJwFYRgA.77728/ba34746cad1fbfc373" title="Shipping Info"/></a>
+    <a href="/file/464001896/2/9gTF8_aGQkE.45826/d5b11a999a40a1a6d9" target="_blank"><img src="/file/464001896/2/9gTF8_aGQkE.45826/d5b11a999a40a1a6d9" title="Shipping Info"/></a>
     <p>Shipping Info</p>  </div>
 
-<h4><a class="anchor" name="3-offer-delivery-options-based-on-shipping-address-optional-step" href="#3-offer-delivery-options-based-on-shipping-address-optional-step"><i class="anchor-icon"></i></a>3. Offer delivery options based on shipping address (optional step)</h4>
+<h4><a class="anchor" name="5-offer-delivery-options-based-on-shipping-address-optional-step" href="#5-offer-delivery-options-based-on-shipping-address-optional-step"><i class="anchor-icon"></i></a>5. Offer delivery options based on shipping address (optional step)</h4>
 <p>If a shipping address was requested and you included the parameter <em>is_flexible</em>, the Bot API will send an <a href="/bots/api#update">Update</a> with a <em>shipping_query</em> field to the bot. The bot must respond using <a href="/bots/api#answershippingquery">answerShippingQuery</a> either with a list of possible delivery options and the relevant delivery prices, or with an error (for example, if delivery to the specified address is not possible).</p>
-<h4><a class="anchor" name="4-select-delivery-option-optional-step" href="#4-select-delivery-option-optional-step"><i class="anchor-icon"></i></a>4. Select delivery option (optional step)</h4>
+<blockquote>
+<p><strong>Tip:</strong> It is recommended that the merchant bot confirms availability of the goods/services at this step – to let the user know in case they are no longer available. This is especially important if you are using <a href="#2-choose-forwarding-behavior">multi-chat</a>, <a href="#2-choose-forwarding-behavior">inline</a> or <a href="#2-choose-forwarding-behavior">single-chat, multi-use</a> invoices.</p>
+</blockquote>
+<h4><a class="anchor" name="6-select-delivery-option-optional-step" href="#6-select-delivery-option-optional-step"><i class="anchor-icon"></i></a>6. Select delivery option (optional step)</h4>
 <p>The user selects a delivery option from the list (the overall amount to be paid may change at this point) and proceeds to checkout.</p>
  <div class="blog_image_wrap">
-    <a href="/file/811140198/4/_WHWdvCzkUE.84075/d99695cbb744e22465" target="_blank"><img src="/file/811140198/4/_WHWdvCzkUE.84075/d99695cbb744e22465" title="Choose Delivery Option"/></a>
+    <a href="/file/464001836/2/rwUQeqMOsnI.31142/b0cc9d885ccb78ab39" target="_blank"><img src="/file/464001836/2/rwUQeqMOsnI.31142/b0cc9d885ccb78ab39" title="Choose Delivery Option"/></a>
     <p>Choose Delivery Option</p>  </div>
 
-<h4><a class="anchor" name="5-pre-checkout" href="#5-pre-checkout"><i class="anchor-icon"></i></a>5. Pre-Checkout</h4>
+<h4><a class="anchor" name="7-pre-checkout" href="#7-pre-checkout"><i class="anchor-icon"></i></a>7. Pre-Checkout</h4>
 <p>The user enters their payment information and presses the final pay button. At this moment the Bot API sends an <a href="/bots/api#update">Update</a> with the field <em>pre_checkout_query</em> to the bot that contains all the available information about the order. Your bot must reply using <a href="/bots/api#answerprecheckoutquery">answerPrecheckoutQuery</a> within <strong>10 seconds</strong> after receiving this update or the transaction is canceled.</p>
-<p>The bot may return an error if it can&#39;t process the order for any reason. We highly recommend specifying a reason for failure to complete the order in human readable form (e.g. &quot;Sorry, we&#39;re all out of rubber ducks! Would you be interested in a steel bear instead?&quot;). Telegram will display this reason to the user.</p>
-<h4><a class="anchor" name="6-checkout" href="#6-checkout"><i class="anchor-icon"></i></a>6. Checkout</h4>
+<p>The bot may return an error if it can&#39;t process the order for any reason. We highly recommend specifying a reason for failure to complete the order in human readable form (e.g. <em>&quot;Sorry, we&#39;re all out of rubber ducks! Would you be interested in a cast iron bear instead?&quot;</em>). Telegram will display this reason to the user.</p>
+<blockquote>
+<p><strong>Warning:</strong> As of <a href="#introducing-payments-2-0">Payments 2.0</a>, it is critical to make sure your bot <strong>only</strong> accepts multiple payments when the order can be processed correctly. This is especially important if you are using <a href="#2-choose-forwarding-behavior">multi-chat</a>, <a href="#2-choose-forwarding-behavior">inline</a> or <a href="#2-choose-forwarding-behavior">single-chat, multi-use</a> invoices.</p>
+</blockquote>
+<h4><a class="anchor" name="8-checkout" href="#8-checkout"><i class="anchor-icon"></i></a>8. Checkout</h4>
 <p>In case the bot confirms the order, Telegram requests the payment provider to complete the transaction. If the payment information was entered correctly and the payment goes through, the API will send a receipt message of the type <a href="/bots/api#message"><em>successful_payment</em></a> from the user. Once your bot receives this message, it should proceed with delivering the goods or services purchased by the user.</p>
-<p>For the user, the Invoice message in the UI becomes a Receipt — they can open this receipt at any time and see all the details of the transaction:</p>
+<p>If the invoice message was sent in the chat with <code>@merchantbot</code>, it becomes a Receipt in the UI for the user — they can open this receipt at any time and see all the details of the transaction:</p>
  <div class="blog_image_wrap">
-    <a href="/file/811140104/2/VUOFvB0_Oic.125278/46af56d444c561b143" target="_blank"><img src="/file/811140104/2/VUOFvB0_Oic.125278/46af56d444c561b143" title="Receipt"/></a>
+    <a href="/file/464001648/1/1-P1Pb7TusA.105628/b9cb2cf4c7427302c0" target="_blank"><img src="/file/464001648/1/1-P1Pb7TusA.105628/b9cb2cf4c7427302c0" title="Receipt"/></a>
     <p>Receipt</p>  </div>
 
-<p><strong> Going Viral: Deep Linking </strong></p>
-<p>Note the <strong>arrow button</strong> on the right of the receipt message on the screenshot above. This quick forwarding button allows the user to select multiple friends, groups, or channels and send the message to them immediately. Thanks to this button, your goods and services can spread virally — the resulting message will have a button that leads users to your bot and asks it to create a similar invoice.</p>
-<p>For the quick forwarding button to work correctly, all your invoice messages must contain a <em>start_parameter</em> for creating a new invoice. <a href="/bots#deep-linking">More info on Deep Linking »</a></p>
+<p>If the message was sent to any other chat, the <strong>Pay button</strong> remains and can be used again. It is up to the merchant bot whether to actually accept multiple payments.</p>
 <h3><a class="anchor" name="going-live" href="#going-live"><i class="anchor-icon"></i></a>Going Live</h3>
 <p>Once you&#39;ve tested everything and confirmed that your payments implementation works, you&#39;re ready to switch to LIVE MODE. To do this, go to BotFather &gt; /mybots &gt; select <code>@merchantbot</code> &gt; Bot Settings / Payments and enable Stripe LIVE MODE. You will get a token that has the string <code>:LIVE:</code> in the middle, e.g. <code>123:LIVE:XXXX</code>. Do not give this token to any third parties!</p>
 <p>Before your merchant bot goes into live mode, please ensure the following:</p>
@@ -149,7 +198,26 @@ Note: This article is intended for bot developers. If you&#39;re…">
 <li>Make sure that your server hardware and software is stable. Use backups to make sure that you don&#39;t lose data about your users&#39; payments.</li>
 <li>Make sure that you have completed the live checklist for your selected <strong>payments provider</strong> as well as this one. </li>
 </ul>
-<h3><a class="anchor" name="supported-currencies" href="#supported-currencies"><i class="anchor-icon"></i></a>Supported Currencies</h3>
+<hr>
+<h3><a class="anchor" name="faq" href="#faq"><i class="anchor-icon"></i></a>FAQ</h3>
+<h4><a class="anchor" name="how-do-i-join-as-a-payment-provider" href="#how-do-i-join-as-a-payment-provider"><i class="anchor-icon"></i></a>How do I join as a payment provider?</h4>
+<p>If you work for a company that provides services similar to standalone accounts in <a href="https://stripe.com/connect">Stripe Connect</a>, please let us know via <a href="https://t.me/botsupport">@BotSupport</a> (kindly include the hashtag <code>#paymentsprovider</code> in your message).</p>
+<h4><a class="anchor" name="how-much-do-you-charge" href="#how-much-do-you-charge"><i class="anchor-icon"></i></a>How much do you charge?</h4>
+<p>Telegram does <strong>not</strong> charge any commission for using the Payments API. Note though, that most payment providers will have their own commissions. For example, Stripe in the US charges 2.9% + 30¢ per successful card charge (see the <a href="https://stripe.com/pricing">Stripe website</a> for more details on pricing).</p>
+<h4><a class="anchor" name="do-i-need-a-bot-to-accept-payments" href="#do-i-need-a-bot-to-accept-payments"><i class="anchor-icon"></i></a>Do I need a bot to accept payments?</h4>
+<p>Yes. If you are not a developer, you will need to either hire someone to make a bot for you (recommended), or use a bot created by a third-party company. We advise extreme caution when using services of bots that process payments for you – Telegram doesn&#39;t maintain any such bots and doesn&#39;t endorse any of the third-party bots offering these services.</p>
+<h4><a class="anchor" name="what-can-my-bot-sell" href="#what-can-my-bot-sell"><i class="anchor-icon"></i></a>What can my bot sell?</h4>
+<p>Telegram does not impose any limits on what products or services your bot can offer. But please note that you <strong>must</strong> comply with the rules of the payments provider you choose in our system. E.g., Stripe has a special page for <a href="https://stripe.com/us/prohibited-businesses">prohibited businesses</a> – you may want to consult that one before you start selling harvested organs.</p>
+<p><strong>Special Note:</strong> Due to Apple&#39;s limitations, bot developers are currently not allowed to accept payments for digital goods and virtual services from <strong>iOS users</strong>.</p>
+<h4><a class="anchor" name="how-are-disputes-handled" href="#how-are-disputes-handled"><i class="anchor-icon"></i></a>How are disputes handled?</h4>
+<p>Telegram acts as a messenger between the paying user, the bot developer, and their chosen payment system. The user sends their credit card details directly to the payment system. Then the payment system&#39;s response and the shipping details entered by the user are passed to the bot developer so that they can process the order.</p>
+<p>Since Telegram doesn‘t process the payments, we don’t store and can‘t access any sensitive data. Due to this structure, it is impossible for Telegram to handle complaints or cashbacks – any disputed payments are the responsibility of the bot developers, payment providers, and banks that participated in the exchange.</p>
+<blockquote>
+<p>See also: <a href="https://telegram.org/privacy#7-third-party-payment-services">Telegram Privacy Policy</a></p>
+</blockquote>
+<h4><a class="anchor" name="how-do-i-support-payments-in-my-third-party-app-that-uses-the-te" href="#how-do-i-support-payments-in-my-third-party-app-that-uses-the-te"><i class="anchor-icon"></i></a>How do I support payments in my third-party app that uses the Telegram API?</h4>
+<p>You are welcome to study the <a href="/api/payments">MTProto payment documentation</a>.</p>
+<h4><a class="anchor" name="supported-currencies" href="#supported-currencies"><i class="anchor-icon"></i></a>Supported Currencies</h4>
 <p>Telegram payments currently support the currencies listed below (here&#39;s a <a href="https://core.telegram.org/bots/payments/currencies.json">JSON version</a> in case you need it).</p>
 <p>If you&#39;re using Stripe as the payments provider, supported currencies may vary depending on the country you have specified in your Stripe account (<a href="https://support.stripe.com/questions/which-currencies-does-stripe-support">more info</a>).</p>
 <p>The minimum and maximum amounts for each of the currencies roughly correspond to the limit of <code>US$ 1-10000</code>. The amount must be expressed in 12 digits or less, so the maximum value will be correspondingly lower for some lower-value currencies. Note that for each currency except USD these limits depend on exchange rates and may change over time (plan ahead for this when you implement limits in your code).</p>
