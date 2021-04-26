@@ -13,8 +13,7 @@ future updates and other things (new vacancies, API updates, etc).
 * ✅ passing – new changes
 * ❌ failing – no changes
 
-You should to subscribe to **[channel with alerts](https://t.me/tgcrawl)** 
-to stay updated or watch (enable notifications) this repository with "All Activity" setting.
+You should to subscribe to **[channel with alerts](https://t.me/tgcrawl)** to stay updated.
 Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-crawler/tree/data/data)**.
 
 ![GitHub pretty diff](https://i.imgur.com/BK8UAju.png)
