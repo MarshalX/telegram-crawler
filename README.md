@@ -20,7 +20,7 @@ Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-c
 
 ### How it works
 
-1. [Link crawling](make_tracked_links_list.py) runs once an hour. 
+1. [Link crawling](make_tracked_links_list.py) runs **as often as possible**. 
    Starts crawling from the home page of the site. 
    Detects relative and absolute sub links and recursively repeats the operation. 
    Writes a list of unique links for future content comparison. 
@@ -44,12 +44,32 @@ Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-c
    
 ### FAQ
 
-**Q:** How many is "**as often as possible**"?
+**Q:** How often is "**as often as possible**"?
 
 **A:** TLTR: content update action runs every ~10 minutes. More info:
 - [Scheduled actions cannot be run more than once every 5 minutes.](https://github.blog/changelog/2019-11-01-github-actions-scheduled-jobs-maximum-frequency-is-changing/)
 - [GitHub Actions workflow not triggering at scheduled time](https://upptime.js.org/blog/2021/01/22/github-actions-schedule-not-working/).
-  
+
+**Q:** Why there is 2 separated crawl scripts instead of one?
+
+**A:** Because the previous idea was to update tracked links once at hour.
+It was so comfortably to use separated scripts and workflows.
+After Telegram 7.7 update, I realised that find new blog posts so slowly is bad idea.
+
+**Q:** Why alert for sending alerts have while loop?
+
+**A:** Because GitHub API doesn't return information about commit immediately 
+after push to repository. Therefore, script are waiting for information to appear...
+
+**Q:** Why are you using GitHab Personal Access Token in action/checkout workflow`s step?
+
+**A:** To have ability to trigger other workflows by on push trigger. More info:
+- [Action does not trigger another on push tag action ](https://github.community/t/action-does-not-trigger-another-on-push-tag-action/17148)
+
+**Q:** Why are you using GitHab PAT in [make_and_send_alert.py](make_and_send_alert.py)?
+
+**A:** To increase limits of GitHub API.
+
 ### TODO list
 
 - add storing history of content using hashes;

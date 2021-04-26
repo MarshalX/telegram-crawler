@@ -7,7 +7,7 @@ import aiohttp
 COMMIT_SHA = os.environ['COMMIT_SHA']
 
 TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
-GITHUB_PWA = os.environ['GITHUB_PWA']
+GITHUB_PAT = os.environ['GITHUB_PAT']
 
 REPOSITORY = os.environ.get('REPOSITORY', 'MarshalX/telegram-crawler')
 CHAT_ID = os.environ.get('CHAT_ID', '@tgcrawl')
@@ -58,7 +58,7 @@ async def main():
             session=session,
             url=f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}'.format(repo=REPOSITORY, sha=COMMIT_SHA),
             headers={
-                'Authorization': f'token {GITHUB_PWA}'
+                'Authorization': f'token {GITHUB_PAT}'
             }
         )
 
