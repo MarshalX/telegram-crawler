@@ -7,6 +7,8 @@ import aiohttp
 COMMIT_SHA = os.environ['COMMIT_SHA']
 
 TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
+GITHUB_PWA = os.environ['GITHUB_PWA']
+
 REPOSITORY = os.environ.get('REPOSITORY', 'MarshalX/telegram-crawler')
 CHAT_ID = os.environ.get('CHAT_ID', '@tgcrawl')
 ROOT_TREE_DIR = os.environ.get('ROOT_TREE_DIR', 'data')
@@ -25,41 +27,73 @@ STATUS_TO_EMOJI = {
     'removed': '❌',
 }
 
+GITHUB_API_LIMIT_PER_HOUR = 5_000
+COUNT_OF_RUNNING_WORKFLOW_AT_SAME_TIME = 5  # just random number ;d
+
+ROW_PER_STATUS = 5
+
+
+async def send_req_until_success(session, **kwargs) -> dict:
+    delay = 5  # in sec
+    count_of_retries = int(GITHUB_API_LIMIT_PER_HOUR / COUNT_OF_RUNNING_WORKFLOW_AT_SAME_TIME / delay)
+
+    retry_number = 1
+    while retry_number <= count_of_retries:
+        retry_number += 1
+
+        res = await session.get(**kwargs)
+        if res.status != 200:
+            await asyncio.sleep(delay)
+            continue
+
+        json = await res.json()
+        return json
+
+    raise RuntimeError('Surprise. Time is over')
+
 
 async def main():
     async with aiohttp.ClientSession() as session:
-        changes = []
+        json = await send_req_until_success(
+            session=session,
+            url=f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}'.format(repo=REPOSITORY, sha=COMMIT_SHA),
+            headers={
+                'Authorization': f'token {GITHUB_PWA}'
+            }
+        )
 
-        url = f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}'.format(repo=REPOSITORY, sha=COMMIT_SHA)
-        async with session.get(url) as response:
-            json = await response.json()
+        html_url = json['html_url']
+        files = json['files']
 
-            html_url = json['html_url']
-            files = json.get('files', [])
-            for file in files:
-                filename = file['filename'].replace(f'{ROOT_TREE_DIR}/', '').replace('.html', '')
-                status = STATUS_TO_EMOJI[file['status']]
+        changes = {k: [] for k in STATUS_TO_EMOJI.keys()}
+        for file in files:
+            changed_url = file['filename'].replace(f'{ROOT_TREE_DIR}/', '').replace('.html', '')
+            status = STATUS_TO_EMOJI[file['status']]
 
-                changes.append(f'{status} <code>{filename}</code>')
+            changes[file['status']].append(f'{status} <code>{changed_url}</code>')
 
-        alert_text = [
-            '<b>New changes on Telegram sites</b>\n',
-            '\n'.join(changes) + '\n',
-            f'<a href="{html_url}">View diff on GitHub...</a>'
-        ]
+        alert_text = f'[TEST] <b>New changes on Telegram sites</b>\n'
 
-        url = f'{BASE_TELEGRAM_API}{TELEGRAM_SEND_MESSAGE}'.format(token=TELEGRAM_BOT_TOKEN)
-        params = {
-            'chat_id': CHAT_ID,
-            'parse_mode': 'HTML',
-            'text': '\n'.join(alert_text),
-        }
+        for i, [status, text_list] in enumerate(changes.items()):
+            alert_text += '\n'.join(text_list[:ROW_PER_STATUS]) + '\n'
 
-        async with await session.get(url, params=params) as response:
-            if response.status != 200:
-                params['text'] = f'<b>❗️ Too many new changes on Telegram sites</b>\n\n' \
-                                 f'<a href="{html_url}">View diff on GitHub...</a>'
-                await session.get(url, params=params)
+            if len(text_list) > ROW_PER_STATUS:
+                count = len(text_list) - ROW_PER_STATUS
+                alert_text += f'And <b>{count}</b> {status} actions more..'
+
+            if i != len(changes.items()) - 1:
+                alert_text += '\n'
+
+        alert_text += f'<a href="{html_url}">View diff on GitHub...</a>'
+
+        await session.get(
+            url=f'{BASE_TELEGRAM_API}{TELEGRAM_SEND_MESSAGE}'.format(token=TELEGRAM_BOT_TOKEN),
+            params={
+                'chat_id': CHAT_ID,
+                'parse_mode': 'HTML',
+                'text': alert_text,
+            }
+        )
 
 
 if __name__ == '__main__':
