@@ -72,7 +72,7 @@ async def main():
 
             changes[file['status']].append(f'{status} <code>{changed_url}</code>')
 
-        alert_text = f'[TEST] <b>New changes on Telegram sites</b>\n'
+        alert_text = f'<b>New changes on Telegram sites</b>\n'
 
         for i, [status, text_list] in enumerate(changes.items()):
             alert_text += '\n'.join(text_list[:ROW_PER_STATUS]) + '\n'
