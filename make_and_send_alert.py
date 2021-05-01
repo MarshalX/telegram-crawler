@@ -72,17 +72,19 @@ async def main():
 
             changes[file['status']].append(f'{status} <code>{changed_url}</code>')
 
-        alert_text = f'<b>New changes on Telegram sites</b>\n'
+        alert_text = f'<b>New changes on Telegram sites</b>\n\n'
 
         for i, [status, text_list] in enumerate(changes.items()):
+            if not text_list:
+                continue
+
             alert_text += '\n'.join(text_list[:ROW_PER_STATUS]) + '\n'
 
             if len(text_list) > ROW_PER_STATUS:
                 count = len(text_list) - ROW_PER_STATUS
-                alert_text += f'And <b>{count}</b> {status} actions more..'
+                alert_text += f'And <b>{count}</b> {status} actions more..\n'
 
-            if i != len(changes.items()) - 1:
-                alert_text += '\n'
+            alert_text += '\n'
 
         alert_text += f'<a href="{html_url}">View diff on GitHub...</a>'
 
