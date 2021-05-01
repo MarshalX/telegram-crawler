@@ -47,9 +47,6 @@ CRAWL_RULES = {
         },
     },
     'instantview.telegram.org': {
-        'allow': {
-            'contest/winners'
-        },
         'deny': {
             'file/',
 
@@ -61,6 +58,8 @@ CRAWL_RULES = {
     'core.telegram.org': {
         'deny': {
             'file/',
+
+            'bots/payments',
 
             'tdlib/docs/classtd',
 
@@ -74,7 +73,17 @@ CRAWL_RULES = {
             'file/',
             r'apps$'
         },
-    }
+    },
+    'webz.telegram.org': {
+        'deny': {
+            '',
+        },
+    },
+    'webk.telegram.org': {
+        'deny': {
+            '',
+        },
+    },
 }
 
 DIRECT_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{0,249}' + BASE_URL_REGEX + r')'
