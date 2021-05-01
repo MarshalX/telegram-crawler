@@ -62,6 +62,8 @@ CRAWL_RULES = {
             'bots/payments',
 
             'tdlib/docs/classtd',
+
+            'validatedRequestedInfo',
         },
     },
     'telegram.org': {
