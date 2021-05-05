@@ -22,6 +22,8 @@ HIDDEN_URLS = {
     'telegram.org/evolution',
 
     'desktop.telegram.org/changelog',
+
+    'instantview.telegram.org/rules',
 }
 BASE_URL_REGEX = r'telegram.org'
 
@@ -52,7 +54,7 @@ CRAWL_RULES = {
 
             r'templates/.+',
             'samples/',
-            'contest/',
+            'contest',
         },
     },
     'core.telegram.org': {
