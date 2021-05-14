@@ -87,16 +87,32 @@
     }
   }
 
-  function postMessageToIframe(iframe, event, data) {
+  if (!window.Telegram) {
+    window.Telegram = {};
+  }
+  if (!window.Telegram.__WidgetUuid) {
+    window.Telegram.__WidgetUuid = 0;
+  }
+  if (!window.Telegram.__WidgetLastId) {
+    window.Telegram.__WidgetLastId = 0;
+  }
+  if (!window.Telegram.__WidgetCallbacks) {
+    window.Telegram.__WidgetCallbacks = {};
+  }
+
+  function postMessageToIframe(iframe, event, data, callback) {
     try {
       data = data || {};
       data.event = event;
+      if (callback) {
+        data._cb = ++window.Telegram.__WidgetLastId;
+        window.Telegram.__WidgetCallbacks[data._cb] = {
+          iframe: iframe,
+          callback: callback
+        };
+      }
       iframe.contentWindow.postMessage(JSON.stringify(data), '*');
     } catch(e) {}
-  }
-
-  if (!window.__TgWidgetUuid) {
-    window.__TgWidgetUuid = 0;
   }
 
   function initWidget(widgetEl) {
@@ -124,7 +140,7 @@
     }
     else if (widgetId = widgetEl.getAttribute('data-telegram-discussion')) {
       widgetsOrigin = getWidgetsOrigin('https://t.me', 'https://post.tg.dev');
-      widgetElId = 'telegram-discussion-' + widgetId.replace(/[^a-z0-9_]/ig, '-') + '-' + (++window.__TgWidgetUuid);
+      widgetElId = 'telegram-discussion-' + widgetId.replace(/[^a-z0-9_]/ig, '-') + '-' + (++window.Telegram.__WidgetUuid);
       var websitePageUrl = widgetEl.getAttribute('data-page-url');
       if (!websitePageUrl) {
         websitePageUrl = getPageCanonical();
@@ -273,6 +289,17 @@
       else if (data.event == 'unauthorized') {
         onUnauth && onUnauth();
       }
+      else if (data.event == 'callback') {
+        var cb_data = null;
+        if (cb_data = window.Telegram.__WidgetCallbacks[data._cb]) {
+          if (cb_data.iframe === iframe) {
+            cb_data.callback(data.value);
+            delete window.Telegram.__WidgetCallbacks[data._cb];
+          }
+        } else {
+          console.warn('Callback #' + data._cb + ' not found');
+        }
+      }
     }
     var iframe = document.createElement('iframe');
     iframe.id = widgetElId;
@@ -342,8 +369,23 @@
     return widgets;
   }
 
+  function getWidgetInfo(el_or_id, callback) {
+    var e = null, iframe = null;
+    if (el = geById(el_or_id)) {
+      if (el.tagName &&
+          el.tagName.toUpperCase() == 'IFRAME') {
+        iframe = el;
+      } else if (el._iframe) {
+        iframe = el._iframe;
+      }
+      if (iframe && callback) {
+        postMessageToIframe(iframe, 'get_info', {}, callback);
+      }
+    }
+  }
+
   function setWidgetOptions(options, el_or_id) {
-    var iframe;
+    var e = null, iframe = null;
     if (typeof el_or_id === 'undefined') {
       var widgets = getAllWidgets();
       for (var i = 0; i < widgets.length; i++) {
@@ -352,12 +394,14 @@
         }
       }
     } else {
-      if (iframe = geById(el_or_id)) {
-        if (iframe.tagName &&
-            iframe.tagName.toUpperCase() == 'IFRAME') {
-          postMessageToIframe(iframe, 'set_options', {options: options});
-        } else if (iframe._iframe) {
-          iframe = iframe._iframe;
+      if (el = geById(el_or_id)) {
+        if (el.tagName &&
+            el.tagName.toUpperCase() == 'IFRAME') {
+          iframe = el;
+        } else if (el._iframe) {
+          iframe = el._iframe;
+        }
+        if (iframe) {
           postMessageToIframe(iframe, 'set_options', {options: options});
         }
       }
@@ -460,9 +504,7 @@
     }
   };
 
-  if (!window.Telegram) {
-    window.Telegram = {};
-  }
+  window.Telegram.getWidgetInfo = getWidgetInfo;
   window.Telegram.setWidgetOptions = setWidgetOptions;
   window.Telegram.Login = {
     auth: TelegramLogin.auth,
