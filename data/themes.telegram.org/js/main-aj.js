@@ -764,7 +764,7 @@ function showConfirm(html, onConfirm, confirm_btn, onCancel, cancel_btn) {
 }
 
 function showMedia(src, is_video, options) {
-  var media_html = is_video ? '<video class="media media-video ohide" autoplay controls></video>' : '<div class="media media-photo ohide"></div>';
+  var media_html = is_video ? '<video class="media media-video ohide" autoplay' + (options.is_gif ? ' loop playsinline' : ' controls') + '></video>' : '<div class="media media-photo ohide"></div>';
   var $popup = $('<div class="popup-container hide media-popup-container"><div class="media-popup-wrap popup-no-close file-loading"><div class="media-popup-cover ohide">' + media_html + '<svg class="circle-progress-wrap ohide" viewport="0 0 66 66" width="66px" height="66px"><circle class="circle-progress-bg" cx="50%" cy="50%"></circle><circle class="circle-progress infinite" cx="50%" cy="50%" stroke-dashoffset="106"></circle></svg></div></div></div>');
   var media = {
     $wrap:    $('.media-popup-wrap', $popup),
