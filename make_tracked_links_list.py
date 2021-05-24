@@ -24,6 +24,8 @@ HIDDEN_URLS = {
     'desktop.telegram.org/changelog',
 
     'instantview.telegram.org/rules',
+
+    'core.telegram.org/resources/cidr.txt',
 }
 BASE_URL_REGEX = r'telegram.org'
 
@@ -207,6 +209,8 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             elif 'application/javascript' in content_type:
                 LINKS_TO_TRACK.add(url)
             elif 'text/css' in content_type:
+                LINKS_TO_TRACK.add(url)
+            elif 'text/plain' in content_type:
                 LINKS_TO_TRACK.add(url)
             elif 'application/json' in content_type:
                 LINKS_TO_TRACK.add(url)
