@@ -41,19 +41,7 @@ partial-type-app-decl ::= boxed-type-ident subexpr …">
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL-patterns" >TL-patterns</a></li></ul></div>
   <h1 id="dev_page_title">TL-patterns</h1>
   
-  <div id="dev_page_content"><div class="richcode">
-<p><em>partial-app-decl</em> ::= <em>partial-type-app-decl</em> | <em>partial-comb-app-decl</em><br>
-<em>partial-type-app-decl</em> ::= <em>boxed-type-ident</em> <em>subexpr</em> { <em>subexpr</em> } <code>;</code>  | <em>boxed-type-ident</em> <code>&lt;</code> <em>expr</em> { <code>,</code> <em>expr</em> } <code>&gt;</code> <code>;</code><br>
-<em>partial-comb-app-decl</em> ::= <em>combinator-id</em> <em>subexpr</em> { <em>subexpr</em> } <code>;</code>   </p>
-</div>
-<p>According to the original design, templates must be used to replace concrete values in the first few or all of the optional arguments of a constructor or polymorphic type. For example, if <code>Tuple int 10</code> is used frequently, you can declare a template for it, which will cause the appropriate constructors to be generated automatically. When using such a constructor there may be nowhere to pass an <code>int</code> type or the tuple size <code>10</code>. Similarly, it was originally planned to declared templates for <code>Vector int</code>, <code>Vector string</code>, etc. in order to generate constructors for each vector type being used type. These constructors would make it possible during deserialization to determine what kind of array is being transmitted.</p>
-<p>Templates are not used now. Instead, the same universal constructors (for example, <code>vector {t:Type} [t] = Vector t</code>) are used with the values of the optional parameters being inferred from the type of the result (if we already know from the schema that in this location there must be a <code>Vector int</code> during deserialization, we understand that we will see the universal <code>vector</code> constructor in which <em>t</em> is equal to <code>int</code>).</p>
-<p>This approach is better in that it is not necessary to define <code>Vector SomeType</code> templates in advance for all possible types in order to generate their own constructors for each of these cases. Nevertheless, there is a drawback. If someone wants to transmit the serialization of a value of the clothed type <code>Vector int</code> as a serialization of a value of type <code>Object</code>, a problem arises during serialization: after seeing the universal <code>vector</code> constructor and then reading the vector length, we cannot determine what type of values should be expected next.</p>
-<p>In theory, this problem can be solved by using the full form of the constructor (<code>@vector</code>) corresponding to <code>vector</code> (it is automatically defined and is different in that all of the optional parameters become required), or by defining</p>
-<div class="richcode">
-<p>object X:Type X = TypedObject   </p>
-</div>
-<p>and passing the object type explicitly. <a href="TL-types">Type serialization</a> is required in both cases.</p></div>
+  <div id="dev_page_content"></div>
   
 </div>
           

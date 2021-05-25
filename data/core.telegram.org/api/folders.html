@@ -39,68 +39,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/folders" >Folders</a></li></ul></div>
   <h1 id="dev_page_title">Folders</h1>
   
-  <div id="dev_page_content"><!-- scroll_nav -->
-
-<p>Telegram allows placing chats into folders, based on their type, mute status, or other custom criteria, thanks to folder blacklists and whitelists.<br>
-In the API, folders are called "dialog filters"; in the UI, they are typically represented as tabs.    </p>
-<p>Scheme:</p>
-<pre><code><a href='/constructor/dialogFilter'>dialogFilter</a>#7438f7e8 flags:<a href='/type/%23'>#</a> contacts:flags.0?<a href='/constructor/true'>true</a> non_contacts:flags.1?<a href='/constructor/true'>true</a> groups:flags.2?<a href='/constructor/true'>true</a> broadcasts:flags.3?<a href='/constructor/true'>true</a> bots:flags.4?<a href='/constructor/true'>true</a> exclude_muted:flags.11?<a href='/constructor/true'>true</a> exclude_read:flags.12?<a href='/constructor/true'>true</a> exclude_archived:flags.13?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> title:<a href='/type/string'>string</a> emoticon:flags.25?<a href='/type/string'>string</a> pinned_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; include_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; exclude_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/DialogFilter'>DialogFilter</a>;
-
-<a href='/constructor/dialogFilterSuggested'>dialogFilterSuggested</a>#77744d4a filter:<a href='/type/DialogFilter'>DialogFilter</a> description:<a href='/type/string'>string</a> = <a href='/type/DialogFilterSuggested'>DialogFilterSuggested</a>;
-
-<a href='/constructor/updateDialogFilter'>updateDialogFilter</a>#26ffde7d flags:<a href='/type/%23'>#</a> id:<a href='/type/int'>int</a> filter:flags.0?<a href='/type/DialogFilter'>DialogFilter</a> = <a href='/type/Update'>Update</a>;
-<a href='/constructor/updateDialogFilterOrder'>updateDialogFilterOrder</a>#a5d72105 order:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Update'>Update</a>;
-<a href='/constructor/updateDialogFilters'>updateDialogFilters</a>#3504914f = <a href='/type/Update'>Update</a>;
-
----functions---
-
-<a href='/method/messages.getDialogFilters'>messages.getDialogFilters</a>#f19ed96d = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DialogFilter'>DialogFilter</a>&gt;;
-<a href='/method/messages.getSuggestedDialogFilters'>messages.getSuggestedDialogFilters</a>#a29cd42c = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DialogFilterSuggested'>DialogFilterSuggested</a>&gt;;
-<a href='/method/messages.updateDialogFilter'>messages.updateDialogFilter</a>#1ad4a04a flags:<a href='/type/%23'>#</a> id:<a href='/type/int'>int</a> filter:flags.0?<a href='/type/DialogFilter'>DialogFilter</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/messages.updateDialogFiltersOrder'>messages.updateDialogFiltersOrder</a>#c563c1e4 order:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Bool'>Bool</a>;
-
-<a href='/method/help.getAppConfig'>help.getAppConfig</a>#98914110 = <a href='/type/JSONValue'>JSONValue</a>;</code></pre>
-<h2><a class="anchor" href="#folders" id="folders" name="folders"><i class="anchor-icon"></i></a>Folders</h2>
-<p>On startup, clients call:  </p>
-<ul>
-<li><a href="/method/messages.getDialogFilters">messages.getDialogFilters</a> to fetch a list of previously configured folders.</li>
-<li><a href="/method/messages.getSuggestedDialogFilters">messages.getSuggestedDialogFilters</a> to fetch a list of suggested folder combinations.</li>
-<li><a href="/method/help.getAppConfig">help.getAppConfig</a> to fetch app-specific configuration parameters.  </li>
-</ul>
-<p>The boolean under the <code>dialog_filters_tooltip</code> JSON key in the result of <a href="/method/help.getAppConfig">help.getAppConfig</a> can be used to determine whether a folder tooltip should be presented to the user right away.<br>
-The UI should then show a list of suggested folder combinations.  </p>
-<p>Once configuration is finished, apps call <a href="/method/messages.updateDialogFilter">messages.updateDialogFilter</a> to create or update existing folders.<br>
-As per the <a href="/constructor/dialogFilter">dialogFilter</a> constructor, folders have multiple flags that can be combined to determine which chats should be included in (or excluded from) the folder.<br>
-Folders can also have unlimited pinned chats, as determined by the <code>pinned_peers</code> field.</p>
-<p>To reorder existing folders, <a href="/method/messages.updateDialogFiltersOrder">messages.updateDialogFiltersOrder</a> should be used with the IDs of the various dialog filters.</p>
-<p>To delete folders, use <a href="/method/messages.updateDialogFilter">messages.updateDialogFilter</a> without populating the <code>filter</code> flag field.  </p>
-<p>Clients can receive <a href="/constructor/updateDialogFilter">updateDialogFilter</a>, <a href="/constructor/updateDialogFilterOrder">updateDialogFilterOrder</a> updates with new filter information, generated by other clients when modifying folder info.<br>
-Clients can also receive <a href="/constructor/updateDialogFilters">updateDialogFilters</a>, in which case folder info should be refetched manually using <a href="/method/messages.getDialogFilters">messages.getDialogFilters</a>.</p>
-<h2><a class="anchor" href="#peer-folders" id="peer-folders" name="peer-folders"><i class="anchor-icon"></i></a>Peer folders</h2>
-<p>The API also has another method for identifying groups of peers, typically used only by archived chats.</p>
-<p>Scheme:</p>
-<pre><code><a href='/constructor/inputDialogPeer'>inputDialogPeer</a>#fcaafeb7 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/InputDialogPeer'>InputDialogPeer</a>;
-<a href='/constructor/inputDialogPeerFolder'>inputDialogPeerFolder</a>#64600527 folder_id:<a href='/type/int'>int</a> = <a href='/type/InputDialogPeer'>InputDialogPeer</a>;
-
-<a href='/constructor/dialogPeer'>dialogPeer</a>#e56dbf05 peer:<a href='/type/Peer'>Peer</a> = <a href='/type/DialogPeer'>DialogPeer</a>;
-<a href='/constructor/dialogPeerFolder'>dialogPeerFolder</a>#514519e2 folder_id:<a href='/type/int'>int</a> = <a href='/type/DialogPeer'>DialogPeer</a>;
-
-<a href='/constructor/updateFolderPeers'>updateFolderPeers</a>#19360dc0 folder_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FolderPeer'>FolderPeer</a>&gt; pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
-
-<a href='/constructor/updates'>updates</a>#74ae4240 updates:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Update'>Update</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; date:<a href='/type/int'>int</a> seq:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
-
----functions---
-
-<a href='/method/folders.editPeerFolders'>folders.editPeerFolders</a>#6847d0ab folder_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputFolderPeer'>InputFolderPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;
-<a href='/method/folders.deleteFolder'>folders.deleteFolder</a>#1c295881 folder_id:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
-<p>API peer folders are typically used only by <a href="https://telegram.org/blog/archive-and-new-design">archived chats</a>, and are really handy for distinguishing groups of peers, since most peer-related constructors (updates, chat info) will contain the <code>folder_id</code> assigned the the specified chat.  </p>
-<p>In Telegram apps, API peer folders are used only to implement the chat archive, identified by <code>folder_id</code> <code>1</code>; all other peers are in <code>folder_id</code> <code>0</code> by default; no other <code>folder_id</code> is allowed at the moment.</p>
-<ul>
-<li><a href="/method/folders.editPeerFolders">folders.editPeerFolders</a> can be used to add and remove peers from peer folders.</li>
-<li><a href="/method/folders.deleteFolder">folders.deleteFolder</a> can be used to delete peer folders, moving all peers previously present in that folder to the default <code>0</code> folder.</li>
-</ul>
-<p>Both methods return an <a href="/constructor/updates">updates</a> constructor, containing a single <a href="/constructor/updateFolderPeers">updateFolderPeers</a> with the new <code>folder_id</code> of moved peers.<br>
-Clients can also receive <a href="/constructor/updateFolderPeers">updateFolderPeers</a> as a normal <a href="/api/updates">update</a>, generated by other clients when modifying peer folders.</p></div>
+  <div id="dev_page_content"></div>
   
 </div>
           
