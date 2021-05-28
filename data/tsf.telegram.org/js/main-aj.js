@@ -103,10 +103,6 @@ function ajInit(options) {
     }, 300);
   }
 
-  function cleanHTML(value) {
-    return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, getBR());
-  }
-
   function apiRequest(method, data, onSuccess) {
     return $.ajax(Aj.apiUrl, {
       type: 'POST',
@@ -368,7 +364,10 @@ function ajInit(options) {
       if (result._dlog) {
         $('#dlog').html(result._dlog);
       }
-      $(window).scrollTop(0);
+      if (push_state || !Aj._useScrollHack) {
+        $(window).scrollTop(0);
+      }
+      $('body').css({height: '', overflow: ''});
       if (url_hash) {
         scrollToHash();
       }
@@ -590,6 +589,9 @@ function ajInit(options) {
       skipPopState = false;
       return;
     }
+    if (Aj._useScrollHack) {
+      $('body').css({height: '100000px', overflow: 'hidden'}); // for correct scroll restoration
+    }
     var link = loc(curHistoryState.u);
     loadPage(link, false, state_go);
   });
@@ -604,6 +606,19 @@ function updateNavBar() {
   } else {
     $nav_menu.css('width', 'auto');
   }
+}
+
+function getBR() {
+  if (window._brHTML) return window._brHTML;
+  return window._brHTML = $('<div><br/></div>').html();
+}
+
+function cleanHTML(value) {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, getBR());
+}
+
+function cleanRE(value) {
+  return value.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&");
 }
 
 var Keys = {
