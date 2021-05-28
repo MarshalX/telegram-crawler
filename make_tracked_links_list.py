@@ -26,6 +26,7 @@ HIDDEN_URLS = {
     'instantview.telegram.org/rules',
 
     'core.telegram.org/resources/cidr.txt',
+    'core.telegram.org/apple_privacy',
 }
 BASE_URL_REGEX = r'telegram.org'
 
