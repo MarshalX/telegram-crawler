@@ -489,14 +489,59 @@ var Editor = {
       result.slug = Aj.state.builtinSlug;
     } else if (match = value.match(/^(?:https?:\/\/)?t\.me\/bg\/(\S+)/i)) {
       arr = match[1].split('?');
-      if (validateSlug(arr[0])) {
+      if (match = arr[0].match(/^[0-9a-f]{6}-[0-9a-f]{6}$/i)) {
+        result.gradient = arr[0].split('-');
+        for (var k = 0; k < result.gradient.length; k++) {
+          result.gradient[k] = Editor.formatColor(result.gradient[k]);
+        }
+        options = arr[1] ? parseStr(arr[1]) : {};
+        if (options.rotation) {
+          var rot = parseInt(options.rotation);
+          if (rot && rot < 360 && !(rot % 45)) {
+            result.rotation = parseInt(options.rotation);
+          }
+        }
+      }
+      else if (match = arr[0].match(/^[0-9a-f]{6}(~[0-9a-f]{6}){1,3}$/i)) {
+        result.gradient = arr[0].split('~');
+        for (var k = 0; k < result.gradient.length; k++) {
+          result.gradient[k] = Editor.formatColor(result.gradient[k]);
+        }
+        options = arr[1] ? parseStr(arr[1]) : {};
+        if (options.rotation) {
+          var rot = parseInt(options.rotation);
+          if (rot && rot < 360 && !(rot % 45)) {
+            result.rotation = parseInt(options.rotation);
+          }
+        }
+      }
+      else if (validateSlug(arr[0])) {
         result.slug = arr[0];
         options = arr[1] ? parseStr(arr[1]) : {};
         if (options.bg_color) {
-          result.color = Editor.formatColor(options.bg_color);
+          if (match = options.bg_color.match(/^[0-9a-f]{6}-[0-9a-f]{6}$/i)) {
+            result.gradient = options.bg_color.split('-');
+            for (var k = 0; k < result.gradient.length; k++) {
+              result.gradient[k] = Editor.formatColor(result.gradient[k]);
+            }
+          }
+          else if (match = options.bg_color.match(/^[0-9a-f]{6}(~[0-9a-f]{6}){1,3}$/i)) {
+            result.gradient = options.bg_color.split('~');
+            for (var k = 0; k < result.gradient.length; k++) {
+              result.gradient[k] = Editor.formatColor(result.gradient[k]);
+            }
+          } else {
+            result.color = Editor.formatColor(options.bg_color);
+          }
         }
         if (options.intensity) {
           result.intensity = parseInt(options.intensity);
+        }
+        if (options.rotation) {
+          var rot = parseInt(options.rotation);
+          if (rot && rot < 360 && !(rot % 45)) {
+            result.rotation = parseInt(options.rotation);
+          }
         }
         if (options.mode) {
           result.mode = options.mode;
@@ -527,6 +572,14 @@ var Editor = {
     var bubble_out_val = Editor.formatColor(Editor.getContentValue(fileContent, Aj.state.thumbKeys.bubble_out)) || '#d4f1ff';
     if (wallpaper.color) {
       bg_color_val = wallpaper.color;
+    } else if (wallpaper.gradient) {
+      var bg_grad = $('#bg_gradient', $parent).get(0);
+      if (bg_grad) {
+        bg_grad.setAttribute('gradientTransform', 'rotate(' + (wallpaper.rotation || 0) + ' 0.5 0.5)');
+      }
+      $('#bg_gradient_color1', $parent).attr('stop-color', wallpaper.gradient[0]);
+      $('#bg_gradient_color2', $parent).attr('stop-color', wallpaper.gradient[1]);
+      bg_color_val = "url('#bg_gradient')";
     }
     if (wallpaper.intensity) {
       var opacity = Math.max(10, Math.min(wallpaper.intensity, 100));
@@ -553,7 +606,7 @@ var Editor = {
     }
   },
   prepareThumb: function(callback) {
-    var $svg = $('<div><svg height="46" viewBox="0 0 74 46" width="74" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><filter id="thumb_blur"><feGaussianBlur stdDeviation="3" /></filter><defs><pattern id="thumb_bg" patternUnits="userSpaceOnUse" width="74" height="46"><rect id="thumb_bg_color" fill="" width="100%" height="100%"/><image id="thumb_bg_image" xlink:href="" x="-5" y="-5" width="84" height="56" preserveAspectRatio="xMidYMid slice" /></pattern></defs><g fill="none" fill-rule="evenodd"><rect fill="url(\'#thumb_bg\')" height="46" width="74"/><rect id="thumb_bubble_in" fill="" height="12" rx="3" width="40" x="8" y="8"/><rect id="thumb_bubble_out" fill="" height="12" rx="3" width="40" x="26" y="26"/></g></svg></div>');
+    var $svg = $('<div><svg height="46" viewBox="0 0 74 46" width="74" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><filter id="thumb_blur"><feGaussianBlur stdDeviation="3" /></filter><defs><linearGradient id="bg_gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" id="bg_gradient_color1" /><stop offset="100%" id="bg_gradient_color2" /></linearGradient><pattern id="thumb_bg" patternUnits="userSpaceOnUse" width="74" height="46"><rect id="thumb_bg_color" fill="" width="100%" height="100%"/><image id="thumb_bg_image" xlink:href="" x="-5" y="-5" width="84" height="56" preserveAspectRatio="xMidYMid slice" /></pattern></defs><g fill="none" fill-rule="evenodd"><rect fill="url(\'#thumb_bg\')" height="46" width="74"/><rect id="thumb_bubble_in" fill="" height="12" rx="3" width="40" x="8" y="8"/><rect id="thumb_bubble_out" fill="" height="12" rx="3" width="40" x="26" y="26"/></g></svg></div>');
     Editor.redrawThumb($svg, function() {
       callback($svg.html());
     });
