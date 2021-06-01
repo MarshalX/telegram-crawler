@@ -28,6 +28,9 @@ HIDDEN_URLS = {
     'core.telegram.org/resources/cidr.txt',
     'core.telegram.org/apple_privacy',
 }
+ADDITIONAL_URLS = {
+    'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/api.tl'
+}
 BASE_URL_REGEX = r'telegram.org'
 
 # disable crawling sub links for specific domains and url patterns
@@ -243,6 +246,7 @@ async def start(url_list: set[str]):
 
 if __name__ == '__main__':
     HIDDEN_URLS.add(BASE_URL)
+    LINKS_TO_TRACK = LINKS_TO_TRACK | ADDITIONAL_URLS
 
     logger.info('Start crawling links...')
     start_time = time()
