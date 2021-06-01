@@ -29,7 +29,8 @@ HIDDEN_URLS = {
     'core.telegram.org/apple_privacy',
 }
 ADDITIONAL_URLS = {
-    'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/api.tl'
+    'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/api.tl',
+    'contest.com',
 }
 BASE_URL_REGEX = r'telegram.org'
 
