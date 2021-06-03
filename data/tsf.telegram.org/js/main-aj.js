@@ -254,6 +254,7 @@ function ajInit(options) {
       }
     }
     onUnload(function() {
+      $(ajContainer).off('.curPage');
       $(document).off('.curPage');
     });
     if (Aj.layer) {
@@ -629,7 +630,10 @@ var Keys = {
   LEFT: 37,
   UP: 38,
   RIGHT: 39,
-  DOWN: 40
+  DOWN: 40,
+  on: function(key, callback) {
+    return function(e){ if(e.which == key) callback.apply(this, Array.prototype.slice.apply(arguments)); };
+  }
 };
 
 var Popups = [];
