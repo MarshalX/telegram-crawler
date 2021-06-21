@@ -38,12 +38,13 @@ async def crawl(url: str, session: aiohttp.ClientSession):
     try:
         logger.info(f'Process {url}')
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False) as response:
-            if response.status == 302:
-                return
+            if response.status == 500:
+                return await asyncio.gather(crawl(url, session))
 
             if response.status != 200:
-                content = await response.text()
-                logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
+                if response.status != 302:
+                    content = await response.text()
+                    logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
                 return
 
             # bypass external slashes and so on

@@ -198,12 +198,13 @@ async def crawl(url: str, session: aiohttp.ClientSession):
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
             content_type = response.headers.get('content-type')
 
-            if response.status == 302:
-                return
+            if response.status == 500:
+                return await asyncio.gather(crawl(url, session))
 
             if response.status != 200:
-                content = await response.text()
-                logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
+                if response.status != 302:
+                    content = await response.text()
+                    logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
                 return
 
             if 'text/html' in content_type:
