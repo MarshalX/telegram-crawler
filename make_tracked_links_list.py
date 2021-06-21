@@ -8,7 +8,7 @@ from time import time
 from urllib.parse import unquote
 
 import aiohttp
-from aiohttp import ClientConnectorError
+from aiohttp import ClientConnectorError, ServerDisconnectedError
 
 PROTOCOL = 'https://'
 BASE_URL = 'telegram.org'
@@ -196,10 +196,14 @@ async def crawl(url: str, session: aiohttp.ClientSession):
     try:
         logger.info(f'[{len(VISITED_LINKS)}] Process {url}')
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
-            status_code = response.status
             content_type = response.headers.get('content-type')
 
-            if status_code != 200:
+            if response.status == 302:
+                return
+
+            if response.status != 200:
+                content = await response.text()
+                logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
                 return
 
             if 'text/html' in content_type:
@@ -234,7 +238,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
         logger.warning('Codec can\'t decode byte. So its was a tgs file')
     except ClientConnectorError:
         logger.warning(f'Wrong link: {url}')
-    except TimeoutError:
+    except (ServerDisconnectedError, TimeoutError):
         logger.warning(f'Retrying {url}')
         VISITED_LINKS.remove(url)
         await asyncio.gather(crawl(url, session))
