@@ -50,6 +50,33 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="june-25-2021" href="#june-25-2021"><i class="anchor-icon"></i></a>June 25, 2021</h4>
+<p><strong>Bot API 5.3</strong></p>
+<p><strong>Personalized Commands</strong></p>
+<ul>
+<li>Bots can now show lists of commands tailored to specific situations - including localized commands for users with different languages, as well as different commands based on chat type or for specific chats, and special lists of commands for chat admins.</li>
+<li>Added the class <a href="#botcommandscope">BotCommandScope</a>, describing the scope to which bot commands apply.</li>
+<li>Added the parameters <code>scope</code> and <code>language_code</code> to the method <a href="#setmycommands">setMyCommands</a> to allow bots specify different commands for different chats and users.</li>
+<li>Added the parameters <code>scope</code> and <code>language_code</code> to the method <a href="#getmycommands">getMyCommands</a>.</li>
+<li>Added the method <a href="#deletemycommands">deleteMyCommands</a> to allow deletion of the bot&#39;s commands for the given scope and user language.</li>
+<li>Improved visibility of bot commands in Telegram apps with the new &#39;Menu&#39; button in chats with bots, read more on the <a href="https://telegram.org/blog/animated-backgrounds#bot-menu">blog</a>.</li>
+</ul>
+<p><strong>Custom Placeholders</strong></p>
+<ul>
+<li>Added the ability to specify a custom input field placeholder in the classes <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a> and <a href="#forcereply">ForceReply</a>.</li>
+</ul>
+<p><strong>And More</strong></p>
+<ul>
+<li>Improved documentation of the class <a href="#chatmember">ChatMember</a> by splitting it into 6 subclasses.</li>
+<li>Renamed the method <code>kickChatMember</code> to <a href="#banchatmember">banChatMember</a>. The old method name can still be used.</li>
+<li>Renamed the method <code>getChatMembersCount</code> to <a href="#getchatmembercount">getChatMemberCount</a>. The old method name can still be used.</li>
+<li>Values of the field <code>file_unique_id</code> in objects of the type <a href="#photosize">PhotoSize</a> and of the fields <code>small_file_unique_id</code> and <code>big_file_unique_id</code> in objects of the type <a href="#chatphoto">ChatPhoto</a> were changed.</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>After one of the upcoming Bot API updates, user identifiers will become bigger than <code>2^31 - 1</code> and it will be no longer possible to store them in a signed 32-bit integer type. User identifiers will have up to 52 significant bits, so a 64-bit integer or double-precision float type would still be safe for storing them. Please make sure that your code can correctly handle such user identifiers.</p>
+</blockquote>
+<hr>
 <h4><a class="anchor" name="april-26-2021" href="#april-26-2021"><i class="anchor-icon"></i></a>April 26, 2021</h4>
 <p><strong>Bot API 5.2</strong></p>
 <ul>
@@ -1794,6 +1821,11 @@ To learn how to create…">
 <td><em>Optional</em>. Requests clients to hide the keyboard as soon as it&#39;s been used. The keyboard will still be available, but clients will automatically display the usual letter-keyboard in the chat – the user can press a special button in the input field to see the custom keyboard again. Defaults to <em>false</em>.</td>
 </tr>
 <tr>
+<td>input_field_placeholder</td>
+<td>String</td>
+<td><em>Optional</em>. The placeholder to be shown in the input field when the keyboard is active; 1-64 characters</td>
+</tr>
+<tr>
 <td>selective</td>
 <td>Boolean</td>
 <td><em>Optional</em>. Use this parameter if you want to show the keyboard to specific users only. Targets: 1) users that are @mentioned in the <em>text</em> of the <a href="#message">Message</a> object; 2) if the bot&#39;s message is a reply (has <em>reply_to_message_id</em>), sender of the original message.<br><br><em>Example:</em> A user requests to change the bot&#39;s language, bot replies to the request with a keyboard to select the new language. Other users in the group don&#39;t see the keyboard.</td>
@@ -2056,6 +2088,11 @@ To learn how to create…">
 <td>Shows reply interface to the user, as if they manually selected the bot&#39;s message and tapped &#39;Reply&#39;</td>
 </tr>
 <tr>
+<td>input_field_placeholder</td>
+<td>String</td>
+<td><em>Optional</em>. The placeholder to be shown in the input field when the reply is active; 1-64 characters</td>
+</tr>
+<tr>
 <td>selective</td>
 <td>Boolean</td>
 <td><em>Optional</em>. Use this parameter if you want to force reply from specific users only. Targets: 1) users that are @mentioned in the <em>text</em> of the <a href="#message">Message</a> object; 2) if the bot&#39;s message is a reply (has <em>reply_to_message_id</em>), sender of the original message.</td>
@@ -2147,7 +2184,17 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="chatmember" href="#chatmember"><i class="anchor-icon"></i></a>ChatMember</h4>
-<p>This object contains information about one member of a chat.</p>
+<p>This object contains information about one member of a chat. Currently, the following 6 types of chat members are supported:</p>
+<ul>
+<li><a href="#chatmemberowner">ChatMemberOwner</a></li>
+<li><a href="#chatmemberadministrator">ChatMemberAdministrator</a></li>
+<li><a href="#chatmembermember">ChatMemberMember</a></li>
+<li><a href="#chatmemberrestricted">ChatMemberRestricted</a></li>
+<li><a href="#chatmemberleft">ChatMemberLeft</a></li>
+<li><a href="#chatmemberbanned">ChatMemberBanned</a></li>
+</ul>
+<h4><a class="anchor" name="chatmemberowner" href="#chatmemberowner"><i class="anchor-icon"></i></a>ChatMemberOwner</h4>
+<p>Represents a <a href="#chatmember">chat member</a> that owns the chat and has all administrator privileges.</p>
 <table class="table">
 <thead>
 <tr>
@@ -2158,114 +2205,259 @@ To learn how to create…">
 </thead>
 <tbody>
 <tr>
+<td>status</td>
+<td>String</td>
+<td>The member&#39;s status in the chat, always “creator”</td>
+</tr>
+<tr>
 <td>user</td>
 <td><a href="#user">User</a></td>
 <td>Information about the user</td>
 </tr>
 <tr>
-<td>status</td>
-<td>String</td>
-<td>The member&#39;s status in the chat. Can be “creator”, “administrator”, “member”, “restricted”, “left” or “kicked”</td>
-</tr>
-<tr>
 <td>custom_title</td>
 <td>String</td>
-<td><em>Optional</em>. Owner and administrators only. Custom title for this user</td>
+<td>Custom title for this user</td>
 </tr>
 <tr>
 <td>is_anonymous</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Owner and administrators only. True, if the user&#39;s presence in the chat is hidden</td>
+<td>True, if the user&#39;s presence in the chat is hidden</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatmemberadministrator" href="#chatmemberadministrator"><i class="anchor-icon"></i></a>ChatMemberAdministrator</h4>
+<p>Represents a <a href="#chatmember">chat member</a> that has some additional privileges.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The member&#39;s status in the chat, always “administrator”</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td>Information about the user</td>
 </tr>
 <tr>
 <td>can_be_edited</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators only. True, if the bot is allowed to edit administrator privileges of that user</td>
+<td>True, if the bot is allowed to edit administrator privileges of that user</td>
+</tr>
+<tr>
+<td>custom_title</td>
+<td>String</td>
+<td>Custom title for this user</td>
+</tr>
+<tr>
+<td>is_anonymous</td>
+<td>Boolean</td>
+<td>True, if the user&#39;s presence in the chat is hidden</td>
 </tr>
 <tr>
 <td>can_manage_chat</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators only. True, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege</td>
+<td>True, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege</td>
 </tr>
 <tr>
 <td>can_post_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators only. True, if the administrator can post in the channel; channels only</td>
+<td>True, if the administrator can post in the channel; channels only</td>
 </tr>
 <tr>
 <td>can_edit_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators only. True, if the administrator can edit messages of other users and can pin messages; channels only</td>
+<td>True, if the administrator can edit messages of other users and can pin messages; channels only</td>
 </tr>
 <tr>
 <td>can_delete_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators only. True, if the administrator can delete messages of other users</td>
+<td>True, if the administrator can delete messages of other users</td>
 </tr>
 <tr>
 <td>can_manage_voice_chats</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators only. True, if the administrator can manage voice chats</td>
+<td>True, if the administrator can manage voice chats</td>
 </tr>
 <tr>
 <td>can_restrict_members</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators only. True, if the administrator can restrict, ban or unban chat members</td>
+<td>True, if the administrator can restrict, ban or unban chat members</td>
 </tr>
 <tr>
 <td>can_promote_members</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators only. True, if the administrator can add new administrators with a subset of their own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by the user)</td>
+<td>True, if the administrator can add new administrators with a subset of their own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by the user)</td>
 </tr>
 <tr>
 <td>can_change_info</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators and restricted only. True, if the user is allowed to change the chat title, photo and other settings</td>
+<td>True, if the user is allowed to change the chat title, photo and other settings</td>
 </tr>
 <tr>
 <td>can_invite_users</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators and restricted only. True, if the user is allowed to invite new users to the chat</td>
+<td>True, if the user is allowed to invite new users to the chat</td>
 </tr>
 <tr>
 <td>can_pin_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Administrators and restricted only. True, if the user is allowed to pin messages; groups and supergroups only</td>
+<td>True, if the user is allowed to pin messages; groups and supergroups only</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatmembermember" href="#chatmembermember"><i class="anchor-icon"></i></a>ChatMemberMember</h4>
+<p>Represents a <a href="#chatmember">chat member</a> that has no additional privileges or restrictions.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The member&#39;s status in the chat, always “member”</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td>Information about the user</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatmemberrestricted" href="#chatmemberrestricted"><i class="anchor-icon"></i></a>ChatMemberRestricted</h4>
+<p>Represents a <a href="#chatmember">chat member</a> that is under certain restrictions in the chat. Supergroups only.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The member&#39;s status in the chat, always “restricted”</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td>Information about the user</td>
 </tr>
 <tr>
 <td>is_member</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Restricted only. True, if the user is a member of the chat at the moment of the request</td>
+<td>True, if the user is a member of the chat at the moment of the request</td>
+</tr>
+<tr>
+<td>can_change_info</td>
+<td>Boolean</td>
+<td>True, if the user is allowed to change the chat title, photo and other settings</td>
+</tr>
+<tr>
+<td>can_invite_users</td>
+<td>Boolean</td>
+<td>True, if the user is allowed to invite new users to the chat</td>
+</tr>
+<tr>
+<td>can_pin_messages</td>
+<td>Boolean</td>
+<td>True, if the user is allowed to pin messages; groups and supergroups only</td>
 </tr>
 <tr>
 <td>can_send_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Restricted only. True, if the user is allowed to send text messages, contacts, locations and venues</td>
+<td>True, if the user is allowed to send text messages, contacts, locations and venues</td>
 </tr>
 <tr>
 <td>can_send_media_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Restricted only. True, if the user is allowed to send audios, documents, photos, videos, video notes and voice notes</td>
+<td>True, if the user is allowed to send audios, documents, photos, videos, video notes and voice notes</td>
 </tr>
 <tr>
 <td>can_send_polls</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Restricted only. True, if the user is allowed to send polls</td>
+<td>True, if the user is allowed to send polls</td>
 </tr>
 <tr>
 <td>can_send_other_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Restricted only. True, if the user is allowed to send animations, games, stickers and use inline bots</td>
+<td>True, if the user is allowed to send animations, games, stickers and use inline bots</td>
 </tr>
 <tr>
 <td>can_add_web_page_previews</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Restricted only. True, if the user is allowed to add web page previews to their messages</td>
+<td>True, if the user is allowed to add web page previews to their messages</td>
 </tr>
 <tr>
 <td>until_date</td>
 <td>Integer</td>
-<td><em>Optional</em>. Restricted and kicked only. Date when restrictions will be lifted for this user; unix time</td>
+<td>Date when restrictions will be lifted for this user; unix time</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatmemberleft" href="#chatmemberleft"><i class="anchor-icon"></i></a>ChatMemberLeft</h4>
+<p>Represents a <a href="#chatmember">chat member</a> that isn&#39;t currently a member of the chat, but may join it themselves.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The member&#39;s status in the chat, always “left”</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td>Information about the user</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatmemberbanned" href="#chatmemberbanned"><i class="anchor-icon"></i></a>ChatMemberBanned</h4>
+<p>Represents a <a href="#chatmember">chat member</a> that was banned in the chat and can&#39;t return to the chat or view chat messages.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The member&#39;s status in the chat, always “kicked”</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td>Information about the user</td>
+</tr>
+<tr>
+<td>until_date</td>
+<td>Integer</td>
+<td>Date when restrictions will be lifted for this user; unix time</td>
 </tr>
 </tbody>
 </table>
@@ -2408,6 +2600,189 @@ To learn how to create…">
 <td>description</td>
 <td>String</td>
 <td>Description of the command, 3-256 characters.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="botcommandscope" href="#botcommandscope"><i class="anchor-icon"></i></a>BotCommandScope</h4>
+<p>This object represents the scope to which bot commands are applied. Currently, the following 7 scopes are supported:</p>
+<ul>
+<li><a href="#botcommandscopedefault">BotCommandScopeDefault</a></li>
+<li><a href="#botcommandscopeallprivatechats">BotCommandScopeAllPrivateChats</a></li>
+<li><a href="#botcommandscopeallgroupchats">BotCommandScopeAllGroupChats</a></li>
+<li><a href="#botcommandscopeallchatadministrators">BotCommandScopeAllChatAdministrators</a></li>
+<li><a href="#botcommandscopechat">BotCommandScopeChat</a></li>
+<li><a href="#botcommandscopechatadministrators">BotCommandScopeChatAdministrators</a></li>
+<li><a href="#botcommandscopechatmember">BotCommandScopeChatMember</a></li>
+</ul>
+<h4><a class="anchor" name="determining-list-of-commands" href="#determining-list-of-commands"><i class="anchor-icon"></i></a>Determining list of commands</h4>
+<p>The following algorithm is used to determine the list of commands for a particular user viewing the bot menu. The first list of commands which is set is returned:</p>
+<p><strong>Commands in the chat with the bot</strong></p>
+<ul>
+<li>botCommandScopeChat + language_code</li>
+<li>botCommandScopeChat</li>
+<li>botCommandScopeAllPrivateChats + language_code</li>
+<li>botCommandScopeAllPrivateChats</li>
+<li>botCommandScopeDefault + language_code</li>
+<li>botCommandScopeDefault</li>
+</ul>
+<p><strong>Commands in group and supergroup chats</strong></p>
+<ul>
+<li>botCommandScopeChatMember + language_code</li>
+<li>botCommandScopeChatMember</li>
+<li>botCommandScopeChatAdministrators + language_code (admins only)</li>
+<li>botCommandScopeChatAdministrators (admins only)</li>
+<li>botCommandScopeChat + language_code</li>
+<li>botCommandScopeChat</li>
+<li>botCommandScopeAllChatAdministrators + language_code (admins only)</li>
+<li>botCommandScopeAllChatAdministrators (admins only)</li>
+<li>botCommandScopeAllGroupChats + language_code</li>
+<li>botCommandScopeAllGroupChats</li>
+<li>botCommandScopeDefault + language_code</li>
+<li>botCommandScopeDefault</li>
+</ul>
+<h4><a class="anchor" name="botcommandscopedefault" href="#botcommandscopedefault"><i class="anchor-icon"></i></a>BotCommandScopeDefault</h4>
+<p>Represents the default <a href="#botcommandscope">scope</a> of bot commands. Default commands are used if no commands with a <a href="#determining-list-of-commands">narrower scope</a> are specified for the user.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Scope type, must be <em>default</em></td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="botcommandscopeallprivatechats" href="#botcommandscopeallprivatechats"><i class="anchor-icon"></i></a>BotCommandScopeAllPrivateChats</h4>
+<p>Represents the <a href="#botcommandscope">scope</a> of bot commands, covering all private chats.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Scope type, must be <em>all_private_chats</em></td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="botcommandscopeallgroupchats" href="#botcommandscopeallgroupchats"><i class="anchor-icon"></i></a>BotCommandScopeAllGroupChats</h4>
+<p>Represents the <a href="#botcommandscope">scope</a> of bot commands, covering all group and supergroup chats.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Scope type, must be <em>all_group_chats</em></td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="botcommandscopeallchatadministrators" href="#botcommandscopeallchatadministrators"><i class="anchor-icon"></i></a>BotCommandScopeAllChatAdministrators</h4>
+<p>Represents the <a href="#botcommandscope">scope</a> of bot commands, covering all group and supergroup chat administrators.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Scope type, must be <em>all_chat_administrators</em></td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="botcommandscopechat" href="#botcommandscopechat"><i class="anchor-icon"></i></a>BotCommandScopeChat</h4>
+<p>Represents the <a href="#botcommandscope">scope</a> of bot commands, covering a specific chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Scope type, must be <em>chat</em></td>
+</tr>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="botcommandscopechatadministrators" href="#botcommandscopechatadministrators"><i class="anchor-icon"></i></a>BotCommandScopeChatAdministrators</h4>
+<p>Represents the <a href="#botcommandscope">scope</a> of bot commands, covering all administrators of a specific group or supergroup chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Scope type, must be <em>chat_administrators</em></td>
+</tr>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="botcommandscopechatmember" href="#botcommandscopechatmember"><i class="anchor-icon"></i></a>BotCommandScopeChatMember</h4>
+<p>Represents the <a href="#botcommandscope">scope</a> of bot commands, covering a specific member of a group or supergroup chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Scope type, must be <em>chat_member</em></td>
+</tr>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Unique identifier of the target user</td>
 </tr>
 </tbody>
 </table>
@@ -4210,8 +4585,8 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <p><strong>Note:</strong> This function may not preserve the original file name and MIME type. You should save the file&#39;s MIME type and name (if available) when the File object is received.</p>
-<h4><a class="anchor" name="kickchatmember" href="#kickchatmember"><i class="anchor-icon"></i></a>kickChatMember</h4>
-<p>Use this method to kick a user from a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless <a href="#unbanchatmember">unbanned</a> first. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns <em>True</em> on success.</p>
+<h4><a class="anchor" name="banchatmember" href="#banchatmember"><i class="anchor-icon"></i></a>banChatMember</h4>
+<p>Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless <a href="#unbanchatmember">unbanned</a> first. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4249,7 +4624,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="unbanchatmember" href="#unbanchatmember"><i class="anchor-icon"></i></a>unbanChatMember</h4>
-<p>Use this method to unban a previously kicked user in a supergroup or channel. The user will <strong>not</strong> return to the group or channel automatically, but will be able to join via link, etc. The bot must be an administrator for this to work. By default, this method guarantees that after the call the user is not a member of the chat, but will be able to join it. So if the user is a member of the chat they will also be <strong>removed</strong> from the chat. If you don&#39;t want this, use the parameter <em>only_if_banned</em>. Returns <em>True</em> on success.</p>
+<p>Use this method to unban a previously banned user in a supergroup or channel. The user will <strong>not</strong> return to the group or channel automatically, but will be able to join via link, etc. The bot must be an administrator for this to work. By default, this method guarantees that after the call the user is not a member of the chat, but will be able to join it. So if the user is a member of the chat they will also be <strong>removed</strong> from the chat. If you don&#39;t want this, use the parameter <em>only_if_banned</em>. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4823,7 +5198,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
-<h4><a class="anchor" name="getchatmemberscount" href="#getchatmemberscount"><i class="anchor-icon"></i></a>getChatMembersCount</h4>
+<h4><a class="anchor" name="getchatmembercount" href="#getchatmembercount"><i class="anchor-icon"></i></a>getChatMemberCount</h4>
 <p>Use this method to get the number of members in a chat. Returns <em>Int</em> on success.</p>
 <table class="table">
 <thead>
@@ -4963,7 +5338,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setmycommands" href="#setmycommands"><i class="anchor-icon"></i></a>setMyCommands</h4>
-<p>Use this method to change the list of the bot&#39;s commands. Returns <em>True</em> on success.</p>
+<p>Use this method to change the list of the bot&#39;s commands. See https://core.telegram.org/bots#commands for more details about bot commands. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4980,10 +5355,72 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Yes</td>
 <td>A JSON-serialized list of bot commands to be set as the list of the bot&#39;s commands. At most 100 commands can be specified.</td>
 </tr>
+<tr>
+<td>scope</td>
+<td><a href="#botcommandscope">BotCommandScope</a></td>
+<td>Optional</td>
+<td>A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to <a href="#botcommandscopedefault">BotCommandScopeDefault</a>.</td>
+</tr>
+<tr>
+<td>language_code</td>
+<td>String</td>
+<td>Optional</td>
+<td>A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="deletemycommands" href="#deletemycommands"><i class="anchor-icon"></i></a>deleteMyCommands</h4>
+<p>Use this method to delete the list of the bot&#39;s commands for the given scope and user language. After deletion, <a href="#determining-list-of-commands">higher level commands</a> will be shown to affected users. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>scope</td>
+<td><a href="#botcommandscope">BotCommandScope</a></td>
+<td>Optional</td>
+<td>A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to <a href="#botcommandscopedefault">BotCommandScopeDefault</a>.</td>
+</tr>
+<tr>
+<td>language_code</td>
+<td>String</td>
+<td>Optional</td>
+<td>A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="getmycommands" href="#getmycommands"><i class="anchor-icon"></i></a>getMyCommands</h4>
-<p>Use this method to get the current list of the bot&#39;s commands. Requires no parameters. Returns Array of <a href="#botcommand">BotCommand</a> on success.</p>
+<p>Use this method to get the current list of the bot&#39;s commands for the given scope and user language. Returns Array of <a href="#botcommand">BotCommand</a> on success. If commands aren&#39;t set, an empty list is returned.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>scope</td>
+<td><a href="#botcommandscope">BotCommandScope</a></td>
+<td>Optional</td>
+<td>A JSON-serialized object, describing scope of users. Defaults to <a href="#botcommandscopedefault">BotCommandScopeDefault</a>.</td>
+</tr>
+<tr>
+<td>language_code</td>
+<td>String</td>
+<td>Optional</td>
+<td>A two-letter ISO 639-1 language code or an empty string</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="inline-mode-methods" href="#inline-mode-methods"><i class="anchor-icon"></i></a>Inline mode methods</h4>
 <p>Methods and objects used in the inline mode are described in the <a href="#inline-mode">Inline mode section</a>.</p>
 <h3><a class="anchor" name="updating-messages" href="#updating-messages"><i class="anchor-icon"></i></a>Updating messages</h3>
