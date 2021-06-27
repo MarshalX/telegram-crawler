@@ -100,6 +100,7 @@ RELATIVE_LINK_REGEX = r'\/(?!\/)([-a-zA-Z0-9\/@:%._\+~#]{0,249})'
 DOM_ATTRS = ['href', 'src']
 
 OUTPUT_FILENAME = os.environ.get('OUTPUT_FILENAME', 'tracked_links.txt')
+COMPARE_OUTPUT_WITH_FILENAME = os.environ.get('COMPARE_OUTPUT_WITH_FILENAME', OUTPUT_FILENAME)
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
@@ -260,7 +261,7 @@ if __name__ == '__main__':
     logger.info(f'Stop crawling links. {time() - start_time} sec.')
 
     try:
-        with open(OUTPUT_FILENAME, 'r') as f:
+        with open(COMPARE_OUTPUT_WITH_FILENAME, 'r') as f:
             OLD_URL_LIST = set([l.replace('\n', '') for l in f.readlines()])
 
         logger.info(f'Is equal: {OLD_URL_LIST == LINKS_TO_TRACK}')
