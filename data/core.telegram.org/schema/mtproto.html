@@ -45,7 +45,8 @@ int ? = Int;…">
   
   <div id="dev_page_content"><p>Below you will find the current MTProto TL-schema. <a href="/mtproto/TL">More details on TL »</a></p>
 <p>See also the <a href="/schema/mtproto-json">detailed schema in JSON »</a></p>
-<p><br></p>
+<p><br/></p>
+
 <pre><code>int ? = Int;
 long ? = Long;
 double ? = Double;
@@ -58,10 +59,9 @@ int256 8*[ int ] = Int256;
 
 resPQ#05162463 nonce:int128 server_nonce:int128 pq:bytes server_public_key_fingerprints:Vector&lt;long&gt; = ResPQ;
 
-p_q_inner_data#83c95aec pq:bytes p:bytes q:bytes nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data;
+p_q_inner_data_dc#a9f55f95 pq:bytes p:bytes q:bytes nonce:int128 server_nonce:int128 new_nonce:int256 dc:int = P_Q_inner_data;
+p_q_inner_data_temp_dc#56fddf88 pq:bytes p:bytes q:bytes nonce:int128 server_nonce:int128 new_nonce:int256 dc:int expires_in:int = P_Q_inner_data;
 
-
-server_DH_params_fail#79cb045d nonce:int128 server_nonce:int128 new_nonce_hash:int128 = Server_DH_Params;
 server_DH_params_ok#d0e8075c nonce:int128 server_nonce:int128 encrypted_answer:bytes = Server_DH_Params;
 
 server_DH_inner_data#b5890dba nonce:int128 server_nonce:int128 g:int dh_prime:bytes g_a:bytes server_time:int = Server_DH_inner_data;
@@ -71,6 +71,8 @@ client_DH_inner_data#6643b654 nonce:int128 server_nonce:int128 retry_id:long g_b
 dh_gen_ok#3bcbf734 nonce:int128 server_nonce:int128 new_nonce_hash1:int128 = Set_client_DH_params_answer;
 dh_gen_retry#46dc1fb9 nonce:int128 server_nonce:int128 new_nonce_hash2:int128 = Set_client_DH_params_answer;
 dh_gen_fail#a69dae02 nonce:int128 server_nonce:int128 new_nonce_hash3:int128 = Set_client_DH_params_answer;
+
+bind_auth_key_inner#75a3f765 nonce:long temp_auth_key_id:long perm_auth_key_id:long temp_session_id:long expires_at:int = BindAuthKeyInner;
 
 rpc_result#f35c6d01 req_msg_id:long result:Object = RpcResult;
 rpc_error#2144ca19 error_code:int error_message:string = RpcError;
@@ -107,9 +109,13 @@ msgs_all_info#8cc0d131 msg_ids:Vector&lt;long&gt; info:bytes = MsgsAllInfo;
 msg_detailed_info#276d3ec6 msg_id:long answer_msg_id:long bytes:int status:int = MsgDetailedInfo;
 msg_new_detailed_info#809db6df answer_msg_id:long bytes:int status:int = MsgDetailedInfo;
 
+destroy_auth_key_ok#f660e1d4 = DestroyAuthKeyRes;
+destroy_auth_key_none#0a9f2259 = DestroyAuthKeyRes;
+destroy_auth_key_fail#ea109b13 = DestroyAuthKeyRes;
+
 ---functions---
 
-req_pq#60469778 nonce:int128 = ResPQ;
+req_pq_multi#be7e8ef1 nonce:int128 = ResPQ;
 
 req_DH_params#d712e4be nonce:int128 server_nonce:int128 p:bytes q:bytes public_key_fingerprint:long encrypted_data:bytes = Server_DH_Params;
 
@@ -121,7 +127,10 @@ ping#7abe77ec ping_id:long = Pong;
 ping_delay_disconnect#f3427b8c ping_id:long disconnect_delay:int = Pong;
 destroy_session#e7512126 session_id:long = DestroySessionRes;
 
-http_wait#9299359f max_delay:int wait_after:int max_wait:int = HttpWait;</code></pre></div>
+http_wait#9299359f max_delay:int wait_after:int max_wait:int = HttpWait;
+
+destroy_auth_key#d1435160 = DestroyAuthKeyRes;</code></pre>
+</div>
   
 </div>
           
