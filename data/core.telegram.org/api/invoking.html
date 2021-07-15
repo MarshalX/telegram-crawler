@@ -59,11 +59,12 @@
 <p><a href="/method/invokeWithoutUpdates">invokeWithoutUpdates</a> can be used to invoke a request without subscribing the used connection for <a href="/api/updates">updates</a> (this is enabled by default for <a href="/api/files">file queries</a>).</p>
 <h3><a class="anchor" name="sequential-requests" href="#sequential-requests"><i class="anchor-icon"></i></a>Sequential Requests</h3>
 <p>Sometimes a client needs to transmit several send message requests to the server all at once in a single message or in several consecutive messages. However, there is a chance that the server may execute these requests out of order (queries are handled by different servers to improve performance, which introduces a degree of randomness to the process).</p>
-<p>There are helper methods for making several consecutive API calls without wasting time waiting for a response:</p>
+<p>There are helper methods for making several consecutive API calls without losing time to wait for a response:</p>
 <div class="richcode">
 <p><a href="/method/invokeAfterMsg">invokeAfterMsg</a>#cb9f372d {X:Type} msg_id:long query:!X = X;<br><a href="/method/invokeAfterMsgs">invokeAfterMsgs</a>#3dc4b4f0 {X:Type} msg_ids:Vector&lt;long&gt; query:!X = X;</p>
 </div>
-<p>They may be used, for example, if a client attempts to send accumulated messages after the Internet connection has been restored after being absent for a long time. In this case, the 32-bit number <code>0xcb9f372d</code> must be added before the method number in each request, followed by a 64-bit message identifier, msg_id, which contains the previous request in the queue.<br>The second method is similar, except it takes several messages that must be waited for.</p>
+<p>They may be used, for example, when a client attempts to send messages that accumulated while waiting for the Internet connection to be restored for a long time. In this case, the 32-bit number <code>0xcb9f372d</code> must be added before the method number in each request, followed by a 64-bit message identifier, msg_id, which contains the previous request in the queue. </p>
+<p>The second method is similar, except it takes several messages that must be successfully processed before the current one.</p>
 <p>If the waiting period exceeds 0.5 seconds (this value may change in the future) and no result has appeared, the method will return the <a href="/api/errors#400-bad-request">400 MSG_WAIT_TIMEOUT</a> error.</p>
 <h4><a class="anchor" name="helper-method-sequence" href="#helper-method-sequence"><i class="anchor-icon"></i></a>Helper Method Sequence</h4>
 <p><strong>Important:</strong> if the helper methods <strong>invokeAfterMsg</strong> / <strong>invokeAfterMsgs</strong> are used together with <strong>invokeWithLayerN</strong> or other helper methods, <strong>invokeAfterMsg</strong> / <strong>invokeAfterMsgs</strong> must always be the outermost wrapper.</p>
