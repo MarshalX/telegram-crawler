@@ -783,9 +783,10 @@ function showConfirm(html, onConfirm, confirm_btn, onCancel, cancel_btn) {
 }
 
 function showMedia(src, is_video, options) {
-  var media_html = is_video ? '<video class="media media-video ohide" autoplay' + (options.is_gif ? ' loop playsinline' : ' controls') + '></video>' : '<div class="media media-photo ohide"></div>';
+  var media_html = (is_video ? '<video class="media media-video ohide" autoplay' + (options.is_gif ? ' loop playsinline' : ' controls') + '></video>' : '<div class="media media-photo ohide"></div>') + (options.add_media_html || '');
+  var title_html = options.title ? '<div class="media-title-wrap"><div class="media-title">' + options.title + '</div></div>' : '';
   var pagination_html = options.pagination ? '<div class="media-counter-wrap"><div class="media-prev-btn"></div><div class="media-counter">' + (options.pagination.num + 1) + ' / ' + options.pagination.total + '</div><div class="media-next-btn"></div></div>' : '';
-  var $popup = $('<div class="popup-container hide media-popup-container">' + pagination_html + '<div class="media-popup-wrap popup-no-close file-loading"><div class="media-popup-cover ohide">' + media_html + '<svg class="circle-progress-wrap ohide" viewport="0 0 66 66" width="66px" height="66px"><circle class="circle-progress-bg" cx="50%" cy="50%"></circle><circle class="circle-progress infinite" cx="50%" cy="50%" stroke-dashoffset="106"></circle></svg></div></div></div>');
+  var $popup = $('<div class="popup-container hide media-popup-container">' + title_html + pagination_html + '<div class="media-popup-wrap popup-no-close file-loading"><div class="media-popup-cover ohide">' + media_html + '<svg class="circle-progress-wrap ohide" viewport="0 0 66 66" width="66px" height="66px"><circle class="circle-progress-bg" cx="50%" cy="50%"></circle><circle class="circle-progress infinite" cx="50%" cy="50%" stroke-dashoffset="106"></circle></svg></div></div></div>');
   var media = {
     $wrap:    $('.media-popup-wrap', $popup),
     $cover:   $('.media-popup-cover', $popup),
@@ -883,6 +884,10 @@ function showMedia(src, is_video, options) {
         media.onPrevMedia(e);
       } else if (e.keyCode == Keys.RIGHT) {
         media.onNextMedia(e);
+      } else if (e.keyCode == Keys.UP) {
+        media.onPrevMediaGroup(e);
+      } else if (e.keyCode == Keys.DOWN) {
+        media.onNextMediaGroup(e);
       }
     },
     onPrevMedia: function(e) {
@@ -899,6 +904,22 @@ function showMedia(src, is_video, options) {
         e.stopImmediatePropagation();
         closePopup($popup);
         options.pagination.next();
+      }
+    },
+    onPrevMediaGroup: function(e) {
+      if (options.pagination && options.pagination.prevGroup) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        closePopup($popup);
+        options.pagination.prevGroup();
+      }
+    },
+    onNextMediaGroup: function(e) {
+      if (options.pagination && options.pagination.nextGroup) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        closePopup($popup);
+        options.pagination.nextGroup();
       }
     }
   };
