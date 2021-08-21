@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Channel statistics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram offers detailed channel statistics for channels and supergroups.">
+    <meta property="og:title" content="Channel statistics">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram offers detailed channel statistics for channels and supergroups.">
+    <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
+
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?212" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/stats" >Channel statistics</a></li></ul></div>
+  <h1 id="dev_page_title">Channel statistics</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram offers detailed channel statistics for channels and supergroups.  </p>
+<h3><a class="anchor" href="#channel-statistics" id="channel-statistics" name="channel-statistics"><i class="anchor-icon"></i></a>Channel statistics</h3>
+<p>Scheme:</p>
+<pre><code><a href='/constructor/statsDateRangeDays'>statsDateRangeDays</a>#b637edaf min_date:<a href='/type/int'>int</a> max_date:<a href='/type/int'>int</a> = <a href='/type/StatsDateRangeDays'>StatsDateRangeDays</a>;
+
+<a href='/constructor/statsAbsValueAndPrev'>statsAbsValueAndPrev</a>#cb43acde current:<a href='/type/double'>double</a> previous:<a href='/type/double'>double</a> = <a href='/type/StatsAbsValueAndPrev'>StatsAbsValueAndPrev</a>;
+
+<a href='/constructor/statsPercentValue'>statsPercentValue</a>#cbce2fe0 part:<a href='/type/double'>double</a> total:<a href='/type/double'>double</a> = <a href='/type/StatsPercentValue'>StatsPercentValue</a>;
+
+<a href='/constructor/statsGraphAsync'>statsGraphAsync</a>#4a27eb2d token:<a href='/type/string'>string</a> = <a href='/type/StatsGraph'>StatsGraph</a>;
+<a href='/constructor/statsGraphError'>statsGraphError</a>#bedc9822 error:<a href='/type/string'>string</a> = <a href='/type/StatsGraph'>StatsGraph</a>;
+<a href='/constructor/statsGraph'>statsGraph</a>#8ea464b6 flags:<a href='/type/%23'>#</a> json:<a href='/type/DataJSON'>DataJSON</a> zoom_token:flags.0?<a href='/type/string'>string</a> = <a href='/type/StatsGraph'>StatsGraph</a>;
+
+<a href='/constructor/messageInteractionCounters'>messageInteractionCounters</a>#ad4fc9bd msg_id:<a href='/type/int'>int</a> views:<a href='/type/int'>int</a> forwards:<a href='/type/int'>int</a> = <a href='/type/MessageInteractionCounters'>MessageInteractionCounters</a>;
+
+<a href='/constructor/stats.broadcastStats'>stats.broadcastStats</a>#bdf78394 period:<a href='/type/StatsDateRangeDays'>StatsDateRangeDays</a> followers:<a href='/type/StatsAbsValueAndPrev'>StatsAbsValueAndPrev</a> views_per_post:<a href='/type/StatsAbsValueAndPrev'>StatsAbsValueAndPrev</a> shares_per_post:<a href='/type/StatsAbsValueAndPrev'>StatsAbsValueAndPrev</a> enabled_notifications:<a href='/type/StatsPercentValue'>StatsPercentValue</a> growth_graph:<a href='/type/StatsGraph'>StatsGraph</a> followers_graph:<a href='/type/StatsGraph'>StatsGraph</a> mute_graph:<a href='/type/StatsGraph'>StatsGraph</a> top_hours_graph:<a href='/type/StatsGraph'>StatsGraph</a> interactions_graph:<a href='/type/StatsGraph'>StatsGraph</a> iv_interactions_graph:<a href='/type/StatsGraph'>StatsGraph</a> views_by_source_graph:<a href='/type/StatsGraph'>StatsGraph</a> new_followers_by_source_graph:<a href='/type/StatsGraph'>StatsGraph</a> languages_graph:<a href='/type/StatsGraph'>StatsGraph</a> recent_message_interactions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageInteractionCounters'>MessageInteractionCounters</a>&gt; = <a href='/type/stats.BroadcastStats'>stats.BroadcastStats</a>;
+
+---functions---
+
+<a href='/method/stats.getBroadcastStats'>stats.getBroadcastStats</a>#ab42441a flags:<a href='/type/%23'>#</a> dark:flags.0?<a href='/constructor/true'>true</a> channel:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/stats.BroadcastStats'>stats.BroadcastStats</a>;
+<a href='/method/stats.loadAsyncGraph'>stats.loadAsyncGraph</a>#621d5fa0 flags:<a href='/type/%23'>#</a> token:<a href='/type/string'>string</a> x:flags.0?<a href='/type/long'>long</a> = <a href='/type/StatsGraph'>StatsGraph</a>;</code></pre>
+<p>Administrators of <a href="/api/channel">channels</a> of a certain size (the exact limit is a server-side config, returned in the <code>can_view_stats</code> flag of <a href="/constructor/channelFull">channelFull</a>) can call <a href="/method/stats.getBroadcastStats">stats.getBroadcastStats</a> to get detailed channel statistics.<br>
+The returned <a href="/constructor/stats.broadcastStats">stats.broadcastStats</a> contains multiple statistics:  </p>
+<ul>
+<li>Period-related statistics: a pair of values, one at the beginning and one at the end of the period in consideration (<code>period</code>). <br>  The <code>period</code> typically depends on channel activity.<ul>
+<li>Absolute follower count (<code>followers</code>)</li>
+<li><code>total_viewcount/postcount</code>, for posts posted during the period in consideration (<code>views_per_post</code>).<br>
+Note that in this case, <code>current</code> refers to the <code>period</code> in consideration (<code>min_date</code> till <code>max_date</code>), and <code>prev</code> refers to the previous period (<code>(min_date - (max_date - min_date))</code> till <code>min_date</code>).  </li>
+<li><code>total_sharecount/postcount</code>, for posts posted during the period in consideration (<code>shares_per_post</code>).<br>
+Note that in this case, <code>current</code> refers to the <code>period</code> in consideration (<code>min_date</code> till <code>max_date</code>), and <code>prev</code> refers to the previous period (<code>(min_date - (max_date - min_date))</code> till <code>min_date</code>).</li>
+</ul>
+</li>
+<li>Percentage statistics<ul>
+<li>Percentage of subscribers with enabled notifications (<code>enabled_notifications</code>)</li>
+</ul>
+</li>
+<li>Graphs: <a href="#graph-visualization">graphs are described below »</a>.  </li>
+</ul>
+<h3><a class="anchor" href="#supergroup-statistics" id="supergroup-statistics" name="supergroup-statistics"><i class="anchor-icon"></i></a>Supergroup statistics</h3>
+<p>Scheme:</p>
+<pre><code><a href='/constructor/statsGroupTopPoster'>statsGroupTopPoster</a>#18f3d0f7 user_id:<a href='/type/int'>int</a> messages:<a href='/type/int'>int</a> avg_chars:<a href='/type/int'>int</a> = <a href='/type/StatsGroupTopPoster'>StatsGroupTopPoster</a>;
+<a href='/constructor/statsGroupTopInviter'>statsGroupTopInviter</a>#31962a4c user_id:<a href='/type/int'>int</a> invitations:<a href='/type/int'>int</a> = <a href='/type/StatsGroupTopInviter'>StatsGroupTopInviter</a>;
+<a href='/constructor/statsGroupTopAdmin'>statsGroupTopAdmin</a>#6014f412 user_id:<a href='/type/int'>int</a> deleted:<a href='/type/int'>int</a> kicked:<a href='/type/int'>int</a> banned:<a href='/type/int'>int</a> = <a href='/type/StatsGroupTopAdmin'>StatsGroupTopAdmin</a>;
+
+<a href='/constructor/stats.megagroupStats'>stats.megagroupStats</a>#ef7ff916 period:<a href='/type/StatsDateRangeDays'>StatsDateRangeDays</a> members:<a href='/type/StatsAbsValueAndPrev'>StatsAbsValueAndPrev</a> messages:<a href='/type/StatsAbsValueAndPrev'>StatsAbsValueAndPrev</a> viewers:<a href='/type/StatsAbsValueAndPrev'>StatsAbsValueAndPrev</a> posters:<a href='/type/StatsAbsValueAndPrev'>StatsAbsValueAndPrev</a> growth_graph:<a href='/type/StatsGraph'>StatsGraph</a> members_graph:<a href='/type/StatsGraph'>StatsGraph</a> new_members_by_source_graph:<a href='/type/StatsGraph'>StatsGraph</a> languages_graph:<a href='/type/StatsGraph'>StatsGraph</a> messages_graph:<a href='/type/StatsGraph'>StatsGraph</a> actions_graph:<a href='/type/StatsGraph'>StatsGraph</a> top_hours_graph:<a href='/type/StatsGraph'>StatsGraph</a> weekdays_graph:<a href='/type/StatsGraph'>StatsGraph</a> top_posters:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StatsGroupTopPoster'>StatsGroupTopPoster</a>&gt; top_admins:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StatsGroupTopAdmin'>StatsGroupTopAdmin</a>&gt; top_inviters:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StatsGroupTopInviter'>StatsGroupTopInviter</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stats.MegagroupStats'>stats.MegagroupStats</a>;
+
+---functions---
+
+<a href='/method/stats.getMegagroupStats'>stats.getMegagroupStats</a>#dcdf8607 flags:<a href='/type/%23'>#</a> dark:flags.0?<a href='/constructor/true'>true</a> channel:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/stats.MegagroupStats'>stats.MegagroupStats</a>;</code></pre>
+<p>Administrators of <a href="/api/channel">supergroups</a> of a certain size (the exact limit is a server-side config, returned in the <code>can_view_stats</code> flag of <a href="/constructor/channelFull">channelFull</a>) can call <a href="/method/stats.getMegagroupStats">stats.getMegagroupStats</a> to get detailed supergroup statistics.<br>
+The returned <a href="/constructor/stats.broadcastStats">stats.broadcastStats</a> contains multiple statistics, see the <a href="/constructor/stats.broadcastStats">constructor page for more info »</a>.  </p>
+<h3><a class="anchor" href="#message-statistics" id="message-statistics" name="message-statistics"><i class="anchor-icon"></i></a>Message statistics</h3>
+<pre><code><a href='/constructor/stats.messageStats'>stats.messageStats</a>#8999f295 views_graph:<a href='/type/StatsGraph'>StatsGraph</a> = <a href='/type/stats.MessageStats'>stats.MessageStats</a>;
+
+---functions---
+
+<a href='/method/stats.getMessageStats'>stats.getMessageStats</a>#b6e0a3f5 flags:<a href='/type/%23'>#</a> dark:flags.0?<a href='/constructor/true'>true</a> channel:<a href='/type/InputChannel'>InputChannel</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/stats.MessageStats'>stats.MessageStats</a>;</code></pre>
+<p>Administrators of <a href="/api/channel">channels</a> of a certain size (the exact limit is a server-side config, returned in the <code>can_view_stats</code> flag of <a href="/constructor/channelFull">channelFull</a>) can call <a href="/method/stats.getMessageStats">stats.getMessageStats</a> to get statistics of a specific message.<br>
+The returned <a href="/constructor/stats.messageStats">stats.messageStats</a> contains the view graph of the message.  </p>
+<h2><a class="anchor" href="#graph-visualization" id="graph-visualization" name="graph-visualization"><i class="anchor-icon"></i></a>Graph visualization</h2>
+<p>There are four available visualizations for graph types:</p>
+<ul>
+<li><a href="#line-graph">Line graph</a></li>
+<li><a href="#step-graph">Step graph</a></li>
+<li><a href="#bar-graph">Bar graph</a></li>
+<li><a href="#area-graph">Area graph</a></li>
+</ul>
+<p>Graph modifiers (see <a href="#graph-examples">various graphs</a> for examples):  </p>
+<ul>
+<li><code>y_scaled</code> - Indicates that each of the two (!) lines in a step graph must be visualized on its own scale, with two different tick axes on the left and right parts of the graph</li>
+<li><code>percentage</code> - Indicates whether value percentages should be shown in labels</li>
+<li><code>stacked</code> - Depending on the graph type, indicates stacking of multiple columns in the same graph</li>
+</ul>
+<h3><a class="anchor" href="#graph-syntax" id="graph-syntax" name="graph-syntax"><i class="anchor-icon"></i></a>Graph syntax</h3>
+<pre><code><a href='/constructor/statsGraphAsync'>statsGraphAsync</a>#4a27eb2d token:<a href='/type/string'>string</a> = <a href='/type/StatsGraph'>StatsGraph</a>;
+<a href='/constructor/statsGraphError'>statsGraphError</a>#bedc9822 error:<a href='/type/string'>string</a> = <a href='/type/StatsGraph'>StatsGraph</a>;
+<a href='/constructor/statsGraph'>statsGraph</a>#8ea464b6 flags:<a href='/type/%23'>#</a> json:<a href='/type/DataJSON'>DataJSON</a> zoom_token:flags.0?<a href='/type/string'>string</a> = <a href='/type/StatsGraph'>StatsGraph</a>;
+
+<a href='/constructor/dataJSON'>dataJSON</a>#7d748d04 data:<a href='/type/string'>string</a> = <a href='/type/DataJSON'>DataJSON</a>;
+
+---functions---
+
+<a href='/method/stats.loadAsyncGraph'>stats.loadAsyncGraph</a>#621d5fa0 flags:<a href='/type/%23'>#</a> token:<a href='/type/string'>string</a> x:flags.0?<a href='/type/long'>long</a> = <a href='/type/StatsGraph'>StatsGraph</a>;</code></pre>
+<p>Certain graphs are not directly sent in the <a href="/constructor/stats.broadcastStats">stats.broadcastStats</a> constructor to reduce server load: instead, those graphs will be sent as a <a href="/constructor/statsGraphAsync">statsGraphAsync</a> constructor, and should be fetched separately using <a href="/method/stats.loadAsyncGraph">stats.loadAsyncGraph</a>.  </p>
+<p>After obtaining the full <a href="/constructor/statsGraph">statsGraph</a> constructor, clients should parse the JSON graph object in the <code>json</code> field.</p>
+<p>Object structure:  </p>
+<table class="table">
+<thead>
+<tr>
+<th>Key</th>
+<th>Graph title</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>columns</td>
+<td>Array of all data column arrays in the chart. Each column array has its <strong>label</strong> at position 0, followed by values.</td>
+</tr>
+<tr>
+<td>types</td>
+<td><a href="#graphs">Graphs types</a> for each of the column arrays (object, <code>"label": "type"</code>): <br>- <code>line</code> - <a href="#line-graph">line graph</a> <br>- <code>area</code> - <a href="#area-graph">area graph</a> <br>- <code>step</code> - <a href="#step-graph">step graph</a> <br>- <code>bar</code> - <a href="#bar-graph">bar graph</a> <br>- <code>x</code> - x axis values for each of the charts at the corresponding positions, UNIX timestamps in milliseconds.</td>
+</tr>
+<tr>
+<td>colors</td>
+<td>Color for each type (object, <code>"label": "colorKey#AAAAAA"</code>; see <a href="#chart-colors">chart colors</a>).</td>
+</tr>
+<tr>
+<td>names</td>
+<td>Localized name for each variable (object, <code>"label": "Name"</code>)</td>
+</tr>
+<tr>
+<td>subchart</td>
+<td>Object indicating the default zoom range for the graph, this is object's structure: <br>- <code>show</code> - Whether to use the specified zoom range (boolean) <br>- <code>defaultZoom</code> - An array with two <code>x</code> values, indicating the two ends of the default zoom range</td>
+</tr>
+<tr>
+<td>y_scaled</td>
+<td>Indicates that each of the two (!) lines in a step graph must be visualized on its own scale, with two different tick axes on the left and right parts of the graph (boolean, see <a href="#graph-examples">various graphs</a> for examples)</td>
+</tr>
+<tr>
+<td>percentage</td>
+<td>Indicates whether value percentages should be shown in labels (boolean, see <a href="#graph-examples">various graphs</a> for examples)</td>
+</tr>
+<tr>
+<td>stacked</td>
+<td>Depending on the graph type, indicates stacking of multiple columns in the same graph (boolean, see <a href="#graph-examples">various graphs</a> for examples)</td>
+</tr>
+</tbody>
+</table>
+<!-- | hidden | Array of columns that should not be visualized in the final graph | -->
+<p>The following chart restrictions apply:</p>
+<ul>
+<li>Up to 50 columns on one graph must be supported.</li>
+<li>Chart types are always the same for every column in the graph.</li>
+<li>The <code>bar</code> chart type and <code>stacked</code> option are always used together.</li>
+<li><code>percentage</code> is always used with the <code>area</code> graph.<!-- * Graphs with every chart type _should_ be able to zoom into the same chart type with the same columns (names and types). -->
+<!-- * `y_scaled` is only used with exactly 2 `line` columns -->
+</li>
+</ul>
+<h3><a class="anchor" href="#chart-zooming" id="chart-zooming" name="chart-zooming"><i class="anchor-icon"></i></a>Chart zooming</h3>
+<pre><code><a href='/constructor/statsGraphError'>statsGraphError</a>#bedc9822 error:<a href='/type/string'>string</a> = <a href='/type/StatsGraph'>StatsGraph</a>;
+<a href='/constructor/statsGraph'>statsGraph</a>#8ea464b6 flags:<a href='/type/%23'>#</a> json:<a href='/type/DataJSON'>DataJSON</a> zoom_token:flags.0?<a href='/type/string'>string</a> = <a href='/type/StatsGraph'>StatsGraph</a>;
+
+<a href='/constructor/dataJSON'>dataJSON</a>#7d748d04 data:<a href='/type/string'>string</a> = <a href='/type/DataJSON'>DataJSON</a>;
+
+---functions---
+
+<a href='/method/stats.loadAsyncGraph'>stats.loadAsyncGraph</a>#621d5fa0 flags:<a href='/type/%23'>#</a> token:<a href='/type/string'>string</a> x:flags.0?<a href='/type/long'>long</a> = <a href='/type/StatsGraph'>StatsGraph</a>;</code></pre>
+<p>Graphs that support zooming will contain a <code>zoom_token</code> in the <a href="/constructor/statsGraph">statsGraph</a> constructor.<br>
+Said token should be then used as <code>token</code> in a new <a href="/method/stats.loadAsyncGraph">stats.loadAsyncGraph</a> call triggered when the user clicks on the label, related to a certain x axis in the graph (see <a href="#graph-examples">graph examples</a>).<br>
+The <code>x</code> coordinate of the label should be provided to the <code>x</code> parameter; the method will then return (if available) a more detailed subgraph.<br>
+If not enough data is available, a localized <a href="/constructor/statsGraphError">statsGraphError</a> will be returned.  </p>
+<p>Typical zoom <em>visualization</em> rules:  </p>
+<ul>
+<li>Any <code>percentage</code> graph (even if a <code>zoom_token</code> is not available) =&gt; <a href="#piechart">piechart</a></li>
+<li><a href="#line-graph">line graph</a> =&gt; <a href="#line-graph">line graph</a></li>
+<li><a href="#step-graph">step graph</a> =&gt; <a href="#step-graph">step graph</a></li>
+<li><a href="#bar-graph">bar graph</a> =&gt; <a href="#bar-graph">bar graph</a></li>
+<li><a href="#area-graph">area graph</a> =&gt; <a href="#area-graph">area graph</a></li>
+</ul>
+<h3><a class="anchor" href="#chart-colors" id="chart-colors" name="chart-colors"><i class="anchor-icon"></i></a>Chart colors</h3>
+<p>Chart colors can be provided as a color key, followed by the primary color value in hex format:  </p>
+<pre><code>red#e05356</code></pre>
+<p>The color key can be one of <code>red</code>, <code>lightblue</code>, <code>lightgreen</code>, <code>golden</code>, <code>green</code>, <code>orange</code>, <code>blue</code>, <code>indigo</code>.<br>
+Apps can choose to use a color value specified by the currently loaded theme: for example, the <a href="https://github.com/DrKLO/Telegram/blob/dceccae0b74576d092fb3b2accaffded2c0b5f63/TMessagesProj/src/main/java/org/telegram/ui/Charts/data/ChartData.java#L81">android app</a> uses <code>statisticChartLine_*</code> themekeys for each of the color keys, check out the <a href="https://github.com/DrKLO/Telegram/tree/master/TMessagesProj/src/main/assets">assets directory</a> for a bunch of default themes with various colors for channel statistics.  </p>
+<p>However, the server may also choose to return just a plain color value in hex format: </p>
+<pre><code>#e05356</code></pre>
+<p>In this case, the <code>dark</code> flag of the <a href="/method/stats.getBroadcastStats">stats.getBroadcastStats</a> method can be used to choose the palette of returned colors.</p>
+<h2><a class="anchor" href="#graph-examples" id="graph-examples" name="graph-examples"><i class="anchor-icon"></i></a>Graph examples</h2>
+<h3><a class="anchor" href="#line-graph" id="line-graph" name="line-graph"><i class="anchor-icon"></i></a>Line graph</h3>
+<p>Simple single line graph</p>
+<h3><a class="anchor" href="#step-graph" id="step-graph" name="step-graph"><i class="anchor-icon"></i></a>Step graph</h3>
+<p>Step graph, always "stacked" (to indicate multiple lines)</p>
+<h3><a class="anchor" href="#bar-graph" id="bar-graph" name="bar-graph"><i class="anchor-icon"></i></a>Bar graph</h3>
+<p>Bar graph with multiple lines, always "stacked" (to indicate actual stacked bars, biggest bars first)</p>
+<h3><a class="anchor" href="#area-graph" id="area-graph" name="area-graph"><i class="anchor-icon"></i></a>Area graph</h3>
+<p>Mixed bar/line graph, always "stacked" (to indicate actual stacked bars, biggest bars first)</p>
+<h3><a class="anchor" href="#piechart" id="piechart" name="piechart"><i class="anchor-icon"></i></a>Piechart</h3>
+<p>Piechart, typically obtained only when zooming into percentage graphs</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/blog">Blog</a></li>
+        <li><a href="//telegram.org/jobs">Jobs</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/dl/android">Android</a></li>
+        <li><a href="//telegram.org/dl/wp">Windows Phone</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)">Twitter</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?42"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
