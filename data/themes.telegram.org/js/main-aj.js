@@ -246,7 +246,6 @@ function ajInit(options) {
   }
 
   function pageLoaded() {
-    curBeforeUnload = false;
     if (curOnLoad.length) {
       for (var i = 0; i < curOnLoad.length; i++) {
         console.log('onLoad', i);
@@ -263,7 +262,6 @@ function ajInit(options) {
   }
 
   function layerLoaded() {
-    curBeforeLayerUnload = false;
     if (curOnLayerLoad.length) {
       for (var i = 0; i < curOnLayerLoad.length; i++) {
         console.log('onLayerLoad', i);
@@ -415,7 +413,7 @@ function ajInit(options) {
       if (result.j) {
         window.execScript ? window.execScript(result.j) : eval(result.j);
       }
-      Aj.layerLoaded();
+      layerLoaded();
       return;
     }
     return changeLocation(url, push_state);
@@ -563,12 +561,17 @@ function ajInit(options) {
     if (!message && curBeforeUnload) {
       message = curBeforeUnload();
     }
+    var load_func = function() {
+      curBeforeLayerUnload = false;
+      curBeforeUnload = false;
+      load_fn();
+    };
     if (message) {
       var message_html = $('<div>').text(message).html();
-      showConfirm(message_html, load_fn, l('WEB_LEAVE_PAGE', 'Leave'));
+      showConfirm(message_html, load_func, l('WEB_LEAVE_PAGE', 'Leave'));
       return false;
     } else {
-      load_fn();
+      load_func();
       return true;
     }
   }
