@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Animated Emojis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Graphical telegram clients should transform emojis into their respective animated version.">
+    <meta property="og:title" content="Animated Emojis">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Graphical telegram clients should transform emojis into their respective animated version.">
+    <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
+
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?212" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/animated-emojis" >Animated Emojis</a></li></ul></div>
+  <h1 id="dev_page_title">Animated Emojis</h1>
+  
+  <div id="dev_page_content"><p>Graphical telegram clients should transform emojis into their respective animated version.  </p>
+<pre><code><a href='/constructor/inputStickerSetAnimatedEmoji'>inputStickerSetAnimatedEmoji</a>#28703c8 = <a href='/type/InputStickerSet'>InputStickerSet</a>;
+
+<a href='/constructor/messages.stickerSet'>messages.stickerSet</a>#b60a24a6 set:<a href='/type/StickerSet'>StickerSet</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; documents:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
+
+---functions---
+
+<a href='/method/messages.getStickerSet'>messages.getStickerSet</a>#2619a90e stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;</code></pre>
+<p>On startup, clients should fetch the animated emoji stickerset by calling the <a href="/method/messages.getStickerSet">messages.getStickerSet</a> method, providing <a href="/constructor/inputStickerSetAnimatedEmoji">inputStickerSetAnimatedEmoji</a> to the <code>stickerset</code> field.<br>
+The returned stickerset will contain a set of animated stickers, one for each of the supported emojis.  </p>
+<p>Clients should substitute messages containing only one instance of one of the allowed emojis with the respective animated sticker.  </p>
+<p>Animated emojis should loop only once when first sent or received, or when clicked.  </p>
+<p>For special <a href="/api/dice">dice emojis</a> like <img class="emoji" src="//telegram.org/img/emoji/40/F09F8EB2.png" width="20" height="20" alt="🎲" />, <img class="emoji" src="//telegram.org/img/emoji/40/F09F8EAF.png" width="20" height="20" alt="🎯" />, or <img class="emoji" src="//telegram.org/img/emoji/40/F09F8F80.png" width="20" height="20" alt="🏀" />, clients are supposed to behave differently both when sending and receiving such emojis: <a href="/api/dice">click here for more info »</a>.</p>
+<h3><a class="anchor" href="#emojis-with-sounds" id="emojis-with-sounds" name="emojis-with-sounds"><i class="anchor-icon"></i></a>Emojis with sounds</h3>
+<p>Certained animated emojis should play sound when clicked, as specified by <a href="/api/config#client-configuration">server-side configuration</a>.  </p>
+<p>The returned JSON object will contain the following map, with a list of file IDs to download:</p>
+<pre><code>    "emojies_sounds": {
+        "\ud83c\udf83": {
+            "id": "4956223179606458539",
+            "access_hash": "-2107001400913062971",
+            "file_reference_base64": "AF-4ApC7ukC0UWEPZN0TeSJURe7T"
+        },
+        "\u26b0": {
+            "id": "4956223179606458540",
+            "access_hash": "-1498869544183595185",
+            "file_reference_base64": "AF-4ApCLKMGt96WCvLm58kbqZHd3"
+        },
+        "\ud83e\udddf\u200d\u2642": {
+            "id": "4960929110848176331",
+            "access_hash": "3986395821757915468",
+            "file_reference_base64": "AF-4ApAedNln3IMEHH-SUQuH8L9g"
+        },
+    }</code></pre>
+<p>The <a href="/api/file_reference">file reference field</a> should be base64-decoded before <a href="/api/files">downloading the file</a></p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/blog">Blog</a></li>
+        <li><a href="//telegram.org/jobs">Jobs</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/dl/android">Android</a></li>
+        <li><a href="//telegram.org/dl/wp">Windows Phone</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)">Twitter</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?42"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
