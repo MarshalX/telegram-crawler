@@ -14,7 +14,7 @@ PROTOCOL = 'https://'
 BASE_URL = 'telegram.org'
 # its necessary to help crawler to find more links
 HIDDEN_URLS = {
-    # 'corefork.telegram.org',
+    'corefork.telegram.org',
 
     'telegram.org/privacy/gmailbot',
     'telegram.org/tos',
@@ -67,6 +67,17 @@ CRAWL_RULES = {
         },
     },
     'core.telegram.org': {
+        'deny': {
+            'file/',
+
+            'bots/payments',
+
+            'tdlib/docs/classtd',
+
+            'validatedRequestedInfo',
+        },
+    },
+    'corefork.telegram.org': {
         'deny': {
             'file/',
 
