@@ -86,6 +86,7 @@ CRAWL_RULES = {
             'tdlib/docs/classtd',
 
             'validatedRequestedInfo',
+            'convertToGigagroup',
         },
     },
     'telegram.org': {
