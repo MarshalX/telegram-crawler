@@ -235,9 +235,9 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                 await asyncio.gather(*[crawl(url, session) for url in sub_links])
             elif 'application/javascript' in content_type:
                 LINKS_TO_TRACK.add(url)
-            elif 'text/css' in content_type:
+            elif 'css' in content_type:
                 LINKS_TO_TRACK.add(url)
-            elif 'text/plain' in content_type:
+            elif 'plain' in content_type:
                 LINKS_TO_TRACK.add(url)
             elif 'application/json' in content_type:
                 LINKS_TO_TRACK.add(url)
