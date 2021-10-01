@@ -15,6 +15,7 @@ BASE_URL = 'telegram.org'
 # its necessary to help crawler to find more links
 HIDDEN_URLS = {
     'corefork.telegram.org',
+    'corefork.telegram.org/getProxyConfig',
 
     'telegram.org/privacy/gmailbot',
     'telegram.org/tos',
@@ -27,6 +28,7 @@ HIDDEN_URLS = {
 
     'core.telegram.org/resources/cidr.txt',
     'core.telegram.org/apple_privacy',
+    'core.telegram.org/getProxyConfig',
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/api.tl',
