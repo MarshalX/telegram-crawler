@@ -25,8 +25,8 @@ PASSPORT_SSID_REGEX = r'passport_ssid=[a-z0-9]+_[a-z0-9]+_[a-z0-9]+'
 PASSPORT_SSID_TEMPLATE = f'passport_ssid={DYNAMIC_PART_MOCK}'
 NONCE_REGEX = r'"nonce":"[a-z0-9]+_[a-z0-9]+_[a-z0-9]+'
 NONCE_TEMPLATE = f'"nonce":"{DYNAMIC_PART_MOCK}'
-PROXY_CONFIG_SUB_NET_REGEX = r'\d+:8888;'
-PROXY_CONFIG_SUB_NET_TEMPLATE = 'X:8888;'
+PROXY_CONFIG_SUB_NET_REGEX = r'\d+\.\d+:8888;'
+PROXY_CONFIG_SUB_NET_TEMPLATE = 'X.X:8888;'
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
