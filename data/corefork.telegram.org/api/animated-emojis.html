@@ -97,11 +97,11 @@ If a set of reactions for the <img class="emoji" src="//telegram.org/img/emoji/4
 <p>Clients on both sides of private chats with users should overlay one of the appropriate reaction animations over the animated sticker when any of the two users clicks on a supported animated emoji.<br>
 The reaction animation for each separate tap should be chosen randomly from all the available reactions for a given emoji, and multiple taps should be aggregated and sent to the other user as follows:  </p>
 <p>At each tap, clients should store the relative timestamp of the tap (starting from the first one @ <code>0</code>) in a list.<br>
-After 500 milliseconds have elapsed with no more taps, the list should be cleared and the stored taps should be sent using <a href="/method/messages.setTyping">messages.setTyping</a>, passing a <a href="/constructor/sendMessageEmojiInteraction">sendMessageEmojiInteraction</a> constructor with the following fields:  </p>
+After 500 milliseconds have elapsed with no more taps, the list should be cleared and stored taps should be sent using <a href="/method/messages.setTyping">messages.setTyping</a>, passing a <a href="/constructor/sendMessageEmojiInteraction">sendMessageEmojiInteraction</a> constructor with the following fields:  </p>
 <ul>
 <li><code>emoticon</code> - The emoji we're reacting to</li>
 <li><code>msg_id</code> - Message ID of the animated emoji that was clicked</li>
-<li>A JSON object with interaction info, containing the following keys:<ul>
+<li><code>interaction</code> - A JSON object with interaction info, containing the following keys:<ul>
 <li><code>v</code> - An integer indicating the object version, currently <code>1</code></li>
 <li><code>a</code> - An array of JSON objects, each containing the following keys:<ul>
 <li><code>t</code> - float, relative timestamp of the tap in seconds, the first one being <code>0.0</code>.</li>
