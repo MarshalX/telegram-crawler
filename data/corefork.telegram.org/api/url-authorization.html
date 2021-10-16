@@ -61,13 +61,13 @@ The same must be done if the user opens the link while refusing the authorizatio
 <h3><a class="anchor" href="#link-url-authorization" id="link-url-authorization" name="link-url-authorization"><i class="anchor-icon"></i></a>Link URL authorization</h3>
 <p>Telegram supports automatic authorization on certain websites upon opening an HTTP URL in-app, upon clicking a link in a message or clicking on a <a href="/constructor/keyboardButtonUrl">keyboardButtonUrl</a>.</p>
 <h4><a class="anchor" href="#automatic-authorization" id="automatic-authorization" name="automatic-authorization"><i class="anchor-icon"></i></a>Automatic authorization</h4>
-<p>Clients should automatically authenticate users when opening official Telegram domains, listed in the <code>url_auth_domains</code> key of the <a href="/api/config#client-configuration">client configuration object »</a>.  </p>
-<p>Upon clicking a link, the URL must be modified by appending the <code>autologin_token</code> from the <a href="/api/config#client-configuration">client configuration object »</a> to the query string, like so:  </p>
-<p>Original URL: <code>https://somedomain.telegram.org/path?query=string#hash=value</code><br>
-Modified URL: <code>https://somedomain.telegram.org/path?query=string&amp;autologin_token=$autologin_token#hash=value</code>  </p>
-<p>Make sure that the used <code>autologin_token</code> is no more than <code>10000</code> seconds old, if it is older it must be refetched as described in the <a href="/api/config#client-configuration">client configuration section »</a>.  </p>
+<p>Clients should automatically authenticate users when opening official Telegram websites, listed in the <code>url_auth_domains</code> key of the <a href="/api/config#client-configuration">client configuration object »</a>.  </p>
+<p>Upon clicking a link, the URL must be modified by appending the <code>autologin_token</code> from the <a href="/api/config#client-configuration">client configuration object »</a> to the <a href="https://datatracker.ietf.org/doc/html/rfc3986#section-3.4">query string</a>, like so:  </p>
+<p>Original URL: <code>https://somedomain.telegram.org/path?query=string#fragment=value</code><br>
+Modified URL: <code>https://somedomain.telegram.org/path?query=string&amp;autologin_token=$autologin_token#fragment=value</code>  </p>
+<p>Make sure that the used <code>autologin_token</code> is no more than <code>10000</code> seconds old, if it is older it must be refetched before use as described in the <a href="/api/config#client-configuration">client configuration section »</a>.  </p>
 <h4><a class="anchor" href="#manual-authorization" id="manual-authorization" name="manual-authorization"><i class="anchor-icon"></i></a>Manual authorization</h4>
-<p>Clients should show a confirmation prompt similar to the one used <a href="#bot-url-authorization">for bots</a>, to authenticate users when opening certain Telegram domains, listed in the <code>url_auth_domains</code> key of the <a href="/api/config#client-configuration">client configuration object »</a>.  </p>
+<p>Clients should show a confirmation prompt similar to the one used <a href="#bot-url-authorization">for bots</a>, to authenticate users when opening certain Telegram websites, listed in the <code>url_auth_domains</code> key of the <a href="/api/config#client-configuration">client configuration object »</a>.  </p>
 <p><a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> should be called, providing only the original <code>url</code>.
 The returned <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a> object will contain more details about the authorization request:</p>
 <ul>
