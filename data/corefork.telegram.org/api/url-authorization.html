@@ -39,7 +39,10 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/url-authorization" >Seamless Telegram Login</a></li></ul></div>
   <h1 id="dev_page_title">Seamless Telegram Login</h1>
   
-  <div id="dev_page_content"><p>Bots may <a href="/bots/api#loginurl">ask users to login to a certain website via Telegram</a> when clicking on certain URL buttons in inline keyboards.</p>
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Bots or Telegram websites may <a href="/bots/api#loginurl">ask users to login to a certain website via Telegram</a> when clicking on certain links or URL buttons in inline keyboards.</p>
+<h3><a class="anchor" href="#bot-url-authorization" id="bot-url-authorization" name="bot-url-authorization"><i class="anchor-icon"></i></a>Bot URL authorization</h3>
 <p>When the user clicks on <a href="/constructor/keyboardButtonUrlAuth">keyboardButtonUrlAuth</a>, <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> should be called, providing the <code>button_id</code> of the button and the ID and peer of the container message.
 The returned <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a> object will contain more details about the authorization request:</p>
 <ul>
@@ -54,7 +57,31 @@ The returned <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a
 <p>If the user agrees to login to the URL, <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> should be called (eventually setting the <code>write_allowed</code> if the permission was requested and the user consented).
 The result will be a <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a> with the final URL to open, which will include a query string with the requested info and a hash that <a href="/widgets/login#receiving-authorization-data">must be verified upon receival by the service</a>.</p>
 <p><a href="/constructor/urlAuthResultDefault">urlAuthResultDefault</a> could also be returned, instead, in which case the <code>url</code> of the <a href="/constructor/keyboardButtonUrlAuth">keyboardButtonUrlAuth</a> must be opened, instead.
-The same must be done if the user opens the link while refusing the authorization request.</p></div>
+The same must be done if the user opens the link while refusing the authorization request.</p>
+<h3><a class="anchor" href="#link-url-authorization" id="link-url-authorization" name="link-url-authorization"><i class="anchor-icon"></i></a>Link URL authorization</h3>
+<p>Telegram supports automatic authorization on certain websites upon opening an HTTP URL in-app, upon clicking a link in a message or clicking on a <a href="/constructor/keyboardButtonUrl">keyboardButtonUrl</a>.</p>
+<h4><a class="anchor" href="#automatic-authorization" id="automatic-authorization" name="automatic-authorization"><i class="anchor-icon"></i></a>Automatic authorization</h4>
+<p>Clients should automatically authenticate users when opening official Telegram domains, listed in the <code>url_auth_domains</code> key of the <a href="/api/config#client-configuration">client configuration object »</a>.  </p>
+<p>Upon clicking a link, the URL must be modified by appending the <code>autologin_token</code> from the <a href="/api/config#client-configuration">client configuration object »</a> to the query string, like so:  </p>
+<p>Original URL: <code>https://somedomain.telegram.org/path?query=string#hash=value</code><br>
+Modified URL: <code>https://somedomain.telegram.org/path?query=string&amp;autologin_token=$autologin_token#hash=value</code>  </p>
+<p>Make sure that the used <code>autologin_token</code> is no more than <code>10000</code> seconds old, if it is older it must be refetched as described in the <a href="/api/config#client-configuration">client configuration section »</a>.  </p>
+<h4><a class="anchor" href="#manual-authorization" id="manual-authorization" name="manual-authorization"><i class="anchor-icon"></i></a>Manual authorization</h4>
+<p>Clients should show a confirmation prompt similar to the one used <a href="#bot-url-authorization">for bots</a>, to authenticate users when opening certain Telegram domains, listed in the <code>url_auth_domains</code> key of the <a href="/api/config#client-configuration">client configuration object »</a>.  </p>
+<p><a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> should be called, providing only the original <code>url</code>.
+The returned <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a> object will contain more details about the authorization request:</p>
+<ul>
+<li>The <code>domain</code> parameter will contain the domain name of the website on which the user will log in (example: <em>comments.app</em>).</li>
+<li>The <code>request_write_access</code> will be set if the website would like to send messages to the user.</li>
+</ul>
+<p>The info should be shown in a prompt.  </p>
+<p>If the user agrees to login to the URL, <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> should be called (eventually setting the <code>write_allowed</code> if the permission was requested and the user consented).
+The result will be a <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a> with the final URL to open.  </p>
+<p><a href="/constructor/urlAuthResultDefault">urlAuthResultDefault</a> could also be returned, instead, in which case the original URL must be opened, instead.
+The same must be done if the user opens the link while refusing the authorization request.</p>
+<h3><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related articles</h3>
+<h4><a class="anchor" href="#client-configuration" id="client-configuration" name="client-configuration"><i class="anchor-icon"></i></a><a href="/api/config">Client configuration</a></h4>
+<p>The MTProto API has multiple configuration parameters that can be fetched with the appropriate methods.</p></div>
   
 </div>
           
@@ -121,8 +148,11 @@ The same must be done if the user opens the link while refusing the authorizatio
 </div>
     </div>
     <script src="/js/main.js?42"></script>
-    
-    <script>backToTopInit("Go up");
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
 removePreloadInit();
 </script>
   </body>
