@@ -76,10 +76,15 @@
 </ul>
 <h3><a class="anchor" href="#hash-generation" id="hash-generation" name="hash-generation"><i class="anchor-icon"></i></a>Hash generation</h3>
 <p>To further reduce the result subset, there is a mechanism to avoid fetching data if the resulting list hasn't changed from the one stored on client, similar to <a href="https://en.wikipedia.org/wiki/HTTP_ETag">ETag</a>.</p>
-<p>When the client has cached results for API request, it can calculate the <code>hash</code> value for it by taking the result IDs (message IDs or other fields with name <code>id</code>) and using them to compute a 32-bit hash with the following algorithm:</p>
-<pre><code>hash = 0
+<p>When the client has cached results for API request, it can calculate the <code>hash</code> value for it by taking the result IDs (message IDs or other fields with name <code>id</code>) and using them to compute a 64-bit hash with the following algorithm:</p>
+<pre><code># Here, ^ indicates a bitwise XOR
+
+hash = 0
 for id in ids:
-    hash = (((hash * 0x4F25) &amp; 0x7FFFFFFF) + id) &amp; 0x7FFFFFFF</code></pre>
+    hash = hash ^ (id &gt;&gt; 21)
+    hash = hash ^ (id &lt;&lt; 35)
+    hash = hash ^ (id &gt;&gt; 4)
+    hash = hash + id</code></pre>
 <p>In some cases, the result container already has a <code>hash</code> field, that can be used instead.</p>
 <p>When the client passes a correct value, the API will return one of <code>*NotModified</code> constructors, e.g. <a href="/constructor/messages.messagesNotModified">messages.messagesNotModified</a> instead of the actual results.</p>
 <h3><a class="anchor" href="#example-methods" id="example-methods" name="example-methods"><i class="anchor-icon"></i></a>Example methods</h3>
