@@ -114,12 +114,13 @@ You can visit <a href="/schema">the schema</a> for an updated list of constructo
 <a href="/method/channels.viewSponsoredMessage">channels.viewSponsoredMessage</a>#beaedb94 channel:<a href="/type/InputChannel">InputChannel</a> random_id:<a href="/type/bytes">bytes</a> = <a href="/type/Bool">Bool</a>;
 <a href="/method/channels.getSponsoredMessages">channels.getSponsoredMessages</a>#ec210fbf channel:<a href="/type/InputChannel">InputChannel</a> = <a href="/type/messages.SponsoredMessages">messages.SponsoredMessages</a>;<br></code></pre></div>
 <h3><a class="anchor" href="#layer-131" id="layer-131" name="layer-131"><i class="anchor-icon"></i></a><a href="/schema?layer=131">Layer 131</a></h3>
+<p>2FA password reset for logged-in accounts, add a method to check the validity of the e-mail recovery code before use.</p>
 <h4><a class="anchor" href="#scheme-changes" id="scheme-changes" name="scheme-changes"><i class="anchor-icon"></i></a>Scheme changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/account.resetPassword">account.resetPassword</a> - Initiate a 2FA password reset</li>
-<li>Added <a href="/method/account.declinePasswordReset">account.declinePasswordReset</a> - Abort a pending 2FA password reset</li>
-<li>Added <a href="/method/auth.checkRecoveryPassword">auth.checkRecoveryPassword</a> - Check if the recovery code sent using <a href="/method/auth.requestPasswordRecovery">auth.requestPasswordRecovery</a> is valid, before passing it to <a href="/method/auth.recoverPassword">auth.recoverPassword</a>.</li>
+<li>Added <a href="/method/account.resetPassword">account.resetPassword</a> - Initiate a 2FA password reset: can only be used if the user is already logged-in, <a href="/api/srp#password-reset">see here for more info »</a></li>
+<li>Added <a href="/method/account.declinePasswordReset">account.declinePasswordReset</a> - Abort a pending 2FA password reset, <a href="/api/srp#password-reset">see here for more info »</a></li>
+<li>Added <a href="/method/auth.checkRecoveryPassword">auth.checkRecoveryPassword</a> - Check if the <a href="/api/srp">2FA recovery code</a> sent using <a href="/method/auth.requestPasswordRecovery">auth.requestPasswordRecovery</a> is valid, before passing it to <a href="/method/auth.recoverPassword">auth.recoverPassword</a>.</li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
@@ -128,8 +129,8 @@ You can visit <a href="/schema">the schema</a> for an updated list of constructo
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/account.resetPasswordFailedWait">account.resetPasswordFailedWait</a> - You requested a password reset too many times, please wait until the specified date before retrying the reset.</li>
-<li>Added <a href="/constructor/account.resetPasswordRequestedWait">account.resetPasswordRequestedWait</a> - You already requested a password reset, please wait until the specified date before retrying the reset.</li>
+<li>Added <a href="/constructor/account.resetPasswordFailedWait">account.resetPasswordFailedWait</a> - You recently requested a password reset that was canceled, please wait until the specified date before requesting another reset.</li>
+<li>Added <a href="/constructor/account.resetPasswordRequestedWait">account.resetPasswordRequestedWait</a> - You successfully requested a password reset, please wait until the specified date before finalizing the reset.</li>
 <li>Added <a href="/constructor/account.resetPasswordOk">account.resetPasswordOk</a> - The 2FA password was reset successfully.</li>
 <li>Added <a href="/constructor/updateBotCommands">updateBotCommands</a> - The <a href="/bots/api#june-25-2021">command set</a> of a certain bot in a certain chat has changed.</li>
 </ul>
