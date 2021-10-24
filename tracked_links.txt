@@ -28,7 +28,9 @@ core.telegram.org/api/errors
 core.telegram.org/api/file_reference
 core.telegram.org/api/files
 core.telegram.org/api/folders
+core.telegram.org/api/geochats
 core.telegram.org/api/invoking
+core.telegram.org/api/layers
 core.telegram.org/api/live-location
 core.telegram.org/api/mentions
 core.telegram.org/api/min
@@ -44,6 +46,7 @@ core.telegram.org/api/poll
 core.telegram.org/api/push-updates
 core.telegram.org/api/qr-login
 core.telegram.org/api/recent-actions
+core.telegram.org/api/requests
 core.telegram.org/api/rights
 core.telegram.org/api/scheduled-messages
 core.telegram.org/api/search
@@ -78,6 +81,7 @@ core.telegram.org/constructor/account.password
 core.telegram.org/constructor/account.passwordInputSettings
 core.telegram.org/constructor/account.passwordSettings
 core.telegram.org/constructor/account.privacyRules
+core.telegram.org/constructor/account.sentChangePhoneCode
 core.telegram.org/constructor/account.sentEmailCode
 core.telegram.org/constructor/account.takeout
 core.telegram.org/constructor/account.themes
@@ -97,6 +101,7 @@ core.telegram.org/constructor/auth.loginToken
 core.telegram.org/constructor/auth.loginTokenMigrateTo
 core.telegram.org/constructor/auth.loginTokenSuccess
 core.telegram.org/constructor/auth.passwordRecovery
+core.telegram.org/constructor/auth.sentAppCode
 core.telegram.org/constructor/auth.sentCode
 core.telegram.org/constructor/auth.sentCodeTypeApp
 core.telegram.org/constructor/auth.sentCodeTypeCall
@@ -238,6 +243,7 @@ core.telegram.org/constructor/dialogFilterSuggested
 core.telegram.org/constructor/dialogFolder
 core.telegram.org/constructor/dialogPeer
 core.telegram.org/constructor/dialogPeerFolder
+core.telegram.org/constructor/disabledFeature
 core.telegram.org/constructor/document
 core.telegram.org/constructor/documentAttributeAnimated
 core.telegram.org/constructor/documentAttributeAudio
@@ -337,6 +343,7 @@ core.telegram.org/constructor/inputFileLocation
 core.telegram.org/constructor/inputFolderPeer
 core.telegram.org/constructor/inputGameID
 core.telegram.org/constructor/inputGameShortName
+core.telegram.org/constructor/inputGeoPoint
 core.telegram.org/constructor/inputGeoPointEmpty
 core.telegram.org/constructor/inputKeyboardButtonUrlAuth
 core.telegram.org/constructor/inputMediaContact
@@ -353,6 +360,7 @@ core.telegram.org/constructor/inputMediaPhotoExternal
 core.telegram.org/constructor/inputMediaPoll
 core.telegram.org/constructor/inputMediaUploadedDocument
 core.telegram.org/constructor/inputMediaUploadedPhoto
+core.telegram.org/constructor/inputMediaUploadedThumbDocument
 core.telegram.org/constructor/inputMediaVenue
 core.telegram.org/constructor/inputMessageCallbackQuery
 core.telegram.org/constructor/inputMessageEntityMentionName
@@ -522,6 +530,7 @@ core.telegram.org/constructor/messageEntityUnknown
 core.telegram.org/constructor/messageEntityUrl
 core.telegram.org/constructor/messageFwdHeader
 core.telegram.org/constructor/messageInteractionCounters
+core.telegram.org/constructor/messageMediaAudio
 core.telegram.org/constructor/messageMediaContact
 core.telegram.org/constructor/messageMediaDice
 core.telegram.org/constructor/messageMediaDocument
@@ -534,6 +543,7 @@ core.telegram.org/constructor/messageMediaPhoto
 core.telegram.org/constructor/messageMediaPoll
 core.telegram.org/constructor/messageMediaUnsupported
 core.telegram.org/constructor/messageMediaVenue
+core.telegram.org/constructor/messageMediaVideo
 core.telegram.org/constructor/messageMediaWebPage
 core.telegram.org/constructor/messageRange
 core.telegram.org/constructor/messageReplies
@@ -581,6 +591,9 @@ core.telegram.org/constructor/messages.savedGifsNotModified
 core.telegram.org/constructor/messages.searchCounter
 core.telegram.org/constructor/messages.sentEncryptedFile
 core.telegram.org/constructor/messages.sentEncryptedMessage
+core.telegram.org/constructor/messages.sentMessageLink
+core.telegram.org/constructor/messages.statedMessageLink
+core.telegram.org/constructor/messages.statedMessagesLinks
 core.telegram.org/constructor/messages.stickerSet
 core.telegram.org/constructor/messages.stickerSetInstallResultArchive
 core.telegram.org/constructor/messages.stickerSetInstallResultSuccess
@@ -899,6 +912,7 @@ core.telegram.org/constructor/updateShortSentMessage
 core.telegram.org/constructor/updateStickerSets
 core.telegram.org/constructor/updateStickerSetsOrder
 core.telegram.org/constructor/updateTheme
+core.telegram.org/constructor/updateUserBlocked
 core.telegram.org/constructor/updateUserName
 core.telegram.org/constructor/updateUserPhone
 core.telegram.org/constructor/updateUserPhoto
@@ -926,9 +940,11 @@ core.telegram.org/constructor/urlAuthResultDefault
 core.telegram.org/constructor/urlAuthResultRequest
 core.telegram.org/constructor/user
 core.telegram.org/constructor/userEmpty
+core.telegram.org/constructor/userForeign
 core.telegram.org/constructor/userFull
 core.telegram.org/constructor/userProfilePhoto
 core.telegram.org/constructor/userProfilePhotoEmpty
+core.telegram.org/constructor/userRequest
 core.telegram.org/constructor/userStatusEmpty
 core.telegram.org/constructor/userStatusLastMonth
 core.telegram.org/constructor/userStatusLastWeek
@@ -940,6 +956,7 @@ core.telegram.org/constructor/videoSize
 core.telegram.org/constructor/wallPaper
 core.telegram.org/constructor/wallPaperNoFile
 core.telegram.org/constructor/wallPaperSettings
+core.telegram.org/constructor/wallPaperSolid
 core.telegram.org/constructor/webAuthorization
 core.telegram.org/constructor/webDocument
 core.telegram.org/constructor/webDocumentNoProxy
@@ -1045,8 +1062,10 @@ core.telegram.org/method/auth.recoverPassword
 core.telegram.org/method/auth.requestPasswordRecovery
 core.telegram.org/method/auth.resendCode
 core.telegram.org/method/auth.resetAuthorizations
+core.telegram.org/method/auth.sendCall
 core.telegram.org/method/auth.sendCode
 core.telegram.org/method/auth.sendInvites
+core.telegram.org/method/auth.sendSms
 core.telegram.org/method/auth.signIn
 core.telegram.org/method/auth.signUp
 core.telegram.org/method/bots.answerWebhookJSONQuery
@@ -1165,6 +1184,7 @@ core.telegram.org/method/messages.editInlineBotMessage
 core.telegram.org/method/messages.editMessage
 core.telegram.org/method/messages.exportChatInvite
 core.telegram.org/method/messages.faveSticker
+core.telegram.org/method/messages.forwardMessage
 core.telegram.org/method/messages.forwardMessages
 core.telegram.org/method/messages.getAllChats
 core.telegram.org/method/messages.getAllDrafts
@@ -1246,6 +1266,7 @@ core.telegram.org/method/messages.search
 core.telegram.org/method/messages.searchGifs
 core.telegram.org/method/messages.searchGlobal
 core.telegram.org/method/messages.searchStickerSets
+core.telegram.org/method/messages.sendBroadcast
 core.telegram.org/method/messages.sendEncrypted
 core.telegram.org/method/messages.sendEncryptedFile
 core.telegram.org/method/messages.sendEncryptedService
@@ -1321,8 +1342,15 @@ core.telegram.org/method/users.getUsers
 core.telegram.org/method/users.setSecureValueErrors
 core.telegram.org/methods
 core.telegram.org/mtproto
+core.telegram.org/mtproto/TL
+core.telegram.org/mtproto/TL-abstract-types
+core.telegram.org/mtproto/TL-combinators
+core.telegram.org/mtproto/TL-dependent
 core.telegram.org/mtproto/TL-formal
+core.telegram.org/mtproto/TL-optargs
+core.telegram.org/mtproto/TL-patterns
 core.telegram.org/mtproto/TL-polymorph
+core.telegram.org/mtproto/TL-tl
 core.telegram.org/mtproto/TL-types
 core.telegram.org/mtproto/auth_key
 core.telegram.org/mtproto/description
@@ -1360,6 +1388,7 @@ core.telegram.org/tdlib/options
 core.telegram.org/techfaq
 core.telegram.org/themes
 core.telegram.org/type/AccountDaysTTL
+core.telegram.org/type/Audio
 core.telegram.org/type/Authorization
 core.telegram.org/type/AutoDownloadSettings
 core.telegram.org/type/BankCardOpenUrl
@@ -1402,6 +1431,7 @@ core.telegram.org/type/Dialog
 core.telegram.org/type/DialogFilter
 core.telegram.org/type/DialogFilterSuggested
 core.telegram.org/type/DialogPeer
+core.telegram.org/type/DisabledFeature
 core.telegram.org/type/Document
 core.telegram.org/type/DocumentAttribute
 core.telegram.org/type/DraftMessage
@@ -1567,6 +1597,7 @@ core.telegram.org/type/UserFull
 core.telegram.org/type/UserProfilePhoto
 core.telegram.org/type/UserStatus
 core.telegram.org/type/Vector t
+core.telegram.org/type/Video
 core.telegram.org/type/VideoSize
 core.telegram.org/type/WallPaper
 core.telegram.org/type/WallPaperSettings
@@ -1582,6 +1613,7 @@ core.telegram.org/type/account.Password
 core.telegram.org/type/account.PasswordInputSettings
 core.telegram.org/type/account.PasswordSettings
 core.telegram.org/type/account.PrivacyRules
+core.telegram.org/type/account.SentChangePhoneCode
 core.telegram.org/type/account.SentEmailCode
 core.telegram.org/type/account.Takeout
 core.telegram.org/type/account.Themes
@@ -1604,6 +1636,7 @@ core.telegram.org/type/contacts.Blocked
 core.telegram.org/type/contacts.Contacts
 core.telegram.org/type/contacts.Found
 core.telegram.org/type/contacts.ImportedContacts
+core.telegram.org/type/contacts.Link
 core.telegram.org/type/contacts.ResolvedPeer
 core.telegram.org/type/contacts.TopPeers
 core.telegram.org/type/double
@@ -1649,7 +1682,9 @@ core.telegram.org/type/messages.RecentStickers
 core.telegram.org/type/messages.SavedGifs
 core.telegram.org/type/messages.SearchCounter
 core.telegram.org/type/messages.SentEncryptedMessage
+core.telegram.org/type/messages.SentMessage
 core.telegram.org/type/messages.StatedMessage
+core.telegram.org/type/messages.StatedMessages
 core.telegram.org/type/messages.StickerSet
 core.telegram.org/type/messages.StickerSetInstallResult
 core.telegram.org/type/messages.Stickers
@@ -3625,6 +3660,7 @@ telegram.org/blog/now-you-see-me
 telegram.org/blog/passport
 telegram.org/blog/payments
 telegram.org/blog/payments-2-0-scheduled-voice-chats
+telegram.org/blog/permissions-groups-undo
 telegram.org/blog/photo-editor-and-passcodes
 telegram.org/blog/pin-and-ifttt
 telegram.org/blog/pinned-messages-locations-playlists
