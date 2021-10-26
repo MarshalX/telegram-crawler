@@ -29,12 +29,13 @@ HIDDEN_URLS = {
     'core.telegram.org/resources/cidr.txt',
     'core.telegram.org/apple_privacy',
     'core.telegram.org/getProxyConfig',
+
+    'promote.telegram.org',
+    'contest.com',
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/api.tl',
     'raw.githubusercontent.com/tdlib/td/master/td/generate/scheme/telegram_api.tl',
-    'promote.telegram.org',
-    'contest.com',
 }
 BASE_URL_REGEX = r'telegram.org'
 
@@ -160,6 +161,10 @@ def find_absolute_links(html: str) -> set[str]:
 
 
 def find_relative_links(html: str, cur_link: str) -> set[str]:
+    matches = re.findall(DIRECT_LINK_REGEX, cur_link)
+    if not matches:
+        return set()
+
     direct_cur_link = re.findall(DIRECT_LINK_REGEX, cur_link)[0]
     # optimization. when we want to exclude domain
     if should_exclude(cur_link):
