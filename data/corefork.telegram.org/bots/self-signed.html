@@ -40,34 +40,41 @@
   <h1 id="dev_page_title">Using self-signed certificates</h1>
   
   <div id="dev_page_content"><p>Upload your certificate using the <em>certificate</em> parameter in the <a href="/bots/api#setwebhook">setWebhook</a> method. The certificate supplied should be <strong>PEM encoded</strong> (ASCII BASE64), the pem file should only contain the <strong>public key</strong> (including BEGIN and END portions). When converting from a bundle format, please split the file to only include the public key.</p>
-<h3><a class="anchor" name="generating-a-self-signed-certificate-pair-pem" href="#generating-a-self-signed-certificate-pair-pem"><i class="anchor-icon"></i></a>Generating a self-signed certificate pair (PEM):</h3>
-<h4><a class="anchor" name="openssl" href="#openssl"><i class="anchor-icon"></i></a>Openssl</h4>
+<h3><a class="anchor" href="#generating-a-self-signed-certificate-pair-pem" id="generating-a-self-signed-certificate-pair-pem" name="generating-a-self-signed-certificate-pair-pem"><i class="anchor-icon"></i></a>Generating a self-signed certificate pair (PEM):</h3>
+<h4><a class="anchor" href="#openssl" id="openssl" name="openssl"><i class="anchor-icon"></i></a>Openssl</h4>
 <blockquote>
 <p>Windows binaries for Openssl are available online</p>
 </blockquote>
-<p><code>openssl req -newkey rsa:2048 -sha256 -nodes -keyout YOURPRIVATE.key -x509 -days 365 -out YOURPUBLIC.pem -subj &quot;/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=YOURDOMAIN.EXAMPLE&quot;</code></p>
+<p><code>openssl req -newkey rsa:2048 -sha256 -nodes -keyout YOURPRIVATE.key -x509 -days 365 -out YOURPUBLIC.pem -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=YOURDOMAIN.EXAMPLE"</code></p>
 <p>YOURPUBLIC.pem has to be used as input for setting the self-signed webhook.</p>
-<p>You can inspect the generated certificate with:<br><code>openssl x509 -text -noout -in YOURPUBLIC.pem</code></p>
-<p>Converting from a previously generated DER:<br><code>openssl x509 -inform der -in YOURDER.der -out YOURPEM.pem</code></p>
-<p>Converting from a previously generated PKCS12:<br><code>openssl pkcs12 -in YOURPKCS.p12 -out YOURPEM.pem</code></p>
+<p>You can inspect the generated certificate with:
+<code>openssl x509 -text -noout -in YOURPUBLIC.pem</code></p>
+<p>Converting from a previously generated DER:
+<code>openssl x509 -inform der -in YOURDER.der -out YOURPEM.pem</code></p>
+<p>Converting from a previously generated PKCS12:
+<code>openssl pkcs12 -in YOURPKCS.p12 -out YOURPEM.pem</code></p>
 <blockquote>
-<p>More information: https://www.openssl.org/</p>
+<p>More information: <a href="https://www.openssl.org/">https://www.openssl.org/</a></p>
 </blockquote>
-<h4><a class="anchor" name="java-keystore" href="#java-keystore"><i class="anchor-icon"></i></a>Java keystore</h4>
-<p>Generate self-signed JKS:<br><code>keytool -genkey -keyalg RSA -alias YOURDOMAIN.EXAMPLE -keystore YOURJKS.jks -storepass YOURPASSWORD -validity 360 -keysize 2048</code></p>
-<p>Converting JKS to pkcs12 (intermediate step for conversion to PEM):<br><code>keytool -importkeystore -srckeystore YOURJKS.jks -destkeystore YOURPKCS.p12 -srcstoretype jks -deststoretype pkcs12</code></p>
-<p>Convert PKCS12 to PEM (requires openssl):<br><code>openssl pkcs12 -in YOURPKCS.p12 -out YOURPEM.pem</code></p>
+<h4><a class="anchor" href="#java-keystore" id="java-keystore" name="java-keystore"><i class="anchor-icon"></i></a>Java keystore</h4>
+<p>Generate self-signed JKS:
+<code>keytool -genkey -keyalg RSA -alias YOURDOMAIN.EXAMPLE -keystore YOURJKS.jks -storepass YOURPASSWORD -validity 360 -keysize 2048</code></p>
+<p>Converting JKS to pkcs12 (intermediate step for conversion to PEM):
+<code>keytool -importkeystore -srckeystore YOURJKS.jks -destkeystore YOURPKCS.p12 -srcstoretype jks -deststoretype pkcs12</code></p>
+<p>Convert PKCS12 to PEM (requires openssl):
+<code>openssl pkcs12 -in YOURPKCS.p12 -out YOURPEM.pem</code></p>
 <blockquote>
-<p>More information: https://docs.oracle.com</p>
+<p>More information: <a href="https://docs.oracle.com">https://docs.oracle.com</a></p>
 </blockquote>
-<h4><a class="anchor" name="windows" href="#windows"><i class="anchor-icon"></i></a>Windows</h4>
+<h4><a class="anchor" href="#windows" id="windows" name="windows"><i class="anchor-icon"></i></a>Windows</h4>
 <p>Creating a self-signed certificate using Windows native utilities is also possible, although OpenSSL binaries for Windows are available online.</p>
-<p>On the commandline:<br><code>certreq -new TEMPLATE.txt RequestFileOut</code></p>
+<p>On the commandline:
+<code>certreq -new TEMPLATE.txt RequestFileOut</code></p>
 <p>TEMPLATE.txt example file:</p>
 <pre><code>[NewRequest]
 
 ; At least one value must be set in this section
-Subject = &quot;CN=DOMAIN.EXAMPLE&quot;
+Subject = "CN=DOMAIN.EXAMPLE"
 KeyLength = 2048
 KeyAlgorithm = RSA
 HashAlgorithm = sha256
@@ -75,17 +82,22 @@ HashAlgorithm = sha256
 RequestType = Cert
 UseExistingKeySet=false ;generates a new private key (for export)
 Exportable = true ;makes the private key exportable with the PFX</code></pre>
-<p>A self-signed certificate will be generated and installed, to view the certificate:<br><code>certutil -store -user my</code></p>
-<p>To export in DER format (intermediate step for conversion to PEM)<br><code>certutil -user -store -split my SERIALNUMBER YOURDER.crt</code></p>
-<p>Converting to PEM (used for setting the webhook)<br><code>certutil -encode YOURDER.crt YOURPEM.cer</code></p>
-<p>To delete a certificate from your store:<br><code>certutil -delstore -user my SERIALNUMBER</code> (from view)</p>
-<p>To export in PFX(PKCS12) format<br><code>certutil -exportpfx -user YOURDOMAIN.EXAMPLE YOURPKCS.pfx NoChain</code></p>
+<p>A self-signed certificate will be generated and installed, to view the certificate:
+<code>certutil -store -user my</code></p>
+<p>To export in DER format (intermediate step for conversion to PEM)
+<code>certutil -user -store -split my SERIALNUMBER YOURDER.crt</code></p>
+<p>Converting to PEM (used for setting the webhook)
+<code>certutil -encode YOURDER.crt YOURPEM.cer</code></p>
+<p>To delete a certificate from your store:
+<code>certutil -delstore -user my SERIALNUMBER</code> (from view)</p>
+<p>To export in PFX(PKCS12) format
+<code>certutil -exportpfx -user YOURDOMAIN.EXAMPLE YOURPKCS.pfx NoChain</code></p>
 <blockquote>
-<p>More information: https://technet.microsoft.com</p>
+<p>More information: <a href="https://technet.microsoft.com">https://technet.microsoft.com</a></p>
 </blockquote>
-<p>Converting YOURPKCS.pfx to PEM including the private key is best done with OpenSSL:<br><code>openssl pkcs12 -in YOURPKCS.pfx -out YOURPEM.cer</code></p>
-<p>Remember that only the public key is needed as input for the self-signed webhook certificate parameter. certmgr.msc can also be used as a GUI to export the public part of self-signed certificates to PEM.</p>
-</div>
+<p>Converting YOURPKCS.pfx to PEM including the private key is best done with OpenSSL:
+<code>openssl pkcs12 -in YOURPKCS.pfx -out YOURPEM.cer</code></p>
+<p>Remember that only the public key is needed as input for the self-signed webhook certificate parameter. certmgr.msc can also be used as a GUI to export the public part of self-signed certificates to PEM.</p></div>
   
 </div>
           
