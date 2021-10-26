@@ -42,33 +42,33 @@ If you have questions, try our FAQ or check out this…">
   <h1 id="dev_page_title">Hellobot</h1>
   
   <div id="dev_page_content"><blockquote>
-<p>This sample PHP bot demonstrates the basics of the <a href="/bots/api">Telegram Bot API</a>.
-If you have questions, try our <a href="/bots/faq">FAQ</a> or check out <a href="/bots/samples">this page</a> for more examples.</p>
+<p>This sample PHP bot demonstrates the basics of the <a href="/bots/api">Telegram Bot API</a>.<br>If you have questions, try our <a href="/bots/faq">FAQ</a> or check out <a href="/bots/samples">this page</a> for more examples.</p>
 </blockquote>
 <div><br></div>
+
 <pre><code>&lt;?php
 
-define('BOT_TOKEN', '12345678:replace-me-with-real-token');
-define('API_URL', 'https://api.telegram.org/bot'.BOT_TOKEN.'/');
+define(&#39;BOT_TOKEN&#39;, &#39;12345678:replace-me-with-real-token&#39;);
+define(&#39;API_URL&#39;, &#39;https://api.telegram.org/bot&#39;.BOT_TOKEN.&#39;/&#39;);
 
 function apiRequestWebhook($method, $parameters) {
   if (!is_string($method)) {
-    error_log("Method name must be a string\n");
+    error_log(&quot;Method name must be a string\n&quot;);
     return false;
   }
 
   if (!$parameters) {
     $parameters = array();
   } else if (!is_array($parameters)) {
-    error_log("Parameters must be an array\n");
+    error_log(&quot;Parameters must be an array\n&quot;);
     return false;
   }
 
-  $parameters["method"] = $method;
+  $parameters[&quot;method&quot;] = $method;
 
   $payload = json_encode($parameters);
-  header('Content-Type: application/json');
-  header('Content-Length: '.strlen($payload));
+  header(&#39;Content-Type: application/json&#39;);
+  header(&#39;Content-Length: &#39;.strlen($payload));
   echo $payload;
 
   return true;
@@ -80,7 +80,7 @@ function exec_curl_request($handle) {
   if ($response === false) {
     $errno = curl_errno($handle);
     $error = curl_error($handle);
-    error_log("Curl returned error $errno: $error\n");
+    error_log(&quot;Curl returned error $errno: $error\n&quot;);
     curl_close($handle);
     return false;
   }
@@ -94,17 +94,17 @@ function exec_curl_request($handle) {
     return false;
   } else if ($http_code != 200) {
     $response = json_decode($response, true);
-    error_log("Request has failed with error {$response['error_code']}: {$response['description']}\n");
+    error_log(&quot;Request has failed with error {$response[&#39;error_code&#39;]}: {$response[&#39;description&#39;]}\n&quot;);
     if ($http_code == 401) {
-      throw new Exception('Invalid access token provided');
+      throw new Exception(&#39;Invalid access token provided&#39;);
     }
     return false;
   } else {
     $response = json_decode($response, true);
-    if (isset($response['description'])) {
-      error_log("Request was successful: {$response['description']}\n");
+    if (isset($response[&#39;description&#39;])) {
+      error_log(&quot;Request was successful: {$response[&#39;description&#39;]}\n&quot;);
     }
-    $response = $response['result'];
+    $response = $response[&#39;result&#39;];
   }
 
   return $response;
@@ -112,14 +112,14 @@ function exec_curl_request($handle) {
 
 function apiRequest($method, $parameters) {
   if (!is_string($method)) {
-    error_log("Method name must be a string\n");
+    error_log(&quot;Method name must be a string\n&quot;);
     return false;
   }
 
   if (!$parameters) {
     $parameters = array();
   } else if (!is_array($parameters)) {
-    error_log("Parameters must be an array\n");
+    error_log(&quot;Parameters must be an array\n&quot;);
     return false;
   }
 
@@ -129,7 +129,7 @@ function apiRequest($method, $parameters) {
       $val = json_encode($val);
     }
   }
-  $url = API_URL.$method.'?'.http_build_query($parameters);
+  $url = API_URL.$method.&#39;?&#39;.http_build_query($parameters);
 
   $handle = curl_init($url);
   curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
@@ -141,18 +141,18 @@ function apiRequest($method, $parameters) {
 
 function apiRequestJson($method, $parameters) {
   if (!is_string($method)) {
-    error_log("Method name must be a string\n");
+    error_log(&quot;Method name must be a string\n&quot;);
     return false;
   }
 
   if (!$parameters) {
     $parameters = array();
   } else if (!is_array($parameters)) {
-    error_log("Parameters must be an array\n");
+    error_log(&quot;Parameters must be an array\n&quot;);
     return false;
   }
 
-  $parameters["method"] = $method;
+  $parameters[&quot;method&quot;] = $method;
 
   $handle = curl_init(API_URL);
   curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
@@ -160,47 +160,47 @@ function apiRequestJson($method, $parameters) {
   curl_setopt($handle, CURLOPT_TIMEOUT, 60);
   curl_setopt($handle, CURLOPT_POST, true);
   curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($parameters));
-  curl_setopt($handle, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+  curl_setopt($handle, CURLOPT_HTTPHEADER, array(&quot;Content-Type: application/json&quot;));
 
   return exec_curl_request($handle);
 }
 
 function processMessage($message) {
   // process incoming message
-  $message_id = $message['message_id'];
-  $chat_id = $message['chat']['id'];
-  if (isset($message['text'])) {
+  $message_id = $message[&#39;message_id&#39;];
+  $chat_id = $message[&#39;chat&#39;][&#39;id&#39;];
+  if (isset($message[&#39;text&#39;])) {
     // incoming text message
-    $text = $message['text'];
+    $text = $message[&#39;text&#39;];
 
-    if (strpos($text, "/start") === 0) {
-      apiRequestJson("sendMessage", array('chat_id' =&gt; $chat_id, "text" =&gt; 'Hello', 'reply_markup' =&gt; array(
-        'keyboard' =&gt; array(array('Hello', 'Hi')),
-        'one_time_keyboard' =&gt; true,
-        'resize_keyboard' =&gt; true)));
-    } else if ($text === "Hello" || $text === "Hi") {
-      apiRequest("sendMessage", array('chat_id' =&gt; $chat_id, "text" =&gt; 'Nice to meet you'));
-    } else if (strpos($text, "/stop") === 0) {
+    if (strpos($text, &quot;/start&quot;) === 0) {
+      apiRequestJson(&quot;sendMessage&quot;, array(&#39;chat_id&#39; =&gt; $chat_id, &quot;text&quot; =&gt; &#39;Hello&#39;, &#39;reply_markup&#39; =&gt; array(
+        &#39;keyboard&#39; =&gt; array(array(&#39;Hello&#39;, &#39;Hi&#39;)),
+        &#39;one_time_keyboard&#39; =&gt; true,
+        &#39;resize_keyboard&#39; =&gt; true)));
+    } else if ($text === &quot;Hello&quot; || $text === &quot;Hi&quot;) {
+      apiRequest(&quot;sendMessage&quot;, array(&#39;chat_id&#39; =&gt; $chat_id, &quot;text&quot; =&gt; &#39;Nice to meet you&#39;));
+    } else if (strpos($text, &quot;/stop&quot;) === 0) {
       // stop now
     } else {
-      apiRequestWebhook("sendMessage", array('chat_id' =&gt; $chat_id, "reply_to_message_id" =&gt; $message_id, "text" =&gt; 'Cool'));
+      apiRequestWebhook(&quot;sendMessage&quot;, array(&#39;chat_id&#39; =&gt; $chat_id, &quot;reply_to_message_id&quot; =&gt; $message_id, &quot;text&quot; =&gt; &#39;Cool&#39;));
     }
   } else {
-    apiRequest("sendMessage", array('chat_id' =&gt; $chat_id, "text" =&gt; 'I understand only text messages'));
+    apiRequest(&quot;sendMessage&quot;, array(&#39;chat_id&#39; =&gt; $chat_id, &quot;text&quot; =&gt; &#39;I understand only text messages&#39;));
   }
 }
 
 
-define('WEBHOOK_URL', 'https://my-site.example.com/secret-path-for-webhooks/');
+define(&#39;WEBHOOK_URL&#39;, &#39;https://my-site.example.com/secret-path-for-webhooks/&#39;);
 
-if (php_sapi_name() == 'cli') {
+if (php_sapi_name() == &#39;cli&#39;) {
   // if run from console, set or delete webhook
-  apiRequest('setWebhook', array('url' =&gt; isset($argv[1]) &amp;&amp; $argv[1] == 'delete' ? '' : WEBHOOK_URL));
+  apiRequest(&#39;setWebhook&#39;, array(&#39;url&#39; =&gt; isset($argv[1]) &amp;&amp; $argv[1] == &#39;delete&#39; ? &#39;&#39; : WEBHOOK_URL));
   exit;
 }
 
 
-$content = file_get_contents("php://input");
+$content = file_get_contents(&quot;php://input&quot;);
 $update = json_decode($content, true);
 
 if (!$update) {
@@ -208,9 +208,10 @@ if (!$update) {
   exit;
 }
 
-if (isset($update["message"])) {
-  processMessage($update["message"]);
-}</code></pre></div>
+if (isset($update[&quot;message&quot;])) {
+  processMessage($update[&quot;message&quot;]);
+}</code></pre>
+</div>
   
 </div>
           
