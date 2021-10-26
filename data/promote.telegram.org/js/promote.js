@@ -1113,7 +1113,7 @@ var OwnerAds = {
         renderItem: function(item, query) {
           var status_attrs = ' href="' + item.base_url + item.status_url + '" ' + (item.status_attrs || 'data-layer');
           var tme_link = item.tme_path ? '<a href="https://t.me/' + item.tme_path + '" target="_blank">' + item.tme_path + '</a>' : '<span class="pr-no-tme-link">' + l('WEB_ADS_NO_TME_LINK') + '</span>';
-          return '<td><div class="pr-cell pr-cell-title"><a href="' + item.base_url + '">' + item.title + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/stats" class="ad-link">' + item.views_str + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + item.cpm_str + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + item.budget + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '" class="ad-link">' + item.target + '</a></div></td><td><div class="pr-cell">' + tme_link + '</div></td><td><div class="pr-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '" class="ad-link">' + OwnerAds.formatTableDate(item.date) + '</a></div></td>';
+          return '<td><div class="pr-cell pr-cell-title"><a href="' + item.base_url + '">' + item.title + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + item.views_str + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + item.cpm_str + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + item.budget + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + item.target + '</a></div></td><td><div class="pr-cell">' + tme_link + '</div></td><td><div class="pr-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + OwnerAds.formatTableDate(item.date) + '</a></div></td>';
         },
         renderLoading: function() {
           return '<tr><td colspan="8" class="pr-cell-empty"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
@@ -1331,7 +1331,7 @@ var ReviewAds = {
   },
   eApproveAd: function(e) {
     e.preventDefault();
-    var $ad      = $(this).parents('.js-ad');
+    var $ad      = $(this).parents('.js-review-item');
     var owner_id = $ad.attr('data-owner-id');
     var ad_id    = $ad.attr('data-ad-id');
     var $buttons = $ad.find('.pr-btn');
@@ -1356,7 +1356,7 @@ var ReviewAds = {
   },
   eDeclineAd: function(e) {
     e.preventDefault();
-    var $ad       = $(this).parents('.js-ad');
+    var $ad       = $(this).parents('.js-review-item');
     var owner_id  = $ad.attr('data-owner-id');
     var ad_id     = $ad.attr('data-ad-id');
     var $buttons  = $ad.find('.pr-btn');
