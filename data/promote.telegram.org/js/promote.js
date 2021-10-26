@@ -125,15 +125,15 @@ var Ads = {
   },
   showFieldHint: function($fieldEl, hint_text, field_invalid) {
     var $formGroup = $fieldEl.parents('.form-group');
-    var $hint = $formGroup.find('>.ads-form-control-hint');
-    var $msg = $formGroup.find('>.ads-form-control-msg');
+    var $hint = $formGroup.find('>.pr-form-control-hint');
+    var $msg = $formGroup.find('>.pr-form-control-msg');
     if (!$msg.size() && hint_text) {
-      $msg = $('<div class="ads-form-control-msg ohide" />');
-      $formGroup.find('>.ads-form-control-wrap').after($msg);
+      $msg = $('<div class="pr-form-control-msg ohide" />');
+      $formGroup.find('>.pr-form-control-wrap').after($msg);
     }
     $msg.toggleClass('no-hint', !$hint.text().length);
     if (hint_text) {
-      $msg.html('<div class="ads-form-control-msg-text">' + hint_text + '</div>').redraw().fadeShow();
+      $msg.html('<div class="pr-form-control-msg-text">' + hint_text + '</div>').redraw().fadeShow();
     } else {
       $msg.fadeHide();
     }
@@ -175,34 +175,34 @@ var Ads = {
   },
   fieldInit: function(field) {
     $(field).on('focus blur keyup change input', Ads.eUpdateField);
-    $(field).parents('.ads-search-input-wrap').find('.ads-search-reset').on('click', Ads.eClearField);
+    $(field).parents('.pr-search-input-wrap').find('.pr-search-reset').on('click', Ads.eClearField);
     Ads.updateField($(field));
   },
   fieldDestroy: function(field) {
     $(field).off('focus blur keyup change input', Ads.eUpdateField);
-    $(field).parents('.ads-search-input-wrap').find('.ads-search-reset').off('click', Ads.eClearField);
+    $(field).parents('.pr-search-input-wrap').find('.pr-search-reset').off('click', Ads.eClearField);
   },
   formInit: function(form) {
     var $form = $(form);
-    $('.ads-form-control', $form).each(function(){ Ads.fieldInit(this); });
+    $('.pr-form-control', $form).each(function(){ Ads.fieldInit(this); });
     $('.js-amount-input', $form).on('keyup change input', Ads.eUpdateAmountField);
     $('input.checkbox,input.radio', $form).on('focus blur', Ads.eUpdateField);
     $('.js-hint-tooltip', $form).on('mouseover mouseout click', Ads.eHintEvent);
-    $('textarea.ads-form-control', $form).initAutosize();
+    $('textarea.pr-form-control', $form).initAutosize();
     $(document).on('touchstart click', Ads.eHideAllHints);
     setTimeout(function(){ $form.removeClass('no-transition'); }, 100);
   },
   formDestroy: function(form) {
     var $form = $(form);
-    $('.ads-form-control', $form).each(function(){ Ads.fieldDestroy(this); });
+    $('.pr-form-control', $form).each(function(){ Ads.fieldDestroy(this); });
     $('.js-amount-input', $form).off('keyup change input', Ads.eUpdateAmountField);
     $('input.checkbox,input.radio', $form).off('focus blur', Ads.eUpdateField);
     $('.js-hint-tooltip', $form).off('mouseover mouseout click', Ads.eHintEvent);
-    $('textarea.ads-form-control', $form).destroyAutosize();
+    $('textarea.pr-form-control', $form).destroyAutosize();
     $(document).off('touchstart click', Ads.eHideAllHints);
   },
   eClearField: function(e) {
-    var $fieldEl = $(this).parents('.ads-search-input-wrap').find('.ads-search-input');
+    var $fieldEl = $(this).parents('.pr-search-input-wrap').find('.pr-search-input');
     $fieldEl.value('').trigger('input').focus();
   },
   showHint: function($hint, delay, hide_delay) {
@@ -273,7 +273,7 @@ var Ads = {
     }
   },
   updateAdMessagePreviews: function(cont) {
-    $('.ads-review-ad-preview .tgme_widget_message_footer', cont).each(function() {
+    $('.pr-review-ad-preview .tgme_widget_message_footer', cont).each(function() {
       Ads.updateTextShadow(this, '.js-message_text', '.js-message_info');
     });
   },
@@ -340,7 +340,7 @@ var NewAd = {
   init: function() {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
-      state.$form = $('.ads-new-form', cont);
+      state.$form = $('.pr-new-form', cont);
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
       cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
@@ -560,7 +560,7 @@ var NewAd = {
   },
   updateAdPreview: function($form, previewData) {
     var $previewPopup = Aj.state.$previewPopup;
-    var inPopup = $form.parents('.ads-layer-preview-ad').size() > 0;
+    var inPopup = $form.parents('.pr-layer-preview-ad').size() > 0;
     if (inPopup) {
       Aj.state.popupPreviewData = previewData;
       if ($previewPopup) {
@@ -576,7 +576,7 @@ var NewAd = {
             Ads.updateTextShadow(this, '.ad-msg-text', '.label', 10);
           });
         }
-        $('.js-promote-photo', $previewPopup).parents('.ads-form-control-wrap').toggleClass('has-photo', !!previewData);
+        $('.js-promote-photo', $previewPopup).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
         $('.js-preview', $previewPopup).toggleClass('active', !!previewData);
       }
     } else {
@@ -585,7 +585,7 @@ var NewAd = {
         $('.js-promote-photo', Aj.state.$form).html(previewData.photo);
         $('.js-promote-photo-tooltip', Aj.state.$form).html(previewData.from);
       }
-      $('.js-promote-photo', Aj.state.$form).parents('.ads-form-control-wrap').toggleClass('has-photo', !!previewData);
+      $('.js-promote-photo', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
       $('.js-preview-link', Aj.state.$form).toggleClass('inactive', !previewData);
     }
   },
@@ -609,13 +609,13 @@ var NewAd = {
     if (!state.previewData) {
       return false;
     }
-    var $previewPopup = $('<div class="popup-container hide alert-popup-container ads-popup-container">' + state.previewTpl + '</div>');
+    var $previewPopup = $('<div class="popup-container hide alert-popup-container pr-popup-container">' + state.previewTpl + '</div>');
     state.$previewPopup = $previewPopup;
     var $form = state.$form;
     var text = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
 
-    var $previewForm = $('.ads-new-form', $previewPopup);
+    var $previewForm = $('.pr-new-form', $previewPopup);
     Ads.formInit($previewForm);
     $previewForm.on('submit', preventDefault);
 
@@ -651,7 +651,7 @@ var NewAd = {
     var $cancelBtn = $('.cancel-form-btn', $previewPopup);
     $cancelBtn.on('click', previewCancel);
     $previewPopup.one('popup:open', function() {
-      $('.ads-preview-ad-message .ad-msg-date', $previewPopup).each(function() {
+      $('.pr-preview-ad-message .ad-msg-date', $previewPopup).each(function() {
         Ads.updateTextShadow(this, '.ad-msg-text', '.label', 10);
       });
       state.previewTextField.updateAutosize();
@@ -698,7 +698,7 @@ var NewAd = {
   getPreviewFormData: function($form) {
     if (Aj.state.$previewPopup) {
       var $previewPopup = Aj.state.$previewPopup;
-      var $previewForm = $('.ads-new-form', $previewPopup);
+      var $previewForm = $('.pr-new-form', $previewPopup);
       if (!$previewForm.get(0)) return false;
       var values = [
         $previewForm.field('text').value(),
@@ -815,10 +815,10 @@ var NewAd = {
       }
       Aj.state.initFormData = curFormData;
       NewAd.saveDraftAuto(true);
-      $('.ads-draft-btn-wrap').toggleClass('active', !!result.has_draft);
-      // $('.ads-draft-btn-wrap').addClass('saved');
+      $('.pr-draft-btn-wrap').toggleClass('active', !!result.has_draft);
+      // $('.pr-draft-btn-wrap').addClass('saved');
       // setTimeout(function() {
-      //   $('.ads-draft-btn-wrap').removeClass('saved');
+      //   $('.pr-draft-btn-wrap').removeClass('saved');
       // }, 1500);
     });
     return false;
@@ -840,7 +840,7 @@ var NewAd = {
     var params = {
       owner_id: Aj.state.ownerId
     };
-    $('.ads-draft-btn-wrap').removeClass('active');
+    $('.pr-draft-btn-wrap').removeClass('active');
     NewAd.saveDraftAuto(true);
     Aj.apiRequest('clearAdDraft', params, function(result) {
       if (result.error) {
@@ -876,7 +876,7 @@ var Account = {
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
       cont.on('click.curPage', '.save-info-btn', Account.eSubmitForm);
-      cont.on('change.curPage', '.ads-form-control', Account.onFieldChange);
+      cont.on('change.curPage', '.pr-form-control', Account.onFieldChange);
       Ads.initSelect(state.$form, 'channel', {
         items: Aj.state.channelItems || [],
         noMultiSelect: true,
@@ -907,8 +907,8 @@ var Account = {
     }
   },
   onChannelChange: function(field, value, valueFull) {
-    $accPhoto = $('.ads-account-button-wrap.current .ads-account-button-photo');
-    $accTitle = $('.ads-account-button-wrap.current .ads-account-button-title');
+    $accPhoto = $('.pr-account-button-wrap.current .pr-account-button-photo');
+    $accTitle = $('.pr-account-button-wrap.current .pr-account-button-title');
     if (!$accPhoto.data('def-val')) {
       $accPhoto.data('def-val', $accPhoto.html());
     }
@@ -989,7 +989,7 @@ var Account = {
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
       cont.on('click.curPage', '.send-request-btn', Account.eSendAddFundsRequest);
-      cont.on('change.curPage', '.ads-form-control', Account.onFieldChange);
+      cont.on('change.curPage', '.pr-form-control', Account.onFieldChange);
       Ads.initSelect(state.$form, 'ads_language', {
         items: Aj.state.langItems || [],
         noMultiSelect: true,
@@ -1096,10 +1096,10 @@ var OwnerAds = {
   init: function() {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
-      state.$searchField = $('.ads-search-input');
-      state.$searchResults = $('.ads-table tbody');
+      state.$searchField = $('.pr-search-input');
+      state.$searchResults = $('.pr-table tbody');
       Ads.fieldInit(state.$searchField);
-      cont.on('click.curPage', '.ads-cell-sort', OwnerAds.eSortList);
+      cont.on('click.curPage', '.pr-cell-sort', OwnerAds.eSortList);
 
       state.$searchField.initSearch({
         $results: state.$searchResults,
@@ -1112,21 +1112,21 @@ var OwnerAds = {
         },
         renderItem: function(item, query) {
           var status_attrs = ' href="' + item.base_url + item.status_url + '" ' + (item.status_attrs || 'data-layer');
-          var tme_link = item.tme_path ? '<a href="https://t.me/' + item.tme_path + '" target="_blank">' + item.tme_path + '</a>' : '<span class="ads-no-tme-link">' + l('WEB_ADS_NO_TME_LINK') + '</span>';
-          return '<td><div class="ads-cell ads-cell-title"><a href="' + item.base_url + '">' + item.title + '</a></div></td><td><div class="ads-cell"><a href="' + item.base_url + '/stats" class="ad-link">' + item.views_str + '</a></div></td><td><div class="ads-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + item.cpm_str + '</a></div></td><td><div class="ads-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + item.budget + '</a></div></td><td><div class="ads-cell"><a href="' + item.base_url + '" class="ad-link">' + item.target + '</a></div></td><td><div class="ads-cell">' + tme_link + '</div></td><td><div class="ads-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td><div class="ads-cell"><a href="' + item.base_url + '" class="ad-link">' + OwnerAds.formatTableDate(item.date) + '</a></div></td>';
+          var tme_link = item.tme_path ? '<a href="https://t.me/' + item.tme_path + '" target="_blank">' + item.tme_path + '</a>' : '<span class="pr-no-tme-link">' + l('WEB_ADS_NO_TME_LINK') + '</span>';
+          return '<td><div class="pr-cell pr-cell-title"><a href="' + item.base_url + '">' + item.title + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/stats" class="ad-link">' + item.views_str + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + item.cpm_str + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + item.budget + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '" class="ad-link">' + item.target + '</a></div></td><td><div class="pr-cell">' + tme_link + '</div></td><td><div class="pr-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '" class="ad-link">' + OwnerAds.formatTableDate(item.date) + '</a></div></td>';
         },
         renderLoading: function() {
-          return '<tr><td colspan="8" class="ads-cell-empty"><div class="ads-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
+          return '<tr><td colspan="8" class="pr-cell-empty"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
         },
         renderNoItems: function(query) {
           if (Aj.state.adsListIsLoading) {
-            return '<tr><td colspan="8" class="ads-cell-empty-full"><div class="ads-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
+            return '<tr><td colspan="8" class="pr-cell-empty-full"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
           }
-          return '<tr><td colspan="8" class="ads-cell-empty-full"><div class="ads-cell">' + l('WEB_OWNER_NO_ADS') + '</div></td></tr>';
+          return '<tr><td colspan="8" class="pr-cell-empty-full"><div class="pr-cell">' + l('WEB_OWNER_NO_ADS') + '</div></td></tr>';
         },
         appendToItems: function(query, result_count) {
           if (Aj.state.adsListIsLoading && result_count > 0) {
-            return '<tr><td colspan="8" class="ads-cell-empty"><div class="ads-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
+            return '<tr><td colspan="8" class="pr-cell-empty"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
           }
           return '';
         },
@@ -1164,7 +1164,7 @@ var OwnerAds = {
     if (Aj.state.adsList) {
       var sortBy  = Aj.state.adsListSortBy;
       var sortAsc = Aj.state.adsListSortAsc;
-      $('.ads-cell-sort').each(function() {
+      $('.pr-cell-sort').each(function() {
         var $sortEl = $(this);
         var curSortBy  = $sortEl.attr('data-sort-by');
         $sortEl.toggleClass('sort-active', sortBy == curSortBy);
@@ -1263,11 +1263,11 @@ var ReviewAds = {
   init: function() {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
-      state.$form = $('.ads-search-form', cont);
+      state.$form = $('.pr-search-form', cont);
       state.$form.on('submit', ReviewAds.onSubmit);
-      state.$searchField = $('.ads-search-input', cont);
+      state.$searchField = $('.pr-search-input', cont);
       Ads.fieldInit(state.$searchField);
-      cont.on('click.curPage', '.ads-search-reset', ReviewAds.eClearSearch);
+      cont.on('click.curPage', '.pr-search-reset', ReviewAds.eClearSearch);
       cont.on('click.curPage', '.ad-approve-btn', ReviewAds.eApproveAd);
       cont.on('click.curPage', '.ad-decline-btn', ReviewAds.eDeclineAd);
       $(window).on('scroll resize', ReviewAds.onScroll);
@@ -1298,19 +1298,19 @@ var ReviewAds = {
     }
     var params = Aj.state.filterParams;
     params.offset_id = offset;
-    var $loadMoreBtn = $('.ads-load-more', $loadMore);
+    var $loadMoreBtn = $('.pr-load-more', $loadMore);
     $loadMoreBtn.data('old-text', $loadMoreBtn.text()).text($loadMoreBtn.data('loading')).addClass('dots-animated');
     $loadMore.data('loading', true);
     Aj.apiRequest('loadReviewedAds', params, function(result) {
       $loadMore.data('loading', false);
       if (result.ads_html) {
-        var $loadMoreCont = $loadMore.closest('.ads-review-list');
+        var $loadMoreCont = $loadMore.closest('.pr-review-list');
         if ($loadMoreCont.size()) {
           $loadMore.remove();
           $loadMoreCont.append(result.ads_html);
           Ads.updateAdMessagePreviews($loadMoreCont);
         } else {
-          var $loadMoreBtn = $('.ads-load-more', $loadMore);
+          var $loadMoreBtn = $('.pr-load-more', $loadMore);
           $loadMoreBtn.text($loadMoreBtn.data('old-text')).removeClass('dots-animated');
         }
         ReviewAds.onScroll();
@@ -1334,7 +1334,7 @@ var ReviewAds = {
     var $ad      = $(this).parents('.js-ad');
     var owner_id = $ad.attr('data-owner-id');
     var ad_id    = $ad.attr('data-ad-id');
-    var $buttons = $ad.find('.ads-btn');
+    var $buttons = $ad.find('.pr-btn');
 
     if ($buttons.prop('disabled')) {
       return false;
@@ -1359,7 +1359,7 @@ var ReviewAds = {
     var $ad       = $(this).parents('.js-ad');
     var owner_id  = $ad.attr('data-owner-id');
     var ad_id     = $ad.attr('data-ad-id');
-    var $buttons  = $ad.find('.ads-btn');
+    var $buttons  = $ad.find('.pr-btn');
     var reason_id = $(this).attr('data-reason-id');
 
     if ($buttons.prop('disabled')) {
@@ -1387,14 +1387,14 @@ var EditAd = {
   init: function() {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
-      state.$form = $('.ads-new-form', cont);
+      state.$form = $('.pr-new-form', cont);
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
       cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
       cont.on('click.curPage', '.edit-ad-btn', EditAd.eSubmitForm);
       cont.on('click.curPage', '.js-clone-ad-btn', EditAd.eCloneAd);
       cont.on('click.curPage', '.delete-ad-btn', EditAd.deleteAd);
-      cont.on('click.curPage', '.ads-form-select', EditAd.eSelectPlaceholder);
+      cont.on('click.curPage', '.pr-form-select', EditAd.eSelectPlaceholder);
       state.titleField = state.$form.field('title');
       state.titleField.on('change.curPage', NewAd.onTitleChange);
       state.textField = state.$form.field('text');
@@ -1439,12 +1439,12 @@ var EditAd = {
     return values.join('|');
   },
   eSelectPlaceholder: function() {
-    Ads.showHint($('.ads-form-control-hint', this), 50, 2000);
+    Ads.showHint($('.pr-form-control-hint', this), 50, 2000);
   },
   initEditTitlePopup: function() {
     var cont = Aj.layer;
     Aj.onLayerLoad(function(layerState) {
-      layerState.$form = $('.ads-popup-edit-form', cont);
+      layerState.$form = $('.pr-popup-edit-form', cont);
       Ads.formInit(layerState.$form);
       layerState.titleField = layerState.$form.field('title');
       layerState.titleField.on('change.curPage', NewAd.onTitleChange);
@@ -1501,7 +1501,7 @@ var EditAd = {
   initEditCPMPopup: function() {
     var cont = Aj.layer;
     Aj.onLayerLoad(function(layerState) {
-      layerState.$form = $('.ads-popup-edit-form', cont);
+      layerState.$form = $('.pr-popup-edit-form', cont);
       Ads.formInit(layerState.$form);
       layerState.cpmField = layerState.$form.field('cpm');
       Aj.layer.one('popup:open', function() {
@@ -1557,7 +1557,7 @@ var EditAd = {
   initEditBudgetPopup: function() {
     var cont = Aj.layer;
     Aj.onLayerLoad(function(layerState) {
-      layerState.$form = $('.ads-popup-edit-form', cont);
+      layerState.$form = $('.pr-popup-edit-form', cont);
       Ads.formInit(layerState.$form);
       layerState.budgetField = layerState.$form.field('budget');
       Aj.layer.one('popup:open', function() {
@@ -1620,7 +1620,7 @@ var EditAd = {
   initEditStatusPopup: function() {
     var cont = Aj.layer;
     Aj.onLayerLoad(function(layerState) {
-      layerState.$form = $('.ads-popup-edit-form', cont);
+      layerState.$form = $('.pr-popup-edit-form', cont);
       Ads.formInit(layerState.$form);
       layerState.$form.on('submit', EditAd.eSubmitEditStatusForm);
       cont.on('click.curLayer', '.submit-form-btn', EditAd.eSubmitEditStatusForm);
@@ -1667,7 +1667,7 @@ var EditAd = {
   initIncrBudget: function() {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
-      state.$form = $('.ads-incr-budget-form', cont);
+      state.$form = $('.pr-incr-budget-form', cont);
       Ads.formInit(state.$form);
       state.budgetField = state.$form.field('budget');
       state.$form.on('submit', EditAd.eSubmitIncrBudgetForm);
@@ -1806,12 +1806,12 @@ var EditAd = {
     return false;
   },
   deletePopup: function (confirm_text, onConfirm) {
-    var $confirm = $('<div class="popup-container hide alert-popup-container"><section class="ads-layer-popup ads-layer-delete-ad popup-no-close"><h3 class="ads-layer-header">' + l('WEB_DELETE_AD_CONFIRM_HEADER') + '</h3><p class="ads-layer-text"></p><div class="tgme_popup_buttons"><div class="tgme_popup_button popup-cancel-btn">' + l('WEB_POPUP_CANCEL_BTN') + '</div><div class="tgme_popup_button popup-primary-btn">' + l('WEB_DELETE_AD_CONFIRM_BUTTON') + '</div></div></section></div>');
+    var $confirm = $('<div class="popup-container hide alert-popup-container"><section class="pr-layer-popup pr-layer-delete-ad popup-no-close"><h3 class="pr-layer-header">' + l('WEB_DELETE_AD_CONFIRM_HEADER') + '</h3><p class="pr-layer-text"></p><div class="tgme_popup_buttons"><div class="tgme_popup_button popup-cancel-btn">' + l('WEB_POPUP_CANCEL_BTN') + '</div><div class="tgme_popup_button popup-primary-btn">' + l('WEB_DELETE_AD_CONFIRM_BUTTON') + '</div></div></section></div>');
     var confirm = function() {
       onConfirm && onConfirm($confirm);
       closePopup($confirm);
     }
-    $('.ads-layer-text', $confirm).html(confirm_text);
+    $('.pr-layer-text', $confirm).html(confirm_text);
     var $primaryBtn = $('.popup-primary-btn', $confirm);
     $primaryBtn.on('click', confirm);
     $confirm.one('popup:close', function() {
@@ -1858,5 +1858,5 @@ var EditAd = {
 
 (function(d){var c=function(a){this._options={checkOnLoad:!1,resetOnEnd:!1,loopCheckTime:50,loopMaxNumber:5,baitClass:"pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links ads-header ads-content",baitStyle:"width: 1px !important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px !important;"};this._var={version:"3.2.1",bait:null,checking:!1,loop:null,loopNumber:0,event:{detected:[],notDetected:[]}};void 0!==a&&this.setOption(a);var b=this;a=function(){setTimeout(function(){!0===b._options.checkOnLoad&&(null===b._var.bait&&b._creatBait(),setTimeout(function(){b.check()},1))},1)};void 0!==d.addEventListener?d.addEventListener("load",a,!1):d.attachEvent("onload",a)};c.prototype._options=null;c.prototype._var=null;c.prototype._bait=null;c.prototype.setOption=function(a,b){if(void 0!==b){var e=a;a={};a[e]=b}for(var f in a)this._options[f]=a[f];return this};c.prototype._creatBait=function(){var a=document.createElement("div");a.setAttribute("class",this._options.baitClass);a.setAttribute("style",this._options.baitStyle);this._var.bait=d.document.body.appendChild(a);this._var.bait.offsetParent;this._var.bait.offsetHeight;this._var.bait.offsetLeft;this._var.bait.offsetTop;this._var.bait.offsetWidth;this._var.bait.clientHeight;this._var.bait.clientWidth};c.prototype._destroyBait=function(){d.document.body.removeChild(this._var.bait);this._var.bait=null};c.prototype.check=function(a){void 0===a&&(a=!0);this._var.checking=!0;null===this._var.bait&&this._creatBait();var b=this;this._var.loopNumber=0;!0===a&&(this._var.loop=setInterval(function(){b._checkBait(a)},this._options.loopCheckTime));setTimeout(function(){b._checkBait(a)},1);return!0};c.prototype._checkBait=function(a){var b=!1;null===this._var.bait&&this._creatBait();if(null!==d.document.body.getAttribute("abp")||null===this._var.bait.offsetParent||0==this._var.bait.offsetHeight||0==this._var.bait.offsetLeft||0==this._var.bait.offsetTop||0==this._var.bait.offsetWidth||0==this._var.bait.clientHeight||0==this._var.bait.clientWidth)b=!0;if(void 0!==d.getComputedStyle){var e=d.getComputedStyle(this._var.bait,null);!e||"none"!=e.getPropertyValue("display")&&"hidden"!=e.getPropertyValue("visibility")||(b=!0)}!0===a&&(this._var.loopNumber++,this._var.loopNumber>=this._options.loopMaxNumber&&this._stopLoop());if(!0===b)this._stopLoop(),this._destroyBait(),this.emitEvent(!0),!0===a&&(this._var.checking=!1);else if(null===this._var.loop||!1===a)this._destroyBait(),this.emitEvent(!1),!0===a&&(this._var.checking=!1)};c.prototype._stopLoop=function(a){clearInterval(this._var.loop);this._var.loop=null;this._var.loopNumber=0};c.prototype.emitEvent=function(a){a=this._var.event[!0===a?"detected":"notDetected"];for(var b in a)if(a.hasOwnProperty(b))a[b]();!0===this._options.resetOnEnd&&this.clearEvent();return this};c.prototype.clearEvent=function(){this._var.event.detected=[];this._var.event.notDetected=[]};c.prototype.on=function(a){this._var.event.detected.push(a);return this};d.ABC=c;void 0===d.AB&&(d.AB=new c({checkOnLoad:!0,resetOnEnd:!0}))})(window);
 AB.on(function() {
-  openPopup('<div class="popup-container hide alert-popup-container"><section class="ads-layer-popup ads-layer-delete-ad popup-no-close"><h3 class="ads-layer-header">' + l('WEB_AB_WARNING_HEADER') + '</h3><p class="ads-layer-text">' + l('WEB_AB_WARNING_TEXT') + '</p><div class="tgme_popup_buttons"><div class="tgme_popup_button popup-cancel-btn">' + l('WEB_POPUP_CLOSE_BTN', 'Close') + '</div></div></section></div>');
+  openPopup('<div class="popup-container hide alert-popup-container"><section class="pr-layer-popup pr-layer-delete-ad popup-no-close"><h3 class="pr-layer-header">' + l('WEB_AB_WARNING_HEADER') + '</h3><p class="pr-layer-text">' + l('WEB_AB_WARNING_TEXT') + '</p><div class="tgme_popup_buttons"><div class="tgme_popup_button popup-cancel-btn">' + l('WEB_POPUP_CLOSE_BTN', 'Close') + '</div></div></section></div>');
 });
