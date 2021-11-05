@@ -50,11 +50,26 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="november-5-2021" href="#november-5-2021"><i class="anchor-icon"></i></a>November 5, 2021</h4>
+<p><strong>Bot API 5.4</strong></p>
+<ul>
+<li>Added the the parameter <code>creates_join_request</code> to the methods <a href="#createchatinvitelink">createChatInviteLink</a> and <a href="#editchatinvitelink">editChatInviteLink</a> for managing chat invite links that create join requests (read more about this on our <a href="https://telegram.org/blog/shared-media-scrolling-calendar-join-requests-and-more#join-requests-for-groups-and-channels">blog</a>).</li>
+<li>Added the fields <code>creates_join_request</code> and <code>pending_join_request_count</code> to the class <a href="#chatinvitelink">ChatInviteLink</a>.</li>
+<li>Added the field <code>name</code> to the class <a href="#chatinvitelink">ChatInviteLink</a> and the parameters <code>name</code> to the methods <a href="#createchatinvitelink">createChatInviteLink</a> and <a href="#editchatinvitelink">editChatInviteLink</a> for managing <a href="https://telegram.org/blog/shared-media-scrolling-calendar-join-requests-and-more#unique-names-for-invite-links">invite link names</a>.</li>
+<li>Added updates about new requests to join the chat, represented by the class <a href="#chatjoinrequest">ChatJoinRequest</a> and the field <em>chat_join_request</em> in the <a href="#update">Update</a> class. The bot must be an administrator in the chat with the <em>can_invite_users</em> administrator right to receive these updates.</li>
+<li>Added the methods <a href="#approvechatjoinrequest">approveChatJoinRequest</a> and <a href="#declinechatjoinrequest">declineChatJoinRequest</a> for managing requests to join the chat.</li>
+<li>Added support for the <em>choose_sticker</em> action in the method <a href="#sendchataction">sendChatAction</a>.</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>User identifiers will become bigger than <code>2^31 - 1</code> before the end of this year and it will be no longer possible to store them in a signed 32-bit integer type. User identifiers will have up to 52 significant bits, so a 64-bit integer or double-precision float type would still be safe for storing them. Please make sure that your code can correctly handle such user identifiers.</p>
+</blockquote>
+<hr>
 <h4><a class="anchor" name="june-25-2021" href="#june-25-2021"><i class="anchor-icon"></i></a>June 25, 2021</h4>
 <p><strong>Bot API 5.3</strong></p>
 <p><strong>Personalized Commands</strong></p>
 <ul>
-<li>Bots can now show lists of commands tailored to specific situations - including localized commands for users with different languages, as well as different commands based on chat type or for specific chats, and special lists of commands for chat admins.</li>
+<li>Bots can now show lists of commands tailored to specific situations - including localized commands for users with different languages, as well as different commands based on chat type or for specific chats, and special lists of commands for chat administrators.</li>
 <li>Added the class <a href="#botcommandscope">BotCommandScope</a>, describing the scope to which bot commands apply.</li>
 <li>Added the parameters <code>scope</code> and <code>language_code</code> to the method <a href="#setmycommands">setMyCommands</a> to allow bots specify different commands for different chats and users.</li>
 <li>Added the parameters <code>scope</code> and <code>language_code</code> to the method <a href="#getmycommands">getMyCommands</a>.</li>
@@ -89,118 +104,6 @@ To learn how to create…">
 <li>Added the type <a href="#voicechatscheduled">VoiceChatScheduled</a> and the field <em>voice_chat_scheduled</em> to the class <a href="#message">Message</a>.</li>
 <li>Fixed an error in <a href="#sendchataction">sendChatAction</a> documentation to correctly mention “record_voice” and “upload_voice” instead of “record_audio” and “upload_audio” for related to voice note actions. Old action names will still work for backward compatibility.</li>
 </ul>
-<hr>
-<blockquote>
-<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>After the next Bot API update (Bot API 5.3) there will be a one-time change of the value of the field <code>file_unique_id</code> in objects of the type <a href="#photosize">PhotoSize</a> and of the fields <code>small_file_unique_id</code> and <code>big_file_unique_id</code> in objects of the type <a href="#chatphoto">ChatPhoto</a>.</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>Service messages about non-bot users joining the chat will be soon removed from large groups. We recommend using the “chat_member” update as a replacement.</p>
-</blockquote>
-<hr>
-<blockquote>
-<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>After one of the upcoming Bot API updates, user identifiers will become bigger than <code>2^31 - 1</code> and it will be no longer possible to store them in a signed 32-bit integer type. User identifiers will have up to 52 significant bits, so a 64-bit integer or double-precision float type would still be safe for storing them. Please make sure that your code can correctly handle such user identifiers.</p>
-</blockquote>
-<hr>
-<h4><a class="anchor" name="march-9-2021" href="#march-9-2021"><i class="anchor-icon"></i></a>March 9, 2021</h4>
-<p><strong>Bot API 5.1</strong></p>
-<p><strong>Added two new update types</strong></p>
-<ul>
-<li>Added updates about member status changes in chats, represented by the class <a href="#chatmemberupdated">ChatMemberUpdated</a> and the fields <em>my_chat_member</em> and <em>chat_member</em> in the <a href="#update">Update</a> class. The bot must be an administrator in the chat to receive <em>chat_member</em> updates about other chat members. By default, only <em>my_chat_member</em> updates about the bot itself are received.</li>
-</ul>
-<p><strong>Improved Invite Links</strong></p>
-<ul>
-<li>Added the class <a href="#chatinvitelink">ChatInviteLink</a>, representing an invite link to a chat.</li>
-<li>Added the method <a href="#createchatinvitelink">createChatInviteLink</a>, which can be used to create new invite links in addition to the primary invite link.</li>
-<li>Added the method <a href="#editchatinvitelink">editChatInviteLink</a>, which can be used to edit non-primary invite links created by the bot.</li>
-<li>Added the method <a href="#revokechatinvitelink">revokeChatInviteLink</a>, which can be used to revoke invite links created by the bot.</li>
-</ul>
-<p><strong>Voice Chat Info</strong></p>
-<ul>
-<li>Added the type <a href="#voicechatstarted">VoiceChatStarted</a> and the field <em>voice_chat_started</em> to the class <a href="#message">Message</a>.</li>
-<li>Added the type <a href="#voicechatended">VoiceChatEnded</a> and the field <em>voice_chat_ended</em> to the class <a href="#message">Message</a>.</li>
-<li>Added the type <a href="#voicechatparticipantsinvited">VoiceChatParticipantsInvited</a> and the field <em>voice_chat_participants_invited</em> to the class <a href="#message">Message</a>.</li>
-<li>Added the new administrator privilege <em>can_manage_voice_chats</em> to the class <a href="#chatmember">ChatMember</a> and parameter <em>can_manage_voice_chats</em> to the method <a href="#promotechatmember">promoteChatMember</a>. For now, bots can use this privilege only for passing to other administrators.</li>
-</ul>
-<p><strong>And More</strong></p>
-<ul>
-<li>Added the type <a href="#messageautodeletetimerchanged">MessageAutoDeleteTimerChanged</a> and the field <em>message_auto_delete_timer_changed</em> to the class <a href="#message">Message</a>.</li>
-<li>Added the parameter <em>revoke_messages</em> to the method <a href="#kickchatmember">kickChatMember</a>, allowing to delete all messages from a group for the user who is being removed.</li>
-<li>Added the new administrator privilege <em>can_manage_chat</em> to the class <a href="#chatmember">ChatMember</a> and parameter <em>can_manage_chat</em> to the method <a href="#promotechatmember">promoteChatMember</a>. This administrator right is implied by any other administrator privilege.</li>
-<li>Supported the new <em>bowling</em> animation for the random <a href="#dice">dice</a>. Choose between different animations (dice, darts, basketball, football, bowling, slot machine) by specifying the <em>emoji</em> parameter in the method <a href="#senddice">sendDice</a>.</li>
-</ul>
-<hr>
-<blockquote>
-<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>After one of the upcoming Bot API updates, some user identifiers will become bigger than <code>2^31 - 1</code> and it will be no longer possible to store them in a signed 32-bit integer type. User identifiers will have up to 52 significant bits, so a 64-bit integer or double-precision float type would still be safe for storing them. Please make sure that your code can correctly handle such user identifiers.</p>
-</blockquote>
-<hr>
-<h4><a class="anchor" name="november-4-2020" href="#november-4-2020"><i class="anchor-icon"></i></a>November 4, 2020</h4>
-<p>Introducing <strong>Bot API 5.0</strong></p>
-<p><strong>Run Your Own Bot API Server</strong></p>
-<ul>
-<li>Bot API source code is now available at <a href="https://github.com/tdlib/telegram-bot-api">telegram-bot-api</a>. You can now run your <strong>own Bot API server</strong> locally, boosting your bots&#39; performance (<a href="https://core.telegram.org/bots/api#using-a-local-bot-api-server">check this out</a> to see if this will benefit your project).</li>
-<li>Added the method <a href="#logout">logOut</a>, which can be used to log out from the cloud Bot API server before launching your bot locally. You <strong>must</strong> log out the bot before running it locally, otherwise there is no guarantee that the bot will receive all updates.</li>
-<li>Added the method <a href="#close">close</a>, which can be used to close the bot instance before moving it from one local server to another.</li>
-</ul>
-<p><strong>Transfer Bot Ownership</strong></p>
-<ul>
-<li>You can now use <a href="https://t.me/botfather">@BotFather</a> to transfer your existing bots to another Telegram account. </li>
-</ul>
-<p><strong>Webhooks</strong></p>
-<ul>
-<li>Added the parameter <em>ip_address</em> to the method <a href="#setwebhook">setWebhook</a>, allowing to bypass DNS resolving and use the specified fixed IP address to send webhook requests.</li>
-<li>Added the field <em>ip_address</em> to the class <a href="#webhookinfo">WebhookInfo</a>, containing the current IP address used for webhook connections creation.</li>
-<li>Added the ability to drop all pending updates when changing webhook URL using the parameter <em>drop_pending_updates</em> in the methods <a href="#setwebhook">setWebhook</a> and <a href="#deletewebhook">deleteWebhook</a>.</li>
-</ul>
-<p><strong>Working with Groups</strong></p>
-<ul>
-<li>The <a href="#getchat">getChat</a> request now returns the user&#39;s bio for private chats if available.</li>
-<li>The <a href="#getchat">getChat</a> request now returns the identifier of the linked chat for supergroups and channels, i.e. the discussion group identifier for a channel and vice versa.</li>
-<li>The <a href="#getchat">getChat</a> request now returns the location to which the supergroup is connected (see <a href="https://telegram.org/blog/contacts-local-groups">Local Groups</a>). Added the class <a href="#chatlocation">ChatLocation</a> to represent the location.</li>
-<li>Added the parameter <em>only_if_banned</em> to the method <a href="#unbanchatmember">unbanChatMember</a> to allow safe unban.</li>
-</ul>
-<p><strong>Working with Files</strong></p>
-<ul>
-<li>Added the field <em>file_name</em> to the classes <a href="#audio">Audio</a> and <a href="#video">Video</a>, containing the name of the original file.</li>
-<li>Added the ability to disable server-side file content type detection using the parameter <em>disable_content_type_detection</em> in the method <a href="#senddocument">sendDocument</a> and the class <a href="#inputmediadocument">inputMediaDocument</a>.</li>
-</ul>
-<p><strong>Multiple Pinned Messages</strong></p>
-<ul>
-<li>Added the ability to <strong>pin messages in private chats</strong>.</li>
-<li>Added the parameter <em>message_id</em> to the method <a href="#unpinchatmessage">unpinChatMessage</a> to allow unpinning of the specific pinned message.</li>
-<li>Added the method <a href="#unpinallchatmessages">unpinAllChatMessages</a>, which can be used to unpin all pinned messages in a chat.</li>
-</ul>
-<p><strong>File Albums</strong></p>
-<ul>
-<li>Added support for sending and receiving audio and document albums in the method <a href="#sendmediagroup">sendMediaGroup</a>.</li>
-</ul>
-<p><strong>Live Locations</strong></p>
-<ul>
-<li>Added the field <em>live_period</em> to the class <a href="#location">Location</a>, representing a maximum period for which the live location can be updated.</li>
-<li>Added support for live location <a href="https://en.wikipedia.org/wiki/Heading_(navigation&#41;">heading</a>: added the field <em>heading</em> to the classes <a href="#location">Location</a>, <a href="#inlinequeryresultlocation">InlineQueryResultLocation</a>, <a href="#inputlocationmessagecontent">InputLocationMessageContent</a> and the parameter <em>heading</em> to the methods <a href="#sendlocation">sendLocation</a> and <a href="#editmessagelivelocation">editMessageLiveLocation</a>.</li>
-<li>Added support for proximity alerts in live locations: added the field <em>proximity_alert_radius</em> to the classes <a href="#location">Location</a>, <a href="#inlinequeryresultlocation">InlineQueryResultLocation</a>, <a href="#inputlocationmessagecontent">InputLocationMessageContent</a> and the parameter <em>proximity_alert_radius</em> to the methods <a href="#sendlocation">sendLocation</a> and <a href="#editmessagelivelocation">editMessageLiveLocation</a>.</li>
-<li>Added the type <a href="#proximityalerttriggered">ProximityAlertTriggered</a> and the field <em>proximity_alert_triggered</em> to the class <a href="#message">Message</a>.</li>
-<li>Added possibility to specify the horizontal accuracy of a location. Added the field <em>horizontal_accuracy</em> to the classes <a href="#location">Location</a>, <a href="#inlinequeryresultlocation">InlineQueryResultLocation</a>, <a href="#inputlocationmessagecontent">InputLocationMessageContent</a> and the parameter <em>horizontal_accuracy</em> to the methods <a href="#sendlocation">sendLocation</a> and <a href="#editmessagelivelocation">editMessageLiveLocation</a>.</li>
-</ul>
-<p><strong>Anonymous Admins</strong></p>
-<ul>
-<li>Added the field <em>sender_chat</em> to the class <a href="#message">Message</a>, containing the sender of a message which is a chat (group or channel). For backward compatibility in non-channel chats, the field <em>from</em> in such messages will contain the user 777000 for messages automatically forwarded to the discussion group and the user 1087968824 (<a href="https://t.me/GroupAnonymousBot">@GroupAnonymousBot</a>) for messages from anonymous group administrators.</li>
-<li>Added the field <em>is_anonymous</em> to the class <a href="#chatmember">chatMember</a>, which can be used to distinguish anonymous chat administrators.</li>
-<li>Added the parameter <em>is_anonymous</em> to the method <a href="#promotechatmember">promoteChatMember</a>, which allows to promote anonymous chat administrators. The bot itself should have the <em>is_anonymous</em> right to do this. Despite the fact that bots can have the <em>is_anonymous</em> right, they will never appear as anonymous in the chat. Bots can use the right only for passing to other administrators.</li>
-<li>Added the custom title of an anonymous message sender to the class <a href="#message">Message</a> as <em>author_signature</em>.</li>
-</ul>
-<p><strong>And More</strong></p>
-<ul>
-<li>Added the method <a href="#copymessage">copyMessage</a>, which sends a copy of any message.</li>
-<li>Maximum poll question length increased to 300.</li>
-<li>Added the ability to manually specify text entities instead of specifying the <em>parse_mode</em> in the classes <a href="#inputmediaphoto">InputMediaPhoto</a>, <a href="#inputmediavideo">InputMediaVideo</a>, <a href="#inputmediaanimation">InputMediaAnimation</a>, <a href="#inputmediaaudio">InputMediaAudio</a>, <a href="#inputmediadocument">InputMediaDocument</a>, <a href="#inlinequeryresultphoto">InlineQueryResultPhoto</a>, <a href="#inlinequeryresultgif">InlineQueryResultGif</a>, <a href="#inlinequeryresultmpeg4gif">InlineQueryResultMpeg4Gif</a>, <a href="#inlinequeryresultvideo">InlineQueryResultVideo</a>, <a href="#inlinequeryresultaudio">InlineQueryResultAudio</a>, <a href="#inlinequeryresultvoice">InlineQueryResultVoice</a>, <a href="#inlinequeryresultdocument">InlineQueryResultDocument</a>, <a href="#inlinequeryresultcachedphoto">InlineQueryResultCachedPhoto</a>, <a href="#inlinequeryresultcachedgif">InlineQueryResultCachedGif</a>, <a href="#inlinequeryresultcachedmpeg4gif">InlineQueryResultCachedMpeg4Gif</a>, <a href="#inlinequeryresultcachedvideo">InlineQueryResultCachedVideo</a>, <a href="#inlinequeryresultcachedaudio">InlineQueryResultCachedAudio</a>, <a href="#inlinequeryresultcachedvoice">InlineQueryResultCachedVoice</a>, <a href="#inlinequeryresultcacheddocument">InlineQueryResultCachedDocument</a>, <a href="#inputtextmessagecontent">InputTextMessageContent</a> and the methods <a href="#sendmessage">sendMessage</a>, <a href="#sendphoto">sendPhoto</a>, <a href="#sendvideo">sendVideo</a>, <a href="#sendanimation">sendAnimation</a>, <a href="#sendaudio">sendAudio</a>, <a href="#senddocument">sendDocument</a>, <a href="#sendvoice">sendVoice</a>, <a href="#sendpoll">sendPoll</a>, <a href="#editmessagetext">editMessageText</a>, <a href="#editmessagecaption">editMessageCaption</a>.</li>
-<li>Added the fields <em>google_place_id</em> and <em>google_place_type</em> to the classes <a href="#venue">Venue</a>, <a href="#inlinequeryresultvenue">InlineQueryResultVenue</a>, <a href="#inputvenuemessagecontent">InputVenueMessageContent</a> and the optional parameters <em>google_place_id</em> and <em>google_place_type</em> to the method <a href="#sendvenue">sendVenue</a> to support Google Places as a venue API provider.</li>
-<li>Added the field <em>allow_sending_without_reply</em> to the methods <a href="#sendmessage">sendMessage</a>, <a href="#sendphoto">sendPhoto</a>, <a href="#sendvideo">sendVideo</a>, <a href="#sendanimation">sendAnimation</a>, <a href="#sendaudio">sendAudio</a>, <a href="#senddocument">sendDocument</a>, <a href="#sendsticker">sendSticker</a>, <a href="#sendvideonote">sendVideoNote</a>, <a href="#sendvoice">sendVoice</a>, <a href="#sendlocation">sendLocation</a>, <a href="#sendvenue">sendVenue</a>, <a href="#sendcontact">sendContact</a>, <a href="#sendpoll">sendPoll</a>, <a href="#senddice">sendDice</a>, <a href="#sendinvoice">sendInvoice</a>, <a href="#sendgame">sendGame</a>, <a href="#sendmediagroup">sendMediaGroup</a> to allow sending messages not a as reply if the replied-to message has already been deleted.</li>
-</ul>
-<p><strong>And Last but bot Least</strong></p>
-<ul>
-<li>Supported the new <strong>football</strong> and <strong>slot machine</strong> animations for the random <a href="#dice">dice</a>. Choose between different animations (dice, darts, basketball, football, slot machine) by specifying the <em>emoji</em> parameter in the method <a href="#senddice">sendDice</a>.</li>
-</ul>
 <p><strong><a href="/bots/api-changelog">See earlier changes »</a></strong></p>
 <h3><a class="anchor" name="authorizing-your-bot" href="#authorizing-your-bot"><i class="anchor-icon"></i></a>Authorizing your bot</h3>
 <p>Each bot is given a unique authentication token <a href="/bots#6-botfather">when it is created</a>. The token looks something like <code>123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11</code>, but we&#39;ll use simply <strong>&lt;token&gt;</strong> in this document instead. You can learn about obtaining tokens and generating new ones in <a href="https://core.telegram.org/bots#6-botfather">this document</a>.</p>
@@ -214,7 +117,7 @@ To learn how to create…">
 <li>application/json (except for uploading files)</li>
 <li>multipart/form-data (use to upload files)</li>
 </ul>
-<p>The response contains a JSON object, which always has a Boolean field &#39;ok&#39; and may have an optional String field &#39;description&#39; with a human-readable description of the result. If &#39;ok&#39; equals true, the request was successful and the result of the query can be found in the &#39;result&#39; field. In case of an unsuccessful request, &#39;ok&#39; equals false and the error is explained in the &#39;description&#39;. An Integer &#39;error_code&#39; field is also returned, but its contents are subject to change in the future. Some errors may also have an optional field &#39;parameters&#39; of the type <a href="#responseparameters">ResponseParameters</a>, which can help to automatically handle the error.</p>
+<p>The response contains a JSON object, which always has a Boolean field &#39;ok&#39; and may have an optional String field &#39;description&#39; with a human-readable description of the result. If &#39;ok&#39; equals <em>True</em>, the request was successful and the result of the query can be found in the &#39;result&#39; field. In case of an unsuccessful request, &#39;ok&#39; equals false and the error is explained in the &#39;description&#39;. An Integer &#39;error_code&#39; field is also returned, but its contents are subject to change in the future. Some errors may also have an optional field &#39;parameters&#39; of the type <a href="#responseparameters">ResponseParameters</a>, which can help to automatically handle the error.</p>
 <ul>
 <li>All methods in the Bot API are case-insensitive.</li>
 <li>All queries must be made using UTF-8.</li>
@@ -321,6 +224,11 @@ To learn how to create…">
 <td>chat_member</td>
 <td><a href="#chatmemberupdated">ChatMemberUpdated</a></td>
 <td><em>Optional</em>. A chat member&#39;s status was updated in a chat. The bot must be an administrator in the chat and must explicitly specify “chat_member” in the list of <em>allowed_updates</em> to receive these updates.</td>
+</tr>
+<tr>
+<td>chat_join_request</td>
+<td><a href="#chatjoinrequest">ChatJoinRequest</a></td>
+<td><em>Optional</em>. A request to join the chat has been sent. The bot must have the <em>can_invite_users</em> administrator right in the chat to receive these updates.</td>
 </tr>
 </tbody>
 </table>
@@ -461,7 +369,7 @@ To learn how to create…">
 <tr>
 <td>has_custom_certificate</td>
 <td>Boolean</td>
-<td>True, if a custom certificate was provided for webhook certificate checks</td>
+<td><em>True</em>, if a custom certificate was provided for webhook certificate checks</td>
 </tr>
 <tr>
 <td>pending_update_count</td>
@@ -520,7 +428,7 @@ To learn how to create…">
 <tr>
 <td>is_bot</td>
 <td>Boolean</td>
-<td>True, if this user is a bot</td>
+<td><em>True</em>, if this user is a bot</td>
 </tr>
 <tr>
 <td>first_name</td>
@@ -545,17 +453,17 @@ To learn how to create…">
 <tr>
 <td>can_join_groups</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the bot can be invited to groups. Returned only in <a href="#getme">getMe</a>.</td>
+<td><em>Optional</em>. <em>True</em>, if the bot can be invited to groups. Returned only in <a href="#getme">getMe</a>.</td>
 </tr>
 <tr>
 <td>can_read_all_group_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if <a href="https://core.telegram.org/bots#privacy-mode">privacy mode</a> is disabled for the bot. Returned only in <a href="#getme">getMe</a>.</td>
+<td><em>Optional</em>. <em>True</em>, if <a href="https://core.telegram.org/bots#privacy-mode">privacy mode</a> is disabled for the bot. Returned only in <a href="#getme">getMe</a>.</td>
 </tr>
 <tr>
 <td>supports_inline_queries</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the bot supports inline queries. Returned only in <a href="#getme">getMe</a>.</td>
+<td><em>Optional</em>. <em>True</em>, if the bot supports inline queries. Returned only in <a href="#getme">getMe</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -648,7 +556,7 @@ To learn how to create…">
 <tr>
 <td>can_set_sticker_set</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the bot can change the group sticker set. Returned only in <a href="#getchat">getChat</a>.</td>
+<td><em>Optional</em>. <em>True</em>, if the bot can change the group sticker set. Returned only in <a href="#getchat">getChat</a>.</td>
 </tr>
 <tr>
 <td>linked_chat_id</td>
@@ -1498,12 +1406,12 @@ To learn how to create…">
 <tr>
 <td>is_closed</td>
 <td>Boolean</td>
-<td>True, if the poll is closed</td>
+<td><em>True</em>, if the poll is closed</td>
 </tr>
 <tr>
 <td>is_anonymous</td>
 <td>Boolean</td>
-<td>True, if the poll is anonymous</td>
+<td><em>True</em>, if the poll is anonymous</td>
 </tr>
 <tr>
 <td>type</td>
@@ -1513,7 +1421,7 @@ To learn how to create…">
 <tr>
 <td>allows_multiple_answers</td>
 <td>Boolean</td>
-<td>True, if the poll allows multiple answers</td>
+<td><em>True</em>, if the poll allows multiple answers</td>
 </tr>
 <tr>
 <td>correct_option_id</td>
@@ -1975,7 +1883,7 @@ To learn how to create…">
 <tr>
 <td>pay</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Specify True, to send a <a href="#payments">Pay button</a>.<br><br><strong>NOTE:</strong> This type of button <strong>must</strong> always be the first button in the first row.</td>
+<td><em>Optional</em>. Specify <em>True</em>, to send a <a href="#payments">Pay button</a>.<br><br><strong>NOTE:</strong> This type of button <strong>must</strong> always be the first button in the first row.</td>
 </tr>
 </tbody>
 </table>
@@ -2016,7 +1924,7 @@ To learn how to create…">
 <tr>
 <td>request_write_access</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass True to request the permission for your bot to send messages to the user.</td>
+<td><em>Optional</em>. Pass <em>True</em> to request the permission for your bot to send messages to the user.</td>
 </tr>
 </tbody>
 </table>
@@ -2162,14 +2070,24 @@ To learn how to create…">
 <td>Creator of the link</td>
 </tr>
 <tr>
+<td>creates_join_request</td>
+<td>Boolean</td>
+<td><em>True</em>, if users joining the chat via the link need to be approved by chat administrators</td>
+</tr>
+<tr>
 <td>is_primary</td>
 <td>Boolean</td>
-<td>True, if the link is primary</td>
+<td><em>True</em>, if the link is primary</td>
 </tr>
 <tr>
 <td>is_revoked</td>
 <td>Boolean</td>
-<td>True, if the link is revoked</td>
+<td><em>True</em>, if the link is revoked</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td><em>Optional</em>. Invite link name</td>
 </tr>
 <tr>
 <td>expire_date</td>
@@ -2180,6 +2098,11 @@ To learn how to create…">
 <td>member_limit</td>
 <td>Integer</td>
 <td><em>Optional</em>. Maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999</td>
+</tr>
+<tr>
+<td>pending_join_request_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. Number of pending join requests created using this link</td>
 </tr>
 </tbody>
 </table>
@@ -2217,7 +2140,7 @@ To learn how to create…">
 <tr>
 <td>is_anonymous</td>
 <td>Boolean</td>
-<td>True, if the user&#39;s presence in the chat is hidden</td>
+<td><em>True</em>, if the user&#39;s presence in the chat is hidden</td>
 </tr>
 <tr>
 <td>custom_title</td>
@@ -2250,62 +2173,62 @@ To learn how to create…">
 <tr>
 <td>can_be_edited</td>
 <td>Boolean</td>
-<td>True, if the bot is allowed to edit administrator privileges of that user</td>
+<td><em>True</em>, if the bot is allowed to edit administrator privileges of that user</td>
 </tr>
 <tr>
 <td>is_anonymous</td>
 <td>Boolean</td>
-<td>True, if the user&#39;s presence in the chat is hidden</td>
+<td><em>True</em>, if the user&#39;s presence in the chat is hidden</td>
 </tr>
 <tr>
 <td>can_manage_chat</td>
 <td>Boolean</td>
-<td>True, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege</td>
+<td><em>True</em>, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege</td>
 </tr>
 <tr>
 <td>can_delete_messages</td>
 <td>Boolean</td>
-<td>True, if the administrator can delete messages of other users</td>
+<td><em>True</em>, if the administrator can delete messages of other users</td>
 </tr>
 <tr>
 <td>can_manage_voice_chats</td>
 <td>Boolean</td>
-<td>True, if the administrator can manage voice chats</td>
+<td><em>True</em>, if the administrator can manage voice chats</td>
 </tr>
 <tr>
 <td>can_restrict_members</td>
 <td>Boolean</td>
-<td>True, if the administrator can restrict, ban or unban chat members</td>
+<td><em>True</em>, if the administrator can restrict, ban or unban chat members</td>
 </tr>
 <tr>
 <td>can_promote_members</td>
 <td>Boolean</td>
-<td>True, if the administrator can add new administrators with a subset of their own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by the user)</td>
+<td><em>True</em>, if the administrator can add new administrators with a subset of their own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by the user)</td>
 </tr>
 <tr>
 <td>can_change_info</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to change the chat title, photo and other settings</td>
+<td><em>True</em>, if the user is allowed to change the chat title, photo and other settings</td>
 </tr>
 <tr>
 <td>can_invite_users</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to invite new users to the chat</td>
+<td><em>True</em>, if the user is allowed to invite new users to the chat</td>
 </tr>
 <tr>
 <td>can_post_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the administrator can post in the channel; channels only</td>
+<td><em>Optional</em>. <em>True</em>, if the administrator can post in the channel; channels only</td>
 </tr>
 <tr>
 <td>can_edit_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the administrator can edit messages of other users and can pin messages; channels only</td>
+<td><em>Optional</em>. <em>True</em>, if the administrator can edit messages of other users and can pin messages; channels only</td>
 </tr>
 <tr>
 <td>can_pin_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the user is allowed to pin messages; groups and supergroups only</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to pin messages; groups and supergroups only</td>
 </tr>
 <tr>
 <td>custom_title</td>
@@ -2361,47 +2284,47 @@ To learn how to create…">
 <tr>
 <td>is_member</td>
 <td>Boolean</td>
-<td>True, if the user is a member of the chat at the moment of the request</td>
+<td><em>True</em>, if the user is a member of the chat at the moment of the request</td>
 </tr>
 <tr>
 <td>can_change_info</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to change the chat title, photo and other settings</td>
+<td><em>True</em>, if the user is allowed to change the chat title, photo and other settings</td>
 </tr>
 <tr>
 <td>can_invite_users</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to invite new users to the chat</td>
+<td><em>True</em>, if the user is allowed to invite new users to the chat</td>
 </tr>
 <tr>
 <td>can_pin_messages</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to pin messages</td>
+<td><em>True</em>, if the user is allowed to pin messages</td>
 </tr>
 <tr>
 <td>can_send_messages</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to send text messages, contacts, locations and venues</td>
+<td><em>True</em>, if the user is allowed to send text messages, contacts, locations and venues</td>
 </tr>
 <tr>
 <td>can_send_media_messages</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to send audios, documents, photos, videos, video notes and voice notes</td>
+<td><em>True</em>, if the user is allowed to send audios, documents, photos, videos, video notes and voice notes</td>
 </tr>
 <tr>
 <td>can_send_polls</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to send polls</td>
+<td><em>True</em>, if the user is allowed to send polls</td>
 </tr>
 <tr>
 <td>can_send_other_messages</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to send animations, games, stickers and use inline bots</td>
+<td><em>True</em>, if the user is allowed to send animations, games, stickers and use inline bots</td>
 </tr>
 <tr>
 <td>can_add_web_page_previews</td>
 <td>Boolean</td>
-<td>True, if the user is allowed to add web page previews to their messages</td>
+<td><em>True</em>, if the user is allowed to add web page previews to their messages</td>
 </tr>
 <tr>
 <td>until_date</td>
@@ -2504,6 +2427,44 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="chatjoinrequest" href="#chatjoinrequest"><i class="anchor-icon"></i></a>ChatJoinRequest</h4>
+<p>Represents a join request sent to a chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Chat to which the request was sent</td>
+</tr>
+<tr>
+<td>from</td>
+<td><a href="#user">User</a></td>
+<td>User that sent the join request</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Integer</td>
+<td>Date the request was sent in Unix time</td>
+</tr>
+<tr>
+<td>bio</td>
+<td>String</td>
+<td><em>Optional</em>. Bio of the user.</td>
+</tr>
+<tr>
+<td>invite_link</td>
+<td><a href="#chatinvitelink">ChatInviteLink</a></td>
+<td><em>Optional</em>. Chat invite link that was used by the user to send the join request</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="chatpermissions" href="#chatpermissions"><i class="anchor-icon"></i></a>ChatPermissions</h4>
 <p>Describes actions that a non-administrator user is allowed to take in a chat.</p>
 <table class="table">
@@ -2518,42 +2479,42 @@ To learn how to create…">
 <tr>
 <td>can_send_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the user is allowed to send text messages, contacts, locations and venues</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send text messages, contacts, locations and venues</td>
 </tr>
 <tr>
 <td>can_send_media_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the user is allowed to send audios, documents, photos, videos, video notes and voice notes, implies can_send_messages</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send audios, documents, photos, videos, video notes and voice notes, implies can_send_messages</td>
 </tr>
 <tr>
 <td>can_send_polls</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the user is allowed to send polls, implies can_send_messages</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send polls, implies can_send_messages</td>
 </tr>
 <tr>
 <td>can_send_other_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the user is allowed to send animations, games, stickers and use inline bots, implies can_send_media_messages</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send animations, games, stickers and use inline bots, implies can_send_media_messages</td>
 </tr>
 <tr>
 <td>can_add_web_page_previews</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the user is allowed to add web page previews to their messages, implies can_send_media_messages</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to add web page previews to their messages, implies can_send_media_messages</td>
 </tr>
 <tr>
 <td>can_change_info</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the user is allowed to change the chat title, photo and other settings. Ignored in public supergroups</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to change the chat title, photo and other settings. Ignored in public supergroups</td>
 </tr>
 <tr>
 <td>can_invite_users</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the user is allowed to invite new users to the chat</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to invite new users to the chat</td>
 </tr>
 <tr>
 <td>can_pin_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. True, if the user is allowed to pin messages. Ignored in public supergroups</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to pin messages. Ignored in public supergroups</td>
 </tr>
 </tbody>
 </table>
@@ -2629,12 +2590,12 @@ To learn how to create…">
 <ul>
 <li>botCommandScopeChatMember + language_code</li>
 <li>botCommandScopeChatMember</li>
-<li>botCommandScopeChatAdministrators + language_code (admins only)</li>
-<li>botCommandScopeChatAdministrators (admins only)</li>
+<li>botCommandScopeChatAdministrators + language_code (administrators only)</li>
+<li>botCommandScopeChatAdministrators (administrators only)</li>
 <li>botCommandScopeChat + language_code</li>
 <li>botCommandScopeChat</li>
-<li>botCommandScopeAllChatAdministrators + language_code (admins only)</li>
-<li>botCommandScopeAllChatAdministrators (admins only)</li>
+<li>botCommandScopeAllChatAdministrators + language_code (administrators only)</li>
+<li>botCommandScopeAllChatAdministrators (administrators only)</li>
 <li>botCommandScopeAllGroupChats + language_code</li>
 <li>botCommandScopeAllGroupChats</li>
 <li>botCommandScopeDefault + language_code</li>
@@ -3079,7 +3040,7 @@ To learn how to create…">
 <tr>
 <td>disable_content_type_detection</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Disables automatic server-side content type detection for files uploaded using multipart/form-data. Always true, if the document is sent as part of an album.</td>
+<td><em>Optional</em>. Disables automatic server-side content type detection for files uploaded using multipart/form-data. Always <em>True</em>, if the document is sent as part of an album.</td>
 </tr>
 </tbody>
 </table>
@@ -4370,7 +4331,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>is_anonymous</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>True, if the poll needs to be anonymous, defaults to <em>True</em></td>
+<td><em>True</em>, if the poll needs to be anonymous, defaults to <em>True</em></td>
 </tr>
 <tr>
 <td>type</td>
@@ -4382,7 +4343,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allows_multiple_answers</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>True, if the poll allows multiple answers, ignored for polls in quiz mode, defaults to <em>False</em></td>
+<td><em>True</em>, if the poll allows multiple answers, ignored for polls in quiz mode, defaults to <em>False</em></td>
 </tr>
 <tr>
 <td>correct_option_id</td>
@@ -4528,7 +4489,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>action</td>
 <td>String</td>
 <td>Yes</td>
-<td>Type of action to broadcast. Choose one, depending on what the user is about to receive: <em>typing</em> for <a href="#sendmessage">text messages</a>, <em>upload_photo</em> for <a href="#sendphoto">photos</a>, <em>record_video</em> or <em>upload_video</em> for <a href="#sendvideo">videos</a>, <em>record_voice</em> or <em>upload_voice</em> for <a href="#sendvoice">voice notes</a>, <em>upload_document</em> for <a href="#senddocument">general files</a>, <em>find_location</em> for <a href="#sendlocation">location data</a>, <em>record_video_note</em> or <em>upload_video_note</em> for <a href="#sendvideonote">video notes</a>.</td>
+<td>Type of action to broadcast. Choose one, depending on what the user is about to receive: <em>typing</em> for <a href="#sendmessage">text messages</a>, <em>upload_photo</em> for <a href="#sendphoto">photos</a>, <em>record_video</em> or <em>upload_video</em> for <a href="#sendvideo">videos</a>, <em>record_voice</em> or <em>upload_voice</em> for <a href="#sendvoice">voice notes</a>, <em>upload_document</em> for <a href="#senddocument">general files</a>, <em>choose_sticker</em> for <a href="#sendsticker">stickers</a>, <em>find_location</em> for <a href="#sendlocation">location data</a>, <em>record_video_note</em> or <em>upload_video_note</em> for <a href="#sendvideonote">video notes</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -4586,7 +4547,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </table>
 <p><strong>Note:</strong> This function may not preserve the original file name and MIME type. You should save the file&#39;s MIME type and name (if available) when the File object is received.</p>
 <h4><a class="anchor" name="banchatmember" href="#banchatmember"><i class="anchor-icon"></i></a>banChatMember</h4>
-<p>Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless <a href="#unbanchatmember">unbanned</a> first. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns <em>True</em> on success.</p>
+<p>Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless <a href="#unbanchatmember">unbanned</a> first. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4656,7 +4617,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="restrictchatmember" href="#restrictchatmember"><i class="anchor-icon"></i></a>restrictChatMember</h4>
-<p>Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for this to work and must have the appropriate admin rights. Pass <em>True</em> for all permissions to lift restrictions from a user. Returns <em>True</em> on success.</p>
+<p>Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for this to work and must have the appropriate administrator rights. Pass <em>True</em> for all permissions to lift restrictions from a user. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4694,7 +4655,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="promotechatmember" href="#promotechatmember"><i class="anchor-icon"></i></a>promoteChatMember</h4>
-<p>Use this method to promote or demote a user in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Pass <em>False</em> for all boolean parameters to demote a user. Returns <em>True</em> on success.</p>
+<p>Use this method to promote or demote a user in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Pass <em>False</em> for all boolean parameters to demote a user. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4727,61 +4688,61 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>can_manage_chat</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege</td>
+<td>Pass <em>True</em>, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege</td>
 </tr>
 <tr>
 <td>can_post_messages</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can create channel posts, channels only</td>
+<td>Pass <em>True</em>, if the administrator can create channel posts, channels only</td>
 </tr>
 <tr>
 <td>can_edit_messages</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can edit messages of other users and can pin messages, channels only</td>
+<td>Pass <em>True</em>, if the administrator can edit messages of other users and can pin messages, channels only</td>
 </tr>
 <tr>
 <td>can_delete_messages</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can delete messages of other users</td>
+<td>Pass <em>True</em>, if the administrator can delete messages of other users</td>
 </tr>
 <tr>
 <td>can_manage_voice_chats</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can manage voice chats</td>
+<td>Pass <em>True</em>, if the administrator can manage voice chats</td>
 </tr>
 <tr>
 <td>can_restrict_members</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can restrict, ban or unban chat members</td>
+<td>Pass <em>True</em>, if the administrator can restrict, ban or unban chat members</td>
 </tr>
 <tr>
 <td>can_promote_members</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can add new administrators with a subset of their own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by him)</td>
+<td>Pass <em>True</em>, if the administrator can add new administrators with a subset of their own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by him)</td>
 </tr>
 <tr>
 <td>can_change_info</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can change chat title, photo and other settings</td>
+<td>Pass <em>True</em>, if the administrator can change chat title, photo and other settings</td>
 </tr>
 <tr>
 <td>can_invite_users</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can invite new users to the chat</td>
+<td>Pass <em>True</em>, if the administrator can invite new users to the chat</td>
 </tr>
 <tr>
 <td>can_pin_messages</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the administrator can pin messages, supergroups only</td>
+<td>Pass <em>True</em>, if the administrator can pin messages, supergroups only</td>
 </tr>
 </tbody>
 </table>
@@ -4818,7 +4779,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setchatpermissions" href="#setchatpermissions"><i class="anchor-icon"></i></a>setChatPermissions</h4>
-<p>Use this method to set default chat permissions for all members. The bot must be an administrator in the group or a supergroup for this to work and must have the <em>can_restrict_members</em> admin rights. Returns <em>True</em> on success.</p>
+<p>Use this method to set default chat permissions for all members. The bot must be an administrator in the group or a supergroup for this to work and must have the <em>can_restrict_members</em> administrator rights. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4844,7 +4805,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="exportchatinvitelink" href="#exportchatinvitelink"><i class="anchor-icon"></i></a>exportChatInviteLink</h4>
-<p>Use this method to generate a new primary invite link for a chat; any previously generated primary link is revoked. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns the new invite link as <em>String</em> on success.</p>
+<p>Use this method to generate a new primary invite link for a chat; any previously generated primary link is revoked. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the new invite link as <em>String</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4867,7 +4828,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <p>Note: Each administrator in a chat generates their own invite links. Bots can&#39;t use invite links generated by other administrators. If you want your bot to work with invite links, it will need to generate its own link using <a href="#exportchatinvitelink">exportChatInviteLink</a> or by calling the <a href="#getchat">getChat</a> method. If your bot needs to generate a new primary invite link replacing its previous one, use <a href="#exportchatinvitelink">exportChatInviteLink</a> again.</p>
 </blockquote>
 <h4><a class="anchor" name="createchatinvitelink" href="#createchatinvitelink"><i class="anchor-icon"></i></a>createChatInviteLink</h4>
-<p>Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. The link can be revoked using the method <a href="#revokechatinvitelink">revokeChatInviteLink</a>. Returns the new invite link as <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
+<p>Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. The link can be revoked using the method <a href="#revokechatinvitelink">revokeChatInviteLink</a>. Returns the new invite link as <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4885,6 +4846,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>name</td>
+<td>String</td>
+<td>Optional</td>
+<td>Invite link name; 0-32 characters</td>
+</tr>
+<tr>
 <td>expire_date</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -4896,10 +4863,16 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Optional</td>
 <td>Maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999</td>
 </tr>
+<tr>
+<td>creates_join_request</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td><em>True</em>, if users joining the chat via the link need to be approved by chat administrators. If <em>True</em>, <em>member_limit</em> can&#39;t be specified</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="editchatinvitelink" href="#editchatinvitelink"><i class="anchor-icon"></i></a>editChatInviteLink</h4>
-<p>Use this method to edit a non-primary invite link created by the bot. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns the edited invite link as a <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
+<p>Use this method to edit a non-primary invite link created by the bot. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the edited invite link as a <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4923,6 +4896,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>The invite link to edit</td>
 </tr>
 <tr>
+<td>name</td>
+<td>String</td>
+<td>Optional</td>
+<td>Invite link name; 0-32 characters</td>
+</tr>
+<tr>
 <td>expire_date</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -4934,10 +4913,16 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Optional</td>
 <td>Maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999</td>
 </tr>
+<tr>
+<td>creates_join_request</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td><em>True</em>, if users joining the chat via the link need to be approved by chat administrators. If <em>True</em>, <em>member_limit</em> can&#39;t be specified</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="revokechatinvitelink" href="#revokechatinvitelink"><i class="anchor-icon"></i></a>revokeChatInviteLink</h4>
-<p>Use this method to revoke an invite link created by the bot. If the primary link is revoked, a new link is automatically generated. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns the revoked invite link as <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
+<p>Use this method to revoke an invite link created by the bot. If the primary link is revoked, a new link is automatically generated. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns the revoked invite link as <a href="#chatinvitelink">ChatInviteLink</a> object.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4962,8 +4947,60 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="approvechatjoinrequest" href="#approvechatjoinrequest"><i class="anchor-icon"></i></a>approveChatJoinRequest</h4>
+<p>Use this method to approve a chat join request. The bot must be an administrator in the chat for this to work and must have the <em>can_invite_users</em> administrator right. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier of the target user</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="declinechatjoinrequest" href="#declinechatjoinrequest"><i class="anchor-icon"></i></a>declineChatJoinRequest</h4>
+<p>Use this method to decline a chat join request. The bot must be an administrator in the chat for this to work and must have the <em>can_invite_users</em> administrator right. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier of the target user</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="setchatphoto" href="#setchatphoto"><i class="anchor-icon"></i></a>setChatPhoto</h4>
-<p>Use this method to set a new profile photo for the chat. Photos can&#39;t be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns <em>True</em> on success.</p>
+<p>Use this method to set a new profile photo for the chat. Photos can&#39;t be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4989,7 +5026,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="deletechatphoto" href="#deletechatphoto"><i class="anchor-icon"></i></a>deleteChatPhoto</h4>
-<p>Use this method to delete a chat photo. Photos can&#39;t be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns <em>True</em> on success.</p>
+<p>Use this method to delete a chat photo. Photos can&#39;t be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5009,7 +5046,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setchattitle" href="#setchattitle"><i class="anchor-icon"></i></a>setChatTitle</h4>
-<p>Use this method to change the title of a chat. Titles can&#39;t be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns <em>True</em> on success.</p>
+<p>Use this method to change the title of a chat. Titles can&#39;t be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5035,7 +5072,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setchatdescription" href="#setchatdescription"><i class="anchor-icon"></i></a>setChatDescription</h4>
-<p>Use this method to change the description of a group, a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns <em>True</em> on success.</p>
+<p>Use this method to change the description of a group, a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5061,7 +5098,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="pinchatmessage" href="#pinchatmessage"><i class="anchor-icon"></i></a>pinChatMessage</h4>
-<p>Use this method to add a message to the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the &#39;can_pin_messages&#39; admin right in a supergroup or &#39;can_edit_messages&#39; admin right in a channel. Returns <em>True</em> on success.</p>
+<p>Use this method to add a message to the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the &#39;can_pin_messages&#39; administrator right in a supergroup or &#39;can_edit_messages&#39; administrator right in a channel. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5093,7 +5130,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="unpinchatmessage" href="#unpinchatmessage"><i class="anchor-icon"></i></a>unpinChatMessage</h4>
-<p>Use this method to remove a message from the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the &#39;can_pin_messages&#39; admin right in a supergroup or &#39;can_edit_messages&#39; admin right in a channel. Returns <em>True</em> on success.</p>
+<p>Use this method to remove a message from the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the &#39;can_pin_messages&#39; administrator right in a supergroup or &#39;can_edit_messages&#39; administrator right in a channel. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5119,7 +5156,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="unpinallchatmessages" href="#unpinallchatmessages"><i class="anchor-icon"></i></a>unpinAllChatMessages</h4>
-<p>Use this method to clear the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the &#39;can_pin_messages&#39; admin right in a supergroup or &#39;can_edit_messages&#39; admin right in a channel. Returns <em>True</em> on success.</p>
+<p>Use this method to clear the list of pinned messages in a chat. If the chat is not a private chat, the bot must be an administrator in the chat for this to work and must have the &#39;can_pin_messages&#39; administrator right in a supergroup or &#39;can_edit_messages&#39; administrator right in a channel. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5245,7 +5282,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setchatstickerset" href="#setchatstickerset"><i class="anchor-icon"></i></a>setChatStickerSet</h4>
-<p>Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Use the field <em>can_set_sticker_set</em> optionally returned in <a href="#getchat">getChat</a> requests to check if the bot can use this method. Returns <em>True</em> on success.</p>
+<p>Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Use the field <em>can_set_sticker_set</em> optionally returned in <a href="#getchat">getChat</a> requests to check if the bot can use this method. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5271,7 +5308,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="deletechatstickerset" href="#deletechatstickerset"><i class="anchor-icon"></i></a>deleteChatStickerSet</h4>
-<p>Use this method to delete a group sticker set from a supergroup. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Use the field <em>can_set_sticker_set</em> optionally returned in <a href="#getchat">getChat</a> requests to check if the bot can use this method. Returns <em>True</em> on success.</p>
+<p>Use this method to delete a group sticker set from a supergroup. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Use the field <em>can_set_sticker_set</em> optionally returned in <a href="#getchat">getChat</a> requests to check if the bot can use this method. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5321,7 +5358,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>show_alert</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>If <em>true</em>, an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to <em>false</em>.</td>
+<td>If <em>True</em>, an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to <em>false</em>.</td>
 </tr>
 <tr>
 <td>url</td>
@@ -8088,7 +8125,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="answershippingquery" href="#answershippingquery"><i class="anchor-icon"></i></a>answerShippingQuery</h4>
-<p>If you sent an invoice requesting a shipping address and the parameter <em>is_flexible</em> was specified, the Bot API will send an <a href="#update">Update</a> with a <em>shipping_query</em> field to the bot. Use this method to reply to shipping queries. On success, True is returned.</p>
+<p>If you sent an invoice requesting a shipping address and the parameter <em>is_flexible</em> was specified, the Bot API will send an <a href="#update">Update</a> with a <em>shipping_query</em> field to the bot. Use this method to reply to shipping queries. On success, <em>True</em> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -8109,13 +8146,13 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>ok</td>
 <td>Boolean</td>
 <td>Yes</td>
-<td>Specify True if delivery to the specified address is possible and False if there are any problems (for example, if delivery to the specified address is not possible)</td>
+<td>Specify <em>True</em> if delivery to the specified address is possible and False if there are any problems (for example, if delivery to the specified address is not possible)</td>
 </tr>
 <tr>
 <td>shipping_options</td>
 <td>Array of <a href="#shippingoption">ShippingOption</a></td>
 <td>Optional</td>
-<td>Required if <em>ok</em> is True. A JSON-serialized array of available shipping options.</td>
+<td>Required if <em>ok</em> is <em>True</em>. A JSON-serialized array of available shipping options.</td>
 </tr>
 <tr>
 <td>error_message</td>
@@ -8126,7 +8163,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="answerprecheckoutquery" href="#answerprecheckoutquery"><i class="anchor-icon"></i></a>answerPreCheckoutQuery</h4>
-<p>Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of an <a href="#update">Update</a> with the field <em>pre_checkout_query</em>. Use this method to respond to such pre-checkout queries. On success, True is returned. <strong>Note:</strong> The Bot API must receive an answer within 10 seconds after the pre-checkout query was sent.</p>
+<p>Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of an <a href="#update">Update</a> with the field <em>pre_checkout_query</em>. Use this method to respond to such pre-checkout queries. On success, <em>True</em> is returned. <strong>Note:</strong> The Bot API must receive an answer within 10 seconds after the pre-checkout query was sent.</p>
 <table class="table">
 <thead>
 <tr>
@@ -9078,13 +9115,13 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>force</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the high score is allowed to decrease. This can be useful when fixing mistakes or banning cheaters</td>
+<td>Pass <em>True</em>, if the high score is allowed to decrease. This can be useful when fixing mistakes or banning cheaters</td>
 </tr>
 <tr>
 <td>disable_edit_message</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass True, if the game message should not be automatically edited to include the current scoreboard</td>
+<td>Pass <em>True</em>, if the game message should not be automatically edited to include the current scoreboard</td>
 </tr>
 <tr>
 <td>chat_id</td>
