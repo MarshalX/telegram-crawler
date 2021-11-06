@@ -479,11 +479,14 @@ var NewAd = {
         var excludeValueFull = $excludeField.data('valueFull');
         var already_excluded = false;
         $.each(excludeValueFull, function(val, item) {
-          if (item.id == result.exclude_channel.id) {
+          if (item.val == result.exclude_channel.id) {
             already_excluded = true;
           } else if (item._auto) {
             $excludeField.trigger('deselectval', [val]);
             $excludeField.data('prevval', '');
+            if (Aj.state.autoExcluded) {
+              delete Aj.state.autoExcluded[item.val];
+            }
           }
         });
         if (!already_excluded) {
