@@ -474,6 +474,35 @@ var NewAd = {
           }
         }
       }
+      if (result.exclude_channel) {
+        var $excludeField = Aj.state.$form.field('exclude_channels');
+        var excludeValueFull = $excludeField.data('valueFull');
+        var already_excluded = false;
+        $.each(excludeValueFull, function(val, item) {
+          if (item.id == result.exclude_channel.id) {
+            already_excluded = true;
+          } else if (item._auto) {
+            $excludeField.trigger('deselectval', [val]);
+            $excludeField.data('prevval', '');
+          }
+        });
+        if (!already_excluded) {
+          if (!Aj.state.autoExcluded) {
+            Aj.state.autoExcluded = {};
+          }
+          if (!Aj.state.autoExcluded[result.exclude_channel.id]) {
+            var item = {
+              val: result.exclude_channel.id,
+              name: result.exclude_channel.title,
+              photo: result.exclude_channel.photo,
+              _auto: true
+            };
+            $excludeField.trigger('selectval', [item, true]);
+            $excludeField.data('prevval', '');
+            Aj.state.autoExcluded[result.exclude_channel.id] = true;
+          }
+        }
+      }
       NewAd.updateAdPreview($form, result.preview_data);
       if (result.error) {
         if (result.field) {
