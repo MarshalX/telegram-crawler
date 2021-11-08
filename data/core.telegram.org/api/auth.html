@@ -42,64 +42,56 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Authorization is associated with a client’s encryption key identifier: <strong>auth_key_id</strong>. No additional parameters need to be passed into methods following authorization. </p>
-<p>To log in as a <a href="/bots">bot</a>, follow <a href="/api/bots">these instructions »</a>.</p>
-<h3><a class="anchor" href="#sending-a-verification-code" id="sending-a-verification-code" name="sending-a-verification-code"><i class="anchor-icon"></i></a>Sending a verification code</h3>
+<p>To log in as a <a href="/bots">bot</a>, follow <a href="/api/bots">these instructions &raquo;</a>.</p>
+<h3><a class="anchor" name="sending-a-verification-code" href="#sending-a-verification-code"><i class="anchor-icon"></i></a>Sending a verification code</h3>
 <p>Example implementations: <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java">telegram for android</a>, <a href="https://github.com/tdlib/td/tree/master/td/telegram/SendCodeHelper.cpp">tdlib</a>.</p>
-<p>To show a nicely formatted and validated phone number field, the <a href="/constructor/help.countriesList">help.countriesList</a> constructor can be obtained using the <a href="/method/help.getCountriesList">help.getCountriesList</a> method.<br>
-The <a href="/constructor/help.countriesList">help.countriesList</a> config is then used as described <a href="/api/config#country-information-and-login-phone-patterns">here »</a>.  </p>
-<p>Authorization requires that a text message containing an authorization code first be sent to the user’s phone.<br>
-This may be done using the <a href="/method/auth.sendCode">auth.sendCode</a> method. 
-The system will automatically choose how to send the authorization code; there are four possible ways the code can arrive:</p>
+<p>To show a nicely formatted and validated phone number field, the <a href="/constructor/help.countriesList">help.countriesList</a> constructor can be obtained using the <a href="/method/help.getCountriesList">help.getCountriesList</a> method.<br>The <a href="/constructor/help.countriesList">help.countriesList</a> config is then used as described <a href="/api/config#country-information-and-login-phone-patterns">here &raquo;</a>.  </p>
+<p>Authorization requires that a text message containing an authorization code first be sent to the user’s phone.<br>This may be done using the <a href="/method/auth.sendCode">auth.sendCode</a> method.<br>The system will automatically choose how to send the authorization code; there are four possible ways the code can arrive:</p>
 <ul>
 <li><a href="/constructor/auth.sentCodeTypeApp">Telegram code</a></li>
 <li><a href="/constructor/auth.sentCodeTypeSms">SMS code</a></li>
 <li><a href="/constructor/auth.sentCodeTypeCall">Phone call</a>: a synthesized voice will tell the user which verification code to input</li>
-<li><a href="/constructor/auth.sentCodeTypeFlashCall">Flash phone call</a>: the code will be sent via a flash phone call, that will be closed immediately.
-In the last case, the phone code will then be the phone number itself, just make sure that the phone number matches the specified pattern (see <a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>).</li>
+<li><a href="/constructor/auth.sentCodeTypeFlashCall">Flash phone call</a>: the code will be sent via a flash phone call, that will be closed immediately.<br>In the last case, the phone code will then be the phone number itself, just make sure that the phone number matches the specified pattern (see <a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>).</li>
 </ul>
-<p>The <a href="/method/auth.sendCode">auth.sendCode</a> method also has parameters for enabling/disabling use of flash calls, and allows passing an SMS token that will be included in the sent SMS.
-For example, the latter is required in newer versions of android, to use the <a href="https://developers.google.com/identity/sms-retriever/overview">android SMS receiver APIs</a>.</p>
+<p>The <a href="/method/auth.sendCode">auth.sendCode</a> method also has parameters for enabling/disabling use of flash calls, and allows passing an SMS token that will be included in the sent SMS.<br>For example, the latter is required in newer versions of android, to use the <a href="https://developers.google.com/identity/sms-retriever/overview">android SMS receiver APIs</a>.</p>
 <p>The returned <a href="/type/auth.SentCode">auth.SentCode</a> object will contain multiple parameters:</p>
 <table class="table">
 <tbody>
 <tr>
 <td><strong>flags</strong></td>
-<td style="text-align: center;"><a href="/type/%23">#</a></td>
+<td align="center"><a href="/type/%23">#</a></td>
 <td>Flags, see <a href="/mtproto/TL-combinators#conditional-fields">TL conditional fields</a></td>
 </tr>
 <tr>
 <td><strong>type</strong></td>
-<td style="text-align: center;"><a href="/type/auth.SentCodeType">auth.SentCodeType</a></td>
+<td align="center"><a href="/type/auth.SentCodeType">auth.SentCodeType</a></td>
 <td>Phone code type</td>
 </tr>
 <tr>
 <td><strong>phone_code_hash</strong></td>
-<td style="text-align: center;"><a href="/type/string">string</a></td>
+<td align="center"><a href="/type/string">string</a></td>
 <td>Phone code hash, to be stored and later re-used with <a href="/method/auth.signIn">auth.signIn</a></td>
 </tr>
 <tr>
 <td><strong>next_type</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/auth.CodeType">auth.CodeType</a></td>
+<td align="center"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/auth.CodeType">auth.CodeType</a></td>
 <td>Phone code type that will be sent next, if the phone code is not received within <code>timeout</code> seconds: to send it use <a href="/method/auth.resendCode">auth.resendCode</a></td>
 </tr>
 <tr>
 <td><strong>timeout</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/int">int</a></td>
+<td align="center"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/int">int</a></td>
 <td>Timeout for reception of the phone code</td>
 </tr>
 </tbody>
 </table>
-<p>If the message takes too long (<code>timeout</code> seconds) to arrive at the phone, the <a href="/method/auth.resendCode">auth.resendCode</a> method may be invoked to resend a code of type <code>next_type</code>.
-If the same happens again, you can use <a href="/method/auth.resendCode">auth.resendCode</a> with the <code>next_type</code> returned by the previous call to <a href="/method/auth.resendCode">auth.resendCode</a>.
-To cancel the verification code use <a href="/method/auth.cancelCode">auth.cancelCode</a>.</p>
-<h3><a class="anchor" href="#sign-insign-up" id="sign-insign-up" name="sign-insign-up"><i class="anchor-icon"></i></a>Sign in/sign up</h3>
+<p>If the message takes too long (<code>timeout</code> seconds) to arrive at the phone, the <a href="/method/auth.resendCode">auth.resendCode</a> method may be invoked to resend a code of type <code>next_type</code>.<br>If the same happens again, you can use <a href="/method/auth.resendCode">auth.resendCode</a> with the <code>next_type</code> returned by the previous call to <a href="/method/auth.resendCode">auth.resendCode</a>.<br>To cancel the verification code use <a href="/method/auth.cancelCode">auth.cancelCode</a>.</p>
+<h3><a class="anchor" name="sign-in-sign-up" href="#sign-in-sign-up"><i class="anchor-icon"></i></a>Sign in/sign up</h3>
 <p>When user enters verification code, the <a href="/method/auth.signIn">auth.signIn</a> method must be used to validate it and possibly sign user in.</p>
-<p>If the code was entered correctly, but the method returns <a href="/constructor/auth.authorizationSignUpRequired">auth.authorizationSignUpRequired</a>, it means that account with this phone number doesn't exist yet: user needs to provide basic information, accept terms of service and then the new user registration method (<a href="/method/auth.signUp">auth.signUp</a>) must be invoked.</p>
-<h3><a class="anchor" href="#2fa" id="2fa" name="2fa"><i class="anchor-icon"></i></a>2FA</h3>
-<p>When trying to sign in using <a href="/method/auth.signIn">auth.signIn</a>, an <a href="/method/auth.signIn#possible-errors">error 400 SESSION_PASSWORD_NEEDED</a> may be returned, if the user has two-factor authentication enabled.
-In this case, instructions for <a href="/api/srp">SRP 2FA authentication</a> must be followed.</p>
+<p>If the code was entered correctly, but the method returns <a href="/constructor/auth.authorizationSignUpRequired">auth.authorizationSignUpRequired</a>, it means that account with this phone number doesn&#39;t exist yet: user needs to provide basic information, accept terms of service and then the new user registration method (<a href="/method/auth.signUp">auth.signUp</a>) must be invoked.</p>
+<h3><a class="anchor" name="2fa" href="#2fa"><i class="anchor-icon"></i></a>2FA</h3>
+<p>When trying to sign in using <a href="/method/auth.signIn">auth.signIn</a>, an <a href="/method/auth.signIn#possible-errors">error 400 SESSION_PASSWORD_NEEDED</a> may be returned, if the user has two-factor authentication enabled.<br>In this case, instructions for <a href="/api/srp">SRP 2FA authentication</a> must be followed.</p>
 <p>To set up two-factor authorization on an already authorized account, follow the <a href="/api/srp">SRP 2FA authentication docs</a>.</p>
-<h4><a class="anchor" href="#test-phone-numbers" id="test-phone-numbers" name="test-phone-numbers"><i class="anchor-icon"></i></a>Test Phone Numbers</h4>
+<h4><a class="anchor" name="test-accounts" href="#test-accounts"><i class="anchor-icon"></i></a>Test Accounts</h4>
 <p>Each phone number is limited to only a certain amount of logins per day (e.g. 5, but this is subject to change) after which the API will return a FLOOD error until the next day. This might not be enough for testing the implementation of User Authorization flows in client applications.</p>
 <p>There are several reserved phone number prefixes for testing that your application handles redirects between DCs, sign up, sign in and 2FA flows correctly. These numbers are only available on <strong>Test DCs</strong> (their IP addresses for TCP transport are availble in <a href="https://my.telegram.org/apps">API development tools</a> panel after <a href="https://core.telegram.org/api/obtaining_api_id#obtaining-api-id">api_id was obtained</a>, <a href="https://core.telegram.org/mtproto/transports#uri-format">URI format</a> for HTTPS/Websocket transport).</p>
 <p>If you wish to emulate an application of a user associated with DC number X, it is sufficient to specify the phone number as <code>99966XYYYY</code>, where YYYY are random numbers, when registering the user. A user like this would always get XXXXXX as the login confirmation code (the DC number, repeated six times). Note that the value of X must be in the range of 1-3 because there are only 3 Test DCs. When the flood limit is reached for any particular test number, just choose another number (changing the YYYY random part).</p>
@@ -108,7 +100,7 @@ In this case, instructions for <a href="/api/srp">SRP 2FA authentication</a> mus
 <blockquote>
 <p>To help you with working on production DCs, logins with the same phone number with which the <code>api_id</code> was registered have more generous flood limits.</p>
 </blockquote>
-<h3><a class="anchor" href="#we-are-authorized" id="we-are-authorized" name="we-are-authorized"><i class="anchor-icon"></i></a>We are authorized</h3>
+<h3><a class="anchor" name="we-are-authorized" href="#we-are-authorized"><i class="anchor-icon"></i></a>We are authorized</h3>
 <p>As a result of authorization, the client key, <strong>auth_key_id</strong>, becomes associated with the user, and each subsequent API call with this key will be executed with that user’s identity. The authorization method itself returns the relevant user. It is best to immediately store the User ID locally in a binding with the key.</p>
 <p>Only a small portion of the API methods are available to <strong>unauthorized</strong> users:</p>
 <ul>
@@ -130,7 +122,8 @@ In this case, instructions for <a href="/api/srp">SRP 2FA authentication</a> mus
 <li><a href="/method/langpack.getLanguages">langpack.getLanguages</a></li>
 <li><a href="/method/langpack.getLanguage">langpack.getLanguage</a></li>
 </ul>
-<p>Other methods will result in an error: <a href="/api/errors#401-unauthorized"><strong>401 UNAUTHORIZED</strong></a>.</p></div>
+<p>Other methods will result in an error: <a href="/api/errors#401-unauthorized"><strong>401 UNAUTHORIZED</strong></a>.</p>
+</div>
   
 </div>
           
