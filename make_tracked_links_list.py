@@ -37,6 +37,7 @@ ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl',
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/api.tl',
     'raw.githubusercontent.com/tdlib/td/master/td/generate/scheme/telegram_api.tl',
+    'raw.githubusercontent.com/tdlib/td/master/td/generate/scheme/td_api.tl',
 }
 BASE_URL_REGEX = r'telegram.org'
 
