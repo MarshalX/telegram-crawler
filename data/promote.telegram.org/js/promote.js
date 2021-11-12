@@ -1380,6 +1380,9 @@ var ReviewAds = {
       if (result.error) {
         return showAlert(result.error);
       }
+      if (result.status_html) {
+        $ad.find('.js-review-ad-status').html(result.status_html);
+      }
       if (result.buttons_html) {
         $ad.find('.js-review-buttons').html(result.buttons_html);
       }
@@ -1406,6 +1409,9 @@ var ReviewAds = {
       $buttons.prop('disabled', false);
       if (result.error) {
         return showAlert(result.error);
+      }
+      if (result.status_html) {
+        $ad.find('.js-review-ad-status').html(result.status_html);
       }
       if (result.buttons_html) {
         $ad.find('.js-review-buttons').html(result.buttons_html);
