@@ -295,7 +295,6 @@ core.telegram.org/constructor/encryptedFile
 core.telegram.org/constructor/encryptedFileEmpty
 core.telegram.org/constructor/encryptedMessage
 core.telegram.org/constructor/encryptedMessageService
-core.telegram.org/constructor/error
 core.telegram.org/constructor/exportedMessageLink
 core.telegram.org/constructor/fileHash
 core.telegram.org/constructor/fileLocation
@@ -661,7 +660,7 @@ core.telegram.org/constructor/notifyBroadcasts
 core.telegram.org/constructor/notifyChats
 core.telegram.org/constructor/notifyPeer
 core.telegram.org/constructor/notifyUsers
-core.telegram.org/constructor/null
+core.telegram.org/constructor/page
 core.telegram.org/constructor/pageBlockAnchor
 core.telegram.org/constructor/pageBlockAudio
 core.telegram.org/constructor/pageBlockAuthorDate
@@ -798,6 +797,7 @@ core.telegram.org/constructor/secureValue
 core.telegram.org/constructor/secureValueError
 core.telegram.org/constructor/secureValueErrorData
 core.telegram.org/constructor/secureValueErrorFile
+core.telegram.org/constructor/secureValueErrorFiles
 core.telegram.org/constructor/secureValueErrorFrontSide
 core.telegram.org/constructor/secureValueErrorReverseSide
 core.telegram.org/constructor/secureValueErrorSelfie
@@ -849,7 +849,6 @@ core.telegram.org/constructor/statsGroupTopAdmin
 core.telegram.org/constructor/statsGroupTopInviter
 core.telegram.org/constructor/statsGroupTopPoster
 core.telegram.org/constructor/statsPercentValue
-core.telegram.org/constructor/statsURL
 core.telegram.org/constructor/stickerPack
 core.telegram.org/constructor/stickerSet
 core.telegram.org/constructor/stickerSetCovered
@@ -1201,6 +1200,7 @@ core.telegram.org/method/contacts.getSaved
 core.telegram.org/method/contacts.getStatuses
 core.telegram.org/method/contacts.getTopPeers
 core.telegram.org/method/contacts.importContacts
+core.telegram.org/method/contacts.resetSaved
 core.telegram.org/method/contacts.resetTopPeerRating
 core.telegram.org/method/contacts.resolveUsername
 core.telegram.org/method/contacts.search
@@ -1424,6 +1424,7 @@ core.telegram.org/method/phone.saveCallDebug
 core.telegram.org/method/phone.saveDefaultGroupCallJoinAs
 core.telegram.org/method/phone.sendSignalingData
 core.telegram.org/method/phone.setCallRating
+core.telegram.org/method/phone.startScheduledGroupCall
 core.telegram.org/method/phone.toggleGroupCallRecord
 core.telegram.org/method/phone.toggleGroupCallSettings
 core.telegram.org/method/phone.toggleGroupCallStartSubscription
@@ -1488,7 +1489,6 @@ core.telegram.org/passport/sdk-ios-mac
 core.telegram.org/passport/sdk-javascript
 core.telegram.org/reproducible-builds
 core.telegram.org/resources/cidr.txt
-core.telegram.org/schema
 core.telegram.org/schema/end-to-end
 core.telegram.org/schema/end-to-end-json
 core.telegram.org/schema/json
@@ -1563,7 +1563,6 @@ core.telegram.org/type/EmojiURL
 core.telegram.org/type/EncryptedChat
 core.telegram.org/type/EncryptedFile
 core.telegram.org/type/EncryptedMessage
-core.telegram.org/type/Error
 core.telegram.org/type/ExportedChatInvite
 core.telegram.org/type/ExportedMessageLink
 core.telegram.org/type/FileHash
@@ -1647,7 +1646,6 @@ core.telegram.org/type/MessageViews
 core.telegram.org/type/MessagesFilter
 core.telegram.org/type/NearestDc
 core.telegram.org/type/NotifyPeer
-core.telegram.org/type/Null
 core.telegram.org/type/Page
 core.telegram.org/type/PageBlock
 core.telegram.org/type/PageCaption
@@ -1707,7 +1705,6 @@ core.telegram.org/type/StatsGroupTopAdmin
 core.telegram.org/type/StatsGroupTopInviter
 core.telegram.org/type/StatsGroupTopPoster
 core.telegram.org/type/StatsPercentValue
-core.telegram.org/type/StatsURL
 core.telegram.org/type/StickerPack
 core.telegram.org/type/StickerSet
 core.telegram.org/type/StickerSetCovered
@@ -1748,6 +1745,7 @@ core.telegram.org/type/account.SentEmailCode
 core.telegram.org/type/account.Takeout
 core.telegram.org/type/account.Themes
 core.telegram.org/type/account.TmpPassword
+core.telegram.org/type/account.WallPapers
 core.telegram.org/type/account.WebAuthorizations
 core.telegram.org/type/auth.Authorization
 core.telegram.org/type/auth.CheckedPhone
@@ -2026,6 +2024,7 @@ corefork.telegram.org/constructor/channelAdminLogEventActionStartGroupCall
 corefork.telegram.org/constructor/channelAdminLogEventActionStopPoll
 corefork.telegram.org/constructor/channelAdminLogEventActionToggleGroupCallSetting
 corefork.telegram.org/constructor/channelAdminLogEventActionToggleInvites
+corefork.telegram.org/constructor/channelAdminLogEventActionTogglePreHistoryHidden
 corefork.telegram.org/constructor/channelAdminLogEventActionToggleSignatures
 corefork.telegram.org/constructor/channelAdminLogEventActionToggleSlowMode
 corefork.telegram.org/constructor/channelAdminLogEventActionUpdatePinned
@@ -2082,6 +2081,7 @@ corefork.telegram.org/constructor/contactStatus
 corefork.telegram.org/constructor/contacts.blocked
 corefork.telegram.org/constructor/contacts.blockedSlice
 corefork.telegram.org/constructor/contacts.contacts
+corefork.telegram.org/constructor/contacts.contactsNotModified
 corefork.telegram.org/constructor/contacts.found
 corefork.telegram.org/constructor/contacts.importedContacts
 corefork.telegram.org/constructor/contacts.resolvedPeer
@@ -2258,6 +2258,7 @@ corefork.telegram.org/constructor/inputMessageCallbackQuery
 corefork.telegram.org/constructor/inputMessageEntityMentionName
 corefork.telegram.org/constructor/inputMessageID
 corefork.telegram.org/constructor/inputMessagePinned
+corefork.telegram.org/constructor/inputMessageReplyTo
 corefork.telegram.org/constructor/inputMessagesFilterChatPhotos
 corefork.telegram.org/constructor/inputMessagesFilterContacts
 corefork.telegram.org/constructor/inputMessagesFilterDocument
@@ -2966,6 +2967,7 @@ corefork.telegram.org/method/account.unregisterDevice
 corefork.telegram.org/method/account.updateDeviceLocked
 corefork.telegram.org/method/account.updateNotifySettings
 corefork.telegram.org/method/account.updatePasswordSettings
+corefork.telegram.org/method/account.updateProfile
 corefork.telegram.org/method/account.updateStatus
 corefork.telegram.org/method/account.updateTheme
 corefork.telegram.org/method/account.updateUsername
@@ -3756,6 +3758,7 @@ raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/api
 raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl
 telegram.org
 telegram.org/android
+telegram.org/api
 telegram.org/apple_privacy
 telegram.org/blog
 telegram.org/blog/200-million
@@ -3868,7 +3871,6 @@ telegram.org/blog/winter-contest-ends
 telegram.org/css/bootstrap-extra.css
 telegram.org/css/bootstrap.min.css
 telegram.org/css/telegram.css
-telegram.org/evolution
 telegram.org/faq
 telegram.org/faq_channels
 telegram.org/faq_spam
