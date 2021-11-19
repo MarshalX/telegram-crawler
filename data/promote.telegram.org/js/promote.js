@@ -378,6 +378,7 @@ var NewAd = {
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
       NewAd.updateAdPreview(state.$form, state.previewData);
+      NewAd.updateAdTargetOverview();
       setTimeout(function() {
         state.titleField.focusAndSelect();
       }, 50);
@@ -553,7 +554,8 @@ var NewAd = {
         var item = {
           val: result.channel.id,
           name: result.channel.title,
-          photo: result.channel.photo
+          photo: result.channel.photo,
+          username: result.channel.username
         };
         $fieldEl.trigger('selectval', [item, true]);
         $fieldEl.data('prevval', '');
@@ -572,6 +574,7 @@ var NewAd = {
       paired_field = 'channels';
     }
     if (!paired_field) {
+      NewAd.updateAdTargetOverview();
       return;
     }
     var $pairedField = Aj.state.$form.field(paired_field);
@@ -585,6 +588,7 @@ var NewAd = {
         }
       });
     }
+    NewAd.updateAdTargetOverview();
   },
   ePreviewAd: function(e) {
     e.preventDefault();
@@ -709,6 +713,58 @@ var NewAd = {
       }
     });
     return $previewPopup;
+  },
+  updateAdTargetOverview: function() {
+    var len = {}, lang_params = {};
+    for (var i = 0; i < Aj.state.selectList.length; i++) {
+      var selectData = Aj.state.selectList[i];
+      var field = selectData.field;
+      var $field = Aj.state.$form.field(field);
+      var value = $field.data('value') || [];
+      var valueFull = $field.data('valueFull') || {};
+      len[field] = value.length;
+      if (value.length) {
+        var list = [];
+        for (var j = 0; j < value.length; j++) {
+          var val = value[j], valFull = valueFull[val] || {};
+          list.push(valFull.username ? '<a class="value" href="https://t.me/' + valFull.username + '" rel="noopener" target="_blank" dir="auto">' + valFull.name + '</a>' : '<span class="value" dir="auto">' + valFull.name + '</span>');
+        }
+        if (list.length > 1) {
+          var last_item = list.pop();
+          list[list.length - 1] = l('WEB_AD_TARGET_AND', {item1: list[list.length - 1], item2: last_item});
+        }
+        lang_params[field] = list.join(', ');
+      } else {
+        lang_params[field] = '';
+      }
+      Ads.hideFieldError($field);
+    }
+    if (!len.langs && len.topics) {
+      Ads.showFieldError(Aj.state.$form.field('langs'), l('ADS_ERROR_LANGUAGE_REQUIRED'));
+    }
+    var overview = '';
+    if (!len.langs && !len.topics && !len.channels ||
+        !len.langs && len.topics) {
+      overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
+    } else {
+      if (len.langs > 0) {
+        if (len.topics > 0) {
+          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_TOPICS', lang_params) + '</div>';
+        } else {
+          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_LANGS', lang_params) + '</div>';
+        }
+      }
+      if (len.channels > 0) {
+        overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_CHANNELS', lang_params) + '</div>';
+      }
+      if (len.exclude_topics > 0) {
+        overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_TOPICS', lang_params) + '</div>';
+      }
+      if (len.exclude_channels > 0) {
+        overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_CHANNELS', lang_params) + '</div>';
+      }
+    }
+    $('.pr-target-overview', Aj.ajContainer).html(overview);
   },
   getFormData: function($form) {
     var form = $form.get(0);
