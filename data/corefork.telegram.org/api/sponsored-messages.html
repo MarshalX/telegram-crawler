@@ -50,16 +50,20 @@ messages.sponsoredMessages messages:Vector&lt;SponsoredMessage&gt; chats:Vector&
 channels.getSponsoredMessages channel:InputChannel = messages.SponsoredMessages;
 channels.viewSponsoredMessage channel:InputChannel random_id:bytes = Bool;</code></pre>
 <h4><a class="anchor" name="getting-sponsored-messages" href="#getting-sponsored-messages"><i class="anchor-icon"></i></a>Getting sponsored messages</h4>
-<p>Each time the user opens a channel, <code>channels.getSponsoredMessages</code> should be called to receive sponsored messages available for this channel. The result should be cached for <strong>5 minutes</strong>.</p>
+<p>Each time the user opens a channel, <code>channels.getSponsoredMessages</code> should be called to receive <a href="https://promote.telegram.org">sponsored messages</a> available for this channel. The result should be cached for <strong>5 minutes</strong>.</p>
+<blockquote>
+<p><a href="https://t.me/durov/172">More about sponsored messages on Telegram</a></p>
+</blockquote>
 <h4><a class="anchor" name="displaying-sponsored-messages" href="#displaying-sponsored-messages"><i class="anchor-icon"></i></a>Displaying sponsored messages</h4>
-<p>Sponsored messages are displayed below all posts of the channel under the scroll. Promoted channel or bot specified in the <code>from_id</code> field is displayed as the author of the message. The message should also contain one of these buttons at the bottom:</p>
+<p>Sponsored messages should be displayed below all other posts in the channel, after the user scrolls futher down, past the the last message. The Promoted channel or bot specified in the <code>from_id</code> field must be displayed as the author of the message. The message should also contain one of the following buttons at the bottom:</p>
 <ul>
-<li><mark><strong>View Bot</strong></mark>, if the bot is promoted. The bot should be opened when the user taps this button. If <code>start_param</code> specified you should use <a href="/bots#deep-linking">deep linking mechanism</a> to open the bot.</li>
-<li><mark><strong>View Channel</strong></mark>, if the channel is promoted. The channel should be opened when the user taps this button.</li>
-<li><mark><strong>View Post</strong></mark>, if the channel is promoted and <code>channel_post</code> specified. The channel post should be opened when the user taps this button.</li>
+<li><mark><strong>View Bot</strong></mark>, if a bot is being promoted. Tapping the button should open the chat with the bot. If <code>start_param</code> is specified, the app should use the <a href="/bots#deep-linking">deep linking mechanism</a> to open the bot.</li>
+<li><mark><strong>View Channel</strong></mark>, if a channel is being promoted. Tapping the button should open the channel.</li>
+<li><mark><strong>View Post</strong></mark>, if a channel is being promoted and <code>channel_post</code> is specified. Tapping the button should open the particular channel post.</li>
 </ul>
-<h4><a class="anchor" name="accounting-for-sponsored-message-views" href="#accounting-for-sponsored-message-views"><i class="anchor-icon"></i></a>Accounting for sponsored message views</h4>
+<h4><a class="anchor" name="counting-sponsored-message-views" href="#counting-sponsored-message-views"><i class="anchor-icon"></i></a>Counting sponsored message views</h4>
 <p>Once the entire text is shown on the screen (excluding the button), <code>channels.viewSponsoredMessage</code> should be called with the <code>random_id</code> of this sponsored message.</p>
+<h4><a class="anchor" name="supporting-official-ads-in-third-party-apps-using-the-telegram-a" href="#supporting-official-ads-in-third-party-apps-using-the-telegram-a"><i class="anchor-icon"></i></a>Supporting official ads in third-party apps using the Telegram API</h4>
 </div>
   
 </div>
