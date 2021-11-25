@@ -1266,6 +1266,7 @@ var OwnerAds = {
     }
   },
   processAdsList: function(result, opts) {
+    opts = opts || {};
     if (result.items) {
       if (!Aj.state.adsList) {
         Aj.state.adsList = [];
@@ -1291,6 +1292,7 @@ var OwnerAds = {
     }
   },
   loadAdsList: function(opts) {
+    opts = opts || {};
     Aj.apiRequest('getAdsList', {
       owner_id: Aj.state.ownerId,
       offset_id: opts.offset
