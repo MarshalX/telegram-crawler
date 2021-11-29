@@ -597,7 +597,10 @@ function ajInit(options) {
       $('body').css({height: '100000px', overflow: 'hidden'}); // for correct scroll restoration
     }
     var link = loc(curHistoryState.u);
-    loadPage(link, false, state_go);
+    var loaded = loadPage(link, false, state_go);
+    if (!loaded && Aj._useScrollHack) {
+      $('body').css({height: '', overflow: ''});
+    }
   });
   window.onbeforeunload = beforeUnloadHandler;
 }

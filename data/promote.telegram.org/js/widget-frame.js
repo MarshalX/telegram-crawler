@@ -1431,6 +1431,9 @@ function checkFrameSize() {
           enableInlineVideo(videoBluredEl);
         }
       }
+      if (videoBluredEl) {
+        videoBluredEl.muted = true;
+      }
       function fixControls() {
         if (videoEl.controls) videoEl.controls = false;
       }
