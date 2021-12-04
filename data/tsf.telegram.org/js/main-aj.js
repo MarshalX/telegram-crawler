@@ -6,7 +6,7 @@ function ajInit(options) {
   var nav_url   = location.href;
   var short_url = layerUrlToShort(nav_url);
   if (options.layer && !short_url) {
-    nav_url = layerUrlToNav(nav_url);
+    nav_url = layerUrlToNav(nav_url, options.layerUnderUrl);
   }
   if (!history.state) {
     history.replaceState({i: 0, u: nav_url}, null, short_url);

@@ -1760,6 +1760,55 @@ var EditAd = {
     });
     return false;
   },
+  initShareStatsPopup: function() {
+    var cont = Aj.layer;
+    Aj.onLayerLoad(function(layerState) {
+      layerState.$urlField = $('.js-share-url', cont);
+      layerState.$copyBtn = $('.js-copy-link', cont);
+      layerState.$revokeBtn = $('.js-revoke-link', cont);
+      layerState.$urlField.on('click', EditAd.eSelectUrl);
+      layerState.$copyBtn.on('click', EditAd.eCopyUrl);
+      layerState.$revokeBtn.on('click', EditAd.eRevokeUrl);
+    });
+    Aj.onLayerUnload(function(layerState) {
+      layerState.$urlField.off('click', EditAd.eSelectUrl);
+      layerState.$copyBtn.off('click', EditAd.eCopyUrl);
+      layerState.$revokeBtn.off('click', EditAd.eRevokeUrl);
+    });
+  },
+  eSelectUrl: function() {
+    Aj.layerState.$urlField.focusAndSelectAll();
+  },
+  eCopyUrl: function(copy) {
+    Aj.layerState.$urlField.focusAndSelectAll();
+    document.execCommand('copy');
+    showToast(l('WEB_AD_STATS_LINK_COPIED', 'Copied.'));
+  },
+  eRevokeUrl: function(e) {
+    e.preventDefault();
+    var $btn = $(this);
+    if ($btn.data('disabled')) {
+      return false;
+    }
+    var params = {
+      owner_id: Aj.layerState.ownerId,
+      ad_id:    Aj.layerState.adId
+    };
+    $btn.data('disabled', true);
+    Aj.apiRequest('revokeStatsUrl', params, function(result) {
+      $btn.data('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.new_url) {
+        Aj.layerState.$urlField.value(result.new_url);
+      }
+      if (result.toast) {
+        showToast(result.toast);
+      }
+    });
+    return false;
+  },
   initIncrBudget: function() {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
