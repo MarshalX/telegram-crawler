@@ -52,8 +52,11 @@ authenticationCodeTypeSms length:int32 = AuthenticationCodeType;
 //@description An authentication code is delivered via a phone call to the specified phone number @length Length of the code
 authenticationCodeTypeCall length:int32 = AuthenticationCodeType;
 
-//@description An authentication code is delivered by an immediately canceled call to the specified phone number. The number from which the call was made is the code @pattern Pattern of the phone number from which the call will be made
+//@description An authentication code is delivered by an immediately canceled call to the specified phone number. The phone number from which the call was made is the code that should be entered automatically @pattern Pattern of the phone number from which the call will be made
 authenticationCodeTypeFlashCall pattern:string = AuthenticationCodeType;
+
+//@description An authentication code is delivered by an immediately canceled call to the specified phone number. The phone number from which the call was made is the code that should be entered manually by the user @phone_number_prefix Prefix of the phone number from which the call will be made @length Number of digits in the code, excluding the prefix
+authenticationCodeTypeMissedCall phone_number_prefix:string length:int32 = AuthenticationCodeType;
 
 
 //@description Information about the authentication code that was sent @phone_number A phone number that is being authenticated @type The way the code was sent to the user @next_type The way the next code will be sent to the user; may be null @timeout Timeout before the code can be re-sent, in seconds
@@ -234,10 +237,6 @@ maskPointChin = MaskPoint;
 maskPosition point:MaskPoint x_shift:double y_shift:double scale:double = MaskPosition;
 
 
-//@description Describes a color replacement for animated emoji @old_color Original animated emoji color in the RGB24 format @new_color Replacement animated emoji color in the RGB24 format
-colorReplacement old_color:int32 new_color:int32 = ColorReplacement;
-
-
 //@description Represents a closed vector path. The path begins at the end point of the last command @commands List of vector path commands
 closedVectorPath commands:vector<VectorPathCommand> = ClosedVectorPath;
 
@@ -300,9 +299,9 @@ voiceNote duration:int32 waveform:bytes mime_type:string voice:file = VoiceNote;
 
 //@description Describes an animated representation of an emoji
 //@sticker Animated sticker for the emoji
-//@color_replacements List of colors to be replaced while the sticker is rendered
+//@fitzpatrick_type Emoji modifier fitzpatrick type; 0-6; 0 if none
 //@sound File containing the sound to be played when the animated emoji is clicked if any; may be null. The sound is encoded with the Opus codec, and stored inside an OGG container
-animatedEmoji sticker:sticker color_replacements:vector<colorReplacement> sound:file = AnimatedEmoji;
+animatedEmoji sticker:sticker fitzpatrick_type:int32 sound:file = AnimatedEmoji;
 
 //@description Describes a user contact @phone_number Phone number of the user @first_name First name of the user; 1-255 characters in length @last_name Last name of the user @vcard Additional data about the user in a form of vCard; 0-2048 bytes in length @user_id Identifier of the user, if known; otherwise 0
 contact phone_number:string first_name:string last_name:string vcard:string user_id:int53 = Contact;
@@ -322,7 +321,7 @@ game id:int64 short_name:string title:string text:formattedText description:stri
 //@description Describes a poll @id Unique poll identifier @question Poll question; 1-300 characters @options List of poll answer options
 //@total_voter_count Total number of voters, participating in the poll @recent_voter_user_ids User identifiers of recent voters, if the poll is non-anonymous
 //@is_anonymous True, if the poll is anonymous @type Type of the poll
-//@open_period Amount of time the poll will be active after creation, in seconds @close_date Point in time (Unix timestamp) when the poll will be automatically closed @is_closed True, if the poll is closed
+//@open_period Amount of time the poll will be active after creation, in seconds @close_date Point in time (Unix timestamp) when the poll will automatically be closed @is_closed True, if the poll is closed
 poll id:int64 question:string options:vector<pollOption> total_voter_count:int32 recent_voter_user_ids:vector<int53> is_anonymous:Bool type:PollType open_period:int32 close_date:int32 is_closed:Bool = Poll;
 
 
@@ -428,13 +427,14 @@ user id:int53 first_name:string last_name:string username:string phone_number:st
 //@can_be_called True, if the user can be called
 //@supports_video_calls True, if a video call can be created with the user
 //@has_private_calls True, if the user can't be called due to their privacy settings
+//@has_private_forwards True, if the user can't be linked in forwarded messages due to their privacy settings
 //@need_phone_number_privacy_exception True, if the current user needs to explicitly allow to share their phone number with the user when the method addContact is used
 //@bio A short user bio
 //@share_text For bots, the text that is shown on the bot's profile page and is sent together with the link when users share the bot
 //@param_description For bots, the text shown in the chat with the bot if the chat is empty
 //@group_in_common_count Number of group chats where both the other user and the current user are a member; 0 for the current user
 //@commands For bots, list of the bot commands
-userFullInfo photo:chatPhoto is_blocked:Bool can_be_called:Bool supports_video_calls:Bool has_private_calls:Bool need_phone_number_privacy_exception:Bool bio:string share_text:string description:string group_in_common_count:int32 commands:vector<botCommand> = UserFullInfo;
+userFullInfo photo:chatPhoto is_blocked:Bool can_be_called:Bool supports_video_calls:Bool has_private_calls:Bool has_private_forwards:Bool need_phone_number_privacy_exception:Bool bio:string share_text:string description:string group_in_common_count:int32 commands:vector<botCommand> = UserFullInfo;
 
 //@description Represents a list of users @total_count Approximate total count of users found @user_ids A list of user identifiers
 users total_count:int32 user_ids:vector<int53> = Users;
@@ -748,11 +748,11 @@ messageForwardInfo origin:MessageForwardOrigin date:int32 public_service_announc
 
 //@description Contains information about replies to a message
 //@reply_count Number of times the message was directly or indirectly replied
-//@recent_repliers Recent repliers to the message; available in channels with a discussion supergroup
+//@recent_replier_ids Identifiers of recent repliers to the message; available in channels with a discussion supergroup
 //@last_read_inbox_message_id Identifier of the last read incoming reply to the message
 //@last_read_outbox_message_id Identifier of the last read outgoing reply to the message
 //@last_message_id Identifier of the last reply to the message
-messageReplyInfo reply_count:int32 recent_repliers:vector<MessageSender> last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 last_message_id:int53 = MessageReplyInfo;
+messageReplyInfo reply_count:int32 recent_replier_ids:vector<MessageSender> last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 last_message_id:int53 = MessageReplyInfo;
 
 //@description Contains information about interactions with a message
 //@view_count Number of times the message was viewed
@@ -767,13 +767,15 @@ messageInteractionInfo view_count:int32 forward_count:int32 reply_info:messageRe
 messageSendingStatePending = MessageSendingState;
 
 //@description The message failed to be sent @error_code An error code; 0 if unknown @error_message Error message
-//@can_retry True, if the message can be re-sent @retry_after Time left before the message can be re-sent, in seconds. No update is sent when this field changes
-messageSendingStateFailed error_code:int32 error_message:string can_retry:Bool retry_after:double = MessageSendingState;
+//@can_retry True, if the message can be re-sent
+//@need_another_sender True, if the message can be re-sent only on behalf of a different sender
+//@retry_after Time left before the message can be re-sent, in seconds. No update is sent when this field changes
+messageSendingStateFailed error_code:int32 error_message:string can_retry:Bool need_another_sender:Bool retry_after:double = MessageSendingState;
 
 
 //@description Describes a message
 //@id Message identifier; unique for the chat to which the message belongs
-//@sender The sender of the message
+//@sender_id Identifier of the sender of the message
 //@chat_id Chat identifier
 //@sending_state The sending state of the message; may be null
 //@scheduling_state The scheduling state of the message; may be null
@@ -781,6 +783,7 @@ messageSendingStateFailed error_code:int32 error_message:string can_retry:Bool r
 //@is_pinned True, if the message is pinned
 //@can_be_edited True, if the message can be edited. For live location and poll messages this fields shows whether editMessageLiveLocation or stopPoll can be used with this message by the application
 //@can_be_forwarded True, if the message can be forwarded
+//@can_be_saved True, if content of the message can be saved locally or copied
 //@can_be_deleted_only_for_self True, if the message can be deleted only for the current user while other users will continue to see it
 //@can_be_deleted_for_all_users True, if the message can be deleted for all users
 //@can_get_statistics True, if the message statistics are available
@@ -805,7 +808,7 @@ messageSendingStateFailed error_code:int32 error_message:string can_retry:Bool r
 //@restriction_reason If non-empty, contains a human-readable description of the reason why access to this message must be restricted
 //@content Content of the message
 //@reply_markup Reply markup for the message; may be null
-message id:int53 sender:MessageSender chat_id:int53 sending_state:MessageSendingState scheduling_state:MessageSchedulingState is_outgoing:Bool is_pinned:Bool can_be_edited:Bool can_be_forwarded:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_get_statistics:Bool can_get_message_thread:Bool can_get_viewers:Bool can_get_media_timestamp_links:Bool has_timestamped_media:Bool is_channel_post:Bool contains_unread_mention:Bool date:int32 edit_date:int32 forward_info:messageForwardInfo interaction_info:messageInteractionInfo reply_in_chat_id:int53 reply_to_message_id:int53 message_thread_id:int53 ttl:int32 ttl_expires_in:double via_bot_user_id:int53 author_signature:string media_album_id:int64 restriction_reason:string content:MessageContent reply_markup:ReplyMarkup = Message;
+message id:int53 sender_id:MessageSender chat_id:int53 sending_state:MessageSendingState scheduling_state:MessageSchedulingState is_outgoing:Bool is_pinned:Bool can_be_edited:Bool can_be_forwarded:Bool can_be_saved:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_get_statistics:Bool can_get_message_thread:Bool can_get_viewers:Bool can_get_media_timestamp_links:Bool has_timestamped_media:Bool is_channel_post:Bool contains_unread_mention:Bool date:int32 edit_date:int32 forward_info:messageForwardInfo interaction_info:messageInteractionInfo reply_in_chat_id:int53 reply_to_message_id:int53 message_thread_id:int53 ttl:int32 ttl_expires_in:double via_bot_user_id:int53 author_signature:string media_album_id:int64 restriction_reason:string content:MessageContent reply_markup:ReplyMarkup = Message;
 
 //@description Contains a list of messages @total_count Approximate total count of messages found @messages List of messages; messages may be null
 messages total_count:int32 messages:vector<message> = Messages;
@@ -962,6 +965,8 @@ videoChat group_call_id:int32 has_participants:Bool default_participant_id:Messa
 //@permissions Actions that non-administrator chat members are allowed to take in the chat
 //@last_message Last message in the chat; may be null
 //@positions Positions of the chat in chat lists
+//@default_message_sender_id Default identifier of a user or chat that is chosen to send messages in the chat; may be null if the user can't change message sender
+//@has_protected_content True, if chat content can't be saved locally, forwarded, or copied
 //@is_marked_as_unread True, if the chat is marked as unread
 //@is_blocked True, if the chat is blocked by the current user and private messages from the chat can't be received
 //@has_scheduled_messages True, if the chat has scheduled messages
@@ -982,7 +987,7 @@ videoChat group_call_id:int32 has_participants:Bool default_participant_id:Messa
 //@reply_markup_message_id Identifier of the message from which reply markup needs to be used; 0 if there is no default custom reply markup in the chat
 //@draft_message A draft of a message in the chat; may be null
 //@client_data Application-specific data associated with the chat. (For example, the chat scroll position or local chat notification settings can be stored here.) Persistent if the message database is used
-chat id:int53 type:ChatType title:string photo:chatPhotoInfo permissions:chatPermissions last_message:message positions:vector<chatPosition> is_marked_as_unread:Bool is_blocked:Bool has_scheduled_messages:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_be_reported:Bool default_disable_notification:Bool unread_count:int32 last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 unread_mention_count:int32 notification_settings:chatNotificationSettings message_ttl_setting:int32 theme_name:string action_bar:ChatActionBar video_chat:videoChat pending_join_requests:chatJoinRequestsInfo reply_markup_message_id:int53 draft_message:draftMessage client_data:string = Chat;
+chat id:int53 type:ChatType title:string photo:chatPhotoInfo permissions:chatPermissions last_message:message positions:vector<chatPosition> default_message_sender_id:MessageSender has_protected_content:Bool is_marked_as_unread:Bool is_blocked:Bool has_scheduled_messages:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_be_reported:Bool default_disable_notification:Bool unread_count:int32 last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 unread_mention_count:int32 notification_settings:chatNotificationSettings message_ttl_setting:int32 theme_name:string action_bar:ChatActionBar video_chat:videoChat pending_join_requests:chatJoinRequestsInfo reply_markup_message_id:int53 draft_message:draftMessage client_data:string = Chat;
 
 //@description Represents a list of chats @total_count Approximate total count of chats found @chat_ids List of chat identifiers
 chats total_count:int32 chat_ids:vector<int53> = Chats;
@@ -1013,7 +1018,7 @@ chatActionBarReportSpam can_unarchive:Bool = ChatActionBar;
 //@description The chat is a location-based supergroup, which can be reported as having unrelated location using the method reportChat with the reason chatReportReasonUnrelatedLocation
 chatActionBarReportUnrelatedLocation = ChatActionBar;
 
-//@description The chat is a recently created group chat, to which new members can be invited
+//@description The chat is a recently created group chat to which new members can be invited
 chatActionBarInviteMembers = ChatActionBar;
 
 //@description The chat is a private or secret chat, which can be reported using the method reportChat, or the other user can be blocked using the method toggleMessageSenderIsBlocked, or the other user can be added to the contact list using the method addContact
@@ -1026,6 +1031,12 @@ chatActionBarAddContact = ChatActionBar;
 
 //@description The chat is a private or secret chat with a mutual contact and the user's phone number can be shared with the other user using the method sharePhoneNumber
 chatActionBarSharePhoneNumber = ChatActionBar;
+
+//@description The chat is a private chat with an administrator of a chat to which the user sent join request
+//@title Title of the chat to which the join request was sent
+//@is_channel True, if the join request was sent to a channel chat
+//@request_date Point in time (Unix timestamp) when the join request was sent
+chatActionBarJoinRequest title:string is_channel:Bool request_date:int32 = ChatActionBar;
 
 
 //@class KeyboardButtonType @description Describes a keyboard button type
@@ -1069,6 +1080,9 @@ inlineKeyboardButtonTypeSwitchInline query:string in_current_chat:Bool = InlineK
 
 //@description A button to buy something. This button must be in the first column and row of the keyboard and can be attached only to a message with content of the type messageInvoice
 inlineKeyboardButtonTypeBuy = InlineKeyboardButtonType;
+
+//@description A button to open a chat with a user @user_id User identifier
+inlineKeyboardButtonTypeUser user_id:int53 = InlineKeyboardButtonType;
 
 
 //@description Represents a single button in an inline keyboard @text Text of the button @type Type of the button
@@ -1854,8 +1868,8 @@ messagePassportDataSent types:vector<PassportElementType> = MessageContent;
 //@description Telegram Passport data has been received; for bots only @elements List of received Telegram Passport elements @credentials Encrypted data credentials
 messagePassportDataReceived elements:vector<encryptedPassportElement> credentials:encryptedCredentials = MessageContent;
 
-//@description A user in the chat came within proximity alert range @traveler The user or chat, which triggered the proximity alert @watcher The user or chat, which subscribed for the proximity alert @distance The distance between the users
-messageProximityAlertTriggered traveler:MessageSender watcher:MessageSender distance:int32 = MessageContent;
+//@description A user in the chat came within proximity alert range @traveler_id The identifier of a user or chat that triggered the proximity alert @watcher_id The identifier of a user or chat that subscribed for the proximity alert @distance The distance between the users
+messageProximityAlertTriggered traveler_id:MessageSender watcher_id:MessageSender distance:int32 = MessageContent;
 
 //@description Message content that is not supported in the current TDLib version
 messageUnsupported = MessageContent;
@@ -2008,7 +2022,7 @@ inputMessageInvoice invoice:invoice title:string description:string photo_url:st
 //@description A message with a poll. Polls can't be sent to secret chats. Polls can be sent only to a private chat with a bot @question Poll question; 1-255 characters (up to 300 characters for bots) @options List of poll answer options, 2-10 strings 1-100 characters each
 //@is_anonymous True, if the poll voters are anonymous. Non-anonymous polls can't be sent or forwarded to channels @type Type of the poll
 //@open_period Amount of time the poll will be active after creation, in seconds; for bots only
-//@close_date Point in time (Unix timestamp) when the poll will be automatically closed; for bots only
+//@close_date Point in time (Unix timestamp) when the poll will automatically be closed; for bots only
 //@is_closed True, if the poll needs to be sent already closed; for bots only
 inputMessagePoll question:string options:vector<string> is_anonymous:Bool type:PollType open_period:int32 close_date:int32 is_closed:Bool = InputMessageContent;
 
@@ -2339,10 +2353,12 @@ call id:int32 user_id:int53 is_outgoing:Bool is_video:Bool state:CallState = Cal
 
 
 //@description Contains settings for the authentication of the user's phone number
-//@allow_flash_call Pass true if the authentication code may be sent via flash call to the specified phone number
+//@allow_flash_call Pass true if the authentication code may be sent via a flash call to the specified phone number
+//@allow_missed_call Pass true if the authentication code may be sent via a missed call to the specified phone number
 //@is_current_phone_number Pass true if the authenticated phone number is used on the current device
 //@allow_sms_retriever_api For official applications only. True, if the application can use Android SMS Retriever API (requires Google Play Services >= 10.2) to automatically receive the authentication code from the SMS. See https://developers.google.com/identity/sms-retriever/ for more details
-phoneNumberAuthenticationSettings allow_flash_call:Bool is_current_phone_number:Bool allow_sms_retriever_api:Bool = PhoneNumberAuthenticationSettings;
+//@authentication_tokens List of authentication tokens, received in updateOption("authentication_token") in previously logged out sessions
+phoneNumberAuthenticationSettings allow_flash_call:Bool allow_missed_call:Bool is_current_phone_number:Bool allow_sms_retriever_api:Bool authentication_tokens:vector<string> = PhoneNumberAuthenticationSettings;
 
 
 //@description Represents a list of animations @animations List of animations
@@ -2586,6 +2602,9 @@ chatEventMessageTtlSettingChanged old_message_ttl_setting:int32 new_message_ttl_
 
 //@description The sign_messages setting of a channel was toggled @sign_messages New value of sign_messages
 chatEventSignMessagesToggled sign_messages:Bool = ChatEventAction;
+
+//@description The has_protected_content setting of a channel was toggled @has_protected_content New value of has_protected_content
+chatEventHasProtectedContentToggled has_protected_content:Bool = ChatEventAction;
 
 //@description The supergroup sticker set was changed @old_sticker_set_id Previous identifier of the chat sticker set; 0 if none @new_sticker_set_id New identifier of the chat sticker set; 0 if none
 chatEventStickerSetChanged old_sticker_set_id:int64 new_sticker_set_id:int64 = ChatEventAction;
@@ -2963,11 +2982,11 @@ notificationTypeNewCall call_id:int32 = NotificationType;
 
 //@description New message was received through a push notification
 //@message_id The message identifier. The message will not be available in the chat history, but the ID can be used in viewMessages, or as reply_to_message_id
-//@sender The sender of the message. Corresponding user or chat may be inaccessible
+//@sender_id Identifier of the sender of the message. Corresponding user or chat may be inaccessible
 //@sender_name Name of the sender
 //@is_outgoing True, if the message is outgoing
 //@content Push message content
-notificationTypeNewPushMessage message_id:int53 sender:MessageSender sender_name:string is_outgoing:Bool content:PushMessageContent = NotificationType;
+notificationTypeNewPushMessage message_id:int53 sender_id:MessageSender sender_name:string is_outgoing:Bool content:PushMessageContent = NotificationType;
 
 
 //@class NotificationGroupType @description Describes the type of notifications in a notification group
@@ -3097,16 +3116,18 @@ accountTtl days:int32 = AccountTtl;
 //@description Contains information about one session in a Telegram application used by the current user. Sessions must be shown to the user in the returned order
 //@id Session identifier @is_current True, if this session is the current session
 //@is_password_pending True, if a password is needed to complete authorization of the session
+//@can_accept_secret_chats True, if incoming secret chats can be accepted by the session
+//@can_accept_calls True, if incoming calls can be accepted by the session
 //@api_id Telegram API identifier, as provided by the application @application_name Name of the application, as provided by the application
 //@application_version The version of the application, as provided by the application @is_official_application True, if the application is an official application or uses the api_id of an official application
 //@device_model Model of the device the application has been run or is running on, as provided by the application @platform Operating system the application has been run or is running on, as provided by the application
 //@system_version Version of the operating system the application has been run or is running on, as provided by the application @log_in_date Point in time (Unix timestamp) when the user has logged in
 //@last_active_date Point in time (Unix timestamp) when the session was last used @ip IP address from which the session was created, in human-readable format
 //@country A two-letter country code for the country from which the session was created, based on the IP address @region Region code from which the session was created, based on the IP address
-session id:int64 is_current:Bool is_password_pending:Bool api_id:int32 application_name:string application_version:string is_official_application:Bool device_model:string platform:string system_version:string log_in_date:int32 last_active_date:int32 ip:string country:string region:string = Session;
+session id:int64 is_current:Bool is_password_pending:Bool can_accept_secret_chats:Bool can_accept_calls:Bool api_id:int32 application_name:string application_version:string is_official_application:Bool device_model:string platform:string system_version:string log_in_date:int32 last_active_date:int32 ip:string country:string region:string = Session;
 
-//@description Contains a list of sessions @sessions List of sessions
-sessions sessions:vector<session> = Sessions;
+//@description Contains a list of sessions @sessions List of sessions @inactive_session_ttl_days Number of days of inactivity before sessions will automatically be terminated; 1-366 days
+sessions sessions:vector<session> inactive_session_ttl_days:int32 = Sessions;
 
 
 //@description Contains information about one website the current user is logged in with Telegram
@@ -3461,6 +3482,9 @@ suggestedActionSeeTicksHint = SuggestedAction;
 //@description Suggests the user to convert specified supergroup to a broadcast group @supergroup_id Supergroup identifier
 suggestedActionConvertToBroadcastGroup supergroup_id:int53 = SuggestedAction;
 
+//@description Suggests the user to set a 2-step verification password to be able to log in again @authorization_delay The number of days to pass between consecutive authorizations if the user declines to set password
+suggestedActionSetPassword authorization_delay:int32 = SuggestedAction;
+
 
 //@description Contains a counter @count Count
 count count:int32 = Count;
@@ -3704,6 +3728,12 @@ updateChatLastMessage chat_id:int53 last_message:message positions:vector<chatPo
 //@description The position of a chat in a chat list has changed. Instead of this update updateChatLastMessage or updateChatDraftMessage might be sent @chat_id Chat identifier @position New chat position. If new order is 0, then the chat needs to be removed from the list
 updateChatPosition chat_id:int53 position:chatPosition = Update;
 
+//@description The default message sender that is chosen to send messages in a chat has changed @chat_id Chat identifier @default_message_sender_id New value of default_message_sender_id; may be null if the user can't change message sender
+updateChatDefaultMessageSenderId chat_id:int53 default_message_sender_id:MessageSender = Update;
+
+//@description A chat content was allowed or restricted for saving @chat_id Chat identifier @has_protected_content New value of has_protected_content
+updateChatHasProtectedContent chat_id:int53 has_protected_content:Bool = Update;
+
 //@description A chat was marked as unread or was read @chat_id Chat identifier @is_marked_as_unread New value of is_marked_as_unread
 updateChatIsMarkedAsUnread chat_id:int53 is_marked_as_unread:Bool = Update;
 
@@ -3785,8 +3815,8 @@ updateHavePendingNotifications have_delayed_notifications:Bool have_unreceived_n
 //@from_cache True, if the messages are deleted only from the cache and can possibly be retrieved again in the future
 updateDeleteMessages chat_id:int53 message_ids:vector<int53> is_permanent:Bool from_cache:Bool = Update;
 
-//@description User activity in the chat has changed @chat_id Chat identifier @message_thread_id If not 0, a message thread identifier in which the action was performed @user_id Identifier of a user performing an action @action The action description
-updateUserChatAction chat_id:int53 message_thread_id:int53 user_id:int53 action:ChatAction = Update;
+//@description A message sender activity in the chat has changed @chat_id Chat identifier @message_thread_id If not 0, a message thread identifier in which the action was performed @sender_id Identifier of a message sender performing the action @action The action
+updateChatAction chat_id:int53 message_thread_id:int53 sender_id:MessageSender action:ChatAction = Update;
 
 //@description The user went online or offline @user_id User identifier @status New status of the user
 updateUserStatus user_id:int53 status:UserStatus = Update;
@@ -3803,16 +3833,16 @@ updateSupergroup supergroup:supergroup = Update;
 //@description Some data of a secret chat has changed. This update is guaranteed to come before the secret chat identifier is returned to the application @secret_chat New data about the secret chat
 updateSecretChat secret_chat:secretChat = Update;
 
-//@description Some data from userFullInfo has been changed @user_id User identifier @user_full_info New full information about the user
+//@description Some data in userFullInfo has been changed @user_id User identifier @user_full_info New full information about the user
 updateUserFullInfo user_id:int53 user_full_info:userFullInfo = Update;
 
-//@description Some data from basicGroupFullInfo has been changed @basic_group_id Identifier of a basic group @basic_group_full_info New full information about the group
+//@description Some data in basicGroupFullInfo has been changed @basic_group_id Identifier of a basic group @basic_group_full_info New full information about the group
 updateBasicGroupFullInfo basic_group_id:int53 basic_group_full_info:basicGroupFullInfo = Update;
 
-//@description Some data from supergroupFullInfo has been changed @supergroup_id Identifier of the supergroup or channel @supergroup_full_info New full information about the supergroup
+//@description Some data in supergroupFullInfo has been changed @supergroup_id Identifier of the supergroup or channel @supergroup_full_info New full information about the supergroup
 updateSupergroupFullInfo supergroup_id:int53 supergroup_full_info:supergroupFullInfo = Update;
 
-//@description Service notification from the server. Upon receiving this the application must show a popup with the content of the notification
+//@description A service notification from the server was received. Upon receiving this the application must show a popup with the content of the notification
 //@type Notification type. If type begins with "AUTH_KEY_DROP_", then two buttons "Cancel" and "Log out" must be shown under notification; if user presses the second, all local data must be destroyed using Destroy method
 //@content Notification content
 updateServiceNotification type:string content:MessageContent = Update;
@@ -3965,7 +3995,7 @@ logStreamDefault = LogStream;
 
 //@description The log is written to a file
 //@path Path to the file to where the internal TDLib log will be written
-//@max_file_size The maximum size of the file to where the internal TDLib log is written before the file will be auto-rotated, in bytes
+//@max_file_size The maximum size of the file to where the internal TDLib log is written before the file will automatically be rotated, in bytes
 //@redirect_stderr Pass true to additionally redirect stderr to the log file. Ignored on Windows
 logStreamFile path:string max_file_size:int53 redirect_stderr:Bool = LogStream;
 
@@ -4015,7 +4045,7 @@ setAuthenticationPhoneNumber phone_number:string settings:phoneNumberAuthenticat
 //@description Re-sends an authentication code to the user. Works only when the current authorization state is authorizationStateWaitCode, the next_code_type of the result is not null and the server-specified timeout has passed
 resendAuthenticationCode = Ok;
 
-//@description Checks the authentication code. Works only when the current authorization state is authorizationStateWaitCode @code The verification code received via SMS, Telegram message, phone call, or flash call
+//@description Checks the authentication code. Works only when the current authorization state is authorizationStateWaitCode @code Authentication code to check
 checkAuthenticationCode code:string = Ok;
 
 //@description Requests QR code authentication by scanning a QR code on another logged in device. Works only when the current authorization state is authorizationStateWaitPhoneNumber,
@@ -4079,7 +4109,7 @@ getRecoveryEmailAddress password:string = RecoveryEmailAddress;
 //-If new_recovery_email_address is the same as the email address that is currently set up, this call succeeds immediately and aborts all other requests waiting for an email confirmation @password Password of the current user @new_recovery_email_address New recovery email address
 setRecoveryEmailAddress password:string new_recovery_email_address:string = PasswordState;
 
-//@description Checks the 2-step verification recovery email address verification code @code Verification code
+//@description Checks the 2-step verification recovery email address verification code @code Verification code to check
 checkRecoveryEmailAddressCode code:string = PasswordState;
 
 //@description Resends the 2-step verification recovery email address verification code
@@ -4260,13 +4290,13 @@ deleteChat chat_id:int53 = Ok;
 //-(searchSecretMessages must be used instead), or without an enabled message database. For optimal performance, the number of returned messages is chosen by TDLib and can be smaller than the specified limit
 //@chat_id Identifier of the chat in which to search messages
 //@query Query to search for
-//@sender Sender of messages to search for; pass null to search for messages from any sender. Not supported in secret chats
+//@sender_id Identifier of the sender of messages to search for; pass null to search for messages from any sender. Not supported in secret chats
 //@from_message_id Identifier of the message starting from which history must be fetched; use 0 to get results from the last message
 //@offset Specify 0 to get results from exactly the from_message_id or a negative offset to get the specified message and some newer messages
 //@limit The maximum number of messages to be returned; must be positive and can't be greater than 100. If the offset is negative, the limit must be greater than -offset. For optimal performance, the number of returned messages is chosen by TDLib and can be smaller than the specified limit
 //@filter Additional filter for messages to search; pass null to search for all messages
 //@message_thread_id If not 0, only messages in the specified thread will be returned; supergroups only
-searchChatMessages chat_id:int53 query:string sender:MessageSender from_message_id:int53 offset:int32 limit:int32 filter:SearchMessagesFilter message_thread_id:int53 = Messages;
+searchChatMessages chat_id:int53 query:string sender_id:MessageSender from_message_id:int53 offset:int32 limit:int32 filter:SearchMessagesFilter message_thread_id:int53 = Messages;
 
 //@description Searches for messages in all chats except secret chats. Returns the results in reverse chronological order (i.e., in order of decreasing (date, chat_id, message_id)).
 //-For optimal performance, the number of returned messages is chosen by TDLib and can be smaller than the specified limit
@@ -4365,6 +4395,12 @@ getMessageEmbeddingCode chat_id:int53 message_id:int53 for_album:Bool = Text;
 getMessageLinkInfo url:string = MessageLinkInfo;
 
 
+//@description Returns list of message sender identifiers, which can be used to send messages in a chat @chat_id Chat identifier
+getChatAvailableMessageSenders chat_id:int53 = MessageSenders;
+
+//@description Changes default message sender that is chosen in a chat @chat_id Chat identifier @default_message_sender_id New default message sender in the chat
+setChatDefaultMessageSender chat_id:int53 default_message_sender_id:MessageSender = Ok;
+
 //@description Sends a message. Returns the sent message
 //@chat_id Target chat
 //@message_thread_id If not 0, a message thread identifier in which the message will be sent
@@ -4416,17 +4452,17 @@ sendChatScreenshotTakenNotification chat_id:int53 = Ok;
 
 //@description Adds a local message to a chat. The message is persistent across application restarts only if the message database is used. Returns the added message
 //@chat_id Target chat
-//@sender The sender of the message
+//@sender_id Identifier of the sender of the message
 //@reply_to_message_id Identifier of the message to reply to or 0
 //@disable_notification Pass true to disable notification for the message
 //@input_message_content The content of the message to be added
-addLocalMessage chat_id:int53 sender:MessageSender reply_to_message_id:int53 disable_notification:Bool input_message_content:InputMessageContent = Message;
+addLocalMessage chat_id:int53 sender_id:MessageSender reply_to_message_id:int53 disable_notification:Bool input_message_content:InputMessageContent = Message;
 
 //@description Deletes messages @chat_id Chat identifier @message_ids Identifiers of the messages to be deleted @revoke Pass true to try to delete messages for all chat members. Always true for supergroups, channels and secret chats
 deleteMessages chat_id:int53 message_ids:vector<int53> revoke:Bool = Ok;
 
-//@description Deletes all messages sent by the specified user to a chat. Supported only for supergroups; requires can_delete_messages administrator privileges @chat_id Chat identifier @user_id User identifier
-deleteChatMessagesFromUser chat_id:int53 user_id:int53 = Ok;
+//@description Deletes all messages sent by the specified message sender in a chat. Supported only for supergroups; requires can_delete_messages administrator privileges @chat_id Chat identifier @sender_id Identifier of the sender of messages to delete
+deleteChatMessagesBySender chat_id:int53 sender_id:MessageSender = Ok;
 
 //@description Deletes all messages between the specified dates in a chat. Supported only for private chats and basic groups. Messages sent in the last 30 seconds will not be deleted
 //@chat_id Chat identifier @min_date The minimum date of the messages to delete @max_date The maximum date of the messages to delete @revoke Pass true to try to delete chat messages for all users; private chats only
@@ -4753,6 +4789,10 @@ setChatDraftMessage chat_id:int53 message_thread_id:int53 draft_message:draftMes
 //@chat_id Chat identifier @notification_settings New notification settings for the chat. If the chat is muted for more than 1 week, it is considered to be muted forever
 setChatNotificationSettings chat_id:int53 notification_settings:chatNotificationSettings = Ok;
 
+//@description Changes the ability of users to save, forward, or copy chat content. Supported only for basic groups, supergroups and channels. Requires owner privileges
+//@chat_id Chat identifier @has_protected_content True, if chat content can't be saved locally, forwarded, or copied
+toggleChatHasProtectedContent chat_id:int53 has_protected_content:Bool = Ok;
+
 //@description Changes the marked as unread state of a chat @chat_id Chat identifier @is_marked_as_unread New value of is_marked_as_unread
 toggleChatIsMarkedAsUnread chat_id:int53 is_marked_as_unread:Bool = Ok;
 
@@ -4866,7 +4906,7 @@ setPinnedChats chat_list:ChatList chat_ids:vector<int53> = Ok;
 //@file_id Identifier of the file to download
 //@priority Priority of the download (1-32). The higher the priority, the earlier the file will be downloaded. If the priorities of two files are equal, then the last one for which downloadFile was called will be downloaded first
 //@offset The starting position from which the file needs to be downloaded
-//@limit Number of bytes which need to be downloaded starting from the "offset" position before the download will be automatically canceled; use 0 to download without a limit
+//@limit Number of bytes which need to be downloaded starting from the "offset" position before the download will automatically be canceled; use 0 to download without a limit
 //@synchronous If false, this request returns file state just after the download has been started. If true, this request returns file state only after
 //-the download has succeeded, has failed, has been canceled or a new downloadFile request with different offset/limit parameters was sent
 downloadFile file_id:int32 priority:int32 offset:int32 limit:int32 synchronous:Bool = File;
@@ -4997,11 +5037,14 @@ joinChatByInviteLink invite_link:string = Chat;
 //@limit The maximum number of chat join requests to return
 getChatJoinRequests chat_id:int53 invite_link:string query:string offset_request:chatJoinRequest limit:int32 = ChatJoinRequests;
 
-//@description Approves pending join request in a chat @chat_id Chat identifier @user_id Identifier of the user, which request will be approved
-approveChatJoinRequest chat_id:int53 user_id:int53 = Ok;
+//@description Handles a pending join request in a chat @chat_id Chat identifier @user_id Identifier of the user that sent the request @approve True, if the request is approved. Otherwise the request is declived
+processChatJoinRequest chat_id:int53 user_id:int53 approve:Bool = Ok;
 
-//@description Declines pending join request in a chat @chat_id Chat identifier @user_id Identifier of the user, which request will be declined
-declineChatJoinRequest chat_id:int53 user_id:int53 = Ok;
+//@description Handles all pending join requests for a given link in a chat
+//@chat_id Chat identifier
+//@invite_link Invite link for which to process join requests. If empty, all join requests will be processed. Requires administrator privileges and can_invite_users right in the chat for own links and owner privileges for other links
+//@approve True, if the requests are approved. Otherwise the requests are declived
+processChatJoinRequests chat_id:int53 invite_link:string approve:Bool = Ok;
 
 
 //@description Creates a new call @user_id Identifier of the user to be called @protocol The call protocols supported by the application @is_video True, if a video call needs to be created
@@ -5136,8 +5179,8 @@ discardGroupCall group_call_id:int32 = Ok;
 getGroupCallStreamSegment group_call_id:int32 time_offset:int53 scale:int32 channel_id:int32 video_quality:GroupCallVideoQuality = FilePart;
 
 
-//@description Changes the block state of a message sender. Currently, only users and supergroup chats can be blocked @sender Message Sender @is_blocked New value of is_blocked
-toggleMessageSenderIsBlocked sender:MessageSender is_blocked:Bool = Ok;
+//@description Changes the block state of a message sender. Currently, only users and supergroup chats can be blocked @sender_id Identifier of a message sender to block/unblock @is_blocked New value of is_blocked
+toggleMessageSenderIsBlocked sender_id:MessageSender is_blocked:Bool = Ok;
 
 //@description Blocks an original sender of a message in the Replies chat
 //@message_id The identifier of an incoming message in the Replies chat
@@ -5316,7 +5359,7 @@ changePhoneNumber phone_number:string settings:phoneNumberAuthenticationSettings
 //@description Re-sends the authentication code sent to confirm a new phone number for the current user. Works only if the previously received authenticationCodeInfo next_code_type was not null and the server-specified timeout has passed
 resendChangePhoneNumberCode = AuthenticationCodeInfo;
 
-//@description Checks the authentication code sent to confirm a new phone number of the user @code Verification code received by SMS, phone call or flash call
+//@description Checks the authentication code sent to confirm a new phone number of the user @code Authentication code to check
 checkChangePhoneNumberCode code:string = Ok;
 
 
@@ -5346,6 +5389,15 @@ terminateSession session_id:int64 = Ok;
 //@description Terminates all other sessions of the current user
 terminateAllOtherSessions = Ok;
 
+//@description Toggles whether a session can accept incoming calls @session_id Session identifier @can_accept_calls True, if incoming calls can be accepted by the session
+toggleSessionCanAcceptCalls session_id:int64 can_accept_calls:Bool = Ok;
+
+//@description Toggles whether a session can accept incoming secret chats @session_id Session identifier @can_accept_secret_chats True, if incoming secret chats can be accepted by the session
+toggleSessionCanAcceptSecretChats session_id:int64 can_accept_secret_chats:Bool = Ok;
+
+//@description Changes the period of inactivity after which sessions will automatically be terminated @inactive_session_ttl_days New number of days of inactivity before sessions will be automatically terminated; 1-366 days
+setInactiveSessionTtl inactive_session_ttl_days:int32 = Ok;
+
 
 //@description Returns all website where the current user used Telegram to log in
 getConnectedWebsites = ConnectedWebsites;
@@ -5363,7 +5415,7 @@ setSupergroupUsername supergroup_id:int53 username:string = Ok;
 //@description Changes the sticker set of a supergroup; requires can_change_info administrator right @supergroup_id Identifier of the supergroup @sticker_set_id New value of the supergroup sticker set identifier. Use 0 to remove the supergroup sticker set
 setSupergroupStickerSet supergroup_id:int53 sticker_set_id:int64 = Ok;
 
-//@description Toggles sender signatures messages sent in a channel; requires can_change_info administrator right @supergroup_id Identifier of the channel @sign_messages New value of sign_messages
+//@description Toggles whether sender signature is added to sent messages in a channel; requires can_change_info administrator right @supergroup_id Identifier of the channel @sign_messages New value of sign_messages
 toggleSupergroupSignMessages supergroup_id:int53 sign_messages:Bool = Ok;
 
 //@description Toggles whether the message history of a supergroup is available to new members; requires can_change_info administrator right @supergroup_id The identifier of the supergroup @is_all_history_available The new value of is_all_history_available
@@ -5372,8 +5424,8 @@ toggleSupergroupIsAllHistoryAvailable supergroup_id:int53 is_all_history_availab
 //@description Upgrades supergroup to a broadcast group; requires owner privileges in the supergroup @supergroup_id Identifier of the supergroup
 toggleSupergroupIsBroadcastGroup supergroup_id:int53 = Ok;
 
-//@description Reports some messages from a user in a supergroup as spam; requires administrator rights in the supergroup @supergroup_id Supergroup identifier @user_id User identifier @message_ids Identifiers of messages sent in the supergroup by the user. This list must be non-empty
-reportSupergroupSpam supergroup_id:int53 user_id:int53 message_ids:vector<int53> = Ok;
+//@description Reports some messages from a message sender in a supergroup as spam; requires administrator rights in the supergroup @supergroup_id Supergroup identifier @message_ids Identifiers of messages sent in the supergroup. All messages must be sent by the same sender. This list must be non-empty
+reportSupergroupSpam supergroup_id:int53 message_ids:vector<int53> = Ok;
 
 //@description Returns information about members or banned users in a supergroup or channel. Can be used only if supergroupFullInfo.can_get_members == true; additionally, administrator privileges may be required for some filters @supergroup_id Identifier of the supergroup or channel
 //@filter The type of users to return; pass null to use supergroupMembersFilterRecent @offset Number of users to skip @limit The maximum number of users be returned; up to 200
@@ -5610,7 +5662,7 @@ sendPhoneNumberVerificationCode phone_number:string settings:phoneNumberAuthenti
 //@description Re-sends the code to verify a phone number to be added to a user's Telegram Passport
 resendPhoneNumberVerificationCode = AuthenticationCodeInfo;
 
-//@description Checks the phone number verification code for Telegram Passport @code Verification code
+//@description Checks the phone number verification code for Telegram Passport @code Verification code to check
 checkPhoneNumberVerificationCode code:string = Ok;
 
 
@@ -5620,7 +5672,7 @@ sendEmailAddressVerificationCode email_address:string = EmailAddressAuthenticati
 //@description Re-sends the code to verify an email address to be added to a user's Telegram Passport
 resendEmailAddressVerificationCode = EmailAddressAuthenticationCodeInfo;
 
-//@description Checks the email address verification code for Telegram Passport @code Verification code
+//@description Checks the email address verification code for Telegram Passport @code Verification code to check
 checkEmailAddressVerificationCode code:string = Ok;
 
 
@@ -5641,7 +5693,7 @@ sendPhoneNumberConfirmationCode hash:string phone_number:string settings:phoneNu
 //@description Resends phone number confirmation code
 resendPhoneNumberConfirmationCode = AuthenticationCodeInfo;
 
-//@description Checks phone number confirmation code @code The phone number confirmation code
+//@description Checks phone number confirmation code @code Confirmation code to check
 checkPhoneNumberConfirmationCode code:string = Ok;
 
 
