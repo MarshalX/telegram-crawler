@@ -114,10 +114,26 @@ function statsFormat(period) {
     case 'hour':
       return statsFormatHour;
 
+    case 'week':
+      return statsFormatWeek;
+
+    case 'month':
+      return statsFormatMonth;
+
     case 'day':
     default:
       return null;
   }
+}
+
+function statsTooltipFormat(period) {
+  switch (period) {
+    case 'week':
+      return statsFormatWeekFull;
+    case 'month':
+      return statsFormatMonthFull;
+  }
+  return statsFormat(period);
 }
 
 function formatNumber(number, decimals, decPoint, thousandsSep) {
@@ -169,7 +185,7 @@ function statsFormatAmount(value, currency) {
     decimals++;
   }
   var amount_str = formatNumber(value / 1000000, decimals, '.', ',');
-  return (currency || 'â‚¬') + ' ' + amount_str;
+  return (currency || '€') + ' ' + amount_str;
 }
 
 function statsFormat5min(time) {
@@ -179,6 +195,49 @@ function statsFormat5min(time) {
 function statsFormatHour(time) {
   var date = new Date(time);
   return statShortMonths[date.getUTCMonth()] + ', ' + date.getUTCDate() + ' ' + date.toUTCString().match(/(\d+:\d+):/)[1];
+}
+
+function statsFormatPeriod(time, days) {
+  var dt = new Date(time),
+      de = new Date(time + (days - 1) * 86400000);
+  var dtm = dt.getUTCMonth(), dem = de.getUTCMonth(),
+      dtd = dt.getUTCDate(), ded = de.getUTCDate();
+
+  if (dtm == dem) {
+    return dtd + '-' + ded + ' ' + statShortMonths[dtm];
+  } else {
+    return dtd + ' ' + statShortMonths[dtm] + ' - ' + ded + ' ' + statShortMonths[dem];
+  }
+}
+
+function statsFormatPeriodFull(time, days) {
+  var dt = new Date(time),
+      de = new Date(time + (days - 1) * 86400000);
+  var dty = dt.getUTCFullYear(), dey = de.getUTCFullYear(),
+      dtm = dt.getUTCMonth(), dem = de.getUTCMonth(),
+      dtd = dt.getUTCDate(), ded = de.getUTCDate();
+
+  if (dty != dey) {
+    return dtd + ' ' + statShortMonths[dtm] + ' ' + dty + ' – ' + ded + ' ' + statShortMonths[dem] + ' ' + dey;
+  } else {
+    return dtd + ' ' + statShortMonths[dtm] + ' – ' + ded + ' ' + statShortMonths[dem] + ' ' + dey;
+  }
+}
+
+function statsFormatWeek(time) {
+  return statsFormatPeriod(time, 7);
+}
+
+function statsFormatWeekFull(time) {
+  return statsFormatPeriodFull(time, 7);
+}
+
+function statsFormatMonth(time) {
+  return statsFormatPeriod(time, 30);
+}
+
+function statsFormatMonthFull(time) {
+  return statsFormatPeriodFull(time, 30);
 }
 
 function statsFormatTooltipValue(val) {
