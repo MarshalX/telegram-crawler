@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>FAQ for the Technically Inclined</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="This FAQ about MTProto is intended for advanced users. You may also want to check out our Basic FAQ.
+Please note, that…">
+    <meta property="og:title" content="FAQ for the Technically Inclined">
+    <meta property="og:image" content="https://core.telegram.org/file/811140746/2/CzMyJPVnPo8.81605/c2310d6ede1a5e220f">
+    <meta property="og:description" content="This FAQ about MTProto is intended for advanced users. You may also want to check out our Basic FAQ.
+Please note, that…">
+    <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
+
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?215" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" dev_faq_page">
+  <div class="dev_page_bread_crumbs"></div>
+  <h1 id="dev_page_title">FAQ for the Technically Inclined</h1>
+  
+  <div id="dev_page_content"><blockquote>
+<p>This FAQ about <a href="http://core.telegram.org/mtproto">MTProto</a> is intended for advanced users. You may also want to check out our <a href="http://telegram.org/faq"><strong>Basic FAQ</strong></a>.<br>Please note, that client developers are required to comply with the <a href="/mtproto/security_guidelines">Security Guidelines</a>.</p>
+</blockquote>
+<p><div class="dev_page_nav_wrap"></p>
+<p><a href="#general-questions"><strong>General</strong></a></p>
+<ul>
+<li><a href="#q-why-did-you-go-for-a-custom-protocol">Why did you use a custom protocol?</a></li>
+<li><a href="#q-where-can-i-read-more-about-the-protocol">How does it work?</a></li>
+<li><a href="#q-how-does-server-client-encryption-work-in-mtproto">Server-client encryption</a></li>
+<li><a href="#q-how-does-end-to-end-encryption-work-in-mtproto">End-to-end encryption</a></li>
+<li><a href="#q-why-are-you-not-using-x-insert-solution">Why didn&#39;t you use a different solution?</a></li>
+<li><a href="#q-why-are-you-mostly-relying-on-classical-crypto-algorithms">Why are you mostly relying on classical crypto algorithms?</a></li>
+<li><a href="#q-i-39m-a-security-expert-and-i-have-comments-about-your-setup">I&#39;m a security expert and I have comments about your setup</a></li>
+</ul>
+<p><a href="#encryption"><strong>Encryption</strong></a></p>
+<ul>
+<li><a href="#q-how-are-mtproto-messages-authenticated">How are MTProto messages authenticated?</a></li>
+<li><a href="#q-are-you-doing-encrypt-then-mac-mac-then-encrypt-or-mac-and-enc">Are you using Encrypt-and-MAC?</a></li>
+<li><a href="#q-why-don-39t-you-go-for-a-standard-encrypt-then-mac-approach">Why not go for Encrypt-then-MAC?</a></li>
+<li><a href="#q-do-you-still-use-sha-1">Do you still use SHA-1?</a></li>
+<li><a href="#q-do-you-use-ige-ige-is-broken">Do you use IGE? IGE is broken!</a></li>
+</ul>
+<p><a href="#authentication"><strong>Authentication</strong></a></p>
+<ul>
+<li><a href="#q-how-is-the-server-authenticated-during-dh-key-exchange">How is the server authenticated during DH key exchange?</a></li>
+<li><a href="#q-how-are-clients-authenticated">How are clients authenticated?</a></li>
+<li><a href="#q-how-are-secret-chats-authenticated">How are secret chats authenticated?</a></li>
+<li><a href="#q-how-are-voice-calls-authenticated">How are voice calls authentication?</a></li>
+<li><a href="#q-do-you-have-forward-secrecy">Do you have Forward Secrecy?</a></li>
+</ul>
+<p><a href="#protection-against-known-attacks"><strong>Protection against known attacks</strong></a></p>
+<ul>
+<li><a href="#known-plaintext-attacks">Known-plaintext attacks</a></li>
+<li><a href="#chosen-plaintext-attacks">Chosen-plaintext attacks</a></li>
+<li><a href="#chosen-ciphertext-attacks">Chosen-ciphertext attacks</a></li>
+<li><a href="#what-about-ind-cca">What about IND CCA?</a></li>
+<li><a href="#replay-attacks">Replay attacks</a></li>
+<li><a href="#man-in-the-middle-attacks">Man-in-the-middle attacks</a></li>
+<li><a href="#hash-collisions-for-diffie-hellman-keys">Hash collisions for DH keys</a></li>
+<li><a href="#length-extension-attacks">Length extension attacks</a></li>
+</ul>
+<p><a href="#encrypted-cdns"><strong>Encrypted CDNs</strong></a></p>
+<ul>
+<li><a href="#q-why-did-you-decide-to-use-cdns">Why do you use CDNs?</a></li>
+<li><a href="#q-can-the-cdn-decipher-the-files">Can CDNs decipher any files?</a></li>
+<li><a href="#q-can-the-cdn-substitute-the-data-with-their-own-version">Can CDNs substitute files with their own versions?</a></li>
+<li><a href="#q-can-cdns-be-used-for-censorship">Can CDNs be used for censorship?</a></li>
+<li><a href="#q-can-i-verify-this">Can I verify this?</a></li>
+<li><a href="#q-does-this-affect-private-data">Does this affect private data?</a></li>
+<li><a href="#q-is-this-connected-with-government-requests-to-move-private-dat">Is this connected to government requests to move servers to their territory?</a></li>
+<li><a href="#q-does-this-give-some-countries-any-influence-over-telegram">Does this give countries any influence over Telegram?</a></li>
+</ul>
+<hr>
+<p></div></p>
+<h3><a class="anchor" name="general-questions" href="#general-questions"><i class="anchor-icon"></i></a>General questions</h3>
+<h4><a class="anchor" name="q-why-did-you-go-for-a-custom-protocol" href="#q-why-did-you-go-for-a-custom-protocol"><i class="anchor-icon"></i></a>Q: Why did you go for a custom protocol?</h4>
+<p>In order to achieve reliability on weak mobile connections as well as speed when dealing with large files (such as photos, large videos and files <strong>up to 2 GB</strong> each), MTProto uses an original approach. This document is intended to clarify certain details of our setup, as well as address some important points that might be overlooked at first glance.</p>
+<h4><a class="anchor" name="q-where-can-i-read-more-about-the-protocol" href="#q-where-can-i-read-more-about-the-protocol"><i class="anchor-icon"></i></a>Q: Where can I read more about the protocol?</h4>
+<p>Detailed protocol documentation is available <a href="https://core.telegram.org/mtproto">here</a>. Please note that MTProto supports two layers: <strong>client-server encryption</strong> that is used in Telegram cloud chats and <strong>end-to-end encryption</strong> that is used in Telegram Secret Chats. See below for more information.</p>
+<p>If you have any comments, feel free to reach out to <a href="mailto:security@telegram.org">security@telegram.org</a></p>
+<h4><a class="anchor" name="q-how-does-server-client-encryption-work-in-mtproto" href="#q-how-does-server-client-encryption-work-in-mtproto"><i class="anchor-icon"></i></a>Q: How does server-client encryption work in MTProto?</h4>
+<p><strong>Server-client encryption</strong> is used in Telegram <strong>Cloud Chats</strong>. Here&#39;s a brief overview of the setup:</p>
+<div><a href="/file/811140746/2/CzMyJPVnPo8.81605/c2310d6ede1a5e220f">
+  <img src="/file/811140746/2/CzMyJPVnPo8.81605/c2310d6ede1a5e220f" alt="MTProto 2.0, Part I. Cloud chats (server-client encryption)" class="dev_page_image" style="width: 600px" />
+</a></div>
+
+<h6><a class="anchor" name="note-1" href="#note-1"><i class="anchor-icon"></i></a><strong>Note 1</strong></h6>
+<p>Each plaintext message to be encrypted in MTProto always contains the following data to be checked upon decryption in order to make the system robust against known problems with the components:</p>
+<ul>
+<li>server salt (64-Bit)</li>
+<li>session id</li>
+<li>message sequence number</li>
+<li>message length</li>
+<li>time</li>
+</ul>
+<h6><a class="anchor" name="note-2" href="#note-2"><i class="anchor-icon"></i></a><strong>Note 2</strong></h6>
+<p>See additional comments on our use of <a href="#q-do-you-use-ige-ige-is-broken">IGE</a> and <a href="#q-how-are-mtproto-messages-authenticated">message authentication</a>.</p>
+<h6><a class="anchor" name="note-3" href="#note-3"><i class="anchor-icon"></i></a><strong>Note 3</strong></h6>
+<p>Telegram&#39;s <strong>End-to-end</strong> encrypted Secret Chats are using an additional layer of encryption on top of the described above.</p>
+<h4><a class="anchor" name="q-how-does-end-to-end-encryption-work-in-mtproto" href="#q-how-does-end-to-end-encryption-work-in-mtproto"><i class="anchor-icon"></i></a>Q: How does end-to-end encryption work in MTProto?</h4>
+<p><strong>End-to-end encryption</strong> is used in Telegram <strong>Secret Chats</strong>, as well as voice and video calls. You can read more about it here: <a href="https://core.telegram.org/api/end-to-end">Secret Chats, End-to-End encryption</a>. Here&#39;s a brief overview of the setup:</p>
+<div>
+    <a href="/file/811140633/4/hHw6Zy2DPyQ.109500/cabc10049a7190694f" target="_blank"><img src="/file/811140633/4/hHw6Zy2DPyQ.109500/cabc10049a7190694f" title="End-to-end encryption in MTProto 2.0 (Secret Chats)"  class="dev_page_image" style="width: 600px" /></a>
+</div>
+
+<p>Please see these articles for details:</p>
+<ul>
+<li><a href="https://core.telegram.org/api/end-to-end">Secret Chats, End-to-End encryption</a></li>
+<li><a href="/schema/end-to-end">End-to-End TL Schema</a></li>
+<li><a href="/api/end-to-end/seq_no">Sequence numbers in secret chats</a></li>
+<li><a href="/api/pfs">Perfect Forward Secrecy</a></li>
+<li><a href="/api/end-to-end/voice-calls">End-to-end encrypted Voice Calls</a></li>
+</ul>
+<h4><a class="anchor" name="q-why-are-you-not-using-x-insert-solution" href="#q-why-are-you-not-using-x-insert-solution"><i class="anchor-icon"></i></a>Q: Why are you not using X? (insert solution)</h4>
+<p>While other ways of achieving the same cryptographic goals, undoubtedly, exist, we feel that the present solution is both robust and also sucсeeds at our secondary task of beating unencrypted messengers in terms of delivery time and stability.</p>
+<h4><a class="anchor" name="q-why-are-you-mostly-relying-on-classical-crypto-algorithms" href="#q-why-are-you-mostly-relying-on-classical-crypto-algorithms"><i class="anchor-icon"></i></a>Q: Why are you mostly relying on classical crypto algorithms?</h4>
+<p>We prefer to use well-known algorithms, created in the days when bandwidth and processing power were both a much rarer commodity. This has valuable side-effects for modern-day mobile development and sending large files, provided one takes care of the known drawbacks.</p>
+<p>The weakspots of such algorithms are also well-known, and have been exploited for decades. We use these algorithms in such a combination that, to the best of our knowledge, prevents any known attacks.</p>
+<h4><a class="anchor" name="q-i-39m-a-security-expert-and-i-have-comments-about-your-setup" href="#q-i-39m-a-security-expert-and-i-have-comments-about-your-setup"><i class="anchor-icon"></i></a>Q: I&#39;m a security expert and I have comments about your setup.</h4>
+<p>Any comments on Telegram&#39;s security are welcome at <a href="mailto:security@telegram.org">security@telegram.org</a>. All submissions which result in a change of code or configuration are eligible for bounties, ranging from <strong>$100</strong> to <a href="https://telegram.org/blog/crowdsourcing-a-more-secure-future"><strong>$100,000</strong></a> or more, depending on the severity of the issue.</p>
+<p>Please note that we can not offer bounties for issues that are disclosed to the public before they are addressed.</p>
+<h3><a class="anchor" name="encryption" href="#encryption"><i class="anchor-icon"></i></a>Encryption</h3>
+<h4><a class="anchor" name="q-how-are-mtproto-messages-authenticated" href="#q-how-are-mtproto-messages-authenticated"><i class="anchor-icon"></i></a>Q: How are MTProto messages authenticated?</h4>
+<p>All Telegram apps <a href="https://core.telegram.org/mtproto/security_guidelines#mtproto-encrypted-messages">ensure</a> that <em>msg_key</em> is equal to SHA-256 of a fragment of the <em>auth_key</em> concatenated with the decrypted message (including 12…1024 bytes of random padding). It is important that the plaintext always contains message length, server salt, <em>session_id</em> and <a href="#note-1">other data</a> not known to the attacker.</p>
+<p>It is crucial that AES decryption keys depend both on <em>msg_key</em>, and on <em>auth_key</em>, known only to the parties involved in the exchange.</p>
+<h4><a class="anchor" name="q-are-you-doing-encrypt-then-mac-mac-then-encrypt-or-mac-and-enc" href="#q-are-you-doing-encrypt-then-mac-mac-then-encrypt-or-mac-and-enc"><i class="anchor-icon"></i></a>Q: Are you doing Encrypt-then-MAC, MAC-then-Encrypt or MAC-and-Encrypt?</h4>
+<p>We do none of the above, strictly speaking. For message authentication, we compute SHA-256(auth_key_fragment + AES_decrypt(…,encrypted_message)) upon message receipt and compare this value to the <em>msg_key</em> received with the encrypted message.</p>
+<blockquote>
+<p>See also: <a href="#q-why-don-39t-you-go-for-a-standard-encrypt-then-mac-approach">Why not Encrypt-then-MAC?</a></p>
+</blockquote>
+<h4><a class="anchor" name="q-why-don-39t-you-go-for-a-standard-encrypt-then-mac-approach" href="#q-why-don-39t-you-go-for-a-standard-encrypt-then-mac-approach"><i class="anchor-icon"></i></a>Q: Why don&#39;t you go for a standard encrypt-then-MAC approach?</h4>
+<p>Using encrypt-then-MAC, e.g. involving GCM (Galois Counter Mode), would enable the receiving party to detect unauthorized or modified ciphertexts, thus eliminating the need to decrypt them in case of tampering.</p>
+<p>In MTProto, the clients and the server authenticate messages by <a href="https://core.telegram.org/mtproto/security_guidelines#mtproto-encrypted-messages">ensuring</a> that SHA-256(auth_key_fragment + plaintext + padding) = msg_key and that the plaintext always contains message length, server salt, session_id and <a href="#note-1">other data</a> not known to a potential attacker before accepting any message. These <a href="https://core.telegram.org/mtproto/security_guidelines#mtproto-encrypted-messages">security checks</a> performed on the client before any message is accepted ensure that invalid or tampered with messages will always be safely (and silently) discarded.</p>
+<p>This way we arrive at the same result. The difference is that the security check is performed before decryption in Encrypt-then-MAC and after decryption in MTProto – but in either case before a message is accepted. AES encryption / decryption on devices currently in use is comparable in speed with the additional HMAC computation required for the encrypt-then-MAC approach.</p>
+<h4><a class="anchor" name="q-do-you-still-use-sha-1" href="#q-do-you-still-use-sha-1"><i class="anchor-icon"></i></a>Q: Do you still use SHA-1?</h4>
+<p>The current version of the protocol is using <strong>SHA-256</strong>. MTProto 1.0 used to rely on SHA-1 (<a href="/techfaq/mtproto_v1#q-why-did-you-use-sha-1-sha-1-is-broken">see this FAQ</a> for details).</p>
+<p>In MTProto 2.0, SHA-1 is used only where the choice of hash function is irrelevant for security, e.g.:</p>
+<ul>
+<li>When <a href="/mtproto/auth_key">generating new keys</a></li>
+<li>For <a href="/mtproto/description#key-identifier-auth-key-id">computing</a> 64-bit <em>auth_key_id</em> from <em>auth_key</em></li>
+<li>For computing the 64-bit <em>key_fingerprint</em> in secret chat used for sanity checks (these are <strong>not</strong> the key visualizations – they use a different algorithm, see <a href="/techfaq#hash-collisions-for-diffie-hellman-keys">Hash Collisions for Diffie-Hellman keys</a>)</li>
+</ul>
+<h4><a class="anchor" name="q-do-you-use-ige-ige-is-broken" href="#q-do-you-use-ige-ige-is-broken"><i class="anchor-icon"></i></a>Q: Do you use IGE? IGE is broken!</h4>
+<p>Yes, we use IGE, but it is not broken in our implementation. The fact that we do not use IGE as MAC together with other properties of our system makes the known attacks on IGE irrelevant.</p>
+<p>IGE, just as the ubiquitous CBC, is vulnerable to <a href="http://eprint.iacr.org/2006/271.pdf">blockwise-adaptive CPA</a>. But adaptive attacks are only a threat for as long as the same key can be used in several messages (not so in <a href="#q-are-you-doing-encrypt-then-mac-mac-then-encrypt-or-mac-and-enc">MTProto</a>).</p>
+<p>Adaptive attacks are even theoretically impossible in MTProto, because in order to be encrypted the message must be fully formed first, since the key is dependent on the message content. As for non-adaptive CPA, IGE is secure against them, as is CBC.</p>
+<h3><a class="anchor" name="authentication" href="#authentication"><i class="anchor-icon"></i></a>Authentication</h3>
+<h4><a class="anchor" name="q-how-is-the-server-authenticated-during-dh-key-exchange" href="#q-how-is-the-server-authenticated-during-dh-key-exchange"><i class="anchor-icon"></i></a>Q: How is the server authenticated during DH key exchange?</h4>
+<p>The DH exchange is <a href="https://core.telegram.org/mtproto/auth_key#dh-exchange-initiation">authenticated</a> with the server&#39;s public RSA-key that is built into the client (the same RSA-key is also used for protection against <a href="https://core.telegram.org/techfaq#man-in-the-middle-attacks">MitM attacks</a>).</p>
+<h4><a class="anchor" name="q-how-are-clients-authenticated" href="#q-how-are-clients-authenticated"><i class="anchor-icon"></i></a>Q: How are clients authenticated?</h4>
+<p>Various secrets (nonce, server_nonce, new_nonce) exchanged during <a href="https://core.telegram.org/mtproto/auth_key#dh-exchange-initiation">key generation</a> guarantee that the DH-key can only be obtained by the instance that initiated the exchange.</p>
+<p>Notice that new_nonce is transferred explicitly only once, inside an RSA-encrypted message from the client to the server.</p>
+<h4><a class="anchor" name="q-how-are-secret-chats-authenticated" href="#q-how-are-secret-chats-authenticated"><i class="anchor-icon"></i></a>Q: How are Secret Chats authenticated?</h4>
+<p>Keys for <a href="https://core.telegram.org/api/end-to-end">end-to-end encrypted secret chats</a> are generated by a new instance of DH key exchange, so they are known only to the parties involved and not to the server. To establish the identities of these parties and to ensure that no MitM is in place, it is recommended to compare identicons, generated from hashes of the DH secret chat keys (key visualizations).</p>
+<h4><a class="anchor" name="q-how-are-voice-calls-authenticated" href="#q-how-are-voice-calls-authenticated"><i class="anchor-icon"></i></a>Q: How are Voice Calls authenticated?</h4>
+<p>Keys for <a href="https://core.telegram.org/api/end-to-end/voice-calls">end-to-end encrypted calls</a> are generated using the Diffie-Hellman key exchange. Users who are on a call can ensure that there is no MitM by comparing key visualizations.</p>
+<p>To make key verification practical in the context of a voice call, Telegram uses a three-message modification of the standard DH key exchange for calls:</p>
+<ul>
+<li>A-&gt;B : (generates a and) sends g_a_hash := hash(g^a)</li>
+<li>B-&gt;A : (stores g_a_hash, generates b and) sends g_b := g^b</li>
+<li>A-&gt;B : (computes key (g_b)<sup>a, then) sends g_a := g</sup>a</li>
+<li>B : checks hash(g_a) == g_a_hash, then computes key (g_a)^b</li>
+</ul>
+<p>The idea is that Alice commits to a specific value of <em>a</em> (and of <em>g_a</em>), but does not reveal <em>g_a</em> to Bob (or Eve) until the very last step. Bob has to choose his value of <em>b</em> and <em>g_b</em> without knowing the true value of <em>g_a</em>. If Eve is performing a Man-in-the-Middle attack, she cannot change <em>a</em> depending on the value of <em>g_b</em> received from Bob and she also can&#39;t tune her value of <em>b</em> depending on <em>g_a</em>. As a result, Eve only gets <strong>one</strong> shot at injecting her parameters — and she must fire this shot with her eyes closed.</p>
+<p>Thanks to this modification, it becomes possible to prevent eavesdropping (MitM attacks on DH) with a probability of more than 0.9999999999 by using just over 33 bits of entropy in the visualization. These bits are presented to the users in the form of four emoticons. We have selected a pool of 333 emoji that all look quite different from one another and can be easily described in simple words in any language.</p>
+<p>You can read more about key verification for Telegram calls <a href="https://core.telegram.org/api/end-to-end/voice-calls#key-verification">here</a>.</p>
+<h4><a class="anchor" name="q-do-you-have-forward-secrecy" href="#q-do-you-have-forward-secrecy"><i class="anchor-icon"></i></a>Q: Do you have Forward Secrecy?</h4>
+<p>Telegram&#39;s Secret chats support Perfect Forward Secrecy, you can read more about it <a href="/api/end-to-end/pfs">here</a>.</p>
+<h3><a class="anchor" name="protection-against-known-attacks" href="#protection-against-known-attacks"><i class="anchor-icon"></i></a>Protection against known attacks</h3>
+<h4><a class="anchor" name="known-plaintext-attacks" href="#known-plaintext-attacks"><i class="anchor-icon"></i></a>Known-Plaintext Attacks</h4>
+<p>By definition, the known-plaintext attack (KPA) is an attack model for cryptanalysis where the attacker has samples of both the plaintext, and its encrypted version (ciphertext).</p>
+<p>AES IGE that is used in MTProto is robust against KPA attacks (<a href="http://core.telegram.org/techfaq#q-do-you-use-ige-ige-is-broken">see this, if you wonder how one can securely use IGE</a>). On top of that, the plaintext in MTProto always contains server_salt and session id.</p>
+<h4><a class="anchor" name="chosen-plaintext-attacks" href="#chosen-plaintext-attacks"><i class="anchor-icon"></i></a>Chosen-Plaintext Attacks</h4>
+<p>By definition, a chosen-plaintext attack (CPA) is an attack model for cryptanalysis which presumes that the attacker has the capability to choose arbitrary plaintexts to be encrypted and obtain the corresponding ciphertexts.</p>
+<p>MTProto uses AES in IGE mode (<a href="http://core.telegram.org/techfaq#q-do-you-use-ige-ige-is-broken">see this, if you wonder how one can securely use IGE</a>) that is <a href="http://eprint.iacr.org/2006/271.pdf">secure against non-adaptive CPAs</a>. IGE is known to be not secure against blockwise-adaptive CPA, but MTProto fixes this in the following manner:</p>
+<p>Each plaintext message to be encrypted always contains the following to be checked upon decryption:</p>
+<ul>
+<li>server salt (64-Bit)</li>
+<li>message sequence number</li>
+<li>time</li>
+</ul>
+<p>On top of this, in order to replace the plaintext, you would also need to use the right AES key and iv, both dependent on the auth_key. This makes MTProto robust against a CPA.</p>
+<h4><a class="anchor" name="chosen-ciphertext-attacks" href="#chosen-ciphertext-attacks"><i class="anchor-icon"></i></a>Chosen-Ciphertext Attacks</h4>
+<p>By definition, a chosen-ciphertext attack (CCA) is an attack model for cryptanalysis in which the cryptanalyst gathers information, at least in part, by choosing a ciphertext and obtaining its decryption under an unknown key. In the attack, an adversary has a chance to enter one or more known ciphertexts into the system and obtain the resulting plaintexts. From these pieces of information the adversary can attempt to recover the hidden secret key used for decryption.</p>
+<p>Each time a message is decrypted in MTProto, a check is performed to see whether <em>msg_key</em> is equal to the SHA-256 of a fragment of the <em>auth_key</em> concatenated with the decrypted message (including 12…1024 bytes of random padding). The plaintext (decrypted data) also always contains message length, server salt and sequence number. This negates known CCAs.</p>
+<h4><a class="anchor" name="what-about-ind-cca" href="#what-about-ind-cca"><i class="anchor-icon"></i></a>What about IND-CCA?</h4>
+<p>MTProto 2.0 satisfies the conditions for indistinguishability under chosen ciphertext attack (IND-CCA).</p>
+<blockquote>
+<p><a href="/techfaq/mtproto_v1#what-about-ind-cca">Read more about IND-CCA in MTProto 1.0</a></p>
+</blockquote>
+<h4><a class="anchor" name="replay-attacks" href="#replay-attacks"><i class="anchor-icon"></i></a>Replay attacks</h4>
+<p>Replay attacks are denied because each plaintext to be encrypted contains the server salt and the unique <a href="/mtproto/description#message-identifier-msg-id">message id</a> and sequence number.</p>
+<p>This means that each message can only be sent once.</p>
+<h4><a class="anchor" name="man-in-the-middle-attacks" href="#man-in-the-middle-attacks"><i class="anchor-icon"></i></a>Man-in-the-middle attacks</h4>
+<p>Telegram has two modes of communication — ordinary chats using client-server encryption and <a href="/api/end-to-end">Secret Chats using end-to-end encryption</a>.</p>
+<p>Client-Server communication is protected from MiTM-attacks during DH key generation by means of a server RSA public key embedded into client software. After that, if both clients trust the server software, the Secret Chats between them are protected by the server from MiTM attacks.</p>
+<p>The interface offers a way of comparing Secret Chat keys for users who do <strong>not</strong> trust the server. Visualizations of the key are presented in the form of identicons (<a href="http://telegram.org/img/key_image.jpg">example here</a>). By comparing key visualizations users can make sure no MITM attack had taken place.</p>
+<h4><a class="anchor" name="hash-collisions-for-diffie-hellman-keys" href="#hash-collisions-for-diffie-hellman-keys"><i class="anchor-icon"></i></a>Hash collisions for Diffie-Hellman Keys</h4>
+<p>Currently, the fingerprint uses 128-bits of SHA-1 concatenated with 160 bits from the SHA-256 of the key, yielding a total of 288 fingerprint bits, thus negating the possibility of hash-collision attacks.</p>
+<blockquote>
+<p><a href="/techfaq/mtproto_v1#hash-collisions-for-diffie-hellman-keys">Read more about fingerprints in earlier versions of Telegram</a></p>
+</blockquote>
+<h4><a class="anchor" name="length-extension-attacks" href="#length-extension-attacks"><i class="anchor-icon"></i></a>Length extension attacks</h4>
+<p>By definition, length extension attacks are a type of attack when certain types of hashes are misused as message authentication codes, allowing for inclusion of extra information.</p>
+<p>A message in MTProto consists of an <em>msg_key</em>, equal to the SHA-256 of a fragment of the <em>auth_key</em> concatenated with the plaintext (including 12…1024 bytes of random padding and <a href="#note-1">some additional parameters</a>), followed by the ciphertext. The attacker cannot append extra bytes to the end and recompute the SHA-256, since the SHA-256 is computed from the plaintext, not the ciphertext, and the attacker has no way to obtain the ciphertext corresponding to the extra plaintext bytes she may want to add. </p>
+<p>Apart from that, changing the <em>msg_key</em> would also change the AES decryption key for the message in a way unpredictable for the attacker, so even the original prefix would decrypt to garbage — which would be immediately detected since the app performs a <a href="/mtproto/security_guidelines">security check</a> to ensure that the SHA-256 of the plaintext (combined with a fragment of the <em>auth_key</em>) matches the <em>msg_key</em> received.</p>
+<h3><a class="anchor" name="encrypted-cdns" href="#encrypted-cdns"><i class="anchor-icon"></i></a>Encrypted CDNs</h3>
+<p>As of Telegram 4.2, we support encrypted CDNs for caching media from public channels with over 100.000 members. The CDN caching nodes are located in regions with significant Telegram traffic where we wouldn&#39;t want to place Telegram servers for various reasons.</p>
+<blockquote>
+<p>For technical details of the implementation, encryption and verification of data, <a href="https://core.telegram.org/cdn">see the CDN manual</a>.</p>
+</blockquote>
+<p>See <a href="https://core.telegram.org/cdn/faq_ir">this document</a> for a Persian version of this FAQ.<br><a href="https://core.telegram.org/cdn/faq_ir">بخش فارسی</a></p>
+<h4><a class="anchor" name="q-why-did-you-decide-to-use-cdns" href="#q-why-did-you-decide-to-use-cdns"><i class="anchor-icon"></i></a>Q: Why did you decide to use CDNs?</h4>
+<p>We use our own distributed servers to speed up downloads in regions where freedom of speech is guaranteed — and even there <a href="https://telegram.org/faq#q-do-you-process-data-requests">we don&#39;t take this for granted</a>. But when Telegram becomes immensely popular in other areas, we can only rely on CDNs which we treat rather like ISPs from the technical standpoint in that they only get encrypted data they can&#39;t decipher.</p>
+<p>Thanks to this technology, the download speed for public photos and videos can become significantly higher in regions like Turkey, Indonesia, South America, India, Iran or Iraq without the slightest compromise in security.</p>
+<h4><a class="anchor" name="q-can-the-cdn-decipher-the-files" href="#q-can-the-cdn-decipher-the-files"><i class="anchor-icon"></i></a>Q: Can the CDN decipher the files?</h4>
+<p>No. Each file that is to be sent to the CDN is encrypted with a unique key using AES-256-CTR encryption. The CDN can&#39;t access the data it stores because these keys are only accessible to the main MTProto server and to the authorized client.</p>
+<h4><a class="anchor" name="q-can-the-cdn-substitute-the-data-with-their-own-version" href="#q-can-the-cdn-substitute-the-data-with-their-own-version"><i class="anchor-icon"></i></a>Q: Can the CDN substitute the data with their own version?</h4>
+<p>No. Data downloaded from CDN caching nodes is always verified by the receiving Telegram app by way of a hash: attackers won’t be able to replace any files with their own versions.</p>
+<h4><a class="anchor" name="q-can-the-cdn-delete-any-files" href="#q-can-the-cdn-delete-any-files"><i class="anchor-icon"></i></a>Q: Can the CDN delete any files?</h4>
+<p>No. CDN nodes only cache encrypted <em>copies</em> of files, originals are stored on the Telegram servers. The user is notified about receiving the file by the Telegram server. If the CDN caching node doesn&#39;t give the file to the user, the user will receive the file from the Telegram server directly.</p>
+<h4><a class="anchor" name="q-can-cdns-be-used-for-censorship" href="#q-can-cdns-be-used-for-censorship"><i class="anchor-icon"></i></a>Q: Can CDNs be used for censorship?</h4>
+<p>No. All original files are stored on the Telegram servers. The CDNs only get encrypted data — and they can&#39;t decipher it. They can&#39;t substitute any data. And in case of any problems with the CDN, the file will be simply delivered to the users directly from the Telegram servers. Users will always get their data, nobody can stop this.</p>
+<h4><a class="anchor" name="q-can-i-verify-this" href="#q-can-i-verify-this"><i class="anchor-icon"></i></a>Q: Can I verify this?</h4>
+<p>Yes. Anyone can verify our CDN implementation by checking the <a href="https://telegram.org/apps#source-code">source code</a> of Telegram apps and inspecting traffic.</p>
+<h4><a class="anchor" name="q-does-this-affect-private-data" href="#q-does-this-affect-private-data"><i class="anchor-icon"></i></a>Q: Does this affect private data?</h4>
+<p>No. The CDN caching nodes are not a part of the Telegram cloud. CDN caching nodes are used only for caching popular public media from massive channels. Private data never goes there.</p>
+<h4><a class="anchor" name="q-is-this-connected-with-government-requests-to-move-private-dat" href="#q-is-this-connected-with-government-requests-to-move-private-dat"><i class="anchor-icon"></i></a>Q: Is this connected with government requests to move private data to their territory?</h4>
+<p>No. We haven&#39;t entered in any agreements with any government regarding the CDNs and the CDNs are not part of any deal. The only purpose of CDNs is to securely improve connectivity in high demand regions where Telegram can&#39;t place its servers.</p>
+<h4><a class="anchor" name="q-does-this-give-some-countries-any-influence-over-telegram" href="#q-does-this-give-some-countries-any-influence-over-telegram"><i class="anchor-icon"></i></a>Q: Does this give some countries any influence over Telegram?</h4>
+<p>No. We have taken special precautions to make sure that no country gains any leverage over Telegram by way of the CDN caching nodes:</p>
+<ul>
+<li>The CDNs do not belong to Telegram – all the risks are on a third-party company that supplies us with CDN nodes around the world.</li>
+<li>We did not invest anything in these CDNs and will only be paying for traffic that is used to pass cached items from our main clusters and to the end users.</li>
+</ul>
+<p>As the result, if any country decides to mess with the CDN in their region, they gain nothing except for reducing connectivity for their own citizens – and Telegram loses nothing of value.</p>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/blog">Blog</a></li>
+        <li><a href="//telegram.org/jobs">Jobs</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/dl/android">Android</a></li>
+        <li><a href="//telegram.org/dl/wp">Windows Phone</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)">Twitter</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?42"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

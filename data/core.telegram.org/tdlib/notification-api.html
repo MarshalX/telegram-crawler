@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Notification API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="This article describes the TDLib Notification API introduced in TDLib 1.4.0.
+Notification API overview
+TDLib takes care…">
+    <meta property="og:title" content="Notification API">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="This article describes the TDLib Notification API introduced in TDLib 1.4.0.
+Notification API overview
+TDLib takes care…">
+    <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
+
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?215" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"></div>
+  <h1 id="dev_page_title">Notification API</h1>
+  
+  <div id="dev_page_content"><p>This article describes the <a href="https://core.telegram.org/tdlib">TDLib</a> Notification API introduced in TDLib 1.4.0.</p>
+<h4><a class="anchor" name="notification-api-overview" href="#notification-api-overview"><i class="anchor-icon"></i></a>Notification API overview</h4>
+<p>TDLib takes care of everything that is related to handling notifications (as usually, except for how exactly the notifications will be shown to the user). TDLib controls when notifications are shown to the user, when they are edited and removed, guarantees consistency of notifications with the database state and persistence of active notifications between client restarts.</p>
+<p>All notifications shown to the user are combined into notification groups. For example, notifications about ordinary messages from the one chat belong to one notification group. This grouping is done automatically by TDLib based on message content and the user&#39;s notification settings. Currently, there are 4 different notification group types:</p>
+<ul>
+<li><code>Messages</code> notification groups contain notifications with ordinary unread messages from a chat.</li>
+<li><code>Mentions</code> notification groups contain notifications with unread mentions of the current user, replies to their messages, and notifications about pinned messages in a chat.</li>
+<li><code>SecretChat</code> notification groups contain a single notification about creating a new secret chat.</li>
+<li><code>Calls</code> notification groups contain notifications about received calls in a chat.</li>
+</ul>
+<p>TDLib ensures that the number of notification groups shown to the user any given moment is limited by the value of the <code>notification_group_count_max</code> option and that the number of active notifications, shown to the user in a notification group at any given time, is limited by the value of the <code>notification_group_size_max</code> option. Whenever the number of notification groups with active notifications exceeds <code>notification_group_count_max</code>, TDLib sends an update hiding all notifications from the oldest group. If subsequently all notifications are hidden in some other group, that first group can be silently brought back by an update from TDLib. Similarly, whenever the number of active notifications in a group exceeds <code>notification_group_size_max</code>, TDLib sends an update hiding the oldest notifications in the group. If subsequently some newer notifications are removed from the group, older notifications can be silently brought back by an update from TDLib.</p>
+<p>To enable the TDLib Notificaition API you need to set option <code>notification_group_count_max</code> to a positive value, to disable the Notification API you can change the option value back to 0 or set the option value to empty.</p>
+<p>Every notification group has a unique ID, which is a persistent small integer number, assigned consequently from 1. The client should not assume that the group‘s type and other fields are fixed, because TDLib may reuse the notification group ID whenever it’s known that the group will never be used again in the future. Every notification belongs to a notification group and has a globally unique ID, which is a persistent small integer number, assigned consequently from 1. Notification IDs are never reused and can be used together with their notification group ID to uniquely identify a notification. Within a notification group, notifications must be shown in the order defined by their IDs. If notification grouping isn&#39;t available in your operating system, the existence of notification groups can be safely ignored and notifications can be handled separately just by their unique ID.</p>
+<p>Currently, there are 4 different kinds of notifications:</p>
+<ul>
+<li><code>NewMessage</code> notifications contain the full information about a new incoming message received from the server. They may be located in Messages and Mentions notification groups.</li>
+<li><code>NewPushMessage</code> notifications contain information about a new incoming message received in a push notification. They contain only partial data about the message and will be replaced by NewMessage notifications as soon as the client downloads the necessary data. They may be located in Messages and Mentions notification groups.</li>
+<li><code>NewSecretChat</code> notifications inform about creating a new secret chat. Only one will be located in each SecretChat notification group. The group may be reused as soon as the notification is removed.</li>
+<li><code>NewCall</code> notifications contain information about a new incoming call. They are located in a Calls notification group. The group may be reused as soon as the notifications are removed.</li>
+</ul>
+<p>Messages from new push message notifications will not be shown in the chat message list, but their message identifiers are known and they can be replied to and used in <code>ViewMessages</code> calls anyway. </p>
+<h4><a class="anchor" name="handling-notification-api-updates" href="#handling-notification-api-updates"><i class="anchor-icon"></i></a>Handling Notification API updates</h4>
+<p>Notification API introduced 4 new updates from TDLib, namely <code>updateActiveNotifications</code>, <code>updateNotificationGroup</code>, <code>updateNotification</code> and <code>updateHavePendingNotifications</code>.</p>
+<p>If Notification API is enabled, the client receives an <code>updateActiveNotifications</code> update on startup, containing all notifications that are to be shown to the user. The client needs to synchronize the list of notifications that is shown to the user with the list received in <code>updateActiveNotifications</code> and save information about all active notifications in memory, because subsequent updates will contain only changes to the list of active notifications.</p>
+<p>Whenever a notification is added to a group or is removed from a group, TDLib sends an <code>updateNotificationGroup</code> update to the client. Aside from the list of added notifications and list of identifiers of removed notifications, the update contains full information about the new type of the notification group, the identifier of the chat to which all notifications in the group now belong, the identifier of the chat the notification settings of which must be used to show the notification, a flag determining whether the notification must be shown with or without sound and the new total count of unread notifications in the group. Be aware that the total count of unread notifications in a group can be higher than the number of active notifications. Also note that some old notifications can be added through <code>updateNotificationGroup</code> when newer notifications are removed, so the client must ensure the correct notification order based on notification identifiers. Whenever possible, <code>updateNotificationGroup</code> updates for a group are combined into a single update, so the client can apply the changes together. TDLib also controls the delay before notifications are shown to the user in order to give them a chance to read the messages from a different device before the notification is shown, therefore the updates should be processed on the client side immediately without any additional delays.</p>
+<p>Whenever an active notification is changed, TDLib sends an <code>updateNotification</code> update to the client. The update contains new content of the notification. The client should be ready to handle the change of notification type, for example, from <code>NewPushMessage</code> to <code>NewMessage</code>.</p>
+<p>Whenever there are some received but delayed notifications or there can be some yet unreceived notifications because of unavailable network connection to the Telegram servers, TDLib informs the client about that via <code>updateHavePendingNotifications</code> update. Client is supposed to keep the application running in order to receive all delayed notifications. If there is no possibility to keep the application running, the client can close the TDLib instance in order to immediately receive all delayed notification updates.</p>
+<p>TDLib tries to ensure that whenever a notification about a pinned message is sent, the pinned message is already available locally in the memory, so the client can use a new request <code>getMessageLocally</code> to get the pinned message. Also, <code>updateNotification</code> will be sent whenever pinned message is changed, despite that the notification itself wasn&#39;t changed.</p>
+<h4><a class="anchor" name="customizing-the-notification-api" href="#customizing-the-notification-api"><i class="anchor-icon"></i></a>Customizing the Notification API</h4>
+<p>The client controls the maximum number of active notification groups by using the option <code>notification_group_count_max</code>. This option&#39;s value defaults to 0, i.e. there are no active notification groups and the Notification API is effectively disabled. Any integer value between 0 and 25 can be used as the value of the option. Values above 25 are not allowed because most operating systems will not show so many notification groups anyway.</p>
+<p>The client also controls the maximum number of active notifications in a group by using the option <code>notification_group_size_max</code>. This option&#39;s value defaults to 10 and can be set to any integer value between 1 and 25. Values above 25 are not allowed, because most operating systems will not show so many notifications in a group anyway.</p>
+<p>The user may choose to show pinned messages or mentions among ordinary messages in the <code>Messages</code> notification group instead of the <code>Mentions</code> notification group and choose to not apply notification settings from the sender&#39;s private chat to them. This can be done on a per chat basis or for the whole chats notification scope via the new options <code>disable_pinned_message_notifications</code> and <code>disable_mention_notifications</code> which were added to <code>chatNotificationSettings</code> and <code>scopeNotificationSettings</code> classes.</p>
+<h4><a class="anchor" name="handling-push-notifications" href="#handling-push-notifications"><i class="anchor-icon"></i></a>Handling push notifications</h4>
+<p>In order to support multiple accounts in one app, the method <code>registerDevice</code> now returns a globally unique identifier of the push notification subscription. This identifier can be used to match a push notification with the corresponding account and process the notification only by the account for which the notification was sent.</p>
+<p>Whenever a push notification is received, the client needs to call the synchronous method <code>getPushReceiverId</code> with the payload of the push notification. The method will return a globally unique identifier of the push notification subscription (aka push receiver ID), which can be used to find the TDLib instance which needs to be launched and used to process the push notification. If the method returns 0 as a push receiver ID, then the push notification should be processed by all clients (this usually happens when there is only one client).</p>
+<p>To process a notification, the method <code>processPushNotification</code> needs to be called in the TDLib instance (or instances) found by push receiver ID. This method can be called before authorization and its execution will be automatically postponed until TDLib initialization. The method returns the result only after all updates caused by the push notification have been sent and the TDLib instance can be safely closed. If the method returns an error with the code 406, then the push notification is known to be unsupported and connection to the server is required to fetch new data. If any other error is returned, an error occurred while processing the push notification, i.e. the notification payload has failed to decrypt or parse. In that case, connection to the server isn&#39;t required, but there can be new notifications there. After a successful response from <code>processPushNotification</code> the TDLib instance can be immediately closed in order to reduce battery usage. Alternatively, the client can wait for an <code>updateHavePendingNotifications</code> update telling that there are no more delayed or unreceived notifications.</p>
+<p>Android and iOS clients can opt-in to receive end-to-end encrypted push notifications via a Firebase Cloud Messaging or Apple Push Notification service VoIP notifications while subscribing to push notifications through <code>registerDevice</code> method. In case of Firebase Cloud Messaging, if end-to-end encrypted push notifications are disabled, push notifications are sent without content, so there no notifications of the type <code>NewPushMessage</code> will be created, the client will always need to connect to Telegram servers to download new messages whenever a push notification is received.</p>
+<p>Examples of push notification payloads, which are accepted by TDLib:</p>
+<pre><code>{
+  &quot;date&quot;: 1234567890,
+  &quot;data&quot;: {
+    &quot;custom&quot;: {
+      &quot;msg_id&quot;: &quot;1234567&quot;,
+      &quot;from_id&quot;: &quot;12345678&quot;,
+      &quot;mtpeer&quot;: {
+        &quot;ah&quot;: &quot;-1234567&quot;,
+        &quot;ph&quot;: {
+          &quot;volume_id&quot;: &quot;987654321&quot;,
+          &quot;local_id&quot;: &quot;98765&quot;,
+          &quot;secret&quot;: &quot;998877665544332211&quot;,
+          &quot;file_reference&quot;: &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;,
+          &quot;dc_id&quot;: 6,
+          &quot;_&quot;: &quot;fileLocation&quot;
+        }
+      }
+    },
+    &quot;badge&quot;: &quot;239&quot;,
+    &quot;loc_key&quot;: &quot;MESSAGE_TEXT&quot;,
+    &quot;loc_args&quot;: [
+      &quot;First name Last name&quot;,
+      &quot;qwerty&quot;
+    ],
+    &quot;line1&quot;: &quot;First name Last name&quot;,
+    &quot;line2&quot;: &quot;qwerty&quot;,
+    &quot;random_id&quot;: 728931540,
+    &quot;text&quot;: &quot;First name Last name: qwerty&quot;,
+    &quot;system&quot;: &quot;Windows 10.0.20573.1&quot;
+  }
+}
+{
+  &quot;google.sent_time&quot;: 1234567890123,
+  &quot;p&quot;: &quot;jdTXkJnEMUTK6R82AB-55bLA3U_RB-2K-CLDz7mWp7ckjMIfnCoHEcm710SkN&quot;
+}
+{
+  &quot;date&quot;: 1234567890,
+  &quot;loc_key&quot;: &quot;CHAT_MESSAGE_TEXT&quot;,
+  &quot;loc_args&quot;: [
+    &quot;First name Last name&quot;,
+    &quot;Chat title&quot;,
+    &quot;qwerty&quot;
+  ],
+  &quot;custom&quot;: {
+    &quot;msg_id&quot;: &quot;1234567&quot;,
+    &quot;channel_id&quot;: &quot;56781234&quot;,
+    &quot;chat_from_id&quot;: &quot;12345678&quot;,
+    &quot;mention&quot;: &quot;1&quot;
+  },
+  &quot;badge&quot;: &quot;239&quot;
+}</code></pre>
+<h4><a class="anchor" name="users-removing-active-notifications" href="#users-removing-active-notifications"><i class="anchor-icon"></i></a>Users removing active notifications</h4>
+<p>There are two methods for removing notifications from the list of active notifications when they are hidden by the user. If the user removes a single notification, it can be removed by calling the method <code>removeNotification</code>. If the user dismisses the whole notification group, this can be achieved using the method <code>removeNotificationGroup</code>. Removed notifications will never return to the list of active notifications, but can be still counted in the total count of unread notifications of the group.</p>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/blog">Blog</a></li>
+        <li><a href="//telegram.org/jobs">Jobs</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/dl/android">Android</a></li>
+        <li><a href="//telegram.org/dl/wp">Windows Phone</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)">Twitter</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?42"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
