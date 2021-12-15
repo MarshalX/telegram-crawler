@@ -75,6 +75,60 @@ mark.label span.hidden {
   letter-spacing: 12em;
   pointer-events: none;
 }
+span.tg-spoiler {
+  --bg-transition: .1s ease;
+  --anim: .6s .1s ease;
+  padding: 1px 0;
+  border-radius: 1px;
+}
+.spoilers_animate span.tg-spoiler {
+  animation: blurred var(--anim);
+  transition: color var(--anim), background var(--bg-transition);
+}
+.spoilers_hidden span.tg-spoiler {
+  background: #ddd;
+  color: transparent;
+  cursor: pointer;
+}
+.widget_frame_base .spoilers_animate span.tg-spoiler a {
+  transition: color var(--anim);
+}
+span.tg-spoiler .emoji {
+  position: relative;
+  background-position: -1000px -1000px;
+}
+span.tg-spoiler .emoji:before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  background-position: 2px 50%;
+  background-position-y: calc(50% - 1px);
+  opacity: 1;
+}
+.widget_frame_base .spoilers_hidden span.tg-spoiler a {
+  color: transparent;
+  pointer-events: none;
+}
+.emoji_image .spoilers_animate span.tg-spoiler .emoji:before {
+  transition: opacity var(--anim);
+}
+.emoji_image .spoilers_hidden span.tg-spoiler .emoji:before {
+  opacity: 0;
+}
+@-webkit-keyframes blurred {
+  from { filter: blur(2px); }
+  to   { filter: blur(0); }
+}
+@keyframes blurred {
+  from { filter: blur(2px); }
+  to   { filter: blur(0); }
+}
+
 .flex_ellipsis,
 .inline_flex_ellipsis {
   position: relative;

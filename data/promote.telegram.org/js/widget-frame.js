@@ -1284,6 +1284,13 @@ function checkFrameSize() {
           }
         }
       }, postEl);
+      gec('.js-message_text', function() {
+        var spoilers = ge('span.tg-spoiler', this);
+        if (spoilers.length) {
+          addClass(this, 'spoilers_hidden');
+          addEvent(spoilers, 'click', TPost.eSpoilerShow);
+        }
+      }, postEl);
       gec('.js-message_footer.compact', function() {
         var timeEl = ge1('time[datetime]', this)
           , textEl = this.previousElementSibling;
@@ -1357,6 +1364,18 @@ function checkFrameSize() {
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.send(null);
       }
+    },
+    eSpoilerShow: function(e) {
+      var text_el = gpeByClass(this, 'js-message_text');
+      if (!text_el) {
+        return false;
+      }
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      addClass(text_el, 'spoilers_animate');
+      removeClass(text_el, 'spoilers_hidden');
+      var spoilers = ge('span.tg-spoiler', text_el);
+      removeEvent(spoilers, 'click', TPost.eSpoilerShow);
     }
   };
 
