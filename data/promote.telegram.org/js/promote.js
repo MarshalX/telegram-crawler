@@ -479,7 +479,7 @@ var NewAd = {
         var $excludeField = Aj.state.$form.field('exclude_channels');
         var excludeValueFull = $excludeField.data('valueFull');
         var already_excluded = false;
-        $.each(excludeValueFull, function(val, item) {
+        excludeValueFull && $.each(excludeValueFull, function(val, item) {
           if (item.val == result.exclude_channel.id) {
             already_excluded = true;
           } else if (item._auto) {
@@ -581,7 +581,7 @@ var NewAd = {
     if ($pairedField.data('inited')) {
       var paired_value = $pairedField.data('value');
       var paired_valueFull = $pairedField.data('valueFull');
-      $.each(valueFull, function(val, item) {
+      valueFull && $.each(valueFull, function(val, item) {
         if (paired_valueFull[val]) {
           $pairedField.trigger('deselectval', [val]);
           $pairedField.data('prevval', '');
