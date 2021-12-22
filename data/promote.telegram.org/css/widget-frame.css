@@ -11,9 +11,6 @@ body.widget_frame_base {
 .widget_frame_base a:hover {
   text-decoration: underline;
 }
-.widget_frame_base a:hover * {
-  text-decoration: inherit;
-}
 body.rtl {
   direction: rtl;
 }
@@ -75,23 +72,49 @@ mark.label span.hidden {
   letter-spacing: 12em;
   pointer-events: none;
 }
+
 span.tg-spoiler {
-  --bg-transition: .1s ease;
-  --anim: .6s .1s ease;
   padding: 1px 0;
   border-radius: 1px;
 }
-.spoilers_animate span.tg-spoiler {
-  animation: blurred var(--anim);
-  transition: color var(--anim), background var(--bg-transition);
-}
 .spoilers_hidden span.tg-spoiler {
-  background: #ddd;
-  color: transparent;
+  background: #e3e5e8;
   cursor: pointer;
 }
-.widget_frame_base .spoilers_animate span.tg-spoiler a {
-  transition: color var(--anim);
+.spoilers_hidden span.tg-spoiler-text {
+  color: transparent;
+}
+body.dark .spoilers_hidden span.tg-spoiler {
+  background: #373e4e;
+}
+.spoilers_hidden.decorated-text s,
+.spoilers_hidden.decorated-text u,
+.spoilers_hidden.decorated-text a:hover {
+  text-decoration: none;
+}
+.spoilers_hidden.decorated-text span.tg-spoiler {
+  text-decoration: none !important;
+}
+.spoilers_hidden.decorated-text s span.d-text {
+  text-decoration: line-through;
+}
+.spoilers_hidden.decorated-text u span.d-text {
+  text-decoration: underline;
+}
+.spoilers_hidden.decorated-text s u span.d-text,
+.spoilers_hidden.decorated-text u s span.d-text {
+  text-decoration: underline line-through;
+}
+.widget_frame_base .spoilers_hidden.decorated-text a:hover span.d-text {
+  text-decoration: underline;
+}
+.widget_frame_base .spoilers_hidden.decorated-text a:hover s span.d-text,
+.widget_frame_base .spoilers_hidden.decorated-text s a:hover span.d-text {
+  text-decoration: underline line-through;
+}
+.widget_frame_base .spoilers_hidden span.tg-spoiler a {
+  color: transparent;
+  pointer-events: none;
 }
 span.tg-spoiler .emoji {
   position: relative;
@@ -110,23 +133,66 @@ span.tg-spoiler .emoji:before {
   background-position-y: calc(50% - 1px);
   opacity: 1;
 }
-.widget_frame_base .spoilers_hidden span.tg-spoiler a {
-  color: transparent;
-  pointer-events: none;
-}
-.emoji_image .spoilers_animate span.tg-spoiler .emoji:before {
-  transition: opacity var(--anim);
-}
 .emoji_image .spoilers_hidden span.tg-spoiler .emoji:before {
   opacity: 0;
 }
-@-webkit-keyframes blurred {
-  from { filter: blur(2px); }
-  to   { filter: blur(0); }
-}
-@keyframes blurred {
-  from { filter: blur(2px); }
-  to   { filter: blur(0); }
+
+@supports (--var:1) {
+  span.tg-spoiler {
+    --anim-dur: .45s;
+    --anim: var(--anim-dur) ease;
+    --anim-fn: text-show;
+    --bg-anim-fn: bg-hide;
+    --bg-color: #e3e5e8;
+  }
+  body.dark span.tg-spoiler {
+    --bg-color: #373e4e;
+  }
+  .spoilers_hidden span.tg-spoiler {
+    --anim-fn: text-hide;
+    --bg-anim-fn: bg-show;
+  }
+  .spoilers_animate span.tg-spoiler {
+    animation: var(--bg-anim-fn) var(--anim);
+  }
+  .spoilers_animate span.tg-spoiler-text {
+    animation: var(--anim-fn) var(--anim);
+    transition: color var(--anim);
+  }
+  .widget_frame_base .spoilers_animate span.tg-spoiler a {
+    transition: color var(--anim);
+  }
+  .emoji_image .spoilers_animate span.tg-spoiler .emoji:before {
+    transition: opacity var(--anim);
+  }
+  @keyframes text-show {
+    from { filter: blur(6px); }
+    to   { filter: blur(0); }
+  }
+  @keyframes text-hide {
+    from { filter: blur(0); }
+    to   { filter: blur(3px); }
+  }
+  @keyframes bg-hide {
+    from {
+      background: var(--bg-color);
+      box-shadow: 0 0 var(--bg-color);
+    }
+    to {
+      background: none;
+      box-shadow: 0 0 60px 60px transparent;
+    }
+  }
+  @keyframes bg-show {
+    from {
+      background: none;
+      box-shadow: 0 0 30px 30px transparent;
+    }
+    to {
+      background: var(--bg-color);
+      box-shadow: 0 0 var(--bg-color);
+    }
+  }
 }
 
 .flex_ellipsis,

@@ -434,6 +434,8 @@ function ge(el, context) {
     list = (ge1(context) || document).querySelectorAll(el);
   } else if (el instanceof Node || el instanceof Window) {
     list = [el];
+  } else if (el instanceof NodeList) {
+    list = el;
   } else if (Array.isArray(el)) {
     list = el;
   } else if (el) {
@@ -1285,11 +1287,7 @@ function checkFrameSize() {
         }
       }, postEl);
       gec('.js-message_text', function() {
-        var spoilers = ge('span.tg-spoiler', this);
-        if (spoilers.length) {
-          addClass(this, 'spoilers_hidden');
-          addEvent(spoilers, 'click', TPost.eSpoilerShow);
-        }
+        TPost.initSpoilers(this);
       }, postEl);
       gec('.js-message_footer.compact', function() {
         var timeEl = ge1('time[datetime]', this)
@@ -1365,17 +1363,60 @@ function checkFrameSize() {
         xhr.send(null);
       }
     },
+    initSpoilers: function(text_el) {
+      var spoilers = ge('span.tg-spoiler', text_el);
+      if (spoilers.length) {
+        TPost.wrapSpoilers(spoilers);
+        TPost.wrapTextNodes(text_el);
+        addClass(text_el, 'decorated-text');
+      }
+      TPost.hideSpoilers(text_el, spoilers);
+    },
+    wrapSpoilers: function(spoilers) {
+      gec(spoilers, function() {
+        this.className = 'tg-spoiler-text';
+        var wrap = newEl('span', 'tg-spoiler');
+        this.parentNode.insertBefore(wrap, this);
+        wrap.appendChild(this);
+      });
+    },
+    wrapTextNodes: function(el) {
+      gec(el.childNodes, function() {
+        if (this.nodeType == this.TEXT_NODE) {
+          var text = newEl('span', 'd-text');
+          this.parentNode.insertBefore(text, this);
+          text.appendChild(this);
+        } else if (!this.classList.contains('tg-spoiler') && this.childNodes) {
+          TPost.wrapTextNodes(this);
+        }
+      });
+    },
+    hideSpoilers: function(text_el, spoilers) {
+      if (!spoilers) {
+        spoilers = ge('span.tg-spoiler', text_el);
+      }
+      if (spoilers.length) {
+        addEvent(spoilers, 'click', TPost.eSpoilerShow);
+        addClass(text_el, 'spoilers_hidden');
+      }
+    },
     eSpoilerShow: function(e) {
       var text_el = gpeByClass(this, 'js-message_text');
-      if (!text_el) {
-        return false;
-      }
+      if (!text_el) return false;
       e.preventDefault();
       e.stopImmediatePropagation();
       addClass(text_el, 'spoilers_animate');
       removeClass(text_el, 'spoilers_hidden');
-      var spoilers = ge('span.tg-spoiler', text_el);
-      removeEvent(spoilers, 'click', TPost.eSpoilerShow);
+      var delay = 0;
+      gec('span.tg-spoiler', function() {
+        removeEvent(this, 'click', TPost.eSpoilerShow);
+        delay += this.innerText.length * 40;
+      }, text_el);
+      if (delay < 4000) delay = 4000;
+      if (delay > 45000) delay = 45000;
+      setTimeout(function() {
+        TPost.hideSpoilers(text_el);
+      }, delay);
     }
   };
 
