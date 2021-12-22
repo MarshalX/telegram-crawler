@@ -308,7 +308,7 @@ var TPopups = {
   },
   show: function(html, buttons, options) {
     options = options || {};
-    var popup_el = newEl('div', 'tgme_popup_container js-popup_container tgme_popup_alert hide', '<div class="tgme_popup js-popup_box"><div class="tgme_popup_body"><div class="tgme_popup_text js-popup_text"></div><div class="tgme_popup_buttons js-popup_buttons"></div></div></div></div>');
+    var popup_el = newEl('div', 'tgme_popup_container js-popup_container tgme_popup_alert hide', '<div class="tgme_popup js-popup_box"><div class="tgme_popup_body"><div class="tgme_popup_text js-popup_text"></div><div class="tgme_popup_buttons js-popup_buttons"></div></div></div>');
     var text_el = ge1('.js-popup_text', popup_el);
     var buttons_el = ge1('.js-popup_buttons', popup_el);
     setHtml(text_el, html);
