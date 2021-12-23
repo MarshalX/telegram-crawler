@@ -1287,6 +1287,9 @@ function checkFrameSize() {
         }
       }, postEl);
       gec('.js-message_text', function() {
+        TPost.initSpoilers(this, !gpeByClass(this, 'service_message'));
+      }, postEl);
+      gec('.js-message_reply_text', function() {
         TPost.initSpoilers(this);
       }, postEl);
       gec('.js-message_footer.compact', function() {
@@ -1363,14 +1366,14 @@ function checkFrameSize() {
         xhr.send(null);
       }
     },
-    initSpoilers: function(text_el) {
+    initSpoilers: function(text_el, active) {
       var spoilers = ge('span.tg-spoiler', text_el);
       if (spoilers.length) {
         TPost.wrapSpoilers(spoilers);
         TPost.wrapTextNodes(text_el);
         addClass(text_el, 'decorated-text');
       }
-      TPost.hideSpoilers(text_el, spoilers);
+      TPost.hideSpoilers(text_el, active);
     },
     wrapSpoilers: function(spoilers) {
       gec(spoilers, function() {
@@ -1391,17 +1394,18 @@ function checkFrameSize() {
         }
       });
     },
-    hideSpoilers: function(text_el, spoilers) {
-      if (!spoilers) {
-        spoilers = ge('span.tg-spoiler', text_el);
-      }
+    hideSpoilers: function(text_el, active) {
+      var spoilers = ge('span.tg-spoiler', text_el);
       if (spoilers.length) {
-        addEvent(spoilers, 'click', TPost.eSpoilerShow);
+        if (active) {
+          addClass(text_el, 'spoilers_active');
+          addEvent(spoilers, 'click', TPost.eSpoilerShow);
+        }
         addClass(text_el, 'spoilers_hidden');
       }
     },
     eSpoilerShow: function(e) {
-      var text_el = gpeByClass(this, 'js-message_text');
+      var text_el = gpeByClass(this, 'spoilers_hidden');
       if (!text_el) return false;
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -1415,7 +1419,7 @@ function checkFrameSize() {
       if (delay < 4000) delay = 4000;
       if (delay > 45000) delay = 45000;
       setTimeout(function() {
-        TPost.hideSpoilers(text_el);
+        TPost.hideSpoilers(text_el, true);
       }, delay);
     }
   };
