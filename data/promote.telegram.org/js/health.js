@@ -173,19 +173,19 @@ function statsFormatAxisAmount(value) {
       decimals++;
       if (decimals >= 3) break;
     }
-    return formatNumber(value / 1000000, decimals, '.', ',');
+    return '€ ' + formatNumber(value / 1000000, decimals, '.', ',');
   }
-  return statsFormatKMBT(value / 1000000);
+  return '€ ' + statsFormatKMBT(value / 1000000);
 }
 
-function statsFormatAmount(value, currency) {
+function statsFormatAmount(value) {
   var decimals = 2;
   while (value % Math.pow(10, 6 - decimals) &&
          value < Math.pow(10, 10 - decimals)) {
     decimals++;
   }
   var amount_str = formatNumber(value / 1000000, decimals, '.', ',');
-  return (currency || '€') + ' ' + amount_str;
+  return '€ ' + amount_str;
 }
 
 function statsFormat5min(time) {
