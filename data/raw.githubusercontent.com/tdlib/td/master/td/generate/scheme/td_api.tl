@@ -73,7 +73,7 @@ textEntity offset:int32 length:int32 type:TextEntityType = TextEntity;
 textEntities entities:vector<textEntity> = TextEntities;
 
 //@description A text with some entities @text The text @entities Entities contained in the text. Entities can be nested, but must not mutually intersect with each other.
-//-Pre, Code and PreCode entities can't contain other entities. Bold, Italic, Underline and Strikethrough entities can contain and to be contained in all other entities. All other entities can't contain each other
+//-Pre, Code and PreCode entities can't contain other entities. Bold, Italic, Underline, Strikethrough, and Spoiler entities can contain and to be contained in all other entities. All other entities can't contain each other
 formattedText text:string entities:vector<textEntity> = FormattedText;
 
 
@@ -831,10 +831,11 @@ messageCalendar total_count:int32 days:vector<messageCalendarDay> = MessageCalen
 
 //@description Describes a sponsored message
 //@message_id Message identifier; unique for the chat to which the sponsored message belongs among both ordinary and sponsored messages
-//@sponsor_chat_id Chat identifier
+//@sponsor_chat_id Sponsor chat identifier; 0 if the sponsor chat is accessible through an invite link
+//@sponsor_chat_info Information about the sponsor chat; may be null unless sponsor_chat_id == 0
 //@link An internal link to be opened when the sponsored message is clicked; may be null. If null, the sponsor chat needs to be opened instead
 //@content Content of the message. Currently, can be only of the type messageText
-sponsoredMessage message_id:int53 sponsor_chat_id:int53 link:InternalLinkType content:MessageContent = SponsoredMessage;
+sponsoredMessage message_id:int53 sponsor_chat_id:int53 sponsor_chat_info:chatInviteLinkInfo link:InternalLinkType content:MessageContent = SponsoredMessage;
 
 
 //@class NotificationSettingsScope @description Describes the types of chats to which notification settings are relevant
@@ -1913,6 +1914,9 @@ textEntityTypeUnderline = TextEntityType;
 //@description A strikethrough text
 textEntityTypeStrikethrough = TextEntityType;
 
+//@description A spoiler text. Not supported in secret chats
+textEntityTypeSpoiler = TextEntityType;
+
 //@description Text that must be formatted as if inside a code HTML tag
 textEntityTypeCode = TextEntityType;
 
@@ -1951,8 +1955,9 @@ messageSchedulingStateSendWhenOnline = MessageSchedulingState;
 //@description Options to be used when a message is sent
 //@disable_notification Pass true to disable notification for the message
 //@from_background Pass true if the message is sent from the background
+//@protect_content Pass true if the content of the message must be protected from forwarding and saving; for bots only
 //@scheduling_state Message scheduling state; pass null to send message immediately. Messages sent to a secret chat, live location messages and self-destructing messages can't be scheduled
-messageSendOptions disable_notification:Bool from_background:Bool scheduling_state:MessageSchedulingState = MessageSendOptions;
+messageSendOptions disable_notification:Bool from_background:Bool protect_content:Bool scheduling_state:MessageSchedulingState = MessageSendOptions;
 
 //@description Options to be used when a message content is copied without reference to the original sender. Service messages and messageInvoice can't be copied
 //@send_copy True, if content of the message needs to be copied without reference to the original sender. Always true if the message is forwarded to a secret chat or is local
@@ -1963,7 +1968,7 @@ messageCopyOptions send_copy:Bool replace_caption:Bool new_caption:formattedText
 
 //@class InputMessageContent @description The content of a message to send
 
-//@description A text message @text Formatted text to be sent; 1-GetOption("message_text_length_max") characters. Only Bold, Italic, Underline, Strikethrough, Code, Pre, PreCode, TextUrl and MentionName entities are allowed to be specified manually
+//@description A text message @text Formatted text to be sent; 1-GetOption("message_text_length_max") characters. Only Bold, Italic, Underline, Strikethrough, Spoiler, Code, Pre, PreCode, TextUrl and MentionName entities are allowed to be specified manually
 //@disable_web_page_preview True, if rich web page previews for URLs in the message text must be disabled @clear_draft True, if a chat message draft must be deleted
 inputMessageText text:formattedText disable_web_page_preview:Bool clear_draft:Bool = InputMessageContent;
 
@@ -4538,11 +4543,11 @@ editMessageSchedulingState chat_id:int53 message_id:int53 scheduling_state:Messa
 //@description Returns all entities (mentions, hashtags, cashtags, bot commands, bank card numbers, URLs, and email addresses) contained in the text. Can be called synchronously @text The text in which to look for entites
 getTextEntities text:string = TextEntities;
 
-//@description Parses Bold, Italic, Underline, Strikethrough, Code, Pre, PreCode, TextUrl and MentionName entities contained in the text. Can be called synchronously @text The text to parse @parse_mode Text parse mode
+//@description Parses Bold, Italic, Underline, Strikethrough, Spoiler, Code, Pre, PreCode, TextUrl and MentionName entities contained in the text. Can be called synchronously @text The text to parse @parse_mode Text parse mode
 parseTextEntities text:string parse_mode:TextParseMode = FormattedText;
 
 //@description Parses Markdown entities in a human-friendly format, ignoring markup errors. Can be called synchronously
-//@text The text to parse. For example, "__italic__ ~~strikethrough~~ **bold** `code` ```pre``` __[italic__ text_url](telegram.org) __italic**bold italic__bold**"
+//@text The text to parse. For example, "__italic__ ~~strikethrough~~ ||spoiler|| **bold** `code` ```pre``` __[italic__ text_url](telegram.org) __italic**bold italic__bold**"
 parseMarkdown text:formattedText = FormattedText;
 
 //@description Replaces text entities with Markdown formatting in a human-friendly format. Entities that can't be represented in Markdown unambiguously are kept as is. Can be called synchronously @text The text
