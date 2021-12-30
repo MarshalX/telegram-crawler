@@ -50,6 +50,15 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="december-30-2021" href="#december-30-2021"><i class="anchor-icon"></i></a>December 30, 2021</h4>
+<p><strong>Bot API 5.6</strong></p>
+<ul>
+<li>Improved support for <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#protected-content-in-groups-and-channels">Protected Content</a>.</li>
+<li>Added the parameter <em>protect_content</em> to the methods <a href="#sendmessage">sendMessage</a>, <a href="#sendphoto">sendPhoto</a>, <a href="#sendvideo">sendVideo</a>, <a href="#sendanimation">sendAnimation</a>, <a href="#sendaudio">sendAudio</a>, <a href="#senddocument">sendDocument</a>, <a href="#sendsticker">sendSticker</a>, <a href="#sendvideonote">sendVideoNote</a>, <a href="#sendvoice">sendVoice</a>, <a href="#sendlocation">sendLocation</a>, <a href="#sendvenue">sendVenue</a>, <a href="#sendcontact">sendContact</a>, <a href="#sendpoll">sendPoll</a>, <a href="#senddice">sendDice</a>, <a href="#sendinvoice">sendInvoice</a>, <a href="#sendgame">sendGame</a>, <a href="#sendmediagroup">sendMediaGroup</a>, <a href="#copymessage">copyMessage</a>, <a href="#forwardmessage">forwardMessage</a> to allow sending messages with protected content to any chat.</li>
+<li>Added support for <a href="https://telegram.org/blog/reactions-spoilers-translations#spoilers">spoiler entities</a>, which will work in Telegram versions released after December 30, 2021. Older clients will display <em>unsupported message</em>.</li>
+<li>Added new <a href="#messageentity">MessageEntity</a> type “spoiler”.</li>
+<li>Added the ability to specify spoiler entities using <a href="#html-style">HTML</a> and <a href="#markdownv2-style">MarkdownV2</a> formatting options.</li>
+</ul>
 <h4><a class="anchor" name="december-7-2021" href="#december-7-2021"><i class="anchor-icon"></i></a>December 7, 2021</h4>
 <p><strong>Bot API 5.5</strong></p>
 <ul>
@@ -928,7 +937,7 @@ To learn how to create…">
 <tr>
 <td>type</td>
 <td>String</td>
-<td>Type of the entity. Can be “mention” (<code>@username</code>), “hashtag” (<code>#hashtag</code>), “cashtag” (<code>$USD</code>), “bot_command” (<code>/start@jobs_bot</code>), “url” (<code>https://telegram.org</code>), “email” (<code>do-not-reply@telegram.org</code>), “phone_number” (<code>+1-212-555-0123</code>), “bold” (<strong>bold text</strong>), “italic” (<em>italic text</em>), “underline” (underlined text), “strikethrough” (strikethrough text), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users <a href="https://telegram.org/blog/edit#new-mentions">without usernames</a>)</td>
+<td>Type of the entity. Currently, can be “mention” (<code>@username</code>), “hashtag” (<code>#hashtag</code>), “cashtag” (<code>$USD</code>), “bot_command” (<code>/start@jobs_bot</code>), “url” (<code>https://telegram.org</code>), “email” (<code>do-not-reply@telegram.org</code>), “phone_number” (<code>+1-212-555-0123</code>), “bold” (<strong>bold text</strong>), “italic” (<em>italic text</em>), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users <a href="https://telegram.org/blog/edit#new-mentions">without usernames</a>)</td>
 </tr>
 <tr>
 <td>offset</td>
@@ -3162,6 +3171,12 @@ To learn how to create…">
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of sent messages from forwarding and saving</td>
+</tr>
+<tr>
 <td>reply_to_message_id</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -3182,9 +3197,9 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="formatting-options" href="#formatting-options"><i class="anchor-icon"></i></a>Formatting options</h4>
-<p>The Bot API supports basic formatting for messages. You can use bold, italic, underlined and strikethrough text, as well as inline links and pre-formatted code in your bots&#39; messages. Telegram clients will render them accordingly. You can use either markdown-style or HTML-style formatting.</p>
+<p>The Bot API supports basic formatting for messages. You can use bold, italic, underlined, strikethrough, and spoiler text, as well as inline links and pre-formatted code in your bots&#39; messages. Telegram clients will render them accordingly. You can use either markdown-style or HTML-style formatting.</p>
 <p>Note that Telegram clients will display an <strong>alert</strong> to the user before opening an inline link (&#39;Open this link?&#39; together with the full URL).</p>
-<p>Message entities can be nested, providing following restrictions are met:<br>- If two entities have common characters then one of them is fully contained inside another.<br>- <em>bold</em>, <em>italic</em>, <em>underline</em> and <em>strikethrough</em> entities can contain and to be contained in any other entities, except <em>pre</em> and <em>code</em>.<br>- All other entities can&#39;t contain each other.</p>
+<p>Message entities can be nested, providing following restrictions are met:<br>- If two entities have common characters then one of them is fully contained inside another.<br>- <em>bold</em>, <em>italic</em>, <em>underline</em>, <em>strikethrough</em>, and <em>spoiler</em> entities can contain and can be part of any other entities, except <em>pre</em> and <em>code</em>.<br>- All other entities can&#39;t contain each other.</p>
 <p>Links <code>tg://user?id=&lt;user_id&gt;</code> can be used to mention a user by their ID without using a username. Please note:</p>
 <ul>
 <li>These links will work <strong>only</strong> if they are used inside an inline link or in an inline keyboard button. For example, they will not work, when used in a message text.</li>
@@ -3196,7 +3211,8 @@ To learn how to create…">
 _italic \*text_
 __underline__
 ~strikethrough~
-*bold _italic bold ~italic bold strikethrough~ __underline italic bold___ bold*
+||spoiler||
+*bold _italic bold ~italic bold strikethrough ||italic bold strikethrough spoiler||~ __underline italic bold___ bold*
 [inline URL](http://www.example.com/)
 [inline mention of a user](tg://user?id=123456789)
 `inline fixed-width code`
@@ -3220,7 +3236,8 @@ pre-formatted fixed-width code block written in the Python programming language
 &lt;i&gt;italic&lt;/i&gt;, &lt;em&gt;italic&lt;/em&gt;
 &lt;u&gt;underline&lt;/u&gt;, &lt;ins&gt;underline&lt;/ins&gt;
 &lt;s&gt;strikethrough&lt;/s&gt;, &lt;strike&gt;strikethrough&lt;/strike&gt;, &lt;del&gt;strikethrough&lt;/del&gt;
-&lt;b&gt;bold &lt;i&gt;italic bold &lt;s&gt;italic bold strikethrough&lt;/s&gt; &lt;u&gt;underline italic bold&lt;/u&gt;&lt;/i&gt; bold&lt;/b&gt;
+&lt;span class=&quot;tg-spoiler&quot;&gt;spoiler&lt;/span&gt;
+&lt;b&gt;bold &lt;i&gt;italic bold &lt;s&gt;italic bold strikethrough &lt;span class=&quot;tg-spoiler&quot;&gt;italic bold strikethrough spoiler&lt;/span&gt;&lt;/s&gt; &lt;u&gt;underline italic bold&lt;/u&gt;&lt;/i&gt; bold&lt;/b&gt;
 &lt;a href=&quot;http://www.example.com/&quot;&gt;inline URL&lt;/a&gt;
 &lt;a href=&quot;tg://user?id=123456789&quot;&gt;inline mention of a user&lt;/a&gt;
 &lt;code&gt;inline fixed-width code&lt;/code&gt;
@@ -3286,6 +3303,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the forwarded message from forwarding and saving</td>
+</tr>
+<tr>
 <td>message_id</td>
 <td>Integer</td>
 <td>Yes</td>
@@ -3346,6 +3369,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
 <td>reply_to_message_id</td>
@@ -3414,6 +3443,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
 <td>reply_to_message_id</td>
@@ -3509,6 +3544,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
 <td>reply_to_message_id</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -3587,6 +3628,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
 <td>reply_to_message_id</td>
@@ -3687,6 +3734,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
 <td>reply_to_message_id</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -3779,6 +3832,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
 <td>reply_to_message_id</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -3853,6 +3912,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
 <td>reply_to_message_id</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -3921,6 +3986,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
 <td>reply_to_message_id</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -3969,6 +4040,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Sends messages <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent messages from forwarding and saving</td>
 </tr>
 <tr>
 <td>reply_to_message_id</td>
@@ -4043,6 +4120,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
 <td>reply_to_message_id</td>
@@ -4243,6 +4326,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
 <td>reply_to_message_id</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -4309,6 +4398,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
 <td>reply_to_message_id</td>
@@ -4427,6 +4522,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
 <td>reply_to_message_id</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -4475,6 +4576,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding</td>
 </tr>
 <tr>
 <td>reply_to_message_id</td>
@@ -5976,6 +6083,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
 <td>reply_to_message_id</td>
@@ -8190,6 +8303,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
 </tr>
 <tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
 <td>reply_to_message_id</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -9106,6 +9225,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
 <td>reply_to_message_id</td>
