@@ -43,7 +43,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             if response.status == 500:
                 return await asyncio.gather(crawl(url, session))
 
-            if response.status != 200:
+            if response.status not in {200, 304}:
                 if response.status != 302:
                     content = await response.text()
                     logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
@@ -58,7 +58,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
 
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             async with aiofiles.open(filename, 'w') as f:
-                content = await response.text()
+                content = await response.text(encoding='UTF-8')
                 content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
                 content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
                 content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)

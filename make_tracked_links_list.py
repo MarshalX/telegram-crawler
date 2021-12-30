@@ -24,6 +24,8 @@ HIDDEN_URLS = {
 
     'desktop.telegram.org/changelog',
 
+    'osx.telegram.org/updates/versions.xml',
+
     'instantview.telegram.org/rules',
 
     'core.telegram.org/resources/cidr.txt',
@@ -222,18 +224,19 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             content_type = response.headers.get('content-type')
 
             if response.status == 500:
+                VISITED_LINKS.remove(url)
                 return await asyncio.gather(crawl(url, session))
 
-            if response.status != 200:
+            if response.status not in {200, 304}:
                 if response.status != 302:
-                    content = await response.text()
+                    content = await response.text(encoding='UTF-8')
                     logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
                 return
 
-            if 'text/html' in content_type:
+            if 'text' in content_type:
                 LINKS_TO_TRACK.add(url)
 
-                html = await response.text()
+                html = await response.text(encoding='UTF-8')
                 absolute_links = cleanup_links(find_absolute_links(html))
                 relative_links = cleanup_links(find_relative_links(html, url))
 
