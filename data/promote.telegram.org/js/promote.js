@@ -31,7 +31,7 @@ var Ads = {
     if (no_currency) {
       return amount_str;
     }
-    var currency = l('WEB_ADS_DEF_CURRENCY_SIGN', 'â‚¬');
+    var currency = l('WEB_ADS_DEF_CURRENCY_SIGN', '€');
     return '<span class="amount-currency">' + currency + '</span>' + amount_str;
   },
   amountFieldValue: function($form, field) {

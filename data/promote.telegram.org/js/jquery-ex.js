@@ -1479,7 +1479,7 @@
             is_mac = ua.indexOf('Mac') >= 0 ||
                      ua.indexOf('AppleWebKit') >= 0 &&
                      /Mobile\/\w+/.test(ua);
-        var shortcut = is_mac ? 'âŒ˜I' : 'Ctrl+I';
+        var shortcut = is_mac ? '⌘I' : 'Ctrl+I';
         $tokensBtns.attr('data-shortcut', shortcut).wrap('<div class="key-add-tokens"></div>').parent().wrap('<div class="key-add-tokens-wrap"></div>').parent().toggleClass('empty', !tokens.length).insertAfter($field);
         var $tokens = $('.field-ins-btn', $tokensBtns);
         $tokens.on('click.tr-textarea', insertTag);
