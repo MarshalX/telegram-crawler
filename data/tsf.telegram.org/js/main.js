@@ -388,8 +388,9 @@ function initScrollVideos(desktop) {
   for (var i = 0; i < pageVideos.length; i++) {
     var videoEl = pageVideos[i];
     videoEl.setAttribute('vindex', index++);
-    videoEl.setAttribute('preload', i >= preloadVideos ? 'metadata' : 'auto');
-    videoEl.preload = i >= preloadVideos ? 'metadata' : 'auto';
+    var preloadValue = i >= preloadVideos ? 'metadata' : 'auto';
+    videoEl.setAttribute('preload', preloadValue);
+    videoEl.preload = preloadValue;
     if (desktop) {
       videoEl.removeAttribute('controls');
       videoEl.autoplay = false;

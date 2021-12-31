@@ -629,7 +629,7 @@ var NewAd = {
     var message = null;
     var curPreviewFormData = NewAd.getPreviewFormData();
     if (Aj.state.initPreviewFormData != curPreviewFormData) {
-      message = l('WEB_LEAVE_PAGE_CONFIRM_TEXT');
+      message = l('WEB_LEAVE_FORM_CONFIRM_TEXT');
     }
     if (message) {
       var message_html = $('<div>').text(message).html();
@@ -681,7 +681,6 @@ var NewAd = {
     var $submitBtn = $('.submit-form-btn', $previewPopup);
     $submitBtn.on('click', previewSave);
     var previewCancel = function() {
-      state.initPreviewFormData = NewAd.getPreviewFormData();
       closePopup($previewPopup);
     }
     var $cancelBtn = $('.cancel-form-btn', $previewPopup);
@@ -700,6 +699,7 @@ var NewAd = {
       $submitBtn.off('click', previewSave);
       $cancelBtn.off('click', previewCancel);
       $previewPopup.remove();
+      state.initPreviewFormData = NewAd.getPreviewFormData();
     });
     openPopup($previewPopup, {
       closeByClickOutside: '.popup-no-close',
