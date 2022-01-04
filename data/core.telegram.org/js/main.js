@@ -674,3 +674,12 @@ function getCookie(name) {
   }
   return null;
 }
+
+function mainScrollTo(element) {
+  if (typeof element === 'string') {
+    element = document.querySelector(element)
+  }
+  if (element) {
+    window.scroll(0, getFullOffsetY(element));
+  }
+}
