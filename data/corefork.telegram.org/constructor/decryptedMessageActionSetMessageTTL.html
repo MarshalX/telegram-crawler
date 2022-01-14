@@ -2,12 +2,12 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>account.setPrivacy</title>
+    <title>decryptedMessageActionSetMessageTTL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Change privacy settings of current account">
-    <meta property="og:title" content="account.setPrivacy">
+    <meta property="description" content="Setting of a message lifetime after reading.">
+    <meta property="og:title" content="decryptedMessageActionSetMessageTTL">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Change privacy settings of current account">
+    <meta property="og:description" content="Setting of a message lifetime after reading.">
     <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
 
     <link href="/css/bootstrap.min.css?3" rel="stylesheet">
@@ -26,9 +26,9 @@
               <li><a href="//telegram.org/">Home</a></li>
 <li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
 <li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
-<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/api">API</a></li>
 <li class=""><a href="/mtproto">Protocol</a></li>
-<li class=""><a href="/schema">Schema</a></li>
+<li class="active"><a href="/schema">Schema</a></li>
             </ul>
           </div>
         </div>
@@ -36,10 +36,11 @@
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/methods" >All Methods</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/method/account.setPrivacy" >account.setPrivacy</a></li></ul></div>
-  <h1 id="dev_page_title">account.setPrivacy</h1>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/decryptedMessageActionSetMessageTTL" >decryptedMessageActionSetMessageTTL</a></li></ul></div>
+  <h1 id="dev_page_title">decryptedMessageActionSetMessageTTL</h1>
   
-  <div id="dev_page_content"><p>Change privacy settings of current account</p>
+  <div id="dev_page_content"><p>Setting of a message lifetime after reading.</p>
+<p>Upon receiving such message the client shall start deleting of all messages of an encrypted chat <strong>ttl_seconds</strong> seconds after the messages were read by user.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -52,9 +53,8 @@
     </li>
   </ul>
 </div>
-<pre class="page_scheme"><code><a  href="/constructor/account.privacyRules" >account.privacyRules</a>#50a04e45 rules:<a  href="/type/Vector%20t" >Vector</a>&lt;<a  href="/type/PrivacyRule" >PrivacyRule</a>&gt; chats:<a  href="/type/Vector%20t" >Vector</a>&lt;<a  href="/type/Chat" >Chat</a>&gt; users:<a  href="/type/Vector%20t" >Vector</a>&lt;<a  href="/type/User" >User</a>&gt; = <a  href="/type/account.PrivacyRules" >account.PrivacyRules</a>;
----functions---
-<a  href="/method/account.setPrivacy"  class="current_page_link" >account.setPrivacy</a>#c9f81ce8 key:<a  href="/type/InputPrivacyKey" >InputPrivacyKey</a> rules:<a  href="/type/Vector%20t" >Vector</a>&lt;<a  href="/type/InputPrivacyRule" >InputPrivacyRule</a>&gt; = <a  href="/type/account.PrivacyRules" >account.PrivacyRules</a>;</code></pre></p>
+<pre class="page_scheme"><code>===8===
+<a  href="/constructor/decryptedMessageActionSetMessageTTL"  class="current_page_link" >decryptedMessageActionSetMessageTTL</a>#a1733aec ttl_seconds:<a  href="/type/int" >int</a> = <a  href="/type/DecryptedMessageAction" >DecryptedMessageAction</a>;</code></pre></p>
 <h3><a class="anchor" href="#parameters" id="parameters" name="parameters"><i class="anchor-icon"></i></a>Parameters</h3>
 <table class="table">
 <thead>
@@ -66,46 +66,14 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>key</strong></td>
-<td style="text-align: center;"><a href="/type/InputPrivacyKey">InputPrivacyKey</a></td>
-<td>Peers to which the privacy rules apply</td>
-</tr>
-<tr>
-<td><strong>rules</strong></td>
-<td style="text-align: center;"><a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/InputPrivacyRule">InputPrivacyRule</a>&gt;</td>
-<td>New privacy rules</td>
+<td><strong>ttl_seconds</strong></td>
+<td style="text-align: center;"><a href="/type/int">int</a></td>
+<td>Lifetime in seconds</td>
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#result" id="result" name="result"><i class="anchor-icon"></i></a>Result</h3>
-<p><a href="/type/account.PrivacyRules">account.PrivacyRules</a></p>
-<h3><a class="anchor" href="#possible-errors" id="possible-errors" name="possible-errors"><i class="anchor-icon"></i></a>Possible errors</h3>
-<table class="table">
-<thead>
-<tr>
-<th>Code</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>400</td>
-<td>PRIVACY_KEY_INVALID</td>
-<td>The privacy key is invalid.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>PRIVACY_TOO_LONG</td>
-<td>Too many privacy rules were specified, the current limit is 1000.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>PRIVACY_VALUE_INVALID</td>
-<td>The specified privacy rule combination is invalid.</td>
-</tr>
-</tbody>
-</table></div>
+<h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
+<p><a href="/type/DecryptedMessageAction">DecryptedMessageAction</a></p></div>
   
 </div>
           
