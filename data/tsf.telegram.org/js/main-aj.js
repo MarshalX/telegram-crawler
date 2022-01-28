@@ -62,6 +62,7 @@ function ajInit(options) {
     layerLocation: layerLocation,
     setLocation: setLocation,
     setLayerLocation: setLayerLocation,
+    reload: reload,
     apiRequest: apiRequest,
     needAuth: needAuth,
     ajContainer: ajContainer,
@@ -430,6 +431,9 @@ function ajInit(options) {
         link.hash != curLocation.hash) {
       return false;
     }
+    if (url == cur_url) {
+      push_state = false;
+    }
     var load_fn, interrupted = false;
     load_fn = function() {
       if (!push_state) {
@@ -499,6 +503,10 @@ function ajInit(options) {
     console.log('history push', 'oldState =', curHistoryState, 'newState =', history.state);
     curHistoryState = history.state;
     curLocation = loc(curHistoryState.u);
+  }
+
+  function reload() {
+    _location(_location());
   }
 
   function historyJump(delta) {

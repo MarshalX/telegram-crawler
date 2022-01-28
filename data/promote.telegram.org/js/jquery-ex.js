@@ -947,6 +947,18 @@
       }
     });
   };
+  $.fn.fields = function() {
+    return this.first().map(function() {
+      if (this.tagName == 'FORM') {
+        var fields = {};
+        for (var i = 0; i < this.elements.length; i++) {
+          var elem = this.elements[i];
+          fields[elem.name] = elem.value;
+        }
+        return fields;
+      }
+    }).get(0) || {};
+  };
   $.fn.reset = function(val) {
     return this.each(function() {
       if (this.tagName == 'FORM') {
