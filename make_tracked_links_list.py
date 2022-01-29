@@ -31,6 +31,7 @@ HIDDEN_URLS = {
     'core.telegram.org/resources/cidr.txt',
     'core.telegram.org/apple_privacy',
     'core.telegram.org/getProxyConfig',
+    'core.telegram.org/video_stickers',
 
     'promote.telegram.org',
     'contest.com',
