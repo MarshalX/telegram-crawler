@@ -44,10 +44,21 @@
   $.fn.isFixed = function() {
     return this.parents().map(function(){ return $(this).css('position'); }).get().indexOf('fixed') != -1;
   };
+  $.fn.focusField = function() {
+    var field = this.get(0);
+    if (field && field instanceof RadioNodeList) {
+      if (field[0]) {
+        field[0].focus();
+      }
+    } else {
+      field.focus();
+    }
+    return this;
+  };
   $.fn.focusAndSelect = function(select_all) {
     var field = this.get(0), len = this.value().length;
     if (field) {
-      field.focus();
+      this.focusField();
       if (len > 0) {
         if (this.is('[contenteditable]')) {
           var range = document.createRange(), sel;
@@ -407,6 +418,9 @@
       }
 
       function open() {
+        if ($field.data('disabled')) {
+          return false;
+        }
         clearTimeout(blurTimeout);
         hover(curSelectedIndex, true);
         if (options.$results.hasClass('collapsed')) {
@@ -604,6 +618,11 @@
       $field.on('input.search',   onKeyUp);
       $field.on('click.search',   onClick);
 
+      $field.on('disable.search', function(e, disable) {
+        $field.data('disabled', disable);
+        $field.attr('contenteditable', disable ? 'false' : 'true');
+        close(true);
+      });
       $field.on('datachange.search', function() {
         valueChange();
       });
@@ -846,12 +865,21 @@
         delSelected(val);
         $field.trigger('datachange');
       });
+      $select.on('disableselect.select', function(e, disable) {
+        $select.toggleClass('select-disabled', disable);
+        $field.trigger('disable', [disable]);
+      });
       $select.on('reset.select', function(e) {
         $('.selected-item', $selected).each(function() {
           var val = $(this).attr('data-val');
           delSelected(val);
         });
         $field.trigger('datachange');
+      });
+      $select.on('datachange', function(e) {
+        if (e.target === this) {
+          $field.trigger('datachange');
+        }
       });
       $field.on('backspaceonleft.select', function(e) {
         if (options.focusSelectedBeforeDelete) {
@@ -903,6 +931,9 @@
           $field.focus();
         }
       });
+      if ($select.hasClass('select-disabled')) {
+        $select.trigger('disableselect', [true]);
+      }
       if (selectedVal.length) {
         updateSelected();
         $field.trigger('datachange');
@@ -946,6 +977,15 @@
         }).get(0);
       }
     });
+  };
+  $.fn.fieldEl = function(name) {
+    var result = [];
+    this.each(function() {
+      $(this).each(function() {
+        result.push(this);
+      });
+    });
+    return $(result);
   };
   $.fn.fields = function() {
     return this.first().map(function() {

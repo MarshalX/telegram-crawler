@@ -113,7 +113,7 @@ var Ads = {
     }
   },
   updateField: function($fieldEl, focused) {
-    var $formGroup = $fieldEl.parents('.form-group');
+    var $formGroup = $fieldEl.fieldEl().parents('.form-group');
     if (typeof focused !== 'undefined') {
       $formGroup.toggleClass('field-focused', focused);
     }
@@ -124,7 +124,7 @@ var Ads = {
     $formGroup.toggleClass('field-has-value', hasValue);
   },
   showFieldHint: function($fieldEl, hint_text, field_invalid) {
-    var $formGroup = $fieldEl.parents('.form-group');
+    var $formGroup = $fieldEl.fieldEl().parents('.form-group');
     var $hint = $formGroup.find('>.pr-form-control-hint');
     var $msg = $formGroup.find('>.pr-form-control-msg');
     if (!$msg.size() && hint_text) {
@@ -450,7 +450,7 @@ var NewAd = {
     var promoteUrlField = $form.field('promote_url');
     var text = textField.value();
     var promote_url = promoteUrlField.value();
-    var $formGroup = promoteUrlField.parents('.form-group');
+    var $formGroup = promoteUrlField.fieldEl().parents('.form-group');
     if (!text && !promote_url) {
       return false;
     }
@@ -522,7 +522,7 @@ var NewAd = {
   },
   onChannelSearch: function(field, value) {
     var $fieldEl = Aj.state.$form.field(field);
-    var $formGroup = $fieldEl.parents('.form-group');
+    var $formGroup = $fieldEl.fieldEl().parents('.form-group');
     var prev_value = $fieldEl.data('prevval');
     if (prev_value && prev_value == value) {
       return false;
