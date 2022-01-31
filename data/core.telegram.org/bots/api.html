@@ -50,6 +50,13 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="january-31-2022" href="#january-31-2022"><i class="anchor-icon"></i></a>January 31, 2022</h4>
+<p><strong>Bot API 5.7</strong></p>
+<ul>
+<li>Added support for <a href="https://telegram.org/blog/video-stickers-better-reactions">Video Stickers</a>.</li>
+<li>Added the field <em>is_video</em> to the classes <a href="#sticker">Sticker</a> and <a href="#stickerset">StickerSet</a>.</li>
+<li>Added the parameter <em>webm_sticker</em> to the methods <a href="#createnewstickerset">createNewStickerSet</a> and <a href="#addstickertoset">addStickerToSet</a>.</li>
+</ul>
 <h4><a class="anchor" name="december-30-2021" href="#december-30-2021"><i class="anchor-icon"></i></a>December 30, 2021</h4>
 <p><strong>Bot API 5.6</strong></p>
 <ul>
@@ -82,38 +89,6 @@ To learn how to create…">
 <li>Added the methods <a href="#approvechatjoinrequest">approveChatJoinRequest</a> and <a href="#declinechatjoinrequest">declineChatJoinRequest</a> for managing requests to join the chat.</li>
 <li>Added support for the <em>choose_sticker</em> action in the method <a href="#sendchataction">sendChatAction</a>.</li>
 </ul>
-<hr>
-<blockquote>
-<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>User identifiers can now be bigger than <code>2^31 - 1</code> and it is no longer possible to store them in a signed 32-bit integer type. User identifiers have up to 52 significant bits, so a 64-bit integer or double-precision float type is safe for storing them. Please make sure that your code can correctly handle such user identifiers.</p>
-</blockquote>
-<hr>
-<h4><a class="anchor" name="june-25-2021" href="#june-25-2021"><i class="anchor-icon"></i></a>June 25, 2021</h4>
-<p><strong>Bot API 5.3</strong></p>
-<p><strong>Personalized Commands</strong></p>
-<ul>
-<li>Bots can now show lists of commands tailored to specific situations - including localized commands for users with different languages, as well as different commands based on chat type or for specific chats, and special lists of commands for chat administrators.</li>
-<li>Added the class <a href="#botcommandscope">BotCommandScope</a>, describing the scope to which bot commands apply.</li>
-<li>Added the parameters <code>scope</code> and <code>language_code</code> to the method <a href="#setmycommands">setMyCommands</a> to allow bots specify different commands for different chats and users.</li>
-<li>Added the parameters <code>scope</code> and <code>language_code</code> to the method <a href="#getmycommands">getMyCommands</a>.</li>
-<li>Added the method <a href="#deletemycommands">deleteMyCommands</a> to allow deletion of the bot&#39;s commands for the given scope and user language.</li>
-<li>Improved visibility of bot commands in Telegram apps with the new &#39;Menu&#39; button in chats with bots, read more on the <a href="https://telegram.org/blog/animated-backgrounds#bot-menu">blog</a>.</li>
-</ul>
-<p><strong>Custom Placeholders</strong></p>
-<ul>
-<li>Added the ability to specify a custom input field placeholder in the classes <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a> and <a href="#forcereply">ForceReply</a>.</li>
-</ul>
-<p><strong>And More</strong></p>
-<ul>
-<li>Improved documentation of the class <a href="#chatmember">ChatMember</a> by splitting it into 6 subclasses.</li>
-<li>Renamed the method <code>kickChatMember</code> to <a href="#banchatmember">banChatMember</a>. The old method name can still be used.</li>
-<li>Renamed the method <code>getChatMembersCount</code> to <a href="#getchatmembercount">getChatMemberCount</a>. The old method name can still be used.</li>
-<li>Values of the field <code>file_unique_id</code> in objects of the type <a href="#photosize">PhotoSize</a> and of the fields <code>small_file_unique_id</code> and <code>big_file_unique_id</code> in objects of the type <a href="#chatphoto">ChatPhoto</a> were changed.</li>
-</ul>
-<hr>
-<blockquote>
-<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>User identifiers can now be bigger than <code>2^31 - 1</code> and it is no longer possible to store them in a signed 32-bit integer type. User identifiers have up to 52 significant bits, so a 64-bit integer or double-precision float type is safe for storing them. Please make sure that your code can correctly handle such user identifiers.</p>
-</blockquote>
-<hr>
 <p><strong><a href="/bots/api-changelog">See earlier changes »</a></strong></p>
 <h3><a class="anchor" name="authorizing-your-bot" href="#authorizing-your-bot"><i class="anchor-icon"></i></a>Authorizing your bot</h3>
 <p>Each bot is given a unique authentication token <a href="/bots#6-botfather">when it is created</a>. The token looks something like <code>123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11</code>, but we&#39;ll use simply <strong>&lt;token&gt;</strong> in this document instead. You can learn about obtaining tokens and generating new ones in <a href="https://core.telegram.org/bots#6-botfather">this document</a>.</p>
@@ -4728,7 +4703,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target group or username of the target supergroup or channel (in the format <code>@username</code>)</td>
+<td>Unique identifier for the target group or username of the target supergroup or channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -5940,6 +5915,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><em>True</em>, if the sticker is <a href="https://telegram.org/blog/animated-stickers">animated</a></td>
 </tr>
 <tr>
+<td>is_video</td>
+<td>Boolean</td>
+<td><em>True</em>, if the sticker is a <a href="https://telegram.org/blog/video-stickers-better-reactions">video sticker</a></td>
+</tr>
+<tr>
 <td>thumb</td>
 <td><a href="#photosize">PhotoSize</a></td>
 <td><em>Optional</em>. Sticker thumbnail in the .WEBP or .JPG format</td>
@@ -5993,6 +5973,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><em>True</em>, if the sticker set contains <a href="https://telegram.org/blog/animated-stickers">animated stickers</a></td>
 </tr>
 <tr>
+<td>is_video</td>
+<td>Boolean</td>
+<td><em>True</em>, if the sticker set contains <a href="https://telegram.org/blog/video-stickers-better-reactions">video stickers</a></td>
+</tr>
+<tr>
 <td>contains_masks</td>
 <td>Boolean</td>
 <td><em>True</em>, if the sticker set contains masks</td>
@@ -6005,7 +5990,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>thumb</td>
 <td><a href="#photosize">PhotoSize</a></td>
-<td><em>Optional</em>. Sticker set thumbnail in the .WEBP or .TGS format</td>
+<td><em>Optional</em>. Sticker set thumbnail in the .WEBP, .TGS, or .WEBM format</td>
 </tr>
 </tbody>
 </table>
@@ -6043,7 +6028,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendsticker" href="#sendsticker"><i class="anchor-icon"></i></a>sendSticker</h4>
-<p>Use this method to send static .WEBP or <a href="https://telegram.org/blog/animated-stickers">animated</a> .TGS stickers. On success, the sent <a href="#message">Message</a> is returned.</p>
+<p>Use this method to send static .WEBP, <a href="https://telegram.org/blog/animated-stickers">animated</a> .TGS, or <a href="https://telegram.org/blog/video-stickers-better-reactions">video</a> .WEBM stickers. On success, the sent <a href="#message">Message</a> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -6145,7 +6130,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="createnewstickerset" href="#createnewstickerset"><i class="anchor-icon"></i></a>createNewStickerSet</h4>
-<p>Use this method to create a new sticker set owned by a user. The bot will be able to edit the sticker set thus created. You <strong>must</strong> use exactly one of the fields <em>png_sticker</em> or <em>tgs_sticker</em>. Returns <em>True</em> on success.</p>
+<p>Use this method to create a new sticker set owned by a user. The bot will be able to edit the sticker set thus created. You <strong>must</strong> use exactly one of the fields <em>png_sticker</em>, <em>tgs_sticker</em>, or <em>webm_sticker</em>. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -6184,7 +6169,13 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>tgs_sticker</td>
 <td><a href="#inputfile">InputFile</a></td>
 <td>Optional</td>
-<td><strong>TGS</strong> animation with the sticker, uploaded using multipart/form-data. See <a href="https://core.telegram.org/animated_stickers#technical-requirements"><a href="https://core.telegram.org/animated_stickers#technical-requirements">https://core.telegram.org/animated_stickers#technical-requirements</a></a> for technical requirements</td>
+<td><strong>TGS</strong> animation with the sticker, uploaded using multipart/form-data. See <a href="https://core.telegram.org/stickers#animated-sticker-requirements"><a href="https://core.telegram.org/stickers#animated-sticker-requirements">https://core.telegram.org/stickers#animated-sticker-requirements</a></a> for technical requirements</td>
+</tr>
+<tr>
+<td>webm_sticker</td>
+<td><a href="#inputfile">InputFile</a></td>
+<td>Optional</td>
+<td><strong>WEBM</strong> video with the sticker, uploaded using multipart/form-data. See <a href="https://core.telegram.org/stickers#video-sticker-requirements"><a href="https://core.telegram.org/stickers#video-sticker-requirements">https://core.telegram.org/stickers#video-sticker-requirements</a></a> for technical requirements</td>
 </tr>
 <tr>
 <td>emojis</td>
@@ -6207,7 +6198,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="addstickertoset" href="#addstickertoset"><i class="anchor-icon"></i></a>addStickerToSet</h4>
-<p>Use this method to add a new sticker to a set created by the bot. You <strong>must</strong> use exactly one of the fields <em>png_sticker</em> or <em>tgs_sticker</em>. Animated stickers can be added to animated sticker sets and only to them. Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120 stickers. Returns <em>True</em> on success.</p>
+<p>Use this method to add a new sticker to a set created by the bot. You <strong>must</strong> use exactly one of the fields <em>png_sticker</em>, <em>tgs_sticker</em>, or <em>webm_sticker</em>. Animated stickers can be added to animated sticker sets and only to them. Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120 stickers. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -6240,7 +6231,13 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>tgs_sticker</td>
 <td><a href="#inputfile">InputFile</a></td>
 <td>Optional</td>
-<td><strong>TGS</strong> animation with the sticker, uploaded using multipart/form-data. See <a href="https://core.telegram.org/animated_stickers#technical-requirements"><a href="https://core.telegram.org/animated_stickers#technical-requirements">https://core.telegram.org/animated_stickers#technical-requirements</a></a> for technical requirements</td>
+<td><strong>TGS</strong> animation with the sticker, uploaded using multipart/form-data. See <a href="https://core.telegram.org/stickers#animated-sticker-requirements"><a href="https://core.telegram.org/stickers#animated-sticker-requirements">https://core.telegram.org/stickers#animated-sticker-requirements</a></a> for technical requirements</td>
+</tr>
+<tr>
+<td>webm_sticker</td>
+<td><a href="#inputfile">InputFile</a></td>
+<td>Optional</td>
+<td><strong>WEBM</strong> video with the sticker, uploaded using multipart/form-data. See <a href="https://core.telegram.org/stickers#video-sticker-requirements"><a href="https://core.telegram.org/stickers#video-sticker-requirements">https://core.telegram.org/stickers#video-sticker-requirements</a></a> for technical requirements</td>
 </tr>
 <tr>
 <td>emojis</td>
@@ -6303,7 +6300,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setstickersetthumb" href="#setstickersetthumb"><i class="anchor-icon"></i></a>setStickerSetThumb</h4>
-<p>Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set for animated sticker sets only. Returns <em>True</em> on success.</p>
+<p>Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set for animated sticker sets only. Video thumbnails can be set only for video sticker sets only. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -6330,7 +6327,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>thumb</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Optional</td>
-<td>A <strong>PNG</strong> image with the thumbnail, must be up to 128 kilobytes in size and have width and height exactly 100px, or a <strong>TGS</strong> animation with the thumbnail up to 32 kilobytes in size; see <a href="https://core.telegram.org/animated_stickers#technical-requirements"><a href="https://core.telegram.org/animated_stickers#technical-requirements">https://core.telegram.org/animated_stickers#technical-requirements</a></a> for animated sticker technical requirements. Pass a <em>file_id</em> as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. <a href="#sending-files">More info on Sending Files »</a>. Animated sticker set thumbnail can&#39;t be uploaded via HTTP URL.</td>
+<td>A <strong>PNG</strong> image with the thumbnail, must be up to 128 kilobytes in size and have width and height exactly 100px, or a <strong>TGS</strong> animation with the thumbnail up to 32 kilobytes in size; see <a href="https://core.telegram.org/stickers#animated-sticker-requirements"><a href="https://core.telegram.org/stickers#animated-sticker-requirements">https://core.telegram.org/stickers#animated-sticker-requirements</a></a> for animated sticker technical requirements, or a <strong>WEBM</strong> video with the thumbnail up to 32 kilobytes in size; see <a href="https://core.telegram.org/stickers#video-sticker-requirements"><a href="https://core.telegram.org/stickers#video-sticker-requirements">https://core.telegram.org/stickers#video-sticker-requirements</a></a> for video sticker technical requirements. Pass a <em>file_id</em> as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. <a href="#sending-files">More info on Sending Files »</a>. Animated sticker set thumbnail can&#39;t be uploaded via HTTP URL.</td>
 </tr>
 </tbody>
 </table>
