@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Instant View Manual</title>
+    
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="alternate icon" href="/favicon.ico?4" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    <link href="/css/bootstrap-extra.css?2" rel="stylesheet">
+    <link href="/css/telegram.css?215" rel="stylesheet">
+    <link href="/css/codemirror.css?1" rel="stylesheet">
+<link href="/css/instantview.css?115" rel="stylesheet">
+
+  </head>
+  <body class="no-transition">
+    <header>
+  
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12 col-lg-10 col-lg-offset-1">
+        <div class="header-wrap">
+          <div id="header-panel" class="header-panel">
+            <div class="header-breadcrumb header-breadcrumb-simple">
+              <ol id="breadcrumb" class="header-nav breadcrumb"><li class="iv-logo"><a href="/"><i class="iv-icon"></i><span class="iv-logo-title">Instant View</span></a></li><li class="active" data-side-nav-item>Manual</li></ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<main class="intro container">
+  <div class="row">
+    <div class="col-sm-3 col-sm-push-9 col-lg-offset-1 col-lg-3 col-lg-push-7">
+      <section class="nav-menu">
+  <ul class="nav nav-pills nav-stacked"><li><a href="/">Intro</a></li><li><a href="/templates">Templates</a></li><li><a href="/checklist">Checklist</a></li><li><a href="/contest/winners2017">2017 Contest Winners</a></li><li><a href="/contest/winners2019">2019 Contest Winners</a></li><li class="divider"></li><li><a href="/samples/">Sample Templates</a></li><li><a href="/my/" data-need-auth>My Templates</a></li><li class="active"><a href="/docs">Manual</a><div id="dev_side_nav_cont"></div></li></ul>
+  <div class="nav-footer">
+  <a class="logged-link" href="/auth" data-need-auth>Login</a>
+  <span class="logged">
+    <span class="logged-label">Hello, anonymous&#33;</span>
+  </span>
+</div>
+</section>
+    </div>
+    <div class="col-sm-9 col-sm-pull-3 col-lg-7 col-lg-pull-3">
+      <div class="content">
+        <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"></div>
+  <h1 id="dev_page_title">Instant Views and Where to Find Them</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>This document describes Telegram&#39;s Instant View format in <strong>stupefying detail</strong>. If this is your first time hearing about Instant View, please check out our <a href="/"><strong>Introduction</strong></a> and <a href="/samples/"><strong>Sample Templates</strong></a> before you dive in. </p>
+<p>If you&#39;re comfortable with the idea of Instant View templates, let&#39;s look at what makes them tick. To begin with, this is our in-house artist&#39;s idea of how Instant View pages are generated:</p>
+<div>
+    <a href="/file/811140069/3/HNOgxR07ql4.872234/f83bfd30da8845e186" target="_blank"><img src="/file/811140938/2/FF1p2pxErHM.79819/a582b1940327a15468" title="How Instant View Pages are made, click for hi-res version"  class="dev_page_image" /></a>
+</div>
+
+<p>It turns out, he is not entirely wrong. This is how Instant View pages are <strong>really</strong> generated:</p>
+<ol>
+<li>Whenever Telegram needs to display a link preview for a URL, it also checks whether an <strong>Instant View template</strong> exists for that domain.</li>
+<li>If a template exists, our Instant View Bot obtains the page using the URL (it only processes pages that have the MIME-type <code>text/html</code>).</li>
+<li>The bot then applies <strong>rules</strong> from the template that determine the positioning of the key elements on the source page (using <a href="https://www.w3.org/TR/xpath/">XPath 1.0</a> expressions) and modifies the page content to fit the <strong>Instant View format</strong>.</li>
+<li>The edited page is used to create a new <strong>Instant View page</strong> that will be displayed to the user.</li>
+</ol>
+<p>This document will explore the <a href="#instant-view-format">Instant View Format</a>, the <a href="#types-of-rules">Types of Rules</a> your template can utilize, as well as some useful <a href="#extended-xpath">XPath constructs</a>, <a href="#supported-conditions">conditions</a>, and <a href="#supported-functions">functions</a> that may help you build better templates.</p>
+<p>This manual was intended to be used as a reference, so you don&#39;t have to read the entire thing to get started. Our <a href="/samples">sample templates</a> make for a much better entry point. You can check back here whenever something is not clear.</p>
+<h3><a class="anchor-link" href="#recent-changes"><i class="anchor-icon"></i></a><a class="anchor" name="recent-changes"></a>Recent changes</h3>
+<h4><a class="anchor-link" href="#september-10-2020"><i class="anchor-icon"></i></a><a class="anchor" name="september-10-2020"></a>September 10, 2020</h4>
+<ul>
+<li>Added the new <a href="#allowed-origin-new">~allowed_origin</a> option</li>
+<li>Added the new <a href="#load-new">@load</a> function</li>
+<li>The <a href="#inline">@inline</a> function now supports the <code>silent</code> parameter which ignores errors while fetching a page</li>
+</ul>
+<h4><a class="anchor-link" href="#march-20-2019"><i class="anchor-icon"></i></a><a class="anchor" name="march-20-2019"></a>March 20, 2019</h4>
+<p><strong>Version 2.1</strong></p>
+<ul>
+<li>Supported the <code>srcset</code> attribute in <strong>Image</strong> and <strong>Icon</strong> types. The IV engine will automatically take the highest image resolution available (but not higher than 2560px).</li>
+<li>The <a href="#match">@match</a> function now returns only nodes which content was matched by regular expression</li>
+<li>The <a href="#replace">@replace</a> function now returns only nodes which content was replaced by regular expression</li>
+<li>The <a href="#inline">@inline</a> function no longer follows canonical redirect links while fetching a page</li>
+</ul>
+<p><strong>Also in this update:</strong></p>
+<ul>
+<li>Added the new <a href="#split-parent">@split_parent</a> function</li>
+</ul>
+<h4><a class="anchor-link" href="#december-10-2018"><i class="anchor-icon"></i></a><a class="anchor" name="december-10-2018"></a>December 10, 2018</h4>
+<p><strong>Instant View 2.0</strong> expands the platform with support for right-to-left languages, new page blocks, useful functions and much more. We recommend using the latest version in your templates. To do this, add the following rule <strong>at the beginning</strong> of the template:</p>
+<pre><code>~version: &quot;2.0&quot;</code></pre>
+<p>Below is a list of changes in version 2.0:</p>
+<p>New <a href="#properties">properties</a>:</p>
+<ul>
+<li>kicker</li>
+<li>site_name</li>
+</ul>
+<p>New <a href="#supported-types">types</a>:</p>
+<ul>
+<li>Map</li>
+<li>Table</li>
+<li>Details</li>
+<li>RelatedArticles</li>
+<li>Marked</li>
+<li>Subscript</li>
+<li>Superscript</li>
+<li>Icon</li>
+<li>PhoneLink</li>
+<li>Reference</li>
+</ul>
+<p>New <a href="#types-of-rules">types of rules</a>:</p>
+<ul>
+<li><a href="#options">Options</a></li>
+<li><a href="#block-functions">Block functions</a></li>
+</ul>
+<p>New <a href="#supported-functions">functions</a>:</p>
+<ul>
+<li><a href="#wrap-inner">wrap_inner</a></li>
+<li><a href="#style-to-attrs">style_to_attrs</a></li>
+</ul>
+<p>Other features and improvements:</p>
+<ul>
+<li>Xpath query results can be appended into variables using <code>+</code> (<a href="#variables">see more</a>)</li>
+<li>New XPath function <a href="#ends-with">ends-with</a></li>
+<li>Lists can contain block elements such as paragraph, nested lists, tables and so on </li>
+<li>Support for attribution in media captions (<code>&lt;cite&gt;</code> tag)</li>
+<li>Support for image links (<code>href</code> attribute for the Image type)</li>
+<li>Unsupported elements (such as an image inside the blockquote) now generate an error instead of moving up</li>
+<li>Improved <code>@simplify</code> function for better processing RichText (e.g. saves line breaks formed by block elements)</li>
+</ul>
+<h3><a class="anchor-link" href="#instant-view-format"><i class="anchor-icon"></i></a><a class="anchor" name="instant-view-format"></a>Instant View Format</h3>
+<p>An Instant View page is an object with the following <a href="#properties"><strong>properties</strong></a>:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>title</strong> <em>Required</em></td>
+<td>RichText</td>
+<td>Page title</td>
+</tr>
+<tr>
+<td><strong>subtitle</strong></td>
+<td>RichText</td>
+<td>Page subtitle</td>
+</tr>
+<tr>
+<td><strong>kicker</strong>&nbsp;</td>
+<td>RichText</td>
+<td>Kicker</td>
+</tr>
+<tr>
+<td><strong>author</strong></td>
+<td>String</td>
+<td>Author name</td>
+</tr>
+<tr>
+<td><strong>author_url</strong></td>
+<td>Url</td>
+<td>Author link</td>
+</tr>
+<tr>
+<td><strong>published_date</strong></td>
+<td>Unixtime</td>
+<td>Date published</td>
+</tr>
+<tr>
+<td><strong>description</strong></td>
+<td>String</td>
+<td>A short description (used in link preview)</td>
+</tr>
+<tr>
+<td><strong>image_url</strong></td>
+<td>Url</td>
+<td>Link preview photo (used in link preview)</td>
+</tr>
+<tr>
+<td><strong>document_url</strong></td>
+<td>Url</td>
+<td>Link preview document (used in link preview)</td>
+</tr>
+<tr>
+<td><strong>site_name</strong>&nbsp;</td>
+<td>String</td>
+<td>Name of website (used in link preview)</td>
+</tr>
+<tr>
+<td><strong>channel</strong></td>
+<td>String</td>
+<td>The username of the article author&#39;s (or the originating website&#39;s) <a href="https://telegram.org/blog/channels">channel</a> on Telegram in the format <code>@username</code></td>
+</tr>
+<tr>
+<td><strong>cover</strong></td>
+<td>Media (Image/Video/Embed/Map)</td>
+<td>Page cover</td>
+</tr>
+<tr>
+<td><strong>body</strong> <em>Required</em></td>
+<td>Article</td>
+<td>Page content</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor-link" href="#rtl-support"><i class="anchor-icon"></i></a><a class="anchor" name="rtl-support"></a>RTL support</h4>
+<p>The platform supports right-to-left languages. If <code>&lt;html&gt;</code> tag or tag referenced by body property has the attribute <code>dir=&quot;rtl&quot;</code>, the page will be marked as RTL. In case this attribute is not set, you can set it manually to display the page in Instant View as RTL using the following rule:</p>
+<pre><code>  @set_attr(dir, &quot;rtl&quot;): $body   # if body is already defined
+  @set_attr(dir, &quot;rtl&quot;): /html   # alternative way</code></pre>
+<h4><a class="anchor-link" href="#supported-types"><i class="anchor-icon"></i></a><a class="anchor" name="supported-types"></a>Supported types</h4>
+<p>The IV page object can hold the following <strong>types</strong>:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Type</th>
+<th>Allowed&nbsp;children</th>
+<th>Description</th>
+<th>HTML counterpart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Article</strong></td>
+<td>Header<br>                     Subheader<br>                     Paragraph<br>                     Preformatted<br>                     Divider<br>                     Anchor<br>                     List<br>                     Blockquote<br>                     Pullquote<br>                     Media<br>                     Image<br>                     Video<br>                     Audio<br>                     Embed<br>                     Slideshow<br>                     Table<br>                     Details<br>                     Footer<br>                     RelatedArticles</td>
+<td>Page content</td>
+<td><code>&lt;article&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Header</strong></td>
+<td>RichText</td>
+<td>Major heading</td>
+<td>We use the top-level of the <code>&lt;h1&gt;</code> – <code>&lt;h4&gt;</code> headings found on the source page</td>
+</tr>
+<tr>
+<td><strong>Subheader</strong></td>
+<td>RichText</td>
+<td>Minor heading</td>
+<td>We use the remaining headings <code>&lt;h1&gt;</code> – <code>&lt;h4&gt;</code> as well as <code>&lt;h5&gt;</code> – <code>&lt;h6&gt;</code> headings</td>
+</tr>
+<tr>
+<td><strong>Paragraph</strong></td>
+<td>RichText</td>
+<td>A paragraph</td>
+<td><code>&lt;p&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Preformatted</strong></td>
+<td>RichText</td>
+<td>Preformatted text</td>
+<td><code>&lt;pre&gt;</code> with the optional attribute <code>data-language</code><a href="#note-on-code-languages">*</a></td>
+</tr>
+<tr>
+<td><strong>Anchor</strong></td>
+<td>–</td>
+<td>Anchor</td>
+<td><code>&lt;anchor&gt;</code> with the attribute <code>name</code> that contains the anchor name</td>
+</tr>
+<tr>
+<td><strong>Divider</strong></td>
+<td>–</td>
+<td>A separator</td>
+<td><code>&lt;hr&gt;</code></td>
+</tr>
+<tr>
+<td><strong>List</strong></td>
+<td>ListItem</td>
+<td>A list</td>
+<td><code>&lt;ul&gt;</code> for a bullet list, <code>&lt;ol&gt;</code> for a numbered list</td>
+</tr>
+<tr>
+<td><strong>ListItem</strong></td>
+<td><em>version 1.0:</em><br>                     RichText<br><br>                     <em>version 2.0:</em><br>                     Header<br>                     Subheader<br>                     Paragraph<br>                     Preformatted<br>                     Divider<br>                     Anchor<br>                     List<br>                     Blockquote<br>                     Pullquote<br>                     Media<br>                     Image<br>                     Video<br>                     Audio<br>                     Embed<br>                     Slideshow<br>                     Table<br>                     Details</td>
+<td>A list item</td>
+<td><code>&lt;li&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Blockquote</strong></td>
+<td>RichText<br>                     QuoteCaption</td>
+<td>A block quote</td>
+<td><code>&lt;blockquote&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Pullquote</strong></td>
+<td>RichText<br>                     QuoteCaption</td>
+<td>A pull quote</td>
+<td><code>&lt;aside&gt;</code></td>
+</tr>
+<tr>
+<td><strong>QuoteCaption</strong></td>
+<td>RichText</td>
+<td>Caption of a quote</td>
+<td><code>&lt;cite&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Media</strong></td>
+<td>Image<br>                     Video<br>                     Audio<br>                     Embed<br>                     Map<br>                     MediaCaption</td>
+<td>Media content</td>
+<td><code>&lt;figure&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Image</strong></td>
+<td>–</td>
+<td>An image</td>
+<td><code>&lt;img&gt;</code> with the attribute <code>src</code> and the optional attribute <code>href</code> to make the image clickable. Allowed formats: GIF, JPG, PNG (GIF would be converted into Video type by IV)<br>As of <a href="#march-20-2019">version 2.1</a>, supports the attribute <code>srcset</code> (<code>srcset</code> has higher priority than <code>src</code>, the same as in a browser; IV gets the highest available resolution under 2560px).</td>
+</tr>
+<tr>
+<td><strong>Video</strong></td>
+<td>–</td>
+<td>A video</td>
+<td><code>&lt;video&gt;</code> with the attribute <code>src</code>, or containing the tag <code>&lt;source type=&quot;video/mp4&quot;&gt;</code> with the attribute <code>src</code></td>
+</tr>
+<tr>
+<td><strong>Audio</strong></td>
+<td>–</td>
+<td>An audio</td>
+<td><code>&lt;audio&gt;</code> with the attribute <code>src</code>, or containing the tag <code>&lt;source&gt;</code> with the attribute <code>src</code> and the attribute <code>type</code> (possible types: <code>audio/ogg</code>, <code>audio/mpeg</code>, <code>audio/mp4</code>)</td>
+</tr>
+<tr>
+<td><strong>Embed</strong></td>
+<td>–</td>
+<td>An embedded element</td>
+<td><code>&lt;iframe&gt;</code> with the attribute <code>src</code>. <a href="#embedded-elements">List of supported embeds</a></td>
+</tr>
+<tr>
+<td><strong>Map</strong>&nbsp;</td>
+<td>–</td>
+<td>A map</td>
+<td><code>&lt;img&gt;</code> or <code>&lt;iframe&gt;</code> with the attribute <code>src</code> referring to Google or Yandex maps</td>
+</tr>
+<tr>
+<td><strong>Slideshow</strong></td>
+<td>Media (Image/Video)<br>                     Image<br>                     Video<br>                     MediaCaption</td>
+<td>A slideshow</td>
+<td><code>&lt;slideshow&gt;</code></td>
+</tr>
+<tr>
+<td><strong>MediaCaption</strong></td>
+<td>RichText</td>
+<td>Media caption</td>
+<td><code>&lt;figcaption&gt;</code><br>                                                               As of IV 2.0, can contain an additional tag <code>&lt;cite&gt;</code> with attribution (author, creator or source of the media)</td>
+</tr>
+<tr>
+<td><strong>Table</strong>&nbsp;</td>
+<td>TableCaption<br>                        TableRow</td>
+<td>A table</td>
+<td><code>&lt;table&gt;</code></td>
+</tr>
+<tr>
+<td><strong>TableCaption</strong>&nbsp;</td>
+<td>RichText</td>
+<td>A table caption</td>
+<td><code>&lt;caption&gt;</code></td>
+</tr>
+<tr>
+<td><strong>TableRow</strong>&nbsp;</td>
+<td>TableCell</td>
+<td>A table row</td>
+<td><code>&lt;tr&gt;</code> with the optional attributes <code>align</code>, <code>valign</code>, can be wrapped with <code>&lt;thead&gt;</code> or <code>&lt;tbody&gt;</code> or <code>&lt;tfoot&gt;</code> with the optional attributes <code>align</code>, <code>valign</code></td>
+</tr>
+<tr>
+<td><strong>TableCell</strong>&nbsp;</td>
+<td>RichText</td>
+<td>A table cell</td>
+<td><code>&lt;td&gt;</code> for a standard cell, <code>&lt;th&gt;</code> for a header cell, with the optional attributes <code>align</code>, <code>valign</code>, <code>colspan</code>, <code>rowspan</code></td>
+</tr>
+<tr>
+<td><strong>Details</strong>&nbsp;<br>  <em>(version 2.0+)</em></td>
+<td>DetailsHeader<br>                     Header<br>                     Subheader<br>                     Paragraph<br>                     Preformatted<br>                     Divider<br>                     Anchor<br>                     List<br>                     Blockquote<br>                     Pullquote<br>                     Media<br>                     Image<br>                     Video<br>                     Audio<br>                     Embed<br>                     Slideshow<br>                     Table<br>                     Details</td>
+<td>A collapsible block</td>
+<td><code>&lt;details&gt;</code> with the optional attribute <code>open</code> to be opened by default</td>
+</tr>
+<tr>
+<td><strong>DetailsHeader</strong>&nbsp;<br>  <em>(version 2.0+)</em></td>
+<td>RichText</td>
+<td>A visible heading for the collapsible block</td>
+<td><code>&lt;summary&gt;</code></td>
+</tr>
+<tr>
+<td><strong>RelatedArticles</strong>&nbsp;</td>
+<td>Header<br>                        Link</td>
+<td>Related articles</td>
+<td><code>&lt;related&gt;</code> containing one of <code>&lt;h1&gt;</code> – <code>&lt;h6&gt;</code> tag as header of the block and <code>&lt;a&gt;</code> tags with the attribute <code>href</code> containing a URL of related article. <strong>Note:</strong> Only articles that have an IV will appear in this block on the IV page.</td>
+</tr>
+<tr>
+<td><strong>Footer</strong></td>
+<td>RichText</td>
+<td>The footer</td>
+<td><code>&lt;footer&gt;</code></td>
+</tr>
+<tr>
+<td><strong>RichText</strong></td>
+<td>Bold<br>                     Italic<br>                     Underline<br>                     Strike<br>                     Fixed<br>                     Marked<br>                     Subscript<br>                     Superscript<br>                     Icon<br>                     Link<br>                     EmailLink<br>                     PhoneLink<br>                     LineBreak<br>                     Anchor<br>                     Reference<br>                     String</td>
+<td>Formatted text</td>
+<td>Text elements and supported tags</td>
+</tr>
+<tr>
+<td><strong>Bold</strong></td>
+<td>RichText</td>
+<td>Bold text</td>
+<td><code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Italic</strong></td>
+<td>RichText</td>
+<td>Italic text</td>
+<td><code>&lt;i&gt;</code> or <code>&lt;em&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Underline</strong></td>
+<td>RichText</td>
+<td>Underlined text</td>
+<td><code>&lt;u&gt;</code> or <code>&lt;ins&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Strike</strong></td>
+<td>RichText</td>
+<td>Strikethrough text</td>
+<td><code>&lt;s&gt;</code> or <code>&lt;del&gt;</code> or <code>&lt;strike&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Fixed</strong></td>
+<td>RichText</td>
+<td>Monospace text</td>
+<td><code>&lt;code&gt;</code> or <code>&lt;kbd&gt;</code> or <code>&lt;samp&gt;</code> or <code>&lt;tt&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Marked</strong>&nbsp;</td>
+<td>RichText</td>
+<td>Marked text</td>
+<td><code>&lt;mark&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Subscript</strong>&nbsp;</td>
+<td>RichText</td>
+<td>Subscript text</td>
+<td><code>&lt;sub&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Superscript</strong>&nbsp;</td>
+<td>RichText</td>
+<td>Superscript text</td>
+<td><code>&lt;sup&gt;</code></td>
+</tr>
+<tr>
+<td><strong>Icon</strong>&nbsp;</td>
+<td>–</td>
+<td>A small image inside the text</td>
+<td><code>&lt;pic&gt;</code> with the attribute <code>src</code>, <code>width</code>, <code>height</code>. Can contain the attribute <code>optional</code> if the image is not important and may be ignored. Allowed formats: JPG, PNG.<br>As of <a href="#march-20-2019">version 2.1</a>, supports the attribute <code>srcset</code> (<code>srcset</code> has higher priority than <code>src</code>, the same as in a browser).</td>
+</tr>
+<tr>
+<td><strong>Link</strong></td>
+<td>RichText</td>
+<td>A link</td>
+<td><code>&lt;a&gt;</code> with the attribute <code>href</code> containing a URL</td>
+</tr>
+<tr>
+<td><strong>EmailLink</strong></td>
+<td>RichText</td>
+<td>A link to an email address</td>
+<td><code>&lt;a&gt;</code> with the attribute <code>href</code> containing a <code>mailto:</code> link</td>
+</tr>
+<tr>
+<td><strong>PhoneLink</strong>&nbsp;</td>
+<td>RichText</td>
+<td>A link to a phone number</td>
+<td><code>&lt;a&gt;</code> with the attribute <code>href</code> containing a <code>tel:</code> link</td>
+</tr>
+<tr>
+<td><strong>Reference</strong>&nbsp;</td>
+<td>RichText</td>
+<td>A reference</td>
+<td><code>&lt;reference&gt;</code> with the attribute <code>name</code> that contains the reference name</td>
+</tr>
+<tr>
+<td><strong>LineBreak</strong></td>
+<td>–</td>
+<td>Line break</td>
+<td><code>&lt;br&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h5><a class="anchor-link" href="#note-on-code-languages"><i class="anchor-icon"></i></a><a class="anchor" name="note-on-code-languages"></a>Note on code languages</h5>
+<p>Telegram apps currently do not support code highlighting, but they will in the future. For this reason, it is advisable to include the code language attribute (<code>data-language</code>) for large <code>&lt;pre&gt;</code> blocks if it is supplied in the source.</p>
+<hr>
+<h3><a class="anchor-link" href="#types-of-rules"><i class="anchor-icon"></i></a><a class="anchor" name="types-of-rules"></a>Types of Rules</h3>
+<p>Instant View rules are instructions that tell our IV bot where to find the meta-elements on the source page and how it should modify the content of the page when an Instant View page is created.</p>
+<p>Each new line in a template describes a new rule. When the bot renders a page into the Instant View format, it applies rules from the relevant template one after another and ignores any empty lines. You can leave comments by starting a line with <code>#</code>, all following text on that line will be ignored unless enclosed in quote marks. You can use the <code>\</code> symbol to carry a rule over to the next string, like this:</p>
+<pre><code># Comment 
+# You can break up \
+  a long rule into \
+  multiple strings</code></pre>
+<p>Most rules are based on <a href="https://www.w3.org/TR/xpath/">XPath 1.0</a> expressions used to locate the required nodes on the source page.</p>
+<p>A block of rules may have a name. In this case, it can be reused in other rules.</p>
+<p>We support the following types of rules:</p>
+<h4><a class="anchor-link" href="#conditions"><i class="anchor-icon"></i></a><a class="anchor" name="conditions"></a>Conditions</h4>
+<p>Conditions offer unlimited flexibility for your templates. Rules of this type begin with the symbols <code>?</code> or <code>!</code> and use the following format:</p>
+<pre><code>?condition:  xpath_query   # condition example
+!condition:  regexp        # parameter on the right depends on the type of the condition
+?condition                 # some conditions don&#39;t have parameters</code></pre>
+<p>Groups of conditions that immediately follow one another are interpreted as a block. <code>?</code>-rules follow the OR logic when joined, while <code>!</code>-rules follow the AND logic. This means that for the bot to apply each block, all <code>!</code>-conditions in the block and at least one of the <code>?</code>-conditions within it must be met. This also means that each block must have at least one <code>?</code>-condition.</p>
+<p>Blocks of conditions split your rule set into groups. Groups of rules that do not have any conditions are always applied. All other groups are only applied if their conditions are met.</p>
+<p><strong>Examples</strong></p>
+<pre><code># If a rule is placed here, it will be applied
+# Same with the one here
+
+?false               # This condition is always false
+# The rule placed here will never be applied, because the condition is not met
+# Very useful indeed
+
+?exists: //article   # This condition is true if the page has an article tag
+# On these lines, a new group of rules is located, and it will be applied if
+# there&#39;s an article tag on the page, despite the ?false condition above
+
+?exists: //article
+?exists: //div[@id=&quot;article&quot;]
+!exists: //meta[@property=&quot;og:title&quot;]
+# The rules below this block will be applied if an &lt;article&gt; tag or a
+# &lt;div id=&quot;article&quot;&gt; can be found, this tag must also be present: &lt;meta property=&quot;og:title&quot;&gt;</code></pre>
+<div><br></div>
+
+<blockquote>
+<p><a href="#supported-conditions">Check out the Supported Conditions to see what works out of the box »</a></p>
+</blockquote>
+<h4><a class="anchor-link" href="#properties"><i class="anchor-icon"></i></a><a class="anchor" name="properties"></a>Properties</h4>
+<p>Properties are the building blocks for your IV page. Check the <a href="#instant-view-format">Instant View Format</a> for a list of properties that can be used when creating IV pages (you can also define custom properties, but they will not be used anywhere on the resulting IV page). Use this format to fill properties:</p>
+<pre><code>property: xpath_query
+property: &quot;Some string&quot;
+property: null</code></pre>
+<p>Properties store the first node that matches the XPath expression <code>xpath_query</code>. By default, if a property already has a value, it will <strong>not</strong> be overwritten. You can change this behavior by adding <code>!</code> to the property name – in this case a new non-empty value can be assigned. If you add <code>!!</code> to the property name, even an empty new value can be assigned to the property.</p>
+<p>You can also assign a <code>string</code> to the property instead of the <code>xpath_query</code>. In this case, the property will contain a text element with the specified text. It is also possible to assign <code>null</code> to discard the property&#39;s value (will only work with <code>!!</code>).</p>
+<p><strong>Examples</strong></p>
+<pre><code>title:   //article//h1      # Looking for the &#39;title&#39; in the article heading
+title:   //h1               # If not found, checking for any headings at all
+title:   //head/title       # If no luck either, trying the &lt;title&gt; tag
+?path: /blog/.*             # On pages in the /blog/ section 
+title!:  //div[@id=&quot;title&quot;] # we prefer to use &lt;div id=&quot;title&quot;&gt;, if present
+?path: /news/.*             # On pages in the /news/ section
+title!!: //h3               # title is always in an h3 tag
+
+author:   //article/@author  # Get author name from the author attribute
+?exists:  //article[has-class(&quot;anonymous&quot;)]    
+author!!: null               # Don&#39;t display author for anonymous posts</code></pre>
+<blockquote>
+<p><strong>Reminder:</strong> The <em>title</em> and <em>body</em> properties are required for an IV page to be created.</p>
+</blockquote>
+<h4><a class="anchor-link" href="#variables"><i class="anchor-icon"></i></a><a class="anchor" name="variables"></a>Variables</h4>
+<p>Variables are useful for storing and manipulating nodes before assigning them to <a href="#properties">properties</a> for the final IV page. Variable names begin with the <code>$</code> symbol. Use this format to initialize them:</p>
+<pre><code>$variable: xpath_query
+$variable: &quot;Some text&quot;
+$variable: null</code></pre>
+<p>Variables store a list of nodes that match the Xpath expression <code>xpath_query</code>. If a variable is assigned for the second time, its previous value is overwritten. You can change this behavior by adding <code>?</code> to the variable name. You can also append a list of nodes to the previous one by adding <code>+</code> to the variable name.</p>
+<p>You can also assign a <code>string</code> to the variable instead of the <code>xpath_query</code>. In this case, the variable will contain a list with one text element that has the specified text. It is also possible to assign <code>null</code> to discard the variable&#39;s value.</p>
+<p><strong>Examples</strong></p>
+<pre><code>$images:  //img
+$images:  //img[@src]     # the previous value will be overwritten
+$images?: //article//img  # a new value will only be assigned if the variable is empty
+$medias:  //img
+$medias+: //video         # now $medias contains all img and video tags</code></pre>
+<h4><a class="anchor-link" href="#options"><i class="anchor-icon"></i></a><a class="anchor" name="options"></a>Options</h4>
+<p>Options affect how the page is processed by the bot. Options begin with the <code>~</code> symbol. Use this format to set them:</p>
+<pre><code>~option: &quot;value&quot;
+~option: true</code></pre>
+<p>Options can be set with values in JSON format.</p>
+<p><strong>Examples</strong></p>
+<pre><code>~version: &quot;2.1&quot;</code></pre>
+<div><br></div>
+
+<blockquote>
+<p>Check out <a href="#supported-options">Supported Options</a> to see what else works out of the box.</p>
+</blockquote>
+<h4><a class="anchor-link" href="#functions"><i class="anchor-icon"></i></a><a class="anchor" name="functions"></a>Functions</h4>
+<p>Functions are extremely flexible, but you&#39;ll probably mostly use them to strip unnecessary nodes from the page and to replace certain elements with others. Function names begin with the <code>@</code> symbol, you can use the following format:</p>
+<pre><code>@function:                 xpath_query   # a function without parameters
+@function(param):          xpath_query   # additional parameters are placed in paretheses
+@function(p1 p2):          xpath_query   # a function with two parameters
+@function(p1, &quot;param #2&quot;): xpath_query   # parameters can be separated by commas
+                                         # and enclosed in quote marks when needed
+@function:                 &quot;Some text&quot;   # use string instead of xpath_query if needed</code></pre>
+<p>The main argument of a function is a list of nodes that match the Xpath expression <code>xpath_query</code>. You can also use a <code>string</code> as the main argument instead of an <code>xpath_query</code>. In this case, the main argument passed to the function will be a list with one text element that has the specified text.</p>
+<p><strong>Examples</strong></p>
+<pre><code>@remove:            //header               # removes all &lt;header&gt; tags found on the page
+@replace_tag(&lt;h1&gt;): //div[@class=&quot;header&quot;] # replaces all &lt;div class=&quot;header&quot;&gt; tags with &lt;h1&gt;
+&lt;h1&gt;:               //div[@class=&quot;header&quot;] # an alias for @replace_tag(&lt;h1&gt;)</code></pre>
+<div><br></div>
+
+<p><strong>Note:</strong> You may find the <a href="#debug">@debug function</a> particularly useful when creating XPath expressions.</p>
+<blockquote>
+<p>Check out <a href="#supported-functions">Supported Functions</a> to see what else works out of the box.</p>
+</blockquote>
+<h4><a class="anchor-link" href="#block-functions"><i class="anchor-icon"></i></a><a class="anchor" name="block-functions"></a>Block Functions</h4>
+<p>Block functions manipulate blocks of rules. Block function names also begin with the <code>@</code> symbol, you can use the following format:</p>
+<pre><code>@function(xpath_query) {   # opening bracket should be at the end of the line
+  $variable: xpath_query   # some other rules here
+  @function: $@            #   inside the block function
+}                          # closing bracket should be on a separate line</code></pre>
+<p>A block function can contain another block function so they can be nested. Block function can not contain <a href="#conditions">conditions</a>.</p>
+<blockquote>
+<p>Please note that block functions that execute a block of rules several times <strong>(map</strong>, <strong>repeat</strong>, <strong>while</strong>, <strong>while_not)</strong> have a limit on the total number of iterations for the entire template.</p>
+</blockquote>
+<p><strong>Examples</strong></p>
+<pre><code>@if( //article ) {    # if &lt;article&gt; exists
+  @append(&lt;p&gt;): $$    #   append paragraph into it
+}</code></pre>
+<div><br></div>
+
+<blockquote>
+<p>Check out <a href="#supported-block-functions">Supported Block Functions</a> to see what else works out of the box.</p>
+</blockquote>
+<h4><a class="anchor-link" href="#include"><i class="anchor-icon"></i></a><a class="anchor" name="include"></a>Include</h4>
+<blockquote>
+<p><strong>Note:</strong> This is a service rule, it <strong>will not work</strong> in your templates. It was included in this reference to give you a better understanding of how the system works. You can see an example of this rule at work in the <a href="#processing-pages">Processing Pages</a> section.</p>
+</blockquote>
+<p>Rules of this type begin with the <code>+</code> symbol and use the following format:</p>
+<pre><code>+ rules</code></pre>
+<p>This rule inserts a block of rules with the specified name. In most cases, the name corresponds to the domain to which the rules apply.</p>
+<p><strong>Examples</strong></p>
+<pre><code>+ core.telegram.org # inserting the block of rules that is used for core.telegram.org
+?not_exists: $body
++ telegram.org      # inserting the block of rules that is used for telegram.org</code></pre>
+<h4><a class="anchor-link" href="#special-variables-and"><i class="anchor-icon"></i></a><a class="anchor" name="special-variables-and"></a>Special variables <code>$$</code> and <code>$@</code></h4>
+<p>The special variables work within a group of rules.</p>
+<ul>
+<li>The <code>$$</code> variable always contains the result of the most recent XPath query. </li>
+<li>The <code>$@</code> variable holds the return of the most recently run function.</li>
+</ul>
+<p>These variables come in handy when you&#39;re creating chains of rules. If a rule is missing xpath_query, the statement is considered to be equal to <code>$$</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Put a picture into a &lt;figure&gt; tag, then set it as the cover
+@wrap(&lt;figure&gt;): //img[@id=&quot;cover&quot;]
+cover:           $@
+
+# Insert a divider before each div.divider that&#39;s no longer required
+@before(&lt;hr&gt;):   //div[has-class(&quot;divider&quot;)]
+@remove          # this is the same as @remove: $$</code></pre>
+<h3><a class="anchor-link" href="#extended-xpath"><i class="anchor-icon"></i></a><a class="anchor" name="extended-xpath"></a>Extended XPath</h3>
+<p>For your convenience, you can use the following constructs in your XPath expressions.</p>
+<h4><a class="anchor-link" href="#context"><i class="anchor-icon"></i></a><a class="anchor" name="context"></a>Context</h4>
+<p>Regular XPath queries search for nodes in the context of the entire document. To specify the context for a particular expression, you can use variables in the format <code>$context</code>. If a matching variable exists, the query will be made relative to each variable node. If it doesn&#39;t and a matching property exists, the query will be made relative to the property node. If no matching variables or properties exist, the query return an empty list.</p>
+<p><strong>Examples</strong></p>
+<pre><code>$headers:      //h1              # all &lt;h1&gt; tags on the page
+article:       //article         # the first &lt;article&gt; tag on the page
+$art_headers:  $article//h1      # all &lt;h1&gt; tags inside article
+$header_links: $art_headers//a   # all &lt;a&gt; tags inside each $art_headers node</code></pre>
+<h4><a class="anchor-link" href="#zeroing-in-on-nodes"><i class="anchor-icon"></i></a><a class="anchor" name="zeroing-in-on-nodes"></a>Zeroing in on nodes</h4>
+<p>The result of an XPath query is always a list of matching nodes. If you&#39;d like to narrow the list down to a single node, you can use the following syntax: <code>(xpath_query)[n]</code>, where <code>n</code> is the number of the desired node. Numbering starts at 1, you can get the last node by using the <code>last()</code> function. This syntax can only be applied to the entire expression.</p>
+<p><strong>Examples</strong></p>
+<pre><code>$headers:    //h1                    # all &lt;h1&gt; tags on the page
+$header2:    (//h1)[2]               # the second &lt;h1&gt; tag on the page
+$header2:    ($headers)[2]           # same
+$last_link:  ($header2//a)[last()]   # the last link inside $header2</code></pre>
+<h4><a class="anchor-link" href="#has-class"><i class="anchor-icon"></i></a><a class="anchor" name="has-class"></a>has-class</h4>
+<p>You will often need to locate nodes that have a certain class. To do this, you can use the <code>has-class(&quot;class&quot;)</code> function that serves as an alias for the expression <code>contains(concat(&quot; &quot;, normalize-space(@class), &quot; &quot;), &quot; class &quot;)</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Transform all div.header elements into h1
+&lt;h1&gt;: //div[contains(concat(&quot; &quot;, normalize-space(@class), &quot; &quot;), &quot; header &quot;)]
+# same idea, but much shorter
+&lt;h1&gt;: //div[has-class(&quot;header&quot;)]</code></pre>
+<h4><a class="anchor-link" href="#ends-with"><i class="anchor-icon"></i></a><a class="anchor" name="ends-with"></a>ends-with</h4>
+<p>XPath has a <code>starts-with</code> function that checks whether the first string starts with the second string but does not have <code>ends-with</code>. In IV you can use the <code>ends-with(&quot;haystack&quot;,&quot;needle&quot;)</code> function that serves as an alias for the expression <code>(substring(&quot;haystack&quot;, string-length(&quot;haystack&quot;) - string-length(&quot;needle&quot;) + 1) = &quot;needle&quot;)</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Select all JPG images
+@debug: //img[(substring(@src, string-length(@src) - string-length(&quot;.jpg&quot;) + 1) = &quot;.jpg&quot;)]
+# the same, but much shorter
+@debug: //img[ends-with(@src, &quot;.jpg&quot;)]</code></pre>
+<h4><a class="anchor-link" href="#prev-sibling"><i class="anchor-icon"></i></a><a class="anchor" name="prev-sibling"></a>prev-sibling</h4>
+<p>An axis that selects the previous sibling of the current node. Serves as an alias for the expression <code>preceding-sibling::*[1]/self</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Transform all div nodes, that immediately follow img nodes into figcaption
+&lt;figcaption&gt;: //div[./preceding-sibling::*[1]/self::img]
+# the same
+&lt;figcaption&gt;: //div[./prev-sibling::img]</code></pre>
+<h4><a class="anchor-link" href="#next-sibling"><i class="anchor-icon"></i></a><a class="anchor" name="next-sibling"></a>next-sibling</h4>
+<p>An axis that selects the next sibling of the current node. Serves as an alias for the expression <code>following-sibling::*[1]/self</code></p>
+<p><strong>Examples</strong></p>
+<pre><code># Join paragraphs following each other into one, separating them with a line break
+@combine(&lt;br&gt;): //p/following-sibling::*[1]/self::p
+# the same, but shorter
+@combine(&lt;br&gt;): //p/next-sibling::p</code></pre>
+<h3><a class="anchor-link" href="#supported-conditions"><i class="anchor-icon"></i></a><a class="anchor" name="supported-conditions"></a>Supported conditions</h3>
+<p>Below are conditions supported in Instant View rules.</p>
+<h4><a class="anchor-link" href="#domain"><i class="anchor-icon"></i></a><a class="anchor" name="domain"></a>domain</h4>
+<pre><code>domain: regexp</code></pre>
+<p>Checks whether the domain of the current page matches a regular expression. The check is case-insensitive, so the actual expression used will look like this: <code>/^regexp$/i</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Rule for *.subdomain.example.com URLs
+?domain: .+\.subdomain\.example\.com</code></pre>
+<h4><a class="anchor-link" href="#domain-not"><i class="anchor-icon"></i></a><a class="anchor" name="domain-not"></a>domain_not</h4>
+<pre><code>domain_not: regexp</code></pre>
+<p>Checks whether the domain of the current page does not match a regular expression. The check is case-insensitive, so the actual expression used will look like this: <code>/^regexp$/i</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Rule for *.subdomain.example.com URLs with an exception for dev.subdomain.example.com
+?domain:     .+\.subdomain\.example\.com
+!domain_not: dev\.subdomain\.example\.com</code></pre>
+<h4><a class="anchor-link" href="#path"><i class="anchor-icon"></i></a><a class="anchor" name="path"></a>path</h4>
+<pre><code>path: regexp</code></pre>
+<p>Checks whether the path to the current page matches a regular expression. The check is case-insensitive, so the actual expression used will look like this: <code>/^regexp$/i</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Rule for example.com/news/* links
+?path: /news/.+   # no need to escape the slash</code></pre>
+<h4><a class="anchor-link" href="#path-not"><i class="anchor-icon"></i></a><a class="anchor" name="path-not"></a>path_not</h4>
+<pre><code>path_not: regexp</code></pre>
+<p>Checks whether the path to the current page does not match a regular expression. The check is case-insensitive, so the actual expression used will look like this: <code>/^regexp$/i</code>.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Rule for example.com/news/* links with an exception for example.com/news/recent
+?path:     /news/.+
+!path_not: /news/recent</code></pre>
+<h4><a class="anchor-link" href="#exists"><i class="anchor-icon"></i></a><a class="anchor" name="exists"></a>exists</h4>
+<pre><code>exists: xpath_query</code></pre>
+<p>Checks whether target nodes exist on the current page.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Apply rule only to pages with an &lt;article&gt; tag
+?exists: //article</code></pre>
+<h4><a class="anchor-link" href="#not-exists"><i class="anchor-icon"></i></a><a class="anchor" name="not-exists"></a>not_exists</h4>
+<pre><code>not_exists: xpath_query</code></pre>
+<p>Checks whether target nodes do not exist on the current page.</p>
+<p><strong>Examples</strong></p>
+<pre><code># Apply rule only to pages with an &lt;article&gt; tag, that do not include any quotes.
+?exists:     //article
+!not_exists: //article//blockquote</code></pre>
+<h4><a class="anchor-link" href="#true"><i class="anchor-icon"></i></a><a class="anchor" name="true"></a>true</h4>
+<pre><code>true</code></pre>
+<p>A condition that is always true.</p>
+<p><strong>Examples</strong></p>
+<pre><code>?path:    /blog/.+
+# Rules for the blog section go here
+?true
+# Rules that go here will be applied to all pages</code></pre>
+<h4><a class="anchor-link" href="#false"><i class="anchor-icon"></i></a><a class="anchor" name="false"></a>false</h4>
+<pre><code>false</code></pre>
+<p>A condition that is always false.</p>
+<p><strong>Examples</strong></p>
+<pre><code>?path:    /news/.+
+# Rules for the news section go here
+?false
+# Rules that go here will never be applied</code></pre>
+<h3><a class="anchor-link" href="#supported-options"><i class="anchor-icon"></i></a><a class="anchor" name="supported-options"></a>Supported options</h3>
+<p>Below are options supported in Instant View rules.</p>
+<h4><a class="anchor-link" href="#version"><i class="anchor-icon"></i></a><a class="anchor" name="version"></a>version</h4>
+<pre><code>~version: &quot;2.1&quot;</code></pre>
+<p>Sets the version of IV used in the template. The behavior of some IV functions may change according to the version provided (see the manual of corresponding function).<br>The value must be one of <code>&quot;1.0&quot;</code>, <code>&quot;2.0&quot;</code> or <code>&quot;2.1&quot;</code>. We recommend using the latest version, <strong>2.1</strong>.</p>
+<p><strong>Examples</strong></p>
+<pre><code>~version: &quot;2.1&quot;
+# Now you can use new features from IV 2.1</code></pre>
+<blockquote>
+<p>Please note that <code>version</code> should be set at the beginning of the template before any other rules.</p>
+</blockquote>
+<h4><a class="anchor-link" href="#allowed-origin-new"><i class="anchor-icon"></i></a><a class="anchor" name="allowed-origin-new"></a>allowed_origin <sup><mark><strong>NEW</strong></mark></sup></h4>
+<pre><code>~allowed_origin: &quot;https://example.com&quot;
+~allowed_origin: [&quot;https://example.com&quot;, &quot;https://subdomain.example.com&quot;]</code></pre>
+<p>Sets the origin (or the list of origins) from which content can be loaded using the <a href="#load-new">@load</a> and <a href="#inline">@inline</a> functions.<br>The value should be <em>String</em> or <em>Array of String</em>.</p>
+<p><strong>Examples</strong></p>
+<pre><code>~allowed_origin: &quot;https://api.example.com&quot;
+# Now you can load content from https://api.example.com regardless of the origin of current page
+@load: &quot;https://api.example.com/get/article&quot;</code></pre>
+<h3><a class="anchor-link" href="#supported-functions"><i class="anchor-icon"></i></a><a class="anchor" name="supported-functions"></a>Supported functions</h3>
+<p>The general format for a function is the following:</p>
+<pre><code>@function: xpath_query</code></pre>
+<p>Each function accepts the list of nodes returned by the XPath statement as the main parameter. You may omit <code>xpath_query</code>, in which case <code>$$</code>, the result of the previous XPath query, will be passed into the function. The function then processes each element in the list and returns a list of transformed nodes which are stored in the <code>$@</code> variable.</p>
+<p>Below is a list of functions that are supported in Instant View rules.</p>
+<h4><a class="anchor-link" href="#debug"><i class="anchor-icon"></i></a><a class="anchor" name="debug"></a>debug</h4>
+<pre><code>@debug: xpath_query</code></pre>
+<p>Logs the elements passed into the function, these elements will be displayed in the status line at the bottom of the screen in the <a href="https://instantview.telegram.org/#instant-view-editor">Instant View Editor</a>. Returns the elements passed. Consider combining with <a href="#special-variables-and"><code>$$</code> and <code>$@</code></a>.</p>
+<p><strong>Example</strong></p>
+<pre><code>@debug: //article//a     # displays all links from the page in the log
+@debug                   # displays all links again</code></pre>
+<div><br></div>
+
+<p>Look for debug output at the bottom of your Editor:</p>
+<div>
+    <a href="/file/811140378/19ec/lgDhyQ_HKcc.120673/c7602c526f316dc5a4" target="_blank"><img src="/file/811140378/19ec/lgDhyQ_HKcc.120673/c7602c526f316dc5a4" title="Debug console at the bottom of the screen" class="dev_page_image" style="max-width: 600px" /></a>
+</div>
+
+
+<h4><a class="anchor-link" href="#remove"><i class="anchor-icon"></i></a><a class="anchor" name="remove"></a>remove</h4>
+<pre><code>@remove: xpath_query</code></pre>
+<p>Removes target nodes from the page, returns an empty list.</p>
+<p><strong>Examples</strong></p>
+<pre><code>@remove: //div[has-class(&quot;related&quot;)] # remove article div.related
+@debug                               # empty list</code></pre>
+<h4><a class="anchor-link" href="#append"><i class="anchor-icon"></i></a><a class="anchor" name="append"></a>append</h4>
+<pre><code>@append(&quot;Some text&quot;): xpath_query
+@append(@attr):       xpath_query
+@append(&lt;tag&gt;):       xpath_query
+@append(&lt;tag&gt;, attr, value[, attr, value[, ...]]): xpath_query</code></pre>
+<p>Inserts content, specified by the parameter, to the end of each target node.</p>
+<ul>
+<li>If the first parameter is in angle brackets, a new <code>&lt;tag&gt;</code> node will be created. The following two parameters then specify the name and value of an attribute for that node. If <code>value</code> has the format <code>@attr</code>, the value of the attribute <code>attr</code> in the target node will be used as the value. <code>value</code> can be an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node, and the text value of the returned elements will be used as the attribute&#39;s value. Otherwise, <code>value</code> will be used as the attribute&#39;s value.</li>
+<li>If the first parameter has the format <code>@attr</code>, a new text element with value of the attribute <code>attr</code> of the targeted node will be created.</li>
+<li>Otherwise, a text element with the text specified in the first parameter will be created.</li>
+</ul>
+<p>Returns a list of the newly created nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;div class=&quot;a&quot;&gt;&lt;em&gt;1&lt;/em&gt;&lt;/div&gt;
+@append(&lt;p&gt;): //div
+# &lt;div class=&quot;a&quot;&gt;&lt;em&gt;1&lt;/em&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;</code></pre>
+<h4><a class="anchor-link" href="#prepend"><i class="anchor-icon"></i></a><a class="anchor" name="prepend"></a>prepend</h4>
+<pre><code>@prepend(&quot;Some text&quot;): xpath_query
+@prepend(@attr):       xpath_query
+@prepend(&lt;tag&gt;):       xpath_query
+@prepend(&lt;tag&gt;, attr, value[, attr, value[, ...]]): xpath_query</code></pre>
+<p>Inserts content, specified by the parameter, to the beginning of each target node.</p>
+<ul>
+<li>If the first parameter is in angle brackets, a new <code>&lt;tag&gt;</code> node will be created. The following two parameters then specify the name and value of an attribute for that node. If <code>value</code> has the format <code>@attr</code>, the value of the attribute <code>attr</code> in the target node will be used as the value. <code>value</code> can be an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node, and the text value of the returned elements will be used as the attribute&#39;s value. Otherwise, <code>value</code> will be used as the attribute&#39;s value.</li>
+<li>If the first parameter has the format <code>@attr</code>, a new text element with value of the attribute <code>attr</code> of the targeted node will be created.</li>
+<li>Otherwise, a text element with the text specified in the first parameter will be created.</li>
+</ul>
+<p>Returns a list of the newly created nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;div class=&quot;a&quot;&gt;&lt;em&gt;1&lt;/em&gt;&lt;/div&gt;
+@prepend(&lt;p&gt;, data-class, @class): //div
+# &lt;div class=&quot;a&quot;&gt;&lt;p data-class=&quot;a&quot;&gt;&lt;/p&gt;&lt;em&gt;1&lt;/em&gt;&lt;/div&gt;</code></pre>
+<h4><a class="anchor-link" href="#after"><i class="anchor-icon"></i></a><a class="anchor" name="after"></a>after</h4>
+<pre><code>@after(&quot;Some text&quot;): xpath_query
+@after(@attr):       xpath_query
+@after(&lt;tag&gt;):       xpath_query
+@after(&lt;tag&gt;, attr, value[, attr, value[, ...]]): xpath_query</code></pre>
+<p>Inserts content, specified by the parameter, after each target node.</p>
+<ul>
+<li>If the first parameter is in angle brackets, a new <code>&lt;tag&gt;</code> node will be created. The following two parameters then specify the name and value of an attribute for that node. If <code>value</code> has the format <code>@attr</code>, the value of the attribute <code>attr</code> in the target node will be used as the value. <code>value</code> can be an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node, and the text value of the returned elements will be used as the attribute&#39;s value. Otherwise, <code>value</code> will be used as the attribute&#39;s value.</li>
+<li>If the first parameter has the format <code>@attr</code>, a new text element with value of the attribute <code>attr</code> of the targeted node will be created.</li>
+<li>Otherwise, a text element with the text specified in the first parameter will be created.</li>
+</ul>
+<p>Returns a list of the newly created nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;div class=&quot;a&quot;&gt;&lt;em&gt;1&lt;/em&gt;&lt;em&gt;2&lt;/em&gt;&lt;/div&gt;
+@after(&quot;!&quot;): //div/em
+# &lt;div class=&quot;a&quot;&gt;&lt;em&gt;1&lt;/em&gt;!&lt;em&gt;2&lt;/em&gt;!&lt;/div&gt;</code></pre>
+<h4><a class="anchor-link" href="#before"><i class="anchor-icon"></i></a><a class="anchor" name="before"></a>before</h4>
+<pre><code>@before(&quot;Some text&quot;): xpath_query
+@before(@attr):       xpath_query
+@before(&lt;tag&gt;):       xpath_query
+@before(&lt;tag&gt;, attr, value[, attr, value[, ...]]): xpath_query</code></pre>
+<p>Inserts content, specified by the parameter, before each target node.</p>
+<ul>
+<li>If the first parameter is in angle brackets, a new <code>&lt;tag&gt;</code> node will be created. The following two parameters then specify the name and value of an attribute for that node. If <code>value</code> has the format <code>@attr</code>, the value of the attribute <code>attr</code> in the target node will be used as the value. <code>value</code> can be an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node, and the text value of the returned elements will be used as the attribute&#39;s value. Otherwise, <code>value</code> will be used as the attribute&#39;s value.</li>
+<li>If the first parameter has the format <code>@attr</code>, a new text element with value of the attribute <code>attr</code> of the targeted node will be created.</li>
+<li>Otherwise, a text element with the text specified in the first parameter will be created.</li>
+</ul>
+<p>Returns a list of the newly created nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;div class=&quot;a&quot;&gt;&lt;em&gt;1&lt;/em&gt;&lt;/div&gt;
+@before(&quot;@&quot;): //div/em
+# &lt;div class=&quot;a&quot;&gt;@&lt;em&gt;1&lt;/em&gt;&lt;/div&gt;</code></pre>
+<h4><a class="anchor-link" href="#append-to"><i class="anchor-icon"></i></a><a class="anchor" name="append-to"></a>append_to</h4>
+<pre><code>@append_to(xpath_query): xpath_query
+@append_to($var):        xpath_query</code></pre>
+<p>Inserts each target node to the end of the base node.</p>
+<p>The first parameter specifies the base node. You can pass an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node. The <em>first relevant node</em> will be used as the base node. You can also pass a variable name. If such a variable exists, the <em>first relevant node</em> will be used as the base node. If the variable doesn&#39;t exist or is empty, the property with a matching name will be used as the base node.</p>
+<p>Returns a list of target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code>$div:             //div
+# &lt;div class=&quot;a&quot;&gt;&lt;em&gt;&lt;/em&gt;&lt;/div&gt;&lt;p&gt;Text&lt;/p&gt;
+@append_to($div): //p
+# &lt;div class=&quot;a&quot;&gt;&lt;em&gt;&lt;/em&gt;&lt;p&gt;Text&lt;/p&gt;&lt;/div&gt;</code></pre>
+<h4><a class="anchor-link" href="#prepend-to"><i class="anchor-icon"></i></a><a class="anchor" name="prepend-to"></a>prepend_to</h4>
+<pre><code>@prepend_to(xpath_query): xpath_query
+@prepend_to($var):        xpath_query</code></pre>
+<p>Inserts each target node to the beginning of the base node.</p>
+<p>The first parameter specifies the base node. You can pass an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node. The <em>first relevant node</em> will be used as the base node. You can also pass a variable name. If such a variable exists, the <em>first relevant node</em> will be used as the base node. If the variable doesn&#39;t exist or is empty, the property with a matching name will be used as the base node.</p>
+<p>Returns a list of target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code>$div:              //div
+# &lt;div class=&quot;a&quot;&gt;&lt;em&gt;&lt;/em&gt;&lt;/div&gt;&lt;p&gt;Text&lt;/p&gt;
+@prepend_to($div): //p
+# &lt;div class=&quot;a&quot;&gt;&lt;p&gt;Text&lt;/p&gt;&lt;em&gt;&lt;/em&gt;&lt;/div&gt;</code></pre>
+<h4><a class="anchor-link" href="#after-el"><i class="anchor-icon"></i></a><a class="anchor" name="after-el"></a>after_el</h4>
+<pre><code>@after_el(xpath_query): xpath_query
+@after_el($var):        xpath_query</code></pre>
+<p>Inserts each target node after the base node.</p>
+<p>The first parameter specifies the base node. You can pass an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node. The <em>first relevant node</em> will be used as the base node. You can also pass a variable name. If such a variable exists, the <em>first relevant node</em> will be used as the base node. If the variable doesn&#39;t exist or is empty, the property with a matching name will be used as the base node.</p>
+<p>Returns a list of target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code>$div:                        //div
+# &lt;div class=&quot;a&quot;&gt;&lt;p&gt;Text&lt;/p&gt;&lt;em&gt;&lt;/em&gt;&lt;/div&gt;
+@after_el(&quot;./../self::div&quot;): //p
+# &lt;div class=&quot;a&quot;&gt;&lt;em&gt;&lt;/em&gt;&lt;/div&gt;&lt;p&gt;Text&lt;/p&gt;</code></pre>
+<h4><a class="anchor-link" href="#before-el"><i class="anchor-icon"></i></a><a class="anchor" name="before-el"></a>before_el</h4>
+<pre><code>@before_el(xpath_query): xpath_query
+@before_el($var):        xpath_query</code></pre>
+<p>Inserts each target node before the base node.</p>
+<p>The first parameter specifies the base node. You can pass an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node. The <em>first relevant node</em> will be used as the base node. You can also pass a variable name. If such a variable exists, the <em>first relevant node</em> will be used as the base node. If the variable doesn&#39;t exist or is empty, the property with a matching name will be used as the base node.</p>
+<p>Returns a list of target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code>$div:                        //div
+# &lt;div class=&quot;a&quot;&gt;&lt;p&gt;Text&lt;/p&gt;&lt;em&gt;&lt;/em&gt;&lt;/div&gt;
+@before_el(&quot;./../self::div&quot;): //p
+# &lt;p&gt;Text&lt;/p&gt;&lt;div class=&quot;a&quot;&gt;&lt;em&gt;&lt;/em&gt;&lt;/div&gt;</code></pre>
+<h4><a class="anchor-link" href="#replace-tag"><i class="anchor-icon"></i></a><a class="anchor" name="replace-tag"></a>replace_tag</h4>
+<pre><code>@replace_tag(&lt;tag&gt;):     xpath_query
+&lt;tag&gt;:                   xpath_query</code></pre>
+<p>Changes the name of the tag. The new name for the tag should be passed as the first parameter. Returns target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;div class=&quot;list unordered&quot;&gt;&lt;div class=&quot;item&quot;&gt;&lt;/div&gt;&lt;div class=&quot;item&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+@replace_tag(&lt;li&gt;): //div[has-class(&quot;item&quot;)]
+&lt;ul&gt;:               //div[has-class(&quot;list&quot;)]
+# &lt;ul class=&quot;list unordered&quot;&gt;&lt;li class=&quot;item&quot;&gt;&lt;/li&gt;&lt;li class=&quot;item&quot;&gt;&lt;/li&gt;&lt;/ul&gt;</code></pre>
+<h4><a class="anchor-link" href="#wrap"><i class="anchor-icon"></i></a><a class="anchor" name="wrap"></a>wrap</h4>
+<pre><code>@wrap(&lt;tag&gt;): xpath_query</code></pre>
+<p>Wrap each target node in the <code>&lt;tag&gt;</code> tag. Returns a list of the new <code>&lt;tag&gt;</code> elements.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;em&gt;1&lt;/em&gt;&lt;em&gt;2&lt;/em&gt;
+@wrap(&lt;b&gt;): //em
+# &lt;b&gt;&lt;em&gt;1&lt;/em&gt;&lt;/b&gt;&lt;b&gt;&lt;em&gt;2&lt;/em&gt;&lt;/b&gt;
+@wrap(&lt;u&gt;)
+# &lt;b&gt;&lt;u&gt;&lt;em&gt;1&lt;/em&gt;&lt;/u&gt;&lt;/b&gt;&lt;b&gt;&lt;u&gt;&lt;em&gt;2&lt;/em&gt;&lt;/u&gt;&lt;/b&gt;
+@wrap(&lt;p&gt;): $@
+# &lt;b&gt;&lt;p&gt;&lt;u&gt;&lt;em&gt;1&lt;/em&gt;&lt;/u&gt;&lt;/p&gt;&lt;/b&gt;&lt;b&gt;&lt;p&gt;&lt;u&gt;&lt;em&gt;2&lt;/em&gt;&lt;/u&gt;&lt;/p&gt;&lt;/b&gt;</code></pre>
+<h4><a class="anchor-link" href="#wrap-inner"><i class="anchor-icon"></i></a><a class="anchor" name="wrap-inner"></a>wrap_inner</h4>
+<pre><code>@wrap_inner(&lt;tag&gt;): xpath_query</code></pre>
+<p>Wrap an HTML structure around the content of each target node in the <code>&lt;tag&gt;</code> tag. Returns a list of new <code>&lt;tag&gt;</code> elements.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p&gt;H&lt;sub&gt;2&lt;/sub&gt;0&lt;/p&gt;
+@wrap_inner(&lt;b&gt;): //p
+# &lt;p&gt;&lt;b&gt;H&lt;sub&gt;2&lt;/sub&gt;0&lt;/b&gt;&lt;/p&gt;</code></pre>
+<h4><a class="anchor-link" href="#clone"><i class="anchor-icon"></i></a><a class="anchor" name="clone"></a>clone</h4>
+<pre><code>@clone: xpath_query</code></pre>
+<p>Creates a copy of each target node. Returns a list of the newly created nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p class=&quot;text&quot;&gt;Paragraph&lt;/p&gt;
+@clone: //p
+# &lt;p class=&quot;text&quot;&gt;Paragraph&lt;/p&gt;&lt;p class=&quot;text&quot;&gt;Paragraph&lt;/p&gt;</code></pre>
+<h4><a class="anchor-link" href="#detach"><i class="anchor-icon"></i></a><a class="anchor" name="detach"></a>detach</h4>
+<pre><code>@detach: xpath_query</code></pre>
+<p>Separates the target node from the rest in the parent tag. Creates a copy of the parent tag and wraps the target node into this new instance. Returns a list of parent tags that contain target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;a href=&quot;#1&quot;&gt;
+#   &lt;b&gt;1&lt;/b&gt;
+#   &lt;p&gt;Link #1&lt;/p&gt;
+# &lt;/a&gt;
+# &lt;a href=&quot;#2&quot;&gt;
+#   &lt;b&gt;2&lt;/b&gt;
+#   &lt;p&gt;Link #2&lt;/p&gt;
+# &lt;/a&gt;
+
+@detach: //a/b
+
+# &lt;a href=&quot;#1&quot;&gt;
+#   &lt;b&gt;1&lt;/b&gt;
+# &lt;/a&gt;
+# &lt;a href=&quot;#1&quot;&gt;
+#   &lt;p&gt;Link #1&lt;/p&gt;
+# &lt;/a&gt;
+# &lt;a href=&quot;#2&quot;&gt;
+#   &lt;b&gt;2&lt;/b&gt;
+# &lt;/a&gt;
+# &lt;a href=&quot;#2&quot;&gt;
+#   &lt;p&gt;Link #2&lt;/p&gt;
+# &lt;/a&gt;
+
+@after(&lt;br&gt;): $@
+
+# &lt;a href=&quot;#1&quot;&gt;
+#   &lt;b&gt;1&lt;/b&gt;
+# &lt;/a&gt;&lt;br&gt;
+# &lt;a href=&quot;#1&quot;&gt;
+#   &lt;p&gt;Link #1&lt;/p&gt;
+# &lt;/a&gt;
+# &lt;a href=&quot;#2&quot;&gt;
+#   &lt;b&gt;2&lt;/b&gt;
+# &lt;/a&gt;&lt;br&gt;
+# &lt;a href=&quot;#2&quot;&gt;
+#   &lt;p&gt;Link #2&lt;/p&gt;
+# &lt;/a&gt;</code></pre>
+<h4><a class="anchor-link" href="#split-parent"><i class="anchor-icon"></i></a><a class="anchor" name="split-parent"></a>split_parent</h4>
+<pre><code>@split_parent: xpath_query</code></pre>
+<p>Splits the parent tag by the target node. Places preceding siblings wrapped into parent element before the target node. Places following siblings wrapped into parent element placed after target node.</p>
+<p>Returns a list of target nodes. </p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p class=&quot;text&quot;&gt;
+#   &lt;b&gt;First&lt;/b&gt; line
+#   &lt;figure&gt;&lt;img src=&quot;photo.jpg&quot;&gt;&lt;/figure&gt;
+#   &lt;i&gt;Second&lt;/i&gt; line
+# &lt;/p&gt;
+@split_parent: //p/figure
+# &lt;p class=&quot;text&quot;&gt;
+#   &lt;b&gt;First&lt;/b&gt; line
+# &lt;/p&gt;
+# &lt;figure&gt;&lt;img src=&quot;photo.jpg&quot;&gt;&lt;/figure&gt;
+# &lt;p class=&quot;text&quot;&gt;
+#   &lt;i&gt;Second&lt;/i&gt; line
+# &lt;/p&gt;</code></pre>
+<h4><a class="anchor-link" href="#pre"><i class="anchor-icon"></i></a><a class="anchor" name="pre"></a>pre</h4>
+<pre><code>@pre: xpath_query</code></pre>
+<p>Specifies that the text inside the target node is already formatted. Returns a list of matching nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p&gt;     Some          text  , &lt;/p&gt;
+# &lt;p&gt;  Some  another      text  &lt;/p&gt;
+@pre: (//p)[1]
+# Result in the Instant View page:
+#      Some          text  , 
+# Some another text</code></pre>
+<h4><a class="anchor-link" href="#set-attr"><i class="anchor-icon"></i></a><a class="anchor" name="set-attr"></a>set_attr</h4>
+<pre><code>@set_attr(attr, value):       xpath_query
+@set_attr(attr, @attr):       xpath_query
+@set_attr(attr, &quot;Some text&quot;): xpath_query
+@set_attr(attr, &quot;Some text&quot;, @from-attr, ...): xpath_query</code></pre>
+<p>Sets an attribute in each matching node. The name of the attribute is passed in the first parameter. The value of the attribute is the rest of the parameters concatenated.</p>
+<p>If <code>value</code> has the format <code>@attr</code>, the value of the attribute <code>attr</code> of the target node will be used as the value. <code>value</code> can be an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node, and the text value of the returned elements will be used as the attribute&#39;s value. Otherwise, <code>value</code> will be used as the attribute&#39;s value.</p>
+<p>Returns a list of attribute nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p class=&quot;a&quot;&gt;&lt;/p&gt;
+@set_attr(data-class, @class)
+# &lt;p class=&quot;a&quot; data-class=&quot;a&quot;&gt;&lt;/p&gt;
+@set_attr(id, @class, &quot;_&quot;, ./@data-class)
+# &lt;p class=&quot;a&quot; data-class=&quot;a&quot; id=&quot;a_a&quot;&gt;&lt;/p&gt;</code></pre>
+<h4><a class="anchor-link" href="#set-attrs"><i class="anchor-icon"></i></a><a class="anchor" name="set-attrs"></a>set_attrs</h4>
+<pre><code>@set_attrs(attr, value): xpath_query
+@set_attrs(attr, value[, attr, value[, ...]]): xpath_query</code></pre>
+<p>Sets multiple attributes for each of the target nodes. Each two parameters specify the name and value for the new attributes.</p>
+<p>If <code>value</code> has the format <code>@attr</code>, the value of the attribute <code>attr</code> of the target node will be used as the value. <code>value</code> can be an XPath expression that begins with <code>.</code>, in this case the query will be executed relative to the relevant node, and the text value of the returned elements will be used as the attribute&#39;s value. Otherwise, <code>value</code> will be used as the attribute&#39;s value.</p>
+<p>Returns a list of the matching nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p class=&quot;a&quot;&gt;&lt;/p&gt;
+@set_attrs(data-class, @class, id, &quot;a_a&quot;): //p
+# &lt;p class=&quot;a&quot; data-class=&quot;a&quot; id=&quot;a_a&quot;&gt;&lt;/p&gt;</code></pre>
+<h4><a class="anchor-link" href="#match"><i class="anchor-icon"></i></a><a class="anchor" name="match"></a>match</h4>
+<pre><code>@match(regexp):                         xpath_query
+@match(regexp, match_index):            xpath_query
+@match(regexp, match_index, modifiers): xpath_query</code></pre>
+<p>Performs a search based on a regular expression. Replaces the content of the target node with the search result. The second parameter specifies the number of the captured parenthesized subpattern. If this is not specified, the text that matched the full pattern will be used. You can specify modifiers for the regular expression using the optional parameter (<a href="http://pcre.org/pcre.txt">ims modifiers</a> are supported).</p>
+<p>Returns a list of target nodes. As of IV <strong>2.1</strong>, returns a list of target nodes the content of which matched the regular expression.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p class=&quot;plainText&quot;&gt;Hello, world!&lt;/p&gt;
+@match(&quot;[a-z]+!&quot;): //p
+# &lt;p class=&quot;plainText&quot;&gt;world!&lt;/p&gt;
+@match(&quot;([a-z]+)!&quot;, 1): //p/text()
+# &lt;p class=&quot;plainText&quot;&gt;world&lt;/p&gt;
+@match(&quot;..t&quot;, 0, &quot;i&quot;): //p/@class
+# &lt;p class=&quot;inT&quot;&gt;Bye, world!&lt;/p&gt;
+
+# &lt;ul&gt;&lt;li&gt;a1&lt;/li&gt;&lt;li&gt;a&lt;/li&gt;&lt;li&gt;21b&lt;/li&gt;&lt;li&gt;.&lt;/li&gt;&lt;/ul&gt;
+@match(&quot;[0-9]+&quot;): //ul/li
+# &lt;ul&gt;&lt;li&gt;1&lt;/li&gt;&lt;li&gt;&lt;/li&gt;&lt;li&gt;21&lt;/li&gt;&lt;li&gt;&lt;/li&gt;&lt;/ul&gt;
+@debug: $@
+# Debug 2 nodes:
+#   [0]: &lt;li&gt;1&lt;/li&gt;
+#   [1]: &lt;li&gt;21&lt;/li&gt;</code></pre>
+<h4><a class="anchor-link" href="#replace"><i class="anchor-icon"></i></a><a class="anchor" name="replace"></a>replace</h4>
+<pre><code>@replace(regexp, replacement):            xpath_query
+@replace(regexp, replacement, modifiers): xpath_query</code></pre>
+<p>Performs a search and replace operation using the regular expression. You can specify modifiers for the regular expression using the optional parameter (<a href="http://pcre.org/pcre.txt">ims modifiers</a> are supported).</p>
+<p>Returns a list of target nodes. As of IV <strong>2.1</strong>, returns a list of target nodes the content of which was replaced by the regular expression.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p class=&quot;text&quot;&gt;Hello, world!&lt;/p&gt;
+@replace(&quot;Hello&quot;, &quot;Goodbye&quot;): //p/text()
+# &lt;p class=&quot;text&quot;&gt;Goodbye, world!&lt;/p&gt;
+@replace(&quot;.t$&quot;, &quot;mp&quot;): //p/@class
+# &lt;p class=&quot;temp&quot;&gt;Goodbye, world!&lt;/p&gt;
+@replace(&quot;goodb&quot;, &quot;B&quot;, &quot;i&quot;): //p/text()
+# &lt;p class=&quot;temp&quot;&gt;Bye, world!&lt;/p&gt;
+
+# &lt;ul&gt;&lt;li&gt;a1&lt;/li&gt;&lt;li&gt;a&lt;/li&gt;&lt;li&gt;21b&lt;/li&gt;&lt;li&gt;.&lt;/li&gt;&lt;/ul&gt;
+@replace(&quot;[0-9]+&quot;, &quot;($0)&quot;): //ul/li
+# &lt;ul&gt;&lt;li&gt;a(1)&lt;/li&gt;&lt;li&gt;a&lt;/li&gt;&lt;li&gt;(21)b&lt;/li&gt;&lt;li&gt;.&lt;/li&gt;&lt;/ul&gt;
+@debug: $@
+# Debug 2 nodes:
+#   [0]: &lt;li&gt;a(1)&lt;/li&gt;
+#   [1]: &lt;li&gt;(21)b&lt;/li&gt;</code></pre>
+<h4><a class="anchor-link" href="#urlencode"><i class="anchor-icon"></i></a><a class="anchor" name="urlencode"></a>urlencode</h4>
+<pre><code>@urlencode: xpath_query</code></pre>
+<p>Encodes the content of the target node as per RFC 3986. Returns target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;a href=&quot;https://telegram.org&quot;&gt;link&lt;/a&gt;
+$a: //a
+@urlencode: $a/@href
+# &lt;a href=&quot;https%3A%2F%2Ftelegram.org&quot;&gt;link&lt;/a&gt;
+@set_attr(href, &quot;/?url=&quot;, @href): $a
+# &lt;a href=&quot;/?url=https%3A%2F%2Ftelegram.org&quot;&gt;link&lt;/a&gt;</code></pre>
+<h4><a class="anchor-link" href="#urldecode"><i class="anchor-icon"></i></a><a class="anchor" name="urldecode"></a>urldecode</h4>
+<pre><code>@urldecode: xpath_query</code></pre>
+<p>Decodes the content of the target node as per RFC 3986. Returns target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;a href=&quot;/?url=https%3A%2F%2Ftelegram.org&quot;&gt;link&lt;/a&gt;
+$a: //a
+@match(&quot;^/\?url=(.+)$&quot;, 1): $a/@href
+# &lt;a href=&quot;https%3A%2F%2Ftelegram.org&quot;&gt;link&lt;/a&gt;
+@urldecode
+# &lt;a href=&quot;https://telegram.org&quot;&gt;link&lt;/a&gt;</code></pre>
+<h4><a class="anchor-link" href="#htmlencode"><i class="anchor-icon"></i></a><a class="anchor" name="htmlencode"></a>htmlencode</h4>
+<pre><code>@htmlencode: xpath_query</code></pre>
+<p>Convert special characters in the target node to HTML entities. Returns the target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p&gt;&amp;lt;b&amp;gt;Some text&amp;lt;\b&amp;gt;&lt;/p&gt;
+@htmlencode: //p
+# &lt;p&gt;&amp;amp;lt;b&amp;amp;gt;Some text&amp;amp;lt;\b&amp;amp;gt;&lt;/p&gt;</code></pre>
+<h4><a class="anchor-link" href="#htmldecode"><i class="anchor-icon"></i></a><a class="anchor" name="htmldecode"></a>htmldecode</h4>
+<pre><code>@htmldecode: xpath_query</code></pre>
+<p>Convert special HTML entities in the target node back to characters. Returns the target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p&gt;&amp;amp;lt;b&amp;amp;gt;Some text&amp;amp;lt;\b&amp;amp;gt;&lt;/p&gt;
+@htmldecode: //p
+# &lt;p&gt;&amp;lt;b&amp;gt;Some text&amp;lt;\b&amp;gt;&lt;/p&gt;</code></pre>
+<h4><a class="anchor-link" href="#style-to-attrs"><i class="anchor-icon"></i></a><a class="anchor" name="style-to-attrs"></a>style_to_attrs</h4>
+<pre><code>@style_to_attrs(css_prop, attr): xpath_query
+@style_to_attrs(css_prop, attr[, css_prop, attr[, ...]]): xpath_query</code></pre>
+<p>Gets a value of a CSS property from the style attribute and sets it into an attribute for each of the target nodes. Each two parameters specify the name for the new attribute and the name of CSS property. Returns a list of matching nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;img style=&quot;width: 20px; height: 20px&quot;&gt;
+@style_to_attrs(width, data-width, height, data-height): //img
+# &lt;img style=&quot;width: 20px; height: 20px&quot; data-width=&quot;20&quot; data-height=&quot;20&quot;&gt;</code></pre>
+<h4><a class="anchor-link" href="#background-to-image"><i class="anchor-icon"></i></a><a class="anchor" name="background-to-image"></a>background_to_image</h4>
+<pre><code>@background_to_image: xpath_query</code></pre>
+<p>Transforms the target node with a background picture into an <code>&lt;img&gt;</code> tag with an <code>src</code> attribute. The target node must contain a <code>style</code> attribute with the background. Returns a list of transformed nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;div class=&quot;bg_image&quot; style=&quot;background-image:url(image.jpg)&quot;&gt;&lt;/div&gt;
+@background_to_image: //div[has-class(&quot;bg_image&quot;)]
+# &lt;img src=&quot;image.jpg&quot;&gt;</code></pre>
+<h4><a class="anchor-link" href="#json-to-xml"><i class="anchor-icon"></i></a><a class="anchor" name="json-to-xml"></a>json_to_xml</h4>
+<pre><code>@json_to_xml: xpath_query</code></pre>
+<p>Transforms the content of the target node to the XML format. The contents must be in valid JSON format. The resulting XML tree will be inserted into the document. Returns the root element of the XML tree.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;div data-var=&#39;{&quot;a&quot;:1,&quot;b&quot;:[1,2],&quot;c&quot;:{&quot;p&quot;:&quot;Hello!&quot;}}&#39;&gt;&lt;/div&gt;
+@json_to_xml: //div/@data-var
+@debug: $@
+# &lt;xml&gt;&lt;a&gt;1&lt;/a&gt;&lt;b&gt;&lt;item&gt;1&lt;/item&gt;&lt;item&gt;2&lt;/item&gt;&lt;/b&gt;&lt;c&gt;&lt;p&gt;Hello!&lt;/p&gt;&lt;/c&gt;&lt;/xml&gt;</code></pre>
+<h4><a class="anchor-link" href="#html-to-dom"><i class="anchor-icon"></i></a><a class="anchor" name="html-to-dom"></a>html_to_dom</h4>
+<pre><code>@html_to_dom: xpath_query</code></pre>
+<p>Parse the content of the target node in HTML format and insert it into the document. Returns the root element of the inserted HTML tree.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;div data-content=&quot;&amp;lt;b&amp;gt;Some text&amp;lt;\b&amp;gt;&quot;&gt;&lt;/div&gt;
+@html_to_dom: //div/@data-content
+@debug: $@
+# &lt;dom&gt;&lt;b&gt;Some text&lt;/b&gt;&lt;/dom&gt;</code></pre>
+<h4><a class="anchor-link" href="#combine"><i class="anchor-icon"></i></a><a class="anchor" name="combine"></a>combine</h4>
+<pre><code>@combine:                        xpath_query
+@combine(&quot; - &quot;):                 xpath_query
+@combine(&lt;tag&gt;):                 xpath_query
+@combine(&lt;tag&gt;[, &quot; - &quot;[, ...]]): xpath_query</code></pre>
+<p>Combines each target node with its preceding node if such a node exists. You can use parameters to specify nodes to be inserted above the target node. If the parameter is in angular brackets, a new <code>&lt;tag&gt;</code> node will be created. Otherwise a text element with the text specified by the parameter will be used.</p>
+<p>Returns a list of nodes, preceding the target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;pre&gt;1 2 3&lt;/pre&gt;
+# &lt;pre&gt; 4 5 &lt;/pre&gt;
+# &lt;pre&gt;6 7 8&lt;/pre&gt;
+@combine:             //pre/following-sibling::*[1]/self::pre
+# &lt;pre&gt;1 2 3 4 5 6 7 8&lt;/pre&gt;
+
+# &lt;p&gt;first&lt;/p&gt;
+# &lt;p&gt;second&lt;/p&gt;
+@combine(&lt;br&gt;, &lt;br&gt;): //p/following-sibling::*[1]/self::p
+# &lt;p&gt;first&lt;br&gt;&lt;br&gt;second&lt;/p&gt;
+
+# &lt;h1&gt;Title&lt;/h1&gt;
+# &lt;strong&gt;Subtitle&lt;/strong&gt;
+@combine(&lt;br&gt;, &quot;\n&quot;): //h1/following-sibling::*[1]/self::strong
+# &lt;h1&gt;Title&lt;br&gt;
+# Subtitle&lt;/h1&gt;</code></pre>
+<h4><a class="anchor-link" href="#datetime"><i class="anchor-icon"></i></a><a class="anchor" name="datetime"></a>datetime</h4>
+<pre><code>@datetime(-2): xpath_query
+@datetime(-2, &quot;en-US&quot;, &quot;yyyy-MM-dd&quot;): xpath_query</code></pre>
+<p>Transforms the date and time from the text of the target node into a unixtime timestamp. The parameter specifies the timezone of the original date and time.</p>
+<p>You can also pass a locale and a pattern to parse the date and time in more complicated cases. If a non-gregorian calendar is used, this needs to be specified in the locale. For example, <code>&quot;fa-IR@calendar=persian&quot;</code>. Available patterns are documented <a href="http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax">here</a>. </p>
+<p>On success, returns a text element with the unixtime timestamp. Otherwise, returns the target element.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;div id=&quot;date&quot;&gt;1 January 2017, 15:04&lt;/div&gt;
+@datetime(-2):  //div[@id=&quot;date&quot;]
+published_date: $@   # the property published_date will hold a unixtime timestamp
+
+# &lt;time&gt;دوشنبه, ۲۳ اسفند ۱۳۹۵&lt;/time&gt;
+@datetime(0, &quot;fa-IR@calendar=persian&quot;, &quot;EEEE, dd MMMM yyyy&quot;): //time
+published_date: $@   # the property published_date will hold a unixtime timestamp</code></pre>
+<h4><a class="anchor-link" href="#simplify"><i class="anchor-icon"></i></a><a class="anchor" name="simplify"></a>simplify</h4>
+<blockquote>
+<p><strong>Note:</strong> This is a service function. There is no reason for you to use it in your templates. It was included in this reference to give you a better understanding of how the system works (see the <code>..after</code> block).</p>
+</blockquote>
+<pre><code>@simplify: xpath_query</code></pre>
+<p>Processes the target nodes according to the Instant View format. Returns the target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p&gt;&lt;span&gt;&lt;b&gt;S&lt;/b&gt;ome&lt;/span&gt; &lt;em&gt;important&lt;/em&gt; text!&lt;/p&gt;
+@simplify: //p
+# &lt;p&gt;&lt;b&gt;S&lt;/b&gt;ome &lt;em&gt;important&lt;/em&gt; text!&lt;/p&gt;</code></pre>
+<h4><a class="anchor-link" href="#inline"><i class="anchor-icon"></i></a><a class="anchor" name="inline"></a>inline</h4>
+<pre><code>@inline:         xpath_query
+@inline(silent): xpath_query</code></pre>
+<p>If the target element is an <code>&lt;iframe&gt;</code> with the attribute <code>src</code>, the content of the iframe will be loaded. The target element will be replaced with the content of the iframe.</p>
+<p>If the target node is an HTML-comment, a <code>&lt;comment&gt;</code> element with the content of the comment will be created. The comment will be replaced by the newly created node.</p>
+<p>You can use <code>silent</code> parameter to ignore errors while processing this function. You will still see an error in the debug console, but the rules that come after will continue to execute.</p>
+<p>Returns a list of replaced nodes.</p>
+<blockquote>
+<p>Note: The @inline function adheres to the <a href="https://en.wikipedia.org/wiki/Same-origin_policy">same-origin policy</a>. This means that the target and the inlined pages should have the same origin. You can specify additional allowed origins using the option <a href="#allowed-origin-new">~allowed_origin</a></p>
+</blockquote>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p&gt;&lt;iframe src=&quot;/subpage.html&quot;&gt;&lt;/iframe&gt;&lt;/p&gt;
+# /subpage.html:
+#   &lt;html&gt;&lt;body&gt;&lt;p&gt;Hello!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+@inline: //p/iframe
+# &lt;p&gt;&lt;html&gt;&lt;body&gt;&lt;p&gt;Hello!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;&lt;/p&gt;
+@debug
+# &lt;html&gt;&lt;body&gt;&lt;p&gt;Hello!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+
+# &lt;p&gt;&lt;!--&lt;b&gt;Hello!&lt;/b&gt;, world!--&gt;&lt;/p&gt;
+@inline: //p/comment()
+# &lt;p&gt;&lt;comment&gt;&lt;b&gt;Hello!&lt;/b&gt;, world!&lt;/comment&gt;&lt;/p&gt;
+@debug
+# &lt;comment&gt;&lt;b&gt;Hello!&lt;/b&gt;, world!&lt;/comment&gt;</code></pre>
+<h4><a class="anchor-link" href="#load-new"><i class="anchor-icon"></i></a><a class="anchor" name="load-new"></a>load <sup><mark><strong>NEW</strong></mark></sup></h4>
+<pre><code>@load:         &quot;https://example.com&quot;
+@load(silent): xpath_query</code></pre>
+<p>Loads the content of the URL. The URL can be specified as a string or be the content of the target node.</p>
+<p>You can use <code>silent</code> parameter to ignore errors while processing this function. You will still see an error in the debug console, but the rules that come after will continue to execute.</p>
+<p>Returns the newly created node with loaded content.</p>
+<blockquote>
+<p>Note: The @load function adheres to the <a href="https://en.wikipedia.org/wiki/Same-origin_policy">same-origin policy</a>. This means that the target and the loaded pages should have the same origin. You can specify additional allowed origins using the option <a href="#allowed-origin-new">~allowed_origin</a></p>
+</blockquote>
+<p><strong>Examples</strong></p>
+<pre><code>@append(&lt;iframe&gt; src &quot;/subpage.html&quot;): /html/body
+$iframe: $@
+@remove
+@inline: $iframe
+# the same, but much shorter
+@load: &quot;/subpage.html&quot;
+
+@load(silent): //meta[@property=&quot;api:url&quot;]/@content
+# trying to load content from api:url
+@if ( $@ ) {
+  # Do something with content
+}</code></pre>
+<h4><a class="anchor-link" href="#unsupported"><i class="anchor-icon"></i></a><a class="anchor" name="unsupported"></a>unsupported</h4>
+<pre><code>@unsupported: xpath_query</code></pre>
+<p>Specifies that the target node contains essential content that can&#39;t be represented in the Instant View format. Returns the target nodes.</p>
+<p><strong>Examples</strong></p>
+<pre><code># &lt;p&gt;See the graph below:&lt;/p&gt;
+# &lt;canvas class=&quot;article_graph&quot; width=&quot;600&quot; height=&quot;400&quot;&gt;&lt;/canvas&gt;
+@unsupported: //canvas[has-class(&quot;article_graph&quot;)]</code></pre>
+<blockquote>
+<p><strong>Tip:</strong> It is important to identify that a page contains essential unsupported content — no IV page will be generated to ensure that the user never gets incomplete info from an article. The system will take care of the most popular cases in the <code>..after</code> block, but your template must cover everything that the system doesn&#39;t catch.</p>
+</blockquote>
+<h3><a class="anchor-link" href="#supported-block-functions"><i class="anchor-icon"></i></a><a class="anchor" name="supported-block-functions"></a>Supported block functions</h3>
+<p>The general format for a block function is the following:</p>
+<pre><code>@function(xpath_query) {
+  # block of rules
+}</code></pre>
+<p>Block functions usually accept the list of nodes returned by the XPath statement as a parameter. Depending on the function and its parameters, rules inside the block can be run several times or never. Block functions can contain any type of rules except conditions.</p>
+<p>Below is a list of block functions that are supported in Instant View rules.</p>
+<h4><a class="anchor-link" href="#if"><i class="anchor-icon"></i></a><a class="anchor" name="if"></a>if</h4>
+<pre><code>@if(xpath_query) {
+  # block of rules
+}</code></pre>
+<p>Executes the block of rules if target nodes exist on the current page. If target nodes do not exist, the block of rules will be skipped. The <code>$$</code> and <code>$@</code> variables contain target nodes found by the XPath query.</p>
+<p><strong>Example</strong></p>
+<pre><code>@if( //div[has-class(&quot;blockquote&quot;)] ) { # if div.blockquote exists
+  &lt;blockquote&gt;: $@                      #   change tag name to blockquote
+  &lt;cite&gt;: $@//div[has-class(&quot;author&quot;)]  #   and mark div.author as a caption
+}</code></pre>
+<h4><a class="anchor-link" href="#if-not"><i class="anchor-icon"></i></a><a class="anchor" name="if-not"></a>if_not</h4>
+<pre><code>@if_not(xpath_query) {
+  # block of rules
+}</code></pre>
+<p>Executes a block of rules if target nodes do not exist on the current page. If such nodes exist, the block of rules will be skipped. The <code>$$</code> and <code>$@</code> variables contain target nodes found by the XPath query.</p>
+<p><strong>Example</strong></p>
+<pre><code>@if_not( $body//footer ) {     # if footer does not exist
+  @append(&lt;footer&gt;): $body     #   append it into body
+}</code></pre>
+<h4><a class="anchor-link" href="#map"><i class="anchor-icon"></i></a><a class="anchor" name="map"></a>map</h4>
+<pre><code>@map(xpath_query) {
+  # block of rules
+}</code></pre>
+<p>Executes a block of rules once per each target node found by the XPath query. At the beginning of each iteration, the following variables will be set: </p>
+<ul>
+<li><code>$$</code> will contain the target nodes found by XPath query;</li>
+<li><code>$@</code> will contain the current target node;</li>
+<li><code>$index</code> will contain the index of the current target node (starts with 1);</li>
+<li><code>$first</code> will contain <code>&lt;true&gt;</code> if the current target node is the first in the list and an empty list otherwise;</li>
+<li><code>$middle</code> will contain <code>&lt;true&gt;</code> if the current target node is between the first and the last in the list, empty list otherwise;</li>
+<li><code>$last</code> would contain <code>&lt;true&gt;</code> if the current target node is the last one in the list, empty list otherwise.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>@map( //div[@id=&quot;list&quot;]/p ) {   # for each paragraph in list
+  $p: $@                        #   store the current paragraph in $p variable
+  @prepend_to($p): &quot;. &quot;         #   and
+  @prepend_to($p): $index       #   number them starting with 1
+}</code></pre>
+<blockquote>
+<p>Please note that the <code>@map</code> function should be used <strong>only</strong> if it is impossible to use <strong>regular functions</strong> with xpath queries (for example you need to use $index). Otherwise, regular functions are faster because they process several nodes at once.</p>
+</blockquote>
+<p><strong>Example</strong></p>
+<pre><code># Bad way:
+@map( //div[has-class(&quot;image&quot;)] ) {
+  $image: $@
+  &lt;cite&gt;:       $image//p/span
+  &lt;figcaption&gt;: $image//p
+  &lt;figure&gt;:     $image
+}
+# The same result, but faster:
+$image:       //div[has-class(&quot;image&quot;)]
+&lt;cite&gt;:       $image//p/span
+&lt;figcaption&gt;: $image//p
+&lt;figure&gt;:     $image</code></pre>
+<h4><a class="anchor-link" href="#repeat"><i class="anchor-icon"></i></a><a class="anchor" name="repeat"></a>repeat</h4>
+<pre><code>@repeat(n) {
+  # block of rules
+}</code></pre>
+<p>Executes a block of rules <strong>n</strong> times. At the beginning of each iteration, the following variables will be set: </p>
+<ul>
+<li><code>$$</code> and <code>$@</code> will contain the previous value of <code>$$</code>;</li>
+<li><code>$index</code> will contain the index of the current iteration (starts with 1);</li>
+<li><code>$first</code> will contain <code>&lt;true&gt;</code> if this is the first iteration, an empty list otherwise;</li>
+<li><code>$middle</code> will contain <code>&lt;true&gt;</code> if the current iteration is between the first and last, empty list otherwise;</li>
+<li><code>$last</code> will contain <code>&lt;true&gt;</code> if this is the last iteration, empty list otherwise.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code># appends &quot;1, 2, 3, 4, 5&quot; to $body
+@repeat( 5 ) {
+  @append_to($body): $index
+  @if_not( $last ) {
+    @append_to($body): &quot;, &quot;
+  }
+}</code></pre>
+<h4><a class="anchor-link" href="#while"><i class="anchor-icon"></i></a><a class="anchor" name="while"></a>while</h4>
+<pre><code>@while(xpath_query) {
+  # block of rules
+}</code></pre>
+<p>Executes a block of rules while target nodes exist on the current page. At the beginning of each iteration the following variables will be set: </p>
+<ul>
+<li><code>$$</code> and <code>$@</code> will contain target nodes found by XPath query;</li>
+<li><code>$index</code> will contain the index of the current iteration (starts with 1);</li>
+<li><code>$first</code> will contain <code>&lt;true&gt;</code> if it is the first iteration, an empty list otherwise.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>@while( //iframe ) {
+  @inline: $@          # inline all nested iframes
+}</code></pre>
+<h4><a class="anchor-link" href="#while-not"><i class="anchor-icon"></i></a><a class="anchor" name="while-not"></a>while_not</h4>
+<pre><code>@while_not(xpath_query) {
+  # block of rules
+}</code></pre>
+<p>Executes a block of rules while target nodes do not exist on the current page. At the beginning of each iteration the following variables will be set: </p>
+<ul>
+<li><code>$$</code> and <code>$@</code> will contain target nodes found by XPath query;</li>
+<li><code>$index</code> will contain the index of the current iteration (starts with 1);</li>
+<li><code>$first</code> will contain <code>&lt;true&gt;</code> if this is the first iteration, an empty list otherwise.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>@while_not( //video ) {   # if no video exists on the current page
+  @inline: //iframe       #   try to inline iframes, maybe video is inside the frame
+}</code></pre>
+<h3><a class="anchor-link" href="#embedded-elements"><i class="anchor-icon"></i></a><a class="anchor" name="embedded-elements"></a>Embedded elements</h3>
+<p>Instant View supports widgets from popular services. We display them as embedded elements or specially formatted quotes. The Instant View bot analyzes all iframes in the document body and generates a widget if the service is supported.</p>
+<blockquote>
+<p>Some popular widgets do not use iframes. Note that the <code>..after</code> block of rules contains rules to transform such widgets to an Instant View compatible format.</p>
+</blockquote>
+<p>We currently support the following services:</p>
+<ul>
+<li>Youtube</li>
+<li>Vimeo</li>
+<li>Tweets &amp; Twitter Videos</li>
+<li>Facebook Posts &amp; Videos</li>
+<li>Instagram</li>
+<li>Giphy</li>
+<li>SoundCloud</li>
+<li>GithubGist</li>
+<li>Aparat</li>
+<li>VK.com Videos</li>
+</ul>
+<h3><a class="anchor-link" href="#processing-pages"><i class="anchor-icon"></i></a><a class="anchor" name="processing-pages"></a>Processing pages</h3>
+<p>All pages are processed according to the following rules:</p>
+<pre><code># Url: http://example.com/some_page.html
++ example.com
+?true
++ ..after</code></pre>
+<p>If a page is on a third-level domain and above, the following rules are applied:</p>
+<pre><code># Url: http://some.subdomain.example.com/some_page.html
++ some.subdomain.example.com
+?not_exists: $body
++ subdomain.example.com
+?not_exists: $body
++ example.com
+?true
++ ..after</code></pre>
+<p>In other words, at first the bot attempts to use a block of rules that features the full domain name. If such a block does not exist, the bot checks for the next level up to the second-level domain.</p>
+<p><code>..after</code> is a special block of rules that is applied to all pages irrespective of the domain name.</p>
+<h4><a class="anchor-link" href="#working-with-subdomains"><i class="anchor-icon"></i></a><a class="anchor" name="working-with-subdomains"></a>Working with subdomains</h4>
+<p>If the page is on a third-level domain or higher, you need to manually select the domain level to which your template will apply. Use this menu in the top left corner of the page:</p>
+<div>
+    <a href="/file/811140424/1/iHfwojr4Vgs.13156/e22aeb9d421eb01c85" target="_blank"><img src="/file/811140424/1/iHfwojr4Vgs.13156/e22aeb9d421eb01c85" title="Select domain level" style="max-width: 300px"  class="dev_page_image" /></a><br>
+</div>
+
+<p>Choose a level that hosts pages with the same structure, so that your rules are relevant to all the matching pages on this domain. </p>
+<blockquote>
+<p>For example, use <code>wikipedia.org</code> to create an IV page for <code>https://en.wikipedia.org/wiki/Domain_name</code> because the page structure doesn&#39;t depend on language in Wikipedia.</p>
+</blockquote>
+</div>
+  
+</div>
+      </div>
+    </div>
+  </div>
+</main><div class="popup-container login-popup-container hide" id="login-popup-container">
+  <div class="popup">
+    <div class="popup-body">
+      <section>
+        <h2>Log In</h2>
+        <p>Log in here to create Instant View templates. Please enter your <b>phone number</b> in the <a target="_blank" rel="noopener" href="https://telegram.org/faq#login-and-sms">international format</a> and we will send a confirmation message to your account via Telegram.</p>
+
+        <div id="login-alert"></div>
+        <form id="send-form" class="login-form" onsubmit="return requestConfirmation(event);">
+          <div class="form-group">
+            <input type="tel" class="form-control iv-form-control input-lg" id="phone-number" placeholder="+12223334455" autocomplete="off"/>
+          </div>
+          <div class="popup-buttons">
+            <a class="btn btn-link btn-lg login-cancel-btn">Cancel</a><!--
+         --><button type="submit" class="btn btn-link btn-lg">Next</button>
+          </div>
+        </form>
+
+        <div id="login-form" class="hide">
+          <div class="form-group">
+            <span class="form-control iv-form-control input input-lg input-disabled"><strong id="phone-number-field"></strong> (<a class="login-back" href="/auth">Incorrect?</a>)</span>
+            <p class="help-block dots-animated">We&#39;ve just sent you a message.<br/>Please confirm access via Telegram</p>
+          </div>
+          <div class="popup-buttons">
+            <a class="btn btn-link btn-lg login-cancel-btn">Cancel</a><!--
+         --><a class="btn btn-link btn-lg login-back">Back</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+    
+    <script src="/js/jquery.min.js?1"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/main.js?43"></script>
+<script src="/js/codemirror/codemirror.js?1"></script>
+<script src="/js/codemirror/simple.js?1"></script>
+<script src="/js/codemirror/runmode.js?1"></script>
+<script src="/js/codemirror-instantview.js?21"></script>
+<script src="/js/instantview.js?72"></script>
+
+    <script>$(window).resize(updateNavBar);updateNavBar();
+window.initDevPageNav&&initDevPageNav();
+$("pre").addClass("cm-s-default").each(function(){CodeMirror.runMode($(this).text(),"instantview",this);});
+$('body').on('activate.bs.scrollspy', function () {
+  var head_active_el = $('.header-nav li.active[data-side-nav-item]');
+  if (head_active_el.length) {
+    head_active_el.removeClass('active').wrapInner('<a href="/docs#"></a>');
+    head_active_el.after('<li class="active"></li>');
+  }
+  head_active_el = $('.header-nav li.active');
+  var active_el = $('.dev_side_nav li.active > a').last();
+  head_active_el.text(active_el.text());
+});
+function showLoginError(error_text) {
+  $('#login-alert').html('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">×</a>' + error_text + ' </div>').show();
+}
+function requestConfirmation(event) {
+  event.preventDefault();
+  $('#login-alert').hide();
+  var phone = $('#phone-number').val();
+
+  $.ajax({
+    type: 'POST',
+    url: '/auth/request',
+    data: {
+      phone: phone
+    },
+    success: function(result) {
+      $('#phone-number-field').text(phone);
+      $('#send-form').addClass('hide');
+      $('#login-form').removeClass('hide');
+      checkAuth(result.temp_session);
+    },
+    error: function(xhr) {
+      showLoginError(xhr.responseText || 'Server error');
+    },
+    dataType: 'json'
+  });
+  return false;
+}
+function cancelConfirmation(event) {
+  event && event.preventDefault();
+  $('#login-alert').hide();
+  $('#phone-number-field').text('');
+  $('#send-form').removeClass('hide');
+  $('#login-form').addClass('hide');
+  $('#phone-number').focus();
+  clearTimeout(window.authTimeout);
+  return false;
+}
+function checkAuth(temp_session) {
+  clearTimeout(window.authTimeout);
+  window.authTimeout = setTimeout(function doCheckAuth() {
+    $.ajax({
+      type: 'POST',
+      url: '/auth/login',
+      data: {
+        temp_session: temp_session
+      },
+      success: function(result) {
+        if (result) {
+          location.reload();
+        } else {
+          checkAuth(temp_session);
+        }
+      },
+      error: function (xhr) {
+        showLoginError(xhr.responseText || 'Server error');
+      },
+      dataType: 'json'
+    });
+  }, 700);
+}
+$('#login-popup-container').on('popup:open', function() {
+  $('#phone-number').focus();
+});
+$('#login-popup-container').on('popup:close', function() {
+  cancelConfirmation();
+  if (location.pathname == '/auth') {
+    window.history && history.replaceState(null, null, '/');
+  }
+});
+App.unauth = true;
+$('a[data-need-auth]').click(function(e) {
+  e.preventDefault();
+  openPopup('#login-popup-container');
+});
+$('#login-popup-container .login-cancel-btn').click(function(e) {
+  e.preventDefault();
+  closePopup('#login-popup-container');
+});
+$('.login-back').click(cancelConfirmation);
+</script>
+  </body>
+</html>
+
