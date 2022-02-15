@@ -232,7 +232,7 @@
           case Keys.UP:
             var index;
             if (!curSelectedIndex) {
-              if (options.enterEnabled()) {
+              if (options.$enter && options.enterEnabled()) {
                 index = false;
               } else {
                 break;
@@ -284,6 +284,9 @@
       }
 
       function check(item, queryLower) {
+        if (options.checkItem) {
+          return options.checkItem(item, queryLower);
+        }
         if (!queryLower.length) {
           return 0;
         }
@@ -347,7 +350,6 @@
           return;
         }
         var time = +(new Date);
-        var queryLower = options.prepareQuery(query);
         from_index = from_index || 0;
         var html = '';
         var render_limit = options.renderLimit || 50;
@@ -365,7 +367,7 @@
           curRenderedIndex = 0;
         }
         if (curRenderedIndex >= result.length) {
-          html += options.appendToItems ? options.appendToItems(query) : '';
+          html += options.appendToItems ? options.appendToItems(query, result.length) : '';
         }
         if (!result.length && html == '') {
           options.$results.fadeHide(function() {
