@@ -45,6 +45,51 @@
 <p>Numerical value similar to HTTP status. Contains information on the type of error that occurred: for example, a data input error, privacy error, or server error. This is a required parameter.</p>
 <h4><a class="anchor" href="#error-type" id="error-type" name="error-type"><i class="anchor-icon"></i></a>Error Type</h4>
 <p>A string literal in the form of <code>/[A-Z_0-9]+/</code>, which summarizes the problem. For example, <code>AUTH_KEY_UNREGISTERED</code>. This is an optional parameter.</p>
+<h4><a class="anchor" href="#error-database" id="error-database" name="error-database"><i class="anchor-icon"></i></a>Error Database</h4>
+<p>A full machine-readable JSON list of RPC errors that can be returned by all methods in the API can be found <a href="/file/464001165/11680/luDh6JDlj7I.76063.json/32eb0548a1749ae301">here »</a>, what follows is a description of its fields:  </p>
+<ul>
+<li><code>errors</code> - All error messages and codes for each method (object).<ul>
+<li>Keys: Error codes as strings (numeric strings)</li>
+<li>Values: All error messages for each method (object)<ul>
+<li>Keys: Error messages (string)</li>
+<li>Values: An array of methods which may emit this error (array of strings)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>descriptions</code> - Descriptions for every error mentioned in <code>errors</code> (and a few other errors not related to a specific method)<ul>
+<li>Keys: Error messages</li>
+<li>Values: Error descriptions</li>
+</ul>
+</li>
+<li><code>user_only</code> - A list of methods that can only be used by users, <strong>not</strong> bots.</li>
+</ul>
+<p>Error messages and error descriptions may contain <code>printf</code> placeholders in key positions, for now only <code>%d</code> is used to map durations contained in error messages to error descriptions.</p>
+<p>Example:</p>
+<pre><code class="language-json">{
+    "errors": {
+        "420": {
+            "2FA_CONFIRM_WAIT_%d": [
+                "account.deleteAccount"
+            ],
+            "SLOWMODE_WAIT_%d": [
+                "messages.forwardMessages",
+                "messages.sendInlineBotResult",
+                "messages.sendMedia",
+                "messages.sendMessage",
+                "messages.sendMultiMedia"
+            ]
+        }
+    },
+    "descriptions": {
+        "2FA_CONFIRM_WAIT_%d": "Since this account is active and protected by a 2FA password, we will delete it in 1 week for security purposes. You can cancel this process at any time, you'll be able to reset your account in %d seconds.",
+        "SLOWMODE_WAIT_%d": "Slowmode is enabled in this chat: wait %d seconds before sending another message to this chat.",
+        "FLOOD_WAIT_%d": "Please wait %d seconds before repeating the action."
+    },
+    "user_only": {
+        "account.deleteAccount"
+    }
+}</code></pre>
 <hr>
 <h4><a class="anchor" href="#error-constructors" id="error-constructors" name="error-constructors"><i class="anchor-icon"></i></a>Error Constructors</h4>
 <p>There should be a way to handle errors that are returned in <a href="/mtproto/service_messages#rpc-error">rpc_error</a> constructors.</p>
