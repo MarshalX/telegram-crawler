@@ -40,7 +40,8 @@ async def crawl(url: str, session: aiohttp.ClientSession):
     try:
         logger.info(f'Process {url}')
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False) as response:
-            if response.status == 500:
+            if response.status // 100 == 5:
+                logger.warning(f'Error 5XX. Retrying {url}')
                 return await asyncio.gather(crawl(url, session))
 
             if response.status not in {200, 304}:
@@ -68,6 +69,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                 logger.info(f'Write to {filename}')
                 await f.write(content)
     except (TimeoutError, ClientConnectorError):
+        logger.warning(f'Client or timeout error. Retrying {url}')
         await asyncio.gather(crawl(url, session))
 
 

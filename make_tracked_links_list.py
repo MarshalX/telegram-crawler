@@ -229,8 +229,9 @@ async def crawl(url: str, session: aiohttp.ClientSession):
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
             content_type = response.headers.get('content-type')
 
-            if response.status == 500:
+            if response.status // 100 == 5:
                 VISITED_LINKS.remove(url)
+                logger.warning(f'Error 5XX. Retrying {url}')
                 return await asyncio.gather(crawl(url, session))
 
             if response.status not in {200, 304}:
@@ -272,7 +273,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
     except ClientConnectorError:
         logger.warning(f'Wrong link: {url}')
     except (ServerDisconnectedError, TimeoutError):
-        logger.warning(f'Retrying {url}')
+        logger.warning(f'Client or timeout error. Retrying {url}')
         VISITED_LINKS.remove(url)
         await asyncio.gather(crawl(url, session))
 
