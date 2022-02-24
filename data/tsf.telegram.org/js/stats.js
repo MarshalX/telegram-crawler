@@ -7,6 +7,7 @@ var statShortWeekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function statsFormat(period) {
   switch (period) {
+    case 'minute':
     case '5min':
       return statsFormat5min;
 
