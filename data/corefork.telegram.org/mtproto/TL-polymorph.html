@@ -92,7 +92,7 @@ nil : forall (X:Type), X -&gt; List X;</code></pre>
 <p>There is a small problem: if we want to serialize the value of the bare type ‘%pair string int’ or ‘%pair string Y’ (which in TL is usually denoted simply as “pair”, though the form “%Pair” is preferable), we cannot simultaneously use both the full constructor @pair and the partial pair, because the constructor’s name will not be serialized. Therefore, we must differentiate the bare types %@pair (type X, type Y, value x:X, and value y:Y are serialized) and %pair (only x:X and y:Y are serialized; types X and Y are known from the context). In practice, we nearly almost always need the bare type %pair, and this is precisely what “pair” means in the type’s context in TL. Therefore, </p>
 <pre><code>record name:string map:(List (pair int string)) = Record;</code></pre>
 <p>will be serialized approximately like we want it to be (the serialization of list elements will consist of the serialization of int and the serialization of string, without any additional headers, types, or combinator names).
-Incidentally, when calculating the “record” combinator’s name <em>'record'</em> in the example given above, the CRC32 of <code>record name:string map:List pair int string = Record</code> will be computed.</p>
+Incidentally, when calculating the “record” combinator's name <em>'record'</em> in the example given above, the CRC32 of <code>record name:string map:List pair int string = Record</code> will be computed.</p>
 <p>Also note that a more precise description of this type would be</p>
 <pre><code>record name:string map:(List %(Pair int string)) = Record</code></pre></div>
   
