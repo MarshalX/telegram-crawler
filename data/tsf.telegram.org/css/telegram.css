@@ -3590,31 +3590,45 @@ a.tgme_footer_dl_button:active {
 .tgme_page_widget_actions {
   position: relative;
   padding: 16px 0;
-  background: #fff;
+  background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(25px);
   border-radius: 16px;
   max-width: 500px;
   margin: 0 auto;
-  transition: border-radius .15s ease-in-out, max-width .15s ease-in-out;
+  transition:
+    border-radius .15s ease-in-out,
+    max-width .15s ease-in-out,
+    background-color 0s linear;
 }
-.fixed_actions .tgme_page_widget_actions_wrap {
+.fixed_actions .tgme_page_widget_actions_wrap,
+.sticky_actions .tgme_page_widget_actions_wrap {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   margin: 0 auto;
 }
-.fixed_actions .tgme_page_widget_actions {
-  background: rgba(255, 255, 255, 0.84);
-  -webkit-backdrop-filter: blur(25px);
-  backdrop-filter: blur(25px);
+.sticky_actions .tgme_page_widget_actions_wrap {
+  position: sticky;
+  margin: 0 -16px;
+}
+.fixed_actions .tgme_page_widget_actions,
+.sticky_actions .tgme_page_widget_actions.stuck {
+  background-color: rgba(255, 255, 255, 0.84);
   border-radius: 0;
   max-width: 100%;
+  transition-delay: 0s, 0s, .15s;
 }
 @media (min-width: 800px) {
-  .fixed_actions .tgme_page_widget_actions {
+  .fixed_actions .tgme_page_widget_actions,
+  .sticky_actions .tgme_page_widget_actions.stuck {
     max-width: 600px;
     border-radius: 16px 16px 0 0;
+  }
+  .sticky_actions .tgme_page_widget_actions.stuck {
+    margin: 0 auto;
   }
 }
 .tgme_page_widget_actions_cont {
