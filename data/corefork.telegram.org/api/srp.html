@@ -42,7 +42,7 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Telegram uses the <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">Secure Remote Password protocol</a> version 6a to implement 2FA.</p>
-<p>Example impementation: <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/PasswordManager.cpp">tdlib</a>.</p>
+<p>Example implementation: <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/PasswordManager.cpp">tdlib</a>.</p>
 <h3><a class="anchor" href="#checking-the-password-with-srp" id="checking-the-password-with-srp" name="checking-the-password-with-srp"><i class="anchor-icon"></i></a>Checking the password with SRP</h3>
 <p>To login to an account protected by a 2FA password or to perform some other actions (like changing channel owner), you will need to verify the user's knowledge of the current 2FA account password.</p>
 <p>To do this, first the client needs to obtain SRP parameters and the KDF algorithm to use to check the validity of the password via <a href="https://core.telegram.org/method/account.getPassword">account.getPassword</a> method. For now, only the <a href="/constructor/passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow">passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow</a> algorithm is supported, so we'll only explain that.</p>
@@ -50,7 +50,7 @@
 <p>This extension of the <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">SRP protocol</a> uses the password-based <a href="https://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a> with 100000 iterations using sha512 (<code>PBKDF2HMACSHA512iter100000</code>).
 PBKDF2 is used to additionally rehash the <code>x</code> parameter, obtained using a method similar to the one described in <a href="https://tools.ietf.org/html/rfc2945#section-3">RFC 2945</a> (<code>H(s | H ( I | password | I) | s)</code> instead of <code>H(s | H ( I | ":" | password)</code>) (see below).</p>
 <p>Here, <code>|</code> denotes concatenation and <code>+</code> denotes the arithmetical operator <code>+</code>.
-In all cases where concatenation of numbers passed to hashing functions is done, the numbers must be used in big-endian form, padded to 2048 bits; all maths is modulo <code>p</code>.
+In all cases where concatenation of numbers passed to hashing functions is done, the numbers must be used in big-endian form, padded to 2048 bits; all math is modulo <code>p</code>.
 Instead of <code>I</code>, <code>salt1</code> will be used (see <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">SRP protocol</a>).
 Instead of <code>s</code>, <code>salt2</code> will be used (see <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">SRP protocol</a>).</p>
 <p>The main hashing function <code>H</code> is sha256:</p>
