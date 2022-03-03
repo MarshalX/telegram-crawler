@@ -66,13 +66,13 @@ The <a href="/mtproto/TL">TL language</a> is used to describe the data types to 
 <p><em>Combinator identifier</em> is an identifier beginning with a lowercase Roman letter that uniquely identifies a combinator. </p>
 </li>
 <li>
-<p><em>Combinator number</em> or <em>combinator name</em> is a 32-bit number (i.e., an element of A) that uniquely identifies a combinator. Most often, it is CRC32 of the string containing the combinator description without the final semicolon, and with one space between contiguous lexemes. This always falls in the range from 0x01000000 to 0xffffff00. The highest 256 values are reserved for the so-called <em>temporal-logic combinators</em> used to transmit functions. We frequently denote as <em>combinator</em> the combinator name with single quotes: ‘<em>combinator</em>'.</p>
+<p><em>Combinator number</em> or <em>combinator name</em> is a 32-bit number (i.e., an element of A) that uniquely identifies a combinator. Most often, it is CRC32 of the string containing the combinator description without the final semicolon, and with one space between contiguous lexemes. This always falls in the range from 0x01000000 to 0xffffff00. The highest 256 values are reserved for the so-called <em>temporal-logic combinators</em> used to transmit functions. We frequently denote as <em>combinator</em> the combinator name with single quotes: '<em>combinator</em>'.</p>
 </li>
 <li>
 <p><em>Combinator description</em> is a string of format <code>combinator_name type_arg_1 ... type_arg_N = type_res;</code> where <code>N</code> stands for the arity of the combinator, <code>type_arg_i</code> is the type of the i-th argument (or rather, a string with the combinator name), and <code>type_res</code> is the combinator value type.</p>
 </li>
 <li>
-<p><em>Constructor</em> is a combinator that cannot be computed (reduced). This is used to represent composite data types. For example, combinator ‘int_tree' with description <code>int_tree IntTree int IntTree = IntTree</code>, alongside combinator <code>empty_tree = IntTree</code>, may be used to define a composite data type called “IntTree” that takes on values in the form of binary trees with integers as nodes. </p>
+<p><em>Constructor</em> is a combinator that cannot be computed (reduced). This is used to represent composite data types. For example, combinator 'int_tree' with description <code>int_tree IntTree int IntTree = IntTree</code>, alongside combinator <code>empty_tree = IntTree</code>, may be used to define a composite data type called “IntTree” that takes on values in the form of binary trees with integers as nodes. </p>
 </li>
 <li>
 <p><em>Function (functional combinator)</em> is a combinator which may be computed (reduced) on condition that the requisite number of arguments of requisite types are provided. The result of the computation is an expression consisting of constructors and base type values only. </p>
@@ -87,7 +87,7 @@ The <a href="/mtproto/TL">TL language</a> is used to describe the data types to 
 <p><em>Type number</em> or <em>type name</em> is a 32-bit number that uniquely identifies a type; it normally is the sum of the CRC32 values of the descriptions of the type constructors.</p>
 </li>
 <li>
-<p><em>Description of (composite) Type T</em> is a collection of the descriptions of all constructors that take on Type <em>T</em> values. This is normally written as text with each string containing the description of a single constructor. Here is a description of Type ‘IntTree', for example:</p>
+<p><em>Description of (composite) Type T</em> is a collection of the descriptions of all constructors that take on Type <em>T</em> values. This is normally written as text with each string containing the description of a single constructor. Here is a description of Type 'IntTree', for example:</p>
 <p>int_tree IntTree int IntTree = IntTree;
 empty_tree = IntTree;</p>
 </li>
@@ -97,7 +97,7 @@ empty_tree = IntTree;</p>
 nil {alpha:Type} = List alpha;</p>
 </li>
 <li>
-<p><em>Value of (composite) Type T</em> is any sequence from A* in the format <code>constr_num arg1 ... argN</code>, where constr_num is the index number of some Constructor <em>C</em> which takes on values of Type <em>T</em>, and arg_i is a value of Type <em>T_i</em> which is the type of the i-th argument to Constructor <em>C</em>. For example, let Combinator int_tree have the index number 17, whereas Combinator empty_tree has the index number 239. Then, the value of Type <code>IntTree</code> is, for example, <code>17 17 239 1 239 2 239</code> which is more conveniently written as <code>'int_tree' 'int_tree' 'empty_tree' 1 'empty_tree' 2 ‘empty_tree'</code>. From the standpoint of a high-level language, this is <code>int_tree (int_tree (empty_tree) 1 (empty_tree)) 2 (empty_tree): IntTree</code>.</p>
+<p><em>Value of (composite) Type T</em> is any sequence from A* in the format <code>constr_num arg1 ... argN</code>, where constr_num is the index number of some Constructor <em>C</em> which takes on values of Type <em>T</em>, and arg_i is a value of Type <em>T_i</em> which is the type of the i-th argument to Constructor <em>C</em>. For example, let Combinator int_tree have the index number 17, whereas Combinator empty_tree has the index number 239. Then, the value of Type <code>IntTree</code> is, for example, <code>17 17 239 1 239 2 239</code> which is more conveniently written as <code>'int_tree' 'int_tree' 'empty_tree' 1 'empty_tree' 2 'empty_tree'</code>. From the standpoint of a high-level language, this is <code>int_tree (int_tree (empty_tree) 1 (empty_tree)) 2 (empty_tree): IntTree</code>.</p>
 </li>
 <li>
 <p><em>Schema</em> is a collection of all the (composite) data type descriptions. This is used to define some agreed-to system of types.</p>
