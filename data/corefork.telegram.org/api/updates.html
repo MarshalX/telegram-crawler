@@ -46,7 +46,7 @@
 <p>Update events are sent to an authorized user into the last active connection (except for connections needed for downloading / uploading files).</p>
 <p>So to start receiving updates the client needs to init connection and call API method, e.g. to <a href="#fetching-state">fetch current state</a>.</p>
 <h3><a class="anchor" href="#event-sequences" id="event-sequences" name="event-sequences"><i class="anchor-icon"></i></a>Event sequences</h3>
-<p>All events are received from the socket as a sequence of TL-serialized <a href="/type/Updates">Updates</a> objects, which might be optionally gzip-compressed in the same way as <a href="/api/invoking#uncompressing-data">responses to queries</a>.</p>
+<p>All events are received from the socket as a sequence of TL-serialized <a href="/type/Updates">Updates</a> objects, which might be optionally gzip-compressed in the same way as <a href="/api/invoking#decompressing-data">responses to queries</a>.</p>
 <p>Each <a href="/type/Updates">Updates</a> object may contain single or multiple <a href="/type/Update">Update</a> objects, representing different events happening.</p>
 <p>In order to apply all updates in precise order and to guarantee that no update is missed or applied twice there is <code>seq</code> attribute in <a href="/type/Updates">Updates</a> constructors, and <code>pts</code> (with <code>pts_count</code>) or <code>qts</code> attributes in <a href="/type/Update">Update</a> constructors. The client must use those attributes values in combination with locally stored state to correctly apply incoming updates.</p>
 <p>When a gap in updates sequence occurs, it must be filled via calling one of the API methods. <a href="#recovering-gaps">More below »</a></p>
