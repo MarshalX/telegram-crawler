@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>Invites</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Chats and channels may have a public username or a private invite link: private invite links may be further enhanced with…">
+    <meta property="description" content="Chats and channels may have a public username or a private invite link: private invite links may be further enhanced with per-user join requests.">
     <meta property="og:title" content="Invites">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Chats and channels may have a public username or a private invite link: private invite links may be further enhanced with…">
+    <meta property="og:description" content="Chats and channels may have a public username or a private invite link: private invite links may be further enhanced with per-user join requests.">
     <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
 
     <link href="/css/bootstrap.min.css?3" rel="stylesheet">
@@ -43,10 +43,7 @@
 
 <p><a href="/api/channel">Chats and channels</a> may have a public username or a private invite link: private invite links may be further enhanced with per-user <a href="https://telegram.org/blog/shared-media-scrolling-calendar-join-requests-and-more#join-requests-for-groups-and-channels">join requests</a>.</p>
 <h2><a class="anchor" href="#public-usernames" id="public-usernames" name="public-usernames"><i class="anchor-icon"></i></a>Public usernames</h2>
-<pre><code><a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
-<a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
-
-<a href='/constructor/contacts.resolvedPeer'>contacts.resolvedPeer</a>#7f077ad9 peer:<a href='/type/Peer'>Peer</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.ResolvedPeer'>contacts.ResolvedPeer</a>;
+<pre><code><a href='/constructor/contacts.resolvedPeer'>contacts.resolvedPeer</a>#7f077ad9 peer:<a href='/type/Peer'>Peer</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.ResolvedPeer'>contacts.ResolvedPeer</a>;
 
 ---functions---
 
@@ -104,7 +101,8 @@ The first matching group can be passed to the <code>hash</code> parameter of <a 
 <a href="/method/messages.checkChatInvite">messages.checkChatInvite</a> may return <a href="/constructor/chatInvitePeek">chatInvitePeek</a>, in which case the user may directly use to fetch chat messages until the time indicate by the <code>expires</code> unixtime field.</p>
 <p>Newly created groups, supergroups and channel already have a default invite link.<br>
 To generate a new one, use <a href="/method/messages.exportChatInvite">messages.exportChatInvite</a>.<br>
-To get info about existing chat invites, optionally filtering only links created by a given admin, use <a href="/method/messages.getExportedChatInvites">messages.getExportedChatInvites</a>; <a href="/method/messages.getExportedChatInvite">messages.getExportedChatInvite</a> can be used to obtain info about a specific invite link.  </p>
+To get info about existing chat invites, optionally filtering only links created by a given admin, use <a href="/method/messages.getExportedChatInvites">messages.getExportedChatInvites</a>.<br>
+<a href="/method/messages.getExportedChatInvite">messages.getExportedChatInvite</a> can be used to obtain info about a specific invite link.  </p>
 <p><a href="/method/messages.editExportedChatInvite">messages.editExportedChatInvite</a> is used to edit or revoke existing invite links: revoked links cannot be used by users to join the group, but info about revoked links can still be fetched using <a href="/method/messages.getExportedChatInvites">messages.getExportedChatInvites</a> with the <code>revoke</code> flag set.<br>
 Use <a href="/method/messages.deleteExportedChatInvite">messages.deleteExportedChatInvite</a> to permanently remove an invite link, and <a href="/method/messages.deleteRevokedExportedChatInvites">messages.deleteRevokedExportedChatInvites</a> to permanently remove a revoked invite link.  </p>
 <p><a href="/method/messages.getChatInviteImporters">messages.getChatInviteImporters</a> can be used to fetch info about users that joined using a specific invite link.  </p>
@@ -136,7 +134,7 @@ Use <a href="/method/messages.deleteExportedChatInvite">messages.deleteExportedC
 <p>Bot administrators will receive a <a href="/constructor/updateBotChatInviteRequester">updateBotChatInviteRequester</a> update for each separate join request.<br>
 User administrators will receive an <a href="/constructor/updatePendingJoinRequests">updatePendingJoinRequests</a>, and should invoke <a href="/method/messages.getChatInviteImporters">messages.getChatInviteImporters</a> with the <code>requested</code> flag set to obtain a list of users waiting to be admitted into the group.  </p>
 <p>Administrators can then use <a href="/method/messages.hideChatJoinRequest">messages.hideChatJoinRequest</a> to approve or dismiss a join request, and <a href="/method/messages.hideAllChatJoinRequests">messages.hideAllChatJoinRequests</a> to approve or dismiss in bulk multiple join requests.  </p>
-<p>Administrators can also choose to message the user before admitting them into the group: in this case, graphical clients on the user side should display a message on the dialog bar of the chat with the admin, indicating that the chat was initiated by the admin of a chat/channel they have recently requested to join, according to the information contained in the <a href="/constructor/peerSettings">peerSettings »</a>.  </p></div>
+<p>Administrators can also choose send a message to the user before admitting them into the group: in this case, graphical clients <em>on the user side</em> should display a message on the dialog bar of the chat with the admin, indicating that the chat was initiated by the admin of a chat/channel they have recently requested to join, according to the information contained in the <a href="/constructor/peerSettings">peerSettings »</a>.  </p></div>
   
 </div>
           
