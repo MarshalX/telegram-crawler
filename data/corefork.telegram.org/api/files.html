@@ -387,9 +387,9 @@ It should be shown to the user in chat message previews, or while still download
 <p>The stripped <code>bytes</code> payload should be inflated to a JPG payload as seen <a href="https://github.com/telegramdesktop/tdesktop/blob/1757dd856b84d23f83d4e562c94dde825f6eb40c/Telegram/SourceFiles/ui/image/image.cpp#L43">here »</a>.</p>
 <h4><a class="anchor" href="#vector-thumbnails" id="vector-thumbnails" name="vector-thumbnails"><i class="anchor-icon"></i></a>Vector thumbnails</h4>
 <pre><code><a href='/constructor/photoPathSize'>photoPathSize</a>#d8214d41 type:<a href='/type/string'>string</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/PhotoSize'>PhotoSize</a>;</code></pre>
-<p>Messages with <a href="/animated_stickers">animated stickers</a> can have a compressed svg (&lt; 300 bytes) to show the outline of the sticker before fetching the actual lottie animation.
-Animated sticker outlines will have a <code>j</code> type <a href="/constructor/photoPathSize">photoPathSize</a> thumbnail.  </p>
-<p>This specific vector thumbnail consists in an <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths">SVG path</a>, specially encoded to save space.<br>
+<p>Messages with <a href="/animated_stickers">animated</a>, <a href="/stickers#video-stickers">video</a>, <a href="/stickers">normal</a> stickers can have a compressed svg (&lt; 300 bytes) to show the outline of the sticker before fetching the actual sticker.
+Sticker outlines will have a <code>j</code> type <a href="/constructor/photoPathSize">photoPathSize</a> thumbnail.  </p>
+<p>This specific vector thumbnail consists of an <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths">SVG path</a>, specially encoded to save space.<br>
 This path will be the outline of the animated sticker, and should be shown to the user while downloading the actual sticker.  </p>
 <p>As for stripped sizes, the payload should be inflated using the following algorithm:</p>
 <pre><code>encoded := photoPathSize.bytes
