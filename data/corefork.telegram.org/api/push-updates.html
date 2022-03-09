@@ -97,8 +97,9 @@
 <li>updates - base64url-encoded TL-serialization of the <a href="/type/Updates">Updates</a> object, currently sent only for PHONE_CALL_REQUEST (with <a href="/constructor/updatePhoneCall">updatePhoneCall</a> inside)</li>
 <li>call_id - Call ID, used in PHONE_CALL_REQUEST</li>
 <li>call_ah - Call access hash, used in PHONE_CALL_REQUEST</li>
-<li>encryption_id - secret chat id for ENCRYPTION_REQUEST, ENCRYPTION_ACCEPT, ENCRYPTED_MESSAGE</li>
-<li>random_id - random id for message in ENCRYPTED_MESSAGE</li>
+<li>encryption_id - Secret chat id for ENCRYPTION_REQUEST, ENCRYPTION_ACCEPT, ENCRYPTED_MESSAGE</li>
+<li>random_id - Random id for message in ENCRYPTED_MESSAGE</li>
+<li>contact_id - Telegram user identifier of contact that joined Telegram in CONTACT_JOINED</li>
 <li>msg_id - Message ID for new message event or reaction event</li>
 <li>channel_id - Identifier of the <a href="/api/channel">channel/supergroup</a> where the event occurred</li>
 <li>chat_id - Identifier of the <a href="/api/channel">legacy group</a> where the event occurred</li>
@@ -132,17 +133,17 @@
 <tbody>
 <tr>
 <td>DC_UPDATE</td>
-<td><strong>dc</strong> - number of the data-center<br><strong>addr</strong> - server address with port number in the format <code>111.112.113.114:443</code></td>
+<td><strong>data.custom.dc</strong> - number of the data-center<br><strong>data.custom.addr</strong> - server address with port number in the format <code>111.112.113.114:443</code></td>
 <td>In case the client gets this notification, it is necessary to add the received server address to the list of possible addresses. In case the address of the first DC was passed (<code>dc=1</code>), it is recommended to call it immediately using <a href="/method/help.getConfig">help.getConfig</a> to update dc-configuration.</td>
 </tr>
 <tr>
 <td>MESSAGE_DELETED</td>
-<td><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>messages</strong>: Comma-separated IDs of messages that were deleted</td>
+<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.messages</strong>: Comma-separated IDs of messages that were deleted</td>
 <td>Messages were deleted, remove multiple notifications for this chat</td>
 </tr>
 <tr>
 <td>READ_HISTORY</td>
-<td><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>max_id</strong>: Maximum ID of read messages</td>
+<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read messages</td>
 <td>Message history was read, remove multiple notifications for this chat</td>
 </tr>
 <tr>
@@ -162,7 +163,7 @@
 </tr>
 <tr>
 <td>MESSAGE_ANNOUNCEMENT</td>
-<td><strong>data.announcement</strong></td>
+<td><strong>data.announcement</strong>: Announcement</td>
 <td>Roughly equivalent to a message received from the service notifications (Telegram Notifications, id <code>777000</code>) user, but must be delivered via push notifications, without contacting the API.</td>
 </tr>
 </tbody>
@@ -534,8 +535,8 @@
 </tr>
 <tr>
 <td>CHAT_REQ_JOINED</td>
-<td>{2}</td>
-<td>{1} was accepted into the group</td>
+<td>{2}|{1} was accepted into the group</td>
+<td>1. User name<br>2. Chat name</td>
 </tr>
 <tr>
 <td>CHAT_RETURNED</td>
