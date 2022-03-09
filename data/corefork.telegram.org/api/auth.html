@@ -47,10 +47,18 @@
 <p>Example implementations: <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java">telegram for android</a>, <a href="https://github.com/tdlib/td/tree/master/td/telegram/SendCodeHelper.cpp">tdlib</a>.</p>
 <p>To show a nicely formatted and validated phone number field, the <a href="/constructor/help.countriesList">help.countriesList</a> constructor can be obtained using the <a href="/method/help.getCountriesList">help.getCountriesList</a> method.<br>
 The <a href="/constructor/help.countriesList">help.countriesList</a> config is then used as described <a href="/api/config#country-information-and-login-phone-patterns">here »</a>.  </p>
-<p>Authorization requires that a text message containing an authorization code first be sent to the user's phone.<br>
-This may be done using the <a href="/method/auth.sendCode">auth.sendCode</a> method. 
-The system will automatically choose how to send the authorization code; there are four possible ways the code can arrive:</p>
+<p>Then, a text message containing an authorization code is sent to the user's phone using <a href="/method/auth.sendCode">auth.sendCode</a>.<br>
+However, this is not always the case, if logout tokens are used:  </p>
+<h4><a class="anchor" href="#logout-tokens" id="logout-tokens" name="logout-tokens"><i class="anchor-icon"></i></a>Logout tokens</h4>
+<p>When invoking <a href="/method/auth.logOut">auth.logOut</a> on a previously authorized session with 2FA enabled, the server may return a <code>future_auth_token</code>, which should be stored in the local database.<br>
+At all times, the logout token database should contain at most <code>20</code> tokens: evict older tokens as new tokens are added.<br>
+When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all logout tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
+If any of the logout tokens matches the account we're trying to login into and the token hasn't expired, <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </p>
+<p>Otherwise, the system will send an authorization code using the following logic:</p>
+<h4><a class="anchor" href="#code-types" id="code-types" name="code-types"><i class="anchor-icon"></i></a>Code types</h4>
+<p>The system will automatically choose how to send the authorization code; there are multiple possible ways the code can arrive:</p>
 <ul>
+<li><a href="/constructor/auth.loggedOut">Logout tokens</a>:  </li>
 <li><a href="/constructor/auth.sentCodeTypeApp">Telegram code</a></li>
 <li><a href="/constructor/auth.sentCodeTypeSms">SMS code</a></li>
 <li><a href="/constructor/auth.sentCodeTypeCall">Phone call</a>: a synthesized voice will tell the user which verification code to input.</li>
@@ -58,7 +66,7 @@ The system will automatically choose how to send the authorization code; there a
 In the last case, the phone code will then be the phone number itself, just make sure that the phone number matches the specified pattern (see <a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>).</li>
 <li><a href="/constructor/auth.sentCodeTypeMissedCall">Missed phone call</a>: the code will be sent via a flash phone call, that will be closed immediately. The last digits of the phone number that calls are the code that must be entered manually by the user.</li>
 </ul>
-<p>The <a href="/method/auth.sendCode">auth.sendCode</a> method also has parameters for enabling/disabling use of flash calls, and allows passing an SMS token that will be included in the sent SMS.
+<p>The <a href="/method/auth.sendCode">auth.sendCode</a> method also has parameters for enabling/disabling use of flash calls and missed calls, and allows passing an SMS token that will be included in the sent SMS.
 For example, the latter is required in newer versions of android, to use the <a href="https://developers.google.com/identity/sms-retriever/overview">android SMS receiver APIs</a>.</p>
 <p>The returned <a href="/type/auth.SentCode">auth.SentCode</a> object will contain multiple parameters:</p>
 <table class="table">
