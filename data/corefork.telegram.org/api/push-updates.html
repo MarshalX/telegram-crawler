@@ -71,8 +71,8 @@
 </ul>
 <h3><a class="anchor" href="#notification-encryption" id="notification-encryption" name="notification-encryption"><i class="anchor-icon"></i></a>Notification encryption</h3>
 <p>For FCM and APNS VoIP, an optional encryption key used to encrypt push notifications can be passed to <a href="/method/account.registerDevice">account.registerDevice</a> (<code>secret</code>). This key (<code>auth_key</code>) is used to encrypt the payloads using <a href="/mtproto/description">MTProto v2</a>.</p>
-<p>The FCM payload will be a JSON payload, containing a <code>p</code> field with the base64-encoded encrypted <a href="/mtproto/description">MTProto payload</a>. After decryption, the result will be a JSON object, prefixed by a 32-bit little-endian integer with the length of the JSON payload. As usual, make sure to follow all security checks as described in the <a href="/mtproto/description#important-checks">MTProto docs</a>.</p>
-<p><a href="https://github.com/DrKLO/Telegram/blob/ff5735503e068a6f1cada09b977f633df7caf98d/TMessagesProj/src/main/java/org/telegram/messenger/GcmPushListenerService.java#L563">Example implementation</a>.</p>
+<p>The FCM payload will be a JSON payload, containing a <code>p</code> field with the base64url-encoded encrypted <a href="/mtproto/description">MTProto payload</a>. After decryption, the result will be a JSON object, prefixed by a 32-bit little-endian integer with the length of the JSON payload. As usual, make sure to follow all security checks as described in the <a href="/mtproto/description#important-checks">MTProto docs</a>.</p>
+<p><a href="https://github.com/DrKLO/Telegram/blob/3708e9847a96ed681ff811d391749cc4535b03f2/TMessagesProj/src/main/java/org/telegram/messenger/GcmPushListenerService.java#L56">Example implementation</a>.</p>
 <p>As mentioned <a href="#subscribing-to-notifications">above</a>, payloads can also be encrypted using <a href="https://tools.ietf.org/html/rfc8291">P-256 Elliptic Curve Diffie-Hellman when using web push</a>.</p>
 <h3><a class="anchor" href="#notification-structure" id="notification-structure" name="notification-structure"><i class="anchor-icon"></i></a>Notification structure</h3>
 <p>An (<a href="#notification-encryption">optionally encrypted</a>) notification is provided as a JSON object in the following format:</p>
@@ -102,7 +102,7 @@
 <li>contact_id - Telegram user identifier of contact that joined Telegram in CONTACT_JOINED</li>
 <li>msg_id - Message ID for new message event or reaction event</li>
 <li>channel_id - Identifier of the <a href="/api/channel">channel/supergroup</a> where the event occurred</li>
-<li>chat_id - Identifier of the <a href="/api/channel">legacy group</a> where the event occurred</li>
+<li>chat_id - Identifier of the <a href="/api/channel#legacy-groups">legacy group</a> where the event occurred</li>
 <li>from_id - User ID where the event occurred</li>
 <li>chat_from_broadcast_id - If the group message was sent as a channel, this field will contain the sender channel ID</li>
 <li>chat_from_group_id - If the group message was sent as a supergroup, this field will contain the sender supergroup ID</li>
