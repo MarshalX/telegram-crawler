@@ -5,11 +5,11 @@
     <title>Sponsored messages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="description" content="Related TL schema:
-sponsoredMessage flags:# random_id:bytes from_id:Peer channel_post:flags.2?int start_param:flags.0?string…">
+sponsoredMessage#3a836df8 flags:# random_id:bytes from_id:flags.3?Peer chat_invite:flags.4?ChatInvite…">
     <meta property="og:title" content="Sponsored messages">
     <meta property="og:image" content="">
     <meta property="og:description" content="Related TL schema:
-sponsoredMessage flags:# random_id:bytes from_id:Peer channel_post:flags.2?int start_param:flags.0?string…">
+sponsoredMessage#3a836df8 flags:# random_id:bytes from_id:flags.3?Peer chat_invite:flags.4?ChatInvite…">
     <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
 
     <link href="/css/bootstrap.min.css?3" rel="stylesheet">
@@ -42,35 +42,34 @@ sponsoredMessage flags:# random_id:bytes from_id:Peer channel_post:flags.2?int s
   <h1 id="dev_page_title">Sponsored messages</h1>
   
   <div id="dev_page_content"><p>Related TL schema:</p>
-<pre><code>sponsoredMessage flags:# random_id:bytes from_id:Peer channel_post:flags.2?int start_param:flags.0?string message:string entities:flags.1?Vector&lt;MessageEntity&gt; = SponsoredMessage;
-messages.sponsoredMessages messages:Vector&lt;SponsoredMessage&gt; chats:Vector&lt;Chat&gt; users:Vector&lt;User&gt; = messages.SponsoredMessages;
+<pre><code><a href='/constructor/sponsoredMessage'>sponsoredMessage</a>#3a836df8 flags:<a href='/type/%23'>#</a> random_id:<a href='/type/bytes'>bytes</a> from_id:flags.3?<a href='/type/Peer'>Peer</a> chat_invite:flags.4?<a href='/type/ChatInvite'>ChatInvite</a> chat_invite_hash:flags.4?<a href='/type/string'>string</a> channel_post:flags.2?<a href='/type/int'>int</a> start_param:flags.0?<a href='/type/string'>string</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; = <a href='/type/SponsoredMessage'>SponsoredMessage</a>;
+<a href='/constructor/messages.sponsoredMessages'>messages.sponsoredMessages</a>#65a4c7d5 messages:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SponsoredMessage'>SponsoredMessage</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.SponsoredMessages'>messages.SponsoredMessages</a>;
 
 ---functions---
 
-channels.getSponsoredMessages channel:InputChannel = messages.SponsoredMessages;
-channels.viewSponsoredMessage channel:InputChannel random_id:bytes = Bool;</code></pre>
-<h4><a class="anchor" name="getting-sponsored-messages" href="#getting-sponsored-messages"><i class="anchor-icon"></i></a>Getting sponsored messages</h4>
+<a href='/method/channels.getSponsoredMessages'>channels.getSponsoredMessages</a>#ec210fbf channel:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/messages.SponsoredMessages'>messages.SponsoredMessages</a>;
+<a href='/method/channels.viewSponsoredMessage'>channels.viewSponsoredMessage</a>#beaedb94 channel:<a href='/type/InputChannel'>InputChannel</a> random_id:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<h4><a class="anchor" href="#getting-sponsored-messages" id="getting-sponsored-messages" name="getting-sponsored-messages"><i class="anchor-icon"></i></a>Getting sponsored messages</h4>
 <p>Each time the user opens a channel, <code>channels.getSponsoredMessages</code> must be called to receive <a href="https://promote.telegram.org">sponsored messages</a> available for this channel. The result must be cached for <strong>5 minutes</strong>.</p>
 <blockquote>
 <p><a href="https://t.me/durov/172">More about sponsored messages on Telegram</a></p>
 </blockquote>
-<h4><a class="anchor" name="displaying-sponsored-messages" href="#displaying-sponsored-messages"><i class="anchor-icon"></i></a>Displaying sponsored messages</h4>
-<p>Sponsored messages must be displayed below all other posts in the channel, after the user scrolls futher down, past the last message. The promoted channel or bot specified in the <code>from_id</code> field must be displayed as the author of the message. The message should also contain one of the following buttons at the bottom:</p>
+<h4><a class="anchor" href="#displaying-sponsored-messages" id="displaying-sponsored-messages" name="displaying-sponsored-messages"><i class="anchor-icon"></i></a>Displaying sponsored messages</h4>
+<p>Sponsored messages must be displayed below all other posts in the channel, after the user scrolls further down, past the last message. The promoted channel or bot specified in the <code>from_id</code> field must be displayed as the author of the message. The message should also contain one of the following buttons at the bottom:</p>
 <ul>
-<li><mark><strong>View Bot</strong></mark> — if a bot is being promoted. Tapping the button must open the chat with the bot. If <code>start_param</code> is specified, the app must use the <a href="/bots#deep-linking">deep linking mechanism</a> to open the bot.</li>
-<li><mark><strong>View Channel</strong></mark> — if a channel is being promoted. Tapping the button must open the channel.</li>
-<li><mark><strong>View Post</strong></mark> — if a channel is being promoted and <code>channel_post</code> is specified. Tapping the button must open the particular channel post.</li>
+<li>==<strong>View Bot</strong>== — if a bot is being promoted. Tapping the button must open the chat with the bot. If <code>start_param</code> is specified, the app must use the <a href="/bots#deep-linking">deep linking mechanism</a> to open the bot.</li>
+<li>==<strong>View Channel</strong>== — if a channel is being promoted. Tapping the button must open the channel.</li>
+<li>==<strong>View Post</strong>== — if a channel is being promoted and <code>channel_post</code> is specified. Tapping the button must open the particular channel post.</li>
 </ul>
-<h4><a class="anchor" name="counting-sponsored-message-views" href="#counting-sponsored-message-views"><i class="anchor-icon"></i></a>Counting sponsored message views</h4>
+<h4><a class="anchor" href="#counting-sponsored-message-views" id="counting-sponsored-message-views" name="counting-sponsored-message-views"><i class="anchor-icon"></i></a>Counting sponsored message views</h4>
 <p>Once the entire text is shown on the screen (excluding the button), <code>channels.viewSponsoredMessage</code> must be called with the <code>random_id</code> of this sponsored message.</p>
-<h4><a class="anchor" name="testing-sponsored-messages" href="#testing-sponsored-messages"><i class="anchor-icon"></i></a>Testing sponsored messages</h4>
-<p>For the channel <a href="https://t.me/SecretAdTestChannel"><a href="https://t.me/SecretAdTestChannel">https://t.me/SecretAdTestChannel</a></a> the system will <strong>always</strong> return a sponsored message: promoting either a channel, a particular message in a channel, or a bot with a start parameter.</p>
+<h4><a class="anchor" href="#testing-sponsored-messages" id="testing-sponsored-messages" name="testing-sponsored-messages"><i class="anchor-icon"></i></a>Testing sponsored messages</h4>
+<p>For the channel <a href="https://t.me/SecretAdTestChannel">https://t.me/SecretAdTestChannel</a> the system will <strong>always</strong> return a sponsored message: promoting either a channel, a particular message in a channel, or a bot with a start parameter.</p>
 <hr>
-<h4><a class="anchor" name="sponsored-messages-in-third-party-apps" href="#sponsored-messages-in-third-party-apps"><i class="anchor-icon"></i></a>Sponsored messages in third-party apps</h4>
+<h4><a class="anchor" href="#sponsored-messages-in-third-party-apps" id="sponsored-messages-in-third-party-apps" name="sponsored-messages-in-third-party-apps"><i class="anchor-icon"></i></a>Sponsored messages in third-party apps</h4>
 <p>Telegram continues to grow worldwide, in part thanks to third-party apps using the Telegram API. To cover the increasing costs that come with this growth, Telegram added <a href="https://promote.telegram.org">sponsored messages</a> – a paid <a href="https://t.me/durov/172">privacy-friendly way</a> to promote <strong>bots and channels</strong>. </p>
-<p>If their app allows its users to <strong>access content from Telegram channels</strong>, third-party developers using the Telegam API are required to support and properly display official sponsored messages in their apps by <strong>January 1, 2022</strong>. Unfortunately, Telegram cannot financially sustain third-party apps that do not display sponsored messages and they will have to be disconnected. </p>
-<p>Telegram&#39;s API usage will continue to be <strong>free of charge</strong> for all developers. The <a href="https://core.telegram.org/api/terms#3-advertising-amp-monetization">rules</a> regarding monetization in third-party apps remain the same: developers are allowed to monetize their coding efforts through advertising of their own or other legitimate means, provided that all the methods of monetization used in their apps are prominently mentioned in their app store descriptions.</p>
-</div>
+<p>If their app allows its users to <strong>access content from Telegram channels</strong>, third-party developers using the Telegram API are required to support and properly display official sponsored messages in their apps by <strong>January 1, 2022</strong>. Unfortunately, Telegram cannot financially sustain third-party apps that do not display sponsored messages and they will have to be disconnected. </p>
+<p>Telegram's API usage will continue to be <strong>free of charge</strong> for all developers. The <a href="https://core.telegram.org/api/terms#3-advertising-amp-monetization">rules</a> regarding monetization in third-party apps remain the same: developers are allowed to monetize their coding efforts through advertising of their own or other legitimate means, provided that all the methods of monetization used in their apps are prominently mentioned in their app store descriptions.</p></div>
   
 </div>
           

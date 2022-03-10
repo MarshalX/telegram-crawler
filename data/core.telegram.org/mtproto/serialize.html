@@ -49,7 +49,7 @@ The <a href="/mtproto/TL">TL language</a> is used to describe the data types to 
 <li><em>Value</em>, in this case, is the same as a <em>string in Alphabet A</em>, i. e. a finite (possibly, empty) sequence of 32-bit numbers. The set of all such sequences is designated as <em>A*</em>. </li>
 <li><em>Type</em>, for our purposes, is the same as the set of legal values of a type, i. e. some set T which is a subset of A* and is a prefix code (i. e. no element of T may be a prefix for any other element). Therefore, any sequence from A* can contain no more than one prefix that is a member of T. </li>
 <li><em>Value of Type T</em> is any sequence (value) which is a member of T as a subset of A*. </li>
-<li><em>Compatible Types</em> are the types T and T’ not intersecting as subsets of A*, such that the union of T and T' is a prefix code. </li>
+<li><em>Compatible Types</em> are the types T and T' not intersecting as subsets of A*, such that the union of T and T' is a prefix code. </li>
 <li><em>Coordinated System of Types</em> is a finite or infinite set of types T_1, ..., T_n, ..., such that any two types from this set are compatible. </li>
 <li><em>Data Type</em> is the same as <em>type</em> in the sense of the definition above. </li>
 <li><em>Functional Type</em> is a type describing a function; it is not a type in the sense of the definition above. Initially, we ignore the existence of functional types and describe only the data types; however, in reality, functional types will later be implemented in some extension of this system using the so-called <em>temporary combinators</em>. </li>
@@ -66,13 +66,13 @@ The <a href="/mtproto/TL">TL language</a> is used to describe the data types to 
 <p><em>Combinator identifier</em> is an identifier beginning with a lowercase Roman letter that uniquely identifies a combinator. </p>
 </li>
 <li>
-<p><em>Combinator number</em> or <em>combinator name</em> is a 32-bit number (i.e., an element of A) that uniquely identifies a combinator. Most often, it is CRC32 of the string containing the combinator description without the final semicolon, and with one space between contiguous lexemes. This always falls in the range from 0x01000000 to 0xffffff00. The highest 256 values are reserved for the so-called <em>temporal-logic combinators</em> used to transmit functions. We frequently denote as <em>combinator</em> the combinator name with single quotes: ‘<em>combinator</em>’.</p>
+<p><em>Combinator number</em> or <em>combinator name</em> is a 32-bit number (i.e., an element of A) that uniquely identifies a combinator. Most often, it is CRC32 of the string containing the combinator description without the final semicolon, and with one space between contiguous lexemes. This always falls in the range from 0x01000000 to 0xffffff00. The highest 256 values are reserved for the so-called <em>temporal-logic combinators</em> used to transmit functions. We frequently denote as <em>combinator</em> the combinator name with single quotes: '<em>combinator</em>'.</p>
 </li>
 <li>
 <p><em>Combinator description</em> is a string of format <code>combinator_name type_arg_1 ... type_arg_N = type_res;</code> where <code>N</code> stands for the arity of the combinator, <code>type_arg_i</code> is the type of the i-th argument (or rather, a string with the combinator name), and <code>type_res</code> is the combinator value type.</p>
 </li>
 <li>
-<p><em>Constructor</em> is a combinator that cannot be computed (reduced). This is used to represent composite data types. For example, combinator ‘int_tree’ with description <code>int_tree IntTree int IntTree = IntTree</code>, alongside combinator <code>empty_tree = IntTree</code>, may be used to define a composite data type called “IntTree” that takes on values in the form of binary trees with integers as nodes. </p>
+<p><em>Constructor</em> is a combinator that cannot be computed (reduced). This is used to represent composite data types. For example, combinator 'int_tree' with description <code>int_tree IntTree int IntTree = IntTree</code>, alongside combinator <code>empty_tree = IntTree</code>, may be used to define a composite data type called “IntTree” that takes on values in the form of binary trees with integers as nodes. </p>
 </li>
 <li>
 <p><em>Function (functional combinator)</em> is a combinator which may be computed (reduced) on condition that the requisite number of arguments of requisite types are provided. The result of the computation is an expression consisting of constructors and base type values only. </p>
@@ -87,17 +87,17 @@ The <a href="/mtproto/TL">TL language</a> is used to describe the data types to 
 <p><em>Type number</em> or <em>type name</em> is a 32-bit number that uniquely identifies a type; it normally is the sum of the CRC32 values of the descriptions of the type constructors.</p>
 </li>
 <li>
-<p><em>Description of (composite) Type T</em> is a collection of the descriptions of all constructors that take on Type <em>T</em> values. This is normally written as text with each string containing the description of a single constructor. Here is a description of Type ‘IntTree’, for example:</p>
+<p><em>Description of (composite) Type T</em> is a collection of the descriptions of all constructors that take on Type <em>T</em> values. This is normally written as text with each string containing the description of a single constructor. Here is a description of Type 'IntTree', for example:</p>
 <p>int_tree IntTree int IntTree = IntTree;
 empty_tree = IntTree;</p>
 </li>
 <li>
-<p><em>Polymorphic type</em> is a type whose description contains parameters (<em>type variables</em>) in lieu of actual types; approximately, what would be a template in C++. Here is a description of Type <code>List alpha</code> where <code>List</code> is a polymorphic type of arity 1 (i. e., dependent on a single argument), and <code>alpha</code> is a type variable which appears as the constructor’s optional parameter (in curly braces): </p>
+<p><em>Polymorphic type</em> is a type whose description contains parameters (<em>type variables</em>) in lieu of actual types; approximately, what would be a template in C++. Here is a description of Type <code>List alpha</code> where <code>List</code> is a polymorphic type of arity 1 (i. e., dependent on a single argument), and <code>alpha</code> is a type variable which appears as the constructor's optional parameter (in curly braces): </p>
 <p>cons {alpha:Type} alpha (List alpha) = List alpha;
 nil {alpha:Type} = List alpha;</p>
 </li>
 <li>
-<p><em>Value of (composite) Type T</em> is any sequence from A* in the format <code>constr_num arg1 ... argN</code>, where constr_num is the index number of some Constructor <em>C</em> which takes on values of Type <em>T</em>, and arg_i is a value of Type <em>T_i</em> which is the type of the i-th argument to Constructor <em>C</em>. For example, let Combinator int_tree have the index number 17, whereas Combinator empty_tree has the index number 239. Then, the value of Type <code>IntTree</code> is, for example, <code>17 17 239 1 239 2 239</code> which is more conveniently written as <code>'int_tree' 'int_tree' 'empty_tree' 1 'empty_tree' 2 ‘empty_tree’</code>. From the standpoint of a high-level language, this is <code>int_tree (int_tree (empty_tree) 1 (empty_tree)) 2 (empty_tree): IntTree</code>.</p>
+<p><em>Value of (composite) Type T</em> is any sequence from A* in the format <code>constr_num arg1 ... argN</code>, where constr_num is the index number of some Constructor <em>C</em> which takes on values of Type <em>T</em>, and arg_i is a value of Type <em>T_i</em> which is the type of the i-th argument to Constructor <em>C</em>. For example, let Combinator int_tree have the index number 17, whereas Combinator empty_tree has the index number 239. Then, the value of Type <code>IntTree</code> is, for example, <code>17 17 239 1 239 2 239</code> which is more conveniently written as <code>'int_tree' 'int_tree' 'empty_tree' 1 'empty_tree' 2 'empty_tree'</code>. From the standpoint of a high-level language, this is <code>int_tree (int_tree (empty_tree) 1 (empty_tree)) 2 (empty_tree): IntTree</code>.</p>
 </li>
 <li>
 <p><em>Schema</em> is a collection of all the (composite) data type descriptions. This is used to define some agreed-to system of types.</p>

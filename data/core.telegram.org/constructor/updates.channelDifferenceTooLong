@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>updates.channelDifferenceTooLong</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="The provided pts + limit &lt; remote pts. Simply, there are too many updates to be fetched (more than limit), the client has to resolve the update gap in one of the following ways:">
+    <meta property="description" content="The provided pts + limit &lt; remote pts. Simply, there are too many updates to be fetched (more than limit), the client has to resolve the update gap in one of the following ways (assuming the existence of a persistent database to locally store messages):">
     <meta property="og:title" content="updates.channelDifferenceTooLong">
     <meta property="og:image" content="">
-    <meta property="og:description" content="The provided pts + limit &lt; remote pts. Simply, there are too many updates to be fetched (more than limit), the client has to resolve the update gap in one of the following ways:">
+    <meta property="og:description" content="The provided pts + limit &lt; remote pts. Simply, there are too many updates to be fetched (more than limit), the client has to resolve the update gap in one of the following ways (assuming the existence of a persistent database to locally store messages):">
     <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
 
     <link href="/css/bootstrap.min.css?3" rel="stylesheet">
@@ -39,13 +39,22 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/updates.channelDifferenceTooLong" >updates.channelDifferenceTooLong</a></li></ul></div>
   <h1 id="dev_page_title">updates.channelDifferenceTooLong</h1>
   
-  <div id="dev_page_content"><p>The provided <code>pts + limit &lt; remote pts</code>. Simply, there are too many updates to be fetched (more than <code>limit</code>), the client has to resolve the update gap in one of the following ways:</p>
+  <div id="dev_page_content"><p>The provided <code>pts + limit &lt; remote pts</code>. Simply, there are too many updates to be fetched (more than <code>limit</code>), the client has to resolve the update gap in one of the following ways (assuming the existence of a persistent database to locally store messages):</p>
 <ol>
-<li>Delete all known messages in the chat, begin from scratch by refetching all messages manually with <a href="/method/messages.getHistory">getHistory</a>. It is easy to implement, but suddenly disappearing messages looks awful for the user.</li>
-<li>Save all messages loaded in the memory until application restart, but delete all messages from database. Messages left in the memory must be lazily updated using calls to <a href="/method/messages.getHistory">getHistory</a>. It looks much smoothly for the user, they will need to redownload messages only after client restart. Unsynchronized messages left in the memory shouldn't be saved to database, results of <a href="/method/messages.getHistory">getHistory</a> and <a href="/method/messages.getMessages">getMessages</a> must be used to update state of deleted and edited messages left in the memory.</li>
-<li>Save all messages loaded in the memory and stored in the database without saving that some messages form continuous ranges. Messages in the database will be excluded from results of getChatHistory and searchChatMessages after application restart and will be available only through getMessage. Every message should still be checked using getHistory. It has more disadvantages over 2) than advantages.</li>
-<li>Save all messages with saving all data about continuous message ranges. Messages from the database may be used as results of getChatHistory and (if implemented continuous ranges support for searching shared media) searchChatMessages. The messages should still be lazily checked using getHistory, but they are still available offline. It is the best way for gaps support, but it is pretty hard to implement correctly. It should be also noted that some messages like live location messages shouldn't be deleted.</li>
+<li>Delete all known messages in the chat, begin from scratch by refetching all messages manually with <a href="/method/messages.getHistory">messages.getHistory</a>. It is easy to implement, but suddenly disappearing messages look awful to the user.</li>
+<li>Save all messages loaded in the memory until application restart, but delete all messages from the database. Messages left in the memory must be lazily updated using calls to <a href="/method/messages.getHistory">messages.getHistory</a>.<br>
+It will look much smoother to the user, they will need to redownload messages only after client restart.<br>
+Unsynchronized messages left in memory shouldn't be saved to the database, results of <a href="/method/messages.getHistory">messages.getHistory</a> and <a href="/method/messages.getMessages">messages.getMessages</a> must be used to update the state of deleted and edited messages left in the memory.</li>
+<li>Save all messages loaded in the memory and stored in the database without saving that some messages form continuous ranges.<br>
+Messages in the database will be excluded when paginating through or searching the local message history after application restart and will be available only through individual message queries.<br>
+Every message should still be checked using <a href="/method/messages.getHistory">messages.getHistory</a>.<br>
+It has more disadvantages over 2) than advantages.</li>
+<li>Save all messages with saving all data about continuous message ranges.<br>
+Messages from the database may be used when paginating through or searching the local message history.<br>
+The messages should still be lazily checked using <a href="/method/messages.getHistory">messages.getHistory</a>, but they are still available offline.<br>
+It is the best way for gaps support, but it is pretty hard to implement correctly.</li>
 </ol>
+<p>It should be also noted that some messages like live location messages shouldn't be deleted.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">

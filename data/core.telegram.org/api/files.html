@@ -41,7 +41,7 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>When working with the API, it is sometimes necessary to send a relatively large file to the server. For example, when sending a message with a photo/video attachment or when setting the current user’s profile picture.</p>
+<p>When working with the API, it is sometimes necessary to send a relatively large file to the server. For example, when sending a message with a photo/video attachment or when setting the current user's profile picture.</p>
 <h3><a class="anchor" href="#uploading-files" id="uploading-files" name="uploading-files"><i class="anchor-icon"></i></a>Uploading files</h3>
 <p>There are a number of API methods to save files. The schema of the types and methods used is presented below:</p>
 <pre><code><a href='/constructor/inputFile'>inputFile</a>#f52ff27f id:<a href='/type/long'>long</a> parts:<a href='/type/int'>int</a> name:<a href='/type/string'>string</a> md5_checksum:<a href='/type/string'>string</a> = <a href='/type/InputFile'>InputFile</a>;
@@ -62,7 +62,7 @@
 
 ---functions---
 
-<a href='/method/messages.sendMedia'>messages.sendMedia</a>#3491eba9 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/messages.sendMedia'>messages.sendMedia</a>#e25ff8e0 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;
 <a href='/method/messages.uploadMedia'>messages.uploadMedia</a>#519bc2b1 peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
 <a href='/method/messages.sendEncryptedFile'>messages.sendEncryptedFile</a>#5559481d flags:<a href='/type/%23'>#</a> silent:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputEncryptedChat'>InputEncryptedChat</a> random_id:<a href='/type/long'>long</a> data:<a href='/type/bytes'>bytes</a> file:<a href='/type/InputEncryptedFile'>InputEncryptedFile</a> = <a href='/type/messages.SentEncryptedMessage'>messages.SentEncryptedMessage</a>;
 
@@ -71,7 +71,7 @@
 <a href='/method/upload.saveFilePart'>upload.saveFilePart</a>#b304a621 file_id:<a href='/type/long'>long</a> file_part:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;
 <a href='/method/upload.saveBigFilePart'>upload.saveBigFilePart</a>#de7b673d file_id:<a href='/type/long'>long</a> file_part:<a href='/type/int'>int</a> file_total_parts:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p>Before transmitting the contents of the file itself, the file has to be assigned a unique 64-bit client identifier: <strong>file_id</strong>.</p>
-<p>The file’s binary content is then split into parts. All parts must have the same size ( <strong>part_size</strong> ) and the following conditions must be met:</p>
+<p>The file's binary content is then split into parts. All parts must have the same size ( <strong>part_size</strong> ) and the following conditions must be met:</p>
 <ul>
 <li><code>part_size % 1024 = 0</code> (divisible by 1KB)</li>
 <li><code>524288 % part_size = 0</code> (512KB must be evenly divisible by <strong>part_size</strong>)</li>
@@ -100,7 +100,7 @@ After the entire file is successfully saved, the final method may be called and 
 <ul>
 <li>FILE_PARTS_INVALID: The number of file parts is invalid The value is not between 1 and 3,000.</li>
 <li>FILE_PART_Х_MISSING: Part X (where X is a number) of the file is missing from storage. Try repeating the method call to resave the part.</li>
-<li>MD5_CHECKSUM_INVALID: The file’s checksum did not match the <strong>md5_checksum</strong> parameter</li>
+<li>MD5_CHECKSUM_INVALID: The file's checksum did not match the <strong>md5_checksum</strong> parameter</li>
 </ul>
 <h4><a class="anchor" href="#albums-grouped-media" id="albums-grouped-media" name="albums-grouped-media"><i class="anchor-icon"></i></a>Albums, grouped media</h4>
 <pre><code><a href='/constructor/inputMediaUploadedPhoto'>inputMediaUploadedPhoto</a>#1e287d04 flags:<a href='/type/%23'>#</a> file:<a href='/type/InputFile'>InputFile</a> stickers:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputDocument'>InputDocument</a>&gt; ttl_seconds:flags.1?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
@@ -110,7 +110,7 @@ After the entire file is successfully saved, the final method may be called and 
 
 ---functions---
 
-<a href='/method/messages.sendMultiMedia'>messages.sendMultiMedia</a>#cc0110cb flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> multi_media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSingleMedia'>InputSingleMedia</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<a href='/method/messages.sendMultiMedia'>messages.sendMultiMedia</a>#f803138f flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> multi_media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSingleMedia'>InputSingleMedia</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Telegram allows grouping photos into <a href="https://telegram.org/blog/albums-saved-messages">albums</a> and generic files (audio, docuemnts) into media groups.  </p>
 <p>To do this, <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> is used, wrapping each <a href="/type/InputMedia">InputMedia</a> constructor (uploaded or pre-existing, maximum 10 per media group) into an <a href="/constructor/inputSingleMedia">inputSingleMedia</a> constructor, optionally providing a custom per-file caption in <code>message</code>.  </p>
 <p>For photo albums, clients should display an album caption only if exactly one photo in the group has a caption, otherwise no album caption should be displayed, and only when viewing in detail a specific photo of the group the caption should be shown.<br>
@@ -148,7 +148,7 @@ The SHA256 hash of the file is computed, and it is passed along with the file's 
 <h4><a class="anchor" href="#animated-profile-pictures" id="animated-profile-pictures" name="animated-profile-pictures"><i class="anchor-icon"></i></a>Animated profile pictures</h4>
 <p>Animated profile pictures are also supported, by populating the <code>video</code> constructor: square MPEG4 videos up to <code>1080x1080</code> are supported, <code>800x800</code> is the recommended resolution.<br>
 The <code>video_start_ts</code> is a floating point UNIX timestamp in seconds, indicating the frame of the video that should be used as static preview.  </p>
-<p><a href="/api/channel">Chat, channel and supergroup</a> profile photos and videos can be uploaded using <a href="/method/messages.editChatPhoto">messages.editChatPhoto</a> (<a href="/api/channel">legacy groups</a>) or <a href="/method/channels.editPhoto">channels.editPhoto</a> (<a href="/api/channel">channels, supergroups</a>).<br>
+<p><a href="/api/channel">Chat, channel and supergroup</a> profile photos and videos can be uploaded using <a href="/method/messages.editChatPhoto">messages.editChatPhoto</a> (<a href="/api/channel#legacy-groups">legacy groups</a>) or <a href="/method/channels.editPhoto">channels.editPhoto</a> (<a href="/api/channel">channels, supergroups</a>).<br>
 Use the <a href="/constructor/inputChatPhoto">inputChatPhoto</a> to reuse previously uploaded profile pictures.  </p>
 <h3><a class="anchor" href="#downloading-files" id="downloading-files" name="downloading-files"><i class="anchor-icon"></i></a>Downloading files</h3>
 <p>There are methods available to download files which have been successfully uploaded. The schema of the types and methods used is presented below:</p>
@@ -245,7 +245,7 @@ The data for the input parameter of the <a href="/type/InputFileLocation">InputF
 </ul>
 </li>
 <li>
-<p>For old <strong>deprecated</strong> photos, if the client has cached some old fileLocations with the <strong>deprecated</strong> <code>secret</code> identifier, <a href="/constructor/inputFileLocation">inputFileLocation</a> or <a href="/constructor/inputPhotoLegacyFileLocation">inputPhotoLegacyFileLocation</a> is used (this is mainly used for backwards compatiblity with bot API file IDs, all user clients must use the modern <a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a> file IDs): </p>
+<p>For old <strong>deprecated</strong> photos, if the client has cached some old fileLocations with the <strong>deprecated</strong> <code>secret</code> identifier, <a href="/constructor/inputFileLocation">inputFileLocation</a> or <a href="/constructor/inputPhotoLegacyFileLocation">inputPhotoLegacyFileLocation</a> is used (this is mainly used for backwards compatibility with bot API file IDs, all user clients must use the modern <a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a> file IDs): </p>
 <ul>
 <li>All fields are taken from the previously cached fileLocation except for <code>file_reference</code>, <code>access_hash</code> and <code>id</code>, which are taken from the <a href="/constructor/photo">photo</a> constructor (the last two fields are used only if available, in which case <a href="/constructor/inputPhotoLegacyFileLocation">inputPhotoLegacyFileLocation</a> is used instead of <a href="/constructor/inputFileLocation">inputFileLocation</a>).</li>
 </ul>
@@ -387,9 +387,9 @@ It should be shown to the user in chat message previews, or while still download
 <p>The stripped <code>bytes</code> payload should be inflated to a JPG payload as seen <a href="https://github.com/telegramdesktop/tdesktop/blob/1757dd856b84d23f83d4e562c94dde825f6eb40c/Telegram/SourceFiles/ui/image/image.cpp#L43">here »</a>.</p>
 <h4><a class="anchor" href="#vector-thumbnails" id="vector-thumbnails" name="vector-thumbnails"><i class="anchor-icon"></i></a>Vector thumbnails</h4>
 <pre><code><a href='/constructor/photoPathSize'>photoPathSize</a>#d8214d41 type:<a href='/type/string'>string</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/PhotoSize'>PhotoSize</a>;</code></pre>
-<p>Messages with <a href="/animated_stickers">animated stickers</a> can have a compressed svg (&lt; 300 bytes) to show the outline of the sticker before fetching the actual lottie animation.
-Animated sticker outlines will have a <code>j</code> type <a href="/constructor/photoPathSize">photoPathSize</a> thumbnail.  </p>
-<p>This specific vector thumbnail consists in an <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths">SVG path</a>, specially encoded to save space.<br>
+<p>Messages with <a href="/animated_stickers">animated</a>, <a href="/stickers#video-stickers">video</a>, <a href="/stickers">normal</a> stickers can have a compressed svg (&lt; 300 bytes) to show the outline of the sticker before fetching the actual sticker.
+Sticker outlines will have a <code>j</code> type <a href="/constructor/photoPathSize">photoPathSize</a> thumbnail.  </p>
+<p>This specific vector thumbnail consists of an <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths">SVG path</a>, specially encoded to save space.<br>
 This path will be the outline of the animated sticker, and should be shown to the user while downloading the actual sticker.  </p>
 <p>As for stripped sizes, the payload should be inflated using the following algorithm:</p>
 <pre><code>encoded := photoPathSize.bytes

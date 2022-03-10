@@ -47,20 +47,20 @@ rpc_result#f35c6d01 req_msg_id:long…">
 <p>A response to an RPC query is normally wrapped as follows:</p>
 <pre><code>rpc_result#f35c6d01 req_msg_id:long result:Object = RpcResult;</code></pre>
 <p>Here req_msg_id is the identifier of the message sent by the other party and containing an RPC query. This way, the recipient knows that the result is a response to the specific RPC query in question.
-At the same time, this response serves as acknowledgment of the other party’s receipt of the req_msg_id message.</p>
+At the same time, this response serves as acknowledgment of the other party's receipt of the req_msg_id message.</p>
 <p>Note that the response to an RPC query  must also be acknowledged. Most frequently, this coincides with the transmission of the next message (which may have a container attached to it carrying a service message with the acknowledgment).</p>
 <h4><a class="anchor" href="#rpc-error" id="rpc-error" name="rpc-error"><i class="anchor-icon"></i></a>RPC Error</h4>
 <p>The result field returned in response to any RPC query may also contain an error message in the following format:</p>
 <pre><code>rpc_error#2144ca19 error_code:int error_message:string = RpcError;</code></pre>
 <h4><a class="anchor" href="#cancellation-of-an-rpc-query" id="cancellation-of-an-rpc-query" name="cancellation-of-an-rpc-query"><i class="anchor-icon"></i></a>Cancellation of an RPC Query</h4>
-<p>In certain situations, the client does not want to receive a response to an already transmitted RPC query, for example because the response turns out to be long and the client has decided to do without it because of insufficient link capacity. Simply interrupting the TCP connection will not have any effect because the server would re-send the missing response at the first opportunity. Therefore, the client needs a way to cancel receipt of the RPC response message, actually acknowledging its receipt prior to it being in fact received, which will settle the server down and prevent it from re-sending the response. However, the client does not know the RPC response’s msg_id prior to receiving the response; the only thing it knows is the req_msg_id. i. e. the msg_id of the relevant RPC query. Therefore, a special query is used:</p>
+<p>In certain situations, the client does not want to receive a response to an already transmitted RPC query, for example because the response turns out to be long and the client has decided to do without it because of insufficient link capacity. Simply interrupting the TCP connection will not have any effect because the server would re-send the missing response at the first opportunity. Therefore, the client needs a way to cancel receipt of the RPC response message, actually acknowledging its receipt prior to it being in fact received, which will settle the server down and prevent it from re-sending the response. However, the client does not know the RPC response's msg_id prior to receiving the response; the only thing it knows is the req_msg_id. i. e. the msg_id of the relevant RPC query. Therefore, a special query is used:</p>
 <pre><code>rpc_drop_answer#58e4a740 req_msg_id:long = RpcDropAnswer;</code></pre>
 <p>The response to this query returns as one of the following messages wrapped in rpc_result and requiring an acknowledgment: </p>
 <pre><code>rpc_answer_unknown#5e2ad36e = RpcDropAnswer;
 rpc_answer_dropped_running#cd78e586 = RpcDropAnswer;
 rpc_answer_dropped#a43ad8b7 msg_id:long seq_no:int bytes:int = RpcDropAnswer;</code></pre>
-<p>The first version of the response is used if the server remembers nothing of the incoming req_msg_id (if it has already been responded to, for example). The second version is used if the response was canceled while the RPC query was being processed (where the RPC query itself was still fully processed); in this case, the same rpc_answer_dropped_running is also returned in response to the original query, and both of these responses require an acknowledgment from the client. The final version means that the RPC response was removed from the server’s outgoing queue, and its msg_id, seq_no, and length in bytes are transmitted to the client.</p>
-<p>Note that rpc_answer_dropped_running and rpc_answer_dropped serve as acknowledgments of the server’s receipt of the original query (the same one, the response to which we wish to forget). In addition, same as for any RPC queries, any response to rpc_drop_answer is an acknowledgment for rpc_drop_answer itself.</p>
+<p>The first version of the response is used if the server remembers nothing of the incoming req_msg_id (if it has already been responded to, for example). The second version is used if the response was canceled while the RPC query was being processed (where the RPC query itself was still fully processed); in this case, the same rpc_answer_dropped_running is also returned in response to the original query, and both of these responses require an acknowledgment from the client. The final version means that the RPC response was removed from the server's outgoing queue, and its msg_id, seq_no, and length in bytes are transmitted to the client.</p>
+<p>Note that rpc_answer_dropped_running and rpc_answer_dropped serve as acknowledgments of the server's receipt of the original query (the same one, the response to which we wish to forget). In addition, same as for any RPC queries, any response to rpc_drop_answer is an acknowledgment for rpc_drop_answer itself.</p>
 <p>As an alternative to using rpc_drop_answer, a new session may be created after the connection is reset and the old session is removed through destroy_session.</p>
 <h4><a class="anchor" href="#messages-associated-with-querying-changing-and-receiving-the-status-of-other-messages" id="messages-associated-with-querying-changing-and-receiving-the-status-of-other-messages" name="messages-associated-with-querying-changing-and-receiving-the-status-of-other-messages"><i class="anchor-icon"></i></a>Messages associated with querying, changing, and receiving the status of other messages</h4>
 <p>See <a href="/mtproto/service_messages_about_messages">Mobile Protocol: Service Messages about Messages</a></p>
@@ -69,7 +69,7 @@ rpc_answer_dropped#a43ad8b7 msg_id:long seq_no:int bytes:int = RpcDropAnswer;</c
 <pre><code>get_future_salts#b921bd04 num:int = FutureSalts;
 future_salt#0949d9dc valid_since:int valid_until:int salt:long = FutureSalt;
 future_salts#ae500895 req_msg_id:long now:int salts:vector&lt;future_salt&gt; = FutureSalts;</code></pre>
-<p>The client must check to see that the response’s req_msg_id in fact coincides with msg_id of the query for get_future_salts. The server returns a maximum of num future server salts (may return fewer). The response serves as the acknowledgment of the query and does not require an acknowledgment itself.</p>
+<p>The client must check to see that the response's req_msg_id in fact coincides with msg_id of the query for get_future_salts. The server returns a maximum of num future server salts (may return fewer). The response serves as the acknowledgment of the query and does not require an acknowledgment itself.</p>
 <h4><a class="anchor" href="#ping-messages-pingpong" id="ping-messages-pingpong" name="ping-messages-pingpong"><i class="anchor-icon"></i></a>Ping Messages (PING/PONG)</h4>
 <pre><code>ping#7abe77ec ping_id:long = Pong;</code></pre>
 <p>A response is usually returned to the same connection:</p>
@@ -84,7 +84,7 @@ future_salts#ae500895 req_msg_id:long now:int salts:vector&lt;future_salt&gt; = 
 destroy_session_ok#e22045fc session_id:long = DestroySessionRes;
 destroy_session_none#62d350c9 session_id:long = DestroySessionRes;</code></pre>
 <h4><a class="anchor" href="#new-session-creation-notification" id="new-session-creation-notification" name="new-session-creation-notification"><i class="anchor-icon"></i></a>New Session Creation Notification</h4>
-<p>The server notifies the client that a new session (from the server’s standpoint) had to be created to handle a client message. If, after this, the server receives a message with an even smaller msg_id within the same session, a similar notification will be generated for this msg_id as well. No such notifications are generated for high msg_id values.</p>
+<p>The server notifies the client that a new session (from the server's standpoint) had to be created to handle a client message. If, after this, the server receives a message with an even smaller msg_id within the same session, a similar notification will be generated for this msg_id as well. No such notifications are generated for high msg_id values.</p>
 <pre><code>new_session_created#9ec20908 first_msg_id:long unique_id:long server_salt:long = NewSession</code></pre>
 <p>The unique_id parameter is generated by the server every time a session is (re-)created.</p>
 <p>This notification must be acknowledged by the client. It is necessary, for instance, for the client to understand that there is, in fact, a “gap” in the stream of long poll notifications received from the server (the user may have failed to receive notifications during some period of time).</p>
@@ -105,7 +105,7 @@ Clients should group acknowledgments, state requests and message resend requests
 <h4><a class="anchor" href="#message-copies" id="message-copies" name="message-copies"><i class="anchor-icon"></i></a>Message Copies</h4>
 <p>In some situations, an old message with a msg_id that is no longer valid needs to be re-sent. Then, it is wrapped in a copy container:</p>
 <pre><code>msg_copy#e06046b2 orig_message:Message = MessageCopy;</code></pre>
-<p>Once received, the message is processed as if the wrapper were not there. However, if it is known for certain that the message orig_message.msg_id was received, then the new message is not processed (while at the same time, it and orig_message.msg_id are acknowledged).  The value of orig_message.msg_id must be lower than the container’s msg_id.</p>
+<p>Once received, the message is processed as if the wrapper were not there. However, if it is known for certain that the message orig_message.msg_id was received, then the new message is not processed (while at the same time, it and orig_message.msg_id are acknowledged).  The value of orig_message.msg_id must be lower than the container's msg_id.</p>
 <p>This is not used at this time, because an old message can be wrapped in a simple container with the same result.</p>
 <h4><a class="anchor" href="#packed-object" id="packed-object" name="packed-object"><i class="anchor-icon"></i></a>Packed Object</h4>
 <p>Used to replace any other object (or rather, a serialization thereof) with its archived (gzipped) representation:</p>
@@ -119,7 +119,7 @@ Clients should group acknowledgments, state requests and message resend requests
 <p>At the same time, the <code>max_delay</code> parameter has higher priority than <code>wait_after</code>, and <code>max_wait</code> has higher priority than <code>max_delay</code>.</p>
 <p>This message does not require a response or an acknowledgement. If the container transmitted over HTTP carries several such messages, the behavior is undefined (in fact, the latest parameter will be used). </p>
 <p>If no <code>http_wait</code> is present in container, default values <code>max_delay=0</code> (milliseconds), <code>wait_after=0</code> (milliseconds), and <code>max_wait=25000</code> (milliseconds) are used. </p>
-<p>If the client’s ping of the server takes a long time, it may make sense to set <code>max_delay</code> to a value that is comparable in magnitude to ping time.</p></div>
+<p>If the client's ping of the server takes a long time, it may make sense to set <code>max_delay</code> to a value that is comparable in magnitude to ping time.</p></div>
   
 </div>
           

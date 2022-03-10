@@ -46,7 +46,7 @@
 <p>Update events are sent to an authorized user into the last active connection (except for connections needed for downloading / uploading files).</p>
 <p>So to start receiving updates the client needs to init connection and call API method, e.g. to <a href="#fetching-state">fetch current state</a>.</p>
 <h3><a class="anchor" href="#event-sequences" id="event-sequences" name="event-sequences"><i class="anchor-icon"></i></a>Event sequences</h3>
-<p>All events are received from the socket as a sequence of TL-serialized <a href="/type/Updates">Updates</a> objects, which might be optionally gzip-compressed in the same way as <a href="/api/invoking#uncompressing-data">responses to queries</a>.</p>
+<p>All events are received from the socket as a sequence of TL-serialized <a href="/type/Updates">Updates</a> objects, which might be optionally gzip-compressed in the same way as <a href="/api/invoking#decompressing-data">responses to queries</a>.</p>
 <p>Each <a href="/type/Updates">Updates</a> object may contain single or multiple <a href="/type/Update">Update</a> objects, representing different events happening.</p>
 <p>In order to apply all updates in precise order and to guarantee that no update is missed or applied twice there is <code>seq</code> attribute in <a href="/type/Updates">Updates</a> constructors, and <code>pts</code> (with <code>pts_count</code>) or <code>qts</code> attributes in <a href="/type/Update">Update</a> constructors. The client must use those attributes values in combination with locally stored state to correctly apply incoming updates.</p>
 <p>When a gap in updates sequence occurs, it must be filled via calling one of the API methods. <a href="#recovering-gaps">More below »</a></p>
@@ -69,7 +69,7 @@
 All boxes are completely independent, and each pts sequence is tied to just one box (see below).</p>
 <p><a href="/type/Update">Update</a> object may contain info about <em>multiple events</em> (for example, <a href="/constructor/updateDeleteMessages">updateDeleteMessages</a>).
 That's why all single updates might have <em>pts_count</em> parameter indicating the <em>number of events</em> contained in the received <em>update</em> (with some exceptions, in this case, the <em>pts_count</em> is considered to be <code>0</code>).</p>
-<p>Each <a href="/api/channel">channel and supergroup</a> has its message box and <em>its event sequence</em> as a result; private chats and legacy groups of one user have another <em>common event sequence</em>.
+<p>Each <a href="/api/channel#channels">channel</a> and <a href="/api/channel#supergroups">supergroup</a> has its message box and <em>its event sequence</em> as a result; private chats and <a href="/api/channel#legacy-groups">legacy groups</a> of one user have another <em>common event sequence</em>.
 Secret chats, certain bot events and other kinds of updates have yet another <em>common secondary event sequence</em>.</p>
 <p>To recap, the client has to take care of the integrity of the following sequences to properly handle updates:</p>
 <ul>
@@ -139,7 +139,7 @@ Manually obtaining updates is also required in the following situations:</p>
 <p>To fetch the updates difference of a channel, <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> is used.
 If the difference is too large to be received in one request, the <code>final</code> flag of the result is <strong>not</strong> set (see <a href="/type/updates.ChannelDifference">docs</a>).
 The intermediate status, represented by the <strong>pts</strong>, must be saved on the client and the query must be repeated, using the intermediate status as the current status.</p>
-<p>For perfomance reasons and for better user experience, client can set maximum gap size to be filled: <code>pts_total_limit</code> parameter of <a href="/method/updates.getDifference">updates.getDifference</a> and <code>limit</code> parameter for <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> can be used.</p>
+<p>For performance reasons and for better user experience, client can set maximum gap size to be filled: <code>pts_total_limit</code> parameter of <a href="/method/updates.getDifference">updates.getDifference</a> and <code>limit</code> parameter for <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> can be used.</p>
 <p>If the gap is too large and there are too many updates to fetch, a <code>*TooLong</code> constructor will be returned. In this case, the client must <a href="#fetching-state">re-fetch the state</a>, re-start fetching updates from that state and follow the instructions that can be found <a href="/constructor/updates.channelDifferenceTooLong">here</a>.</p>
 <p>It is recommended to use limit <code>10-100</code> for channels and <code>1000-10000</code> otherwise.</p>
 <h3><a class="anchor" href="#example-implementations" id="example-implementations" name="example-implementations"><i class="anchor-icon"></i></a>Example implementations</h3>

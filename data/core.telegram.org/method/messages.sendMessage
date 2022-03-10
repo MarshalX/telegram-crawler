@@ -97,6 +97,11 @@
 <td>Clear the draft field</td>
 </tr>
 <tr>
+<td><strong>noforwards</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/constructor/true">true</a></td>
+<td>Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more">content protection</a> enabled</td>
+</tr>
+<tr>
 <td><strong>peer</strong></td>
 <td style="text-align: center;"><a href="/type/InputPeer">InputPeer</a></td>
 <td>The destination where the message will be sent</td>
@@ -131,6 +136,11 @@
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.10?<a href="/type/int">int</a></td>
 <td>Scheduled message date for <a href="/api/scheduled-messages">scheduled messages</a></td>
 </tr>
+<tr>
+<td><strong>send_as</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.13?<a href="/type/InputPeer">InputPeer</a></td>
+<td>Send this message as the specified peer</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#result" id="result" name="result"><i class="anchor-icon"></i></a>Result</h3>
@@ -145,11 +155,6 @@
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>401</td>
-<td>AUTH_KEY_PERM_EMPTY</td>
-<td>The temporary auth key must be binded to the permanent auth key to use these methods.</td>
-</tr>
 <tr>
 <td>400</td>
 <td>BOT_DOMAIN_INVALID</td>
@@ -243,7 +248,7 @@
 <tr>
 <td>400</td>
 <td>MSG_ID_INVALID</td>
-<td>Provided reply_to_msg_id is invalid.</td>
+<td>Invalid message ID provided.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -259,6 +264,11 @@
 <td>400</td>
 <td>POLL_OPTION_INVALID</td>
 <td>Invalid poll option provided.</td>
+</tr>
+<tr>
+<td>500</td>
+<td>RANDOM_ID_DUPLICATE</td>
+<td>You provided a random ID that was already used.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -291,9 +301,14 @@
 <td>There are too many scheduled messages.</td>
 </tr>
 <tr>
+<td>400</td>
+<td>SEND_AS_PEER_INVALID</td>
+<td>You can't send messages as the specified peer.</td>
+</tr>
+<tr>
 <td>420</td>
-<td>SLOWMODE_WAIT_X</td>
-<td>Slowmode is enabled in this chat: you must wait for the specified number of seconds before sending another message to the chat.</td>
+<td>SLOWMODE_WAIT_%d</td>
+<td>Slowmode is enabled in this chat: wait %d seconds before sending another message to this chat.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -301,7 +316,7 @@
 <td>You're banned from sending messages in supergroups/channels.</td>
 </tr>
 <tr>
-<td>400</td>
+<td>403</td>
 <td>USER_IS_BLOCKED</td>
 <td>You were blocked by this user.</td>
 </tr>

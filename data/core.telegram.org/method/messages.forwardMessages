@@ -102,6 +102,11 @@
 <td>Whether to strip captions from media</td>
 </tr>
 <tr>
+<td><strong>noforwards</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/constructor/true">true</a></td>
+<td>Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn't have <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more">content protection</a> enabled</td>
+</tr>
+<tr>
 <td><strong>from_peer</strong></td>
 <td style="text-align: center;"><a href="/type/InputPeer">InputPeer</a></td>
 <td>Source of messages</td>
@@ -125,6 +130,11 @@
 <td><strong>schedule_date</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.10?<a href="/type/int">int</a></td>
 <td>Scheduled message date for scheduled messages</td>
+</tr>
+<tr>
+<td><strong>send_as</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.13?<a href="/type/InputPeer">InputPeer</a></td>
+<td>Forward the messages as the specified peer</td>
 </tr>
 </tbody>
 </table>
@@ -159,6 +169,11 @@
 <td>400</td>
 <td>CHAT_ADMIN_REQUIRED</td>
 <td>You must be an admin in this chat to do this.</td>
+</tr>
+<tr>
+<td>406</td>
+<td>CHAT_FORWARDS_RESTRICTED</td>
+<td>You can't forward messages from a protected chat.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -231,14 +246,19 @@
 <td>Invalid message ID provided.</td>
 </tr>
 <tr>
-<td>420</td>
-<td>P0NY_FLOODWAIT</td>
-<td> </td>
-</tr>
-<tr>
 <td>400</td>
 <td>PEER_ID_INVALID</td>
 <td>The provided peer id is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>QUIZ_ANSWER_MISSING</td>
+<td>You can forward a quiz while hiding the original author only after choosing an option in the quiz.</td>
+</tr>
+<tr>
+<td>500</td>
+<td>RANDOM_ID_DUPLICATE</td>
+<td>You provided a random ID that was already used.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -257,13 +277,18 @@
 </tr>
 <tr>
 <td>400</td>
-<td>SLOWMODE_MULTI_MSGS_DISABLED</td>
-<td>Slowmode is enabled, you cannot forward multiple messages to this group.</td>
+<td>SEND_AS_PEER_INVALID</td>
+<td>You can't send messages as the specified peer.</td>
 </tr>
 <tr>
 <td>420</td>
-<td>SLOWMODE_WAIT_X</td>
-<td>Slowmode is enabled in this chat: you must wait for the specified number of seconds before sending another message to the chat.</td>
+<td>SLOWMODE_WAIT_%d</td>
+<td>Slowmode is enabled in this chat: wait %d seconds before sending another message to this chat.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>SLOWMODE_MULTI_MSGS_DISABLED</td>
+<td>Slowmode is enabled, you cannot forward multiple messages to this group.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -271,7 +296,7 @@
 <td>You're banned from sending messages in supergroups/channels.</td>
 </tr>
 <tr>
-<td>400</td>
+<td>403</td>
 <td>USER_IS_BLOCKED</td>
 <td>You were blocked by this user.</td>
 </tr>

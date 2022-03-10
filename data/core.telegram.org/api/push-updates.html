@@ -71,8 +71,8 @@
 </ul>
 <h3><a class="anchor" href="#notification-encryption" id="notification-encryption" name="notification-encryption"><i class="anchor-icon"></i></a>Notification encryption</h3>
 <p>For FCM and APNS VoIP, an optional encryption key used to encrypt push notifications can be passed to <a href="/method/account.registerDevice">account.registerDevice</a> (<code>secret</code>). This key (<code>auth_key</code>) is used to encrypt the payloads using <a href="/mtproto/description">MTProto v2</a>.</p>
-<p>The FCM payload will be a JSON payload, containing a <code>p</code> field with the base64-encoded encrypted <a href="/mtproto/description">MTProto payload</a>. After decryption, the result will be a JSON object, prefixed by a 32-bit little-endian integer with the length of the JSON payload. As usual, make sure to follow all security checks as described in the <a href="/mtproto/description#important-checks">MTProto docs</a>.</p>
-<p><a href="https://github.com/DrKLO/Telegram/blob/ff5735503e068a6f1cada09b977f633df7caf98d/TMessagesProj/src/main/java/org/telegram/messenger/GcmPushListenerService.java#L563">Example implementation</a>.</p>
+<p>The FCM payload will be a JSON payload, containing a <code>p</code> field with the base64url-encoded encrypted <a href="/mtproto/description">MTProto payload</a>. After decryption, the result will be a JSON object, prefixed by a 32-bit little-endian integer with the length of the JSON payload. As usual, make sure to follow all security checks as described in the <a href="/mtproto/description#important-checks">MTProto docs</a>.</p>
+<p><a href="https://github.com/DrKLO/Telegram/blob/3708e9847a96ed681ff811d391749cc4535b03f2/TMessagesProj/src/main/java/org/telegram/messenger/GcmPushListenerService.java#L56">Example implementation</a>.</p>
 <p>As mentioned <a href="#subscribing-to-notifications">above</a>, payloads can also be encrypted using <a href="https://tools.ietf.org/html/rfc8291">P-256 Elliptic Curve Diffie-Hellman when using web push</a>.</p>
 <h3><a class="anchor" href="#notification-structure" id="notification-structure" name="notification-structure"><i class="anchor-icon"></i></a>Notification structure</h3>
 <p>An (<a href="#notification-encryption">optionally encrypted</a>) notification is provided as a JSON object in the following format:</p>
@@ -89,16 +89,35 @@
   }
 }</code></pre>
 <p>Each notification has several parameters that describe it.</p>
-<h4><a class="anchor" href="#notification-type" id="notification-type" name="notification-type"><i class="anchor-icon"></i></a>Notification type</h4>
-<p><strong>data.loc_key</strong> - A string literal in the form <code>/[A-Z_0-9]+/</code>, which summarizes the notification. For example, <code>CHAT_MESSAGE_TEXT</code>.</p>
-<h4><a class="anchor" href="#notification-text-arguments" id="notification-text-arguments" name="notification-text-arguments"><i class="anchor-icon"></i></a>Notification text arguments</h4>
-<p><strong>data.loc_args</strong> - A list or arguments which, when inserted into a template, produce a readable notification.</p>
-<h4><a class="anchor" href="#custom-parameters" id="custom-parameters" name="custom-parameters"><i class="anchor-icon"></i></a>Custom parameters</h4>
-<p><strong>data.custom</strong> - Parameters which are be passed into the application when a notification is opened.</p>
-<h4><a class="anchor" href="#sound" id="sound" name="sound"><i class="anchor-icon"></i></a>Sound</h4>
-<p><strong>data.sound</strong> - The name of an audio file to be played.</p>
-<h4><a class="anchor" href="#user-id" id="user-id" name="user-id"><i class="anchor-icon"></i></a>User id</h4>
-<p><strong>data.user_id</strong> - ID of the account to which the PUSH notification should be delivered, in case of clients with multiple accounts active and running.</p>
+<ul>
+<li>loc_key - Notification type: a string literal in the form <code>/[A-Z_0-9]+/</code>, which summarizes the notification. For example, <code>CHAT_MESSAGE_TEXT</code>.</li>
+<li>loc_args - Notification placeholder arguments: a list or arguments which, when inserted into a template, produce a readable notification.</li>
+<li>custom - Custom parameters to be passed into the application when a notification is opened. Possible fields:<ul>
+<li>attachb64 - For notifications about media, base64url-encoded TL-serialization of the corresponding <a href="/type/Photo">Photo</a> / <a href="/type/Document">Document</a> object</li>
+<li>updates - base64url-encoded TL-serialization of the <a href="/type/Updates">Updates</a> object, currently sent only for PHONE_CALL_REQUEST (with <a href="/constructor/updatePhoneCall">updatePhoneCall</a> inside)</li>
+<li>call_id - Call ID, used in PHONE_CALL_REQUEST</li>
+<li>call_ah - Call access hash, used in PHONE_CALL_REQUEST</li>
+<li>encryption_id - Secret chat id for ENCRYPTION_REQUEST, ENCRYPTION_ACCEPT, ENCRYPTED_MESSAGE</li>
+<li>random_id - Random id for message in ENCRYPTED_MESSAGE</li>
+<li>contact_id - Telegram user identifier of contact that joined Telegram in CONTACT_JOINED</li>
+<li>msg_id - Message ID for new message event or reaction event</li>
+<li>channel_id - Identifier of the <a href="/api/channel">channel/supergroup</a> where the event occurred</li>
+<li>chat_id - Identifier of the <a href="/api/channel#legacy-groups">legacy group</a> where the event occurred</li>
+<li>from_id - User ID where the event occurred</li>
+<li>chat_from_broadcast_id - If the group message was sent as a channel, this field will contain the sender channel ID</li>
+<li>chat_from_group_id - If the group message was sent as a supergroup, this field will contain the sender supergroup ID</li>
+<li>chat_from_id - Groups only, message author identifier (ignore if any of chat_from_broadcast_id / chat_from_group_id was present)</li>
+<li>mention - Whether the current user was mentioned/replied to in this new message</li>
+<li>silent - Whether the message was posted silently (no sound should be played for this notification)</li>
+<li>schedule - Whether the message is outgoing and was sent via <a href="/api/scheduled-messages">scheduled messages</a></li>
+<li>edit_date - When was the message last edited</li>
+<li>top_msg_id - thread_id for new mentions/replies in <a href="/api/threads">threads</a></li>
+</ul>
+</li>
+<li>sound - The name of an audio file to be played.</li>
+<li>user_id - ID of the account to which the PUSH notification should be delivered, in case of clients with multiple accounts active and running.</li>
+<li>announcement - Roughly equivalent to a message received from the service notifications (Telegram Notifications, id <code>777000</code>) user, but must be delivered via push notifications, without contacting the API.</li>
+</ul>
 <h3><a class="anchor" href="#processing-notifications" id="processing-notifications" name="processing-notifications"><i class="anchor-icon"></i></a>Processing notifications</h3>
 <p>In principle, <strong>data.loc_key</strong>, <strong>data.custom</strong>, and an Internet connection are sufficient to generate a notification. Obviously, if possible, when generating a visual notification you need not use all of the transmitted data and may rely on the information already stored on the client. But if a user or a chat is not cached locally, the values passed in loc_args may also be used. <strong>data.user_id</strong> is the ID of the account to which the PUSH notification should be delivered, in case of clients with multiple accounts active and running.</p>
 <h3><a class="anchor" href="#service-notifications" id="service-notifications" name="service-notifications"><i class="anchor-icon"></i></a>Service notifications</h3>
@@ -114,17 +133,17 @@
 <tbody>
 <tr>
 <td>DC_UPDATE</td>
-<td><strong>dc</strong> - number of the data-center<br><strong>addr</strong> - server address with port number in the format <code>111.112.113.114:443</code></td>
+<td><strong>data.custom.dc</strong> - number of the data-center<br><strong>data.custom.addr</strong> - server address with port number in the format <code>111.112.113.114:443</code></td>
 <td>In case the client gets this notification, it is necessary to add the received server address to the list of possible addresses. In case the address of the first DC was passed (<code>dc=1</code>), it is recommended to call it immediately using <a href="/method/help.getConfig">help.getConfig</a> to update dc-configuration.</td>
 </tr>
 <tr>
 <td>MESSAGE_DELETED</td>
-<td><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>messages</strong>: Comma-separated IDs of messages that were deleted</td>
+<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.messages</strong>: Comma-separated IDs of messages that were deleted</td>
 <td>Messages were deleted, remove multiple notifications for this chat</td>
 </tr>
 <tr>
 <td>READ_HISTORY</td>
-<td><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>max_id</strong>: Maximum ID of read messages</td>
+<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read messages</td>
 <td>Message history was read, remove multiple notifications for this chat</td>
 </tr>
 <tr>
@@ -142,6 +161,11 @@
 <td> </td>
 <td>Sent rarely, every 10th message in chats or once per 15 sec in PM, to update badge or download messages</td>
 </tr>
+<tr>
+<td>MESSAGE_ANNOUNCEMENT</td>
+<td><strong>data.announcement</strong>: Announcement</td>
+<td>Roughly equivalent to a message received from the service notifications (Telegram Notifications, id <code>777000</code>) user, but must be delivered via push notifications, without contacting the API.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#possible-notifications" id="possible-notifications" name="possible-notifications"><i class="anchor-icon"></i></a>Possible Notifications</h3>
@@ -151,7 +175,6 @@
 <th>Type</th>
 <th>Template example</th>
 <th>Arguments</th>
-<th>Extra custom arguments</th>
 </tr>
 </thead>
 <tbody>
@@ -159,775 +182,806 @@
 <td>AUTH_REGION</td>
 <td>New login from unrecognized device {1}, location: {2}</td>
 <td>1. Device name<br>2. Location</td>
-<td> </td>
 </tr>
 <tr>
 <td>AUTH_UNKNOWN</td>
 <td>New login from unrecognized device {1}</td>
 <td>1. Device name</td>
-<td> </td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGES</td>
 <td>{1} posted an album</td>
 <td>1. Message author</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_AUDIO</td>
 <td>{1} posted a voice message</td>
 <td>1. Message author</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_CONTACT</td>
 <td>{1} posted a contact {2}</td>
 <td>1. Message author<br>2. Contact name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_DOC</td>
 <td>{1} posted a file</td>
 <td>1. Message author</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_DOCS</td>
 <td>{1} posted {2} files</td>
 <td>1. Channel name<br>2. Number of documents that were posted</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_FWDS</td>
 <td>{1} posted {2} forwarded messages</td>
 <td>1. Message author<br>2. Number of forwarded messages</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_GAME</td>
 <td>{1} invited you to play {2}</td>
 <td>1. Message author<br>2. Game name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_GAME_SCORE</td>
 <td>{1} scored {3} in game {2}</td>
 <td>1. User<br>2. Game name<br>3. Score</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_GEO</td>
 <td>{1} posted a location</td>
 <td>1. Channel name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_GEOLIVE</td>
 <td>{1} posted a live location</td>
 <td>1. Channel name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_GIF</td>
 <td>{1} posted a GIF</td>
 <td>1. Channel name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_NOTEXT</td>
 <td>{1} posted a message</td>
 <td>1. Channel name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_PHOTO</td>
 <td>{1} posted a photo</td>
 <td>1. Channel name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_PHOTOS</td>
 <td>{1} posted {2} photos</td>
 <td>1. Channel name<br>2. Number of photos that was sent</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_PLAYLIST</td>
 <td>{1} posted {2} music files</td>
 <td>1. Channel name<br>2. Number of audio files that were posted</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_POLL</td>
 <td>{1} posted a poll {2}</td>
 <td>1. Channel name<br>2. Poll name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_QUIZ</td>
 <td>{1} posted a quiz {2}</td>
 <td>1. Channel name<br>2. Quiz name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_ROUND</td>
 <td>{1} posted a video message</td>
 <td>1. Channel name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_STICKER</td>
 <td>{1} posted a {2} sticker</td>
 <td>1. Channel name<br>2. Sticker emoji</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_TEXT</td>
 <td>{1}: {2}</td>
 <td>1. Channel name<br>2. Message body</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_VIDEO</td>
 <td>{1} posted a video</td>
 <td>1. Channel name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_VIDEOS</td>
 <td>{1} posted {2} videos</td>
 <td>1. Channel name<br>2. Number of videos that were posted</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>channel_id</strong>: <a href="/api/channel">Channel/supergroup</a> identifier (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>CHAT_ADD_MEMBER</td>
 <td>{1} invited {3} to the group {2}</td>
 <td>1. Message author<br>2. Chat name<br>3. New participant name</td>
-<td><strong>chat_id</strong>: chat identifier</td>
 </tr>
 <tr>
 <td>CHAT_ADD_YOU</td>
 <td>{1} invited you to the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>chat_id</strong>: chat identifier</td>
 </tr>
 <tr>
 <td>CHAT_CREATED</td>
 <td>{1} invited you to the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>chat_id</strong>: chat identifier</td>
 </tr>
 <tr>
 <td>CHAT_DELETE_MEMBER</td>
 <td>{1} removed {3} from the group {2}</td>
 <td>1. Message author<br>2. Chat name<br>3. Dropped participant name</td>
-<td><strong>chat_id</strong>: chat identifier</td>
 </tr>
 <tr>
 <td>CHAT_DELETE_YOU</td>
 <td>{1} removed you from the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>chat_id</strong>: chat identifier</td>
 </tr>
 <tr>
 <td>CHAT_JOINED</td>
 <td>{1} joined the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>chat_id</strong>: chat identifier</td>
 </tr>
 <tr>
 <td>CHAT_LEFT</td>
 <td>{1} left the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>chat_id</strong>: chat identifier</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGES</td>
 <td>{1} sent an album to the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>chat_from_id</strong>: Message author identifier<br><strong>chat_id</strong>: chat identifier<br><strong>mention</strong>: Whether the user was mentioned in the message</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_AUDIO</td>
 <td>{1} sent a voice message to the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_CONTACT</td>
 <td>{1} shared a contact {3} in the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Contact name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_DOC</td>
 <td>{1} sent a file to the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_DOCS</td>
 <td>{1} sent {3} files to the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Number of documents that were sent</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_FWDS</td>
 <td>{1} forwarded {3} messages to the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Number of messages that were forwarded</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_GAME</td>
 <td>{1} invited the group {2} to play {3}</td>
 <td>1. User name<br>2. Group name<br>3. Game name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_GAME_SCORE</td>
 <td>{1} scored {4} in game {3} in the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Game name<br>4. Score</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_GEO</td>
 <td>{1} sent a location to the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_GEOLIVE</td>
 <td>{1} shared a live location with the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_GIF</td>
 <td>{1} sent a GIF to the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_INVOICE</td>
 <td>{1} sent an invoice to the group {2} for {3}</td>
 <td>1. User name<br>2. Group name<br>3. Product name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_NOTEXT</td>
 <td>{1} sent a message to the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_PHOTO</td>
 <td>{1} sent a photo to the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_PHOTOS</td>
 <td>{1} sent {3} photos to the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Number of photos that were sent</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_PLAYLIST</td>
 <td>{1} sent {3} music files to the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Number of audio files that were sent</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_POLL</td>
 <td>{1} sent a poll {3} to the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Poll name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_QUIZ</td>
 <td>{1} sent a quiz {3} to the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Quiz name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_ROUND</td>
 <td>{1} sent a video message to the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_STICKER</td>
 <td>{1} sent a {3} sticker to the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Sticker emoji</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_TEXT</td>
 <td>{1} @ {2}: {3}</td>
 <td>1. Message author<br>2. Chat name<br>3. Message body</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_VIDEO</td>
 <td>{1} sent a video to the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>CHAT_MESSAGE_VIDEOS</td>
 <td>{1} sent {3} videos to the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Number of videos that were sent</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>chat_id</strong>: <a href="/api/channel">Chat</a> identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>CHAT_PHOTO_EDITED</td>
 <td>{1} changed the group photo for {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>chat_from_id</strong>: Message author identifier<br><strong>chat_id</strong>: chat identifier<br><strong>msg_id</strong>: ID of the message</td>
+</tr>
+<tr>
+<td>CHAT_REACT_AUDIO</td>
+<td>{1}: {3} to your voice message in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_CONTACT</td>
+<td>{1}: {3} to your contact {4} in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Contact name</td>
+</tr>
+<tr>
+<td>CHAT_REACT_DOC</td>
+<td>{1}: {3} to your file in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_GAME</td>
+<td>{1}: {3} to your game in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_GEO</td>
+<td>{1}: {3} to your map in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_GEOLIVE</td>
+<td>{1}: {3} to your live location in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_GIF</td>
+<td>{1}: {3} to your GIF in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_INVOICE</td>
+<td>{1}: {3} to your invoice in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_NOTEXT</td>
+<td>{1}: {3} to your message in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_PHOTO</td>
+<td>{1}: {3} to your photo in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_POLL</td>
+<td>{1}: {3} to your poll {4} in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Poll name</td>
+</tr>
+<tr>
+<td>CHAT_REACT_QUIZ</td>
+<td>{1}: {3} to your quiz {4} in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Quiz name</td>
+</tr>
+<tr>
+<td>CHAT_REACT_ROUND</td>
+<td>{1}: {3} to your video message in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_STICKER</td>
+<td>{1}: {3} to your {4} sticker in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Sticker emoji</td>
+</tr>
+<tr>
+<td>CHAT_REACT_TEXT</td>
+<td>{1}: {3} in {2} to your "{4}"</td>
+<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Message body</td>
+</tr>
+<tr>
+<td>CHAT_REACT_VIDEO</td>
+<td>{1}: {3} to your video in {2}</td>
+<td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REQ_JOINED</td>
+<td>{2}|{1} was accepted into the group</td>
+<td>1. User name<br>2. Chat name</td>
 </tr>
 <tr>
 <td>CHAT_RETURNED</td>
 <td>{1} returned to the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
-<td><strong>chat_id</strong>: chat identifier</td>
 </tr>
 <tr>
 <td>CHAT_TITLE_EDITED</td>
 <td>{1} renamed the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>chat_id</strong>: chat identifier</td>
 </tr>
 <tr>
 <td>CHAT_VOICECHAT_END</td>
 <td>{1} ended a voice chat in the group {2}</td>
 <td>1. User name<br>2. Chat name</td>
-<td> </td>
 </tr>
 <tr>
 <td>CHAT_VOICECHAT_INVITE</td>
 <td>{1} invited {3} to a voice chat in the group {2}</td>
 <td>1. User name<br>2. Chat name<br>3. Invited users</td>
-<td> </td>
 </tr>
 <tr>
 <td>CHAT_VOICECHAT_INVITE_YOU</td>
 <td>{1} invited you to a voice chat in the group {2}</td>
 <td>1. User name<br>2. Chat name</td>
-<td> </td>
 </tr>
 <tr>
 <td>CHAT_VOICECHAT_START</td>
 <td>{1} started a voice chat in the group {2}</td>
 <td>1. User name<br>2. Chat name</td>
-<td> </td>
 </tr>
 <tr>
 <td>CONTACT_JOINED</td>
 <td>{1} joined Telegram!</td>
 <td>1. Contact name</td>
-<td><strong>contact_id</strong>: contact identifier</td>
 </tr>
 <tr>
 <td>ENCRYPTED_MESSAGE</td>
 <td>You have a new message</td>
 <td> </td>
-<td><strong>encryption_id</strong>: secret chat identifier<br><strong>random_id</strong>: message identifier</td>
 </tr>
 <tr>
 <td>ENCRYPTION_ACCEPT</td>
 <td>You have a new message</td>
 <td> </td>
-<td><strong>encryption_id</strong>: secret chat identifier</td>
 </tr>
 <tr>
 <td>ENCRYPTION_REQUEST</td>
 <td>You have a new message</td>
 <td> </td>
-<td><strong>encryption_id</strong>: secret chat identifier</td>
 </tr>
 <tr>
 <td>LOCKED_MESSAGE</td>
 <td>You have a new message</td>
-<td> </td>
 <td> </td>
 </tr>
 <tr>
 <td>MESSAGES</td>
 <td>{1} sent you an album</td>
 <td>1. User name</td>
-<td><strong>from_id</strong>: author identifier</td>
-</tr>
-<tr>
-<td>MESSAGE_ANNOUNCEMENT</td>
-<td>{1}</td>
-<td>1. Announcement</td>
-<td><strong>announcement</strong>: Announcement: roughly equivalent to a message received from the service notifications (Telegram Notifications, id <code>777000</code>) user, but must be delivered via push notifications, without contacting the API.</td>
 </tr>
 <tr>
 <td>MESSAGE_AUDIO</td>
 <td>{1} sent you a voice message</td>
 <td>1. Message author</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_CONTACT</td>
 <td>{1} shared a contact {2} with you</td>
 <td>1. User name<br>2. Contact name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_DOC</td>
 <td>{1} sent you a file</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_DOCS</td>
 <td>{1} sent you {2} files</td>
 <td>1. User name<br>2. Number of documents that were sent</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>from_id</strong>: Author identifier (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>MESSAGE_FWDS</td>
 <td>{1} forwarded you {2} messages</td>
 <td>1. User name<br>2. Number of messages that were forwarded</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>from_id</strong>: Author identifier (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>MESSAGE_GAME</td>
 <td>{1} invited you to play {2}</td>
 <td>1. User name<br>2. Game name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_GAME_SCORE</td>
 <td>{1} scored {3} in game {2}</td>
 <td>1. User name<br>2. Game name<br>3. Score</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_GEO</td>
 <td>{1} sent you a location</td>
 <td>1. Message author</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_GEOLIVE</td>
 <td>{1} sent you a live location</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_GIF</td>
 <td>{1} sent you a GIF</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_INVOICE</td>
 <td>{1} sent you an invoice for {2}</td>
 <td>1. User name<br>2. Product</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_NOTEXT</td>
 <td>{1} sent you a message</td>
 <td>1. Message author</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_PHOTO</td>
 <td>{1} sent you a photo</td>
 <td>1. Message author</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_PHOTOS</td>
 <td>{1} sent you {2} photos</td>
 <td>1. User name<br>2. Number of photos that were sent</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>from_id</strong>: Author identifier (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>MESSAGE_PHOTO_SECRET</td>
 <td>{1} sent you a self-destructing photo</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_PLAYLIST</td>
 <td>{1} sent you {2} music files</td>
 <td>1. User name<br>2. Number of audio files that were sent</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_POLL</td>
 <td>{1} sent you a poll {2}</td>
 <td>1. User name<br>2. Poll name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_QUIZ</td>
 <td>{1} sent you a quiz {2}</td>
 <td>1. User name<br>2. Quiz name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_ROUND</td>
 <td>{1} sent you a video message</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_SCREENSHOT</td>
 <td>{1} took a screenshot</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_STICKER</td>
 <td>{1} sent you a {2} sticker</td>
 <td>1. User name<br>2. Sticker emoji</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_TEXT</td>
 <td>{1}: {2}</td>
 <td>1. Message author<br>2. Message body</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_VIDEO</td>
 <td>{1} sent you a video</td>
 <td>1. Message author</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>MESSAGE_VIDEOS</td>
 <td>{1} sent you {2} videos</td>
 <td>1. User name<br>2. Number of videos that were sent</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media (related to the first message)<br><strong>chat_from_id</strong>: Groups only, message author identifier (related to the first message)<br><strong>edit_date</strong>: When was the message last edited (related to the first message)<br><strong>from_id</strong>: Author identifier (related to the first message)<br><strong>mention</strong>: Whether the user was mentioned in the message (related to the first message)<br><strong>msg_id</strong>: ID of the message (related to the first message)<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued) (related to the first message)</td>
 </tr>
 <tr>
 <td>MESSAGE_VIDEO_SECRET</td>
 <td>{1} sent you a self-destructing video</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>scheduled</strong>: Whether this is a scheduled message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PHONE_CALL_MISSED</td>
 <td>You missed a call from {1}</td>
 <td>1. User name</td>
-<td> </td>
 </tr>
 <tr>
 <td>PHONE_CALL_REQUEST</td>
 <td>{1} is calling you!</td>
 <td>1. User name</td>
-<td><strong>call_ah</strong>: Call access hash<br><strong>call_id</strong>: Call ID</td>
 </tr>
 <tr>
 <td>PINNED_AUDIO</td>
 <td>{1} pinned a voice message</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_AUDIO</td>
 <td>{1} pinned a voice message in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_CONTACT</td>
 <td>{1} pinned a contact {2}</td>
 <td>1. User name<br>2. Contact name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_CONTACT</td>
 <td>{1} pinned a contact {3} in the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Contact name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_DOC</td>
 <td>{1} pinned a file</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_DOC</td>
 <td>{1} pinned a file in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GAME</td>
 <td>{1} pinned a game</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GAME</td>
 <td>{1} pinned a game in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GAME_SCORE</td>
 <td>{1} pinned a game score</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GAME_SCORE</td>
 <td>{1} pinned a game score in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GEO</td>
 <td>{1} pinned a map</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GEO</td>
 <td>{1} pinned a map in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GEOLIVE</td>
 <td>{1} pinned a live location</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GEOLIVE</td>
 <td>{1} pinned a live location in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GIF</td>
 <td>{1} pinned a GIF</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_GIF</td>
 <td>{1} pinned a GIF in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_INVOICE</td>
 <td>{1} pinned an invoice</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_INVOICE</td>
 <td>{1} pinned an invoice in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_NOTEXT</td>
 <td>{1} pinned a message</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_NOTEXT</td>
 <td>{1} pinned a message in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_PHOTO</td>
 <td>{1} pinned a photo</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_PHOTO</td>
 <td>{1} pinned a photo in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_POLL</td>
 <td>{1} pinned a poll {2}</td>
 <td>1. User name<br>2. Poll name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_POLL</td>
 <td>{1} pinned a poll {3} in the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Poll name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_QUIZ</td>
 <td>{1} pinned a quiz {2}</td>
 <td>1. User name<br>2. Quiz name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_QUIZ</td>
 <td>{1} pinned a quiz {3} in the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Quiz name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_ROUND</td>
 <td>{1} pinned a video message</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_ROUND</td>
 <td>{1} pinned a video message in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_STICKER</td>
 <td>{1} pinned a {2} sticker</td>
 <td>1. User name<br>2. Sticker emoji</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_STICKER</td>
 <td>{1} pinned a {3} sticker in the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Sticker emoji</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_TEXT</td>
 <td>{1} pinned "{2}"</td>
 <td>1. User name<br>2. Message body</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_TEXT</td>
 <td>{1} pinned "{3}" in the group {2}</td>
 <td>1. User name<br>2. Group name<br>3. Message body</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_VIDEO</td>
 <td>{1} pinned a video</td>
 <td>1. User name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
 </tr>
 <tr>
 <td>PINNED_VIDEO</td>
 <td>{1} pinned a video in the group {2}</td>
 <td>1. User name<br>2. Group name</td>
-<td><strong>attachb64</strong>: Base64-encoded version of the attached media<br><strong>channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>chat_from_id</strong>: Groups only, message author identifier<br><strong>chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>edit_date</strong>: When was the message last edited<br><strong>from_id</strong>: For PMs, Author identifier<br><strong>mention</strong>: Whether the user was mentioned in the message<br><strong>msg_id</strong>: ID of the message<br><strong>silent</strong>: Whether the message was posted silently (no notification should be issued)</td>
+</tr>
+<tr>
+<td>REACT_AUDIO</td>
+<td>{1}: {2} to your voice message</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_CONTACT</td>
+<td>{1}: {2} to your contact {3}</td>
+<td>1. User name<br>2. Reaction<br>3. Contact name</td>
+</tr>
+<tr>
+<td>REACT_DOC</td>
+<td>{1}: {2} to your file</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_GAME</td>
+<td>{1}: {2} to your game</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_GEO</td>
+<td>{1}: {2} to your map</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_GEOLIVE</td>
+<td>{1}: {2} to your live location</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_GIF</td>
+<td>{1}: {2} to your GIF</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_INVOICE</td>
+<td>{1}: {2} to your invoice</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_NOTEXT</td>
+<td>{1}: {2} to your message</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_PHOTO</td>
+<td>{1}: {2} to your photo</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_POLL</td>
+<td>{1}: {2} to your poll {3}</td>
+<td>1. User name<br>2. Reaction<br>3. Poll name</td>
+</tr>
+<tr>
+<td>REACT_QUIZ</td>
+<td>{1}: {2} to your quiz {3}</td>
+<td>1. User name<br>2. Reaction<br>3. Quiz name</td>
+</tr>
+<tr>
+<td>REACT_ROUND</td>
+<td>{1}: {2} to your video message</td>
+<td>1. User name<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_STICKER</td>
+<td>{1}: {2} to your {3} sticker</td>
+<td>1. User name<br>2. Reaction<br>3. Sticker emoji</td>
+</tr>
+<tr>
+<td>REACT_TEXT</td>
+<td>{1}: {2} to your "{3}"</td>
+<td>1. User name<br>2. Reaction<br>3. Message body</td>
+</tr>
+<tr>
+<td>REACT_VIDEO</td>
+<td>{1}: {2} to your video</td>
+<td>1. User name<br>2. Reaction</td>
 </tr>
 </tbody>
 </table></div>

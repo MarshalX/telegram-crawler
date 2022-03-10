@@ -2,12 +2,12 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>Channels</title>
+    <title>Channels, supergroups, gigagroups and legacy groups</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="How to handle channels, supergroups, groups, and what&#39;s the difference between them.">
-    <meta property="og:title" content="Channels">
+    <meta property="description" content="How to handle channels, supergroups, gigagroups, legacy groups, and what&#39;s the difference between them.">
+    <meta property="og:title" content="Channels, supergroups, gigagroups and legacy groups">
     <meta property="og:image" content="2831d0518f782d1977">
-    <meta property="og:description" content="How to handle channels, supergroups, groups, and what&#39;s the difference between them.">
+    <meta property="og:description" content="How to handle channels, supergroups, gigagroups, legacy groups, and what&#39;s the difference between them.">
     <link rel="shortcut icon" href="/favicon.ico?4" type="image/x-icon" />
 
     <link href="/css/bootstrap.min.css?3" rel="stylesheet">
@@ -36,24 +36,29 @@
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/channel" >Channels</a></li></ul></div>
-  <h1 id="dev_page_title">Channels</h1>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/channel" >Channels, supergroups, gigagroups and legacy…</a></li></ul></div>
+  <h1 id="dev_page_title">Channels, supergroups, gigagroups and legacy groups</h1>
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<h3><a class="anchor" href="#channels-chats-supergroups--gigagroups" id="channels-chats-supergroups--gigagroups" name="channels-chats-supergroups--gigagroups"><i class="anchor-icon"></i></a>Channels, chats, supergroups &amp; gigagroups</h3>
+<h3><a class="anchor" href="#channels" id="channels" name="channels"><i class="anchor-icon"></i></a>Channels</h3>
 <p><a href="https://telegram.org/tour/channels">Channels</a> are a tool for broadcasting your messages to large audiences. They can have an unlimited number of subscribers, they can be public with a permanent URL and each post in a channel has its own view counter.<br>
 Technically, they are represented by <a href="/constructor/channel">channel</a> constructors.  </p>
+<p>Channels can be created using the <a href="/method/channels.createChannel">channels.createChannel</a> method, by setting the <code>broadcast</code> flag.  </p>
+<h3><a class="anchor" href="#supergroups" id="supergroups" name="supergroups"><i class="anchor-icon"></i></a>Supergroups</h3>
 <p><a href="https://telegram.org/tour/groups">Supergroups</a> are a powerful tool for building communities and can support up to 200,000 members each.<br>
 Technically, supergroups are actually channels: they are represented by <a href="/constructor/channel">channel</a> constructors, with the <code>megagroup</code> flag set to true.  </p>
-<p>Gigagroups are something inbetween a channel and a supergroup.<br>
+<p>Channels can be created using the <a href="/method/channels.createChannel">channels.createChannel</a> method, by setting the <code>megagroup</code> flag.<br>
+Supergroups can also be assigned a <code>geo_point</code> to become <a href="https://telegram.org/blog/contacts-local-groups">geochats</a>.  </p>
+<h3><a class="anchor" href="#gigagroups" id="gigagroups" name="gigagroups"><i class="anchor-icon"></i></a>Gigagroups</h3>
+<p>Gigagroups are something between a channel and a supergroup.<br>
 An admin, <a href="/api/config#channel-suggestions">when prompted by the API using suggestions »</a>, can convert a megagroup into a gigagroup using <a href="/method/channels.convertToGigagroup">channels.convertToGigagroup</a> (one way only).<br>
 After that, only admins will be able to write in the group (like when <a href="#rights"><code>send_messages</code> rights are disabled for all group participants by default</a>), but the participant limit is removed and the group can become much bigger than a supergroup (e.g. &gt;200,000 currently).<br>
 Also, one can't invite people into gigagroups and participants of voice chats in gigagroups are muted by default.  </p>
-<p>Channels and supergroup can be created using the <a href="/method/channels.createChannel">channels.createChannel</a> method, by setting the appropriate <code>broadcast</code> or <code>megagroup</code> flags.<br>
-Supergroups can also be assigned a <code>geo_point</code> to become <a href="https://telegram.org/blog/contacts-local-groups">geochats</a>.  </p>
-<p>In previous versions of telegram, only normal groups (represented by <a href="/constructor/chat">chat</a> constructors) could be created using <a href="/method/messages.createChat">messages.createChat</a>: these groups have fewer features, and can only have 200 members at max.</p>
-<h3><a class="anchor" href="#migration" id="migration" name="migration"><i class="anchor-icon"></i></a>Migration</h3>
+<h3><a class="anchor" href="#legacy-groups" id="legacy-groups" name="legacy-groups"><i class="anchor-icon"></i></a>Legacy groups</h3>
+<p>In previous versions of telegram, only legacy groups (represented by <a href="/constructor/chat">chat</a> constructors) could be created using <a href="/method/messages.createChat">messages.createChat</a>: these groups have fewer features, and can only have 200 members at max.<br>
+Messages from all legacy groups are stored in the <a href="/api/updates#message-related-event-sequences">user's message box »</a>: this means that all legacy groups and all private chats share the same, single message ID and <a href="/api/updates">PTS</a> sequence.  </p>
+<h4><a class="anchor" href="#migration" id="migration" name="migration"><i class="anchor-icon"></i></a>Migration</h4>
 <p>To upgrade a legacy group to a supergroup, <a href="/method/messages.migrateChat">messages.migrateChat</a> can be used.
 The <code>chats</code> field of the result will have two objects: </p>
 <ul>
@@ -64,6 +69,9 @@ The <code>chats</code> field of the result will have two objects: </p>
 <p>All users of the chat will receive an <a href="/constructor/updateNewMessage">updateNewMessage</a> from the old chat with a <a href="/constructor/messageService">messageService</a> containing a <a href="/constructor/messageActionChatMigrateTo">messageActionChatMigrateTo</a> constructor.</p>
 <p>All new messages have to be sent to the new supergroup.</p>
 <p>When working with migrated groups clients need to handle loading of the message history (as well as search results et cetera) from both the legacy group and the new supergroup. This is done by merging the two messages lists (requested with different <a href="/type/Peer">Peer</a> values) client side.</p>
+<h3><a class="anchor" href="#invite-links-and-join-requests" id="invite-links-and-join-requests" name="invite-links-and-join-requests"><i class="anchor-icon"></i></a>Invite links and join requests</h3>
+<p>Channels, legacy groups and supergroups may have a public username or a private invite link: private invite links may be further enhanced with per-user join requests.</p>
+<p>For more info on how to work with public usernames, invite links and join requests, see <a href="/api/invites">here »</a>.</p>
 <h3><a class="anchor" href="#rights" id="rights" name="rights"><i class="anchor-icon"></i></a>Rights</h3>
 <p>Channels, legacy groups and supergroups allow setting <a href="https://telegram.org/blog/permissions-groups-undo">granular permissions</a> both for admins and specific users; channels, supergroups and legacy groups also allow setting global granular permissions for users.</p>
 <p>For more info on how to set and modify rights, see <a href="/api/rights">here »</a>.</p>
