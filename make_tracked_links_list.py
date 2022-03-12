@@ -58,7 +58,8 @@ CRAWL_RULES = {
         'allow': {
             r'^[^/]*$',  # root
             r'org/[^/]*/$',  # 1 lvl sub
-            r'/en/[a-z_]+/$'  # 1 lvl after /en/
+            r'/en/[a-z_]+/$',  # 1 lvl after /en/
+            r'/en/[a-z_]+/[a-z_]+/$',  # 2 lvl after /en/. for example, /en/ios/unsorted/
         },
         'deny': {
             '',  # all
@@ -130,7 +131,7 @@ COMPARE_OUTPUT_WITH_FILENAME = os.environ.get('COMPARE_OUTPUT_WITH_FILENAME', OU
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
-TIMEOUT = aiohttp.ClientTimeout(total=30)
+TIMEOUT = aiohttp.ClientTimeout(total=10)
 
 logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
