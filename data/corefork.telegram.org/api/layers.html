@@ -44,9 +44,48 @@ Layer…">
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Below you will find information on schema changes. For more details on the use of layers, see <a href="/api/invoking#layers">Invoking API methods</a>.</p>
-<h3><a class="anchor" href="#layer-138" id="layer-138" name="layer-138"><i class="anchor-icon"></i></a><a href="/schema?layer=138">Layer 138</a></h3>
-<p><a href="https://telegram.org/blog/video-stickers-better-reactions#video-stickers">Video stickers</a>, <a href="https://telegram.org/blog/video-stickers-better-reactions#better-reactions">better reactions</a>, RTMP streams in group calls and livestreams.</p>
+<h3><a class="anchor" href="#layer-139" id="layer-139" name="layer-139"><i class="anchor-icon"></i></a><a href="/schema?layer=139">Layer 139</a></h3>
+<p><a href="https://telegram.org/blog/downloads-attachments-streaming#live-streaming-with-other-apps">RTMP streams in group calls and livestreams</a>, <a href="https://telegram.org/blog/downloads-attachments-streaming#phone-number-links">link to users by their phone number</a>, <a href="https://telegram.org/blog/downloads-attachments-streaming#new-attachment-menu">browse recently sent media</a> and new report options for illegal drugs and personal details.</p>
 <p>The <a href="/api/errors#error-database">RPC error database »</a> was also updated.</p>
+<h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
+<h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
+<ul>
+<li>Added <a href="/method/contacts.resolvePhone">contacts.resolvePhone</a> - Resolve a phone number to get user info, if their privacy settings allow it.</li>
+<li>Added <a href="/method/phone.getGroupCallStreamChannels">phone.getGroupCallStreamChannels</a> - Get info about RTMP streams in a group call or livestream.  </li>
+<li>Added <a href="/method/phone.getGroupCallStreamRtmpUrl">phone.getGroupCallStreamRtmpUrl</a> - Get RTMP URL and stream key for RTMP livestreams. Can be used even before creating the actual RTMP livestream with <a href="/method/phone.createGroupCall">phone.createGroupCall</a> (the <code>rtmp_stream</code> flag must be set).</li>
+<li>Added <a href="/method/messages.searchSentMedia">messages.searchSentMedia</a> - View and search recently sent media.  </li>
+</ul>
+<h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
+<ul>
+<li>Added <strong>rtmp_stream</strong> parameter in <a href="/method/phone.createGroupCall">phone.createGroupCall</a></li>
+</ul>
+<h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
+<ul>
+<li>Added <a href="/constructor/groupCallStreamChannel">groupCallStreamChannel</a> - Info about an RTMP stream in a group call or livestream</li>
+<li>Added <a href="/constructor/phone.groupCallStreamChannels">phone.groupCallStreamChannels</a> - Info about RTMP streams in a group call or livestream</li>
+<li>Added <a href="/constructor/inputReportReasonIllegalDrugs">inputReportReasonIllegalDrugs</a> - Report for illegal drugs</li>
+<li>Added <a href="/constructor/inputReportReasonPersonalDetails">inputReportReasonPersonalDetails</a> - Report for divulgation of personal details</li>
+<li>Added <a href="/constructor/phone.groupCallStreamRtmpUrl">phone.groupCallStreamRtmpUrl</a> - RTMP URL and stream key to be used in streaming software</li>
+</ul>
+<h5><a class="anchor" href="#changed-constructors" id="changed-constructors" name="changed-constructors"><i class="anchor-icon"></i></a>Changed Constructors</h5>
+<ul>
+<li>Added <strong>rtmp_stream</strong>, <strong>listeners_hidden</strong> parameters in <a href="/constructor/groupCall">groupCall</a></li>
+</ul>
+<h4><a class="anchor" href="#schema" id="schema" name="schema"><i class="anchor-icon"></i></a>Schema</h4>
+<div><pre><code><a href="/constructor/groupCall">groupCall</a>#d597650c flags:<a href="/type/%23">#</a> join_muted:flags.1?<a href="/constructor/true">true</a> can_change_join_muted:flags.2?<a href="/constructor/true">true</a> join_date_asc:flags.6?<a href="/constructor/true">true</a> schedule_start_subscribed:flags.8?<a href="/constructor/true">true</a> can_start_video:flags.9?<a href="/constructor/true">true</a> record_video_active:flags.11?<a href="/constructor/true">true</a> rtmp_stream:flags.12?<a href="/constructor/true">true</a> listeners_hidden:flags.13?<a href="/constructor/true">true</a> id:<a href="/type/long">long</a> access_hash:<a href="/type/long">long</a> participants_count:<a href="/type/int">int</a> title:flags.3?<a href="/type/string">string</a> stream_dc_id:flags.4?<a href="/type/int">int</a> record_start_date:flags.5?<a href="/type/int">int</a> schedule_date:flags.7?<a href="/type/int">int</a> unmuted_video_count:flags.10?<a href="/type/int">int</a> unmuted_video_limit:<a href="/type/int">int</a> version:<a href="/type/int">int</a> = <a href="/type/GroupCall">GroupCall</a>;
+<a href="/constructor/groupCallStreamChannel">groupCallStreamChannel</a>#80eb48af channel:<a href="/type/int">int</a> scale:<a href="/type/int">int</a> last_timestamp_ms:<a href="/type/long">long</a> = <a href="/type/GroupCallStreamChannel">GroupCallStreamChannel</a>;<br>
+<a href="/constructor/phone.groupCallStreamChannels">phone.groupCallStreamChannels</a>#d0e482b2 channels:<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/GroupCallStreamChannel">GroupCallStreamChannel</a>&gt; = <a href="/type/phone.GroupCallStreamChannels">phone.GroupCallStreamChannels</a>;<br>
+<a href="/constructor/inputReportReasonIllegalDrugs">inputReportReasonIllegalDrugs</a>#0a8eb2be = <a href="/type/ReportReason">ReportReason</a>;
+<a href="/constructor/inputReportReasonPersonalDetails">inputReportReasonPersonalDetails</a>#9ec7863d = <a href="/type/ReportReason">ReportReason</a>;<br>
+<a href="/constructor/phone.groupCallStreamRtmpUrl">phone.groupCallStreamRtmpUrl</a>#2dbf3432 url:<a href="/type/string">string</a> key:<a href="/type/string">string</a> = <a href="/type/phone.GroupCallStreamRtmpUrl">phone.GroupCallStreamRtmpUrl</a>;<br>
+---functions---<br>
+<a href="/method/phone.createGroupCall">phone.createGroupCall</a>#48cdc6d8 flags:<a href="/type/%23">#</a> rtmp_stream:flags.2?<a href="/constructor/true">true</a> peer:<a href="/type/InputPeer">InputPeer</a> random_id:<a href="/type/int">int</a> title:flags.0?<a href="/type/string">string</a> schedule_date:flags.1?<a href="/type/int">int</a> = <a href="/type/Updates">Updates</a>;<br>
+<a href="/method/contacts.resolvePhone">contacts.resolvePhone</a>#8af94344 phone:<a href="/type/string">string</a> = <a href="/type/contacts.ResolvedPeer">contacts.ResolvedPeer</a>;<br>
+<a href="/method/phone.getGroupCallStreamChannels">phone.getGroupCallStreamChannels</a>#1ab21940 call:<a href="/type/InputGroupCall">InputGroupCall</a> = <a href="/type/phone.GroupCallStreamChannels">phone.GroupCallStreamChannels</a>;
+<a href="/method/phone.getGroupCallStreamRtmpUrl">phone.getGroupCallStreamRtmpUrl</a>#deb3abbf peer:<a href="/type/InputPeer">InputPeer</a> revoke:<a href="/type/Bool">Bool</a> = <a href="/type/phone.GroupCallStreamRtmpUrl">phone.GroupCallStreamRtmpUrl</a>;<br>
+<a href="/method/messages.searchSentMedia">messages.searchSentMedia</a>#107e31a0 q:<a href="/type/string">string</a> filter:<a href="/type/MessagesFilter">MessagesFilter</a> limit:<a href="/type/int">int</a> = <a href="/type/messages.Messages">messages.Messages</a>;<br></code></pre></div>
+<h3><a class="anchor" href="#layer-138" id="layer-138" name="layer-138"><i class="anchor-icon"></i></a><a href="/schema?layer=138">Layer 138</a></h3>
+<p><a href="https://telegram.org/blog/video-stickers-better-reactions#video-stickers">Video stickers</a>, <a href="https://telegram.org/blog/video-stickers-better-reactions#better-reactions">better reactions</a>.</p>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
@@ -56,7 +95,6 @@ Layer…">
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
 <li>Added <strong>videos</strong> parameter in <a href="/method/stickers.createStickerSet">stickers.createStickerSet</a></li>
-<li>Added <strong>rtmp_stream</strong> parameter in <a href="/method/phone.createGroupCall">phone.createGroupCall</a></li>
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
@@ -66,7 +104,6 @@ Layer…">
 <ul>
 <li>Added <strong>unread_reactions_count</strong> parameter in <a href="/constructor/dialog">dialog</a></li>
 <li>Added <strong>videos</strong> parameter in <a href="/constructor/stickerSet">stickerSet</a></li>
-<li>Added <strong>rtmp_stream</strong>, <strong>listeners_hidden</strong> parameters in <a href="/constructor/groupCall">groupCall</a></li>
 <li>Added <strong>recent_reactions</strong> parameter, removed <strong>recent_reactons</strong> parameter in <a href="/constructor/messageReactions">messageReactions</a></li>
 <li>Added <strong>chats</strong> parameter, changed type of <strong>reactions</strong> from <strong>Vector&lt;MessageUserReaction&gt;</strong> to <strong>Vector&lt;MessagePeerReaction&gt;</strong> in <a href="/constructor/messages.messageReactionsList">messages.messageReactionsList</a></li>
 </ul>
@@ -77,13 +114,11 @@ Layer…">
 <h4><a class="anchor" href="#schema" id="schema" name="schema"><i class="anchor-icon"></i></a>Schema</h4>
 <div><pre><code><a href="/constructor/dialog">dialog</a>#a8edd0f5 flags:<a href="/type/%23">#</a> pinned:flags.2?<a href="/constructor/true">true</a> unread_mark:flags.3?<a href="/constructor/true">true</a> peer:<a href="/type/Peer">Peer</a> top_message:<a href="/type/int">int</a> read_inbox_max_id:<a href="/type/int">int</a> read_outbox_max_id:<a href="/type/int">int</a> unread_count:<a href="/type/int">int</a> unread_mentions_count:<a href="/type/int">int</a> unread_reactions_count:<a href="/type/int">int</a> notify_settings:<a href="/type/PeerNotifySettings">PeerNotifySettings</a> pts:flags.0?<a href="/type/int">int</a> draft:flags.1?<a href="/type/DraftMessage">DraftMessage</a> folder_id:flags.4?<a href="/type/int">int</a> = <a href="/type/Dialog">Dialog</a>;<br>
 <a href="/constructor/stickerSet">stickerSet</a>#d7df217a flags:<a href="/type/%23">#</a> archived:flags.1?<a href="/constructor/true">true</a> official:flags.2?<a href="/constructor/true">true</a> masks:flags.3?<a href="/constructor/true">true</a> animated:flags.5?<a href="/constructor/true">true</a> videos:flags.6?<a href="/constructor/true">true</a> installed_date:flags.0?<a href="/type/int">int</a> id:<a href="/type/long">long</a> access_hash:<a href="/type/long">long</a> title:<a href="/type/string">string</a> short_name:<a href="/type/string">string</a> thumbs:flags.4?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/PhotoSize">PhotoSize</a>&gt; thumb_dc_id:flags.4?<a href="/type/int">int</a> thumb_version:flags.4?<a href="/type/int">int</a> count:<a href="/type/int">int</a> hash:<a href="/type/int">int</a> = <a href="/type/StickerSet">StickerSet</a>;<br>
-<a href="/constructor/groupCall">groupCall</a>#d597650c flags:<a href="/type/%23">#</a> join_muted:flags.1?<a href="/constructor/true">true</a> can_change_join_muted:flags.2?<a href="/constructor/true">true</a> join_date_asc:flags.6?<a href="/constructor/true">true</a> schedule_start_subscribed:flags.8?<a href="/constructor/true">true</a> can_start_video:flags.9?<a href="/constructor/true">true</a> record_video_active:flags.11?<a href="/constructor/true">true</a> rtmp_stream:flags.12?<a href="/constructor/true">true</a> listeners_hidden:flags.13?<a href="/constructor/true">true</a> id:<a href="/type/long">long</a> access_hash:<a href="/type/long">long</a> participants_count:<a href="/type/int">int</a> title:flags.3?<a href="/type/string">string</a> stream_dc_id:flags.4?<a href="/type/int">int</a> record_start_date:flags.5?<a href="/type/int">int</a> schedule_date:flags.7?<a href="/type/int">int</a> unmuted_video_count:flags.10?<a href="/type/int">int</a> unmuted_video_limit:<a href="/type/int">int</a> version:<a href="/type/int">int</a> = <a href="/type/GroupCall">GroupCall</a>;<br>
 <a href="/constructor/messageReactions">messageReactions</a>#4f2b9479 flags:<a href="/type/%23">#</a> min:flags.0?<a href="/constructor/true">true</a> can_see_list:flags.2?<a href="/constructor/true">true</a> results:<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/ReactionCount">ReactionCount</a>&gt; recent_reactions:flags.1?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/MessagePeerReaction">MessagePeerReaction</a>&gt; = <a href="/type/MessageReactions">MessageReactions</a>;
 <a href="/constructor/messages.messageReactionsList">messages.messageReactionsList</a>#31bd492d flags:<a href="/type/%23">#</a> count:<a href="/type/int">int</a> reactions:<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/MessagePeerReaction">MessagePeerReaction</a>&gt; chats:<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/Chat">Chat</a>&gt; users:<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/User">User</a>&gt; next_offset:flags.0?<a href="/type/string">string</a> = <a href="/type/messages.MessageReactionsList">messages.MessageReactionsList</a>;
 <a href="/constructor/messagePeerReaction">messagePeerReaction</a>#51b67eff flags:<a href="/type/%23">#</a> big:flags.0?<a href="/constructor/true">true</a> unread:flags.1?<a href="/constructor/true">true</a> peer_id:<a href="/type/Peer">Peer</a> reaction:<a href="/type/string">string</a> = <a href="/type/MessagePeerReaction">MessagePeerReaction</a>;<br>
 ---functions---<br>
 <a href="/method/stickers.createStickerSet">stickers.createStickerSet</a>#9021ab67 flags:<a href="/type/%23">#</a> masks:flags.0?<a href="/constructor/true">true</a> animated:flags.1?<a href="/constructor/true">true</a> videos:flags.4?<a href="/constructor/true">true</a> user_id:<a href="/type/InputUser">InputUser</a> title:<a href="/type/string">string</a> short_name:<a href="/type/string">string</a> thumb:flags.2?<a href="/type/InputDocument">InputDocument</a> stickers:<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/InputStickerSetItem">InputStickerSetItem</a>&gt; software:flags.3?<a href="/type/string">string</a> = <a href="/type/messages.StickerSet">messages.StickerSet</a>;<br>
-<a href="/method/phone.createGroupCall">phone.createGroupCall</a>#48cdc6d8 flags:<a href="/type/%23">#</a> rtmp_stream:flags.2?<a href="/constructor/true">true</a> peer:<a href="/type/InputPeer">InputPeer</a> random_id:<a href="/type/int">int</a> title:flags.0?<a href="/type/string">string</a> schedule_date:flags.1?<a href="/type/int">int</a> = <a href="/type/Updates">Updates</a>;<br>
 <a href="/method/messages.getUnreadReactions">messages.getUnreadReactions</a>#e85bae1a peer:<a href="/type/InputPeer">InputPeer</a> offset_id:<a href="/type/int">int</a> add_offset:<a href="/type/int">int</a> limit:<a href="/type/int">int</a> max_id:<a href="/type/int">int</a> min_id:<a href="/type/int">int</a> = <a href="/type/messages.Messages">messages.Messages</a>;
 <a href="/method/messages.readReactions">messages.readReactions</a>#82e251d7 peer:<a href="/type/InputPeer">InputPeer</a> = <a href="/type/messages.AffectedHistory">messages.AffectedHistory</a>;<br></code></pre></div>
 <h3><a class="anchor" href="#layer-137" id="layer-137" name="layer-137"><i class="anchor-icon"></i></a><a href="/schema?layer=137">Layer 137</a></h3>
