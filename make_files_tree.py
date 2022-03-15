@@ -29,6 +29,7 @@ NONCE_REGEX = r'"nonce":"[a-z0-9]+_[a-z0-9]+_[a-z0-9]+'
 NONCE_TEMPLATE = f'"nonce":"{DYNAMIC_PART_MOCK}'
 PROXY_CONFIG_SUB_NET_REGEX = r'\d+\.\d+:8888;'
 PROXY_CONFIG_SUB_NET_TEMPLATE = 'X.X:8888;'
+TRANSLATE_SUGGESTION_REGEX = r'<div class="tr-value-suggestion">(.?)+</div>'
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
@@ -99,6 +100,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                 content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
                 content = re.sub(NONCE_REGEX, NONCE_TEMPLATE, content)
                 content = re.sub(PROXY_CONFIG_SUB_NET_REGEX, PROXY_CONFIG_SUB_NET_TEMPLATE, content)
+                content = re.sub(TRANSLATE_SUGGESTION_REGEX, '', content)
 
                 logger.info(f'Write to {filename}')
                 await f.write(content)
