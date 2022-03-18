@@ -101,6 +101,11 @@
   }
 
   function postMessageToIframe(iframe, event, data, callback) {
+    if (!iframe._ready) {
+      if (!iframe._readyQueue) iframe._readyQueue = [];
+      iframe._readyQueue.push([event, data, callback]);
+      return;
+    }
     try {
       data = data || {};
       data.event = event;
@@ -262,7 +267,13 @@
         }
       }
       else if (data.event == 'ready') {
+        iframe._ready = true;
         focusHandler();
+        for (var i = 0; i < iframe._readyQueue.length; i++) {
+          var queue_item = iframe._readyQueue[i];
+          postMessageToIframe(iframe, queue_item[0], queue_item[1], queue_item[2]);
+        }
+        iframe._readyQueue = [];
       }
       else if (data.event == 'visible_off') {
         removeEvent(window, 'scroll', visibilityHandler);
@@ -321,6 +332,8 @@
         widgetEl.parentNode.removeChild(widgetEl);
       }
     }
+    iframe._ready = false;
+    iframe._readyQueue = [];
     widgetEl._iframe = iframe;
     addEvent(iframe, 'load', function() {
       removeEvent(iframe, 'load', visibilityHandler);
