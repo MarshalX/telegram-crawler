@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import re
+import shutil
 import subprocess
 from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
@@ -84,6 +85,10 @@ async def download_apk_and_extract_resources(session: aiohttp.ClientSession):
     async with aiofiles.open(filename, 'w') as f:
         async with aiofiles.open(os.path.join('app', path_to_strings), 'r') as ff:
             await f.write(await ff.read())
+
+    shutil.rmtree('app')
+    os.remove('tool.apk')
+    os.remove('app.apk')
 
 
 async def collect_translations_paginated_content(url: str, session: aiohttp.ClientSession) -> str:
