@@ -3,7 +3,6 @@ import logging
 import os
 import re
 import shutil
-import subprocess
 from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
 from time import time
@@ -41,54 +40,69 @@ logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
+async def download_file(url, path, session):
+    async with session.get(url) as response:
+        if response.status != 200:
+            return
+
+        async with aiofiles.open(path, mode='wb') as f:
+            await f.write(await response.read())
+
+
 async def download_apk_and_extract_resources(session: aiohttp.ClientSession):
     api_base = 'https://install.appcenter.ms/api/v0.1'
     parameterized_url = 'apps/drklo-2kb-ghpo/telegram-beta-2/distribution_groups/all-users-of-telegram-beta-2'
-    url = f'{api_base}/{parameterized_url}'
+    base_url = f'{api_base}/{parameterized_url}'
 
-    latest_id = download_url = None
-
-    async with session.get(f'{url}/public_releases') as response:
-        if response.status != 200: return
-        json = await response.json(encoding='UTF-8')
-        if json and json[0]:
-            latest_id = json[0]['id']
-
-    if not latest_id:
-        return
-
-    async with session.get(f'{url}/releases/{latest_id}') as response:
-        if response.status != 200: return
-        json = await response.json(encoding='UTF-8')
-        if not json: return
-        download_url = json['download_url']
-
-    if not download_url:
-        return
-
-    async def download_file(url, path):
+    async def make_req(url):
         async with session.get(url) as response:
-            if response.status != 200: return
-            async with aiofiles.open(path, mode='wb') as f:
-                await f.write(await response.read())
+            if response.status != 200:
+                return
 
-    await download_file('https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar', 'tool.apk')
-    await download_file(download_url, 'app.apk')
+            return await response.json(encoding='UTF-8')
 
-    # synced but I don't have about it ;d
-    subprocess.call(['java', '-jar', 'tool.apk', 'd', '-s', '-f', 'app.apk'])
+    json = await make_req(f'{base_url}/public_releases')
+    if json and json[0]:
+        latest_id = json[0]['id']
+    else:
+        return
 
-    path_to_strings = 'res/values/strings.xml'
+    json = await make_req(f'{base_url}/releases/{latest_id}')
+    if json:
+        download_url = json['download_url']
+    else:
+        return
 
-    filename = os.path.join(OUTPUT_FOLDER, 'telegram-beta-android', path_to_strings)
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    async with aiofiles.open(filename, 'w') as f:
-        async with aiofiles.open(os.path.join('app', path_to_strings), 'r') as ff:
-            await f.write(await ff.read())
+    await download_file('https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar', 'tool.apk', session)
+    await download_file(download_url, 'app.apk', session)
 
-    shutil.rmtree('app')
-    os.remove('tool.apk')
-    os.remove('app.apk')
+    def cleanup():
+        os.path.isdir('app') and shutil.rmtree('app')
+        os.remove('tool.apk')
+        os.remove('app.apk')
+
+    process = await asyncio.create_subprocess_exec('java', '-jar', 'tool.apk', 'd', '-s', '-f', 'app.apk')
+    await process.communicate()
+
+    if process.returncode != 0:
+        cleanup()
+        return
+
+    files_to_track = [
+        'res/values/strings.xml',
+        'res/values/public.xml'
+    ]
+
+    for file in files_to_track:
+        filename = os.path.join(OUTPUT_FOLDER, 'telegram-beta-android', file)
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        async with aiofiles.open(filename, 'w') as w_file:
+            async with aiofiles.open(os.path.join('app', file), 'r') as r_file:
+                content = await r_file.read()
+                content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
+                await w_file.write(content)
+
+    cleanup()
 
 
 async def collect_translations_paginated_content(url: str, session: aiohttp.ClientSession) -> str:
