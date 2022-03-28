@@ -3,9 +3,11 @@ import logging
 import os
 import re
 import shutil
+import zipfile
 from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
 from time import time
+from typing import List
 
 import aiofiles
 import aiohttp
@@ -49,9 +51,8 @@ async def download_file(url, path, session):
             await f.write(await response.read())
 
 
-async def download_apk_and_extract_resources(session: aiohttp.ClientSession):
+async def get_download_link_of_latest_appcenter_release(parameterized_url: str, session: aiohttp.ClientSession):
     api_base = 'https://install.appcenter.ms/api/v0.1'
-    parameterized_url = 'apps/drklo-2kb-ghpo/telegram-beta-2/distribution_groups/all-users-of-telegram-beta-2'
     base_url = f'{api_base}/{parameterized_url}'
 
     async def make_req(url):
@@ -69,19 +70,60 @@ async def download_apk_and_extract_resources(session: aiohttp.ClientSession):
 
     json = await make_req(f'{base_url}/releases/{latest_id}')
     if json:
-        download_url = json['download_url']
-    else:
+        return json['download_url']
+
+    return None
+
+
+async def track_additional_files(files_to_track: List[str], input_dir_name: str, output_dir_name: str, encoding='utf-8'):
+    for file in files_to_track:
+        filename = os.path.join(OUTPUT_FOLDER, output_dir_name, file)
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        async with aiofiles.open(filename, 'w', encoding='utf-8') as w_file:
+            async with aiofiles.open(os.path.join(input_dir_name, file), 'r', encoding=encoding) as r_file:
+                content = await r_file.read()
+                content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
+                await w_file.write(content)
+
+
+async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.ClientSession):
+    parameterized_url = 'apps/keepcoder/telegram-swift/distribution_groups/public'
+    download_url = await get_download_link_of_latest_appcenter_release(parameterized_url, session)
+
+    if not download_url:
+        return
+
+    await download_file(download_url, 'macos.zip', session)
+
+    # synced
+    with zipfile.ZipFile('macos.zip', 'r') as f:
+        f.extractall('macos')
+
+    files_to_track = [
+        'Telegram.app/Contents/Resources/en.lproj/Localizable.strings',
+    ]
+    await track_additional_files(files_to_track, 'macos', 'telegram-beta-macos', 'utf-16')
+
+    os.path.isdir('macos') and shutil.rmtree('macos')
+    os.remove('macos.zip')
+
+
+async def download_telegram_android_beta_and_extract_resources(session: aiohttp.ClientSession):
+    parameterized_url = 'apps/drklo-2kb-ghpo/telegram-beta-2/distribution_groups/all-users-of-telegram-beta-2'
+    download_url = await get_download_link_of_latest_appcenter_release(parameterized_url, session)
+
+    if not download_url:
         return
 
     await download_file('https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar', 'tool.apk', session)
-    await download_file(download_url, 'app.apk', session)
+    await download_file(download_url, 'android.apk', session)
 
     def cleanup():
-        os.path.isdir('app') and shutil.rmtree('app')
+        os.path.isdir('android') and shutil.rmtree('android')
         os.remove('tool.apk')
-        os.remove('app.apk')
+        os.remove('android.apk')
 
-    process = await asyncio.create_subprocess_exec('java', '-jar', 'tool.apk', 'd', '-s', '-f', 'app.apk')
+    process = await asyncio.create_subprocess_exec('java', '-jar', 'tool.apk', 'd', '-s', '-f', 'android.apk')
     await process.communicate()
 
     if process.returncode != 0:
@@ -92,15 +134,7 @@ async def download_apk_and_extract_resources(session: aiohttp.ClientSession):
         'res/values/strings.xml',
         'res/values/public.xml'
     ]
-
-    for file in files_to_track:
-        filename = os.path.join(OUTPUT_FOLDER, 'telegram-beta-android', file)
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        async with aiofiles.open(filename, 'w') as w_file:
-            async with aiofiles.open(os.path.join('app', file), 'r') as r_file:
-                content = await r_file.read()
-                content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
-                await w_file.write(content)
+    await track_additional_files(files_to_track, 'android', 'telegram-beta-android')
 
     cleanup()
 
@@ -160,7 +194,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                 content = await collect_translations_paginated_content(url, session)
 
             os.makedirs(os.path.dirname(filename), exist_ok=True)
-            async with aiofiles.open(filename, 'w') as f:
+            async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
                 content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
                 content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
                 content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
@@ -180,7 +214,8 @@ async def start(url_list: set[str]):
         await asyncio.gather(*[crawl(url, session) for url in url_list])
 
         # yeap it will be called each run, and what? ;d
-        await download_apk_and_extract_resources(session)
+        await download_telegram_android_beta_and_extract_resources(session)
+        await download_telegram_macos_beta_and_extract_resources(session)
 
 
 if __name__ == '__main__':
