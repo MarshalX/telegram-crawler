@@ -33,10 +33,10 @@ NONCE_TEMPLATE = f'"nonce":"{DYNAMIC_PART_MOCK}'
 PROXY_CONFIG_SUB_NET_REGEX = r'\d+\.\d+:8888;'
 PROXY_CONFIG_SUB_NET_TEMPLATE = 'X.X:8888;'
 TRANSLATE_SUGGESTION_REGEX = r'<div class="tr-value-suggestion">(.?)+</div>'
-SPARKLE_SIG_REGEX = r'sig=(.*?);'
-SPARKLE_SE_REGEX = r'se=(.*?);'
-SPARKLE_SIG_TEMPLATE = f'sig={DYNAMIC_PART_MOCK};'
-SPARKLE_SE_TEMPLATE = f'se={DYNAMIC_PART_MOCK};'
+SPARKLE_SIG_REGEX = r';sig=(.*?);'
+SPARKLE_SE_REGEX = r';se=(.*?);'
+SPARKLE_SIG_TEMPLATE = f';sig={DYNAMIC_PART_MOCK};'
+SPARKLE_SE_TEMPLATE = f';se={DYNAMIC_PART_MOCK};'
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
