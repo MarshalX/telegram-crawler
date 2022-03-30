@@ -24,7 +24,8 @@ HIDDEN_URLS = {
 
     'desktop.telegram.org/changelog',
 
-    'osx.telegram.org/updates/versions.xml',
+    'osx.telegram.org/updates/versions.xml',    # stable
+    'api.appcenter.ms/v0.1/public/sparkle/apps/6ed2ac30-49e1-4073-87c2-f1ffcb74e81f',   # beta
 
     'instantview.telegram.org/rules',
 
@@ -40,6 +41,8 @@ HIDDEN_URLS = {
 
     'promote.telegram.org',
     'contest.com',
+
+    'comments.app/test_webview',
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl',
