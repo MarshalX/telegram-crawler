@@ -61,6 +61,7 @@ CRAWL_RULES = {
         'allow': {
             r'^[^/]*$',  # root
             r'org/[^/]*/$',  # 1 lvl sub
+            r'/css/[a-z-_.]+$',  # css files
             r'/en/[a-z_]+/$',  # 1 lvl after /en/
             r'/en/[a-z_]+/[a-z_]+/$',  # 2 lvl after /en/. for example, /en/ios/unsorted/
         },
