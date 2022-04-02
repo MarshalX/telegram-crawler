@@ -48,7 +48,8 @@
         pointer-events: none;
       }
       button.close_btn {
-        position: fixed;
+        /*position: fixed;*/
+        position: absolute;
         left: 0;
         right: 0;
         bottom: 0;
@@ -63,6 +64,12 @@
       }
       p {
         margin: 40px 0 15px;
+      }
+      ul {
+        text-align: left;
+      }
+      li {
+        color: var(--tg-theme-hint-color, #a8a8a8);
       }
       textarea {
         width: 100%;
@@ -92,6 +99,13 @@
       .err {
         color: red;
       }
+      #fixed_wrap {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        transform: translateY(100vh);
+      }
     </style>
   </head>
   <body style="visibility: hidden;">
@@ -100,16 +114,25 @@
   <button id="with_webview_btn" onclick="sendMessage('', true);">Send «Hello, World!» with inline webview button</button>
   <button id="data_btn" onclick="sendTime();">Send current time to bot</button>
   <button id="spam_btn" onclick="sendTime(true);">Send current time to bot (x100)</button>
-      <button class="close_btn" onclick="webviewClose()">Close Webview</button>
       <div id="btn_status" class="hint" style="display: none;">
       </div>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <a href="https://telegram.org/" target="_blank">Morbi lacus</a>.</p>
+      <p>Test links:</p>
+      <ul>
+        <li><a id="regular_link" href="?nextpage=1">Regular link #1</a> (opens inside webview)</li>
+        <li><a href="https://telegram.org/" target="_blank">target="_blank" link</a> (opens outside webview)</li>
+        <li><a href="javascript:window.open('https://telegram.org/');">window.open() link</a> (opens outside webview)</li>
+        <li><a href="https://t.me/like">LikeBot t.me link</a> (opens inside Telegram app)</li>
+        <li><a href="tg://resolve?domain=vote">VoteBot tg:// link</a> (does not open)</li>
+      </ul>
       <pre><code id="webview_data"></code></pre>
       <div class="hint">
         Data passed to webview.
         <span id="webview_data_status" style="display: none;">Checking hash...</span>
       </div>
     </section>
+    <div id="fixed_wrap">
+      <button class="close_btn" onclick="webviewClose()">Close Webview</button>
+    </div>
     <script src="/js/jquery.min.js"></script>
     <script>
 var WebAppData = Telegram.WebApp.initData || {};
@@ -187,6 +210,7 @@ $('#main_btn').toggle(!!WebAppData.query_id);
 $('#with_webview_btn').toggle(!!WebAppData.query_id && !WebAppData.receiver);
 $('#data_btn,#spam_btn').toggle(!WebAppData.query_id || !WebAppData.receiver);
 $('#webview_data').html(JSON.stringify(WebAppData, null, 2));
+$('#regular_link').attr('href', $('#regular_link').attr('href') + location.href);
 $('#text_field').focus();
 if (WebAppData.query_id && WebAppDataRaw) {
   $('#webview_data_status').show();
