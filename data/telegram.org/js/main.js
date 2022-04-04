@@ -385,6 +385,7 @@ function initScrollVideos(desktop) {
   var index = 1;
   var tgStickersCnt = document.querySelectorAll('.js-tgsticker_image').length;
   var preloadVideos = tgStickersCnt ? 0 : 2;
+  var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   for (var i = 0; i < pageVideos.length; i++) {
     var videoEl = pageVideos[i];
     videoEl.setAttribute('vindex', index++);
@@ -400,6 +401,12 @@ function initScrollVideos(desktop) {
       videoEl.playsinline = true;
       videoEl.setAttribute('autoplay', 'autoplay');
       videoEl.setAttribute('playsinline', 'playsinline');
+    }
+    var posterUrl = videoEl.poster;
+    if (posterUrl && isSafari) {
+      videoEl.parentNode.style.background = "url('" + escapeHTML(posterUrl) +  "') center no-repeat";
+      videoEl.parentNode.style.backgroundSize = "cover";
+      videoEl.parentNode.style.lineHeight = "0";
     }
   }
   if (!desktop) {
