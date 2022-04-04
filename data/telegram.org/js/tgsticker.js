@@ -199,7 +199,8 @@ var RLottie = (function () {
       curWorkerNum = 0;
     }
     rlPlayer.options = options;
-    rlPlayer.paused = false;
+    rlPlayer.paused = options.noAutoPlay || false;
+    rlPlayer.forcePlayOnce = false;
     rlPlayer.times = [];
     rlPlayer.clamped = new Uint8ClampedArray(rlPlayer.width * rlPlayer.height * 4);
     rlPlayer.imageData = new ImageData(rlPlayer.width, rlPlayer.height);
@@ -297,7 +298,8 @@ var RLottie = (function () {
     rlPlayer.frameQueue.push(frame);
     var nextFrameNo = ++frameNo;
     if (nextFrameNo >= rlPlayer.frameCount) {
-      if (!rlPlayer.options.playOnce) {
+      if (!rlPlayer.options.playOnce &&
+          !rlPlayer.forcePlayOnce) {
         nextFrameNo = 0;
         if (rlPlayer.times.length) {
           // var avg = 0;
@@ -308,7 +310,11 @@ var RLottie = (function () {
           rlPlayer.times = [];
         }
       } else {
+        if (rlPlayer.forcePlayOnce) {
+          nextFrameNo = 0;
+        }
         rlPlayer.paused = true;
+        rlPlayer.forcePlayOnce = false;
       }
     }
     if (rlPlayer.frameQueue.needsMore()) {
@@ -348,6 +354,13 @@ var RLottie = (function () {
 
   rlottie.destroy = function(el) {
     destroyPlayer(el);
+  }
+
+  rlottie.playOnce = function(el) {
+    if (el && el.rlPlayer) {
+      el.rlPlayer.paused = false;
+      el.rlPlayer.forcePlayOnce = true;
+    }
   }
 
   rlottie.destroyWorkers = function() {

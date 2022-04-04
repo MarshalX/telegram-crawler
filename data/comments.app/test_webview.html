@@ -130,9 +130,6 @@
         <span id="webview_data_status" style="display: none;">Checking hash...</span>
       </div>
     </section>
-    <div id="fixed_wrap">
-      <button class="close_btn" onclick="webviewClose()">Close Webview</button>
-    </div>
     <script src="/js/jquery.min.js"></script>
     <script>
 var WebAppData = Telegram.WebApp.initData || {};
@@ -210,7 +207,7 @@ $('#main_btn').toggle(!!WebAppData.query_id);
 $('#with_webview_btn').toggle(!!WebAppData.query_id && !WebAppData.receiver);
 $('#data_btn,#spam_btn').toggle(!WebAppData.query_id || !WebAppData.receiver);
 $('#webview_data').html(JSON.stringify(WebAppData, null, 2));
-$('#regular_link').attr('href', $('#regular_link').attr('href') + location.href);
+$('#regular_link').attr('href', $('#regular_link').attr('href') + location.hash);
 $('#text_field').focus();
 if (WebAppData.query_id && WebAppDataRaw) {
   $('#webview_data_status').show();
@@ -231,6 +228,12 @@ if (WebAppData.query_id && WebAppDataRaw) {
   });
 }
 $('body').css('visibility', '');
+Telegram.WebApp.MainButton.setParams({
+  text: 'CLOSE WEBVIEW',
+  is_visible: true
+}).onClick(function() {
+  webviewClose();
+});
 
 
 </script>
