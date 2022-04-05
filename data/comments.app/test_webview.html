@@ -112,8 +112,7 @@
     <section>
         <button id="main_btn" onclick="sendMessage('');">Send «Hello, World!»</button>
   <button id="with_webview_btn" onclick="sendMessage('', true);">Send «Hello, World!» with inline webview button</button>
-  <button id="data_btn" onclick="sendTime();">Send current time to bot</button>
-  <button id="spam_btn" onclick="sendTime(true);">Send current time to bot (x100)</button>
+  <button id="data_btn" onclick="sendTime(true);">Send current time to bot (x10)</button>
   <button onclick="webviewExpand();">Expand Webview</button>
       <div id="btn_status" class="hint" style="display: none;">
       </div>
@@ -196,13 +195,13 @@ function sendText(spam) {
   if (byteLength(text) > 4096) {
     return alert('Text is too long');
   }
-  var repeat = spam ? 100 : 1;
+  var repeat = spam ? 10 : 1;
   for (var i = 0; i < repeat; i++) {
     Telegram.WebApp.sendData(text);
   }
 }
 function sendTime(spam) {
-  var repeat = spam ? 100 : 1;
+  var repeat = spam ? 10 : 1;
   for (var i = 0; i < repeat; i++) {
     Telegram.WebApp.sendData(new Date().toString());
   }
@@ -247,7 +246,7 @@ function requestAudio(el) {
 
 $('#main_btn').toggle(!!WebAppData.query_id);
 $('#with_webview_btn').toggle(!!WebAppData.query_id && !WebAppData.receiver);
-$('#data_btn,#spam_btn').toggle(!WebAppData.query_id || !WebAppData.receiver);
+// $('#data_btn').toggle(!WebAppData.query_id || !WebAppData.receiver);
 $('#webview_data').html(JSON.stringify(WebAppData, null, 2));
 $('#regular_link').attr('href', $('#regular_link').attr('href') + location.hash);
 $('#text_field').focus();
