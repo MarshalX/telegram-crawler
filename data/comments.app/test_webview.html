@@ -114,6 +114,7 @@
   <button id="with_webview_btn" onclick="sendMessage('', true);">Send «Hello, World!» with inline webview button</button>
   <button id="data_btn" onclick="sendTime();">Send current time to bot</button>
   <button id="spam_btn" onclick="sendTime(true);">Send current time to bot (x100)</button>
+  <button onclick="webviewExpand();">Expand Webview</button>
       <div id="btn_status" class="hint" style="display: none;">
       </div>
       <p>Test links:</p>
@@ -123,6 +124,12 @@
         <li><a href="javascript:window.open('https://telegram.org/');">window.open() link</a> (opens outside webview)</li>
         <li><a href="https://t.me/like">LikeBot t.me link</a> (opens inside Telegram app)</li>
         <li><a href="tg://resolve?domain=vote">VoteBot tg:// link</a> (does not open)</li>
+      </ul>
+      <p>Test permissions:</p>
+      <ul>
+        <li><a href="javascript:;" onclick="return requestLocation(this);">Request Location</a> <span></span></li>
+        <li><a href="javascript:;" onclick="return requestVideo(this);">Request Video</a> <span></span></li>
+        <li><a href="javascript:;" onclick="return requestAudio(this);">Request Audio</a> <span></span></li>
       </ul>
       <pre><code id="webview_data"></code></pre>
       <div class="hint">
@@ -200,9 +207,44 @@ function sendTime(spam) {
     Telegram.WebApp.sendData(new Date().toString());
   }
 }
+function webviewExpand() {
+  Telegram.WebApp.expand();
+}
 function webviewClose() {
   Telegram.WebApp.close();
 }
+function requestLocation(el) {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      $(el).next('span').html('(' + position.coords.latitude + ', ' + position.coords.longitude + ')').attr('class', 'ok');
+    });
+  } else {
+    $(el).next('span').html('Geolocation is not supported in this browser.').attr('class', 'err');
+  }
+  return false;
+}
+function requestVideo(el) {
+  if (navigator.mediaDevices) {
+    navigator.mediaDevices.getUserMedia({ audio: false, video: true }).then(function(stream) {
+      $(el).next('span').html('(Access granted)').attr('class', 'ok');
+    });
+  } else {
+    $(el).next('span').html('Media devices is not supported in this browser.').attr('class', 'err');
+  }
+  return false;
+}
+function requestAudio(el) {
+  if (navigator.mediaDevices) {
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream) {
+      $(el).next('span').html('(Access granted)').attr('class', 'ok');
+    });
+  } else {
+    $(el).next('span').html('Media devices is not supported in this browser.').attr('class', 'err');
+  }
+  return false;
+}
+
+
 $('#main_btn').toggle(!!WebAppData.query_id);
 $('#with_webview_btn').toggle(!!WebAppData.query_id && !WebAppData.receiver);
 $('#data_btn,#spam_btn').toggle(!WebAppData.query_id || !WebAppData.receiver);
@@ -228,12 +270,10 @@ if (WebAppData.query_id && WebAppDataRaw) {
   });
 }
 $('body').css('visibility', '');
-Telegram.WebApp.MainButton.setParams({
-  text: 'CLOSE WEBVIEW',
-  is_visible: true
-}).onClick(function() {
-  webviewClose();
-});
+Telegram.WebApp.MainButton
+  .setText('CLOSE WEBVIEW')
+  .show()
+  .onClick(function(){ webviewClose(); });
 
 
 </script>

@@ -264,10 +264,40 @@
     var isVisible = false;
     var isActive = true;
     var isProgressVisible = false;
-    var buttonText = '';
+    var buttonText = 'CONTINUE';
     var buttonColor = false;
     var buttonTextColor = false;
     var onClickCallback = null;
+
+    var mainButton = {};
+    Object.defineProperty(mainButton, 'text', {
+      set: function(val){ mainButton.setParams({text: val}); },
+      get: function(){ return buttonText; },
+      enumerable: true
+    });
+    Object.defineProperty(mainButton, 'color', {
+      set: function(val){ mainButton.setParams({color: val}); },
+      get: function(){ return buttonColor || themeParams.button_color || '#2481cc'; },
+      enumerable: true
+    });
+    Object.defineProperty(mainButton, 'textColor', {
+      set: function(val){ mainButton.setParams({text_color: val}); },
+      get: function(){ return buttonTextColor || themeParams.button_text_color || '#ffffff'; },
+      enumerable: true
+    });
+    Object.defineProperty(mainButton, 'isVisible', {
+      set: function(val){ mainButton.setParams({is_visible: val}); },
+      get: function(){ return isVisible; },
+      enumerable: true
+    });
+    Object.defineProperty(mainButton, 'isProgressVisible', {
+      get: function(){ return isProgressVisible; },
+      enumerable: true
+    });
+    Object.defineProperty(mainButton, 'isActive', {
+      get: function(){ return isActive; },
+      enumerable: true
+    });
 
     onEvent('main_button_pressed', onMainButtonPressed);
 
@@ -310,8 +340,8 @@
     }
 
     function updateButton() {
-      var color = buttonColor || themeParams.button_color || '#2481cc';
-      var text_color = buttonTextColor || themeParams.button_text_color || '#ffffff';
+      var color = mainButton.color;
+      var text_color = mainButton.textColor;
       postEvent('web_app_setup_main_button', false, isVisible ? {
         is_visible: true,
         is_active: true,
@@ -332,79 +362,105 @@
       }
     }
 
-    var mainButton = {
-      setParams: function(params) {
-        if (typeof params.text !== 'undefined') {
-          var text = params.text.toString();
-          if (text.length > 64) {
-            console.error('[Telegram.WebApp] Main button text is too long', text);
+    function setParams(params) {
+      var changed = false;
+      if (typeof params.text !== 'undefined') {
+        var text = params.text.toString().replace(/^\s+|\s+$/g, '');
+        if (!text.length) {
+          console.error('[Telegram.WebApp] Main button text is required', params.text);
+          throw Error('WebAppMainButtonParamInvalid');
+        }
+        if (text.length > 64) {
+          console.error('[Telegram.WebApp] Main button text is too long', text);
+          throw Error('WebAppMainButtonParamInvalid');
+        }
+        if (buttonText !== text) {
+          changed = true;
+        }
+        buttonText = text;
+      }
+      if (typeof params.color !== 'undefined') {
+        if (params.color === false ||
+            params.color === null) {
+          if (buttonColor !== false) {
+            changed = true;
+          }
+          buttonColor = false;
+        } else {
+          var color = parseColorToHex(params.color);
+          if (!color) {
+            console.error('[Telegram.WebApp] Main button color format is invalid', color);
             throw Error('WebAppMainButtonParamInvalid');
           }
-          buttonText = text;
-        }
-        if (typeof params.color !== 'undefined') {
-          if (params.color === false ||
-              params.color === null) {
-            buttonColor = false;
-          } else {
-            var color = parseColorToHex(params.color);
-            if (!color) {
-              console.error('[Telegram.WebApp] Main button color format is invalid', color);
-              throw Error('WebAppMainButtonParamInvalid');
-            }
-            buttonColor = color;
+          if (buttonColor !== color) {
+            changed = true;
           }
+          buttonColor = color;
         }
-        if (typeof params.text_color !== 'undefined') {
-          if (params.text_color === false ||
-              params.text_color === null) {
-            buttonTextColor = false;
-          } else {
-            var text_color = parseColorToHex(params.text_color);
-            if (!text_color) {
-              console.error('[Telegram.WebApp] Main button text color format is invalid', text_color);
-              throw Error('WebAppMainButtonParamInvalid');
-            }
-            buttonTextColor = text_color;
-          }
-        }
-        if (typeof params.is_progress_visible !== 'undefined') {
-          isProgressVisible = !!params.is_progress_visible;
-        }
-        if (typeof params.is_active !== 'undefined') {
-          isActive = !!params.is_active;
-        }
-        if (typeof params.is_visible !== 'undefined') {
-          isVisible = !!params.is_visible;
-        }
-        updateButton();
-        return mainButton;
-      },
-      onClick: function(callback) {
-        onClickCallback = callback;
-      },
-      show: function() {
-        return mainButton.setParams({is_visible: true});
-      },
-      hide: function() {
-        return mainButton.setParams({is_visible: false});
-      },
-      enable: function() {
-        return mainButton.setParams({is_active: true});
-      },
-      disable: function() {
-        return mainButton.setParams({is_active: false});
-      },
-      setText: function(text) {
-        return mainButton.setParams({text: text});
-      },
-      showProgress: function() {
-        return mainButton.setParams({is_progress_visible: true, is_active: false});
-      },
-      hideProgress: function() {
-        return mainButton.setParams({is_progress_visible: false, is_active: true});
       }
+      if (typeof params.text_color !== 'undefined') {
+        if (params.text_color === false ||
+            params.text_color === null) {
+          if (buttonTextColor !== false) {
+            changed = true;
+          }
+          buttonTextColor = false;
+        } else {
+          var text_color = parseColorToHex(params.text_color);
+          if (!text_color) {
+            console.error('[Telegram.WebApp] Main button text color format is invalid', text_color);
+            throw Error('WebAppMainButtonParamInvalid');
+          }
+          if (buttonTextColor !== text_color) {
+            changed = true;
+          }
+          buttonTextColor = text_color;
+        }
+      }
+      if (typeof params.is_visible !== 'undefined') {
+        if (params.is_visible &&
+            !mainButton.text.length) {
+          console.error('[Telegram.WebApp] Main button text is required');
+          throw Error('WebAppMainButtonParamInvalid');
+        }
+        if (isVisible !== !!params.is_visible) {
+          changed = true;
+        }
+        isVisible = !!params.is_visible;
+      }
+      if (changed) {
+        updateButton();
+      }
+      return mainButton;
+    }
+
+    mainButton.setParams = setParams;
+    mainButton.setText = function(text) {
+      mainButton.text = text;
     };
+    mainButton.onClick = function(callback) {
+      onClickCallback = callback;
+    };
+    mainButton.show = function() {
+      return mainButton.setParams({is_visible: true});
+    };
+    mainButton.hide = function() {
+      return mainButton.setParams({is_visible: false});
+    };
+    mainButton.showProgress = function(leaveActive) {
+      isActive = !!leaveActive;
+      isProgressVisible = true;
+      updateButton();
+      return mainButton;
+    };
+    mainButton.hideProgress = function() {
+      if (!mainButton.isActive) {
+        isActive = true;
+      }
+      isProgressVisible = false;
+      updateButton();
+      return mainButton;
+    }
     return mainButton;
   })();
 
@@ -486,7 +542,7 @@
     MainButton: MainButton,
     sendData: function (data) {
       if (!data || !data.length) {
-        console.error('[Telegram.WebApp] Data is empty', data);
+        console.error('[Telegram.WebApp] Data is required', data);
         throw Error('WebAppDataInvalid');
       }
       if (byteLength(data) > 4096) {
@@ -494,6 +550,9 @@
         throw Error('WebAppDataInvalid');
       }
       postEvent('web_app_data_send', false, {data: data});
+    },
+    expand: function () {
+      postEvent('web_app_expand');
     },
     close: function () {
       postEvent('web_app_close');
