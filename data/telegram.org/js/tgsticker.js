@@ -200,7 +200,7 @@ var RLottie = (function () {
     }
     rlPlayer.options = options;
     rlPlayer.paused = options.noAutoPlay || false;
-    rlPlayer.forcePlayOnce = false;
+    rlPlayer.forcePlayFrames = 0;
     rlPlayer.times = [];
     rlPlayer.clamped = new Uint8ClampedArray(rlPlayer.width * rlPlayer.height * 4);
     rlPlayer.imageData = new ImageData(rlPlayer.width, rlPlayer.height);
@@ -298,8 +298,7 @@ var RLottie = (function () {
     rlPlayer.frameQueue.push(frame);
     var nextFrameNo = ++frameNo;
     if (nextFrameNo >= rlPlayer.frameCount) {
-      if (!rlPlayer.options.playOnce &&
-          !rlPlayer.forcePlayOnce) {
+      if (!rlPlayer.options.playOnce) {
         nextFrameNo = 0;
         if (rlPlayer.times.length) {
           // var avg = 0;
@@ -310,11 +309,13 @@ var RLottie = (function () {
           rlPlayer.times = [];
         }
       } else {
-        if (rlPlayer.forcePlayOnce) {
-          nextFrameNo = 0;
-        }
         rlPlayer.paused = true;
-        rlPlayer.forcePlayOnce = false;
+      }
+    }
+    if (rlPlayer.forcePlayFrames > 0) {
+      rlPlayer.forcePlayFrames--;
+      if (!rlPlayer.forcePlayFrames) {
+        rlPlayer.paused = true;
       }
     }
     if (rlPlayer.frameQueue.needsMore()) {
@@ -357,9 +358,11 @@ var RLottie = (function () {
   }
 
   rlottie.playOnce = function(el) {
-    if (el && el.rlPlayer) {
+    if (el && el.rlPlayer &&
+        !el.rlPlayer.forcePlayFrames &&
+        el.rlPlayer.frameCount) {
       el.rlPlayer.paused = false;
-      el.rlPlayer.forcePlayOnce = true;
+      el.rlPlayer.forcePlayFrames = el.rlPlayer.frameCount;
     }
   }
 
