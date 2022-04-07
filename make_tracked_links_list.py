@@ -42,7 +42,9 @@ HIDDEN_URLS = {
     'promote.telegram.org',
     'contest.com',
 
-    'comments.app/test_webview',
+    # web apps beta
+    'comments.app/test_webview',    # old
+    'webappcontent.telegram.org/demo',  # new
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl',
