@@ -584,6 +584,8 @@
   onEvent('theme_changed', onThemeChanged);
   onEvent('viewport_changed', onViewportChanged);
 
+  postEvent('web_app_request_viewport');
+
   // For Windows Phone app
   window.TelegramGameProxy_receiveEvent = receiveEvent;
 
