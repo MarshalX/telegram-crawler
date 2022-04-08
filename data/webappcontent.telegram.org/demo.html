@@ -150,13 +150,42 @@ function sendMessage(msg_id, with_webview) {
   $('#btn_status').text('Sending...').removeClass('ok err').show();
   $.ajax('/demo/sendMessage', {
     type: 'POST',
-    data: {query_id: WebAppData.query_id, msg_id: msg_id || '', with_webview: !WebAppData.receiver && with_webview ? 1 : 0},
+    data: {_auth: WebAppDataRaw, query_id: WebAppData.query_id, msg_id: msg_id || '', with_webview: !WebAppData.receiver && with_webview ? 1 : 0},
     dataType: 'json',
     success: function(result) {
       $('button').prop('disabled', false);
       if (result.response) {
         if (result.response.ok) {
           $('#btn_status').html('Message sent successfully!').addClass('ok').show();
+        } else {
+          $('#btn_status').text(result.response.description).addClass('err').show();
+          alert(result.response.description);
+        }
+      } else {
+        $('#btn_status').text('Unknown error').addClass('err').show();
+        alert('Unknown error');
+      }
+    },
+    error: function(xhr) {
+      $('button').prop('disabled', false);
+      $('#btn_status').text('Server error').addClass('err').show();
+      alert('Server error');
+    }
+  });
+}
+function changeButton() {
+  $('button').prop('disabled', true);
+  $('#btn_status').text('Changing button...').removeClass('ok err').show();
+  $.ajax('/demo/changeMenuButton', {
+    type: 'POST',
+    data: {_auth: WebAppDataRaw},
+    dataType: 'json',
+    success: function(result) {
+      $('button').prop('disabled', false);
+      if (result.response) {
+        if (result.response.ok) {
+          $('#btn_status').html('Button changed!').addClass('ok').show();
+          Telegram.WebApp.close();
         } else {
           $('#btn_status').text(result.response.description).addClass('err').show();
           alert(result.response.description);
@@ -254,7 +283,7 @@ if (WebAppData.query_id && WebAppDataRaw) {
   $('#webview_data_status').show();
   $.ajax('/demo/checkData', {
     type: 'POST',
-    data: {data: WebAppDataRaw},
+    data: {_auth: WebAppDataRaw},
     dataType: 'json',
     success: function(result) {
       if (result.ok) {

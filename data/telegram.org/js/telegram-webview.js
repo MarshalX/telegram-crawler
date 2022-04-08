@@ -450,9 +450,11 @@
     mainButton.setParams = setParams;
     mainButton.setText = function(text) {
       mainButton.text = text;
+      return mainButton;
     };
     mainButton.onClick = function(callback) {
       onClickCallback = callback;
+      return mainButton;
     };
     mainButton.show = function() {
       return mainButton.setParams({is_visible: true});
