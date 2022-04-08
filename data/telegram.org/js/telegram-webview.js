@@ -303,7 +303,7 @@
     onEvent('main_button_pressed', onMainButtonPressed);
 
     var debugBtn = null, debugBodyBottom, debugBtnStyle = {};
-    if (initParams.tgDebug) {
+    if (initParams.tgWebAppDebug) {
       debugBtn = document.createElement('tg-main-button');
       debugBtnStyle = {
         font: '600 14px/18px sans-serif',
@@ -351,7 +351,7 @@
         color: color,
         text_color: text_color
       } : {is_visible: false});
-      if (initParams.tgDebug) {
+      if (initParams.tgWebAppDebug) {
         debugBtn.style.display = isVisible ? 'block' : 'none';
         debugBtn.style.opacity = isActive ? '1' : '0.8';
         debugBtn.style.cursor = isActive ? 'pointer' : 'auto';
