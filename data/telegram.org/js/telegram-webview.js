@@ -572,6 +572,9 @@
       }
       postEvent('web_app_data_send', false, {data: data});
     },
+    ready: function () {
+      postEvent('web_app_ready');
+    },
     expand: function () {
       postEvent('web_app_expand');
     },
