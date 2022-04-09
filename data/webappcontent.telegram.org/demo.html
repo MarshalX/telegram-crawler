@@ -106,6 +106,34 @@
         top: 0;
         transform: translateY(100vh);
       }
+      .viewport_border {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: var(--tg-viewport-height, 100vh);
+        pointer-events: none;
+      }
+      .viewport_border:before {
+        content: attr(text);
+        display: inline-block;
+        background: green;
+        left: 0;
+        top: 0;
+        font-size: 7px;
+        padding: 2px 4px;
+        vertical-align: top;
+      }
+      .viewport_border:after {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        border: 2px dashed green;
+      }
     </style>
   </head>
   <body style="visibility: hidden;">
@@ -136,6 +164,7 @@
         <span id="webview_data_status" style="display: none;">Checking hash...</span>
       </div>
     </section>
+    <div class="viewport_border"></div>
     <script src="/js/jquery.min.js"></script>
     <script>
 Telegram.WebApp.ready();
@@ -307,6 +336,13 @@ Telegram.WebApp.MainButton
   .setText('CLOSE WEBVIEW')
   .show()
   .onClick(function(){ webviewClose(); });
+
+function setViewportHeight() {
+  var h = document.documentElement.style.getPropertyValue('--tg-viewport-height');
+  $('.viewport_border').attr('text', h);
+}
+Telegram.WebApp.onEvent('viewport_changed', setViewportHeight);
+setViewportHeight();
 
 
 </script>
