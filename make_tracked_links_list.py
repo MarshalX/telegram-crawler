@@ -45,6 +45,7 @@ HIDDEN_URLS = {
     # web apps beta
     'comments.app/test_webview',    # old
     'webappcontent.telegram.org/demo',  # new
+    'webappcontent.telegram.org/cafe',  # demo 2
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl',
