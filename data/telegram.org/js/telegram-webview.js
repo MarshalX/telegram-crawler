@@ -211,16 +211,15 @@
     }
   }
 
-  var themeParams = {};
+  var themeParams = {}, colorScheme = 'light';
   function setThemeParams(theme_params) {
     var color;
     for (var key in theme_params) {
       if (color = parseColorToHex(theme_params[key])) {
         themeParams[key] = color;
         if (key == 'bg_color') {
-          var color_scheme = isColorDark(color) ? 'dark' : 'light'
-          themeParams.color_scheme = color_scheme;
-          setCssProperty('theme-color-scheme', color_scheme);
+          colorScheme = isColorDark(color) ? 'dark' : 'light'
+          setCssProperty('color-scheme', colorScheme);
         }
         key = 'theme-' + key.split('_').join('-');
         setCssProperty(key, color);
@@ -589,8 +588,6 @@
     }
   };
   window.Telegram.WebApp = {
-    initData: webAppData,
-    initDataRaw: webAppDataRaw,
     onEvent: onEvent,
     offEvent: offEvent,
     MainButton: MainButton,
@@ -615,6 +612,18 @@
       postEvent('web_app_close');
     }
   };
+  Object.defineProperty(window.Telegram.WebApp, 'initData', {
+    get: function(){ return webAppData; },
+    enumerable: true
+  });
+  Object.defineProperty(window.Telegram.WebApp, 'initDataRaw', {
+    get: function(){ return webAppDataRaw; },
+    enumerable: true
+  });
+  Object.defineProperty(window.Telegram.WebApp, 'colorScheme', {
+    get: function(){ return colorScheme; },
+    enumerable: true
+  });
   Object.defineProperty(window.Telegram.WebApp, 'viewportHeight', {
     get: function(){ return (viewportHeight === false ? window.innerHeight : viewportHeight) - mainButtonHeight; },
     enumerable: true
