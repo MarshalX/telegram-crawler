@@ -599,6 +599,10 @@
       postEvent('web_app_close');
     }
   };
+  Object.defineProperty(window.Telegram.WebApp, 'viewportHeight', {
+    get: function(){ return (viewportHeight === false ? window.innerHeight : viewportHeight) - mainButtonHeight; },
+    enumerable: true
+  });
 
   if (webAppData.theme_params) {
     setThemeParams(webAppData.theme_params);
