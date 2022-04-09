@@ -193,8 +193,25 @@ var Cafe = {
   },
   toggleMode: function(mode_order) {
     Cafe.modeOrder = mode_order;
+    var anim_duration, match;
+    try {
+      anim_duration = window.getComputedStyle(document.body).getPropertyValue('--page-animation-duration');
+      if (match = /([\d\.]+)(ms|s)/.exec(anim_duration)) {
+        anim_duration = +match[1];
+        if (match[2] == 's') {
+          anim_duration *= 1000;
+        }
+      } else {
+        anim_duration = 400;
+      }
+    } catch (e) {
+      anim_duration = 400;
+    }
     if (mode_order) {
       var height = $('.cafe-items').height();
+      $('.js-item-lottie').each(function() {
+        RLottie.setVisible(this, false);
+      });
       $('.cafe-order-overview').show();
       $('.cafe-items').css('maxHeight', height).redraw();
       $('body').addClass('order-mode');
@@ -202,12 +219,23 @@ var Cafe = {
         autosize.update(this);
       });
       Telegram.WebApp.expand();
+      setTimeout(function() {
+        $('.js-item-lottie').each(function() {
+          RLottie.setVisible(this, true);
+        });
+      }, anim_duration);
     } else {
+      $('.js-item-lottie').each(function() {
+        RLottie.setVisible(this, false);
+      });
       $('body').removeClass('order-mode');
       setTimeout(function() {
         $('.cafe-items').css('maxHeight', '');
         $('.cafe-order-overview').hide();
-      }, 400);
+        $('.js-item-lottie').each(function() {
+          RLottie.setVisible(this, true);
+        });
+      }, anim_duration);
     }
     Cafe.updateMainButton();
   },

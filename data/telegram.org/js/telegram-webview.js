@@ -50,13 +50,9 @@
       window.Telegram.WebApp.MainButton.setParams({});
     }
   }
-
-  document.write('<style>#tg-fixed-container{position:fixed;left:0;right:0;top:0;transform:translateY(100vh)}</style>');
-
   function onViewportChanged(eventType, eventData) {
-    var el = document.getElementById('tg-fixed-container');
-    if (el && eventData.height) {
-      el.style.transform = 'translateY(' + eventData.height + 'px)';
+    if (eventData.height) {
+      setViewportHeight(eventData.height);
     }
   }
 
@@ -192,24 +188,46 @@
     eventHandlers[eventType].splice(index, 1);
   };
 
+  function setCssProperty(name, value) {
+    var root = document.documentElement;
+    if (root && root.style && root.style.setProperty) {
+      root.style.setProperty('--tg-' + name, value);
+    }
+  }
+
   var themeParams = {};
   function setThemeParams(theme_params) {
-    var root = document.documentElement, color;
-    if (root && root.style && root.style.setProperty) {
-      for (var key in theme_params) {
-        if (color = parseColorToHex(theme_params[key])) {
-          themeParams[key] = color;
-          if (key == 'bg_color') {
-            var color_scheme = isColorDark(color) ? 'dark' : 'light'
-            themeParams.color_scheme = color_scheme;
-            root.style.setProperty('--tg-theme-color-scheme', color_scheme);
-          }
-          key = '--tg-theme-' + key.split('_').join('-');
-          root.style.setProperty(key, color);
+    var color;
+    for (var key in theme_params) {
+      if (color = parseColorToHex(theme_params[key])) {
+        themeParams[key] = color;
+        if (key == 'bg_color') {
+          var color_scheme = isColorDark(color) ? 'dark' : 'light'
+          themeParams.color_scheme = color_scheme;
+          setCssProperty('theme-color-scheme', color_scheme);
         }
+        key = 'theme-' + key.split('_').join('-');
+        setCssProperty(key, color);
       }
     }
   }
+
+  var viewportHeight = false;
+  function setViewportHeight(height) {
+    if (typeof height !== 'undefined') {
+      viewportHeight = height;
+    }
+    var css_height;
+    if (viewportHeight !== false) {
+      css_height = (viewportHeight - mainButtonHeight) + 'px';
+    } else if (mainButtonHeight) {
+      css_height = 'calc(100vh - ' + mainButtonHeight + 'px)';
+    } else {
+      css_height = '100vh';
+    }
+    setCssProperty('viewport-height', css_height);
+  }
+
 
   function parseColorToHex(color) {
     color += '';
@@ -260,6 +278,7 @@
     return false;
   }
 
+  var mainButtonHeight = 0;
   var MainButton = (function() {
     var isVisible = false;
     var isActive = true;
@@ -302,7 +321,7 @@
 
     onEvent('main_button_pressed', onMainButtonPressed);
 
-    var debugBtn = null, debugBodyBottom, debugBtnStyle = {};
+    var debugBtn = null, debugBtnStyle = {};
     if (initParams.tgWebAppDebug) {
       debugBtn = document.createElement('tg-main-button');
       debugBtnStyle = {
@@ -328,8 +347,6 @@
       document.addEventListener('DOMContentLoaded', function onDomLoaded(event) {
         document.removeEventListener('DOMContentLoaded', onDomLoaded);
         document.body.appendChild(debugBtn);
-        debugBodyBottom = window.getComputedStyle ? window.getComputedStyle(document.body).marginBottom : document.body.style.marginBottom;
-        debugBodyBottom = parseInt(debugBodyBottom) || 0;
         debugBtn.addEventListener('click', onMainButtonPressed, false);
       });
     }
@@ -361,11 +378,11 @@
         debugBtn.style.backgroundColor = color;
         debugBtn.style.color = text_color;
 
-        var fixedContainer = document.getElementById('tg-fixed-container');
-        if (fixedContainer) {
-          fixedContainer.style.top = isVisible ? '-48px' : '0';
+        mainButtonHeight = (isVisible ? 48 : 0);
+        if (document.documentElement) {
+          document.documentElement.style.marginBottom = mainButtonHeight + 'px';
         }
-        document.body.style.marginBottom = (debugBodyBottom + (isVisible ? 48 : 0)) + 'px';
+        setViewportHeight();
       }
     }
 
@@ -586,9 +603,10 @@
   if (webAppData.theme_params) {
     setThemeParams(webAppData.theme_params);
   }
+  setViewportHeight();
+
   onEvent('theme_changed', onThemeChanged);
   onEvent('viewport_changed', onViewportChanged);
-
   postEvent('web_app_request_viewport');
 
   // For Windows Phone app

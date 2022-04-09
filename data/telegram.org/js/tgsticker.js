@@ -199,6 +199,7 @@ var RLottie = (function () {
       curWorkerNum = 0;
     }
     rlPlayer.options = options;
+    rlPlayer.isVisible = true;
     rlPlayer.paused = options.noAutoPlay || false;
     rlPlayer.forcePlayFrames = 0;
     rlPlayer.times = [];
@@ -225,6 +226,7 @@ var RLottie = (function () {
       var focused = window.isFocused ? isFocused() : document.hasFocus();
       if (!focused ||
           rlPlayer.paused ||
+          !rlPlayer.isVisible ||
           !rlPlayer.frameCount) {
         return false;
       }
@@ -363,6 +365,12 @@ var RLottie = (function () {
         el.rlPlayer.frameCount) {
       el.rlPlayer.paused = false;
       el.rlPlayer.forcePlayFrames = el.rlPlayer.frameCount;
+    }
+  }
+
+  rlottie.setVisible = function(el, visible) {
+    if (el && el.rlPlayer) {
+      el.rlPlayer.isVisible = visible;
     }
   }
 

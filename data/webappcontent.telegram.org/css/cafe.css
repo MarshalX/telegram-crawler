@@ -1,20 +1,5 @@
-@font-face {
-  font-display: swap;
-  font-family: 'SF-Pro-Rounded';
-  src: local('SF Pro Rounded Medium'),
-       url('fonts/SF-Pro-Rounded-Medium.otf') format('opentype');
-  font-weight: 500;
-}
-@font-face {
-  font-display: swap;
-  font-family: 'SF-Pro-Rounded';
-  src: local('SF Pro Rounded Bold'),
-       url('fonts/SF-Pro-Rounded-Bold.otf') format('opentype');
-  font-weight: 700;
-}
-
 body {
-  font-family: 'SF-Pro-Rounded', sans-serif;
+  font-family: var(--default-font);
   font-size: 13px;
   line-height: 16px;
   font-weight: 500;
@@ -26,10 +11,12 @@ body {
   width: 1px;
   min-width: 100%;
 
+  --default-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   --block-bg-color: var(--tg-theme-bg-color);
   --bg-color: #ebedf0;
   --animation: .15s ease;
-  --page-animation: .3s ease;
+  --page-animation-duration: .3s;
+  --page-animation: var(--page-animation-duration) ease;
   --status-height: 48px;
   --accent-color: #31b545;
   --main-color: #f8a917;
@@ -79,11 +66,12 @@ body.closed .cafe-page {
   max-width: 480px;
   justify-content: space-around;
   align-content: flex-end;
-  transition: -webkit-filter var(--animation), max-height var(--page-animation);
+  transition: max-height var(--page-animation), opacity var(--page-animation);
   background-color: var(--block-bg-color);
 }
 body.order-mode .cafe-items {
   max-height: 0 !important;
+  opacity: 0 !important;
 }
 .cafe-items:after {
   content: '';
@@ -166,7 +154,7 @@ button {
 button,
 .cafe-item-counter {
   display: inline-block;
-  font-family: 'SF-Pro-Rounded', sans-serif;
+  font-family: var(--default-font);
   font-weight: 700;
   font-size: 14px;
   line-height: 18px;
@@ -257,6 +245,13 @@ button,
   height: 14px;
 }
 
+.cafe-status-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  transform: translateY(var(--tg-viewport-height, 100vh));
+}
 .cafe-status {
   position: fixed;
   bottom: 0;
@@ -287,8 +282,8 @@ button,
 }
 
 .cafe-order-overview {
-  display: none; /*temp*/
-  font-family: 'SF-Pro-Rounded', sans-serif;
+  display: none;
+  font-family: var(--default-font);
   background-color: var(--bg-color);
   transition: opacity var(--page-animation);
   opacity: 0;
@@ -367,7 +362,7 @@ body.order-mode .cafe-order-overview {
   margin-top: 14px;
 }
 .cafe-text-field {
-  font-family: 'SF-Pro-Rounded', sans-serif;
+  font-family: var(--default-font);
   font-size: 17px;
   line-height: 21px;
   font-weight: 500;
@@ -404,7 +399,7 @@ body.order-mode .cafe-order-overview {
   text-overflow: ellipsis;
 }
 .cafe-text-field-hint {
-  font-family: 'SF-Pro-Rounded', sans-serif;
+  font-family: var(--default-font);
   font-size: 14px;
   line-height: 18px;
   font-weight: 500;
