@@ -50,9 +50,21 @@
       window.Telegram.WebApp.MainButton.setParams({});
     }
   }
+
+  var lastWindowHeight = window.innerHeight, skipOnViewportChanged = false;
   function onViewportChanged(eventType, eventData) {
-    if (eventData.height) {
+    if (!skipOnViewportChanged &&
+        eventData.height) {
+      window.removeEventListener('resize', onWindowResize);
       setViewportHeight(eventData.height);
+    }
+  }
+  function onWindowResize(e) {
+    if (lastWindowHeight != window.innerHeight) {
+      lastWindowHeight = window.innerHeight;
+      skipOnViewportChanged = true;
+      receiveEvent('viewport_changed', {height: lastWindowHeight});
+      skipOnViewportChanged = false;
     }
   }
 
@@ -127,12 +139,10 @@
 
     if (window.TelegramWebviewProxy !== undefined) {
       TelegramWebviewProxy.postEvent(eventType, JSON.stringify(eventData));
-      console.log('[Telegram.WebView] postEvent via TelegramWebviewProxy', eventType, eventData);
       callback();
     }
     else if (window.external && 'notify' in window.external) {
       window.external.notify(JSON.stringify({eventType: eventType, eventData: eventData}));
-      console.log('[Telegram.WebView] postEvent via external.notify', eventType, eventData);
       callback();
     }
     else if (isIframe) {
@@ -141,20 +151,26 @@
         // For now we don't restrict target, for testing purposes
         trustedTarget = '*';
         window.parent.postMessage(JSON.stringify({eventType: eventType, eventData: eventData}), trustedTarget);
-        console.log('[Telegram.WebView] postEvent via postMessage', eventType, eventData);
+        if (initParams.tgWebAppDebug) {
+          console.log('[Telegram.WebView] postEvent via postMessage', eventType, eventData);
+        }
         callback();
       } catch (e) {
         callback(e);
       }
     }
     else {
-      console.log('[Telegram.WebView] postEvent', eventType, eventData);
+      if (initParams.tgWebAppDebug) {
+        console.log('[Telegram.WebView] postEvent', eventType, eventData);
+      }
       callback({notAvailable: true});
     }
   };
 
   function receiveEvent(eventType, eventData) {
-    console.log('[Telegram.WebView] receiveEvent', eventType, eventData);
+    if (initParams.tgWebAppDebug) {
+      console.log('[Telegram.WebView] receiveEvent', eventType, eventData);
+    }
     var curEventHandlers = eventHandlers[eventType];
     if (curEventHandlers === undefined ||
         !curEventHandlers.length) {
@@ -612,6 +628,8 @@
   onEvent('theme_changed', onThemeChanged);
   onEvent('viewport_changed', onViewportChanged);
   postEvent('web_app_request_viewport');
+
+  window.addEventListener('resize', onWindowResize);
 
   // For Windows Phone app
   window.TelegramGameProxy_receiveEvent = receiveEvent;
