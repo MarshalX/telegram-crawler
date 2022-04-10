@@ -129,6 +129,7 @@ CRAWL_RULES = {
 DIRECT_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{0,249}' + BASE_URL_REGEX + r')'
 ABSOLUTE_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{0,248}' + BASE_URL_REGEX + r'\b[-a-zA-Z0-9@:%_\+.~#?&//=]*)'
 RELATIVE_LINK_REGEX = r'\/(?!\/)([-a-zA-Z0-9\/@:%._\+~#]{0,249})'
+RELATIVE_JS_SCRIPTS_REGEX = r'["\'](.*\.js)["\'\?]'
 
 DOM_ATTRS = ['href', 'src']
 
@@ -199,6 +200,28 @@ def find_relative_links(html: str, cur_link: str) -> set[str]:
     return relative_links
 
 
+def find_relative_scripts(code: str, cur_link: str) -> set[str]:
+    matches = re.findall(DIRECT_LINK_REGEX, cur_link)
+    if not matches:
+        return set()
+
+    direct_cur_link = re.findall(DIRECT_LINK_REGEX, cur_link)[0]
+
+    relative_links = set()
+    for link in re.findall(RELATIVE_JS_SCRIPTS_REGEX, code):
+        # dirty magic for specific cases
+        if '/' in link:    # path to file from the root
+            url = f'{direct_cur_link}/{link}'
+        else:   # its relative link from current folder. Not from the root
+            current_folder_link, *_ = cur_link.rsplit('/', 1)
+            url = f'{current_folder_link}/{link}'
+
+        if not should_exclude(url):
+            relative_links.add(url)
+
+    return relative_links
+
+
 def cleanup_links(links: set[str]) -> set[str]:
     cleaned_links = set()
     for tmp_link in links:
@@ -207,6 +230,7 @@ def cleanup_links(links: set[str]) -> set[str]:
         link = unescape(link)
         link = link.replace('www.', '')
         link = link.replace('http://', '').replace('https://', '')
+        link = link.replace('//', '/')  # not a universal solution
 
         # skip anchor links
         if '#' in link:
@@ -228,7 +252,6 @@ def cleanup_links(links: set[str]) -> set[str]:
 
 def is_trackable_content_type(content_type) -> bool:
     trackable_content_types = (
-        'javascript',
         'css',
         'plain',
         'json',
@@ -269,12 +292,17 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                     logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
                 return
 
-            if 'text' in content_type:
+            if 'text' in content_type or 'javascript' in content_type:
                 LINKS_TO_TRACK.add(url)
 
-                html = await response.text(encoding='UTF-8')
-                absolute_links = cleanup_links(find_absolute_links(html))
-                relative_links = cleanup_links(find_relative_links(html, url))
+                content = await response.text(encoding='UTF-8')
+                absolute_links = cleanup_links(find_absolute_links(content))
+
+                relative_links_finder = find_relative_links
+                if 'javascript' in content_type:
+                    relative_links_finder = find_relative_scripts
+
+                relative_links = cleanup_links(relative_links_finder(content, url))
 
                 sub_links = absolute_links | relative_links
                 await asyncio.gather(*[crawl(url, session) for url in sub_links])
