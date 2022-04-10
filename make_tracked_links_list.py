@@ -12,7 +12,7 @@ from aiohttp import ClientConnectorError, ServerDisconnectedError
 
 PROTOCOL = 'https://'
 BASE_URL = 'telegram.org'
-# its necessary to help crawler to find more links
+# it's necessary to help crawler to find more links
 HIDDEN_URLS = {
     'corefork.telegram.org',
     'corefork.telegram.org/getProxyConfig',
@@ -111,8 +111,7 @@ CRAWL_RULES = {
     },
     'telegram.org': {
         'deny': {
-            'file/',
-            r'apps$'
+            r'apps$',
         },
     },
     'webz.telegram.org': {
@@ -227,6 +226,28 @@ def cleanup_links(links: set[str]) -> set[str]:
     return cleaned_links
 
 
+def is_trackable_content_type(content_type) -> bool:
+    trackable_content_types = (
+        'javascript',
+        'css',
+        'plain',
+        'json',
+        'svg',
+        'png',
+        'jpeg',
+        'x-icon',
+        'gif',
+        'mp4',
+        'webm',
+    )
+
+    for trackable_content_type in trackable_content_types:
+        if trackable_content_type in content_type:
+            return True
+
+    return False
+
+
 async def crawl(url: str, session: aiohttp.ClientSession):
     if url in VISITED_LINKS:
         return
@@ -257,19 +278,13 @@ async def crawl(url: str, session: aiohttp.ClientSession):
 
                 sub_links = absolute_links | relative_links
                 await asyncio.gather(*[crawl(url, session) for url in sub_links])
-            elif 'application/javascript' in content_type:
-                LINKS_TO_TRACK.add(url)
-            elif 'css' in content_type:
-                LINKS_TO_TRACK.add(url)
-            elif 'plain' in content_type:
-                LINKS_TO_TRACK.add(url)
-            elif 'application/json' in content_type:
+            elif is_trackable_content_type(content_type):
                 LINKS_TO_TRACK.add(url)
             else:
-                # TODO track hashes of image/svg/video content types
-                logger.info(f'Unhandled type: {content_type}')
+                # for example, zip with update of macOS client
+                logger.info(f'Unhandled type: {content_type} from {url}')
 
-            # telegram url can work with and without trailing slash (no redirect). P.S. not on every sub domain ;d
+            # telegram url can work with and without trailing slash (no redirect). P.S. not on every subdomain ;d
             # so this is a problem when we have random behavior with link will be added
             # this if resolve this issue. If available both link we prefer without trailing slash
             without_trailing_slash = url[:-1:] if url.endswith('/') else url
@@ -277,7 +292,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                     f'{without_trailing_slash}/' in LINKS_TO_TRACK:
                 LINKS_TO_TRACK.remove(f'{without_trailing_slash}/')
     except UnicodeDecodeError:
-        logger.warning('Codec can\'t decode byte. So its was a tgs file')
+        logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
     except ClientConnectorError:
         logger.warning(f'Wrong link: {url}')
     except (ServerDisconnectedError, TimeoutError):

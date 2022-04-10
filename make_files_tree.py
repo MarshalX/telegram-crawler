@@ -47,6 +47,10 @@ logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
+def get_hash(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
 async def download_file(url, path, session):
     async with session.get(url) as response:
         if response.status != 200:
@@ -96,7 +100,7 @@ async def track_additional_files(
                 content = await r_file.read()
 
                 if save_hash_only:
-                    await w_file.write(hashlib.sha256(content).hexdigest())
+                    await w_file.write(get_hash(content))
                     continue
 
                 content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
@@ -194,6 +198,23 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
     return '\n'.join(content)
 
 
+def is_hashable_only_content_type(content_type) -> bool:
+    hashable_only_content_types = (
+        'png',
+        'jpeg',
+        'x-icon',
+        'gif',
+        'mp4',
+        'webm',
+    )
+
+    for hashable_only_content_type in hashable_only_content_types:
+        if hashable_only_content_type in content_type:
+            return True
+
+    return False
+
+
 async def crawl(url: str, session: aiohttp.ClientSession):
     try:
         logger.info(f'Process {url}')
@@ -210,16 +231,35 @@ async def crawl(url: str, session: aiohttp.ClientSession):
 
             # bypass external slashes and so on
             url_parts = [p for p in url.split('/') if p not in ILLEGAL_PATH_CHARS]
+
+            is_hashable_only = is_hashable_only_content_type(response.content_type)
+            # amazing dirt for media files like
+            # telegram.org/file/811140591/1/q7zZHjgES6s/9d121a89ffb0015837
+            # with response content type HTML instead of image. Shame on you
+            # sometimes it returns correct type. noice load balancing
+            is_sucking_file = '/file/' in url and 'text' in response.content_type
+
             # handle pure domains and html pages without ext in url
             ext = '.html' if '.' not in url_parts[-1] or len(url_parts) == 1 else ''
 
+            # I don't add ext by content type for images and so on cuz TG servers sucks.
+            # Some servers do not return correct content type. Some servers do...
+            if is_hashable_only or is_sucking_file:
+                ext = ''
+
             filename = OUTPUT_FOLDER + '/'.join(url_parts) + ext
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+            if is_sucking_file or is_hashable_only:
+                content = await response.read()
+                async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
+                    await f.write(get_hash(content))
+                return
 
             content = await response.text(encoding='UTF-8')
             if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
                 content = await collect_translations_paginated_content(url, session)
 
-            os.makedirs(os.path.dirname(filename), exist_ok=True)
             async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
                 content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
                 content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)

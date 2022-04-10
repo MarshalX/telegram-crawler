@@ -79,10 +79,6 @@ resources (-s flag of apktool to disable disassembly of dex files).
 Writing a check for the need for decompilation by the hash of the apk file 
 would take more time.
 
-### TODO list
-
-- add storing hashes of image, svg, video.
-
 ### Example of link crawler rules configuration
 
 ```python
