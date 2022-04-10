@@ -1,22 +1,22 @@
-## 🕷 Telegram Web Crawler
+## 🕷 Telegram Crawler
 
 This project is developed to automatically detect changes made 
-to the official Telegram sites. This is necessary for anticipating
-future updates and other things (new vacancies, API updates, etc).
+to the official Telegram sites and beta clients. This is necessary for 
+anticipating future updates and other things 
+(new vacancies, API updates, etc).
 
-
-| Name | Commits  | Status |
-| -----| -------- | ------ |
-| Site updates tracker| [Commits](https://github.com/MarshalX/telegram-crawler/commits/data)  | ![Fetch new content of tracked links to files](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_files_tree.yml/badge.svg?branch=main)  |
-| Site links tracker | [Commits](https://github.com/MarshalX/telegram-crawler/commits/main/tracked_links.txt)  | ![Generate or update list of tracked links](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_tracked_links_list.yml/badge.svg?branch=main)  |
+| Name                 | Commits  | Status                                                                                                                                                        |
+|----------------------| -------- |---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Data tracker         | [Commits](https://github.com/MarshalX/telegram-crawler/commits/data)  | ![Fetch new content of tracked links and files](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_files_tree.yml/badge.svg?branch=main)     |
+| Site links collector | [Commits](https://github.com/MarshalX/telegram-crawler/commits/main/tracked_links.txt)  | ![Generate or update list of tracked links](https://github.com/MarshalX/telegram-crawler/actions/workflows/make_tracked_links_list.yml/badge.svg?branch=main) |
 
 * ✅ passing – new changes
 * ❌ failing – no changes
 
 You should to subscribe to **[channel with alerts](https://t.me/tgcrawl)** to stay updated.
-Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-crawler/tree/data/data)**.
+Copy of Telegram websites and client`s resources stored **[here](https://github.com/MarshalX/telegram-crawler/tree/data/data)**.
 
-![GitHub pretty diff](https://i.imgur.com/BK8UAju.png)
+![GitHub pretty diff example](https://i.imgur.com/BK8UAju.png)
 
 ### How it works
 
@@ -32,16 +32,18 @@ Copy of Telegram websites stored **[here](https://github.com/MarshalX/telegram-c
 2. [Content crawling](make_files_tree.py) is launched **as often as 
    possible** and uses the existing list of links collected in step 1. 
    Going through the base it gets contains and builds a system of subfolders 
-   and files. Removes all dynamic content from files.
-   
+   and files. Removes all dynamic content from files. It downloads beta version 
+   of Android Client, decompiles it and track resources also. Tracking of 
+   resources of Telegram for macOS presented too.
+
 3. Using of [GitHub Actions](.github/workflows/). Works without own servers.
    You can just fork this repository and own tracker system by yourself.
    Workflows launch scripts and commit changes. All file changes are tracked 
-   by the GIT and beautifully displayed on the GitHub. GitHub Actions 
-   should be built correctly only if there are changes on the Telegram website. 
-   Otherwise, the workflow should fail. If build was successful, we can 
-   send notifications to Telegram channel and so on.
-   
+   by GIT and beautifully displayed on GitHub. GitHub Actions should be built
+   correctly only if there are changes on the Telegram website. Otherwise, the 
+   workflow should fail. If build was successful, we can send notifications to 
+   Telegram channel and so on.
+
 ### FAQ
 
 **Q:** How often is "**as often as possible**"?
@@ -70,9 +72,15 @@ after push to repository. Therefore, script are waiting for information to appea
 
 **A:** To increase limits of GitHub API.
 
+**Q:** Why are you decompiling .apk file each run?
+
+**A:** Because it doesn't require much time. I am decompiling only 
+resources (-s flag of apktool to disable disassembly of dex files). 
+Writing a check for the need for decompilation by the hash of the apk file 
+would take more time.
+
 ### TODO list
 
-- add storing history of content using hashes;
 - add storing hashes of image, svg, video.
 
 ### Example of link crawler rules configuration
