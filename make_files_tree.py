@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 import zipfile
+import hashlib
 from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
 from time import time
@@ -79,14 +80,27 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
     return None
 
 
-async def track_additional_files(files_to_track: List[str], input_dir_name: str, output_dir_name: str, encoding='utf-8'):
+async def track_additional_files(
+        files_to_track: List[str], input_dir_name: str, output_dir_name: str, encoding='utf-8', save_hash_only=False
+):
     for file in files_to_track:
         filename = os.path.join(OUTPUT_FOLDER, output_dir_name, file)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         async with aiofiles.open(filename, 'w', encoding='utf-8') as w_file:
-            async with aiofiles.open(os.path.join(input_dir_name, file), 'r', encoding=encoding) as r_file:
+            kwargs = {'mode': 'r', 'encoding': encoding}
+            if save_hash_only:
+                kwargs['mode'] = 'rb'
+                del kwargs['encoding']
+
+            async with aiofiles.open(os.path.join(input_dir_name, file), **kwargs) as r_file:
                 content = await r_file.read()
+
+                if save_hash_only:
+                    await w_file.write(hashlib.sha256(content).hexdigest())
+                    continue
+
                 content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
+                content = re.sub(r'name="APKTOOL_DUMMY_.*" id', 'name="tgcrawl" id', content)
                 await w_file.write(content)
 
 
@@ -97,19 +111,27 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
     if not download_url:
         return
 
-    await download_file(download_url, 'macos.zip', session)
+    folder_name = 'macos'
+    archive_name = 'macos.zip'
+
+    await download_file(download_url, archive_name, session)
 
     # synced
-    with zipfile.ZipFile('macos.zip', 'r') as f:
-        f.extractall('macos')
+    with zipfile.ZipFile(archive_name, 'r') as f:
+        f.extractall(folder_name)
 
+    resources_path = 'Telegram.app/Contents/Resources'
     files_to_track = [
-        'Telegram.app/Contents/Resources/en.lproj/Localizable.strings',
+        f'{resources_path}/en.lproj/Localizable.strings',
     ]
-    await track_additional_files(files_to_track, 'macos', 'telegram-beta-macos', 'utf-16')
+    await track_additional_files(files_to_track, folder_name, 'telegram-beta-macos', 'utf-16')
 
-    os.path.isdir('macos') and shutil.rmtree('macos')
-    os.remove('macos.zip')
+    _, _, hash_of_files_to_track = next(os.walk(f'{folder_name}/{resources_path}'))
+    hash_of_files_to_track = [f'{resources_path}/{i}' for i in hash_of_files_to_track]
+    await track_additional_files(hash_of_files_to_track, folder_name, 'telegram-beta-macos', save_hash_only=True)
+
+    os.path.isdir(folder_name) and shutil.rmtree(folder_name)
+    os.remove(archive_name)
 
 
 async def download_telegram_android_beta_and_extract_resources(session: aiohttp.ClientSession):
