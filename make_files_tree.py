@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import platform
 import re
 import shutil
 import zipfile
@@ -115,27 +116,72 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
     if not download_url:
         return
 
-    folder_name = 'macos'
-    archive_name = 'macos.zip'
+    crawled_data_folder = 'telegram-beta-macos'
+    client_folder_name = 'macos'
+    client_archive_name = 'macos.zip'
 
-    await download_file(download_url, archive_name, session)
+    await download_file(download_url, client_archive_name, session)
 
     # synced
-    with zipfile.ZipFile(archive_name, 'r') as f:
-        f.extractall(folder_name)
+    with zipfile.ZipFile(client_archive_name, 'r') as f:
+        f.extractall(client_folder_name)
 
     resources_path = 'Telegram.app/Contents/Resources'
     files_to_track = [
         f'{resources_path}/en.lproj/Localizable.strings',
     ]
-    await track_additional_files(files_to_track, folder_name, 'telegram-beta-macos', 'utf-16')
+    await track_additional_files(files_to_track, client_folder_name, crawled_data_folder, 'utf-16')
 
-    _, _, hash_of_files_to_track = next(os.walk(f'{folder_name}/{resources_path}'))
+    _, _, hash_of_files_to_track = next(os.walk(f'{client_folder_name}/{resources_path}'))
     hash_of_files_to_track = [f'{resources_path}/{i}' for i in hash_of_files_to_track]
-    await track_additional_files(hash_of_files_to_track, folder_name, 'telegram-beta-macos', save_hash_only=True)
+    await track_additional_files(hash_of_files_to_track, client_folder_name, crawled_data_folder, save_hash_only=True)
 
-    os.path.isdir(folder_name) and shutil.rmtree(folder_name)
-    os.remove(archive_name)
+    def cleanup1():
+        os.path.isdir(client_folder_name) and shutil.rmtree(client_folder_name)
+        os.remove(client_archive_name)
+
+    # .car crawler works only in macOS
+    if 'darwin' not in platform.system().lower():
+        cleanup1()
+        return
+
+    assets_output_dir = 'macos_assets'
+    assets_extractor = 'acextract'
+    assets_filename = 'Assets.car'
+    tool_archive_name = f'{assets_extractor}.zip'
+
+    download_url = 'https://github.com/bartoszj/acextract/releases/download/2.2/acextract.zip'
+    await download_file(download_url, tool_archive_name, session)
+
+    # synced
+    with zipfile.ZipFile(tool_archive_name, 'r') as f:
+        f.extractall(assets_extractor)
+
+    path_to_car = os.path.join(client_folder_name, resources_path, assets_filename)
+    path_to_extractor = os.path.join(assets_extractor, assets_extractor)
+    await (await asyncio.create_subprocess_exec('chmod', '+x', path_to_extractor)).communicate()
+    process = await asyncio.create_subprocess_exec(path_to_extractor, '-i', path_to_car, '-o', assets_output_dir)
+    await process.communicate()
+
+    def cleanup2():
+        cleanup1()
+        os.path.isdir(assets_output_dir) and shutil.rmtree(assets_output_dir)
+        os.path.isdir(assets_extractor) and shutil.rmtree(assets_extractor)
+        os.remove(tool_archive_name)
+
+    if process.returncode != 0:
+        cleanup2()
+        return
+
+    _, _, hash_of_files_to_track = next(os.walk(assets_output_dir))
+    await track_additional_files(
+        hash_of_files_to_track,
+        assets_output_dir,
+        os.path.join(crawled_data_folder, assets_filename),
+        save_hash_only=True
+    )
+
+    cleanup2()
 
 
 async def download_telegram_android_beta_and_extract_resources(session: aiohttp.ClientSession):
