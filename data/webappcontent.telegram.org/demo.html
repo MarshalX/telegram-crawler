@@ -8,12 +8,12 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://telegram.org/js/telegram-webview.js?11"></script>
+    <script src="https://telegram.org/js/telegram-webview.js?14"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
       }
-      Telegram.WebView.onEvent('theme_changed', setThemeClass);
+      Telegram.WebApp.onEvent('themeChanged', setThemeClass);
       setThemeClass();
       
     </script>
@@ -106,7 +106,8 @@
         top: 0;
         transform: translateY(100vh);
       }
-      .viewport_border {
+      .viewport_border,
+      .viewport_stable_border {
         position: fixed;
         left: 0;
         right: 0;
@@ -114,17 +115,28 @@
         height: var(--tg-viewport-height, 100vh);
         pointer-events: none;
       }
-      .viewport_border:before {
+      .viewport_stable_border {
+        height: var(--tg-viewport-stable-height, 100vh);
+      }
+      .viewport_border:before,
+      .viewport_stable_border:before {
         content: attr(text);
         display: inline-block;
-        background: green;
-        left: 0;
+        position: absolute;
+        background: gray;
+        right: 0;
         top: 0;
         font-size: 7px;
         padding: 2px 4px;
         vertical-align: top;
       }
-      .viewport_border:after {
+      .viewport_stable_border:before {
+        background: green;
+        left: 0;
+        right: auto;
+      }
+      .viewport_border:after,
+      .viewport_stable_border:after {
         content: '';
         display: block;
         position: absolute;
@@ -132,7 +144,10 @@
         right: 0;
         top: 0;
         bottom: 0;
-        border: 2px dashed green;
+        border: 2px dashed gray;
+      }
+      .viewport_stable_border:after {
+        border-color: green;
       }
     </style>
   </head>
@@ -142,6 +157,7 @@
   <button id="with_webview_btn" onclick="sendMessage('', true);">Send «Hello, World!» with inline webview button</button>
   <button id="data_btn" onclick="sendTime(true);">Send current time to bot (x10)</button>
   <button onclick="webviewExpand();">Expand Webview</button>
+  <button onclick="toggleMainButton(this);">Hide Main Button</button>
       <div id="btn_status" class="hint" style="display: none;">
       </div>
       <p>Test links:</p>
@@ -165,6 +181,7 @@
       </div>
     </section>
     <div class="viewport_border"></div>
+    <div class="viewport_stable_border"></div>
     <script src="/js/jquery.min.js"></script>
     <script>
 Telegram.WebApp.ready();
@@ -337,11 +354,28 @@ Telegram.WebApp.MainButton
   .show()
   .onClick(function(){ webviewClose(); });
 
-function setViewportHeight() {
-  $('.viewport_border').attr('text', window.innerWidth + ' x ' + Telegram.WebApp.viewportHeight);
+function toggleMainButton(el) {
+  var mainButton = Telegram.WebApp.MainButton;
+  if (mainButton.isVisible) {
+    mainButton.hide();
+    el.innerHTML = 'Show Main Button';
+  } else {
+    mainButton.show();
+    el.innerHTML = 'Hide Main Button';
+  }
 }
-Telegram.WebApp.onEvent('viewport_changed', setViewportHeight);
-setViewportHeight();
+
+function round(val, d) {
+  var k = Math.pow(10, d || 0);
+  return Math.round(val * k) / k;
+}
+
+function setViewportData() {
+  $('.viewport_border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportHeight, 2));
+  $('.viewport_stable_border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportStableHeight, 2) + ' | is_expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false'));
+}
+Telegram.WebApp.onEvent('viewportChanged', setViewportData);
+setViewportData();
 
 
 </script>

@@ -1,7 +1,6 @@
 (function () {
   var eventHandlers = {};
 
-  // Parse init params from location hash: for Android < 5.0, TDesktop
   var locationHash = '';
   try {
     locationHash = location.hash.toString();
@@ -10,6 +9,8 @@
   var initParams = urlParseHashParams(locationHash);
 
   var webAppDataRaw = '', webAppData = {};
+  var themeParams = {}, colorScheme = 'light';
+
   if (initParams.tgWebAppData && initParams.tgWebAppData.length) {
     webAppDataRaw = initParams.tgWebAppData;
     webAppData = urlParseHashParams(webAppDataRaw);
@@ -23,6 +24,15 @@
         }
       } catch (e) {}
     }
+  }
+  if (initParams.tgWebAppThemeParams && initParams.tgWebAppThemeParams.length) {
+    var themeParamsRaw = initParams.tgWebAppThemeParams;
+    try {
+      var theme_params = JSON.parse(themeParamsRaw);
+      setThemeParams(theme_params);
+    } catch (e) {}
+  } else if (webAppData.theme_params) { // legacy
+    setThemeParams(webAppData.theme_params);
   }
 
   var isIframe = false;
@@ -47,24 +57,26 @@
   function onThemeChanged(eventType, eventData) {
     if (eventData.theme_params) {
       setThemeParams(eventData.theme_params);
-      window.Telegram.WebApp.MainButton.setParams({});
+      window.Telegram.WebApp.MainButton.setParams({
+        force_update: true
+      });
+      receiveWebViewEvent('themeChanged');
     }
   }
 
-  var lastWindowHeight = window.innerHeight, skipOnViewportChanged = false;
+  var lastWindowHeight = window.innerHeight;
   function onViewportChanged(eventType, eventData) {
-    if (!skipOnViewportChanged &&
-        eventData.height) {
+    if (eventData.height) {
       window.removeEventListener('resize', onWindowResize);
-      setViewportHeight(eventData.height);
+      setViewportHeight(eventData);
     }
   }
   function onWindowResize(e) {
     if (lastWindowHeight != window.innerHeight) {
       lastWindowHeight = window.innerHeight;
-      skipOnViewportChanged = true;
-      receiveEvent('viewport_changed', {height: lastWindowHeight});
-      skipOnViewportChanged = false;
+      receiveWebViewEvent('viewportChanged', {
+        isStateStable: true
+      });
     }
   }
 
@@ -128,7 +140,6 @@
     return url + addHash;
   }
 
-
   function postEvent(eventType, callback, eventData) {
     if (!callback) {
       callback = function () {};
@@ -168,9 +179,12 @@
   };
 
   function receiveEvent(eventType, eventData) {
-    if (initParams.tgWebAppDebug) {
-      console.log('[Telegram.WebView] receiveEvent', eventType, eventData);
-    }
+    callEventCallbacks(eventType, function(callback) {
+      callback(eventType, eventData);
+    });
+  }
+
+  function callEventCallbacks(eventType, func) {
     var curEventHandlers = eventHandlers[eventType];
     if (curEventHandlers === undefined ||
         !curEventHandlers.length) {
@@ -178,7 +192,7 @@
     }
     for (var i = 0; i < curEventHandlers.length; i++) {
       try {
-        curEventHandlers[i](eventType, eventData);
+        func(curEventHandlers[i]);
       } catch (e) {}
     }
   }
@@ -204,6 +218,22 @@
     eventHandlers[eventType].splice(index, 1);
   };
 
+  function receiveWebViewEvent(eventType) {
+    var args = Array.prototype.slice.call(arguments);
+    eventType = args.shift();
+    callEventCallbacks('webview:' + eventType, function(callback) {
+      callback.apply(window.Telegram.WebApp, args);
+    });
+  }
+
+  function onWebViewEvent(eventType, callback) {
+    onEvent('webview:' + eventType, callback);
+  };
+
+  function offWebViewEvent(eventType, callback) {
+    offEvent('webview:' + eventType, callback);
+  };
+
   function setCssProperty(name, value) {
     var root = document.documentElement;
     if (root && root.style && root.style.setProperty) {
@@ -211,7 +241,6 @@
     }
   }
 
-  var themeParams = {}, colorScheme = 'light';
   function setThemeParams(theme_params) {
     var color;
     for (var key in theme_params) {
@@ -227,20 +256,31 @@
     }
   }
 
-  var viewportHeight = false;
-  function setViewportHeight(height) {
-    if (typeof height !== 'undefined') {
-      viewportHeight = height;
+  var viewportHeight = false, viewportStableHeight = false, isExpanded = true;
+  function setViewportHeight(data) {
+    if (typeof data !== 'undefined') {
+      isExpanded = !!data.is_expanded;
+      viewportHeight = data.height;
+      if (data.is_state_stable) {
+        viewportStableHeight = data.height;
+      }
+      receiveWebViewEvent('viewportChanged', {
+        isStateStable: !!data.is_state_stable
+      });
     }
-    var css_height;
+    var height, stable_height;
     if (viewportHeight !== false) {
-      css_height = (viewportHeight - mainButtonHeight) + 'px';
-    } else if (mainButtonHeight) {
-      css_height = 'calc(100vh - ' + mainButtonHeight + 'px)';
+      height = (viewportHeight - mainButtonHeight) + 'px';
     } else {
-      css_height = '100vh';
+      height = mainButtonHeight ? 'calc(100vh - ' + mainButtonHeight + 'px)' : '100vh';
     }
-    setCssProperty('viewport-height', css_height);
+    if (viewportStableHeight !== false) {
+      stable_height = (viewportStableHeight - mainButtonHeight) + 'px';
+    } else {
+      stable_height = mainButtonHeight ? 'calc(100vh - ' + mainButtonHeight + 'px)' : '100vh';
+    }
+    setCssProperty('viewport-height', height);
+    setCssProperty('viewport-stable-height', stable_height);
   }
 
 
@@ -301,7 +341,6 @@
     var buttonText = 'CONTINUE';
     var buttonColor = false;
     var buttonTextColor = false;
-    var onClickCallback = null;
 
     var mainButton = {};
     Object.defineProperty(mainButton, 'text', {
@@ -367,8 +406,8 @@
     }
 
     function onMainButtonPressed() {
-      if (isActive && onClickCallback) {
-        onClickCallback();
+      if (isActive) {
+        receiveWebViewEvent('mainButtonClicked');
       }
     }
 
@@ -395,7 +434,8 @@
 
         mainButtonHeight = (isVisible ? 48 : 0);
         if (document.documentElement) {
-          document.documentElement.style.marginBottom = mainButtonHeight + 'px';
+          document.documentElement.style.boxSizing = 'border-box';
+          document.documentElement.style.paddingBottom = mainButtonHeight + 'px';
         }
         setViewportHeight();
       }
@@ -473,19 +513,21 @@
         }
         isActive = !!params.is_active;
       }
-      if (changed) {
+      if (changed || params.force_update) {
         updateButton();
       }
       return mainButton;
     }
 
-    mainButton.setParams = setParams;
     mainButton.setText = function(text) {
-      mainButton.text = text;
-      return mainButton;
+      return mainButton.setParams({text: text});
     };
     mainButton.onClick = function(callback) {
-      onClickCallback = callback;
+      onWebViewEvent('mainButtonClicked', callback);
+      return mainButton;
+    };
+    mainButton.offClick = function(callback) {
+      offWebViewEvent('mainButtonClicked', callback);
       return mainButton;
     };
     mainButton.show = function() {
@@ -514,6 +556,7 @@
       updateButton();
       return mainButton;
     }
+    mainButton.setParams = setParams;
     return mainButton;
   })();
 
@@ -588,9 +631,12 @@
     }
   };
   window.Telegram.WebApp = {
-    onEvent: onEvent,
-    offEvent: offEvent,
     MainButton: MainButton,
+    onEvent: function(eventType, callback) {
+      onWebViewEvent(eventType, callback);
+    },
+    offEvent: function(eventType, callback) {offWebViewEvent(eventType, callback);
+    },
     sendData: function (data) {
       if (!data || !data.length) {
         console.error('[Telegram.WebApp] Data is required', data);
@@ -624,21 +670,31 @@
     get: function(){ return colorScheme; },
     enumerable: true
   });
+  Object.defineProperty(window.Telegram.WebApp, 'themeParams', {
+    get: function(){ return themeParams; },
+    enumerable: true
+  });
+  Object.defineProperty(window.Telegram.WebApp, 'isExpanded', {
+    get: function(){ return isExpanded; },
+    enumerable: true
+  });
   Object.defineProperty(window.Telegram.WebApp, 'viewportHeight', {
     get: function(){ return (viewportHeight === false ? window.innerHeight : viewportHeight) - mainButtonHeight; },
     enumerable: true
   });
+  Object.defineProperty(window.Telegram.WebApp, 'viewportStableHeight', {
+    get: function(){ return (viewportStableHeight === false ? window.innerHeight : viewportStableHeight) - mainButtonHeight; },
+    enumerable: true
+  });
 
-  if (webAppData.theme_params) {
-    setThemeParams(webAppData.theme_params);
-  }
   setViewportHeight();
+
+  window.addEventListener('resize', onWindowResize);
 
   onEvent('theme_changed', onThemeChanged);
   onEvent('viewport_changed', onViewportChanged);
+  postEvent('web_app_request_theme');
   postEvent('web_app_request_viewport');
-
-  window.addEventListener('resize', onWindowResize);
 
   // For Windows Phone app
   window.TelegramGameProxy_receiveEvent = receiveEvent;
