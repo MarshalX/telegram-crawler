@@ -179,6 +179,10 @@
         Data passed to webview.
         <span id="webview_data_status" style="display: none;">Checking hash...</span>
       </div>
+      <pre><code id="theme_data"></code></pre>
+      <div class="hint">
+        Theme params
+      </div>
     </section>
     <div class="viewport_border"></div>
     <div class="viewport_stable_border"></div>
@@ -323,11 +327,15 @@ function requestAudio(el) {
   return false;
 }
 
+Telegram.WebApp.onEvent('themeChanged', function() {
+  $('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
+});
 
 $('#main_btn').toggle(!!WebAppData.query_id);
 $('#with_webview_btn').toggle(!!WebAppData.query_id && !WebAppData.receiver);
 // $('#data_btn').toggle(!WebAppData.query_id || !WebAppData.receiver);
 $('#webview_data').html(JSON.stringify(WebAppData, null, 2));
+$('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
 $('#regular_link').attr('href', $('#regular_link').attr('href') + location.hash);
 $('#text_field').focus();
 if (WebAppData.query_id && WebAppDataRaw) {
