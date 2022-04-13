@@ -15,9 +15,9 @@ var Cafe = {
     Cafe.userId = options.userId;
     Cafe.userHash = options.userHash;
     Cafe.initLotties();
-    var userId = Telegram.WebApp.initData && Telegram.WebApp.initData.user && Telegram.WebApp.initData.user.id || Cafe.userId;
     $('body').show();
-    if (!userId) {
+    if (!Telegram.WebApp.initDataUnsafe ||
+        !Telegram.WebApp.initDataUnsafe.query_id) {
       Cafe.isClosed = true;
       $('body').addClass('closed');
       Cafe.showStatus('Cafe is temporarily closed');
@@ -255,9 +255,7 @@ var Cafe = {
         order_data: Cafe.getOrderData(),
         comment: comment
       };
-      if (!Telegram.WebApp.initData ||
-          !Telegram.WebApp.initData.user ||
-          !Telegram.WebApp.initData.user.id) {
+      if (Cafe.userId && Cafe.userHash) {
         params.user_id = Cafe.userId;
         params.user_hash = Cafe.userHash;
       }
@@ -290,7 +288,7 @@ var Cafe = {
     $('.js-status').removeClass('shown');
   },
   apiRequest: function(method, data, onCallback) {
-    var authData = Telegram.WebApp.initDataRaw || '';
+    var authData = Telegram.WebApp.initData || '';
     $.ajax(Cafe.apiUrl, {
       type: 'POST',
       data: $.extend(data, {_auth: authData, method: method}),

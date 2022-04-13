@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://telegram.org/js/telegram-webview.js?14"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js?1"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -190,11 +190,11 @@
     <script>
 Telegram.WebApp.ready();
 
-var WebAppData = Telegram.WebApp.initData || {};
-var WebAppDataRaw = Telegram.WebApp.initDataRaw || '';
+var initData = Telegram.WebApp.initData || '';
+var initDataUnsafe = Telegram.WebApp.initDataUnsafe || {};
 
 function sendMessage(msg_id, with_webview) {
-  if (!WebAppData.query_id) {
+  if (!initDataUnsafe.query_id) {
     alert('WebViewQueryId not defined');
     return;
   }
@@ -202,7 +202,7 @@ function sendMessage(msg_id, with_webview) {
   $('#btn_status').text('Sending...').removeClass('ok err').show();
   $.ajax('/demo/sendMessage', {
     type: 'POST',
-    data: {_auth: WebAppDataRaw, query_id: WebAppData.query_id, msg_id: msg_id || '', with_webview: !WebAppData.receiver && with_webview ? 1 : 0},
+    data: {_auth: initData, msg_id: msg_id || '', with_webview: !initDataUnsafe.receiver && with_webview ? 1 : 0},
     dataType: 'json',
     success: function(result) {
       $('button').prop('disabled', false);
@@ -230,7 +230,7 @@ function changeButton() {
   $('#btn_status').text('Changing button...').removeClass('ok err').show();
   $.ajax('/demo/changeMenuButton', {
     type: 'POST',
-    data: {_auth: WebAppDataRaw},
+    data: {_auth: initData},
     dataType: 'json',
     success: function(result) {
       $('button').prop('disabled', false);
@@ -331,18 +331,18 @@ Telegram.WebApp.onEvent('themeChanged', function() {
   $('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
 });
 
-$('#main_btn').toggle(!!WebAppData.query_id);
-$('#with_webview_btn').toggle(!!WebAppData.query_id && !WebAppData.receiver);
-// $('#data_btn').toggle(!WebAppData.query_id || !WebAppData.receiver);
-$('#webview_data').html(JSON.stringify(WebAppData, null, 2));
+$('#main_btn').toggle(!!initDataUnsafe.query_id);
+$('#with_webview_btn').toggle(!!initDataUnsafe.query_id && !initDataUnsafe.receiver);
+// $('#data_btn').toggle(!initDataUnsafe.query_id || !initDataUnsafe.receiver);
+$('#webview_data').html(JSON.stringify(initDataUnsafe, null, 2));
 $('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
 $('#regular_link').attr('href', $('#regular_link').attr('href') + location.hash);
 $('#text_field').focus();
-if (WebAppData.query_id && WebAppDataRaw) {
+if (initDataUnsafe.query_id && initData) {
   $('#webview_data_status').show();
   $.ajax('/demo/checkData', {
     type: 'POST',
-    data: {_auth: WebAppDataRaw},
+    data: {_auth: initData},
     dataType: 'json',
     success: function(result) {
       if (result.ok) {

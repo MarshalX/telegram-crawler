@@ -1,3 +1,4 @@
+// WebView
 (function () {
   var eventHandlers = {};
 
@@ -7,33 +8,6 @@
   } catch (e) {}
 
   var initParams = urlParseHashParams(locationHash);
-
-  var webAppDataRaw = '', webAppData = {};
-  var themeParams = {}, colorScheme = 'light';
-
-  if (initParams.tgWebAppData && initParams.tgWebAppData.length) {
-    webAppDataRaw = initParams.tgWebAppData;
-    webAppData = urlParseHashParams(webAppDataRaw);
-    delete webAppData._path;
-    for (var key in webAppData) {
-      var val = webAppData[key];
-      try {
-        if (val.substr(0, 1) == '{' && val.substr(-1) == '}' ||
-            val.substr(0, 1) == '[' && val.substr(-1) == ']') {
-          webAppData[key] = JSON.parse(val);
-        }
-      } catch (e) {}
-    }
-  }
-  if (initParams.tgWebAppThemeParams && initParams.tgWebAppThemeParams.length) {
-    var themeParamsRaw = initParams.tgWebAppThemeParams;
-    try {
-      var theme_params = JSON.parse(themeParamsRaw);
-      setThemeParams(theme_params);
-    } catch (e) {}
-  } else if (webAppData.theme_params) { // legacy
-    setThemeParams(webAppData.theme_params);
-  }
 
   var isIframe = false;
   try {
@@ -53,32 +27,6 @@
       });
     }
   } catch (e) {}
-
-  function onThemeChanged(eventType, eventData) {
-    if (eventData.theme_params) {
-      setThemeParams(eventData.theme_params);
-      window.Telegram.WebApp.MainButton.setParams({
-        force_update: true
-      });
-      receiveWebViewEvent('themeChanged');
-    }
-  }
-
-  var lastWindowHeight = window.innerHeight;
-  function onViewportChanged(eventType, eventData) {
-    if (eventData.height) {
-      window.removeEventListener('resize', onWindowResize);
-      setViewportHeight(eventData);
-    }
-  }
-  function onWindowResize(e) {
-    if (lastWindowHeight != window.innerHeight) {
-      lastWindowHeight = window.innerHeight;
-      receiveWebViewEvent('viewportChanged', {
-        isStateStable: true
-      });
-    }
-  }
 
   function urlSafeDecode(urlencoded) {
     try {
@@ -105,10 +53,22 @@
       params._path = urlSafeDecode(pathParam);
       locationHash = locationHash.substr(qIndex + 1);
     }
-    var locationHashParams = locationHash.split('&');
+    var query_params = urlParseQueryString(locationHash);
+    for (var k in query_params) {
+      params[k] = query_params[k];
+    }
+    return params;
+  }
+
+  function urlParseQueryString(queryString) {
+    var params = {};
+    if (!queryString.length) {
+      return params;
+    }
+    var queryStringParams = queryString.split('&');
     var i, param, paramName, paramValue;
-    for (i = 0; i < locationHashParams.length; i++) {
-      param = locationHashParams[i].split('=');
+    for (i = 0; i < queryStringParams.length; i++) {
+      param = queryStringParams[i].split('=');
       paramName = urlSafeDecode(param[0]);
       paramValue = param[1] == null ? null : urlSafeDecode(param[1]);
       params[paramName] = paramValue;
@@ -218,20 +178,138 @@
     eventHandlers[eventType].splice(index, 1);
   };
 
+  function openProtoUrl(url) {
+    if (!url.match(/^(web\+)?tgb?:\/\/./)) {
+      return false;
+    }
+    var useIframe = navigator.userAgent.match(/iOS|iPhone OS|iPhone|iPod|iPad/i) ? true : false;
+    if (useIframe) {
+      var iframeContEl = document.getElementById('tgme_frame_cont') || document.body;
+      var iframeEl = document.createElement('iframe');
+      iframeContEl.appendChild(iframeEl);
+      var pageHidden = false;
+      var enableHidden = function () {
+        pageHidden = true;
+      };
+      window.addEventListener('pagehide', enableHidden, false);
+      window.addEventListener('blur', enableHidden, false);
+      if (iframeEl !== null) {
+        iframeEl.src = url;
+      }
+      setTimeout(function() {
+        if (!pageHidden) {
+          window.location = url;
+        }
+        window.removeEventListener('pagehide', enableHidden, false);
+        window.removeEventListener('blur', enableHidden, false);
+      }, 2000);
+    }
+    else {
+      window.location = url;
+    }
+    return true;
+  }
+
+  if (!window.Telegram) {
+    window.Telegram = {};
+  }
+  window.Telegram.WebView = {
+    initParams: initParams,
+    onEvent: onEvent,
+    offEvent: offEvent,
+    postEvent: postEvent,
+    receiveEvent: receiveEvent,
+    callEventCallbacks: callEventCallbacks
+  };
+
+  window.Telegram.Utils = {
+    urlSafeDecode: urlSafeDecode,
+    urlParseQueryString: urlParseQueryString,
+    urlParseHashParams: urlParseHashParams,
+    urlAppendHashParams: urlAppendHashParams
+  };
+
+  // For Windows Phone app
+  window.TelegramGameProxy_receiveEvent = receiveEvent;
+
+  // App backward compatibility
+  window.TelegramGameProxy = {
+    receiveEvent: receiveEvent
+  };
+})();
+
+// WebApp
+(function () {
+  var Utils = window.Telegram.Utils;
+  var WebView = window.Telegram.WebView;
+  var initParams = WebView.initParams;
+
+  var WebApp = {};
+  var webAppInitData = '', webAppInitDataUnsafe = {};
+  var themeParams = {}, colorScheme = 'light';
+
+  if (initParams.tgWebAppData && initParams.tgWebAppData.length) {
+    webAppInitData = initParams.tgWebAppData;
+    webAppInitDataUnsafe = Utils.urlParseQueryString(webAppInitData);
+    for (var key in webAppInitDataUnsafe) {
+      var val = webAppInitDataUnsafe[key];
+      try {
+        if (val.substr(0, 1) == '{' && val.substr(-1) == '}' ||
+            val.substr(0, 1) == '[' && val.substr(-1) == ']') {
+          webAppInitDataUnsafe[key] = JSON.parse(val);
+        }
+      } catch (e) {}
+    }
+  }
+  if (initParams.tgWebAppThemeParams && initParams.tgWebAppThemeParams.length) {
+    var themeParamsRaw = initParams.tgWebAppThemeParams;
+    try {
+      var theme_params = JSON.parse(themeParamsRaw);
+      setThemeParams(theme_params);
+    } catch (e) {}
+  }
+
+  function onThemeChanged(eventType, eventData) {
+    if (eventData.theme_params) {
+      setThemeParams(eventData.theme_params);
+      window.Telegram.WebApp.MainButton.setParams({
+        force_update: true
+      });
+      receiveWebViewEvent('themeChanged');
+    }
+  }
+
+  var lastWindowHeight = window.innerHeight;
+  function onViewportChanged(eventType, eventData) {
+    if (eventData.height) {
+      window.removeEventListener('resize', onWindowResize);
+      setViewportHeight(eventData);
+    }
+  }
+
+  function onWindowResize(e) {
+    if (lastWindowHeight != window.innerHeight) {
+      lastWindowHeight = window.innerHeight;
+      receiveWebViewEvent('viewportChanged', {
+        isStateStable: true
+      });
+    }
+  }
+
   function receiveWebViewEvent(eventType) {
     var args = Array.prototype.slice.call(arguments);
     eventType = args.shift();
-    callEventCallbacks('webview:' + eventType, function(callback) {
-      callback.apply(window.Telegram.WebApp, args);
+    WebView.callEventCallbacks('webview:' + eventType, function(callback) {
+      callback.apply(WebApp, args);
     });
   }
 
   function onWebViewEvent(eventType, callback) {
-    onEvent('webview:' + eventType, callback);
+    WebView.onEvent('webview:' + eventType, callback);
   };
 
   function offWebViewEvent(eventType, callback) {
-    offEvent('webview:' + eventType, callback);
+    WebView.offEvent('webview:' + eventType, callback);
   };
 
   function setCssProperty(name, value) {
@@ -322,17 +400,6 @@
     return s;
   }
 
-  function isParentEl(el, parentEl) {
-    var checkEl = el.parentNode;
-    while (checkEl) {
-      if (checkEl === parentEl) {
-        return true;
-      }
-      checkEl = checkEl.parentNode;
-    }
-    return false;
-  }
-
   var mainButtonHeight = 0;
   var MainButton = (function() {
     var isVisible = false;
@@ -373,7 +440,7 @@
       enumerable: true
     });
 
-    onEvent('main_button_pressed', onMainButtonPressed);
+    WebView.onEvent('main_button_pressed', onMainButtonPressed);
 
     var debugBtn = null, debugBtnStyle = {};
     if (initParams.tgWebAppDebug) {
@@ -414,7 +481,7 @@
     function updateButton() {
       var color = mainButton.color;
       var text_color = mainButton.textColor;
-      postEvent('web_app_setup_main_button', false, isVisible ? {
+      WebView.postEvent('web_app_setup_main_button', false, isVisible ? {
         is_visible: true,
         is_active: isActive,
         is_progress_visible: isProgressVisible,
@@ -560,152 +627,77 @@
     return mainButton;
   })();
 
-  function openProtoUrl(url) {
-    if (!url.match(/^(web\+)?tgb?:\/\/./)) {
-      return false;
-    }
-    var useIframe = navigator.userAgent.match(/iOS|iPhone OS|iPhone|iPod|iPad/i) ? true : false;
-    if (useIframe) {
-      var iframeContEl = document.getElementById('tgme_frame_cont') || document.body;
-      var iframeEl = document.createElement('iframe');
-      iframeContEl.appendChild(iframeEl);
-      var pageHidden = false;
-      var enableHidden = function () {
-        pageHidden = true;
-      };
-      window.addEventListener('pagehide', enableHidden, false);
-      window.addEventListener('blur', enableHidden, false);
-      if (iframeEl !== null) {
-        iframeEl.src = url;
-      }
-      setTimeout(function() {
-        if (!pageHidden) {
-          window.location = url;
-        }
-        window.removeEventListener('pagehide', enableHidden, false);
-        window.removeEventListener('blur', enableHidden, false);
-      }, 2000);
-    }
-    else {
-      window.location = url;
-    }
-    return true;
-  }
-
   if (!window.Telegram) {
     window.Telegram = {};
   }
-  window.Telegram.WebView = {
-    initParams: initParams,
-    onEvent: onEvent,
-    offEvent: offEvent,
-    receiveEvent: receiveEvent,
-  };
-  window.Telegram.Games = {
-    shareScore: function() {
-      postEvent('share_score', function (error) {
-        if (error) {
-          var shareScoreUrl = initParams.tgShareScoreUrl;
-          if (shareScoreUrl) {
-            openProtoUrl(shareScoreUrl);
-          }
-        }
-      });
-    },
-    shareGame: function() {
-      postEvent('share_game');
-    }
-  };
-  window.Telegram.Payments = {
-    submitPaymentForm: function (formData) {
-      if (!formData ||
-          !formData.credentials ||
-          formData.credentials.type !== 'card' ||
-          !formData.credentials.token ||
-          !formData.credentials.token.match(/^[A-Za-z0-9\/=_\-]{4,512}$/) ||
-          !formData.title) {
-        console.error('[Telegram.Payments] Invalid form data submitted', formData);
-        throw Error('PaymentFormDataInvalid');
-      }
-      postEvent('payment_form_submit', false, formData);
-    }
-  };
-  window.Telegram.WebApp = {
-    MainButton: MainButton,
-    onEvent: function(eventType, callback) {
-      onWebViewEvent(eventType, callback);
-    },
-    offEvent: function(eventType, callback) {offWebViewEvent(eventType, callback);
-    },
-    sendData: function (data) {
-      if (!data || !data.length) {
-        console.error('[Telegram.WebApp] Data is required', data);
-        throw Error('WebAppDataInvalid');
-      }
-      if (byteLength(data) > 4096) {
-        console.error('[Telegram.WebApp] Data is too long', data);
-        throw Error('WebAppDataInvalid');
-      }
-      postEvent('web_app_data_send', false, {data: data});
-    },
-    ready: function () {
-      postEvent('web_app_ready');
-    },
-    expand: function () {
-      postEvent('web_app_expand');
-    },
-    close: function () {
-      postEvent('web_app_close');
-    }
-  };
-  Object.defineProperty(window.Telegram.WebApp, 'initData', {
-    get: function(){ return webAppData; },
+
+  Object.defineProperty(WebApp, 'initData', {
+    get: function(){ return webAppInitData; },
     enumerable: true
   });
-  Object.defineProperty(window.Telegram.WebApp, 'initDataRaw', {
-    get: function(){ return webAppDataRaw; },
+  Object.defineProperty(WebApp, 'initDataUnsafe', {
+    get: function(){ return webAppInitDataUnsafe; },
     enumerable: true
   });
-  Object.defineProperty(window.Telegram.WebApp, 'colorScheme', {
+  Object.defineProperty(WebApp, 'colorScheme', {
     get: function(){ return colorScheme; },
     enumerable: true
   });
-  Object.defineProperty(window.Telegram.WebApp, 'themeParams', {
+  Object.defineProperty(WebApp, 'themeParams', {
     get: function(){ return themeParams; },
     enumerable: true
   });
-  Object.defineProperty(window.Telegram.WebApp, 'isExpanded', {
+  Object.defineProperty(WebApp, 'isExpanded', {
     get: function(){ return isExpanded; },
     enumerable: true
   });
-  Object.defineProperty(window.Telegram.WebApp, 'viewportHeight', {
+  Object.defineProperty(WebApp, 'viewportHeight', {
     get: function(){ return (viewportHeight === false ? window.innerHeight : viewportHeight) - mainButtonHeight; },
     enumerable: true
   });
-  Object.defineProperty(window.Telegram.WebApp, 'viewportStableHeight', {
+  Object.defineProperty(WebApp, 'viewportStableHeight', {
     get: function(){ return (viewportStableHeight === false ? window.innerHeight : viewportStableHeight) - mainButtonHeight; },
     enumerable: true
   });
+  Object.defineProperty(WebApp, 'MainButton', {
+    value: MainButton,
+    enumerable: true
+  });
+  WebApp.onEvent = function(eventType, callback) {
+    onWebViewEvent(eventType, callback);
+  };
+  WebApp.offEvent = function(eventType, callback) {offWebViewEvent(eventType, callback);
+  };
+  WebApp.sendData = function (data) {
+    if (!data || !data.length) {
+      console.error('[Telegram.WebApp] Data is required', data);
+      throw Error('WebAppDataInvalid');
+    }
+    if (byteLength(data) > 4096) {
+      console.error('[Telegram.WebApp] Data is too long', data);
+      throw Error('WebAppDataInvalid');
+    }
+    WebView.postEvent('web_app_data_send', false, {data: data});
+  };
+  WebApp.ready = function () {
+    WebView.postEvent('web_app_ready');
+  };
+  WebApp.expand = function () {
+    WebView.postEvent('web_app_expand');
+  };
+  WebApp.close = function () {
+    WebView.postEvent('web_app_close');
+  };
+
+  window.Telegram.WebApp = WebApp;
 
   setViewportHeight();
 
   window.addEventListener('resize', onWindowResize);
 
-  onEvent('theme_changed', onThemeChanged);
-  onEvent('viewport_changed', onViewportChanged);
-  postEvent('web_app_request_theme');
-  postEvent('web_app_request_viewport');
-
-  // For Windows Phone app
-  window.TelegramGameProxy_receiveEvent = receiveEvent;
-
-  // Backward compatibility
-  window.TelegramGameProxy = {
-    initParams: initParams,
-    onEvent: onEvent,
-    receiveEvent: receiveEvent,
-    shareScore: window.Telegram.Games.shareScore,
-    paymentFormSubmit: window.Telegram.Payments.submitPaymentForm
-  };
+  WebView.onEvent('theme_changed', onThemeChanged);
+  WebView.onEvent('viewport_changed', onViewportChanged);
+  WebView.postEvent('web_app_request_theme');
+  WebView.postEvent('web_app_request_viewport');
 
 })();
