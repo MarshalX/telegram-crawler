@@ -138,7 +138,7 @@
       widgetsOrigin = getWidgetsOrigin('https://t.me', 'https://post.tg.dev');
       widgetElId = 'telegram-post-' + widgetId.replace(/[^a-z0-9_]/ig, '-') + (comment ? '-comment' + comment : '');
       src = widgetsOrigin + '/' + widgetId + '?embed=1';
-      allowedAttrs = ['comment', 'userpic', 'tme_mode?', 'single?', 'color', 'dark', 'dark_color'];
+      allowedAttrs = ['comment', 'userpic', 'mode', 'single?', 'color', 'dark', 'dark_color'];
       defWidth = widgetEl.getAttribute('data-width') || '100%';
       defHeight = '';
       styles.minWidth = '320px';
