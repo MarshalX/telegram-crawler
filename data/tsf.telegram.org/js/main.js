@@ -384,12 +384,12 @@ function initScrollVideos(desktop) {
 
   var index = 1;
   var tgStickersCnt = document.querySelectorAll('.js-tgsticker_image').length;
-  var preloadVideos = tgStickersCnt ? 0 : 2;
+  var preloadVideos = tgStickersCnt > 1 ? 0 : (tgStickersCnt ? 1 : 2);
   var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   for (var i = 0; i < pageVideos.length; i++) {
     var videoEl = pageVideos[i];
     videoEl.setAttribute('vindex', index++);
-    var preloadValue = i >= preloadVideos ? 'metadata' : 'auto';
+    var preloadValue = i >= preloadVideos ? (isSafari ? 'none' : 'metadata') : 'auto';
     videoEl.setAttribute('preload', preloadValue);
     videoEl.preload = preloadValue;
     if (desktop) {
@@ -407,6 +407,7 @@ function initScrollVideos(desktop) {
       videoEl.parentNode.style.background = "url('" + escapeHTML(posterUrl) +  "') center no-repeat";
       videoEl.parentNode.style.backgroundSize = "cover";
       videoEl.parentNode.style.lineHeight = "0";
+      videoPreloadPosterDimensions(videoEl, posterUrl);
     }
   }
   if (!desktop) {
@@ -449,6 +450,16 @@ function checkScrollVideos() {
       }
     }
   }
+}
+
+function videoPreloadPosterDimensions(videoEl, posterUrl) {
+  var img = new Image();
+  img.onload = function () {
+    if (img.width > 0 && img.height > 0) {
+      videoEl.style.aspectRatio = img.width / img.height;
+    }
+  };
+  img.src = posterUrl;
 }
 
 function isVisibleEnough(boxOffset, boxSize, viewOffset, viewSize, boxThreshold, viewThreshold) {
