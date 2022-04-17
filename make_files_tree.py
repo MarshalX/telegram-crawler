@@ -13,7 +13,7 @@ from typing import List
 
 import aiofiles
 import aiohttp
-from aiohttp import ClientConnectorError
+from aiohttp import ClientConnectorError, ServerDisconnectedError
 
 PROTOCOL = 'https://'
 ILLEGAL_PATH_CHARS = punctuation.replace('.', '') + whitespace
@@ -229,15 +229,15 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
             ) as response:
                 if response.status != 200:
                     logger.debug(f'Resend cuz {response.status}')
-                    return await asyncio.gather(_get_page(offset))
+                    return await _get_page(offset)
 
                 json = await response.json(encoding='UTF-8')
                 if 'more_html' in json and json['more_html']:
                     content.append(json['more_html'])
-                    await asyncio.gather(_get_page(offset + 200))
+                    await _get_page(offset + 200)
         except (TimeoutError, ClientConnectorError):
             logger.warning(f'Client or timeout error. Retrying {url}; offset {offset}')
-            await asyncio.gather(_get_page(offset))
+            await _get_page(offset)
 
     await _get_page(0)
 
@@ -267,7 +267,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
             if response.status // 100 == 5:
                 logger.warning(f'Error 5XX. Retrying {url}')
-                return await asyncio.gather(crawl(url, session))
+                return await crawl(url, session)
 
             if response.status not in {200, 304}:
                 if response.status != 302:
@@ -318,18 +318,19 @@ async def crawl(url: str, session: aiohttp.ClientSession):
 
                 logger.info(f'Write to {filename}')
                 await f.write(content)
-    except (TimeoutError, ClientConnectorError):
+    except (ServerDisconnectedError, TimeoutError, ClientConnectorError):
         logger.warning(f'Client or timeout error. Retrying {url}')
-        await asyncio.gather(crawl(url, session))
+        await crawl(url, session)
 
 
 async def start(url_list: set[str]):
     async with aiohttp.ClientSession(connector=CONNECTOR) as session:
-        await asyncio.gather(*[crawl(url, session) for url in url_list])
-
-        # yeap it will be called each run, and what? ;d
-        await download_telegram_android_beta_and_extract_resources(session)
-        await download_telegram_macos_beta_and_extract_resources(session)
+        await asyncio.gather(
+            *[crawl(url, session) for url in url_list],
+            # yeap it will be called each run, and what? ;d
+            download_telegram_android_beta_and_extract_resources(session),
+            download_telegram_macos_beta_and_extract_resources(session),
+        )
 
 
 if __name__ == '__main__':

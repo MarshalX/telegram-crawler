@@ -71,6 +71,11 @@ CRAWL_RULES = {
             '',  # all
         }
     },
+    'osx.telegram.org': {
+      'deny': {
+          'updates/Telegram'
+      }
+    },
     'bugs.telegram.org': {  # crawl first page of cards sorted by rating
         'deny': {
             # r'/c/[0-9]+/[0-9]+',  # disable comments
@@ -286,7 +291,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             if response.status // 100 == 5:
                 VISITED_LINKS.remove(url)
                 logger.warning(f'Error 5XX. Retrying {url}')
-                return await asyncio.gather(crawl(url, session))
+                return await crawl(url, session)
 
             if response.status not in {200, 304}:
                 if response.status != 302:
@@ -329,7 +334,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
         logger.warning(f'Client or timeout error. Retrying {url}')
         VISITED_LINKS.remove(url)
         # sleep + count of attempts?
-        await asyncio.gather(crawl(url, session))
+        await crawl(url, session)
 
 
 async def start(url_list: set[str]):
