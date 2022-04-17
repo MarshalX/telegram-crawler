@@ -72,7 +72,7 @@ async def main():
 
             changes[file['status']].append(f'{status} <code>{changed_url}</code>')
 
-        alert_text = f'<b>New changes on Telegram sites</b>\n\n'
+        alert_text = f'<b>New changes of Telegram</b>\n\n'
 
         for i, [status, text_list] in enumerate(changes.items()):
             if not text_list:

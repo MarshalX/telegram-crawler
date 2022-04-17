@@ -23,6 +23,8 @@ HIDDEN_URLS = {
     'telegram.org/evolution',
 
     'desktop.telegram.org/changelog',
+    'td.telegram.org/current',
+    'td.telegram.org/current2',
 
     'osx.telegram.org/updates/versions.xml',    # stable
     'api.appcenter.ms/v0.1/public/sparkle/apps/6ed2ac30-49e1-4073-87c2-f1ffcb74e81f',   # beta
@@ -35,9 +37,6 @@ HIDDEN_URLS = {
 
     'core.telegram.org/video_stickers',
     'core.telegram.org/stickers',
-
-    # temp
-    'telegram.org/blog/video-stickers-better-reactions',
 
     'promote.telegram.org',
     'contest.com',
@@ -112,6 +111,7 @@ CRAWL_RULES = {
     'telegram.org': {
         'deny': {
             r'apps$',
+            r'img/StickerExample.psd$',
         },
     },
     'webz.telegram.org': {
@@ -231,6 +231,7 @@ def cleanup_links(links: set[str]) -> set[str]:
         link = link.replace('www.', '')
         link = link.replace('http://', '').replace('https://', '')
         link = link.replace('//', '/')  # not a universal solution
+        link = link.replace('"', '')  # regex fix hack
 
         # skip anchor links
         if '#' in link:
@@ -262,6 +263,7 @@ def is_trackable_content_type(content_type) -> bool:
         'gif',
         'mp4',
         'webm',
+        'application/octet-stream',    # td updates
     )
 
     for trackable_content_type in trackable_content_types:
@@ -321,11 +323,12 @@ async def crawl(url: str, session: aiohttp.ClientSession):
                 LINKS_TO_TRACK.remove(f'{without_trailing_slash}/')
     except UnicodeDecodeError:
         logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
-    except ClientConnectorError:
-        logger.warning(f'Wrong link: {url}')
-    except (ServerDisconnectedError, TimeoutError):
+    # except ClientConnectorError:
+    #     logger.warning(f'Wrong link: {url}')
+    except (ServerDisconnectedError, TimeoutError, ClientConnectorError):
         logger.warning(f'Client or timeout error. Retrying {url}')
         VISITED_LINKS.remove(url)
+        # sleep + count of attempts?
         await asyncio.gather(crawl(url, session))
 
 
