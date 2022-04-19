@@ -652,6 +652,16 @@ function mainDemoVideoDoHover(videoLinkEl, isHover) {
   }
 }
 
+function mainInitLogo(logo_url) {
+  var img = new Image();
+  img.onload = function() {
+    var logo = document.querySelector('div.tl_main_logo');
+    logo.style.backgroundImage = 'url(\'' + logo_url + '\')';
+    logo.classList.add('play');
+  };
+  img.src = logo_url;
+}
+
 function mainInitTgStickers(options) {
   options = options || {};
   if (!RLottie.isSupported) {
