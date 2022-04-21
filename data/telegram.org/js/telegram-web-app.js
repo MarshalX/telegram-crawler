@@ -9,7 +9,7 @@
 
   var initParams = urlParseHashParams(locationHash);
 
-  var isIframe = false;
+  var isIframe = false, iFrameStyle;
   try {
     isIframe = (window.parent != null && window != window.parent);
     if (isIframe) {
@@ -23,8 +23,17 @@
         if (!dataParsed || !dataParsed.eventType) {
           return;
         }
-        receiveEvent(dataParsed.eventType, dataParsed.eventData);
+        if (dataParsed.eventType == 'set_custom_style') {
+          iFrameStyle.innerHTML = dataParsed.eventData;
+        } else {
+          receiveEvent(dataParsed.eventType, dataParsed.eventData);
+        }
       });
+      iFrameStyle = document.createElement('style');
+      document.head.appendChild(iFrameStyle);
+      try {
+        window.parent.postMessage(JSON.stringify({eventType: 'iframe_ready'}), '*');
+      } catch (e) {}
     }
   } catch (e) {}
 
