@@ -265,6 +265,7 @@ def is_hashable_only_content_type(content_type) -> bool:
         'gif',
         'mp4',
         'webm',
+        'application/zip',
     )
 
     for hashable_only_content_type in hashable_only_content_types:

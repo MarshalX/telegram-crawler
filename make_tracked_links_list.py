@@ -45,6 +45,8 @@ HIDDEN_URLS = {
     'comments.app/test_webview',    # old
     'webappcontent.telegram.org/demo',  # new
     'webappcontent.telegram.org/cafe',  # demo 2
+    'a-webappcontent.stel.com/demo',
+    'a-webappcontent.stel.com/cafe',
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl',
@@ -84,8 +86,6 @@ CRAWL_RULES = {
     },
     'instantview.telegram.org': {
         'deny': {
-            'file/',
-
             r'templates/.+',
             'samples/',
             'contest',
@@ -93,8 +93,6 @@ CRAWL_RULES = {
     },
     'core.telegram.org': {
         'deny': {
-            'file/',
-
             'bots/payments',
 
             'tdlib/docs/classtd',
@@ -104,8 +102,6 @@ CRAWL_RULES = {
     },
     'corefork.telegram.org': {
         'deny': {
-            'file/',
-
             'bots/payments',
 
             'tdlib/docs/classtd',
@@ -269,6 +265,7 @@ def is_trackable_content_type(content_type) -> bool:
         'mp4',
         'webm',
         'application/octet-stream',    # td updates
+        'application/zip',
     )
 
     for trackable_content_type in trackable_content_types:
