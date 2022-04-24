@@ -45,7 +45,7 @@ SPARKLE_SE_TEMPLATE = f';se={DYNAMIC_PART_MOCK};'
 CONNECTOR = aiohttp.TCPConnector(ssl=False)
 TIMEOUT = aiohttp.ClientTimeout(total=10)
 
-logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -257,6 +257,59 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
     return '\n'.join(content)
 
 
+async def track_mtproto_configs():
+    import json
+    from pyrogram import Client
+    from pyrogram.raw import functions
+
+    app = Client(
+        os.environ['TELEGRAM_SESSION'],
+        api_id=int(os.environ['TELEGRAM_API_ID']),
+        api_hash=os.environ['TELEGRAM_API_HASH'],
+    )
+    await app.start()
+
+    configs = {
+        'GetConfig': await app.send(functions.help.GetConfig()),
+        'GetCdnConfig': await app.send(functions.help.GetCdnConfig()),
+        # 'GetInviteText': await app.send(functions.help.GetInviteText()),
+        # 'GetSupport': await app.send(functions.help.GetSupport()),
+        # 'GetSupportName': await app.send(functions.help.GetSupportName()),
+        # 'GetPassportConfig': await app.send(functions.help.GetPassportConfig(hash=0)),
+        'GetCountriesList': await app.send(functions.help.GetCountriesList(lang_code='en', hash=0)),
+        'GetAppConfig': await app.send(functions.help.GetAppConfig()),
+        # 'GetAppUpdate': await app.send(functions.help.GetAppUpdate(source='')),
+   }
+
+    keys_to_hide = {'access_hash', 'autologin_token', 'file_reference_base64'}
+
+    def rem_rec(config):
+        for key, value in config.items():
+            if isinstance(value, dict):
+                rem_rec(value)
+            elif isinstance(value, list):
+                for item in value:
+                    rem_rec(item)
+            elif key == 'key' and value in keys_to_hide:
+                config['value']['value'] = 'crawler'
+
+    configs['GetAppConfig'] = json.loads(str(configs['GetAppConfig']))
+    rem_rec(configs['GetAppConfig'])
+    configs['GetAppConfig'] = json.dumps(configs['GetAppConfig'], indent=4)
+
+    configs['GetConfig'].date = 0
+    configs['GetConfig'].expires = 0
+
+    output_dir_name = 'telegram-mtproto'
+    for file, content in configs.items():
+        filename = os.path.join(OUTPUT_FOLDER, output_dir_name, f'{file}.json')
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        async with aiofiles.open(filename, 'w', encoding='utf-8') as w_file:
+            await w_file.write(str(content))
+
+    await app.stop()
+
+
 def is_hashable_only_content_type(content_type) -> bool:
     hashable_only_content_types = (
         'png',
@@ -348,10 +401,12 @@ async def start(url_list: set[str], mode: int):
             *[crawl(url, session) for url in url_list],
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
+            track_mtproto_configs(),
         )
         mode == 1 and await asyncio.gather(*[crawl(url, session) for url in url_list])
         mode == 2 and await download_telegram_android_beta_and_extract_resources(session)
         mode == 3 and await download_telegram_macos_beta_and_extract_resources(session)
+        mode == 4 and await track_mtproto_configs()
 
 
 if __name__ == '__main__':
