@@ -45,8 +45,8 @@ HIDDEN_URLS = {
     'comments.app/test_webview',    # old
     'webappcontent.telegram.org/demo',  # new
     'webappcontent.telegram.org/cafe',  # demo 2
-    'a-webappcontent.stel.com/demo',
-    'a-webappcontent.stel.com/cafe',
+    # 'a-webappcontent.stel.com/demo',
+    # 'a-webappcontent.stel.com/cafe',
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl',
