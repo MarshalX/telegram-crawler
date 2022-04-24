@@ -299,6 +299,7 @@ async def track_mtproto_configs():
 
     configs['GetConfig'].date = 0
     configs['GetConfig'].expires = 0
+    configs['GetConfig'].dc_options = []
 
     output_dir_name = 'telegram-mtproto'
     for file, content in configs.items():
