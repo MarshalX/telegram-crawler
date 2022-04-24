@@ -4,6 +4,7 @@ import os
 import platform
 import re
 import shutil
+import sys
 import zipfile
 import hashlib
 from asyncio.exceptions import TimeoutError
@@ -57,8 +58,10 @@ async def download_file(url, path, session):
         if response.status != 200:
             return
 
-        async with aiofiles.open(path, mode='wb') as f:
-            await f.write(await response.read())
+        content = await response.read()
+
+    async with aiofiles.open(path, mode='wb') as f:
+        await f.write(content)
 
 
 async def get_download_link_of_latest_appcenter_release(parameterized_url: str, session: aiohttp.ClientSession):
@@ -88,25 +91,25 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
 async def track_additional_files(
         files_to_track: List[str], input_dir_name: str, output_dir_name: str, encoding='utf-8', save_hash_only=False
 ):
+    kwargs = {'mode': 'r', 'encoding': encoding}
+    if save_hash_only:
+        kwargs['mode'] = 'rb'
+        del kwargs['encoding']
+
     for file in files_to_track:
+        async with aiofiles.open(os.path.join(input_dir_name, file), **kwargs) as r_file:
+            content = await r_file.read()
+
+        if save_hash_only:
+            content = get_hash(content)
+        else:
+            content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
+            content = re.sub(r'name="APKTOOL_DUMMY_.*" id', 'name="tgcrawl" id', content)
+
         filename = os.path.join(OUTPUT_FOLDER, output_dir_name, file)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         async with aiofiles.open(filename, 'w', encoding='utf-8') as w_file:
-            kwargs = {'mode': 'r', 'encoding': encoding}
-            if save_hash_only:
-                kwargs['mode'] = 'rb'
-                del kwargs['encoding']
-
-            async with aiofiles.open(os.path.join(input_dir_name, file), **kwargs) as r_file:
-                content = await r_file.read()
-
-                if save_hash_only:
-                    await w_file.write(get_hash(content))
-                    continue
-
-                content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
-                content = re.sub(r'name="APKTOOL_DUMMY_.*" id', 'name="tgcrawl" id', content)
-                await w_file.write(content)
+            await w_file.write(content)
 
 
 async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.ClientSession):
@@ -120,7 +123,20 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
     client_folder_name = 'macos'
     client_archive_name = 'macos.zip'
 
-    await download_file(download_url, client_archive_name, session)
+    assets_output_dir = 'macos_assets'
+    assets_filename = 'Assets.car'
+    assets_extractor = 'acextract'
+    tool_archive_name = f'{assets_extractor}.zip'
+
+    tool_download_url = 'https://github.com/bartoszj/acextract/releases/download/2.2/acextract.zip'
+
+    if 'darwin' not in platform.system().lower():
+        await download_file(download_url, client_archive_name, session)
+    else:
+        await asyncio.gather(
+            download_file(download_url, client_archive_name, session),
+            download_file(tool_download_url, tool_archive_name, session),
+        )
 
     # synced
     with zipfile.ZipFile(client_archive_name, 'r') as f:
@@ -144,14 +160,6 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
     if 'darwin' not in platform.system().lower():
         cleanup1()
         return
-
-    assets_output_dir = 'macos_assets'
-    assets_extractor = 'acextract'
-    assets_filename = 'Assets.car'
-    tool_archive_name = f'{assets_extractor}.zip'
-
-    download_url = 'https://github.com/bartoszj/acextract/releases/download/2.2/acextract.zip'
-    await download_file(download_url, tool_archive_name, session)
 
     # synced
     with zipfile.ZipFile(tool_archive_name, 'r') as f:
@@ -191,8 +199,10 @@ async def download_telegram_android_beta_and_extract_resources(session: aiohttp.
     if not download_url:
         return
 
-    await download_file('https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar', 'tool.apk', session)
-    await download_file(download_url, 'android.apk', session)
+    await asyncio.gather(
+        download_file('https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar', 'tool.apk', session),
+        download_file(download_url, 'android.apk', session),
+    )
 
     def cleanup():
         os.path.isdir('android') and shutil.rmtree('android')
@@ -224,17 +234,20 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
         data = {'offset': offset, 'more': 1}
 
         try:
+            new_offset = None
             async with session.post(
                     f'{PROTOCOL}{url}', data=data, headers=headers, allow_redirects=False, timeout=TIMEOUT
             ) as response:
                 if response.status != 200:
                     logger.debug(f'Resend cuz {response.status}')
-                    return await _get_page(offset)
+                    new_offset = offset
+                else:
+                    json = await response.json(encoding='UTF-8')
+                    if 'more_html' in json and json['more_html']:
+                        content.append(json['more_html'])
+                        new_offset = offset + 200
 
-                json = await response.json(encoding='UTF-8')
-                if 'more_html' in json and json['more_html']:
-                    content.append(json['more_html'])
-                    await _get_page(offset + 200)
+            new_offset and await _get_page(new_offset)
         except (TimeoutError, ClientConnectorError):
             logger.warning(f'Client or timeout error. Retrying {url}; offset {offset}')
             await _get_page(offset)
@@ -261,13 +274,18 @@ def is_hashable_only_content_type(content_type) -> bool:
     return False
 
 
+class RetryError(Exception):
+    ...
+
+
 async def crawl(url: str, session: aiohttp.ClientSession):
     try:
         logger.info(f'Process {url}')
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
             if response.status // 100 == 5:
-                logger.warning(f'Error 5XX. Retrying {url}')
-                return await crawl(url, session)
+                msg = f'Error 5XX. Retrying {url}'
+                logger.warning(msg)
+                raise RetryError(msg)
 
             if response.status not in {200, 304}:
                 if response.status != 302:
@@ -306,16 +324,16 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
                 content = await collect_translations_paginated_content(url, session)
 
-            async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
-                content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
-                content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
-                content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
-                content = re.sub(NONCE_REGEX, NONCE_TEMPLATE, content)
-                content = re.sub(PROXY_CONFIG_SUB_NET_REGEX, PROXY_CONFIG_SUB_NET_TEMPLATE, content)
-                content = re.sub(TRANSLATE_SUGGESTION_REGEX, '', content)
-                content = re.sub(SPARKLE_SIG_REGEX, SPARKLE_SIG_TEMPLATE, content)
-                content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
+            content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
+            content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
+            content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
+            content = re.sub(NONCE_REGEX, NONCE_TEMPLATE, content)
+            content = re.sub(PROXY_CONFIG_SUB_NET_REGEX, PROXY_CONFIG_SUB_NET_TEMPLATE, content)
+            content = re.sub(TRANSLATE_SUGGESTION_REGEX, '', content)
+            content = re.sub(SPARKLE_SIG_REGEX, SPARKLE_SIG_TEMPLATE, content)
+            content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
 
+            async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
                 logger.info(f'Write to {filename}')
                 await f.write(content)
     except (ServerDisconnectedError, TimeoutError, ClientConnectorError):
@@ -323,21 +341,25 @@ async def crawl(url: str, session: aiohttp.ClientSession):
         await crawl(url, session)
 
 
-async def start(url_list: set[str]):
+async def start(url_list: set[str], mode: int):
     async with aiohttp.ClientSession(connector=CONNECTOR) as session:
-        await asyncio.gather(
+        mode == 0 and await asyncio.gather(
             *[crawl(url, session) for url in url_list],
-            # yeap it will be called each run, and what? ;d
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
         )
+        mode == 1 and await asyncio.gather(*[crawl(url, session) for url in url_list])
+        mode == 2 and await download_telegram_android_beta_and_extract_resources(session)
+        mode == 3 and await download_telegram_macos_beta_and_extract_resources(session)
 
 
 if __name__ == '__main__':
+    run_mode = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+
     with open(INPUT_FILENAME, 'r') as f:
         tracked_urls = set([l.replace('\n', '') for l in f.readlines()])
 
-    logger.info(f'Start crawling content of {len(tracked_urls)} tracked urls...')
     start_time = time()
-    asyncio.get_event_loop().run_until_complete(start(tracked_urls))
-    logger.info(f'Stop crawling content. {time() - start_time} sec.')
+    logger.info(f'Start crawling content of {len(tracked_urls)} tracked urls...')
+    asyncio.get_event_loop().run_until_complete(start(tracked_urls, run_mode))
+    logger.info(f'Stop crawling content in mode {run_mode}. {time() - start_time} sec.')
