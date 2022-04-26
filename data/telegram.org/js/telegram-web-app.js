@@ -224,6 +224,7 @@
   }
   window.Telegram.WebView = {
     initParams: initParams,
+    isIframe: isIframe,
     onEvent: onEvent,
     offEvent: offEvent,
     postEvent: postEvent,
@@ -252,10 +253,12 @@
   var Utils = window.Telegram.Utils;
   var WebView = window.Telegram.WebView;
   var initParams = WebView.initParams;
+  var isIframe = WebView.isIframe;
 
   var WebApp = {};
   var webAppInitData = '', webAppInitDataUnsafe = {};
   var themeParams = {}, colorScheme = 'light';
+  var webAppVersion = '1.0';
 
   if (initParams.tgWebAppData && initParams.tgWebAppData.length) {
     webAppInitData = initParams.tgWebAppData;
@@ -276,6 +279,9 @@
       var theme_params = JSON.parse(themeParamsRaw);
       setThemeParams(theme_params);
     } catch (e) {}
+  }
+  if (initParams.tgWebAppVersion) {
+    webAppVersion = initParams.tgWebAppVersion;
   }
 
   function onThemeChanged(eventType, eventData) {
@@ -302,6 +308,20 @@
       receiveWebViewEvent('viewportChanged', {
         isStateStable: true
       });
+    }
+  }
+
+  function linkHandler(e) {
+    if (e.metaKey || e.ctrlKey) return;
+    var el = e.target;
+    while (el.tagName != 'A' && el.parentNode) {
+      el = el.parentNode;
+    }
+    if (el.tagName == 'A' &&
+        el.target != '_blank' &&
+        (el.protocol == 'http:' || el.protocol == 'https:') &&
+        el.hostname == 't.me') {
+      WebApp.openTgLink(el.href);
     }
   }
 
@@ -393,6 +413,26 @@
     var b = parseInt(rgb.substr(4, 2), 16);
     var hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
     return hsp < 120;
+  }
+
+  function versionCompare(v1, v2) {
+    if (typeof v1 !== 'string') v1 = '';
+    if (typeof v2 !== 'string') v2 = '';
+    v1 = v1.replace(/^\s+|\s+$/g, '').split('.');
+    v2 = v2.replace(/^\s+|\s+$/g, '').split('.');
+    var a = Math.max(v1.length, v2.length), i, p1, p2;
+    for (i = 0; i < a; i++) {
+      p1 = parseInt(v1[i]) || 0;
+      p2 = parseInt(v2[i]) || 0;
+      if (p1 == p2) continue;
+      if (p1 > p2) return 1;
+      return -1;
+    }
+    return 0;
+  }
+
+  function versionAtLeast(ver) {
+    return versionCompare(webAppVersion, ver) >= 0;
   }
 
   function byteLength(str) {
@@ -652,6 +692,10 @@
     get: function(){ return webAppInitDataUnsafe; },
     enumerable: true
   });
+  Object.defineProperty(WebApp, 'version', {
+    get: function(){ return webAppVersion; },
+    enumerable: true
+  });
   Object.defineProperty(WebApp, 'colorScheme', {
     get: function(){ return colorScheme; },
     enumerable: true
@@ -676,6 +720,9 @@
     value: MainButton,
     enumerable: true
   });
+  WebApp.isVersionAtLeast = function(ver) {
+    return versionAtLeast(ver);
+  };
   WebApp.onEvent = function(eventType, callback) {
     onWebViewEvent(eventType, callback);
   };
@@ -692,6 +739,26 @@
     }
     WebView.postEvent('web_app_data_send', false, {data: data});
   };
+  WebApp.openTgLink = function (url) {
+    var a = document.createElement('A');
+    a.href = url;
+    if (a.protocol != 'http:' &&
+        a.protocol != 'https:') {
+      console.error('[Telegram.WebApp] Url protocol is not supported', url);
+      throw Error('WebAppTgUrlInvalid');
+    }
+    if (a.hostname != 't.me') {
+      console.error('[Telegram.WebApp] Url host is not supported', url);
+      throw Error('WebAppTgUrlInvalid');
+    }
+    var path_full = a.pathname + a.search;
+    if (WebApp.isIframe ||
+        versionAtLeast('1.1')) {
+      WebView.postEvent('open_tg_link', false, {path_full: path_full});
+    } else {
+      location.href = 'https://t.me' + path_full;
+    }
+  };
   WebApp.ready = function () {
     WebView.postEvent('web_app_ready');
   };
@@ -707,6 +774,9 @@
   setViewportHeight();
 
   window.addEventListener('resize', onWindowResize);
+  if (isIframe) {
+    document.addEventListener('click', linkHandler);
+  }
 
   WebView.onEvent('theme_changed', onThemeChanged);
   WebView.onEvent('viewport_changed', onViewportChanged);
