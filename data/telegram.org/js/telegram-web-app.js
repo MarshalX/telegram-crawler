@@ -322,6 +322,7 @@
         (el.protocol == 'http:' || el.protocol == 'https:') &&
         el.hostname == 't.me') {
       WebApp.openTgLink(el.href);
+      e.preventDefault();
     }
   }
 
@@ -752,8 +753,7 @@
       throw Error('WebAppTgUrlInvalid');
     }
     var path_full = a.pathname + a.search;
-    if (WebApp.isIframe ||
-        versionAtLeast('1.1')) {
+    if (isIframe || versionAtLeast('1.1')) {
       WebView.postEvent('web_app_open_tg_link', false, {path_full: path_full});
     } else {
       location.href = 'https://t.me' + path_full;
