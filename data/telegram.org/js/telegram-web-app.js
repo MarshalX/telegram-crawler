@@ -449,6 +449,8 @@
       enumerable: true
     });
 
+    var curButtonState = null;
+
     WebView.onEvent('main_button_pressed', onMainButtonPressed);
 
     var debugBtn = null, debugBtnStyle = {};
@@ -487,38 +489,63 @@
       }
     }
 
-    function updateButton() {
+    function buttonParams() {
       var color = mainButton.color;
       var text_color = mainButton.textColor;
-      WebView.postEvent('web_app_setup_main_button', false, isVisible ? {
+      return isVisible ? {
         is_visible: true,
         is_active: isActive,
         is_progress_visible: isProgressVisible,
         text: buttonText,
         color: color,
         text_color: text_color
-      } : {is_visible: false});
-      if (initParams.tgWebAppDebug) {
-        debugBtn.style.display = isVisible ? 'block' : 'none';
-        debugBtn.style.opacity = isActive ? '1' : '0.8';
-        debugBtn.style.cursor = isActive ? 'pointer' : 'auto';
-        debugBtn.disabled = !isActive;
-        debugBtn.innerText = buttonText;
-        debugBtn.style.backgroundImage = isProgressVisible ? "url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20viewport%3D%220%200%2048%2048%22%20width%3D%2248px%22%20height%3D%2248px%22%3E%3Ccircle%20cx%3D%2250%25%22%20cy%3D%2250%25%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.25%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%20stroke-dashoffset%3D%22106%22%20r%3D%229%22%20stroke-dasharray%3D%2256.52%22%20rotate%3D%22-90%22%3E%3Canimate%20attributeName%3D%22stroke-dashoffset%22%20attributeType%3D%22XML%22%20dur%3D%22360s%22%20from%3D%220%22%20to%3D%2212500%22%20repeatCount%3D%22indefinite%22%3E%3C%2Fanimate%3E%3CanimateTransform%20attributeName%3D%22transform%22%20attributeType%3D%22XML%22%20type%3D%22rotate%22%20dur%3D%221s%22%20from%3D%22-90%2024%2024%22%20to%3D%22630%2024%2024%22%20repeatCount%3D%22indefinite%22%3E%3C%2FanimateTransform%3E%3C%2Fcircle%3E%3C%2Fsvg%3E')" : 'none';
-        debugBtn.style.backgroundColor = color;
-        debugBtn.style.color = text_color;
+      } : {is_visible: false};
+    }
 
-        mainButtonHeight = (isVisible ? 48 : 0);
-        if (document.documentElement) {
-          document.documentElement.style.boxSizing = 'border-box';
-          document.documentElement.style.paddingBottom = mainButtonHeight + 'px';
-        }
-        setViewportHeight();
+    function buttonState(btn_params) {
+      if (typeof btn_params === 'undefined') {
+        btn_params = buttonParams();
+      }
+      return JSON.stringify(btn_params);
+    }
+
+    function updateButton() {
+      var btn_params = buttonParams();
+      var btn_state = buttonState(btn_params);
+      if (curButtonState === btn_state) {
+        return;
+      }
+      curButtonState = btn_state;
+      WebView.postEvent('web_app_setup_main_button', false, btn_params);
+      if (initParams.tgWebAppDebug) {
+        updateDebugButton(btn_params);
       }
     }
 
+    function updateDebugButton(btn_params) {
+      if (btn_params.is_visible) {
+        debugBtn.style.display = 'block';
+        mainButtonHeight = 48;
+
+        debugBtn.style.opacity = btn_params.is_active ? '1' : '0.8';
+        debugBtn.style.cursor = btn_params.is_active ? 'pointer' : 'auto';
+        debugBtn.disabled = !btn_params.is_active;
+        debugBtn.innerText = btn_params.text;
+        debugBtn.style.backgroundImage = btn_params.is_progress_visible ? "url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20viewport%3D%220%200%2048%2048%22%20width%3D%2248px%22%20height%3D%2248px%22%3E%3Ccircle%20cx%3D%2250%25%22%20cy%3D%2250%25%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.25%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%20stroke-dashoffset%3D%22106%22%20r%3D%229%22%20stroke-dasharray%3D%2256.52%22%20rotate%3D%22-90%22%3E%3Canimate%20attributeName%3D%22stroke-dashoffset%22%20attributeType%3D%22XML%22%20dur%3D%22360s%22%20from%3D%220%22%20to%3D%2212500%22%20repeatCount%3D%22indefinite%22%3E%3C%2Fanimate%3E%3CanimateTransform%20attributeName%3D%22transform%22%20attributeType%3D%22XML%22%20type%3D%22rotate%22%20dur%3D%221s%22%20from%3D%22-90%2024%2024%22%20to%3D%22630%2024%2024%22%20repeatCount%3D%22indefinite%22%3E%3C%2FanimateTransform%3E%3C%2Fcircle%3E%3C%2Fsvg%3E')" : 'none';
+        debugBtn.style.backgroundColor = btn_params.color;
+        debugBtn.style.color = btn_params.text_color;
+      } else {
+        debugBtn.style.display = 'none';
+        mainButtonHeight = 0;
+      }
+      if (document.documentElement) {
+        document.documentElement.style.boxSizing = 'border-box';
+        document.documentElement.style.paddingBottom = mainButtonHeight + 'px';
+      }
+      setViewportHeight();
+    }
+
     function setParams(params) {
-      var changed = false;
       if (typeof params.text !== 'undefined') {
         var text = params.text.toString().replace(/^\s+|\s+$/g, '');
         if (!text.length) {
@@ -529,17 +556,11 @@
           console.error('[Telegram.WebApp] Main button text is too long', text);
           throw Error('WebAppMainButtonParamInvalid');
         }
-        if (buttonText !== text) {
-          changed = true;
-        }
         buttonText = text;
       }
       if (typeof params.color !== 'undefined') {
         if (params.color === false ||
             params.color === null) {
-          if (buttonColor !== false) {
-            changed = true;
-          }
           buttonColor = false;
         } else {
           var color = parseColorToHex(params.color);
@@ -547,27 +568,18 @@
             console.error('[Telegram.WebApp] Main button color format is invalid', color);
             throw Error('WebAppMainButtonParamInvalid');
           }
-          if (buttonColor !== color) {
-            changed = true;
-          }
           buttonColor = color;
         }
       }
       if (typeof params.text_color !== 'undefined') {
         if (params.text_color === false ||
             params.text_color === null) {
-          if (buttonTextColor !== false) {
-            changed = true;
-          }
           buttonTextColor = false;
         } else {
           var text_color = parseColorToHex(params.text_color);
           if (!text_color) {
             console.error('[Telegram.WebApp] Main button text color format is invalid', text_color);
             throw Error('WebAppMainButtonParamInvalid');
-          }
-          if (buttonTextColor !== text_color) {
-            changed = true;
           }
           buttonTextColor = text_color;
         }
@@ -578,20 +590,12 @@
           console.error('[Telegram.WebApp] Main button text is required');
           throw Error('WebAppMainButtonParamInvalid');
         }
-        if (isVisible !== !!params.is_visible) {
-          changed = true;
-        }
         isVisible = !!params.is_visible;
       }
       if (typeof params.is_active !== 'undefined') {
-        if (isActive !== !!params.is_active) {
-          changed = true;
-        }
         isActive = !!params.is_active;
       }
-      if (changed || params.force_update) {
-        updateButton();
-      }
+      updateButton();
       return mainButton;
     }
 
