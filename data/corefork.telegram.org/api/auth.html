@@ -54,14 +54,14 @@ The <a href="/constructor/help.countriesList">help.countriesList</a> config is t
 However, this is not always the case, if logout tokens are used:  </p>
 <h4><a class="anchor" href="#logout-tokens" id="logout-tokens" name="logout-tokens"><i class="anchor-icon"></i></a>Logout tokens</h4>
 <p>When invoking <a href="/method/auth.logOut">auth.logOut</a> on a previously authorized session with 2FA enabled, the server may return a <code>future_auth_token</code>, which should be stored in the local database.<br>
-At all times, the logout token database should contain at most <code>20</code> tokens: evict older tokens as new tokens are added.<br>
+At all times, the logout token database should contain at most 20 tokens: evict older tokens as new tokens are added.<br>
 When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all logout tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
 If any of the logout tokens matches the account we're trying to login into and the token hasn't expired, <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </p>
 <p>Otherwise, the system will send an authorization code using the following logic:</p>
 <h4><a class="anchor" href="#code-types" id="code-types" name="code-types"><i class="anchor-icon"></i></a>Code types</h4>
 <p>The system will automatically choose how to send the authorization code; there are multiple possible ways the code can arrive:</p>
 <ul>
-<li><a href="/constructor/auth.loggedOut">Logout tokens</a>:  </li>
+<li><a href="/constructor/auth.loggedOut">Logout tokens »</a></li>
 <li><a href="/constructor/auth.sentCodeTypeApp">Telegram code</a></li>
 <li><a href="/constructor/auth.sentCodeTypeSms">SMS code</a></li>
 <li><a href="/constructor/auth.sentCodeTypeCall">Phone call</a>: a synthesized voice will tell the user which verification code to input.</li>
