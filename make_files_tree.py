@@ -335,6 +335,10 @@ class RetryError(Exception):
 
 async def crawl(url: str, session: aiohttp.ClientSession):
     try:
+        # f*ck this shit. I believe it's temp solution
+        if 'css/telegram.css' in url:
+            return
+
         logger.info(f'Process {url}')
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
             if response.status // 100 == 5:
