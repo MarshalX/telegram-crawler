@@ -261,6 +261,7 @@ async def track_mtproto_configs():
     import json
     from pyrogram import Client
     from pyrogram.raw import functions
+    from pyrogram.raw.types import InputStickerSetAnimatedEmoji
 
     app = Client(
         os.environ['TELEGRAM_SESSION'],
@@ -279,11 +280,17 @@ async def track_mtproto_configs():
         'GetCountriesList': await app.send(functions.help.GetCountriesList(lang_code='en', hash=0)),
         'GetAppConfig': await app.send(functions.help.GetAppConfig()),
         # 'GetAppUpdate': await app.send(functions.help.GetAppUpdate(source='')),
+        'AnimatedEmoji': await app.send(
+            functions.messages.GetStickerSet(stickerset=InputStickerSetAnimatedEmoji(), hash=0)
+        ),
    }
 
-    keys_to_hide = {'access_hash', 'autologin_token', 'file_reference_base64'}
+    keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64'}
 
     def rem_rec(config):
+        if not isinstance(config, dict):
+            return
+
         for key, value in config.items():
             if isinstance(value, dict):
                 rem_rec(value)
@@ -292,10 +299,13 @@ async def track_mtproto_configs():
                     rem_rec(item)
             elif key == 'key' and value in keys_to_hide:
                 config['value']['value'] = 'crawler'
+            elif key in keys_to_hide:
+                config[key] = 'crawler'
 
-    configs['GetAppConfig'] = json.loads(str(configs['GetAppConfig']))
-    rem_rec(configs['GetAppConfig'])
-    configs['GetAppConfig'] = json.dumps(configs['GetAppConfig'], indent=4)
+    for config_name in {'GetAppConfig', 'AnimatedEmoji'}:
+        configs[config_name] = json.loads(str(configs[config_name]))
+        rem_rec(configs[config_name])
+        configs[config_name] = json.dumps(configs[config_name], indent=4)
 
     configs['GetConfig'].date = 0
     configs['GetConfig'].expires = 0
