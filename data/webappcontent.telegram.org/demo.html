@@ -99,6 +99,9 @@
       .err {
         color: red;
       }
+      .status_need {
+        display: none;
+      }
       #fixed_wrap {
         position: fixed;
         left: 0;
@@ -184,7 +187,7 @@
       <pre><code id="webview_data"></code></pre>
       <div class="hint">
         Data passed to webview.
-        <span id="webview_data_status" style="display: none;">Checking hash...</span>
+        <span id="webview_data_status" class="status_need">Checking hash...</span>
       </div>
       <pre><code id="theme_data"></code></pre>
       <div class="hint">
@@ -345,21 +348,21 @@ $('#webview_data').html(JSON.stringify(initDataUnsafe, null, 2));
 $('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
 $('#regular_link').attr('href', $('#regular_link').attr('href') + location.hash);
 $('#text_field').focus();
-if (initDataUnsafe.query_id && initData) {
-  $('#webview_data_status').show();
+if (initDataUnsafe.query_id && initData && $('#webview_data_status').hasClass('status_need')) {
+  $('#webview_data_status').removeClass('status_need');
   $.ajax('/demo/checkData', {
     type: 'POST',
     data: {_auth: initData},
     dataType: 'json',
     success: function(result) {
       if (result.ok) {
-        $('#webview_data_status').html('Hash is correct').addClass('ok');
+        $('#webview_data_status').html('Hash is correct (async)').addClass('ok');
       } else {
-        $('#webview_data_status').html(result.error).addClass('err');
+        $('#webview_data_status').html(result.error + ' (async)').addClass('err');
       }
     },
     error: function(xhr) {
-      $('#webview_data_status').html('Server error').addClass('err');
+      $('#webview_data_status').html('Server error (async)').addClass('err');
     }
   });
 }
