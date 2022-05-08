@@ -126,16 +126,15 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
     assets_output_dir = 'macos_assets'
     assets_filename = 'Assets.car'
     assets_extractor = 'acextract'
-    tool_archive_name = f'{assets_extractor}.zip'
 
-    tool_download_url = 'https://github.com/bartoszj/acextract/releases/download/2.2/acextract.zip'
+    tool_download_url = 'https://github.com/MarshalX/acextract/releases/download/3.0/acextract'
 
     if 'darwin' not in platform.system().lower():
         await download_file(download_url, client_archive_name, session)
     else:
         await asyncio.gather(
             download_file(download_url, client_archive_name, session),
-            download_file(tool_download_url, tool_archive_name, session),
+            download_file(tool_download_url, assets_extractor, session),
         )
 
     # synced
@@ -161,21 +160,15 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
         cleanup1()
         return
 
-    # synced
-    with zipfile.ZipFile(tool_archive_name, 'r') as f:
-        f.extractall(assets_extractor)
-
     path_to_car = os.path.join(client_folder_name, resources_path, assets_filename)
-    path_to_extractor = os.path.join(assets_extractor, assets_extractor)
-    await (await asyncio.create_subprocess_exec('chmod', '+x', path_to_extractor)).communicate()
-    process = await asyncio.create_subprocess_exec(path_to_extractor, '-i', path_to_car, '-o', assets_output_dir)
+    await (await asyncio.create_subprocess_exec('chmod', '+x', assets_extractor)).communicate()
+    process = await asyncio.create_subprocess_exec(f'./{assets_extractor}', '-i', path_to_car, '-o', assets_output_dir)
     await process.communicate()
 
     def cleanup2():
         cleanup1()
         os.path.isdir(assets_output_dir) and shutil.rmtree(assets_output_dir)
-        os.path.isdir(assets_extractor) and shutil.rmtree(assets_extractor)
-        os.remove(tool_archive_name)
+        os.remove(assets_extractor)
 
     if process.returncode != 0:
         cleanup2()
