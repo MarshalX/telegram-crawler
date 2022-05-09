@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 import platform
@@ -15,6 +16,8 @@ from typing import List
 import aiofiles
 import aiohttp
 from aiohttp import ClientConnectorError, ServerDisconnectedError
+
+import ccl_bplist
 
 PROTOCOL = 'https://'
 ILLEGAL_PATH_CHARS = punctuation.replace('.', '') + whitespace
@@ -181,6 +184,100 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
         os.path.join(crawled_data_folder, assets_filename),
         save_hash_only=True
     )
+
+    cleanup2()
+
+
+async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.ClientSession):
+    # TODO fetch version automatically
+    # ref: https://docs.github.com/en/rest/releases/releases#get-the-latest-release
+    version = '8.6.22933'
+
+    download_url = f'https://github.com/MarshalX/decrypted-telegram-ios/releases/download/{version}/Telegram-{version}.ipa'
+    tool_download_url = 'https://github.com/MarshalX/acextract/releases/download/3.0/acextract'
+
+    ipa_filename = f'Telegram-{version}.ipa'
+    assets_extractor = 'acextract'
+    assets_filename = 'Assets.car'
+    assets_output_dir = 'ios_assets'
+    client_folder_name = 'ios'
+    crawled_data_folder = 'telegram-beta-ios'
+
+    if 'darwin' not in platform.system().lower():
+        await download_file(download_url, ipa_filename, session)
+    else:
+        await asyncio.gather(
+            download_file(download_url, ipa_filename, session),
+            download_file(tool_download_url, assets_extractor, session),
+        )
+
+    # synced
+    with zipfile.ZipFile(ipa_filename, 'r') as f:
+        f.extractall(client_folder_name)
+
+    resources_path = 'Payload/Telegram.app'
+
+    files_to_convert = [
+        f'{resources_path}/en.lproj/Localizable.strings',
+        f'{resources_path}/en.lproj/InfoPlist.strings',
+        f'{resources_path}/en.lproj/AppIntentVocabulary.plist',
+    ]
+    for filename in files_to_convert:
+        path = os.path.join(client_folder_name, filename)
+
+        # synced cuz ccl_bplist works with file objects and doesn't support asyncio
+        with open(path, 'rb') as r_file:
+            plist = ccl_bplist.load(r_file)
+
+        async with aiofiles.open(path, 'w', encoding='utf-8') as w_file:
+            await w_file.write(json.dumps(plist, indent=4))
+
+    files_to_track = files_to_convert + [
+        f'{resources_path}/_CodeSignature/CodeResources',
+        f'{resources_path}/SC_Info/Manifest.plist',
+    ]
+    await track_additional_files(files_to_track, client_folder_name, crawled_data_folder)
+
+    resources_folder = os.path.join(client_folder_name, resources_path)
+    crawled_resources_folder = os.path.join(crawled_data_folder, resources_path)
+    _, _, hash_of_files_to_track = next(os.walk(resources_folder))
+    await track_additional_files(
+        hash_of_files_to_track, resources_folder, crawled_resources_folder, save_hash_only=True
+    )
+
+    def cleanup1():
+        os.path.isdir(client_folder_name) and shutil.rmtree(client_folder_name)
+        os.remove(ipa_filename)
+
+    # sry for copy-paste from macos def ;d
+
+    # .car crawler works only in macOS
+    if 'darwin' not in platform.system().lower():
+        cleanup1()
+        return
+
+    path_to_car = os.path.join(resources_folder, assets_filename)
+    await (await asyncio.create_subprocess_exec('chmod', '+x', assets_extractor)).communicate()
+    process = await asyncio.create_subprocess_exec(f'./{assets_extractor}', '-i', path_to_car, '-o', assets_output_dir)
+    await process.communicate()
+
+    def cleanup2():
+        cleanup1()
+        os.path.isdir(assets_output_dir) and shutil.rmtree(assets_output_dir)
+        os.remove(assets_extractor)
+
+    if process.returncode != 0:
+        cleanup2()
+        return
+
+    for dir_path, _, hash_of_files_to_track in os.walk(assets_output_dir):
+        await track_additional_files(
+            # sry for this shit ;d
+            [os.path.join(dir_path, file).replace(f'{assets_output_dir}/', '') for file in hash_of_files_to_track],
+            assets_output_dir,
+            os.path.join(crawled_data_folder, assets_filename),
+            save_hash_only=True
+        )
 
     cleanup2()
 
@@ -410,11 +507,13 @@ async def start(url_list: set[str], mode: int):
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
             track_mtproto_configs(),
+            download_telegram_ios_beta_and_extract_resources(session),
         )
         mode == 1 and await asyncio.gather(*[crawl(url, session) for url in url_list])
         mode == 2 and await download_telegram_android_beta_and_extract_resources(session)
         mode == 3 and await download_telegram_macos_beta_and_extract_resources(session)
         mode == 4 and await track_mtproto_configs()
+        mode == 5 and await download_telegram_ios_beta_and_extract_resources(session)
 
 
 if __name__ == '__main__':
