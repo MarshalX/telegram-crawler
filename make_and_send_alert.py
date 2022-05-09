@@ -25,6 +25,10 @@ STATUS_TO_EMOJI = {
     'added': '✅',
     'modified': '📝',
     'removed': '❌',
+    'renamed': '🔄',
+    'copied': '📋',
+    'changed': '📝',
+    'unchanged': '📝',
 }
 
 GITHUB_API_LIMIT_PER_HOUR = 5_000
