@@ -197,7 +197,7 @@ async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.Clie
     tool_download_url = 'https://github.com/MarshalX/acextract/releases/download/3.0/acextract'
 
     ipa_filename = f'Telegram-{version}.ipa'
-    assets_extractor = 'acextract'
+    assets_extractor = 'acextract_ios'
     assets_filename = 'Assets.car'
     assets_output_dir = 'ios_assets'
     client_folder_name = 'ios'
