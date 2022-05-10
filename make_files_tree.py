@@ -350,8 +350,8 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
 async def track_mtproto_configs():
     from pyrogram import Client
 
-    app = Client('crawler', session_string=os.environ['TELEGRAM_SESSION'])
-    app_test = Client('crawler_test', session_string=os.environ['TELEGRAM_SESSION_TEST'], test_mode=True)
+    app = Client('crawler', session_string=os.environ['TELEGRAM_SESSION'], in_memory=True)
+    app_test = Client('crawler_test', session_string=os.environ['TELEGRAM_SESSION_TEST'], test_mode=True, in_memory=True)
     await app.start()
     await app_test.start()
 
