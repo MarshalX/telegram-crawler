@@ -35,7 +35,7 @@ function fetchGraph(id, tokenData, retry) {
   }
   var loadingEl = domEl.querySelector('.chart_wrap_loading');
   retry = retry || 0;
-  return fetch('/asyncgraph', {
+  return fetch('/asyncgraph' + (tokenData.test ? '?_test=1' : ''), {
     method: 'post',
     headers: {
       "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"

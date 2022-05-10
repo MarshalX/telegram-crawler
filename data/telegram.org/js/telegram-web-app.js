@@ -681,6 +681,21 @@
     return mainButton;
   })();
 
+  var webAppInvoices = {};
+  function onInvoiceClosed(eventType, eventData) {
+    if (eventData.slug && webAppInvoices[eventData.slug]) {
+      var invoiceData = webAppInvoices[eventData.slug];
+      delete webAppInvoices[eventData.slug];
+      if (invoiceData.callback) {
+        invoiceData.callback(eventData.status);
+      }
+      receiveWebViewEvent('invoiceClosed', {
+        url: invoiceData.url,
+        status: eventData.status
+      });
+    }
+  }
+
   if (!window.Telegram) {
     window.Telegram = {};
   }
@@ -740,7 +755,7 @@
     }
     WebView.postEvent('web_app_data_send', false, {data: data});
   };
-  WebApp.openTgLink = function (url) {
+  WebApp.openTelegramLink = function (url) {
     var a = document.createElement('A');
     a.href = url;
     if (a.protocol != 'http:' &&
@@ -758,6 +773,31 @@
     } else {
       location.href = 'https://t.me' + path_full;
     }
+  };
+  WebApp.openInvoice = function (url, callback) {
+    var a = document.createElement('A'), match, slug;
+    a.href = url;
+    if (a.protocol != 'http:' &&
+        a.protocol != 'https:' ||
+        a.hostname != 't.me' ||
+        !(match = a.pathname.match(/^\/(\$|invoice\/)([A-Za-z0-9\-_=]+)$/)) ||
+        !(slug = match[2])) {
+      console.error('[Telegram.WebApp] Invoice url is invalid', url);
+      throw Error('WebAppInvoiceUrlInvalid');
+    }
+    if (!versionAtLeast('1.1')) {
+      console.error('[Telegram.WebApp] Method openInvoice is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    if (webAppInvoices[slug]) {
+      console.error('[Telegram.WebApp] Invoice is already opened');
+      throw Error('WebAppInvoiceOpened');
+    }
+    webAppInvoices[slug] = {
+      url: url,
+      callback: callback
+    };
+    WebView.postEvent('web_app_open_invoice', false, {slug: slug});
   };
   WebApp.ready = function () {
     WebView.postEvent('web_app_ready');
@@ -780,6 +820,7 @@
 
   WebView.onEvent('theme_changed', onThemeChanged);
   WebView.onEvent('viewport_changed', onViewportChanged);
+  WebView.onEvent('invoice_closed', onInvoiceClosed);
   WebView.postEvent('web_app_request_theme');
   WebView.postEvent('web_app_request_viewport');
 

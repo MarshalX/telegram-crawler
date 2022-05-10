@@ -259,11 +259,27 @@ var Cafe = {
         params.user_id = Cafe.userId;
         params.user_hash = Cafe.userHash;
       }
+      var invoiceSupported = Telegram.WebApp.isVersionAtLeast('1.1');
+      if (invoiceSupported) {
+        params.invoice = 1;
+      }
       Cafe.toggleLoading(true);
       Cafe.apiRequest('makeOrder', params, function(result) {
         Cafe.toggleLoading(false);
         if (result.ok) {
-          Telegram.WebApp.close();
+          if (invoiceSupported) {
+            Telegram.WebApp.openInvoice(result.invoice_url, function(status) {
+              if (status == 'paid') {
+                Telegram.WebApp.close();
+              } else if (status == 'failed') {
+                Cafe.showStatus('Payment has been failed.');
+              } else {
+                Cafe.showStatus('You have cancelled this order.');
+              }
+            });
+          } else {
+            Telegram.WebApp.close();
+          }
         }
         if (result.error) {
           Cafe.showStatus(result.error);
