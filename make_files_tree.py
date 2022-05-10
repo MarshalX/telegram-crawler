@@ -348,29 +348,32 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
 
 
 async def track_mtproto_configs():
-    import json
     from pyrogram import Client
+
+    app = Client('crawler', session_string=os.environ['TELEGRAM_SESSION'])
+    app_test = Client('crawler_test', session_string=os.environ['TELEGRAM_SESSION_TEST'], test_mode=True)
+    await app.start()
+    await app_test.start()
+
+    await _fetch_and_track_mtproto(app, '')
+    await _fetch_and_track_mtproto(app_test, 'test')
+
+
+async def _fetch_and_track_mtproto(app, output_dir):
     from pyrogram.raw import functions
     from pyrogram.raw.types import InputStickerSetAnimatedEmoji
 
-    app = Client(
-        os.environ['TELEGRAM_SESSION'],
-        api_id=int(os.environ['TELEGRAM_API_ID']),
-        api_hash=os.environ['TELEGRAM_API_HASH'],
-    )
-    await app.start()
-
     configs = {
-        'GetConfig': await app.send(functions.help.GetConfig()),
-        'GetCdnConfig': await app.send(functions.help.GetCdnConfig()),
-        # 'GetInviteText': await app.send(functions.help.GetInviteText()),
-        # 'GetSupport': await app.send(functions.help.GetSupport()),
-        # 'GetSupportName': await app.send(functions.help.GetSupportName()),
-        # 'GetPassportConfig': await app.send(functions.help.GetPassportConfig(hash=0)),
-        'GetCountriesList': await app.send(functions.help.GetCountriesList(lang_code='en', hash=0)),
-        'GetAppConfig': await app.send(functions.help.GetAppConfig()),
-        # 'GetAppUpdate': await app.send(functions.help.GetAppUpdate(source='')),
-        'AnimatedEmoji': await app.send(
+        'GetConfig': await app.invoke(functions.help.GetConfig()),
+        'GetCdnConfig': await app.invoke(functions.help.GetCdnConfig()),
+        # 'GetInviteText': await app.invoke(functions.help.GetInviteText()),
+        # 'GetSupport': await app.invoke(functions.help.GetSupport()),
+        # 'GetSupportName': await app.invoke(functions.help.GetSupportName()),
+        # 'GetPassportConfig': await app.invoke(functions.help.GetPassportConfig(hash=0)),
+        'GetCountriesList': await app.invoke(functions.help.GetCountriesList(lang_code='en', hash=0)),
+        'GetAppConfig': await app.invoke(functions.help.GetAppConfig()),
+        # 'GetAppUpdate': await app.invoke(functions.help.GetAppUpdate(source='')),
+        'AnimatedEmoji': await app.invoke(
             functions.messages.GetStickerSet(stickerset=InputStickerSetAnimatedEmoji(), hash=0)
         ),
    }
@@ -401,7 +404,7 @@ async def track_mtproto_configs():
     configs['GetConfig'].expires = 0
     configs['GetConfig'].dc_options = []
 
-    output_dir_name = 'telegram-mtproto'
+    output_dir_name = os.path.join('telegram-mtproto', output_dir)
     for file, content in configs.items():
         filename = os.path.join(OUTPUT_FOLDER, output_dir_name, f'{file}.json')
         os.makedirs(os.path.dirname(filename), exist_ok=True)
