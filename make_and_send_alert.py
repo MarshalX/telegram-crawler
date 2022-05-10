@@ -37,7 +37,7 @@ COUNT_OF_RUNNING_WORKFLOW_AT_SAME_TIME = 5  # just random number ;d
 ROW_PER_STATUS = 5
 
 
-async def send_req_until_success(session, **kwargs) -> dict:
+async def send_req_until_success(session, **kwargs):
     delay = 5  # in sec
     count_of_retries = int(GITHUB_API_LIMIT_PER_HOUR / COUNT_OF_RUNNING_WORKFLOW_AT_SAME_TIME / delay)
 
@@ -51,23 +51,48 @@ async def send_req_until_success(session, **kwargs) -> dict:
             continue
 
         json = await res.json()
-        return json
+
+        # TODO rewrite всратое говно написанное за 1 насосеку
+        last_page = 0
+        import re
+        kurwa_regex = r'page=(\d+)>; rel="last"'
+        if 'Link' in res.headers:
+            link = res.headers['Link']
+            try:
+                last_page = int(re.findall(kurwa_regex, link)[0])
+            except:
+                ...
+
+        return json, last_page
 
     raise RuntimeError('Surprise. Time is over')
 
 
 async def main():
     async with aiohttp.ClientSession() as session:
-        json = await send_req_until_success(
+        json, last_page = await send_req_until_success(
             session=session,
             url=f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}'.format(repo=REPOSITORY, sha=COMMIT_SHA),
             headers={
                 'Authorization': f'token {GITHUB_PAT}'
             }
         )
+        files = json['files']
+
+        # рофлянус в анус
+        if last_page != 0:
+            for page in range(2, last_page + 1):
+                print(f'Page {page}')
+                json2, _ = await send_req_until_success(
+                    session=session,
+                    url=f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}?page={page}'.format(repo=REPOSITORY, sha=COMMIT_SHA),
+                    headers={
+                        'Authorization': f'token {GITHUB_PAT}'
+                    }
+                )
+                files.extend(json2['files'])
 
         html_url = json['html_url']
-        files = json['files']
 
         changes = {k: [] for k in STATUS_TO_EMOJI.keys()}
         for file in files:
