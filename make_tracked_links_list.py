@@ -137,9 +137,27 @@ DOM_ATTRS = ['href', 'src']
 OUTPUT_FILENAME = os.environ.get('OUTPUT_FILENAME', 'tracked_links.txt')
 COMPARE_OUTPUT_WITH_FILENAME = os.environ.get('COMPARE_OUTPUT_WITH_FILENAME', OUTPUT_FILENAME)
 
+stel_dev_layer = 132
+
 # unsecure but so simple
-CONNECTOR = aiohttp.TCPConnector(ssl=False)
+CONNECTOR = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
 TIMEOUT = aiohttp.ClientTimeout(total=10)
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'DNT': '1',
+    'Connection': 'keep-alive',
+    'Cookie': f'stel_ln=en; stel_dev_layer={stel_dev_layer}',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1',
+    'Cache-Control': 'max-age=0',
+    'TE': 'trailers',
+}
 
 logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -275,7 +293,22 @@ def is_trackable_content_type(content_type) -> bool:
     return False
 
 
+class ServerSideError(Exception):
+    pass
+
+
 async def crawl(url: str, session: aiohttp.ClientSession):
+    ok = False
+    while not ok:
+        try:
+            await _crawl(url, session)
+            ok = True
+        except (ServerSideError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
+            logger.warning(f'Client or timeout error. Retrying {url}')
+            VISITED_LINKS.remove(url)
+
+
+async def _crawl(url: str, session: aiohttp.ClientSession):
     if url in VISITED_LINKS:
         return
     VISITED_LINKS.add(url)
@@ -288,7 +321,7 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             if response.status // 100 == 5:
                 VISITED_LINKS.remove(url)
                 logger.warning(f'Error 5XX. Retrying {url}')
-                return await crawl(url, session)
+                raise ServerSideError()
 
             if response.status not in {200, 304}:
                 if response.status != 302:
@@ -327,15 +360,10 @@ async def crawl(url: str, session: aiohttp.ClientSession):
         logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
     # except ClientConnectorError:
     #     logger.warning(f'Wrong link: {url}')
-    except (ServerDisconnectedError, TimeoutError, ClientConnectorError):
-        logger.warning(f'Client or timeout error. Retrying {url}')
-        VISITED_LINKS.remove(url)
-        # sleep + count of attempts?
-        await crawl(url, session)
 
 
 async def start(url_list: set[str]):
-    async with aiohttp.ClientSession(connector=CONNECTOR) as session:
+    async with aiohttp.ClientSession(connector=CONNECTOR, headers=HEADERS) as session:
         await asyncio.gather(*[crawl(url, session) for url in url_list])
 
 

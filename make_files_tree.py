@@ -44,9 +44,27 @@ SPARKLE_SE_REGEX = r';se=(.*?);'
 SPARKLE_SIG_TEMPLATE = f';sig={DYNAMIC_PART_MOCK};'
 SPARKLE_SE_TEMPLATE = f';se={DYNAMIC_PART_MOCK};'
 
+stel_dev_layer = 132
+
 # unsecure but so simple
-CONNECTOR = aiohttp.TCPConnector(ssl=False)
+CONNECTOR = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
 TIMEOUT = aiohttp.ClientTimeout(total=10)
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'DNT': '1',
+    'Connection': 'keep-alive',
+    'Cookie': f'stel_ln=en; stel_dev_layer={stel_dev_layer}',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1',
+    'Cache-Control': 'max-age=0',
+    'TE': 'trailers',
+}
 
 logging.basicConfig(format='%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -56,7 +74,7 @@ def get_hash(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-async def download_file(url, path, session):
+async def download_file(url: str, path: str, session: aiohttp.ClientSession):
     async with session.get(url) as response:
         if response.status != 200:
             return
@@ -437,70 +455,72 @@ class RetryError(Exception):
 
 
 async def crawl(url: str, session: aiohttp.ClientSession):
-    try:
-        # f*ck this shit. I believe it's temp solution
-        if 'css/telegram.css' in url:
+    ok = False
+    while not ok:
+        try:
+            await _crawl(url, session)
+            ok = True
+        except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
+            logger.warning(f'Client or timeout error. Retrying {url}')
+
+
+async def _crawl(url: str, session: aiohttp.ClientSession):
+    logger.info(f'Process {url}')
+    async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT, headers=HEADERS) as response:
+        if response.status // 100 == 5:
+            msg = f'Error 5XX. Retrying {url}'
+            logger.warning(msg)
+            raise RetryError(msg)
+
+        if response.status not in {200, 304}:
+            if response.status != 302:
+                content = await response.text()
+                logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
             return
 
-        logger.info(f'Process {url}')
-        async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
-            if response.status // 100 == 5:
-                msg = f'Error 5XX. Retrying {url}'
-                logger.warning(msg)
-                raise RetryError(msg)
+        # bypass external slashes and so on
+        url_parts = [p for p in url.split('/') if p not in ILLEGAL_PATH_CHARS]
 
-            if response.status not in {200, 304}:
-                if response.status != 302:
-                    content = await response.text()
-                    logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
-                return
+        is_hashable_only = is_hashable_only_content_type(response.content_type)
+        # amazing dirt for media files like
+        # telegram.org/file/811140591/1/q7zZHjgES6s/9d121a89ffb0015837
+        # with response content type HTML instead of image. Shame on you
+        # sometimes it returns correct type. noice load balancing
+        is_sucking_file = '/file/' in url and 'text' in response.content_type
 
-            # bypass external slashes and so on
-            url_parts = [p for p in url.split('/') if p not in ILLEGAL_PATH_CHARS]
+        # handle pure domains and html pages without ext in url
+        ext = '.html' if '.' not in url_parts[-1] or len(url_parts) == 1 else ''
 
-            is_hashable_only = is_hashable_only_content_type(response.content_type)
-            # amazing dirt for media files like
-            # telegram.org/file/811140591/1/q7zZHjgES6s/9d121a89ffb0015837
-            # with response content type HTML instead of image. Shame on you
-            # sometimes it returns correct type. noice load balancing
-            is_sucking_file = '/file/' in url and 'text' in response.content_type
+        # I don't add ext by content type for images and so on cuz TG servers sucks.
+        # Some servers do not return correct content type. Some servers do...
+        if is_hashable_only or is_sucking_file:
+            ext = ''
 
-            # handle pure domains and html pages without ext in url
-            ext = '.html' if '.' not in url_parts[-1] or len(url_parts) == 1 else ''
+        filename = OUTPUT_FOLDER + '/'.join(url_parts) + ext
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-            # I don't add ext by content type for images and so on cuz TG servers sucks.
-            # Some servers do not return correct content type. Some servers do...
-            if is_hashable_only or is_sucking_file:
-                ext = ''
-
-            filename = OUTPUT_FOLDER + '/'.join(url_parts) + ext
-            os.makedirs(os.path.dirname(filename), exist_ok=True)
-
-            if is_sucking_file or is_hashable_only:
-                content = await response.read()
-                async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
-                    await f.write(get_hash(content))
-                return
-
-            content = await response.text(encoding='UTF-8')
-            if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
-                content = await collect_translations_paginated_content(url, session)
-
-            content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
-            content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
-            content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
-            content = re.sub(NONCE_REGEX, NONCE_TEMPLATE, content)
-            content = re.sub(PROXY_CONFIG_SUB_NET_REGEX, PROXY_CONFIG_SUB_NET_TEMPLATE, content)
-            content = re.sub(TRANSLATE_SUGGESTION_REGEX, '', content)
-            content = re.sub(SPARKLE_SIG_REGEX, SPARKLE_SIG_TEMPLATE, content)
-            content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
-
+        if is_sucking_file or is_hashable_only:
+            content = await response.read()
             async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
-                logger.info(f'Write to {filename}')
-                await f.write(content)
-    except (ServerDisconnectedError, TimeoutError, ClientConnectorError):
-        logger.warning(f'Client or timeout error. Retrying {url}')
-        await crawl(url, session)
+                await f.write(get_hash(content))
+            return
+
+        content = await response.text(encoding='UTF-8')
+        if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
+            content = await collect_translations_paginated_content(url, session)
+
+        content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
+        content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
+        content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
+        content = re.sub(NONCE_REGEX, NONCE_TEMPLATE, content)
+        content = re.sub(PROXY_CONFIG_SUB_NET_REGEX, PROXY_CONFIG_SUB_NET_TEMPLATE, content)
+        content = re.sub(TRANSLATE_SUGGESTION_REGEX, '', content)
+        content = re.sub(SPARKLE_SIG_REGEX, SPARKLE_SIG_TEMPLATE, content)
+        content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
+
+        async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
+            logger.info(f'Write to {filename}')
+            await f.write(content)
 
 
 async def start(url_list: set[str], mode: int):
