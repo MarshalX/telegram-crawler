@@ -368,8 +368,14 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
 async def track_mtproto_configs():
     from pyrogram import Client
 
-    app = Client('crawler', session_string=os.environ['TELEGRAM_SESSION'], in_memory=True)
-    app_test = Client('crawler_test', session_string=os.environ['TELEGRAM_SESSION_TEST'], test_mode=True, in_memory=True)
+    kw = {
+        'api_id': int(os.environ['TELEGRAM_API_ID']),
+        'api_hash': os.environ['TELEGRAM_API_HASH'],
+        'in_memory': True
+    }
+
+    app = Client('crawler', session_string=os.environ['TELEGRAM_SESSION'], **kw)
+    app_test = Client('crawler_test', session_string=os.environ['TELEGRAM_SESSION_TEST'], test_mode=True, **kw)
     await app.start()
     await app_test.start()
 
@@ -394,7 +400,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
         'AnimatedEmoji': await app.invoke(
             functions.messages.GetStickerSet(stickerset=InputStickerSetAnimatedEmoji(), hash=0)
         ),
-   }
+    }
 
     keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64'}
 
