@@ -44,7 +44,7 @@ SPARKLE_SE_REGEX = r';se=(.*?);'
 SPARKLE_SIG_TEMPLATE = f';sig={DYNAMIC_PART_MOCK};'
 SPARKLE_SE_TEMPLATE = f';se={DYNAMIC_PART_MOCK};'
 
-stel_dev_layer = 132
+stel_dev_layer = 190
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
