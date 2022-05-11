@@ -535,7 +535,7 @@ async def start(url_list: set[str], mode: int):
             *[crawl(url, session) for url in url_list],
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
-            track_mtproto_configs(),
+            # track_mtproto_configs(),
             download_telegram_ios_beta_and_extract_resources(session),
         )
         mode == 1 and await asyncio.gather(*[crawl(url, session) for url in url_list])
