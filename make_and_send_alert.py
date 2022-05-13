@@ -1,16 +1,25 @@
 import asyncio
 import logging
 import os
+import re
+from typing import Tuple
 
 import aiohttp
 
 COMMIT_SHA = os.environ['COMMIT_SHA']
+
+# commits for test alert builder
+# COMMIT_SHA = '4015bd9c48b45910727569fff5e770000d85d207' # all clients + server and test server + web
+# COMMIT_SHA = '9cc3f0fb7c390c8cb8b789e9377f10ed5e80a089' # web and web res together
+# COMMIT_SHA = '4efaf918af43054ba3ff76068e83d135a9a2535d' # web
+# COMMIT_SHA = 'e2d725c2b3813d7c170f50b0ab21424a71466f6d' # web res
 
 TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
 GITHUB_PAT = os.environ['GITHUB_PAT']
 
 REPOSITORY = os.environ.get('REPOSITORY', 'MarshalX/telegram-crawler')
 CHAT_ID = os.environ.get('CHAT_ID', '@tgcrawl')
+CHAT_ID = os.environ.get('CHAT_ID', '@AOAOAOAOAOAA')
 ROOT_TREE_DIR = os.environ.get('ROOT_TREE_DIR', 'data')
 
 BASE_GITHUB_API = 'https://api.github.com/'
@@ -20,6 +29,7 @@ BASE_TELEGRAM_API = 'https://api.telegram.org/bot{token}/'
 TELEGRAM_SEND_MESSAGE = 'sendMessage'
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 STATUS_TO_EMOJI = {
     'added': '✅',
@@ -31,16 +41,41 @@ STATUS_TO_EMOJI = {
     'unchanged': '📝',
 }
 
+# order is important!
+AVAILABLE_HASHTAGS = [
+    'web_res', 'web', 'server', 'test_server', 'client', 'ios', 'macos', 'android'
+]
+HASHTAGS_PATTERNS = {
+    'web_res': os.path.join(ROOT_TREE_DIR, 'web_res'),
+    'web': os.path.join(ROOT_TREE_DIR, 'web'),
+    'server': os.path.join(ROOT_TREE_DIR, 'server'),
+    'test_server': os.path.join(ROOT_TREE_DIR, 'server', 'test'),
+    'client': os.path.join(ROOT_TREE_DIR, 'client'),
+    'ios': os.path.join(ROOT_TREE_DIR, 'client', 'ios-beta'),
+    'macos': os.path.join(ROOT_TREE_DIR, 'client', 'macos-beta'),
+    'android': os.path.join(ROOT_TREE_DIR, 'client', 'android-beta'),
+}
+# order is important!
+PATHS_TO_REMOVE_FROM_ALERT = [
+    os.path.join(ROOT_TREE_DIR, 'web_res'),
+    os.path.join(ROOT_TREE_DIR, 'web'),
+    os.path.join(ROOT_TREE_DIR, 'server'),
+    os.path.join(ROOT_TREE_DIR, 'client'),
+]
+
 GITHUB_API_LIMIT_PER_HOUR = 5_000
 COUNT_OF_RUNNING_WORKFLOW_AT_SAME_TIME = 5  # just random number ;d
 
 ROW_PER_STATUS = 5
 
+LAST_PAGE_NUMBER_REGEX = r'page=(\d+)>; rel="last"'
 
-async def send_req_until_success(session, **kwargs):
+
+async def send_req_until_success(session: aiohttp.ClientSession, **kwargs) -> Tuple[dict, int]:
     delay = 5  # in sec
     count_of_retries = int(GITHUB_API_LIMIT_PER_HOUR / COUNT_OF_RUNNING_WORKFLOW_AT_SAME_TIME / delay)
 
+    last_page_number = 1
     retry_number = 1
     while retry_number <= count_of_retries:
         retry_number += 1
@@ -52,56 +87,72 @@ async def send_req_until_success(session, **kwargs):
 
         json = await res.json()
 
-        # TODO rewrite всратое говно написанное за 1 насосеку
-        last_page = 0
-        import re
-        kurwa_regex = r'page=(\d+)>; rel="last"'
-        if 'Link' in res.headers:
-            link = res.headers['Link']
-            try:
-                last_page = int(re.findall(kurwa_regex, link)[0])
-            except:
-                ...
+        pagination_data = res.headers.get('Link', '')
+        matches = re.findall(LAST_PAGE_NUMBER_REGEX, pagination_data)
+        if matches:
+            last_page_number = int(matches[0])
 
-        return json, last_page
+        return json, last_page_number
 
     raise RuntimeError('Surprise. Time is over')
 
 
-async def main():
+async def main() -> None:
     async with aiohttp.ClientSession() as session:
-        json, last_page = await send_req_until_success(
+        commit_data, last_page = await send_req_until_success(
             session=session,
             url=f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}'.format(repo=REPOSITORY, sha=COMMIT_SHA),
             headers={
                 'Authorization': f'token {GITHUB_PAT}'
             }
         )
-        files = json['files']
+        commit_files = commit_data['files']
 
-        # рофлянус в анус
-        if last_page != 0:
-            for page in range(2, last_page + 1):
-                print(f'Page {page}')
-                json2, _ = await send_req_until_success(
-                    session=session,
-                    url=f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}?page={page}'.format(repo=REPOSITORY, sha=COMMIT_SHA),
-                    headers={
-                        'Authorization': f'token {GITHUB_PAT}'
-                    }
-                )
-                files.extend(json2['files'])
+        coroutine_list = list()
+        for current_page in range(2, last_page + 1):
+            coroutine_list.append(send_req_until_success(
+                session=session,
+                url=f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}?page={current_page}'.format(
+                    repo=REPOSITORY, sha=COMMIT_SHA
+                ),
+                headers={
+                    'Authorization': f'token {GITHUB_PAT}'
+                }
+            ))
 
-        html_url = json['html_url']
+        paginated_responses = await asyncio.gather(*coroutine_list)
+        for json_response, _ in paginated_responses:
+            commit_files.extend(json_response['files'])
 
-        changes = {k: [] for k in STATUS_TO_EMOJI.keys()}
-        for file in files:
-            changed_url = file['filename'].replace(f'{ROOT_TREE_DIR}/', '').replace('.html', '')
-            status = STATUS_TO_EMOJI[file['status']]
-
-            changes[file['status']].append(f'{status} <code>{changed_url}</code>')
+        html_url = commit_data['html_url']
 
         alert_text = f'<b>New changes of Telegram</b>\n\n'
+        alert_hashtags = set()
+
+        global AVAILABLE_HASHTAGS
+        available_hashtags = AVAILABLE_HASHTAGS.copy()
+
+        changes = {k: [] for k in STATUS_TO_EMOJI.keys()}
+        for file in commit_files:
+            used_hashtags = set()
+            for available_hashtag in available_hashtags:
+                pattern = HASHTAGS_PATTERNS[available_hashtag]
+                if pattern in file['filename']:
+                    alert_hashtags.add(available_hashtag)
+                    used_hashtags.add(available_hashtag)
+                    break    # one file cannot have more than one hashtag
+            # optimize substring search
+            for used_hashtag in used_hashtags:
+                available_hashtags.remove(used_hashtag)
+
+            changed_url = file['filename'].replace('.html', '')
+            for path_to_remove in PATHS_TO_REMOVE_FROM_ALERT:
+                if changed_url.startswith(path_to_remove):
+                    changed_url = changed_url[len(path_to_remove) + 1:]
+                    break   # can't occur more than one time
+
+            status = STATUS_TO_EMOJI[file['status']]
+            changes[file['status']].append(f'{status} <code>{changed_url}</code>')
 
         for i, [status, text_list] in enumerate(changes.items()):
             if not text_list:
@@ -116,8 +167,11 @@ async def main():
             alert_text += '\n'
 
         alert_text += f'<a href="{html_url}">View diff on GitHub...</a>'
+        if alert_hashtags:
+            alert_text += '\n\n' + ' '.join([f'#{hashtag}' for hashtag in sorted(alert_hashtags)])
 
-        await session.get(
+        logger.info(alert_text)
+        telegram_response = await session.get(
             url=f'{BASE_TELEGRAM_API}{TELEGRAM_SEND_MESSAGE}'.format(token=TELEGRAM_BOT_TOKEN),
             params={
                 'chat_id': CHAT_ID,
@@ -125,6 +179,7 @@ async def main():
                 'text': alert_text,
             }
         )
+        logger.debug(await telegram_response.read())
 
 
 if __name__ == '__main__':
