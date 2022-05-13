@@ -111,6 +111,15 @@ CRAWL_RULES = {
             'validatedRequestedInfo',
         },
     },
+    'blogfork.telegram.org': {
+        'deny': {
+            'bots/payments',
+
+            'tdlib/docs/classtd',
+
+            'validatedRequestedInfo',
+        },
+    },
     'telegram.org': {
         'deny': {
             r'apps$',
