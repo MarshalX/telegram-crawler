@@ -14,6 +14,8 @@ PROTOCOL = 'https://'
 BASE_URL = 'telegram.org'
 # it's necessary to help crawler to find more links
 HIDDEN_URLS = {
+    'blogfork.telegram.org',
+
     'corefork.telegram.org',
     'corefork.telegram.org/getProxyConfig',
 
