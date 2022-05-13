@@ -19,7 +19,6 @@ GITHUB_PAT = os.environ['GITHUB_PAT']
 
 REPOSITORY = os.environ.get('REPOSITORY', 'MarshalX/telegram-crawler')
 CHAT_ID = os.environ.get('CHAT_ID', '@tgcrawl')
-CHAT_ID = os.environ.get('CHAT_ID', '@AOAOAOAOAOAA')
 ROOT_TREE_DIR = os.environ.get('ROOT_TREE_DIR', 'data')
 
 BASE_GITHUB_API = 'https://api.github.com/'
