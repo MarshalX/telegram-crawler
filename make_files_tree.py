@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import json
 import logging
 import os
@@ -7,7 +8,6 @@ import re
 import shutil
 import sys
 import zipfile
-import hashlib
 from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
 from time import time
@@ -25,7 +25,12 @@ ILLEGAL_PATH_CHARS = punctuation.replace('.', '') + whitespace
 DYNAMIC_PART_MOCK = 'telegram-crawler'
 
 INPUT_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_links.txt')
+INPUT_RES_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_res_links.txt')
 OUTPUT_FOLDER = os.environ.get('OUTPUT_FOLDER', 'data/')
+OUTPUT_MTPROTO_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_MTPROTO_FOLDER', 'server/'))
+OUTPUT_SITES_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_SITES_FOLDER', 'web/'))
+OUTPUT_CLIENTS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_CLIENTS_FOLDER', 'client/'))
+OUTPUT_RESOURCES_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_RESOURCES_FOLDER', 'web_res/'))
 
 TRANSLATIONS_EN_CATEGORY_URL_REGEX = r'/en/[a-z_]+/[a-z_]+/$'
 
@@ -44,7 +49,7 @@ SPARKLE_SE_REGEX = r';se=(.*?);'
 SPARKLE_SIG_TEMPLATE = f';sig={DYNAMIC_PART_MOCK};'
 SPARKLE_SE_TEMPLATE = f';se={DYNAMIC_PART_MOCK};'
 
-stel_dev_layer = 190
+STEL_DEV_LAYER = 190
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
@@ -56,7 +61,7 @@ HEADERS = {
     'Accept-Encoding': 'gzip, deflate, br',
     'DNT': '1',
     'Connection': 'keep-alive',
-    'Cookie': f'stel_ln=en; stel_dev_layer={stel_dev_layer}',
+    'Cookie': f'stel_ln=en; stel_dev_layer={STEL_DEV_LAYER}',
     'Upgrade-Insecure-Requests': '1',
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
@@ -127,7 +132,7 @@ async def track_additional_files(
             content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
             content = re.sub(r'name="APKTOOL_DUMMY_.*" id', 'name="tgcrawl" id', content)
 
-        filename = os.path.join(OUTPUT_FOLDER, output_dir_name, file)
+        filename = os.path.join(output_dir_name, file)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         async with aiofiles.open(filename, 'w', encoding='utf-8') as w_file:
             await w_file.write(content)
@@ -140,7 +145,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
     if not download_url:
         return
 
-    crawled_data_folder = 'telegram-beta-macos'
+    crawled_data_folder = os.path.join(OUTPUT_CLIENTS_FOLDER, 'macos-beta')
     client_folder_name = 'macos'
     client_archive_name = 'macos.zip'
 
@@ -219,7 +224,7 @@ async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.Clie
     assets_filename = 'Assets.car'
     assets_output_dir = 'ios_assets'
     client_folder_name = 'ios'
-    crawled_data_folder = 'telegram-beta-ios'
+    crawled_data_folder = os.path.join(OUTPUT_CLIENTS_FOLDER, 'ios-beta')
 
     if 'darwin' not in platform.system().lower():
         await download_file(download_url, ipa_filename, session)
@@ -304,6 +309,8 @@ async def download_telegram_android_beta_and_extract_resources(session: aiohttp.
     parameterized_url = 'apps/drklo-2kb-ghpo/telegram-beta-2/distribution_groups/all-users-of-telegram-beta-2'
     download_url = await get_download_link_of_latest_appcenter_release(parameterized_url, session)
 
+    crawled_data_folder = os.path.join(OUTPUT_CLIENTS_FOLDER, 'android-beta')
+
     if not download_url:
         return
 
@@ -328,7 +335,7 @@ async def download_telegram_android_beta_and_extract_resources(session: aiohttp.
         'res/values/strings.xml',
         'res/values/public.xml'
     ]
-    await track_additional_files(files_to_track, 'android', 'telegram-beta-android')
+    await track_additional_files(files_to_track, 'android', crawled_data_folder)
 
     cleanup()
 
@@ -428,9 +435,8 @@ async def _fetch_and_track_mtproto(app, output_dir):
     configs['GetConfig'].expires = 0
     configs['GetConfig'].dc_options = []
 
-    output_dir_name = os.path.join('telegram-mtproto', output_dir)
     for file, content in configs.items():
-        filename = os.path.join(OUTPUT_FOLDER, output_dir_name, f'{file}.json')
+        filename = os.path.join(OUTPUT_MTPROTO_FOLDER, output_dir, f'{file}.json')
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         async with aiofiles.open(filename, 'w', encoding='utf-8') as w_file:
             await w_file.write(str(content))
@@ -460,20 +466,20 @@ class RetryError(Exception):
     ...
 
 
-async def crawl(url: str, session: aiohttp.ClientSession):
-    ok = False
-    while not ok:
+async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str = OUTPUT_SITES_FOLDER):
+    while True:
         try:
-            await _crawl(url, session)
-            ok = True
+            await _crawl(url, session, output_dir)
         except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
             logger.warning(f'Client or timeout error. Retrying {url}')
+        else:
+            break
 
 
-async def _crawl(url: str, session: aiohttp.ClientSession):
+async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
     logger.info(f'Process {url}')
     async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT, headers=HEADERS) as response:
-        if response.status // 100 == 5:
+        if 499 < response.status < 600:
             msg = f'Error 5XX. Retrying {url}'
             logger.warning(msg)
             raise RetryError(msg)
@@ -502,7 +508,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
         if is_hashable_only or is_sucking_file:
             ext = ''
 
-        filename = OUTPUT_FOLDER + '/'.join(url_parts) + ext
+        filename = os.path.join(output_dir, *url_parts) + ext
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
         if is_sucking_file or is_hashable_only:
@@ -529,29 +535,44 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
             await f.write(content)
 
 
-async def start(url_list: set[str], mode: int):
+async def crawl_web(session: aiohttp.ClientSession):
+    with open(INPUT_FILENAME, 'r') as f:
+        tracked_urls = set([l.replace('\n', '') for l in f.readlines()])
+
+    await asyncio.gather(*[crawl(url, session) for url in tracked_urls])
+
+
+async def crawl_web_res(session: aiohttp.ClientSession):
+    with open(INPUT_RES_FILENAME, 'r') as f:
+        tracked_urls = set([l.replace('\n', '') for l in f.readlines()])
+
+    await asyncio.gather(*[crawl(url, session, OUTPUT_RESOURCES_FOLDER) for url in tracked_urls])
+
+
+async def start(mode: int):
     async with aiohttp.ClientSession(connector=CONNECTOR) as session:
+        # all without web resources
         mode == 0 and await asyncio.gather(
-            *[crawl(url, session) for url in url_list],
+            crawl_web(session),
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
-            # track_mtproto_configs(),
+            track_mtproto_configs(),
             download_telegram_ios_beta_and_extract_resources(session),
         )
-        mode == 1 and await asyncio.gather(*[crawl(url, session) for url in url_list])
+        mode == 1 and await crawl_web(session)
         mode == 2 and await download_telegram_android_beta_and_extract_resources(session)
         mode == 3 and await download_telegram_macos_beta_and_extract_resources(session)
         mode == 4 and await track_mtproto_configs()
         mode == 5 and await download_telegram_ios_beta_and_extract_resources(session)
+        mode == 6 and await crawl_web_res(session)
 
 
 if __name__ == '__main__':
     run_mode = int(sys.argv[1]) if len(sys.argv) > 1 else 0
-
-    with open(INPUT_FILENAME, 'r') as f:
-        tracked_urls = set([l.replace('\n', '') for l in f.readlines()])
+    if 'MODE' in os.environ:
+        run_mode = int(os.environ['MODE'])
 
     start_time = time()
-    logger.info(f'Start crawling content of {len(tracked_urls)} tracked urls...')
-    asyncio.get_event_loop().run_until_complete(start(tracked_urls, run_mode))
+    logger.info(f'Start crawling content of tracked urls...')
+    asyncio.get_event_loop().run_until_complete(start(run_mode))
     logger.info(f'Stop crawling content in mode {run_mode}. {time() - start_time} sec.')

@@ -135,9 +135,9 @@ RELATIVE_JS_SCRIPTS_REGEX = r'["\'](.*\.js)["\'\?]'
 DOM_ATTRS = ['href', 'src']
 
 OUTPUT_FILENAME = os.environ.get('OUTPUT_FILENAME', 'tracked_links.txt')
-COMPARE_OUTPUT_WITH_FILENAME = os.environ.get('COMPARE_OUTPUT_WITH_FILENAME', OUTPUT_FILENAME)
+OUTPUT_RESOURCES_FILENAME = os.environ.get('OUTPUT_RESOURCES_FILENAME', 'tracked_res_links.txt')
 
-stel_dev_layer = 190
+STEL_DEV_LAYER = 190
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
@@ -149,7 +149,7 @@ HEADERS = {
     'Accept-Encoding': 'gzip, deflate, br',
     'DNT': '1',
     'Connection': 'keep-alive',
-    'Cookie': f'stel_ln=en; stel_dev_layer={stel_dev_layer}',
+    'Cookie': f'stel_ln=en; stel_dev_layer={STEL_DEV_LAYER}',
     'Upgrade-Insecure-Requests': '1',
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
@@ -164,6 +164,7 @@ logger = logging.getLogger(__name__)
 
 VISITED_LINKS = set()
 LINKS_TO_TRACK = set()
+LINKS_TO_TRACKABLE_RESOURCES = set()
 
 
 def should_exclude(url: str) -> bool:
@@ -270,11 +271,28 @@ def cleanup_links(links: set[str]) -> set[str]:
     return cleaned_links
 
 
-def is_trackable_content_type(content_type) -> bool:
-    trackable_content_types = (
-        'css',
+def _is_x_content_type(content_types_set: set[str], content_type) -> bool:
+    for match_content_type in content_types_set:
+        if match_content_type in content_type:
+            return True
+
+    return False
+
+
+def is_textable_content_type(content_type: str) -> bool:
+    textable_content_type = {
         'plain',
+        'css',
         'json',
+        'text',
+        'javascript',
+    }
+
+    return _is_x_content_type(textable_content_type, content_type)
+
+
+def is_trackable_content_type(content_type) -> bool:
+    trackable_content_types = {
         'svg',
         'png',
         'jpeg',
@@ -284,13 +302,9 @@ def is_trackable_content_type(content_type) -> bool:
         'webm',
         'application/octet-stream',    # td updates
         'application/zip',
-    )
+    }
 
-    for trackable_content_type in trackable_content_types:
-        if trackable_content_type in content_type:
-            return True
-
-    return False
+    return _is_x_content_type(trackable_content_types, content_type)
 
 
 class ServerSideError(Exception):
@@ -298,14 +312,14 @@ class ServerSideError(Exception):
 
 
 async def crawl(url: str, session: aiohttp.ClientSession):
-    ok = False
-    while not ok:
+    while True:
         try:
             await _crawl(url, session)
-            ok = True
         except (ServerSideError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
             logger.warning(f'Client or timeout error. Retrying {url}')
             VISITED_LINKS.remove(url)
+        else:
+            break
 
 
 async def _crawl(url: str, session: aiohttp.ClientSession):
@@ -318,7 +332,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
             content_type = response.headers.get('content-type')
 
-            if response.status // 100 == 5:
+            if 499 < response.status < 600:
                 VISITED_LINKS.remove(url)
                 logger.warning(f'Error 5XX. Retrying {url}')
                 raise ServerSideError()
@@ -329,9 +343,11 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
                     logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
                 return
 
-            if 'text' in content_type or 'javascript' in content_type:
+            if is_textable_content_type(content_type):
                 LINKS_TO_TRACK.add(url)
 
+                # raw content will be cached by aiohttp. Don't worry about it
+                raw_content = await response.read()
                 content = await response.text(encoding='UTF-8')
                 absolute_links = cleanup_links(find_absolute_links(content))
 
@@ -344,7 +360,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
                 sub_links = absolute_links | relative_links
                 await asyncio.gather(*[crawl(url, session) for url in sub_links])
             elif is_trackable_content_type(content_type):
-                LINKS_TO_TRACK.add(url)
+                LINKS_TO_TRACKABLE_RESOURCES.add(url)
             else:
                 # for example, zip with update of macOS client
                 logger.info(f'Unhandled type: {content_type} from {url}')
@@ -358,8 +374,10 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
                 LINKS_TO_TRACK.remove(f'{without_trailing_slash}/')
     except UnicodeDecodeError:
         logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
-    # except ClientConnectorError:
-    #     logger.warning(f'Wrong link: {url}')
+
+        if raw_content.startswith(b'GIF89a'):
+            LINKS_TO_TRACK.remove(url)
+            LINKS_TO_TRACKABLE_RESOURCES.add(url)
 
 
 async def start(url_list: set[str]):
@@ -377,14 +395,21 @@ if __name__ == '__main__':
     logger.info(f'Stop crawling links. {time() - start_time} sec.')
 
     try:
-        with open(COMPARE_OUTPUT_WITH_FILENAME, 'r') as f:
-            OLD_URL_LIST = set([l.replace('\n', '') for l in f.readlines()])
+        OLD_URL_LIST = set()
+        for filename in (OUTPUT_FILENAME, OUTPUT_RESOURCES_FILENAME):
+            with open(filename, 'r') as f:
+                OLD_URL_LIST |= set([l.replace('\n', '') for l in f.readlines()])
 
-        logger.info(f'Is equal: {OLD_URL_LIST == LINKS_TO_TRACK}')
-        logger.info(f'Deleted: {OLD_URL_LIST - LINKS_TO_TRACK}')
-        logger.info(f'Added: {LINKS_TO_TRACK - OLD_URL_LIST}')
+        CURRENT_URL_LIST = LINKS_TO_TRACK | LINKS_TO_TRACKABLE_RESOURCES
+
+        logger.info(f'Is equal: {OLD_URL_LIST == CURRENT_URL_LIST}')
+        logger.info(f'Deleted: {OLD_URL_LIST - CURRENT_URL_LIST}')
+        logger.info(f'Added: {CURRENT_URL_LIST - OLD_URL_LIST}')
     except IOError:
         pass
 
     with open(OUTPUT_FILENAME, 'w') as f:
         f.write('\n'.join(sorted(LINKS_TO_TRACK)))
+
+    with open(OUTPUT_RESOURCES_FILENAME, 'w') as f:
+        f.write('\n'.join(sorted(LINKS_TO_TRACKABLE_RESOURCES)))

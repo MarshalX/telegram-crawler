@@ -12,7 +12,16 @@ jobs:
   fetch_new_content:
     name: Make files tree
     runs-on: macos-10.15
+    continue-on-error: true
     timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [
+          "0",
+          "6"
+        ]
 
     steps:
 
@@ -37,18 +46,35 @@ jobs:
           TELEGRAM_SESSION_TEST: ${{ secrets.TELEGRAM_SESSION_TEST }}
           TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
           TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+          MODE: ${{ matrix.mode }}
         run: |
           git pull
           python make_files_tree.py
           rm -rf __pycache__
 
-      - name: Commit and push changes.
+      - name: Prepare data for mode 0.
+        if: matrix.mode == '0'
         run: |
           git checkout data
+
+          mv data/web_res data_ci/web_res
+          rm -rf data
+          mv data_ci data
+
+      - name: Prepare data for mode 6.
+        if: matrix.mode == '6'
+        run: |
+          git checkout data
+
+          mv data/web data_ci/web
+          mv data/client data_ci/client
+          mv data/server data_ci/server
 
           rm -rf data
           mv data_ci data
 
+      - name: Commit and push changes.
+        run: |
           git config --global user.email "github-action@users.noreply.github.com"
           git config --global user.name "GitHub Action"
 
