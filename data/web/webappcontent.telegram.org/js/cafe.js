@@ -259,7 +259,7 @@ var Cafe = {
         params.user_id = Cafe.userId;
         params.user_hash = Cafe.userHash;
       }
-      var invoiceSupported = Telegram.WebApp.isVersionAtLeast('1.1');
+      var invoiceSupported = Telegram.WebApp.isVersionAtLeast('6.1');
       if (invoiceSupported) {
         params.invoice = 1;
       }
