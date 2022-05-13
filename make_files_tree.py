@@ -549,28 +549,36 @@ async def crawl_web_res(session: aiohttp.ClientSession):
     await asyncio.gather(*[crawl(url, session, OUTPUT_RESOURCES_FOLDER) for url in tracked_urls])
 
 
-async def start(mode: int):
+async def start(mode: str):
     async with aiohttp.ClientSession(connector=CONNECTOR) as session:
-        # all without web resources
-        mode == 0 and await asyncio.gather(
+        mode == 'all' and await asyncio.gather(
             crawl_web(session),
+            crawl_web_res(session),
+            track_mtproto_configs(),
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
-            track_mtproto_configs(),
             download_telegram_ios_beta_and_extract_resources(session),
         )
-        mode == 1 and await crawl_web(session)
-        mode == 2 and await download_telegram_android_beta_and_extract_resources(session)
-        mode == 3 and await download_telegram_macos_beta_and_extract_resources(session)
-        mode == 4 and await track_mtproto_configs()
-        mode == 5 and await download_telegram_ios_beta_and_extract_resources(session)
-        mode == 6 and await crawl_web_res(session)
+        mode == 'web' and await asyncio.gather(
+            crawl_web(session),
+        )
+        mode == 'web_res' and await asyncio.gather(
+            crawl_web_res(session),
+        )
+        mode == 'server' and await asyncio.gather(
+            track_mtproto_configs(),
+        )
+        mode == 'client' and await asyncio.gather(
+            download_telegram_android_beta_and_extract_resources(session),
+            download_telegram_macos_beta_and_extract_resources(session),
+            download_telegram_ios_beta_and_extract_resources(session),
+        )
 
 
 if __name__ == '__main__':
-    run_mode = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+    run_mode = 'all'
     if 'MODE' in os.environ:
-        run_mode = int(os.environ['MODE'])
+        run_mode = os.environ['MODE']
 
     start_time = time()
     logger.info(f'Start crawling content of tracked urls...')

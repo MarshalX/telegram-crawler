@@ -19,8 +19,10 @@ jobs:
       fail-fast: false
       matrix:
         mode: [
-          "0",
-          "6"
+          "web",
+          "web_res",
+          "server",
+          "client"
         ]
 
     steps:
@@ -52,22 +54,53 @@ jobs:
           python make_files_tree.py
           rm -rf __pycache__
 
-      - name: Prepare data for mode 0.
-        if: matrix.mode == '0'
+      - name: Prepare data.
+        if: matrix.mode == 'web'
         run: |
           git checkout data
+          git pull
 
           mv data/web_res data_ci/web_res
+          mv data/client data_ci/client
+          mv data/server data_ci/server
+
           rm -rf data
           mv data_ci data
 
-      - name: Prepare data for mode 6.
-        if: matrix.mode == '6'
+      - name: Prepare data.
+        if: matrix.mode == 'web_res'
         run: |
           git checkout data
+          git pull
 
           mv data/web data_ci/web
           mv data/client data_ci/client
+          mv data/server data_ci/server
+
+          rm -rf data
+          mv data_ci data
+
+      - name: Prepare data.
+        if: matrix.mode == 'server'
+        run: |
+          git checkout data
+          git pull
+
+          mv data/web data_ci/web
+          mv data/web_res data_ci/web_res
+          mv data/client data_ci/client
+
+          rm -rf data
+          mv data_ci data
+
+      - name: Prepare data.
+        if: matrix.mode == 'client'
+        run: |
+          git checkout data
+          git pull
+
+          mv data/web data_ci/web
+          mv data/web_res data_ci/web_res
           mv data/server data_ci/server
 
           rm -rf data
