@@ -40,11 +40,11 @@ STATUS_TO_EMOJI = {
     'unchanged': '📝',
 }
 
-# order is important!
-AVAILABLE_HASHTAGS = [
+AVAILABLE_HASHTAGS = {
     'web_res', 'web', 'server', 'test_server', 'client', 'ios', 'macos', 'android'
-]
+}
 HASHTAGS_PATTERNS = {
+    # regex will be more flexible. for example, in issue with double hashtag '#web #web_res' when data/res not changed
     'web_res': os.path.join(ROOT_TREE_DIR, 'web_res'),
     'web': os.path.join(ROOT_TREE_DIR, 'web'),
     'server': os.path.join(ROOT_TREE_DIR, 'server'),
@@ -133,16 +133,13 @@ async def main() -> None:
 
         changes = {k: [] for k in STATUS_TO_EMOJI.keys()}
         for file in commit_files:
-            used_hashtags = set()
             for available_hashtag in available_hashtags:
                 pattern = HASHTAGS_PATTERNS[available_hashtag]
                 if pattern in file['filename']:
                     alert_hashtags.add(available_hashtag)
-                    used_hashtags.add(available_hashtag)
                     break    # one file cannot have more than one hashtag
             # optimize substring search
-            for used_hashtag in used_hashtags:
-                available_hashtags.remove(used_hashtag)
+            available_hashtags -= alert_hashtags
 
             changed_url = file['filename'].replace('.html', '')
             for path_to_remove in PATHS_TO_REMOVE_FROM_ALERT:
