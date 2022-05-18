@@ -369,6 +369,7 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
 
     await _get_page(0)
 
+    # TODO parse html and sort items by name
     return '\n'.join(content)
 
 
@@ -519,6 +520,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
 
         content = await response.text(encoding='UTF-8')
         if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
+            return  # temp solution until fix
             content = await collect_translations_paginated_content(url, session)
 
         content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
