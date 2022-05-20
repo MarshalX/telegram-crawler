@@ -450,6 +450,85 @@
     return s;
   }
 
+  var windowOpen = window.open;
+  window.open = function(url) {
+    WebApp.openLink(url);
+  };
+
+  var BackButton = (function() {
+    var isVisible = false;
+
+    var backButton = {};
+    Object.defineProperty(backButton, 'isVisible', {
+      set: function(val){ setParams({is_visible: val}); },
+      get: function(){ return isVisible; },
+      enumerable: true
+    });
+
+    var curButtonState = null;
+
+    WebView.onEvent('back_button_pressed', onBackButtonPressed);
+
+    function onBackButtonPressed() {
+      receiveWebViewEvent('backButtonClicked');
+    }
+
+    function buttonParams() {
+      return {is_visible: isVisible};
+    }
+
+    function buttonState(btn_params) {
+      if (typeof btn_params === 'undefined') {
+        btn_params = buttonParams();
+      }
+      return JSON.stringify(btn_params);
+    }
+
+    function buttonCheckVersion() {
+      if (!versionAtLeast('6.1')) {
+        console.warn('[Telegram.WebApp] BackButton is not supported in version ' + webAppVersion);
+      }
+    }
+
+    function updateButton() {
+      var btn_params = buttonParams();
+      var btn_state = buttonState(btn_params);
+      if (curButtonState === btn_state) {
+        return;
+      }
+      curButtonState = btn_state;
+      WebView.postEvent('web_app_setup_back_button', false, btn_params);
+    }
+
+    function setParams(params) {
+      if (typeof params.is_visible !== 'undefined') {
+        isVisible = !!params.is_visible;
+      }
+      updateButton();
+      return backButton;
+    }
+
+    backButton.onClick = function(callback) {
+      buttonCheckVersion();
+      onWebViewEvent('backButtonClicked', callback);
+      return backButton;
+    };
+    backButton.offClick = function(callback) {
+      buttonCheckVersion();
+      offWebViewEvent('backButtonClicked', callback);
+      return backButton;
+    };
+    backButton.show = function() {
+      buttonCheckVersion();
+      return setParams({is_visible: true});
+    };
+    backButton.hide = function() {
+      buttonCheckVersion();
+      return setParams({is_visible: false});
+    };
+    return backButton;
+  })();
+
   var mainButtonHeight = 0;
   var MainButton = (function() {
     var isVisible = false;
@@ -681,6 +760,51 @@
     return mainButton;
   })();
 
+  var HapticFeedback = (function() {
+    var hapticFeedback = {};
+
+    function triggerFeedback(params) {
+      if (params.type == 'impact') {
+        if (params.impact_style != 'light' &&
+            params.impact_style != 'medium' &&
+            params.impact_style != 'heavy' &&
+            params.impact_style != 'rigid' &&
+            params.impact_style != 'soft') {
+          console.error('[Telegram.WebApp] Haptic impact style is invalid', params.impact_style);
+          throw Error('WebAppHapticImpactStyleInvalid');
+        }
+      } else if (params.type == 'notification') {
+        if (params.notification_type != 'error' &&
+            params.notification_type != 'success' &&
+            params.notification_type != 'warning') {
+          console.error('[Telegram.WebApp] Haptic notification type is invalid', params.notification_type);
+          throw Error('WebAppHapticNotificationTypeInvalid');
+        }
+      } else if (params.type == 'selection_change') {
+        // no params needed
+      } else {
+        console.error('[Telegram.WebApp] Haptic feedback type is invalid', params.type);
+        throw Error('WebAppHapticFeedbackTypeInvalid');
+      }
+      if (!versionAtLeast('6.1')) {
+        console.warn('[Telegram.WebApp] HapticFeedback is not supported in version ' + webAppVersion);
+      }
+      WebView.postEvent('web_app_trigger_haptic_feedback', false, params);
+      return hapticFeedback;
+    }
+
+    hapticFeedback.impactOccupped = function(style) {
+      return triggerFeedback({type: 'impact', impact_style: style});
+    };
+    hapticFeedback.notificationOccurred = function(type) {
+      return triggerFeedback({type: 'notification', notification_type: type});
+    };
+    hapticFeedback.selectionChanged = function() {
+      return triggerFeedback({type: 'selection_change'});
+    };
+    return hapticFeedback;
+  })();
+
   var webAppInvoices = {};
   function onInvoiceClosed(eventType, eventData) {
     if (eventData.slug && webAppInvoices[eventData.slug]) {
@@ -732,8 +856,16 @@
     get: function(){ return (viewportStableHeight === false ? window.innerHeight : viewportStableHeight) - mainButtonHeight; },
     enumerable: true
   });
+  Object.defineProperty(WebApp, 'BackButton', {
+    value: BackButton,
+    enumerable: true
+  });
   Object.defineProperty(WebApp, 'MainButton', {
     value: MainButton,
+    enumerable: true
+  });
+  Object.defineProperty(WebApp, 'HapticFeedback', {
+    value: HapticFeedback,
     enumerable: true
   });
   WebApp.isVersionAtLeast = function(ver) {
@@ -755,6 +887,21 @@
     }
     WebView.postEvent('web_app_data_send', false, {data: data});
   };
+  WebApp.openLink = function (url) {
+    var a = document.createElement('A');
+    a.href = url;
+    if (a.protocol != 'http:' &&
+        a.protocol != 'https:') {
+      console.error('[Telegram.WebApp] Url protocol is not supported', url);
+      throw Error('WebAppTgUrlInvalid');
+    }
+    var url = a.href;
+    if (versionAtLeast('6.1')) {
+      WebView.postEvent('web_app_open_link', false, {url: url});
+    } else {
+      windowOpen(url, '_blank');
+    }
+  };
   WebApp.openTelegramLink = function (url) {
     var a = document.createElement('A');
     a.href = url;
@@ -768,7 +915,7 @@
       throw Error('WebAppTgUrlInvalid');
     }
     var path_full = a.pathname + a.search;
-    if (isIframe || versionAtLeast('1.1')) {
+    if (isIframe || versionAtLeast('6.1')) {
       WebView.postEvent('web_app_open_tg_link', false, {path_full: path_full});
     } else {
       location.href = 'https://t.me' + path_full;
@@ -785,7 +932,7 @@
       console.error('[Telegram.WebApp] Invoice url is invalid', url);
       throw Error('WebAppInvoiceUrlInvalid');
     }
-    if (!versionAtLeast('1.1')) {
+    if (!versionAtLeast('6.1')) {
       console.error('[Telegram.WebApp] Method openInvoice is not supported in version ' + webAppVersion);
       throw Error('WebAppMethodUnsupported');
     }

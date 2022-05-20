@@ -34,6 +34,7 @@ var Cafe = {
     Telegram.WebApp.MainButton.setParams({
       text_color: '#fff'
     }).onClick(Cafe.mainBtnClicked);
+    Telegram.WebApp.BackButton.onClick(Cafe.backBtnClicked);
     initRipple();
   },
   initLotties: function() {
@@ -63,6 +64,9 @@ var Cafe = {
   },
   eEditClicked: function(e) {
     e.preventDefault();
+    Cafe.toggleMode(false);
+  },
+  backBtnClicked: function() {
     Cafe.toggleMode(false);
   },
   getOrderItem: function(itemEl) {
@@ -224,6 +228,7 @@ var Cafe = {
           RLottie.setVisible(this, true);
         });
       }, anim_duration);
+      Telegram.WebApp.BackButton.show();
     } else {
       $('.js-item-lottie').each(function() {
         RLottie.setVisible(this, false);
@@ -236,6 +241,7 @@ var Cafe = {
           RLottie.setVisible(this, true);
         });
       }, anim_duration);
+      Telegram.WebApp.BackButton.hide();
     }
     Cafe.updateMainButton();
   },
