@@ -54,11 +54,13 @@ var Cafe = {
   },
   eIncrClicked: function(e) {
     e.preventDefault();
+    Telegram.WebApp.HapticFeedback.impactOccurred('light');
     var itemEl = $(this).parents('.js-item');
     Cafe.incrClicked(itemEl, 1);
   },
   eDecrClicked: function(e) {
     e.preventDefault();
+    Telegram.WebApp.HapticFeedback.impactOccurred('light');
     var itemEl = $(this).parents('.js-item');
     Cafe.incrClicked(itemEl, -1);
   },
@@ -278,8 +280,10 @@ var Cafe = {
               if (status == 'paid') {
                 Telegram.WebApp.close();
               } else if (status == 'failed') {
+                Telegram.WebApp.HapticFeedback.notificationOccurred('error');
                 Cafe.showStatus('Payment has been failed.');
               } else {
+                Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
                 Cafe.showStatus('You have cancelled this order.');
               }
             });
@@ -288,6 +292,7 @@ var Cafe = {
           }
         }
         if (result.error) {
+          Telegram.WebApp.HapticFeedback.notificationOccurred('error');
           Cafe.showStatus(result.error);
         }
       });
