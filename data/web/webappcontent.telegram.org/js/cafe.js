@@ -35,6 +35,7 @@ var Cafe = {
       text_color: '#fff'
     }).onClick(Cafe.mainBtnClicked);
     Telegram.WebApp.BackButton.onClick(Cafe.backBtnClicked);
+    Telegram.WebApp.setHeaderColor('bg_color');
     initRipple();
   },
   initLotties: function() {
@@ -150,6 +151,11 @@ var Cafe = {
     }
     return s.join(dec)
   },
+  updateBackgroundColor: function() {
+    var style = window.getComputedStyle(document.body);
+    var bg_color = parseColorToHex(style.backgroundColor || '#fff');
+    Telegram.WebApp.setBackgroundColor(bg_color);
+  },
   updateMainButton: function() {
     var mainButton = Telegram.WebApp.MainButton;
     if (Cafe.modeOrder) {
@@ -220,7 +226,7 @@ var Cafe = {
       });
       $('.cafe-order-overview').show();
       $('.cafe-items').css('maxHeight', height).redraw();
-      $('body').addClass('order-mode');
+      $('html').addClass('order-mode');
       $('.js-order-comment-field').each(function() {
         autosize.update(this);
       });
@@ -235,7 +241,7 @@ var Cafe = {
       $('.js-item-lottie').each(function() {
         RLottie.setVisible(this, false);
       });
-      $('body').removeClass('order-mode');
+      $('html').removeClass('order-mode');
       setTimeout(function() {
         $('.cafe-items').css('maxHeight', '');
         $('.cafe-order-overview').hide();
@@ -245,6 +251,7 @@ var Cafe = {
       }, anim_duration);
       Telegram.WebApp.BackButton.hide();
     }
+    Cafe.updateBackgroundColor();
     Cafe.updateMainButton();
   },
   toggleLoading: function(loading) {
@@ -332,6 +339,25 @@ var Cafe = {
     });
   }
 };
+
+function parseColorToHex(color) {
+  color += '';
+  var match;
+  if (match = /^\s*#([0-9a-f]{6})\s*$/i.exec(color)) {
+    return '#' + match[1].toLowerCase();
+  }
+  else if (match = /^\s*#([0-9a-f])([0-9a-f])([0-9a-f])\s*$/i.exec(color)) {
+    return ('#' + match[1] + match[1] + match[2] + match[2] + match[3] + match[3]).toLowerCase();
+  }
+  else if (match = /^\s*rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)\s*$/.exec(color)) {
+    var r = parseInt(match[1]), g = parseInt(match[2]), b = parseInt(match[3]);
+    r = (r < 16 ? '0' : '') + r.toString(16);
+    g = (g < 16 ? '0' : '') + g.toString(16);
+    b = (b < 16 ? '0' : '') + b.toString(16);
+    return '#' + r + g + b;
+  }
+  return false;
+}
 
 /*!
   Autosize 3.0.20

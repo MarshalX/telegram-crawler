@@ -395,11 +395,18 @@
   function parseColorToHex(color) {
     color += '';
     var match;
-    if (/^#([0-9a-f]){6}$/i.test(color)) {
-      return color.toLowerCase();
+    if (match = /^\s*#([0-9a-f]{6})\s*$/i.exec(color)) {
+      return '#' + match[1].toLowerCase();
     }
-    else if (match = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(color)) {
+    else if (match = /^\s*#([0-9a-f])([0-9a-f])([0-9a-f])\s*$/i.exec(color)) {
       return ('#' + match[1] + match[1] + match[2] + match[2] + match[3] + match[3]).toLowerCase();
+    }
+    else if (match = /^\s*rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)\s*$/.exec(color)) {
+      var r = parseInt(match[1]), g = parseInt(match[2]), b = parseInt(match[3]);
+      r = (r < 16 ? '0' : '') + r.toString(16);
+      g = (g < 16 ? '0' : '') + g.toString(16);
+      b = (b < 16 ? '0' : '') + b.toString(16);
+      return '#' + r + g + b;
     }
     return false;
   }
@@ -450,11 +457,6 @@
     return s;
   }
 
-  var windowOpen = window.open;
-  window.open = function(url) {
-    WebApp.openLink(url);
-  };
-
   var BackButton = (function() {
     var isVisible = false;
 
@@ -487,7 +489,9 @@
     function buttonCheckVersion() {
       if (!versionAtLeast('6.1')) {
         console.warn('[Telegram.WebApp] BackButton is not supported in version ' + webAppVersion);
+        return false;
       }
+      return true;
     }
 
     function updateButton() {
@@ -501,6 +505,9 @@
     }
 
     function setParams(params) {
+      if (!buttonCheckVersion()) {
+        return backButton;
+      }
       if (typeof params.is_visible !== 'undefined') {
         isVisible = !!params.is_visible;
       }
@@ -509,21 +516,21 @@
     }
 
     backButton.onClick = function(callback) {
-      buttonCheckVersion();
-      onWebViewEvent('backButtonClicked', callback);
+      if (buttonCheckVersion()) {
+        onWebViewEvent('backButtonClicked', callback);
+      }
       return backButton;
     };
     backButton.offClick = function(callback) {
-      buttonCheckVersion();
-      offWebViewEvent('backButtonClicked', callback);
+      if (buttonCheckVersion()) {
+        offWebViewEvent('backButtonClicked', callback);
+      }
       return backButton;
     };
     backButton.show = function() {
-      buttonCheckVersion();
       return setParams({is_visible: true});
     };
     backButton.hide = function() {
-      buttonCheckVersion();
       return setParams({is_visible: false});
     };
     return backButton;
@@ -685,7 +692,7 @@
         } else {
           var color = parseColorToHex(params.color);
           if (!color) {
-            console.error('[Telegram.WebApp] Main button color format is invalid', color);
+            console.error('[Telegram.WebApp] Main button color format is invalid', params.color);
             throw Error('WebAppMainButtonParamInvalid');
           }
           buttonColor = color;
@@ -698,7 +705,7 @@
         } else {
           var text_color = parseColorToHex(params.text_color);
           if (!text_color) {
-            console.error('[Telegram.WebApp] Main button text color format is invalid', text_color);
+            console.error('[Telegram.WebApp] Main button text color format is invalid', params.text_color);
             throw Error('WebAppMainButtonParamInvalid');
           }
           buttonTextColor = text_color;
@@ -764,6 +771,10 @@
     var hapticFeedback = {};
 
     function triggerFeedback(params) {
+      if (!versionAtLeast('6.1')) {
+        console.warn('[Telegram.WebApp] HapticFeedback is not supported in version ' + webAppVersion);
+        return hapticFeedback;
+      }
       if (params.type == 'impact') {
         if (params.impact_style != 'light' &&
             params.impact_style != 'medium' &&
@@ -786,14 +797,11 @@
         console.error('[Telegram.WebApp] Haptic feedback type is invalid', params.type);
         throw Error('WebAppHapticFeedbackTypeInvalid');
       }
-      if (!versionAtLeast('6.1')) {
-        console.warn('[Telegram.WebApp] HapticFeedback is not supported in version ' + webAppVersion);
-      }
       WebView.postEvent('web_app_trigger_haptic_feedback', false, params);
       return hapticFeedback;
     }
 
-    hapticFeedback.impactOccupped = function(style) {
+    hapticFeedback.impactOccurred = function(style) {
       return triggerFeedback({type: 'impact', impact_style: style});
     };
     hapticFeedback.notificationOccurred = function(type) {
@@ -868,6 +876,22 @@
     value: HapticFeedback,
     enumerable: true
   });
+  WebApp.setHeaderColor = function(color_key) {
+    if (color_key != 'bg_color' &&
+        color_key != 'secondary_bg_color') {
+      console.error('[Telegram.WebApp] Header color key should be one of \'bg_color\', \'secondary_bg_color\'', color_key);
+      throw Error('WebAppHeaderColorKeyInvalid');
+    }
+    WebView.postEvent('web_app_set_header_color', false, {color_key: color_key});
+  };
+  WebApp.setBackgroundColor = function(color) {
+    var bg_color = parseColorToHex(color);
+    if (!bg_color) {
+      console.error('[Telegram.WebApp] Background color format is invalid', color);
+      throw Error('WebAppBackgroundColorInvalid');
+    }
+    WebView.postEvent('web_app_set_background_color', false, {color: color});
+  };
   WebApp.isVersionAtLeast = function(ver) {
     return versionAtLeast(ver);
   };
@@ -899,7 +923,7 @@
     if (versionAtLeast('6.1')) {
       WebView.postEvent('web_app_open_link', false, {url: url});
     } else {
-      windowOpen(url, '_blank');
+      window.open(url, '_blank');
     }
   };
   WebApp.openTelegramLink = function (url) {
