@@ -391,6 +391,28 @@
     setCssProperty('viewport-stable-height', stable_height);
   }
 
+  var headerColor = 'bg_color';
+  function setHeaderColor(color_key) {
+    if (color_key != 'bg_color' &&
+        color_key != 'secondary_bg_color') {
+      console.error('[Telegram.WebApp] Header color key should be one of \'bg_color\', \'secondary_bg_color\'', color_key);
+      throw Error('WebAppHeaderColorKeyInvalid');
+    }
+    headerColor = color_key;
+    WebView.postEvent('web_app_set_header_color', false, {color_key: color_key});
+  };
+
+  var backgroundColor = null;
+  function setBackgroundColor(color) {
+    var bg_color = parseColorToHex(color);
+    if (!bg_color) {
+      console.error('[Telegram.WebApp] Background color format is invalid', color);
+      throw Error('WebAppBackgroundColorInvalid');
+    }
+    backgroundColor = color;
+    WebView.postEvent('web_app_set_background_color', false, {color: color});
+  };
+
 
   function parseColorToHex(color) {
     color += '';
@@ -864,6 +886,16 @@
     get: function(){ return (viewportStableHeight === false ? window.innerHeight : viewportStableHeight) - mainButtonHeight; },
     enumerable: true
   });
+  Object.defineProperty(WebApp, 'headerColor', {
+    set: function(val){ setHeaderColor(val); },
+    get: function(){ return headerColor; },
+    enumerable: true
+  });
+  Object.defineProperty(WebApp, 'backgroundColor', {
+    set: function(val){ setBackgroundColor(val); },
+    get: function(){ return backgroundColor; },
+    enumerable: true
+  });
   Object.defineProperty(WebApp, 'BackButton', {
     value: BackButton,
     enumerable: true
@@ -877,20 +909,10 @@
     enumerable: true
   });
   WebApp.setHeaderColor = function(color_key) {
-    if (color_key != 'bg_color' &&
-        color_key != 'secondary_bg_color') {
-      console.error('[Telegram.WebApp] Header color key should be one of \'bg_color\', \'secondary_bg_color\'', color_key);
-      throw Error('WebAppHeaderColorKeyInvalid');
-    }
-    WebView.postEvent('web_app_set_header_color', false, {color_key: color_key});
+    WebApp.headerColor = color_key;
   };
   WebApp.setBackgroundColor = function(color) {
-    var bg_color = parseColorToHex(color);
-    if (!bg_color) {
-      console.error('[Telegram.WebApp] Background color format is invalid', color);
-      throw Error('WebAppBackgroundColorInvalid');
-    }
-    WebView.postEvent('web_app_set_background_color', false, {color: color});
+    WebApp.backgroundColor = color;
   };
   WebApp.isVersionAtLeast = function(ver) {
     return versionAtLeast(ver);
