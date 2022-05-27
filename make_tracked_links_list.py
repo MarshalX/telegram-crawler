@@ -123,6 +123,7 @@ CRAWL_RULES = {
     'telegram.org': {
         'deny': {
             r'apps$',
+            r'img/emoji/.+',
             r'img/StickerExample.psd$',
         },
     },
