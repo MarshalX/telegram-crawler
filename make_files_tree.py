@@ -6,7 +6,6 @@ import os
 import platform
 import re
 import shutil
-import sys
 import zipfile
 from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
@@ -16,6 +15,7 @@ from typing import List
 import aiofiles
 import aiohttp
 from aiohttp import ClientConnectorError, ServerDisconnectedError
+from bs4 import BeautifulSoup
 
 import ccl_bplist
 
@@ -342,7 +342,7 @@ async def download_telegram_android_beta_and_extract_resources(session: aiohttp.
 
 async def collect_translations_paginated_content(url: str, session: aiohttp.ClientSession) -> str:
     headers = {'X-Requested-With': 'XMLHttpRequest'}
-    content = list()
+    content = dict()
 
     async def _get_page(offset: int):
         logger.info(f'Url: {url}, offset: {offset}')
@@ -359,7 +359,18 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
                 else:
                     json = await response.json(encoding='UTF-8')
                     if 'more_html' in json and json['more_html']:
-                        content.append(json['more_html'])
+                        json['more_html'] = re.sub(TRANSLATE_SUGGESTION_REGEX, '', json['more_html'])
+
+                        soup = BeautifulSoup(json['more_html'], 'html.parser')
+                        tr_items = soup.find_all('div', {'class': 'tr-key-row-wrap'})
+                        for tr_item in tr_items:
+                            tr_key = tr_item.find_next('div', {'class': 'tr-value-key'}).text
+
+                            tr_values = tr_item.find_all('span', {'class': 'value'})
+                            tr_values_content = [tr_value.decode_contents() for tr_value in tr_values]
+
+                            content[tr_key] = tr_values_content
+
                         new_offset = offset + 200
 
             new_offset and await _get_page(new_offset)
@@ -369,8 +380,8 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
 
     await _get_page(0)
 
-    # TODO parse html and sort items by name
-    return '\n'.join(content)
+    content = dict(sorted(content.items()))
+    return json.dumps(content, indent=4, ensure_ascii=False)
 
 
 async def track_mtproto_configs():
@@ -520,7 +531,6 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
 
         content = await response.text(encoding='UTF-8')
         if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
-            return  # temp solution until fix
             content = await collect_translations_paginated_content(url, session)
 
         content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
@@ -528,7 +538,6 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
         content = re.sub(NONCE_REGEX, NONCE_TEMPLATE, content)
         content = re.sub(PROXY_CONFIG_SUB_NET_REGEX, PROXY_CONFIG_SUB_NET_TEMPLATE, content)
-        content = re.sub(TRANSLATE_SUGGESTION_REGEX, '', content)
         content = re.sub(SPARKLE_SIG_REGEX, SPARKLE_SIG_TEMPLATE, content)
         content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
 
