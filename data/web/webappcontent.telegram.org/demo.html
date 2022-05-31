@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://telegram.org/js/telegram-web-app.js?14"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js?16"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -101,11 +101,13 @@
       section {
         padding: 15px;
         text-align: center;
+        background-color: var(--tg-theme-bg-color, #ffffff);
+      }
+      section.gray {
         background-color: var(--tg-theme-secondary-bg-color, #efefef);
       }
       section + section {
         padding: 0 15px 65px;
-        background-color: var(--tg-theme-bg-color, #ffffff);
       }
       p {
         margin: 40px 0 15px;
@@ -200,7 +202,7 @@
     </style>
   </head>
   <body style="visibility: hidden;">
-    <section>
+    <section class="">
         <button id="main_btn" onclick="sendMessage('');">Send «Hello, World!»</button>
   <button id="with_webview_btn" onclick="sendMessage('', true);">Send «Hello, World!» with inline webview button</button>
   <button id="data_btn" onclick="sendTime(true);">Send current time to bot (x10)</button>
@@ -451,7 +453,9 @@ function setViewportData() {
 Telegram.WebApp.setHeaderColor('bg_color');
 Telegram.WebApp.onEvent('viewportChanged', setViewportData);
 setViewportData();
-
+Telegram.WebApp.onEvent('settingsButtonClicked', function() {
+  alert('Settings opened!');
+});
 
 </script>
   </body>

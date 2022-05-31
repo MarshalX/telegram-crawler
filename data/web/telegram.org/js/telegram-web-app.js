@@ -391,19 +391,42 @@
     setCssProperty('viewport-stable-height', stable_height);
   }
 
-  var headerColor = 'bg_color';
-  function setHeaderColor(color_key) {
+  var headerColorKey = 'bg_color';
+  function setHeaderColor(color) {
+    if (!versionAtLeast('6.1')) {
+      console.warn('[Telegram.WebApp] Header color is not supported in version ' + webAppVersion);
+      return;
+    }
+    var color_key;
+    if (color == 'bg_color' || color == 'secondary_bg_color') {
+      color_key = color;
+    } else {
+      color_key = parseColorToHex(color);
+      if (themeParams.bg_color &&
+          themeParams.bg_color == color_key) {
+        color_key = 'bg_color';
+      } else if (themeParams.secondary_bg_color &&
+                 themeParams.secondary_bg_color == color_key) {
+        color_key = 'secondary_bg_color';
+      } else {
+        color_key = false;
+      }
+    }
     if (color_key != 'bg_color' &&
         color_key != 'secondary_bg_color') {
-      console.error('[Telegram.WebApp] Header color key should be one of \'bg_color\', \'secondary_bg_color\'', color_key);
+      console.error('[Telegram.WebApp] Header color key should be one of Telegram.WebApp.themeParams.bg_color, Telegram.WebApp.themeParams.secondary_bg_color, \'bg_color\', \'secondary_bg_color\'', color);
       throw Error('WebAppHeaderColorKeyInvalid');
     }
-    headerColor = color_key;
+    headerColorKey = color_key;
     WebView.postEvent('web_app_set_header_color', false, {color_key: color_key});
   };
 
   var backgroundColor = null;
   function setBackgroundColor(color) {
+    if (!versionAtLeast('6.1')) {
+      console.warn('[Telegram.WebApp] Background color is not supported in version ' + webAppVersion);
+      return;
+    }
     var bg_color = parseColorToHex(color);
     if (!bg_color) {
       console.error('[Telegram.WebApp] Background color format is invalid', color);
@@ -789,6 +812,11 @@
     return mainButton;
   })();
 
+  function onSettingsButtonPressed() {
+    receiveWebViewEvent('settingsButtonClicked');
+  }
+  WebView.onEvent('settings_button_pressed', onSettingsButtonPressed);
+
   var HapticFeedback = (function() {
     var hapticFeedback = {};
 
@@ -888,7 +916,7 @@
   });
   Object.defineProperty(WebApp, 'headerColor', {
     set: function(val){ setHeaderColor(val); },
-    get: function(){ return headerColor; },
+    get: function(){ return themeParams[headerColorKey] || null; },
     enumerable: true
   });
   Object.defineProperty(WebApp, 'backgroundColor', {
