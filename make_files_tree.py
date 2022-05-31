@@ -404,7 +404,7 @@ async def track_mtproto_configs():
 
 async def _fetch_and_track_mtproto(app, output_dir):
     from pyrogram.raw import functions
-    from pyrogram.raw.types import InputStickerSetAnimatedEmoji
+    from pyrogram.raw.types import InputStickerSetShortName
 
     configs = {
         'GetConfig': await app.invoke(functions.help.GetConfig()),
@@ -416,10 +416,20 @@ async def _fetch_and_track_mtproto(app, output_dir):
         'GetCountriesList': await app.invoke(functions.help.GetCountriesList(lang_code='en', hash=0)),
         'GetAppConfig': await app.invoke(functions.help.GetAppConfig()),
         # 'GetAppUpdate': await app.invoke(functions.help.GetAppUpdate(source='')),
-        'AnimatedEmoji': await app.invoke(
-            functions.messages.GetStickerSet(stickerset=InputStickerSetAnimatedEmoji(), hash=0)
-        ),
+        # 'AnimatedEmoji': await app.invoke(
+        #     functions.messages.GetStickerSet(stickerset=InputStickerSetAnimatedEmoji(), hash=0)
+        # ),
+        'GetAvailableReactions': await app.invoke(functions.messages.GetAvailableReactions(hash=0)),
     }
+
+    sticker_set_short_names = {'EmojiAnimations', 'EmojiAroundAnimations', 'EmojiShortAnimations',
+                               'EmojiAppearAnimations', 'EmojiCenterAnimations', 'AnimatedEmojies'}
+
+    for short_name in sticker_set_short_names:
+        sticker_set = await app.invoke(functions.messages.GetStickerSet(
+            stickerset=InputStickerSetShortName(short_name=short_name), hash=0
+        ))
+        configs[f'sticker_set/{short_name}'] = sticker_set
 
     keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64'}
 
@@ -438,7 +448,9 @@ async def _fetch_and_track_mtproto(app, output_dir):
             elif key in keys_to_hide:
                 config[key] = 'crawler'
 
-    for config_name in {'GetAppConfig', 'AnimatedEmoji'}:
+    configs_to_filter = {f'sticker_set/{name}' for name in sticker_set_short_names} | \
+                        {'GetAppConfig', 'GetAvailableReactions'}
+    for config_name in configs_to_filter:
         configs[config_name] = json.loads(str(configs[config_name]))
         rem_rec(configs[config_name])
         configs[config_name] = json.dumps(configs[config_name], indent=4)
