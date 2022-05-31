@@ -448,9 +448,8 @@ async def _fetch_and_track_mtproto(app, output_dir):
             elif key in keys_to_hide:
                 config[key] = 'crawler'
 
-    configs_to_filter = {f'sticker_set/{name}' for name in sticker_set_short_names} | \
-                        {'GetAppConfig', 'GetAvailableReactions'}
-    for config_name in configs_to_filter:
+    sticker_sets_to_filter = {f'sticker_set/{name}' for name in sticker_set_short_names}
+    for config_name in sticker_sets_to_filter | {'GetAppConfig', 'GetAvailableReactions'}:
         configs[config_name] = json.loads(str(configs[config_name]))
         rem_rec(configs[config_name])
         configs[config_name] = json.dumps(configs[config_name], indent=4)
