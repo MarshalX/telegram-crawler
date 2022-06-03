@@ -8,6 +8,15 @@
   } catch (e) {}
 
   var initParams = urlParseHashParams(locationHash);
+  var storedParams = sessionStorageGet('initParams');
+  if (storedParams) {
+    for (var key in storedParams) {
+      if (typeof initParams[key] === 'undefined') {
+        initParams[key] = storedParams[key];
+      }
+    }
+  }
+  sessionStorageSet('initParams', initParams);
 
   var isIframe = false, iFrameStyle;
   try {
@@ -219,6 +228,20 @@
     return true;
   }
 
+  function sessionStorageSet(key, value) {
+    try {
+      window.sessionStorage.setItem('__telegram__' + key, JSON.stringify(value));
+      return true;
+    } catch(e) {}
+    return false;
+  }
+  function sessionStorageGet(key) {
+    try {
+      return JSON.parse(window.sessionStorage.getItem('__telegram__' + key));
+    } catch(e) {}
+    return null;
+  }
+
   if (!window.Telegram) {
     window.Telegram = {};
   }
@@ -236,7 +259,9 @@
     urlSafeDecode: urlSafeDecode,
     urlParseQueryString: urlParseQueryString,
     urlParseHashParams: urlParseHashParams,
-    urlAppendHashParams: urlAppendHashParams
+    urlAppendHashParams: urlAppendHashParams,
+    sessionStorageSet: sessionStorageSet,
+    sessionStorageGet: sessionStorageGet
   };
 
   // For Windows Phone app
@@ -277,8 +302,14 @@
     var themeParamsRaw = initParams.tgWebAppThemeParams;
     try {
       var theme_params = JSON.parse(themeParamsRaw);
-      setThemeParams(theme_params);
+      if (theme_params) {
+        setThemeParams(theme_params);
+      }
     } catch (e) {}
+  }
+  var theme_params = Utils.sessionStorageGet('themeParams');
+  if (theme_params) {
+    setThemeParams(theme_params);
   }
   if (initParams.tgWebAppVersion) {
     webAppVersion = initParams.tgWebAppVersion;
@@ -362,6 +393,7 @@
         setCssProperty(key, color);
       }
     }
+    Utils.sessionStorageSet('themeParams', themeParams);
   }
 
   var viewportHeight = false, viewportStableHeight = false, isExpanded = true;

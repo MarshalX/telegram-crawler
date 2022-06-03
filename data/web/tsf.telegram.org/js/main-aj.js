@@ -423,6 +423,7 @@ function ajInit(options) {
   function loadPage(link, push_state, state_go) {
     var url = link.href;
     var cur_url = curLocation.href;
+    var cur_ref = curLocation.origin + curLocation.pathname + curLocation.search;
     if (link.origin != curLocation.origin) {
       return false;
     }
@@ -451,7 +452,7 @@ function ajInit(options) {
       $.ajax(url, {
         dataType: 'json',
         xhrFields: {withCredentials: true},
-        headers: {'X-Aj-Referer': cur_url},
+        headers: {'X-Aj-Referer': cur_ref},
         success: function(result, t, xhr) {
           onResult(url, xhr.status, result, push_state);
         },
