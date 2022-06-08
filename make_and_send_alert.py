@@ -137,7 +137,7 @@ async def main() -> None:
                 pattern = HASHTAGS_PATTERNS[available_hashtag]
                 if pattern in file['filename']:
                     alert_hashtags.add(available_hashtag)
-                    break    # one file cannot have more than one hashtag
+
             # optimize substring search
             available_hashtags -= alert_hashtags
 
