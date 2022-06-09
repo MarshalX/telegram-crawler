@@ -1,6 +1,7 @@
 import asyncio
 import hashlib
 import json
+import math
 import logging
 import os
 import platform
@@ -493,13 +494,21 @@ class RetryError(Exception):
 
 
 async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str = OUTPUT_SITES_FOLDER):
-    while True:
+    attempt = 0
+    while attempt < 100:   # around 6 minutes
+        attempt += 1
         try:
             await _crawl(url, session, output_dir)
-        except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
-            logger.warning(f'Client or timeout error. Retrying {url}')
+        except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError) as e:
+            logger.warning(f'Client or timeout error ({repr(e)}). Retrying {url}')
         else:
-            break
+            return
+
+        delay = math.log(attempt)
+        logger.info(f'Sleep for {delay}. Attempt {attempt}. URL: {url}')
+        await asyncio.sleep(delay)
+
+    logger.info(f'Max amount of attempts has been reached ({url})')
 
 
 async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
