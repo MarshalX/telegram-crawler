@@ -104,8 +104,11 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
     json = await make_req(f'{base_url}/public_releases')
     if json and json[0]:
         latest_id = json[0]['id']
+        version = json[0]['version']
     else:
         return
+
+    logger.info(f'The latest appcenter release is {version} ({parameterized_url})')
 
     json = await make_req(f'{base_url}/releases/{latest_id}')
     if json:
