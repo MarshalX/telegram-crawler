@@ -318,9 +318,8 @@
   function onThemeChanged(eventType, eventData) {
     if (eventData.theme_params) {
       setThemeParams(eventData.theme_params);
-      window.Telegram.WebApp.MainButton.setParams({
-        force_update: true
-      });
+      window.Telegram.WebApp.MainButton.setParams({});
+      updateBackgroundColor();
       receiveWebViewEvent('themeChanged');
     }
   }
@@ -424,6 +423,9 @@
   }
 
   var headerColorKey = 'bg_color';
+  function getHeaderColor() {
+    return themeParams[headerColorKey] || null;
+  }
   function setHeaderColor(color) {
     if (!versionAtLeast('6.1')) {
       console.warn('[Telegram.WebApp] Header color is not supported in version ' + webAppVersion);
@@ -451,22 +453,43 @@
     }
     headerColorKey = color_key;
     WebView.postEvent('web_app_set_header_color', false, {color_key: color_key});
-  };
+  }
 
-  var backgroundColor = null;
+  var backgroundColor = 'bg_color';
+  function getBackgroundColor() {
+    if (backgroundColor == 'secondary_bg_color') {
+      return themeParams.secondary_bg_color;
+    } else if (backgroundColor == 'bg_color') {
+      return themeParams.bg_color;
+    }
+    return backgroundColor;
+  }
   function setBackgroundColor(color) {
     if (!versionAtLeast('6.1')) {
       console.warn('[Telegram.WebApp] Background color is not supported in version ' + webAppVersion);
       return;
     }
-    var bg_color = parseColorToHex(color);
-    if (!bg_color) {
-      console.error('[Telegram.WebApp] Background color format is invalid', color);
-      throw Error('WebAppBackgroundColorInvalid');
+    var bg_color;
+    if (color == 'bg_color' || color == 'secondary_bg_color') {
+      bg_color = color;
+    } else {
+      bg_color = parseColorToHex(color);
+      if (!bg_color) {
+        console.error('[Telegram.WebApp] Background color format is invalid', color);
+        throw Error('WebAppBackgroundColorInvalid');
+      }
     }
-    backgroundColor = color;
-    WebView.postEvent('web_app_set_background_color', false, {color: color});
-  };
+    backgroundColor = bg_color;
+    updateBackgroundColor();
+  }
+  var appBackgroundColor = null;
+  function updateBackgroundColor() {
+    var color = getBackgroundColor();
+    if (appBackgroundColor != color) {
+      appBackgroundColor = color;
+      WebView.postEvent('web_app_set_background_color', false, {color: color});
+    }
+  }
 
 
   function parseColorToHex(color) {
@@ -948,12 +971,12 @@
   });
   Object.defineProperty(WebApp, 'headerColor', {
     set: function(val){ setHeaderColor(val); },
-    get: function(){ return themeParams[headerColorKey] || null; },
+    get: function(){ return getHeaderColor(); },
     enumerable: true
   });
   Object.defineProperty(WebApp, 'backgroundColor', {
     set: function(val){ setBackgroundColor(val); },
-    get: function(){ return backgroundColor; },
+    get: function(){ return getBackgroundColor(); },
     enumerable: true
   });
   Object.defineProperty(WebApp, 'BackButton', {
@@ -1064,6 +1087,7 @@
 
   window.Telegram.WebApp = WebApp;
 
+  updateBackgroundColor();
   setViewportHeight();
 
   window.addEventListener('resize', onWindowResize);
