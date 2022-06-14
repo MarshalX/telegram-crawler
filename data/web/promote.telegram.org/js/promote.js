@@ -557,6 +557,9 @@ var NewAd = {
           photo: result.channel.photo,
           username: result.channel.username
         };
+        if (result.channel.ask_outside) {
+          item.ask_outside = result.channel.ask_outside;
+        }
         $fieldEl.trigger('selectval', [item, true]);
         $fieldEl.data('prevval', '');
       }
@@ -715,7 +718,7 @@ var NewAd = {
     return $previewPopup;
   },
   updateAdTargetOverview: function() {
-    var len = {}, lang_params = {};
+    var len = {}, lang_params = {}, need_outside_cb = false;
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
       var field = selectData.field;
@@ -728,6 +731,9 @@ var NewAd = {
         for (var j = 0; j < value.length; j++) {
           var val = value[j], valFull = valueFull[val] || {};
           list.push(valFull.username ? '<a class="value" href="https://t.me/' + valFull.username + '" rel="noopener" target="_blank" dir="auto">' + valFull.name + '</a>' : '<span class="value" dir="auto">' + valFull.name + '</span>');
+          if (valFull.ask_outside) {
+            need_outside_cb = true;
+          }
         }
         if (list.length > 1) {
           var last_item = list.pop();
@@ -764,6 +770,7 @@ var NewAd = {
         overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_CHANNELS', lang_params) + '</div>';
       }
     }
+    $('.js-exclude-outside').toggleClass('hide', !need_outside_cb);
     $('.pr-target-overview', Aj.ajContainer).html(overview);
   },
   getFormData: function($form) {
@@ -780,6 +787,9 @@ var NewAd = {
       var selectData = Aj.state.selectList[i];
       var vals = $form.field(selectData.field).data('value');
       values.push(vals.join(';'));
+    }
+    if ($form.field('exclude_outside').prop('checked')) {
+      values.push('exclude_outside');
     }
     return values.join('|');
   },
@@ -839,6 +849,9 @@ var NewAd = {
       var values = $form.field(selectData.field).data('value');
       params[selectData.field] = values.join(';');
     }
+    if ($form.field('exclude_outside').prop('checked')) {
+      params.exclude_outside = 1;
+    }
     NewAd.saveDraftAuto(true);
     $button.prop('disabled', true);
     Aj.apiRequest('createAd', params, function(result) {
@@ -897,6 +910,9 @@ var NewAd = {
       var values = $form.field(selectData.field).data('value');
       params[selectData.field] = values.join(';');
     }
+    if ($form.field('exclude_outside').prop('checked')) {
+      params.exclude_outside = 1;
+    }
     Aj.apiRequest('saveAdDraft', params, function(result) {
       if (result.error) {
         return showAlert(result.error);
@@ -922,6 +938,7 @@ var NewAd = {
       var selectData = Aj.state.selectList[i];
       var values = $form.field(selectData.field).trigger('reset');
     }
+    $form.field('exclude_outside').prop('checked', false);
     Aj.state.titleField.focusAndSelect();
     NewAd.updateAdPreview(Aj.state.$form, false);
     var curFormData = NewAd.getFormData($form);
