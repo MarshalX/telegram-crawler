@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app.js?17"></script>
+    <script src="https://tg.dev/js/telegram-web-app.js?18"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -66,6 +66,11 @@
       <li>Notification: <a href="javascript:Telegram.WebApp.HapticFeedback.notificationOccurred('error');">error</a>, &nbsp; <a href="javascript:Telegram.WebApp.HapticFeedback.notificationOccurred('success');">success</a>, &nbsp; <a href="javascript:Telegram.WebApp.HapticFeedback.notificationOccurred('warning');">warning</a><br><br></li>
       <li>Selection: <a href="javascript:Telegram.WebApp.HapticFeedback.selectionChanged();">changed</a><br><br></li>
     </ul>
+    <p>Background: <input type="color" id="bg_color_input" /> <select id="bg_color_sel">
+        <option value="bg_color" selected>bg_color</option>
+        <option value="secondary_bg_color">secondary_bg_color</option>
+        <option value="custom" id="bg_color_val">custom...</option>
+      </select></p>
     <pre><code id="webview_data"></code></pre>
     <div class="hint">
       Data passed to webview.
@@ -126,6 +131,35 @@ Telegram.WebApp.onEvent('viewportChanged', setViewportData);
 setViewportData();
 Telegram.WebApp.onEvent('settingsButtonClicked', function() {
   alert('Settings opened!');
+});
+
+var prev_bg_color_val = $('#bg_color_sel').val();
+$('#bg_color_input').val(Telegram.WebApp.backgroundColor);
+$('body').attr('style', '--tg-theme-bg-color:' + Telegram.WebApp.backgroundColor);
+$('#bg_color_input').on('change', function(e) {
+  var color = e.target.value;
+  $('#bg_color_val').text(color);
+  $('#bg_color_sel').val('custom');
+  prev_bg_color_val = $('#bg_color_sel').val();
+  Telegram.WebApp.setBackgroundColor(color);
+  $('body').attr('style', '--tg-theme-bg-color:' + Telegram.WebApp.backgroundColor);
+});
+$('#bg_color_sel').on('change', function(e) {
+  var color_key = e.target.value;
+  if (color_key == 'custom') {
+    $('#bg_color_sel').val(prev_bg_color_val);
+    $('#bg_color_input').focus().click();
+  } else {
+    $('#bg_color_val').text('custom...');
+    Telegram.WebApp.setBackgroundColor(color_key);
+    $('body').attr('style', '--tg-theme-bg-color:' + Telegram.WebApp.backgroundColor);
+    $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
+    prev_bg_color_val = $('#bg_color_sel').val();
+  }
+});
+Telegram.WebApp.onEvent('themeChanged', function() {
+  $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
+  $('body').attr('style', '--tg-theme-bg-color:' + Telegram.WebApp.backgroundColor);
 });
 
 </script>
