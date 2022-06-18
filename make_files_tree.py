@@ -25,11 +25,13 @@ DYNAMIC_PART_MOCK = 'telegram-crawler'
 
 INPUT_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_links.txt')
 INPUT_RES_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_res_links.txt')
+INPUT_TR_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_tr_links.txt')
 OUTPUT_FOLDER = os.environ.get('OUTPUT_FOLDER', 'data/')
 OUTPUT_MTPROTO_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_MTPROTO_FOLDER', 'server/'))
 OUTPUT_SITES_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_SITES_FOLDER', 'web/'))
 OUTPUT_CLIENTS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_CLIENTS_FOLDER', 'client/'))
 OUTPUT_RESOURCES_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_RESOURCES_FOLDER', 'web_res/'))
+OUTPUT_TRANSLATIONS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_RESOURCES_FOLDER', 'web_tr/'))
 
 TRANSLATIONS_EN_CATEGORY_URL_REGEX = r'/en/[a-z_]+/[a-z_]+/$'
 
@@ -514,7 +516,7 @@ class RetryError(Exception):
     ...
 
 
-async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str = OUTPUT_SITES_FOLDER):
+async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
     while True:
         try:
             await _crawl(url, session, output_dir)
@@ -585,18 +587,23 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
             await f.write(content)
 
 
-async def crawl_web(session: aiohttp.ClientSession):
-    with open(INPUT_FILENAME, 'r') as f:
+async def _crawl_web(session: aiohttp.ClientSession, input_filename: str, output_folder=None):
+    with open(input_filename, 'r') as f:
         tracked_urls = set([l.replace('\n', '') for l in f.readlines()])
 
-    await asyncio.gather(*[crawl(url, session) for url in tracked_urls])
+    await asyncio.gather(*[crawl(url, session, output_folder) for url in tracked_urls])
+
+
+async def crawl_web(session: aiohttp.ClientSession):
+    await _crawl_web(session, INPUT_FILENAME, OUTPUT_SITES_FOLDER)
 
 
 async def crawl_web_res(session: aiohttp.ClientSession):
-    with open(INPUT_RES_FILENAME, 'r') as f:
-        tracked_urls = set([l.replace('\n', '') for l in f.readlines()])
+    await _crawl_web(session, INPUT_RES_FILENAME, OUTPUT_RESOURCES_FOLDER)
 
-    await asyncio.gather(*[crawl(url, session, OUTPUT_RESOURCES_FOLDER) for url in tracked_urls])
+
+async def crawl_web_tr(session: aiohttp.ClientSession):
+    await _crawl_web(session, INPUT_TR_FILENAME, OUTPUT_TRANSLATIONS_FOLDER)
 
 
 async def start(mode: str):
@@ -604,6 +611,7 @@ async def start(mode: str):
         mode == 'all' and await asyncio.gather(
             crawl_web(session),
             crawl_web_res(session),
+            crawl_web_tr(session),
             track_mtproto_configs(),
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
@@ -614,6 +622,9 @@ async def start(mode: str):
         )
         mode == 'web_res' and await asyncio.gather(
             crawl_web_res(session),
+        )
+        mode == 'web_tr' and await asyncio.gather(
+            crawl_web_tr(session),
         )
         mode == 'server' and await asyncio.gather(
             track_mtproto_configs(),

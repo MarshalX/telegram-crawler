@@ -148,6 +148,7 @@ DOM_ATTRS = ['href', 'src']
 
 OUTPUT_FILENAME = os.environ.get('OUTPUT_FILENAME', 'tracked_links.txt')
 OUTPUT_RESOURCES_FILENAME = os.environ.get('OUTPUT_RESOURCES_FILENAME', 'tracked_res_links.txt')
+OUTPUT_TRANSLATIONS_FILENAME = os.environ.get('OUTPUT_TRANSLATIONS_FILENAME', 'tracked_tr_links.txt')
 
 STEL_DEV_LAYER = 190
 
@@ -176,6 +177,7 @@ logger = logging.getLogger(__name__)
 
 VISITED_LINKS = set()
 LINKS_TO_TRACK = set()
+LINKS_TO_TRANSLATIONS = set()
 LINKS_TO_TRACKABLE_RESOURCES = set()
 
 
@@ -291,6 +293,10 @@ def _is_x_content_type(content_types_set: set[str], content_type) -> bool:
     return False
 
 
+def is_translation_url(url: str) -> bool:
+    return 'translations.telegram.org' in url
+
+
 def is_textable_content_type(content_type: str) -> bool:
     textable_content_type = {
         'plain',
@@ -356,7 +362,10 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
                 return
 
             if is_textable_content_type(content_type):
-                LINKS_TO_TRACK.add(url)
+                if is_translation_url(url):
+                    LINKS_TO_TRANSLATIONS.add(url)
+                else:
+                    LINKS_TO_TRACK.add(url)
 
                 # raw content will be cached by aiohttp. Don't worry about it
                 raw_content = await response.read()
@@ -380,10 +389,10 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
             # telegram url can work with and without trailing slash (no redirect). P.S. not on every subdomain ;d
             # so this is a problem when we have random behavior with link will be added
             # this if resolve this issue. If available both link we prefer without trailing slash
-            without_trailing_slash = url[:-1:] if url.endswith('/') else url
-            if without_trailing_slash in LINKS_TO_TRACK and \
-                    f'{without_trailing_slash}/' in LINKS_TO_TRACK:
-                LINKS_TO_TRACK.remove(f'{without_trailing_slash}/')
+            for links_set in (LINKS_TO_TRACK, LINKS_TO_TRANSLATIONS, LINKS_TO_TRACKABLE_RESOURCES):
+                without_trailing_slash = url[:-1:] if url.endswith('/') else url
+                if without_trailing_slash in links_set and f'{without_trailing_slash}/' in links_set:
+                    links_set.remove(f'{without_trailing_slash}/')
     except UnicodeDecodeError:
         logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
 
@@ -412,7 +421,7 @@ if __name__ == '__main__':
             with open(filename, 'r') as f:
                 OLD_URL_LIST |= set([l.replace('\n', '') for l in f.readlines()])
 
-        CURRENT_URL_LIST = LINKS_TO_TRACK | LINKS_TO_TRACKABLE_RESOURCES
+        CURRENT_URL_LIST = LINKS_TO_TRACK | LINKS_TO_TRACKABLE_RESOURCES | LINKS_TO_TRANSLATIONS
 
         logger.info(f'Is equal: {OLD_URL_LIST == CURRENT_URL_LIST}')
         logger.info(f'Deleted: {OLD_URL_LIST - CURRENT_URL_LIST}')
@@ -425,3 +434,6 @@ if __name__ == '__main__':
 
     with open(OUTPUT_RESOURCES_FILENAME, 'w') as f:
         f.write('\n'.join(sorted(LINKS_TO_TRACKABLE_RESOURCES)))
+
+    with open(OUTPUT_TRANSLATIONS_FILENAME, 'w') as f:
+        f.write('\n'.join(sorted(LINKS_TO_TRANSLATIONS)))
