@@ -556,6 +556,9 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         if is_hashable_only or is_sucking_file:
             ext = ''
 
+        if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
+            ext = '.json'
+
         filename = os.path.join(output_dir, *url_parts) + ext
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
