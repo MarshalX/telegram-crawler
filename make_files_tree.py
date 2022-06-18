@@ -15,7 +15,6 @@ from typing import List
 import aiofiles
 import aiohttp
 from aiohttp import ClientConnectorError, ServerDisconnectedError
-from bs4 import BeautifulSoup
 
 import ccl_bplist
 
@@ -344,6 +343,11 @@ async def download_telegram_android_beta_and_extract_resources(session: aiohttp.
 
 
 async def collect_translations_paginated_content(url: str, session: aiohttp.ClientSession) -> str:
+    import cssutils
+    from bs4 import BeautifulSoup
+
+    css_parser = cssutils.CSSParser(loglevel=logging.FATAL, raiseExceptions=False)
+
     headers = {'X-Requested-With': 'XMLHttpRequest'}
     content = dict()
 
@@ -356,7 +360,7 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
             async with session.post(
                     f'{PROTOCOL}{url}', data=data, headers=headers, allow_redirects=False, timeout=TIMEOUT
             ) as response:
-                if response.status != 200:
+                if (499 < response.status < 600) or (response.status != 200):
                     logger.debug(f'Resend cuz {response.status}')
                     new_offset = offset
                 else:
@@ -369,15 +373,33 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
                         for tr_item in tr_items:
                             tr_key = tr_item.find_next('div', {'class': 'tr-value-key'}).text
 
-                            tr_values = tr_item.find_all('span', {'class': 'value'})
-                            tr_values_content = [tr_value.decode_contents() for tr_value in tr_values]
+                            tr_url = tr_item.find_next('div', {'class': 'tr-key-row'})['data-href']
+                            tr_url = f'https://translations.telegram.org{tr_url}'
 
-                            content[tr_key] = tr_values_content
+                            tr_photo = tr_item.find_next('a', {'class': 'tr-value-photo'})
+                            if tr_photo:
+                                tr_photo = css_parser.parseStyle(tr_photo['style']).backgroundImage[5:-2]
+
+                            tr_has_binding = tr_item.find_next('span', {'class': 'has-1binding binding'})
+                            tr_has_binding = tr_has_binding is not None
+
+                            tr_values = tr_item.find_all('span', {'class': 'value'})
+                            tr_value_singular, *tr_value_plural = [tr_value.decode_contents() for tr_value in tr_values]
+                            tr_values = {'singular': tr_value_singular}
+                            if tr_value_plural:
+                                tr_values['plural'] = tr_value_plural[0]
+
+                            content[tr_key] = {
+                                'url': tr_url,
+                                'photo_url': tr_photo,
+                                'has_binding': tr_has_binding is not None,
+                                'values': tr_values,
+                            }
 
                         new_offset = offset + 200
 
             new_offset and await _get_page(new_offset)
-        except (TimeoutError, ClientConnectorError):
+        except (ServerDisconnectedError, TimeoutError, ClientConnectorError):
             logger.warning(f'Client or timeout error. Retrying {url}; offset {offset}')
             await _get_page(offset)
 

@@ -41,7 +41,7 @@ STATUS_TO_EMOJI = {
 }
 
 AVAILABLE_HASHTAGS = {
-    'web_res', 'web', 'server', 'test_server', 'client', 'ios', 'macos', 'android'
+    'web_res', 'web', 'server', 'test_server', 'client', 'ios', 'macos', 'android', 'translations'
 }
 HASHTAGS_PATTERNS = {
     # regex will be more flexible. for example, in issue with double hashtag '#web #web_res' when data/res not changed
@@ -53,6 +53,7 @@ HASHTAGS_PATTERNS = {
     'ios': os.path.join(ROOT_TREE_DIR, 'client', 'ios-beta'),
     'macos': os.path.join(ROOT_TREE_DIR, 'client', 'macos-beta'),
     'android': os.path.join(ROOT_TREE_DIR, 'client', 'android-beta'),
+    'translations': os.path.join(ROOT_TREE_DIR, 'web', 'translations.telegram.org'),
 }
 # order is important!
 PATHS_TO_REMOVE_FROM_ALERT = [
