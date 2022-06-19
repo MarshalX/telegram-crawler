@@ -335,7 +335,9 @@ async def crawl(url: str, session: aiohttp.ClientSession):
             await _crawl(url, session)
         except (ServerSideError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
             logger.warning(f'Client or timeout error. Retrying {url}')
-            VISITED_LINKS.remove(url)
+
+            if url in VISITED_LINKS:
+                VISITED_LINKS.remove(url)
         else:
             break
 
