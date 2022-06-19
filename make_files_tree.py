@@ -411,7 +411,7 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
     return json.dumps(content, indent=4, ensure_ascii=False)
 
 
-async def track_mtproto_configs():
+async def track_mtproto_methods():
     from pyrogram import Client
 
     kw = {
@@ -458,6 +458,27 @@ async def _fetch_and_track_mtproto(app, output_dir):
         ))
         configs[f'sticker_set/{short_name}'] = sticker_set
 
+    bots_usernames_to_track = {'BotFather', 'DurgerKingBot', 'asmico_attach_bot'}
+    if app.test_mode:
+        bots_usernames_to_track.add('izpremiumbot')
+    else:
+        bots_usernames_to_track.add('PremiumBot')
+
+    for bot_username in bots_usernames_to_track:
+        bot_peer = await app.resolve_peer(bot_username)
+        bot_full = (await app.invoke(functions.users.GetFullUser(id=bot_peer)))
+        configs[f'bot/{bot_username}'] = f'{{"full_user": {str(bot_full.full_user)}, "users": {str(bot_full.users)}}}'
+
+    peers_to_track = set()
+    if not app.test_mode:
+        peers_to_track.add('invoice')
+        peers_to_track.add('premium')
+
+    for peer_id in peers_to_track:
+        peer = await app.resolve_peer(peer_id)
+        configs[f'peer/{peer_id}'] = peer
+
+
     keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64'}
 
     def rem_rec(config):
@@ -475,8 +496,13 @@ async def _fetch_and_track_mtproto(app, output_dir):
             elif key in keys_to_hide:
                 config[key] = 'crawler'
 
+    methods_to_filter = {'GetAppConfig', 'GetAvailableReactions'}
     sticker_sets_to_filter = {f'sticker_set/{name}' for name in sticker_set_short_names}
-    for config_name in sticker_sets_to_filter | {'GetAppConfig', 'GetAvailableReactions'}:
+    bots_to_filter = {f'bot/{name}' for name in bots_usernames_to_track}
+    peers_to_filter = {f'peer/{name}' for name in peers_to_track}
+
+    combined_filter = methods_to_filter | sticker_sets_to_filter | bots_to_filter | peers_to_filter
+    for config_name in combined_filter:
         configs[config_name] = json.loads(str(configs[config_name]))
         rem_rec(configs[config_name])
         configs[config_name] = json.dumps(configs[config_name], indent=4)
@@ -612,7 +638,7 @@ async def start(mode: str):
             crawl_web(session),
             crawl_web_res(session),
             crawl_web_tr(session),
-            track_mtproto_configs(),
+            track_mtproto_methods(),
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
             download_telegram_ios_beta_and_extract_resources(session),
@@ -627,7 +653,7 @@ async def start(mode: str):
             crawl_web_tr(session),
         )
         mode == 'server' and await asyncio.gather(
-            track_mtproto_configs(),
+            track_mtproto_methods(),
         )
         mode == 'client' and await asyncio.gather(
             download_telegram_android_beta_and_extract_resources(session),
