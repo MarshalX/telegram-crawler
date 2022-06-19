@@ -464,6 +464,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
     else:
         bots_usernames_to_track.add('PremiumBot')
 
+    bots_usernames_to_track.clear()
     for bot_username in bots_usernames_to_track:
         bot_peer = await app.resolve_peer(bot_username)
         bot_full = (await app.invoke(functions.users.GetFullUser(id=bot_peer)))
@@ -474,6 +475,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
         peers_to_track.add('invoice')
         peers_to_track.add('premium')
 
+    peers_to_track.clear()
     for peer_id in peers_to_track:
         peer = await app.resolve_peer(peer_id)
         configs[f'peer/{peer_id}'] = peer
