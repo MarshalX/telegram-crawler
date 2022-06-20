@@ -447,6 +447,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
         #     functions.messages.GetStickerSet(stickerset=InputStickerSetAnimatedEmoji(), hash=0)
         # ),
         'GetAvailableReactions': await app.invoke(functions.messages.GetAvailableReactions(hash=0)),
+        'GetPremiumPromo': await app.invoke(functions.help.GetPremiumPromo()),
     }
 
     sticker_set_short_names = {'EmojiAnimations', 'EmojiAroundAnimations', 'EmojiShortAnimations',
@@ -480,6 +481,9 @@ async def _fetch_and_track_mtproto(app, output_dir):
         peer = await app.resolve_peer(peer_id)
         configs[f'peer/{peer_id}'] = peer
 
+    configs['GetPremiumPromo'].users = []
+    configs['GetPremiumPromo'].currency = 'crawler'
+    configs['GetPremiumPromo'].monthly_amount = -1
 
     keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64'}
 
@@ -498,7 +502,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
             elif key in keys_to_hide:
                 config[key] = 'crawler'
 
-    methods_to_filter = {'GetAppConfig', 'GetAvailableReactions'}
+    methods_to_filter = {'GetAppConfig', 'GetAvailableReactions', 'GetPremiumPromo'}
     sticker_sets_to_filter = {f'sticker_set/{name}' for name in sticker_set_short_names}
     bots_to_filter = {f'bot/{name}' for name in bots_usernames_to_track}
     peers_to_filter = {f'peer/{name}' for name in peers_to_track}
