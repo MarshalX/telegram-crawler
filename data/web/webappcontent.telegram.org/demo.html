@@ -19,10 +19,10 @@
     </script>
     <link href="https://tg.dev/css/bootstrap.min.css?3" rel="stylesheet">
     <link href="https://tg.dev/css/bootstrap-extra.css?2" rel="stylesheet">
-    <link href="/css/webappdemo.css?1" rel="stylesheet">
+    <link href="/css/webappdemo.css?3" rel="stylesheet">
   </head>
   <body class="" style="visibility: hidden;">
-      <section class="">
+      <section id="top_sect" class="second">
       <button id="main_btn" onclick="DemoApp.sendMessage('');">Send «Hello, World!»</button>
   <button id="with_webview_btn" onclick="DemoApp.sendMessage('', true);">Send «Hello, World!» with inline webview button</button>
   <button id="data_btn" onclick="DemoApp.sendTime(true);">Send current time to bot (x10)</button>
@@ -30,10 +30,19 @@
   <button onclick="DemoApp.toggleMainButton(this);">Hide Main Button</button>
   <input type="text" placeholder="Input text in regular input..." />
   <div class="input" contenteditable="true" data-placeholder="Input text in contenteditable field..."></div>
-    <div id="peer_wrap">
+    <div id="peer_wrap" style="display:none">
       <img id="peer_photo" class="chat_img" src="">
       <span id="peer_name"></span>
     </div>
+    <div class="sect_row">Header: <select id="header_color_sel">
+        <option value="bg_color" selected>bg_color</option>
+        <option value="secondary_bg_color">secondary_bg_color</option>
+      </select></div>
+    <div class="sect_row">Background: <input type="color" id="bg_color_input" /> <select id="bg_color_sel">
+        <option value="bg_color" selected>bg_color</option>
+        <option value="secondary_bg_color">secondary_bg_color</option>
+        <option value="custom" id="bg_color_val">custom...</option>
+      </select></div>
   </section>
   <section>
     <div id="btn_status" class="hint" style="display: none;">
@@ -66,11 +75,6 @@
       <li>Notification: <a href="javascript:Telegram.WebApp.HapticFeedback.notificationOccurred('error');">error</a>, &nbsp; <a href="javascript:Telegram.WebApp.HapticFeedback.notificationOccurred('success');">success</a>, &nbsp; <a href="javascript:Telegram.WebApp.HapticFeedback.notificationOccurred('warning');">warning</a><br><br></li>
       <li>Selection: <a href="javascript:Telegram.WebApp.HapticFeedback.selectionChanged();">changed</a><br><br></li>
     </ul>
-    <p>Background: <input type="color" id="bg_color_input" /> <select id="bg_color_sel">
-        <option value="bg_color" selected>bg_color</option>
-        <option value="secondary_bg_color">secondary_bg_color</option>
-        <option value="custom" id="bg_color_val">custom...</option>
-      </select></p>
     <pre><code id="webview_data"></code></pre>
     <div class="hint">
       Data passed to webview.
@@ -85,7 +89,7 @@
   <div class="viewport-stable_border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?1"></script>
+    <script src="/js/webappdemo.js?3"></script>
     <script>
 Telegram.WebApp.onEvent('themeChanged', function() {
   $('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
@@ -126,7 +130,7 @@ function setViewportData() {
   $('.viewport-border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportHeight, 2));
   $('.viewport-stable_border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportStableHeight, 2) + ' | is_expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false'));
 }
-Telegram.WebApp.setHeaderColor('bg_color');
+Telegram.WebApp.setHeaderColor('secondary_bg_color');
 Telegram.WebApp.onEvent('viewportChanged', setViewportData);
 setViewportData();
 Telegram.WebApp.onEvent('settingsButtonClicked', function() {
@@ -136,6 +140,13 @@ Telegram.WebApp.onEvent('settingsButtonClicked', function() {
 var prev_bg_color_val = $('#bg_color_sel').val();
 $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
 $('body').attr('style', '--tg-theme-bg-color:' + Telegram.WebApp.backgroundColor);
+$('#header_color_sel').val('secondary_bg_color');
+$('#header_color_sel').on('change', function(e) {
+  var color_key = e.target.value;
+  $('#top_sect').toggleClass('second', color_key == 'secondary_bg_color');
+  Telegram.WebApp.setHeaderColor(color_key);
+  $('body').attr('style', '--tg-theme-bg-color:' + Telegram.WebApp.backgroundColor);
+});
 $('#bg_color_input').on('change', function(e) {
   var color = e.target.value;
   $('#bg_color_val').text(color);
