@@ -226,7 +226,7 @@ var Cafe = {
       });
       $('.cafe-order-overview').show();
       $('.cafe-items').css('maxHeight', height).redraw();
-      $('html').addClass('order-mode');
+      $('body').addClass('order-mode');
       $('.js-order-comment-field').each(function() {
         autosize.update(this);
       });
@@ -241,7 +241,7 @@ var Cafe = {
       $('.js-item-lottie').each(function() {
         RLottie.setVisible(this, false);
       });
-      $('html').removeClass('order-mode');
+      $('body').removeClass('order-mode');
       setTimeout(function() {
         $('.cafe-items').css('maxHeight', '');
         $('.cafe-order-overview').hide();
