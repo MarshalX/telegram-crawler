@@ -364,14 +364,17 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
                 return
 
             if is_textable_content_type(content_type):
-                if is_translation_url(url):
-                    LINKS_TO_TRANSLATIONS.add(url)
-                else:
-                    LINKS_TO_TRACK.add(url)
-
                 # raw content will be cached by aiohttp. Don't worry about it
                 raw_content = await response.read()
                 content = await response.text(encoding='UTF-8')
+
+                if is_translation_url(url):
+                    LINKS_TO_TRANSLATIONS.add(url)
+                    logger.info(f'add {url} to LINKS_TO_TRANSLATIONS')
+                else:
+                    LINKS_TO_TRACK.add(url)
+                    logger.info(f'add {url} to LINKS_TO_TRACK')
+
                 absolute_links = cleanup_links(find_absolute_links(content))
 
                 relative_links_finder = find_relative_links
@@ -384,6 +387,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
                 await asyncio.gather(*[crawl(url, session) for url in sub_links])
             elif is_trackable_content_type(content_type):
                 LINKS_TO_TRACKABLE_RESOURCES.add(url)
+                logger.info(f'add {url} to LINKS_TO_TRACKABLE_RESOURCES')
             else:
                 # for example, zip with update of macOS client
                 logger.info(f'Unhandled type: {content_type} from {url}')
@@ -395,12 +399,13 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
                 without_trailing_slash = url[:-1:] if url.endswith('/') else url
                 if without_trailing_slash in links_set and f'{without_trailing_slash}/' in links_set:
                     links_set.remove(f'{without_trailing_slash}/')
+                    logger.info(f'remove {without_trailing_slash}/')
     except UnicodeDecodeError:
         logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
 
-        if raw_content.startswith(b'GIF89a'):
-            LINKS_TO_TRACK.remove(url)
+        if raw_content.startswith(b'GIF'):
             LINKS_TO_TRACKABLE_RESOURCES.add(url)
+            logger.info(f'add {url} to LINKS_TO_TRACKABLE_RESOURCES (raw content)')
 
 
 async def start(url_list: set[str]):
@@ -419,7 +424,7 @@ if __name__ == '__main__':
 
     try:
         OLD_URL_LIST = set()
-        for filename in (OUTPUT_FILENAME, OUTPUT_RESOURCES_FILENAME):
+        for filename in (OUTPUT_FILENAME, OUTPUT_RESOURCES_FILENAME, OUTPUT_TRANSLATIONS_FILENAME):
             with open(filename, 'r') as f:
                 OLD_URL_LIST |= set([l.replace('\n', '') for l in f.readlines()])
 
