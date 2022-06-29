@@ -403,6 +403,13 @@ function removeEvent(el, event, handler) {
     }
   });
 }
+function addEventOnce(el, event, handler) {
+  var once_handler = function(e) {
+    removeEvent(el, event, once_handler);
+    handler(e);
+  };
+  addEvent(el, event, once_handler);
+}
 function triggerEvent(el, event_type, init_dict) {
   gec(el, function() {
     var event = new CustomEvent(event_type, init_dict);
@@ -1274,6 +1281,13 @@ function checkFrameSize() {
       options = options || {};
       if (!postEl || postEl.__inited) return;
       postEl.__inited = true;
+      if (window.RLottie) {
+        if (options.tgs_workers_limit) {
+          RLottie.WORKERS_LIMIT = options.tgs_workers_limit;
+        } else if (options.frame) {
+          RLottie.WORKERS_LIMIT = 1;
+        }
+      }
       gec('time[datetime]', function() {
         var datetime = this.getAttribute('datetime');
         if (datetime) {
@@ -1345,14 +1359,33 @@ function checkFrameSize() {
         TSticker.init(this);
       }, postEl);
       gec('.js-tgsticker_image', function() {
-        if (options.tgs_workers_limit) {
-          RLottie.WORKERS_LIMIT = options.tgs_workers_limit;
-        } else if (options.frame) {
-          RLottie.WORKERS_LIMIT = 1;
+        var stickerEl = this;
+        var effectEl = ge1('.js-tgsticker_effect', postEl);
+        if (effectEl) {
+          addEventOnce(this, 'tg:play', function() {
+            RLottie.playOnce(effectEl);
+          });
+          addEvent(this, 'click', function(e) {
+            e.stopPropagation();
+            RLottie.playOnce(effectEl);
+          });
         }
         RLottie.init(this, {
-          playOnce: this.hasAttribute('data-play-once')
+          playUntilEnd: this.hasAttribute('data-is-dice')
         });
+      }, postEl);
+      gec('.js-tgsticker_effect', function() {
+        RLottie.init(this, {noAutoPlay: true});
+        var effectEl = this;
+        addEvent(this, 'tg:play', function() {
+          effectEl.style.visibility = 'visible';
+        });
+        addEvent(this, 'tg:pause', function() {
+          effectEl.style.visibility = 'hidden';
+        });
+      }, postEl);
+      gec('.js-videosticker', function() {
+        TVideoSticker.init(this);
       }, postEl);
     },
     view: function(postEl) {
@@ -2293,6 +2326,32 @@ function checkFrameSize() {
 
   var TSticker = window.TSticker = {
     init: proccessWebpImage
+  };
+
+  var TVideoSticker = window.TVideoSticker = {
+    init: function(stickerEl) {
+      stickerEl = geById(stickerEl);
+      if (!stickerEl || stickerEl.__inited) return;
+      stickerEl.__inited = true;
+      var videoEl = ge1('.js-videosticker_video', stickerEl)
+        , postEl = gpeByClass(stickerEl, 'js-widget_message');
+      if (!videoEl) return;
+      if (browser.safari) {
+        addClass(postEl, 'media_not_supported');
+        removeClass(postEl, 'no_bubble');
+        return;
+      }
+      enableInlineVideo(videoEl);
+      checkVideo(videoEl, function() {
+        addClass(postEl, 'media_not_supported');
+        removeClass(postEl, 'no_bubble');
+      });
+      function removeShadow() {
+        stickerEl.style.backgroundImage = 'none';
+        removeEvent(videoEl, 'timeupdate', removeShadow);
+      }
+      addEvent(videoEl, 'timeupdate', removeShadow);
+    }
   };
 
   window.TWidgetPost = {
