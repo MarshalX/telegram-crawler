@@ -356,6 +356,10 @@
     }
   }
 
+  function strTrim(str) {
+    return str.toString().replace(/^\s+|\s+$/g, '');
+  }
+
   function receiveWebViewEvent(eventType) {
     var args = Array.prototype.slice.call(arguments);
     eventType = args.shift();
@@ -425,6 +429,16 @@
     }
     setCssProperty('viewport-height', height);
     setCssProperty('viewport-stable-height', stable_height);
+  }
+
+  var closingConfirmation = false;
+  function setClosingConfirmation(need_confirmation) {
+    if (!versionAtLeast('6.2')) {
+      console.warn('[Telegram.WebApp] closingConfirmation is not supported in version ' + webAppVersion);
+      return;
+    }
+    closingConfirmation = !!need_confirmation;
+    WebView.postEvent('web_app_setup_closing_behavior', false, {need_confirmation: closingConfirmation});
   }
 
   var headerColorKey = 'bg_color';
@@ -779,7 +793,7 @@
 
     function setParams(params) {
       if (typeof params.text !== 'undefined') {
-        var text = params.text.toString().replace(/^\s+|\s+$/g, '');
+        var text = strTrim(params.text);
         if (!text.length) {
           console.error('[Telegram.WebApp] Main button text is required', params.text);
           throw Error('WebAppMainButtonParamInvalid');
@@ -938,6 +952,24 @@
     }
   }
 
+  var webAppPopupOpened = false;
+  function onPopupClosed(eventType, eventData) {
+    if (webAppPopupOpened) {
+      var popupData = webAppPopupOpened;
+      webAppPopupOpened = false;
+      var button_id = null;
+      if (typeof eventData.button_id !== 'undefined') {
+        button_id = eventData.button_id;
+      }
+      if (popupData.callback) {
+        popupData.callback(button_id);
+      }
+      receiveWebViewEvent('popupClosed', {
+        button_id: button_id
+      });
+    }
+  }
+
   if (!window.Telegram) {
     window.Telegram = {};
   }
@@ -974,6 +1006,11 @@
     get: function(){ return (viewportStableHeight === false ? window.innerHeight : viewportStableHeight) - mainButtonHeight; },
     enumerable: true
   });
+  Object.defineProperty(WebApp, 'closingConfirmation', {
+    set: function(val){ setClosingConfirmation(val); },
+    get: function(){ return closingConfirmation; },
+    enumerable: true
+  });
   Object.defineProperty(WebApp, 'headerColor', {
     set: function(val){ setHeaderColor(val); },
     get: function(){ return getHeaderColor(); },
@@ -1001,6 +1038,12 @@
   };
   WebApp.setBackgroundColor = function(color) {
     WebApp.backgroundColor = color;
+  };
+  WebApp.enableClosingConfirmation = function() {
+    WebApp.closingConfirmation = true;
+  };
+  WebApp.disableClosingConfirmation = function() {
+    WebApp.closingConfirmation = false;
   };
   WebApp.isVersionAtLeast = function(ver) {
     return versionAtLeast(ver);
@@ -1080,6 +1123,123 @@
     };
     WebView.postEvent('web_app_open_invoice', false, {slug: slug});
   };
+  WebApp.openPopup = function (params, callback) {
+    if (!versionAtLeast('6.2')) {
+      console.error('[Telegram.WebApp] Method openPopup is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    if (webAppPopupOpened) {
+      console.error('[Telegram.WebApp] Popup is already opened');
+      throw Error('WebAppPopupOpened');
+    }
+    var title = '';
+    var message = '';
+    var buttons = [];
+    var popup_buttons = {};
+    var popup_params = {};
+    if (typeof params.title !== 'undefined') {
+      title = strTrim(params.title);
+      if (title.length > 64) {
+        console.error('[Telegram.WebApp] Popup title is too long', title);
+        throw Error('WebAppPopupParamInvalid');
+      }
+      if (title.length > 0) {
+        popup_params.title = title;
+      }
+    }
+    if (typeof params.message !== 'undefined') {
+      message = strTrim(params.message);
+    }
+    if (!message.length) {
+      console.error('[Telegram.WebApp] Popup message is required', params.message);
+      throw Error('WebAppPopupParamInvalid');
+    }
+    if (message.length > 256) {
+      console.error('[Telegram.WebApp] Popup message is too long', message);
+      throw Error('WebAppPopupParamInvalid');
+    }
+    popup_params.message = message;
+    if (typeof params.buttons !== 'undefined') {
+      if (!Array.isArray(params.buttons)) {
+        console.error('[Telegram.WebApp] Popup buttons should be an array', params.buttons);
+        throw Error('WebAppPopupParamInvalid');
+      }
+      for (var i = 0; i < params.buttons.length; i++) {
+        var button = params.buttons[i];
+        var btn = {};
+        var id = '';
+        if (typeof button.id !== 'undefined') {
+          id = button.id.toString();
+          if (id.length > 64) {
+            console.error('[Telegram.WebApp] Popup button id is too long', id);
+            throw Error('WebAppPopupParamInvalid');
+          }
+        }
+        btn.id = id;
+        var button_type = button.type;
+        if (typeof button_type === 'undefined') {
+          button_type = 'default';
+        }
+        btn.type = button_type;
+        if (button_type == 'ok' ||
+            button_type == 'close' ||
+            button_type == 'cancel') {
+          // no params needed
+        } else if (button_type == 'default' ||
+                   button_type == 'destructive') {
+          var text = '';
+          if (typeof button.text !== 'undefined') {
+            text = strTrim(button.text);
+          }
+          if (!text.length) {
+            console.error('[Telegram.WebApp] Popup button text is required for type ' + button_type, button.text);
+            throw Error('WebAppPopupParamInvalid');
+          }
+          if (text.length > 64) {
+            console.error('[Telegram.WebApp] Popup button text is too long', text);
+            throw Error('WebAppPopupParamInvalid');
+          }
+          btn.text = text;
+        } else {
+          console.error('[Telegram.WebApp] Popup button type is invalid', button_type);
+          throw Error('WebAppPopupParamInvalid');
+        }
+        buttons.push(btn);
+      }
+    } else {
+      buttons.push({id: '', type: 'close'});
+    }
+    if (buttons.length < 1) {
+      console.error('[Telegram.WebApp] Popup should have at least one button');
+      throw Error('WebAppPopupParamInvalid');
+    }
+    if (buttons.length > 3) {
+      console.error('[Telegram.WebApp] Popup should not have more than 3 buttons');
+      throw Error('WebAppPopupParamInvalid');
+    }
+    popup_params.buttons = buttons;
+
+    webAppPopupOpened = {
+      callback: callback
+    };
+    WebView.postEvent('web_app_open_popup', false, popup_params);
+  };
+  WebApp.showAlert = function (message, callback) {
+    WebApp.openPopup({
+      message: message
+    }, callback ? function(){ callback(); } : null);
+  };
+  WebApp.showConfirm = function (message, callback) {
+    WebApp.openPopup({
+      message: message,
+      buttons: [
+        {type: 'ok', id: 'ok'},
+        {type: 'cancel'}
+      ]
+    }, callback ? function (button_id) {
+      callback(button_id == 'ok');
+    } : null);
+  };
   WebApp.ready = function () {
     WebView.postEvent('web_app_ready');
   };
@@ -1103,6 +1263,7 @@
   WebView.onEvent('theme_changed', onThemeChanged);
   WebView.onEvent('viewport_changed', onViewportChanged);
   WebView.onEvent('invoice_closed', onInvoiceClosed);
+  WebView.onEvent('popup_closed', onPopupClosed);
   WebView.postEvent('web_app_request_theme');
   WebView.postEvent('web_app_request_viewport');
 
