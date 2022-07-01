@@ -145,6 +145,29 @@ var DemoApp = {
       el.innerHTML = 'Hide Main Button';
     }
   },
+  showAlert: function(message) {
+    Telegram.WebApp.showAlert(message);
+  },
+  showConfirm: function(message) {
+    Telegram.WebApp.showConfirm(message);
+  },
+  showPopup: function() {
+    Telegram.WebApp.showPopup({
+      title: 'Popup title',
+      message: 'Popup message',
+      buttons: [
+        {id: 'delete', type: 'destructive', text: 'Delete all'},
+        {id: 'faq', type: 'default', text: 'Open FAQ'},
+        {type: 'cancel'},
+      ]
+    }, function(button_id) {
+      if (button_id == 'delete') {
+        DemoApp.showAlert("'Delete all' selected");
+      } else if (button_id == 'faq') {
+        Telegram.WebApp.openLink('https://telegram.org/faq');
+      }
+    });
+  },
 
   apiRequest: function(method, data, onCallback) {
     var authData = DemoApp.initData || '';

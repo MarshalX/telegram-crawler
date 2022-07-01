@@ -1123,9 +1123,9 @@
     };
     WebView.postEvent('web_app_open_invoice', false, {slug: slug});
   };
-  WebApp.openPopup = function (params, callback) {
+  WebApp.showPopup = function (params, callback) {
     if (!versionAtLeast('6.2')) {
-      console.error('[Telegram.WebApp] Method openPopup is not supported in version ' + webAppVersion);
+      console.error('[Telegram.WebApp] Method showPopup is not supported in version ' + webAppVersion);
       throw Error('WebAppMethodUnsupported');
     }
     if (webAppPopupOpened) {
@@ -1225,12 +1225,12 @@
     WebView.postEvent('web_app_open_popup', false, popup_params);
   };
   WebApp.showAlert = function (message, callback) {
-    WebApp.openPopup({
+    WebApp.showPopup({
       message: message
     }, callback ? function(){ callback(); } : null);
   };
   WebApp.showConfirm = function (message, callback) {
-    WebApp.openPopup({
+    WebApp.showPopup({
       message: message,
       buttons: [
         {type: 'ok', id: 'ok'},
