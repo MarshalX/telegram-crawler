@@ -63,12 +63,12 @@ After Telegram 7.7 update, I realised that find new blog posts so slowly is bad 
 **A:** Because GitHub API doesn't return information about commit immediately 
 after push to repository. Therefore, script are waiting for information to appear...
 
-**Q:** Why are you using GitHab Personal Access Token in action/checkout workflow`s step?
+**Q:** Why are you using GitHub Personal Access Token in action/checkout workflow`s step?
 
 **A:** To have ability to trigger other workflows by on push trigger. More info:
 - [Action does not trigger another on push tag action ](https://github.community/t/action-does-not-trigger-another-on-push-tag-action/17148)
 
-**Q:** Why are you using GitHab PAT in [make_and_send_alert.py](make_and_send_alert.py)?
+**Q:** Why are you using GitHub PAT in [make_and_send_alert.py](make_and_send_alert.py)?
 
 **A:** To increase limits of GitHub API.
 
