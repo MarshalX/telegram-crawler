@@ -218,7 +218,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
 async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.ClientSession):
     # TODO fetch version automatically
     # ref: https://docs.github.com/en/rest/releases/releases#get-the-latest-release
-    version = '8.8.1'
+    version = '8.8.2.23753'
 
     download_url = f'https://github.com/MarshalX/decrypted-telegram-ios/releases/download/{version}/Telegram-{version}.ipa'
     tool_download_url = 'https://github.com/MarshalX/acextract/releases/download/3.0/acextract'
