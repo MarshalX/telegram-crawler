@@ -1247,6 +1247,42 @@ function checkFrameSize() {
     });
   }
 
+  function proccessWebmImage(imageEl, failed_callback, success_callback) {
+    imageEl = geById(imageEl);
+    if (!imageEl || imageEl.__inited) return;
+    imageEl.__inited = true;
+    failed_callback = failed_callback || function(){};
+    success_callback = success_callback || function(){};
+    var videoEl = ge1('video', imageEl);
+    var imgEl = ge1('img', videoEl);
+    if (!videoEl) return;
+    var fallback = function() {
+      videoEl.parentNode.removeChild(videoEl);
+      imageEl.style.backgroundImage = 'none';
+      if (imgEl && imgEl.src) {
+        var img = new Image();
+        img.onload = function() {
+          imageEl.style.backgroundImage = "url('" + img.src + "')";
+        }
+        img.src = imgEl.src;
+      }
+      failed_callback();
+    };
+    if (browser.safari) {
+      fallback();
+      return;
+    }
+    enableInlineVideo(videoEl);
+    checkVideo(videoEl, fallback);
+    function videoStarted() {
+      removeEvent(videoEl, 'timeupdate', videoStarted);
+      imageEl.style.backgroundImage = 'none';
+      addClass(imgEl, 'webm_sticker_done');
+      success_callback();
+    }
+    addEvent(videoEl, 'timeupdate', videoStarted);
+  }
+
   function checkVideo(el, error_callback) {
     var timeout, eventAdded;
     if (!eventAdded) {
@@ -1385,7 +1421,10 @@ function checkFrameSize() {
         });
       }, postEl);
       gec('.js-videosticker', function() {
-        TVideoSticker.init(this);
+        TVideoSticker.init(this, function() {
+          addClass(postEl, 'media_not_supported');
+          removeClass(postEl, 'no_bubble');
+        });
       }, postEl);
     },
     view: function(postEl) {
@@ -2329,29 +2368,7 @@ function checkFrameSize() {
   };
 
   var TVideoSticker = window.TVideoSticker = {
-    init: function(stickerEl) {
-      stickerEl = geById(stickerEl);
-      if (!stickerEl || stickerEl.__inited) return;
-      stickerEl.__inited = true;
-      var videoEl = ge1('.js-videosticker_video', stickerEl)
-        , postEl = gpeByClass(stickerEl, 'js-widget_message');
-      if (!videoEl) return;
-      if (browser.safari) {
-        addClass(postEl, 'media_not_supported');
-        removeClass(postEl, 'no_bubble');
-        return;
-      }
-      enableInlineVideo(videoEl);
-      checkVideo(videoEl, function() {
-        addClass(postEl, 'media_not_supported');
-        removeClass(postEl, 'no_bubble');
-      });
-      function removeShadow() {
-        stickerEl.style.backgroundImage = 'none';
-        removeEvent(videoEl, 'timeupdate', removeShadow);
-      }
-      addEvent(videoEl, 'timeupdate', removeShadow);
-    }
+    init: proccessWebmImage
   };
 
   window.TWidgetPost = {
