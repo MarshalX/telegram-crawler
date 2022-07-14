@@ -719,6 +719,37 @@ function xhrRequest(href, postdata, onCallback, retry_delay) {
   return xhr;
 }
 
+function xhrJsonRequest(href, onCallback) {
+  var xhr = getXHR();
+  xhr.open('get', href);
+  if (xhr.overrideMimeType) {
+    xhr.overrideMimeType('text/plain; charset=x-user-defined');
+  } else {
+    xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
+  }
+  xhr.onerror = function() {
+    onCallback({error: 'XHR_ERROR'});
+  }
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4) {
+      var result;
+      if (typeof xhr.responseBody == 'undefined' &&
+          xhr.responseText && xhr.status == 200) {
+        try {
+          result = JSON.parse(xhr.responseText);
+        } catch(e) {
+          result = {error: 'JSON_PARSE_FAILED'};
+        }
+      } else {
+        result = {error: 'HTTP_ERROR_' + xhr.status};
+      }
+      onCallback(result);
+    }
+  };
+  xhr.send(null);
+  return xhr;
+}
+
 function xhrUploadRequest(href, params, onCallback, onProgress) {
   var xhr = getXHR(), data = new FormData(), ls_header;
   xhr.open('POST', href, true);
@@ -1283,6 +1314,71 @@ function checkFrameSize() {
     addEvent(videoEl, 'timeupdate', videoStarted);
   }
 
+  function proccessEmoji(emojiEl, failed_callback, success_callback) {
+    emojiEl = geById(emojiEl);
+    if (!emojiEl || emojiEl.__inited) return;
+    emojiEl.__inited = true;
+    failed_callback = failed_callback || function(){};
+    success_callback = success_callback || function(){};
+
+    var emoji_id = emojiEl.getAttribute('emoji-id');
+    if (!emoji_id) {
+      failed_callback();
+      return;
+    }
+    xhrJsonRequest('/i/emoji/' + emoji_id + '.json', function(emoji) {
+      if (emoji.error) {
+        failed_callback();
+        return;
+      }
+      var emoji_html = '', thumb_url = '', thumb_mime = '';
+      if (emoji.path) {
+        var size = emoji.size || (emoji.type == 'tgs' ? 512 : 100);
+        var thumb_svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + size + ' ' + size + '"><defs><linearGradient id="g" x1="-300%" x2="-200%" y1="0" y2="0"><stop offset="-10%" stop-opacity=".1"/><stop offset="30%" stop-opacity=".07"/><stop offset="70%" stop-opacity=".07"/><stop offset="110%" stop-opacity=".1"/><animate attributeName="x1" from="-300%" to="1200%" dur="3s" repeatCount="indefinite"/><animate attributeName="x2" from="-200%" to="1300%" dur="3s" repeatCount="indefinite"/></linearGradient></defs><path fill="url(#g)" d="' + emoji.path + '"/></svg>';
+        thumb_url = 'data:image/svg+xml,' + encodeURIComponent(thumb_svg);
+      }
+      if (emoji.type == 'tgs') {
+        if (!thumb_url) {
+          thumb_url = emoji.thumb;
+          thumb_mime = 'image/webp';
+        } else {
+          thumb_mime = 'image/svg+xml';
+        }
+        emoji_html = '<picture class="tg-emoji tg-emoji-tgs"><source type="application/x-tgsticker" srcset="' + emoji.emoji + '"><source type="' + thumb_mime + '" srcset="' + thumb_url + '"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></picture>';
+      } else if (emoji.type == 'webm') {
+        var wrap_attr = thumb_url ? ' style="background-image:url(\'' + thumb_url + '\');"' : '';
+        emoji_html = '<div class="tg-emoji tg-emoji-webm"' + wrap_attr + '><video src="' + emoji.emoji + '" width="100%" height="100%" preload muted autoplay loop playsinline disablepictureinpicture><img src="' + emoji.thumb + '"></video></div>';
+      } else if (emoji.type == 'webp') {
+        var wrap_attr = thumb_url ? ' style="background-image:url(\'' + thumb_url + '\');" data-webp="' + emoji.emoji + '"' : ' style="background-image:url(\'' + emoji.emoji + '\');"';
+        emoji_html = '<i class="tg-emoji tg-emoji-webp"' + wrap_attr + '></i>';
+      }
+      if (emoji_html) {
+        var emojiWrapEl = newEl('span', 'tg-emoji-wrap', emoji_html);
+        emojiEl.insertBefore(emojiWrapEl, emojiEl.firstChild);
+        if (emoji.type == 'tgs') {
+          gec('.tg-emoji-tgs', function() {
+            if (!RLottie.isSupported) {
+              failed_callback();
+            } else {
+              addEventOnce(this, 'tg:init', success_callback);
+              RLottie.init(this);
+            }
+          }, emojiWrapEl);
+        } else if (emoji.type == 'webm') {
+          gec('.tg-emoji-webm', function() {
+            TVideoSticker.init(this, failed_callback, success_callback);
+          }, emojiWrapEl);
+        } else if (emoji.type == 'webp') {
+          gec('.tg-emoji-webp', function() {
+            TSticker.init(this, failed_callback, success_callback);
+          }, emojiWrapEl);
+        }
+      } else {
+        failed_callback();
+      }
+    });
+  }
+
   function checkVideo(el, error_callback) {
     var timeout, eventAdded;
     if (!eventAdded) {
@@ -1338,13 +1434,27 @@ function checkFrameSize() {
       }, postEl);
       gec('.js-message_text', function() {
         TPost.initSpoilers(this, !gpeByClass(this, 'service_message'));
+        gec('tg-emoji', function() {
+          var emojiEl = this;
+          TEmoji.init(this, function() {
+            var wrapEl = gpeByClass(emojiEl, 'js-message_media') || postEl;
+            addClass(wrapEl, 'media_not_supported');
+            removeClass(postEl, 'no_bubble');
+          });
+        }, this);
       }, postEl);
       gec('.js-message_reply_text', function() {
         TPost.initSpoilers(this);
+        gec('tg-emoji', function() {
+          TEmoji.init(this);
+        }, this);
       }, postEl);
       gec('.js-message_footer.compact', function() {
         var timeEl = ge1('time[datetime]', this)
           , textEl = this.previousElementSibling;
+        if (textEl && hasClass(textEl, 'js-message_media')) {
+          textEl = textEl.lastElementChild;
+        }
         if (textEl && !textEl.__inited && hasClass(textEl, 'js-message_text')) {
           var text_rect = textEl.getBoundingClientRect();
           var tnode = textEl.firstChild;
@@ -1439,7 +1549,7 @@ function checkFrameSize() {
       }
     },
     initSpoilers: function(text_el, active) {
-      var spoilers = ge('span.tg-spoiler', text_el);
+      var spoilers = ge('tg-spoiler', text_el);
       if (spoilers.length) {
         TPost.wrapSpoilers(spoilers);
         TPost.wrapTextNodes(text_el);
@@ -1449,10 +1559,11 @@ function checkFrameSize() {
     },
     wrapSpoilers: function(spoilers) {
       gec(spoilers, function() {
-        this.className = 'tg-spoiler-text';
-        var wrap = newEl('span', 'tg-spoiler');
-        this.parentNode.insertBefore(wrap, this);
-        wrap.appendChild(this);
+        var inner_el = newEl('span', 'tg-spoiler-text');
+        while (this.firstChild) {
+          inner_el.appendChild(this.firstChild);
+        }
+        this.appendChild(inner_el);
       });
     },
     wrapTextNodes: function(el) {
@@ -1467,7 +1578,7 @@ function checkFrameSize() {
       });
     },
     hideSpoilers: function(text_el, active) {
-      var spoilers = ge('span.tg-spoiler', text_el);
+      var spoilers = ge('tg-spoiler', text_el);
       if (spoilers.length) {
         if (active) {
           addClass(text_el, 'spoilers_active');
@@ -1484,7 +1595,7 @@ function checkFrameSize() {
       addClass(text_el, 'spoilers_animate');
       removeClass(text_el, 'spoilers_hidden');
       var delay = 0;
-      gec('span.tg-spoiler', function() {
+      gec('tg-spoiler', function() {
         removeEvent(this, 'click', TPost.eSpoilerShow);
         delay += this.innerText.length * 40;
       }, text_el);
@@ -2370,6 +2481,10 @@ function checkFrameSize() {
   var TVideoSticker = window.TVideoSticker = {
     init: proccessWebmImage
   };
+
+  var TEmoji = window.TEmoji = {
+    init: proccessEmoji
+  }
 
   window.TWidgetPost = {
     init: function(options) {

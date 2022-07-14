@@ -153,28 +153,49 @@ mark.label span.hidden {
 .emoji > b {
   font-weight: normal;
 }
+s .emoji > b {
+  font-weight: normal;
+}
+a:hover :has(.emoji),
+a:hover .emoji,
+a:hover .emoji > b {
+  text-decoration: inherit;
+}
 .emoji_default .emoji {
   background: none !important;
 }
 .emoji_image .emoji {
   width: 1.25em;
+  height: 1.25em;
   vertical-align: top;
   display: inline-block;
   white-space: nowrap;
   overflow: hidden;
-  background: no-repeat 2px 50%;
-  background-position-y: calc(50% - 1px);
+  position: relative;
+  background: no-repeat -1000px -1000px;
   background-size: 1.25em 1.25em;
   text-indent: -10em;
   padding: 3px 3px 3px 2px;
   margin: -3px -2px;
+}
+.emoji_image .emoji:before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  background-position: 2px 50%;
+  background-position-y: calc(50% + 1px);
 }
 .emoji_image .emoji > b {
   letter-spacing: 12em;
   pointer-events: none;
 }
 
-span.tg-spoiler {
+tg-spoiler {
   --anim-dur: .45s;
   --anim: var(--anim-dur) ease;
   --anim-fn: text-show;
@@ -183,12 +204,12 @@ span.tg-spoiler {
   padding: 1px 0;
   border-radius: 1px;
 }
-.spoilers_hidden span.tg-spoiler {
+.spoilers_hidden tg-spoiler {
   --anim-fn: text-hide;
   --bg-anim-fn: bg-show;
   background: var(--spoiler-bgcolor);
 }
-.spoilers_hidden.spoilers_active span.tg-spoiler {
+.spoilers_hidden.spoilers_active tg-spoiler {
   cursor: pointer;
 }
 .spoilers_hidden span.tg-spoiler-text {
@@ -199,7 +220,8 @@ span.tg-spoiler {
 .spoilers_hidden.decorated-text a:hover {
   text-decoration: none;
 }
-.spoilers_hidden.decorated-text span.tg-spoiler {
+.spoilers_hidden.decorated-text tg-spoiler,
+.spoilers_hidden.decorated-text tg-spoiler span.d-text {
   text-decoration: none !important;
 }
 .spoilers_hidden.decorated-text s span.d-text {
@@ -219,41 +241,26 @@ span.tg-spoiler {
 .widget_frame_base .spoilers_hidden.decorated-text s a:hover span.d-text {
   text-decoration: underline line-through;
 }
-.widget_frame_base .spoilers_hidden span.tg-spoiler a {
+.widget_frame_base .spoilers_hidden tg-spoiler a {
   color: transparent;
   pointer-events: none;
 }
-span.tg-spoiler .emoji {
-  position: relative;
-  background-position: -1000px -1000px;
-}
-span.tg-spoiler .emoji:before {
-  content: '';
-  position: absolute;
-  pointer-events: none;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: inherit;
-  background-position: 2px 50%;
-  background-position-y: calc(50% - 1px);
-  opacity: 1;
-}
-.emoji_image .spoilers_hidden span.tg-spoiler .emoji:before {
+.emoji_image .spoilers_hidden tg-spoiler .emoji:before,
+.emoji_image .spoilers_hidden tg-spoiler tg-emoji .tg-emoji-wrap {
   opacity: 0;
 }
-.spoilers_animate span.tg-spoiler {
+.spoilers_animate tg-spoiler {
   animation: var(--bg-anim-fn) var(--anim);
 }
 .spoilers_animate span.tg-spoiler-text {
   animation: var(--anim-fn) var(--anim);
   transition: color var(--anim);
 }
-.widget_frame_base .spoilers_animate span.tg-spoiler a {
+.widget_frame_base .spoilers_animate tg-spoiler a {
   transition: color var(--anim);
 }
-.emoji_image .spoilers_animate span.tg-spoiler .emoji:before {
+.emoji_image .spoilers_animate tg-spoiler .emoji:before,
+.emoji_image .spoilers_animate tg-spoiler tg-emoji .tg-emoji-wrap {
   transition: opacity var(--anim);
 }
 @keyframes text-show {
@@ -283,6 +290,52 @@ span.tg-spoiler .emoji:before {
     background: var(--spoiler-bgcolor);
     box-shadow: 0 0 var(--spoiler-bgcolor);
   }
+}
+
+tg-emoji {
+  display: inline-block;
+  position: relative;
+}
+.emoji_image tg-emoji .emoji {
+  background: none !important;
+}
+tg-emoji span.tg-emoji-wrap {
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+  margin-right: -1.25em;
+  margin-top: 1px;
+  vertical-align: top;
+  background: no-repeat 2px 50%;
+  background-size: 1.25em 1.25em;
+  pointer-events: none;
+  transform: scale(1.1);
+}
+tg-emoji .tg-emoji:before {
+  content: '';
+  display: block;
+  padding-top: 100%;
+}
+tg-emoji .tg-emoji {
+  position: relative;
+  display: block;
+}
+tg-emoji .tg-emoji-webp {
+  background: no-repeat center;
+  background-size: 100%;
+}
+tg-emoji .tg-emoji-webm {
+  background: no-repeat top center;
+  background-size: 100%;
+}
+tg-emoji .tg-emoji-tgs img,
+tg-emoji .tg-emoji-tgs canvas,
+tg-emoji .tg-emoji-webm video {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0; right: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .flex_ellipsis,
