@@ -451,7 +451,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
     }
 
     sticker_set_short_names = {'EmojiAnimations', 'EmojiAroundAnimations', 'EmojiShortAnimations',
-                               'EmojiAppearAnimations', 'EmojiCenterAnimations', 'AnimatedEmojies'}
+                               'EmojiAppearAnimations', 'EmojiCenterAnimations', 'AnimatedEmojies', 'AnimatedEmoji'}
 
     for short_name in sticker_set_short_names:
         sticker_set = await app.invoke(functions.messages.GetStickerSet(
