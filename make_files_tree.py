@@ -450,8 +450,16 @@ async def _fetch_and_track_mtproto(app, output_dir):
         'GetPremiumPromo': await app.invoke(functions.help.GetPremiumPromo()),
     }
 
-    sticker_set_short_names = {'EmojiAnimations', 'EmojiAroundAnimations', 'EmojiShortAnimations',
-                               'EmojiAppearAnimations', 'EmojiCenterAnimations', 'AnimatedEmojies', 'AnimatedEmoji'}
+    sticker_set_short_names = {
+        'EmojiAnimations',
+        'EmojiAroundAnimations',
+        'EmojiShortAnimations',
+        'EmojiAppearAnimations',
+        'EmojiCenterAnimations',
+        'AnimatedEmojies',
+        'AnimatedEmoji',
+        'GiftsPremium',
+    }
 
     for short_name in sticker_set_short_names:
         sticker_set = await app.invoke(functions.messages.GetStickerSet(
