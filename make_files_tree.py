@@ -457,7 +457,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
         'EmojiAppearAnimations',
         'EmojiCenterAnimations',
         'AnimatedEmojies',
-        'AnimatedEmoji',
+        #'AnimatedEmoji',
     }
 
     if app.test_mode:
