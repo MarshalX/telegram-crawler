@@ -569,6 +569,11 @@ a.tr-menu-item:hover,
   background: #f0ad4e;
   color: #fff;
 }
+.tr-badges .tr-badge.unused,
+.tr-badges a.tr-badge.unused:hover {
+  background: #f0ad4e;
+  color: #fff;
+}
 .tr-menu-section-collapsed .tr-menu-selected .tr-badges {
   margin-top: -1px;
 }
@@ -2010,6 +2015,7 @@ a:hover > .pluralized:before,
 .cover10 { background-image: url(/img/translations/section10.png?1) }
 .cover_untranslated { background-image: url(/img/translations/section_untranslated.png?2) }
 .cover_unreleased { background-image: url(/img/translations/section_unreleased.png?2) }
+.cover_unused { background-image: url(/img/translations/section_untranslated.png?2) }
 .cover_android  { background-image: url(/img/translations/langpack_android.png?1) }
 .cover_ios      { background-image: url(/img/translations/langpack_ios.png?1) }
 .cover_tdesktop { background-image: url(/img/translations/langpack_tdesktop.png?1) }
@@ -2029,6 +2035,7 @@ a:hover > .pluralized:before,
   .cover10 { background-image: url(/img/translations/section10_2x.png?1) }
   .cover_untranslated { background-image: url(/img/translations/section_untranslated_2x.png?2) }
   .cover_unreleased { background-image: url(/img/translations/section_unreleased_2x.png?2) }
+  .cover_unused { background-image: url(/img/translations/section_untranslated_2x.png?2) }
   .cover_android  { background-image: url(/img/translations/langpack_android_2x.png?1) }
   .cover_ios      { background-image: url(/img/translations/langpack_ios_2x.png?1) }
   .cover_tdesktop { background-image: url(/img/translations/langpack_tdesktop_2x.png?1) }
@@ -2114,7 +2121,7 @@ a:hover > .pluralized:before,
   margin: auto;
   width: 56px;
   height: 56px;
-  background: url('/img/translations/app_icons.png?1') no-repeat center;
+  background: url('/img/translations/app_icons.png?1') no-repeat center 56px;
 }
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .tr-section-circle:after {
@@ -2133,6 +2140,10 @@ a:hover > .pluralized:before,
 }
 .circle_unreleased:after {
   background-position: 0 -224px;
+}
+.circle_unused:before,
+.tr-section-wrap.inactive:hover .circle_unused:before {
+  background: #bbb;
 }
 .circle_android:before,
 .tr-section-wrap.inactive:hover .circle_android:before {
@@ -4443,6 +4454,9 @@ main.intro #dev_page_content_wrap h1#dev_page_title {
 .tr-badge.outdated {
   background: #f0ad4e;
 }
+.tr-badge.unused {
+  background: #f0ad4e;
+}
 
 a.outdated {
   color: #dba30a;
@@ -6184,6 +6198,126 @@ a.tr-lang-intro-button {
     font-size: 16px;
     line-height: 24px;
   }
+}
+
+.app-releases-wrap {
+  position: relative;
+}
+.app-releases {
+  display: flex;
+  height: 2px;
+  background: #f2f2f2;
+  transition: height .2s ease;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.app-releases.open {
+  height: 18px;
+}
+.app-releases:before {
+  content: '';
+}
+.app-release {
+  min-width: 0;
+  transition: all .15s ease;
+  display: flex;
+  justify-content: space-between;
+}
+.app-release,
+.app-releases:before {
+  width: 0;
+  flex-grow: var(--k);
+  flex-shrink: var(--k);
+  position: relative;
+}
+.app-release:before,
+.app-release:after {
+  display: inline-block;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: all .15s ease;
+  font-size: 11px;
+  line-height: 13px;
+  margin: 3px 5px;
+  transform: scale(0);
+  visibility: hidden;
+  opacity: 0;
+}
+.app-release:before {
+  content: attr(data-since);
+  transform-origin: left center;
+  left: 0;
+}
+.app-release:after {
+  content: attr(data-until);
+  transform-origin: right center;
+  right: 0;
+}
+.app-releases.open .app-release:hover {
+  min-width: 75px;
+}
+.app-releases.open .app-release:hover:before,
+.app-releases.open .app-release:hover:after {
+  transform: scale(1);
+  visibility: visible;
+  opacity: 1;
+}
+.app-release.used {
+  background: #0f9ae4;
+}
+.app-release.unused {
+  background: #f0ad4e;
+}
+.app-release.used:before,
+.app-release.used:after,
+.app-release.unused:before,
+.app-release.unused:after {
+  color: #fff;
+}
+
+.key-default-usage {
+  margin: 10px 0 0;
+}
+.key-default-usage + .btn-block {
+  margin: 15px 0 0;
+}
+.key-usage-header {
+  font-size: 13px;
+  line-height: 19px;
+  padding: 0 0 5px;
+  cursor: pointer;
+}
+.key-usage-date {
+  font-size: 12px;
+  font-weight: normal;
+  color: #a8a8a8;
+  margin-left: 5px;
+}
+.key-usage-lines-wrap {
+  position: relative;
+  transition: all .2s ease;
+  overflow: hidden;
+  border-bottom: 1px solid #e7e7e7;
+}
+.key-usage-lines {
+  padding: 9px 0 8px;
+}
+.key-usage-line {
+  font-size: 12px;
+  line-height: 14px;
+  display: inline-block;
+  direction: rtl;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.key-usage-line a {
+  color: inherit;
+}
+
+.tr-value-key-usage .key-usage-lines {
+  padding: 7px 0 0;
 }
 
 .mobile-view-only {
