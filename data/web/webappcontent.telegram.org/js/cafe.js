@@ -178,7 +178,7 @@ var Cafe = {
         color: '#31b545'
       }).hideProgress();
     }
-    Telegram.WebApp.closingConfirmation = !!Cafe.canPay;
+    Telegram.WebApp.isClosingConfirmationEnabled = !!Cafe.canPay;
   },
   updateTotalPrice: function() {
     var total_price = 0;
