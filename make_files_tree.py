@@ -328,7 +328,11 @@ async def download_telegram_android_beta_and_extract_resources(session: aiohttp.
         os.remove('tool.apk')
         os.remove('android.apk')
 
-    process = await asyncio.create_subprocess_exec('java', '-jar', 'tool.apk', 'd', '-s', '-f', 'android.apk')
+    process = await asyncio.create_subprocess_exec(
+        'java', '-jar', 'tool.apk', 'd', '-s', '-f', 'android.apk',
+        stdout=asyncio.subprocess.STDOUT,
+        stderr=asyncio.subprocess.STDOUT
+    )
     await process.communicate()
 
     if process.returncode != 0:
