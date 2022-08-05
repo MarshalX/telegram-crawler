@@ -1247,6 +1247,9 @@
     WebView.postEvent('web_app_expand');
   };
   WebApp.close = function () {
+    if (WebApp.isClosingConfirmationEnabled) {
+      WebApp.isClosingConfirmationEnabled = false;
+    }
     WebView.postEvent('web_app_close');
   };
 
