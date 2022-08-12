@@ -212,11 +212,16 @@ Use <a href="/method/account.confirmPasswordEmail">account.confirmPasswordEmail<
 Use <a href="/method/account.resendPasswordEmail">account.resendPasswordEmail</a> to resend the verification code.
 Use <a href="/method/account.cancelPasswordEmail">account.cancelPasswordEmail</a> to cancel the verification code.</p>
 <p>To get the current recovery email, use <a href="/method/account.getPasswordSettings">account.getPasswordSettings</a>.</p>
-<h4><a class="anchor" href="#email-recovery" id="email-recovery" name="email-recovery"><i class="anchor-icon"></i></a>Email recovery</h4>
-<p>In order to recover a forgotten 2FA password, an email must be sent to the <a href="#email-verification">previously specified address</a> using the <a href="/method/auth.requestPasswordRecovery">auth.requestPasswordRecovery</a> method.<br>
-Use <a href="/method/auth.checkRecoveryPassword">auth.checkRecoveryPassword</a> to make sure that the user provided a valid code.<br>
-Then use <a href="/method/auth.recoverPassword">auth.recoverPassword</a> with the received code to delete the current 2FA password, to set a new one follow <a href="/api/srp">these instructions</a>.</p>
+<h3><a class="anchor" href="#password-recovery" id="password-recovery" name="password-recovery"><i class="anchor-icon"></i></a>Password recovery</h3>
+<p>If the user has forgotten their 2FA password, the following recovery options are available:  </p>
+<ul>
+<li>Logged-in sessions only: <a href="#password-reset">password reset »</a></li>
+<li>Logged-in and not logged-in sessions: <a href="#email-recovery">email recovery »</a></li>
+<li>Not logged-in sessions: <a href="#account-deletion">account deletion »</a></li>
+</ul>
 <h4><a class="anchor" href="#password-reset" id="password-reset" name="password-reset"><i class="anchor-icon"></i></a>Password reset</h4>
+<p>Password reset can be requested from logged-in sessions only.  </p>
+<p>The following procedure can be used to reset the password without deleting the account:</p>
 <pre><code><a href='/constructor/account.resetPasswordFailedWait'>account.resetPasswordFailedWait</a>#e3779861 retry_date:<a href='/type/int'>int</a> = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
 <a href='/constructor/account.resetPasswordRequestedWait'>account.resetPasswordRequestedWait</a>#e9effc7d until_date:<a href='/type/int'>int</a> = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
 <a href='/constructor/account.resetPasswordOk'>account.resetPasswordOk</a>#e926d63e = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
@@ -230,6 +235,14 @@ On success, the call will initially return a <a href="/constructor/account.reset
 <p>When the time comes, <a href="/method/account.resetPassword">account.resetPassword</a> is invoked once more, returning a <a href="/constructor/account.resetPasswordOk">account.resetPasswordOk</a> to indicate that the password was successfully reset.  </p>
 <p>If the user recently requested a password reset that was canceled, <a href="/constructor/account.resetPasswordFailedWait">account.resetPasswordFailedWait</a> will be returned by the initial <a href="/method/account.resetPassword">account.resetPassword</a> call, and they must wait until the specified date before requesting another reset.  </p>
 <p>Note that if the user already knows their 2FA password and simply wants to disable 2FA, <a href="#setting-a-new-2fa-password">the same process used to enable the password must also be used to disable it »</a>.</p>
+<h4><a class="anchor" href="#email-recovery" id="email-recovery" name="email-recovery"><i class="anchor-icon"></i></a>Email recovery</h4>
+<p>Email recovery can be requested from logged in sessions, and from non-logged in sessions if the user has successfully provided the login code.<br>
+In both cases, the account must have an associated <a href="#email-verification">recovery email »</a>.  </p>
+<p>In order to recover a forgotten 2FA password, an email must be sent to the <a href="#email-verification">previously specified address</a> using the <a href="/method/auth.requestPasswordRecovery">auth.requestPasswordRecovery</a> method.<br>
+Use <a href="/method/auth.checkRecoveryPassword">auth.checkRecoveryPassword</a> to make sure that the user provided a valid code.<br>
+Then use <a href="/method/auth.recoverPassword">auth.recoverPassword</a> with the received code to delete the current 2FA password, to set a new one follow <a href="/api/srp">these instructions »</a>.</p>
+<h4><a class="anchor" href="#account-deletion" id="account-deletion" name="account-deletion"><i class="anchor-icon"></i></a>Account deletion</h4>
+<p>If the user has successfully provided the login code, but they forgot their <a href="/api/srp">2FA</a> password and they don't have access to any other logged-in session, the account can be deleted following <a href="/api/account-deletion">these instructions »</a>.  </p>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#srp-design" id="srp-design" name="srp-design"><i class="anchor-icon"></i></a><a href="http://srp.stanford.edu/design.html">SRP design</a></h4></div>
   
