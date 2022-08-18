@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Links</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps…">
+    <meta property="og:title" content="Links">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?231" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/links" >Links</a></li></ul></div>
+  <h1 id="dev_page_title">Links</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram clients must handle special <code>tg://</code> and <code>t.me</code> deep links encountered in messages, link entities and in other apps by registering OS handlers.  </p>
+<p>Links are generally available in two flavors: <code>t.me</code> HTTP links and <code>tg:</code> URIs.  </p>
+<p><code>t.me</code> link syntax examples:  </p>
+<ul>
+<li><code>t.me/path?query</code></li>
+<li><code>http://t.me/path?query</code></li>
+<li><code>https://t.me/path?query</code></li>
+</ul>
+<p>Where <code>t.me</code> can also be <code>telegram.me</code> or <code>telegram.dog</code>.</p>
+<p><code>tg:</code> link syntax examples:  </p>
+<ul>
+<li><code>tg:path?query</code></li>
+<li><code>tg://path?query</code></li>
+</ul>
+<p>The <code>#fragment</code> part is always ignored when parsing links.  </p>
+<h3><a class="anchor" href="#public-username-links" id="public-username-links" name="public-username-links"><i class="anchor-icon"></i></a>Public username links</h3>
+<p>Used to link to public users, groups and channels, see <a href="/api/invites#public-usernames">here for more info on how to handle them »</a>.  </p>
+<p>t.me syntax:</p>
+<pre><code>t.me/&lt;username&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://resolve?domain=&lt;username&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username to <a href="/api/invites#public-usernames">check or import »</a></td>
+</tr>
+</tbody>
+</table>
+<p>Note that <a href="#message-links">message links</a> have the same syntax, with extra parameters.  </p>
+<h3><a class="anchor" href="#chat-invite-links" id="chat-invite-links" name="chat-invite-links"><i class="anchor-icon"></i></a>Chat invite links</h3>
+<p>Used to invite users to private groups and channels, see <a href="/api/invites#invite-links">here for more info on how to generate such links »</a>.  </p>
+<p>t.me syntax:</p>
+<pre><code>t.me/+&lt;hash&gt;</code></pre>
+<p>t.me syntax (legacy):</p>
+<pre><code>t.me/joinchat/&lt;hash&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://join?invite=&lt;hash&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hash</code></td>
+<td style="text-align: center;">Required</td>
+<td>Invite hash to <a href="/api/invites#invite-links">check or import »</a></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#message-links" id="message-links" name="message-links"><i class="anchor-icon"></i></a>Message links</h3>
+<p>Used to link to specific messages in public or private groups and channels.  </p>
+<p>t.me syntax (public links):  </p>
+<pre><code>t.me/&lt;username&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
+<p>t.me syntax (private links):  </p>
+<pre><code>t.me/c/&lt;channel&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
+<p>tg: syntax (public links):</p>
+<pre><code>tg://resolve?domain=&lt;username&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
+<p>tg: syntax (private links):</p>
+<pre><code>tg://privatepost?channel=&lt;channelid&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required if public link</td>
+<td>Dialog username.</td>
+</tr>
+<tr>
+<td><code>channel</code></td>
+<td style="text-align: center;">Required if private link</td>
+<td>Channel or supergroup ID.</td>
+</tr>
+<tr>
+<td><code>post</code></td>
+<td style="text-align: center;">Required</td>
+<td>Message ID.</td>
+</tr>
+<tr>
+<td><code>single</code></td>
+<td style="text-align: center;">Optional</td>
+<td></td>
+</tr>
+<tr>
+<td><code>thread</code></td>
+<td style="text-align: center;">Optional</td>
+<td>For <a href="/api/threads">message threads</a>, contains the thread ID.</td>
+</tr>
+<tr>
+<td><code>comment</code></td>
+<td style="text-align: center;">Optional</td>
+<td>For <a href="/api/discussion">channel comments</a>, <code>username</code> will contain the channel username, <code>id</code> will contain the message ID of the channel message that started the comment section and this field will contain the message ID of the comment in the discussion group.</td>
+</tr>
+<tr>
+<td><code>t</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Timestamp in seconds at which to start playing the media file present in the body or in the webpage preview of the message.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#active-sessions-link" id="active-sessions-link" name="active-sessions-link"><i class="anchor-icon"></i></a>Active sessions link</h3>
+<p>Used to bring the user to the active sessions page, calling <a href="/method/account.getAuthorizations">account.getAuthorizations</a>.  </p>
+<p>tg: syntax:</p>
+<pre><code>tg://settings/devices</code></pre>
+<p>No parameters.</p>
+<h3><a class="anchor" href="#login-code-link" id="login-code-link" name="login-code-link"><i class="anchor-icon"></i></a>Login code link</h3>
+<p>Contains the phone number verification code to use during <a href="/api/auth">user authorization »</a>.  </p>
+<p>t.me syntax:</p>
+<pre><code>t.me/login/&lt;code&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://login?code=&lt;code&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Login code.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#wallpaper-links" id="wallpaper-links" name="wallpaper-links"><i class="anchor-icon"></i></a>Wallpaper links</h3>
+<p>Used to share and install chat backgrounds (wallpapers).  </p>
+<h4><a class="anchor" href="#single-color-backgrounds" id="single-color-backgrounds" name="single-color-backgrounds"><i class="anchor-icon"></i></a>Single-color backgrounds</h4>
+<p>t.me syntax:</p>
+<pre><code>t.me/bg/&lt;hex_color&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://bg?color=&lt;hex_color&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hex_color</code></td>
+<td style="text-align: center;">Required</td>
+<td>Hex color in RGB format.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#gradient-backgrounds" id="gradient-backgrounds" name="gradient-backgrounds"><i class="anchor-icon"></i></a>Gradient backgrounds</h4>
+<p>t.me syntax:</p>
+<pre><code>t.me/bg/&lt;hex_color1&gt;-&lt;hex_color2&gt;&amp;rotation=&lt;rotation&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://bg?gradient=&lt;hex_color&gt;-&lt;hex_color&gt;&amp;rotation=&lt;rotation&gt;</code></pre></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/blog">Blog</a></li>
+        <li><a href="//telegram.org/jobs">Jobs</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/dl/android">Android</a></li>
+        <li><a href="//telegram.org/dl/wp">Windows Phone</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)">Twitter</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?46"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
