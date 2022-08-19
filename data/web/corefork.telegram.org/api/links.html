@@ -45,7 +45,7 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Telegram clients must handle special <code>tg://</code> and <code>t.me</code> deep links encountered in messages, link entities and in other apps by registering OS handlers.  </p>
-<p>Links are generally available in two flavors: <code>t.me</code> HTTP links and <code>tg:</code> URIs.  </p>
+<p>Links are generally available in two flavors: <code>t.me</code> HTTPS links and <code>tg:</code> URIs.  </p>
 <p><code>t.me</code> link syntax examples:  </p>
 <ul>
 <li><code>t.me/path?query</code></li>
@@ -83,6 +83,30 @@
 </tbody>
 </table>
 <p>Note that <a href="#message-links">message links</a> have the same syntax, with extra parameters.  </p>
+<h3><a class="anchor" href="#phone-number-links" id="phone-number-links" name="phone-number-links"><i class="anchor-icon"></i></a>Phone number links</h3>
+<p>Used to link to public and private users by their phone number.  </p>
+<p>t.me syntax:</p>
+<pre><code>t.me/+&lt;phone_number&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://resolve?phone=&lt;phone_number&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>phone_number</code></td>
+<td style="text-align: center;">Required</td>
+<td>Phone number to resolve using <a href="/method/contacts.resolvePhone">contacts.resolvePhone</a></td>
+</tr>
+</tbody>
+</table>
+<p>Note that <a href="#message-links">chat invite links</a> have the same syntax, but `<phone_number> is not a valid phone number.  </phone_number></p>
 <h3><a class="anchor" href="#chat-invite-links" id="chat-invite-links" name="chat-invite-links"><i class="anchor-icon"></i></a>Chat invite links</h3>
 <p>Used to invite users to private groups and channels, see <a href="/api/invites#invite-links">here for more info on how to generate such links »</a>.  </p>
 <p>t.me syntax:</p>
@@ -691,6 +715,155 @@ tg://msg_url?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
 <td><code>text</code></td>
 <td style="text-align: center;">Optional</td>
 <td>Message to share</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#telegram-passport-links" id="telegram-passport-links" name="telegram-passport-links"><i class="anchor-icon"></i></a>Telegram Passport links</h3>
+<p>t.me syntax:</p>
+<pre><code>t.me/passport?bot_id=&lt;bot_user_id&gt;&amp;scope=&lt;scope&gt;&amp;public_key=&lt;public_key&gt;&amp;nonce=&lt;nonce&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://resolve?domain=telegrampassport&amp;bot_id=&lt;bot_user_id&gt;&amp;scope=&lt;scope&gt;&amp;public_key=&lt;public_key&gt;&amp;nonce=&lt;nonce&gt;</code></pre>
+<h3><a class="anchor" href="#phone-confirmation-links" id="phone-confirmation-links" name="phone-confirmation-links"><i class="anchor-icon"></i></a>Phone confirmation links</h3>
+<p>Different from <a href="#login-code-links">login code links</a>.<br>
+These links are used to confirm ownership of the phone number, to prevent account deletion: see <a href="/api/account-deletion">the account deletion docs for more info on how to handle them »</a>.</p>
+<p>t.me syntax:</p>
+<pre><code>t.me/confirmphone?phone=&lt;phone&gt;&amp;hash=&lt;hash&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://confirmphone?phone=&lt;phone&gt;&amp;hash=&lt;hash&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>phone</code></td>
+<td style="text-align: center;">Required</td>
+<td>Phone number</td>
+</tr>
+<tr>
+<td><code>hash</code></td>
+<td style="text-align: center;">Required</td>
+<td>Confirmation hash to handle <a href="/api/account-deletion">as described here »</a></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#premium-referrer-links" id="premium-referrer-links" name="premium-referrer-links"><i class="anchor-icon"></i></a>Premium referrer links</h3>
+<p>Used by official apps to show the <a href="/api/premium">Telegram Premium</a> subscription page.  </p>
+<p>tg: syntax:</p>
+<pre><code>tg://premium_offer?ref=&lt;referrer&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>referrer</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Used by official apps for analytics using <a href="/method/help.saveAppLog">help.saveAppLog</a></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#proxy-links" id="proxy-links" name="proxy-links"><i class="anchor-icon"></i></a>Proxy links</h3>
+<p>Used to share a proxy server that can be used to connect to Telegram.  </p>
+<h4><a class="anchor" href="#mtproxy-links" id="mtproxy-links" name="mtproxy-links"><i class="anchor-icon"></i></a>MTProxy links</h4>
+<p>Used for <a href="/mtproto/mtproto-transports#transport-obfuscation">MTProxies »</a>.</p>
+<p>t.me syntax:</p>
+<pre><code>t.me/proxy?server=&lt;server&gt;&amp;port=&lt;port&gt;&amp;secret=&lt;secret&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://proxy?server=&lt;server&gt;&amp;port=&lt;port&gt;&amp;secret=&lt;secret&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>server</code></td>
+<td style="text-align: center;">Required</td>
+<td>MTProxy server IP address or host</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td style="text-align: center;">Required</td>
+<td>MTProxy server port</td>
+</tr>
+<tr>
+<td><code>secret</code></td>
+<td style="text-align: center;">Required</td>
+<td>MTProxy server secret</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#socks5-proxy-links" id="socks5-proxy-links" name="socks5-proxy-links"><i class="anchor-icon"></i></a>Socks5 proxy links</h4>
+<p>Used for socks5 proxies.</p>
+<p>t.me syntax:</p>
+<pre><code>t.me/socks?server=&lt;server&gt;&amp;port=&lt;port&gt;&amp;user=&lt;user&gt;&amp;pass=&lt;pass&gt;</code></pre>
+<p>tg: syntax:</p>
+<pre><code>tg://socks?server=&lt;server&gt;&amp;port=&lt;port&gt;&amp;user=&lt;user&gt;&amp;pass=&lt;pass&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>server</code></td>
+<td style="text-align: center;">Required</td>
+<td>Proxy server IP address or host</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td style="text-align: center;">Required</td>
+<td>Proxy server port</td>
+</tr>
+<tr>
+<td><code>user</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Proxy server username</td>
+</tr>
+<tr>
+<td><code>pass</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Proxy server password</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#qr-code-login-links" id="qr-code-login-links" name="qr-code-login-links"><i class="anchor-icon"></i></a>QR code login links</h3>
+<p>Used by <a href="/api/qr-login">QR code login</a>.</p>
+<p>tg: syntax:</p>
+<pre><code>tg://login?token=&lt;base64encodedtoken&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>server</code></td>
+<td style="text-align: center;">Required</td>
+<td>Base64URL-encoded <a href="/api/qr-login">QR code login token</a></td>
 </tr>
 </tbody>
 </table></div>
