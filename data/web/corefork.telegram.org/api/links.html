@@ -2,12 +2,12 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>Links</title>
+    <title>Deep links</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps…">
-    <meta property="og:title" content="Links">
+    <meta property="description" content="Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps by registering OS handlers.">
+    <meta property="og:title" content="Deep links">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps…">
+    <meta property="og:description" content="Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps by registering OS handlers.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -39,8 +39,8 @@
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/links" >Links</a></li></ul></div>
-  <h1 id="dev_page_title">Links</h1>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/links" >Deep links</a></li></ul></div>
+  <h1 id="dev_page_title">Deep links</h1>
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
@@ -968,7 +968,47 @@ tg://resolve?domain=&lt;username&gt;&amp;livestream=&lt;invite_hash&gt;</code></
 <td>Invite hash exported if the <code>can_self_unmute</code> flag is set when calling <a href="/method/phone.exportGroupCallInvite">phone.exportGroupCallInvite</a>: should be passed to <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a>, allows the user to speak in livestreams or muted group chats.</td>
 </tr>
 </tbody>
-</table></div>
+</table>
+<h3><a class="anchor" href="#bot-attachment-menu-links" id="bot-attachment-menu-links" name="bot-attachment-menu-links"><i class="anchor-icon"></i></a>Bot attachment menu links</h3>
+<p>t.me syntax:</p>
+<pre><code>t.me/&lt;username&gt;?attach=&lt;bot_username&gt;
+t.me/&lt;username&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
+t.me/&lt;bot_username&gt;?startattach&amp;choose=users+bots+groups+channels
+t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels
+t.me/+&lt;phone_number&gt;?attach=&lt;bot_username&gt;
+t.me/+&lt;phone_number&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;</code></pre>
+<p>tg: synax:</p>
+<pre><code>tg://resolve?domain=&lt;username&gt;&amp;attach=&lt;bot_username&gt;
+tg://resolve?domain=&lt;username&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
+tg://resolve?domain=&lt;bot_username&gt;&amp;startattach&amp;choose=users+bots+groups+channels
+tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels
+tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;
+tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;</code></pre>
+<h3><a class="anchor" href="#unsupported-links" id="unsupported-links" name="unsupported-links"><i class="anchor-icon"></i></a>Unsupported links</h3>
+<p>If a client encounters a tg: link type not listed on this page, <a href="/method/help.getDeepLinkInfo">help.getDeepLinkInfo</a> should be invoked with just the <code>path</code> component of the link.  </p>
+<p>Schema:</p>
+<pre><code><a href='/constructor/help.deepLinkInfoEmpty'>help.deepLinkInfoEmpty</a>#66afa166 = <a href='/type/help.DeepLinkInfo'>help.DeepLinkInfo</a>;
+<a href='/constructor/help.deepLinkInfo'>help.deepLinkInfo</a>#6a4ee832 flags:<a href='/type/%23'>#</a> update_app:flags.0?<a href='/constructor/true'>true</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; = <a href='/type/help.DeepLinkInfo'>help.DeepLinkInfo</a>;
+
+---functions---
+
+<a href='/method/help.getDeepLinkInfo'>help.getDeepLinkInfo</a>#3fedc75f path:<a href='/type/string'>string</a> = <a href='/type/help.DeepLinkInfo'>help.DeepLinkInfo</a>;</code></pre>
+<p>The method may return formatted text, containing for example:  </p>
+<ul>
+<li>A description of what the link does or,</li>
+<li>An explanation of why a certain link isn't supported by the app</li>
+</ul>
+<p>And/or an invitation to upgrade to the latest version of the client app to be able to use the link: in this case, the result <code>update_app</code> flag will also be set, and the app should directly link to a store or attempt autoupdating to the latest version.  </p>
+<p>Example links that can be used for testing: </p>
+<ul>
+<li><code>tg://need_update_for_some_feature?test=a</code></li>
+<li><code>tg:some_unsupported_feature?test=b</code></li>
+</ul>
+<p>In these cases, <a href="/method/help.getDeepLinkInfo">help.getDeepLinkInfo</a> should be invoked with the following parameters:</p>
+<ul>
+<li><code>help.getDeepLinkInfo({path: "need_update_for_some_feature"})</code></li>
+<li><code>help.getDeepLinkInfo({path: "some_unsupported_feature"})</code></li>
+</ul></div>
   
 </div>
           

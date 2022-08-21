@@ -4,12 +4,10 @@
     <meta charset="utf-8">
     <title>Inline</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Users can interact with your bot via inline queries, straight from the text input field in any chat.
-This article describes…">
+    <meta property="description" content="Users can interact with your bot via inline queries, straight from the text input field in any chat.">
     <meta property="og:title" content="Inline">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Users can interact with your bot via inline queries, straight from the text input field in any chat.
-This article describes…">
+    <meta property="og:description" content="Users can interact with your bot via inline queries, straight from the text input field in any chat.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -41,20 +39,19 @@ This article describes…">
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"></div>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/bots%2Finline" >Inline</a></li></ul></div>
   <h1 id="dev_page_title">Inline</h1>
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>Users can interact with your bot via <a href="/bots/#inline-mode"><strong>inline queries</strong></a>, straight from the <strong>text input field</strong> in <strong>any</strong> chat.<br>
-This article describes the full inline bot flow, using the MTProto API.  </p>
-<p>For a simplified description using the HTTP bot API, see <a href="/bots/#inline-mode">here »</a>.  </p>
-<h3><a class="anchor" href="#making-an-inline-query" id="making-an-inline-query" name="making-an-inline-query"><i class="anchor-icon"></i></a>Making an inline query</h3>
-<pre><code><a href='/constructor/messages.botResults'>messages.botResults</a>#947ca848 flags:<a href='/type/%23'>#</a> gallery:flags.0?<a href='/constructor/true'>true</a> query_id:<a href='/type/long'>long</a> next_offset:flags.1?<a href='/type/string'>string</a> switch_pm:flags.2?<a href='/type/InlineBotSwitchPM'>InlineBotSwitchPM</a> results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotInlineResult'>BotInlineResult</a>&gt; cache_time:<a href='/type/int'>int</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.BotResults'>messages.BotResults</a>;
+<p>Users can interact with your bot via <a href="/bots/#inline-mode"><strong>inline queries</strong></a>, straight from the <strong>text input field</strong> in <strong>any</strong> chat.<br>This article describes the full inline bot flow, using the MTProto API.  </p>
+<p>For a simplified description using the HTTP bot API, see <a href="/bots/#inline-mode">here &raquo;</a>.  </p>
+<h3><a class="anchor" name="making-an-inline-query" href="#making-an-inline-query"><i class="anchor-icon"></i></a>Making an inline query</h3>
+<pre><code>messages.botResults#947ca848 flags:# gallery:flags.0?true query_id:long next_offset:flags.1?string switch_pm:flags.2?InlineBotSwitchPM results:Vector&lt;BotInlineResult&gt; cache_time:int users:Vector&lt;User&gt; = messages.BotResults;
 
 ---functions---
 
-<a href='/method/messages.getInlineBotResults'>messages.getInlineBotResults</a>#514e999d flags:<a href='/type/%23'>#</a> bot:<a href='/type/InputUser'>InputUser</a> peer:<a href='/type/InputPeer'>InputPeer</a> geo_point:flags.0?<a href='/type/InputGeoPoint'>InputGeoPoint</a> query:<a href='/type/string'>string</a> offset:<a href='/type/string'>string</a> = <a href='/type/messages.BotResults'>messages.BotResults</a>;</code></pre>
+messages.getInlineBotResults#514e999d flags:# bot:InputUser peer:InputPeer geo_point:flags.0?InputGeoPoint query:string offset:string = messages.BotResults;</code></pre>
 <p>When, in a graphical client, the user starts a message with an <code>@</code>, clients should:</p>
 <ul>
 <li>Use the cached <a href="/api/top-rating">top peer rating for inline bots</a> to show a list of frequently used inline bots.</li>
@@ -63,48 +60,47 @@ This article describes the full inline bot flow, using the MTProto API.  </p>
 <li><a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a> is called, with the following parameters:<ul>
 <li><code>bot</code> - The bot peer</li>
 <li><code>peer</code> - The chat where the user made the query</li>
-<li><code>geo_point</code> - The user's current geolocation, if the bot requires <a href="/bots/inline#location-based-results">location-based inline results</a> (the <code>bot_inline_geo</code> flag of the bot's <a href="/constructor/user">user constructor</a> will be set)</li>
-<li><code>query</code> - What the user typed after the bot's username</li>
+<li><code>geo_point</code> - The user&#39;s current geolocation, if the bot requires <a href="/bots/inline#location-based-results">location-based inline results</a> (the <code>bot_inline_geo</code> flag of the bot&#39;s <a href="/constructor/user">user constructor</a> will be set)</li>
+<li><code>query</code> - What the user typed after the bot&#39;s username</li>
 <li><code>offset</code> - If the user scrolls past the first <code>len(results)</code> results, and <code>next_offset</code> field is set, the inline query should be repeated with this offset.</li>
 </ul>
 </li>
 </ul>
-<h3><a class="anchor" href="#answering-to-an-inline-query" id="answering-to-an-inline-query" name="answering-to-an-inline-query"><i class="anchor-icon"></i></a>Answering to an inline query</h3>
-<pre><code><a href='/constructor/inputBotInlineMessageMediaAuto'>inputBotInlineMessageMediaAuto</a>#3380c786 flags:<a href='/type/%23'>#</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a>;
-<a href='/constructor/inputBotInlineMessageText'>inputBotInlineMessageText</a>#3dcd7a87 flags:<a href='/type/%23'>#</a> no_webpage:flags.0?<a href='/constructor/true'>true</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a>;
-<a href='/constructor/inputBotInlineMessageMediaGeo'>inputBotInlineMessageMediaGeo</a>#96929a85 flags:<a href='/type/%23'>#</a> geo_point:<a href='/type/InputGeoPoint'>InputGeoPoint</a> heading:flags.0?<a href='/type/int'>int</a> period:flags.1?<a href='/type/int'>int</a> proximity_notification_radius:flags.3?<a href='/type/int'>int</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a>;
-<a href='/constructor/inputBotInlineMessageMediaVenue'>inputBotInlineMessageMediaVenue</a>#417bbf11 flags:<a href='/type/%23'>#</a> geo_point:<a href='/type/InputGeoPoint'>InputGeoPoint</a> title:<a href='/type/string'>string</a> address:<a href='/type/string'>string</a> provider:<a href='/type/string'>string</a> venue_id:<a href='/type/string'>string</a> venue_type:<a href='/type/string'>string</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a>;
-<a href='/constructor/inputBotInlineMessageMediaContact'>inputBotInlineMessageMediaContact</a>#a6edbffd flags:<a href='/type/%23'>#</a> phone_number:<a href='/type/string'>string</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> vcard:<a href='/type/string'>string</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a>;
-<a href='/constructor/inputBotInlineMessageGame'>inputBotInlineMessageGame</a>#4b425864 flags:<a href='/type/%23'>#</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a>;
+<h3><a class="anchor" name="answering-to-an-inline-query" href="#answering-to-an-inline-query"><i class="anchor-icon"></i></a>Answering to an inline query</h3>
+<pre><code>inputBotInlineMessageMediaAuto#3380c786 flags:# message:string entities:flags.1?Vector&lt;MessageEntity&gt; reply_markup:flags.2?ReplyMarkup = InputBotInlineMessage;
+inputBotInlineMessageText#3dcd7a87 flags:# no_webpage:flags.0?true message:string entities:flags.1?Vector&lt;MessageEntity&gt; reply_markup:flags.2?ReplyMarkup = InputBotInlineMessage;
+inputBotInlineMessageMediaGeo#96929a85 flags:# geo_point:InputGeoPoint heading:flags.0?int period:flags.1?int proximity_notification_radius:flags.3?int reply_markup:flags.2?ReplyMarkup = InputBotInlineMessage;
+inputBotInlineMessageMediaVenue#417bbf11 flags:# geo_point:InputGeoPoint title:string address:string provider:string venue_id:string venue_type:string reply_markup:flags.2?ReplyMarkup = InputBotInlineMessage;
+inputBotInlineMessageMediaContact#a6edbffd flags:# phone_number:string first_name:string last_name:string vcard:string reply_markup:flags.2?ReplyMarkup = InputBotInlineMessage;
+inputBotInlineMessageGame#4b425864 flags:# reply_markup:flags.2?ReplyMarkup = InputBotInlineMessage;
 
-<a href='/constructor/inputBotInlineResult'>inputBotInlineResult</a>#88bf9319 flags:<a href='/type/%23'>#</a> id:<a href='/type/string'>string</a> type:<a href='/type/string'>string</a> title:flags.1?<a href='/type/string'>string</a> description:flags.2?<a href='/type/string'>string</a> url:flags.3?<a href='/type/string'>string</a> thumb:flags.4?<a href='/type/InputWebDocument'>InputWebDocument</a> content:flags.5?<a href='/type/InputWebDocument'>InputWebDocument</a> send_message:<a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a> = <a href='/type/InputBotInlineResult'>InputBotInlineResult</a>;
-<a href='/constructor/inputBotInlineResultPhoto'>inputBotInlineResultPhoto</a>#a8d864a7 id:<a href='/type/string'>string</a> type:<a href='/type/string'>string</a> photo:<a href='/type/InputPhoto'>InputPhoto</a> send_message:<a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a> = <a href='/type/InputBotInlineResult'>InputBotInlineResult</a>;
-<a href='/constructor/inputBotInlineResultDocument'>inputBotInlineResultDocument</a>#fff8fdc4 flags:<a href='/type/%23'>#</a> id:<a href='/type/string'>string</a> type:<a href='/type/string'>string</a> title:flags.1?<a href='/type/string'>string</a> description:flags.2?<a href='/type/string'>string</a> document:<a href='/type/InputDocument'>InputDocument</a> send_message:<a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a> = <a href='/type/InputBotInlineResult'>InputBotInlineResult</a>;
-<a href='/constructor/inputBotInlineResultGame'>inputBotInlineResultGame</a>#4fa417f2 id:<a href='/type/string'>string</a> short_name:<a href='/type/string'>string</a> send_message:<a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a> = <a href='/type/InputBotInlineResult'>InputBotInlineResult</a>;
+inputBotInlineResult#88bf9319 flags:# id:string type:string title:flags.1?string description:flags.2?string url:flags.3?string thumb:flags.4?InputWebDocument content:flags.5?InputWebDocument send_message:InputBotInlineMessage = InputBotInlineResult;
+inputBotInlineResultPhoto#a8d864a7 id:string type:string photo:InputPhoto send_message:InputBotInlineMessage = InputBotInlineResult;
+inputBotInlineResultDocument#fff8fdc4 flags:# id:string type:string title:flags.1?string description:flags.2?string document:InputDocument send_message:InputBotInlineMessage = InputBotInlineResult;
+inputBotInlineResultGame#4fa417f2 id:string short_name:string send_message:InputBotInlineMessage = InputBotInlineResult;
 
-<a href='/constructor/updateBotInlineQuery'>updateBotInlineQuery</a>#496f379c flags:<a href='/type/%23'>#</a> query_id:<a href='/type/long'>long</a> user_id:<a href='/type/long'>long</a> query:<a href='/type/string'>string</a> geo:flags.0?<a href='/type/GeoPoint'>GeoPoint</a> peer_type:flags.1?<a href='/type/InlineQueryPeerType'>InlineQueryPeerType</a> offset:<a href='/type/string'>string</a> = <a href='/type/Update'>Update</a>;
+updateBotInlineQuery#496f379c flags:# query_id:long user_id:long query:string geo:flags.0?GeoPoint peer_type:flags.1?InlineQueryPeerType offset:string = Update;
 
 ---functions---
 
-<a href='/method/messages.setInlineBotResults'>messages.setInlineBotResults</a>#eb5ea206 flags:<a href='/type/%23'>#</a> gallery:flags.0?<a href='/constructor/true'>true</a> private:flags.1?<a href='/constructor/true'>true</a> query_id:<a href='/type/long'>long</a> results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputBotInlineResult'>InputBotInlineResult</a>&gt; cache_time:<a href='/type/int'>int</a> next_offset:flags.2?<a href='/type/string'>string</a> switch_pm:flags.3?<a href='/type/InlineBotSwitchPM'>InlineBotSwitchPM</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
-<p>Bots can answer to incoming <a href="/constructor/updateBotInlineQuery">updateBotInlineQuery</a> updates using <a href="/method/messages.setInlineBotResults">messages.setInlineBotResults</a>.<br>
-Just like its <a href="/bots/api#answerinlinequery">bot API counterpart</a>, the method can be used to send a set of inline results to the user; see the <a href="/method/messages.setInlineBotResults">constructor page for more info on the MTProto method parameters »</a>.</p>
+messages.setInlineBotResults#eb5ea206 flags:# gallery:flags.0?true private:flags.1?true query_id:long results:Vector&lt;InputBotInlineResult&gt; cache_time:int next_offset:flags.2?string switch_pm:flags.3?InlineBotSwitchPM = Bool;</code></pre>
+<p>Bots can answer to incoming <a href="/constructor/updateBotInlineQuery">updateBotInlineQuery</a> updates using <a href="/method/messages.setInlineBotResults">messages.setInlineBotResults</a>.<br>Just like its <a href="/bots/api#answerinlinequery">bot API counterpart</a>, the method can be used to send a set of inline results to the user; see the <a href="/method/messages.setInlineBotResults">constructor page for more info on the MTProto method parameters &raquo;</a>.</p>
 <p>In general, the method accepts a vector of <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructors, that when <a href="#sending-the-inline-query-result">chosen</a>, generates a message with optionally attached media, and even inline buttons.</p>
-<h3><a class="anchor" href="#sending-the-inline-query-result" id="sending-the-inline-query-result" name="sending-the-inline-query-result"><i class="anchor-icon"></i></a>Sending the inline query result</h3>
-<pre><code><a href='/constructor/botInlineMessageMediaAuto'>botInlineMessageMediaAuto</a>#764cf810 flags:<a href='/type/%23'>#</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/BotInlineMessage'>BotInlineMessage</a>;
-<a href='/constructor/botInlineMessageText'>botInlineMessageText</a>#8c7f65e2 flags:<a href='/type/%23'>#</a> no_webpage:flags.0?<a href='/constructor/true'>true</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/BotInlineMessage'>BotInlineMessage</a>;
-<a href='/constructor/botInlineMessageMediaGeo'>botInlineMessageMediaGeo</a>#51846fd flags:<a href='/type/%23'>#</a> geo:<a href='/type/GeoPoint'>GeoPoint</a> heading:flags.0?<a href='/type/int'>int</a> period:flags.1?<a href='/type/int'>int</a> proximity_notification_radius:flags.3?<a href='/type/int'>int</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/BotInlineMessage'>BotInlineMessage</a>;
-<a href='/constructor/botInlineMessageMediaVenue'>botInlineMessageMediaVenue</a>#8a86659c flags:<a href='/type/%23'>#</a> geo:<a href='/type/GeoPoint'>GeoPoint</a> title:<a href='/type/string'>string</a> address:<a href='/type/string'>string</a> provider:<a href='/type/string'>string</a> venue_id:<a href='/type/string'>string</a> venue_type:<a href='/type/string'>string</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/BotInlineMessage'>BotInlineMessage</a>;
-<a href='/constructor/botInlineMessageMediaContact'>botInlineMessageMediaContact</a>#18d1cdc2 flags:<a href='/type/%23'>#</a> phone_number:<a href='/type/string'>string</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> vcard:<a href='/type/string'>string</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> = <a href='/type/BotInlineMessage'>BotInlineMessage</a>;
+<h3><a class="anchor" name="sending-the-inline-query-result" href="#sending-the-inline-query-result"><i class="anchor-icon"></i></a>Sending the inline query result</h3>
+<pre><code>botInlineMessageMediaAuto#764cf810 flags:# message:string entities:flags.1?Vector&lt;MessageEntity&gt; reply_markup:flags.2?ReplyMarkup = BotInlineMessage;
+botInlineMessageText#8c7f65e2 flags:# no_webpage:flags.0?true message:string entities:flags.1?Vector&lt;MessageEntity&gt; reply_markup:flags.2?ReplyMarkup = BotInlineMessage;
+botInlineMessageMediaGeo#51846fd flags:# geo:GeoPoint heading:flags.0?int period:flags.1?int proximity_notification_radius:flags.3?int reply_markup:flags.2?ReplyMarkup = BotInlineMessage;
+botInlineMessageMediaVenue#8a86659c flags:# geo:GeoPoint title:string address:string provider:string venue_id:string venue_type:string reply_markup:flags.2?ReplyMarkup = BotInlineMessage;
+botInlineMessageMediaContact#18d1cdc2 flags:# phone_number:string first_name:string last_name:string vcard:string reply_markup:flags.2?ReplyMarkup = BotInlineMessage;
 
-<a href='/constructor/botInlineResult'>botInlineResult</a>#11965f3a flags:<a href='/type/%23'>#</a> id:<a href='/type/string'>string</a> type:<a href='/type/string'>string</a> title:flags.1?<a href='/type/string'>string</a> description:flags.2?<a href='/type/string'>string</a> url:flags.3?<a href='/type/string'>string</a> thumb:flags.4?<a href='/type/WebDocument'>WebDocument</a> content:flags.5?<a href='/type/WebDocument'>WebDocument</a> send_message:<a href='/type/BotInlineMessage'>BotInlineMessage</a> = <a href='/type/BotInlineResult'>BotInlineResult</a>;
-<a href='/constructor/botInlineMediaResult'>botInlineMediaResult</a>#17db940b flags:<a href='/type/%23'>#</a> id:<a href='/type/string'>string</a> type:<a href='/type/string'>string</a> photo:flags.0?<a href='/type/Photo'>Photo</a> document:flags.1?<a href='/type/Document'>Document</a> title:flags.2?<a href='/type/string'>string</a> description:flags.3?<a href='/type/string'>string</a> send_message:<a href='/type/BotInlineMessage'>BotInlineMessage</a> = <a href='/type/BotInlineResult'>BotInlineResult</a>;
+botInlineResult#11965f3a flags:# id:string type:string title:flags.1?string description:flags.2?string url:flags.3?string thumb:flags.4?WebDocument content:flags.5?WebDocument send_message:BotInlineMessage = BotInlineResult;
+botInlineMediaResult#17db940b flags:# id:string type:string photo:flags.0?Photo document:flags.1?Document title:flags.2?string description:flags.3?string send_message:BotInlineMessage = BotInlineResult;
 
-<a href='/constructor/messages.botResults'>messages.botResults</a>#947ca848 flags:<a href='/type/%23'>#</a> gallery:flags.0?<a href='/constructor/true'>true</a> query_id:<a href='/type/long'>long</a> next_offset:flags.1?<a href='/type/string'>string</a> switch_pm:flags.2?<a href='/type/InlineBotSwitchPM'>InlineBotSwitchPM</a> results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotInlineResult'>BotInlineResult</a>&gt; cache_time:<a href='/type/int'>int</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.BotResults'>messages.BotResults</a>;
+messages.botResults#947ca848 flags:# gallery:flags.0?true query_id:long next_offset:flags.1?string switch_pm:flags.2?InlineBotSwitchPM results:Vector&lt;BotInlineResult&gt; cache_time:int users:Vector&lt;User&gt; = messages.BotResults;
 
 ---functions---
 
-<a href='/method/messages.sendInlineBotResult'>messages.sendInlineBotResult</a>#7aa11297 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> hide_via:flags.11?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> random_id:<a href='/type/long'>long</a> query_id:<a href='/type/long'>long</a> id:<a href='/type/string'>string</a> schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+messages.sendInlineBotResult#7aa11297 flags:# silent:flags.5?true background:flags.6?true clear_draft:flags.7?true hide_via:flags.11?true peer:InputPeer reply_to_msg_id:flags.0?int random_id:long query_id:long id:string schedule_date:flags.10?int send_as:flags.13?InputPeer = Updates;</code></pre>
 <p>The user client should display the <code>results</code> obtained <a href="#making-an-inline-query">during querying</a> in a list, making sure to handle eventual bot timeouts in the form of a <code>BOT_RESPONSE_TIMEOUT</code> RPC error, by simply not displaying anything.</p>
 <p>If the user then chooses a specific <code>BotInlineResult</code>, the <a href="/method/messages.sendInlineBotResult">messages.sendInlineBotResult</a> method should be invoked, passing:</p>
 <ul>
@@ -112,15 +108,13 @@ Just like its <a href="/bots/api#answerinlinequery">bot API counterpart</a>, the
 <li>The <code>id</code> of the chosen result</li>
 <li>The <code>peer</code> where to send the chosen result</li>
 </ul>
-<p>The resulting <a href="/constructor/message">message</a> will have the <code>via_bot_id</code> field set, to indicate that the result was generated by the bot that generated the inline result.<br>
-Graphical clients should display the bot <code>@username</code> in the header of the message, allowing the user to click on it, automatically starting an inline query by inserting <code>@username</code> in the text bar.</p>
-<h3><a class="anchor" href="#inline-feedback" id="inline-feedback" name="inline-feedback"><i class="anchor-icon"></i></a>Inline feedback</h3>
-<pre><code><a href='/constructor/inputBotInlineMessageID'>inputBotInlineMessageID</a>#890c3d89 dc_id:<a href='/type/int'>int</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputBotInlineMessageID'>InputBotInlineMessageID</a>;
+<p>The resulting <a href="/constructor/message">message</a> will have the <code>via_bot_id</code> field set, to indicate that the result was generated by the bot that generated the inline result.<br>Graphical clients should display the bot <code>@username</code> in the header of the message, allowing the user to click on it, automatically starting an inline query by inserting <code>@username</code> in the text bar.</p>
+<h3><a class="anchor" name="inline-feedback" href="#inline-feedback"><i class="anchor-icon"></i></a>Inline feedback</h3>
+<pre><code>inputBotInlineMessageID#890c3d89 dc_id:int id:long access_hash:long = InputBotInlineMessageID;
 
-<a href='/constructor/updateBotInlineSend'>updateBotInlineSend</a>#12f12a07 flags:<a href='/type/%23'>#</a> user_id:<a href='/type/long'>long</a> query:<a href='/type/string'>string</a> geo:flags.0?<a href='/type/GeoPoint'>GeoPoint</a> id:<a href='/type/string'>string</a> msg_id:flags.1?<a href='/type/InputBotInlineMessageID'>InputBotInlineMessageID</a> = <a href='/type/Update'>Update</a>;</code></pre>
+updateBotInlineSend#12f12a07 flags:# user_id:long query:string geo:flags.0?GeoPoint id:string msg_id:flags.1?InputBotInlineMessageID = Update;</code></pre>
 <p>If <a href="/bots/inline#collecting-feedback">feedback collection</a> is enabled, the bot may receive an <a href="/constructor/updateBotInlineSend">updateBotInlineSend</a> when the user <a href="#sending-the-inline-query-result">chooses and sends</a> an inline result.  </p>
-<p>Even if the <a href="/bots/inline#collecting-feedback">probability setting is set to 100%</a>, not all inline results may be reported due to caching (see the <code>cache_time</code> parameter in <a href="/api/bots/buttons#answering-a-callback-query">Answering a callback query</a>).<br>
-<a href="/bots/inline#collecting-feedback">Feedback collection</a> can also create load issues for popular bots, so adjust the probability setting to a lower value in such cases.</p>
+<p>Even if the <a href="/bots/inline#collecting-feedback">probability setting is set to 100%</a>, not all inline results may be reported due to caching (see the <code>cache_time</code> parameter in <a href="/api/bots/buttons#answering-a-callback-query">Answering a callback query</a>).<br><a href="/bots/inline#collecting-feedback">Feedback collection</a> can also create load issues for popular bots, so adjust the probability setting to a lower value in such cases.</p>
 <p>Either way, feedback collection should only be used for statistical purposes rather than functional.  </p>
 <p>The <a href="/constructor/updateBotInlineSend">updateBotInlineSend</a> will contain:  </p>
 <ul>
@@ -128,18 +122,19 @@ Graphical clients should display the bot <code>@username</code> in the header of
 <li><code>msg_id</code> - The ID of the sent inline message</li>
 <li><code>user_id</code> - The ID of the user that chose the result</li>
 <li><code>query</code> - The query string that was used to obtain the result</li>
-<li><code>geo</code> - For bots requiring <a href="/bots/inline#location-based-results">location-based inline results</a>, the user's location</li>
+<li><code>geo</code> - For bots requiring <a href="/bots/inline#location-based-results">location-based inline results</a>, the user&#39;s location</li>
 </ul>
-<h3><a class="anchor" href="#editing-sent-inline-messages" id="editing-sent-inline-messages" name="editing-sent-inline-messages"><i class="anchor-icon"></i></a>Editing sent inline messages</h3>
-<pre><code><a href='/constructor/updateInlineBotCallbackQuery'>updateInlineBotCallbackQuery</a>#691e9052 flags:<a href='/type/%23'>#</a> query_id:<a href='/type/long'>long</a> user_id:<a href='/type/long'>long</a> msg_id:<a href='/type/InputBotInlineMessageID'>InputBotInlineMessageID</a> chat_instance:<a href='/type/long'>long</a> data:flags.0?<a href='/type/bytes'>bytes</a> game_short_name:flags.1?<a href='/type/string'>string</a> = <a href='/type/Update'>Update</a>;
+<h3><a class="anchor" name="editing-sent-inline-messages" href="#editing-sent-inline-messages"><i class="anchor-icon"></i></a>Editing sent inline messages</h3>
+<pre><code>updateInlineBotCallbackQuery#691e9052 flags:# query_id:long user_id:long msg_id:InputBotInlineMessageID chat_instance:long data:flags.0?bytes game_short_name:flags.1?string = Update;
 
-<a href='/constructor/inputBotInlineMessageID'>inputBotInlineMessageID</a>#890c3d89 dc_id:<a href='/type/int'>int</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputBotInlineMessageID'>InputBotInlineMessageID</a>;
+inputBotInlineMessageID#890c3d89 dc_id:int id:long access_hash:long = InputBotInlineMessageID;
 
 ---functions---
 
-<a href='/method/messages.editInlineBotMessage'>messages.editInlineBotMessage</a>#83557dba flags:<a href='/type/%23'>#</a> no_webpage:flags.1?<a href='/constructor/true'>true</a> id:<a href='/type/InputBotInlineMessageID'>InputBotInlineMessageID</a> message:flags.11?<a href='/type/string'>string</a> media:flags.14?<a href='/type/InputMedia'>InputMedia</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; = <a href='/type/Bool'>Bool</a>;</code></pre>
+messages.editInlineBotMessage#83557dba flags:# no_webpage:flags.1?true id:InputBotInlineMessageID message:flags.11?string media:flags.14?InputMedia reply_markup:flags.2?ReplyMarkup entities:flags.3?Vector&lt;MessageEntity&gt; = Bool;</code></pre>
 <p>Sent inline messages can be edited by the bot, for example in response to a <a href="/api/bots/buttons#callback-queries">button press callback query</a>.  </p>
-<p>Simply pass the <a href="/constructor/inputBotInlineMessageID">inputBotInlineMessageID</a> specified in the <a href="/constructor/updateInlineBotCallbackQuery">updateInlineBotCallbackQuery</a> to <a href="/method/messages.editInlineBotMessage">messages.editInlineBotMessage</a> along with the new message, making sure to send the query to the <a href="/api/datacenter">datacenter</a> specified in <code>inputBotInlineMessageID.dc_id</code>.</p></div>
+<p>Simply pass the <a href="/constructor/inputBotInlineMessageID">inputBotInlineMessageID</a> specified in the <a href="/constructor/updateInlineBotCallbackQuery">updateInlineBotCallbackQuery</a> to <a href="/method/messages.editInlineBotMessage">messages.editInlineBotMessage</a> along with the new message, making sure to send the query to the <a href="/api/datacenter">datacenter</a> specified in <code>inputBotInlineMessageID.dc_id</code>.</p>
+</div>
   
 </div>
           
