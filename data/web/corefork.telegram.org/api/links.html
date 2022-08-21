@@ -52,7 +52,7 @@
 <li><code>http://t.me/path?query</code></li>
 <li><code>https://t.me/path?query</code></li>
 </ul>
-<p>Where <code>t.me</code> can also be <code>telegram.me</code> or <code>telegram.dog</code>.</p>
+<p>Where <code>t.me</code> can also be <code>telegram.me</code>, <code>telegram.dog</code>, and the domain specified in the <code>me_url_prefix</code> field of the global <a href="/constructor/config">configuration</a>, obtainable using <a href="/method/help.getConfig">help.getConfig</a>.</p>
 <p><code>tg:</code> link syntax examples:  </p>
 <ul>
 <li><code>tg:path?query</code></li>
@@ -61,9 +61,9 @@
 <p>The <code>#fragment</code> part is always ignored when parsing links.  </p>
 <h3><a class="anchor" href="#public-username-links" id="public-username-links" name="public-username-links"><i class="anchor-icon"></i></a>Public username links</h3>
 <p>Used to link to public users, groups and channels, see <a href="/api/invites#public-usernames">here for more info on how to handle them »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;username&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=&lt;username&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -85,9 +85,9 @@
 <p>Note that <a href="#message-links">message links</a> have the same syntax, with extra parameters.  </p>
 <h3><a class="anchor" href="#phone-number-links" id="phone-number-links" name="phone-number-links"><i class="anchor-icon"></i></a>Phone number links</h3>
 <p>Used to link to public and private users by their phone number.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/+&lt;phone_number&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?phone=&lt;phone_number&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -109,11 +109,11 @@
 <p>Note that <a href="#message-links">chat invite links</a> have the same syntax, but <code>&lt;phone_number&gt;</code> is not a valid phone number.  </p>
 <h3><a class="anchor" href="#chat-invite-links" id="chat-invite-links" name="chat-invite-links"><i class="anchor-icon"></i></a>Chat invite links</h3>
 <p>Used to invite users to private groups and channels, see <a href="/api/invites#invite-links">here for more info on how to generate such links »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/+&lt;hash&gt;</code></pre>
-<p>t.me syntax (legacy):</p>
+<p><code>t.me</code> syntax (legacy):</p>
 <pre><code>t.me/joinchat/&lt;hash&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://join?invite=&lt;hash&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -134,13 +134,13 @@
 </table>
 <h3><a class="anchor" href="#message-links" id="message-links" name="message-links"><i class="anchor-icon"></i></a>Message links</h3>
 <p>Used to link to specific messages in public or private groups and channels.  </p>
-<p>t.me syntax (public links):  </p>
+<p><code>t.me</code> syntax (public links):  </p>
 <pre><code>t.me/&lt;username&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
-<p>t.me syntax (private links):  </p>
+<p><code>t.me</code> syntax (private links):  </p>
 <pre><code>t.me/c/&lt;channel&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
-<p>tg: syntax (public links):</p>
+<p><code>tg:</code> syntax (public links):</p>
 <pre><code>tg://resolve?domain=&lt;username&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
-<p>tg: syntax (private links):</p>
+<p><code>tg:</code> syntax (private links):</p>
 <pre><code>tg://privatepost?channel=&lt;channelid&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -192,44 +192,44 @@
 <h3><a class="anchor" href="#settings-links" id="settings-links" name="settings-links"><i class="anchor-icon"></i></a>Settings links</h3>
 <h4><a class="anchor" href="#settings-link" id="settings-link" name="settings-link"><i class="anchor-icon"></i></a>Settings link</h4>
 <p>Used to bring the user to the app settings.  </p>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://settings</code></pre>
 <p>No parameters.</p>
 <h4><a class="anchor" href="#change-phone-number-link" id="change-phone-number-link" name="change-phone-number-link"><i class="anchor-icon"></i></a>Change phone number link</h4>
 <p>Used to bring the user to the phone number modification page, invoking <a href="/method/account.sendChangePhoneCode">account.sendChangePhoneCode</a> and <a href="/method/account.changePhone">account.changePhone</a>.</p>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://settings/change_number</code></pre>
 <p>No parameters.</p>
 <h4><a class="anchor" href="#active-sessions-link" id="active-sessions-link" name="active-sessions-link"><i class="anchor-icon"></i></a>Active sessions link</h4>
 <p>Used to bring the user to the active sessions page, calling <a href="/method/account.getAuthorizations">account.getAuthorizations</a>.  </p>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://settings/devices</code></pre>
 <p>No parameters.</p>
 <h4><a class="anchor" href="#folder-settings-link" id="folder-settings-link" name="folder-settings-link"><i class="anchor-icon"></i></a>Folder settings link</h4>
 <p>Used to bring the user to the <a href="/api/folders">folder settings</a>.  </p>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://settings/folders</code></pre>
 <p>No parameters.</p>
 <h4><a class="anchor" href="#language-settings-link" id="language-settings-link" name="language-settings-link"><i class="anchor-icon"></i></a>Language settings link</h4>
 <p>Used to bring the user to the language settings.  </p>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://settings/language</code></pre>
 <p>No parameters.</p>
 <h4><a class="anchor" href="#privacy-and-security-settings-link" id="privacy-and-security-settings-link" name="privacy-and-security-settings-link"><i class="anchor-icon"></i></a>Privacy and security settings link</h4>
 <p>Used to bring the user to the privacy and security settings.  </p>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://settings/privacy</code></pre>
 <p>No parameters.</p>
 <h4><a class="anchor" href="#theme-settings-link" id="theme-settings-link" name="theme-settings-link"><i class="anchor-icon"></i></a>Theme settings link</h4>
 <p>Used to bring the user to the theme settings section of the app.  </p>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://settings/theme</code></pre>
 <p>No parameters.</p>
 <h3><a class="anchor" href="#login-code-link" id="login-code-link" name="login-code-link"><i class="anchor-icon"></i></a>Login code link</h3>
 <p>Contains the phone number verification code to use during <a href="/api/auth">user authorization »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/login/&lt;code&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://login?code=&lt;code&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -252,9 +252,9 @@
 <p>Used to share and install chat backgrounds (wallpapers): see <a href="/api/wallpapers">here for more info on the various wallpaper and fill types »</a>.  </p>
 <h4><a class="anchor" href="#image-wallpapers" id="image-wallpapers" name="image-wallpapers"><i class="anchor-icon"></i></a><a href="/api/wallpapers#image-wallpapers">Image wallpapers</a></h4>
 <p>Used for <a href="/api/wallpapers#image-wallpapers">image-based wallpapers »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/bg/&lt;slug&gt;?mode=&lt;mode&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://bg?slug=&lt;slug&gt;&amp;mode=&lt;mode&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -280,9 +280,9 @@
 </table>
 <h4><a class="anchor" href="#solid-fill-wallpapers" id="solid-fill-wallpapers" name="solid-fill-wallpapers"><i class="anchor-icon"></i></a>Solid fill wallpapers</h4>
 <p>Used for <a href="/api/wallpapers#fill-wallpapers">fill wallpapers »</a> with a <a href="/api/wallpapers#solid-fill">solid fill »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/bg/&lt;hex_color&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://bg?color=&lt;hex_color&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -303,9 +303,9 @@
 </table>
 <h4><a class="anchor" href="#gradient-fill-wallpapers" id="gradient-fill-wallpapers" name="gradient-fill-wallpapers"><i class="anchor-icon"></i></a>Gradient fill wallpapers</h4>
 <p>Used for <a href="/api/wallpapers#fill-wallpapers">fill wallpapers »</a> with a <a href="/api/wallpapers#gradient-fill">gradient fill »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/bg/&lt;top_color&gt;-&lt;bottom_color&gt;?rotation=&lt;rotation&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://bg?gradient=&lt;top_color&gt;-&lt;bottom_color&gt;&amp;rotation=&lt;rotation&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -336,10 +336,10 @@
 </table>
 <h4><a class="anchor" href="#freeform-gradient-fill-wallpapers" id="freeform-gradient-fill-wallpapers" name="freeform-gradient-fill-wallpapers"><i class="anchor-icon"></i></a>Freeform gradient fill wallpapers</h4>
 <p>Used for <a href="/api/wallpapers#fill-wallpapers">fill wallpapers »</a> with a <a href="/api/wallpapers#freeform-gradient-fill">freeform gradient fill »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/bg/&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;
 t.me/bg/&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;~&lt;hex_color4&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://bg?gradient=&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;
 tg://bg?gradient=&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;~&lt;hex_color4&gt;</code></pre>
 <p>Parameters:</p>
@@ -376,9 +376,9 @@ tg://bg?gradient=&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;~&lt;he
 </table>
 <h4><a class="anchor" href="#solid-pattern-wallpapers" id="solid-pattern-wallpapers" name="solid-pattern-wallpapers"><i class="anchor-icon"></i></a>Solid pattern wallpapers</h4>
 <p>Used for <a href="/api/wallpapers#pattern-wallpapers">pattern wallpapers »</a> with a <a href="/api/wallpapers#solid-fill">solid fill »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/bg/&lt;slug&gt;?intensity=&lt;intensity&gt;&amp;bg_color=&lt;bg_color&gt;&amp;mode=&lt;mode&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://bg?slug=&lt;slug&gt;&amp;intensity=&lt;intensity&gt;&amp;bg_color=&lt;bg_color&gt;&amp;mode=&lt;mode&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -414,9 +414,9 @@ tg://bg?gradient=&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;~&lt;he
 </table>
 <h4><a class="anchor" href="#gradient-pattern-wallpapers" id="gradient-pattern-wallpapers" name="gradient-pattern-wallpapers"><i class="anchor-icon"></i></a>Gradient pattern wallpapers</h4>
 <p>Used for <a href="/api/wallpapers#pattern-wallpapers">pattern wallpapers »</a> with a <a href="/api/wallpapers#gradient-fill">gradient fill »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/bg/&lt;slug&gt;?intensity=&lt;intensity&gt;&amp;bg_color=&lt;top_color&gt;-&lt;bottom_color&gt;&amp;rotation=&lt;rotation&gt;&amp;mode=&lt;mode&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://bg?slug=&lt;slug&gt;&amp;intensity=&lt;intensity&gt;&amp;bg_color=&lt;top_color&gt;-&lt;bottom_color&gt;&amp;rotation=&lt;rotation&gt;&amp;mode=&lt;mode&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -462,10 +462,10 @@ tg://bg?gradient=&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;~&lt;he
 </table>
 <h4><a class="anchor" href="#freeform-gradient-pattern-wallpapers" id="freeform-gradient-pattern-wallpapers" name="freeform-gradient-pattern-wallpapers"><i class="anchor-icon"></i></a>Freeform gradient pattern wallpapers</h4>
 <p>Used for <a href="/api/wallpapers#pattern-wallpapers">pattern wallpapers »</a> with a <a href="/api/wallpapers#freeform-gradient-fill">freeform gradient fill »</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/bg/&lt;slug&gt;?intensity=&lt;intensity&gt;&amp;bg_color=&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;&amp;mode=&lt;mode&gt;
 t.me/bg/&lt;slug&gt;?intensity=&lt;intensity&gt;&amp;bg_color=&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;~&lt;hex_color4&gt;&amp;mode=&lt;mode&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://bg?slug=&lt;slug&gt;&amp;intensity=&lt;intensity&gt;&amp;bg_color=&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;&amp;mode=&lt;mode&gt;
 tg://bg?slug=&lt;slug&gt;&amp;intensity=&lt;intensity&gt;&amp;bg_color=&lt;hex_color1&gt;~&lt;hex_color2&gt;~&lt;hex_color3&gt;~&lt;hex_color4&gt;&amp;mode=&lt;mode&gt;</code></pre>
 <p>Parameters:</p>
@@ -517,9 +517,9 @@ tg://bg?slug=&lt;slug&gt;&amp;intensity=&lt;intensity&gt;&amp;bg_color=&lt;hex_c
 </table>
 <h3><a class="anchor" href="#bot-links" id="bot-links" name="bot-links"><i class="anchor-icon"></i></a>Bot links</h3>
 <p>Used to link to bots.</p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;?start=&lt;parameter&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;start=&lt;parameter&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -568,15 +568,15 @@ Then, for group links:</p>
 <li>If the bot is already an admin of the channel, combine existing admin rights with the admin rights in <code>admin</code></li>
 <li>Add the bot as admin/modify admin permissions to the new rights</li>
 </ul>
-<p>t.me syntax (groups):</p>
+<p><code>t.me</code> syntax (groups):</p>
 <pre><code>t.me/&lt;bot_username&gt;?startgroup=&lt;parameter&gt;&amp;admin=&lt;permissions&gt;
 t.me/&lt;bot_username&gt;?startgroup&amp;admin=&lt;permissions&gt;</code></pre>
-<p>tg: syntax (groups):</p>
+<p><code>tg:</code> syntax (groups):</p>
 <pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup=&lt;parameter&gt;&amp;admin=&lt;permissions&gt;
 tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permissions&gt;</code></pre>
-<p>t.me syntax (channels):</p>
+<p><code>t.me</code> syntax (channels):</p>
 <pre><code>t.me/&lt;bot_username&gt;?startchannel&amp;admin=&lt;permissions&gt;</code></pre>
-<p>tg: syntax (channels):</p>
+<p><code>tg:</code> syntax (channels):</p>
 <pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;startchannel&amp;admin=&lt;permissions&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -613,9 +613,9 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 <li>Bring up a dialog selection prompt</li>
 <li>Send the game to the selected dialog using an <a href="/constructor/inputMediaGame">inputMediaGame</a> with an <a href="/constructor/inputGameShortName">inputGameShortName</a> as specified in the <a href="/api/bots/games#sending-a-game">game docs</a>.  </li>
 </ul>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;?game=&lt;short_name&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;game=&lt;short_name&gt;</code></pre>
 <p>Parameters: </p>
 <table class="table">
@@ -640,10 +640,10 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 </tbody>
 </table>
 <h3><a class="anchor" href="#invoice-links" id="invoice-links" name="invoice-links"><i class="anchor-icon"></i></a>Invoice links</h3>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/invoice/&lt;slug&gt;
 t.me/$&lt;slug&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://invoice?slug=&lt;slug&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -664,9 +664,9 @@ t.me/$&lt;slug&gt;</code></pre>
 </table>
 <h3><a class="anchor" href="#language-pack-links" id="language-pack-links" name="language-pack-links"><i class="anchor-icon"></i></a>Language pack links</h3>
 <p>Used to import custom language packs using <a href="/method/langpack.getLangPack">langpack.getLangPack</a>.</p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/setlanguage/&lt;slug&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://setlanguage?lang=&lt;slug&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -694,10 +694,10 @@ These links should be handled as follows:  </p>
 <li>Append a newline to the text field</li>
 <li>Append and select the <code>text</code>, if present</li>
 </ul>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/share?url=&lt;url&gt;
 t.me/share/url?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://msg_url?url=&lt;url&gt;
 tg://msg_url?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
 <p>Parameters:</p>
@@ -723,16 +723,16 @@ tg://msg_url?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
 </tbody>
 </table>
 <h3><a class="anchor" href="#telegram-passport-links" id="telegram-passport-links" name="telegram-passport-links"><i class="anchor-icon"></i></a>Telegram Passport links</h3>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/passport?bot_id=&lt;bot_user_id&gt;&amp;scope=&lt;scope&gt;&amp;public_key=&lt;public_key&gt;&amp;nonce=&lt;nonce&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=telegrampassport&amp;bot_id=&lt;bot_user_id&gt;&amp;scope=&lt;scope&gt;&amp;public_key=&lt;public_key&gt;&amp;nonce=&lt;nonce&gt;</code></pre>
 <h3><a class="anchor" href="#phone-confirmation-links" id="phone-confirmation-links" name="phone-confirmation-links"><i class="anchor-icon"></i></a>Phone confirmation links</h3>
 <p>Different from <a href="#login-code-links">login code links</a>.<br>
 These links are used to confirm ownership of the phone number, to prevent account deletion: see <a href="/api/account-deletion">the account deletion docs for more info on how to handle them »</a>.</p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/confirmphone?phone=&lt;phone&gt;&amp;hash=&lt;hash&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://confirmphone?phone=&lt;phone&gt;&amp;hash=&lt;hash&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -758,7 +758,7 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </table>
 <h3><a class="anchor" href="#premium-referrer-links" id="premium-referrer-links" name="premium-referrer-links"><i class="anchor-icon"></i></a>Premium referrer links</h3>
 <p>Used by official apps to show the <a href="/api/premium">Telegram Premium</a> subscription page.  </p>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://premium_offer?ref=&lt;referrer&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -781,9 +781,9 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 <p>Used to share a proxy server that can be used to connect to Telegram.  </p>
 <h4><a class="anchor" href="#mtproxy-links" id="mtproxy-links" name="mtproxy-links"><i class="anchor-icon"></i></a>MTProxy links</h4>
 <p>Used for <a href="/mtproto/mtproto-transports#transport-obfuscation">MTProxies »</a>.</p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/proxy?server=&lt;server&gt;&amp;port=&lt;port&gt;&amp;secret=&lt;secret&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://proxy?server=&lt;server&gt;&amp;port=&lt;port&gt;&amp;secret=&lt;secret&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -814,9 +814,9 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </table>
 <h4><a class="anchor" href="#socks5-proxy-links" id="socks5-proxy-links" name="socks5-proxy-links"><i class="anchor-icon"></i></a>Socks5 proxy links</h4>
 <p>Used for socks5 proxies.</p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/socks?server=&lt;server&gt;&amp;port=&lt;port&gt;&amp;user=&lt;user&gt;&amp;pass=&lt;pass&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://socks?server=&lt;server&gt;&amp;port=&lt;port&gt;&amp;user=&lt;user&gt;&amp;pass=&lt;pass&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -852,7 +852,7 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </table>
 <h3><a class="anchor" href="#qr-code-login-links" id="qr-code-login-links" name="qr-code-login-links"><i class="anchor-icon"></i></a>QR code login links</h3>
 <p>Used by <a href="/api/qr-login">QR code login</a>.</p>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://login?token=&lt;base64encodedtoken&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -873,9 +873,9 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </table>
 <h3><a class="anchor" href="#stickerset-links" id="stickerset-links" name="stickerset-links"><i class="anchor-icon"></i></a>Stickerset links</h3>
 <p>Used to import stickersets:</p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/addstickers/&lt;name&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://addstickers?set=&lt;name&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -896,9 +896,9 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </table>
 <h3><a class="anchor" href="#custom-emoji-stickerset-links" id="custom-emoji-stickerset-links" name="custom-emoji-stickerset-links"><i class="anchor-icon"></i></a>Custom emoji stickerset links</h3>
 <p>Used to import custom emoji stickersets:</p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/addemoji/&lt;name&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://addemoji?set=&lt;name&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -918,9 +918,9 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </tbody>
 </table>
 <h3><a class="anchor" href="#theme-links" id="theme-links" name="theme-links"><i class="anchor-icon"></i></a>Theme links</h3>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/addtheme/&lt;name&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://addtheme?slug=&lt;name&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -942,14 +942,14 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 <h3><a class="anchor" href="#voice-chatvideo-chatlivestream-links" id="voice-chatvideo-chatlivestream-links" name="voice-chatvideo-chatlivestream-links"><i class="anchor-icon"></i></a>Voice chat/Video chat/Livestream links</h3>
 <p>Used to join voice chats and video chats in groups, and livestreams in channels.<br>
 Such links are generated using <a href="/method/phone.exportGroupCallInvite">phone.exportGroupCallInvite</a>.  </p>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;username&gt;?voicechat
 t.me/&lt;username&gt;?voicechat=&lt;invite_hash&gt;
 t.me/&lt;username&gt;?videochat
 t.me/&lt;username&gt;?videochat=&lt;invite_hash&gt;
 t.me/&lt;username&gt;?livestream
 t.me/&lt;username&gt;?livestream=&lt;invite_hash&gt;</code></pre>
-<p>tg: syntax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=&lt;username&gt;&amp;voicechat
 tg://resolve?domain=&lt;username&gt;&amp;voicechat=&lt;invite_hash&gt;
 tg://resolve?domain=&lt;username&gt;&amp;videochat
@@ -974,14 +974,14 @@ tg://resolve?domain=&lt;username&gt;&amp;livestream=&lt;invite_hash&gt;</code></
 </tbody>
 </table>
 <h3><a class="anchor" href="#bot-attachment-menu-links" id="bot-attachment-menu-links" name="bot-attachment-menu-links"><i class="anchor-icon"></i></a>Bot attachment menu links</h3>
-<p>t.me syntax:</p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;username&gt;?attach=&lt;bot_username&gt;
 t.me/&lt;username&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 t.me/&lt;bot_username&gt;?startattach&amp;choose=users+bots+groups+channels
 t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels
 t.me/+&lt;phone_number&gt;?attach=&lt;bot_username&gt;
 t.me/+&lt;phone_number&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;</code></pre>
-<p>tg: synax:</p>
+<p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=&lt;username&gt;&amp;attach=&lt;bot_username&gt;
 tg://resolve?domain=&lt;username&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 tg://resolve?domain=&lt;bot_username&gt;&amp;startattach&amp;choose=users+bots+groups+channels
@@ -989,7 +989,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;
 tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;</code></pre>
 <h3><a class="anchor" href="#unsupported-links" id="unsupported-links" name="unsupported-links"><i class="anchor-icon"></i></a>Unsupported links</h3>
-<p>If a client encounters a tg: link type not listed on this page, <a href="/method/help.getDeepLinkInfo">help.getDeepLinkInfo</a> should be invoked with just the <code>path</code> component of the link.  </p>
+<p>If a client encounters a <code>tg:</code> link type not listed on this page, <a href="/method/help.getDeepLinkInfo">help.getDeepLinkInfo</a> should be invoked with just the <code>path</code> component of the link.  </p>
 <p>Schema:</p>
 <pre><code><a href='/constructor/help.deepLinkInfoEmpty'>help.deepLinkInfoEmpty</a>#66afa166 = <a href='/type/help.DeepLinkInfo'>help.DeepLinkInfo</a>;
 <a href='/constructor/help.deepLinkInfo'>help.deepLinkInfo</a>#6a4ee832 flags:<a href='/type/%23'>#</a> update_app:flags.0?<a href='/constructor/true'>true</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; = <a href='/type/help.DeepLinkInfo'>help.DeepLinkInfo</a>;
