@@ -421,6 +421,7 @@ async def track_mtproto_methods():
     kw = {
         'api_id': int(os.environ['TELEGRAM_API_ID']),
         'api_hash': os.environ['TELEGRAM_API_HASH'],
+        'app_version': '@tgcrawl',
         'in_memory': True
     }
 
