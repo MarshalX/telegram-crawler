@@ -45,48 +45,73 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>The API allows uploading and synchronizing notification sounds associated to a specific chat.</p>
-<h3><a class="anchor" name="uploading-notification-sounds" href="#uploading-notification-sounds"><i class="anchor-icon"></i></a>Uploading notification sounds</h3>
+<h3><a class="anchor" href="#uploading-notification-sounds" id="uploading-notification-sounds" name="uploading-notification-sounds"><i class="anchor-icon"></i></a>Uploading notification sounds</h3>
 <p>Schema:</p>
-<pre><code>inputPeerNotifySettings#df1f002b flags:# show_previews:flags.0?Bool silent:flags.1?Bool mute_until:flags.2?int sound:flags.3?NotificationSound = InputPeerNotifySettings;
+<pre><code><a href='/constructor/account.savedRingtonesNotModified'>account.savedRingtonesNotModified</a>#fbf6e8b1 = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;
+<a href='/constructor/account.savedRingtones'>account.savedRingtones</a>#c1e92cc5 hash:<a href='/type/long'>long</a> ringtones:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;
 
-peerNotifySettings#a83b0426 flags:# show_previews:flags.0?Bool silent:flags.1?Bool mute_until:flags.2?int ios_sound:flags.3?NotificationSound android_sound:flags.4?NotificationSound other_sound:flags.5?NotificationSound = PeerNotifySettings;
+<a href='/constructor/updateSavedRingtones'>updateSavedRingtones</a>#74d8be99 = <a href='/type/Update'>Update</a>;
 
-account.savedRingtonesNotModified#fbf6e8b1 = account.SavedRingtones;
-account.savedRingtones#c1e92cc5 hash:long ringtones:Vector&lt;Document&gt; = account.SavedRingtones;
-
-updateSavedRingtones#74d8be99 = Update;
-
-notificationSoundDefault#97e8bebe = NotificationSound;
-notificationSoundNone#6f0c34df = NotificationSound;
-notificationSoundLocal#830b9ae4 title:string data:string = NotificationSound;
-notificationSoundRingtone#ff6c8049 id:long = NotificationSound;
-
-account.savedRingtone#b7263f6d = account.SavedRingtone;
-account.savedRingtoneConverted#1f307eb7 document:Document = account.SavedRingtone;
+<a href='/constructor/account.savedRingtone'>account.savedRingtone</a>#b7263f6d = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;
+<a href='/constructor/account.savedRingtoneConverted'>account.savedRingtoneConverted</a>#1f307eb7 document:<a href='/type/Document'>Document</a> = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;
 
 ---functions---
 
-account.getSavedRingtones#e1902288 hash:long = account.SavedRingtones;
-account.saveRingtone#3dea5b03 id:InputDocument unsave:Bool = account.SavedRingtone;
-account.uploadRingtone#831a83a2 file:InputFile file_name:string mime_type:string = Document;</code></pre>
-<p>A notification sound file may be uploaded using [account.uploadRingtone]</p>
-<h3><a class="anchor" name="setting-notification-sounds" href="#setting-notification-sounds"><i class="anchor-icon"></i></a>Setting notification sounds</h3>
+<a href='/method/account.uploadRingtone'>account.uploadRingtone</a>#831a83a2 file:<a href='/type/InputFile'>InputFile</a> file_name:<a href='/type/string'>string</a> mime_type:<a href='/type/string'>string</a> = <a href='/type/Document'>Document</a>;
+<a href='/method/account.saveRingtone'>account.saveRingtone</a>#3dea5b03 id:<a href='/type/InputDocument'>InputDocument</a> unsave:<a href='/type/Bool'>Bool</a> = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;
+<a href='/method/account.getSavedRingtones'>account.getSavedRingtones</a>#e1902288 hash:<a href='/type/long'>long</a> = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;</code></pre>
+<p>A notification sound file may be uploaded using <a href="/method/account.uploadRingtone">account.uploadRingtone</a>.<br>
+After upload, the document should be provided to <a href="/method/account.saveRingtone">account.saveRingtone</a> to save the notification sound.  </p>
+<p>Supported formats:</p>
+<ul>
+<li>MP3</li>
+<li>OGG OPUS</li>
+</ul>
+<p>If the notification sound is not in MP3 format it will be converted to MP3 by <a href="/method/account.saveRingtone">account.saveRingtone</a> and an <a href="/constructor/account.savedRingtoneConverted">account.savedRingtoneConverted</a> constructor will be returned containing the new document to use <strong>instead of</strong> the one returned by <a href="/method/account.uploadRingtone">account.uploadRingtone</a> when <a href="#removing-notification-sounds">removing</a> or <a href="#setting-notification-sounds">using</a> notification sounds.  </p>
+<h3><a class="anchor" href="#removing-notification-sounds" id="removing-notification-sounds" name="removing-notification-sounds"><i class="anchor-icon"></i></a>Removing notification sounds</h3>
 <p>Schema:</p>
-<pre><code>notificationSoundDefault#97e8bebe = NotificationSound;
-notificationSoundNone#6f0c34df = NotificationSound;
-notificationSoundLocal#830b9ae4 title:string data:string = NotificationSound;
-notificationSoundRingtone#ff6c8049 id:long = NotificationSound;
-
-inputPeerNotifySettings#df1f002b flags:# show_previews:flags.0?Bool silent:flags.1?Bool mute_until:flags.2?int sound:flags.3?NotificationSound = InputPeerNotifySettings;
-
-peerNotifySettings#a83b0426 flags:# show_previews:flags.0?Bool silent:flags.1?Bool mute_until:flags.2?int ios_sound:flags.3?NotificationSound android_sound:flags.4?NotificationSound other_sound:flags.5?NotificationSound = PeerNotifySettings;
-
-updateNotifySettings#bec268ef peer:NotifyPeer notify_settings:PeerNotifySettings = Update;
+<pre><code><a href='/constructor/account.savedRingtone'>account.savedRingtone</a>#b7263f6d = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;
 
 ---functions---
 
-account.updateNotifySettings#84be5b93 peer:InputNotifyPeer settings:InputPeerNotifySettings = Bool;</code></pre>
-</div>
+<a href='/method/account.saveRingtone'>account.saveRingtone</a>#3dea5b03 id:<a href='/type/InputDocument'>InputDocument</a> unsave:<a href='/type/Bool'>Bool</a> = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;</code></pre>
+<p>Pass true to <code>unsave</code> in <a href="/method/account.saveRingtone">account.saveRingtone</a> to remove an uploaded notification sound.  </p>
+<h3><a class="anchor" href="#getting-notification-sounds" id="getting-notification-sounds" name="getting-notification-sounds"><i class="anchor-icon"></i></a>Getting notification sounds</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/updateSavedRingtones'>updateSavedRingtones</a>#74d8be99 = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/account.savedRingtonesNotModified'>account.savedRingtonesNotModified</a>#fbf6e8b1 = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;
+<a href='/constructor/account.savedRingtones'>account.savedRingtones</a>#c1e92cc5 hash:<a href='/type/long'>long</a> ringtones:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;
+
+---functions---
+
+<a href='/method/account.getSavedRingtones'>account.getSavedRingtones</a>#e1902288 hash:<a href='/type/long'>long</a> = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;</code></pre>
+<p><a href="/method/account.getSavedRingtones">account.getSavedRingtones</a> can be used to obtain all saved notification sounds: the client will receive <a href="/constructor/updateSavedRingtones">updateSavedRingtones</a> updates if the list is modified by the user on other clients.  </p>
+<h3><a class="anchor" href="#setting-notification-sounds" id="setting-notification-sounds" name="setting-notification-sounds"><i class="anchor-icon"></i></a>Setting notification sounds</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/notificationSoundDefault'>notificationSoundDefault</a>#97e8bebe = <a href='/type/NotificationSound'>NotificationSound</a>;
+<a href='/constructor/notificationSoundNone'>notificationSoundNone</a>#6f0c34df = <a href='/type/NotificationSound'>NotificationSound</a>;
+<a href='/constructor/notificationSoundLocal'>notificationSoundLocal</a>#830b9ae4 title:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/NotificationSound'>NotificationSound</a>;
+<a href='/constructor/notificationSoundRingtone'>notificationSoundRingtone</a>#ff6c8049 id:<a href='/type/long'>long</a> = <a href='/type/NotificationSound'>NotificationSound</a>;
+
+<a href='/constructor/inputNotifyPeer'>inputNotifyPeer</a>#b8bc5b0c peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/InputNotifyPeer'>InputNotifyPeer</a>;
+<a href='/constructor/inputNotifyUsers'>inputNotifyUsers</a>#193b4417 = <a href='/type/InputNotifyPeer'>InputNotifyPeer</a>;
+<a href='/constructor/inputNotifyChats'>inputNotifyChats</a>#4a95e84e = <a href='/type/InputNotifyPeer'>InputNotifyPeer</a>;
+<a href='/constructor/inputNotifyBroadcasts'>inputNotifyBroadcasts</a>#b1db7c7e = <a href='/type/InputNotifyPeer'>InputNotifyPeer</a>;
+
+<a href='/constructor/inputPeerNotifySettings'>inputPeerNotifySettings</a>#df1f002b flags:<a href='/type/%23'>#</a> show_previews:flags.0?<a href='/type/Bool'>Bool</a> silent:flags.1?<a href='/type/Bool'>Bool</a> mute_until:flags.2?<a href='/type/int'>int</a> sound:flags.3?<a href='/type/NotificationSound'>NotificationSound</a> = <a href='/type/InputPeerNotifySettings'>InputPeerNotifySettings</a>;
+
+---functions---
+
+<a href='/method/account.updateNotifySettings'>account.updateNotifySettings</a>#84be5b93 peer:<a href='/type/InputNotifyPeer'>InputNotifyPeer</a> settings:<a href='/type/InputPeerNotifySettings'>InputPeerNotifySettings</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>To the notification sound to play when receiving messages from a specific peer or from a category of peers, use <a href="/constructor/account.updateNotifySettings">account.updateNotifySettings</a>, populating the <code>ios_sound</code>, <code>android_sound</code> or <code>other_sound</code> fields according to the platform where a sound should be played.  </p>
+<p>The fields can be populated with the following constructors:</p>
+<ul>
+<li><a href="/constructor/notificationSoundDefault">notificationSoundDefault</a> - The default notification sound should be played</li>
+<li><a href="/constructor/notificationSoundNone">notificationSoundNone</a> - No notification sound should be played</li>
+<li><a href="/constructor/notificationSoundRingtone">notificationSoundRingtone</a> - A previously <a href="#uploading-notification-sounds">uploaded</a> notification sound identified by the uploaded/converted document <code>id</code> should be played.</li>
+<li><a href="/constructor/notificationSoundLocal">notificationSoundLocal</a> - A local notification sound (possibly provided by the OS) identified by the client-specific <code>data</code> payload should be played.  </li>
+</ul></div>
   
 </div>
           
