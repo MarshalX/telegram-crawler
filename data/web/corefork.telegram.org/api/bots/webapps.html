@@ -2,14 +2,12 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>Webapps</title>
+    <title>Bot web apps</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Bots can offer users interactive HTML5 web apps to completely replace any website.
-They support seamless authorization…">
-    <meta property="og:title" content="Webapps">
+    <meta property="description" content="Bots can offer users interactive HTML5 web apps to completely replace any website.">
+    <meta property="og:title" content="Bot web apps">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Bots can offer users interactive HTML5 web apps to completely replace any website.
-They support seamless authorization…">
+    <meta property="og:description" content="Bots can offer users interactive HTML5 web apps to completely replace any website.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -41,16 +39,55 @@ They support seamless authorization…">
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/bots%2Fwebapps" >Webapps</a></li></ul></div>
-  <h1 id="dev_page_title">Webapps</h1>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/bots%2Fwebapps" >Bot web apps</a></li></ul></div>
+  <h1 id="dev_page_title">Bot web apps</h1>
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Bots can offer users interactive <a href="/bots/webapps">HTML5 web apps</a> to completely replace <strong>any website</strong>.  </p>
-<p>They support <a href="https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots">seamless authorization</a>, <a href="https://core.telegram.org/bots/payments">integrated payments</a> via <strong>15</strong> payment providers (with <em>Google Pay</em> and <em>Apple Pay</em> out of the box), delivering tailored push notifications to users, and <a href="https://core.telegram.org/bots">much more</a>.</p>
-<p>This article offers a technical overview of the user-side implementation of bot web apps, using the MTProto API: see <a href="/bots/webapps">here an overview from the bot developer side, using the bot API »</a>.  </p>
-<h3><a class="anchor" href="#webviews" id="webviews" name="webviews"><i class="anchor-icon"></i></a>Webviews</h3>
-<p>Bots </p></div>
+<p>They support <a href="https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots">seamless authorization</a>, <a href="https://core.telegram.org/bots/payments">integrated payments</a> via multiple payment providers (with <em>Google Pay</em> and <em>Apple Pay</em> out of the box), delivering tailored push notifications to users, and <a href="https://core.telegram.org/bots">much more</a>.</p>
+<p>This article offers a technical overview of the implementation of bot web apps using the MTProto API: see <a href="/bots/webapps">here an overview using the simplified bot API »</a>.  </p>
+<p>Schema:</p>
+<pre><code><a href='/constructor/messageActionWebViewDataSentMe'>messageActionWebViewDataSentMe</a>#47dd8079 text:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/MessageAction'>MessageAction</a>;
+<a href='/constructor/messageActionWebViewDataSent'>messageActionWebViewDataSent</a>#b4c38cb5 text:<a href='/type/string'>string</a> = <a href='/type/MessageAction'>MessageAction</a>;
+
+<a href='/constructor/updateWebViewResultSent'>updateWebViewResultSent</a>#1592b79d query_id:<a href='/type/long'>long</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/keyboardButtonWebView'>keyboardButtonWebView</a>#13767230 text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+<a href='/constructor/keyboardButtonSimpleWebView'>keyboardButtonSimpleWebView</a>#a0c0505c text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
+<a href='/constructor/webViewResultUrl'>webViewResultUrl</a>#c14557c query_id:<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+
+<a href='/constructor/simpleWebViewResultUrl'>simpleWebViewResultUrl</a>#882f76bb url:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
+
+<a href='/constructor/webViewMessageSent'>webViewMessageSent</a>#c94511c flags:<a href='/type/%23'>#</a> msg_id:flags.0?<a href='/type/InputBotInlineMessageID'>InputBotInlineMessageID</a> = <a href='/type/WebViewMessageSent'>WebViewMessageSent</a>;
+
+---functions---
+
+<a href='/method/messages.requestWebView'>messages.requestWebView</a>#91b15831 flags:<a href='/type/%23'>#</a> from_bot_menu:flags.4?<a href='/constructor/true'>true</a> silent:flags.5?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> bot:<a href='/type/InputUser'>InputUser</a> url:flags.1?<a href='/type/string'>string</a> start_param:flags.3?<a href='/type/string'>string</a> theme_params:flags.2?<a href='/type/DataJSON'>DataJSON</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+<a href='/method/messages.prolongWebView'>messages.prolongWebView</a>#ea5fbcce flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> bot:<a href='/type/InputUser'>InputUser</a> query_id:<a href='/type/long'>long</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#6abb2f73 flags:<a href='/type/%23'>#</a> bot:<a href='/type/InputUser'>InputUser</a> url:<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
+<a href='/method/messages.sendWebViewResultMessage'>messages.sendWebViewResultMessage</a>#a4314f5 bot_query_id:<a href='/type/string'>string</a> result:<a href='/type/InputBotInlineResult'>InputBotInlineResult</a> = <a href='/type/WebViewMessageSent'>WebViewMessageSent</a>;
+<a href='/method/messages.sendWebViewData'>messages.sendWebViewData</a>#dc0242c8 bot:<a href='/type/InputUser'>InputUser</a> random_id:<a href='/type/long'>long</a> button_text:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<h3><a class="anchor" href="#simple-web-apps" id="simple-web-apps" name="simple-web-apps"><i class="anchor-icon"></i></a>Simple web apps</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/replyKeyboardMarkup'>replyKeyboardMarkup</a>#85dd99d1 flags:<a href='/type/%23'>#</a> resize:flags.0?<a href='/constructor/true'>true</a> single_use:flags.1?<a href='/constructor/true'>true</a> selective:flags.2?<a href='/constructor/true'>true</a> rows:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>&gt; placeholder:flags.3?<a href='/type/string'>string</a> = <a href='/type/ReplyMarkup'>ReplyMarkup</a>;
+
+<a href='/constructor/keyboardButtonSimpleWebView'>keyboardButtonSimpleWebView</a>#a0c0505c text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
+<a href='/constructor/messageActionWebViewDataSentMe'>messageActionWebViewDataSentMe</a>#47dd8079 text:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/MessageAction'>MessageAction</a>;
+<a href='/constructor/messageActionWebViewDataSent'>messageActionWebViewDataSent</a>#b4c38cb5 text:<a href='/type/string'>string</a> = <a href='/type/MessageAction'>MessageAction</a>;
+
+<a href='/constructor/simpleWebViewResultUrl'>simpleWebViewResultUrl</a>#882f76bb url:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
+
+---functions---
+
+<a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#6abb2f73 flags:<a href='/type/%23'>#</a> bot:<a href='/type/InputUser'>InputUser</a> url:<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
+
+<a href='/method/messages.sendWebViewData'>messages.sendWebViewData</a>#dc0242c8 bot:<a href='/type/InputUser'>InputUser</a> random_id:<a href='/type/long'>long</a> button_text:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Simple webapps can only be opened from a <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> button contained in a reply keyboard identified by a <a href="/constructor/replyKeyboardMarkup">replyKeyboardMarkup</a> constructor.  </p>
+<p>To open them, users should call <a href="/constructor/messages.requestSimpleWebView">messages.requestSimpleWebView</a>, and then open a webview using the <code>url</code> contained in the returned <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a>.  </p>
+<h3><a class="anchor" href="#normal-web-apps" id="normal-web-apps" name="normal-web-apps"><i class="anchor-icon"></i></a>Normal web apps</h3></div>
   
 </div>
           

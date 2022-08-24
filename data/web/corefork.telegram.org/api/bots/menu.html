@@ -58,12 +58,28 @@
 ---functions---
 
 <a href='/method/bots.setBotMenuButton'>bots.setBotMenuButton</a>#4504d54f user_id:<a href='/type/InputUser'>InputUser</a> button:<a href='/type/BotMenuButton'>BotMenuButton</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
-<p>Bots can use <a href="/method/bots.setBotMenuButton">bots.setBotMenuButton</a> to change the menu button for a certain user, by providing an <a href="/constructor/inputUser">inputUser</a>, or for all users, by providing an <a href="/constructor/inputUser">inputUserEmpty</a>.  </p>
-<p>Available bot menu button types:</p>
+<p>Bots can use <a href="/method/bots.setBotMenuButton">bots.setBotMenuButton</a> to change the menu button for a certain user, or for all users.</p>
+<h4><a class="anchor" href="#set-scope-all-users" id="set-scope-all-users" name="set-scope-all-users"><i class="anchor-icon"></i></a>Set scope: all users</h4>
+<p>To change the menu button for all users use the following parameters:</p>
 <ul>
+<li><code>user_id</code> - <a href="/constructor/inputUserEmpty">inputUserEmpty</a></li>
+<li><code>button</code> - one of the following constructors:<ul>
 <li><a href="/constructor/botMenuButton">botMenuButton</a> - Opens a <a href="/api/bots/webapps">bot web app</a> when clicked.</li>
 <li><a href="/constructor/botMenuButtonCommands">botMenuButtonCommands</a> - Open the bot's command list when clicked.</li>
-<li><a href="/constructor/botMenuButton">botMenuButton</a> - Default bot menu button behavior is used.</li>
+<li><a href="/constructor/botMenuButton">botMenuButtonDefault</a> - No effect, keeps the previous menu button (either <a href="/constructor/botMenuButton">botMenuButton</a> or <a href="/constructor/botMenuButtonCommands">botMenuButtonCommands</a>)</li>
+</ul>
+</li>
+</ul>
+<h4><a class="anchor" href="#set-scope-specific-users" id="set-scope-specific-users" name="set-scope-specific-users"><i class="anchor-icon"></i></a>Set scope: specific users</h4>
+<p>To change the menu button for a specific users use the following parameters:</p>
+<ul>
+<li><code>user_id</code> - <a href="/constructor/inputUser">inputUser</a> with the user ID/access hash</li>
+<li><code>button</code> - one of the following constructors:<ul>
+<li><a href="/constructor/botMenuButton">botMenuButton</a> - Opens a <a href="/api/bots/webapps">bot web app</a> when clicked.</li>
+<li><a href="/constructor/botMenuButtonCommands">botMenuButtonCommands</a> - Open the bot's command list when clicked.</li>
+<li><a href="/constructor/botMenuButton">botMenuButtonDefault</a> - Resets the behavior of the button to the <a href="#set-scope-all-users">default scope (all users)</a>.  </li>
+</ul>
+</li>
 </ul>
 <h3><a class="anchor" href="#getting-the-menu-button" id="getting-the-menu-button" name="getting-the-menu-button"><i class="anchor-icon"></i></a>Getting the menu button</h3>
 <h4><a class="anchor" href="#bots" id="bots" name="bots"><i class="anchor-icon"></i></a>Bots</h4>
@@ -77,12 +93,33 @@
 ---functions---
 
 <a href='/method/bots.getBotMenuButton'>bots.getBotMenuButton</a>#9c60eb28 user_id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/BotMenuButton'>BotMenuButton</a>;</code></pre>
-<p>Bots might need to know the button type currently used in a given chat or in all chats: <a href="/method/bots.getBotMenuButton">bots.getBotMenuButton</a> can be used for that, providing <a href="/constructor/inputUser">inputUser</a> for a specific user or <a href="/constructor/inputUser">inputUserEmpty</a> for all chats.  </p>
+<p>Bots might need to know the button type currently used in a given chat or in all chats: <a href="/method/bots.getBotMenuButton">bots.getBotMenuButton</a> can be used for this.</p>
 <p>Users can't use this method, and should use the <a href="#users">user</a> method instead.  </p>
+<h4><a class="anchor" href="#get-scope-all-users" id="get-scope-all-users" name="get-scope-all-users"><i class="anchor-icon"></i></a>Get scope: all users</h4>
+<p>To get the menu button used for for all users use the following parameters:</p>
+<ul>
+<li><code>user_id</code> - <a href="/constructor/inputUserEmpty">inputUserEmpty</a></li>
+</ul>
+<p>One of the following constructors will be returned:</p>
+<ul>
+<li><a href="/constructor/botMenuButton">botMenuButton</a> - Opens a <a href="/api/bots/webapps">bot web app</a> when clicked.</li>
+<li><a href="/constructor/botMenuButtonCommands">botMenuButtonCommands</a> - Open the bot's command list when clicked.</li>
+</ul>
+<p><a href="/constructor/botMenuButton">botMenuButtonDefault</a> will never be returned in this case.</p>
+<h4><a class="anchor" href="#get-scope-specific-users" id="get-scope-specific-users" name="get-scope-specific-users"><i class="anchor-icon"></i></a>Get scope: specific users</h4>
+<p>To get the menu button used for for all users use the following parameters:</p>
+<ul>
+<li><code>user_id</code> - <a href="/constructor/inputUser">inputUser</a> with the user ID access/hash</li>
+</ul>
+<p>One of the following constructors will be returned:</p>
+<ul>
+<li><a href="/constructor/botMenuButton">botMenuButton</a> - Opens a <a href="/api/bots/webapps">bot web app</a> when clicked.</li>
+<li><a href="/constructor/botMenuButtonCommands">botMenuButtonCommands</a> - Open the bot's command list when clicked.</li>
+<li><a href="/constructor/botMenuButton">botMenuButtonDefault</a> - The <a href="#get-scope-all-users">default scope (all users) button behavior is in use</a>.  </li>
+</ul>
 <h4><a class="anchor" href="#users" id="users" name="users"><i class="anchor-icon"></i></a>Users</h4>
 <pre><code><a href='/constructor/updateBotMenuButton'>updateBotMenuButton</a>#14b85813 bot_id:<a href='/type/long'>long</a> button:<a href='/type/BotMenuButton'>BotMenuButton</a> = <a href='/type/Update'>Update</a>;
 
-<a href='/constructor/botMenuButtonDefault'>botMenuButtonDefault</a>#7533a588 = <a href='/type/BotMenuButton'>BotMenuButton</a>;
 <a href='/constructor/botMenuButtonCommands'>botMenuButtonCommands</a>#4258c205 = <a href='/type/BotMenuButton'>BotMenuButton</a>;
 <a href='/constructor/botMenuButton'>botMenuButton</a>#c7b57ce6 text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/BotMenuButton'>BotMenuButton</a>;
 
@@ -95,6 +132,7 @@
 <a href='/method/users.getFullUser'>users.getFullUser</a>#b60f5918 id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.UserFull'>users.UserFull</a>;</code></pre>
 <p>Users will receive an <a href="/constructor/updateBotMenuButton">updateBotMenuButton</a> update when a bot changes the behavior of the menu button globally or in the private chat with the user.  </p>
 <p>For new bots, <a href="/method/users.getFullUser">users.getFullUser</a> can be used to fetch the <a href="/constructor/userFull">userFull</a> related to the bot, containing the <a href="/constructor/botInfo">botInfo</a> constructor with various info about the bot, including the menu button behavior.  </p>
+<p><a href="/constructor/botMenuButton">botMenuButtonDefault</a> will never be returned in a <a href="/constructor/updateBotMenuButton">updateBotMenuButton</a> or in a <a href="/constructor/botInfo">botInfo</a> (but if it does happen, treat it like a <a href="/constructor/botMenuButtonCommands">botMenuButtonCommands</a>).</p>
 <p>Bots should use the <a href="#bots">bot</a> method instead.  </p></div>
   
 </div>
