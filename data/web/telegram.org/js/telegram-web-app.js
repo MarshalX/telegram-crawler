@@ -284,6 +284,7 @@
   var webAppInitData = '', webAppInitDataUnsafe = {};
   var themeParams = {}, colorScheme = 'light';
   var webAppVersion = '6.0';
+  var webAppPlatform = 'unknown';
 
   if (initParams.tgWebAppData && initParams.tgWebAppData.length) {
     webAppInitData = initParams.tgWebAppData;
@@ -313,6 +314,9 @@
   }
   if (initParams.tgWebAppVersion) {
     webAppVersion = initParams.tgWebAppVersion;
+  }
+  if (initParams.tgWebAppPlatform) {
+    webAppPlatform = initParams.tgWebAppPlatform;
   }
 
   function onThemeChanged(eventType, eventData) {
@@ -984,6 +988,10 @@
   });
   Object.defineProperty(WebApp, 'version', {
     get: function(){ return webAppVersion; },
+    enumerable: true
+  });
+  Object.defineProperty(WebApp, 'platform', {
+    get: function(){ return webAppPlatform; },
     enumerable: true
   });
   Object.defineProperty(WebApp, 'colorScheme', {
