@@ -451,7 +451,9 @@ path += "z"</code></pre>
 When forwarding such remote HTTP files, they should be sent using <a href="/type/InputMedia">external InputMedia constructors</a>.
 Remote HTTP files can only be downloaded directly by the client if contained in a <a href="/constructor/webDocumentNoProxy">webDocumentNoProxy</a> constructor: in this case, the file is deemed safe to download (this is the case for HTTPS files from certain trusted domains).</p>
 <p>However, if the remote file is contained in a <a href="/constructor/webDocument">webDocument</a>, to avoid leaking sensitive information the file must be downloaded through telegram's servers.
-This can be done in a manner similar to <a href="#downloading-files">normal files</a>, with the difference that <a href="/method/upload.getWebFile">upload.getWebFile</a> must be used, instead.</p>
+This can be done in a manner similar to <a href="#downloading-files">normal files</a>, with the difference that <a href="/method/upload.getWebFile">upload.getWebFile</a> must be used, instead.  </p>
+<p>The <a href="/method/upload.getWebFile">upload.getWebFile</a> method is also used to generate preview pictures for maps and download music file covers, as follows.  </p>
+<p><strong>Note</strong>: the <a href="/method/upload.getWebFile">upload.getWebFile</a> query must be sent to the DC specified in the <code>webfile_dc_id</code> <a href="/api/config#mtproto-configuration">MTProto configuration field</a>.  </p>
 <pre><code><a href='/constructor/upload.webFile'>upload.webFile</a>#21e753bc size:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> file_type:<a href='/type/storage.FileType'>storage.FileType</a> mtime:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/upload.WebFile'>upload.WebFile</a>;
 
 <a href='/constructor/storage.fileUnknown'>storage.fileUnknown</a>#aa963b05 = <a href='/type/storage.FileType'>storage.FileType</a>;
@@ -488,7 +490,15 @@ This can be done in a manner similar to <a href="#downloading-files">normal file
 <li><code>scale</code> - Map scale; 1-3</li>
 </ul>
 </li>
-<li><a href="/constructor/inputWebFileAudioAlbumThumbLocation">inputWebFileAudioAlbumThumbLocation</a> is used to download an album cover for any music file.</li>
+<li><a href="/constructor/inputWebFileAudioAlbumThumbLocation">inputWebFileAudioAlbumThumbLocation</a> is used to download an album cover with <code>600x600</code> resolution for any music file missing embedded album art.
+Note that the <code>document</code> field containing the music file must NOT be provided in secret chats: the locally extracted <code>title</code> and <code>performer</code> fields should be provided, instead.<br>
+In normal chats <code>document</code> should always be provided instead of <code>title</code> and <code>performer</code>, as it has more lax flood limits.  <ul>
+<li><code>small</code> if set, downloads a <code>100x100</code> thumbnail instead.</li>
+<li><code>document</code> contains the music file: MUST NOT be provided in secret chats.</li>
+<li><code>title</code> contains the song title: should only be provided in secret chats.</li>
+<li><code>performer</code> contains the song performer: should only be provided in secret chats.</li>
+</ul>
+</li>
 </ul>
 <h3><a class="anchor" href="#general-considerations" id="general-considerations" name="general-considerations"><i class="anchor-icon"></i></a>General Considerations</h3>
 <p>It is recommended that large queries (<a href="/method/upload.getFile">upload.getFile</a>, <a href="/method/upload.saveFilePart">upload.saveFilePart</a>, <a href="/method/upload.getWebFile">upload.getWebFile</a>) be handled through a separate session and a separate connection, in which no methods other than these should be executed. If this is done, then data transfer will cause less interference with <a href="/api/updates">getting updates</a> and other method calls.</p>
