@@ -69,8 +69,53 @@
 <a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#6abb2f73 flags:<a href='/type/%23'>#</a> bot:<a href='/type/InputUser'>InputUser</a> url:<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
 <a href='/method/messages.sendWebViewResultMessage'>messages.sendWebViewResultMessage</a>#a4314f5 bot_query_id:<a href='/type/string'>string</a> result:<a href='/type/InputBotInlineResult'>InputBotInlineResult</a> = <a href='/type/WebViewMessageSent'>WebViewMessageSent</a>;
 <a href='/method/messages.sendWebViewData'>messages.sendWebViewData</a>#dc0242c8 bot:<a href='/type/InputUser'>InputUser</a> random_id:<a href='/type/long'>long</a> button_text:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
-<h3><a class="anchor" href="#web-events" id="web-events" name="web-events"><i class="anchor-icon"></i></a>Web events</h3>
-<p>Both <a href="#simple-web-apps">simple</a> and <a href="#normal-web-apps">normal</a> should handle <a href="/api/web-events">web events</a> starting with <code>web_app_</code>; see the <a href="/api/web-events">web event documentation for more info »</a>.  </p>
+<h3><a class="anchor" href="#outgoing-events-web-app-to-client" id="outgoing-events-web-app-to-client" name="outgoing-events-web-app-to-client"><i class="anchor-icon"></i></a>Outgoing events: Web app to client</h3>
+<p>Both <a href="#simple-web-apps">simple</a> and <a href="#normal-web-apps">normal</a> can <em>send</em> <a href="/api/web-events">web events</a> starting with <code>web_app_</code>; see the <a href="/api/web-events">web event documentation for the full list of events that can be <em>sent</em> by the web app to the client »</a>.  </p>
+<h3><a class="anchor" href="#incoming-events-client-to-web-app" id="incoming-events-client-to-web-app" name="incoming-events-client-to-web-app"><i class="anchor-icon"></i></a>Incoming events: Client to web app</h3>
+<p>Web apps can also <em>receive</em> events, by exposing a <code>window.Telegram.WebView.receiveEvent("event_name", params)</code> method.  </p>
+<p>Here's the full list of events that can be <em>received</em> by a web app from the client. </p>
+<h4><a class="anchor" href="#phone-requested" id="phone-requested" name="phone-requested"><i class="anchor-icon"></i></a><code>phone_requested</code></h4>
+<p>Params: a JSON object containing an optional string <code>phone_number</code> field.</p>
+<p>Sent in response to a <a href="/api/web-events#web_app_request_phone">web_app_request_phone</a> outgoing event, see the <a href="/api/web-events#web_app_request_phone">docs for more info »</a>.  </p>
+<h4><a class="anchor" href="#back-button-pressed" id="back-button-pressed" name="back-button-pressed"><i class="anchor-icon"></i></a><code>back_button_pressed</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client when the user presses the back button, if it was <a href="/api/web-events#web_app_setup_back_button">previously enabled by a <code>web_app_setup_back_button</code> event</a></p>
+<h4><a class="anchor" href="#invoice-closed" id="invoice-closed" name="invoice-closed"><i class="anchor-icon"></i></a><code>invoice_closed</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>slug</code> - Invoice slug</li>
+<li><code>status</code> - </li>
+</ul>
+<h4><a class="anchor" href="#settings-button-pressed" id="settings-button-pressed" name="settings-button-pressed"><i class="anchor-icon"></i></a><code>settings_button_pressed</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client when the user presses the settings button, if it was previously enabled in BotFather.  </p>
+<h4><a class="anchor" href="#main-button-pressed" id="main-button-pressed" name="main-button-pressed"><i class="anchor-icon"></i></a><code>main_button_pressed</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client when the user presses the main button, if it was <a href="/api/web-events#web_app_setup_main_button">previously configured by a <code>web_app_setup_main_button</code> event</a></p>
+<h4><a class="anchor" href="#viewport-changed" id="viewport-changed" name="viewport-changed"><i class="anchor-icon"></i></a><code>viewport_changed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>height</code> -</li>
+<li><code>is_state_stable</code> -</li>
+<li><code>is_expanded</code> - </li>
+</ul>
+<h4><a class="anchor" href="#theme-changed" id="theme-changed" name="theme-changed"><i class="anchor-icon"></i></a><code>theme_changed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>theme_params</code>: a JSON object with the following fields:<ul>
+<li><code>bg_color</code> -</li>
+<li><code>secondary_bg_color</code> -</li>
+<li><code>text_color</code> - </li>
+<li><code>hint_color</code> - </li>
+<li><code>link_color</code> - </li>
+<li><code>button_color</code> - </li>
+<li><code>button_text_color</code> - </li>
+</ul>
+</li>
+</ul>
+<h4><a class="anchor" href="#popup-closed" id="popup-closed" name="popup-closed"><i class="anchor-icon"></i></a><code>popup_closed</code></h4>
+<p>Params: a JSON object with an optional <code>button_id</code> string field.</p>
+<p>Emitted when the user presses a button or cancels a popup brought up by a previous <a href="/api/web-events#web_app_open_popup"><code>web_app_open_popup</code> event</a>.  </p>
 <h3><a class="anchor" href="#simple-web-apps" id="simple-web-apps" name="simple-web-apps"><i class="anchor-icon"></i></a>Simple web apps</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/replyKeyboardMarkup'>replyKeyboardMarkup</a>#85dd99d1 flags:<a href='/type/%23'>#</a> resize:flags.0?<a href='/constructor/true'>true</a> single_use:flags.1?<a href='/constructor/true'>true</a> selective:flags.2?<a href='/constructor/true'>true</a> rows:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>&gt; placeholder:flags.3?<a href='/type/string'>string</a> = <a href='/type/ReplyMarkup'>ReplyMarkup</a>;
