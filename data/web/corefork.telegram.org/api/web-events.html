@@ -59,105 +59,65 @@ The <code>postEvent</code> function will try sending the event to the Telegram a
 <p>Finally, web MTProto clients that need to open a game or process a payment in an iframe can use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">postMessage API</a> to receive events from iframes.
 The GamingCommunication and bot web app libraries by default will use <code>'*'</code> as <code>targetOrigin</code>, sending messages to parent pages regardless of the origin of the embedder.</p>
 <pre><code>window.parent.postMessage(JSON.stringify({eventType: eventType, eventData: eventData}), targetOrigin);</code></pre>
-<h4><a class="anchor" href="#event-types" id="event-types" name="event-types"><i class="anchor-icon"></i></a>Event types</h4>
+<h3><a class="anchor" href="#event-types" id="event-types" name="event-types"><i class="anchor-icon"></i></a>Event types</h3>
 <p><code>eventType</code> is a simple string indicating the event type, and <code>eventData</code> is a payload with an object that will be parsed by the Telegram app.</p>
-<table class="table">
-<thead>
-<tr>
-<th>eventType</th>
-<th>eventData</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>web_app_close</code></td>
-<td>null</td>
-<td>Emitted by bot web apps when the web app webview should be closed.</td>
-</tr>
-<tr>
-<td><code>web_app_request_phone</code></td>
-<td>null</td>
-<td>Emitted by bot web apps when they request the user's phone number: Telegram clients should show a prompt to the user, which should call <code>window.Telegram.WebView.receiveEvent({})</code> upon completion</td>
-</tr>
-<tr>
-<td><code>web_app_open_popup</code></td>
-<td>JSON object with <code>title</code> (optional string), <code>message</code> (string),</td>
-</tr>
-<tr>
-<td><code>web_app_setup_closing_behavior</code></td>
-</tr>
-<tr>
-<td><code>web_app_set_background_color</code></td>
-</tr>
-<tr>
-<td><code>web_app_set_header_color</code></td>
-</tr>
-<tr>
-<td><code>web_app_data_send</code></td>
-</tr>
-<tr>
-<td><code>web_app_trigger_haptic_feedback</code></td>
-</tr>
-<tr>
-<td><code>web_app_open_link</code></td>
-</tr>
-<tr>
-<td><code>web_app_open_tg_link</code></td>
-</tr>
-<tr>
-<td><code>web_app_setup_back_button</code></td>
-</tr>
-<tr>
-<td><code>web_app_open_invoice</code></td>
-</tr>
-<tr>
-<td><code>web_app_expand</code></td>
-</tr>
-<tr>
-<td><code>web_app_request_viewport</code></td>
-</tr>
-<tr>
-<td><code>web_app_request_theme</code></td>
-</tr>
-<tr>
-<td><code>web_app_ready</code></td>
-</tr>
-<tr>
-<td><code>web_app_setup_main_button</code></td>
-</tr>
-<tr>
-<td><code>payment_form_submit</code></td>
-<td>JSON object with <code>credentials</code> and <code>title</code> fields</td>
-<td><code>title</code> is the censored credit card title.<br><code>credentials</code> is a service-specific JSON object with information about the payment credentials provided by the user to the payment system.<br><strong>Neither Telegram, nor bots will have access to your credit card information.</strong><br>Credit card details will be handled only by the payment system.</td>
-</tr>
-<tr>
-<td><code>share_score</code></td>
-<td>null</td>
-<td>Will be called by games when the user explicitly clicks on the <strong>share score</strong> button to share the game, along with his score.<br>Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message with the <code>with_my_score</code> flag.</td>
-</tr>
-<tr>
-<td><code>share_game</code></td>
-<td>null</td>
-<td>Will be called by games when the user explicitly clicks on the <strong>share game</strong> button to share the game, without sharing his score.<br>Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message without the <code>with_my_score</code> flag, or by sharing the game's <a href="/api/links#game-links">deep link</a>.</td>
-</tr>
-<tr>
-<td><code>game_over</code></td>
-<td>null</td>
-<td>Can be called by games when the user loses a game</td>
-</tr>
-<tr>
-<td><code>game_loaded</code></td>
-<td>null</td>
-<td>Can be called by games once the game fully loads</td>
-</tr>
-<tr>
-<td><code>resize_frame</code></td>
-<td>JSON object with <code>height</code> field</td>
-<td>Called by supported pages inside of <a href="https://instantview.telegram.org">IV</a> iframe embeds, indicates the new size of the embed frame.</td>
-</tr>
-</tbody>
-</table></div>
+<h4><a class="anchor" href="#web-app-close" id="web-app-close" name="web-app-close"><i class="anchor-icon"></i></a><code>web_app_close</code></h4>
+<p>No event payload.  </p>
+<p>Emitted by bot web apps when the web app webview should be closed.</p>
+<h4><a class="anchor" href="#web-app-request-phone" id="web-app-request-phone" name="web-app-request-phone"><i class="anchor-icon"></i></a><code>web_app_request_phone</code></h4>
+<p>No event payload.  </p>
+<p>Emitted by bot web apps when they request the user's phone number: Telegram clients should show a prompt to the user, asking to share the phone number.</p>
+<ul>
+<li>If the user refuses, call <code>window.Telegram.WebView.receiveEvent("phone_requested", {})</code></li>
+<li>If the user accepts, call <code>window.Telegram.WebView.receiveEvent("phone_requested", {"phone_number": "Phone number"})</code></li>
+</ul>
+<h4><a class="anchor" href="#web-app-open-popup" id="web-app-open-popup" name="web-app-open-popup"><i class="anchor-icon"></i></a><code>web_app_open_popup</code></h4>
+<p>Event data: JSON object with the following fields:</p>
+<ul>
+<li><code>title</code> - Title for the popup (optional string)</li>
+<li><code>message</code> - Message of the popup (string)</li>
+<li><code>buttons</code> - An array of the following objects (optional, max 3)<ul>
+<li><code>text</code> - Button title</li>
+<li><code>id</code> - Button ID</li>
+</ul>
+</li>
+</ul>
+<h4><a class="anchor" href="#web-app-setup-closing-behavior" id="web-app-setup-closing-behavior" name="web-app-setup-closing-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_closing_behavior</code></h4>
+<h4><a class="anchor" href="#web-app-set-background-color" id="web-app-set-background-color" name="web-app-set-background-color"><i class="anchor-icon"></i></a><code>web_app_set_background_color</code></h4>
+<h4><a class="anchor" href="#web-app-set-header-color" id="web-app-set-header-color" name="web-app-set-header-color"><i class="anchor-icon"></i></a><code>web_app_set_header_color</code></h4>
+<h4><a class="anchor" href="#web-app-data-send" id="web-app-data-send" name="web-app-data-send"><i class="anchor-icon"></i></a><code>web_app_data_send</code></h4>
+<h4><a class="anchor" href="#web-app-trigger-haptic-feedback" id="web-app-trigger-haptic-feedback" name="web-app-trigger-haptic-feedback"><i class="anchor-icon"></i></a><code>web_app_trigger_haptic_feedback</code></h4>
+<h4><a class="anchor" href="#web-app-open-link" id="web-app-open-link" name="web-app-open-link"><i class="anchor-icon"></i></a><code>web_app_open_link</code></h4>
+<h4><a class="anchor" href="#web-app-open-tg-link" id="web-app-open-tg-link" name="web-app-open-tg-link"><i class="anchor-icon"></i></a><code>web_app_open_tg_link</code></h4>
+<h4><a class="anchor" href="#web-app-setup-back-button" id="web-app-setup-back-button" name="web-app-setup-back-button"><i class="anchor-icon"></i></a><code>web_app_setup_back_button</code></h4>
+<h4><a class="anchor" href="#web-app-open-invoice" id="web-app-open-invoice" name="web-app-open-invoice"><i class="anchor-icon"></i></a><code>web_app_open_invoice</code></h4>
+<h4><a class="anchor" href="#web-app-expand" id="web-app-expand" name="web-app-expand"><i class="anchor-icon"></i></a><code>web_app_expand</code></h4>
+<h4><a class="anchor" href="#web-app-request-viewport" id="web-app-request-viewport" name="web-app-request-viewport"><i class="anchor-icon"></i></a><code>web_app_request_viewport</code></h4>
+<h4><a class="anchor" href="#web-app-request-theme" id="web-app-request-theme" name="web-app-request-theme"><i class="anchor-icon"></i></a><code>web_app_request_theme</code></h4>
+<h4><a class="anchor" href="#web-app-ready" id="web-app-ready" name="web-app-ready"><i class="anchor-icon"></i></a><code>web_app_ready</code></h4>
+<h4><a class="anchor" href="#web-app-setup-main-button" id="web-app-setup-main-button" name="web-app-setup-main-button"><i class="anchor-icon"></i></a><code>web_app_setup_main_button</code></h4>
+<h4><a class="anchor" href="#payment-form-submit" id="payment-form-submit" name="payment-form-submit"><i class="anchor-icon"></i></a><code>payment_form_submit</code></h4>
+<p>Event payload: JSON object with <code>credentials</code> and <code>title</code> fields.</p>
+<p><code>title</code> is the censored credit card title.<br>
+<code>credentials</code> is a service-specific JSON object with information about the payment credentials provided by the user to the payment system.<br>
+<strong>Neither Telegram, nor bots will have access to your credit card information.</strong><br>
+Credit card details will be handled only by the payment system. </p>
+<h4><a class="anchor" href="#share-score" id="share-score" name="share-score"><i class="anchor-icon"></i></a><code>share_score</code></h4>
+<p>No event payload.</p>
+<p>Will be called by games when the user explicitly clicks on the <strong>share score</strong> button to share the game, along with his score.<br>
+Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message with the <code>with_my_score</code> flag.  </p>
+<h4><a class="anchor" href="#share-game" id="share-game" name="share-game"><i class="anchor-icon"></i></a><code>share_game</code></h4>
+<p>No event payload.</p>
+<p>Will be called by games when the user explicitly clicks on the <strong>share game</strong> button to share the game, without sharing his score.<br>
+Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message without the <code>with_my_score</code> flag, or by sharing the game's <a href="/api/links#game-links">deep link</a>.</p>
+<h4><a class="anchor" href="#game-over" id="game-over" name="game-over"><i class="anchor-icon"></i></a><code>game_over</code></h4>
+<p>No event payload.</p>
+<p>Can be called by games when the user loses a game</p>
+<h4><a class="anchor" href="#game-loaded" id="game-loaded" name="game-loaded"><i class="anchor-icon"></i></a><code>game_loaded</code></h4>
+<p>Can be called by games once the game fully loads.</p>
+<h4><a class="anchor" href="#resize-frame" id="resize-frame" name="resize-frame"><i class="anchor-icon"></i></a><code>resize_frame</code></h4>
+<p>Event payload: JSON object with <code>height</code> field</p>
+<p>Called by supported pages inside of <a href="https://instantview.telegram.org">IV</a> iframe embeds, indicates the new size of the embed frame.</p></div>
   
 </div>
           
