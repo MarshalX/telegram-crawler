@@ -139,25 +139,42 @@ The GamingCommunication and bot web app libraries by default will use <code>'*'<
 <h4><a class="anchor" href="#web-app-open-tg-link" id="web-app-open-tg-link" name="web-app-open-tg-link"><i class="anchor-icon"></i></a><code>web_app_open_tg_link</code></h4>
 <p>Event data: a JSON object with a string <code>path_full</code> field, containing the path+query component of a <a href="/api/links">t.me deep link</a>.  </p>
 <p>Used to open a <a href="/api/links">t.me deep link</a>. The Web App will be closed.</p>
-<h4><a class="anchor" href="#web-app-setup-back-button" id="web-app-setup-back-button" name="web-app-setup-back-button"><i class="anchor-icon"></i></a><code>web_app_setup_back_button</code></h4>
-<p>Event data: a JSON object with an <code>is_visible</code> boolean field.</p>
-<p>Determines whether to show or hide the back button.  </p>
 <h4><a class="anchor" href="#web-app-open-invoice" id="web-app-open-invoice" name="web-app-open-invoice"><i class="anchor-icon"></i></a><code>web_app_open_invoice</code></h4>
+<p>Event data: a JSON object with a string <code>slug</code> field</p>
 <h4><a class="anchor" href="#web-app-expand" id="web-app-expand" name="web-app-expand"><i class="anchor-icon"></i></a><code>web_app_expand</code></h4>
 <p>No event payload.</p>
 <p>Expands the web app to the maximum available height.</p>
 <h4><a class="anchor" href="#web-app-request-viewport" id="web-app-request-viewport" name="web-app-request-viewport"><i class="anchor-icon"></i></a><code>web_app_request_viewport</code></h4>
 <p>No event payload.</p>
-<p>Used by web apps to request information about the viewport, clients should call <code>window.Telegram.WebView.receiveEvent("viewport_changed", {})</code></p>
+<p>Used by web apps to request information about the viewport, clients should emit a <a href="/bots/api/webapps#viewport_changed">viewport_changed event</a></p>
 <h4><a class="anchor" href="#web-app-request-theme" id="web-app-request-theme" name="web-app-request-theme"><i class="anchor-icon"></i></a><code>web_app_request_theme</code></h4>
+<p>No event payload.</p>
+<p>Used by web apps to request information about the current theme, clients should emit a <a href="/bots/api/webapps#theme_changed">theme_changed event</a>.</p>
 <h4><a class="anchor" href="#web-app-ready" id="web-app-ready" name="web-app-ready"><i class="anchor-icon"></i></a><code>web_app_ready</code></h4>
+<p>No event payload.</p>
+<p>Emitted by web apps when they are fully loaded.</p>
 <h4><a class="anchor" href="#web-app-setup-main-button" id="web-app-setup-main-button" name="web-app-setup-main-button"><i class="anchor-icon"></i></a><code>web_app_setup_main_button</code></h4>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>is_visible</code> - Whether the main button is visible (boolean)</li>
+<li><code>is_active</code> - Whether the main button is active (boolean)</li>
+<li><code>text</code> - Button text (string)</li>
+<li><code>color</code> - Button color in hex RGB format (string)</li>
+<li><code>text_color</code> - Button text color in hex RGB format (string)</li>
+<li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean)</li>
+</ul>
+<p>Configures the main button: when the user presses it a <a href="/api/bots/webapps#main_button_pressed"><code>main_button_pressed</code> event should be emitted by the client</a>.  </p>
+<h4><a class="anchor" href="#web-app-setup-back-button" id="web-app-setup-back-button" name="web-app-setup-back-button"><i class="anchor-icon"></i></a><code>web_app_setup_back_button</code></h4>
+<p>Event data: a JSON object with an <code>is_visible</code> boolean field.</p>
+<p>Determines whether to show or hide the back button: when the user presses it a <a href="/api/bots/webapps#back_button_pressed"><code>back_button_pressed</code> event should be emitted by the client</a>.  </p>
 <h4><a class="anchor" href="#payment-form-submit" id="payment-form-submit" name="payment-form-submit"><i class="anchor-icon"></i></a><code>payment_form_submit</code></h4>
 <p>Event payload: JSON object with <code>credentials</code> and <code>title</code> fields.</p>
-<p><code>title</code> is the censored credit card title.<br>
-<code>credentials</code> is a service-specific JSON object with information about the payment credentials provided by the user to the payment system.<br>
-<strong>Neither Telegram, nor bots will have access to your credit card information.</strong><br>
-Credit card details will be handled only by the payment system. </p>
+<ul>
+<li><code>title</code> is the censored credit card title.  </li>
+<li><code>credentials</code> is a service-specific JSON object with information about the payment credentials provided by the user to the payment system.  </li>
+</ul>
+<p><strong>Neither Telegram, nor bots will have access to your credit card information.</strong><br>
+Credit card details will be handled only by the payment system, see the <a href="/api/payments">payment documentation for more info »</a>.  </p>
 <h4><a class="anchor" href="#share-score" id="share-score" name="share-score"><i class="anchor-icon"></i></a><code>share_score</code></h4>
 <p>No event payload.</p>
 <p>Will be called by games when the user explicitly clicks on the <strong>share score</strong> button to share the game, along with his score.<br>

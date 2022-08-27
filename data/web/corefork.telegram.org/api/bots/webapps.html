@@ -73,46 +73,48 @@
 <p>Both <a href="#simple-web-apps">simple</a> and <a href="#normal-web-apps">normal</a> can <em>send</em> <a href="/api/web-events">web events</a> starting with <code>web_app_</code>; see the <a href="/api/web-events">web event documentation for the full list of events that can be <em>sent</em> by the web app to the client »</a>.  </p>
 <h3><a class="anchor" href="#incoming-events-client-to-web-app" id="incoming-events-client-to-web-app" name="incoming-events-client-to-web-app"><i class="anchor-icon"></i></a>Incoming events: Client to web app</h3>
 <p>Web apps can also <em>receive</em> events, by exposing a <code>window.Telegram.WebView.receiveEvent("event_name", params)</code> method.  </p>
-<p>Here's the full list of events that can be <em>received</em> by a web app from the client. </p>
+<p>Here's the full list of events that can be <em>received</em> by a web app from the client, by calling the <code>receiveEvent</code> method.  </p>
 <h4><a class="anchor" href="#phone-requested" id="phone-requested" name="phone-requested"><i class="anchor-icon"></i></a><code>phone_requested</code></h4>
 <p>Params: a JSON object containing an optional string <code>phone_number</code> field.</p>
 <p>Sent in response to a <a href="/api/web-events#web_app_request_phone">web_app_request_phone</a> outgoing event, see the <a href="/api/web-events#web_app_request_phone">docs for more info »</a>.  </p>
+<h4><a class="anchor" href="#main-button-pressed" id="main-button-pressed" name="main-button-pressed"><i class="anchor-icon"></i></a><code>main_button_pressed</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client when the user presses the main button, if it was <a href="/api/web-events#web_app_setup_main_button">previously configured by a <code>web_app_setup_main_button</code> event</a>.</p>
+<h4><a class="anchor" href="#settings-button-pressed" id="settings-button-pressed" name="settings-button-pressed"><i class="anchor-icon"></i></a><code>settings_button_pressed</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client when the user presses the settings button, if it was previously enabled in BotFather.  </p>
 <h4><a class="anchor" href="#back-button-pressed" id="back-button-pressed" name="back-button-pressed"><i class="anchor-icon"></i></a><code>back_button_pressed</code></h4>
 <p>Params: <code>null</code></p>
-<p>Sent by the client when the user presses the back button, if it was <a href="/api/web-events#web_app_setup_back_button">previously enabled by a <code>web_app_setup_back_button</code> event</a></p>
+<p>Sent by the client when the user presses the back button, if it was <a href="/api/web-events#web_app_setup_back_button">previously enabled by a <code>web_app_setup_back_button</code> event</a>.</p>
 <h4><a class="anchor" href="#invoice-closed" id="invoice-closed" name="invoice-closed"><i class="anchor-icon"></i></a><code>invoice_closed</code></h4>
 <p>Params: JSON object with the following fields:</p>
 <ul>
 <li><code>slug</code> - Invoice slug</li>
 <li><code>status</code> - </li>
 </ul>
-<h4><a class="anchor" href="#settings-button-pressed" id="settings-button-pressed" name="settings-button-pressed"><i class="anchor-icon"></i></a><code>settings_button_pressed</code></h4>
-<p>Params: <code>null</code></p>
-<p>Sent by the client when the user presses the settings button, if it was previously enabled in BotFather.  </p>
-<h4><a class="anchor" href="#main-button-pressed" id="main-button-pressed" name="main-button-pressed"><i class="anchor-icon"></i></a><code>main_button_pressed</code></h4>
-<p>Params: <code>null</code></p>
-<p>Sent by the client when the user presses the main button, if it was <a href="/api/web-events#web_app_setup_main_button">previously configured by a <code>web_app_setup_main_button</code> event</a></p>
 <h4><a class="anchor" href="#viewport-changed" id="viewport-changed" name="viewport-changed"><i class="anchor-icon"></i></a><code>viewport_changed</code></h4>
 <p>Params: a JSON object with the following fields:</p>
 <ul>
-<li><code>height</code> -</li>
-<li><code>is_state_stable</code> -</li>
-<li><code>is_expanded</code> - </li>
+<li><code>height</code> - The current height of the visible area of the Web App</li>
+<li><code>is_state_stable</code> - The height of the visible area of the Web App in its last stable state</li>
+<li><code>is_expanded</code> - Whether the Web App is expanded to its maximum height</li>
 </ul>
+<p>Emitted when the viewport is changed.  </p>
 <h4><a class="anchor" href="#theme-changed" id="theme-changed" name="theme-changed"><i class="anchor-icon"></i></a><code>theme_changed</code></h4>
 <p>Params: a JSON object with the following fields:</p>
 <ul>
 <li><code>theme_params</code>: a JSON object with the following fields:<ul>
-<li><code>bg_color</code> -</li>
-<li><code>secondary_bg_color</code> -</li>
-<li><code>text_color</code> - </li>
-<li><code>hint_color</code> - </li>
-<li><code>link_color</code> - </li>
-<li><code>button_color</code> - </li>
-<li><code>button_text_color</code> - </li>
+<li><code>bg_color</code> - Background color in hex RGB format (string)</li>
+<li><code>secondary_bg_color</code> - Secondary background color in hex RGB format (string)</li>
+<li><code>text_color</code> - Text color in hex RGB format (string)</li>
+<li><code>hint_color</code> - Hint color in hex RGB format (string)</li>
+<li><code>link_color</code> - Link color in hex RGB format (string)</li>
+<li><code>button_color</code> - Button color in hex RGB format (string)</li>
+<li><code>button_text_color</code> - Button text color in hex RGB format (string)</li>
 </ul>
 </li>
 </ul>
+<p>Emitted when requested by the web app using a <a href="/api/web-events#web_app_request_theme"><code>web_app_request_theme</code> event</a>, or when the app theme changes.  </p>
 <h4><a class="anchor" href="#popup-closed" id="popup-closed" name="popup-closed"><i class="anchor-icon"></i></a><code>popup_closed</code></h4>
 <p>Params: a JSON object with an optional <code>button_id</code> string field.</p>
 <p>Emitted when the user presses a button or cancels a popup brought up by a previous <a href="/api/web-events#web_app_open_popup"><code>web_app_open_popup</code> event</a>.  </p>
