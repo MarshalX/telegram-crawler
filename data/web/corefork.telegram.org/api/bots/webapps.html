@@ -67,9 +67,16 @@
 <h4><a class="anchor" href="#invoice-closed" id="invoice-closed" name="invoice-closed"><i class="anchor-icon"></i></a><code>invoice_closed</code></h4>
 <p>Params: JSON object with the following fields:</p>
 <ul>
-<li><code>slug</code> - Invoice slug</li>
-<li><code>status</code> - </li>
+<li><code>slug</code> - Invoice identifier</li>
+<li><code>status</code> - One of the following values:<ul>
+<li><code>paid</code> – The invoice was paid successfully</li>
+<li><code>cancelled</code> – The user closed this invoice without paying</li>
+<li><code>failed</code> – The user tried to pay, but the payment was failed</li>
+<li><code>pending</code> – The payment is still processing. The bot will receive a service message about a successful payment when the payment is successfully paid.</li>
 </ul>
+</li>
+</ul>
+<p>Sent by the client to report the payment status of an invoice obtained from a <a href="/api/web-events#web_app_open_invoice"><code>web_app_open_invoice</code> event</a>.  </p>
 <h4><a class="anchor" href="#viewport-changed" id="viewport-changed" name="viewport-changed"><i class="anchor-icon"></i></a><code>viewport_changed</code></h4>
 <p>Params: a JSON object with the following fields:</p>
 <ul>
@@ -149,8 +156,8 @@
 <p>Normal webapps can be opened from:</p>
 <ul>
 <li>A <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a> button contained in an inline keyboard identified by a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> constructor</li>
-<li>A <a href="/constructor/botMenuButton">botMenuButton</a> <a href="/api/bots/menu">menu button »</a></li>
-<li>An <a href="/api/bots/attach">attachment menu »</a></li>
+<li>A <a href="/constructor/botMenuButton">botMenuButton</a> <a href="/api/bots/menu">menu button »</a> (in this case the <a href="/method/messages.requestSimpleWebView">messages.requestWebView</a>.<code>from_bot_menu</code> flag should be set)</li>
+<li>An <a href="/api/bots/attach">attachment menu »</a> (in this case the <a href="/method/messages.requestSimpleWebView">messages.requestWebView</a>.<code>start_attach</code> flag should be populated)</li>
 </ul>
 <p>To open them, clients should call <a href="/method/messages.requestSimpleWebView">messages.requestWebView</a>, and then open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
 <p>After loading the webview, until it is closed by a <a href="/api/web-events#web_app_close">web_app_close event</a>, the user client must invoke <a href="/method/messages.prolongWebView">messages.prolongWebView</a> every 60 seconds.  </p>
