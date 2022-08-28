@@ -58,6 +58,7 @@ For more info on how payments work, check out the <a href="https://telegram.org/
 <p>The first step for bots is <a href="/bots/payments#the-payments-api">enable payments as described here »</a>.</p>
 <p>Then, we work with payments as follows.</p>
 <h3><a class="anchor" href="#1-create-invoice" id="1-create-invoice" name="1-create-invoice"><i class="anchor-icon"></i></a>1. Create Invoice</h3>
+<h4><a class="anchor" href="#11-create-invoice-message" id="11-create-invoice-message" name="11-create-invoice-message"><i class="anchor-icon"></i></a>1.1 Create Invoice Message</h4>
 <pre><code><a href='/constructor/inputWebDocument'>inputWebDocument</a>#9bed434d url:<a href='/type/string'>string</a> size:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/InputWebDocument'>InputWebDocument</a>;
 
 <a href='/constructor/labeledPrice'>labeledPrice</a>#cb296bf8 label:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/LabeledPrice'>LabeledPrice</a>;
@@ -75,8 +76,18 @@ The <code>provider</code> parameter of the <a href="/constructor/inputMediaInvoi
 <p>Use the <a href="/method/messages.sendMedia">messages.sendMedia</a> method to send the <a href="/constructor/invoice">invoice</a>. 
 You can also attach an inline keyboard to the message using the <code>reply_markup</code> field: if provided, the first button must be a <a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> button. Otherwise, an inline keyboard will be generated automatically, with a <code>Pay 'total price'</code> <a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> as only button.</p>
 <p>An invoice message with a pay button can only be sent to a private chat with the user. Groups and channels are not supported.</p>
+<h4><a class="anchor" href="#12-create-invoice-link" id="12-create-invoice-link" name="12-create-invoice-link"><i class="anchor-icon"></i></a>1.2 Create Invoice Link</h4>
+<pre><code><a href='/constructor/inputMediaInvoice'>inputMediaInvoice</a>#d9799874 flags:<a href='/type/%23'>#</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:flags.0?<a href='/type/InputWebDocument'>InputWebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> payload:<a href='/type/bytes'>bytes</a> provider:<a href='/type/string'>string</a> provider_data:<a href='/type/DataJSON'>DataJSON</a> start_param:flags.1?<a href='/type/string'>string</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
+<a href='/constructor/payments.exportedInvoice'>payments.exportedInvoice</a>#aed0cbd9 url:<a href='/type/string'>string</a> = <a href='/type/payments.ExportedInvoice'>payments.ExportedInvoice</a>;
+
+---functions---
+
+<a href='/method/payments.exportInvoice'>payments.exportInvoice</a>#f91b065 invoice_media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/payments.ExportedInvoice'>payments.ExportedInvoice</a>;</code></pre>
+<p>Bots may also generate <a href="/api/links#invoice-links">invoice deep links</a> using <a href="/method/payments.exportInvoice">payments.exportInvoice</a>.  </p>
+<p>The returned <a href="/constructor/payments.exportedInvoice">payments.exportedInvoice</a> will contain an <a href="/api/links#invoice-links">invoice deep link</a> that can be shared directly, or sent in a bot web app <a href="/api/web-events#web_app_open_invoice"><code>web_app_open_invoice</code> event</a>.</p>
 <h3><a class="anchor" href="#2-order-information" id="2-order-information" name="2-order-information"><i class="anchor-icon"></i></a>2. Order information</h3>
-<h4><a class="anchor" href="#21-invoice-message" id="21-invoice-message" name="21-invoice-message"><i class="anchor-icon"></i></a>2.1 Invoice message</h4>
+<h4><a class="anchor" href="#21-invoice" id="21-invoice" name="21-invoice"><i class="anchor-icon"></i></a>2.1 Invoice</h4>
 <pre><code><a href='/constructor/keyboardButtonBuy'>keyboardButtonBuy</a>#afd93fbb text:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
 
 <a href='/constructor/keyboardButtonRow'>keyboardButtonRow</a>#77608b83 buttons:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButton'>KeyboardButton</a>&gt; = <a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>;
@@ -90,8 +101,8 @@ You can also attach an inline keyboard to the message using the <code>reply_mark
 <a href='/constructor/message'>message</a>#38116ee0 flags:<a href='/type/%23'>#</a> out:flags.1?<a href='/constructor/true'>true</a> mentioned:flags.4?<a href='/constructor/true'>true</a> media_unread:flags.5?<a href='/constructor/true'>true</a> silent:flags.13?<a href='/constructor/true'>true</a> post:flags.14?<a href='/constructor/true'>true</a> from_scheduled:flags.18?<a href='/constructor/true'>true</a> legacy:flags.19?<a href='/constructor/true'>true</a> edit_hide:flags.21?<a href='/constructor/true'>true</a> pinned:flags.24?<a href='/constructor/true'>true</a> noforwards:flags.26?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> from_id:flags.8?<a href='/type/Peer'>Peer</a> peer_id:<a href='/type/Peer'>Peer</a> fwd_from:flags.2?<a href='/type/MessageFwdHeader'>MessageFwdHeader</a> via_bot_id:flags.11?<a href='/type/long'>long</a> reply_to:flags.3?<a href='/type/MessageReplyHeader'>MessageReplyHeader</a> date:<a href='/type/int'>int</a> message:<a href='/type/string'>string</a> media:flags.9?<a href='/type/MessageMedia'>MessageMedia</a> reply_markup:flags.6?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.7?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; views:flags.10?<a href='/type/int'>int</a> forwards:flags.10?<a href='/type/int'>int</a> replies:flags.23?<a href='/type/MessageReplies'>MessageReplies</a> edit_date:flags.15?<a href='/type/int'>int</a> post_author:flags.16?<a href='/type/string'>string</a> grouped_id:flags.17?<a href='/type/long'>long</a> reactions:flags.20?<a href='/type/MessageReactions'>MessageReactions</a> restriction_reason:flags.22?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; ttl_period:flags.25?<a href='/type/int'>int</a> = <a href='/type/Message'>Message</a>;
 
 <a href='/constructor/updateNewMessage'>updateNewMessage</a>#1f2b0afd message:<a href='/type/Message'>Message</a> pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;</code></pre>
-<p>The user receives an <a href="/constructor/updateNewMessage">updateNewMessage</a> constructor from the bot, containing a <a href="/constructor/messageMediaInvoice">messageMediaInvoice</a> constructor with basic info about the product.</p>
-<p>The <a href="/constructor/message">message</a> will also have a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> keyboard attached to it.
+<p>The user receives an <a href="/api/links#invoice-links">invoice deep link</a> or an <a href="/constructor/updateNewMessage">updateNewMessage</a> constructor from the bot, containing a <a href="/constructor/messageMediaInvoice">messageMediaInvoice</a> constructor with basic info about the product.</p>
+<p>For invoice messages, the <a href="/constructor/message">message</a> will also have a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> keyboard attached to it.
 The the first button of the keyboard will always be a <a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> button.</p>
 <h4><a class="anchor" href="#22-getting-invoice-info-about-the-product" id="22-getting-invoice-info-about-the-product" name="22-getting-invoice-info-about-the-product"><i class="anchor-icon"></i></a>2.2 Getting invoice info about the product</h4>
 <pre><code><a href='/constructor/inputInvoiceMessage'>inputInvoiceMessage</a>#c5b56859 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
@@ -115,9 +126,8 @@ The the first button of the keyboard will always be a <a href="/constructor/keyb
 </ul>
 </li>
 <li><a href="/constructor/inputInvoiceSlug">inputInvoiceSlug</a><ul>
-<li>If the user opens an <a href="/api/links#invoice-links">invoice deep link</a> contains the <code>slug</code> parameter</li>
-<li>If the client receives a <a href="/api/web-events#web_app_open_invoice"><code>web_app_open_invoice</code> event from a web app</a></li>
-<li>If the client has to process a <a href="/api/premium">Telegram Premium</a> payment, using the <a href="/api/config#client-configuration"><code>premium_invoice_slug</code> app config parameter »</a></li>
+<li>If the user opens an <a href="/api/links#invoice-links">invoice deep link</a>, contains the <code>slug</code> parameter</li>
+<li>If the client has to process a <a href="/api/premium">Telegram Premium</a> payment, contains the <a href="/api/config#client-configuration"><code>premium_invoice_slug</code> app config parameter »</a></li>
 </ul>
 </li>
 </ul>
