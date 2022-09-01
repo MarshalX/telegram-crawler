@@ -974,23 +974,95 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </tbody>
 </table>
 <h3><a class="anchor" href="#bot-attachment-menu-links" id="bot-attachment-menu-links" name="bot-attachment-menu-links"><i class="anchor-icon"></i></a>Bot attachment menu links</h3>
-<p>Used to install and optionally open a <a href="/api/bots/attach">bot attachment menu »</a> in a certain chat.  </p>
-<p><code>t.me</code> syntax (install):</p>
-<pre><code>t.me/&lt;bot_username&gt;?startattach&amp;choose=users+bots+groups+channels
-t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels</code></pre>
-<p><code>t.me</code> syntax (install+open in chat):</p>
+<p>Used to install and optionally open a <a href="/api/bots/attach">bot attachment menu »</a> in a certain chat.<br>
+For all link types, clients should:</p>
+<ul>
+<li>Check that the associated bot username has an associated <a href="/api/bots/attach">attachment menu</a>.</li>
+<li>If not installed, ask the user to <a href="/api/bots/attach">install the attachment menu</a></li>
+<li>Once installed, check that the attachment menu can be opened in the chosen chat type.</li>
+</ul>
+<h4><a class="anchor" href="#open-in-current-chat" id="open-in-current-chat" name="open-in-current-chat"><i class="anchor-icon"></i></a>Open in current chat</h4>
+<p>Installs and opens an attachment menu web app in the currently open chat.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;bot_username&gt;?startattach
+t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;startattach
+tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bot_username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment menu</a>.</td>
+</tr>
+<tr>
+<td><code>start_parameter</code></td>
+<td style="text-align: center;">Optional</td>
+<td>If provided, should be passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code>.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#open-in-specific-chat" id="open-in-specific-chat" name="open-in-specific-chat"><i class="anchor-icon"></i></a>Open in specific chat</h4>
+<p>Installs and opens an attachment menu web app in a specific chat.  </p>
+<p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;username&gt;?attach=&lt;bot_username&gt;
 t.me/&lt;username&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 t.me/+&lt;phone_number&gt;?attach=&lt;bot_username&gt;
 t.me/+&lt;phone_number&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;</code></pre>
-<p><code>tg:</code> syntax (install):</p>
-<pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;startattach&amp;choose=users+bots+groups+channels
-tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels</code></pre>
 <p><code>tg:</code> syntax (install+open in chat):</p>
 <pre><code>tg://resolve?domain=&lt;username&gt;&amp;attach=&lt;bot_username&gt;
 tg://resolve?domain=&lt;username&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;
 tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required for <a href="#public-username-links">username links</a></td>
+<td>Username of chat where to open web app.</td>
+</tr>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required for <a href="#phone-number-links">phone number links</a></td>
+<td>Phone number of private chat where to open web app.</td>
+</tr>
+<tr>
+<td><code>bot_username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment menu</a>.</td>
+</tr>
+<tr>
+<td><code>start_parameter</code></td>
+<td style="text-align: center;">Optional</td>
+<td>If provided, should be passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code>.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#open-in-any-chat" id="open-in-any-chat" name="open-in-any-chat"><i class="anchor-icon"></i></a>Open in any chat</h4>
+<p>Installs an attachment menu, opens a dialog selection form that will open the attachment menu web app in a specific chat.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;bot_username&gt;?startattach&amp;choose=users+bots+groups+channels
+t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels</code></pre>
+<p><code>tg:</code> syntax (install):</p>
+<pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;startattach&amp;choose=users+bots+groups+channels
+tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels</code></pre>
 <p>Parameters:</p>
 <table class="table">
 <thead>
@@ -1009,12 +1081,12 @@ tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;star
 <tr>
 <td><code>start_parameter</code></td>
 <td style="text-align: center;">Optional</td>
-<td></td>
+<td>If provided, should be passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code>.</td>
 </tr>
 <tr>
 <td><code>choose</code></td>
 <td style="text-align: center;">Optional</td>
-<td></td>
+<td>A combination of <code>users</code>, <code>bots</code>, <code>groups</code>, <code>channels</code> separated by <code>+</code>: indicates the dialog types to show in the dialog selection popup.</td>
 </tr>
 </tbody>
 </table>
