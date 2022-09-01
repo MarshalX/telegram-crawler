@@ -157,12 +157,17 @@ If set, <code>rotation</code> indicates clockwise rotation angle of the gradient
 <p>Once you've <a href="#uploading-wallpapers">uploaded your wallpaper</a> or received a <a href="/api/links#wallpaper-links">wallpaper deep link</a>, it can be installed as follows.  </p>
 <p><em>Note that <a href="#fill-wallpapers">fill wallpapers</a> cannot be installed using the API, clients should install and keep track of them only locally, without synchronizing the wallpaper list or signalling installations.</em></p>
 <p>The API keeps a list of wallpapers that the user can set as chat background, including some preinstalled ones.<br>
-To fetch this list use <a href="/method/account.getWallPapers">account.getWallPapers</a>.<br>
-To save a wallpaper to that list use <a href="/method/account.saveWallPaper">account.saveWallPaper</a> with <code>unsave=false</code>.<br>
+To fetch the list use <a href="/method/account.getWallPapers">account.getWallPapers</a>.<br>
+To save a wallpaper to the list use <a href="/method/account.saveWallPaper">account.saveWallPaper</a> with <code>unsave=false</code>.<br>
 To remove a wallpaper (including preinstalled wallpapers) from the list use <a href="/method/account.saveWallPaper">account.saveWallPaper</a> with <code>unsave=true</code>.<br>
 To restore the default list, removing all installed wallpapers and reinstalling previously removed preinstalled wallpapers use <a href="/method/account.resetWallPapers">account.resetWallPapers</a>.  </p>
-<p>When a client sets a wallpaper as the default chat background, it should call <a href="/method/account.installWallPaper">account.installWallPaper</a> to signal this installation to the server.  </p>
-<p>In all cases where an <a href="/type/InputWallPaper">InputWallPaper</a> constructor is required, pass <a href="/constructor/inputWallPaperSlug">inputWallPaperSlug</a> when working with <a href="/api/links#wallpaper-links">wallpaper deep links</a> and <a href="/constructor/inputWallPaper">inputWallPaper</a> otherwise, using the ID and access hash fields of a full <a href="/constructor/wallPaper">wallPaper</a>.</p></div>
+<p>When a client sets a wallpaper as the default chat background, call <a href="/method/account.installWallPaper">account.installWallPaper</a> to signal this installation to the server.  </p>
+<p>In all cases where an <a href="/type/InputWallPaper">InputWallPaper</a> constructor is required, pass:  </p>
+<ul>
+<li><a href="/constructor/inputWallPaperSlug">inputWallPaperSlug</a> when working with <a href="/api/links#wallpaper-links">wallpaper deep links</a>.</li>
+<li><a href="/constructor/inputWallPaper">inputWallPaper</a> otherwise, using the ID and access hash fields of a full <a href="/constructor/wallPaper">wallPaper</a>.<br>
+As mentioned earlier, <a href="#fill-wallpapers">fill wallpapers</a> can't be saved to the server: an <a href="/constructor/inputWallPaperNoFile">inputWallPaperNoFile</a> is available for fill wallpapers but can <strong>only</strong> be used when working with themes, for example using <a href="/method/account.createTheme">account.createTheme</a>.  </li>
+</ul></div>
   
 </div>
           
