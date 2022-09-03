@@ -74,7 +74,7 @@ document#8fd4c4d8 flags:# id:long…">
 <ul>
 <li><a href="/api/dice">Dice »</a></li>
 <li><a href="/api/animated-emojis">Animated emojis »</a></li>
-<li><a href="/api/custom-emojis">Custom emojis »</a></li>
+<li><a href="/api/custom-emoji">Custom emojis »</a></li>
 <li><a href="/api/reactions">Reactions »</a></li>
 <li><a href="/api/masks">Mask stickers »</a></li>
 </ul>
@@ -82,7 +82,7 @@ document#8fd4c4d8 flags:# id:long…">
 <p>Static stickers are <a href="https://en.wikipedia.org/wiki/WebP">WebP</a> images with the following specs:</p>
 <ul>
 <li>For stickers, either the width or height must be equal to 512 pixels.</li>
-<li>For <a href="/api/custom-emojis">custom emojis</a>, the resolution must be equal 100x100 pixels.</li>
+<li>For <a href="/api/custom-emoji">custom emojis</a>, the resolution must be equal 100x100 pixels.</li>
 <li>Transparency is supported.</li>
 </ul>
 <p>They're identified by <code>mime_type</code> field of the associated <a href="/constructor/document">document</a>, always equal to <code>image/webp</code>.</p>
@@ -106,7 +106,7 @@ document#8fd4c4d8 flags:# id:long…">
 <li>The video must be encoded using <a href="https://en.wikipedia.org/wiki/VP9">VP9</a>, in a <a href="https://en.wikipedia.org/wiki/WebM">WebM</a> container.</li>
 <li>The <a href="https://en.wikipedia.org/wiki/WebM">WebM</a> container must have <strong>no audio stream</strong>.</li>
 <li>For stickers, either the width or height must be equal to 512 pixels.</li>
-<li>For <a href="/api/custom-emojis">custom emojis</a>, the resolution must be equal 100x100 pixels.</li>
+<li>For <a href="/api/custom-emoji">custom emojis</a>, the resolution must be equal 100x100 pixels.</li>
 <li>Maximum duration: 3 seconds.</li>
 <li>Frame rate: up to 30 FPS.</li>
 <li>Transparency is supported.</li>
@@ -198,10 +198,12 @@ This field is actually used to allow associating more than one emoji to a sticke
 <li><a href="/constructor/messages.stickerSetInstallResultArchive">messages.stickerSetInstallResultArchive</a> - The stickerset was successfully installed, displacing some older unused stickersets specified in the <code>sets</code> field by <a href="#archived-stickers">archiving them</a>.  </li>
 </ul>
 <p>Use <a href="/method/messages.uninstallStickerSet">messages.uninstallStickerSet</a> or <a href="/method/messages.toggleStickerSets">messages.toggleStickerSets</a> with the <code>uninstall</code> flag to uninstall one or more stickersets.  </p>
-<p>An <a href="/constructor/updateNewStickerSet">updateNewStickerSet</a> update will be emitted to the other logged-in sessions when installing stickersets.
-An <a href="/constructor/updateStickerSets">updateStickerSets</a> update will be emitted to the other logged-in sessions when uninstalling or archiving stickersets.  </p>
+<p>An <a href="/constructor/updateNewStickerSet">updateNewStickerSet</a> update will be emitted to the other logged-in sessions when installing stickersets.<br>
+An <a href="/constructor/updateStickerSets">updateStickerSets</a> update will be emitted to the other logged-in sessions when uninstalling or archiving stickersets.<br>
+Both updates should trigger a call to <a href="/method/messages.getAllStickers">messages.getAllStickers</a>.  </p>
 <p>Use <a href="/method/messages.reorderStickerSets">messages.reorderStickerSets</a> to reorder installed stickersets by the <a href="/constructor/stickerSet">stickerSet</a> ID: notice that normal, <a href="/api/masks">mask</a> and <a href="/api/custom-emoji">custom emoji</a> stickersets are ordered independently, use the appropriate flags to sort the correct type of stickerset.</p>
-<p>An <a href="/constructor/updateStickerSetsOrder">updateStickerSetsOrder</a> update will be emitted to the other logged-in sessions when reordering stickersets.  </p>
+<p>An <a href="/constructor/updateStickerSetsOrder">updateStickerSetsOrder</a> update will be emitted to the other logged-in sessions when reordering stickersets.<br>
+This update should trigger a call to <a href="/method/messages.getAllStickers">messages.getAllStickers</a>.  </p>
 <p>Use <a href="/method/messages.getAllStickers">messages.getAllStickers</a> to fetch all installed and non-archived stickers.</p>
 <h3><a class="anchor" href="#creating-stickersets" id="creating-stickersets" name="creating-stickersets"><i class="anchor-icon"></i></a>Creating stickersets</h3>
 <pre><code><a href='/constructor/inputStickerSetItem'>inputStickerSetItem</a>#ffa0a496 flags:<a href='/type/%23'>#</a> document:<a href='/type/InputDocument'>InputDocument</a> emoji:<a href='/type/string'>string</a> mask_coords:flags.0?<a href='/type/MaskCoords'>MaskCoords</a> = <a href='/type/InputStickerSetItem'>InputStickerSetItem</a>;
@@ -213,20 +215,27 @@ An <a href="/constructor/updateStickerSets">updateStickerSets</a> update will be
 
 ---functions---
 
+<a href='/method/messages.uploadMedia'>messages.uploadMedia</a>#519bc2b1 peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
+
 <a href='/method/stickers.checkShortName'>stickers.checkShortName</a>#284b3639 short_name:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
 <a href='/method/stickers.suggestShortName'>stickers.suggestShortName</a>#4dafc503 title:<a href='/type/string'>string</a> = <a href='/type/stickers.SuggestedShortName'>stickers.SuggestedShortName</a>;
 
 <a href='/method/stickers.createStickerSet'>stickers.createStickerSet</a>#9021ab67 flags:<a href='/type/%23'>#</a> masks:flags.0?<a href='/constructor/true'>true</a> animated:flags.1?<a href='/constructor/true'>true</a> videos:flags.4?<a href='/constructor/true'>true</a> user_id:<a href='/type/InputUser'>InputUser</a> title:<a href='/type/string'>string</a> short_name:<a href='/type/string'>string</a> thumb:flags.2?<a href='/type/InputDocument'>InputDocument</a> stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputStickerSetItem'>InputStickerSetItem</a>&gt; software:flags.3?<a href='/type/string'>string</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
 
+<a href='/method/stickers.addStickerToSet'>stickers.addStickerToSet</a>#8653febe stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> sticker:<a href='/type/InputStickerSetItem'>InputStickerSetItem</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
 <a href='/method/stickers.removeStickerFromSet'>stickers.removeStickerFromSet</a>#f7760f51 sticker:<a href='/type/InputDocument'>InputDocument</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
 <a href='/method/stickers.changeStickerPosition'>stickers.changeStickerPosition</a>#ffb6d4ca sticker:<a href='/type/InputDocument'>InputDocument</a> position:<a href='/type/int'>int</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
-<a href='/method/stickers.addStickerToSet'>stickers.addStickerToSet</a>#8653febe stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> sticker:<a href='/type/InputStickerSetItem'>InputStickerSetItem</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
 <a href='/method/stickers.setStickerSetThumb'>stickers.setStickerSetThumb</a>#9a364e30 stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> thumb:<a href='/type/InputDocument'>InputDocument</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;</code></pre>
 <p>Bots and users can create stickersets by using the following methods.<br>
 Users can also create stickersets by interacting with the official <a href="https://t.me/stickers">@stickers</a> bot.</p>
-<p>Note that unofficial bots <strong>must</strong> append a <code>"_by_&lt;bot_username&gt;"</code> prefix to the stickerset short name when creating packs.</p>
+<p>Note that unofficial bots <strong>must</strong> append a <code>"_by_&lt;bot_username&gt;"</code> prefix to the stickerset short name when creating stickersets.</p>
+<p>Use <a href="/method/messages.uploadMedia">messages.uploadMedia</a> to upload stickers and thumbnails, if you don't already have access to a previously uploaded <a href="/constructor/document">document</a>.  </p>
+<p>Use <a href="/method/stickers.checkShortName">stickers.checkShortName</a> to check if a given short name is available, and <a href="/method/stickers.suggestShortName">stickers.suggestShortName</a> to let the server suggest a short name, given the stickerset title.</p>
 <p>Use <a href="/method/stickers.createStickerSet">stickers.createStickerSet</a> to create normal, <a href="#animated-stickers">animated</a>, <a href="#video-stickers">video</a> or <a href="/api/masks">mask</a> stickersets.<br>
 <a href="/api/custom-emoji">Custom emoji</a> stickersets can only be created using the <a href="https://t.me/stickers">@stickers</a> bot for now.  </p>
+<p>Use <a href="/method/stickers.addStickerToSet">stickers.addStickerToSet</a> to add stickers to the stickerset.<br>
+Use <a href="/method/stickers.addStickerToSet">stickers.setStickerSetThumb</a> to edit the stickerset thumbnail after creation.<br>
+Use <a href="/method/stickers.removeStickerFromSet">stickers.removeStickerFromSet</a> to remove stickers from a stickerset, and <a href="/method/stickers.changeStickerPosition">stickers.changeStickerPosition</a> to move stickers in a stickerset (simply providing the sticker document is enough).  </p>
 <h3><a class="anchor" href="#searching-stickers" id="searching-stickers" name="searching-stickers"><i class="anchor-icon"></i></a>Searching stickers</h3>
 <pre><code><a href='/constructor/messages.foundStickerSetsNotModified'>messages.foundStickerSetsNotModified</a>#d54b65d = <a href='/type/messages.FoundStickerSets'>messages.FoundStickerSets</a>;
 <a href='/constructor/messages.foundStickerSets'>messages.foundStickerSets</a>#8af09dd2 hash:<a href='/type/long'>long</a> sets:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerSetCovered'>StickerSetCovered</a>&gt; = <a href='/type/messages.FoundStickerSets'>messages.FoundStickerSets</a>;
@@ -250,7 +259,7 @@ Users can also create stickersets by interacting with the official <a href="http
 <a href='/method/messages.getOldFeaturedStickers'>messages.getOldFeaturedStickers</a>#7ed094a1 offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.FeaturedStickers'>messages.FeaturedStickers</a>;
 
 <a href='/method/messages.getFeaturedEmojiStickers'>messages.getFeaturedEmojiStickers</a>#ecf6736 hash:<a href='/type/long'>long</a> = <a href='/type/messages.FeaturedStickers'>messages.FeaturedStickers</a>;</code></pre>
-<p>Telegram showcases a set of featured stickers: they can be fetched using <a href="/method/messages.getFeaturedStickers">messages.getFeaturedStickers</a> or <a href="/method/messages.getFeaturedEmojiStickers">messages.getFeaturedEmojiStickers</a>, for <a href="/api/custom-emojis">custom emojis</a>.  </p>
+<p>Telegram showcases a set of featured stickers: they can be fetched using <a href="/method/messages.getFeaturedStickers">messages.getFeaturedStickers</a> or <a href="/method/messages.getFeaturedEmojiStickers">messages.getFeaturedEmojiStickers</a>, for <a href="/api/custom-emoji">custom emojis</a>.  </p>
 <p>Clients should preload featured stickers on startup according to the value of the <code>preload_featured_stickers</code> <a href="/constructor/config">configuration parameter</a>.  </p>
 <p>The method also returns a set of unread <a href="/constructor/stickerSet">stickerSet</a> IDs in the <code>unread</code> field: use <a href="/method/messages.readFeaturedStickers">messages.readFeaturedStickers</a> to mark them as read: note that this will only affect the <code>unread</code> field, all stickersets will still be returned, unless you also <a href="/api/offsets#hash-generation">generate a <code>hash</code></a>.  </p>
 <p><a href="/method/messages.getOldFeaturedStickers">messages.getOldFeaturedStickers</a> can be used to fetch an extended list with even more featured stickersets, that were previously featured in the short list returned by <a href="/method/messages.getFeaturedStickers">messages.getFeaturedStickers</a>.  </p>
@@ -271,7 +280,8 @@ Users can also create stickersets by interacting with the official <a href="http
 <li>Premium users can fave a total of <code>stickers_faved_limit_premium</code> stickersets.  </li>
 <li>Non-Premium users can fave a total of <code>stickers_faved_limit_default</code> stickersets.  </li>
 </ul>
-<p>An <a href="/constructor/updateFavedStickers">updateFavedStickers</a> update will be emitted to the other logged-in sessions when faving or unfaving stickersets.  </p>
+<p>An <a href="/constructor/updateFavedStickers">updateFavedStickers</a> update will be emitted to the other logged-in sessions when faving or unfaving stickersets.<br>
+This update should trigger a call to <a href="/method/messages.getFavedStickers">messages.getFavedStickers</a>.  </p>
 <h3><a class="anchor" href="#recent-stickers" id="recent-stickers" name="recent-stickers"><i class="anchor-icon"></i></a>Recent stickers</h3>
 <pre><code><a href='/constructor/messages.recentStickersNotModified'>messages.recentStickersNotModified</a>#b17f890 = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
 <a href='/constructor/messages.recentStickers'>messages.recentStickers</a>#88d37c56 hash:<a href='/type/long'>long</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; dates:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
@@ -287,7 +297,8 @@ Users can also create stickersets by interacting with the official <a href="http
 <p>A sticker can be then removed from the recent stickers list using <a href="/method/messages.saveRecentSticker">messages.saveRecentSticker</a> with <code>unsave=true</code>; the entire list can be cleared using <a href="/method/messages.clearRecentStickers">messages.clearRecentStickers</a>.  </p>
 <p>Use <a href="/method/messages.getRecentStickers">messages.getRecentStickers</a> to fetch the recent stickers list.</p>
 <p>Users can add only a certain number of recent stickers, according to the value of the <code>stickers_recent_limit</code> <a href="/constructor/config">configuration parameter</a>.  </p>
-<p>An <a href="/constructor/updateRecentStickers">updateRecentStickers</a> update will be emitted to the other logged-in sessions when modifying the recent stickerset list.  </p>
+<p>An <a href="/constructor/updateRecentStickers">updateRecentStickers</a> update will be emitted to the other logged-in sessions when modifying the recent stickerset list.<br>
+This update should trigger a call to <a href="/method/messages.getRecentStickers">messages.getRecentStickers</a>.  </p>
 <h3><a class="anchor" href="#sticker-suggestions" id="sticker-suggestions" name="sticker-suggestions"><i class="anchor-icon"></i></a>Sticker suggestions</h3>
 <pre><code><a href='/constructor/messages.stickersNotModified'>messages.stickersNotModified</a>#f1749a22 = <a href='/type/messages.Stickers'>messages.Stickers</a>;
 <a href='/constructor/messages.stickers'>messages.stickers</a>#30a6ec7e hash:<a href='/type/long'>long</a> stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.Stickers'>messages.Stickers</a>;
@@ -295,7 +306,7 @@ Users can also create stickersets by interacting with the official <a href="http
 ---functions---
 
 <a href='/method/messages.getStickers'>messages.getStickers</a>#d5a5d3a1 emoticon:<a href='/type/string'>string</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.Stickers'>messages.Stickers</a>;</code></pre>
-<p>Clients should show a popup with a list of suggested stickers and <a href="/api/custom-emojis">custom emojis</a> when the user enters an emoji in the text bar.  </p>
+<p>Clients should show a popup with a list of suggested stickers and <a href="/api/custom-emoji">custom emojis</a> when the user enters an emoji in the text bar.  </p>
 <p>If the <code>stickers_emoji_suggest_only_api</code> <a href="/api/config#client-configuration">app configuration parameter</a> is set to true, clients must invoke <a href="/method/messages.getStickers">messages.getStickers</a> to fetch a list of suggested stickers for the emoji.<br>
 The <code>stickers_emoji_cache_time</code> specifies the validity period of the local cache of messages.getStickers, also relevant when generating the pagination hash when invoking the method.  </p>
 <p>Otherwise, the following local logic should be used.  </p>
@@ -325,7 +336,8 @@ The <code>stickers_emoji_cache_time</code> specifies the validity period of the 
 <p>One or more stickersets can be archived (or unarchived) using <a href="/method/messages.installStickerSet">messages.installStickerSet</a> with <code>archived=true|false</code>, or <a href="/method/messages.toggleStickerSets">messages.toggleStickerSets</a> with either the <code>archive</code> or <code>unarchive</code> flag.  </p>
 <p>An unused stickerset may also be automatically archived when <a href="#installing-stickers">installing new stickersets</a>.</p>
 <p>Archived stickers are not returned by <a href="/method/messages.getAllStickers">messages.getAllStickers</a> and can only be fetched using <a href="/method/messages.getArchivedStickers">messages.getArchivedStickers</a>: note that this method returns a set of <a href="#stickerset-previews">stickerset previews »</a>.</p>
-<p>An <a href="/constructor/updateStickerSets">updateStickerSets</a> update will be emitted to the other logged-in sessions when archiving or unarchiving stickersets.  </p></div>
+<p>An <a href="/constructor/updateStickerSets">updateStickerSets</a> update will be emitted to the other logged-in sessions when archiving or unarchiving stickersets.<br>
+This update should trigger a call to <a href="/method/messages.getArchivedStickers">messages.getArchivedStickers</a>.  </p></div>
   
 </div>
           
