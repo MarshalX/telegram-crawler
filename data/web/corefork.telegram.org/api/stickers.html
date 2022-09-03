@@ -181,6 +181,10 @@ This field is actually used to allow associating more than one emoji to a sticke
 <a href='/constructor/messages.allStickersNotModified'>messages.allStickersNotModified</a>#e86602c3 = <a href='/type/messages.AllStickers'>messages.AllStickers</a>;
 <a href='/constructor/messages.allStickers'>messages.allStickers</a>#cdbbcebb hash:<a href='/type/long'>long</a> sets:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerSet'>StickerSet</a>&gt; = <a href='/type/messages.AllStickers'>messages.AllStickers</a>;
 
+<a href='/constructor/updateNewStickerSet'>updateNewStickerSet</a>#688a30aa stickerset:<a href='/type/messages.StickerSet'>messages.StickerSet</a> = <a href='/type/Update'>Update</a>;
+<a href='/constructor/updateStickerSetsOrder'>updateStickerSetsOrder</a>#bb2d201 flags:<a href='/type/%23'>#</a> masks:flags.0?<a href='/constructor/true'>true</a> emojis:flags.1?<a href='/constructor/true'>true</a> order:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/Update'>Update</a>;
+<a href='/constructor/updateStickerSets'>updateStickerSets</a>#43ae3dec = <a href='/type/Update'>Update</a>;
+
 ---functions---
 
 <a href='/method/messages.installStickerSet'>messages.installStickerSet</a>#c78fe460 stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> archived:<a href='/type/Bool'>Bool</a> = <a href='/type/messages.StickerSetInstallResult'>messages.StickerSetInstallResult</a>;
@@ -194,7 +198,10 @@ This field is actually used to allow associating more than one emoji to a sticke
 <li><a href="/constructor/messages.stickerSetInstallResultArchive">messages.stickerSetInstallResultArchive</a> - The stickerset was successfully installed, displacing some older unused stickersets specified in the <code>sets</code> field by <a href="#archived-stickers">archiving them</a>.  </li>
 </ul>
 <p>Use <a href="/method/messages.uninstallStickerSet">messages.uninstallStickerSet</a> or <a href="/method/messages.toggleStickerSets">messages.toggleStickerSets</a> with the <code>uninstall</code> flag to uninstall one or more stickersets.  </p>
+<p>An <a href="/constructor/updateNewStickerSet">updateNewStickerSet</a> update will be emitted to the other logged-in sessions when installing stickersets.
+An <a href="/constructor/updateStickerSets">updateStickerSets</a> update will be emitted to the other logged-in sessions when uninstalling or archiving stickersets.  </p>
 <p>Use <a href="/method/messages.reorderStickerSets">messages.reorderStickerSets</a> to reorder installed stickersets by the <a href="/constructor/stickerSet">stickerSet</a> ID: notice that normal, <a href="/api/masks">mask</a> and <a href="/api/custom-emoji">custom emoji</a> stickersets are ordered independently, use the appropriate flags to sort the correct type of stickerset.</p>
+<p>An <a href="/constructor/updateStickerSetsOrder">updateStickerSetsOrder</a> update will be emitted to the other logged-in sessions when reordering stickersets.  </p>
 <p>Use <a href="/method/messages.getAllStickers">messages.getAllStickers</a> to fetch all installed and non-archived stickers.</p>
 <h3><a class="anchor" href="#creating-stickersets" id="creating-stickersets" name="creating-stickersets"><i class="anchor-icon"></i></a>Creating stickersets</h3>
 <pre><code><a href='/constructor/messages.stickerSet'>messages.stickerSet</a>#b60a24a6 set:<a href='/type/StickerSet'>StickerSet</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; documents:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
@@ -211,6 +218,10 @@ This field is actually used to allow associating more than one emoji to a sticke
 <a href='/method/stickers.setStickerSetThumb'>stickers.setStickerSetThumb</a>#9a364e30 stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> thumb:<a href='/type/InputDocument'>InputDocument</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
 <a href='/method/stickers.checkShortName'>stickers.checkShortName</a>#284b3639 short_name:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
 <a href='/method/stickers.suggestShortName'>stickers.suggestShortName</a>#4dafc503 title:<a href='/type/string'>string</a> = <a href='/type/stickers.SuggestedShortName'>stickers.SuggestedShortName</a>;</code></pre>
+<p>Bots can create stickersets by using the following methods.<br>
+Users can't create stickersets by using these methods, so they must interact either with the official <a href="https://t.me/stickers">@stickers</a> bot, or with some other bot that offers similar features.  </p>
+<p>Note that unofficial bots <strong>must</strong> append a <code>"_by_&lt;bot_username&gt;"</code> prefix to the stickerset short name when creating packs.</p>
+<p>Use <a href="/method/stickers.createStickerSet">stickers.createStickerSet</a> to create a normal, <a href="#animated-stickers">animated</a>, <a href="#video-stickers">video</a>, <a href="/api/masks">mask</a> an stickerset. </p>
 <h3><a class="anchor" href="#searching-stickers" id="searching-stickers" name="searching-stickers"><i class="anchor-icon"></i></a>Searching stickers</h3>
 <pre><code><a href='/constructor/messages.foundStickerSetsNotModified'>messages.foundStickerSetsNotModified</a>#d54b65d = <a href='/type/messages.FoundStickerSets'>messages.FoundStickerSets</a>;
 <a href='/constructor/messages.foundStickerSets'>messages.foundStickerSets</a>#8af09dd2 hash:<a href='/type/long'>long</a> sets:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerSetCovered'>StickerSetCovered</a>&gt; = <a href='/type/messages.FoundStickerSets'>messages.FoundStickerSets</a>;
@@ -222,6 +233,9 @@ This field is actually used to allow associating more than one emoji to a sticke
 <h3><a class="anchor" href="#featured-stickers" id="featured-stickers" name="featured-stickers"><i class="anchor-icon"></i></a>Featured stickers</h3>
 <pre><code><a href='/constructor/messages.featuredStickersNotModified'>messages.featuredStickersNotModified</a>#c6dc0c66 count:<a href='/type/int'>int</a> = <a href='/type/messages.FeaturedStickers'>messages.FeaturedStickers</a>;
 <a href='/constructor/messages.featuredStickers'>messages.featuredStickers</a>#be382906 flags:<a href='/type/%23'>#</a> premium:flags.0?<a href='/constructor/true'>true</a> hash:<a href='/type/long'>long</a> count:<a href='/type/int'>int</a> sets:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerSetCovered'>StickerSetCovered</a>&gt; unread:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/messages.FeaturedStickers'>messages.FeaturedStickers</a>;
+
+<a href='/constructor/updateReadFeaturedStickers'>updateReadFeaturedStickers</a>#571d2742 = <a href='/type/Update'>Update</a>;
+<a href='/constructor/updateReadFeaturedEmojiStickers'>updateReadFeaturedEmojiStickers</a>#fb4c496c = <a href='/type/Update'>Update</a>;
 
 ---functions---
 
@@ -239,6 +253,8 @@ This field is actually used to allow associating more than one emoji to a sticke
 <pre><code><a href='/constructor/messages.favedStickersNotModified'>messages.favedStickersNotModified</a>#9e8fa6d3 = <a href='/type/messages.FavedStickers'>messages.FavedStickers</a>;
 <a href='/constructor/messages.favedStickers'>messages.favedStickers</a>#2cb51097 hash:<a href='/type/long'>long</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.FavedStickers'>messages.FavedStickers</a>;
 
+<a href='/constructor/updateFavedStickers'>updateFavedStickers</a>#e511996d = <a href='/type/Update'>Update</a>;
+
 ---functions---
 
 <a href='/method/messages.faveSticker'>messages.faveSticker</a>#b9ffc55b id:<a href='/type/InputDocument'>InputDocument</a> unfave:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
@@ -250,9 +266,12 @@ This field is actually used to allow associating more than one emoji to a sticke
 <li>Premium users can fave a total of <code>stickers_faved_limit_premium</code> stickersets.  </li>
 <li>Non-Premium users can fave a total of <code>stickers_faved_limit_default</code> stickersets.  </li>
 </ul>
+<p>An <a href="/constructor/updateFavedStickers">updateFavedStickers</a> update will be emitted to the other logged-in sessions when faving or unfaving stickersets.  </p>
 <h3><a class="anchor" href="#recent-stickers" id="recent-stickers" name="recent-stickers"><i class="anchor-icon"></i></a>Recent stickers</h3>
 <pre><code><a href='/constructor/messages.recentStickersNotModified'>messages.recentStickersNotModified</a>#b17f890 = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
 <a href='/constructor/messages.recentStickers'>messages.recentStickers</a>#88d37c56 hash:<a href='/type/long'>long</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; dates:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
+
+<a href='/constructor/updateRecentStickers'>updateRecentStickers</a>#9a422c20 = <a href='/type/Update'>Update</a>;
 
 ---functions---
 
@@ -263,6 +282,7 @@ This field is actually used to allow associating more than one emoji to a sticke
 <p>A sticker can be then removed from the recent stickers list using <a href="/method/messages.saveRecentSticker">messages.saveRecentSticker</a> with <code>unsave=true</code>; the entire list can be cleared using <a href="/method/messages.clearRecentStickers">messages.clearRecentStickers</a>.  </p>
 <p>Use <a href="/method/messages.getRecentStickers">messages.getRecentStickers</a> to fetch the recent stickers list.</p>
 <p>Users can add only a certain number of recent stickers, according to the value of the <code>stickers_recent_limit</code> <a href="/constructor/config">configuration parameter</a>.  </p>
+<p>An <a href="/constructor/updateRecentStickers">updateRecentStickers</a> update will be emitted to the other logged-in sessions when modifying the recent stickerset list.  </p>
 <h3><a class="anchor" href="#sticker-suggestions" id="sticker-suggestions" name="sticker-suggestions"><i class="anchor-icon"></i></a>Sticker suggestions</h3>
 <pre><code><a href='/constructor/messages.stickersNotModified'>messages.stickersNotModified</a>#f1749a22 = <a href='/type/messages.Stickers'>messages.Stickers</a>;
 <a href='/constructor/messages.stickers'>messages.stickers</a>#30a6ec7e hash:<a href='/type/long'>long</a> stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.Stickers'>messages.Stickers</a>;
@@ -289,6 +309,8 @@ The <code>stickers_emoji_cache_time</code> specifies the validity period of the 
 <h3><a class="anchor" href="#archived-stickers" id="archived-stickers" name="archived-stickers"><i class="anchor-icon"></i></a>Archived stickers</h3>
 <pre><code><a href='/constructor/messages.archivedStickers'>messages.archivedStickers</a>#4fcba9c8 count:<a href='/type/int'>int</a> sets:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerSetCovered'>StickerSetCovered</a>&gt; = <a href='/type/messages.ArchivedStickers'>messages.ArchivedStickers</a>;
 
+<a href='/constructor/updateStickerSets'>updateStickerSets</a>#43ae3dec = <a href='/type/Update'>Update</a>;
+
 ---functions---
 
 <a href='/method/messages.installStickerSet'>messages.installStickerSet</a>#c78fe460 stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> archived:<a href='/type/Bool'>Bool</a> = <a href='/type/messages.StickerSetInstallResult'>messages.StickerSetInstallResult</a>;
@@ -297,7 +319,8 @@ The <code>stickers_emoji_cache_time</code> specifies the validity period of the 
 <a href='/method/messages.getArchivedStickers'>messages.getArchivedStickers</a>#57f17692 flags:<a href='/type/%23'>#</a> masks:flags.0?<a href='/constructor/true'>true</a> emojis:flags.1?<a href='/constructor/true'>true</a> offset_id:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> = <a href='/type/messages.ArchivedStickers'>messages.ArchivedStickers</a>;</code></pre>
 <p>One or more stickersets can be archived (or unarchived) using <a href="/method/messages.installStickerSet">messages.installStickerSet</a> with <code>archived=true|false</code>, or <a href="/method/messages.toggleStickerSets">messages.toggleStickerSets</a> with either the <code>archive</code> or <code>unarchive</code> flag.  </p>
 <p>An unused stickerset may also be automatically archived when <a href="#installing-stickers">installing new stickersets</a>.</p>
-<p>Archived stickers are not returned by <a href="/method/messages.getAllStickers">messages.getAllStickers</a> and can only be fetched using <a href="/method/messages.getArchivedStickers">messages.getArchivedStickers</a>: note that this method returns a set of <a href="#stickerset-previews">stickerset previews »</a>.</p></div>
+<p>Archived stickers are not returned by <a href="/method/messages.getAllStickers">messages.getAllStickers</a> and can only be fetched using <a href="/method/messages.getArchivedStickers">messages.getArchivedStickers</a>: note that this method returns a set of <a href="#stickerset-previews">stickerset previews »</a>.</p>
+<p>An <a href="/constructor/updateStickerSets">updateStickerSets</a> update will be emitted to the other logged-in sessions when archiving or unarchiving stickersets.  </p></div>
   
 </div>
           
