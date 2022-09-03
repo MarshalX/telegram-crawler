@@ -61,10 +61,38 @@ document#8fd4c4d8 flags:# id:long…">
 <a href='/constructor/inputStickerSetDice'>inputStickerSetDice</a>#e67f520e emoticon:<a href='/type/string'>string</a> = <a href='/type/InputStickerSet'>InputStickerSet</a>;
 <a href='/constructor/inputStickerSetAnimatedEmojiAnimations'>inputStickerSetAnimatedEmojiAnimations</a>#cde3739 = <a href='/type/InputStickerSet'>InputStickerSet</a>;
 <a href='/constructor/inputStickerSetPremiumGifts'>inputStickerSetPremiumGifts</a>#c88b3b02 = <a href='/type/InputStickerSet'>InputStickerSet</a>;</code></pre>
-<p>Stickers are contained in <a href="/constructor/document">document</a> constructors attached to messages, and always have an attribute of type <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a>.  </p>
-<p>The <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a> contains information about the associated <a href="#stickersets">stickerset</a>, the emoji that represents the sticker, </p>
-<h4><a class="anchor" href="#image-stickers" id="image-stickers" name="image-stickers"><i class="anchor-icon"></i></a>Image stickers</h4>
-<p>Image stickers are simple </p>
+<p>Stickers can be contained in <a href="/constructor/document">document</a> constructors attached to <a href="/constructor/message">messages</a>, and always have an attribute of type <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a>.  </p>
+<p>The <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a> attribute contains information about the associated <a href="#stickersets">stickerset</a>, the emoji that represents the sticker, and more.  </p>
+<p>There are multiple available sticker types:</p>
+<h4><a class="anchor" href="#static-stickers" id="static-stickers" name="static-stickers"><i class="anchor-icon"></i></a>Static stickers</h4>
+<p>Static stickers are <a href="https://en.wikipedia.org/wiki/WebP">WebP</a> images with the following specs:</p>
+<ul>
+<li>For stickers, either the width or height must be equal to 512 pixels.</li>
+<li>For <a href="/api/custom-emojis">custom emojis</a>, the resolution must be equal 100x100 pixels.</li>
+<li>Transparency is supported.</li>
+</ul>
+<p>They're identified by <code>mime_type</code> field of the associated <a href="/constructor/document">document</a>, always equal to <code>image/webp</code>.</p>
+<p>See <a href="/stickers#static-stickers-and-emoji">here »</a> for tips on how to create the perfect static sticker, and <a href="#creating-stickersets">here »</a> for info on how to upload it using the API.</p>
+<h4><a class="anchor" href="#animated-stickers" id="animated-stickers" name="animated-stickers"><i class="anchor-icon"></i></a>Animated stickers</h4>
+<p>Animated stickers are vector 
+They're identified by <code>mime_type</code> field of the associated <a href="/constructor/document">document</a>, always equal to <code>application/x-tgsticker</code>.</p>
+<p>See <a href="/stickers#creating-animations">here »</a> for tips on how to create the perfect animated sticker, and <a href="#creating-stickersets">here »</a> for info on how to upload it using the API.</p>
+<h4><a class="anchor" href="#video-stickers" id="video-stickers" name="video-stickers"><i class="anchor-icon"></i></a>Video stickers</h4>
+<p>Video stickers are <a href="https://en.wikipedia.org/wiki/VP9">VP9</a> videos with the following specs:</p>
+<ul>
+<li>The video must be encoded using <a href="https://en.wikipedia.org/wiki/VP9">VP9</a>, in a <a href="https://en.wikipedia.org/wiki/WebM">WebM</a> container.</li>
+<li>The <a href="https://en.wikipedia.org/wiki/WebM">WebM</a> container must have <strong>no audio stream</strong>.</li>
+<li>For stickers, either the width or height must be equal to 512 pixels.</li>
+<li>For <a href="/api/custom-emojis">custom emojis</a>, the resolution must be equal 100x100 pixels.</li>
+<li>Maximum duration: 3 seconds.</li>
+<li>Frame rate: up to 30 FPS.</li>
+<li>Transparency is supported.</li>
+<li>The video should be looped for optimal user experience.</li>
+</ul>
+<p>They're identified by <code>mime_type</code> field of the associated <a href="/constructor/document">document</a>, always equal to <code>video/webm</code>.</p>
+<p>See <a href="/stickers#video-stickers-and-emoji">here »</a> for tips on how to create the perfect video sticker, and <a href="#creating-stickersets">here »</a> for info on how to upload it using the API.</p>
+<h4><a class="anchor" href="#sticker-previews" id="sticker-previews" name="sticker-previews"><i class="anchor-icon"></i></a>Sticker previews</h4>
+<p>Like all files, stickers have a set of previews that should be handled as described in the <a href="/api/files#image-thumbnail-types">file docs »</a>.</p>
 <h4><a class="anchor" href="#mask-stickers" id="mask-stickers" name="mask-stickers"><i class="anchor-icon"></i></a>Mask stickers</h4>
 <pre><code><a href='/constructor/inputStickeredMediaPhoto'>inputStickeredMediaPhoto</a>#4a992157 id:<a href='/type/InputPhoto'>InputPhoto</a> = <a href='/type/InputStickeredMedia'>InputStickeredMedia</a>;
 <a href='/constructor/inputStickeredMediaDocument'>inputStickeredMediaDocument</a>#438865b id:<a href='/type/InputDocument'>InputDocument</a> = <a href='/type/InputStickeredMedia'>InputStickeredMedia</a>;
@@ -123,7 +151,7 @@ This field is actually used to allow associating more than one emoji to a sticke
 <a href='/constructor/stickerSetFullCovered'>stickerSetFullCovered</a>#1aed5ee5 set:<a href='/type/StickerSet'>StickerSet</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; documents:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/StickerSetCovered'>StickerSetCovered</a>;</code></pre>
 <p>Certain parts of the API may return partial <a href="/type/StickerSetCovered">StickerSetCovered</a> constructors instead of full <a href="/constructor/document">document</a> constructors for every sticker in the set:</p>
 <ul>
-<li><a href="/constructor/stickerSetCovered">stickerSetCovered</a> - Contains generic info about a stickerset and <em>one</em> preview sticker</li>
+<li><a href="/constructor/stickerSetCovered">stickerSetCovered</a> - Contains generic info about a stickerset and one preview sticker</li>
 <li><a href="/constructor/stickerSetMultiCovered">stickerSetMultiCovered</a> - Contains generic info about a stickerset and multiple preview stickers</li>
 <li><a href="/constructor/stickerSetFullCovered">stickerSetFullCovered</a> - Contains generic info about a stickerset and all stickers in the set (not just a preview): currently only used for <a href="/api/custom-emoji">custom emoji stickersets</a>, to avoid a further call to <a href="/method/messages.getStickerSet">messages.getStickerSet</a>.</li>
 </ul>
