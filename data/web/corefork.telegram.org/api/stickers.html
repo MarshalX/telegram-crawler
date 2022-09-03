@@ -232,8 +232,60 @@ This field is actually used to allow associating more than one emoji to a sticke
 
 <a href='/method/messages.getFeaturedEmojiStickers'>messages.getFeaturedEmojiStickers</a>#ecf6736 hash:<a href='/type/long'>long</a> = <a href='/type/messages.FeaturedStickers'>messages.FeaturedStickers</a>;</code></pre>
 <p>Telegram showcases a set of featured stickers: they can be fetched using <a href="/method/messages.getFeaturedStickers">messages.getFeaturedStickers</a> or <a href="/method/messages.getFeaturedEmojiStickers">messages.getFeaturedEmojiStickers</a>, for <a href="/api/custom-emojis">custom emojis</a>.  </p>
+<p>Clients should preload featured stickers on startup according to the value of the <code>preload_featured_stickers</code> <a href="/constructor/config">configuration parameter</a>.  </p>
 <p>The method also returns a set of unread <a href="/constructor/stickerSet">stickerSet</a> IDs in the <code>unread</code> field: use <a href="/method/messages.readFeaturedStickers">messages.readFeaturedStickers</a> to mark them as read: note that this will only affect the <code>unread</code> field, all stickersets will still be returned, unless you also <a href="/api/offsets#hash-generation">generate a <code>hash</code></a>.  </p>
 <p><a href="/method/messages.getOldFeaturedStickers">messages.getOldFeaturedStickers</a> can be used to fetch an extended list with even more featured stickersets, that were previously featured in the short list returned by <a href="/method/messages.getFeaturedStickers">messages.getFeaturedStickers</a>.  </p>
+<h3><a class="anchor" href="#favorite-stickers" id="favorite-stickers" name="favorite-stickers"><i class="anchor-icon"></i></a>Favorite stickers</h3>
+<pre><code><a href='/constructor/messages.favedStickersNotModified'>messages.favedStickersNotModified</a>#9e8fa6d3 = <a href='/type/messages.FavedStickers'>messages.FavedStickers</a>;
+<a href='/constructor/messages.favedStickers'>messages.favedStickers</a>#2cb51097 hash:<a href='/type/long'>long</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.FavedStickers'>messages.FavedStickers</a>;
+
+---functions---
+
+<a href='/method/messages.faveSticker'>messages.faveSticker</a>#b9ffc55b id:<a href='/type/InputDocument'>InputDocument</a> unfave:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/messages.getFavedStickers'>messages.getFavedStickers</a>#4f1aaa9 hash:<a href='/type/long'>long</a> = <a href='/type/messages.FavedStickers'>messages.FavedStickers</a>;</code></pre>
+<p>A stickerset can be faved or unfaved using <a href="/method/messages.faveSticker">messages.faveSticker</a>.</p>
+<p>Favorited stickers can be fetched using <a href="/method/messages.getFavedStickers">messages.getFavedStickers</a>: note that this method returns a set of <a href="#stickerset-previews">stickerset previews »</a>.</p>
+<p>Users can fave only a certain number of stickersets, as specified by the following <a href="/api/config#client-configuration">configuration</a> parameters:</p>
+<ul>
+<li>Premium users can fave a total of <code>stickers_faved_limit_premium</code> stickersets.  </li>
+<li>Non-Premium users can fave a total of <code>stickers_faved_limit_default</code> stickersets.  </li>
+</ul>
+<h3><a class="anchor" href="#recent-stickers" id="recent-stickers" name="recent-stickers"><i class="anchor-icon"></i></a>Recent stickers</h3>
+<pre><code><a href='/constructor/messages.recentStickersNotModified'>messages.recentStickersNotModified</a>#b17f890 = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
+<a href='/constructor/messages.recentStickers'>messages.recentStickers</a>#88d37c56 hash:<a href='/type/long'>long</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; dates:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
+
+---functions---
+
+<a href='/method/messages.saveRecentSticker'>messages.saveRecentSticker</a>#392718f8 flags:<a href='/type/%23'>#</a> attached:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputDocument'>InputDocument</a> unsave:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/messages.getRecentStickers'>messages.getRecentStickers</a>#9da9403b flags:<a href='/type/%23'>#</a> attached:flags.0?<a href='/constructor/true'>true</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
+<a href='/method/messages.clearRecentStickers'>messages.clearRecentStickers</a>#8999602d flags:<a href='/type/%23'>#</a> attached:flags.0?<a href='/constructor/true'>true</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>After using a sticker in a message, clients should invoke <a href="/method/messages.saveRecentSticker">messages.saveRecentSticker</a> (normal and <a href="/api/masks">mask</a> stickers only, mask stickers should set the <code>attached</code> flag).  </p>
+<p>A sticker can be then removed from the recent stickers list using <a href="/method/messages.saveRecentSticker">messages.saveRecentSticker</a> with <code>unsave=true</code>; the entire list can be cleared using <a href="/method/messages.clearRecentStickers">messages.clearRecentStickers</a>.  </p>
+<p>Use <a href="/method/messages.getRecentStickers">messages.getRecentStickers</a> to fetch the recent stickers list.</p>
+<p>Users can add only a certain number of recent stickers, according to the value of the <code>stickers_recent_limit</code> <a href="/constructor/config">configuration parameter</a>.  </p>
+<h3><a class="anchor" href="#sticker-suggestions" id="sticker-suggestions" name="sticker-suggestions"><i class="anchor-icon"></i></a>Sticker suggestions</h3>
+<pre><code><a href='/constructor/messages.stickersNotModified'>messages.stickersNotModified</a>#f1749a22 = <a href='/type/messages.Stickers'>messages.Stickers</a>;
+<a href='/constructor/messages.stickers'>messages.stickers</a>#30a6ec7e hash:<a href='/type/long'>long</a> stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.Stickers'>messages.Stickers</a>;
+
+---functions---
+
+<a href='/method/messages.getStickers'>messages.getStickers</a>#d5a5d3a1 emoticon:<a href='/type/string'>string</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.Stickers'>messages.Stickers</a>;</code></pre>
+<p>Clients should show a popup with a list of suggested stickers and <a href="/api/custom-emojis">custom emojis</a> when the user enters an emoji in the text bar.  </p>
+<p>If the <code>stickers_emoji_suggest_only_api</code> <a href="/api/config#client-configuration">app configuration parameter</a> is set to true, clients must invoke <a href="/method/messages.getStickers">messages.getStickers</a> to fetch a list of suggested stickers for the emoji.<br>
+The <code>stickers_emoji_cache_time</code> specifies the validity period of the local cache of messages.getStickers, also relevant when generating the pagination hash when invoking the method.  </p>
+<p>Otherwise, the following local logic should be used.  </p>
+<ul>
+<li>Construct two lists of recently used stickers, matching the emoji:<ul>
+<li>List <strong>a</strong>) Contains all non-Premium stickers.</li>
+<li>List <strong>b</strong>) Contains all Premium stickers.  </li>
+</ul>
+</li>
+<li>The final suggested sticker list <strong>c</strong> is composed as follows:<ul>
+<li>If the user doesn't have a Premium subscription: all stickers from <strong>a</strong>, followed by <code>stickers_premium_by_emoji_num</code> stickers from <strong>b</strong>.</li>
+<li>If the user has a Premium subscription: <code>stickers_normal_by_emoji_per_premium_num</code> stickers from <strong>a</strong>, followed by 1 sticker from <strong>b</strong>, and so on until both lists are empty.</li>
+</ul>
+</li>
+</ul>
 <h3><a class="anchor" href="#archived-stickers" id="archived-stickers" name="archived-stickers"><i class="anchor-icon"></i></a>Archived stickers</h3>
 <pre><code><a href='/constructor/messages.archivedStickers'>messages.archivedStickers</a>#4fcba9c8 count:<a href='/type/int'>int</a> sets:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerSetCovered'>StickerSetCovered</a>&gt; = <a href='/type/messages.ArchivedStickers'>messages.ArchivedStickers</a>;
 
@@ -245,41 +297,7 @@ This field is actually used to allow associating more than one emoji to a sticke
 <a href='/method/messages.getArchivedStickers'>messages.getArchivedStickers</a>#57f17692 flags:<a href='/type/%23'>#</a> masks:flags.0?<a href='/constructor/true'>true</a> emojis:flags.1?<a href='/constructor/true'>true</a> offset_id:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> = <a href='/type/messages.ArchivedStickers'>messages.ArchivedStickers</a>;</code></pre>
 <p>One or more stickersets can be archived (or unarchived) using <a href="/method/messages.installStickerSet">messages.installStickerSet</a> with <code>archived=true|false</code>, or <a href="/method/messages.toggleStickerSets">messages.toggleStickerSets</a> with either the <code>archive</code> or <code>unarchive</code> flag.  </p>
 <p>An unused stickerset may also be automatically archived when <a href="#installing-stickers">installing new stickersets</a>.</p>
-<p>Archived stickers are not returned by <a href="/method/messages.getAllStickers">messages.getAllStickers</a> and can only be fetched using <a href="/method/messages.getArchivedStickers">messages.getArchivedStickers</a>: note that this method returns a set of <a href="#stickerset-previews">stickerset previews »</a>.</p>
-<h3><a class="anchor" href="#recent-stickers" id="recent-stickers" name="recent-stickers"><i class="anchor-icon"></i></a>Recent stickers</h3>
-<pre><code><a href='/constructor/messages.recentStickersNotModified'>messages.recentStickersNotModified</a>#b17f890 = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
-<a href='/constructor/messages.recentStickers'>messages.recentStickers</a>#88d37c56 hash:<a href='/type/long'>long</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; dates:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
-
----functions---
-
-<a href='/method/messages.saveRecentSticker'>messages.saveRecentSticker</a>#392718f8 flags:<a href='/type/%23'>#</a> attached:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputDocument'>InputDocument</a> unsave:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/messages.getRecentStickers'>messages.getRecentStickers</a>#9da9403b flags:<a href='/type/%23'>#</a> attached:flags.0?<a href='/constructor/true'>true</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.RecentStickers'>messages.RecentStickers</a>;
-<a href='/method/messages.clearRecentStickers'>messages.clearRecentStickers</a>#8999602d flags:<a href='/type/%23'>#</a> attached:flags.0?<a href='/constructor/true'>true</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
-<h3><a class="anchor" href="#favorite-stickers" id="favorite-stickers" name="favorite-stickers"><i class="anchor-icon"></i></a>Favorite stickers</h3>
-<pre><code><a href='/constructor/messages.favedStickersNotModified'>messages.favedStickersNotModified</a>#9e8fa6d3 = <a href='/type/messages.FavedStickers'>messages.FavedStickers</a>;
-<a href='/constructor/messages.favedStickers'>messages.favedStickers</a>#2cb51097 hash:<a href='/type/long'>long</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.FavedStickers'>messages.FavedStickers</a>;
-
----functions---
-
-<a href='/method/messages.faveSticker'>messages.faveSticker</a>#b9ffc55b id:<a href='/type/InputDocument'>InputDocument</a> unfave:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/messages.getFavedStickers'>messages.getFavedStickers</a>#4f1aaa9 hash:<a href='/type/long'>long</a> = <a href='/type/messages.FavedStickers'>messages.FavedStickers</a>;</code></pre>
-<p>A stickerset can be faved or unfaved using <a href="/method/messages.faveSticker">messages.faveSticker</a>.</p>
-<p>Favorited stickers can be fetched using <a href="/method/messages.getFavedStickers">messages.getFavedStickers</a>: note that this method returns a set of <a href="#stickerset-previews">stickerset previews »</a>.</p>
-<h3><a class="anchor" href="#sticker-suggestions" id="sticker-suggestions" name="sticker-suggestions"><i class="anchor-icon"></i></a>Sticker suggestions</h3>
-<pre><code><a href='/constructor/messages.stickersNotModified'>messages.stickersNotModified</a>#f1749a22 = <a href='/type/messages.Stickers'>messages.Stickers</a>;
-<a href='/constructor/messages.stickers'>messages.stickers</a>#30a6ec7e hash:<a href='/type/long'>long</a> stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.Stickers'>messages.Stickers</a>;
-
----functions---
-
-<a href='/method/messages.getStickers'>messages.getStickers</a>#d5a5d3a1 emoticon:<a href='/type/string'>string</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.Stickers'>messages.Stickers</a>;</code></pre>
-<ul>
-<li><code>stickers_premium_by_emoji_num</code> - Defines how many premium stickers to show in the sticker suggestion popup when entering an emoji into the text field, see the <a href="/api/stickers">sticker docs for more info</a> (integer, defaults to 0):<ul>
-<li>For non-Premium users, the suggested sticker list should have at most this many premium stickers at the end. </li>
-<li>For Premium users, the suggested sticker list should have at most this many premium stickers, ordered as specified by the <code>stickers_normal_by_emoji_per_premium_num</code> field.</li>
-</ul>
-</li>
-<li><code>stickers_normal_by_emoji_per_premium_num</code> - For Premium users, the sticker suggestion popup should show this many normal stickers, then o (integer, defaults to 2)</li>
-</ul></div>
+<p>Archived stickers are not returned by <a href="/method/messages.getAllStickers">messages.getAllStickers</a> and can only be fetched using <a href="/method/messages.getArchivedStickers">messages.getArchivedStickers</a>: note that this method returns a set of <a href="#stickerset-previews">stickerset previews »</a>.</p></div>
   
 </div>
           
