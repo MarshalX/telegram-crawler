@@ -218,7 +218,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
 async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.ClientSession):
     # TODO fetch version automatically
     # ref: https://docs.github.com/en/rest/releases/releases#get-the-latest-release
-    version = '9.0.24102'
+    version = '8.9.1'
 
     download_url = f'https://github.com/MarshalX/decrypted-telegram-ios/releases/download/{version}/Telegram-{version}.ipa'
     tool_download_url = 'https://github.com/MarshalX/acextract/releases/download/3.0/acextract'
@@ -679,8 +679,8 @@ async def start(mode: str):
             track_mtproto_methods(),
         )
         mode == 'client' and await asyncio.gather(
-            # download_telegram_android_beta_and_extract_resources(session),
-            # download_telegram_macos_beta_and_extract_resources(session),
+            download_telegram_android_beta_and_extract_resources(session),
+            download_telegram_macos_beta_and_extract_resources(session),
             download_telegram_ios_beta_and_extract_resources(session),
         )
 
