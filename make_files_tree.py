@@ -261,6 +261,7 @@ async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.Clie
 
     files_to_track = files_to_convert + [
         f'{resources_path}/_CodeSignature/CodeResources',
+        f'{resources_path}/SC_Info/Manifest.plist',
     ]
     await track_additional_files(files_to_track, client_folder_name, crawled_data_folder)
 
