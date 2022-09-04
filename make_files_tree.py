@@ -261,6 +261,7 @@ async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.Clie
 
     files_to_track = files_to_convert + [
         f'{resources_path}/_CodeSignature/CodeResources',
+        f'{resources_path}/SC_Info/Manifest.plist',
     ]
     await track_additional_files(files_to_track, client_folder_name, crawled_data_folder)
 
@@ -279,7 +280,7 @@ async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.Clie
 
     # .car crawler works only in macOS
     if 'darwin' not in platform.system().lower():
-        # cleanup1()
+        cleanup1()
         return
 
     path_to_car = os.path.join(resources_folder, assets_filename)
@@ -305,7 +306,7 @@ async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.Clie
             save_hash_only=True
         )
 
-    # cleanup2()
+    cleanup2()
 
 
 async def download_telegram_android_beta_and_extract_resources(session: aiohttp.ClientSession):
@@ -678,8 +679,8 @@ async def start(mode: str):
             track_mtproto_methods(),
         )
         mode == 'client' and await asyncio.gather(
-            # download_telegram_android_beta_and_extract_resources(session),
-            # download_telegram_macos_beta_and_extract_resources(session),
+            download_telegram_android_beta_and_extract_resources(session),
+            download_telegram_macos_beta_and_extract_resources(session),
             download_telegram_ios_beta_and_extract_resources(session),
         )
 
