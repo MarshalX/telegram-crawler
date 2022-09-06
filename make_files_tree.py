@@ -462,13 +462,15 @@ async def _fetch_and_track_mtproto(app, output_dir):
         'EmojiAppearAnimations',
         'EmojiCenterAnimations',
         'AnimatedEmojies',
-        #'AnimatedEmoji',
+        'EmojiGenericAnimations',
     }
 
     if app.test_mode:
         sticker_set_short_names.add('PremiumGifts')
+        sticker_set_short_names.add('StatusEmojiWhite')
     else:
         sticker_set_short_names.add('GiftsPremium')
+        sticker_set_short_names.add('StatusPack')
 
     for short_name in sticker_set_short_names:
         sticker_set = await app.invoke(functions.messages.GetStickerSet(
