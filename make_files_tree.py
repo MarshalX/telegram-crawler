@@ -499,8 +499,9 @@ async def _fetch_and_track_mtproto(app, output_dir):
         configs[f'peer/{peer_id}'] = peer
 
     configs['GetPremiumPromo'].users = []
-    configs['GetPremiumPromo'].currency = 'crawler'
-    configs['GetPremiumPromo'].monthly_amount = -1
+    configs['GetPremiumPromo'].status_text = 'crawler'
+    configs['GetPremiumPromo'].status_entities = []
+    configs['GetPremiumPromo'].period_options = []
 
     keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64'}
 
