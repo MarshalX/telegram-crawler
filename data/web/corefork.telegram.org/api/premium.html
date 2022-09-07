@@ -49,7 +49,25 @@
 <p>This page describes how should client apps handle Premium features: for a user-friendly overview of Telegram Premium features, see the <a href="https://telegram.org/faq_premium">Telegram Premium FAQ</a>.</p>
 </blockquote>
 <h3><a class="anchor" href="#subscribing-to-telegram-premium" id="subscribing-to-telegram-premium" name="subscribing-to-telegram-premium"><i class="anchor-icon"></i></a>Subscribing to Telegram Premium</h3>
-<p>Telegram </p></div>
+<p>Apps should implement a Telegram Premium modal, listing the Premium features contained in the <code>premium_promo_order</code> <a href="/api/config#client-configuration">app configuration parameter »</a>.  </p>
+<p>Here's how to pay for a Telegram Premium subscription, when the user clicks on the subscribe button:</p>
+<ul>
+<li>If the <code>premium_bot_username</code> field is set, call <a href="/method/messages.startBot">messages.startBot</a>, specifying the following parameters:<ul>
+<li><code>peer</code> and <code>bot</code>: The bot mentioned in <code>premium_bot_username</code></li>
+<li><code>start_param</code>: One of the following values:<ul>
+<li>If the user clicks on the subscribe button when viewing the promo page for a specific Premium feature, provide the feature identifier.</li>
+<li>If the user clicks on the subscribe button after hitting a limit that Telegram Premium raises, provide <code>double_limits</code></li>
+<li>If the user clicks on the subscribe button from the Telegram Premium button in the settings, provide <code>settings</code></li>
+<li>If the user clicks on the subscribe button from the Telegram Premium star in a profile page, provide <code>profile</code>
+Then, when the user clicks on the subscribe button in the sent invoice, follow the <a href="/api/payments">usual payment flow for message invoices</a>.  </li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Otherwise, if the <code>premium_invoice_slug</code> field is set, handle the payment as you would handle a <code>t.me/$premium_invoice_slug</code> <a href="/api/links#invoice-links">invoice deep link</a>.</li>
+</ul>
+<h3><a class="anchor" href="#blocked-telegram-premium" id="blocked-telegram-premium" name="blocked-telegram-premium"><i class="anchor-icon"></i></a>Blocked Telegram Premium</h3>
+<p>If the <code>premium_purchase_blocked</code> <a href="/api/config#client-configuration">app configuration parameter</a> is set, the user can't purchase a Premium account, and all Telegram Premium features must be hidden (like the stars of Premium users, Telegram Premium purchase buttons, and so on).  </p></div>
   
 </div>
           
