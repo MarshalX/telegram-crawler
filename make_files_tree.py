@@ -659,7 +659,7 @@ async def _collect_and_track_all_translation_keys():
 
     start_folder = 'en/'
     file_format = '.json'
-    output_filename = 'global.json'
+    output_filename = 'translation_keys.json'
 
     for root, folder, files in os.walk(OUTPUT_TRANSLATIONS_FOLDER):
         for file in files:
