@@ -654,8 +654,41 @@ async def crawl_web_res(session: aiohttp.ClientSession):
     await _crawl_web(session, INPUT_RES_FILENAME, OUTPUT_RESOURCES_FOLDER)
 
 
+async def _collect_and_track_all_translation_keys():
+    translations = dict()
+
+    start_folder = 'en/'
+    file_format = '.json'
+    output_filename = 'global.json'
+
+    for root, folder, files in os.walk(OUTPUT_TRANSLATIONS_FOLDER):
+        for file in files:
+            if not file.endswith(file_format) or file == output_filename:
+                continue
+
+            async with aiofiles.open(os.path.join(root, file)) as f:
+                content = json.loads(await f.read())
+
+                client = root[root.index(start_folder) + len(start_folder):]
+                category = file.replace(file_format, '')
+
+                if client not in translations:
+                    translations[client] = dict()
+
+                translations[client][category] = sorted(content.keys())
+
+    for client in translations.keys():
+        translations[client] = dict(sorted(translations[client].items()))
+
+    translations = dict(sorted(translations.items()))
+
+    async with aiofiles.open(os.path.join(OUTPUT_TRANSLATIONS_FOLDER, output_filename), 'w', encoding='utf-8') as f:
+        await f.write(json.dumps(translations, indent=4))
+
+
 async def crawl_web_tr(session: aiohttp.ClientSession):
     await _crawl_web(session, INPUT_TR_FILENAME, OUTPUT_TRANSLATIONS_FOLDER)
+    await _collect_and_track_all_translation_keys()
 
 
 async def start(mode: str):
