@@ -48,8 +48,55 @@
 <blockquote>
 <p>This page describes how should client apps handle Premium features: for a user-friendly overview of Telegram Premium features, see the <a href="https://telegram.org/faq_premium">Telegram Premium FAQ</a>.</p>
 </blockquote>
+<h3><a class="anchor" href="#telegram-premium-features" id="telegram-premium-features" name="telegram-premium-features"><i class="anchor-icon"></i></a>Telegram Premium features</h3>
+<pre><code><a href='/constructor/inputUserSelf'>inputUserSelf</a>#f7c1b13f = <a href='/type/InputUser'>InputUser</a>;
+
+<a href='/constructor/user'>user</a>#3ff6ecb0 flags:<a href='/type/%23'>#</a> self:flags.10?<a href='/constructor/true'>true</a> contact:flags.11?<a href='/constructor/true'>true</a> mutual_contact:flags.12?<a href='/constructor/true'>true</a> deleted:flags.13?<a href='/constructor/true'>true</a> bot:flags.14?<a href='/constructor/true'>true</a> bot_chat_history:flags.15?<a href='/constructor/true'>true</a> bot_nochats:flags.16?<a href='/constructor/true'>true</a> verified:flags.17?<a href='/constructor/true'>true</a> restricted:flags.18?<a href='/constructor/true'>true</a> min:flags.20?<a href='/constructor/true'>true</a> bot_inline_geo:flags.21?<a href='/constructor/true'>true</a> support:flags.23?<a href='/constructor/true'>true</a> scam:flags.24?<a href='/constructor/true'>true</a> apply_min_photo:flags.25?<a href='/constructor/true'>true</a> fake:flags.26?<a href='/constructor/true'>true</a> bot_attach_menu:flags.27?<a href='/constructor/true'>true</a> premium:flags.28?<a href='/constructor/true'>true</a> attach_menu_enabled:flags.29?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:flags.0?<a href='/type/long'>long</a> first_name:flags.1?<a href='/type/string'>string</a> last_name:flags.2?<a href='/type/string'>string</a> username:flags.3?<a href='/type/string'>string</a> phone:flags.4?<a href='/type/string'>string</a> photo:flags.5?<a href='/type/UserProfilePhoto'>UserProfilePhoto</a> status:flags.6?<a href='/type/UserStatus'>UserStatus</a> bot_info_version:flags.14?<a href='/type/int'>int</a> restriction_reason:flags.18?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; bot_inline_placeholder:flags.19?<a href='/type/string'>string</a> lang_code:flags.22?<a href='/type/string'>string</a> = <a href='/type/User'>User</a>;
+
+---functions---
+
+<a href='/method/help.getAppConfig'>help.getAppConfig</a>#98914110 = <a href='/type/JSONValue'>JSONValue</a>;
+<a href='/method/users.getUsers'>users.getUsers</a>#d91a548 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt;;</code></pre>
+<p>Telegram Premium offers a set of additional features and raised limits: info about them can be fetched using <a href="/method/%C4%A7elp.getAppConfig">ħelp.getAppConfig</a>, as described in the <a href="/api/config#client-configuration">client configuration page »</a>.<br>
+Use <a href="/method/users.getUsers">users.getUsers</a> with <a href="/constructor/inputUserSelf">inputUserSelf</a> to fetch info about the current subscription status from the <code>premium</code> flag of the returned <a href="/constructor/user">user</a> constructor.  </p>
+<p>The following fields are related to Telegram Premium, and clients should be aware of the current subscription status to eventually modify their behavior accordingly.  </p>
+<h4><a class="anchor" href="#promo-page" id="promo-page" name="promo-page"><i class="anchor-icon"></i></a>Promo page</h4>
+<p>Clients should show a Telegram Premium button in the settings.<br>
+Clicking on this button in the settings, clicking on the <a href="#star">star</a> of a Premium user or hitting one of the Premium limits listed below should open a Telegram Premium modal.<br>
+This modal should list the following Premium <a href="#telegram-premium-features">features</a> contained in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig field</a>, and presented in the order dynamically specified by the appConfig.  </p>
+<p>Note that whenever config keys end with a <code>*</code> in the following list, the <code>*</code> should be replaced with <code>default</code> or <code>premium</code>, to fetch the appropriate limit value for normal and Premium users.</p>
+<ul>
+<li><code>double_limits</code> - Clicking on this entry should open a secondary popup with a list of the following improved Premium limits.<br>
+What follows is a list of <a href="/api/config#client-configuration">appConfig integer config parameters</a>, containing the non-Premium (<code>default</code>) and the Premium (<code>premium</code>) limit.  <ul>
+<li><code>channels_limit_*</code> - The maximum number of <a href="/api/channel">channels and supergroups</a> a user may join</li>
+<li><code>saved_gifs_limit_*</code> - The maximum number of GIFs a user may save</li>
+<li><code>stickers_faved_limit_*</code> - The maximum number of stickers a user may <a href="/api/stickers#favorite-stickers">add to favorites »</a></li>
+<li><code>dialog_filters_limit_*</code> - The maximum number of <a href="/api/folders">folders</a> a user may create</li>
+<li><code>dialog_filters_chats_*</code> - The maximum number of chats a user may add to a <a href="/api/folders">folder</a></li>
+<li><code>dialogs_pinned_limit_*</code> - The maximum number of chats a user may pin</li>
+<li><code>dialogs_folder_pinned_limit_*</code> - The maximum number of chats a user may pin in a folder</li>
+<li><code>channels_public_limit_*</code> - The maximum number of public <a href="/api/channel">channels or supergroups</a> a user may create</li>
+<li><code>caption_length_limit_*</code> - The maximum UTF-8 length of media captions</li>
+<li><code>about_length_limit_*</code> - The maximum UTF-8 length of user bios</li>
+</ul>
+</li>
+<li><code>more_upload</code> - Premium users can upload bigger files, as specified by the <code>upload_max_fileparts_*</code> config keys (integer, indicates the number of 512kb file parts, so the size in bytes is determined by multiplying by <code>524288</code>)</li>
+<li><code>faster_download</code> - Premium users have no download speed limits</li>
+<li><code>voice_to_text</code> - Premium users can <a href="/api/transcribe">transcribe voice messages</a></li>
+<li><code>no_ads</code> - Premium users see no <a href="/api/sponsored-messages">sponsored messages</a></li>
+<li><code>unique_reactions</code> - Premium users have access to more <a href="/api/reactions">message reactions</a></li>
+<li><code>premimum_stickers</code> - Premium users have access to premium <a href="/api/stickers">stickersets</a></li>
+<li><code>animated_emoji</code> - Premium users can send custom <a href="/api/custom-emoji">animated emojis</a></li>
+<li><code>advanced_chat_management</code> - Premium users can <a href="/api/folders">reorder the default folder</a>, auto-archive and hide new chats from non-contacts</li>
+<li><code>profile_badge</code> - Premium users have a <a href="#badge">badge</a> next to their name, showing that they are helping support Telegram</li>
+<li><code>animated_userpics</code> - <a href="/api/files#animated-profile-pictures">Animated profile pictures</a> of Premium users will play in-chat and when browsing the dialog list</li>
+<li><code>app_icons</code> - Premium users can change the default icon of the Telegram app</li>
+</ul>
+<h4><a class="anchor" href="#badge" id="badge" name="badge"><i class="anchor-icon"></i></a>Badge</h4>
+<p>Users with a Telegram Premium subscription (<a href="/constructor/user">user</a>.<code>premium</code> is set) should have a Telegram Premium badge next to their name.  </p>
+<h4><a class="anchor" href="#sticker-suggestions" id="sticker-suggestions" name="sticker-suggestions"><i class="anchor-icon"></i></a>Sticker suggestions</h4>
+<p>The suggested sticker selection logic is slightly different for Premium users, see <a href="/api/stickers#sticker-suggestions">here for more info »</a>.</p>
 <h3><a class="anchor" href="#subscribing-to-telegram-premium" id="subscribing-to-telegram-premium" name="subscribing-to-telegram-premium"><i class="anchor-icon"></i></a>Subscribing to Telegram Premium</h3>
-<p>Apps should implement a Telegram Premium modal, listing the Premium features contained in the <code>premium_promo_order</code> <a href="/api/config#client-configuration">app configuration parameter »</a>.  </p>
 <p>Here's how to pay for a Telegram Premium subscription, when the user clicks on the subscribe button:</p>
 <ul>
 <li>If the <code>premium_bot_username</code> field is set, call <a href="/method/messages.startBot">messages.startBot</a>, specifying the following parameters:<ul>
