@@ -61,9 +61,24 @@
 Use <a href="/method/users.getUsers">users.getUsers</a> with <a href="/constructor/inputUserSelf">inputUserSelf</a> to fetch info about the current subscription status from the <code>premium</code> flag of the returned <a href="/constructor/user">user</a> constructor.  </p>
 <p>The following fields are related to Telegram Premium, and clients should be aware of the current subscription status to eventually modify their behavior accordingly.  </p>
 <h4><a class="anchor" href="#promo-page" id="promo-page" name="promo-page"><i class="anchor-icon"></i></a>Promo page</h4>
+<pre><code><a href='/constructor/help.premiumPromo'>help.premiumPromo</a>#8a4f3c29 status_text:<a href='/type/string'>string</a> status_entities:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; video_sections:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; videos:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; currency:<a href='/type/string'>string</a> monthly_amount:<a href='/type/long'>long</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/help.PremiumPromo'>help.PremiumPromo</a>;
+
+---functions---
+
+<a href='/method/help.getPremiumPromo'>help.getPremiumPromo</a>#b81b93d4 = <a href='/type/help.PremiumPromo'>help.PremiumPromo</a>;
+<a href='/method/help.getAppConfig'>help.getAppConfig</a>#98914110 = <a href='/type/JSONValue'>JSONValue</a>;</code></pre>
 <p>Clients should show a Telegram Premium button in the settings.<br>
-Clicking on this button in the settings, clicking on the <a href="#badge">badge</a> of a Premium user or hitting one of the Premium limits listed below should open a Telegram Premium modal.<br>
-This modal should list the following Premium <a href="#telegram-premium-features">features</a> contained in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig field</a>, and presented in the order dynamically specified by the appConfig.  </p>
+Clicking on this button in the settings, clicking on the <a href="#badge">badge</a> of a Premium user or hitting one of the Premium limits listed below should open a Telegram Premium modal.  </p>
+<p>This modal should list the Premium <a href="#feature-identifiers">features</a> contained in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig field</a>, and presented in the order dynamically specified by the appConfig.<br>
+<a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> must also be called, to fetch a list of promotional videos to show when clicking on a Premium feature row, and the current subscription status, to be shown in the header of the modal:</p>
+<ul>
+<li><code>status_text</code>+<code>status_entities</code>+<code>users</code> - Contain the current subscription status (with associated <a href="/api/entities">styled text entities and mentions</a>)</li>
+<li><code>video</code>+<code>video_sections</code> - Contain a list of videos, and the corresponding <a href="#feature-identifiers">premium feature identifiers</a>.</li>
+<li><code>currency</code> - Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code</li>
+<li><code>monthly_amount</code> - Monthly price of the product in the smallest units of the currency (integer, not float/double). For example, for a price of <code>US$ 1.45</code> pass <code>amount = 145</code>. See the exp parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</li>
+</ul>
+<h5><a class="anchor" href="#feature-identifiers" id="feature-identifiers" name="feature-identifiers"><i class="anchor-icon"></i></a>Feature identifiers</h5>
+<p>This list contains the feature identifiers returned in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig array field</a>.</p>
 <p>Note that whenever config keys end with a <code>*</code> in the following list, the <code>*</code> should be replaced with <code>default</code> or <code>premium</code>, to fetch the appropriate limit value for normal and Premium users.</p>
 <ul>
 <li><code>double_limits</code> - Clicking on this entry should open a secondary popup with a list of the following improved Premium limits.<br>
@@ -97,8 +112,15 @@ What follows is a list of <a href="/api/config#client-configuration">appConfig i
 <h4><a class="anchor" href="#sticker-suggestions" id="sticker-suggestions" name="sticker-suggestions"><i class="anchor-icon"></i></a>Sticker suggestions</h4>
 <p>The suggested sticker selection logic is slightly different for Premium users, see <a href="/api/stickers#sticker-suggestions">here for more info »</a>.</p>
 <h3><a class="anchor" href="#subscribing-to-telegram-premium" id="subscribing-to-telegram-premium" name="subscribing-to-telegram-premium"><i class="anchor-icon"></i></a>Subscribing to Telegram Premium</h3>
-<p>Here's how to pay for a Telegram Premium subscription, when the user clicks on the subscribe button:</p>
+<pre><code><a href='/constructor/inputStorePaymentPremiumSubscription'>inputStorePaymentPremiumSubscription</a>#a6751e66 flags:<a href='/type/%23'>#</a> restore:flags.0?<a href='/constructor/true'>true</a> = <a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a>;
+
+---functions---
+
+<a href='/method/payments.canPurchasePremium'>payments.canPurchasePremium</a>#9fc19eb6 purpose:<a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/messages.startBot'>messages.startBot</a>#e6df7378 bot:<a href='/type/InputUser'>InputUser</a> peer:<a href='/type/InputPeer'>InputPeer</a> random_id:<a href='/type/long'>long</a> start_param:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Here's how to activate a Telegram Premium subscription, when the user clicks on the subscribe button:</p>
 <ul>
+<li>Before doing anything, call <a href="/method/payments.canPurchasePremium">payments.canPurchasePremium</a>, specifying <a href="/constructor/inputStorePaymentPremiumSubscription">inputStorePaymentPremiumSubscription</a></li>
 <li>If the <code>premium_bot_username</code> field is set, call <a href="/method/messages.startBot">messages.startBot</a>, specifying the following parameters:<ul>
 <li><code>peer</code> and <code>bot</code>: The bot mentioned in <code>premium_bot_username</code></li>
 <li><code>start_param</code>: One of the following values:<ul>
@@ -113,6 +135,7 @@ Then, when the user clicks on the subscribe button in the sent invoice, follow t
 </li>
 <li>Otherwise, if the <code>premium_invoice_slug</code> field is set, handle the payment as you would handle a <code>t.me/$premium_invoice_slug</code> <a href="/api/links#invoice-links">invoice deep link</a>.</li>
 </ul>
+<h3><a class="anchor" href="#gifting-telegram-premium" id="gifting-telegram-premium" name="gifting-telegram-premium"><i class="anchor-icon"></i></a>Gifting Telegram Premium.</h3>
 <h3><a class="anchor" href="#blocked-telegram-premium" id="blocked-telegram-premium" name="blocked-telegram-premium"><i class="anchor-icon"></i></a>Blocked Telegram Premium</h3>
 <p>If the <code>premium_purchase_blocked</code> <a href="/api/config#client-configuration">app configuration parameter</a> is set, the user can't purchase a Premium account, and all Telegram Premium features must be hidden (like the stars of Premium users, Telegram Premium purchase buttons, and so on).  </p></div>
   
