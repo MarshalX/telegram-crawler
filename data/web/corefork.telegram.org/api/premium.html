@@ -109,6 +109,8 @@ What follows is a list of <a href="/api/config#client-configuration">appConfig i
 </ul>
 <h4><a class="anchor" href="#badge" id="badge" name="badge"><i class="anchor-icon"></i></a>Badge</h4>
 <p>Users with a Telegram Premium subscription (<a href="/constructor/user">user</a>.<code>premium</code> is set) should have a Telegram Premium badge next to their name.  </p>
+<h4><a class="anchor" href="#animated-profile-pictures" id="animated-profile-pictures" name="animated-profile-pictures"><i class="anchor-icon"></i></a>Animated profile pictures</h4>
+<p>The <a href="/api/files#animated-profile-pictures">animated profile pictures</a> of Premium users should play inside of chats and dialog lists, and not just when opening the profile page.</p>
 <h4><a class="anchor" href="#sticker-suggestions" id="sticker-suggestions" name="sticker-suggestions"><i class="anchor-icon"></i></a>Sticker suggestions</h4>
 <p>The suggested sticker selection logic is slightly different for Premium users, see <a href="/api/stickers#sticker-suggestions">here for more info »</a>.</p>
 <h3><a class="anchor" href="#subscribing-to-telegram-premium" id="subscribing-to-telegram-premium" name="subscribing-to-telegram-premium"><i class="anchor-icon"></i></a>Subscribing to Telegram Premium</h3>
@@ -128,7 +130,16 @@ Then, when the user clicks on the subscribe button in the sent invoice, follow t
 </li>
 <li>Otherwise, if the <code>premium_invoice_slug</code> field is set, handle the payment as you would handle a <code>t.me/$premium_invoice_slug</code> <a href="/api/links#invoice-links">invoice deep link</a>.</li>
 </ul>
-<h3><a class="anchor" href="#gifting-telegram-premium" id="gifting-telegram-premium" name="gifting-telegram-premium"><i class="anchor-icon"></i></a>Gifting Telegram Premium.</h3>
+<h3><a class="anchor" href="#gifting-telegram-premium" id="gifting-telegram-premium" name="gifting-telegram-premium"><i class="anchor-icon"></i></a>Gifting Telegram Premium</h3>
+<pre><code><a href='/constructor/userFull'>userFull</a>#c4b1fc3f flags:<a href='/type/%23'>#</a> blocked:flags.0?<a href='/constructor/true'>true</a> phone_calls_available:flags.4?<a href='/constructor/true'>true</a> phone_calls_private:flags.5?<a href='/constructor/true'>true</a> can_pin_message:flags.7?<a href='/constructor/true'>true</a> has_scheduled:flags.12?<a href='/constructor/true'>true</a> video_calls_available:flags.13?<a href='/constructor/true'>true</a> voice_messages_forbidden:flags.20?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> about:flags.1?<a href='/type/string'>string</a> settings:<a href='/type/PeerSettings'>PeerSettings</a> profile_photo:flags.2?<a href='/type/Photo'>Photo</a> notify_settings:<a href='/type/PeerNotifySettings'>PeerNotifySettings</a> bot_info:flags.3?<a href='/type/BotInfo'>BotInfo</a> pinned_msg_id:flags.6?<a href='/type/int'>int</a> common_chats_count:<a href='/type/int'>int</a> folder_id:flags.11?<a href='/type/int'>int</a> ttl_period:flags.14?<a href='/type/int'>int</a> theme_emoticon:flags.15?<a href='/type/string'>string</a> private_forward_name:flags.16?<a href='/type/string'>string</a> bot_group_admin_rights:flags.17?<a href='/type/ChatAdminRights'>ChatAdminRights</a> bot_broadcast_admin_rights:flags.18?<a href='/type/ChatAdminRights'>ChatAdminRights</a> premium_gifts:flags.19?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PremiumGiftOption'>PremiumGiftOption</a>&gt; = <a href='/type/UserFull'>UserFull</a>;
+
+<a href='/constructor/premiumGiftOption'>premiumGiftOption</a>#74c34319 flags:<a href='/type/%23'>#</a> months:<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> bot_url:<a href='/type/string'>string</a> store_product:flags.0?<a href='/type/string'>string</a> = <a href='/type/PremiumGiftOption'>PremiumGiftOption</a>;
+
+---functions---
+
+<a href='/method/users.getFullUser'>users.getFullUser</a>#b60f5918 id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.UserFull'>users.UserFull</a>;</code></pre>
+<p>If after calling <a href="/method/users.getFullUser">users.getFullUser</a> the resulting <a href="/constructor/userFull">userFull</a> constructor has one or more <a href="/constructor/premiumGiftOption">premiumGiftOptions</a> in the <code>premium_gifts</code> field, we can gift a Telegram Premium subscription to this user.  </p>
+<p>The <a href="/constructor/premiumGiftOption">premiumGiftOption</a> constructors contain an ordered list of Premium gift offers with discounts over the base price: to process the gift payment open the <a href="/api/links">deep link</a> contained in the <code>bot_url</code> field.  </p>
 <h3><a class="anchor" href="#blocked-telegram-premium" id="blocked-telegram-premium" name="blocked-telegram-premium"><i class="anchor-icon"></i></a>Blocked Telegram Premium</h3>
 <p>If the <code>premium_purchase_blocked</code> <a href="/api/config#client-configuration">app configuration parameter</a> is set, the user can't purchase a Premium account, and all Telegram Premium features must be hidden (like the stars of Premium users, Telegram Premium purchase buttons, and so on).  </p></div>
   
