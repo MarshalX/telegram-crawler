@@ -178,7 +178,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
     await track_additional_files(files_to_track, client_folder_name, crawled_data_folder, 'utf-16')
 
     _, _, hash_of_files_to_track = next(os.walk(f'{client_folder_name}/{resources_path}'))
-    hash_of_files_to_track = [f'{resources_path}/{i}' for i in hash_of_files_to_track]
+    hash_of_files_to_track = [f'{resources_path}/{i}' for i in hash_of_files_to_track if i != assets_filename]
     await track_additional_files(hash_of_files_to_track, client_folder_name, crawled_data_folder, save_hash_only=True)
 
     def cleanup1():
