@@ -76,7 +76,48 @@ Clients should display the correct dice animated sticker for the specified value
         }
     }</code></pre>
 <p>For each of the dice emojis, a maximum "winning" value is specified, along with the frame number at which to show the fireworks <img class="emoji" src="//telegram.org/img/emoji/40/F09F8E86.png" width="20" height="20" alt="🎆" />.<br>
-Please note that dice animated stickers should loop only once, right after being sent/received <strong>for the first time</strong>; clicking on the dice sticker should bring up a popup, inviting the user to send a new dice of the same type.  </p></div>
+Please note that dice animated stickers should loop only once, right after being sent/received <strong>for the first time</strong>; clicking on the dice sticker should bring up a popup, inviting the user to send a new dice of the same type.  </p>
+<h3><a class="anchor" href="#slot-machine" id="slot-machine" name="slot-machine"><i class="anchor-icon"></i></a>Slot machine</h3>
+<p>Slot machine <img class="emoji" src="//telegram.org/img/emoji/40/F09F8EB0.png" width="20" height="20" alt="🎰" /> dice stickers are implemented a bit differently: the <code>value</code> isn't used to directly index the stickers array, but is instead used as follows.  </p>
+<p>The <code>value</code> is composed of three 2-bit values, each indicating the animated sticker to show in the three slots (left, center, right), incremented by one.  </p>
+<p>The <code>stickers</code> array is composed as follows:</p>
+<ul>
+<li>0 =&gt; Slot machine background</li>
+<li>1 =&gt; Slot machine winning background, to show after a winning spin</li>
+<li>2 =&gt; Slot machine frame&amp;handle to play once at the beginning</li>
+<li>3 =&gt; Left slot winning 7</li>
+<li>4..7 =&gt; Left slot non-winning options</li>
+<li>8 =&gt; Left slot spinning animation</li>
+<li>9 =&gt; Center slot winning 7</li>
+<li>10..13 =&gt; Center slot non-winning options</li>
+<li>14 =&gt; Center slot spinning animation</li>
+<li>15 =&gt; Right slot winning 7</li>
+<li>16..19 =&gt; Right slot non-winning options</li>
+<li>20 =&gt; Right slot spinning animation</li>
+</ul>
+<p>How to play the animation (all involved stickers are to be directly overlaid on top of each other, no special placing is required):  </p>
+<ul>
+<li>Freeze single-frame background (<code>0</code>)</li>
+<li>Play handle animation (<code>2</code>) once</li>
+<li>Play the three spinning slots animations (<code>8</code>, <code>14</code>, <code>20</code>) once</li>
+<li>Play the three slot animations once, chosen as follows<ul>
+<li>If we're in a winning <code>value == 64</code>:<ul>
+<li>Left slot: choose <code>3</code></li>
+<li>Center slot: choose <code>9</code></li>
+<li>Right slot: choose <code>15</code></li>
+</ul>
+</li>
+<li>Otherwise, considering <code>map := [1, 2, 3, 0]</code>:<ul>
+<li>Left slot: choose <code>4 + map[(value-1) &amp; 3]</code></li>
+<li>Center slot: choose <code>10 + map[((value-1) &gt;&gt; 2) &amp; 3]</code></li>
+<li>Right slot: choose <code>16 + map[((value-1) &gt;&gt; 4) &amp; 3]</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>If we're in a winning <code>value=64</code>, replace the background (<code>0</code>) with <code>1</code>.</li>
+</ul>
+<p>Example implementation: <a href="https://github.com/telegramdesktop/tdesktop/blob/dev/Telegram/SourceFiles/history/view/media/history_view_slot_machine.cpp">tdesktop</a>.</p></div>
   
 </div>
           
