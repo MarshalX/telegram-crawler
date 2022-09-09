@@ -55,11 +55,9 @@
 
 ---functions---
 
-<a href='/method/help.getAppConfig'>help.getAppConfig</a>#98914110 = <a href='/type/JSONValue'>JSONValue</a>;
 <a href='/method/users.getUsers'>users.getUsers</a>#d91a548 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt;;</code></pre>
-<p>Telegram Premium offers a set of additional features and raised limits: info about them can be fetched using <a href="/method/help.getAppConfig">ħelp.getAppConfig</a>, as described in the <a href="/api/config#client-configuration">client configuration page »</a>.<br>
-Use <a href="/method/users.getUsers">users.getUsers</a> with <a href="/constructor/inputUserSelf">inputUserSelf</a> to fetch info about the current subscription status from the <code>premium</code> flag of the returned <a href="/constructor/user">user</a> constructor.  </p>
-<p>The following fields are related to Telegram Premium, and clients should be aware of the current subscription status to eventually modify their behavior accordingly.  </p>
+<p>Telegram Premium offers a set of additional features and raised limits: clients should be aware of the current subscription status to accordingly modify client behavior.  </p>
+<p>Use <a href="/method/users.getUsers">users.getUsers</a> with <a href="/constructor/inputUserSelf">inputUserSelf</a> to fetch info about the current subscription status from the <code>premium</code> flag of the returned <a href="/constructor/user">user</a> constructor.  </p>
 <h4><a class="anchor" href="#promo-page" id="promo-page" name="promo-page"><i class="anchor-icon"></i></a>Promo page</h4>
 <pre><code><a href='/constructor/help.premiumPromo'>help.premiumPromo</a>#8a4f3c29 status_text:<a href='/type/string'>string</a> status_entities:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; video_sections:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; videos:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; currency:<a href='/type/string'>string</a> monthly_amount:<a href='/type/long'>long</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/help.PremiumPromo'>help.PremiumPromo</a>;
 
@@ -69,13 +67,16 @@ Use <a href="/method/users.getUsers">users.getUsers</a> with <a href="/construct
 <a href='/method/help.getAppConfig'>help.getAppConfig</a>#98914110 = <a href='/type/JSONValue'>JSONValue</a>;</code></pre>
 <p>Clients should show a Telegram Premium button in the settings.<br>
 Clicking on this button in the settings, clicking on the <a href="#badge">badge</a> of a Premium user or hitting one of the Premium limits listed below should open a Telegram Premium modal.  </p>
-<p>This modal should list the Premium <a href="#feature-identifiers">features</a> contained in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig field</a>, and presented in the order dynamically specified by the appConfig.<br>
-<a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> must also be called, to fetch a list of promotional videos to show when clicking on a Premium feature row, and the current subscription status, to be shown in the header of the modal:</p>
+<p>Call <a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> and <a href="/method/help.getAppConfig">help.getAppConfig</a> to fetch info on how to build the premium modal.  </p>
+<p><a href="/method/help.getAppConfig">help.getAppConfig</a> will return a list of Premium <a href="#feature-identifiers">features</a> in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig field</a>, and the modal should contain a row for each <a href="#feature-identifiers">feature identifier</a>.  </p>
+<p>The <a href="/constructor/help.premiumPromo">help.premiumPromo</a> constructor returned by <a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> contains the following fields:  </p>
 <ul>
-<li><code>status_text</code>+<code>status_entities</code>+<code>users</code> - Contain the current subscription status (with associated <a href="/api/entities">styled text entities and mentions</a>)</li>
-<li><code>video</code>+<code>video_sections</code> - Contain a list of videos, and the corresponding <a href="#feature-identifiers">premium feature identifiers</a>.</li>
+<li><code>status_text</code>+<code>status_entities</code> - The current subscription status (with associated <a href="/api/entities">styled text entities</a>), to be shown in the modal header.  </li>
+<li><code>video_sections</code>+<code>videos</code> - A list of videos, and the corresponding <a href="#feature-identifiers">premium feature identifiers</a>.<br>
+Equivalent to a section =&gt; video dictionary, with keys from <code>video_section</code> and values from <code>videos</code>.<br>
+The keys in <code>video_sections</code> correspond to a specific <a href="#feature-identifiers">feature identifier</a>, and the associated promotional video should be shown when clicking on the associated feature row.</li>
 <li><code>currency</code> - Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code</li>
-<li><code>monthly_amount</code> - Monthly price of the product in the smallest units of the currency (integer, not float/double). For example, for a price of <code>US$ 1.45</code> pass <code>amount = 145</code>. See the exp parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</li>
+<li><code>monthly_amount</code> - Monthly price of the subscription in the smallest units of the currency (integer, not float/double). For example, for a price of <code>US$ 1.45</code> pass <code>amount = 145</code>. See the exp parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</li>
 </ul>
 <h5><a class="anchor" href="#feature-identifiers" id="feature-identifiers" name="feature-identifiers"><i class="anchor-icon"></i></a>Feature identifiers</h5>
 <p>This list contains the feature identifiers returned in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig array field</a>.</p>
