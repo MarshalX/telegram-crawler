@@ -142,11 +142,17 @@ Then, when the user clicks on the subscribe button in the sent invoice, follow t
 
 <a href='/constructor/premiumGiftOption'>premiumGiftOption</a>#74c34319 flags:<a href='/type/%23'>#</a> months:<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> bot_url:<a href='/type/string'>string</a> store_product:flags.0?<a href='/type/string'>string</a> = <a href='/type/PremiumGiftOption'>PremiumGiftOption</a>;
 
+<a href='/constructor/messageActionGiftPremium'>messageActionGiftPremium</a>#aba0f5c6 currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> months:<a href='/type/int'>int</a> = <a href='/type/MessageAction'>MessageAction</a>;
+
+<a href='/constructor/inputStickerSetPremiumGifts'>inputStickerSetPremiumGifts</a>#c88b3b02 = <a href='/type/InputStickerSet'>InputStickerSet</a>;
+
 ---functions---
 
 <a href='/method/users.getFullUser'>users.getFullUser</a>#b60f5918 id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.UserFull'>users.UserFull</a>;</code></pre>
 <p>If after calling <a href="/method/users.getFullUser">users.getFullUser</a> the resulting <a href="/constructor/userFull">userFull</a> constructor has one or more <a href="/constructor/premiumGiftOption">premiumGiftOptions</a> in the <code>premium_gifts</code> field, we can gift a Telegram Premium subscription to this user.  </p>
 <p>The <a href="/constructor/premiumGiftOption">premiumGiftOption</a> constructors contain an ordered list of Premium gift offers with discounts over the base price: to process the gift payment open the <a href="/api/links">deep link</a> contained in the <code>bot_url</code> field.  </p>
+<p>Once the payment is successfully processed, the user to which the gift was sent will automatically receive a <a href="/constructor/messageService">messageService</a> from the user that sent the gift, containing a <a href="/constructor/messageActionGiftPremium">messageActionGiftPremium</a> constructor with further info about the price and duration of the gifted Telegram Premium subscription.<br>
+Clients should display this message, along with a sticker from the <a href="/constructor/inputStickerSetPremiumGifts">inputStickerSetPremiumGifts</a> <a href="/api/stickers">stickerset</a>: here's an <a href="https://telegram.org/blog/custom-emoji#gifting-telegram-premium">example</a>.  </p>
 <h3><a class="anchor" href="#blocked-telegram-premium" id="blocked-telegram-premium" name="blocked-telegram-premium"><i class="anchor-icon"></i></a>Blocked Telegram Premium</h3>
 <p>If the <code>premium_purchase_blocked</code> <a href="/api/config#client-configuration">app configuration parameter</a> is set, the user can't purchase a Premium account, and all Telegram Premium features must be hidden (like the <a href="#badge">badges</a> of Premium users, Telegram Premium purchase buttons, and so on).  </p></div>
   
