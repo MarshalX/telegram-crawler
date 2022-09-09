@@ -74,45 +74,45 @@ You can also directly use <a href="/method/help.getPremiumPromo">help.getPremium
 <p>Clients should show a Telegram Premium button in the settings.<br>
 Clicking on this button in the settings, clicking on the <a href="#badge">badge</a> of a Premium user or hitting one of the Premium limits listed below should open a Telegram Premium modal.  </p>
 <p>Call <a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> and <a href="/method/help.getAppConfig">help.getAppConfig</a> to fetch info on how to build the premium modal.  </p>
-<p><a href="/method/help.getAppConfig">help.getAppConfig</a> will return a list of Premium feature identifiers in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig field (array of strings)</a>: the modal should contain a row for each returned feature.  </p>
+<p><a href="/method/help.getAppConfig">help.getAppConfig</a> will return a list of Premium feature identifiers in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig field</a>: the modal should contain a row for each returned feature, ordered as specified in the returned array.  </p>
 <p>Possible feature identifiers:</p>
 <ul>
 <li><code>double_limits</code> - Clicking on this entry should open a secondary popup with a list of the <a href="#premium-limits">improved Premium limits »</a>.</li>
-<li><code>more_upload</code> - Premium users can upload bigger files, as specified by the <a href="/api/config#upload-max-fileparts-default">upload_max_fileparts_default</a> vs <a href="/api/config#upload-max-fileparts-premium"><code>upload_max_fileparts_premium</code></a> config keys.</li>
-<li><code>faster_download</code> - Premium users have no download speed limits</li>
-<li><code>voice_to_text</code> - Premium users can <a href="/api/transcribe">transcribe voice messages</a></li>
-<li><code>no_ads</code> - Premium users see no <a href="/api/sponsored-messages">sponsored messages</a></li>
-<li><code>unique_reactions</code> - Premium users have access to more <a href="/api/reactions">message reactions</a></li>
-<li><code>premimum_stickers</code> - Premium users have access to premium <a href="/api/stickers">stickersets</a></li>
-<li><code>animated_emoji</code> - Premium users can send custom <a href="/api/custom-emoji">animated emojis</a></li>
-<li><code>advanced_chat_management</code> - Premium users can <a href="/api/folders">reorder the default folder</a>, auto-archive and hide new chats from non-contacts</li>
-<li><code>profile_badge</code> - Premium users have a <a href="#badge">badge</a> next to their name, showing that they are helping support Telegram</li>
-<li><code>animated_userpics</code> - <a href="/api/files#animated-profile-pictures">Animated profile pictures</a> of Premium users will play in-chat and when browsing the dialog list</li>
-<li><code>app_icons</code> - Premium users can change the default icon of the Telegram app</li>
+<li><code>more_upload</code> - Premium users can upload bigger files, as specified by the <a href="/api/config#upload-max-fileparts-default">upload_max_fileparts_default</a> vs <a href="/api/config#upload-max-fileparts-premium">upload_max_fileparts_premium</a> config keys.</li>
+<li><code>faster_download</code> - Premium users have no download speed limits.</li>
+<li><code>voice_to_text</code> - Premium users can <a href="/api/transcribe">transcribe voice messages</a>.</li>
+<li><code>no_ads</code> - Premium users see no <a href="/api/sponsored-messages">sponsored messages</a>.</li>
+<li><code>unique_reactions</code> - Premium users have access to more <a href="/api/reactions">message reactions</a>.</li>
+<li><code>premimum_stickers</code> - Premium users have access to premium <a href="/api/stickers">stickersets</a>.</li>
+<li><code>animated_emoji</code> - Premium users can send custom <a href="/api/custom-emoji">animated emojis</a>.</li>
+<li><code>advanced_chat_management</code> - Premium users can <a href="/api/folders">reorder the default folder</a>, auto-archive and hide new chats from non-contacts.</li>
+<li><code>profile_badge</code> - Premium users have a <a href="#badge">badge</a> next to their name, showing that they are helping support Telegram.</li>
+<li><code>animated_userpics</code> - <a href="/api/files#animated-profile-pictures">Animated profile pictures</a> of Premium users will play in-chat and when browsing the dialog list.</li>
+<li><code>app_icons</code> - Premium users can change the default icon of the Telegram app.</li>
 </ul>
-<p>The <a href="/constructor/help.premiumPromo">help.premiumPromo</a> constructor returned by <a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> contains the following fields:  </p>
+<p>The <a href="/constructor/help.premiumPromo">help.premiumPromo</a> constructor returned by <a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> also contains the following fields:  </p>
 <ul>
 <li><code>status_text</code>+<code>status_entities</code> - The current subscription status (with associated <a href="/api/entities">styled text entities</a>), to be shown in the modal header.  </li>
-<li><code>video_sections</code>+<code>videos</code> - A list of videos, and the corresponding premium feature identifiers
+<li><code>video_sections</code>+<code>videos</code> - A list of videos, and the corresponding premium feature identifiers.<br>
 Equivalent to a section =&gt; video dictionary, with keys from <code>video_section</code> and values from <code>videos</code>.<br>
-The keys in <code>video_sections</code> correspond to a specific feature identifier, and the associated promotional video should be shown when clicking on the associated feature row.</li>
-<li><code>currency</code> - Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code</li>
+The keys in <code>video_sections</code> correspond to a specific feature identifier, and the associated promotional video should be shown when the associated feature row is clicked.</li>
+<li><code>currency</code> - Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code.</li>
 <li><code>monthly_amount</code> - Monthly price of the subscription in the smallest units of the currency (integer, not float/double). For example, for a price of <code>US$ 1.45</code> pass <code>amount = 145</code>. See the exp parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).</li>
 </ul>
 <h4><a class="anchor" href="#premium-limits" id="premium-limits" name="premium-limits"><i class="anchor-icon"></i></a>Premium limits</h4>
 <p>What follows is a list of <a href="/api/config#client-configuration">appConfig integer config parameters</a>.  </p>
-<p>Note that whenever config keys end with a <code>*</code> in the following list, the <code>*</code> should be replaced with <code>default</code> or <code>premium</code>, to fetch the appropriate limit value for normal and Premium users.</p>
+<p>Note that whenever config keys end with a <code>*</code> in the following list, the <code>*</code> should be replaced with <code>premium</code> or <code>default</code>, to fetch the appropriate limit value for Premium and non-Premium users.</p>
 <ul>
-<li><code>channels_limit_*</code> - The maximum number of <a href="/api/channel">channels and supergroups</a> a user may join</li>
-<li><code>saved_gifs_limit_*</code> - The maximum number of GIFs a user may save</li>
-<li><code>stickers_faved_limit_*</code> - The maximum number of stickers a user may <a href="/api/stickers#favorite-stickers">add to favorites »</a></li>
-<li><code>dialog_filters_limit_*</code> - The maximum number of <a href="/api/folders">folders</a> a user may create</li>
-<li><code>dialog_filters_chats_*</code> - The maximum number of chats a user may add to a <a href="/api/folders">folder</a></li>
-<li><code>dialogs_pinned_limit_*</code> - The maximum number of chats a user may pin</li>
-<li><code>dialogs_folder_pinned_limit_*</code> - The maximum number of chats a user may pin in a folder</li>
-<li><code>channels_public_limit_*</code> - The maximum number of public <a href="/api/channel">channels or supergroups</a> a user may create</li>
-<li><code>caption_length_limit_*</code> - The maximum UTF-8 length of media captions</li>
-<li><code>about_length_limit_*</code> - The maximum UTF-8 length of user bios</li>
+<li><code>channels_limit_*</code> - The maximum number of <a href="/api/channel">channels and supergroups</a> a user may join.</li>
+<li><code>saved_gifs_limit_*</code> - The maximum number of GIFs a user may save.</li>
+<li><code>stickers_faved_limit_*</code> - The maximum number of stickers a user may <a href="/api/stickers#favorite-stickers">add to favorites</a>.</li>
+<li><code>dialog_filters_limit_*</code> - The maximum number of <a href="/api/folders">folders</a> a user may create.</li>
+<li><code>dialog_filters_chats_*</code> - The maximum number of chats a user may add to a <a href="/api/folders">folder</a>.</li>
+<li><code>dialogs_pinned_limit_*</code> - The maximum number of chats a user may pin.</li>
+<li><code>dialogs_folder_pinned_limit_*</code> - The maximum number of chats a user may pin in a folder.</li>
+<li><code>channels_public_limit_*</code> - The maximum number of public <a href="/api/channel">channels or supergroups</a> a user may create.</li>
+<li><code>caption_length_limit_*</code> - The maximum UTF-8 length of media captions.</li>
+<li><code>about_length_limit_*</code> - The maximum UTF-8 length of user bios.</li>
 </ul>
 <h4><a class="anchor" href="#badge" id="badge" name="badge"><i class="anchor-icon"></i></a>Badge</h4>
 <p>Users with a Telegram Premium subscription (<a href="/constructor/user">user</a>.<code>premium</code> is set) should have a Telegram Premium badge next to their name.  </p>
@@ -148,7 +148,7 @@ Then, when the user clicks on the subscribe button in the sent invoice, follow t
 <p>If after calling <a href="/method/users.getFullUser">users.getFullUser</a> the resulting <a href="/constructor/userFull">userFull</a> constructor has one or more <a href="/constructor/premiumGiftOption">premiumGiftOptions</a> in the <code>premium_gifts</code> field, we can gift a Telegram Premium subscription to this user.  </p>
 <p>The <a href="/constructor/premiumGiftOption">premiumGiftOption</a> constructors contain an ordered list of Premium gift offers with discounts over the base price: to process the gift payment open the <a href="/api/links">deep link</a> contained in the <code>bot_url</code> field.  </p>
 <h3><a class="anchor" href="#blocked-telegram-premium" id="blocked-telegram-premium" name="blocked-telegram-premium"><i class="anchor-icon"></i></a>Blocked Telegram Premium</h3>
-<p>If the <code>premium_purchase_blocked</code> <a href="/api/config#client-configuration">app configuration parameter</a> is set, the user can't purchase a Premium account, and all Telegram Premium features must be hidden (like the stars of Premium users, Telegram Premium purchase buttons, and so on).  </p></div>
+<p>If the <code>premium_purchase_blocked</code> <a href="/api/config#client-configuration">app configuration parameter</a> is set, the user can't purchase a Premium account, and all Telegram Premium features must be hidden (like the <a href="#badge">badges</a> of Premium users, Telegram Premium purchase buttons, and so on).  </p></div>
   
 </div>
           
