@@ -125,6 +125,10 @@ async def main() -> None:
         for json_response, _ in paginated_responses:
             commit_files.extend(json_response['files'])
 
+        commit_files = [file for file in commit_files if 'translations.telegram.org/' not in file['filename']]
+        if not commit_files:
+            return
+
         html_url = commit_data['html_url']
 
         alert_text = f'<b>New changes of Telegram</b>\n\n'
