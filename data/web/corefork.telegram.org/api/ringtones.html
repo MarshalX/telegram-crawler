@@ -70,9 +70,9 @@ After upload, the document should be provided to <a href="/method/account.saveRi
 <p>If the notification sound is not in MP3 format it will be converted to MP3 by <a href="/method/account.saveRingtone">account.saveRingtone</a> and an <a href="/constructor/account.savedRingtoneConverted">account.savedRingtoneConverted</a> constructor will be returned containing the new document to use <strong>instead of</strong> the one returned by <a href="/method/account.uploadRingtone">account.uploadRingtone</a> when <a href="#removing-notification-sounds">removing</a> or <a href="#setting-notification-sounds">using</a> notification sounds.  </p>
 <p>The following ringtone limits are specified in the <a href="/api/config#client-configuration">client configuration</a>:</p>
 <ul>
-<li><code>ringtone_duration_max</code> - The maximum duration in seconds of uploaded ringtones</li>
-<li><code>ringtone_saved_count_max</code> - The maximum number of saveable ringtones</li>
-<li><code>ringtone_size_max</code> - The maximum (post-conversion) filesize in bytes of uploadable ringtones</li>
+<li><a href="/api/config#ringtone-duration-max">ringtone_duration_max</a> - The maximum duration in seconds of uploaded ringtones</li>
+<li><a href="/api/config#ringtone-saved-count-max">ringtone_saved_count_max</a> - The maximum number of saveable ringtones</li>
+<li><a href="/api/config#ringtone-size-max">ringtone_size_max</a> - The maximum (post-conversion) filesize in bytes of uploadable ringtones</li>
 </ul>
 <h3><a class="anchor" href="#removing-notification-sounds" id="removing-notification-sounds" name="removing-notification-sounds"><i class="anchor-icon"></i></a>Removing notification sounds</h3>
 <p>Schema:</p>
@@ -92,7 +92,8 @@ After upload, the document should be provided to <a href="/method/account.saveRi
 ---functions---
 
 <a href='/method/account.getSavedRingtones'>account.getSavedRingtones</a>#e1902288 hash:<a href='/type/long'>long</a> = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;</code></pre>
-<p><a href="/method/account.getSavedRingtones">account.getSavedRingtones</a> can be used to obtain all saved notification sounds: the client will receive <a href="/constructor/updateSavedRingtones">updateSavedRingtones</a> updates if the list is modified by the user on other clients.  </p>
+<p><a href="/method/account.getSavedRingtones">account.getSavedRingtones</a> can be used to obtain all saved notification sounds.<br>
+The client will receive an <a href="/constructor/updateSavedRingtones">updateSavedRingtones</a> update if the list is modified by the user on other clients, which should trigger a call to <a href="/method/account.getSavedRingtones">account.getSavedRingtones</a>.  </p>
 <h3><a class="anchor" href="#setting-notification-sounds" id="setting-notification-sounds" name="setting-notification-sounds"><i class="anchor-icon"></i></a>Setting notification sounds</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/notificationSoundDefault'>notificationSoundDefault</a>#97e8bebe = <a href='/type/NotificationSound'>NotificationSound</a>;
@@ -110,7 +111,7 @@ After upload, the document should be provided to <a href="/method/account.saveRi
 ---functions---
 
 <a href='/method/account.updateNotifySettings'>account.updateNotifySettings</a>#84be5b93 peer:<a href='/type/InputNotifyPeer'>InputNotifyPeer</a> settings:<a href='/type/InputPeerNotifySettings'>InputPeerNotifySettings</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
-<p>To the notification sound to play when receiving messages from a specific peer or from a category of peers, use <a href="/method/account.updateNotifySettings">account.updateNotifySettings</a>, populating the <code>ios_sound</code>, <code>android_sound</code> or <code>other_sound</code> fields according to the platform where a sound should be played.  </p>
+<p>To set the notification sound to play when receiving messages from a specific peer or from a category of peers, use <a href="/method/account.updateNotifySettings">account.updateNotifySettings</a>, populating the <code>ios_sound</code>, <code>android_sound</code> or <code>other_sound</code> fields according to the platform where the sound should be played.  </p>
 <p>The fields can be populated with the following constructors:</p>
 <ul>
 <li><a href="/constructor/notificationSoundDefault">notificationSoundDefault</a> - The default notification sound should be played</li>
