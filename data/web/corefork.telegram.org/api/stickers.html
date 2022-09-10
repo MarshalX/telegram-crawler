@@ -78,7 +78,7 @@
 <p>Static stickers are <a href="https://en.wikipedia.org/wiki/WebP">WebP</a> images with the following specs:</p>
 <ul>
 <li>For stickers, either the width or height must be equal to 512 pixels.</li>
-<li>For <a href="/api/custom-emoji">custom emojis</a>, the resolution must be equal 100x100 pixels.</li>
+<li>For <a href="/api/custom-emoji">custom emojis</a>, the resolution must be equal to 100x100 pixels.</li>
 <li>Transparency is supported.</li>
 </ul>
 <p>They're identified by <code>mime_type</code> field of the associated <a href="/constructor/document">document</a>, always equal to <code>image/webp</code>.</p>
@@ -102,7 +102,7 @@
 <li>The video must be encoded using <a href="https://en.wikipedia.org/wiki/VP9">VP9</a>, in a <a href="https://en.wikipedia.org/wiki/WebM">WebM</a> container.</li>
 <li>The <a href="https://en.wikipedia.org/wiki/WebM">WebM</a> container must have <strong>no audio stream</strong>.</li>
 <li>For stickers, either the width or height must be equal to 512 pixels.</li>
-<li>For <a href="/api/custom-emoji">custom emojis</a>, the resolution must be equal 100x100 pixels.</li>
+<li>For <a href="/api/custom-emoji">custom emojis</a>, the resolution must be equal to 100x100 pixels.</li>
 <li>Maximum duration: 3 seconds.</li>
 <li>Frame rate: up to 30 FPS.</li>
 <li>Transparency is supported.</li>
@@ -146,7 +146,7 @@
 Otherwise, a <a href="/constructor/messages.stickerSet">messages.stickerSet</a> will be returned, containing:</p>
 <ul>
 <li>A <a href="/constructor/stickerSet">stickerSet</a> constructor with info about the stickerset</li>
-<li>A vector of <a href="/constructor/document">document</a>, containing all the stickers.
+<li>A vector of <a href="/constructor/document">document</a> constructors, containing all the stickers.<br>
 Note that even if we provided an old <code>hash</code> and just a few stickers were modified/reordered, all stickers will be returned anyway.  </li>
 <li>A vector of <a href="/constructor/stickerPack">stickerPack</a> constructors, containing all the stickers IDs in the stickerpack, grouped by emoji.<br>
 The main emoji to use when previewing stickers in the chat list is present in the <code>alt</code> field of the <a href="/constructor/document">document</a>.<br>
@@ -323,8 +323,8 @@ This update should trigger a call to <a href="/method/messages.getRecentStickers
 
 <a href='/method/messages.getStickers'>messages.getStickers</a>#d5a5d3a1 emoticon:<a href='/type/string'>string</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.Stickers'>messages.Stickers</a>;</code></pre>
 <p>Clients should show a popup with a list of suggested stickers and <a href="/api/custom-emoji">custom emojis</a> when the user enters an emoji in the text bar.  </p>
-<p>If the <code>stickers_emoji_suggest_only_api</code> <a href="/api/config#client-configuration">app configuration parameter</a> is set to true, clients must invoke <a href="/method/messages.getStickers">messages.getStickers</a> to fetch a list of suggested stickers for the emoji.<br>
-The <code>stickers_emoji_cache_time</code> specifies the validity period of the local cache of messages.getStickers, also relevant when generating the pagination hash when invoking the method.  </p>
+<p>If the <a href="/api/config#stickers-emojis-suggest-only-api"><code>stickers_emoji_suggest_only_api</code> app configuration parameter</a> is set to true, clients must invoke <a href="/method/messages.getStickers">messages.getStickers</a> to fetch a list of suggested stickers for the emoji.<br>
+The <a href="/api/config#stickers-emoji-cache-time">stickers_emoji_cache_time appConfig parameter</a> specifies the validity period of the local cache of <a href="/method/messages.getStickers">messages.getStickers</a>, also relevant when generating the pagination hash when invoking the method.  </p>
 <p>Otherwise, the following local logic should be used.  </p>
 <ul>
 <li>Construct two lists of recently used stickers, matching the emoji:<ul>
@@ -333,8 +333,8 @@ The <code>stickers_emoji_cache_time</code> specifies the validity period of the 
 </ul>
 </li>
 <li>The final suggested sticker list <strong>c</strong> is composed as follows:<ul>
-<li>If the user doesn't have a Premium subscription: all stickers from <strong>a</strong>, followed by <code>stickers_premium_by_emoji_num</code> stickers from <strong>b</strong>.</li>
-<li>If the user has a Premium subscription: <code>stickers_normal_by_emoji_per_premium_num</code> stickers from <strong>a</strong>, followed by 1 sticker from <strong>b</strong>, and so on until both lists are empty.</li>
+<li>If the user doesn't have a <a href="/api/premium">Premium subscription</a>: all stickers from <strong>a</strong>, followed by <code>stickers_premium_by_emoji_num</code> stickers from <strong>b</strong>.</li>
+<li>If the user has a <a href="/api/premium">Premium subscription</a>: <code>stickers_normal_by_emoji_per_premium_num</code> stickers from <strong>a</strong>, followed by 1 sticker from <strong>b</strong>, and so on until both lists are empty.</li>
 </ul>
 </li>
 </ul>
