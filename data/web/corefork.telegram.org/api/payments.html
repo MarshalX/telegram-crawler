@@ -149,9 +149,9 @@ The <code>recurring</code> flag will be set for recurring payments, and <code>re
 <a href='/method/payments.validateRequestedInfo'>payments.validateRequestedInfo</a>#b6c8f12b flags:<a href='/type/%23'>#</a> save:flags.0?<a href='/constructor/true'>true</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> info:<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> = <a href='/type/payments.ValidatedRequestedInfo'>payments.ValidatedRequestedInfo</a>;</code></pre>
 <p>If any data at all is requested by the <a href="/constructor/invoice"><strong>invoice</strong></a> (<code>name_requested</code>, <code>phone_requested</code>, <code>email_requested</code>, <code>shipping_address_requested</code>), the user must call <a href="/method/payments.validateRequestedInfo">payments.validateRequestedInfo</a>, providing the required data (as usual, <code>msg_id</code> is the ID of the invoice message).
 The user can choose to save order information for future use by setting the <code>save</code> flag.
-Data can be autofilled as described in <a href="#2-3-1-autofill">autofill</a>.</p>
+Data can be autofilled as described in <a href="#231-autofill">autofill</a>.</p>
 <p>If no errors are found in the submitted info, the <a href="/constructor/payments.ValidatedRequestedInfo">response</a> of the method will contain an <code>id</code> flag, to be used later to complete the payment.</p>
-<p>If the <code>flexible</code> flag of the invoice is set, calling the <a href="/method/payments.validateRequestedInfo">payments.validateRequestedInfo</a> method will send a <a href="/constructor/updateBotShippingQuery">shipping query update</a> to the bot, to which the bot will reply with the available shipping options for the specified address <a href="#2-4-select-delivery-option">as described here »</a>.
+<p>If the <code>flexible</code> flag of the invoice is set, calling the <a href="/method/payments.validateRequestedInfo">payments.validateRequestedInfo</a> method will send a <a href="/constructor/updateBotShippingQuery">shipping query update</a> to the bot, to which the bot will reply with the available shipping options for the specified address <a href="#24-select-delivery-option">as described here »</a>.
 The return value in this case will also contain a <code>shipping_options</code> field with the available shipping options.</p>
 <p>If any errors are found in the submitted data, a <a href="/constructor/updateServiceNotification">service notification</a> will be sent to the user, with a description of the error from the bot.</p>
 <h4><a class="anchor" href="#231-autofill" id="231-autofill" name="231-autofill"><i class="anchor-icon"></i></a>2.3.1 Autofill</h4>
@@ -173,9 +173,9 @@ The return value in this case will also contain a <code>shipping_options</code> 
 ---functions---
 
 <a href='/method/messages.setBotShippingResults'>messages.setBotShippingResults</a>#e5f672fa flags:<a href='/type/%23'>#</a> query_id:<a href='/type/long'>long</a> error:flags.0?<a href='/type/string'>string</a> shipping_options:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ShippingOption'>ShippingOption</a>&gt; = <a href='/type/Bool'>Bool</a>;</code></pre>
-<p>If a shipping address was requested and the bot included the parameter <code>flexible</code>, when the user <a href="#2-3-verifying-information">validates order information</a> the Telegram API will send an <a href="/constructor/updateBotShippingQuery">updateBotShippingQuery</a> to the bot. 
+<p>If a shipping address was requested and the bot included the parameter <code>flexible</code>, when the user <a href="#23-verifying-information">validates order information</a> the Telegram API will send an <a href="/constructor/updateBotShippingQuery">updateBotShippingQuery</a> to the bot. 
 The bot must respond using <a href="/method/messages.setBotShippingResults">messages.setBotShippingResults</a> either with a list of possible delivery options and the relevant delivery prices, or with an error (for example, if delivery to the specified address is not possible).</p>
-<p>The returned shipping options or the shipping error will be returned to the user while <a href="#2-3-verifying-information">validating order information</a>.</p>
+<p>The returned shipping options or the shipping error will be returned to the user while <a href="#23-verifying-information">validating order information</a>.</p>
 <h3><a class="anchor" href="#3-payment" id="3-payment" name="3-payment"><i class="anchor-icon"></i></a>3. Payment</h3>
 <pre><code><a href='/constructor/inputPaymentCredentialsSaved'>inputPaymentCredentialsSaved</a>#c10eb2cf id:<a href='/type/string'>string</a> tmp_password:<a href='/type/bytes'>bytes</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
 <a href='/constructor/inputPaymentCredentials'>inputPaymentCredentials</a>#3417d728 flags:<a href='/type/%23'>#</a> save:flags.0?<a href='/constructor/true'>true</a> data:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
@@ -267,16 +267,16 @@ Full credit card info <strong>is not</strong> saved on Telegram Servers, and can
 ---functions---
 
 <a href='/method/payments.sendPaymentForm'>payments.sendPaymentForm</a>#2d03522f flags:<a href='/type/%23'>#</a> form_id:<a href='/type/long'>long</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> requested_info_id:flags.0?<a href='/type/string'>string</a> shipping_option_id:flags.1?<a href='/type/string'>string</a> credentials:<a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a> tip_amount:flags.2?<a href='/type/long'>long</a> = <a href='/type/payments.PaymentResult'>payments.PaymentResult</a>;</code></pre>
-<p>After <a href="#2-3-verifying-information">verifying order information</a>, the final step for the client is to call <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a>, with the following parameters:</p>
+<p>After <a href="#23-verifying-information">verifying order information</a>, the final step for the client is to call <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a>, with the following parameters:</p>
 <ul>
 <li>The <code>msg_id</code> is set to the ID of the invoice message</li>
-<li><code>requested_info_id</code> is set to the <code>id</code> of the <a href="#2-3-verifying-information">verified order information</a>, if it was requested</li>
-<li><code>shipping_option_id</code> is set to the <a href="#2-5-select-delivery-option">selected delivery option</a>, if shipping was requested.</li>
+<li><code>requested_info_id</code> is set to the <code>id</code> of the <a href="#23-verifying-information">verified order information</a>, if it was requested</li>
+<li><code>shipping_option_id</code> is set to the <a href="#24-select-delivery-option">selected delivery option</a>, if shipping was requested.</li>
 <li><code>credentials</code> are the payment credentials generated by the payment provider, required to complete the order.</li>
 </ul>
 <p>Payment method info can also be saved to the Telegram Servers and reused, by setting the <code>save</code> flag of <a href="/constructor/inputPaymentCredentials">inputPaymentCredentials</a> when sending the form.
 This is only possible on accounts with <a href="/api/srp">2FA</a> enabled.</p>
-<p>The bot then <a href="#4-1-receiving-pre-checkout-query">replies to the received precheckout query</a>, finally the user <a href="#5-checkout">proceeds to checkout</a>.</p>
+<p>The bot then <a href="#41-receiving-pre-checkout-query">replies to the received precheckout query</a>, finally the user <a href="#5-checkout">proceeds to checkout</a>.</p>
 <p>Please note that if the result of the method is a <a href="/constructor/payments.paymentVerificationNeeded">payments.paymentVerificationNeeded</a>, before <a href="#5-checkout">proceeding to checkout</a> the payment provider requires the user to verify their identity by opening the provided <code>url</code> and following instructions.
 Once the user finishes working with the webpage, the client can <a href="#5-checkout">proceed to checkout</a>.</p>
 <p>Eventual errors are returned in the form of RPC errors, with the description of the error by the bot contained in <a href="/constructor/updateServiceNotification">service updates</a>.</p>
