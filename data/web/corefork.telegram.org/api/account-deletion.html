@@ -54,17 +54,19 @@ If the account has a <a href="/api/srp">2FA password</a> and it is provided to <
 <p>In this case, if the account's <a href="/api/srp">2FA password</a> was modified more than 7 days ago and was active in the last 7 days, <strong>account deletion will be delayed for 7 days</strong>.
 Otherwise, the account will be <strong>immediately deleted</strong>.<br>
 In the first case, a <a href="/constructor/updateServiceNotification">service message will be sent to the user</a>, containing a <a href="/api/links#phone-confirmation-links">phone number confirmation link »</a>.</p>
-<p>When such a link is clicked, <a href="/method/account.sendConfirmPhoneCode">account.sendConfirmPhoneCode</a> must be called with the specified <code>hash</code>, using the account with the specified <code>phone</code> number.
-This will send a phone number verification code to the phone number associated with the account.
+<p>When such a link is clicked, <a href="/method/account.sendConfirmPhoneCode">account.sendConfirmPhoneCode</a> must be called with the specified <code>hash</code>, using the account with the specified <code>phone</code> number.<br>
+This will send a phone number verification code to the phone number associated with the account.<br>
 The phone code settings are the same as for the <a href="/api/auth">login code</a>, and <a href="/method/auth.cancelCode">auth.cancelCode</a> with <a href="/method/auth.resendCode">auth.resendCode</a> can be used as well, to resend or cancel the phone code as for the <a href="/api/auth">login code</a>.</p>
 <p>Once the SMS code is received, the <a href="/method/account.confirmPhone">account.confirmPhone</a> method will have to be called with the SMS code and the phone hash received from the <a href="/method/account.sendConfirmPhoneCode">account.sendConfirmPhoneCode</a> method.</p>
-<p>This will cancel deletion of the account and will log out the user that tried to reset it.
-Otherwise, if the number isn't confirmed in 7 days, the account will be deleted and the user will be free to recreate it.</p>
+<p>This will cancel deletion of the account and will log out the user that tried to reset it.<br>
+Otherwise, if the number isn't confirmed in 7 days, the <strong>account will be deleted</strong> and the user will be free to recreate it.</p>
 <h2><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related articles</h2>
 <h3><a class="anchor" href="#user-authorization" id="user-authorization" name="user-authorization"><i class="anchor-icon"></i></a><a href="/api/auth">User Authorization</a></h3>
 <p>How to register a user's phone to start using the API.</p>
 <h3><a class="anchor" href="#two-factor-authentication" id="two-factor-authentication" name="two-factor-authentication"><i class="anchor-icon"></i></a><a href="/api/srp">Two-factor authentication</a></h3>
-<p>How to login to a user's account if they have enabled 2FA, how to change password.  </p></div>
+<p>How to login to a user's account if they have enabled 2FA, how to change password.  </p>
+<h3><a class="anchor" href="#deep-links" id="deep-links" name="deep-links"><i class="anchor-icon"></i></a><a href="/api/links">Deep links</a></h3>
+<p>Telegram clients must handle special <code>tg://</code> and <code>t.me</code> deep links encountered in messages, link entities and in other apps by registering OS handlers. </p></div>
   
 </div>
           
