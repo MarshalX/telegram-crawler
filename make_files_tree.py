@@ -666,19 +666,17 @@ async def _collect_and_track_all_translation_keys():
             if not file.endswith(file_format) or file == output_filename:
                 continue
 
-            async with aiofiles.open(os.path.join(root, file)) as f:
+            async with aiofiles.open(os.path.join(root, file), encoding='utf-8') as f:
                 content = json.loads(await f.read())
 
                 client = root[root.index(start_folder) + len(start_folder):]
-                category = file.replace(file_format, '')
-
                 if client not in translations:
-                    translations[client] = dict()
+                    translations[client] = list()
 
-                translations[client][category] = sorted(content.keys())
+                translations[client].extend(content.keys())
 
     for client in translations.keys():
-        translations[client] = dict(sorted(translations[client].items()))
+        translations[client] = sorted(translations[client])
 
     translations = dict(sorted(translations.items()))
 
