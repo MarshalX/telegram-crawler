@@ -80,13 +80,17 @@
 <li><code>524288 % part_size = 0</code> (512KB must be evenly divisible by <strong>part_size</strong>)</li>
 </ul>
 <p>The last part does not have to satisfy these conditions, provided its size is less than <strong>part_size</strong>.</p>
-<p>Each part should have a sequence number, <strong>file_part</strong>, with a value ranging from 0 to 2,999.</p>
+<p>Each part should have a sequence number, <strong>file_part</strong>, with a value ranging from 0 to the value of one of the following <a href="/api/config#client-configuration">appConfig fields</a> minus 1:  </p>
+<ul>
+<li><a href="/api/config#upload-max-fileparts-default">upload_max_fileparts_default »</a> - Maximum number of 512KB file parts uploadable by non-Premium users.  </li>
+<li><a href="/api/config#upload-max-fileparts-premium">upload_max_fileparts_premium »</a> - Maximum number of 512KB file parts uploadable by Premium users.  </li>
+</ul>
 <p>After the file has been partitioned you need to choose a method for saving it on the server. Use <a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> in case the full size of the file is more than <strong>10 MB</strong> and <a href="/method/upload.saveFilePart">upload.saveFilePart</a> for smaller files.</p>
 <p>Each call saves a portion of the data in a temporary location on the server to be used later. The storage life of each portion of data is between several minutes and several hours (depending on how busy the storage area is). After this time, the file part will become unavailable. To increase the time efficiency of a file save operation, we recommend using a call queue, so X pieces of the file are being saved at any given moment in time. Each successful operation to save a part invokes the method call to save the next part. The value of X can be tuned to achieve maximum performance.</p>
 <p>When using one of the methods mentioned above to save file parts, one of the following <a href="/api/errors#400-bad-request">data input errors</a> may be returned:</p>
 <ul>
-<li>FILE_PARTS_INVALID - Invalid number of parts. The value is not between <code>1..3000</code></li>
-<li>FILE_PART_INVALID: The file part number is invalid. The value is not between <code>0 and 2,999</code>.</li>
+<li>FILE_PARTS_INVALID - Invalid number of parts. The value is not between <code>1..upload_max_fileparts_*</code></li>
+<li>FILE_PART_INVALID: The file part number is invalid. The value is not between <code>0</code> and <code>upload_max_fileparts_*-1</code>.</li>
 <li>FILE_PART_TOO_BIG: The size limit (512 KB) for the content of the file part has been exceeded</li>
 <li>FILE_PART_EMPTY: The file part sent is empty</li>
 <li>FILE_PART_SIZE_INVALID - 512KB cannot be evenly divided by <strong>part_size</strong></li>
