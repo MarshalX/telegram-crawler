@@ -74,17 +74,19 @@
 <a href='/method/upload.saveFilePart'>upload.saveFilePart</a>#b304a621 file_id:<a href='/type/long'>long</a> file_part:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;
 <a href='/method/upload.saveBigFilePart'>upload.saveBigFilePart</a>#de7b673d file_id:<a href='/type/long'>long</a> file_part:<a href='/type/int'>int</a> file_total_parts:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p>Before transmitting the contents of the file itself, the file has to be assigned a unique 64-bit client identifier: <strong>file_id</strong>.</p>
-<p>The file's binary content is then split into parts. All parts must have the same size ( <strong>part_size</strong> ) and the following conditions must be met:</p>
+<p>The file's binary content is then split into parts. All parts must have the same size (<strong>part_size</strong>) and the following conditions must be met:</p>
 <ul>
 <li><code>part_size % 1024 = 0</code> (divisible by 1KB)</li>
 <li><code>524288 % part_size = 0</code> (512KB must be evenly divisible by <strong>part_size</strong>)</li>
 </ul>
 <p>The last part does not have to satisfy these conditions, provided its size is less than <strong>part_size</strong>.</p>
-<p>Each part should have a sequence number, <strong>file_part</strong>, with a value ranging from 0 to the value of one of the following <a href="/api/config#client-configuration">appConfig fields</a> minus 1:  </p>
+<p>The following <a href="/api/config#client-configuration">appConfig fields</a> specify the maximum number of uploadable file parts:  </p>
 <ul>
-<li><a href="/api/config#upload-max-fileparts-default">upload_max_fileparts_default »</a> - Maximum number of 512KB file parts uploadable by non-Premium users.  </li>
-<li><a href="/api/config#upload-max-fileparts-premium">upload_max_fileparts_premium »</a> - Maximum number of 512KB file parts uploadable by Premium users.  </li>
+<li><a href="/api/config#upload-max-fileparts-default">upload_max_fileparts_default »</a> - Maximum number of file parts uploadable by non-Premium users.  </li>
+<li><a href="/api/config#upload-max-fileparts-premium">upload_max_fileparts_premium »</a> - Maximum number of file parts uploadable by Premium users.  </li>
 </ul>
+<p>Note that the limit of uploadable file parts does not account for the <strong>part_size</strong>: thus the total file size limit can only be reached with the biggest possible <strong>part_size</strong> of 512KB, which is actually the recommended <strong>part_size</strong> to avoid excessive protocol overhead.  </p>
+<p>Each part should have a sequence number, <strong>file_part</strong>, with a value ranging from 0 to the value of the appropriate config parameter minus 1.  </p>
 <p>After the file has been partitioned you need to choose a method for saving it on the server. Use <a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> in case the full size of the file is more than <strong>10 MB</strong> and <a href="/method/upload.saveFilePart">upload.saveFilePart</a> for smaller files.</p>
 <p>Each call saves a portion of the data in a temporary location on the server to be used later. The storage life of each portion of data is between several minutes and several hours (depending on how busy the storage area is). After this time, the file part will become unavailable. To increase the time efficiency of a file save operation, we recommend using a call queue, so X pieces of the file are being saved at any given moment in time. Each successful operation to save a part invokes the method call to save the next part. The value of X can be tuned to achieve maximum performance.</p>
 <p>When using one of the methods mentioned above to save file parts, one of the following <a href="/api/errors#400-bad-request">data input errors</a> may be returned:</p>
@@ -96,7 +98,7 @@
 <li>FILE_PART_SIZE_INVALID - 512KB cannot be evenly divided by <strong>part_size</strong></li>
 <li>FILE_PART_SIZE_CHANGED - The part size is different from the size of one of the previous parts in the same file</li>
 </ul>
-<p>While the parts are being uploaded, an <a href="https://en.wikipedia.org/wiki/MD5">MD5 hash</a> of the file contents can also be computed to be used later as the <strong>md5_checksum</strong> parameter in the <a href="/constructor/inputFile">inputFile</a> constructor (since it is checked only by the server, for encrypted secret chat files it must be generated from the encrypted file).
+<p>While the parts are being uploaded, an <a href="https://en.wikipedia.org/wiki/MD5">MD5 hash</a> of the file contents can also be computed to be used later as the <strong>md5_checksum</strong> parameter in the <a href="/constructor/inputFile">inputFile</a> constructor (since it is checked only by the server, for encrypted secret chat files it must be generated from the encrypted file).<br>
 After the entire file is successfully saved, the final method may be called and passed the generated <a href="/type/InputFile">inputFile</a> object. In case the <a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> method is used, the <a href="/constructor/inputFileBig">inputFileBig</a> constructor must be passed, in other cases use <a href="/constructor/inputFile">inputFile</a>.</p>
 <ul>
 <li><a href="/method/messages.sendMedia">messages.sendMedia</a> - Sends a media file to a chat</li>
