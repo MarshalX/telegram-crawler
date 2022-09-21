@@ -109,7 +109,7 @@ After the entire file is successfully saved, the final method may be called and 
 <ul>
 <li>FILE_PARTS_INVALID: The number of file parts is invalid The value is not between 1 and 3,000.</li>
 <li>FILE_PART_X_MISSING: Part X (where X is a number) of the file is missing from storage. Try repeating the method call to resave the part.</li>
-<li>MD5_CHECKSUM_INVALID: The file's checksum did not match the <strong>md5_checksum</strong> parameter</li>
+<li>MD5_CHECKSUM_INVALID: The file's MD5 checksum did not match the <strong>md5_checksum</strong> parameter</li>
 </ul>
 <h4><a class="anchor" href="#albums-grouped-media" id="albums-grouped-media" name="albums-grouped-media"><i class="anchor-icon"></i></a>Albums, grouped media</h4>
 <pre><code><a href='/constructor/inputMediaUploadedPhoto'>inputMediaUploadedPhoto</a>#1e287d04 flags:<a href='/type/%23'>#</a> file:<a href='/type/InputFile'>InputFile</a> stickers:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputDocument'>InputDocument</a>&gt; ttl_seconds:flags.1?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
@@ -507,7 +507,10 @@ In normal chats <code>document</code> should always be provided instead of <code
 </li>
 </ul>
 <h3><a class="anchor" href="#general-considerations" id="general-considerations" name="general-considerations"><i class="anchor-icon"></i></a>General Considerations</h3>
-<p>It is recommended that large queries (<a href="/method/upload.getFile">upload.getFile</a>, <a href="/method/upload.saveFilePart">upload.saveFilePart</a>, <a href="/method/upload.getWebFile">upload.getWebFile</a>) be handled through a separate session and a separate connection, in which no methods other than these should be executed. If this is done, then data transfer will cause less interference with <a href="/api/updates">getting updates</a> and other method calls.</p>
+<pre><code><a href='/constructor/dcOption'>dcOption</a>#18b7a10d flags:<a href='/type/%23'>#</a> ipv6:flags.0?<a href='/constructor/true'>true</a> media_only:flags.1?<a href='/constructor/true'>true</a> tcpo_only:flags.2?<a href='/constructor/true'>true</a> cdn:flags.3?<a href='/constructor/true'>true</a> static:flags.4?<a href='/constructor/true'>true</a> this_port_only:flags.5?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> ip_address:<a href='/type/string'>string</a> port:<a href='/type/int'>int</a> secret:flags.10?<a href='/type/bytes'>bytes</a> = <a href='/type/DcOption'>DcOption</a>;</code></pre>
+<p>It is recommended that large queries (<a href="/method/upload.getFile">upload.getFile</a>, <a href="/method/upload.saveFilePart">upload.saveFilePart</a>, <a href="/method/upload.getWebFile">upload.getWebFile</a>) be handled through one or more separate sessions and separate connections, in which no methods other than these should be executed.<br>
+This way, data transfer will cause less interference with <a href="/api/updates">getting updates</a> and other method calls.<br>
+If a media DC with the required DC ID is available (<a href="/constructor/dcOption">dcOption</a> will have the <code>media</code> flag set), queries must be sent to that DC.  </p>
 <h3><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related articles</h3>
 <h4><a class="anchor" href="#handling-file-references" id="handling-file-references" name="handling-file-references"><i class="anchor-icon"></i></a><a href="/api/file_reference">Handling file references</a></h4>
 <p>How to handle file references.</p></div>
