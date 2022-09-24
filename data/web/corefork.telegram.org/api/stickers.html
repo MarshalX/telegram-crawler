@@ -188,6 +188,7 @@ This field is actually used to allow associating more than one emoji to a sticke
 <a href='/method/messages.toggleStickerSets'>messages.toggleStickerSets</a>#b5052fea flags:<a href='/type/%23'>#</a> uninstall:flags.0?<a href='/constructor/true'>true</a> archive:flags.1?<a href='/constructor/true'>true</a> unarchive:flags.2?<a href='/constructor/true'>true</a> stickersets:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputStickerSet'>InputStickerSet</a>&gt; = <a href='/type/Bool'>Bool</a>;
 <a href='/method/messages.reorderStickerSets'>messages.reorderStickerSets</a>#78337739 flags:<a href='/type/%23'>#</a> masks:flags.0?<a href='/constructor/true'>true</a> emojis:flags.1?<a href='/constructor/true'>true</a> order:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/Bool'>Bool</a>;
 <a href='/method/messages.getAllStickers'>messages.getAllStickers</a>#b8a0a1a8 hash:<a href='/type/long'>long</a> = <a href='/type/messages.AllStickers'>messages.AllStickers</a>;
+<a href='/method/messages.getMaskStickers'>messages.getMaskStickers</a>#640f82b8 hash:<a href='/type/long'>long</a> = <a href='/type/messages.AllStickers'>messages.AllStickers</a>;
 <a href='/method/messages.getEmojiStickers'>messages.getEmojiStickers</a>#fbfca18f hash:<a href='/type/long'>long</a> = <a href='/type/messages.AllStickers'>messages.AllStickers</a>;</code></pre>
 <p>A <a href="#stickersets">stickerset</a> can be installed using <a href="/method/messages.installStickerSet">messages.installStickerSet</a>, <code>archived=false</code>, with possible return values:  </p>
 <ul>
@@ -195,9 +196,14 @@ This field is actually used to allow associating more than one emoji to a sticke
 <li><a href="/constructor/messages.stickerSetInstallResultArchive">messages.stickerSetInstallResultArchive</a> - The stickerset was successfully installed, displacing some older unused stickersets specified in the <code>sets</code> field by <a href="#archived-stickersets">archiving them</a>.  </li>
 </ul>
 <p>Use <a href="/method/messages.uninstallStickerSet">messages.uninstallStickerSet</a> or <a href="/method/messages.toggleStickerSets">messages.toggleStickerSets</a> with the <code>uninstall</code> flag to uninstall one or more stickersets.  </p>
-<p>An <a href="/constructor/updateNewStickerSet">updateNewStickerSet</a> update will be emitted to the other logged-in sessions when installing stickersets.<br>
-An <a href="/constructor/updateStickerSets">updateStickerSets</a> update will be emitted to the other logged-in sessions when uninstalling or archiving stickersets.<br>
-Both updates should trigger a call to <a href="/method/messages.getAllStickers">messages.getAllStickers</a>, <a href="/method/messages.getArchivedStickers">messages.getArchivedStickers</a>, <a href="/method/messages.getEmojiStickers">messages.getEmojiStickers</a>.  </p>
+<p>An <a href="/constructor/updateNewStickerSet">updateNewStickerSet</a> update will be emitted to the other logged-in sessions when installing stickersets.  </p>
+<p>An <a href="/constructor/updateStickerSets">updateStickerSets</a> update will be emitted to the other logged-in sessions when uninstalling or archiving stickersets.<br>
+This update should trigger a call to the following methods:  </p>
+<ul>
+<li>If <code>masks</code> is set, call <a href="/method/messages.getMaskStickers">messages.getMaskStickers</a>.  </li>
+<li>If <code>emoji</code> is set, call <a href="/method/messages.getEmojiStickers">messages.getEmojiStickers</a>.  </li>
+<li>Otherwise, call <a href="/method/messages.getAllStickers">messages.getAllStickers</a> and <a href="/method/messages.getArchivedStickers">messages.getArchivedStickers</a>.</li>
+</ul>
 <p>Use <a href="/method/messages.reorderStickerSets">messages.reorderStickerSets</a> to reorder installed stickersets by the <a href="/constructor/stickerSet">stickerSet</a> ID: notice that normal, <a href="#mask-stickers">mask</a> and <a href="/api/custom-emoji">custom emoji</a> stickersets are ordered independently, use the appropriate flags to sort the correct type of stickerset.</p>
 <p>An <a href="/constructor/updateStickerSetsOrder">updateStickerSetsOrder</a> update will be emitted to the other logged-in sessions when reordering stickersets.<br>
 This update should trigger a call to <a href="/method/messages.getAllStickers">messages.getAllStickers</a>, <a href="/method/messages.getArchivedStickers">messages.getArchivedStickers</a>, <a href="/method/messages.getEmojiStickers">messages.getEmojiStickers</a>.  </p>
@@ -373,7 +379,11 @@ Sent stickered <a href="/constructor/document">video documents</a> will have a <
 
 <a href='/constructor/documentAttributeSticker'>documentAttributeSticker</a>#6319d612 flags:<a href='/type/%23'>#</a> mask:flags.1?<a href='/constructor/true'>true</a> alt:<a href='/type/string'>string</a> stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> mask_coords:flags.0?<a href='/type/MaskCoords'>MaskCoords</a> = <a href='/type/DocumentAttribute'>DocumentAttribute</a>;
 
-<a href='/constructor/inputStickerSetItem'>inputStickerSetItem</a>#ffa0a496 flags:<a href='/type/%23'>#</a> document:<a href='/type/InputDocument'>InputDocument</a> emoji:<a href='/type/string'>string</a> mask_coords:flags.0?<a href='/type/MaskCoords'>MaskCoords</a> = <a href='/type/InputStickerSetItem'>InputStickerSetItem</a>;</code></pre>
+<a href='/constructor/inputStickerSetItem'>inputStickerSetItem</a>#ffa0a496 flags:<a href='/type/%23'>#</a> document:<a href='/type/InputDocument'>InputDocument</a> emoji:<a href='/type/string'>string</a> mask_coords:flags.0?<a href='/type/MaskCoords'>MaskCoords</a> = <a href='/type/InputStickerSetItem'>InputStickerSetItem</a>;
+
+---functions---
+
+<a href='/method/messages.getMaskStickers'>messages.getMaskStickers</a>#640f82b8 hash:<a href='/type/long'>long</a> = <a href='/type/messages.AllStickers'>messages.AllStickers</a>;</code></pre>
 <p>Mask stickers can optionally have associated coordinates, contained in the <a href="/constructor/maskCoords">maskCoords</a> constructor.  </p>
 <p>The <code>n</code> position indicates where the mask should be placed:</p>
 <ul>
