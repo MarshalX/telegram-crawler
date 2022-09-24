@@ -318,6 +318,8 @@ Data must be in JSON format and not TL, as it has to be passed directly to the s
 <pre><code><a href='/constructor/securePlainPhone'>securePlainPhone</a>#7d6099dd phone:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
 <a href='/constructor/securePlainEmail'>securePlainEmail</a>#21ec5a5f email:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
 
+<a href='/constructor/emailVerifyPurposePassport'>emailVerifyPurposePassport</a>#bbf51685 = <a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a>;
+
 ---functions---
 
 <a href='/method/account.sendVerifyPhoneCode'>account.sendVerifyPhoneCode</a>#a5a356f9 phone_number:<a href='/type/string'>string</a> settings:<a href='/type/CodeSettings'>CodeSettings</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
@@ -339,7 +341,10 @@ To verify a phone number or email and use it in Telegram Passport, use the appro
 </ul>
 <p>The flow is similar to the one used for <a href="/api/auth">logging in</a>:</p>
 <ul>
-<li>Send email/phone code using the appropriate <code>account.sendVerify*Code</code> method</li>
+<li>Send email/phone code using the appropriate <code>account.sendVerify*Code</code> method<ul>
+<li>Make sure to pass <a href="/constructor/emailVerifyPurposePassport">emailVerifyPurposePassport</a> as verification purpose to <a href="/method/account.sendVerifyEmailCode">account.sendVerifyEmailCode</a>.</li>
+</ul>
+</li>
 <li>Pass the received code to the appropriate <code>account.verify*</code> method</li>
 <li>Only for phone code verification, you can also resend/cancel the phone code using <a href="/method/auth.resendCode">auth.resendCode</a>/<a href="/method/auth.cancelCode">auth.cancelCode</a>, as for <a href="/api/auth">logging in</a>.</li>
 </ul>
