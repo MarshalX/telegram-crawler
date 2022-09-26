@@ -161,7 +161,7 @@ Otherwise, something went wrong.
 </blockquote>
 <p>To provide a stable and easily reproducible environment, Telegram iOS builds are compiled on a virtual machine. Parallels is used to verify the builds.</p>
 <blockquote>
-<p>Due to recent changes introduced in <strong>XCode 14</strong> by Apple, the instruction below doesn&#39;t work at the moment. <strong>We will update this page as soon as Apple resolves the issue.</strong></p>
+<p>Due to recent changes introduced in <strong>XCode 14</strong> by Apple, the instruction below doesn&#39;t work at the moment. <strong>We will update this page as soon as Apple resolves the issue.</strong> <a href="#troubleshooting-ios">Read more about the issue</a> </p>
 </blockquote>
 <h3><a class="anchor" name="step-1-install-the-parallels-virtual-machine" href="#step-1-install-the-parallels-virtual-machine"><i class="anchor-icon"></i></a>Step 1. Install the Parallels virtual machine</h3>
 <p>Parallels can be obtained <a href="https://www.parallels.com/">here</a>, it features a fully-functional trial version.</p>
@@ -416,8 +416,18 @@ BAZEL=&quot;$HOME/bazel/bazel&quot; sh buildbox/build-telegram.sh verify</code><
 <li><p>If the gradle version used in the Dockerfile is not available anymore and building of the Docker image fails, wait for a Dockerfile update or update manually to lastest available version.</p>
 </li>
 </ol>
-<p>…</p>
-<p>We will update this section with information on overcoming other common issues.</p>
+<h3><a class="anchor" name="troubleshooting-ios" href="#troubleshooting-ios"><i class="anchor-icon"></i></a>Troubleshooting: iOS</h3>
+<p>Due to recent changes introduced in <strong>XCode 14</strong> by <strong>Apple</strong>, it is currently not possible to create <a href="#reproducible-builds-for-ios">reproducible builds for iOS</a> using tools officially supported by Apple. <strong>We will update this page as soon as Apple resolves the issue.</strong></p>
+<p>To confirm the issue for yourself, follow these steps:</p>
+<ol>
+<li>Unzip <a href="/">link-issue.zip</a></li>
+<li><code>sh test-link.sh</code></li>
+<li>Compare <code>link1.output</code> and <code>link.output</code>. Specifically:</li>
+</ol>
+<ul>
+<li>With some probability, the ordering of the <code>LC_LOAD_DYLIB</code> commands will vary.</li>
+<li>The <code>__LIKEDIT</code> section will <strong>always vary</strong>.</li>
+</ul>
 </div>
   
 </div>
