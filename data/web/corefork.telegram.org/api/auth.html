@@ -62,6 +62,8 @@ If any of the logout tokens matches the account we're trying to login into and t
 <p>The system will automatically choose how to send the authorization code; there are multiple possible ways the code can arrive:</p>
 <ul>
 <li><a href="/constructor/auth.loggedOut">Logout tokens »</a></li>
+<li><a href="#email-verification">Email verification »</a>: the code wasn't sent yet, the user should verify an email that will be used to send the login code.</li>
+<li><a href="#email-sign-in">Email verification »</a>: the code was sent to the configured login email.</li>
 <li><a href="/constructor/auth.sentCodeTypeApp">Telegram code</a></li>
 <li><a href="/constructor/auth.sentCodeTypeSms">SMS code</a></li>
 <li><a href="/constructor/auth.sentCodeTypeCall">Phone call</a>: a synthesized voice will tell the user which verification code to input.</li>
@@ -104,6 +106,78 @@ For example, the latter is required in newer versions of android, to use the <a 
 <p>If the message takes too long (<code>timeout</code> seconds) to arrive at the phone, the <a href="/method/auth.resendCode">auth.resendCode</a> method may be invoked to resend a code of type <code>next_type</code>.
 If the same happens again, you can use <a href="/method/auth.resendCode">auth.resendCode</a> with the <code>next_type</code> returned by the previous call to <a href="/method/auth.resendCode">auth.resendCode</a>.
 To cancel the verification code use <a href="/method/auth.cancelCode">auth.cancelCode</a>.</p>
+<h3><a class="anchor" href="#email-verification" id="email-verification" name="email-verification"><i class="anchor-icon"></i></a>Email verification</h3>
+<pre><code><a href='/constructor/auth.sentCodeTypeSetUpEmailRequired'>auth.sentCodeTypeSetUpEmailRequired</a>#a5491dea flags:<a href='/type/%23'>#</a> apple_signin_allowed:flags.0?<a href='/constructor/true'>true</a> google_signin_allowed:flags.1?<a href='/constructor/true'>true</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
+
+<a href='/constructor/emailVerifyPurposeLoginSetup'>emailVerifyPurposeLoginSetup</a>#4345be73 phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> = <a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a>;
+
+<a href='/constructor/emailVerificationCode'>emailVerificationCode</a>#922e55a9 code:<a href='/type/string'>string</a> = <a href='/type/EmailVerification'>EmailVerification</a>;
+<a href='/constructor/emailVerificationGoogle'>emailVerificationGoogle</a>#db909ec2 token:<a href='/type/string'>string</a> = <a href='/type/EmailVerification'>EmailVerification</a>;
+<a href='/constructor/emailVerificationApple'>emailVerificationApple</a>#96d074fd token:<a href='/type/string'>string</a> = <a href='/type/EmailVerification'>EmailVerification</a>;
+
+<a href='/constructor/account.sentEmailCode'>account.sentEmailCode</a>#811f854f email_pattern:<a href='/type/string'>string</a> length:<a href='/type/int'>int</a> = <a href='/type/account.SentEmailCode'>account.SentEmailCode</a>;
+
+<a href='/constructor/account.emailVerifiedLogin'>account.emailVerifiedLogin</a>#e1bb0d61 email:<a href='/type/string'>string</a> sent_code:<a href='/type/auth.SentCode'>auth.SentCode</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;
+
+<a href='/constructor/emailVerifyPurposeLoginChange'>emailVerifyPurposeLoginChange</a>#527d22eb = <a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a>;
+<a href='/constructor/account.emailVerified'>account.emailVerified</a>#2b96cd1b email:<a href='/type/string'>string</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;
+
+---functions---
+
+<a href='/method/account.sendVerifyEmailCode'>account.sendVerifyEmailCode</a>#98e037bb purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> email:<a href='/type/string'>string</a> = <a href='/type/account.SentEmailCode'>account.SentEmailCode</a>;
+<a href='/method/account.verifyEmail'>account.verifyEmail</a>#32da4cf purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> verification:<a href='/type/EmailVerification'>EmailVerification</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;</code></pre>
+<p>Telegram may return a <a href="/constructor/auth.sentCodeTypeSetUpEmailRequired">auth.sentCodeTypeSetUpEmailRequired</a> code type in the <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor returned by <a href="/method/auth.sendCode">auth.sendCode</a>.<br>
+In this case, clients should ask the user to verify an email address that will be used to receive the login code as follows:  </p>
+<ul>
+<li>
+<p>If the <code>google_signin_allowed</code> or <code>apple_signin_allowed</code> flags are set, users can directly verify their email with Google/Apple ID as specified <a href="https://developers.google.com/identity/sign-in/android/sign-in">here (Google ID) »</a> and <a href="https://developer.apple.com/documentation/sign_in_with_apple">here (Apple ID) »</a>.<br>
+After obtaining the ID token, call <a href="/method/account.verifyEmail">account.verifyEmail</a>, providing the following parameters:</p>
+<ul>
+<li><code>purpose</code> - A <a href="/constructor/emailVerifyPurposeLoginSetup">emailVerifyPurposeLoginSetup</a> constructor</li>
+<li><code>purpose.phone_number</code> - The phone number used with <a href="/method/auth.sendCode">auth.sendCode</a></li>
+<li><code>purpose.phone_code_hash</code> - The phone code hash contained in the <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor returned by <a href="/method/auth.sendCode">auth.sendCode</a></li>
+<li><code>verification</code> - <a href="/constructor/emailVerificationGoogle">emailVerificationGoogle</a> or <a href="/constructor/emailVerificationApple">emailVerificationApple</a></li>
+<li><code>verification.token</code> - The ID token returned by the Google ID API.</li>
+</ul>
+<p>On success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return a <a href="/method/account.emailVerifiedLogin">account.emailVerifiedLogin</a> constructor with an <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor that should be handled <a href="#code-types">as usual »</a>.  </p>
+</li>
+<li>
+<p>Otherwise, ask the user to enter an email address and then call <a href="/method/account.sendVerifyEmailCode">account.sendVerifyEmailCode</a>, providing the following parameters:</p>
+<ul>
+<li><code>email</code> - The email address</li>
+<li><code>purpose</code> - A <a href="/constructor/emailVerifyPurposeLoginSetup">emailVerifyPurposeLoginSetup</a> constructor</li>
+<li><code>purpose.phone_number</code> - The phone number used with <a href="/method/auth.sendCode">auth.sendCode</a></li>
+<li><code>purpose.phone_code_hash</code> - The phone code hash contained in the <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor returned by <a href="/method/auth.sendCode">auth.sendCode</a></li>
+</ul>
+<p>Once the user receives and inputs the verification code, call <a href="/method/account.verifyEmail">account.verifyEmail</a>, providing the following parameters:</p>
+<ul>
+<li><code>purpose</code> - A <a href="/constructor/emailVerifyPurposeLoginSetup">emailVerifyPurposeLoginSetup</a> constructor</li>
+<li><code>purpose.phone_number</code> - The phone number used with <a href="/method/auth.sendCode">auth.sendCode</a></li>
+<li><code>purpose.phone_code_hash</code> - The phone code hash contained in the <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor returned by <a href="/method/auth.sendCode">auth.sendCode</a></li>
+<li><code>verification</code> - <a href="/constructor/emailVerificationCode">emailVerificationCode</a></li>
+<li><code>verification.code</code> - The verification code received by the user.</li>
+</ul>
+<p>On success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return a <a href="/method/account.emailVerifiedLogin">account.emailVerifiedLogin</a> constructor with an <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor that should be handled <a href="#code-types">as usual »</a>.  </p>
+</li>
+</ul>
+<p>To change the login email after login, pass <a href="/constructor/emailVerifyPurposeLoginChange">emailVerifyPurposeLoginChange</a> as <code>purpose</code>, following the exact same Google ID/Apple ID/email code login flow as above: on success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return a <a href="/method/account.emailVerified">account.emailVerified</a> constructor.</p>
+<h3><a class="anchor" href="#email-sign-in" id="email-sign-in" name="email-sign-in"><i class="anchor-icon"></i></a>Email sign in</h3>
+<pre><code><a href='/constructor/auth.sentCodeTypeEmailCode'>auth.sentCodeTypeEmailCode</a>#5a159841 flags:<a href='/type/%23'>#</a> apple_signin_allowed:flags.0?<a href='/constructor/true'>true</a> google_signin_allowed:flags.1?<a href='/constructor/true'>true</a> email_pattern:<a href='/type/string'>string</a> length:<a href='/type/int'>int</a> next_phone_login_date:flags.2?<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
+
+<a href='/constructor/emailVerifyPurposeLoginSetup'>emailVerifyPurposeLoginSetup</a>#4345be73 phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> = <a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a>;
+<a href='/constructor/emailVerifyPurposeLoginChange'>emailVerifyPurposeLoginChange</a>#527d22eb = <a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a>;
+
+<a href='/constructor/emailVerificationCode'>emailVerificationCode</a>#922e55a9 code:<a href='/type/string'>string</a> = <a href='/type/EmailVerification'>EmailVerification</a>;
+<a href='/constructor/emailVerificationGoogle'>emailVerificationGoogle</a>#db909ec2 token:<a href='/type/string'>string</a> = <a href='/type/EmailVerification'>EmailVerification</a>;
+<a href='/constructor/emailVerificationApple'>emailVerificationApple</a>#96d074fd token:<a href='/type/string'>string</a> = <a href='/type/EmailVerification'>EmailVerification</a>;
+
+<a href='/constructor/account.emailVerified'>account.emailVerified</a>#2b96cd1b email:<a href='/type/string'>string</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;
+<a href='/constructor/account.emailVerifiedLogin'>account.emailVerifiedLogin</a>#e1bb0d61 email:<a href='/type/string'>string</a> sent_code:<a href='/type/auth.SentCode'>auth.SentCode</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;
+
+---functions---
+
+<a href='/method/account.sendVerifyEmailCode'>account.sendVerifyEmailCode</a>#98e037bb purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> email:<a href='/type/string'>string</a> = <a href='/type/account.SentEmailCode'>account.SentEmailCode</a>;
+<a href='/method/account.verifyEmail'>account.verifyEmail</a>#32da4cf purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> verification:<a href='/type/EmailVerification'>EmailVerification</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;</code></pre>
 <h3><a class="anchor" href="#sign-insign-up" id="sign-insign-up" name="sign-insign-up"><i class="anchor-icon"></i></a>Sign in/sign up</h3>
 <p>When user enters verification code, the <a href="/method/auth.signIn">auth.signIn</a> method must be used to validate it and possibly sign user in.</p>
 <p>If the code was entered correctly, but the method returns <a href="/constructor/auth.authorizationSignUpRequired">auth.authorizationSignUpRequired</a>, it means that account with this phone number doesn't exist yet: user needs to provide basic information, accept terms of service and then the new user registration method (<a href="/method/auth.signUp">auth.signUp</a>) must be invoked.</p>
