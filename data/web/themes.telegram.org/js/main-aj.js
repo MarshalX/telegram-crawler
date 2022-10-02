@@ -675,6 +675,12 @@ function openPopup(popup, options) {
   if (document.activeElement) {
     document.activeElement.blur();
   }
+  if (options.onOpen) {
+    $popup.one('popup:open', options.onOpen);
+  }
+  if (options.onClose) {
+    $popup.one('popup:close', options.onClose);
+  }
   if (options.closeByClickOutside) {
     $popup.on('click', function(e) {
       if ($(e.target).closest('body').length &&

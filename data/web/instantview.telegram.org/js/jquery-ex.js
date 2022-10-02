@@ -122,6 +122,19 @@
     }
     return this.prepareSlideY(callback).toggleClass('shide', state);
   };
+  $.fn.fitText = function() {
+    return this.map(function(){
+      while (this.scrollWidth > this.offsetWidth) {
+        var size = $(this).css('font-size');
+        size = parseInt(size) - 0.5;
+        $(this).css('font-size', size + 'px');
+        if (size <= 9) {
+          break;
+        }
+      }
+      return this;
+    });
+  };
   $.fn.highlight = function(delay) {
     var $this = this;
     $this.addClass('highlight');
@@ -1041,7 +1054,13 @@
     if (typeof val !== 'undefined') {
       return this.each(function() {
         if (this.tagName == 'TEXTAREA' || this.tagName == 'INPUT' || this instanceof RadioNodeList) {
-          this.value = val;
+          if (this instanceof RadioNodeList && val === '') {
+            for (var i = 0; i < this.length; i++) {
+              this[i].checked = false;
+            }
+          } else {
+            this.value = val;
+          }
         } else {
           $(this).text(val).trigger('input');
         }
@@ -1659,7 +1678,7 @@ function copyToClipboard(str) {
     document.getSelection().addRange(selected);
   }
 }
-function formatDateTime(datetime, short) {
+function formatDateTime(datetime, short, full) {
   if (short) {
     var date = new Date(datetime);
     var cur_date = new Date();
@@ -1669,16 +1688,19 @@ function formatDateTime(datetime, short) {
         cur_date - date < 6*3600*1000) {
       return formatTime(datetime);
     }
-    return formatDate(datetime);
+    return formatDate(datetime, full);
   }
-  return formatDate(datetime) + ' at ' + formatTime(datetime);
+  return formatDate(datetime, full) + ' at ' + formatTime(datetime);
 }
-function formatDate(datetime) {
+function formatDate(datetime, full) {
   var date = new Date(datetime);
   var cur_date = new Date();
   var j = date.getDate();
   var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()];
   var Y = date.getFullYear();
+  if (full) {
+    return j + ' ' + M + ' ' + Y;
+  }
   if (cur_date.getFullYear() == date.getFullYear() ||
       cur_date - date < 90*86400*1000) {
     return M + ' ' + j;
