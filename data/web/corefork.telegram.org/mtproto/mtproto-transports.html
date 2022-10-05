@@ -177,8 +177,8 @@ The secret is a 16-byte string, usually distributed in its hexadecimal form alon
 <p>Often, a 17-byte version of the secret can be found: this simply indicates that the client should use a specific MTProto transport (based on the first byte, usually it's <code>0xdd</code>, to indicate that the padded intermediate protocol should be used <code>0xdddddddd</code>; however, clients should default to the padded intermediate transport whenever an additional byte in the secret is encountered).</p>
 <p>The extracted encryption and decryption keys must be concatenated with the secret (the first byte of which should be ignored if it's the 17-byte version), and the SHA256 hash of such string should be used as encryption/decryption key.</p>
 <p>The obtained encryption and decryption key/IV pairs must then be used with <strong>AES-256-CTR</strong> to encrypt and decrypt all outgoing and incoming payloads.<br>
-The encryption and decryption counters must be reused for every payload, until the TCP/WS connection is closed.<br>
-In other words, reuse the same <strong>AES-256-CTR</strong> OpenSSL instance until the connection is closed.  </p>
+The final value of the encryption/decryption counter after handling an MTProto payload must be used as IV for the next payload, until the TCP/WS connection is closed.<br>
+In other words, reuse the two encryption and decryption <strong>AES-256-CTR</strong> OpenSSL instances until the connection is closed.  </p>
 <p>The first thing that must be encrypted using the encryption key is the initialization payload itself.
 Then bytes <code>56-64</code> of the encrypted initialization payload are substituted in the original initialization payload: this is the part that contains the constant MTProto transport protocol identifier and the DC ID (<strong>only for MTProxies</strong>).</p>
 <p>The final initialization payload must then be sent in the socket as <strong>first 64 bytes</strong> after the TCP handshake.</p>
