@@ -661,7 +661,7 @@ function openPopup(popup, options) {
   if (!popup_id) {
     if (!Popups._pid) Popups._pid = 0;
     popup_id = ++Popups._pid;
-    $popup.data('puid', popup_id);
+    $popup.data('puid', popup_id).addClass('aj_popup');
   }
   $popup.data('options', options);
   var i = Popups.indexOf(popup_id);
@@ -670,7 +670,9 @@ function openPopup(popup, options) {
   }
   Popups.push(popup_id);
   $('body').css('overflow', 'hidden');
-  $popup.appendTo(window.Aj && Aj.ajContainer || 'body');
+  if (!options.noAppend) {
+    $popup.appendTo(window.Aj && Aj.ajContainer || 'body').redraw();
+  }
   $popup.removeClass('hide');
   if (document.activeElement) {
     document.activeElement.blur();
@@ -696,7 +698,7 @@ function openPopup(popup, options) {
 }
 
 function getPopupById(popup_id) {
-  var $popups = $('.popup-container');
+  var $popups = $('.aj_popup');
   var found = false;
   for (var i = 0; i < $popups.length; i++) {
     $popup = $popups.eq(i);
