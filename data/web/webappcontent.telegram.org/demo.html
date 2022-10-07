@@ -113,6 +113,14 @@ $('#webview_data').html(JSON.stringify(DemoApp.initDataUnsafe, null, 2));
 $('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
 $('#regular_link').attr('href', $('#regular_link').attr('href') + location.hash);
 $('#text_field').focus();
+$('#regular_field').on('input', function(e) {
+  var val = $(this).val().toLowerCase();
+  if (val.indexOf('progress') >= 0) {
+    Telegram.WebApp.MainButton.showProgress();
+  } else {
+    Telegram.WebApp.MainButton.hideProgress();
+  }
+});
 
 $('#ver').text(Telegram.WebApp.version);
 $('#platform').text(Telegram.WebApp.platform);
