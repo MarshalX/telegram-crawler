@@ -2592,7 +2592,7 @@ function checkFrameSize() {
   };
 
   var TWidgetLogin = {
-    init: function(id, bot_id, params, init_auth, lang) {
+    init: function(id, bot_id, params, init_auth) {
       initWidgetFrame({
         auto_height: true,
         auto_width: true
@@ -2600,7 +2600,7 @@ function checkFrameSize() {
       TWidgetLogin.widgetEl = document.getElementById(id);
       TWidgetLogin.botId = bot_id;
       TWidgetLogin.params = params;
-      TWidgetLogin.lang = lang;
+      TWidgetLogin.lang = (params || {}).lang;
       var params_encoded = '', params_arr = [];
       for (var k in params) {
         params_arr.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));

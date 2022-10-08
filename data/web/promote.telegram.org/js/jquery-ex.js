@@ -124,11 +124,18 @@
   };
   $.fn.fitText = function() {
     return this.map(function(){
+      var init_size = $(this).data('init-size');
+      if (!init_size) {
+        init_size = parseInt($(this).css('font-size'));
+        $(this).data('init-size', init_size);
+      }
+      var size = parseInt($(this).css('font-size'));
+      size = parseInt(size);
       while (this.scrollWidth > this.offsetWidth) {
-        var size = $(this).css('font-size');
-        size = parseInt(size) - 0.5;
-        $(this).css('font-size', size + 'px');
-        if (size <= 9) {
+        size -= 0.5;
+        if (size >= init_size * 0.75) {
+          $(this).css('font-size', size + 'px');
+        } else {
           break;
         }
       }

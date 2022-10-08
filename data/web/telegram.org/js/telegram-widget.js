@@ -79,6 +79,18 @@
     return false;
   };
 
+  function isTgAuthFinished() {
+    var locationHash = '', re = /[#\?\&]tgAuthFinished=1$/;
+    try {
+      locationHash = location.hash.toString();
+    } catch (e) {}
+    if (re.test(locationHash)) {
+      location.hash = locationHash.replace(re, '');
+      return true;
+    }
+    return false;
+  }
+
   function getXHR() {
     if (navigator.appName == "Microsoft Internet Explorer"){
       return new ActiveXObject("Microsoft.XMLHTTP");
@@ -163,7 +175,10 @@
       widgetId = widgetEl.getAttribute('data-telegram-login');
       widgetsOrigin = getWidgetsOrigin('https://oauth.telegram.org', 'https://oauth.tg.dev');
       widgetElId = 'telegram-login-' + widgetId.replace(/[^a-z0-9_]/ig, '-');
-      src = widgetsOrigin + '/embed/' + widgetId + '?origin=' + encodeURIComponent(location.origin || location.protocol + '//' + location.hostname);
+      src = widgetsOrigin + '/embed/' + widgetId + '?origin=' + encodeURIComponent(location.origin || location.protocol + '//' + location.hostname) + '&return_to=' + encodeURIComponent(location.href);
+      if (isTgAuthFinished()) {
+        widgetEl.setAttribute('data-init-auth', '1');
+      }
       allowedAttrs = ['size', 'userpic', 'init_auth', 'request_access', 'radius', 'min_width', 'max_width', 'lang'];
       defWidth = 186;
       defHeight = 28;
@@ -431,7 +446,29 @@
 
   var TelegramLogin = {
     popups: {},
-    auth: function(options, callback) {
+    options: null,
+    auth_callback: null,
+    _init: function(options, auth_callback) {
+      TelegramLogin.options = options;
+      TelegramLogin.auth_callback = auth_callback;
+      if (auth_callback &&
+          isTgAuthFinished()) {
+        TelegramLogin.getAuthData(options, function(origin, authData) {
+            auth_callback(authData);
+          });
+      }
+    },
+    _open: function(callback) {
+      TelegramLogin._auth(TelegramLogin.options, function(authData) {
+        if (TelegramLogin.auth_callback) {
+          TelegramLogin.auth_callback(authData);
+        }
+        if (callback) {
+          callback(authData);
+        }
+      });
+    },
+    _auth: function(options, callback) {
       var bot_id = parseInt(options.bot_id);
       if (!bot_id) {
         throw new Error('Bot id required');
@@ -469,7 +506,7 @@
         }
         setTimeout(checkClose, 100, bot_id);
       }
-      var popup_url = Telegram.Login.widgetsOrigin + '/auth?bot_id=' + encodeURIComponent(options.bot_id) + '&origin=' + encodeURIComponent(location.origin || location.protocol + '//' + location.hostname) + (options.request_access ? '&request_access=' + encodeURIComponent(options.request_access) : '') + (options.lang ? '&lang=' + encodeURIComponent(options.lang) : '');
+      var popup_url = Telegram.Login.widgetsOrigin + '/auth?bot_id=' + encodeURIComponent(options.bot_id) + '&origin=' + encodeURIComponent(location.origin || location.protocol + '//' + location.hostname) + (options.request_access ? '&request_access=' + encodeURIComponent(options.request_access) : '') + (options.lang ? '&lang=' + encodeURIComponent(options.lang) : '') + '&return_to=' + encodeURIComponent(location.href);
       var popup = window.open(popup_url, 'telegram_oauth_bot' + bot_id, 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',status=0,location=0,menubar=0,toolbar=0');
       TelegramLogin.popups[bot_id] = {
         window: popup,
@@ -520,7 +557,9 @@
   window.Telegram.getWidgetInfo = getWidgetInfo;
   window.Telegram.setWidgetOptions = setWidgetOptions;
   window.Telegram.Login = {
-    auth: TelegramLogin.auth,
+    init: TelegramLogin._init,
+    open: TelegramLogin._open,
+    auth: TelegramLogin._auth,
     widgetsOrigin: getWidgetsOrigin('https://oauth.telegram.org', 'https://oauth.tg.dev')
   };
 

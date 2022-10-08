@@ -17,8 +17,8 @@ function ajInit(options) {
   }
 
   var $progress = $('#aj_progress'),
-      progressBoxShadow = 'inset 0 2px 0 #39ade7',
-      progressNoBoxShadow = 'inset 0 0 0 #39ade7',
+      progressBoxShadow = 'inset 0 2px 0 var(--accent-color, #39ade7)',
+      progressNoBoxShadow = 'inset 0 0 0 var(--accent-color, #39ade7)',
       progressTransition = 'width .3s linear, box-shadow .2s ease',
       progressTo,
       progressVal = 0;
