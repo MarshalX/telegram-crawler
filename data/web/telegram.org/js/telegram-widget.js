@@ -79,15 +79,21 @@
     return false;
   };
 
-  function isTgAuthFinished() {
-    var locationHash = '', re = /[#\?\&]tgAuthFinished=1$/;
+  function haveTgAuthResult() {
+    var locationHash = '', re = /[#\?\&]tgAuthResult=([A-Za-z0-9\-_=]*)$/, match;
     try {
       locationHash = location.hash.toString();
+      if (match = locationHash.match(re)) {
+        location.hash = locationHash.replace(re, '');
+        var data = match[1] || '';
+        data = data.replace(/-/g, '+').replace(/_/g, '/');
+        var pad = data.length % 4;
+        if (pad > 1) {
+          data += new Array(5 - pad).join('=');
+        }
+        return JSON.parse(window.atob(data));
+      }
     } catch (e) {}
-    if (re.test(locationHash)) {
-      location.hash = locationHash.replace(re, '');
-      return true;
-    }
     return false;
   }
 
@@ -176,9 +182,6 @@
       widgetsOrigin = getWidgetsOrigin('https://oauth.telegram.org', 'https://oauth.tg.dev');
       widgetElId = 'telegram-login-' + widgetId.replace(/[^a-z0-9_]/ig, '-');
       src = widgetsOrigin + '/embed/' + widgetId + '?origin=' + encodeURIComponent(location.origin || location.protocol + '//' + location.hostname) + '&return_to=' + encodeURIComponent(location.href);
-      if (isTgAuthFinished()) {
-        widgetEl.setAttribute('data-init-auth', '1');
-      }
       allowedAttrs = ['size', 'userpic', 'init_auth', 'request_access', 'radius', 'min_width', 'max_width', 'lang'];
       defWidth = 186;
       defHeight = 28;
@@ -206,6 +209,10 @@
       }
       if (widgetEl.hasAttribute('data-onunauth')) {
         onUnauth = __parseFunction(widgetEl.getAttribute('data-onunauth'));
+      }
+      var auth_result = haveTgAuthResult();
+      if (auth_result && onAuthUser) {
+        onAuthUser(auth_result);
       }
     }
     else if (widgetId = widgetEl.getAttribute('data-telegram-share-url')) {
@@ -451,11 +458,9 @@
     _init: function(options, auth_callback) {
       TelegramLogin.options = options;
       TelegramLogin.auth_callback = auth_callback;
-      if (auth_callback &&
-          isTgAuthFinished()) {
-        TelegramLogin.getAuthData(options, function(origin, authData) {
-            auth_callback(authData);
-          });
+      var auth_result = haveTgAuthResult();
+      if (auth_result && auth_callback) {
+        auth_callback(auth_result);
       }
     },
     _open: function(callback) {
