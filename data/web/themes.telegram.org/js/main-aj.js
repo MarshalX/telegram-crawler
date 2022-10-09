@@ -664,6 +664,10 @@ function openPopup(popup, options) {
     $popup.data('puid', popup_id).addClass('aj_popup');
   }
   $popup.data('options', options);
+  var closeOutside = $popup.attr('data-close-outside');
+  if (closeOutside && !options.closeByClickOutside) {
+    options.closeByClickOutside = '.' + closeOutside;
+  }
   var i = Popups.indexOf(popup_id);
   if (i >= 0) {
     Popups.splice(i, 1);
