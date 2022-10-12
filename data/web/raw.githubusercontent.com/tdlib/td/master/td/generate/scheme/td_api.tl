@@ -163,9 +163,6 @@ remoteFile id:string unique_id:string is_uploading_active:Bool is_uploading_comp
 //@remote Information about the remote copy of the file
 file id:int32 size:int53 expected_size:int53 local:localFile remote:remoteFile = File;
 
-//@description Represents a list of files @files List of files
-files files:vector<file> = Files;
-
 
 //@class InputFile @description Points to a file
 
@@ -334,9 +331,11 @@ voiceNote duration:int32 waveform:bytes mime_type:string speech_recognition_resu
 
 //@description Describes an animated or custom representation of an emoji
 //@sticker Sticker for the emoji; may be null if yet unknown for a custom emoji. If the sticker is a custom emoji, it can have arbitrary format different from stickerFormatTgs
+//@sticker_width Expected width of the sticker, which can be used if the sticker is null
+//@sticker_height Expected height of the sticker, which can be used if the sticker is null
 //@fitzpatrick_type Emoji modifier fitzpatrick type; 0-6; 0 if none
 //@sound File containing the sound to be played when the sticker is clicked; may be null. The sound is encoded with the Opus codec, and stored inside an OGG container
-animatedEmoji sticker:sticker fitzpatrick_type:int32 sound:file = AnimatedEmoji;
+animatedEmoji sticker:sticker sticker_width:int32 sticker_height:int32 fitzpatrick_type:int32 sound:file = AnimatedEmoji;
 
 //@description Describes a user contact @phone_number Phone number of the user @first_name First name of the user; 1-255 characters in length @last_name Last name of the user @vcard Additional data about the user in a form of vCard; 0-2048 bytes in length @user_id Identifier of the user, if known; otherwise 0
 contact phone_number:string first_name:string last_name:string vcard:string user_id:int53 = Contact;
@@ -478,6 +477,7 @@ chatAdministratorRights can_manage_chat:Bool can_change_info:Bool can_post_messa
 //@store_product_id Identifier of the store product associated with the option
 //@payment_link An internal link to be opened for buying Telegram Premium to the user if store payment isn't possible; may be null if direct payment isn't available
 premiumPaymentOption currency:string amount:int53 discount_percentage:int32 month_count:int32 store_product_id:string payment_link:InternalLinkType = PremiumPaymentOption;
+
 
 //@description Describes a custom emoji to be shown instead of the Telegram Premium badge @custom_emoji_id Identifier of the custom emoji in stickerFormatTgs format. If the custom emoji belongs to the sticker set GetOption("themed_emoji_statuses_sticker_set_id"), then it's color must be changed to the color of the Telegram Premium badge
 emojiStatus custom_emoji_id:int64 = EmojiStatus;
@@ -718,7 +718,7 @@ basicGroupFullInfo photo:chatPhoto description:string creator_user_id:int53 memb
 //@id Supergroup or channel identifier
 //@username Username of the supergroup or channel; empty for private supergroups or channels
 //@date Point in time (Unix timestamp) when the current user joined, or the point in time when the supergroup or channel was created, in case the user is not a member
-//@status Status of the current user in the supergroup or channel; custom title will be always empty
+//@status Status of the current user in the supergroup or channel; custom title will always be empty
 //@member_count Number of members in the supergroup or channel; 0 if unknown. Currently, it is guaranteed to be known only if the supergroup or channel was received through searchPublicChats, searchChatsNearby, getInactiveSupergroupChats, getSuitableDiscussionChats, getGroupsInCommon, or getUserPrivacySettingRules
 //@has_linked_chat True, if the channel has a discussion group, or the supergroup is the designated discussion group for a channel
 //@has_location True, if the supergroup is connected to a location, i.e. the supergroup is a location-based supergroup
@@ -793,6 +793,13 @@ messageSenderChat chat_id:int53 = MessageSender;
 
 //@description Represents a list of message senders @total_count Approximate total number of messages senders found @senders List of message senders
 messageSenders total_count:int32 senders:vector<MessageSender> = MessageSenders;
+
+
+//@description Represents a message sender, which can be used to send messages in a chat @sender Available message senders @needs_premium True, if Telegram Premium is needed to use the message sender
+chatMessageSender sender:MessageSender needs_premium:Bool = ChatMessageSender;
+
+//@description Represents a list of message senders, which can be used to send messages in a chat @senders List of available message senders
+chatMessageSenders senders:vector<chatMessageSender> = ChatMessageSenders;
 
 
 //@class MessageForwardOrigin @description Contains information about the origin of a forwarded message
@@ -1634,13 +1641,34 @@ paymentResult success:Bool verification_url:string = PaymentResult;
 paymentReceipt title:string description:formattedText photo:photo date:int32 seller_bot_user_id:int53 payment_provider_user_id:int53 invoice:invoice order_info:orderInfo shipping_option:shippingOption credentials_title:string tip_amount:int53 = PaymentReceipt;
 
 
-//@class InputInvoice @description Describe an invoice to process
+//@class InputInvoice @description Describes an invoice to process
 
 //@description An invoice from a message of the type messageInvoice @chat_id Chat identifier of the message @message_id Message identifier
 inputInvoiceMessage chat_id:int53 message_id:int53 = InputInvoice;
 
 //@description An invoice from a link of the type internalLinkTypeInvoice @name Name of the invoice
 inputInvoiceName name:string = InputInvoice;
+
+
+//@class MessageExtendedMedia @description Describes a media, which is attached to an invoice
+
+//@description The media is hidden until the invoice is paid
+//@width Media width; 0 if unknown
+//@height Media height; 0 if unknown
+//@duration Media duration; 0 if unknown
+//@minithumbnail Media minithumbnail; may be null
+//@caption Media caption
+messageExtendedMediaPreview width:int32 height:int32 duration:int32 minithumbnail:minithumbnail caption:formattedText = MessageExtendedMedia;
+
+//@description The media is a photo @photo The photo @caption Photo caption
+messageExtendedMediaPhoto photo:photo caption:formattedText = MessageExtendedMedia;
+
+//@description The media is a video @video The video @caption Photo caption
+messageExtendedMediaVideo video:video caption:formattedText = MessageExtendedMedia;
+
+//@description The media is unuspported @caption Media caption
+messageExtendedMediaUnsupported caption:formattedText = MessageExtendedMedia;
+
 
 
 //@description File with the date it was uploaded @file The file @date Point in time (Unix timestamp) when the file was uploaded
@@ -1960,7 +1988,8 @@ messagePoll poll:poll = MessageContent;
 //@description A message with an invoice from a bot @title Product title @param_description Product description @photo Product photo; may be null @currency Currency for the product price @total_amount Product total price in the smallest units of the currency
 //@start_parameter Unique invoice bot start_parameter. To share an invoice use the URL https://t.me/{bot_username}?start={start_parameter} @is_test True, if the invoice is a test invoice
 //@need_shipping_address True, if the shipping address must be specified @receipt_message_id The identifier of the message with the receipt, after the product has been purchased
-messageInvoice title:string description:formattedText photo:photo currency:string total_amount:int53 start_parameter:string is_test:Bool need_shipping_address:Bool receipt_message_id:int53 = MessageContent;
+//@extended_media Extended media attached to the invoice; may be null
+messageInvoice title:string description:formattedText photo:photo currency:string total_amount:int53 start_parameter:string is_test:Bool need_shipping_address:Bool receipt_message_id:int53 extended_media:MessageExtendedMedia = MessageContent;
 
 //@description A message with information about an ended call @is_video True, if the call was a video call @discard_reason Reason why the call was discarded @duration Call duration, in seconds
 messageCall is_video:Bool discard_reason:CallDiscardReason duration:int32 = MessageContent;
@@ -2176,7 +2205,7 @@ inputMessageAnimation animation:InputFile thumbnail:inputThumbnail added_sticker
 //@performer Performer of the audio; 0-64 characters, may be replaced by the server @caption Audio caption; pass null to use an empty caption; 0-GetOption("message_caption_length_max") characters
 inputMessageAudio audio:InputFile album_cover_thumbnail:inputThumbnail duration:int32 title:string performer:string caption:formattedText = InputMessageContent;
 
-//@description A document message (general file) @document Document to be sent @thumbnail Document thumbnail; pass null to skip thumbnail uploading @disable_content_type_detection If true, automatic file type detection will be disabled and the document will be always sent as file. Always true for files sent to secret chats @caption Document caption; pass null to use an empty caption; 0-GetOption("message_caption_length_max") characters
+//@description A document message (general file) @document Document to be sent @thumbnail Document thumbnail; pass null to skip thumbnail uploading @disable_content_type_detection If true, automatic file type detection will be disabled and the document will always be sent as file. Always true for files sent to secret chats @caption Document caption; pass null to use an empty caption; 0-GetOption("message_caption_length_max") characters
 inputMessageDocument document:InputFile thumbnail:inputThumbnail disable_content_type_detection:Bool caption:formattedText = InputMessageContent;
 
 //@description A photo message @photo Photo to send. The photo must be at most 10 MB in size. The photo's width and height must not exceed 10000 in total. Width and height ratio must be at most 20 @thumbnail Photo thumbnail to be sent; pass null to skip thumbnail uploading. The thumbnail is sent to the other party only in secret chats @added_sticker_file_ids File identifiers of the stickers added to the photo, if applicable @width Photo width @height Photo height @caption Photo caption; pass null to use an empty caption; 0-GetOption("message_caption_length_max") characters
@@ -2218,7 +2247,8 @@ inputMessageGame bot_user_id:int53 game_short_name:string = InputMessageContent;
 //@photo_url Product photo URL; optional @photo_size Product photo size @photo_width Product photo width @photo_height Product photo height
 //@payload The invoice payload @provider_token Payment provider token @provider_data JSON-encoded data about the invoice, which will be shared with the payment provider
 //@start_parameter Unique invoice bot deep link parameter for the generation of this invoice. If empty, it would be possible to pay directly from forwards of the invoice message
-inputMessageInvoice invoice:invoice title:string description:string photo_url:string photo_size:int32 photo_width:int32 photo_height:int32 payload:bytes provider_token:string provider_data:string start_parameter:string = InputMessageContent;
+//@extended_media_content The content of extended media attached to the invoice. The content of the message to be sent. Must be one of the following types: inputMessagePhoto, inputMessageVideo
+inputMessageInvoice invoice:invoice title:string description:string photo_url:string photo_size:int32 photo_width:int32 photo_height:int32 payload:bytes provider_token:string provider_data:string start_parameter:string extended_media_content:InputMessageContent = InputMessageContent;
 
 //@description A message with a poll. Polls can't be sent to secret chats. Polls can be sent only to a private chat with a bot @question Poll question; 1-255 characters (up to 300 characters for bots) @options List of poll answer options, 2-10 strings 1-100 characters each
 //@is_anonymous True, if the poll voters are anonymous. Non-anonymous polls can't be sent or forwarded to channels @type Type of the poll
@@ -3146,7 +3176,7 @@ pushReceiverId id:int64 = PushReceiverId;
 backgroundFillSolid color:int32 = BackgroundFill;
 
 //@description Describes a gradient fill of a background @top_color A top color of the background in the RGB24 format @bottom_color A bottom color of the background in the RGB24 format
-//@rotation_angle Clockwise rotation angle of the gradient, in degrees; 0-359. Must be always divisible by 45
+//@rotation_angle Clockwise rotation angle of the gradient, in degrees; 0-359. Must always be divisible by 45
 backgroundFillGradient top_color:int32 bottom_color:int32 rotation_angle:int32 = BackgroundFill;
 
 //@description Describes a freeform gradient fill of a background @colors A list of 3 or 4 colors of the freeform gradients in the RGB24 format
@@ -3725,8 +3755,8 @@ internalLinkTypeFilterSettings = InternalLinkType;
 //@bot_username Username of the bot that owns the game @game_short_name Short name of the game
 internalLinkTypeGame bot_username:string game_short_name:string = InternalLinkType;
 
-//@description The link must be opened in an Instant View. Call getWebPageInstantView with the given URL to process the link @url URL to be passed to getWebPageInstantView
-internalLinkTypeInstantView url:string = InternalLinkType;
+//@description The link must be opened in an Instant View. Call getWebPageInstantView with the given URL to process the link @url URL to be passed to getWebPageInstantView @fallback_url An URL to open if getWebPageInstantView fails
+internalLinkTypeInstantView url:string fallback_url:string = InternalLinkType;
 
 //@description The link is a link to an invoice. Call getPaymentForm with the given invoice name to process the link @invoice_name Name of the invoice
 internalLinkTypeInvoice invoice_name:string = InternalLinkType;
@@ -4972,6 +5002,12 @@ getChatMessageCalendar chat_id:int53 filter:SearchMessagesFilter from_message_id
 //@description Returns approximate number of messages of the specified type in the chat @chat_id Identifier of the chat in which to count messages @filter Filter for message content; searchMessagesFilterEmpty is unsupported in this function @return_local Pass true to get the number of messages without sending network requests, or -1 if the number of messages is unknown locally
 getChatMessageCount chat_id:int53 filter:SearchMessagesFilter return_local:Bool = Count;
 
+//@description Returns approximate 1-based position of a message among messages, which can be found by the specified filter in the chat. Cannot be used in secret chats
+//@chat_id Identifier of the chat in which to find message position @message_id Message identifier
+//@filter Filter for message content; searchMessagesFilterEmpty, searchMessagesFilterUnreadMention, searchMessagesFilterUnreadReaction, and searchMessagesFilterFailedToSend are unsupported in this function
+//@message_thread_id If not 0, only messages in the specified thread will be considered; supergroups only
+getChatMessagePosition chat_id:int53 message_id:int53 filter:SearchMessagesFilter message_thread_id:int53 = Count;
+
 //@description Returns all scheduled messages in a chat. The messages are returned in a reverse chronological order (i.e., in order of decreasing message_id) @chat_id Chat identifier
 getChatScheduledMessages chat_id:int53 = Messages;
 
@@ -5027,7 +5063,7 @@ rateSpeechRecognition chat_id:int53 message_id:int53 is_good:Bool = Ok;
 
 
 //@description Returns list of message sender identifiers, which can be used to send messages in a chat @chat_id Chat identifier
-getChatAvailableMessageSenders chat_id:int53 = MessageSenders;
+getChatAvailableMessageSenders chat_id:int53 = ChatMessageSenders;
 
 //@description Selects a message sender to send messages in a chat @chat_id Chat identifier @message_sender_id New message sender for the chat
 setChatMessageSender chat_id:int53 message_sender_id:MessageSender = Ok;
@@ -5179,8 +5215,8 @@ editMessageSchedulingState chat_id:int53 message_id:int53 scheduling_state:Messa
 //@description Returns information about a emoji reaction. Returns a 404 error if the reaction is not found @emoji Text representation of the reaction
 getEmojiReaction emoji:string = EmojiReaction;
 
-//@description Returns TGS files with generic animations for custom emoji reactions
-getCustomEmojiReactionAnimations = Files;
+//@description Returns TGS stickers with generic animations for custom emoji reactions
+getCustomEmojiReactionAnimations = Stickers;
 
 //@description Returns reactions, which can be added to a message. The list can change after updateActiveEmojiReactions, updateChatAvailableReactions for the chat, or updateMessageInteractionInfo for the message
 //@chat_id Identifier of the chat to which the message belongs
@@ -6024,12 +6060,12 @@ sharePhoneNumber user_id:int53 = Ok;
 getUserProfilePhotos user_id:int53 offset:int32 limit:int32 = ChatPhotos;
 
 
-//@description Returns stickers from the installed sticker sets that correspond to a given emoji. If the emoji is non-empty, then favorite, recently used or trending stickers may also be returned
-//@sticker_type Type of the sticker sets to return
-//@emoji String representation of emoji. If empty, returns all known installed stickers
+//@description Returns stickers from the installed sticker sets that correspond to a given emoji or can be found by sticker-specific keywords. If the query is non-empty, then favorite, recently used or trending stickers may also be returned
+//@sticker_type Type of the stickers to return
+//@query Search query; an emoji or a keyword prefix. If empty, returns all known installed stickers
 //@limit The maximum number of stickers to be returned
-//@chat_id Chat identifier for which to return stickers. Available custom emoji may be different for different chats
-getStickers sticker_type:StickerType emoji:string limit:int32 chat_id:int53 = Stickers;
+//@chat_id Chat identifier for which to return stickers. Available custom emoji stickers may be different for different chats
+getStickers sticker_type:StickerType query:string limit:int32 chat_id:int53 = Stickers;
 
 //@description Searches for stickers from public sticker sets that correspond to a given emoji @emoji String representation of emoji; must be non-empty @limit The maximum number of stickers to be returned; 0-100
 searchStickers emoji:string limit:int32 = Stickers;
