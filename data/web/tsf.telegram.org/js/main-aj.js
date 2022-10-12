@@ -257,6 +257,7 @@ function ajInit(options) {
       $(ajContainer).off('.curPage');
       $(document).off('.curPage');
     });
+    $(ajContainer).trigger('page:load');
     if (Aj.layer) {
       layerLoaded();
     }
@@ -308,6 +309,7 @@ function ajInit(options) {
         return unloaded;
       }
     });
+    $(ajContainer).trigger('layer:load');
   }
 
   function onResult(url, http_code, result, push_state) {
