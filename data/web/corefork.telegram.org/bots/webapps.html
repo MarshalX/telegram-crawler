@@ -57,6 +57,13 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="august-12-2022" href="#august-12-2022"><i class="anchor-icon"></i></a>August 12, 2022</h4>
+<p><strong>Bot API 6.2</strong></p>
+<ul>
+<li>Added the field <em>isClosingConfirmationEnabled</em> and the methods <em>enableClosingConfirmation</em>, <em>disableClosingConfirmation</em>, <em>showPopup</em>, <em>showAlert</em>, <em>showConfirm</em> to the class <a href="#initializing-web-apps">WebApp</a>.</li>
+<li>Added the field <em>is_premium</em> to the class <a href="#webappuser">WebAppUser</a>.</li>
+<li>Added the event <em>popupClosed</em>.</li>
+</ul>
 <h4><a class="anchor" name="june-20-2022" href="#june-20-2022"><i class="anchor-icon"></i></a>June 20, 2022</h4>
 <p><strong>Bot API 6.1</strong></p>
 <ul>
@@ -106,7 +113,7 @@
 <p>To transmit data from the user back to the bot, the Web App can call the <a href="#initializing-web-apps">Telegram.WebApp.sendData</a> method. Data will be transmitted to the bot as a String in a service message. The bot can continue communicating with the user after receiving it.</p>
 <p><strong>Good for:</strong></p>
 <ul>
-<li><strong>Custom data input interfaces</strong> (a personalized calendar for selecting dates; selecting data from a list with advanced search options; a randomizer that lets the user “spin a wheel” and chooses one of the available options, etc.)</li>
+<li><strong>Сustom data input interfaces</strong> (a personalized calendar for selecting dates; selecting data from a list with advanced search options; a randomizer that lets the user “spin a wheel” and chooses one of the available options, etc.)</li>
 <li><strong>Reusable components</strong> that do not depend on a particular bot.</li>
 </ul>
 <h4><a class="anchor" name="inline-button-web-apps" href="#inline-button-web-apps"><i class="anchor-icon"></i></a>Inline Button Web Apps</h4>
@@ -146,10 +153,10 @@
 <blockquote>
 <p><strong>TL;DR:</strong> Web App Bots can request to be added directly to a user&#39;s attachment menu, allowing them to be quickly launched from any chat. To try this mode, open this <a href="https://t.me/durgerkingbot?startattach">attachment menu link</a> for <em>@DurgerKingBot</em>, then use the <img class="icon" src="/file/464001085/2/E4hNXSNQimQ.2503/bf6ffcab3cb3afd43d" alt="Attach"> menu in <strong>any type of chat</strong>.</p>
 </blockquote>
-<p>Web App Bots can request to be added directly to a user&#39;s attachment menu, allowing them to be quickly launched from <strong>any type of chat</strong>. <sup><mark>NEW</mark></sup> You can configure in which types of chats your web app can be started from the attachment menu (private, groups, supergroups or channels).</p>
+<p>Web App Bots can request to be added directly to a user&#39;s attachment menu, allowing them to be quickly launched from <strong>any type of chat</strong>. You can configure in which types of chats your web app can be started from the attachment menu (private, groups, supergroups or channels).</p>
 <p>Attachment menu integration is currently only available for major advertisers on the <a href="https://promote.telegram.org/basics">Telegram Ad Platform</a>. However, <strong>all bots</strong> can use it in the <a href="#using-bots-in-the-test-environment">test server environment</a>.</p>
 <p>To enable this feature for your bot, open <a href="https://t.me/botfather">@BotFather</a> <a href="#using-bots-in-the-test-environment">from an account on the test server</a> and send the <code>/setattach</code> command – or go to <em>Bot Settings &gt; Configure Attachment Menu</em>. Then specify the URL that will be opened to launch the bot&#39;s Web App via its icon in the attachment menu.</p>
-<p><sup><mark>NEW</mark></sup> You can add a &#39;Settings&#39; item to the context menu of your Web App using <a href="https://t.me/botfather">@BotFather</a>. When users select this option from the menu, your bot will receive a <code>settingsButtonClicked</code> event.</p>
+<p>You can add a &#39;Settings&#39; item to the context menu of your Web App using <a href="https://t.me/botfather">@BotFather</a>. When users select this option from the menu, your bot will receive a <code>settingsButtonClicked</code> event.</p>
 <p>In addition to the user&#39;s <a href="#color-schemes">theme settings</a>, the bot will receive basic user information (<code>ID</code>, <code>name</code>, <code>username</code>, <code>language_code</code>, <code>photo</code>), as well as public info about the chat partner (<code>ID</code>, <code>name</code>, <code>username</code>, <code>photo</code>) or the chat info (<code>ID</code>, <code>type</code>, <code>title</code>, <code>username</code>, <code>photo</code>) and a unique identifier for the web view session <strong>query_id</strong>, which allows messages of any type to be sent to the chat on behalf of the user that opened the bot.</p>
 <p>The bot can call the Bot API method <a href="/bots/api#answerwebappquery">answerWebAppQuery</a>, which sends an inline message from the user via the bot to the chat where it was launched and closes the Web App.</p>
 <blockquote>
@@ -180,7 +187,7 @@
 <td>An object with input data transferred to the Web App.<br><strong>WARNING:</strong> Data from this field should not be trusted. You should only use data from <em>initData</em> on the bot&#39;s server and only after it has been <a href="#validating-data-received-via-the-web-app">validated</a>.</td>
 </tr>
 <tr>
-<td>version <sup><mark>NEW</mark></sup></td>
+<td>version</td>
 <td>String</td>
 <td>The version of the Bot API available in the user&#39;s Telegram app.</td>
 </tr>
@@ -210,17 +217,22 @@
 <td>The height of the visible area of the Web App in its last stable state. Also available in CSS as a variable <code>var(--tg-viewport-stable-height)</code>.<br><br>The application can display just the top part of the Web App, with its lower part remaining outside the screen area. From this position, the user can “pull” the Web App to its maximum height, while the bot can do the same by calling the <strong>expand()</strong> method. Unlike the value of <code>viewportHeight</code>, the value of <code>viewportStableHeight</code> does not change as the position of the Web App changes with user gestures or during animations. The value of <code>viewportStableHeight</code> will be updated after all gestures and animations are completed and the Web App reaches its final size.<br><br><em>Note the <a href="#events-available-for-web-apps">event</a> <code>viewportChanged</code> with the passed parameter <code>isStateStable=true</code>, which will allow you to track when the stable state of the height of the visible area changes.</em></td>
 </tr>
 <tr>
-<td>headerColor <sup><mark>NEW</mark></sup></td>
+<td>headerColor</td>
 <td>String</td>
 <td>Current header color in the <code>#RRGGBB</code> format.</td>
 </tr>
 <tr>
-<td>backgroundColor <sup><mark>NEW</mark></sup></td>
+<td>backgroundColor</td>
 <td>String</td>
 <td>Current background color in the <code>#RRGGBB</code> format.</td>
 </tr>
 <tr>
-<td>BackButton <sup><mark>NEW</mark></sup></td>
+<td>isClosingConfirmationEnabled <sup><mark>NEW</mark></sup></td>
+<td>Boolean</td>
+<td><em>True</em>, if the confirmation dialog is enabled while the user is trying to close the Web App. <em>False</em>, if the confirmation dialog is disabled.</td>
+</tr>
+<tr>
+<td>BackButton</td>
 <td><a href="#backbutton">BackButton</a></td>
 <td>An object for controlling the back button which can be displayed in the header of the Web App in the Telegram interface.</td>
 </tr>
@@ -230,24 +242,34 @@
 <td>An object for controlling the main button, which is displayed at the bottom of the Web App in the Telegram interface.</td>
 </tr>
 <tr>
-<td>HapticFeedback <sup><mark>NEW</mark></sup></td>
+<td>HapticFeedback</td>
 <td><a href="#hapticfeedback">HapticFeedback</a></td>
 <td>An object for controlling haptic feedback.</td>
 </tr>
 <tr>
-<td>isVersionAtLeast(version) <sup><mark>NEW</mark></sup></td>
+<td>isVersionAtLeast(version)</td>
 <td>Function</td>
 <td>Returns true if the user&#39;s app supports a version of the Bot API that is equal to or higher than the version passed as the parameter.</td>
 </tr>
 <tr>
-<td>setHeaderColor(color) <sup><mark>NEW</mark></sup></td>
+<td>setHeaderColor(color)</td>
 <td>Function</td>
 <td><mark>Bot API 6.1+</mark> A method that sets the app header color. You can only pass <em>Telegram.WebApp.themeParams.bg_color</em> or <em>Telegram.WebApp.themeParams.secondary_bg_color</em> as a color or you can use keywords <em>bg_color</em>, <em>secondary_bg_color</em> instead.</td>
 </tr>
 <tr>
-<td>setBackgroundColor(color) <sup><mark>NEW</mark></sup></td>
+<td>setBackgroundColor(color)</td>
 <td>Function</td>
 <td><mark>Bot API 6.1+</mark> A method that sets the app background color in the <code>#RRGGBB</code> format or you can use keywords <em>bg_color</em>, <em>secondary_bg_color</em> instead.</td>
+</tr>
+<tr>
+<td>enableClosingConfirmation() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that enables a confirmation dialog while the user is trying to close the Web App.</td>
+</tr>
+<tr>
+<td>disableClosingConfirmation() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that disables the confirmation dialog while the user is trying to close the Web App.</td>
 </tr>
 <tr>
 <td>onEvent(eventType, eventHandler)</td>
@@ -265,19 +287,34 @@
 <td>A method used to send data to the bot. When this method is called, a service message is sent to the bot containing the data <em>data</em> of the length up to 4096 bytes, and the Web App is closed. See the field <em>web_app_data</em> in the class <a href="/bots/api#message">Message</a>.<br><br><em>This method is only available for Web Apps launched via a <a href="#keyboard-button-web-apps">Keyboard button</a>.</em></td>
 </tr>
 <tr>
-<td>openLink(url) <sup><mark>NEW</mark></sup></td>
+<td>openLink(url)</td>
 <td>Function</td>
 <td>A method that opens a link in an external browser. The Web App will <em>not</em> be closed.<br><br><em>Note that this method can be called only in response to the user interaction with the Web App interface (e.g. click inside the Web App or on the main button)</em></td>
 </tr>
 <tr>
-<td>openTelegramLink(url) <sup><mark>NEW</mark></sup></td>
+<td>openTelegramLink(url)</td>
 <td>Function</td>
 <td>A method that opens a telegram link inside Telegram app. The Web App <em>will</em> be closed.</td>
 </tr>
 <tr>
-<td>openInvoice(url[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>openInvoice(url[, callback])</td>
 <td>Function</td>
 <td><mark>Bot API 6.1+</mark> A method that opens an invoice using the link <em>url</em>. The Web App will receive the <a href="#events-available-for-web-apps">event</a> <em>invoiceClosed</em> when the invoice is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the invoice status will be passed as the first argument.</td>
+</tr>
+<tr>
+<td>showPopup(params[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that shows a native popup described by the <em>params</em> argument of the type <a href="#popupparams">PopupParams</a>. The Web App will receive the <a href="#events-available-for-web-apps">event</a> <em>popupClosed</em> when the popup is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the field <em>id</em> of the pressed button will be passed as the first argument.</td>
+</tr>
+<tr>
+<td>showAlert(message[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that shows <em>message</em> in a simple alert with a &#39;Close&#39; button. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed.</td>
+</tr>
+<tr>
+<td>showConfirm(message[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that shows <em>message</em> in a simple confirmation window with &#39;OK&#39; and &#39;Cancel&#39; buttons. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed and the first argument will be a boolean indicating whether the user pressed the &#39;OK&#39; button.</td>
 </tr>
 <tr>
 <td>ready()</td>
@@ -338,7 +375,7 @@
 <td><em>Optional</em>. Button text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-button-text-color)</code>.</td>
 </tr>
 <tr>
-<td>secondary_bg_color <sup><mark>NEW</mark></sup></td>
+<td>secondary_bg_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 6.1+</mark> Secondary background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-secondary-bg-color)</code>.</td>
 </tr>
@@ -348,8 +385,64 @@
   <a href="/file/464001695/11185/DAwyUjA7LNA.215601/26f4c8ebf862ae860d" target="_blank"><img src="/file/464001695/11185/DAwyUjA7LNA.215601/26f4c8ebf862ae860d" title="WebViewColors explained"  class="dev_page_image" /></a>
 </div>
 
+<h4><a class="anchor" name="popupparams" href="#popupparams"><i class="anchor-icon"></i></a>PopupParams</h4>
+<p><sup><mark>NEW</mark></sup> This object describes the native popup.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>title</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed in the popup title, 0-64 characters.</td>
+</tr>
+<tr>
+<td>message</td>
+<td>String</td>
+<td>The message to be displayed in the body of the popup, 1-256 characters.</td>
+</tr>
+<tr>
+<td>buttons</td>
+<td>Array of <a href="#popupbutton">PopupButton</a></td>
+<td><em>Optional</em>. List of buttons to be displayed in the popup, 1-3 buttons. Set to <em>[{“type”:“close”}]</em> by default.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="popupbutton" href="#popupbutton"><i class="anchor-icon"></i></a>PopupButton</h4>
+<p><sup><mark>NEW</mark></sup> This object describes the native popup button.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>String</td>
+<td><em>Optional</em>. Identifier of the button, 0-64 characters. Set to empty string by default.<br>If the button is pressed, its <em>id</em> is returned in the callback and the <em>popupClosed</em> event.</td>
+</tr>
+<tr>
+<td>type</td>
+<td>String</td>
+<td><em>Optional</em>. Type of the button. Set to <em>default</em> by default.<br>Can be one of these values:<br>- <em>default</em>, a button with the default style,<br>- <em>ok</em>, a button with the localized text “OK”,<br>- <em>close</em>, a button with the localized text “Close”,<br>- <em>cancel</em>, a button with the localized text “Cancel”,<br>- <em>destructive</em>, a button with a style that indicates a destructive action (e.g. “Remove”, “Delete”, etc.).</td>
+</tr>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed on the button, 0-64 characters. Required if <em>type</em> is <em>default</em> or <em>destructive</em>. Irrelevant for other types.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="backbutton" href="#backbutton"><i class="anchor-icon"></i></a>BackButton</h4>
-<p><sup><mark>NEW</mark></sup> This object controls the <strong>back</strong> button, which can be displayed in the header of the Web App in the Telegram interface.</p>
+<p>This object controls the <strong>back</strong> button, which can be displayed in the header of the Web App in the Telegram interface.</p>
 <table class="table">
 <thead>
 <tr>
@@ -439,7 +532,7 @@
 <td>A method that sets the button press event handler. An alias for <code>Telegram.WebApp.onEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
 </tr>
 <tr>
-<td>offClick(callback) <sup><mark>NEW</mark></sup></td>
+<td>offClick(callback)</td>
 <td>Function</td>
 <td>A method that removes the button press event handler. An alias for <code>Telegram.WebApp.offEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
 </tr>
@@ -482,7 +575,7 @@
 </table>
 <p>All these methods return the MainButton object so they can be chained.</p>
 <h4><a class="anchor" name="hapticfeedback" href="#hapticfeedback"><i class="anchor-icon"></i></a>HapticFeedback</h4>
-<p><sup><mark>NEW</mark></sup> This object controls haptic feedback.</p>
+<p>This object controls haptic feedback.</p>
 <table class="table">
 <thead>
 <tr>
@@ -537,7 +630,7 @@
 <td><em>Optional.</em> An object containing data about the chat partner of the current user in the chat where the bot was launched via the attachment menu. Returned only for private chats and only for Web Apps launched via the attachment menu.</td>
 </tr>
 <tr>
-<td>chat <sup><mark>NEW</mark></sup></td>
+<td>chat</td>
 <td><a href="#webappchat">WebAppChat</a></td>
 <td><em>Optional.</em> An object containing data about the chat where the bot was launched via the attachment menu. Returned for supergroups, channels and group chats – only for Web Apps launched via the attachment menu.</td>
 </tr>
@@ -547,7 +640,7 @@
 <td><em>Optional.</em> The value of the <em>startattach</em> parameter, passed <a href="#adding-bots-to-the-attachment-menu">via link</a>. Only returned for Web Apps when launched from the attachment menu via link.<br><br>The value of the <code>start_param</code> parameter will also be passed in the GET-parameter <code>tgWebAppStartParam</code>, so the Web App can load the correct interface right away.</td>
 </tr>
 <tr>
-<td>can_send_after <sup><mark>NEW</mark></sup></td>
+<td>can_send_after</td>
 <td>Integer</td>
 <td><em>Optional.</em> Time in seconds, after which a message can be sent via the <a href="/bots/api#answerwebappquery">answerWebAppQuery</a> method.</td>
 </tr>
@@ -605,6 +698,11 @@
 <td><em>Optional</em>. <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF language tag</a> of the user&#39;s language. Returns in <em>user</em> field only.</td>
 </tr>
 <tr>
+<td>is_premium <sup><mark>NEW</mark></sup></td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if this user is a Telegram Premium user</td>
+</tr>
+<tr>
 <td>photo_url</td>
 <td>String</td>
 <td><em>Optional</em>. URL of the user’s profile photo. The photo can be in .jpeg or .svg formats. Only returned for Web Apps launched from the attachment menu.</td>
@@ -612,7 +710,7 @@
 </tbody>
 </table>
 <h4><a class="anchor" name="webappchat" href="#webappchat"><i class="anchor-icon"></i></a>WebAppChat</h4>
-<p><sup><mark>NEW</mark></sup> This object represents a chat.</p>
+<p>This object represents a chat.</p>
 <table class="table">
 <thead>
 <tr>
@@ -657,7 +755,7 @@
 <pre><code>data_check_string = ...
 secret_key = HMAC_SHA256(&lt;bot_token&gt;, &quot;WebAppData&quot;)
 if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
-    // data is from Telegram
+  // data is from Telegram
 }</code></pre>
 <p>To prevent the use of outdated data, you can additionally check the <em>auth_date</em> field, which contains a Unix timestamp of when it was received by the Web App.</p>
 <p>Once validated, the data may be used on your server. Complex data types are represented as JSON-serialized objects.</p>
@@ -684,16 +782,20 @@ if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
 <td>Occurs when the <a href="#mainbutton">main button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
 </tr>
 <tr>
-<td><code>backButtonClicked</code> <sup><mark>NEW</mark></sup></td>
+<td><code>backButtonClicked</code></td>
 <td><mark>Bot API 6.1+</mark> Occurrs when the <a href="#backbutton">back button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
 </tr>
 <tr>
-<td><code>settingsButtonClicked</code> <sup><mark>NEW</mark></sup></td>
+<td><code>settingsButtonClicked</code></td>
 <td><mark>Bot API 6.1+</mark> Occurrs when the Settings item in context menu is pressed.<br><em>eventHandler</em> receives no parameters.</td>
 </tr>
 <tr>
-<td><code>invoiceClosed</code> <sup><mark>NEW</mark></sup></td>
+<td><code>invoiceClosed</code></td>
 <td><mark>Bot API 6.1+</mark> Occurrs when the opened invoice is closed.<br><em>eventHandler</em> receives an object with the two fields: <em>url</em> – invoice link provided and <em>status</em> – one of the invoice statuses:<br>- <strong>paid</strong> – invoice was paid successfully,<br>- <strong>cancelled</strong> – user closed this invoice without paying,<br>- <strong>failed</strong> – user tried to pay, but the payment was failed,<br>- <strong>pending</strong> – the payment is still processing. The bot will receive a service message about a <a href="https://core.telegram.org/bots/api#successfulpayment">successful payment</a> when the payment is successfully paid.</td>
+</tr>
+<tr>
+<td><code>popupClosed</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 6.2+</mark> Occurrs when the opened popup is closed.<br><em>eventHandler</em> receives an object with the single field <em>button_id</em> – the value of the field <em>id</em> of the pressed button. If no buttons were pressed, the field <em>button_id</em> will be <em>null</em>.</td>
 </tr>
 </tbody>
 </table>
