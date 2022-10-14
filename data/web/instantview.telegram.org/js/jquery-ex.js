@@ -77,6 +77,11 @@
           }
         }
       }
+      if (field.scrollIntoViewIfNeeded) {
+        field.scrollIntoViewIfNeeded();
+      } else if (field.scrollIntoView) {
+        field.scrollIntoView();
+      }
     }
     return this;
   };
@@ -1603,6 +1608,10 @@
       }
     }
     return this.on('mousewheel', onResultsMouseWheel);
+  };
+
+  $.fn.closeDropdown = function() {
+    return this.parents('.open').find('.dropdown-toggle').dropdown('toggle');
   };
 
   $.fn.initAutosize = function() {
