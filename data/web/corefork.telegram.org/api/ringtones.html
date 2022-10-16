@@ -61,13 +61,14 @@
 <a href='/method/account.saveRingtone'>account.saveRingtone</a>#3dea5b03 id:<a href='/type/InputDocument'>InputDocument</a> unsave:<a href='/type/Bool'>Bool</a> = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;
 <a href='/method/account.getSavedRingtones'>account.getSavedRingtones</a>#e1902288 hash:<a href='/type/long'>long</a> = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;</code></pre>
 <p>A notification sound file may be uploaded using <a href="/method/account.uploadRingtone">account.uploadRingtone</a>.<br>
-After upload, the document should be provided to <a href="/method/account.saveRingtone">account.saveRingtone</a> to save the notification sound.  </p>
+After upload, the document should be provided to <a href="/method/account.saveRingtone">account.saveRingtone</a> to save the notification sound, returning a simple <a href="/constructor/account.savedRingtone">account.savedRingtone</a>.  </p>
 <p>Supported formats:</p>
 <ul>
 <li>MP3</li>
 <li>OGG OPUS</li>
 </ul>
-<p>If the notification sound is not in MP3 format it will be converted to MP3 by <a href="/method/account.saveRingtone">account.saveRingtone</a> and an <a href="/constructor/account.savedRingtoneConverted">account.savedRingtoneConverted</a> constructor will be returned containing the new document to use <strong>instead of</strong> the one returned by <a href="/method/account.uploadRingtone">account.uploadRingtone</a> when <a href="#removing-notification-sounds">removing</a> or <a href="#setting-notification-sounds">using</a> notification sounds.  </p>
+<p>An existing voice message may also be passed directly to <a href="/method/account.saveRingtone">account.saveRingtone</a>.<br>
+When passing existing voice messages to <a href="/method/account.saveRingtone">account.saveRingtone</a> an <a href="/constructor/account.savedRingtoneConverted">account.savedRingtoneConverted</a> constructor will be returned containing the new document to use <strong>instead of</strong> the original voice message document when <a href="#removing-notification-sounds">removing</a> or <a href="#setting-notification-sounds">using</a> notification sounds.  </p>
 <p>The following ringtone limits are specified in the <a href="/api/config#client-configuration">client configuration</a>:</p>
 <ul>
 <li><a href="/api/config#ringtone-duration-max">ringtone_duration_max</a> - The maximum duration in seconds of uploaded ringtones</li>
@@ -117,7 +118,7 @@ The client will receive an <a href="/constructor/updateSavedRingtones">updateSav
 <li><a href="/constructor/notificationSoundDefault">notificationSoundDefault</a> - The default notification sound should be played</li>
 <li><a href="/constructor/notificationSoundNone">notificationSoundNone</a> - No notification sound should be played</li>
 <li><a href="/constructor/notificationSoundRingtone">notificationSoundRingtone</a> - A previously <a href="#uploading-notification-sounds">uploaded</a> notification sound identified by the uploaded/converted document <code>id</code> should be played.</li>
-<li><a href="/constructor/notificationSoundLocal">notificationSoundLocal</a> - A local notification sound (possibly provided by the OS) identified by the client-specific <code>data</code> payload should be played.  </li>
+<li><a href="/constructor/notificationSoundLocal">notificationSoundLocal</a> - A local notification sound (possibly provided by the OS) identified by the client-specific <code>data</code> payload should be played.</li>
 </ul></div>
   
 </div>
