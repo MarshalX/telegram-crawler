@@ -257,16 +257,28 @@ i.emoji > b {
 }
 .emoji_image i.emoji {
   width: 1.25em;
+  height: 1.25em;
   vertical-align: top;
   display: inline-block;
   white-space: nowrap;
   overflow: hidden;
-  background: no-repeat 2px 50%;
-  background-position-y: calc(50% - 1px);
+  background: no-repeat -1000px -1000px;
   background-size: 1.25em 1.25em;
   text-indent: -10em;
   padding: 3px 3px 3px 2px;
   margin: -3px -2px;
+}
+.emoji_image .emoji:before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  background-position: 2px 50%;
+  background-position-y: calc(50% + 1px);
 }
 .emoji_image .rtl i.emoji {
   padding-left: 3px;
@@ -1258,19 +1270,68 @@ input.pr-form-control:focus {
   top: -8px;
   max-height: 0;
   opacity: 0;
-  transition: max-height .2s ease, opacity .2s ease;
+  transform: translateX(-36px);
+  transition: all .2s ease;
 }
 .pr-preview-ad-message-wrap.active {
+  transform: translateX(-36px);
   max-height: 100%;
   opacity: 1;
 }
+.pr-preview-ad-message-wrap.picture {
+  transform: translateX(0px);
+}
 .pr-preview-ad-message {
   padding: 0 20px 12px;
+  display: flex;
+}
+.pr-preview-ad-message .ad-msg-photo-wrap {
+  align-self: flex-end;
+  margin: 0 8px 0 -8px;
+  transition: opacity .2s ease;
+  opacity: 0;
+}
+.pr-preview-ad-message-wrap.picture .ad-msg-photo-wrap {
+  opacity: 1;
+}
+.pr-preview-ad-message .ad-msg-photo,
+.pr-preview-ad-message .ad-msg-photo img {
+  display: inline-block;
+  vertical-align: top;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+}
+.pr-preview-ad-message .ad-msg-photo {
+  position: relative;
+  font-style: normal;
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  font-size: 16px;
+  line-height: 37px;
+  color: #999;
+  background: #efefef;
+  overflow: hidden;
+}
+.pr-preview-ad-message .ad-msg-photo:before {
+  content: attr(data-content);
+  font-weight: 500;
+}
+.pr-preview-ad-message .ad-msg-photo a {
+  text-decoration: none;
+  color: #999;
+}
+.pr-preview-ad-message .ad-msg-photo img {
+  position: absolute;
+  pointer-events: none;
+  left: 0;
+  top: 0;
 }
 .pr-preview-ad-message .ad-msg-bubble {
   position: relative;
   background: #fff;
-  width: 280px;
+  width: 254px;
   max-width: 100%;
   padding: 7px 10px;
   border-radius: 10px 10px 10px 0;
@@ -1485,7 +1546,7 @@ form > .form-group {
   font-weight: 500;
   color: #d75959;
 }
-.pr-form .form-group-no-label {
+.pr-form .form-group.form-group-no-label {
   padding-top: 0;
 }
 .pr-form .form-group-slim .radio-group {
@@ -2558,6 +2619,14 @@ a.ad-declined:focus {
 .pr-review-ad-info .pr-ad-info-value {
   font-size: 15px;
 }
+.pr-review-ad-info-multi .pr-review-ad-info + .pr-review-ad-info {
+  margin-left: 12px;
+}
+.pr-review-ad-info-multi .pr-review-ad-info .pr-ad-info-value {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
 .pr-ad-info-value .included.a,
 .pr-ad-info-value .excluded.a {
   color: #0088cc;
@@ -2588,6 +2657,9 @@ a.ad-declined:focus {
 }
 .pr-review-ad-info-multi > .pr-review-ad-info.large {
   flex-basis: 66.66%;
+}
+.pr-review-ad-info-multi > .pr-review-ad-info.large.half {
+  max-width: 50%;
 }
 .pr-review-ad-status {
   padding: 5px 0;

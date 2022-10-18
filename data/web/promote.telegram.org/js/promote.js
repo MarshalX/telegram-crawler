@@ -455,11 +455,11 @@ var NewAd = {
       return false;
     }
     var params = {
+      owner_id: Aj.state.ownerId,
       text: text,
       promote_url: promote_url
     };
-    if (Aj.state.ownerId && Aj.state.adId) {
-      params.owner_id = Aj.state.ownerId;
+    if (Aj.state.adId) {
       params.ad_id = Aj.state.adId;
     }
     $formGroup.addClass('field-loading');
@@ -614,6 +614,8 @@ var NewAd = {
           $('.js-preview-footer', $previewPopup).each(function() {
             Ads.updateTextShadow(this, '.ad-msg-text', '.label', 10);
           });
+          $('.js-picture-label', $previewPopup).html(previewData.picture_label);
+          $('.js-picture-hint', $previewPopup).html(previewData.picture_hint);
         }
         $('.js-promote-photo', $previewPopup).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
         $('.js-preview', $previewPopup).toggleClass('active', !!previewData);
@@ -623,6 +625,8 @@ var NewAd = {
       if (previewData) {
         $('.js-promote-photo', Aj.state.$form).html(previewData.photo);
         $('.js-promote-photo-tooltip', Aj.state.$form).html(previewData.from);
+        $('.js-picture-label', Aj.state.$form).html(previewData.picture_label);
+        $('.js-picture-hint', Aj.state.$form).html(previewData.picture_hint);
       }
       $('.js-promote-photo', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
       $('.js-preview-link', Aj.state.$form).toggleClass('inactive', !previewData);
@@ -653,6 +657,10 @@ var NewAd = {
     var $form = state.$form;
     var text = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
+    var picture_checked = $form.field('picture').prop('checked');
+    var previewPictureChange = function() {
+      $('.js-preview', $previewPopup).toggleClass('picture', !!$(this).prop('checked'));
+    };
 
     var $previewForm = $('.pr-new-form', $previewPopup);
     Ads.formInit($previewForm);
@@ -665,6 +673,10 @@ var NewAd = {
     state.previewPromoteUrlField = $previewForm.field('promote_url');
     state.previewPromoteUrlField.on('change.curPage', NewAd.onPromoteUrlChange);
     state.previewPromoteUrlField.value(promote_url);
+    state.previewPictureCheckbox = $previewForm.field('picture');
+    state.previewPictureCheckbox.on('change.curPage', previewPictureChange);
+    state.previewPictureCheckbox.prop('checked', picture_checked);
+    $('.js-preview', $previewPopup).toggleClass('picture', !!picture_checked);
 
     NewAd.updateAdPreview($previewForm, state.previewData);
     NewAd.adPostCheck($previewForm);
@@ -672,8 +684,10 @@ var NewAd = {
     var previewSave = function() {
       var text = state.previewTextField.value();
       var promote_url = state.previewPromoteUrlField.value();
+      var picture_checked = state.previewPictureCheckbox.prop('checked');
       $form.field('text').value(text).updateAutosize();
       $form.field('promote_url').value(promote_url);
+      $form.field('picture').prop('checked', picture_checked);
       NewAd.updateAdPreview($form, state.popupPreviewData);
       NewAd.adPostCheck($form);
       delete state.popupPreviewData;
@@ -745,11 +759,18 @@ var NewAd = {
       }
       Ads.hideFieldError($field);
     }
-    if (!len.langs && len.topics) {
+    if ((len.langs || len.topics) && len.channels) {
+      if (len.langs) {
+        Ads.showFieldError(Aj.state.$form.field('langs'), l('ADS_ERROR_LANG_AND_CHANNEL_NOT_ALLOWED'));
+      } else if (len.topics) {
+        Ads.showFieldError(Aj.state.$form.field('topics'), l('ADS_ERROR_TOPIC_AND_CHANNEL_NOT_ALLOWED'));
+      }
+    } else if (!len.langs && len.topics) {
       Ads.showFieldError(Aj.state.$form.field('langs'), l('ADS_ERROR_LANGUAGE_REQUIRED'));
     }
     var overview = '';
     if (!len.langs && !len.topics && !len.channels ||
+        (len.langs || len.topics) && len.channels ||
         !len.langs && len.topics) {
       overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
     } else {
@@ -783,6 +804,9 @@ var NewAd = {
       $form.field('cpm').value(),
       $form.field('budget').value()
     ];
+    if ($form.field('picture').prop('checked')) {
+      values.push('picture');
+    }
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
       var vals = $form.field(selectData.field).data('value');
@@ -802,6 +826,9 @@ var NewAd = {
         $previewForm.field('text').value(),
         $previewForm.field('promote_url').value()
       ];
+      if ($previewForm.field('picture').prop('checked')) {
+        values.push('picture');
+      }
       return values.join('|');
     }
     return false;
@@ -844,6 +871,9 @@ var NewAd = {
       cpm: cpm,
       budget: budget
     };
+    if ($form.field('picture').prop('checked')) {
+      params.picture = 1;
+    }
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
       var values = $form.field(selectData.field).data('value');
@@ -905,6 +935,9 @@ var NewAd = {
       cpm: cpm,
       budget: budget
     };
+    if ($form.field('picture').prop('checked')) {
+      params.picture = 1;
+    }
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
       var values = $form.field(selectData.field).data('value');
@@ -934,6 +967,7 @@ var NewAd = {
     $form.field('promote_url').value('');
     $form.field('cpm').value('');
     $form.field('budget').value('');
+    $form.field('picture').prop('checked', false);
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
       var values = $form.field(selectData.field).trigger('reset');
@@ -1918,6 +1952,9 @@ var EditAd = {
       promote_url: promote_url,
       cpm: cpm
     };
+    if ($form.field('picture').prop('checked')) {
+      params.picture = 1;
+    }
     $button.prop('disabled', true);
     Aj.apiRequest('editAd', params, function(result) {
       if (result.error) {
