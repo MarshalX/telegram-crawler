@@ -68,6 +68,7 @@ function ajInit(options) {
     ajContainer: ajContainer,
     state: options.state || {},
     layerState: {},
+    globalState: {},
     layer: false
   };
 
@@ -728,7 +729,7 @@ function closePopup(popup) {
       return false;
     }
   }
-  var options = $popup.data('options');
+  var options = $popup.data('options') || {};
   if (options.onBeforeClose) {
     var result = options.onBeforeClose($popup);
     if (result === false) {
