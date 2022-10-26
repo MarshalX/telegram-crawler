@@ -90,13 +90,13 @@ The GamingCommunication and bot web apps libraries by default will use <code>'*'
 </ul>
 <h4><a class="anchor" href="#web-app-setup-closing-behavior" id="web-app-setup-closing-behavior" name="web-app-setup-closing-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_closing_behavior</code></h4>
 <p>Event data: a JSON object with a boolean <code>need_confirmation</code>.</p>
-<p>If equal to <code>true</code>, the app should require user confirmation before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
+<p>If equal to <code>true</code>, the client should require user confirmation before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
 <h4><a class="anchor" href="#web-app-set-background-color" id="web-app-set-background-color" name="web-app-set-background-color"><i class="anchor-icon"></i></a><code>web_app_set_background_color</code></h4>
 <p>Event data: a JSON object with a string <code>color</code> with a hex RGB color.  </p>
-<p>Used to set the app background color.  </p>
+<p>Used to set the web app background color.  </p>
 <h4><a class="anchor" href="#web-app-set-header-color" id="web-app-set-header-color" name="web-app-set-header-color"><i class="anchor-icon"></i></a><code>web_app_set_header_color</code></h4>
-<p>Event data: a JSON object with a string <code>color</code> with a hex RGB color.  </p>
-<p>Used to set the app header color.  </p>
+<p>Event data: a JSON object with a string <code>color_key</code> with a hex RGB color.  </p>
+<p>Used to set the web app header color.  </p>
 <h4><a class="anchor" href="#web-app-data-send" id="web-app-data-send" name="web-app-data-send"><i class="anchor-icon"></i></a><code>web_app_data_send</code></h4>
 <p>Event data: a JSON object with a string <code>data</code> field.  </p>
 <p>Used by <a href="/api/bots/webapps#simple-web-apps">simple webapps</a> to send back data to the bot.  </p>
@@ -127,18 +127,22 @@ The GamingCommunication and bot web apps libraries by default will use <code>'*'
 <p>Used to trigger haptic feedback for a user interaction in a webapp.</p>
 <h4><a class="anchor" href="#web-app-open-link" id="web-app-open-link" name="web-app-open-link"><i class="anchor-icon"></i></a><code>web_app_open_link</code></h4>
 <p>Event data: a JSON object with a string <code>url</code> field.  </p>
-<p>Used to open a link in an external browser. The Web App will not be closed.  </p>
-<p>Note that this method can be called only in response to the user interaction with the Web App interface (e.g. click inside the Web App or on the main button).  </p>
+<p>Used to open a link in an external browser (or in a new tab for browser clients). The Web App will not be closed.  </p>
+<p>Note that this method can be called only in response to the user interaction with the Web App interface (e.g. a click inside the Web App or on the main button).<br>
+After opening the URL, further events of this type should be ignored until the user interacts again with the Web App interface (as above).<br>
+Note that user interactions must have a TTL of 10 seconds: events of this type must be ignored if the last Web App user interaction happened more than 10 seconds ago.</p>
 <h4><a class="anchor" href="#web-app-open-tg-link" id="web-app-open-tg-link" name="web-app-open-tg-link"><i class="anchor-icon"></i></a><code>web_app_open_tg_link</code></h4>
-<p>Event data: a JSON object with a string <code>path_full</code> field, containing the path+query component of a <a href="/api/links">t.me deep link</a>.  </p>
-<p>Used to open a <a href="/api/links">t.me deep link</a>. The Web App will be closed.</p>
+<p>Event data: a JSON object with a string <code>path_full</code> field, containing the path+query component of a <a href="/api/links">t.me deep link</a> (<code>url = 'https://t.me' + path_full</code>).  </p>
+<p>Used to open a <a href="/api/links">t.me deep link</a>. The Web App must be closed.</p>
 <h4><a class="anchor" href="#web-app-open-invoice" id="web-app-open-invoice" name="web-app-open-invoice"><i class="anchor-icon"></i></a><code>web_app_open_invoice</code></h4>
 <p>Event data: a JSON object with a string <code>slug</code> field, containing an <a href="/api/links#invoice-links">invoice deep link</a>.</p>
-<p>Used to initiate <a href="/api/payments">payment of an invoice »</a>. The Web App will not be closed.  </p>
-<p>The payment status should be reported back to the web app using <a href="/api/bots/webapps#invoice-closed">invoice_closed</a>.</p>
+<p>Used to initiate <a href="/api/payments">payment of an invoice »</a>, by opening an invoice popup over the Web App: the Web App itself must not be closed.  </p>
+<p>The payment status must be reported back to the web app using <a href="/api/bots/webapps#invoice-closed">invoice_closed</a>.</p>
 <h4><a class="anchor" href="#web-app-expand" id="web-app-expand" name="web-app-expand"><i class="anchor-icon"></i></a><code>web_app_expand</code></h4>
 <p>No event payload.</p>
-<p>Expands the web app to the maximum available height.</p>
+<p>Expands the web app to the maximum available height.<br>
+The web app must also be expanded when the user swipes up on the webview.  </p>
+<p>This event must be ignored <em>during</em> a user swipe down, used to reduce the webview.</p>
 <h4><a class="anchor" href="#web-app-request-viewport" id="web-app-request-viewport" name="web-app-request-viewport"><i class="anchor-icon"></i></a><code>web_app_request_viewport</code></h4>
 <p>No event payload.</p>
 <p>Used by web apps to request information about the viewport, clients should emit a <a href="/api/bots/webapps#viewport-changed">viewport_changed event</a></p>
@@ -147,7 +151,8 @@ The GamingCommunication and bot web apps libraries by default will use <code>'*'
 <p>Used by web apps to request information about the current theme, clients should emit a <a href="/api/bots/webapps#theme-changed">theme_changed event</a>.</p>
 <h4><a class="anchor" href="#web-app-ready" id="web-app-ready" name="web-app-ready"><i class="anchor-icon"></i></a><code>web_app_ready</code></h4>
 <p>No event payload.</p>
-<p>Emitted by web apps when they are fully loaded.</p>
+<p>Emitted by web apps when they are fully loaded, signaling to client apps that the loading spinner placeholder can be removed.  </p>
+<p>Note that there is no guarantee that this event will be emitted when the web app is fully loaded: clients should remove the loading spinner upon receiving this event or when the page finishes loading (native webview/iframe event), whichever event comes first.</p>
 <h4><a class="anchor" href="#web-app-setup-main-button" id="web-app-setup-main-button" name="web-app-setup-main-button"><i class="anchor-icon"></i></a><code>web_app_setup_main_button</code></h4>
 <p>Event payload: JSON object with the following fields:</p>
 <ul>
