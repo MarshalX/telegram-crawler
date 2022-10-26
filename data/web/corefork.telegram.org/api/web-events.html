@@ -67,36 +67,33 @@ The GamingCommunication and bot web apps libraries by default will use <code>'*'
 <h4><a class="anchor" href="#web-app-open-popup" id="web-app-open-popup" name="web-app-open-popup"><i class="anchor-icon"></i></a><code>web_app_open_popup</code></h4>
 <p>Event data: a JSON object with the following fields (which should be properly validated by the client).</p>
 <ul>
-<li>
-<p><code>title</code> - Title for the popup (optional string, max 64 characters)</p>
-</li>
-<li>
-<p><code>message</code> - Message of the popup (string, max 256 characters)</p>
-</li>
-<li>
-<p><code>buttons</code> - An array of the following objects (optional, max 3)</p>
-<ul>
-<li><code>type</code> - Button type (string, one of <code>ok</code>, <code>close</code>, <code>cancel</code>, <code>default</code>, <code>destructive</code>, used by the client to choose an appropriate button color)</li>
+<li><code>title</code> - Title for the popup (optional string, max 64 characters)</li>
+<li><code>message</code> - Message of the popup (string, max 256 characters)</li>
+<li><code>buttons</code> - An array of the following objects (array of 1-3 objects)<ul>
+<li><code>type</code> - Button type (string, one of <code>ok</code>, <code>close</code>, <code>cancel</code>, <code>default</code>, <code>destructive</code> (in this case, the button must be red))</li>
 <li><code>text</code> - Button text (string, optional for <code>ok</code>, <code>close</code> and <code>cancel</code> types)</li>
 <li><code>id</code> - Button ID (unique string)</li>
 </ul>
 </li>
-<li>
-<p>If the user presses any of the buttons, call <code>window.Telegram.WebView.receiveEvent("popup_closed", {"button_id": "&lt;button id&gt;"})</code></p>
-</li>
-<li>
-<p>If the user cancel the interaction, call <code>window.Telegram.WebView.receiveEvent("popup_closed", {})</code></p>
-</li>
+</ul>
+<p>Emitted by <a href="/api/bots/webapps">bot web apps</a> when to open a native pop-up over the webview.</p>
+<ul>
+<li>If the user presses any of the buttons, call <code>window.Telegram.WebView.receiveEvent("popup_closed", {"button_id": "&lt;button id&gt;"})</code></li>
+<li>If the user cancels the interaction without pressing any of the specified buttons, call <code>window.Telegram.WebView.receiveEvent("popup_closed", {})</code></li>
 </ul>
 <h4><a class="anchor" href="#web-app-setup-closing-behavior" id="web-app-setup-closing-behavior" name="web-app-setup-closing-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_closing_behavior</code></h4>
 <p>Event data: a JSON object with a boolean <code>need_confirmation</code>.</p>
 <p>If equal to <code>true</code>, the client should require user confirmation before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
 <h4><a class="anchor" href="#web-app-set-background-color" id="web-app-set-background-color" name="web-app-set-background-color"><i class="anchor-icon"></i></a><code>web_app_set_background_color</code></h4>
 <p>Event data: a JSON object with a string <code>color</code> with a hex RGB color.  </p>
-<p>Used to set the web app background color.  </p>
+<p>Used to set the web app background and lower overscroll color.  </p>
 <h4><a class="anchor" href="#web-app-set-header-color" id="web-app-set-header-color" name="web-app-set-header-color"><i class="anchor-icon"></i></a><code>web_app_set_header_color</code></h4>
-<p>Event data: a JSON object with a string <code>color_key</code> with a hex RGB color.  </p>
-<p>Used to set the web app header color.  </p>
+<p>Event data: a JSON object with a string <code>color_key</code>, with of the following values:</p>
+<ul>
+<li><code>bg_color</code> - The color provided by <a href="#web-app-set-background-color">web_app_set_background_color</a> must be used (if set), otherwise use the <code>bg_color</code> from the <a href="/api/bots/webapps#theme-parameters">theme parameters</a>.</li>
+<li><code>secondary_bg_color</code> - The <code>secondary_bg_color</code> from the <a href="/api/bots/webapps#theme-parameters">theme parameters</a> should be used.</li>
+</ul>
+<p>Used to set the web app header and upper overscroll color.  </p>
 <h4><a class="anchor" href="#web-app-data-send" id="web-app-data-send" name="web-app-data-send"><i class="anchor-icon"></i></a><code>web_app_data_send</code></h4>
 <p>Event data: a JSON object with a string <code>data</code> field.  </p>
 <p>Used by <a href="/api/bots/webapps#simple-web-apps">simple webapps</a> to send back data to the bot.  </p>
