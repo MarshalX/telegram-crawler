@@ -147,7 +147,7 @@ The web app must also be expanded when the user swipes up on the webview.  </p>
 <p>This event must be ignored <em>during</em> a user swipe down, used to reduce the webview.</p>
 <h4><a class="anchor" href="#web-app-request-viewport" id="web-app-request-viewport" name="web-app-request-viewport"><i class="anchor-icon"></i></a><code>web_app_request_viewport</code></h4>
 <p>No event payload.</p>
-<p>Used by web apps to request information about the viewport, clients should emit a <a href="/api/bots/webapps#viewport-changed">viewport_changed event</a></p>
+<p>Used by web apps to request information about the viewport, clients should emit a <a href="/api/bots/webapps#viewport-changed">viewport_changed event</a>.</p>
 <h4><a class="anchor" href="#web-app-request-theme" id="web-app-request-theme" name="web-app-request-theme"><i class="anchor-icon"></i></a><code>web_app_request_theme</code></h4>
 <p>No event payload.</p>
 <p>Used by web apps to request information about the current theme, clients should emit a <a href="/api/bots/webapps#theme-changed">theme_changed event</a>.</p>
@@ -166,6 +166,8 @@ The web app must also be expanded when the user swipes up on the webview.  </p>
 <li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean, false by default)</li>
 </ul>
 <p>Configures the main button, located immediately below the webview: when the user presses it a <a href="/api/bots/webapps#main-button-pressed"><code>main_button_pressed</code> event should be emitted by the client</a>.  </p>
+<p>Note that if <code>is_visible</code> is true, <em>only when opening web apps from the <a href="/api/bots/attach">attachment menu</a></em> and <em>only on clients with tab bars</em>, the main button should be displayed only after the first user tap inside of the webview (to prevent bots from immediately blocking the tab bar).<br>
+Otherwise, the main button can be displayed right away if <code>is_visible</code> is true.  </p>
 <h4><a class="anchor" href="#web-app-setup-back-button" id="web-app-setup-back-button" name="web-app-setup-back-button"><i class="anchor-icon"></i></a><code>web_app_setup_back_button</code></h4>
 <p>Event data: a JSON object with an <code>is_visible</code> boolean field.</p>
 <p>Determines whether to show or hide the back button: when the user presses it a <a href="/api/bots/webapps#back-button-pressed"><code>back_button_pressed</code> event should be emitted by the client</a>.<br>
