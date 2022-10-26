@@ -54,13 +54,13 @@
 <p>Here's the full list of events that can be <em>received</em> by a web app from the client, by calling the <code>receiveEvent</code> method.  </p>
 <h4><a class="anchor" href="#main-button-pressed" id="main-button-pressed" name="main-button-pressed"><i class="anchor-icon"></i></a><code>main_button_pressed</code></h4>
 <p>Params: <code>null</code></p>
-<p>Sent by the client when the user presses the main button, if it was <a href="/api/web-events#web-app-setup-main-button">previously configured by a <code>web_app_setup_main_button</code> event »</a>.</p>
+<p>Sent by the client when the user presses the main button located at the bottom of the webview, handle this event only if the main button was <a href="/api/web-events#web-app-setup-main-button">previously configured by a <code>web_app_setup_main_button</code> event »</a>.</p>
 <h4><a class="anchor" href="#settings-button-pressed" id="settings-button-pressed" name="settings-button-pressed"><i class="anchor-icon"></i></a><code>settings_button_pressed</code></h4>
 <p>Params: <code>null</code></p>
 <p>Sent by the client when the user presses the settings button, if it was previously enabled in <a href="https://t.me/BotFather">@BotFather</a>, as specified by the <code>has_settings</code> flag of <a href="/constructor/attachMenuBot">attachMenuBot »</a>.  </p>
 <h4><a class="anchor" href="#back-button-pressed" id="back-button-pressed" name="back-button-pressed"><i class="anchor-icon"></i></a><code>back_button_pressed</code></h4>
 <p>Params: <code>null</code></p>
-<p>Sent by the client when the user presses the back button, if it was <a href="/api/web-events#web-app-setup-back-button">previously enabled by a <code>web_app_setup_back_button</code> event »</a>.</p>
+<p>Sent by the client when the user presses the (OS or UI) back button, if it was <a href="/api/web-events#web-app-setup-back-button">previously enabled by a <code>web_app_setup_back_button</code> event »</a>.</p>
 <h4><a class="anchor" href="#invoice-closed" id="invoice-closed" name="invoice-closed"><i class="anchor-icon"></i></a><code>invoice_closed</code></h4>
 <p>Params: JSON object with the following fields:</p>
 <ul>
@@ -77,9 +77,9 @@
 <h4><a class="anchor" href="#viewport-changed" id="viewport-changed" name="viewport-changed"><i class="anchor-icon"></i></a><code>viewport_changed</code></h4>
 <p>Params: a JSON object with the following fields:</p>
 <ul>
-<li><code>height</code> - The current height of the visible area of the Web App (integer)</li>
-<li><code>is_state_stable</code> - The height of the visible area of the Web App in its last stable state (integer)</li>
-<li><code>is_expanded</code> - Whether the Web App is expanded to its maximum height (boolean)</li>
+<li><code>height</code> - The current height of the visible area of the Web App (excluding the bottom <a href="#main-button-pressed">main button</a>, if visible) (integer)</li>
+<li><code>is_state_stable</code> - If true, the viewport is currently being resized (animation in progress), more events of this type may be emitted. (boolean)</li>
+<li><code>is_expanded</code> - Whether the Web App is expanded to its maximum height after the user swiped up or after the web app emitted a <a href="/api/web-events#web-app-expand">web_app_expand</a> event (boolean)</li>
 </ul>
 <p>Emitted when the viewport is changed.  </p>
 <h4><a class="anchor" href="#theme-changed" id="theme-changed" name="theme-changed"><i class="anchor-icon"></i></a><code>theme_changed</code></h4>
@@ -152,7 +152,7 @@
 <p>The opened URL's fragment parameters already contain basic information about the user and a <code>query_id</code> parameter, that is exposed by the <a href="/bots/webapps">bot web apps JS library</a>: this <code>query_id</code> can then be used <strong>by the bot</strong> to invoke <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a>, passing an <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructor that will automatically send a message with optionally attached media, and even inline buttons on behalf of the user.  </p>
 <h3><a class="anchor" href="#theme-parameters" id="theme-parameters" name="theme-parameters"><i class="anchor-icon"></i></a>Theme parameters</h3>
 <p>Bot web apps can be themed according to the following theme parameters, passed as a JSON object to the <code>theme_params</code> parameter of the <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and <a href="/method/messages.requestWebView">messages.requestWebView</a> methods.  </p>
-<p>This JSON object has the the following keys, containing color theme information (hex string, RGB24) to pass to the web app:</p>
+<p>This JSON object has the the following keys, containing color theme information (hex string, RGB, no alpha) to pass to the web app:</p>
 <ul>
 <li><code>bg_color</code> - Background color <br><em> <code>secondary_bg_color</code> - Secondary background color <br></em> <code>text_color</code> - Text color <br><em> <code>hint_color</code> - Hint text color <br></em> <code>link_color</code> - Link color <br><em> <code>button_color</code> - Button color <br></em> <code>button_text_color</code> - Button text color</li>
 </ul></div>

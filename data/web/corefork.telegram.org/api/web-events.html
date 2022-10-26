@@ -84,11 +84,11 @@ If the web app provides three buttons, always display each button on a separate 
 <li>If the user presses any of the buttons, call <code>window.Telegram.WebView.receiveEvent("popup_closed", {"button_id": "&lt;button id&gt;"})</code></li>
 <li>If the user cancels the interaction without pressing any of the specified buttons, call <code>window.Telegram.WebView.receiveEvent("popup_closed", {})</code></li>
 </ul>
-<p>Ignore instances of this event if a popup is already being displayed (handling can only resume after the <code>popup_closed</code> response event is emitted).<br>
-Maximum 3 consecutive events of this type can be handled in a timespan of 3 seconds, ignore excess events.  </p>
+<p>Disable handling of this event if a popup is already being displayed, re-enable handling only after the <code>popup_closed</code> response event is emitted.<br>
+While handling is enabled, maximum 3 consecutive valid events of this type can be handled in a timespan of 3 seconds, ignore excess events.  </p>
 <h4><a class="anchor" href="#web-app-setup-closing-behavior" id="web-app-setup-closing-behavior" name="web-app-setup-closing-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_closing_behavior</code></h4>
 <p>Event data: a JSON object with a boolean <code>need_confirmation</code>.</p>
-<p>If equal to <code>true</code>, the client should require user confirmation before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
+<p>If equal to <code>true</code>, the client should require user confirmation with a "Changes that you made may not be saved." popup with "Cancel"/"Close anyway" buttons before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
 <h4><a class="anchor" href="#web-app-set-background-color" id="web-app-set-background-color" name="web-app-set-background-color"><i class="anchor-icon"></i></a><code>web_app_set_background_color</code></h4>
 <p>Event data: a JSON object with a string <code>color</code> with a hex RGB color.  </p>
 <p>Used to set the web app background and lower overscroll color.  </p>
