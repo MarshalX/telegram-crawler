@@ -52,9 +52,6 @@
 <h3><a class="anchor" href="#incoming-events-client-to-web-app" id="incoming-events-client-to-web-app" name="incoming-events-client-to-web-app"><i class="anchor-icon"></i></a>Incoming events: Client to web app</h3>
 <p>Web apps can also <em>receive</em> events, by exposing a <code>window.Telegram.WebView.receiveEvent("event_name", params)</code> method.  </p>
 <p>Here's the full list of events that can be <em>received</em> by a web app from the client, by calling the <code>receiveEvent</code> method.  </p>
-<h4><a class="anchor" href="#phone-requested" id="phone-requested" name="phone-requested"><i class="anchor-icon"></i></a><code>phone_requested</code></h4>
-<p>Params: a JSON object containing an optional string <code>phone_number</code> field.</p>
-<p>Sent in response to a <a href="/api/web-events#web-app-request-phone">web_app_request_phone</a> outgoing event, see the <a href="/api/web-events#web-app-request-phone">docs for more info »</a>.  </p>
 <h4><a class="anchor" href="#main-button-pressed" id="main-button-pressed" name="main-button-pressed"><i class="anchor-icon"></i></a><code>main_button_pressed</code></h4>
 <p>Params: <code>null</code></p>
 <p>Sent by the client when the user presses the main button, if it was <a href="/api/web-events#web-app-setup-main-button">previously configured by a <code>web_app_setup_main_button</code> event »</a>.</p>
@@ -155,13 +152,13 @@
 <p>Normal webapps work similarly to <a href="/api/bots/inline">inline bots »</a>: they send messages on behalf of the user to the chat from which the query originated.</p>
 <p>Normal webapps can be opened from:</p>
 <ul>
-<li>A <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a> button contained in an inline keyboard identified by a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> constructor</li>
-<li>A <a href="/constructor/botMenuButton">botMenuButton</a> <a href="/api/bots/menu">menu button »</a> (in this case the <a href="/method/messages.requestSimpleWebView">messages.requestWebView</a>.<code>from_bot_menu</code> flag should be set)</li>
+<li>A <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a> button contained in an inline keyboard identified by a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> constructor: in this case, <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a>.<code>url</code> must be passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>url</code>.</li>
+<li>A <a href="/constructor/botMenuButton">botMenuButton</a> <a href="/api/bots/menu">menu button »</a>: in this case, the <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>from_bot_menu</code> flag should be set.</li>
 <li>An <a href="/api/bots/attach">attachment menu »</a></li>
 </ul>
-<p>To open them, clients should call <a href="/method/messages.requestSimpleWebView">messages.requestWebView</a>, and then open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
+<p>To open them, clients should call <a href="/method/messages.requestWebView">messages.requestWebView</a>, and then open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
 <p>After loading the webview, until it is closed by a <a href="/api/web-events#web-app-close">web_app_close event</a>, the user client must invoke <a href="/method/messages.prolongWebView">messages.prolongWebView</a> every 60 seconds.  </p>
-<p>The opened URL's fragment parameters already contain basic information about the user and a <code>query_id</code> parameter, that is exposed by the <a href="/bots/webapps">bot web apps JS library</a>: this <code>query_id</code> can then be used <strong>by the bot</strong> to invoke <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a>, passing an <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructor that will automatically send a message with optionally attached media, and even inline buttons on behalf of the user.  </p></div>
+<p>The opened URL's fragment parameters already contain basic information about the user and a <code>query_id</code> parameter, that is exposed by the <a href="/bots/webapps">bot web apps JS library</a>: this <code>query_id</code> can then be used <strong>by the bot</strong> to invoke <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a>, passing an <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructor that will automatically send a message with optionally attached media, and even inline buttons on behalf of the user.</p></div>
   
 </div>
           

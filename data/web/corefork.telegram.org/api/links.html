@@ -982,7 +982,15 @@ For all link types, clients should:</p>
 <ul>
 <li>Check that the associated bot username has an associated <a href="/api/bots/attach">attachment menu</a>.</li>
 <li>If not installed, ask the user to <a href="/api/bots/attach">install the attachment menu</a>.</li>
-<li>Once installed, check that the attachment menu can be opened in the chosen chat type by checking the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field.</li>
+<li>Check that the attachment menu can be opened in the chosen chat type by checking the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field.<ul>
+<li>If the chosen chat is supported, open the attachment menu <a href="/api/bots/webapps#normal-web-apps">web app »</a></li>
+<li>Otherwise:<ul>
+<li>If the user has just installed the attachment menu @ step 2, notify the user that the attachment menu was installed successfully.</li>
+<li>Otherwise, notify the user that the attachment menu webapp can't be opened in the specified chat.</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <h4><a class="anchor" href="#open-in-current-chat" id="open-in-current-chat" name="open-in-current-chat"><i class="anchor-icon"></i></a>Open in current chat</h4>
 <p>Installs and opens an attachment menu web app in the currently open chat.  </p>
@@ -1089,7 +1097,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 <tr>
 <td><code>choose</code></td>
 <td style="text-align: center;">Optional</td>
-<td>A combination of <code>users</code>, <code>bots</code>, <code>groups</code>, <code>channels</code> separated by <code>+</code>: indicates the dialog types to show in the dialog selection popup</td>
+<td>A combination of <code>users</code>, <code>bots</code>, <code>groups</code>, <code>channels</code> separated by <code>+</code>: indicates the dialog types to show in the dialog selection popup: must be intersected with the dialog types contained in the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field before use.</td>
 </tr>
 </tbody>
 </table>

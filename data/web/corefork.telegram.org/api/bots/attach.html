@@ -44,7 +44,7 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>Bots can install attachment menu entries, offering conveniently accessible, versatile <a href="/api/bots/webapps">web apps</a>.</p>
+<p>Bots can install attachment menu entries, offering conveniently accessible, versatile <a href="/api/bots/webapps#normal-web-apps">web apps</a>.</p>
 <p>Schema:</p>
 <pre><code><a href='/constructor/user'>user</a>#5d99adee flags:<a href='/type/%23'>#</a> self:flags.10?<a href='/constructor/true'>true</a> contact:flags.11?<a href='/constructor/true'>true</a> mutual_contact:flags.12?<a href='/constructor/true'>true</a> deleted:flags.13?<a href='/constructor/true'>true</a> bot:flags.14?<a href='/constructor/true'>true</a> bot_chat_history:flags.15?<a href='/constructor/true'>true</a> bot_nochats:flags.16?<a href='/constructor/true'>true</a> verified:flags.17?<a href='/constructor/true'>true</a> restricted:flags.18?<a href='/constructor/true'>true</a> min:flags.20?<a href='/constructor/true'>true</a> bot_inline_geo:flags.21?<a href='/constructor/true'>true</a> support:flags.23?<a href='/constructor/true'>true</a> scam:flags.24?<a href='/constructor/true'>true</a> apply_min_photo:flags.25?<a href='/constructor/true'>true</a> fake:flags.26?<a href='/constructor/true'>true</a> bot_attach_menu:flags.27?<a href='/constructor/true'>true</a> premium:flags.28?<a href='/constructor/true'>true</a> attach_menu_enabled:flags.29?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:flags.0?<a href='/type/long'>long</a> first_name:flags.1?<a href='/type/string'>string</a> last_name:flags.2?<a href='/type/string'>string</a> username:flags.3?<a href='/type/string'>string</a> phone:flags.4?<a href='/type/string'>string</a> photo:flags.5?<a href='/type/UserProfilePhoto'>UserProfilePhoto</a> status:flags.6?<a href='/type/UserStatus'>UserStatus</a> bot_info_version:flags.14?<a href='/type/int'>int</a> restriction_reason:flags.18?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; bot_inline_placeholder:flags.19?<a href='/type/string'>string</a> lang_code:flags.22?<a href='/type/string'>string</a> emoji_status:flags.30?<a href='/type/EmojiStatus'>EmojiStatus</a> = <a href='/type/User'>User</a>;
 
@@ -76,15 +76,19 @@
 <a href='/method/messages.toggleBotInAttachMenu'>messages.toggleBotInAttachMenu</a>#1aee33af bot:<a href='/type/InputUser'>InputUser</a> enabled:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
 
 <a href='/method/messages.getAttachMenuBots'>messages.getAttachMenuBots</a>#16fcc2cb hash:<a href='/type/long'>long</a> = <a href='/type/AttachMenuBots'>AttachMenuBots</a>;</code></pre>
-<p>Bots that have the <code>bot_attach_menu</code> flag set offer an attachment menu entry that can be added to the attachment menu.<br>
-Use <a href="/method/messages.getAttachMenuBot">messages.getAttachMenuBot</a> to get info about the attachment menu entry, specifically:</p>
+<p>Bots that have the <code>bot_attach_menu</code> flag set offer an attachment menu entry that can be added to the attachment menu.  </p>
+<p>Use <a href="/method/messages.getAttachMenuBot">messages.getAttachMenuBot</a> to get info about the attachment menu entry of a given bot, specifically:</p>
 <ul>
+<li><a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>short_name</code> contains the short name used for the attachment menu label</li>
 <li><a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> indicates the dialog types supported by the attachment menu</li>
 <li><a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>icons</code> contains a list of platform-specific static icons and animations to use for the attachment menu button.</li>
 </ul>
-<p>Use <a href="/method/messages.toggleBotInAttachMenu">messages.toggleBotInAttachMenu</a> to enable or disable the attachment menu.<br>
-Changes made using this method will trigger an <a href="/constructor/updateAttachMenuBots">updateAttachMenuBots</a> update in other clients, which should trigger a <a href="/method/messages.getAttachMenuBots">messages.getAttachMenuBots</a> call to fetch the full updated list of installed attachment menu entries.  </p>
+<p>The installed attachment menu list can be fetched using <a href="/method/messages.getAttachMenuBots">messages.getAttachMenuBots</a>.  </p>
+<p>Use <a href="/method/messages.toggleBotInAttachMenu">messages.toggleBotInAttachMenu</a> to enable or disable the attachment menu of a given bot.<br>
+Changes made using this method will trigger an <a href="/constructor/updateAttachMenuBots">updateAttachMenuBots</a> update in other clients, which should trigger a <a href="/method/messages.getAttachMenuBots">messages.getAttachMenuBots</a> call to fetch the full updated list of installed attachment menu entries.<br>
+The attachment menu list should also be refreshed if the user changes the app's language in the settings.  </p>
 <p>Once an attachment menu is enabled for a certain user, the <a href="/constructor/user">user</a>.<code>attach_menu_enabled</code> flag will be set <em>for the bot</em>, and the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>inactive</code> flag will be unset.  </p>
+<p>Clicking on the attachment menu entry should open the related bot <a href="/api/bots/webapps#normal-web-apps">web app</a>.</p>
 <p>Attachment menus can be installed and opened through <a href="/api/links#bot-attachment-menu-links">attachment menu deep links</a>.</p></div>
   
 </div>
