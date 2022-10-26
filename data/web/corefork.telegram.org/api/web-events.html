@@ -77,10 +77,15 @@ The GamingCommunication and bot web apps libraries by default will use <code>'*'
 </li>
 </ul>
 <p>Emitted by <a href="/api/bots/webapps">bot web apps</a> when to open a native pop-up over the webview.</p>
+<p>By default, buttons should be displayed on one row.<br>
+If the web app provides two buttons that can't fit horizontally on one row, display each button on a separate row.<br>
+If the web app provides three buttons, always display each button on a separate row.  </p>
 <ul>
 <li>If the user presses any of the buttons, call <code>window.Telegram.WebView.receiveEvent("popup_closed", {"button_id": "&lt;button id&gt;"})</code></li>
 <li>If the user cancels the interaction without pressing any of the specified buttons, call <code>window.Telegram.WebView.receiveEvent("popup_closed", {})</code></li>
 </ul>
+<p>Ignore instances of this event if a popup is already being displayed (handling can only resume after the <code>popup_closed</code> response event is emitted).<br>
+Maximum 3 consecutive events of this type can be handled in a timespan of 3 seconds, ignore excess events.  </p>
 <h4><a class="anchor" href="#web-app-setup-closing-behavior" id="web-app-setup-closing-behavior" name="web-app-setup-closing-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_closing_behavior</code></h4>
 <p>Event data: a JSON object with a boolean <code>need_confirmation</code>.</p>
 <p>If equal to <code>true</code>, the client should require user confirmation before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
