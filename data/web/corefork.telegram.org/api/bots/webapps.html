@@ -85,16 +85,7 @@
 <h4><a class="anchor" href="#theme-changed" id="theme-changed" name="theme-changed"><i class="anchor-icon"></i></a><code>theme_changed</code></h4>
 <p>Params: a JSON object with the following fields:</p>
 <ul>
-<li><code>theme_params</code>: a JSON object with the following fields:<ul>
-<li><code>bg_color</code> - Background color in hex RGB format (string)</li>
-<li><code>secondary_bg_color</code> - Secondary background color in hex RGB format (string)</li>
-<li><code>text_color</code> - Text color in hex RGB format (string)</li>
-<li><code>hint_color</code> - Hint color in hex RGB format (string)</li>
-<li><code>link_color</code> - Link color in hex RGB format (string)</li>
-<li><code>button_color</code> - Button color in hex RGB format (string)</li>
-<li><code>button_text_color</code> - Button text color in hex RGB format (string)</li>
-</ul>
-</li>
+<li><code>theme_params</code>: A <a href="#theme-parameters">theme parameters object »</a> (object)</li>
 </ul>
 <p>Emitted when requested by the web app using a <a href="/api/web-events#web-app-request-theme"><code>web_app_request_theme</code> event »</a>, or when the app theme changes.  </p>
 <h4><a class="anchor" href="#popup-closed" id="popup-closed" name="popup-closed"><i class="anchor-icon"></i></a><code>popup_closed</code></h4>
@@ -158,7 +149,13 @@
 </ul>
 <p>To open them, clients should call <a href="/method/messages.requestWebView">messages.requestWebView</a>, and then open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
 <p>After loading the webview, until it is closed by a <a href="/api/web-events#web-app-close">web_app_close event</a>, the user client must invoke <a href="/method/messages.prolongWebView">messages.prolongWebView</a> every 60 seconds.  </p>
-<p>The opened URL's fragment parameters already contain basic information about the user and a <code>query_id</code> parameter, that is exposed by the <a href="/bots/webapps">bot web apps JS library</a>: this <code>query_id</code> can then be used <strong>by the bot</strong> to invoke <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a>, passing an <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructor that will automatically send a message with optionally attached media, and even inline buttons on behalf of the user.</p></div>
+<p>The opened URL's fragment parameters already contain basic information about the user and a <code>query_id</code> parameter, that is exposed by the <a href="/bots/webapps">bot web apps JS library</a>: this <code>query_id</code> can then be used <strong>by the bot</strong> to invoke <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a>, passing an <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructor that will automatically send a message with optionally attached media, and even inline buttons on behalf of the user.  </p>
+<h3><a class="anchor" href="#theme-parameters" id="theme-parameters" name="theme-parameters"><i class="anchor-icon"></i></a>Theme parameters</h3>
+<p>Bot web apps can be themed according to the following theme parameters, passed as a JSON object to the <code>theme_params</code> parameter of the <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and <a href="/method/messages.requestWebView">messages.requestWebView</a> methods.  </p>
+<p>This JSON object has the the following keys, containing color theme information (hex string, RGB24) to pass to the web app:</p>
+<ul>
+<li><code>bg_color</code> - Background color <br><em> <code>secondary_bg_color</code> - Secondary background color (layer 143+) <br></em> <code>text_color</code> - Text color <br><em> <code>hint_color</code> - Hint text color <br></em> <code>link_color</code> - Link color <br><em> <code>button_color</code> - Button color <br></em> <code>button_text_color</code> - Button text color</li>
+</ul></div>
   
 </div>
           

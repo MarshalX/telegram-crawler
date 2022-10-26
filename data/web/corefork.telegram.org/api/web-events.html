@@ -151,17 +151,18 @@ The GamingCommunication and bot web apps libraries by default will use <code>'*'
 <h4><a class="anchor" href="#web-app-setup-main-button" id="web-app-setup-main-button" name="web-app-setup-main-button"><i class="anchor-icon"></i></a><code>web_app_setup_main_button</code></h4>
 <p>Event payload: JSON object with the following fields:</p>
 <ul>
-<li><code>is_visible</code> - Whether the main button is visible (boolean)</li>
-<li><code>is_active</code> - Whether the main button is active (boolean)</li>
-<li><code>text</code> - Button text (string)</li>
-<li><code>color</code> - Button color in hex RGB format (string)</li>
-<li><code>text_color</code> - Button text color in hex RGB format (string)</li>
-<li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean)</li>
+<li><code>is_visible</code> - Whether the main button is visible (boolean, false by default)</li>
+<li><code>is_active</code> - Whether the main button is active (boolean, true by default)</li>
+<li><code>text</code> - Button text (string, if <code>trim(text)</code> is empty the button must be hidden)</li>
+<li><code>color</code> - Button color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_color</code> theme parameter</a>)</li>
+<li><code>text_color</code> - Button text color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_text_color</code> theme parameter</a>)</li>
+<li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean, false by default)</li>
 </ul>
-<p>Configures the main button: when the user presses it a <a href="/api/bots/webapps#main-button-pressed"><code>main_button_pressed</code> event should be emitted by the client</a>.  </p>
+<p>Configures the main button, located immediately below the webview: when the user presses it a <a href="/api/bots/webapps#main-button-pressed"><code>main_button_pressed</code> event should be emitted by the client</a>.  </p>
 <h4><a class="anchor" href="#web-app-setup-back-button" id="web-app-setup-back-button" name="web-app-setup-back-button"><i class="anchor-icon"></i></a><code>web_app_setup_back_button</code></h4>
 <p>Event data: a JSON object with an <code>is_visible</code> boolean field.</p>
-<p>Determines whether to show or hide the back button: when the user presses it a <a href="/api/bots/webapps#back-button-pressed"><code>back_button_pressed</code> event should be emitted by the client</a>.  </p>
+<p>Determines whether to show or hide the back button: when the user presses it a <a href="/api/bots/webapps#back-button-pressed"><code>back_button_pressed</code> event should be emitted by the client</a>.<br>
+Note that on supported platforms, the OS back button can be used instead of a custom back button: in this case, if <code>is_visible</code> is true pressing the OS back button should emit a <a href="/api/bots/webapps#back-button-pressed"><code>back_button_pressed</code> event</a>, otherwise the webview should be closed.</p>
 <h4><a class="anchor" href="#payment-form-submit" id="payment-form-submit" name="payment-form-submit"><i class="anchor-icon"></i></a><code>payment_form_submit</code></h4>
 <p>Event payload: JSON object with <code>credentials</code> and <code>title</code> fields.</p>
 <ul>
