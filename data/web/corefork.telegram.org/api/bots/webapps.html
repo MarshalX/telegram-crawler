@@ -66,10 +66,10 @@
 <ul>
 <li><code>slug</code> - Invoice identifier (string)</li>
 <li><code>status</code> - One of the following values (string):<ul>
-<li><code>paid</code> – The invoice was paid successfully: the client completed the <a href="/api/payments">payment flow »</a> and received a <a href="/constructor/messageActionPaymentSent">messageActionPaymentSent</a> service message.</li>
-<li><code>cancelled</code> – The user closed this invoice without paying: the user aborted the <a href="/api/payments">payment flow »</a>, <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> was NOT invoked.</li>
-<li><code>failed</code> – The user tried to pay, but the payment failed: the user completed the <a href="/api/payments">payment flow »</a> but <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> returned an RPC error.</li>
-<li><code>pending</code> – The payment is still processing. The bot will receive a service message about a successful payment when the invoice is successfully paid: the user aborted the <a href="/api/payments">payment flow »</a>, <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> was NOT invoked.</li>
+<li><code>cancelled</code> – The user closed the invoice popup without paying, before the call to <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a>.</li>
+<li><code>pending</code> – The payment is still processing: the bot will receive a further service message about a successful or failed payment. <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> was successfully invoked, the user completed all additional verification forms returned by the method, the invoice popup was closed but the client hasn't received a <a href="/constructor/messageActionPaymentSent">messageActionPaymentSent</a> service message yet.</li>
+<li><code>failed</code> – The user tried to pay, but the payment failed: the call to <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> returned an RPC error and the popup was closed.</li>
+<li><code>paid</code> – The invoice was paid successfully: the client completed the <a href="/api/payments">payment flow »</a>, the invoice popup was closed and a <a href="/constructor/messageActionPaymentSent">messageActionPaymentSent</a> service message was received by the client.</li>
 </ul>
 </li>
 </ul>
