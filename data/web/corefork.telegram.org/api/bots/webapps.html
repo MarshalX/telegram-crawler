@@ -46,7 +46,7 @@
 
 <p>Bots can offer users interactive <a href="/bots/webapps">HTML5 web apps</a> to completely replace <strong>any website</strong>.  </p>
 <p>They support <a href="https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots">seamless authorization</a>, <a href="https://core.telegram.org/bots/payments">integrated payments</a> via multiple payment providers (with <em>Google Pay</em> and <em>Apple Pay</em> out of the box), delivering tailored push notifications to users, and <a href="https://core.telegram.org/bots">much more</a>.</p>
-<p>This article offers a client-side overview of the implementation of bot web apps using the MTProto API: see <a href="/bots/webapps">here an overview of the web-app side JS API »</a>.  </p>
+<p>This article offers a client-side overview of the implementation of bot web apps using the MTProto API: see <a href="/bots/webapps">here for an overview of the web-app side JS API »</a>.  </p>
 <h3><a class="anchor" href="#outgoing-events-web-app-to-client" id="outgoing-events-web-app-to-client" name="outgoing-events-web-app-to-client"><i class="anchor-icon"></i></a>Outgoing events: Web app to client</h3>
 <p>Both <a href="#simple-web-apps">simple</a> and <a href="#normal-web-apps">normal</a> web apps can <em>send</em> web events starting with <code>web_app_</code>; see the <a href="/api/web-events">web event documentation for the full list of events that can be <em>sent</em> by the web app to the client »</a>.  </p>
 <h3><a class="anchor" href="#incoming-events-client-to-web-app" id="incoming-events-client-to-web-app" name="incoming-events-client-to-web-app"><i class="anchor-icon"></i></a>Incoming events: Client to web app</h3>
@@ -66,10 +66,10 @@
 <ul>
 <li><code>slug</code> - Invoice identifier (string)</li>
 <li><code>status</code> - One of the following values (string):<ul>
-<li><code>paid</code> – The invoice was paid successfully</li>
-<li><code>cancelled</code> – The user closed this invoice without paying</li>
-<li><code>failed</code> – The user tried to pay, but the payment was failed</li>
-<li><code>pending</code> – The payment is still processing. The bot will receive a service message about a successful payment when the invoice is successfully paid.</li>
+<li><code>paid</code> – The invoice was paid successfully: the client completed the <a href="/api/payments">payment flow »</a> and received a <a href="/constructor/messageActionPaymentSent">messageActionPaymentSent</a> service message.</li>
+<li><code>cancelled</code> – The user closed this invoice without paying: the user aborted the <a href="/api/payments">payment flow »</a>, <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> was NOT invoked.</li>
+<li><code>failed</code> – The user tried to pay, but the payment failed: the user completed the <a href="/api/payments">payment flow »</a> but <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> returned an RPC error.</li>
+<li><code>pending</code> – The payment is still processing. The bot will receive a service message about a successful payment when the invoice is successfully paid: the user aborted the <a href="/api/payments">payment flow »</a>, <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> was NOT invoked.</li>
 </ul>
 </li>
 </ul>
@@ -148,7 +148,7 @@
 <li>An <a href="/api/bots/attach">attachment menu »</a>: in this case, no special flag should be set, unless the attachment menu is opened via a with a <a href="/api/links#bot-attachment-menu-links">bot attachment menu deep link</a>, in which case the <code>start_parameter</code> should be provided to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code>, if present.</li>
 </ul>
 <p>To open them, clients should call <a href="/method/messages.requestWebView">messages.requestWebView</a>, and then open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
-<p>After loading the webview, until it is closed by a <a href="/api/web-events#web-app-close">web_app_close event</a>, the user client must invoke <a href="/method/messages.prolongWebView">messages.prolongWebView</a> every 60 seconds.  </p>
+<p>After loading the webview, until it is closed by a <a href="/api/web-events#web-app-close">web_app_close event</a>, the user client must invoke <a href="/method/messages.prolongWebView">messages.prolongWebView</a> every 60 seconds: if the method call returns <code>QUERY_ID_INVALID</code>, the webview must be closed.  </p>
 <p>The opened URL's fragment parameters already contain basic information about the user and a <code>query_id</code> parameter, that is exposed by the <a href="/bots/webapps">bot web apps JS library</a>: this <code>query_id</code> can then be used <strong>by the bot</strong> to invoke <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a>, passing an <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructor that will automatically send a message with optionally attached media, and even inline buttons on behalf of the user.  </p>
 <h3><a class="anchor" href="#theme-parameters" id="theme-parameters" name="theme-parameters"><i class="anchor-icon"></i></a>Theme parameters</h3>
 <p>Bot web apps can be themed according to the following theme parameters, passed as a JSON object to the <code>theme_params</code> parameter of the <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and <a href="/method/messages.requestWebView">messages.requestWebView</a> methods.  </p>
