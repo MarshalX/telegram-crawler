@@ -49,6 +49,10 @@ HIDDEN_URLS = {
     'webappcontent.telegram.org/cafe',  # demo 2
     # 'a-webappcontent.stel.com/demo',
     # 'a-webappcontent.stel.com/cafe',
+
+    # 'fragment.com/about',
+    # 'fragment.com/privacy',
+    # 'fragment.com/terms',
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl',
@@ -279,6 +283,10 @@ def cleanup_links(links: set[str]) -> set[str]:
         link_parts = link.split('.')
         if '@' in link_parts[0]:
             continue
+
+        # fix wildcard
+        if link.startswith('.'):
+            link = link[1:]
 
         cleaned_links.add(link)
 
