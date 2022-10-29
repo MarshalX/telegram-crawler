@@ -50,9 +50,10 @@ HIDDEN_URLS = {
     # 'a-webappcontent.stel.com/demo',
     # 'a-webappcontent.stel.com/cafe',
 
-    # 'fragment.com/about',
-    # 'fragment.com/privacy',
-    # 'fragment.com/terms',
+    'fragment.com/about',
+    'fragment.com/privacy',
+    'fragment.com/terms',
+    'fragment.com/js/auction.js',
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl',

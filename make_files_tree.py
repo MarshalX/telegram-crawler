@@ -38,6 +38,8 @@ TRANSLATIONS_EN_CATEGORY_URL_REGEX = r'/en/[a-z_]+/[a-z_]+/$'
 PAGE_GENERATION_TIME_REGEX = r'<!-- page generated in .+ -->'
 PAGE_API_HASH_REGEX = r'\?hash=[a-z0-9]+'
 PAGE_API_HASH_TEMPLATE = f'?hash={DYNAMIC_PART_MOCK}'
+TON_RATE_REGEX = r'"tonRate":"[.0-9]+"'
+TON_RATE_TEMPLATE = f'"tonRate":"{DYNAMIC_PART_MOCK}"'
 PASSPORT_SSID_REGEX = r'passport_ssid=[a-z0-9]+_[a-z0-9]+_[a-z0-9]+'
 PASSPORT_SSID_TEMPLATE = f'passport_ssid={DYNAMIC_PART_MOCK}'
 NONCE_REGEX = r'"nonce":"[a-z0-9]+_[a-z0-9]+_[a-z0-9]+'
@@ -633,6 +635,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         content = re.sub(PROXY_CONFIG_SUB_NET_REGEX, PROXY_CONFIG_SUB_NET_TEMPLATE, content)
         content = re.sub(SPARKLE_SIG_REGEX, SPARKLE_SIG_TEMPLATE, content)
         content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
+        content = re.sub(TON_RATE_REGEX, TON_RATE_TEMPLATE, content)
 
         async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
             logger.info(f'Write to {filename}')
