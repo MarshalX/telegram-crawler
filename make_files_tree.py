@@ -505,7 +505,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
     configs['GetPremiumPromo'].status_entities = []
     configs['GetPremiumPromo'].period_options = []
 
-    keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64'}
+    keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64', 'pending_suggestions'}
 
     def rem_rec(config):
         if not isinstance(config, dict):
