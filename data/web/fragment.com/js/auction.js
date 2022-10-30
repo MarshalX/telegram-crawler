@@ -110,6 +110,32 @@ var Main = {
       $el.attr('data-prev-val', cur_value);
     }
   },
+  fitUsername: function($el) {
+    $el.each(function(){
+      var init_size = $(this).data('init-size');
+      if (!init_size) {
+        init_size = parseInt($(this).css('font-size'));
+        $(this).data('init-size', init_size);
+      }
+      var size = parseInt($(this).css('font-size'));
+      size = parseInt(size);
+      while (this.scrollWidth > this.offsetWidth) {
+        size -= 0.5;
+        if (size >= init_size * 0.75) {
+          $(this).css('font-size', size + 'px');
+        } else {
+          break;
+        }
+      }
+      var text = $(this).attr('title') || $(this).text();
+      var prefix_len = text.length - 3;
+      while (this.scrollWidth > this.offsetWidth &&
+             prefix_len > 3) {
+        prefix_len--;
+        $(this).text(text.substr(0, prefix_len) + '…' + text.substr(-3));
+      }
+    });
+  },
   initViewport: function() {
     if (!window.$viewportHelper) {
       window.$viewportHelper = $('<div>').css({position: 'absolute', left: '-100px', top: '0', height: '100vh'}).appendTo('body');
@@ -406,6 +432,7 @@ var Auction = {
       state.needUpdate = true;
       state.updStateTo = setTimeout(Auction.updateState, Auction.UPDATE_PERIOD);
       Assets.init();
+      Account.init();
     });
     Aj.onUnload(function(state) {
       Main.destroyForm(state.$bidForm);
@@ -415,7 +442,7 @@ var Auction = {
   },
   updateState: function() {
     Aj.apiRequest('updateAuction', {
-      address: Aj.state.auctionAddress,
+      username: Aj.state.username,
       lt: Aj.state.auctionLastLt
     }, function(result) {
       if (result.html) {
@@ -767,6 +794,108 @@ var Assets = {
   }
 };
 
+var Account = {
+  init: function() {
+    Aj.onLoad(function(state) {
+      $(document).on('click.curPage', '.js-blockchain-transfer-btn', Account.eBlockchainTransfer);
+      $(document).on('click.curPage', '.js-do-transfer-btn', Account.eBlockchainTranswerInit);
+      state.$transferInitPopup = $('.js-transfer-init-popup');
+      state.$transferCheckPopup = $('.js-transfer-check-popup');
+    });
+    Aj.onUnload(function(state) {
+      clearTimeout(state.transferTimeout);
+    });
+  },
+  eBlockchainTransfer: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    var $actions    = $(this).closest('.js-actions');
+    var username    = $actions.attr('data-username');
+    var $popup      = Aj.state.$transferInitPopup;
+    $('.js-username', $popup).html('@' + username);
+    $popup.data('username', username);
+    openPopup($popup);
+  },
+  eBlockchainTranswerInit: function(e) {
+    e.preventDefault();
+    var $btn = $(this);
+    if ($btn.data('loading')) {
+      return false;
+    }
+    var $popup   = Aj.state.$transferInitPopup;
+    var username = $popup.data('username');
+    $btn.data('loading', true);
+    Aj.apiRequest('initBlockchainTransfer', {
+      username: username
+    }, function(result) {
+      $btn.data('loading', false);
+      closePopup($popup);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.confirmed) {
+        return Account.blockchainTranswerStart($popup, result);
+      }
+      Aj.state.$transferCheckPopup.data('username', username);
+      openPopup(Aj.state.$transferCheckPopup, {
+        onOpen: function() {
+          Account.blockchainTranswerCheck(result.req_id);
+        },
+        onClose: function() {
+          clearTimeout(Aj.state.transferTimeout);
+        }
+      });
+    });
+  },
+  blockchainTranswerCheck: function(req_id) {
+    if (Aj.state.$transferCheckPopup.hasClass('hide')) {
+      return false;
+    }
+    clearTimeout(Aj.state.transferTimeout);
+    var $popup = Aj.state.$transferCheckPopup;
+    Aj.state.transferTimeout = setTimeout(function() {
+      Aj.apiRequest('checkBlockchainTransfer', {
+        id: req_id
+      }, function(result) {
+        if (result.error) {
+          if (result.declined) {
+            closePopup($popup);
+          }
+          return showAlert(result.error);
+        }
+        if (result.confirmed) {
+          Account.blockchainTranswerStart($popup, result);
+        } else {
+          Account.blockchainTranswerCheck(req_id);
+        }
+      });
+    }, 700);
+  },
+  blockchainTranswerStart: function($popup, data) {
+    var username = $popup.data('username');
+    var amount   = $('.js-amount', Aj.state.$transferInitPopup).html();
+    closePopup($popup);
+    QR.showPopup({
+      data: data,
+      title: l('WEB_POPUP_QR_BLOCKCHAIN_TRANSFER_HEADER'),
+      description: l('WEB_POPUP_QR_BLOCKCHAIN_TRANSFER_TEXT', {
+        amount: '<span class="icon-before icon-ton-text">' + amount + '</span>'
+      }),
+      qr_label: '@' + username,
+      tk_label: l('WEB_POPUP_QR_BLOCKCHAIN_TRANSFER_TK_BUTTON'),
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
+      onConfirm: function(by_server) {
+        if (by_server) {
+          $(Aj.ajContainer).one('page:load', function() {
+            showAlert(l('WEB_BLOCKCHAIN_TRANSFER_SENT'));
+          });
+        }
+        Aj.location('/username/' + username);
+      }
+    });
+  }
+};
+
 var MyBids = {
   init: function() {
     Aj.onLoad(function(state) {
@@ -800,7 +929,8 @@ var QR = {
       terms_label: null,
       data: null,
       request: null,
-      onConfirm: null
+      onConfirm: null,
+      onExpire: null
     }, options);
     var ua = (navigator.userAgent || '').toLowerCase(),
         is_ios = ua.indexOf('iphone') >= 0 ||
@@ -837,10 +967,10 @@ var QR = {
       }
     };
     var onExpire = function() {
+      options.onExpire && options.onExpire();
       closePopup($popup);
-      showAlert('QR code expired');
     };
-    var setData = function(data) {
+    var setData = function(data, req) {
       QR.getUrl(data.qr_link, function(url) {
         var urlObj = $popup.data('qrCodeUrlObj');
         if (urlObj) {
@@ -851,6 +981,21 @@ var QR = {
         $tonkeeperBtn.attr('data-href', data.link);
         $popup.removeClass('qr-inactive');
       });
+      if (expTimeout = $popup.data('expTimeout')) {
+        clearTimeout(expTimeout);
+      }
+      if (data.expire_after) {
+        expTimeout = setTimeout(onExpire, data.expire_after * 1000);
+        $popup.data('expTimeout', expTimeout);
+        var retry_after = data.expire_after - 10;
+        if (retry_after > 0 && data.can_retry) {
+          var retryTimeout = setTimeout(loadData, retry_after * 1000, req);
+          $popup.data('retryTimeout', retryTimeout);
+        }
+      }
+      if (data.check_method) {
+        checkAction(data.check_method, data.check_params);
+      }
     };
     var loadData = function(req) {
       var retryTimeout, expTimeout;
@@ -864,23 +1009,7 @@ var QR = {
           }
           return showAlert(result.error);
         }
-        setData(result);
-        if (expTimeout = $popup.data('expTimeout')) {
-          clearTimeout(expTimeout);
-        }
-        if (result.expire_after) {
-          expTimeout = setTimeout(onExpire, result.expire_after * 1000);
-          $popup.data('expTimeout', expTimeout);
-          var retry_after = result.expire_after - 10;
-          if (retry_after > 0) {
-            var retryTimeout = setTimeout(loadData, retry_after * 1000, req);
-            $popup.data('retryTimeout', retryTimeout);
-          }
-        }
-        if (result.check_method) {
-          checkAction(result.check_method, result.check_params);
-
-        }
+        setData(result, req);
       });
     };
     var checkAction = function(method, params) {
@@ -906,7 +1035,7 @@ var QR = {
       $popup.data('checkTimeout', checkTimeout);
     };
     if (options.data) {
-      setData(options.data);
+      setData(options.data, options.request);
     } else if (options.request) {
       loadData(options.request);
     }
@@ -914,7 +1043,7 @@ var QR = {
     $confirmedBtn.on('click', onConfirmedPress);
     $(document).on('keydown', onEnterPress);
     $popup.one('popup:open', function() {
-      $('.fit-text', $popup).fitText();
+      Main.fitUsername($('.fit-text', $popup));
     });
     $popup.one('popup:close', function() {
       $tonkeeperBtn.off('click', tkOpen);
