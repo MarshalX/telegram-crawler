@@ -702,8 +702,10 @@ var Assets = {
         Aj.state.$assignForm.reset();
         Aj.state.$assignForm.field('username').value(username);
         Aj.state.$assignForm.field('assign_to').value(assigned_to);
+        $('.js-assign-account-item.external').addClass('hide');
         if (assigned_to) {
           $('.js-assign-account-item:has(input[name="assign_to"][value="' + assigned_to + '"])', Aj.state.$assignPopup).each(function() {
+            $(this).removeClass('hide');
             if (this.scrollIntoViewIfNeeded) {
               this.scrollIntoViewIfNeeded();
             } else if (this.scrollIntoView) {
