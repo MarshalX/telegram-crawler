@@ -10,7 +10,6 @@ var Main = {
       $(cont).on('click.curPage', '.js-header-menu-button', Main.eHeaderMenu);
       $(cont).on('click.curPage', '.js-header-menu-close-button', Main.eHeaderMenuClose);
       $(cont).on('click.curPage', '.js-btn-tonkeeper', Main.eTonkeeperOpen);
-      $(cont).on('click.curPage', '.js-form-clear', Main.eFormClear);
       $(cont).on('click.curPage', '.js-auction-unavail', Main.eAuctionUnavailable);
       $(cont).on('click.curPage', '.js-howitworks', Main.eHowitworks);
       $(cont).on('click.curPage', '.logout-link', Login.logOut);
@@ -18,15 +17,25 @@ var Main = {
       state.$headerMenu = $('.js-header-menu');
       state.$unavailPopup = $('.js-unavailable-popup');
       state.$howitworksPopup = $('.js-howitworks-popup');
+      state.$mainSearchField = $('.js-main-search-field');
+      state.$mainSearchForm = $('.js-main-search-form');
+      state.$mainSearchForm.on('submit', Main.eMainSearchSubmit);
+      state.$mainSearchForm.field('query').on('input', Main.eMainSearchInput);
+      state.mainSearchCache = {};
+      $('.js-form-clear', state.$mainSearchForm).on('click', Main.eMainSearchClear);
       Main.updateTime();
       Main.initViewport();
       Main.initLogo();
     });
     Aj.onUnload(function(state) {
+      clearTimeout(Aj.state.searchTimeout);
       $(window).off('resize', Main.onResize);
       $('.js-logo-hoverable').off('mouseover', Main.playLogo);
       $('.js-logo-clickable').off('click', Main.playLogo);
       $('.js-logo-icon').off('animationend', Main.eLogoAnimEnd);
+      state.$mainSearchForm.off('submit', Main.eMainSearchSubmit);
+      state.$mainSearchForm.field('query').off('input', Main.eMainSearchInput);
+      $('.js-form-clear', state.$mainSearchForm).off('click', Main.eMainSearchClear);
     });
   },
   initForm: function(form) {
@@ -204,13 +213,6 @@ var Main = {
     e.preventDefault();
     closePopup(Aj.state.$headerMenu);
   },
-  eFormClear: function(e) {
-    var form = $(this).closest('form').get(0);
-    if (form) {
-      form.query.value = '';
-      form.submit();
-    }
-  },
   eAuctionUnavailable: function(e) {
     e.preventDefault();
     var username = $(this).attr('data-username');
@@ -364,6 +366,68 @@ var Main = {
     if (href) {
       location.href = href;
     }
+  },
+  eMainSearchInput: function(e) {
+    clearTimeout(Aj.state.searchTimeout);
+    var cached_results = Main.getSearchCachedResult();
+    if (cached_results) {
+      Main.updateResults(cached_results);
+    } else {
+      Aj.state.searchTimeout = setTimeout(Main.searchSubmit, 400);
+    }
+  },
+  eMainSearchClear: function(e) {
+    var $form = Aj.state.$mainSearchForm;
+    $form.field('query').value('');
+    Main.searchSubmit();
+  },
+  eMainSearchSubmit: function(e) {
+    e.preventDefault();
+    Main.searchSubmit();
+  },
+  updateResults: function(result) {
+    if (result.html) {
+      $('.js-search-results', Aj.ajContainer).html(result.html);
+      Main.updateTime();
+      Aj.setLocation(result.url, true);
+    }
+    $('.js-main-recent-bids').toggleClass('hide', !result.show_recent_bids);
+  },
+  getSearchCachedResult: function() {
+    var $form  = Aj.state.$mainSearchForm;
+    var cache  = Aj.state.mainSearchCache;
+    var query  = $form.field('query').value();
+    var filter = $form.field('filter').value();
+    var sort   = $form.field('sort').value();
+    var cache_key = 'q='+query+'&f='+filter+'&s='+sort;
+    if (cache[cache_key]) {
+      var expire_time = cache[cache_key].expire*1000;
+      var now_time = +(new Date);
+      if (expire_time > now_time) {
+        return cache[cache_key];
+      } else {
+        delete cache[cache_key];
+      }
+    }
+    return false;
+  },
+  searchSubmit: function() {
+    var $form  = Aj.state.$mainSearchForm;
+    var cache  = Aj.state.mainSearchCache;
+    var query  = $form.field('query').value();
+    var filter = $form.field('filter').value();
+    var sort   = $form.field('sort').value();
+    var cache_key = 'q='+query+'&f='+filter+'&s='+sort;
+    Aj.state.$mainSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
+    Aj.apiRequest('searchAuctions', {
+      query: query,
+      filter: filter,
+      sort: sort
+    }, function(result) {
+      cache[cache_key] = result;
+      Main.updateResults(result);
+      Aj.state.$mainSearchField.removeClass('loading');
+    });
   }
 };
 
@@ -375,7 +439,8 @@ var Login = {
       }
     });
   },
-  open: function() {
+  open: function(return_to) {
+    Login.returnTo = return_to;
     Telegram.Login.open();
   },
   checkAuth: function (e) {
@@ -394,7 +459,11 @@ var Login = {
       if (result.error) {
         return showAlert(result.error);
       }
-      location.reload();
+      if (Login.returnTo) {
+        location.href = Login.returnTo;
+      } else {
+        location.reload();
+      }
     });
   },
   logOut: function (e) {
@@ -419,13 +488,14 @@ var Auction = {
   UPDATE_PERIOD: 1200,
   init: function() {
     Aj.onLoad(function(state) {
-      $(document).on('click.curPage', '.js-place-bid-btn', Auction.ePlaceBid);
-      $(document).on('submit.curPage', '.js-place-bid-form', Auction.ePlaceBidSubmit);
-      $(document).on('click.curPage', '.js-buy-now-btn', Auction.eBuyNow);
-      $(document).on('click.curPage', '.js-subscribe-btn', Auction.eSubscribe);
-      $(document).on('click.curPage', '.js-unsubscribe-btn', Auction.eUnsubscribe);
-      $(document).on('click.curPage', '.js-load-more-orders', Auction.eLoadMoreOrders);
-      $(document).on('click.curPage', '.js-load-more-owners', Auction.eLoadMoreOwners);
+      var cont = Aj.ajContainer;
+      $(cont).on('click.curPage', '.js-place-bid-btn', Auction.ePlaceBid);
+      $(cont).on('submit.curPage', '.js-place-bid-form', Auction.ePlaceBidSubmit);
+      $(cont).on('click.curPage', '.js-buy-now-btn', Auction.eBuyNow);
+      $(cont).on('click.curPage', '.js-subscribe-btn', Auction.eSubscribe);
+      $(cont).on('click.curPage', '.js-unsubscribe-btn', Auction.eUnsubscribe);
+      $(cont).on('click.curPage', '.js-load-more-orders', Auction.eLoadMoreOrders);
+      $(cont).on('click.curPage', '.js-load-more-owners', Auction.eLoadMoreOwners);
       state.$bidPopup = $('.js-place-bid-popup');
       state.$bidForm = $('.js-place-bid-form');
       Main.initForm(state.$bidForm);

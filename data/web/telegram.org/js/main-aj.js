@@ -488,11 +488,16 @@ function ajInit(options) {
     }
   }
 
-  function setLocation(href) {
+  function setLocation(href, replace = false) {
     var url = loc(href).href;
     var short_url = layerUrlToShort(url) || url;
-    history.pushState({i: curHistoryState.i + 1, u: url}, null, short_url);
-    console.log('history push', 'oldState =', curHistoryState, 'newState =', history.state);
+    if (replace) {
+      history.replaceState({i: curHistoryState.i, u: url}, null, short_url);
+      console.log('history replace', 'oldState =', curHistoryState, 'newState =', history.state);
+    } else {
+      history.pushState({i: curHistoryState.i + 1, u: url}, null, short_url);
+      console.log('history push', 'oldState =', curHistoryState, 'newState =', history.state);
+    }
     curHistoryState = history.state;
     curLocation = loc(curHistoryState.u);
     layerCloseLocation = layerCloseLoc(curHistoryState.u);
