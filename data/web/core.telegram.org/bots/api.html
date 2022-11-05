@@ -53,6 +53,20 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="november-5-2022" href="#november-5-2022"><i class="anchor-icon"></i></a>November 5, 2022</h4>
+<p><strong>Bot API 6.3</strong></p>
+<ul>
+<li>Added support for <a href="https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups">Topics in Groups</a>.</li>
+<li>Added the field <em>is_forum</em> to the class <a href="#chat">Chat</a>.</li>
+<li>Added the fields <em>is_topic_message</em> and <em>message_thread_id</em> to the class <a href="#message">Message</a> to allow detection of messages belonging to a forum topic and their message thread identifier.</li>
+<li>Added the classes <a href="#forumtopiccreated">ForumTopicCreated</a>, <a href="#forumtopicclosed">ForumTopicClosed</a>, and <a href="#forumtopicreopened">ForumTopicReopened</a> and the fields <em>forum_topic_created</em>, <em>forum_topic_closed</em>, and <em>forum_topic_reopened</em> to the class <a href="#message">Message</a>. Note that service messages about forum topic creation can&#39;t be deleted with the <a href="#deletemessage">deleteMessage</a> method.</li>
+<li>Added the field <em>can_manage_topics</em> to the classes <a href="#chatadministratorrights">ChatAdministratorRights</a>, <a href="#chatpermissions">ChatPermissions</a>, <a href="#chatmemberadministrator">ChatMemberAdministrator</a>, and <a href="#chatmemberrestricted">ChatMemberRestricted</a>.</li>
+<li>Added the parameter <em>can_manage_topics</em> to the method <a href="#promotechatmember">promoteChatMember</a>.</li>
+<li>Added the methods <a href="#createforumtopic">createForumTopic</a>, <a href="#editforumtopic">editForumTopic</a>, <a href="#closeforumtopic">closeForumTopic</a>, <a href="#reopenforumtopic">reopenForumTopic</a>, <a href="#deleteforumtopic">deleteForumTopic</a>, <a href="#unpinallforumtopicmessages">unpinAllForumTopicMessages</a>, and <a href="#getforumtopiciconstickers">getForumTopicIconStickers</a> for forum topic management.</li>
+<li>Added the parameter <em>message_thread_id</em> to the methods <a href="#sendmessage">sendMessage</a>, <a href="#sendphoto">sendPhoto</a>, <a href="#sendvideo">sendVideo</a>, <a href="#sendanimation">sendAnimation</a>, <a href="#sendaudio">sendAudio</a>, <a href="#senddocument">sendDocument</a>, <a href="#sendsticker">sendSticker</a>, <a href="#sendvideonote">sendVideoNote</a>, <a href="#sendvoice">sendVoice</a>, <a href="#sendlocation">sendLocation</a>, <a href="#sendvenue">sendVenue</a>, <a href="#sendcontact">sendContact</a>, <a href="#sendpoll">sendPoll</a>, <a href="#senddice">sendDice</a>, <a href="#sendinvoice">sendInvoice</a>, <a href="#sendgame">sendGame</a>, <a href="#sendmediagroup">sendMediaGroup</a>, <a href="#copymessage">copyMessage</a>, <a href="#forwardmessage">forwardMessage</a> to support sending of messages to a forum topic.</li>
+<li>Added support for <a href="https://telegram.org/blog/topics-in-groups-collectible-usernames#collectible-usernames">Multiple Usernames</a> via the field <em>active_usernames</em> in the class <a href="#chat">Chat</a>.</li>
+<li>Added the field <em>emoji_status_custom_emoji_id</em> to the class <a href="#chat">Chat</a>.</li>
+</ul>
 <h4><a class="anchor" name="august-12-2022" href="#august-12-2022"><i class="anchor-icon"></i></a>August 12, 2022</h4>
 <p><strong>Bot API 6.2</strong></p>
 <p><strong>Custom Emoji Support</strong></p>
@@ -566,9 +580,24 @@ To learn how to create…">
 <td><em>Optional</em>. Last name of the other party in a private chat</td>
 </tr>
 <tr>
+<td>is_forum</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if the supergroup chat is a forum (has <a href="https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups">topics</a> enabled)</td>
+</tr>
+<tr>
 <td>photo</td>
 <td><a href="#chatphoto">ChatPhoto</a></td>
 <td><em>Optional</em>. Chat photo. Returned only in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
+<td>active_usernames</td>
+<td>Array of String</td>
+<td><em>Optional</em>. If non-empty, the list of all <a href="https://telegram.org/blog/topics-in-groups-collectible-usernames#collectible-usernames">active chat usernames</a>; for private chats, supergroups and channels. Returned only in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
+<td>emoji_status_custom_emoji_id</td>
+<td>String</td>
+<td><em>Optional</em>. Custom emoji identifier of emoji status of the other party in a private chat. Returned only in <a href="#getchat">getChat</a>.</td>
 </tr>
 <tr>
 <td>bio</td>
@@ -669,6 +698,11 @@ To learn how to create…">
 <td>Unique message identifier inside this chat</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td><em>Optional</em>. Unique identifier of a message thread to which the message belongs; for supergroups only</td>
+</tr>
+<tr>
 <td>from</td>
 <td><a href="#user">User</a></td>
 <td><em>Optional</em>. Sender of the message; empty for messages sent to channels. For backward compatibility, the field contains a fake sender user in non-channel chats, if the message was sent on behalf of a chat.</td>
@@ -717,6 +751,11 @@ To learn how to create…">
 <td>forward_date</td>
 <td>Integer</td>
 <td><em>Optional</em>. For forwarded messages, date the original message was sent in Unix time</td>
+</tr>
+<tr>
+<td>is_topic_message</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if the message is sent to a forum topic</td>
 </tr>
 <tr>
 <td>is_automatic_forward</td>
@@ -927,6 +966,21 @@ To learn how to create…">
 <td>proximity_alert_triggered</td>
 <td><a href="#proximityalerttriggered">ProximityAlertTriggered</a></td>
 <td><em>Optional</em>. Service message. A user in the chat triggered another user&#39;s proximity alert while sharing Live Location.</td>
+</tr>
+<tr>
+<td>forum_topic_created</td>
+<td><a href="#forumtopiccreated">ForumTopicCreated</a></td>
+<td><em>Optional</em>. Service message: forum topic created</td>
+</tr>
+<tr>
+<td>forum_topic_closed</td>
+<td><a href="#forumtopicclosed">ForumTopicClosed</a></td>
+<td><em>Optional</em>. Service message: forum topic closed</td>
+</tr>
+<tr>
+<td>forum_topic_reopened</td>
+<td><a href="#forumtopicreopened">ForumTopicReopened</a></td>
+<td><em>Optional</em>. Service message: forum topic reopened</td>
 </tr>
 <tr>
 <td>video_chat_scheduled</td>
@@ -1712,6 +1766,38 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="forumtopiccreated" href="#forumtopiccreated"><i class="anchor-icon"></i></a>ForumTopicCreated</h4>
+<p>This object represents a service message about a new forum topic created in the chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>Name of the topic</td>
+</tr>
+<tr>
+<td>icon_color</td>
+<td>Integer</td>
+<td>Color of the topic icon in RGB format</td>
+</tr>
+<tr>
+<td>icon_custom_emoji_id</td>
+<td>String</td>
+<td><em>Optional</em>. Unique identifier of the custom emoji shown as the topic icon</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="forumtopicclosed" href="#forumtopicclosed"><i class="anchor-icon"></i></a>ForumTopicClosed</h4>
+<p>This object represents a service message about a forum topic closed in the chat. Currently holds no information.</p>
+<h4><a class="anchor" name="forumtopicreopened" href="#forumtopicreopened"><i class="anchor-icon"></i></a>ForumTopicReopened</h4>
+<p>This object represents a service message about a forum topic reopened in the chat. Currently holds no information.</p>
 <h4><a class="anchor" name="videochatscheduled" href="#videochatscheduled"><i class="anchor-icon"></i></a>VideoChatScheduled</h4>
 <p>This object represents a service message about a video chat scheduled in the chat.</p>
 <table class="table">
@@ -2325,6 +2411,11 @@ To learn how to create…">
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the user is allowed to pin messages; groups and supergroups only</td>
 </tr>
+<tr>
+<td>can_manage_topics</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to create, rename, close, and reopen forum topics; supergroups only</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="chatmember" href="#chatmember"><i class="anchor-icon"></i></a>ChatMember</h4>
@@ -2452,6 +2543,11 @@ To learn how to create…">
 <td><em>Optional</em>. <em>True</em>, if the user is allowed to pin messages; groups and supergroups only</td>
 </tr>
 <tr>
+<td>can_manage_topics</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to create, rename, close, and reopen forum topics; supergroups only</td>
+</tr>
+<tr>
 <td>custom_title</td>
 <td>String</td>
 <td><em>Optional</em>. Custom title for this user</td>
@@ -2521,6 +2617,11 @@ To learn how to create…">
 <td>can_pin_messages</td>
 <td>Boolean</td>
 <td><em>True</em>, if the user is allowed to pin messages</td>
+</tr>
+<tr>
+<td>can_manage_topics</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to create forum topics</td>
 </tr>
 <tr>
 <td>can_send_messages</td>
@@ -2737,6 +2838,11 @@ To learn how to create…">
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the user is allowed to pin messages. Ignored in public supergroups</td>
 </tr>
+<tr>
+<td>can_manage_topics</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to create forum topics. If omitted defaults to the value of can_pin_messages</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="chatlocation" href="#chatlocation"><i class="anchor-icon"></i></a>ChatLocation</h4>
@@ -2759,6 +2865,39 @@ To learn how to create…">
 <td>address</td>
 <td>String</td>
 <td>Location address; 1-64 characters, as defined by the chat owner</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="forumtopic" href="#forumtopic"><i class="anchor-icon"></i></a>ForumTopic</h4>
+<p>This object represents a forum topic.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Unique identifier of the forum topic</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>Name of the topic</td>
+</tr>
+<tr>
+<td>icon_color</td>
+<td>Integer</td>
+<td>Color of the topic icon in RGB format</td>
+</tr>
+<tr>
+<td>icon_custom_emoji_id</td>
+<td>String</td>
+<td><em>Optional</em>. Unique identifier of the custom emoji shown as the topic icon</td>
 </tr>
 </tbody>
 </table>
@@ -3392,6 +3531,12 @@ To learn how to create…">
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>text</td>
 <td>String</td>
 <td>Yes</td>
@@ -3542,6 +3687,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>from_chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
@@ -3584,6 +3735,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer or String</td>
 <td>Yes</td>
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
 </tr>
 <tr>
 <td>from_chat_id</td>
@@ -3666,6 +3823,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>photo</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Yes</td>
@@ -3739,6 +3902,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer or String</td>
 <td>Yes</td>
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
 </tr>
 <tr>
 <td>audio</td>
@@ -3839,6 +4008,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>document</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Yes</td>
@@ -3923,6 +4098,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer or String</td>
 <td>Yes</td>
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
 </tr>
 <tr>
 <td>video</td>
@@ -4029,6 +4210,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>animation</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Yes</td>
@@ -4127,6 +4314,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>voice</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Yes</td>
@@ -4207,6 +4400,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>video_note</td>
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Yes</td>
@@ -4281,6 +4480,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>media</td>
 <td>Array of <a href="#inputmediaaudio">InputMediaAudio</a>, <a href="#inputmediadocument">InputMediaDocument</a>, <a href="#inputmediaphoto">InputMediaPhoto</a> and <a href="#inputmediavideo">InputMediaVideo</a></td>
 <td>Yes</td>
@@ -4329,6 +4534,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer or String</td>
 <td>Yes</td>
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
 </tr>
 <tr>
 <td>latitude</td>
@@ -4523,6 +4734,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>latitude</td>
 <td>Float number</td>
 <td>Yes</td>
@@ -4621,6 +4838,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>phone_number</td>
 <td>String</td>
 <td>Yes</td>
@@ -4693,6 +4916,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer or String</td>
 <td>Yes</td>
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
 </tr>
 <tr>
 <td>question</td>
@@ -4815,6 +5044,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer or String</td>
 <td>Yes</td>
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
 </tr>
 <tr>
 <td>emoji</td>
@@ -5134,6 +5369,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Pass <em>True</em> if the administrator can pin messages, supergroups only</td>
+</tr>
+<tr>
+<td>can_manage_topics</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the user is allowed to create, rename, close, and reopen forum topics, supergroups only</td>
 </tr>
 </tbody>
 </table>
@@ -5510,7 +5751,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>title</td>
 <td>String</td>
 <td>Yes</td>
-<td>New chat title, 1-255 characters</td>
+<td>New chat title, 1-128 characters</td>
 </tr>
 </tbody>
 </table>
@@ -5767,6 +6008,188 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer or String</td>
 <td>Yes</td>
 <td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="getforumtopiciconstickers" href="#getforumtopiciconstickers"><i class="anchor-icon"></i></a>getForumTopicIconStickers</h4>
+<p>Use this method to get custom emoji stickers, which can be used as a forum topic icon by any user. Requires no parameters. Returns an Array of <a href="#sticker">Sticker</a> objects.</p>
+<h4><a class="anchor" name="createforumtopic" href="#createforumtopic"><i class="anchor-icon"></i></a>createForumTopic</h4>
+<p>Use this method to create a topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights. Returns information about the created topic as a <a href="#forumtopic">ForumTopic</a> object.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>Yes</td>
+<td>Topic name, 1-128 characters</td>
+</tr>
+<tr>
+<td>icon_color</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Color of the topic icon in RGB format. Currently, must be one of 0x6FB9F0, 0xFFD67E, 0xCB86DB, 0x8EEE98, 0xFF93B2, or 0xFB6F5F</td>
+</tr>
+<tr>
+<td>icon_custom_emoji_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the custom emoji shown as the topic icon. Use <a href="#getforumtopiciconstickers">getForumTopicIconStickers</a> to get all allowed custom emoji identifiers.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="editforumtopic" href="#editforumtopic"><i class="anchor-icon"></i></a>editForumTopic</h4>
+<p>Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have <em>can_manage_topics</em> administrator rights, unless it is the creator of the topic. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier for the target message thread of the forum topic</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>Yes</td>
+<td>New topic name, 1-128 characters</td>
+</tr>
+<tr>
+<td>icon_custom_emoji_id</td>
+<td>String</td>
+<td>Yes</td>
+<td>New unique identifier of the custom emoji shown as the topic icon. Use <a href="#getforumtopiciconstickers">getForumTopicIconStickers</a> to get all allowed custom emoji identifiers</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="closeforumtopic" href="#closeforumtopic"><i class="anchor-icon"></i></a>closeForumTopic</h4>
+<p>Use this method to close an open topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights, unless it is the creator of the topic. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier for the target message thread of the forum topic</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="reopenforumtopic" href="#reopenforumtopic"><i class="anchor-icon"></i></a>reopenForumTopic</h4>
+<p>Use this method to reopen a closed topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights, unless it is the creator of the topic. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier for the target message thread of the forum topic</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="deleteforumtopic" href="#deleteforumtopic"><i class="anchor-icon"></i></a>deleteForumTopic</h4>
+<p>Use this method to delete a forum topic along with all its messages in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_delete_messages</em> administrator rights. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier for the target message thread of the forum topic</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="unpinallforumtopicmessages" href="#unpinallforumtopicmessages"><i class="anchor-icon"></i></a>unpinAllForumTopicMessages</h4>
+<p>Use this method to clear the list of pinned messages in a forum topic. The bot must be an administrator in the chat for this to work and must have the <em>can_pin_messages</em> administrator right in the supergroup. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier for the target message thread of the forum topic</td>
 </tr>
 </tbody>
 </table>
@@ -6231,7 +6654,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="deletemessage" href="#deletemessage"><i class="anchor-icon"></i></a>deleteMessage</h4>
-<p>Use this method to delete a message, including service messages, with the following limitations:<br>- A message can only be deleted if it was sent less than 48 hours ago.<br>- A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.<br>- Bots can delete outgoing messages in private chats, groups, and supergroups.<br>- Bots can delete incoming messages in private chats.<br>- Bots granted <em>can_post_messages</em> permissions can delete outgoing messages in channels.<br>- If the bot is an administrator of a group, it can delete any message there.<br>- If the bot has <em>can_delete_messages</em> permission in a supergroup or a channel, it can delete any message there.<br>Returns <em>True</em> on success.</p>
+<p>Use this method to delete a message, including service messages, with the following limitations:<br>- A message can only be deleted if it was sent less than 48 hours ago.<br>- Service messages about a supergroup, channel, or forum topic creation can&#39;t be deleted.<br>- A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.<br>- Bots can delete outgoing messages in private chats, groups, and supergroups.<br>- Bots can delete incoming messages in private chats.<br>- Bots granted <em>can_post_messages</em> permissions can delete outgoing messages in channels.<br>- If the bot is an administrator of a group, it can delete any message there.<br>- If the bot has <em>can_delete_messages</em> permission in a supergroup or a channel, it can delete any message there.<br>Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -6439,6 +6862,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer or String</td>
 <td>Yes</td>
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
 </tr>
 <tr>
 <td>sticker</td>
@@ -8615,6 +9044,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
 <td>title</td>
 <td>String</td>
 <td>Yes</td>
@@ -9791,6 +10226,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer</td>
 <td>Yes</td>
 <td>Unique identifier for the target chat</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
 </tr>
 <tr>
 <td>game_short_name</td>
