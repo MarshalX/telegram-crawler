@@ -64,6 +64,17 @@ PATHS_TO_REMOVE_FROM_ALERT = [
     os.path.join(ROOT_TREE_DIR, 'client'),
 ]
 
+FORUM_CHAT_ID = '@tfcrawl'
+HASHTAG_TO_TOPIC = {
+    'web': '2200',
+    'web_tr': '2202',
+    'web_res': '2206',
+    'server': '2317',
+    'ios': '2194',
+    'macos': '2187',
+    'android': '2190',
+}
+
 GITHUB_API_LIMIT_PER_HOUR = 5_000
 COUNT_OF_RUNNING_WORKFLOW_AT_SAME_TIME = 5  # just random number ;d
 
@@ -96,6 +107,21 @@ async def send_req_until_success(session: aiohttp.ClientSession, **kwargs) -> Tu
         return json, last_page_number
 
     raise RuntimeError('Surprise. Time is over')
+
+
+async def send_alert(session: aiohttp.ClientSession, text: str, thread_id=None) -> aiohttp.ClientResponse:
+    params = {
+        'chat_id': CHAT_ID,
+        'parse_mode': 'HTML',
+        'text': text,
+    }
+    if thread_id:
+        params['chat_id'] = FORUM_CHAT_ID
+        params['message_thread_id'] = thread_id
+
+    return await session.get(
+        url=f'{BASE_TELEGRAM_API}{TELEGRAM_SEND_MESSAGE}'.format(token=TELEGRAM_BOT_TOKEN), params=params
+    )
 
 
 async def main() -> None:
@@ -169,18 +195,21 @@ async def main() -> None:
             alert_text += '\n'
 
         alert_text += f'<a href="{html_url}">View diff on GitHub...</a>'
+        logger.info(alert_text)
+
+        if 'web_tr' in alert_hashtags or 'web_res' in alert_hashtags:
+            alert_hashtags.remove('web')
+
+        for hashtag, topic_thread_id in HASHTAG_TO_TOPIC.items():
+            if hashtag in alert_hashtags:
+                logger.info(f'Sending alert to the forum. Topic: {topic_thread_id}')
+                telegram_response = await send_alert(session, alert_text, topic_thread_id)
+                logger.debug(await telegram_response.read())
+
         if alert_hashtags:
             alert_text += '\n\n' + ' '.join([f'#{hashtag}' for hashtag in sorted(alert_hashtags)])
 
-        logger.info(alert_text)
-        telegram_response = await session.get(
-            url=f'{BASE_TELEGRAM_API}{TELEGRAM_SEND_MESSAGE}'.format(token=TELEGRAM_BOT_TOKEN),
-            params={
-                'chat_id': CHAT_ID,
-                'parse_mode': 'HTML',
-                'text': alert_text,
-            }
-        )
+        telegram_response = await send_alert(session, alert_text)
         logger.debug(await telegram_response.read())
 
 
