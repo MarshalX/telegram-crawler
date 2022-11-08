@@ -49,7 +49,7 @@ An error is characterized by several parameters:</p>
 <h4><a class="anchor" href="#error-type" id="error-type" name="error-type"><i class="anchor-icon"></i></a>Error Type</h4>
 <p>A string literal in the form of <code>/[A-Z_0-9]+/</code>, which summarizes the problem. For example, <code>AUTH_KEY_UNREGISTERED</code>. This is an optional parameter.</p>
 <h4><a class="anchor" href="#error-database" id="error-database" name="error-database"><i class="anchor-icon"></i></a>Error Database</h4>
-<p>A full machine-readable JSON list of RPC errors that can be returned by all methods in the API can be found <a href="/file/464001461/f908/XnOjNzqzywo.87735.json/4b8e219e468c83bb0d">here »</a>, what follows is a description of its fields:  </p>
+<p>A full machine-readable JSON list of RPC errors that can be returned by all methods in the API can be found <a href="/file/464001173/109f8/k9gTkjfzNHs.87735.json/de2c1dc08a54bde597">here »</a>, what follows is a description of its fields:  </p>
 <ul>
 <li><code>errors</code> - All error messages and codes for each method (object).<ul>
 <li>Keys: Error codes as strings (numeric strings)</li>
@@ -152,9 +152,9 @@ An error is characterized by several parameters:</p>
 <h3><a class="anchor" href="#406-not-acceptable" id="406-not-acceptable" name="406-not-acceptable"><i class="anchor-icon"></i></a>406 NOT_ACCEPTABLE</h3>
 <p>Similar to <a href="#400-bad-request">400 BAD_REQUEST</a>, but the app must display the error to the user a bit differently.<br>
 Do not display any visible error to the user when receiving the <code>rpc_error</code> constructor: instead, wait for an <a href="/constructor/updateServiceNotification">updateServiceNotification</a> update, and handle it as usual.<br>
-Basically, an <a href="/constructor/updateServiceNotification">updateServiceNotification</a> <code>popup</code> update will be emitted indipendently immediately after emission of a 406 <code>rpc_error</code>: the update will contain the actual localized error message to show to the user with a UI popup.  </p>
+Basically, an <a href="/constructor/updateServiceNotification">updateServiceNotification</a> <code>popup</code> update will be emitted independently (ie NOT as an <a href="/type/Updates">Updates</a> constructor inside <code>rpc_result</code> but as a normal update) immediately after emission of a 406 <code>rpc_error</code>: the update will contain the actual localized error message to show to the user with a UI popup.  </p>
 <p>An exception to this is the <code>AUTH_KEY_DUPLICATED</code> error, which is only emitted if any of the non-media DC detects that an authorized session is sending requests in parallel from two separate TCP connections, from the same or different IP addresses.<br>
-Note that parallel connections are still allowed and actually recommended for media DCs.
+Note that parallel connections are still allowed and actually recommended for media DCs.<br>
 Also note that by session we mean a logged-in session identified by an <a href="/constructor/authorization">authorization</a> constructor, fetchable using <a href="/method/account.getAuthorizations">account.getAuthorizations</a>, not an MTProto session.  </p>
 <p>If the client receives an <code>AUTH_KEY_DUPLICATED</code> error, the session is already invalidated by the server and the user must generate a new auth key and login again.  </p>
 <h3><a class="anchor" href="#420-flood" id="420-flood" name="420-flood"><i class="anchor-icon"></i></a>420 FLOOD</h3>
