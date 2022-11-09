@@ -358,12 +358,20 @@ width=44% /></a>
 <p>This mode not only increases user privacy, but also makes the bot more efficient by reducing the number of inputs it needs to process. Users can always see a bot’s current privacy setting in the list of group members.</p>
 </blockquote>
 <h3><a class="anchor" name="testing-your-bot" href="#testing-your-bot"><i class="anchor-icon"></i></a>Testing your bot</h3>
-<p>To quickly test your bot <strong>without interfering</strong> with its users, you can simply run another instance of your code with a different token. You would then privately interact and run your benchmarks on the bot associated with the new token.</p>
+<p>You can quickly test your bot <strong>without interfering</strong> with its users by simply running another instance of your code on a different bot account. To do so, create a <em>new bot</em> via <a href="https://t.me/botfather">@BotFather</a>, obtain its token and use it in the testing instance of your code.</p>
+<p>All further testing and debugging can happen privately on the new bot, without affecting the original instance.</p>
 <blockquote>
 <p>If you need to share file references across bots, note that the <code>file_id</code> field is tied to a single bot id, so your test instance cannot use a shared <code>file_id</code> database to quickly send media – files must be individually reuploaded.</p>
 </blockquote>
 <h4><a class="anchor" name="dedicated-test-environment" href="#dedicated-test-environment"><i class="anchor-icon"></i></a>Dedicated test environment</h4>
-<p>Telegram also offers a dedicated <strong>test environment</strong> suitable for more advanced testing. Bots and users in this environment generally unlock expedited limits and more flexible restrictions – for example, you can test <a href="https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups">topics</a> without needing 200 users in your group.</p>
+<p>Telegram also offers a dedicated <strong>test environment</strong> suitable for more advanced testing. Bots and users in this environment generally have more flexible restrictions – for example:</p>
+<ul>
+<li>When working with the test environment, you may use HTTP links without TLS to test your <a href="https://core.telegram.org/bots/features#web-apps">Web Apps</a> or <a href="https://core.telegram.org/bots/features#web-login">Web Login</a>.</li>
+<li>You can test <a href="https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups">topics</a> without needing 200 users in your group.</li>
+</ul>
+<blockquote>
+<p><strong>Flood limits</strong> are not raised in the test environment, and may at times be stricter. To minimize how this impacts your bot, you should make sure that it handles errors with retry policies and does not depend on hardcoded limit values.</p>
+</blockquote>
 <h4><a class="anchor" name="creating-a-bot-in-the-test-environment" href="#creating-a-bot-in-the-test-environment"><i class="anchor-icon"></i></a>Creating a bot in the test environment</h4>
 <p>The test environment is <strong>completely separate</strong> from the main environment, so you will need to create a new user account and a new bot with <a href="https://t.me/botfather">@BotFather</a>.</p>
 <p>To create an account and log in, use either of the following:</p>
@@ -375,7 +383,7 @@ width=44% /></a>
 <p>After logging in, simply <a href="#creating-a-new-bot">create a new bot</a> following the standard procedure and send your requests to the Test Bot API in this format:</p>
 <pre><code>https://api.telegram.org/bot&lt;token&gt;/test/METHOD_NAME</code></pre>
 <blockquote>
-<p>When working with the test environment, you may use HTTP links without TLS to test your Web Apps.</p>
+<p>When working with the test environment, you may use HTTP links without TLS in the <code>url</code> field of both <a href="/bots/api#loginurl">LoginUrl</a> and <a href="/bots/api#webappinfo">WebAppInfo</a>.</p>
 </blockquote>
 <h4><a class="anchor" name="status-alerts" href="#status-alerts"><i class="anchor-icon"></i></a>Status alerts</h4>
 <p>Millions choose Telegram for its speed. To best benefit users, your bot also <strong>needs to be responsive</strong>. In order to help developers keep their bots in shape, <a href="https://t.me/botfather">@BotFather</a> will send <strong>status alerts</strong> if it sees something is wrong.</p>
