@@ -51,8 +51,9 @@ HIDDEN_URLS = {
     # 'a-webappcontent.stel.com/cafe',
 
     'fragment.com/about',
-    'fragment.com/privacy',
-    'fragment.com/terms',
+    # 'fragment.com/privacy',
+    # 'fragment.com/terms',
+    'fragment.com/css/auction.css',
     'fragment.com/js/auction.js',
 }
 ADDITIONAL_URLS = {
