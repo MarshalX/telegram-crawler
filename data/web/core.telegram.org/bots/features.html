@@ -74,6 +74,7 @@
 <li><a href="#language-support"><strong>Language Support</strong></a></li>
 <li><a href="#bot-management"><strong>Bot Management</strong></a><ul>
 <li><a href="#privacy-mode">Privacy Mode</a></li>
+<li><a href="#testing-your-bot">Testing Your Bot</a></li>
 <li><a href="#status-alerts">Status Alerts</a></li>
 <li><a href="#local-bot-api">Local API</a></li>
 </ul>
@@ -355,6 +356,26 @@ width=44% /></a>
 
 <blockquote>
 <p>This mode not only increases user privacy, but also makes the bot more efficient by reducing the number of inputs it needs to process. Users can always see a bot’s current privacy setting in the list of group members.</p>
+</blockquote>
+<h3><a class="anchor" name="testing-your-bot" href="#testing-your-bot"><i class="anchor-icon"></i></a>Testing your bot</h3>
+<p>To quickly test your bot <strong>without interfering</strong> with its users, you can simply run another instance of your code with a different token. You would then privately interact and run your benchmarks on the bot associated with the new token.</p>
+<blockquote>
+<p>If you need to share file references across bots, note that the <code>file_id</code> field is tied to a single bot id, so your test instance cannot use a shared <code>file_id</code> database to quickly send media – files must be individually reuploaded.</p>
+</blockquote>
+<h4><a class="anchor" name="dedicated-test-environment" href="#dedicated-test-environment"><i class="anchor-icon"></i></a>Dedicated test environment</h4>
+<p>Telegram also offers a dedicated <strong>test environment</strong> suitable for more advanced testing. Bots and users in this environment generally unlock expedited limits and more flexible restrictions – for example, you can test <a href="https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups">topics</a> without needing 200 users in your group.</p>
+<h4><a class="anchor" name="creating-a-bot-in-the-test-environment" href="#creating-a-bot-in-the-test-environment"><i class="anchor-icon"></i></a>Creating a bot in the test environment</h4>
+<p>The test environment is <strong>completely separate</strong> from the main environment, so you will need to create a new user account and a new bot with <a href="https://t.me/botfather">@BotFather</a>.</p>
+<p>To create an account and log in, use either of the following:</p>
+<ul>
+<li><strong>iOS</strong>: tap 10 times on the Settings icon &gt; Accounts &gt; Login to another account &gt; Test.</li>
+<li><strong>Telegram Desktop</strong>: open ☰ Settings &gt; Shift + Alt + Right click &#39;Add Account&#39; and select &#39;Test Server&#39;.</li>
+<li><strong>macOS</strong>: click the Settings icon 10 times to open the Debug Menu, ⌘ + click &#39;Add Account&#39; and log in via phone number.</li>
+</ul>
+<p>After logging in, simply <a href="#creating-a-new-bot">create a new bot</a> following the standard procedure and send your requests to the Test Bot API in this format:</p>
+<pre><code>https://api.telegram.org/bot&lt;token&gt;/test/METHOD_NAME</code></pre>
+<blockquote>
+<p>When working with the test environment, you may use HTTP links without TLS to test your Web Apps.</p>
 </blockquote>
 <h4><a class="anchor" name="status-alerts" href="#status-alerts"><i class="anchor-icon"></i></a>Status alerts</h4>
 <p>Millions choose Telegram for its speed. To best benefit users, your bot also <strong>needs to be responsive</strong>. In order to help developers keep their bots in shape, <a href="https://t.me/botfather">@BotFather</a> will send <strong>status alerts</strong> if it sees something is wrong.</p>
