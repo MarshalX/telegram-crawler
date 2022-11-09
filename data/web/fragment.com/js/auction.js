@@ -869,101 +869,141 @@ var Assets = {
 var Account = {
   init: function() {
     Aj.onLoad(function(state) {
-      $(document).on('click.curPage', '.js-blockchain-transfer-btn', Account.eBlockchainTransfer);
-      $(document).on('click.curPage', '.js-do-transfer-btn', Account.eBlockchainTranswerInit);
-      state.$transferInitPopup = $('.js-transfer-init-popup');
-      state.$transferCheckPopup = $('.js-transfer-check-popup');
+      var cont = Aj.ajContainer;
+      $(cont).on('click.curPage', '.js-convert-btn', Account.eConvertInit);
+      $(cont).on('submit.curPage', '.js-convert-bid-form', Account.eConvertBidSubmit);
+      state.$convertBidPopup = $('.js-convert-bid-popup');
+      state.$convertBidForm = $('.js-convert-bid-form');
+      Main.initForm(state.$convertBidForm);
+      state.$convertConfirmPopup = $('.js-convert-confirm-popup');
     });
     Aj.onUnload(function(state) {
-      clearTimeout(state.transferTimeout);
+      Main.destroyForm(state.$convertBidForm);
+      clearTimeout(state.convertTimeout);
     });
   },
-  eBlockchainTransfer: function(e) {
+  eConvertInit: function(e) {
     e.stopImmediatePropagation();
     e.preventDefault();
-    var $actions    = $(this).closest('.js-actions');
-    var username    = $actions.attr('data-username');
-    var $popup      = Aj.state.$transferInitPopup;
-    $('.js-username', $popup).html('@' + username);
-    $popup.data('username', username);
-    openPopup($popup);
-  },
-  eBlockchainTranswerInit: function(e) {
-    e.preventDefault();
-    var $btn = $(this);
-    if ($btn.data('loading')) {
-      return false;
-    }
-    var $popup   = Aj.state.$transferInitPopup;
-    var username = $popup.data('username');
-    $btn.data('loading', true);
-    Aj.apiRequest('initBlockchainTransfer', {
+    var $actions = $(this).closest('.js-actions');
+    var username = $actions.attr('data-username');
+    Aj.state.curPopup = null;
+    Aj.state.curPopupState = null;
+    Aj.apiRequest('initConverting', {
       username: username
     }, function(result) {
-      $btn.data('loading', false);
-      closePopup($popup);
-      if (result.error) {
-        return showAlert(result.error);
-      }
-      if (result.confirmed) {
-        return Account.blockchainTranswerStart($popup, result);
-      }
-      Aj.state.$transferCheckPopup.data('username', username);
-      openPopup(Aj.state.$transferCheckPopup, {
-        onOpen: function() {
-          Account.blockchainTranswerCheck(result.req_id);
-        },
-        onClose: function() {
-          clearTimeout(Aj.state.transferTimeout);
-        }
-      });
+      Account.processConverting(result);
     });
   },
-  blockchainTranswerCheck: function(req_id) {
-    if (Aj.state.$transferCheckPopup.hasClass('hide')) {
-      return false;
+  processConverting: function(result) {
+    var $popup = Aj.state.curPopup;
+    if (result.error) {
+      if (!result.keep && $popup) {
+        closePopup($popup);
+      }
+      return showAlert(result.error);
     }
-    clearTimeout(Aj.state.transferTimeout);
-    var $popup = Aj.state.$transferCheckPopup;
-    Aj.state.transferTimeout = setTimeout(function() {
-      Aj.apiRequest('checkBlockchainTransfer', {
-        id: req_id
-      }, function(result) {
-        if (result.error) {
-          if (result.declined) {
-            closePopup($popup);
-          }
-          return showAlert(result.error);
+    if (result.state == 'tg_confirm') {
+      Aj.state.curPopup = Aj.state.$convertConfirmPopup;
+      if (Aj.state.curPopupState != result.state) {
+        if ($popup) {
+          closePopup($popup);
         }
-        if (result.confirmed) {
-          Account.blockchainTranswerStart($popup, result);
-        } else {
-          Account.blockchainTranswerCheck(req_id);
+        Aj.state.curPopupState = result.state;
+        openPopup(Aj.state.curPopup, {
+          onOpen: function() {
+            Account.convertStateCheck(result.req_id);
+          },
+          onClose: function() {
+            Aj.state.curPopupState = null;
+            clearTimeout(Aj.state.convertTimeout);
+          }
+        });
+      } else {
+        Account.convertStateCheck(result.req_id);
+      }
+    }
+    else if (result.state == 'tg_declined') {
+      if ($popup) {
+        closePopup($popup);
+      }
+      Aj.state.curPopupState = result.state;
+      showAlert(result.message);
+    }
+    else if (result.state == 'bid_request') {
+      Aj.state.curPopup = Aj.state.$convertBidPopup;
+      if (Aj.state.curPopupState != result.state) {
+        if ($popup) {
+          closePopup($popup);
+        }
+        $('.js-username', Aj.state.curPopup).html('@' + result.username);
+        Aj.state.$convertBidForm.field('id').value(result.req_id);
+        Aj.state.curPopupState = result.state;
+        openPopup(Aj.state.curPopup, {
+          onClose: function() {
+            Aj.state.curPopupState = null;
+          }
+        });
+      }
+    }
+    else if (result.state == 'qr') {
+      Aj.state.curPopupState = result.state;
+      if ($popup) {
+        closePopup($popup);
+      }
+      QR.showPopup({
+        data: result,
+        title: l('WEB_POPUP_QR_CONVERT_HEADER'),
+        description: l('WEB_POPUP_QR_CONVERT_TEXT', {
+          amount: '<span class="icon-before icon-ton-text">' + result.amount + '</span>'
+        }),
+        qr_label: '@' + result.username,
+        tk_label: l('WEB_POPUP_QR_CONVERT_TK_BUTTON'),
+        terms_label: l('WEB_POPUP_QR_PLACE_BID_TERMS'),
+        onConfirm: function(by_server) {
+          if (by_server) {
+            $(Aj.ajContainer).one('page:load', function() {
+              showAlert(l('WEB_CONVERT_SENT'));
+            });
+          }
+          Aj.location('/username/' + result.username);
         }
       });
-    }, 700);
+    }
   },
-  blockchainTranswerStart: function($popup, data) {
-    var username = $popup.data('username');
-    var amount   = $('.js-amount', Aj.state.$transferInitPopup).html();
-    closePopup($popup);
-    QR.showPopup({
-      data: data,
-      title: l('WEB_POPUP_QR_BLOCKCHAIN_TRANSFER_HEADER'),
-      description: l('WEB_POPUP_QR_BLOCKCHAIN_TRANSFER_TEXT', {
-        amount: '<span class="icon-before icon-ton-text">' + amount + '</span>'
-      }),
-      qr_label: '@' + username,
-      tk_label: l('WEB_POPUP_QR_BLOCKCHAIN_TRANSFER_TK_BUTTON'),
-      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
-      onConfirm: function(by_server) {
-        if (by_server) {
-          $(Aj.ajContainer).one('page:load', function() {
-            showAlert(l('WEB_BLOCKCHAIN_TRANSFER_SENT'));
-          });
-        }
-        Aj.location('/username/' + username);
-      }
+  convertStateCheck: function(req_id, force) {
+    var $popup = Aj.state.curPopup;
+    if (!force && (!$popup || $popup.hasClass('hide'))) {
+      return false;
+    }
+    clearTimeout(Aj.state.convertTimeout);
+    Aj.state.convertTimeout = setTimeout(function() {
+      Aj.apiRequest('checkConverting', {
+        id: req_id
+      }, function(result) {
+        Account.processConverting(result);
+      });
+    }, force ? 1 : 700);
+  },
+  eConvertBidSubmit: function(e) {
+    e.preventDefault();
+    var $form = $(this);
+    var req_id = $form.field('id').value();
+    var amount = Main.amountFieldValue($form, 'bid_value');
+    if (amount === false) {
+      $form.field('bid_value').focus();
+      return;
+    }
+    if ($form.data('loading')) {
+      return false;
+    }
+    $form.data('loading', true);
+    Aj.apiRequest('startConverting', {
+      id: req_id,
+      bid: amount
+    }, function(result) {
+      $form.data('loading', false);
+      Account.processConverting(result);
     });
   }
 };
