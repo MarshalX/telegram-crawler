@@ -370,7 +370,7 @@ function ajInit(options) {
       if (push_state || !Aj._useScrollHack) {
         $(window).scrollTop(0);
       }
-      $('body').css({height: '', overflow: ''});
+      unfreezeBody();
       if (url_hash) {
         scrollToHash();
       }
@@ -611,15 +611,25 @@ function ajInit(options) {
       return;
     }
     if (Aj._useScrollHack) {
-      $('body').css({height: '100000px', overflow: 'hidden'}); // for correct scroll restoration
+      freezeBody();
     }
     var link = loc(curHistoryState.u);
     var loaded = loadPage(link, false, state_go);
     if (!loaded && Aj._useScrollHack) {
-      $('body').css({height: '', overflow: ''});
+      unfreezeBody();
     }
   });
   window.onbeforeunload = beforeUnloadHandler;
+}
+
+function freezeBody() {
+  $('body').css({height: '1000000px', overflow: 'hidden'}); // for correct scroll restoration
+  $(Aj.ajContainer).css({position: 'fixed', width: '100%', top: -$(window).scrollTop() + 'px', left: -$(window).scrollLeft() + 'px'});
+}
+
+function unfreezeBody() {
+  $(Aj.ajContainer).css({position: '', width: '', top: '', left: ''});
+  $('body').css({height: '', overflow: ''});
 }
 
 function updateNavBar() {
