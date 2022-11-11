@@ -368,6 +368,9 @@ var Main = {
     }
   },
   eMainSearchInput: function(e) {
+    if (!Aj.state.quickSearch) {
+      return;
+    }
     clearTimeout(Aj.state.searchTimeout);
     var cached_results = Main.getSearchCachedResult();
     if (cached_results) {
@@ -424,8 +427,10 @@ var Main = {
       filter: filter,
       sort: sort
     }, function(result) {
-      cache[cache_key] = result;
-      Main.updateResults(result);
+      if (result.ok) {
+        cache[cache_key] = result;
+        Main.updateResults(result);
+      }
       Aj.state.$mainSearchField.removeClass('loading');
     });
   }
