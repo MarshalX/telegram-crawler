@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>Dice</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Telegram supports sending [animated dice](https://telegram.org/blog/folders#and-one-more-thing) emojis.">
+    <meta property="description" content="Telegram supports sending animated dice emojis.">
     <meta property="og:title" content="Dice">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Telegram supports sending [animated dice](https://telegram.org/blog/folders#and-one-more-thing) emojis.">
+    <meta property="og:description" content="Telegram supports sending animated dice emojis.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -53,18 +53,18 @@ This is implemented by using the dice constructors:  </p>
 
 ---functions---
 
-<a href='/method/messages.sendMedia'>messages.sendMedia</a>#e25ff8e0 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/messages.sendMedia'>messages.sendMedia</a>#e25ff8e0 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> update_stickersets_order:flags.15?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;
 
 <a href='/method/messages.getStickerSet'>messages.getStickerSet</a>#c8a0ec74 stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> hash:<a href='/type/int'>int</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
 
 <a href='/method/help.getAppConfig'>help.getAppConfig</a>#98914110 = <a href='/type/JSONValue'>JSONValue</a>;</code></pre>
 <p>On startup, clients should fetch <a href="/api/config#client-configuration">app configuration using help.getAppConfig</a>.<br>
-Then, for each dice emoji contained in the <code>emojies_send_dice</code> field, clients should fetch the dice emoji stickerset by calling the <a href="/method/messages.getStickerSet">messages.getStickerSet</a> method, providing the properly populated <a href="/constructor/inputStickerSetDice">inputStickerSetDice</a> to the <code>stickerset</code> field.<br>
+Then, for each dice emoji contained in the <a href="/api/config#emojies-send-dice"><code>emojies_send_dice</code> field</a>, clients should fetch the dice emoji stickerset by calling the <a href="/method/messages.getStickerSet">messages.getStickerSet</a> method, providing the properly populated <a href="/constructor/inputStickerSetDice">inputStickerSetDice</a> to the <code>stickerset</code> field.<br>
 The returned stickerset will contain a set of animated stickers, one for each of the dice outcomes, plus a first looping sticker that should be shown as preview to the user before actually sending the dice.  </p>
 <p>If a user attempts to send a single emoji from the ones specified in <code>emojies_send_dice</code>, the dice should be sent using <a href="/method/messages.sendMedia">messages.sendMedia</a>, providing the dice emoji to the <code>emoticon</code> field.  </p>
 <p>Incoming dice stickers will be received as a <a href="/constructor/messageMediaDice">messageMediaDice</a> constructor, along with a randomly generated server-side value, ranging from 1 to the maximum allowed value for this type of dice.<br>
 Clients should display the correct dice animated sticker for the specified value: since dice values start from 1, and the first animated sticker in dice stickerset is the preview, <code>value</code> can be used to directly index the <code>documents</code> sticker array from the animated stickerset.  </p>
-<p>The <code>emojies_send_dice_success</code> configuration parameter contains more info about dice emojis other than the basic <img class="emoji" src="//telegram.org/img/emoji/40/F09F8EB2.png" width="20" height="20" alt="🎲" />: </p>
+<p>The <a href="/api/config#emojies-send-dice-success"><code>emojies_send_dice_success</code> configuration parameter</a> contains more info about dice emojis other than the basic <img class="emoji" src="//telegram.org/img/emoji/40/F09F8EB2.png" width="20" height="20" alt="🎲" />: </p>
 <pre><code>    "emojies_send_dice_success": {
         "\ud83c\udfaf": {
             "value": 6,
@@ -76,7 +76,48 @@ Clients should display the correct dice animated sticker for the specified value
         }
     }</code></pre>
 <p>For each of the dice emojis, a maximum "winning" value is specified, along with the frame number at which to show the fireworks <img class="emoji" src="//telegram.org/img/emoji/40/F09F8E86.png" width="20" height="20" alt="🎆" />.<br>
-Please note that dice animated stickers should loop only once, right after being sent/received <strong>for the first time</strong>; clicking on the dice sticker should bring up a popup, inviting the user to send a new dice of the same type.  </p></div>
+Please note that dice animated stickers should loop only once, right after being sent/received <strong>for the first time</strong>; clicking on the dice sticker should bring up a popup, inviting the user to send a new dice of the same type.  </p>
+<h3><a class="anchor" href="#slot-machine" id="slot-machine" name="slot-machine"><i class="anchor-icon"></i></a>Slot machine</h3>
+<p>Slot machine <img class="emoji" src="//telegram.org/img/emoji/40/F09F8EB0.png" width="20" height="20" alt="🎰" /> dice stickers are implemented a bit differently: the <code>value</code> isn't used to directly index the stickers array, but is instead used as follows.  </p>
+<p>The <code>value</code> is composed of three 2-bit values, each indicating the animated sticker to show in the three slots, incremented by one.  </p>
+<p>The <code>stickers</code> array is composed as follows:</p>
+<ul>
+<li>0 =&gt; Slot machine background</li>
+<li>1 =&gt; Slot machine winning background, to show after a winning spin</li>
+<li>2 =&gt; Slot machine frame&amp;handle to play once at the beginning</li>
+<li>3 =&gt; Left slot winning 7</li>
+<li>4..7 =&gt; Left slot non-winning options</li>
+<li>8 =&gt; Left slot spinning animation</li>
+<li>9 =&gt; Center slot winning 7</li>
+<li>10..13 =&gt; Center slot non-winning options</li>
+<li>14 =&gt; Center slot spinning animation</li>
+<li>15 =&gt; Right slot winning 7</li>
+<li>16..19 =&gt; Right slot non-winning options</li>
+<li>20 =&gt; Right slot spinning animation</li>
+</ul>
+<p>How to play the animation (all involved stickers are to be directly overlaid on top of each other, no special placing is required):  </p>
+<ul>
+<li>Freeze single-frame background (<code>0</code>)</li>
+<li>Play handle animation (<code>2</code>) once</li>
+<li>Play the three spinning slots animations (<code>8</code>, <code>14</code>, <code>20</code>) once</li>
+<li>Play the three slot animations once, chosen as follows:<ul>
+<li>If we're in a winning <code>value == 64</code>:<ul>
+<li>Left slot: choose <code>3</code></li>
+<li>Center slot: choose <code>9</code></li>
+<li>Right slot: choose <code>15</code></li>
+</ul>
+</li>
+<li>Otherwise, considering <code>map := [1, 2, 3, 0]</code>:<ul>
+<li>Left slot: choose <code>4 + map[(value-1) &amp; 3]</code></li>
+<li>Center slot: choose <code>10 + map[((value-1) &gt;&gt; 2) &amp; 3]</code></li>
+<li>Right slot: choose <code>16 + map[((value-1) &gt;&gt; 4) &amp; 3]</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>If we're in a winning <code>value=64</code>, replace the background (<code>0</code>) with <code>1</code>.</li>
+</ul>
+<p>Example implementation: <a href="https://github.com/telegramdesktop/tdesktop/blob/dev/Telegram/SourceFiles/history/view/media/history_view_slot_machine.cpp">tdesktop</a>.</p></div>
   
 </div>
           

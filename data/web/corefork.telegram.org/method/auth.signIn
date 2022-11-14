@@ -70,11 +70,6 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>flags</strong></td>
-<td style="text-align: center;"><a href="/type/%23">#</a></td>
-<td>Flags, see <a href="/mtproto/TL-combinators#conditional-fields">TL conditional fields</a></td>
-</tr>
-<tr>
 <td><strong>phone_number</strong></td>
 <td style="text-align: center;"><a href="/type/string">string</a></td>
 <td>Phone number in the international format</td>
@@ -86,18 +81,13 @@
 </tr>
 <tr>
 <td><strong>phone_code</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/string">string</a></td>
+<td style="text-align: center;"><a href="/type/string">string</a></td>
 <td>Valid numerical code from the SMS-message</td>
-</tr>
-<tr>
-<td><strong>email_verification</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/EmailVerification">EmailVerification</a></td>
-<td>Email verification code or token</td>
 </tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#result" id="result" name="result"><i class="anchor-icon"></i></a>Result</h3>
-<p><a href="/type/auth.Authorization">auth.Authorization</a></p>
+<p>Returns an <a href="/type/auth.Authorization">auth.Authorization</a> object with information on the new authorization.</p>
 <h3><a class="anchor" href="#possible-errors" id="possible-errors" name="possible-errors"><i class="anchor-icon"></i></a>Possible errors</h3>
 <table class="table">
 <thead>
@@ -140,6 +130,25 @@
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#query-example" id="query-example" name="query-example"><i class="anchor-icon"></i></a>Query example</h3>
+<pre><code>(auth.signIn "79991234567" "2dc02d2cda9e615c84" "44444")
+=
+(auth.authorization
+  expires:1403938438
+  user:(userSelf
+    id:603177
+    first_name:"John"
+    last_name:"Doe"
+    phone:"79991234567"
+    photo:(userProfilePhotoEmpty)
+    status:(userStatusEmpty)
+    inactive:(boolTrue)
+  )
+)
+
+bcd51581 3939370b 33323139 37363534 63643212 32643230 39616463 35313665 00343863 34343405 00003434 45ca2b3b
+=
+f6b673a4 53ae6686 720535ec 00093429 686f4a04 0000006e 656f4403 3939370b 33323139 37363534 4f11bae1 09d05049 997275b5 d8487410</code></pre>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#authsendcode" id="authsendcode" name="authsendcode"><i class="anchor-icon"></i></a><a href="/method/auth.sendCode">auth.sendCode</a></h4>
 <p>Send the verification code for login</p></div>

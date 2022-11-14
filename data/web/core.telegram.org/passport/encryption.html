@@ -54,7 +54,7 @@
 <p>The passport secret must also be downloaded, re-encrypted and re-uploaded as described in <a href="#passport-secret-encryption">Passport Secret Encryption</a> if a new, more secure encryption algorithm is defined in a newer version of Telegram or the 2FA password is updated.</p>
 <h4><a class="anchor" href="#passport-secret-encryption" id="passport-secret-encryption" name="passport-secret-encryption"><i class="anchor-icon"></i></a>Passport Secret Encryption</h4>
 <p>First of all, server-side passport parameters are fetched, schema:</p>
-<pre><code><a href='/constructor/account.password'>account.password</a>#185b184f flags:<a href='/type/%23'>#</a> has_recovery:flags.0?<a href='/constructor/true'>true</a> has_secure_values:flags.1?<a href='/constructor/true'>true</a> has_password:flags.2?<a href='/constructor/true'>true</a> current_algo:flags.2?<a href='/type/PasswordKdfAlgo'>PasswordKdfAlgo</a> srp_B:flags.2?<a href='/type/bytes'>bytes</a> srp_id:flags.2?<a href='/type/long'>long</a> hint:flags.3?<a href='/type/string'>string</a> email_unconfirmed_pattern:flags.4?<a href='/type/string'>string</a> new_algo:<a href='/type/PasswordKdfAlgo'>PasswordKdfAlgo</a> new_secure_algo:<a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a> secure_random:<a href='/type/bytes'>bytes</a> pending_reset_date:flags.5?<a href='/type/int'>int</a> = <a href='/type/account.Password'>account.Password</a>;
+<pre><code><a href='/constructor/account.password'>account.password</a>#957b50fb flags:<a href='/type/%23'>#</a> has_recovery:flags.0?<a href='/constructor/true'>true</a> has_secure_values:flags.1?<a href='/constructor/true'>true</a> has_password:flags.2?<a href='/constructor/true'>true</a> current_algo:flags.2?<a href='/type/PasswordKdfAlgo'>PasswordKdfAlgo</a> srp_B:flags.2?<a href='/type/bytes'>bytes</a> srp_id:flags.2?<a href='/type/long'>long</a> hint:flags.3?<a href='/type/string'>string</a> email_unconfirmed_pattern:flags.4?<a href='/type/string'>string</a> new_algo:<a href='/type/PasswordKdfAlgo'>PasswordKdfAlgo</a> new_secure_algo:<a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a> secure_random:<a href='/type/bytes'>bytes</a> pending_reset_date:flags.5?<a href='/type/int'>int</a> login_email_pattern:flags.6?<a href='/type/string'>string</a> = <a href='/type/account.Password'>account.Password</a>;
 
 <a href='/constructor/securePasswordKdfAlgoUnknown'>securePasswordKdfAlgoUnknown</a>#4a8537 = <a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a>;
 <a href='/constructor/securePasswordKdfAlgoPBKDF2HMACSHA512iter100000'>securePasswordKdfAlgoPBKDF2HMACSHA512iter100000</a>#bbf2dda0 salt:<a href='/type/bytes'>bytes</a> = <a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a>;
@@ -318,12 +318,14 @@ Data must be in JSON format and not TL, as it has to be passed directly to the s
 <pre><code><a href='/constructor/securePlainPhone'>securePlainPhone</a>#7d6099dd phone:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
 <a href='/constructor/securePlainEmail'>securePlainEmail</a>#21ec5a5f email:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
 
+<a href='/constructor/emailVerifyPurposePassport'>emailVerifyPurposePassport</a>#bbf51685 = <a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a>;
+
 ---functions---
 
 <a href='/method/account.sendVerifyPhoneCode'>account.sendVerifyPhoneCode</a>#a5a356f9 phone_number:<a href='/type/string'>string</a> settings:<a href='/type/CodeSettings'>CodeSettings</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
 <a href='/method/account.verifyPhone'>account.verifyPhone</a>#4dd3a7f6 phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> phone_code:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/account.sendVerifyEmailCode'>account.sendVerifyEmailCode</a>#7011509f email:<a href='/type/string'>string</a> = <a href='/type/account.SentEmailCode'>account.SentEmailCode</a>;
-<a href='/method/account.verifyEmail'>account.verifyEmail</a>#ecba39db email:<a href='/type/string'>string</a> code:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/account.sendVerifyEmailCode'>account.sendVerifyEmailCode</a>#98e037bb purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> email:<a href='/type/string'>string</a> = <a href='/type/account.SentEmailCode'>account.SentEmailCode</a>;
+<a href='/method/account.verifyEmail'>account.verifyEmail</a>#32da4cf purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> verification:<a href='/type/EmailVerification'>EmailVerification</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;
 
 <a href='/method/auth.resendCode'>auth.resendCode</a>#3ef1a9bf phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
 <a href='/method/auth.cancelCode'>auth.cancelCode</a>#1f040578 phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
@@ -339,7 +341,10 @@ To verify a phone number or email and use it in Telegram Passport, use the appro
 </ul>
 <p>The flow is similar to the one used for <a href="/api/auth">logging in</a>:</p>
 <ul>
-<li>Send email/phone code using the appropriate <code>account.sendVerify*Code</code> method</li>
+<li>Send email/phone code using the appropriate <code>account.sendVerify*Code</code> method<ul>
+<li>Make sure to pass <a href="/constructor/emailVerifyPurposePassport">emailVerifyPurposePassport</a> as verification purpose to <a href="/method/account.sendVerifyEmailCode">account.sendVerifyEmailCode</a>.</li>
+</ul>
+</li>
 <li>Pass the received code to the appropriate <code>account.verify*</code> method</li>
 <li>Only for phone code verification, you can also resend/cancel the phone code using <a href="/method/auth.resendCode">auth.resendCode</a>/<a href="/method/auth.cancelCode">auth.cancelCode</a>, as for <a href="/api/auth">logging in</a>.</li>
 </ul>
