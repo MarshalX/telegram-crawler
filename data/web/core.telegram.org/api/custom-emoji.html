@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Custom emojis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram allows including animated and static custom emojis inside of messages.">
+    <meta property="og:title" content="Custom emojis">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram allows including animated and static custom emojis inside of messages.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?232" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/custom-emoji" >Custom emojis</a></li></ul></div>
+  <h1 id="dev_page_title">Custom emojis</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram allows including animated and static custom emojis inside of messages.</p>
+<pre><code><a href='/constructor/messageEntityCustomEmoji'>messageEntityCustomEmoji</a>#c8cf05f8 offset:<a href='/type/int'>int</a> length:<a href='/type/int'>int</a> document_id:<a href='/type/long'>long</a> = <a href='/type/MessageEntity'>MessageEntity</a>;
+
+<a href='/constructor/document'>document</a>#8fd4c4d8 flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/long'>long</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
+
+<a href='/constructor/documentAttributeCustomEmoji'>documentAttributeCustomEmoji</a>#fd149899 flags:<a href='/type/%23'>#</a> free:flags.0?<a href='/constructor/true'>true</a> alt:<a href='/type/string'>string</a> stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> = <a href='/type/DocumentAttribute'>DocumentAttribute</a>;
+
+---functions---
+
+<a href='/method/messages.getCustomEmojiDocuments'>messages.getCustomEmojiDocuments</a>#d9ab0f54 document_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt;;</code></pre>
+<p>Custom emojis are a special kind of <a href="/api/entities">entity »</a>, containing just a <code>document_id</code>, which can be passed to <a href="/method/messages.getCustomEmojiDocuments">messages.getCustomEmojiDocuments</a> to fetch the <a href="/api/stickers">static, animated or video sticker emoji</a> that should be displayed to the user as described in the <a href="/api/stickers">stickers documentation</a>.  </p>
+<p>Custom emoji documents will contain <a href="/constructor/documentAttributeCustomEmoji">documentAttributeCustomEmoji</a> attribute instead of a <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a>, containing information on the associated emoji (<code>alt</code>), whether the emoji can be used by non-premium users (<code>free</code>) and the associated <code>stickerset</code>.</p>
+<p>Note that when sending messages with attached custom emojis, the <a href="/constructor/messageEntityCustomEmoji">messageEntityCustomEmoji</a> <a href="/api/entities">entity »</a> must wrap exactly one regular emoji (the one contained in <a href="/constructor/documentAttributeCustomEmoji">documentAttributeCustomEmoji</a>.<code>alt</code>) in the related text, otherwise the server will ignore it.  </p>
+<p>Like stickers, custom emojis are organized in <a href="/api/stickers#stickersets">stickersets</a>: see the <a href="/api/stickers">stickers documentation »</a> for more info on how to work with them.</p>
+<p>To send a message with one or more custom emojis, create and attach <a href="/constructor/messageEntityCustomEmoji">messageEntityCustomEmoji</a> <a href="/api/entities">entities »</a> to a message.<br>
+Note that you can attach a maximum of <code>message_animated_emoji_max</code> custom emojis, as specified by the <a href="/api/config#message-animated-emoji-max">appConfig field »</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)">Twitter</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?46"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

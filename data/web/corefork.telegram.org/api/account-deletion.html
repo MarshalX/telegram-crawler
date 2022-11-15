@@ -42,21 +42,31 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/account-deletion" >Account deletion</a></li></ul></div>
   <h1 id="dev_page_title">Account deletion</h1>
   
-  <div id="dev_page_content"><p>If the user has successfully provided the login code, but they forgot the <a href="/api/srp">2FA</a> password, the account should be reset: this can be done using <a href="/method/account.deleteAccount">account.deleteAccount</a>.  </p>
-<p>If the account's 2FA password was modified more than 7 days ago and was active in the last 7 days, account deletion will be delayed for 7 days, and a <a href="/constructor/updateServiceNotification">service message will be sent to the user</a>, containing a link in one of the following formats:</p>
-<ul>
-<li><code>https://telegram.me/confirmphone?phone=XXX&amp;hash=YYYY</code></li>
-<li><code>tg://confirmphone?phone=XXX&amp;hash=YYYY</code></li>
-</ul>
-<p>When clicked, <a href="/method/account.sendConfirmPhoneCode">account.sendConfirmPhoneCode</a> must be called with the specified <code>hash</code>, using the account with the specified <code>phone</code> number.
-This will send a phone number verification code to the phone number associated with the account.
+  <div id="dev_page_content"><p>A user can delete their Telegram account using <a href="/method/account.deleteAccount">account.deleteAccount</a>.  </p>
+<pre><code>---functions---
+<a href='/method/account.deleteAccount'>account.deleteAccount</a>#a2c0cf74 flags:<a href='/type/%23'>#</a> reason:<a href='/type/string'>string</a> password:flags.0?<a href='/type/InputCheckPasswordSRP'>InputCheckPasswordSRP</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/account.confirmPhone'>account.confirmPhone</a>#5f2178c3 phone_code_hash:<a href='/type/string'>string</a> phone_code:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/account.sendConfirmPhoneCode'>account.sendConfirmPhoneCode</a>#1b3faa88 hash:<a href='/type/string'>string</a> settings:<a href='/type/CodeSettings'>CodeSettings</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;</code></pre>
+<p>If the account doesn't have a <a href="/api/srp">2FA password</a>, calling this method  will <strong>immediately delete the Telegram account</strong>.<br>
+If the account has a <a href="/api/srp">2FA password</a> and it is provided to <code>account.deleteAccount:password</code>, calling this method will <strong>immediately delete the Telegram account</strong>.  </p>
+<p>If the account has a <a href="/api/srp">2FA password</a> but the user doesn't remember it, <a href="/api/srp#password-reset">password reset may be requested first »</a>, or otherwise, the <code>password</code> field may simply be left empty.  </p>
+<p>In this case, if the account's <a href="/api/srp">2FA password</a> was modified more than 7 days ago and was active in the last 7 days, <strong>account deletion will be delayed for 7 days</strong>.
+Otherwise, the account will be <strong>immediately deleted</strong>.<br>
+In the first case, a <a href="/constructor/updateServiceNotification">service message will be sent to the user</a>, containing a <a href="/api/links#phone-confirmation-links">phone number confirmation link »</a>.</p>
+<p>When such a link is clicked, <a href="/method/account.sendConfirmPhoneCode">account.sendConfirmPhoneCode</a> must be called with the specified <code>hash</code>, using the account with the specified <code>phone</code> number.<br>
+This will send a phone number verification code to the phone number associated with the account.<br>
 The phone code settings are the same as for the <a href="/api/auth">login code</a>, and <a href="/method/auth.cancelCode">auth.cancelCode</a> with <a href="/method/auth.resendCode">auth.resendCode</a> can be used as well, to resend or cancel the phone code as for the <a href="/api/auth">login code</a>.</p>
 <p>Once the SMS code is received, the <a href="/method/account.confirmPhone">account.confirmPhone</a> method will have to be called with the SMS code and the phone hash received from the <a href="/method/account.sendConfirmPhoneCode">account.sendConfirmPhoneCode</a> method.</p>
-<p>This will cancel deletion of the account and will log out the user that tried to reset it.
-Otherwise, if the number isn't confirmed in 7 days, the account will be deleted and the user will be free to recreate it.</p>
+<p>This will cancel deletion of the account and will log out the user that tried to reset it.<br>
+Otherwise, if the number isn't confirmed in 7 days, the <strong>account will be deleted</strong> and the user will be free to recreate it.</p>
 <h2><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related articles</h2>
 <h3><a class="anchor" href="#user-authorization" id="user-authorization" name="user-authorization"><i class="anchor-icon"></i></a><a href="/api/auth">User Authorization</a></h3>
-<p>How to register a user's phone to start using the API.</p></div>
+<p>How to register a user's phone to start using the API.</p>
+<h3><a class="anchor" href="#two-factor-authentication" id="two-factor-authentication" name="two-factor-authentication"><i class="anchor-icon"></i></a><a href="/api/srp">Two-factor authentication</a></h3>
+<p>How to login to a user's account if they have enabled 2FA, how to change password.  </p>
+<h3><a class="anchor" href="#deep-links" id="deep-links" name="deep-links"><i class="anchor-icon"></i></a><a href="/api/links">Deep links</a></h3>
+<p>Telegram clients must handle special <code>tg://</code> and <code>t.me</code> deep links encountered in messages, link entities and in other apps by registering OS handlers. </p></div>
   
 </div>
           

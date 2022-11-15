@@ -65,7 +65,7 @@
 
 ---functions---
 
-<a href='/method/messages.sendMedia'>messages.sendMedia</a>#e25ff8e0 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/messages.sendMedia'>messages.sendMedia</a>#e25ff8e0 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> update_stickersets_order:flags.15?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;
 <a href='/method/messages.uploadMedia'>messages.uploadMedia</a>#519bc2b1 peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
 <a href='/method/messages.sendEncryptedFile'>messages.sendEncryptedFile</a>#5559481d flags:<a href='/type/%23'>#</a> silent:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputEncryptedChat'>InputEncryptedChat</a> random_id:<a href='/type/long'>long</a> data:<a href='/type/bytes'>bytes</a> file:<a href='/type/InputEncryptedFile'>InputEncryptedFile</a> = <a href='/type/messages.SentEncryptedMessage'>messages.SentEncryptedMessage</a>;
 
@@ -74,25 +74,31 @@
 <a href='/method/upload.saveFilePart'>upload.saveFilePart</a>#b304a621 file_id:<a href='/type/long'>long</a> file_part:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;
 <a href='/method/upload.saveBigFilePart'>upload.saveBigFilePart</a>#de7b673d file_id:<a href='/type/long'>long</a> file_part:<a href='/type/int'>int</a> file_total_parts:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p>Before transmitting the contents of the file itself, the file has to be assigned a unique 64-bit client identifier: <strong>file_id</strong>.</p>
-<p>The file's binary content is then split into parts. All parts must have the same size ( <strong>part_size</strong> ) and the following conditions must be met:</p>
+<p>The file's binary content is then split into parts. All parts must have the same size (<strong>part_size</strong>) and the following conditions must be met:</p>
 <ul>
 <li><code>part_size % 1024 = 0</code> (divisible by 1KB)</li>
 <li><code>524288 % part_size = 0</code> (512KB must be evenly divisible by <strong>part_size</strong>)</li>
 </ul>
 <p>The last part does not have to satisfy these conditions, provided its size is less than <strong>part_size</strong>.</p>
-<p>Each part should have a sequence number, <strong>file_part</strong>, with a value ranging from 0 to 2,999.</p>
+<p>The following <a href="/api/config#client-configuration">appConfig fields</a> specify the maximum number of uploadable file parts:  </p>
+<ul>
+<li><a href="/api/config#upload-max-fileparts-default">upload_max_fileparts_default »</a> - Maximum number of file parts uploadable by non-Premium users.  </li>
+<li><a href="/api/config#upload-max-fileparts-premium">upload_max_fileparts_premium »</a> - Maximum number of file parts uploadable by Premium users.  </li>
+</ul>
+<p>Note that the limit of uploadable file parts does not account for the <strong>part_size</strong>: thus the total file size limit can only be reached with the biggest possible <strong>part_size</strong> of 512KB, which is actually the recommended <strong>part_size</strong> to avoid excessive protocol overhead.  </p>
+<p>Each part should have a sequence number, <strong>file_part</strong>, with a value ranging from 0 to the value of the appropriate config parameter minus 1.  </p>
 <p>After the file has been partitioned you need to choose a method for saving it on the server. Use <a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> in case the full size of the file is more than <strong>10 MB</strong> and <a href="/method/upload.saveFilePart">upload.saveFilePart</a> for smaller files.</p>
 <p>Each call saves a portion of the data in a temporary location on the server to be used later. The storage life of each portion of data is between several minutes and several hours (depending on how busy the storage area is). After this time, the file part will become unavailable. To increase the time efficiency of a file save operation, we recommend using a call queue, so X pieces of the file are being saved at any given moment in time. Each successful operation to save a part invokes the method call to save the next part. The value of X can be tuned to achieve maximum performance.</p>
 <p>When using one of the methods mentioned above to save file parts, one of the following <a href="/api/errors#400-bad-request">data input errors</a> may be returned:</p>
 <ul>
-<li>FILE_PARTS_INVALID - Invalid number of parts. The value is not between <code>1..3000</code></li>
-<li>FILE_PART_INVALID: The file part number is invalid. The value is not between <code>0 and 2,999</code>.</li>
+<li>FILE_PARTS_INVALID - Invalid number of parts. The value is not between <code>1..upload_max_fileparts_*</code></li>
+<li>FILE_PART_INVALID: The file part number is invalid. The value is not between <code>0</code> and <code>upload_max_fileparts_*-1</code>.</li>
 <li>FILE_PART_TOO_BIG: The size limit (512 KB) for the content of the file part has been exceeded</li>
 <li>FILE_PART_EMPTY: The file part sent is empty</li>
 <li>FILE_PART_SIZE_INVALID - 512KB cannot be evenly divided by <strong>part_size</strong></li>
 <li>FILE_PART_SIZE_CHANGED - The part size is different from the size of one of the previous parts in the same file</li>
 </ul>
-<p>While the parts are being uploaded, an <a href="https://en.wikipedia.org/wiki/MD5">MD5 hash</a> of the file contents can also be computed to be used later as the <strong>md5_checksum</strong> parameter in the <a href="/constructor/inputFile">inputFile</a> constructor (since it is checked only by the server, for encrypted secret chat files it must be generated from the encrypted file).
+<p>While the parts are being uploaded, an <a href="https://en.wikipedia.org/wiki/MD5">MD5 hash</a> of the file contents can also be computed to be used later as the <strong>md5_checksum</strong> parameter in the <a href="/constructor/inputFile">inputFile</a> constructor (since it is checked only by the server, for encrypted secret chat files it must be generated from the encrypted file).<br>
 After the entire file is successfully saved, the final method may be called and passed the generated <a href="/type/InputFile">inputFile</a> object. In case the <a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> method is used, the <a href="/constructor/inputFileBig">inputFileBig</a> constructor must be passed, in other cases use <a href="/constructor/inputFile">inputFile</a>.</p>
 <ul>
 <li><a href="/method/messages.sendMedia">messages.sendMedia</a> - Sends a media file to a chat</li>
@@ -101,9 +107,9 @@ After the entire file is successfully saved, the final method may be called and 
 </ul>
 <p>The file save operation may return one of the following <a href="/api/errors#400-bad-request">data input errors</a>:</p>
 <ul>
-<li>FILE_PARTS_INVALID: The number of file parts is invalid The value is not between 1 and 3,000.</li>
-<li>FILE_PART_Х_MISSING: Part X (where X is a number) of the file is missing from storage. Try repeating the method call to resave the part.</li>
-<li>MD5_CHECKSUM_INVALID: The file's checksum did not match the <strong>md5_checksum</strong> parameter</li>
+<li>FILE_PARTS_INVALID: The number of file parts is invalid The value is not between 1 and <code>upload_max_fileparts_*</code>.</li>
+<li>FILE_PART_X_MISSING: Part X (where X is a number) of the file is missing from storage. Try repeating the method call to resave the part.</li>
+<li>MD5_CHECKSUM_INVALID: The file's MD5 checksum did not match the <strong>md5_checksum</strong> parameter</li>
 </ul>
 <h4><a class="anchor" href="#albums-grouped-media" id="albums-grouped-media" name="albums-grouped-media"><i class="anchor-icon"></i></a>Albums, grouped media</h4>
 <pre><code><a href='/constructor/inputMediaUploadedPhoto'>inputMediaUploadedPhoto</a>#1e287d04 flags:<a href='/type/%23'>#</a> file:<a href='/type/InputFile'>InputFile</a> stickers:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputDocument'>InputDocument</a>&gt; ttl_seconds:flags.1?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
@@ -113,17 +119,17 @@ After the entire file is successfully saved, the final method may be called and 
 
 ---functions---
 
-<a href='/method/messages.sendMultiMedia'>messages.sendMultiMedia</a>#f803138f flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> multi_media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSingleMedia'>InputSingleMedia</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<a href='/method/messages.sendMultiMedia'>messages.sendMultiMedia</a>#f803138f flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> update_stickersets_order:flags.15?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> multi_media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSingleMedia'>InputSingleMedia</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Telegram allows grouping photos into <a href="https://telegram.org/blog/albums-saved-messages">albums</a> and generic files (audio, docuemnts) into media groups.  </p>
 <p>To do this, <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> is used, wrapping each <a href="/type/InputMedia">InputMedia</a> constructor (uploaded or pre-existing, maximum 10 per media group) into an <a href="/constructor/inputSingleMedia">inputSingleMedia</a> constructor, optionally providing a custom per-file caption in <code>message</code>.  </p>
 <p>For photo albums, clients should display an album caption only if exactly one photo in the group has a caption, otherwise no album caption should be displayed, and only when viewing in detail a specific photo of the group the caption should be shown.<br>
 Other grouped media can display a caption under each file.  </p>
 <h4><a class="anchor" href="#re-using-pre-uploaded-files" id="re-using-pre-uploaded-files" name="re-using-pre-uploaded-files"><i class="anchor-icon"></i></a>Re-using pre-uploaded files</h4>
-<pre><code><a href='/constructor/document'>document</a>#1e87342b flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/int'>int</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
+<pre><code><a href='/constructor/document'>document</a>#8fd4c4d8 flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/long'>long</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
 
 ---functions---
 
-<a href='/method/messages.getDocumentByHash'>messages.getDocumentByHash</a>#338e2464 sha256:<a href='/type/bytes'>bytes</a> size:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> = <a href='/type/Document'>Document</a>;</code></pre>
+<a href='/method/messages.getDocumentByHash'>messages.getDocumentByHash</a>#b1f2061f sha256:<a href='/type/bytes'>bytes</a> size:<a href='/type/long'>long</a> mime_type:<a href='/type/string'>string</a> = <a href='/type/Document'>Document</a>;</code></pre>
 <p>For some types of documents like GIFs, <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a> can be used to search for the document on Telegram servers.
 The SHA256 hash of the file is computed, and it is passed along with the file's mime type and size to the method: if the file type is correct and the file is found, a <a href="/constructor/document">document</a> is returned.</p>
 <h3><a class="anchor" href="#uploading-profile-or-chat-pictures" id="uploading-profile-or-chat-pictures" name="uploading-profile-or-chat-pictures"><i class="anchor-icon"></i></a>Uploading profile or chat pictures</h3>
@@ -170,7 +176,7 @@ Use the <a href="/constructor/inputChatPhoto">inputChatPhoto</a> to reuse previo
 
 ---functions---
 
-<a href='/method/upload.getFile'>upload.getFile</a>#b15a9afc flags:<a href='/type/%23'>#</a> precise:flags.0?<a href='/constructor/true'>true</a> cdn_supported:flags.1?<a href='/constructor/true'>true</a> location:<a href='/type/InputFileLocation'>InputFileLocation</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/upload.File'>upload.File</a>;</code></pre>
+<a href='/method/upload.getFile'>upload.getFile</a>#be5335be flags:<a href='/type/%23'>#</a> precise:flags.0?<a href='/constructor/true'>true</a> cdn_supported:flags.1?<a href='/constructor/true'>true</a> location:<a href='/type/InputFileLocation'>InputFileLocation</a> offset:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> = <a href='/type/upload.File'>upload.File</a>;</code></pre>
 <p>Any file can be downloaded by calling <a href="/method/upload.getFile">upload.getFile</a>. 
 The data for the input parameter of the <a href="/type/InputFileLocation">InputFileLocation</a> type is generated as follows:</p>
 <pre><code><a href='/constructor/inputFileLocation'>inputFileLocation</a>#dfdaabe1 volume_id:<a href='/type/long'>long</a> local_id:<a href='/type/int'>int</a> secret:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> = <a href='/type/InputFileLocation'>InputFileLocation</a>;
@@ -197,7 +203,7 @@ The data for the input parameter of the <a href="/type/InputFileLocation">InputF
 <a href='/constructor/inputPeerChannel'>inputPeerChannel</a>#27bcbbfc channel_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputPeer'>InputPeer</a>;
 
 <a href='/constructor/photo'>photo</a>#fb197a65 flags:<a href='/type/%23'>#</a> has_stickers:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> sizes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_sizes:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> = <a href='/type/Photo'>Photo</a>;
-<a href='/constructor/document'>document</a>#1e87342b flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/int'>int</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
+<a href='/constructor/document'>document</a>#8fd4c4d8 flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/long'>long</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
 
 <a href='/constructor/photoSize'>photoSize</a>#75c78e60 type:<a href='/type/string'>string</a> w:<a href='/type/int'>int</a> h:<a href='/type/int'>int</a> size:<a href='/type/int'>int</a> = <a href='/type/PhotoSize'>PhotoSize</a>;
 <a href='/constructor/photoCachedSize'>photoCachedSize</a>#21e1ad6 type:<a href='/type/string'>string</a> w:<a href='/type/int'>int</a> h:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/PhotoSize'>PhotoSize</a>;
@@ -281,11 +287,11 @@ The file download operation may also return one of the following <a href="/api/e
 <li>FILE_MIGRATE_X: The file is in the datacenter No. X</li>
 </ul>
 <h4><a class="anchor" href="#verifying-downloaded-chunks" id="verifying-downloaded-chunks" name="verifying-downloaded-chunks"><i class="anchor-icon"></i></a>Verifying downloaded chunks</h4>
-<pre><code><a href='/constructor/fileHash'>fileHash</a>#6242c773 offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/bytes'>bytes</a> = <a href='/type/FileHash'>FileHash</a>;
+<pre><code><a href='/constructor/fileHash'>fileHash</a>#f39b035c offset:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/bytes'>bytes</a> = <a href='/type/FileHash'>FileHash</a>;
 
 ---functions---
 
-<a href='/method/upload.getFileHashes'>upload.getFileHashes</a>#c7025931 location:<a href='/type/InputFileLocation'>InputFileLocation</a> offset:<a href='/type/int'>int</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FileHash'>FileHash</a>&gt;;</code></pre>
+<a href='/method/upload.getFileHashes'>upload.getFileHashes</a>#9156982a location:<a href='/type/InputFileLocation'>InputFileLocation</a> offset:<a href='/type/long'>long</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FileHash'>FileHash</a>&gt;;</code></pre>
 <p>In order to confirm the integrity of the downloaded file, clients are recommended to verify hashes for each downloaded part, as for <a href="/cdn">CDN DCs</a>. 
 <a href="/method/upload.getFileHashes">upload.getFileHashes</a> contain <a href="/type/FileHash">FileHash</a> constructors. Each of these constructors contains the SHA-256 hash of a part of the file that starts with <code>offset</code> and takes <code>limit</code> bytes.</p>
 <p>Before saving each portion of the data received from the DC into the file, the client can confirm that its hash matches the hash that was received from the master DC. If missing a hash for any file part, client developers must use the <a href="/method/upload.getFileHashes">upload.getFileHashes</a> method to obtain the missing hash.</p>
@@ -300,7 +306,7 @@ The file download operation may also return one of the following <a href="/api/e
 
 <a href='/constructor/videoSize'>videoSize</a>#de33b094 flags:<a href='/type/%23'>#</a> type:<a href='/type/string'>string</a> w:<a href='/type/int'>int</a> h:<a href='/type/int'>int</a> size:<a href='/type/int'>int</a> video_start_ts:flags.0?<a href='/type/double'>double</a> = <a href='/type/VideoSize'>VideoSize</a>;
 
-<a href='/constructor/document'>document</a>#1e87342b flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/int'>int</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
+<a href='/constructor/document'>document</a>#8fd4c4d8 flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/long'>long</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
 <a href='/constructor/photo'>photo</a>#fb197a65 flags:<a href='/type/%23'>#</a> has_stickers:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> sizes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_sizes:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> = <a href='/type/Photo'>Photo</a>;
 
 <a href='/constructor/photo'>photo</a>#fb197a65 flags:<a href='/type/%23'>#</a> has_stickers:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> sizes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_sizes:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> = <a href='/type/Photo'>Photo</a>;</code></pre>
@@ -390,11 +396,11 @@ It should be shown to the user in chat message previews, or while still download
 <p>The stripped <code>bytes</code> payload should be inflated to a JPG payload as seen <a href="https://github.com/telegramdesktop/tdesktop/blob/1757dd856b84d23f83d4e562c94dde825f6eb40c/Telegram/SourceFiles/ui/image/image.cpp#L43">here »</a>.</p>
 <h4><a class="anchor" href="#vector-thumbnails" id="vector-thumbnails" name="vector-thumbnails"><i class="anchor-icon"></i></a>Vector thumbnails</h4>
 <pre><code><a href='/constructor/photoPathSize'>photoPathSize</a>#d8214d41 type:<a href='/type/string'>string</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/PhotoSize'>PhotoSize</a>;</code></pre>
-<p>Messages with <a href="/animated_stickers">animated</a>, <a href="/stickers#video-stickers">video</a>, <a href="/stickers">normal</a> stickers can have a compressed svg (&lt; 300 bytes) to show the outline of the sticker before fetching the actual sticker.
+<p>Messages with <a href="/api/stickers#animated-stickers">animated</a>, <a href="/api/stickers#video-stickers">video</a>, <a href="/api/stickers#static-stickers">static</a> stickers can have a compressed svg (&lt; 300 bytes) to show the outline of the sticker before fetching the actual sticker.
 Sticker outlines will have a <code>j</code> type <a href="/constructor/photoPathSize">photoPathSize</a> thumbnail.  </p>
 <p>This specific vector thumbnail consists of an <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths">SVG path</a>, specially encoded to save space.<br>
 This path will be the outline of the animated sticker, and should be shown to the user while downloading the actual sticker.  </p>
-<p>As for stripped sizes, the payload should be inflated using the following algorithm:</p>
+<p>The payload should be inflated using the following algorithm:</p>
 <pre><code>encoded := photoPathSize.bytes
 
 lookup := "AACAAAAHAAALMAAAQASTAVAAAZaacaaaahaaalmaaaqastava.az0123456789-,"
@@ -451,7 +457,9 @@ path += "z"</code></pre>
 When forwarding such remote HTTP files, they should be sent using <a href="/type/InputMedia">external InputMedia constructors</a>.
 Remote HTTP files can only be downloaded directly by the client if contained in a <a href="/constructor/webDocumentNoProxy">webDocumentNoProxy</a> constructor: in this case, the file is deemed safe to download (this is the case for HTTPS files from certain trusted domains).</p>
 <p>However, if the remote file is contained in a <a href="/constructor/webDocument">webDocument</a>, to avoid leaking sensitive information the file must be downloaded through telegram's servers.
-This can be done in a manner similar to <a href="#downloading-files">normal files</a>, with the difference that <a href="/method/upload.getWebFile">upload.getWebFile</a> must be used, instead.</p>
+This can be done in a manner similar to <a href="#downloading-files">normal files</a>, with the difference that <a href="/method/upload.getWebFile">upload.getWebFile</a> must be used, instead.  </p>
+<p>The <a href="/method/upload.getWebFile">upload.getWebFile</a> method is also used to generate preview pictures for maps and download music file covers, as follows.  </p>
+<p><strong>Note</strong>: the <a href="/method/upload.getWebFile">upload.getWebFile</a> query must be sent to the DC specified in the <code>webfile_dc_id</code> <a href="/api/config#mtproto-configuration">MTProto configuration field</a>.  </p>
 <pre><code><a href='/constructor/upload.webFile'>upload.webFile</a>#21e753bc size:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> file_type:<a href='/type/storage.FileType'>storage.FileType</a> mtime:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/upload.WebFile'>upload.WebFile</a>;
 
 <a href='/constructor/storage.fileUnknown'>storage.fileUnknown</a>#aa963b05 = <a href='/type/storage.FileType'>storage.FileType</a>;
@@ -470,6 +478,7 @@ This can be done in a manner similar to <a href="#downloading-files">normal file
 <p>The <a href="/type/InputWebFileLocation">InputWebFileLocation</a> constructor is generated as follows.</p>
 <pre><code><a href='/constructor/inputWebFileLocation'>inputWebFileLocation</a>#c239d686 url:<a href='/type/string'>string</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputWebFileLocation'>InputWebFileLocation</a>;
 <a href='/constructor/inputWebFileGeoPointLocation'>inputWebFileGeoPointLocation</a>#9f2221c9 geo_point:<a href='/type/InputGeoPoint'>InputGeoPoint</a> access_hash:<a href='/type/long'>long</a> w:<a href='/type/int'>int</a> h:<a href='/type/int'>int</a> zoom:<a href='/type/int'>int</a> scale:<a href='/type/int'>int</a> = <a href='/type/InputWebFileLocation'>InputWebFileLocation</a>;
+<a href='/constructor/inputWebFileAudioAlbumThumbLocation'>inputWebFileAudioAlbumThumbLocation</a>#f46fe924 flags:<a href='/type/%23'>#</a> small:flags.2?<a href='/constructor/true'>true</a> document:flags.0?<a href='/type/InputDocument'>InputDocument</a> title:flags.1?<a href='/type/string'>string</a> performer:flags.1?<a href='/type/string'>string</a> = <a href='/type/InputWebFileLocation'>InputWebFileLocation</a>;
 
 <a href='/constructor/webDocument'>webDocument</a>#1c570ed1 url:<a href='/type/string'>string</a> access_hash:<a href='/type/long'>long</a> size:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/WebDocument'>WebDocument</a>;
 
@@ -487,9 +496,21 @@ This can be done in a manner similar to <a href="#downloading-files">normal file
 <li><code>scale</code> - Map scale; 1-3</li>
 </ul>
 </li>
+<li><a href="/constructor/inputWebFileAudioAlbumThumbLocation">inputWebFileAudioAlbumThumbLocation</a> is used to download an album cover with <code>600x600</code> resolution for any music file missing embedded album art.
+Note that the <code>document</code> field containing the music file must NOT be provided in secret chats: the locally extracted <code>title</code> and <code>performer</code> fields should be provided, instead.<br>
+In normal chats <code>document</code> should always be provided instead of <code>title</code> and <code>performer</code>, as it has more lax flood limits.  <ul>
+<li><code>small</code> if set, downloads a <code>100x100</code> thumbnail instead.</li>
+<li><code>document</code> contains the music file: MUST NOT be provided in secret chats.</li>
+<li><code>title</code> contains the song title: should only be provided in secret chats.</li>
+<li><code>performer</code> contains the song performer: should only be provided in secret chats.</li>
+</ul>
+</li>
 </ul>
 <h3><a class="anchor" href="#general-considerations" id="general-considerations" name="general-considerations"><i class="anchor-icon"></i></a>General Considerations</h3>
-<p>It is recommended that large queries (<a href="/method/upload.getFile">upload.getFile</a>, <a href="/method/upload.saveFilePart">upload.saveFilePart</a>, <a href="/method/upload.getWebFile">upload.getWebFile</a>) be handled through a separate session and a separate connection, in which no methods other than these should be executed. If this is done, then data transfer will cause less interference with <a href="/api/updates">getting updates</a> and other method calls.</p>
+<pre><code><a href='/constructor/dcOption'>dcOption</a>#18b7a10d flags:<a href='/type/%23'>#</a> ipv6:flags.0?<a href='/constructor/true'>true</a> media_only:flags.1?<a href='/constructor/true'>true</a> tcpo_only:flags.2?<a href='/constructor/true'>true</a> cdn:flags.3?<a href='/constructor/true'>true</a> static:flags.4?<a href='/constructor/true'>true</a> this_port_only:flags.5?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> ip_address:<a href='/type/string'>string</a> port:<a href='/type/int'>int</a> secret:flags.10?<a href='/type/bytes'>bytes</a> = <a href='/type/DcOption'>DcOption</a>;</code></pre>
+<p>It is recommended that large queries (<a href="/method/upload.getFile">upload.getFile</a>, <a href="/method/upload.saveFilePart">upload.saveFilePart</a>, <a href="/method/upload.getWebFile">upload.getWebFile</a>) be handled through one or more separate sessions and separate connections, in which no methods other than these should be executed.<br>
+This way, data transfer will cause less interference with <a href="/api/updates">getting updates</a> and other method calls.<br>
+If a media DC with the required DC ID is available (<a href="/constructor/dcOption">dcOption</a> will have the <code>media</code> flag set), queries must be sent to that DC.  </p>
 <h3><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related articles</h3>
 <h4><a class="anchor" href="#handling-file-references" id="handling-file-references" name="handling-file-references"><i class="anchor-icon"></i></a><a href="/api/file_reference">Handling file references</a></h4>
 <p>How to handle file references.</p></div>

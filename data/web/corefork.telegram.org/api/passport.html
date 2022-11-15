@@ -87,7 +87,7 @@ Look at the <a href="/passport">Passport Manual</a> to see how to request passpo
 <a href='/constructor/securePlainPhone'>securePlainPhone</a>#7d6099dd phone:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
 <a href='/constructor/securePlainEmail'>securePlainEmail</a>#21ec5a5f email:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
 
-<a href='/constructor/secureFile'>secureFile</a>#e0277a62 id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> size:<a href='/type/int'>int</a> dc_id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> file_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureFile'>SecureFile</a>;
+<a href='/constructor/secureFile'>secureFile</a>#7d09c27e id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> size:<a href='/type/long'>long</a> dc_id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> file_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureFile'>SecureFile</a>;
 
 <a href='/constructor/secureValueTypePersonalDetails'>secureValueTypePersonalDetails</a>#9d2a81e3 = <a href='/type/SecureValueType'>SecureValueType</a>;
 <a href='/constructor/secureValueTypePassport'>secureValueTypePassport</a>#3dac6a00 = <a href='/type/SecureValueType'>SecureValueType</a>;
@@ -306,13 +306,13 @@ In this case, the container for the E2E encrypted data is in TL, while the encry
 <p><a href="/passport#datacredentials">DataCredentials</a> extracted <a href="#credentials">from the credentials</a> can then be used to decrypt encrypted data from the <em>data</em> field in <a href="/constructor/secureData">secureData</a>.
 For more info on how to decrypt the <em>data</em> field, see the <a href="/passport#datacredentials">passport manual</a>.</p>
 <h5><a class="anchor" href="#securefile" id="securefile" name="securefile"><i class="anchor-icon"></i></a><a href="/type/SecureFile">SecureFile</a></h5>
-<pre><code><a href='/constructor/secureFile'>secureFile</a>#e0277a62 id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> size:<a href='/type/int'>int</a> dc_id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> file_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureFile'>SecureFile</a>; 
+<pre><code><a href='/constructor/secureFile'>secureFile</a>#7d09c27e id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> size:<a href='/type/long'>long</a> dc_id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> file_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureFile'>SecureFile</a>;    
 
 <a href='/constructor/inputSecureFileLocation'>inputSecureFileLocation</a>#cbc7ee28 id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputFileLocation'>InputFileLocation</a>;
 
 ---functions---
 
-<a href='/method/upload.getFile'>upload.getFile</a>#b15a9afc flags:<a href='/type/%23'>#</a> precise:flags.0?<a href='/constructor/true'>true</a> cdn_supported:flags.1?<a href='/constructor/true'>true</a> location:<a href='/type/InputFileLocation'>InputFileLocation</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/upload.File'>upload.File</a>;</code></pre>
+<a href='/method/upload.getFile'>upload.getFile</a>#be5335be flags:<a href='/type/%23'>#</a> precise:flags.0?<a href='/constructor/true'>true</a> cdn_supported:flags.1?<a href='/constructor/true'>true</a> location:<a href='/type/InputFileLocation'>InputFileLocation</a> offset:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> = <a href='/type/upload.File'>upload.File</a>;</code></pre>
 <p>Files (JPG format when decrypted, max. 10 MB) are downloaded chunk by chunk as described in <a href="/api/files">files »</a>, except that instead of generating an <a href="/constructor/inputFile">inputFileLocation</a>, an <a href="/constructor/inputFileLocation">inputFileLocation</a> should be generated, instead.</p>
 <ul>
 <li>The <code>id</code> field is the <code>id</code> of the <a href="/constructor/secureFile">secureFile</a></li>
@@ -348,8 +348,10 @@ Emails and phone numbers sent using telegram passport are <em>already verified</
 <h4><a class="anchor" href="#receiving-requests" id="receiving-requests" name="receiving-requests"><i class="anchor-icon"></i></a>Receiving requests</h4>
 <p>The process starts when your app receives an event from one of the <a href="/passport#sdk">SDKs</a>, or from a custom source.</p>
 <h4><a class="anchor" href="#uri-format" id="uri-format" name="uri-format"><i class="anchor-icon"></i></a>URI format</h4>
-<p>The SDKs trigger a passport authorization request by opening the following Telegram-specific URI:</p>
-<pre><code>tg://resolve?params</code></pre>
+<p>The SDKs trigger a passport authorization request by opening the following <a href="/api/links">deep links »</a>:</p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://passport?bot_id=&lt;bot_user_id&gt;&amp;scope=&lt;scope&gt;&amp;public_key=&lt;public_key&gt;&amp;nonce=&lt;nonce&gt;
+tg://resolve?domain=telegrampassport&amp;bot_id=&lt;bot_user_id&gt;&amp;scope=&lt;scope&gt;&amp;public_key=&lt;public_key&gt;&amp;nonce=&lt;nonce&gt;</code></pre>
 <p>With the following query string parameters:</p>
 <table class="table">
 <tbody>
@@ -357,41 +359,49 @@ Emails and phone numbers sent using telegram passport are <em>already verified</
 <td><strong>Parameters</strong></td>
 <td><strong>Type</strong></td>
 <td><strong>Required</strong></td>
+<td><strong>Description</strong></td>
 </tr>
 <tr>
 <td>domain</td>
 <td>String</td>
-<td>Yes</td>
+<td>Required only for <code>resolve</code> versions of the passport URI</td>
+<td>Always <code>telegrampassport</code> for Passport authorization requests.</td>
 </tr>
 <tr>
 <td>bot_id</td>
 <td>Integer</td>
 <td>Yes</td>
+<td>Unique identifier for the bot. You can get it from bot token. For example, for the bot token <code>1234567:4TT8bAc8GHUspu3ERYn-KGcvsvGB9u_n4ddy</code>, the bot id is <code>1234567</code>.</td>
 </tr>
 <tr>
 <td>scope</td>
 <td><a href="#uripassportscope">UriPassportScope</a></td>
 <td>Yes</td>
+<td>A more compact JSON-serialized object describing the data you want to request</td>
 </tr>
 <tr>
 <td>public_key</td>
 <td>String</td>
 <td>Yes</td>
+<td>Public key of the bot</td>
 </tr>
 <tr>
 <td>nonce</td>
 <td>String</td>
 <td>Yes</td>
+<td>Bot-specified nonce. <strong>Important:</strong> For security purposes it should be a cryptographically secure unique identifier of the request. In particular, it should be long enough and it should be generated using a cryptographically secure pseudorandom number generator. You should never accept credentials with the same nonce twice.</td>
 </tr>
 <tr>
 <td>callback_url</td>
 <td>String</td>
 <td>Optional</td>
+<td>Supported by some Telegram clients, specifies a callback URL to open once the process is finished or canceled.</td>
 </tr>
 <tr>
 <td>payload</td>
 <td>String</td>
 <td>Optional</td>
+<td><strong>Deprecated</strong> parameter from Telegram Passport 1.0 that had the same function of the <code>nonce</code> parameter.<br>Services that still use a legacy version of the SDK may provide this parameter instead of the <code>nonce</code>.<br>In some cases, both the <code>nonce</code> and the <code>payload</code> parameters may be found in a URI, for backwards compatibility: in this case, the <code>nonce</code> parameter should always be used instead of <code>payload</code>.</td>
 </tr>
 </tbody>
 </table>
