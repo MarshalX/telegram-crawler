@@ -876,14 +876,20 @@ var Account = {
     Aj.onLoad(function(state) {
       var cont = Aj.ajContainer;
       $(cont).on('click.curPage', '.js-convert-btn', Account.eConvertInit);
+      $(cont).on('click.curPage', '.js-revert-btn', Account.eConvertRevert);
       $(cont).on('submit.curPage', '.js-convert-bid-form', Account.eConvertBidSubmit);
+      $(cont).on('submit.curPage', '.js-new-convert-bid-form', Account.eConvertBidSubmit);
       state.$convertBidPopup = $('.js-convert-bid-popup');
+      state.$newConvertBidPopup = $('.js-new-convert-bid-popup');
       state.$convertBidForm = $('.js-convert-bid-form');
+      state.$newConvertBidForm = $('.js-new-convert-bid-form');
       Main.initForm(state.$convertBidForm);
+      Main.initForm(state.$newConvertBidForm);
       state.$convertConfirmPopup = $('.js-convert-confirm-popup');
     });
     Aj.onUnload(function(state) {
       Main.destroyForm(state.$convertBidForm);
+      Main.destroyForm(state.$newConvertBidForm);
       clearTimeout(state.convertTimeout);
     });
   },
@@ -895,6 +901,19 @@ var Account = {
     Aj.state.curPopup = null;
     Aj.state.curPopupState = null;
     Aj.apiRequest('initConverting', {
+      username: username
+    }, function(result) {
+      Account.processConverting(result);
+    });
+  },
+  eConvertRevert: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    var $actions = $(this).closest('.js-actions');
+    var username = $actions.attr('data-username');
+    Aj.state.curPopup = null;
+    Aj.state.curPopupState = null;
+    Aj.apiRequest('revertConverting', {
       username: username
     }, function(result) {
       Account.processConverting(result);
@@ -950,6 +969,45 @@ var Account = {
           }
         });
       }
+    }
+    else if (result.state == 'min_bid_request') {
+      Aj.state.curPopup = Aj.state.$newConvertBidPopup;
+      if (Aj.state.curPopupState != result.state) {
+        if ($popup) {
+          closePopup($popup);
+        }
+        $('.js-username', Aj.state.curPopup).html('@' + result.username);
+        $('.js-address', Aj.state.curPopup).html(result.address);
+        Aj.state.$newConvertBidForm.field('id').value(result.req_id);
+        Aj.state.curPopupState = result.state;
+        openPopup(Aj.state.curPopup, {
+          onClose: function() {
+            Aj.state.curPopupState = null;
+          }
+        });
+      }
+    }
+    else if (result.state == 'created') {
+      $(Aj.ajContainer).one('page:load', function() {
+        showAlert(result.message);
+      });
+      Aj.location('/username/' + result.username);
+    }
+    else if (result.state == 'revert_confirm') {
+      showConfirm(result.message, function() {
+        Aj.apiRequest('revertConverting', {
+          username: result.username,
+          confirmed: 1
+        }, function(result) {
+          Account.processConverting(result);
+        });
+      }, result.button);
+    }
+    else if (result.state == 'reverted') {
+      $(Aj.ajContainer).one('page:load', function() {
+        showAlert(result.message);
+      });
+      Aj.reload();
     }
     else if (result.state == 'qr') {
       Aj.state.curPopupState = result.state;
