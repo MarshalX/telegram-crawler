@@ -136,6 +136,26 @@ var DemoApp = {
     }
     return false;
   },
+  requestAudioVideo: function(el) {
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(function(stream) {
+        $(el).next('span').html('(Access granted)').attr('class', 'ok');
+      });
+    } else {
+      $(el).next('span').html('Media devices is not supported in this browser.').attr('class', 'err');
+    }
+    return false;
+  },
+  testClipboard: function(el) {
+    if (navigator.clipboard) {
+      navigator.clipboard.readText().then(function(clipText) {
+        $(el).next('span').text('(Read from clipboard: «' + clipText + '»)').attr('class', 'ok');
+      });
+    } else {
+      $(el).next('span').html('Media devices is not supported in this browser.').attr('class', 'err');
+    }
+    return false;
+  },
   toggleMainButton: function(el) {
     if (DemoApp.MainButton.isVisible) {
       DemoApp.MainButton.hide();

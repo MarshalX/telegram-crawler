@@ -14,6 +14,8 @@ var Main = {
       $(cont).on('click.curPage', '.js-howitworks', Main.eHowitworks);
       $(cont).on('click.curPage', '.logout-link', Login.logOut);
       $(cont).on('click.curPage', '.ton-logout-link', Login.tonLogOut);
+      $(cont).on('click.curPage', '.js-copy-code', Main.copyText);
+      $(cont).on('click.curPage', '.js-main-search-dd-item', Main.eMainSearchDDSelected);
       state.$headerMenu = $('.js-header-menu');
       state.$unavailPopup = $('.js-unavailable-popup');
       state.$howitworksPopup = $('.js-howitworks-popup');
@@ -367,6 +369,19 @@ var Main = {
       location.href = href;
     }
   },
+  copyText: function() {
+    var text = $(this).attr('data-copy');
+    var $text = $('<textarea readonly>').css('position', 'fixed').css('left', '-9999px');
+    $text.val(text).appendTo('body');
+    var selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
+    $text.focus().select();
+    document.execCommand('copy');
+    $text.remove();
+    if (selected) {
+      document.getSelection().removeAllRanges();
+      document.getSelection().addRange(selected);
+    }
+  },
   eMainSearchInput: function(e) {
     if (!Aj.state.quickSearch) {
       return;
@@ -378,6 +393,15 @@ var Main = {
     } else {
       Aj.state.searchTimeout = setTimeout(Main.searchSubmit, 400);
     }
+  },
+  eMainSearchDDSelected: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var field = $(this).attr('data-field');
+    var value = $(this).attr('data-value');
+    var $form  = Aj.state.$mainSearchForm;
+    $form.field(field).value(value);
+    Main.searchSubmit();
   },
   eMainSearchClear: function(e) {
     var $form = Aj.state.$mainSearchForm;
