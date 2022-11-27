@@ -152,7 +152,7 @@ var DemoApp = {
         $(el).next('span').text('(Read from clipboard: «' + clipText + '»)').attr('class', 'ok');
       });
     } else {
-      $(el).next('span').html('Media devices is not supported in this browser.').attr('class', 'err');
+      $(el).next('span').html('Clipboard is not available in this browser.').attr('class', 'err');
     }
     return false;
   },
