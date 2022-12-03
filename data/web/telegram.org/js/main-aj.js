@@ -364,6 +364,7 @@ function ajInit(options) {
       if (result.s) {
         $.extend(Aj.state, result.s);
       }
+      document.documentElement.className = result.rc || '';
       if (result._dlog) {
         $('#dlog').html(result._dlog);
       }

@@ -1,5 +1,8 @@
 
 var Main = {
+  CHECK_PERIOD: 400,
+  UPDATE_PERIOD: 1200,
+  FORCE_UPDATE_PERIOD: 5000,
   init: function() {
     Aj.onLoad(function(state) {
       var cont = Aj.ajContainer;
@@ -14,7 +17,7 @@ var Main = {
       $(cont).on('click.curPage', '.js-howitworks', Main.eHowitworks);
       $(cont).on('click.curPage', '.logout-link', Login.logOut);
       $(cont).on('click.curPage', '.ton-logout-link', Login.tonLogOut);
-      $(cont).on('click.curPage', '.js-copy-code', Main.copyText);
+      $(cont).on('click.curPage', '.js-copy-code', Main.copyCode);
       $(cont).on('click.curPage', '.js-main-search-dd-item', Main.eMainSearchDDSelected);
       state.$headerMenu = $('.js-header-menu');
       state.$unavailPopup = $('.js-unavailable-popup');
@@ -369,8 +372,7 @@ var Main = {
       location.href = href;
     }
   },
-  copyText: function() {
-    var text = $(this).attr('data-copy');
+  copyText: function(text) {
     var $text = $('<textarea readonly>').css('position', 'fixed').css('left', '-9999px');
     $text.val(text).appendTo('body');
     var selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false;
@@ -380,6 +382,37 @@ var Main = {
     if (selected) {
       document.getSelection().removeAllRanges();
       document.getSelection().addRange(selected);
+    }
+  },
+  openApp: function(app_url) {
+    if (Aj.state.appUseIframe) {
+      var $frame = $('<iframe>').css('position', 'fixed').css('left', '-9999px');
+      $frame.appendTo('body');
+      var pageHidden = false, hideCallback = function () {
+        $(window).off('pagehide blur', hideCallback);
+        pageHidden = true;
+      };
+      $(window).on('pagehide blur', hideCallback);
+      $frame.attr('src', app_url);
+      if (!Aj.state.appUseIframeOnce) {
+        setTimeout(function() {
+          if (!pageHidden) {
+            window.location = app_url;
+          }
+        }, 2000);
+      }
+    } else {
+      setTimeout(function() {
+        window.location = app_url;
+      }, 100);
+    }
+  },
+  copyCode: function() {
+    var code = $(this).attr('data-copy');
+    var app_url = $(this).attr('data-app-url');
+    Main.copyText(code);
+    if (app_url) {
+      Main.openApp(app_url);
     }
   },
   eMainSearchInput: function(e) {
@@ -397,6 +430,7 @@ var Main = {
   eMainSearchDDSelected: function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
+    $(this).closeDropdown();
     var field = $(this).attr('data-field');
     var value = $(this).attr('data-value');
     var $form  = Aj.state.$mainSearchForm;
@@ -416,7 +450,8 @@ var Main = {
     if (result.html) {
       $('.js-search-results', Aj.ajContainer).html(result.html);
       Main.updateTime();
-      Aj.setLocation(result.url, true);
+      var loc = Aj.location(), path = loc.pathname + loc.search;
+      Aj.setLocation(result.url, path != '/');
     }
     $('.js-main-recent-bids').toggleClass('hide', !result.show_recent_bids);
   },
@@ -441,16 +476,20 @@ var Main = {
   searchSubmit: function() {
     var $form  = Aj.state.$mainSearchForm;
     var cache  = Aj.state.mainSearchCache;
+    var type  = $form.field('type').value();
     var query  = $form.field('query').value();
     var filter = $form.field('filter').value();
     var sort   = $form.field('sort').value();
     var cache_key = 'q='+query+'&f='+filter+'&s='+sort;
     Aj.state.$mainSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
+    Aj.showProgress();
     Aj.apiRequest('searchAuctions', {
+      type: type,
       query: query,
       filter: filter,
       sort: sort
     }, function(result) {
+      Aj.hideProgress();
       if (result.ok) {
         cache[cache_key] = result;
         Main.updateResults(result);
@@ -514,7 +553,6 @@ var Login = {
 };
 
 var Auction = {
-  UPDATE_PERIOD: 1200,
   init: function() {
     Aj.onLoad(function(state) {
       var cont = Aj.ajContainer;
@@ -529,7 +567,8 @@ var Auction = {
       state.$bidForm = $('.js-place-bid-form');
       Main.initForm(state.$bidForm);
       state.needUpdate = true;
-      state.updStateTo = setTimeout(Auction.updateState, Auction.UPDATE_PERIOD);
+      state.updLastReq = +Date.now();
+      state.updStateTo = setTimeout(Auction.updateState, Main.UPDATE_PERIOD);
       Assets.init();
       Account.init();
     });
@@ -540,20 +579,30 @@ var Auction = {
     });
   },
   updateState: function() {
-    Aj.apiRequest('updateAuction', {
-      username: Aj.state.username,
-      lt: Aj.state.auctionLastLt
-    }, function(result) {
-      if (result.html) {
-        $('.js-main-content').html(result.html);
-      }
-      if (result.lt) {
-        Aj.state.auctionLastLt = result.lt;
-      }
+    var now = +Date.now();
+    if (document.hasFocus() ||
+        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
+      Aj.state.updLastReq = now;
+      Aj.apiRequest('updateAuction', {
+        type: Aj.state.type,
+        username: Aj.state.username,
+        lt: Aj.state.auctionLastLt
+      }, function(result) {
+        if (result.html) {
+          $('.js-main-content').html(result.html);
+        }
+        if (result.lt) {
+          Aj.state.auctionLastLt = result.lt;
+        }
+        if (Aj.state.needUpdate) {
+          Aj.state.updStateTo = setTimeout(Auction.updateState, Main.UPDATE_PERIOD);
+        }
+      });
+    } else {
       if (Aj.state.needUpdate) {
-        Aj.state.updStateTo = setTimeout(Auction.updateState, Auction.UPDATE_PERIOD);
+        Aj.state.updStateTo = setTimeout(Auction.updateState, Main.CHECK_PERIOD);
       }
-    });
+    }
   },
   ePlaceBid: function(e) {
     e.stopImmediatePropagation();
@@ -569,7 +618,9 @@ var Auction = {
   ePlaceBidSubmit: function(e) {
     e.preventDefault();
     var $form = $(this);
+    var type = Aj.state.type;
     var username = Aj.state.username;
+    var item_title = Aj.state.itemTitle;
     var amount = Main.amountFieldValue($form, 'bid_value');
     if (amount === false) {
       $form.field('bid_value').focus();
@@ -580,6 +631,7 @@ var Auction = {
       request: {
         method: 'getBidLink',
         params: {
+          type: type,
           username: username,
           bid: amount
         }
@@ -588,7 +640,7 @@ var Auction = {
       description: l('WEB_POPUP_QR_PLACE_BID_TEXT', {
         amount: '<span class="icon-before icon-ton-text">' + amount + '</span>'
       }),
-      qr_label: '@' + username,
+      qr_label: item_title,
       tk_label: l('WEB_POPUP_QR_PLACE_BID_TK_BUTTON'),
       terms_label: l('WEB_POPUP_QR_PLACE_BID_TERMS'),
       onConfirm: function(by_server) {
@@ -600,23 +652,26 @@ var Auction = {
   },
   eBuyNow: function(e) {
     e.preventDefault();
+    var type = Aj.state.type;
     var username = Aj.state.username;
+    var item_title = Aj.state.itemTitle;
     var amount   = $(this).attr('data-bid-amount');
     QR.showPopup({
       request: {
         method: 'getBidLink',
         params: {
+          type: type,
           username: username,
           bid: amount
         }
       },
       title: l('WEB_POPUP_QR_BUY_NOW_HEADER', {
-        username: '<span class="accent-color">@' + username + '</span>'
+        username: '<span class="accent-color">' + item_title + '</span>'
       }),
       description: l('WEB_POPUP_QR_BUY_NOW_TEXT', {
         amount: '<span class="icon-before icon-ton-text">' + amount + '</span>'
       }),
-      qr_label: '@' + username,
+      qr_label: item_title,
       tk_label: l('WEB_POPUP_QR_BUY_NOW_TK_BUTTON'),
       terms_label: l('WEB_POPUP_QR_PLACE_BID_TERMS'),
       onConfirm: function(by_server) {
@@ -631,9 +686,9 @@ var Auction = {
       return false;
     }
     e.preventDefault();
-    var username = Aj.state.username;
     Aj.apiRequest('subscribe', {
-      username: username
+      type: Aj.state.type,
+      username: Aj.state.username
     }, function(result) {
       if (result.error) {
         return showAlert(result.error);
@@ -646,9 +701,9 @@ var Auction = {
       return false;
     }
     e.preventDefault();
-    var username = Aj.state.username;
     Aj.apiRequest('unsubscribe', {
-      username: username
+      type: Aj.state.type,
+      username: Aj.state.username
     }, function(result) {
       if (result.error) {
         return showAlert(result.error);
@@ -658,11 +713,11 @@ var Auction = {
   },
   eLoadMoreOrders: function(e) {
     e.preventDefault();
-    var username = Aj.state.username;
     var $table    = $(this).closest('table');
     var offset_id = $(this).attr('data-next-offset');
     Aj.apiRequest('getOrdersHistory', {
-      username: username,
+      type: Aj.state.type,
+      username: Aj.state.username,
       offset_id: offset_id
     }, function(result) {
       if (result.error) {
@@ -674,11 +729,11 @@ var Auction = {
   },
   eLoadMoreOwners: function(e) {
     e.preventDefault();
-    var username = Aj.state.username;
     var $table    = $(this).closest('table');
     var offset_id = $(this).attr('data-next-offset');
     Aj.apiRequest('getOwnersHistory', {
-      username: username,
+      type: Aj.state.type,
+      username: Aj.state.username,
       offset_id: offset_id
     }, function(result) {
       if (result.error) {
@@ -695,6 +750,7 @@ var Assets = {
     Aj.onLoad(function(state) {
       $(document).on('click.curPage', '.js-assign-btn', Assets.eAssignToTelegram);
       $(document).on('submit.curPage', '.js-assign-form', Assets.eAssignSubmit);
+      $(document).on('click.curPage', '.js-get-code-btn', Assets.eGetCode);
       $(document).on('click.curPage', '.js-put-to-auction-btn', Assets.ePutToAuction);
       $(document).on('submit.curPage', '.js-put-to-auction-form', Assets.ePutToAuctionSubmit);
       $(document).on('click.curPage', '.js-cancel-auction-btn', Assets.eCancelAuction);
@@ -719,6 +775,14 @@ var Assets = {
   },
   eTableRowSelHovered: function(e) {
     $(this).closest('.tm-row-selectable').toggleClass('noselect', e.type == 'mouseover');
+  },
+  eGetCode: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    var href = $(this).attr('data-href');
+    if (href) {
+      Aj.location(href);
+    }
   },
   eAssignToTelegram: function(e) {
     e.stopImmediatePropagation();
@@ -778,20 +842,42 @@ var Assets = {
     $(this).closeDropdown();
     var $actions = $(this).closest('.js-actions');
     var username = $actions.attr('data-username');
+    var item_title = $actions.attr('data-item-title');
     var def_bid  = $actions.attr('data-def-bid');
-    $('.js-username', Aj.state.$putToAuctionPopup).html('@' + username);
-    openPopup(Aj.state.$putToAuctionPopup, {
-      onOpen: function() {
-        Aj.state.$putToAuctionForm.reset();
-        Aj.state.$putToAuctionForm.field('username').value(username);
-        Aj.state.$putToAuctionForm.field('min_bid_value').value(def_bid).trigger('input').focusAndSelect();
-      }
-    });
+    var doPutToAuction = function() {
+      $('.js-username', Aj.state.$putToAuctionPopup).html(item_title);
+      openPopup(Aj.state.$putToAuctionPopup, {
+        onOpen: function() {
+          Aj.state.$putToAuctionForm.reset();
+          Aj.state.$putToAuctionForm.field('username').value(username);
+          Aj.state.$putToAuctionForm.data('item_title', item_title);
+          Aj.state.$putToAuctionForm.field('min_bid_value').value(def_bid).trigger('input').focusAndSelect();
+        }
+      });
+    };
+    if ($actions.attr('data-need-check')) {
+      Aj.apiRequest('canSellItem', {
+        type: Aj.state.type,
+        username: username,
+        auction: true
+      }, function(result) {
+        if (result.confirm_message) {
+          showConfirm(result.confirm_message, function() {
+            doPutToAuction();
+          }, result.confirm_button);
+        } else {
+          doPutToAuction();
+        }
+      });
+    } else {
+      doPutToAuction();
+    }
   },
   ePutToAuctionSubmit: function(e) {
     e.preventDefault();
     var $form = $(this);
     var username = $form.field('username').value();
+    var item_title = Aj.state.$putToAuctionForm.data('item_title');
     var min_amount = Main.amountFieldValue($form, 'min_bid_value');
     var max_amount = Main.amountFieldValue($form, 'max_price_value');
     closePopup(Aj.state.$putToAuctionPopup);
@@ -799,6 +885,7 @@ var Assets = {
       request: {
         method: 'getStartAuctionLink',
         params: {
+          type: Aj.state.type,
           username: username,
           min_amount: min_amount,
           max_amount: max_amount
@@ -806,7 +893,7 @@ var Assets = {
       },
       title: l('WEB_POPUP_QR_START_AUCTION_HEADER'),
       description: l('WEB_POPUP_QR_START_AUCTION_TEXT'),
-      qr_label: '@' + username,
+      qr_label: item_title,
       tk_label: l('WEB_POPUP_QR_START_AUCTION_TK_BUTTON'),
       terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
       onConfirm: function(by_server) {
@@ -815,7 +902,7 @@ var Assets = {
             showAlert(l('WEB_START_AUCTION_SENT'));
           });
         }
-        Aj.location('/username/' + username);
+        Aj.location(Aj.state.typeUrl + username);
       }
     });
   },
@@ -825,16 +912,18 @@ var Assets = {
     $(this).closeDropdown();
     var $actions = $(this).closest('.js-actions');
     var username = $actions.attr('data-username');
+    var item_title = $actions.attr('data-item-title');
     QR.showPopup({
       request: {
         method: 'getCancelAuctionLink',
         params: {
+          type: Aj.state.type,
           username: username
         }
       },
       title: l('WEB_POPUP_QR_STOP_AUCTION_HEADER'),
       description: l('WEB_POPUP_QR_STOP_AUCTION_TEXT'),
-      qr_label: '@' + username,
+      qr_label: item_title,
       tk_label: l('WEB_POPUP_QR_STOP_AUCTION_TK_BUTTON'),
       terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
       onConfirm: function(by_server) {
@@ -843,7 +932,7 @@ var Assets = {
             showAlert(l('WEB_STOP_AUCTION_SENT'));
           });
         }
-        Aj.location('/username/' + username);
+        Aj.location(Aj.state.typeUrl + username);
       }
     });
   },
@@ -853,45 +942,215 @@ var Assets = {
     $(this).closeDropdown();
     var $actions = $(this).closest('.js-actions');
     var username = $actions.attr('data-username');
+    var item_title = $actions.attr('data-item-title');
     var def_bid  = $actions.attr('data-def-bid');
-    $('.js-username', Aj.state.$sellUsernamePopup).html('@'+username);
-    openPopup(Aj.state.$sellUsernamePopup, {
-      onOpen: function() {
-        Aj.state.$sellUsernameForm.reset();
-        Aj.state.$sellUsernameForm.field('username').value(username);
-        Aj.state.$sellUsernameForm.field('sell_value').value(def_bid).trigger('input').focusAndSelect();
-      }
-    });
+    var doSellUsername = function() {
+      $('.js-username', Aj.state.$sellUsernamePopup).html(item_title);
+      openPopup(Aj.state.$sellUsernamePopup, {
+        onOpen: function() {
+          Aj.state.$sellUsernameForm.reset();
+          Aj.state.$sellUsernameForm.field('username').value(username);
+          Aj.state.$sellUsernameForm.data('item_title', item_title);
+          Aj.state.$sellUsernameForm.field('sell_value').value(def_bid).trigger('input').focusAndSelect();
+        }
+      });
+    };
+    if ($actions.attr('data-need-check')) {
+      Aj.apiRequest('canSellItem', {
+        type: Aj.state.type,
+        username: username,
+        auction: false
+      }, function(result) {
+        if (result.confirm_message) {
+          showConfirm(result.confirm_message, function() {
+            doSellUsername();
+          }, result.confirm_button);
+        } else {
+          doSellUsername();
+        }
+      });
+    } else {
+      doSellUsername();
+    }
   },
   eSellUsernameSubmit: function(e) {
     e.preventDefault();
     var $form = $(this);
     var username = $form.field('username').value();
+    var item_title = Aj.state.$sellUsernameForm.data('item_title');
     var sell_amount = Main.amountFieldValue($form, 'sell_value');
     closePopup(Aj.state.$sellUsernamePopup);
     QR.showPopup({
       request: {
         method: 'getStartAuctionLink',
         params: {
+          type: Aj.state.type,
           username: username,
           min_amount: sell_amount,
           max_amount: sell_amount
         }
       },
-      title: l('WEB_POPUP_QR_SELL_USERNAME_HEADER'),
-      description: l('WEB_POPUP_QR_SELL_USERNAME_TEXT'),
-      qr_label: '@' + username,
-      tk_label: l('WEB_POPUP_QR_SELL_USERNAME_TK_BUTTON'),
+      title: l('WEB_POPUP_QR_SELL_HEADER'),
+      description: l('WEB_POPUP_QR_SELL_TEXT'),
+      qr_label: item_title,
+      tk_label: l('WEB_POPUP_QR_SELL_TK_BUTTON'),
       terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
       onConfirm: function(by_server) {
         if (by_server) {
           $(Aj.ajContainer).one('page:load', function() {
-            showAlert(l('WEB_SELL_USERNAME_SENT'));
+            showAlert(l('WEB_SELL_SENT'));
           });
         }
-        Aj.location('/username/' + username);
+        Aj.location(Aj.state.typeUrl + username);
       }
     });
+  }
+};
+
+var Random = {
+  init: function() {
+    Aj.onLoad(function(state) {
+      var cont = Aj.ajContainer;
+      $(cont).on('click.curPage', '.js-buy-random-btn', Random.eBuyRandom);
+      $(cont).on('click.curPage', '.js-buy-more-random-btn', Random.eBuyMoreRandom);
+      state.updLastReq = +Date.now();
+      if (state.needUpdate) {
+        state.updStateTo = setTimeout(Random.updateState, Main.UPDATE_PERIOD);
+      }
+      $('.js-spoiler', cont).each(function() {
+        SimpleSpoiler.init(this);
+      }).removeClass('blured');
+    });
+    Aj.onUnload(function(state) {
+      var cont = Aj.ajContainer;
+      clearTimeout(state.updStateTo);
+      state.needUpdate = false;
+      $('.js-spoiler', cont).each(function() {
+        SimpleSpoiler.destroy(this);
+      });
+    });
+  },
+  updateContent: function(html) {
+    var $main = $('.js-main-content');
+    $('.js-spoiler', $main).each(function() {
+      SimpleSpoiler.destroy(this);
+    });
+    $('.js-main-content').html(html);
+    $('.js-spoiler', $main).each(function() {
+      SimpleSpoiler.init(this);
+    }).removeClass('blured');
+  },
+  updateState: function() {
+    var now = +Date.now();
+    if (document.hasFocus() ||
+        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
+      Aj.state.updLastReq = now;
+      Aj.apiRequest('updateRandom', {}, function(result) {
+        if (result.html) {
+          Random.updateContent(result.html);
+        }
+        if (result.done && Aj.state.$sentPopup) {
+          closePopup(Aj.state.$sentPopup);
+        }
+        if (Aj.state.needUpdate &&
+            result.need_update) {
+          Aj.state.updStateTo = setTimeout(Random.updateState, Main.UPDATE_PERIOD);
+        }
+      });
+    } else {
+      if (Aj.state.needUpdate) {
+        Aj.state.updStateTo = setTimeout(Random.updateState, Main.CHECK_PERIOD);
+      }
+    }
+  },
+  eBuyRandom: function(e) {
+    e.preventDefault();
+    var item_title = Aj.state.itemTitle;
+    var amount = Aj.state.price;
+    QR.showPopup({
+      request: {
+        method: 'getRandomNumberLink',
+        params: {}
+      },
+      popup_class: 'qr-random-popup',
+      title: l('WEB_POPUP_QR_BUY_RANDOM_HEADER'),
+      description: l('WEB_POPUP_QR_BUY_RANDOM_TEXT', {
+        amount: '<span class="icon-before icon-ton-text">' + amount + '</span>',
+        address: Aj.state.curWallet
+      }),
+      qr_label: item_title,
+      tk_label: l('WEB_POPUP_QR_BUY_RANDOM_TK_BUTTON'),
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
+      onConfirm: function(by_server) {
+        if (by_server) {
+          Aj.state.$sentPopup = showAlert(l('WEB_BUY_RANDOM_SENT'));
+        }
+      },
+      onOpen: function() {
+        $('.js-spoiler', this).each(function() {
+          SimpleSpoiler.init(this);
+        }).removeClass('blured');
+      },
+      onClose: function() {
+        $('.js-spoiler', this).each(function() {
+          SimpleSpoiler.destroy(this);
+        });
+      }
+    });
+    Aj.state.needUpdate = true;
+    clearTimeout(Aj.state.updStateTo);
+    Aj.state.updStateTo = setTimeout(Random.updateState, Main.UPDATE_PERIOD);
+  },
+  eBuyMoreRandom: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    Aj.apiRequest('repeatRandom', {}, function(result) {
+      Aj.state.needUpdate = false;
+      if (result.html) {
+        Random.updateContent(result.html);
+      }
+    });
+  }
+};
+
+var LoginCodes = {
+  init: function() {
+    Aj.onLoad(function(state) {
+      state.needUpdate = true;
+      state.updLastReq = +Date.now();
+      state.updStateTo = setTimeout(LoginCodes.updateState, Main.UPDATE_PERIOD);
+    });
+    Aj.onUnload(function(state) {
+      clearTimeout(state.updStateTo);
+      state.needUpdate = false;
+    });
+  },
+  updateState: function() {
+    var now = +Date.now();
+    if (document.hasFocus() ||
+        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
+      Aj.state.updLastReq = now;
+      Aj.apiRequest('updateLoginCodes', {
+        number: Aj.state.number,
+        lt: Aj.state.lastLt,
+        from_app: Aj.state.fromApp
+      }, function(result) {
+        if (result.html) {
+          $('.js-main-content').html(result.html);
+        }
+        if (result.lt) {
+          Aj.state.lastLt = result.lt;
+        }
+        if (Aj.state.needUpdate) {
+          Aj.state.updStateTo = setTimeout(LoginCodes.updateState, Main.UPDATE_PERIOD);
+        }
+      });
+    } else {
+      if (Aj.state.needUpdate) {
+        Aj.state.updStateTo = setTimeout(LoginCodes.updateState, Main.CHECK_PERIOD);
+      }
+
+    }
   }
 };
 
@@ -1106,6 +1365,7 @@ var MyBids = {
     var $table    = $(this).closest('table');
     var offset_id = $(this).attr('data-next-offset');
     Aj.apiRequest('getBidsHistory', {
+      type: Aj.state.type || '',
       offset_id: offset_id
     }, function(result) {
       if (result.error) {
@@ -1117,11 +1377,37 @@ var MyBids = {
   }
 };
 
+var Sessions = {
+  init: function() {
+    Aj.onLoad(function(state) {
+      $(document).on('click.curPage', '.js-terminate-btn', Sessions.eTerminate);
+    });
+  },
+  eTerminate: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    var $actions   = $(this).closest('.js-actions');
+    var $table_row = $(this).closest('tr');
+    var session_id = $actions.attr('data-session-id');
+    Aj.apiRequest('tonTerminateSession', {
+      session_id: session_id
+    }, function(result) {
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.ok) {
+        $table_row.remove();
+      }
+    });
+  }
+};
+
 var QR = {
   showPopup: function(options) {
     options = $.extend({
       title: 'Scan QR Code',
       description: null,
+      popup_class: null,
       hint: null,
       qr_label: null,
       tk_label: null,
@@ -1139,7 +1425,7 @@ var QR = {
     var hint = options.hint ? '<p class="popup-text popup-hint-text">' + options.hint + '</p>' : '';
     var tk_button = options.tk_label && (is_android || is_ios) ? '<p class="tm-qr-code-or">' + l('WEB_POPUP_QR_OR_BUTTON') + '</p><button class="btn btn-primary btn-block btn-tonkeeper js-tonkeeper-btn" data-inactive-label="' + l('WEB_WAITING', 'Waiting...') + '"><span class="tm-button-label">' + options.tk_label + '</span></button>' : '';
     var terms_text = options.terms_label ? '<p class="popup-footer-text">' + options.terms_label + '</p>' : '';
-    var $popup = $('<div class="popup-container hide qr-code-popup-container qr-inactive" data-close-outside="popup-body"><div class="popup"><div class="popup-body"><section><h2>' + options.title + '</h2><p class="popup-text">' + options.description + '</p><div class="tm-qr-code"><div class="tm-qr-code-image"></div>' + qr_label + '</div>' + tk_button + hint + terms_text + '</section></div></div></div>');
+    var $popup = $('<div class="popup-container hide qr-code-popup-container' + (options.popup_class ? ' ' + options.popup_class : '') + ' qr-inactive" data-close-outside="popup-body"><div class="popup"><div class="popup-body"><section><h2>' + options.title + '</h2><p class="popup-text">' + options.description + '</p><div class="tm-qr-code"><div class="tm-qr-code-image"></div>' + qr_label + '</div>' + tk_button + hint + terms_text + '</section></div></div></div>');
     var $qrCode = $('.tm-qr-code-image', $popup);
     var $tonkeeperBtn = $('.js-tonkeeper-btn', $popup);
     var $confirmedBtn = $('.js-confirmed-btn', $popup);
@@ -1265,7 +1551,10 @@ var QR = {
         $popup.remove();
       }, 500);
     });
-    openPopup($popup);
+    openPopup($popup, {
+      onOpen: options.onOpen,
+      onClose: options.onClose,
+    });
     return $popup;
   },
   getUrl: function(link, callback) {
@@ -1298,5 +1587,124 @@ var QR = {
       var qr_url = URL.createObjectURL(blob);
       callback(qr_url);
     });
+  }
+};
+
+var SimpleSpoiler = {
+  init: function(el) {
+    el.style.position = 'relative';
+    var el_w = el.offsetWidth;
+    var el_h = el.offsetHeight;
+    var max_d = 5;
+    var fps = 30;
+    var lsec = 0.6;
+    var count = 300;
+    console.log(count)
+    var points = [];
+    for (var i = 0; i < count; i++) {
+      var b = document.createElement('b');
+      b.className = 'point';
+      var point = {
+        b: b,
+        mx: el_w,
+        my: el_h,
+        md: max_d,
+        cnt: count,
+        fps: fps,
+        lsec: lsec,
+        t: SimpleSpoiler.random(0, fps * lsec)
+      };
+      SimpleSpoiler.resetPoint(point);
+      SimpleSpoiler.updatePoint(point);
+      el.appendChild(b);
+      points.push(point);
+    }
+    var userAgent = window.navigator.userAgent;
+    var isSafari = !!window.safari ||
+                   !!(userAgent && (/\b(iPad|iPhone|iPod)\b/.test(userAgent) || (!!userAgent.match('Safari') && !userAgent.match('Chrome'))));
+    var isRAF = isSafari;
+    var interval = 1000 / fps;
+    var last_render = +(new Date);
+    var doRedraw = function() {
+      var now = +Date.now();
+      if (now - last_render >= interval) {
+        for (var i = 0; i < spoiler.points.length; i++) {
+          var point = spoiler.points[i];
+          if (++point.t >= fps * lsec) {
+            point.t = 0;
+            SimpleSpoiler.resetPoint(point);
+          }
+          SimpleSpoiler.updatePoint(point);
+        }
+        last_render = now;
+      }
+      if (isRAF) {
+        spoiler.raf = requestAnimationFrame(doRedraw)
+      } else {
+        var delay = interval - (now - last_render);
+        spoiler.to = setTimeout(doRedraw, delay);
+      }
+    };
+    var spoiler = {
+      points: points
+    };
+    if (isRAF) {
+      spoiler.raf = requestAnimationFrame(doRedraw)
+    } else {
+      spoiler.to = setTimeout(doRedraw, 20);
+    }
+    el._spoiler = spoiler;
+  },
+  destroy: function(el) {
+    var spoiler = el._spoiler;
+    if (spoiler.raf) {
+      cancelAnimationFrame(spoiler.raf);
+    }
+    if (spoiler.to) {
+      clearTimeout(spoiler.to);
+    }
+    for (var i = 0; i < spoiler.points.length; i++) {
+      var point = spoiler.points[i];
+      var b = point.b;
+      b.parentNode && b.parentNode.removeChild(b);
+    }
+  },
+  random: function(x, y) {
+    return x + Math.floor(Math.random() * (y + 1 - x));
+  },
+  resetPoint: function(point) {
+    var v = SimpleSpoiler.generateVector(point.cnt);
+    point.x = SimpleSpoiler.random(point.md, point.mx - point.md);
+    point.y = SimpleSpoiler.random(point.md, point.my - point.md);
+    point.dx = v.dx;
+    point.dy = v.dy;
+    point.s = SimpleSpoiler.random(60, 80) * point.my / 3600;
+  },
+  updatePoint: function(point) {
+    var b = point.b;
+    var t = point.t;
+    var d = point.fps * point.lsec / 3;
+    var k = 360 / point.lsec / point.fps
+    var x = point.x + k * t * point.dx;
+    var y = point.y + k * t * point.dy;
+    b.style.transform = 'translate(' + x + 'px, ' + y + 'px) scale(' + point.s + ')';
+    b.style.opacity = (t < d ? (t / d) : (t < d*2 ? 1 : (d*3 - t) / d)) * 0.95;
+  },
+  generateVector: function(count) {
+    var speedMax = 8;
+    var speedMin = 4;
+    var lifetime = 600;
+    var value = SimpleSpoiler.random(0, 2 * count + 2);
+    var negative = (value < count + 1);
+    var mod = (negative ? value : (value - count - 1));
+    var speed = speedMin + (((speedMax - speedMin) * mod) / count);
+    var max = Math.ceil(speedMax * lifetime);
+    var k = speed / lifetime;
+    var x = (SimpleSpoiler.random(0, 2 * max + 1) - max) / max;
+    var y = Math.sqrt(1 - x * x) * (negative ? -1 : 1);
+    return {
+      dx: k * x,
+      dy: k * y,
+    };
   }
 };
