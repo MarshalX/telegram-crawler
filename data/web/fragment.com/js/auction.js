@@ -63,6 +63,9 @@ var Main = {
           var date = new Date(datetime);
           var cur_date = new Date();
           var time_left = Math.floor((date - cur_date) / 1000);
+          if (mode == 'ago-text') {
+            time_left = -time_left;
+          }
           var ended = time_left < 0;
           if (time_left < 0) time_left = 0;
           var days = Math.floor(time_left / 86400);
@@ -98,8 +101,11 @@ var Main = {
             if (!days && !hours && (mode == 'text' || !minutes)) {
               arr.push(l('{n:# seconds|# second|# seconds}', {n: seconds}));
             }
-            arr = arr.slice(0, mode == 'text' ? 3 : 2);
-            $time.html(arr.join(' '));
+            arr = arr.slice(0, mode == 'short-text' ? 2 : (mode == 'ago-text' ? 1 : 3));
+            var text = arr.join(' ');
+            if (text != $time.text()) {
+              $time.text(text);
+            }
           }
           $(this).closest('.js-timer-wrap').toggleClass('ended', ended);
         } else {
