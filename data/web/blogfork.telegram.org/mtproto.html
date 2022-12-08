@@ -79,7 +79,7 @@ Client developers are required to comply with the Security…">
 <ul>
 <li>High-level component (API query language): defines the method whereby API queries and responses are converted to binary <em>messages</em>.</li>
 <li>Cryptographic (authorization) layer: defines the method by which messages are encrypted prior to being transmitted through the transport protocol.</li>
-<li>Transport component: defines the method for the client and the server to transmit messages over some other existing network protocol (such as HTTP, HTTPS, WS (plain websockets), WSS (websockets over HTTPS), TCP, UDP).</li>
+<li>Transport component: defines the method for the client and the server to transmit messages over some other existing network protocol (such as HTTP, HTTPS, WS (plain WebSockets), WSS (WebSockets over HTTPS), TCP, UDP).</li>
 </ul>
 <div><a href="/file/811140746/2/CzMyJPVnPo8.81605/c2310d6ede1a5e220f">
   <img src="/file/811140746/2/CzMyJPVnPo8.81605/c2310d6ede1a5e220f" alt="MTProto 2.0, server-client encryption, cloud chats" class="dev_page_image" style="max-width: 600px;" />
@@ -113,7 +113,7 @@ Client developers are required to comply with the Security…">
 <p>To prevent attackers potentially intercepting encrypted messages from decrypting them <em>post factum</em> by somehow appropriating the authorization key (for example, by stealing a device – even though in that case one could also gain access to all the information cached on the device without decrypting anything), MTProto supports <a href="https://core.telegram.org/api/pfs">Perfect Forward Secrecy</a> in both <a href="https://core.telegram.org/api/pfs">cloud chats</a> and <a href="https://core.telegram.org/api/end-to-end/pfs">secret chats</a>.</p>
 <h4><a class="anchor" name="time-synchronization" href="#time-synchronization"><i class="anchor-icon"></i></a>Time Synchronization</h4>
 <p>If client time diverges widely from server time, a server may start ignoring client messages, or vice versa, because of an invalid message identifier (which is closely related to creation time). Under these circumstances, the server will send the client a special message containing the correct time and a certain 128-bit salt (either explicitly provided by the client in a special RPC synchronization request or equal to the key of the latest message received from the client during the current session). This message could be the first one in a container that includes other messages (if the time discrepancy is significant but does not as yet result in the client&#39;s messages being ignored).</p>
-<p>Having received such a message or a container holding it, the client first performs a time synchronization (in effect, simply storing the difference between the server&#39;s time and its own to be able to compute the “correct” time in the future) and then verifies that the message identifiers for correctness.</p>
+<p>Having received such a message or a container holding it, the client first performs a time synchronization (in effect, simply storing the difference between the server&#39;s time and its own to be able to compute the “correct” time in the future) and then verifies the message identifiers for correctness.</p>
 <p>Where a correction has been neglected, the client will have to generate a new session to assure the monotonicity of message identifiers.</p>
 <h3><a class="anchor" name="mtproto-transport" href="#mtproto-transport"><i class="anchor-icon"></i></a>MTProto transport</h3>
 <p>Before being sent using the selected transport protocol, the payload has to be wrapped in a secondary protocol header, defined by the appropriate MTProto transport protocol.  </p>
@@ -144,9 +144,9 @@ Client developers are required to comply with the Security…">
 <h3><a class="anchor" name="recap" href="#recap"><i class="anchor-icon"></i></a>Recap</h3>
 <p>To recap, using the <a href="https://en.wikipedia.org/wiki/OSI_model#Layer_architecture">ISO/OSI stack as comparison</a>:  </p>
 <ul>
-<li>Layer 7 (Application): <a href="#high-level-component-rpc-query-languageapi">High-level RPC API</a></li>
+<li>Layer 7 (Application): <a href="#high-level-component-rpc-query-language-api">High-level RPC API</a></li>
 <li>Layer 6 (Presentation): <a href="/mtproto/TL">Type Language</a></li>
-<li>Layer 5 (Session): <a href="#high-level-component-rpc-query-languageapi">MTProto session</a></li>
+<li>Layer 5 (Session): <a href="https://core.telegram.org/mtproto/description#session">MTProto session</a></li>
 <li>Layer 4 (Transport):<ul>
 <li>4.3: <a href="#mtproto-transport">MTProto transport protocol</a></li>
 <li>4.2: <a href="/mtproto/mtproto-transports#transport-obfuscation">MTProto obfuscation (optional)</a></li>
