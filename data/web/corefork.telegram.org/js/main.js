@@ -401,6 +401,8 @@ function initScrollVideos(desktop) {
       videoEl.playsinline = true;
       videoEl.setAttribute('autoplay', 'autoplay');
       videoEl.setAttribute('playsinline', 'playsinline');
+      videoEl.controls = false;
+      videoEl.removeAttribute('controls');
     }
     var posterUrl = videoEl.poster;
     if (posterUrl && isSafari) {
