@@ -1320,7 +1320,7 @@
     };
     WebView.postEvent('web_app_open_scan_qr_popup', false, popup_params);
   };
-  WebApp.readTextFromClipboard = function () {
+  WebApp.readTextFromClipboard = function (callback) {
     if (!versionAtLeast('6.4')) {
       console.error('[Telegram.WebApp] Method readTextFromClipboard is not supported in version ' + webAppVersion);
       throw Error('WebAppMethodUnsupported');
