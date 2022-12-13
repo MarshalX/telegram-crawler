@@ -147,13 +147,13 @@ var DemoApp = {
     return false;
   },
   testClipboard: function(el) {
-    if (navigator.clipboard) {
-      navigator.clipboard.readText().then(function(clipText) {
+    Telegram.WebApp.readTextFromClipboard(function(clipText) {
+      if (clipText === null) {
+        $(el).next('span').html('Clipboard text unavailable.').attr('class', 'err');
+      } else {
         $(el).next('span').text('(Read from clipboard: «' + clipText + '»)').attr('class', 'ok');
-      });
-    } else {
-      $(el).next('span').html('Clipboard is not available in this browser.').attr('class', 'err');
-    }
+      }
+    });
     return false;
   },
   toggleMainButton: function(el) {
@@ -185,6 +185,15 @@ var DemoApp = {
         DemoApp.showAlert("'Delete all' selected");
       } else if (button_id == 'faq') {
         Telegram.WebApp.openLink('https://telegram.org/faq');
+      }
+    });
+  },
+  showScanQrPopup: function() {
+    Telegram.WebApp.showScanQrPopup({
+      text: 'for test purposes'
+    }, function(text) {
+      if (text !== null) {
+        DemoApp.showAlert(text);
       }
     });
   },

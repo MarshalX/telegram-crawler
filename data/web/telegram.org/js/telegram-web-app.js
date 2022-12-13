@@ -408,6 +408,14 @@
     Utils.sessionStorageSet('themeParams', themeParams);
   }
 
+  function generateId(len) {
+    var id = '', chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', chars_len = chars.length;
+    for (var i = 0; i < len; i++) {
+      id += chars[Math.floor(Math.random() * chars_len)];
+    }
+    return id;
+  }
+
   var viewportHeight = false, viewportStableHeight = false, isExpanded = true;
   function setViewportHeight(data) {
     if (typeof data !== 'undefined') {
@@ -974,6 +982,42 @@
     }
   }
 
+  var webAppScanQrPopupOpened = false;
+  function onScanQrPopupClosed(eventType, eventData) {
+    if (webAppScanQrPopupOpened) {
+      var popupData = webAppScanQrPopupOpened;
+      webAppScanQrPopupOpened = false;
+      var data = null;
+      if (typeof eventData.data !== 'undefined') {
+        data = eventData.data;
+      }
+      if (popupData.callback) {
+        popupData.callback(data);
+      }
+      receiveWebViewEvent('scanQrPopupClosed', {
+        data: data
+      });
+    }
+  }
+
+  var webAppClipboardRequests = {};
+  function onClipboardTextReceived(eventType, eventData) {
+    if (eventData.req_id && webAppClipboardRequests[eventData.req_id]) {
+      var requestData = webAppClipboardRequests[eventData.req_id];
+      delete webAppClipboardRequests[eventData.req_id];
+      var data = null;
+      if (typeof eventData.data !== 'undefined') {
+        data = eventData.data;
+      }
+      if (requestData.callback) {
+        requestData.callback(data);
+      }
+      receiveWebViewEvent('clipboardTextReceived', {
+        data: data
+      });
+    }
+  }
+
   if (!window.Telegram) {
     window.Telegram = {};
   }
@@ -1072,7 +1116,7 @@
     }
     WebView.postEvent('web_app_data_send', false, {data: data});
   };
-  WebApp.openLink = function (url) {
+  WebApp.openLink = function (url, options) {
     var a = document.createElement('A');
     a.href = url;
     if (a.protocol != 'http:' &&
@@ -1081,8 +1125,9 @@
       throw Error('WebAppTgUrlInvalid');
     }
     var url = a.href;
+    options = options || {};
     if (versionAtLeast('6.1')) {
-      WebView.postEvent('web_app_open_link', false, {url: url});
+      WebView.postEvent('web_app_open_link', false, {url: url, try_instant_view: versionAtLeast('6.4') && !!options.try_instant_view});
     } else {
       window.open(url, '_blank');
     }
@@ -1248,6 +1293,45 @@
       callback(button_id == 'ok');
     } : null);
   };
+  WebApp.showScanQrPopup = function (params, callback) {
+    if (!versionAtLeast('6.4')) {
+      console.error('[Telegram.WebApp] Method showScanQrPopup is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    if (webAppScanQrPopupOpened) {
+      console.error('[Telegram.WebApp] Popup is already opened');
+      throw Error('WebAppScanQrPopupOpened');
+    }
+    var text = '';
+    var popup_params = {};
+    if (typeof params.text !== 'undefined') {
+      text = strTrim(params.text);
+      if (text.length > 64) {
+        console.error('[Telegram.WebApp] Scan QR popup text is too long', text);
+        throw Error('WebAppScanQrPopupParamInvalid');
+      }
+      if (text.length > 0) {
+        popup_params.text = text;
+      }
+    }
+
+    webAppScanQrPopupOpened = {
+      callback: callback
+    };
+    WebView.postEvent('web_app_open_scan_qr_popup', false, popup_params);
+  };
+  WebApp.readTextFromClipboard = function () {
+    if (!versionAtLeast('6.4')) {
+      console.error('[Telegram.WebApp] Method readTextFromClipboard is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    var req_id = generateId(16);
+    var req_params = {req_id: req_id};
+    webAppClipboardRequests[req_id] = {
+      callback: callback
+    };
+    WebView.postEvent('web_app_read_text_from_clipboard', false, req_params);
+  };
   WebApp.ready = function () {
     WebView.postEvent('web_app_ready');
   };
@@ -1272,6 +1356,8 @@
   WebView.onEvent('viewport_changed', onViewportChanged);
   WebView.onEvent('invoice_closed', onInvoiceClosed);
   WebView.onEvent('popup_closed', onPopupClosed);
+  WebView.onEvent('scan_qr_popup_closed', onScanQrPopupClosed);
+  WebView.onEvent('clipboard_text_received', onClipboardTextReceived);
   WebView.postEvent('web_app_request_theme');
   WebView.postEvent('web_app_request_viewport');
 
