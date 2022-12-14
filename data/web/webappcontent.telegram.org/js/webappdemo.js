@@ -188,12 +188,22 @@ var DemoApp = {
       }
     });
   },
-  showScanQrPopup: function() {
+  showScanQrPopup: function(links_only) {
     Telegram.WebApp.showScanQrPopup({
-      text: 'for test purposes'
+      text: links_only ? 'with any link' : 'for test purposes'
     }, function(text) {
-      if (text !== null) {
+      if (links_only) {
+        var lower_text = text.toSting().toLowerCase();
+        if (lower_text.substr(0, 7) == 'http://' ||
+            lower_text.substr(0, 8) == 'https://') {
+          setTimeout(function() {
+            Telegram.WebApp.openLink(text);
+          }, 50);
+          return true;
+        }
+      } else {
         DemoApp.showAlert(text);
+        return true;
       }
     });
   },

@@ -983,21 +983,26 @@
   }
 
   var webAppScanQrPopupOpened = false;
-  function onScanQrPopupClosed(eventType, eventData) {
+  function onQrTextReceived(eventType, eventData) {
     if (webAppScanQrPopupOpened) {
       var popupData = webAppScanQrPopupOpened;
-      webAppScanQrPopupOpened = false;
       var data = null;
       if (typeof eventData.data !== 'undefined') {
         data = eventData.data;
       }
       if (popupData.callback) {
-        popupData.callback(data);
+        if (popupData.callback(data)) {
+          webAppScanQrPopupOpened = false;
+          WebView.postEvent('web_app_close_scan_qr_popup', false);
+        }
       }
-      receiveWebViewEvent('scanQrPopupClosed', {
+      receiveWebViewEvent('qrTextReceived', {
         data: data
       });
     }
+  }
+  function onScanQrPopupClosed(eventType, eventData) {
+    webAppScanQrPopupOpened = false;
   }
 
   var webAppClipboardRequests = {};
@@ -1320,6 +1325,15 @@
     };
     WebView.postEvent('web_app_open_scan_qr_popup', false, popup_params);
   };
+  WebApp.closeScanQrPopup = function () {
+    if (!versionAtLeast('6.4')) {
+      console.error('[Telegram.WebApp] Method closeScanQrPopup is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+
+    webAppScanQrPopupOpened = false;
+    WebView.postEvent('web_app_close_scan_qr_popup', false);
+  };
   WebApp.readTextFromClipboard = function (callback) {
     if (!versionAtLeast('6.4')) {
       console.error('[Telegram.WebApp] Method readTextFromClipboard is not supported in version ' + webAppVersion);
@@ -1356,6 +1370,7 @@
   WebView.onEvent('viewport_changed', onViewportChanged);
   WebView.onEvent('invoice_closed', onInvoiceClosed);
   WebView.onEvent('popup_closed', onPopupClosed);
+  WebView.onEvent('qr_text_received', onQrTextReceived);
   WebView.onEvent('scan_qr_popup_closed', onScanQrPopupClosed);
   WebView.onEvent('clipboard_text_received', onClipboardTextReceived);
   WebView.postEvent('web_app_request_theme');
