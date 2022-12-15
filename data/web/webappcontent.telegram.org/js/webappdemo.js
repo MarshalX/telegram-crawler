@@ -193,7 +193,7 @@ var DemoApp = {
       text: links_only ? 'with any link' : 'for test purposes'
     }, function(text) {
       if (links_only) {
-        var lower_text = text.toSting().toLowerCase();
+        var lower_text = text.toString().toLowerCase();
         if (lower_text.substr(0, 7) == 'http://' ||
             lower_text.substr(0, 8) == 'https://') {
           setTimeout(function() {
