@@ -45,11 +45,13 @@ var Main = {
   },
   initForm: function(form) {
     var $form = $(form);
+    $('.form-control:has(+.form-control-hint)', $form).on('keyup change input', Main.eUpdateFieldHint);
     $('.js-amount-input', $form).on('keyup change input', Main.eUpdateAmountField);
     $('.js-amount-input', $form).trigger('input');
   },
   destroyForm: function(form) {
     var $form = $(form);
+    $('.form-control:has(+.form-control-hint)', $form).off('keyup change input', Main.eUpdateFieldHint);
     $('.js-amount-input', $form).off('keyup change input', Main.eUpdateAmountField);
   },
   updateTime: function() {
@@ -286,6 +288,11 @@ var Main = {
       return float_value;
     }
   },
+  eUpdateFieldHint: function(e) {
+    var $fieldEl = $(this);
+    var has_value = $fieldEl.value().length > 0;
+    $('+.form-control-hint', $fieldEl).toggle(has_value);
+  },
   eUpdateAmountField: function(e) {
     var $fieldEl = $(this);
     var minValue = $fieldEl.attr('data-min') || null;
@@ -312,7 +319,7 @@ var Main = {
         }
         has_decimal = true;
         new_value += decPoint;
-      } else if (char >= '0' && char <= '9' && (!has_decimal || decimal_len < decimals)) {
+      } else if (char >= '0' && char <= '9' && chars_len < 12 && (!has_decimal || decimal_len < decimals)) {
         new_value += char;
         if (has_decimal) decimal_len++;
         else chars_len++;
@@ -364,9 +371,6 @@ var Main = {
     return formatNumber(value, dec.length, '.', field_format ? '' : ',');
   },
   wrapUsdAmount: function(value, field_format) {
-    if (!value) {
-      return '';
-    }
     value = Math.round(value * Aj.state.tonRate * 100) / 100;
     return formatNumber(value, (value % 1) && value < 1000 ? 2 : 0, '.', field_format ? '' : ',');
   },
@@ -564,6 +568,8 @@ var Auction = {
       var cont = Aj.ajContainer;
       $(cont).on('click.curPage', '.js-place-bid-btn', Auction.ePlaceBid);
       $(cont).on('submit.curPage', '.js-place-bid-form', Auction.ePlaceBidSubmit);
+      $(cont).on('click.curPage', '.js-make-offer-btn', Auction.eMakeOffer);
+      $(cont).on('submit.curPage', '.js-make-offer-form', Auction.eMakeOfferSubmit);
       $(cont).on('click.curPage', '.js-buy-now-btn', Auction.eBuyNow);
       $(cont).on('click.curPage', '.js-subscribe-btn', Auction.eSubscribe);
       $(cont).on('click.curPage', '.js-unsubscribe-btn', Auction.eUnsubscribe);
@@ -572,6 +578,9 @@ var Auction = {
       state.$bidPopup = $('.js-place-bid-popup');
       state.$bidForm = $('.js-place-bid-form');
       Main.initForm(state.$bidForm);
+      state.$makeOfferPopup = $('.js-make-offer-popup');
+      state.$makeOfferForm = $('.js-make-offer-form');
+      Main.initForm(state.$makeOfferForm);
       state.needUpdate = true;
       state.updLastReq = +Date.now();
       state.updStateTo = setTimeout(Auction.updateState, Main.UPDATE_PERIOD);
@@ -592,13 +601,17 @@ var Auction = {
       Aj.apiRequest('updateAuction', {
         type: Aj.state.type,
         username: Aj.state.username,
-        lt: Aj.state.auctionLastLt
+        lt: Aj.state.auctionLastLt,
+        lv: Aj.state.auctionLastVer
       }, function(result) {
         if (result.html) {
           $('.js-main-content').html(result.html);
         }
         if (result.lt) {
           Aj.state.auctionLastLt = result.lt;
+        }
+        if (result.lv) {
+          Aj.state.auctionLastVer = result.lv;
         }
         if (Aj.state.needUpdate) {
           Aj.state.updStateTo = setTimeout(Auction.updateState, Main.UPDATE_PERIOD);
@@ -683,6 +696,76 @@ var Auction = {
       onConfirm: function(by_server) {
         if (by_server) {
           showAlert(l('WEB_BUY_NOW_SENT'));
+        }
+      }
+    });
+  },
+  eMakeOffer: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    Aj.apiRequest('initOfferRequest', {
+      type: Aj.state.type,
+      username: Aj.state.username
+    }, function(result) {
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      Aj.state.offerFeeMin = result.min_fee;
+      Aj.state.$makeOfferForm.field('id').value(result.req_id);
+      var eUpdateOfferFee = function(e) {
+        var amount  = Main.amountFieldValue(Aj.state.$makeOfferForm, 'amount_value');
+        var mult    = Aj.state.offerFeeMult;
+        var fee     = Math.ceil(amount * mult);
+        var fee_val = Math.max(Aj.state.offerFeeMin, Math.min(fee, Aj.state.offerFeeMax));
+        Aj.state.offerFee = fee_val;
+        $('.js-amount_fee', Aj.state.$makeOfferForm).html(Main.wrapTonAmount(fee_val));
+      };
+      openPopup(Aj.state.$makeOfferPopup, {
+        onOpen: function() {
+          Aj.state.$makeOfferForm.reset();
+          var $amountField = Aj.state.$makeOfferForm.field('amount_value');
+          $amountField.on('keyup change input', eUpdateOfferFee);
+          $amountField.trigger('input').focusAndSelect();
+        },
+        onClose: function() {
+          var $amountField = Aj.state.$makeOfferForm.field('amount_value');
+          $amountField.off('keyup change input', eUpdateOfferFee);
+        }
+      });
+    });
+  },
+  eMakeOfferSubmit: function(e) {
+    e.preventDefault();
+    var $form = $(this);
+    var item_title = Aj.state.itemTitle;
+    var req_id = $form.field('id').value();
+    var amount = Main.amountFieldValue($form, 'amount_value');
+    if (amount === false) {
+      $form.field('amount_value').focus();
+      return;
+    }
+    closePopup(Aj.state.$makeOfferPopup);
+    QR.showPopup({
+      request: {
+        method: 'getOfferLink',
+        params: {
+          id: req_id,
+          amount: amount
+        }
+      },
+      title: l('WEB_POPUP_QR_OFFER_HEADER'),
+      description: l('WEB_POPUP_QR_OFFER_TEXT', {
+        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Main.wrapTonAmount(Aj.state.offerFee) + '</span>'
+      }),
+      qr_label: item_title,
+      tk_label: l('WEB_POPUP_QR_OFFER_TK_BUTTON'),
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
+      onDataUpdate: function(data) {
+        $('.js-amount_fee', this).html(Main.wrapTonAmount(data.fee));
+      },
+      onConfirm: function(by_server) {
+        if (by_server) {
+          showAlert(l('WEB_OFFER_REQUEST_MADE'));
         }
       }
     });
@@ -1421,6 +1504,7 @@ var QR = {
       data: null,
       request: null,
       onConfirm: null,
+      onDataUpdate: null,
       onExpire: null
     }, options);
     var ua = (navigator.userAgent || '').toLowerCase(),
@@ -1474,6 +1558,9 @@ var QR = {
       });
       if (expTimeout = $popup.data('expTimeout')) {
         clearTimeout(expTimeout);
+      }
+      if (options.onDataUpdate) {
+        options.onDataUpdate.call($popup.get(0), data);
       }
       if (data.expire_after) {
         expTimeout = setTimeout(onExpire, data.expire_after * 1000);
