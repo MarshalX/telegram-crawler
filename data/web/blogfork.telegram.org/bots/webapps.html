@@ -57,6 +57,12 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="december-30-2022" href="#december-30-2022"><i class="anchor-icon"></i></a>December 30, 2022</h4>
+<p><strong>Bot API 6.4</strong></p>
+<ul>
+<li>Added the field <em>platform</em>, the optional parameter <em>options</em> to the method <em>openLink</em> and the methods <em>showScanQrPopup</em>, <em>closeScanQrPopup</em>, <em>readTextFromClipboard</em> to the class <a href="#initializing-web-apps">WebApp</a>.</li>
+<li>Added the events <em>qrTextReceived</em>, <em>clipboardTextReceived</em>.</li>
+</ul>
 <h4><a class="anchor" name="august-12-2022" href="#august-12-2022"><i class="anchor-icon"></i></a>August 12, 2022</h4>
 <p><strong>Bot API 6.2</strong></p>
 <ul>
@@ -192,6 +198,11 @@
 <td>The version of the Bot API available in the user&#39;s Telegram app.</td>
 </tr>
 <tr>
+<td>platform <sup><mark>NEW</mark></sup></td>
+<td>String</td>
+<td>The name of the platform of the user&#39;s Telegram app.</td>
+</tr>
+<tr>
 <td>colorScheme</td>
 <td>String</td>
 <td>The color scheme currently used in the Telegram app. Either “light” or “dark”.<br>Also available as the CSS variable <code>var(--tg-color-scheme)</code>.</td>
@@ -227,7 +238,7 @@
 <td>Current background color in the <code>#RRGGBB</code> format.</td>
 </tr>
 <tr>
-<td>isClosingConfirmationEnabled <sup><mark>NEW</mark></sup></td>
+<td>isClosingConfirmationEnabled</td>
 <td>Boolean</td>
 <td><em>True</em>, if the confirmation dialog is enabled while the user is trying to close the Web App. <em>False</em>, if the confirmation dialog is disabled.</td>
 </tr>
@@ -262,12 +273,12 @@
 <td><mark>Bot API 6.1+</mark> A method that sets the app background color in the <code>#RRGGBB</code> format or you can use keywords <em>bg_color</em>, <em>secondary_bg_color</em> instead.</td>
 </tr>
 <tr>
-<td>enableClosingConfirmation() <sup><mark>NEW</mark></sup></td>
+<td>enableClosingConfirmation()</td>
 <td>Function</td>
 <td><mark>Bot API 6.2+</mark> A method that enables a confirmation dialog while the user is trying to close the Web App.</td>
 </tr>
 <tr>
-<td>disableClosingConfirmation() <sup><mark>NEW</mark></sup></td>
+<td>disableClosingConfirmation()</td>
 <td>Function</td>
 <td><mark>Bot API 6.2+</mark> A method that disables the confirmation dialog while the user is trying to close the Web App.</td>
 </tr>
@@ -287,9 +298,9 @@
 <td>A method used to send data to the bot. When this method is called, a service message is sent to the bot containing the data <em>data</em> of the length up to 4096 bytes, and the Web App is closed. See the field <em>web_app_data</em> in the class <a href="/bots/api#message">Message</a>.<br><br><em>This method is only available for Web Apps launched via a <a href="#keyboard-button-web-apps">Keyboard button</a>.</em></td>
 </tr>
 <tr>
-<td>openLink(url)</td>
+<td>openLink(url[, options])</td>
 <td>Function</td>
-<td>A method that opens a link in an external browser. The Web App will <em>not</em> be closed.<br><br><em>Note that this method can be called only in response to the user interaction with the Web App interface (e.g. click inside the Web App or on the main button)</em></td>
+<td>A method that opens a link in an external browser. The Web App will <em>not</em> be closed.<br><mark>Bot API 6.4+</mark> If the optional <em>options</em> parameter is passed with the field <em>try_instant_view=true</em>, the link will be opened in <a href="https://instantview.telegram.org/">Instant View</a> mode if possible.<br><br><em>Note that this method can be called only in response to user interaction with the Web App interface (e.g. a click inside the Web App or on the main button)</em></td>
 </tr>
 <tr>
 <td>openTelegramLink(url)</td>
@@ -302,19 +313,34 @@
 <td><mark>Bot API 6.1+</mark> A method that opens an invoice using the link <em>url</em>. The Web App will receive the <a href="#events-available-for-web-apps">event</a> <em>invoiceClosed</em> when the invoice is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the invoice status will be passed as the first argument.</td>
 </tr>
 <tr>
-<td>showPopup(params[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>showPopup(params[, callback])</td>
 <td>Function</td>
 <td><mark>Bot API 6.2+</mark> A method that shows a native popup described by the <em>params</em> argument of the type <a href="#popupparams">PopupParams</a>. The Web App will receive the <a href="#events-available-for-web-apps">event</a> <em>popupClosed</em> when the popup is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the field <em>id</em> of the pressed button will be passed as the first argument.</td>
 </tr>
 <tr>
-<td>showAlert(message[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>showAlert(message[, callback])</td>
 <td>Function</td>
 <td><mark>Bot API 6.2+</mark> A method that shows <em>message</em> in a simple alert with a &#39;Close&#39; button. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed.</td>
 </tr>
 <tr>
-<td>showConfirm(message[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>showConfirm(message[, callback])</td>
 <td>Function</td>
 <td><mark>Bot API 6.2+</mark> A method that shows <em>message</em> in a simple confirmation window with &#39;OK&#39; and &#39;Cancel&#39; buttons. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed and the first argument will be a boolean indicating whether the user pressed the &#39;OK&#39; button.</td>
+</tr>
+<tr>
+<td>showScanQrPopup(params[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.4+</mark> A method that shows a native popup for scanning a QR code described by the <em>params</em> argument of the type <a href="#scanqrpopupparams">ScanQrPopupParams</a>. The Web App will receive the <a href="#events-available-for-web-apps">event</a> <em>qrTextReceived</em> every time the scanner catches a code with text data. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the text from the QR code will be passed as the first argument. Returning <em>true</em> inside this callback function causes the popup to be closed.</td>
+</tr>
+<tr>
+<td>closeScanQrPopup() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.4+</mark> A method that closes the native popup for scanning a QR code opened with the <em>showScanQrPopup</em> method. Run it if you received valid data in the <a href="#events-available-for-web-apps">event</a> <em>qrTextReceived</em>.</td>
+</tr>
+<tr>
+<td>readTextFromClipboard([callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.4+</mark> A method that requests text from the clipboard. The Web App will receive the <a href="#events-available-for-web-apps">event</a> <em>clipboardTextReceived</em>. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the text from the clipboard will be passed as the first argument.<br><br><em>Note: this method can be called only for Web Apps launched from the attachment menu and only in response to a user interaction with the Web App interface (e.g. a click inside the Web App or on the main button).</em></td>
 </tr>
 <tr>
 <td>ready()</td>
@@ -386,7 +412,7 @@
 </div>
 
 <h4><a class="anchor" name="popupparams" href="#popupparams"><i class="anchor-icon"></i></a>PopupParams</h4>
-<p><sup><mark>NEW</mark></sup> This object describes the native popup.</p>
+<p>This object describes the native popup.</p>
 <table class="table">
 <thead>
 <tr>
@@ -413,8 +439,26 @@
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="scanqrpopupparams" href="#scanqrpopupparams"><i class="anchor-icon"></i></a>ScanQrPopupParams</h4>
+<p><sup><mark>NEW</mark></sup> This object describes the native popup for scanning QR codes.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed under the &#39;Scan QR&#39; heading, 0-64 characters.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="popupbutton" href="#popupbutton"><i class="anchor-icon"></i></a>PopupButton</h4>
-<p><sup><mark>NEW</mark></sup> This object describes the native popup button.</p>
+<p>This object describes the native popup button.</p>
 <table class="table">
 <thead>
 <tr>
@@ -698,7 +742,7 @@
 <td><em>Optional</em>. <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF language tag</a> of the user&#39;s language. Returns in <em>user</em> field only.</td>
 </tr>
 <tr>
-<td>is_premium <sup><mark>NEW</mark></sup></td>
+<td>is_premium</td>
 <td>True</td>
 <td><em>Optional</em>. <em>True</em>, if this user is a Telegram Premium user</td>
 </tr>
@@ -794,8 +838,16 @@ if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
 <td><mark>Bot API 6.1+</mark> Occurrs when the opened invoice is closed.<br><em>eventHandler</em> receives an object with the two fields: <em>url</em> – invoice link provided and <em>status</em> – one of the invoice statuses:<br>- <strong>paid</strong> – invoice was paid successfully,<br>- <strong>cancelled</strong> – user closed this invoice without paying,<br>- <strong>failed</strong> – user tried to pay, but the payment was failed,<br>- <strong>pending</strong> – the payment is still processing. The bot will receive a service message about a <a href="https://core.telegram.org/bots/api#successfulpayment">successful payment</a> when the payment is successfully paid.</td>
 </tr>
 <tr>
-<td><code>popupClosed</code> <sup><mark>NEW</mark></sup></td>
+<td><code>popupClosed</code></td>
 <td><mark>Bot API 6.2+</mark> Occurrs when the opened popup is closed.<br><em>eventHandler</em> receives an object with the single field <em>button_id</em> – the value of the field <em>id</em> of the pressed button. If no buttons were pressed, the field <em>button_id</em> will be <em>null</em>.</td>
+</tr>
+<tr>
+<td><code>qrTextReceived</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 6.4+</mark> Occurs when the QR code scanner catches a code with text data.<br><em>eventHandler</em> receives an object with the single field <em>data</em> containing text data from the QR code.</td>
+</tr>
+<tr>
+<td><code>clipboardTextReceived</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 6.4+</mark> Occurrs when the <code>readTextFromClipboard</code> method is called.<br><em>eventHandler</em> receives an object with the single field <em>data</em> containing text data from the clipboard. If the clipboard contains non-text data, the field <em>data</em> will be an empty string. If the Web App has no access to the clipboard, the field <em>data</em> will be <em>null</em>.</td>
 </tr>
 </tbody>
 </table>
