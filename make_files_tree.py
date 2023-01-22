@@ -145,7 +145,7 @@ async def track_additional_files(
 
 
 async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.ClientSession):
-    parameterized_url = 'apps/keepcoder/telegram-swift/distribution_groups/public'
+    parameterized_url = 'apps/keepcoder/Telergam-Beta-Updated/distribution_groups/public'
     download_url = await get_download_link_of_latest_appcenter_release(parameterized_url, session)
 
     if not download_url:
