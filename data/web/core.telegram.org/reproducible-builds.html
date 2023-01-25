@@ -161,7 +161,7 @@ Otherwise, something went wrong.
 </blockquote>
 <p>To provide a stable and easily reproducible environment, Telegram iOS builds are compiled on a virtual machine. Parallels is used to verify the builds.</p>
 <blockquote>
-<p>Due to recent changes introduced in <strong>XCode 14</strong> by Apple, the instruction below doesn&#39;t work at the moment. <strong>We will update this page as soon as Apple resolves the issue.</strong> <a href="#troubleshooting-ios">Read more about the issue</a> </p>
+<p>Despite the compiler bugs introduced by Apple in <strong>Xcode 14</strong> (<a href="#troubleshooting-ios">read more</a>), we were able to restore deterministic builds using manually crafted linker flags. Use the steps below to verify builds compiled with XCode 13 and below, <a href="#ios-xcode-14">see here for XCode 14 instructions</a>.</p>
 </blockquote>
 <h3><a class="anchor" name="step-1-install-the-parallels-virtual-machine" href="#step-1-install-the-parallels-virtual-machine"><i class="anchor-icon"></i></a>Step 1. Install the Parallels virtual machine</h3>
 <p>Parallels can be obtained <a href="https://www.parallels.com/">here</a>, it features a fully-functional trial version.</p>
@@ -393,6 +393,31 @@ BAZEL=&quot;$HOME/bazel/bazel&quot; sh buildbox/build-telegram.sh verify</code><
     <a href="/file/464001384/3/iSp-75NOtIU.58868/7b08b99752cdf7dd22" target="_blank"><img src="/file/464001384/3/iSp-75NOtIU.58868/7b08b99752cdf7dd22" title="Mismatching IPAs"  /></a>
 </div>
 
+<hr>
+<h4><a class="anchor" name="ios-xcode-14" href="#ios-xcode-14"><i class="anchor-icon"></i></a>iOS, XCode 14</h4>
+<p>Due to compiler bugs introduced by Apple in <strong>Xcode 14</strong> (<a href="#troubleshooting-ios">read more</a>), you will need to use the modified instructions below to verify the latest builds:</p>
+<p><strong>Remove steps 6, 7</strong></p>
+<p><strong>Steps 1-4.1</strong> are replaced with:</p>
+<h5><a class="anchor" name="running-darwin-containers" href="#running-darwin-containers"><i class="anchor-icon"></i></a>Running Darwin-Containers:</h5>
+<ol>
+<li>Checkout the latest DarwinContainers code: <code>git clone https://github.com/ali-fareed/darwin-containers.git</code></li>
+<li>Open darwin-containers/DarwinContainers.xcodeproj</li>
+<li>Select DarwinContainersDaemon target</li>
+<li>In Signing &amp; Capabilities select your team and set a unique bundle id</li>
+<li>Run</li>
+</ol>
+<h5><a class="anchor" name="creating-an-os-image" href="#creating-an-os-image"><i class="anchor-icon"></i></a>Creating an OS image:</h5>
+<p><code>./darwin-containers fetch</code></p>
+<p>Download the appropriate macOS restore image (e.g. 13.0):</p>
+<p><code>./darwin-containers fetch &quot;macOS 13.0&quot;</code></p>
+<p>Create a new OS image:</p>
+<p><code>./darwin-containers create --source &quot;macOS 13.0&quot; --tag &quot;macos-13.0-xcode-14.1&quot; --manual</code></p>
+<p>Follow the installation instructions. Set username to <code>containerhost</code> and password to <code>containerhost</code>.<br>Enable Remote Login and allow full disk access for remote users.<br>Connect to the guest VM using SSH with username <code>containerhost</code> and password <code>containerhost</code>.<br>Create directory <code>~/.ssh</code> and set up the <code>authorized_keys</code> using the public key string printed by the <code>darwin-containers create</code> command earlier.<br>Upload the appropriate version of Xcode via <code>scp</code> and install to /Applications. Run it at least once to complete installation.<br>Shutdown the guest OS.</p>
+<h5><a class="anchor" name="obtaining-verification-ipa" href="#obtaining-verification-ipa"><i class="anchor-icon"></i></a>Obtaining verification IPA:</h5>
+<p><code>python3 -u build-system/Make/Make.py remote-build --darwinContainers=&quot;path-to-darwin-containers-script&quot; --darwinContainersHost=&quot;unix://$HOME/.darwin-containers.sock&quot; --configurationPath=&quot;build-system/appstore-configuration.json&quot; --codesigningInformationPath=build-system/fake-codesigning --configuration=release_arm64</code></p>
+<p>For more information see:</p>
+<p><code>build-system/Make/RemoteBuild.py</code><br><code>.gitlab-ci.yml</code> lane <code>verify_beta_testflight</code></p>
+<hr>
 <h3><a class="anchor" name="ios-notes" href="#ios-notes"><i class="anchor-icon"></i></a>iOS: Notes</h3>
 <ol>
 <li><p>You will get a warning if the archive created in <a href="#step-7-building-the-app">Step 7</a> contains encrypted files. If all these files are in the <code>PlugIns</code> subfolder, they represent various system extensions (e.g. external sharing, Siri, 3D touch). Decrypting such files using existing ways of receiving app archives via Jailbreak is non-trivial (but we&#39;re working on resolving this issue). If you do manage to decrypt them, e.g. on iOS 8, they will be matched.</p>
@@ -417,6 +442,9 @@ BAZEL=&quot;$HOME/bazel/bazel&quot; sh buildbox/build-telegram.sh verify</code><
 </li>
 </ol>
 <h3><a class="anchor" name="troubleshooting-ios" href="#troubleshooting-ios"><i class="anchor-icon"></i></a>Troubleshooting: iOS</h3>
+<blockquote>
+<p><strong>UPD:</strong> Despite the fact that the issue below persists, we were able to restore deterministic builds using manually crafted linker flags. See these updated <a href="#ios-xcode-14">steps for XCode 14</a>.</p>
+</blockquote>
 <p>Due to recent changes introduced in <strong>XCode 14</strong> by <strong>Apple</strong>, it is currently not possible to create <a href="#reproducible-builds-for-ios">reproducible builds for iOS</a> using tools officially supported by Apple. <strong>We will update this page as soon as Apple resolves the issue.</strong></p>
 <p>To confirm the issue for yourself, follow these steps:</p>
 <ol>
