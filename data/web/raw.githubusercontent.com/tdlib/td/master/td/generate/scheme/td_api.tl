@@ -50,6 +50,17 @@ authenticationCodeTypeMissedCall phone_number_prefix:string length:int32 = Authe
 //@length Length of the code
 authenticationCodeTypeFragment url:string length:int32 = AuthenticationCodeType;
 
+//@description An authentication code is delivered via Firebase Authentication to the official Android application
+//@nonce Nonce to pass to the SafetyNet Attestation API
+//@length Length of the code
+authenticationCodeTypeFirebaseAndroid nonce:bytes length:int32 = AuthenticationCodeType;
+
+//@description An authentication code is delivered via Firebase Authentication to the official iOS application
+//@receipt Receipt of successful applikation token validation to compare with receipt from push notification
+//@push_timeout Time after the next authentication method is supposed to be used if verification push notification isn't received, in seconds
+//@length Length of the code
+authenticationCodeTypeFirebaseIos receipt:string push_timeout:int32 length:int32 = AuthenticationCodeType;
+
 
 //@description Information about the authentication code that was sent
 //@phone_number A phone number that is being authenticated
@@ -310,7 +321,8 @@ stickerFullTypeMask mask_position:maskPosition = StickerFullType;
 
 //@description The sticker is a custom emoji to be used inside message text and caption. Currently, only Telegram Premium users can use custom emoji
 //@custom_emoji_id Identifier of the custom emoji
-//@needs_repainting True, if the sticker must be repainted to a text color in messages, the color of the Telegram Premium badge in emoji status, or another appropriate color in other places
+//@needs_repainting True, if the sticker must be repainted to a text color in messages, the color of the Telegram Premium badge in emoji status, or another appropriate color in other places.
+//-The sticker must not be repainted on chat photos
 stickerFullTypeCustomEmoji custom_emoji_id:int64 needs_repainting:Bool = StickerFullType;
 
 
@@ -377,6 +389,7 @@ document file_name:string mime_type:string minithumbnail:minithumbnail thumbnail
 photo has_stickers:Bool minithumbnail:minithumbnail sizes:vector<photoSize> = Photo;
 
 //@description Describes a sticker
+//@id Unique sticker identifier within the set; 0 if none
 //@set_id The identifier of the sticker set to which the sticker belongs; 0 if none
 //@width Sticker width; as defined by the sender
 //@height Sticker height; as defined by the sender
@@ -386,7 +399,7 @@ photo has_stickers:Bool minithumbnail:minithumbnail sizes:vector<photoSize> = Ph
 //@outline Sticker's outline represented as a list of closed vector paths; may be empty. The coordinate system origin is in the upper-left corner
 //@thumbnail Sticker thumbnail in WEBP or JPEG format; may be null
 //@sticker File containing the sticker
-sticker set_id:int64 width:int32 height:int32 emoji:string format:StickerFormat full_type:StickerFullType outline:vector<closedVectorPath> thumbnail:thumbnail sticker:file = Sticker;
+sticker id:int64 set_id:int64 width:int32 height:int32 emoji:string format:StickerFormat full_type:StickerFullType outline:vector<closedVectorPath> thumbnail:thumbnail sticker:file = Sticker;
 
 //@description Describes a video file
 //@duration Duration of the video, in seconds; as defined by the sender
@@ -527,6 +540,23 @@ botMenuButton text:string url:string = BotMenuButton;
 chatLocation location:location address:string = ChatLocation;
 
 
+//@class ChatPhotoStickerType @description Describes type of a sticker, which was used to create a chat photo
+
+//@description Information about the sticker, which was used to create the chat photo
+//@sticker_set_id Sticker set identifier
+//@sticker_id Identifier of the sticker in the set
+chatPhotoStickerTypeRegularOrMask sticker_set_id:int64 sticker_id:int64 = ChatPhotoStickerType;
+
+//@description Information about the custom emoji, which was used to create the chat photo
+//@custom_emoji_id Identifier of the custom emoji
+chatPhotoStickerTypeCustomEmoji custom_emoji_id:int64 = ChatPhotoStickerType;
+
+
+//@description Information about the sticker, which was used to create the chat photo. The sticker is shown at the center of the photo and occupies at most 67% of it
+//@type Type of the sticker
+//@background_fill The fill to be used as background for the sticker; rotation angle in backgroundFillGradient isn't supported
+chatPhotoSticker type:ChatPhotoStickerType background_fill:BackgroundFill = ChatPhotoSticker;
+
 //@description Animated variant of a chat photo in MPEG4 format
 //@length Animation width and height
 //@file Information about the animation file
@@ -539,9 +569,10 @@ animatedChatPhoto length:int32 file:file main_frame_timestamp:double = AnimatedC
 //@added_date Point in time (Unix timestamp) when the photo has been added
 //@minithumbnail Photo minithumbnail; may be null
 //@sizes Available variants of the photo in JPEG format, in different size
-//@animation A big (640x640) animated variant of the photo in MPEG4 format; may be null
+//@animation A big (up to 1280x1280) animated variant of the photo in MPEG4 format; may be null
 //@small_animation A small (160x160) animated variant of the photo in MPEG4 format; may be null even the big animation is available
-chatPhoto id:int64 added_date:int32 minithumbnail:minithumbnail sizes:vector<photoSize> animation:animatedChatPhoto small_animation:animatedChatPhoto = ChatPhoto;
+//@sticker Sticker-based version of the chat photo; may be null
+chatPhoto id:int64 added_date:int32 minithumbnail:minithumbnail sizes:vector<photoSize> animation:animatedChatPhoto small_animation:animatedChatPhoto sticker:chatPhotoSticker = ChatPhoto;
 
 //@description Contains a list of chat or user profile photos @total_count Total number of photos @photos List of photos
 chatPhotos total_count:int32 photos:vector<chatPhoto> = ChatPhotos;
@@ -555,23 +586,31 @@ inputChatPhotoPrevious chat_photo_id:int64 = InputChatPhoto;
 //@description A static photo in JPEG format @photo Photo to be set as profile photo. Only inputFileLocal and inputFileGenerated are allowed
 inputChatPhotoStatic photo:InputFile = InputChatPhoto;
 
-//@description An animation in MPEG4 format; must be square, at most 10 seconds long, have width between 160 and 800 and be at most 2MB in size
+//@description An animation in MPEG4 format; must be square, at most 10 seconds long, have width between 160 and 1280 and be at most 2MB in size
 //@animation Animation to be set as profile photo. Only inputFileLocal and inputFileGenerated are allowed
 //@main_frame_timestamp Timestamp of the frame, which will be used as static chat photo
 inputChatPhotoAnimation animation:InputFile main_frame_timestamp:double = InputChatPhoto;
 
+//@description A sticker on a custom background @sticker Information about the sticker
+inputChatPhotoSticker sticker:chatPhotoSticker = InputChatPhoto;
+
 
 //@description Describes actions that a user is allowed to take in a chat
 //@can_send_messages True, if the user can send text messages, contacts, invoices, locations, and venues
-//@can_send_media_messages True, if the user can send audio files, documents, photos, videos, video notes, and voice notes. Implies can_send_messages permissions
-//@can_send_polls True, if the user can send polls. Implies can_send_messages permissions
-//@can_send_other_messages True, if the user can send animations, games, stickers, and dice and use inline bots. Implies can_send_messages permissions
-//@can_add_web_page_previews True, if the user may add a web page preview to their messages. Implies can_send_messages permissions
+//@can_send_audios True, if the user can send music files
+//@can_send_documents True, if the user can send documents
+//@can_send_photos True, if the user can send audio photos
+//@can_send_videos True, if the user can send audio videos
+//@can_send_video_notes True, if the user can send video notes
+//@can_send_voice_notes True, if the user can send voice notes
+//@can_send_polls True, if the user can send polls
+//@can_send_other_messages True, if the user can send animations, games, stickers, and dice and use inline bots
+//@can_add_web_page_previews True, if the user may add a web page preview to their messages
 //@can_change_info True, if the user can change the chat title, photo, and other settings
 //@can_invite_users True, if the user can invite new users to the chat
 //@can_pin_messages True, if the user can pin messages
 //@can_manage_topics True, if the user can manage topics
-chatPermissions can_send_messages:Bool can_send_media_messages:Bool can_send_polls:Bool can_send_other_messages:Bool can_add_web_page_previews:Bool can_change_info:Bool can_invite_users:Bool can_pin_messages:Bool can_manage_topics:Bool = ChatPermissions;
+chatPermissions can_send_messages:Bool can_send_audios:Bool can_send_documents:Bool can_send_photos:Bool can_send_videos:Bool can_send_video_notes:Bool can_send_voice_notes:Bool can_send_polls:Bool can_send_other_messages:Bool can_add_web_page_previews:Bool can_change_info:Bool can_invite_users:Bool can_pin_messages:Bool can_manage_topics:Bool = ChatPermissions;
 
 //@description Describes rights of the administrator
 //@can_manage_chat True, if the administrator can get chat event log, get chat statistics, get message statistics in channels, get channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other privilege; applicable to supergroups and channels only
@@ -597,6 +636,13 @@ chatAdministratorRights can_manage_chat:Bool can_change_info:Bool can_post_messa
 //@store_product_id Identifier of the store product associated with the option
 //@payment_link An internal link to be opened for buying Telegram Premium to the user if store payment isn't possible; may be null if direct payment isn't available
 premiumPaymentOption currency:string amount:int53 discount_percentage:int32 month_count:int32 store_product_id:string payment_link:InternalLinkType = PremiumPaymentOption;
+
+//@description Describes an option for buying or upgrading Telegram Premium for self
+//@payment_option Information about the payment option
+//@is_current True, if this is the currently used Telegram Premium subscription option
+//@is_upgrade True, if the payment option can be used to upgrade the existing Telegram Premium subscription
+//@last_transaction_id Identifier of the last in-store transaction for the currently used option
+premiumStatePaymentOption payment_option:premiumPaymentOption is_current:Bool is_upgrade:Bool last_transaction_id:string = PremiumStatePaymentOption;
 
 
 //@description Describes a custom emoji to be shown instead of the Telegram Premium badge @custom_emoji_id Identifier of the custom emoji in stickerFormatTgs format
@@ -1275,6 +1321,7 @@ videoChat group_call_id:int32 has_participants:Bool default_participant_id:Messa
 //@positions Positions of the chat in chat lists
 //@message_sender_id Identifier of a user or chat that is selected to send messages in the chat; may be null if the user can't change message sender
 //@has_protected_content True, if chat content can't be saved locally, forwarded, or copied
+//@is_translatable True, if translation of all messages in the chat must be suggested to the user
 //@is_marked_as_unread True, if the chat is marked as unread
 //@is_blocked True, if the chat is blocked by the current user and private messages from the chat can't be received
 //@has_scheduled_messages True, if the chat has scheduled messages
@@ -1297,7 +1344,7 @@ videoChat group_call_id:int32 has_participants:Bool default_participant_id:Messa
 //@reply_markup_message_id Identifier of the message from which reply markup needs to be used; 0 if there is no default custom reply markup in the chat
 //@draft_message A draft of a message in the chat; may be null
 //@client_data Application-specific data associated with the chat. (For example, the chat scroll position or local chat notification settings can be stored here.) Persistent if the message database is used
-chat id:int53 type:ChatType title:string photo:chatPhotoInfo permissions:chatPermissions last_message:message positions:vector<chatPosition> message_sender_id:MessageSender has_protected_content:Bool is_marked_as_unread:Bool is_blocked:Bool has_scheduled_messages:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_be_reported:Bool default_disable_notification:Bool unread_count:int32 last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 unread_mention_count:int32 unread_reaction_count:int32 notification_settings:chatNotificationSettings available_reactions:ChatAvailableReactions message_auto_delete_time:int32 theme_name:string action_bar:ChatActionBar video_chat:videoChat pending_join_requests:chatJoinRequestsInfo reply_markup_message_id:int53 draft_message:draftMessage client_data:string = Chat;
+chat id:int53 type:ChatType title:string photo:chatPhotoInfo permissions:chatPermissions last_message:message positions:vector<chatPosition> message_sender_id:MessageSender has_protected_content:Bool is_translatable:Bool is_marked_as_unread:Bool is_blocked:Bool has_scheduled_messages:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_be_reported:Bool default_disable_notification:Bool unread_count:int32 last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 unread_mention_count:int32 unread_reaction_count:int32 notification_settings:chatNotificationSettings available_reactions:ChatAvailableReactions message_auto_delete_time:int32 theme_name:string action_bar:ChatActionBar video_chat:videoChat pending_join_requests:chatJoinRequestsInfo reply_markup_message_id:int53 draft_message:draftMessage client_data:string = Chat;
 
 //@description Represents a list of chats @total_count Approximate total number of chats found @chat_ids List of chat identifiers
 chats total_count:int32 chat_ids:vector<int53> = Chats;
@@ -1363,6 +1410,27 @@ keyboardButtonTypeRequestLocation = KeyboardButtonType;
 
 //@description A button that allows the user to create and send a poll when pressed; available only in private chats @force_regular If true, only regular polls must be allowed to create @force_quiz If true, only polls in quiz mode must be allowed to create
 keyboardButtonTypeRequestPoll force_regular:Bool force_quiz:Bool = KeyboardButtonType;
+
+//@description A button that requests a user to be shared by the current user; available only in private chats. Use the method shareUserWithBot to complete the request
+//@id Unique button identifier
+//@restrict_user_is_bot True, if the shared user must or must not be a bot
+//@user_is_bot True, if the shared user must be a bot; otherwise, the shared user must no be a bot. Ignored if restrict_user_is_bot is false
+//@restrict_user_is_premium True, if the shared user must or must not be a Telegram Premium user
+//@user_is_premium True, if the shared user must be a Telegram Premium user; otherwise, the shared user must no be a Telegram Premium user. Ignored if restrict_user_is_premium is false
+keyboardButtonTypeRequestUser id:int32 restrict_user_is_bot:Bool user_is_bot:Bool restrict_user_is_premium:Bool user_is_premium:Bool = KeyboardButtonType;
+
+//@description A button that requests a chat to be shared by the current user; available only in private chats. Use the method shareChatWithBot to complete the request
+//@id Unique button identifier
+//@chat_is_channel True, if the chat must be a channel; otherwise, a basic group or a supergroup chat is shared
+//@restrict_chat_is_forum True, if the chat must or must not be a forum supergroup
+//@chat_is_forum True, if the chat must be a forum supergroup; otherwise, the chat must not be a forum supergroup. Ignored if restrict_chat_is_forum is false
+//@restrict_chat_has_username True, if the chat must or must not have a username
+//@chat_has_username True, if the chat must have a username; otherwise, the chat must not have a username. Ignored if restrict_chat_has_username is false
+//@chat_is_created True, if the chat must be created by the current user
+//@user_administrator_rights Expected user administrator rights in the chat; may be null if they aren't restricted
+//@bot_administrator_rights Expected bot administrator rights in the chat; may be null if they aren't restricted
+//@bot_is_member True, if the bot must be a member of the chat; for basic group and supergroup chats only
+keyboardButtonTypeRequestChat id:int32 chat_is_channel:Bool restrict_chat_is_forum:Bool chat_is_forum:Bool restrict_chat_has_username:Bool chat_has_username:Bool chat_is_created:Bool user_administrator_rights:chatAdministratorRights bot_administrator_rights:chatAdministratorRights bot_is_member:Bool = KeyboardButtonType;
 
 //@description A button that opens a Web App by calling getWebAppUrl @url An HTTP URL to pass to getWebAppUrl
 keyboardButtonTypeWebApp url:string = KeyboardButtonType;
@@ -2450,6 +2518,12 @@ messageGiftedPremium currency:string amount:int53 month_count:int32 sticker:stic
 //@description A contact has registered with Telegram
 messageContactRegistered = MessageContent;
 
+//@description The current user shared a user, which was requested by the bot @user_id Identifier of the shared user @button_id Identifier of the keyboard button with the request
+messageUserShared user_id:int53 button_id:int32 = MessageContent;
+
+//@description The current user shared a chat, which was requested by the bot @chat_id Identifier of the shared chat @button_id Identifier of the keyboard button with the request
+messageChatShared chat_id:int53 button_id:int32 = MessageContent;
+
 //@description The current user has connected a website by logging in using Telegram Login Widget on it @domain_name Domain name of the connected website
 messageWebsiteConnected domain_name:string = MessageContent;
 
@@ -2870,6 +2944,28 @@ stickerSets total_count:int32 sets:vector<stickerSetInfo> = StickerSets;
 trendingStickerSets total_count:int32 sets:vector<stickerSetInfo> is_premium:Bool = TrendingStickerSets;
 
 
+//@description Contains a list of similar emoji to search for in getStickers and searchStickers
+//@name Name of the category
+//@icon_custom_emoji_id Unique identifier of the custom emoji, which represents icon of the category
+//@emojis List of emojis in the category
+emojiCategory name:string icon_custom_emoji_id:int64 emojis:vector<string> = EmojiCategory;
+
+//@description Represents a list of emoji categories @categories List of categories
+emojiCategories categories:vector<emojiCategory> = EmojiCategories;
+
+
+//@class EmojiCategoryType @description Describes type of an emoji category
+
+//@description The category must be used by default
+emojiCategoryTypeDefault = EmojiCategoryType;
+
+//@description The category must be used for emoji status selection
+emojiCategoryTypeEmojiStatus = EmojiCategoryType;
+
+//@description The category must be used for chat photo emoji selection
+emojiCategoryTypeChatPhoto = EmojiCategoryType;
+
+
 //@class CallDiscardReason @description Describes the reason why a call was discarded
 
 //@description The call wasn't discarded, or the reason is unknown
@@ -3079,13 +3175,23 @@ callProblemPixelatedVideo = CallProblem;
 call id:int32 user_id:int53 is_outgoing:Bool is_video:Bool state:CallState = Call;
 
 
+//@class FirebaseAuthenticationSettings @description Contains settings for Firebase Authentication in the official applications
+
+//@description Settings for Firebase Authentication in the official Android application
+firebaseAuthenticationSettingsAndroid = FirebaseAuthenticationSettings;
+
+//@description Settings for Firebase Authentication in the official iOS application @device_token Device token from Apple Push Notification service @is_app_sandbox True, if App Sandbox is enabled
+firebaseAuthenticationSettingsIos device_token:string is_app_sandbox:Bool = FirebaseAuthenticationSettings;
+
+
 //@description Contains settings for the authentication of the user's phone number
 //@allow_flash_call Pass true if the authentication code may be sent via a flash call to the specified phone number
 //@allow_missed_call Pass true if the authentication code may be sent via a missed call to the specified phone number
 //@is_current_phone_number Pass true if the authenticated phone number is used on the current device
 //@allow_sms_retriever_api For official applications only. True, if the application can use Android SMS Retriever API (requires Google Play Services >= 10.2) to automatically receive the authentication code from the SMS. See https://developers.google.com/identity/sms-retriever/ for more details
+//@firebase_authentication_settings For official Android and iOS applications only; pass null otherwise. Settings for Firebase Authentication
 //@authentication_tokens List of up to 20 authentication tokens, recently received in updateOption("authentication_token") in previously logged out sessions
-phoneNumberAuthenticationSettings allow_flash_call:Bool allow_missed_call:Bool is_current_phone_number:Bool allow_sms_retriever_api:Bool authentication_tokens:vector<string> = PhoneNumberAuthenticationSettings;
+phoneNumberAuthenticationSettings allow_flash_call:Bool allow_missed_call:Bool is_current_phone_number:Bool allow_sms_retriever_api:Bool firebase_authentication_settings:FirebaseAuthenticationSettings authentication_tokens:vector<string> = PhoneNumberAuthenticationSettings;
 
 
 //@description Represents a reaction applied to a message @type Type of the reaction @sender_id Identifier of the chat member, applied the reaction
@@ -3722,6 +3828,9 @@ premiumFeatureForumTopicIcon = PremiumFeature;
 //@description Allowed to set a premium appllication icons
 premiumFeatureAppIcons = PremiumFeature;
 
+//@description Allowed to translate chat messages real-time
+premiumFeatureRealTimeChatTranslation = PremiumFeature;
+
 
 //@description Contains information about a limit, increased for Premium users @type The type of the limit @default_value Default value of the limit @premium_value Value of the limit for Premium users
 premiumLimit type:PremiumLimitType default_value:int32 premium_value:int32 = PremiumLimit;
@@ -3755,13 +3864,13 @@ premiumFeaturePromotionAnimation feature:PremiumFeature animation:animation = Pr
 //@state Text description of the state of the current Premium subscription; may be empty if the current user has no Telegram Premium subscription
 //@payment_options The list of available options for buying Telegram Premium
 //@animations The list of available promotion animations for Premium features
-premiumState state:formattedText payment_options:vector<premiumPaymentOption> animations:vector<premiumFeaturePromotionAnimation> = PremiumState;
+premiumState state:formattedText payment_options:vector<premiumStatePaymentOption> animations:vector<premiumFeaturePromotionAnimation> = PremiumState;
 
 
 //@class StorePaymentPurpose @description Describes a purpose of an in-store payment
 
-//@description The user subscribed to Telegram Premium @is_restore Pass true if this is a restore of a Telegram Premium purchase; only for App Store
-storePaymentPurposePremiumSubscription is_restore:Bool = StorePaymentPurpose;
+//@description The user subscribed to Telegram Premium @is_restore Pass true if this is a restore of a Telegram Premium purchase; only for App Store @is_upgrade Pass true if this is an upgrade from a monthly subscription to early subscription; only for App Store
+storePaymentPurposePremiumSubscription is_restore:Bool is_upgrade:Bool = StorePaymentPurpose;
 
 //@description The user gifted Telegram Premium to another user @user_id Identifier of the user for which Premium was gifted @currency ISO 4217 currency code of the payment currency @amount Paid amount, in the smallest units of the currency
 storePaymentPurposeGiftedPremium user_id:int53 currency:string amount:int53 = StorePaymentPurpose;
@@ -3805,6 +3914,9 @@ deviceTokenBlackBerryPush token:string = DeviceToken;
 
 //@description A token for Tizen Push Service @reg_id Push service registration identifier; may be empty to deregister a device
 deviceTokenTizenPush reg_id:string = DeviceToken;
+
+//@description A token for HUAWEI Push Service @token Device registration token; may be empty to deregister a device @encrypt True, if push notifications must be additionally encrypted
+deviceTokenHuaweiPush token:string encrypt:Bool = DeviceToken;
 
 
 //@description Contains a globally unique push receiver identifier, which can be used to identify which account has received a push notification @id The globally unique identifier of push notification subscription
@@ -4704,6 +4816,40 @@ autoDownloadSettings is_auto_download_enabled:Bool max_photo_file_size:int32 max
 autoDownloadSettingsPresets low:autoDownloadSettings medium:autoDownloadSettings high:autoDownloadSettings = AutoDownloadSettingsPresets;
 
 
+//@class AutosaveSettingsScope @description Describes scope of autosave settings
+
+//@description Autosave settings applied to all private chats without chat-specific settings
+autosaveSettingsScopePrivateChats = AutosaveSettingsScope;
+
+//@description Autosave settings applied to all basic group and supergroup chats without chat-specific settings
+autosaveSettingsScopeGroupChats = AutosaveSettingsScope;
+
+//@description Autosave settings applied to all channel chats without chat-specific settings
+autosaveSettingsScopeChannelChats = AutosaveSettingsScope;
+
+//@description Autosave settings applied to a chat @chat_id Chat identifier
+autosaveSettingsScopeChat chat_id:int53 = AutosaveSettingsScope;
+
+
+//@description Contains autosave settings for an autosave settings scope
+//@autosave_photos True, if photo autosave is enabled
+//@autosave_videos True, if video autosave is enabled
+//@max_video_file_size The maximum size of a video file to be autosaved, in bytes; 512 KB - 4000 MB
+scopeAutosaveSettings autosave_photos:Bool autosave_videos:Bool max_video_file_size:int53 = ScopeAutosaveSettings;
+
+//@description Contains autosave settings for a chat, which overrides default settings for the corresponding scope
+//@chat_id Chat identifier
+//@settings Autosave settings for the chat
+autosaveSettingsException chat_id:int53 settings:scopeAutosaveSettings = AutosaveSettingsException;
+
+//@description Describes autosave settings
+//@private_chat_settings Default autosave settings for private chats
+//@group_settings Default autosave settings for basic group and supergroup chats
+//@channel_settings Default autosave settings for channel chats
+//@exceptions Autosave settings for specific chats
+autosaveSettings private_chat_settings:scopeAutosaveSettings group_settings:scopeAutosaveSettings channel_settings:scopeAutosaveSettings exceptions:vector<autosaveSettingsException> = AutosaveSettings;
+
+
 //@class ConnectionState @description Describes the current state of the connection to Telegram servers
 
 //@description Currently waiting for the network to become available. Use setNetworkType to change the available network type
@@ -4784,8 +4930,15 @@ suggestedActionViewChecksHint = SuggestedAction;
 //@description Suggests the user to convert specified supergroup to a broadcast group @supergroup_id Supergroup identifier
 suggestedActionConvertToBroadcastGroup supergroup_id:int53 = SuggestedAction;
 
-//@description Suggests the user to set a 2-step verification password to be able to log in again @authorization_delay The number of days to pass between consecutive authorizations if the user declines to set password
+//@description Suggests the user to set a 2-step verification password to be able to log in again
+//@authorization_delay The number of days to pass between consecutive authorizations if the user declines to set password; if 0, then the user is advised to set the password for security reasons
 suggestedActionSetPassword authorization_delay:int32 = SuggestedAction;
+
+//@description Suggests the user to upgrade the Premium subscription from monthly payments to annual payments
+suggestedActionUpgradePremium = SuggestedAction;
+
+//@description Suggests the user to subscribe to the Premium subscription with annual payments
+suggestedActionSubscribeToAnnualPremium = SuggestedAction;
 
 
 //@description Contains a counter @count Count
@@ -5109,14 +5262,17 @@ updateChatDefaultDisableNotification chat_id:int53 default_disable_notification:
 //@description A chat content was allowed or restricted for saving @chat_id Chat identifier @has_protected_content New value of has_protected_content
 updateChatHasProtectedContent chat_id:int53 has_protected_content:Bool = Update;
 
-//@description A chat's has_scheduled_messages field has changed @chat_id Chat identifier @has_scheduled_messages New value of has_scheduled_messages
-updateChatHasScheduledMessages chat_id:int53 has_scheduled_messages:Bool = Update;
+//@description Translation of chat messages was enabled or disabled @chat_id Chat identifier @is_translatable New value of is_translatable
+updateChatIsTranslatable chat_id:int53 is_translatable:Bool = Update;
+
+//@description A chat was marked as unread or was read @chat_id Chat identifier @is_marked_as_unread New value of is_marked_as_unread
+updateChatIsMarkedAsUnread chat_id:int53 is_marked_as_unread:Bool = Update;
 
 //@description A chat was blocked or unblocked @chat_id Chat identifier @is_blocked New value of is_blocked
 updateChatIsBlocked chat_id:int53 is_blocked:Bool = Update;
 
-//@description A chat was marked as unread or was read @chat_id Chat identifier @is_marked_as_unread New value of is_marked_as_unread
-updateChatIsMarkedAsUnread chat_id:int53 is_marked_as_unread:Bool = Update;
+//@description A chat's has_scheduled_messages field has changed @chat_id Chat identifier @has_scheduled_messages New value of has_scheduled_messages
+updateChatHasScheduledMessages chat_id:int53 has_scheduled_messages:Bool = Update;
 
 //@description The list of chat filters or a chat filter has changed @chat_filters The new list of chat filters @main_chat_list_position Position of the main chat list among chat filters, 0-based
 updateChatFilters chat_filters:vector<chatFilterInfo> main_chat_list_position:int32 = Update;
@@ -5331,6 +5487,9 @@ updateAnimationSearchParameters provider:string emojis:vector<string> = Update;
 //@description The list of suggested to the user actions has changed @added_actions Added suggested actions @removed_actions Removed suggested actions
 updateSuggestedActions added_actions:vector<SuggestedAction> removed_actions:vector<SuggestedAction> = Update;
 
+//@description Autosave settings for some type of chats were updated @scope Type of chats for which autosave settings were updated @settings The new autosave settings
+updateAutosaveSettings scope:AutosaveSettingsScope settings:scopeAutosaveSettings = Update;
+
 //@description A new incoming inline query; for bots only
 //@id Unique query identifier
 //@sender_user_id Identifier of the user who sent the query
@@ -5403,8 +5562,12 @@ updatePollAnswer poll_id:int64 user_id:int53 option_ids:vector<int32> = Update;
 //@new_chat_member New chat member
 updateChatMember chat_id:int53 actor_user_id:int53 date:int32 invite_link:chatInviteLink old_chat_member:chatMember new_chat_member:chatMember = Update;
 
-//@description A user sent a join request to a chat; for bots only @chat_id Chat identifier @request Join request @invite_link The invite link, which was used to send join request; may be null
-updateNewChatJoinRequest chat_id:int53 request:chatJoinRequest invite_link:chatInviteLink = Update;
+//@description A user sent a join request to a chat; for bots only
+//@chat_id Chat identifier
+//@request Join request
+//@user_chat_id Chat identifier of the private chat with the user
+//@invite_link The invite link, which was used to send join request; may be null
+updateNewChatJoinRequest chat_id:int53 request:chatJoinRequest user_chat_id:int53 invite_link:chatInviteLink = Update;
 
 
 //@description Contains a list of updates @updates List of updates
@@ -5520,6 +5683,10 @@ checkAuthenticationPasswordRecoveryCode recovery_code:string = Ok;
 //@new_password New 2-step verification password of the user; may be empty to remove the password
 //@new_hint New password hint; may be empty
 recoverAuthenticationPassword recovery_code:string new_password:string new_hint:string = Ok;
+
+//@description Sends Firebase Authentication SMS to the phone number of the user. Works only when the current authorization state is authorizationStateWaitCode and the server returned code of the type authenticationCodeTypeFirebaseAndroid or authenticationCodeTypeFirebaseIos
+//@token SafetyNet Attestation API token for the Android application, or secret from push notification for the iOS application
+sendAuthenticationFirebaseSms token:string = Ok;
 
 //@description Checks the authentication token of a bot; to log in as a bot. Works only when the current authorization state is authorizationStateWaitPhoneNumber. Can be used instead of setAuthenticationPhoneNumber and checkAuthenticationCode to log in @token The bot token
 checkAuthenticationBotToken token:string = Ok;
@@ -5900,11 +6067,24 @@ getMessageEmbeddingCode chat_id:int53 message_id:int53 for_album:Bool = Text;
 getMessageLinkInfo url:string = MessageLinkInfo;
 
 
-//@description Translates a text to the given language. Returns a 404 error if the translation can't be performed
+//@description Translates a text to the given language. If the current user is a Telegram Premium user, then text formatting is preserved
 //@text Text to translate
-//@from_language_code A two-letter ISO 639-1 language code of the language from which the message is translated. If empty, the language will be detected automatically
-//@to_language_code A two-letter ISO 639-1 language code of the language to which the message is translated
-translateText text:string from_language_code:string to_language_code:string = Text;
+//@to_language_code ISO language code of the language to which the message is translated. Must be one of
+//-"af", "sq", "am", "ar", "hy", "az", "eu", "be", "bn", "bs", "bg", "ca", "ceb", "zh-CN", "zh", "zh-Hans", "zh-TW", "zh-Hant", "co", "hr", "cs", "da", "nl", "en", "eo", "et",
+//-"fi", "fr", "fy", "gl", "ka", "de", "el", "gu", "ht", "ha", "haw", "he", "iw", "hi", "hmn", "hu", "is", "ig", "id", "in", "ga", "it", "ja", "jv", "kn", "kk", "km", "rw", "ko",
+//-"ku", "ky", "lo", "la", "lv", "lt", "lb", "mk", "mg", "ms", "ml", "mt", "mi", "mr", "mn", "my", "ne", "no", "ny", "or", "ps", "fa", "pl", "pt", "pa", "ro", "ru", "sm", "gd", "sr",
+//-"st", "sn", "sd", "si", "sk", "sl", "so", "es", "su", "sw", "sv", "tl", "tg", "ta", "tt", "te", "th", "tr", "tk", "uk", "ur", "ug", "uz", "vi", "cy", "xh", "yi", "ji", "yo", "zu"
+translateText text:formattedText to_language_code:string = FormattedText;
+
+//@description Extracts text or caption of the given message and translates it to the given language. If the current user is a Telegram Premium user, then text formatting is preserved
+//@chat_id Identifier of the chat to which the message belongs
+//@message_id Identifier of the message
+//@to_language_code ISO language code of the language to which the message is translated. Must be one of
+//-"af", "sq", "am", "ar", "hy", "az", "eu", "be", "bn", "bs", "bg", "ca", "ceb", "zh-CN", "zh", "zh-Hans", "zh-TW", "zh-Hant", "co", "hr", "cs", "da", "nl", "en", "eo", "et",
+//-"fi", "fr", "fy", "gl", "ka", "de", "el", "gu", "ht", "ha", "haw", "he", "iw", "hi", "hmn", "hu", "is", "ig", "id", "in", "ga", "it", "ja", "jv", "kn", "kk", "km", "rw", "ko",
+//-"ku", "ky", "lo", "la", "lv", "lt", "lb", "mk", "mg", "ms", "ml", "mt", "mi", "mr", "mn", "my", "ne", "no", "ny", "or", "ps", "fa", "pl", "pt", "pa", "ro", "ru", "sm", "gd", "sr",
+//-"st", "sn", "sd", "si", "sk", "sl", "so", "es", "su", "sw", "sv", "tl", "tg", "ta", "tt", "te", "th", "tr", "tk", "uk", "ur", "ug", "uz", "vi", "cy", "xh", "yi", "ji", "yo", "zu"
+translateMessageText chat_id:int53 message_id:int53 to_language_code:string = FormattedText;
 
 //@description Recognizes speech in a video note or a voice note message. The message must be successfully sent and must not be scheduled. May return an error with a message "MSG_VOICE_TOO_LONG" if media duration is too big to be recognized
 //@chat_id Identifier of the chat to which the message belongs
@@ -6256,6 +6436,25 @@ getLoginUrlInfo chat_id:int53 message_id:int53 button_id:int53 = LoginUrlInfo;
 getLoginUrl chat_id:int53 message_id:int53 button_id:int53 allow_write_access:Bool = HttpUrl;
 
 
+//@description Shares a user after pressing a keyboardButtonTypeRequestUser button with the bot
+//@chat_id Identifier of the chat with the bot
+//@message_id Identifier of the message with the button
+//@button_id Identifier of the button
+//@shared_user_id Identifier of the shared user
+//@only_check Pass true to check that the user can be shared by the button instead of actually sharing them
+shareUserWithBot chat_id:int53 message_id:int53 button_id:int32 shared_user_id:int53 only_check:Bool = Ok;
+
+//@description Shares a chat after pressing a keyboardButtonTypeRequestChat button with the bot
+//@chat_id Identifier of the chat with the bot
+//@message_id Identifier of the message with the button
+//@button_id Identifier of the button
+//@shared_chat_id Identifier of the shared chat
+//@only_check Pass true to check that the chat can be shared by the button instead of actually sharing it. Doesn't check bot_is_member and bot_administrator_rights restrictions.
+//-If the bot must be a member, then all chats from getGroupsInCommon and all chats, where the user can add the bot, are suitable. In the latter case the bot will be automatically added to the chat.
+//-If the bot must be an administrator, then all chats, where the bot already has requested rights or can be added to administrators by the user, are suitable. In the latter case the bot will be automatically granted requested rights
+shareChatWithBot chat_id:int53 message_id:int53 button_id:int32 shared_chat_id:int53 only_check:Bool = Ok;
+
+
 //@description Sends an inline query to a bot and returns its results. Returns an error with code 502 if the bot fails to answer the query before the query timeout expires
 //@bot_user_id The identifier of the target bot
 //@chat_id Identifier of the chat where the query was sent
@@ -6432,12 +6631,13 @@ createNewBasicGroupChat user_ids:vector<int53> title:string message_auto_delete_
 
 //@description Creates a new supergroup or channel and sends a corresponding messageSupergroupChatCreate. Returns the newly created chat
 //@title Title of the new chat; 1-128 characters
-//@is_channel Pass true to create a channel chat
+//@is_forum Pass true to create a forum supergroup chat
+//@is_channel Pass true to create a channel chat; ignored if a forum is created
 //@param_description Chat description; 0-255 characters
 //@location Chat location if a location-based supergroup is being created; pass null to create an ordinary supergroup chat
 //@message_auto_delete_time Message auto-delete time value, in seconds; must be from 0 up to 365 * 86400 and be divisible by 86400. If 0, then messages aren't deleted automatically
 //@for_import Pass true to create a supergroup for importing messages using importMessage
-createNewSupergroupChat title:string is_channel:Bool description:string location:chatLocation message_auto_delete_time:int32 for_import:Bool = Chat;
+createNewSupergroupChat title:string is_forum:Bool is_channel:Bool description:string location:chatLocation message_auto_delete_time:int32 for_import:Bool = Chat;
 
 //@description Creates a new secret chat. Returns the newly created chat @user_id Identifier of the target user
 createNewSecretChat user_id:int53 = Chat;
@@ -6512,6 +6712,9 @@ setChatNotificationSettings chat_id:int53 notification_settings:chatNotification
 //@chat_id Chat identifier
 //@has_protected_content New value of has_protected_content
 toggleChatHasProtectedContent chat_id:int53 has_protected_content:Bool = Ok;
+
+//@description Changes the tranlatable state of a chat; for Telegram Premium users only @chat_id Chat identifier @is_translatable New value of is_translatable
+toggleChatIsTranslatable chat_id:int53 is_translatable:Bool = Ok;
 
 //@description Changes the marked as unread state of a chat @chat_id Chat identifier @is_marked_as_unread New value of is_marked_as_unread
 toggleChatIsMarkedAsUnread chat_id:int53 is_marked_as_unread:Bool = Ok;
@@ -7090,15 +7293,18 @@ sharePhoneNumber user_id:int53 = Ok;
 getUserProfilePhotos user_id:int53 offset:int32 limit:int32 = ChatPhotos;
 
 
-//@description Returns stickers from the installed sticker sets that correspond to a given emoji or can be found by sticker-specific keywords. If the query is non-empty, then favorite, recently used or trending stickers may also be returned
+//@description Returns stickers from the installed sticker sets that correspond to any of the given emoji or can be found by sticker-specific keywords. If the query is non-empty, then favorite, recently used or trending stickers may also be returned
 //@sticker_type Type of the stickers to return
-//@query Search query; an emoji or a keyword prefix. If empty, returns all known installed stickers
+//@query Search query; a space-separated list of emoji or a keyword prefix. If empty, returns all known installed stickers
 //@limit The maximum number of stickers to be returned
 //@chat_id Chat identifier for which to return stickers. Available custom emoji stickers may be different for different chats
 getStickers sticker_type:StickerType query:string limit:int32 chat_id:int53 = Stickers;
 
-//@description Searches for stickers from public sticker sets that correspond to a given emoji @emoji String representation of emoji; must be non-empty @limit The maximum number of stickers to be returned; 0-100
-searchStickers emoji:string limit:int32 = Stickers;
+//@description Searches for stickers from public sticker sets that correspond to any of the given emoji
+//@sticker_type Type of the stickers to return
+//@emojis Space-separated list of emoji to search for; must be non-empty
+//@limit The maximum number of stickers to be returned; 0-100
+searchStickers sticker_type:StickerType emojis:string limit:int32 = Stickers;
 
 //@description Returns premium stickers from regular sticker sets @limit The maximum number of stickers to be returned; 0-100
 getPremiumStickers limit:int32 = Stickers;
@@ -7174,6 +7380,9 @@ getStickerEmojis sticker:InputFile = Emojis;
 //@input_language_codes List of possible IETF language tags of the user's input language; may be empty if unknown
 searchEmojis text:string exact_match:Bool input_language_codes:vector<string> = Emojis;
 
+//@description Returns available emojis categories @type Type of emoji categories to return; pass null to get default emoji categories
+getEmojiCategories type:EmojiCategoryType = EmojiCategories;
+
 //@description Returns an animated emoji corresponding to a given emoji. Returns a 404 error if the emoji has no animated emoji @emoji The emoji
 getAnimatedEmoji emoji:string = AnimatedEmoji;
 
@@ -7182,6 +7391,12 @@ getEmojiSuggestionsUrl language_code:string = HttpUrl;
 
 //@description Returns list of custom emoji stickers by their identifiers. Stickers are returned in arbitrary order. Only found stickers are returned @custom_emoji_ids Identifiers of custom emoji stickers. At most 200 custom emoji stickers can be received simultaneously
 getCustomEmojiStickers custom_emoji_ids:vector<int64> = Stickers;
+
+//@description Returns default list of custom emoji stickers for placing on a chat photo
+getDefaultChatPhotoCustomEmojiStickers = Stickers;
+
+//@description Returns default list of custom emoji stickers for placing on a profile photo
+getDefaultProfilePhotoCustomEmojiStickers = Stickers;
 
 
 //@description Returns saved animations
@@ -7213,7 +7428,9 @@ getWebPagePreview text:formattedText = WebPage;
 getWebPageInstantView url:string force_full:Bool = WebPageInstantView;
 
 
-//@description Changes a profile photo for the current user @photo Profile photo to set @is_public Pass true to set a public photo, which will be visible even the main photo is hidden by privacy settings
+//@description Changes a profile photo for the current user
+//@photo Profile photo to set
+//@is_public Pass true to set a public photo, which will be visible even the main photo is hidden by privacy settings
 setProfilePhoto photo:InputChatPhoto is_public:Bool = Ok;
 
 //@description Deletes a profile photo @profile_photo_id Identifier of the profile photo to delete
@@ -7275,7 +7492,7 @@ setCommands scope:BotCommandScope language_code:string commands:vector<botComman
 //@language_code A two-letter ISO 639-1 language code or an empty string
 deleteCommands scope:BotCommandScope language_code:string = Ok;
 
-//@description Returns the list of commands supported by the bot for the given user scope and language; for bots only
+//@description Returns list of commands supported by the bot for the given user scope and language; for bots only
 //@scope The scope to which the commands are relevant; pass null to get commands in the default bot command scope
 //@language_code A two-letter ISO 639-1 language code or an empty string
 getCommands scope:BotCommandScope language_code:string = BotCommands;
@@ -7628,6 +7845,15 @@ getAutoDownloadSettingsPresets = AutoDownloadSettingsPresets;
 
 //@description Sets auto-download settings @settings New user auto-download settings @type Type of the network for which the new settings are relevant
 setAutoDownloadSettings settings:autoDownloadSettings type:NetworkType = Ok;
+
+//@description Returns autosave settings for the current user
+getAutosaveSettings = AutosaveSettings;
+
+//@description Sets autosave settings for the given scope @scope Autosave settings scope @settings New autosave settings for the scope; pass null to set autosave settings to default
+setAutosaveSettings scope:AutosaveSettingsScope settings:scopeAutosaveSettings = Ok;
+
+//@description Clears the list of all autosave settings exceptions
+clearAutosaveSettingsExceptions = Ok;
 
 
 //@description Returns information about a bank card @bank_card_number The bank card number
