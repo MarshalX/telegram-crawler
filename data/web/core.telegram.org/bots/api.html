@@ -53,6 +53,17 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="february-3-2023" href="#february-3-2023"><i class="anchor-icon"></i></a>February 3, 2023</h4>
+<p><strong>Bot API 6.5</strong></p>
+<ul>
+<li>Added <a href="https://telegram.org/blog/profile-pics-emoji-translations#chat-selection-for-bots">requests for users and chats</a> and support for <a href="https://telegram.org/blog/profile-pics-emoji-translations#granular-media-permissions">granular media permissions</a>.</li>
+<li>Added the class <a href="#keyboardbuttonrequestuser">KeyboardButtonRequestUser</a> and the field <em>request_user</em> to the class <a href="#keyboardbutton">KeyboardButton</a>.</li>
+<li>Added the class <a href="#keyboardbuttonrequestchat">KeyboardButtonRequestChat</a> and the field <em>request_chat</em> to the class <a href="#keyboardbutton">KeyboardButton</a>.</li>
+<li>Added the classes <a href="#usershared">UserShared</a>, <a href="#chatshared">ChatShared</a> and the fields <em>user_shared</em>, and <em>chat_shared</em> to the class <a href="#message">Message</a>.</li>
+<li>Replaced the fields <em>can_send_media_messages</em> in the classes <a href="#chatmemberrestricted">ChatMemberRestricted</a> and <a href="#chatpermissions">ChatPermissions</a> with separate fields <em>can_send_audios</em>, <em>can_send_documents</em>, <em>can_send_photos</em>, <em>can_send_videos</em>, <em>can_send_video_notes</em>, and <em>can_send_voice_notes</em> for different media types.</li>
+<li>Added the parameter <em>use_independent_chat_permissions</em> to the methods <a href="#restrictchatmember">restrictChatMember</a> and <a href="#chatpermissions">setChatPermissions</a>.</li>
+<li>Added the field <em>user_chat_id</em> to the class <a href="#chatjoinrequest">ChatJoinRequest</a>.</li>
+</ul>
 <h4><a class="anchor" name="december-30-2022" href="#december-30-2022"><i class="anchor-icon"></i></a>December 30, 2022</h4>
 <p><strong>Bot API 6.4</strong></p>
 <ul>
@@ -107,70 +118,6 @@ To learn how to create…">
 <p><strong>Other Changes</strong></p>
 <ul>
 <li>Added the field <em>has_restricted_voice_and_video_messages</em> to the class <a href="#chat">Chat</a> to support the <a href="https://telegram.org/blog/custom-emoji#privacy-settings-for-voice-messages">new setting</a>.</li>
-</ul>
-<h4><a class="anchor" name="june-20-2022" href="#june-20-2022"><i class="anchor-icon"></i></a>June 20, 2022</h4>
-<p><strong>Bot API 6.1</strong></p>
-<p><strong>Media in Descriptions</strong></p>
-<ul>
-<li>Added support for photos and videos in the &#39;What can this bot do?&#39; section (shown on the bot&#39;s start screen). Use <a href="https://t.me/BotFather">BotFather</a> to set up media.</li>
-</ul>
-<p><strong>Web App Improvements</strong></p>
-<ul>
-<li>Added the fields <em>version</em>, <em>headerColor</em>, <em>backgroundColor</em>, <em>BackButton</em>, <em>HapticFeedback</em> and the methods <em>isVersionAtLeast</em>, <em>setHeaderColor</em>, <em>setBackgroundColor</em>, <em>openLink</em>, <em>openTelegramLink</em>, <em>openInvoice</em> to the class <a href="/bots/webapps#initializing-web-apps">WebApp</a>.</li>
-<li>Added the field <em>secondary_bg_color</em> to the class <a href="/bots/webapps#themeparams">ThemeParams</a>.</li>
-<li>Added the method <em>offClick</em> to the class <a href="/bots/webapps#mainbutton">MainButton</a>.</li>
-<li>Added the fields <em>chat</em>, <em>can_send_after</em> to the class <a href="/bots/webapps#webappinitdata">WebAppInitData</a>.</li>
-<li>Added the events <em>backButtonClicked</em>, <em>settingsButtonClicked</em>, <em>invoiceClosed</em>.</li>
-</ul>
-<p><strong>Join Requests &amp; Payments</strong></p>
-<ul>
-<li>Added the fields <em>join_to_send_messages</em> and <em>join_by_request</em> to the class <a href="#chat">Chat</a>.</li>
-<li>Added the ability to process join requests which were created <a href="https://telegram.org/blog/700-million-and-premium#join-requests-for-public-groups">without an invite link</a>. Bots will receive a “chat_join_request” update as usual.</li>
-<li>Added the method <a href="#createinvoicelink">createInvoiceLink</a> to generate an HTTP link for an invoice.</li>
-</ul>
-<p><strong>Telegram Premium Support</strong> (<a href="https://telegram.org/blog/700-million-and-premium#telegram-premium">more info</a>)</p>
-<ul>
-<li>The maximum value of the field <em>file_size</em> in the classes <a href="#animation">Animation</a>, <a href="#audio">Audio</a>, <a href="#document">Document</a>, <a href="#video">Video</a>, <a href="#voice">Voice</a>, and <a href="#file">File</a> can no longer be stored in a signed 32-bit integer type. This change is necessary to support 4GB files uploaded by <a href="https://telegram.org/blog/700-million-and-premium#telegram-premium">premium accounts</a>.</li>
-<li>Added the field <em>is_premium</em> to the class <a href="#user">User</a>.</li>
-<li>Added the field <em>premium_animation</em> to the class <a href="#sticker">Sticker</a>.</li>
-</ul>
-<p><strong>Attachment Menu Integration</strong></p>
-<ul>
-<li>Added the field <em>added_to_attachment_menu</em> to the class <a href="#user">User</a>.</li>
-<li>Bots integrated in the attachment menu can now be used in groups, supergroups and channels.</li>
-<li>Added support for t.me links that can be used to select the chat in which the attachment menu with the bot will be opened.</li>
-</ul>
-<p><strong>Other Changes</strong></p>
-<ul>
-<li>Added the parameter <em>secret_token</em> to the method <a href="#setwebhook">setWebhook</a>.</li>
-<li>As previously announced, only HTTPS links are now allowed in <em>login_url</em> inline keyboard buttons.</li>
-</ul>
-<h4><a class="anchor" name="april-16-2022" href="#april-16-2022"><i class="anchor-icon"></i></a>April 16, 2022</h4>
-<p><strong>Bot API 6.0</strong></p>
-<ul>
-<li>Added support for <strong>Web Apps</strong>, see the <a href="/bots/webapps">detailed manual here</a>. (<a href="https://telegram.org/blog/notifications-bots">blog announcement</a>)</li>
-<li>Added the class <a href="#webappinfo">WebAppInfo</a> and the fields <em>web_app</em> to the classes <a href="#keyboardbutton">KeyboardButton</a> and <a href="#inlinekeyboardbutton">InlineKeyboardButton</a>.</li>
-<li>Added the class <a href="#sentwebappmessage">SentWebAppMessage</a> and the method <a href="#answerwebappquery">answerWebAppQuery</a> for sending an answer to a Web App query, which originated from an inline button of the &#39;web_app&#39; type.</li>
-<li>Added the class <a href="#webappdata">WebAppData</a> and the field <em>web_app_data</em> to the class <a href="#message">Message</a>.</li>
-<li>Added the class <a href="#menubutton">MenuButton</a> and the methods <a href="#setchatmenubutton">setChatMenuButton</a> and <a href="#getchatmenubutton">getChatMenuButton</a> for managing the behavior of the bot&#39;s menu button in private chats.</li>
-<li>Added the class <a href="#chatadministratorrights">ChatAdministratorRights</a> and the methods <a href="#setmydefaultadministratorrights">setMyDefaultAdministratorRights</a> and <a href="#getmydefaultadministratorrights">getMyDefaultAdministratorRights</a> for managing the bot&#39;s default administrator rights.</li>
-<li>Added support for t.me links that can be used to add the bot to groups and channels as an administrator.</li>
-<li>Added the field <em>last_synchronization_error_date</em> to the class <a href="#webhookinfo">WebhookInfo</a>.</li>
-<li>Renamed the field <em>can_manage_voice_chats</em> to <em>can_manage_video_chats</em> in the class <a href="#chatmemberadministrator">ChatMemberAdministrator</a>. The old field will remain temporarily available.</li>
-<li>Renamed the parameter <em>can_manage_voice_chats</em> to <em>can_manage_video_chats</em> in the method <a href="#promotechatmember">promoteChatMember</a>. The old parameter will remain temporarily available.</li>
-<li>Renamed the fields <em>voice_chat_scheduled</em>, <em>voice_chat_started</em>, <em>voice_chat_ended</em>, and <em>voice_chat_participants_invited</em> to <em>video_chat_scheduled</em>, <em>video_chat_started</em>, <em>video_chat_ended</em>, and <em>video_chat_participants_invited</em> in the class <a href="#message">Message</a>. The old fields will remain temporarily available.</li>
-</ul>
-<hr>
-<blockquote>
-<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>After the next update, only HTTPS links will be allowed in <em>login_url</em> inline keyboard buttons.</p>
-</blockquote>
-<hr>
-<h4><a class="anchor" name="january-31-2022" href="#january-31-2022"><i class="anchor-icon"></i></a>January 31, 2022</h4>
-<p><strong>Bot API 5.7</strong></p>
-<ul>
-<li>Added support for <a href="https://telegram.org/blog/video-stickers-better-reactions">Video Stickers</a>.</li>
-<li>Added the field <em>is_video</em> to the classes <a href="#sticker">Sticker</a> and <a href="#stickerset">StickerSet</a>.</li>
-<li>Added the parameter <em>webm_sticker</em> to the methods <a href="#createnewstickerset">createNewStickerSet</a> and <a href="#addstickertoset">addStickerToSet</a>.</li>
 </ul>
 <p><strong><a href="/bots/api-changelog">See earlier changes »</a></strong></p>
 <h3><a class="anchor" name="authorizing-your-bot" href="#authorizing-your-bot"><i class="anchor-icon"></i></a>Authorizing your bot</h3>
@@ -984,6 +931,16 @@ To learn how to create…">
 <td>successful_payment</td>
 <td><a href="#successfulpayment">SuccessfulPayment</a></td>
 <td><em>Optional</em>. Message is a service message about a successful payment, information about the payment. <a href="#payments">More about payments »</a></td>
+</tr>
+<tr>
+<td>user_shared</td>
+<td><a href="#usershared">UserShared</a></td>
+<td><em>Optional</em>. Service message: a user was shared with the bot</td>
+</tr>
+<tr>
+<td>chat_shared</td>
+<td><a href="#chatshared">ChatShared</a></td>
+<td><em>Optional</em>. Service message: a chat was shared with the bot</td>
 </tr>
 <tr>
 <td>connected_website</td>
@@ -1878,6 +1835,52 @@ To learn how to create…">
 <p>This object represents a service message about General forum topic hidden in the chat. Currently holds no information.</p>
 <h4><a class="anchor" name="generalforumtopicunhidden" href="#generalforumtopicunhidden"><i class="anchor-icon"></i></a>GeneralForumTopicUnhidden</h4>
 <p>This object represents a service message about General forum topic unhidden in the chat. Currently holds no information.</p>
+<h4><a class="anchor" name="usershared" href="#usershared"><i class="anchor-icon"></i></a>UserShared</h4>
+<p>This object contains information about the user whose identifier was shared with the bot using a <a href="#keyboardbuttonrequestuser">KeyboardButtonRequestUser</a> button.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request_id</td>
+<td>Integer</td>
+<td>Identifier of the request</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Identifier of the shared user. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier. The bot may not have access to the user and could be unable to use this identifier, unless the user is already known to the bot by some other means.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatshared" href="#chatshared"><i class="anchor-icon"></i></a>ChatShared</h4>
+<p>This object contains information about the chat whose identifier was shared with the bot using a <a href="#keyboardbuttonrequestchat">KeyboardButtonRequestChat</a> button.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request_id</td>
+<td>Integer</td>
+<td>Identifier of the request</td>
+</tr>
+<tr>
+<td>chat_id</td>
+<td>Integer</td>
+<td>Identifier of the shared chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier. The bot may not have access to the chat and could be unable to use this identifier, unless the chat is already known to the bot by some other means.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="writeaccessallowed" href="#writeaccessallowed"><i class="anchor-icon"></i></a>WriteAccessAllowed</h4>
 <p>This object represents a service message about a user allowing a bot added to the attachment menu to write messages. Currently holds no information.</p>
 <h4><a class="anchor" name="videochatscheduled" href="#videochatscheduled"><i class="anchor-icon"></i></a>VideoChatScheduled</h4>
@@ -2057,7 +2060,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="keyboardbutton" href="#keyboardbutton"><i class="anchor-icon"></i></a>KeyboardButton</h4>
-<p>This object represents one button of the reply keyboard. For simple text buttons <em>String</em> can be used instead of this object to specify text of the button. Optional fields <em>web_app</em>, <em>request_contact</em>, <em>request_location</em>, and <em>request_poll</em> are mutually exclusive.</p>
+<p>This object represents one button of the reply keyboard. For simple text buttons, <em>String</em> can be used instead of this object to specify the button text. The optional fields <em>web_app</em>, <em>request_user</em>, <em>request_chat</em>, <em>request_contact</em>, <em>request_location</em>, and <em>request_poll</em> are mutually exclusive.</p>
 <table class="table">
 <thead>
 <tr>
@@ -2071,6 +2074,16 @@ To learn how to create…">
 <td>text</td>
 <td>String</td>
 <td>Text of the button. If none of the optional fields are used, it will be sent as a message when the button is pressed</td>
+</tr>
+<tr>
+<td>request_user</td>
+<td><a href="#keyboardbuttonrequestuser">KeyboardButtonRequestUser</a></td>
+<td><em>Optional.</em> If specified, pressing the button will open a list of suitable users. Tapping on any user will send their identifier to the bot in a “user_shared” service message. Available in private chats only.</td>
+</tr>
+<tr>
+<td>request_chat</td>
+<td><a href="#keyboardbuttonrequestchat">KeyboardButtonRequestChat</a></td>
+<td><em>Optional.</em> If specified, pressing the button will open a list of suitable chats. Tapping on a chat will send its identifier to the bot in a “chat_shared” service message. Available in private chats only.</td>
 </tr>
 <tr>
 <td>request_contact</td>
@@ -2094,7 +2107,88 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
-<p><strong>Note:</strong> <em>request_contact</em> and <em>request_location</em> options will only work in Telegram versions released after 9 April, 2016. Older clients will display <em>unsupported message</em>.<br><strong>Note:</strong> <em>request_poll</em> option will only work in Telegram versions released after 23 January, 2020. Older clients will display <em>unsupported message</em>.<br><strong>Note:</strong> <em>web_app</em> option will only work in Telegram versions released after 16 April, 2022. Older clients will display <em>unsupported message</em>.</p>
+<p><strong>Note:</strong> <em>request_contact</em> and <em>request_location</em> options will only work in Telegram versions released after 9 April, 2016. Older clients will display <em>unsupported message</em>.<br><strong>Note:</strong> <em>request_poll</em> option will only work in Telegram versions released after 23 January, 2020. Older clients will display <em>unsupported message</em>.<br><strong>Note:</strong> <em>web_app</em> option will only work in Telegram versions released after 16 April, 2022. Older clients will display <em>unsupported message</em>.<br><strong>Note:</strong> <em>request_user</em> and <em>request_chat</em> options will only work in Telegram versions released after 3 February, 2023. Older clients will display <em>unsupported message</em>.</p>
+<h4><a class="anchor" name="keyboardbuttonrequestuser" href="#keyboardbuttonrequestuser"><i class="anchor-icon"></i></a>KeyboardButtonRequestUser</h4>
+<p>This object defines the criteria used to request a suitable user. The identifier of the selected user will be shared with the bot when the corresponding button is pressed.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request_id</td>
+<td>Integer</td>
+<td>Signed 32-bit identifier of the request</td>
+</tr>
+<tr>
+<td>user_is_bot</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> to request a bot, pass <em>False</em> to request a regular user. If not specified, no additional restrictions are applied.</td>
+</tr>
+<tr>
+<td>user_is_premium</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> to request a premium user, pass <em>False</em> to request a non-premium user. If not specified, no additional restrictions are applied.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="keyboardbuttonrequestchat" href="#keyboardbuttonrequestchat"><i class="anchor-icon"></i></a>KeyboardButtonRequestChat</h4>
+<p>This object defines the criteria used to request a suitable chat. The identifier of the selected chat will be shared with the bot when the corresponding button is pressed.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request_id</td>
+<td>Integer</td>
+<td>Signed 32-bit identifier of the request</td>
+</tr>
+<tr>
+<td>chat_is_channel</td>
+<td>Boolean</td>
+<td>Pass <em>True</em> to request a channel chat, pass <em>False</em> to request a group or a supergroup chat.</td>
+</tr>
+<tr>
+<td>chat_is_forum</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> to request a forum supergroup, pass <em>False</em> to request a non-forum chat. If not specified, no additional restrictions are applied.</td>
+</tr>
+<tr>
+<td>chat_has_username</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> to request a supergroup or a channel with a username, pass <em>False</em> to request a chat without a username. If not specified, no additional restrictions are applied.</td>
+</tr>
+<tr>
+<td>chat_is_created</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> to request a chat owned by the user. Otherwise, no additional restrictions are applied.</td>
+</tr>
+<tr>
+<td>user_administrator_rights</td>
+<td><a href="#chatadministratorrights">ChatAdministratorRights</a></td>
+<td><em>Optional</em>. A JSON-serialized object listing the required administrator rights of the user in the chat. If not specified, no additional restrictions are applied.</td>
+</tr>
+<tr>
+<td>bot_administrator_rights</td>
+<td><a href="#chatadministratorrights">ChatAdministratorRights</a></td>
+<td><em>Optional</em>. A JSON-serialized object listing the required administrator rights of the bot in the chat. The rights must be a subset of <em>user_administrator_rights</em>. If not specified, no additional restrictions are applied.</td>
+</tr>
+<tr>
+<td>bot_is_member</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> to request a chat with the bot as a member. Otherwise, no additional restrictions are applied.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="keyboardbuttonpolltype" href="#keyboardbuttonpolltype"><i class="anchor-icon"></i></a>KeyboardButtonPollType</h4>
 <p>This object represents type of a poll, which is allowed to be created and sent when the corresponding button is pressed.</p>
 <table class="table">
@@ -2691,6 +2785,56 @@ To learn how to create…">
 <td><em>True</em>, if the user is a member of the chat at the moment of the request</td>
 </tr>
 <tr>
+<td>can_send_messages</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to send text messages, contacts, invoices, locations and venues</td>
+</tr>
+<tr>
+<td>can_send_audios</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to send audios</td>
+</tr>
+<tr>
+<td>can_send_documents</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to send documents</td>
+</tr>
+<tr>
+<td>can_send_photos</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to send photos</td>
+</tr>
+<tr>
+<td>can_send_videos</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to send videos</td>
+</tr>
+<tr>
+<td>can_send_video_notes</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to send video notes</td>
+</tr>
+<tr>
+<td>can_send_voice_notes</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to send voice notes</td>
+</tr>
+<tr>
+<td>can_send_polls</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to send polls</td>
+</tr>
+<tr>
+<td>can_send_other_messages</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to send animations, games, stickers and use inline bots</td>
+</tr>
+<tr>
+<td>can_add_web_page_previews</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to add web page previews to their messages</td>
+</tr>
+<tr>
 <td>can_change_info</td>
 <td>Boolean</td>
 <td><em>True</em>, if the user is allowed to change the chat title, photo and other settings</td>
@@ -2709,31 +2853,6 @@ To learn how to create…">
 <td>can_manage_topics</td>
 <td>Boolean</td>
 <td><em>True</em>, if the user is allowed to create forum topics</td>
-</tr>
-<tr>
-<td>can_send_messages</td>
-<td>Boolean</td>
-<td><em>True</em>, if the user is allowed to send text messages, contacts, locations and venues</td>
-</tr>
-<tr>
-<td>can_send_media_messages</td>
-<td>Boolean</td>
-<td><em>True</em>, if the user is allowed to send audios, documents, photos, videos, video notes and voice notes</td>
-</tr>
-<tr>
-<td>can_send_polls</td>
-<td>Boolean</td>
-<td><em>True</em>, if the user is allowed to send polls</td>
-</tr>
-<tr>
-<td>can_send_other_messages</td>
-<td>Boolean</td>
-<td><em>True</em>, if the user is allowed to send animations, games, stickers and use inline bots</td>
-</tr>
-<tr>
-<td>can_add_web_page_previews</td>
-<td>Boolean</td>
-<td><em>True</em>, if the user is allowed to add web page previews to their messages</td>
 </tr>
 <tr>
 <td>until_date</td>
@@ -2858,6 +2977,11 @@ To learn how to create…">
 <td>User that sent the join request</td>
 </tr>
 <tr>
+<td>user_chat_id</td>
+<td>Integer</td>
+<td>Identifier of a private chat with the user who sent the join request. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier. The bot can use this identifier for 24 hours to send messages until the join request is processed, assuming no other administrator contacted the user.</td>
+</tr>
+<tr>
 <td>date</td>
 <td>Integer</td>
 <td>Date the request was sent in Unix time</td>
@@ -2888,27 +3012,52 @@ To learn how to create…">
 <tr>
 <td>can_send_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the user is allowed to send text messages, contacts, locations and venues</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send text messages, contacts, invoices, locations and venues</td>
 </tr>
 <tr>
-<td>can_send_media_messages</td>
+<td>can_send_audios</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the user is allowed to send audios, documents, photos, videos, video notes and voice notes, implies can_send_messages</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send audios</td>
+</tr>
+<tr>
+<td>can_send_documents</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send documents</td>
+</tr>
+<tr>
+<td>can_send_photos</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send photos</td>
+</tr>
+<tr>
+<td>can_send_videos</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send videos</td>
+</tr>
+<tr>
+<td>can_send_video_notes</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send video notes</td>
+</tr>
+<tr>
+<td>can_send_voice_notes</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send voice notes</td>
 </tr>
 <tr>
 <td>can_send_polls</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the user is allowed to send polls, implies can_send_messages</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send polls</td>
 </tr>
 <tr>
 <td>can_send_other_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the user is allowed to send animations, games, stickers and use inline bots, implies can_send_media_messages</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send animations, games, stickers and use inline bots</td>
 </tr>
 <tr>
 <td>can_add_web_page_previews</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the user is allowed to add web page previews to their messages, implies can_send_media_messages</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to add web page previews to their messages</td>
 </tr>
 <tr>
 <td>can_change_info</td>
@@ -5399,6 +5548,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>A JSON-serialized object for new user permissions</td>
 </tr>
 <tr>
+<td>use_independent_chat_permissions</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if chat permissions are set independently. Otherwise, the <em>can_send_other_messages</em> and <em>can_add_web_page_previews</em> permissions will imply the <em>can_send_messages</em>, <em>can_send_audios</em>, <em>can_send_documents</em>, <em>can_send_photos</em>, <em>can_send_videos</em>, <em>can_send_video_notes</em>, and <em>can_send_voice_notes</em> permissions; the <em>can_send_polls</em> permission will imply the <em>can_send_messages</em> permission.</td>
+</tr>
+<tr>
 <td>until_date</td>
 <td>Integer</td>
 <td>Optional</td>
@@ -5611,6 +5766,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><a href="#chatpermissions">ChatPermissions</a></td>
 <td>Yes</td>
 <td>A JSON-serialized object for new default chat permissions</td>
+</tr>
+<tr>
+<td>use_independent_chat_permissions</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if chat permissions are set independently. Otherwise, the <em>can_send_other_messages</em> and <em>can_add_web_page_previews</em> permissions will imply the <em>can_send_messages</em>, <em>can_send_audios</em>, <em>can_send_documents</em>, <em>can_send_photos</em>, <em>can_send_videos</em>, <em>can_send_video_notes</em>, and <em>can_send_voice_notes</em> permissions; the <em>can_send_polls</em> permission will imply the <em>can_send_messages</em> permission.</td>
 </tr>
 </tbody>
 </table>
