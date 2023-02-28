@@ -375,6 +375,8 @@ var NewAd = {
       state.textField.on('input.curPage', NewAd.onTextInput);
       state.promoteUrlField = state.$form.field('promote_url');
       state.promoteUrlField.on('change.curPage', NewAd.onPromoteUrlChange);
+      state.adInfoField = state.$form.field('ad_info');
+      state.adInfoField.on('change.curPage', NewAd.onAdInfoChange);
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
       NewAd.updateAdPreview(state.$form, state.previewData);
@@ -405,11 +407,15 @@ var NewAd = {
       state.titleField.off('.curPage');
       state.textField.off('.curPage');
       state.promoteUrlField.off('.curPage');
+      state.adInfoField.off('.curPage');
       state.confirmedCheckbox.off('.curPage');
       clearTimeout(state.saveDraftTo);
     });
   },
   onTitleChange: function() {
+    Ads.hideFieldError($(this));
+  },
+  onAdInfoChange: function() {
     Ads.hideFieldError($(this));
   },
   onConfirmedChange: function() {
@@ -801,6 +807,7 @@ var NewAd = {
       $form.field('title').value(),
       $form.field('text').value(),
       $form.field('promote_url').value(),
+      $form.field('ad_info').value(),
       $form.field('cpm').value(),
       $form.field('budget').value()
     ];
@@ -840,6 +847,7 @@ var NewAd = {
     var title       = $form.field('title').value();
     var text        = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
+    var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
     var budget      = Ads.amountFieldValue($form, 'budget');
 
@@ -868,6 +876,7 @@ var NewAd = {
       title: title,
       text: text,
       promote_url: promote_url,
+      ad_info: ad_info,
       cpm: cpm,
       budget: budget
     };
@@ -920,6 +929,7 @@ var NewAd = {
     var title       = $form.field('title').value();
     var text        = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
+    var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
     var budget      = Ads.amountFieldValue($form, 'budget');
 
@@ -932,6 +942,7 @@ var NewAd = {
       title: title,
       text: text,
       promote_url: promote_url,
+      ad_info: ad_info,
       cpm: cpm,
       budget: budget
     };
@@ -965,6 +976,7 @@ var NewAd = {
     $form.field('title').value('');
     $form.field('text').value('');
     $form.field('promote_url').value('');
+    $form.field('ad_info').value('');
     $form.field('cpm').value('');
     $form.field('budget').value('');
     $form.field('picture').prop('checked', false);
@@ -999,7 +1011,8 @@ var Account = {
     'email',
     'phone_number',
     'country',
-    'city'
+    'city',
+    'ad_info'
   ],
   addFundsFormFields: [
     'adv_type',
@@ -1008,6 +1021,9 @@ var Account = {
     'annual_budget',
     'additional_comment',
   ],
+  optFields: {
+    ad_info: 1
+  },
   init: function() {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
@@ -1094,7 +1110,7 @@ var Account = {
     for (var i = 0; i < Account.formFields.length; i++) {
       var field = Account.formFields[i];
       var value = $form.field(field).value();
-      if (!value.length) {
+      if (!value.length && !Account.optFields[field]) {
         $form.field(field).focus();
         return false;
       }
@@ -1182,7 +1198,7 @@ var Account = {
     for (var i = 0; i < Account.formFields.length; i++) {
       var field = Account.formFields[i];
       var value = $form.field(field).value();
-      if (!value.length) {
+      if (!value.length && !Account.optFields[field]) {
         $form.field(field).focus();
         return false;
       }
