@@ -106,6 +106,9 @@ var DemoApp = {
       Telegram.WebApp.sendData(new Date().toString());
     }
   },
+  switchInlineQuery: function(query, choose_chat) {
+    Telegram.WebApp.switchInlineQuery(query, choose_chat ? ['users', 'bots', 'groups', 'channels'] : false);
+  },
   requestLocation: function(el) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function (position) {
