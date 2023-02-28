@@ -42,7 +42,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/pfs" >Perfect Forward Secrecy</a></li></ul></div>
   <h1 id="dev_page_title">Perfect Forward Secrecy</h1>
   
-  <div id="dev_page_content"><h5><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related articles</h5>
+  <div id="dev_page_content"><h5><a class="anchor" name="related-articles" href="#related-articles"><i class="anchor-icon"></i></a>Related articles</h5>
 <p><div class="dev_page_nav_wrap"></p>
 <ul>
 <li><a href="/api/end-to-end/pfs">Perfect Forward Secrecy in Secret Chats</a></li>
@@ -54,7 +54,7 @@
 </blockquote>
 <hr>
 <p>Telegram supports Perfect Forward Secrecy (PFS).</p>
-<p>To make this possible, the client generates a permanent authorization key using <strong>p_q_inner_data</strong> and a temporary key using <strong>p_q_inner_data_temp</strong>. (See <a href="/mtproto/auth_key">Creating an Authorization Key</a> for more info.) These 2 operations may be done in parallel and even using the same connection. The client must save an <strong>expires_at</strong> unix timestamp <code>expires_at = time + expires_in</code>.</p>
+<p>To make this possible, the client generates a permanent authorization key using <strong>p_q_inner_data</strong> and a temporary key using <strong>p_q_inner_data_temp</strong>. (See <a href="/mtproto/auth_key">Creating an Authorization Key</a> for more info.) These 2 operations may be done in parallel using different connections. The client must save an <strong>expires_at</strong> unix timestamp <code>expires_at = time + expires_in</code>.</p>
 <p><strong>Important</strong>: in order to achieve PFS, the client must <strong>never</strong> use the permanent auth_key_id directly. Every message that is sent to MTProto, must be encrypted by a <strong>temp_auth_key_id</strong>, that was bound to the <strong>perm_auth_key_id</strong>.</p>
 <p>An unbound <strong>temp_auth_key_id</strong> may only be used with the following methods:</p>
 <ul>
@@ -62,10 +62,11 @@
 <li><a href="/method/help.getConfig">help.getConfig</a></li>
 <li><a href="/method/help.getNearestDc">help.getNearestDc</a></li>
 </ul>
-<p>In order to bind a temporary authorization key to the permanent key the client creates a <a href="/method/auth.bindTempAuthKey#binding-message-contents">special binding message</a> and executes the <a href="/method/auth.bindTempAuthKey">auth.bindTempAuthKey</a> method using <strong>temp_auth_key</strong>. Once <strong>auth.bindTempAuthKey</strong> has been executed successfully, the client may signUp / signIn using other auth.* methods and continue using the API as usual; the client must also <a href="/api/invoking#saving-client-info">rewrite client info</a> using <a href="/method/initConnection">initConnection</a> after each binding. Each permanent key may only be bound to <strong>one</strong> temporary key at a time, binding a new temporary key overwrites the previous one.</p>
+<p>In order to bind a temporary authorization key to the permanent key the client creates a <a href="/method/auth.bindTempAuthKey#binding-message-contents">special binding message</a> and executes the <a href="/method/auth.bindTempAuthKey">auth.bindTempAuthKey</a> method using <strong>temp_auth_key</strong>. Once <strong>auth.bindTempAuthKey</strong> has been executed successfully, the client may continue using the API as usual; the client must also <a href="/api/invoking#saving-client-info">rewrite client info</a> using <a href="/method/initConnection">initConnection</a> after each binding. Each permanent key may only be bound to <strong>one</strong> temporary key at a time, binding a new temporary key overwrites the previous one.</p>
 <p>Once the temporary key expires, the client needs to generate a new temporary key using <strong>p_q_inner_data_temp</strong>. Then it needs to re-bind that new temporary key to the initial permanent key. A new key can also be generated in advance, so that the client has a new key ready by the time the old one has expired.</p>
 <p>For additional security, the client can store the temporary authorization key in RAM only and never save it in persistent storage.</p>
-<p>A temporary authorization key may expire at any moment before <strong>expires_at</strong>, since such keys are also stored only in the RAM on the server-side. Be prepared to handle resulting MTProto errors correctly (non-existent auth_key_id results in a 404 error).</p></div>
+<p>A temporary authorization key may expire at any moment before <strong>expires_at</strong>, since such keys are also stored only in the RAM on the server-side. Be prepared to handle resulting MTProto errors correctly (non-existent auth_key_id results in a 404 error).</p>
+</div>
   
 </div>
           
