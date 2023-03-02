@@ -106,6 +106,22 @@ var DemoApp = {
       Telegram.WebApp.sendData(new Date().toString());
     }
   },
+  switchInlineQuery: function(query, choose_chat) {
+    var choose_chat_types = false;
+    if (choose_chat) {
+      var choose_chat_types = [];
+      var types = ['users', 'bots', 'groups', 'channels'];
+      for (var i = 0; i < types.length; i++) {
+        if ($('#select-' + types[i]).prop('checked')) {
+          choose_chat_types.push(types[i]);
+        }
+      }
+      if (!choose_chat_types.length) {
+        return DemoApp.showAlert('Select chat types!');
+      }
+    }
+    Telegram.WebApp.switchInlineQuery(query, choose_chat_types);
+  },
   requestLocation: function(el) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function (position) {
