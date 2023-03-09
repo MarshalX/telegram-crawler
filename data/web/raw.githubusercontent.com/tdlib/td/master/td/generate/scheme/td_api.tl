@@ -135,8 +135,9 @@ authorizationStateWaitRegistration terms_of_service:termsOfService = Authorizati
 //-Call checkAuthenticationPassword to provide the password, or requestAuthenticationPasswordRecovery to recover the password, or deleteAccount to delete the account after a week
 //@password_hint Hint for the password; may be empty
 //@has_recovery_email_address True, if a recovery email address has been set up
+//@has_passport_data True, if some Telegram Passport elements were saved
 //@recovery_email_address_pattern Pattern of the email address to which the recovery email was sent; empty until a recovery email has been sent
-authorizationStateWaitPassword password_hint:string has_recovery_email_address:Bool recovery_email_address_pattern:string = AuthorizationState;
+authorizationStateWaitPassword password_hint:string has_recovery_email_address:Bool has_passport_data:Bool recovery_email_address_pattern:string = AuthorizationState;
 
 //@description The user has been successfully authorized. TDLib is now ready to answer general requests
 authorizationStateReady = AuthorizationState;
@@ -462,15 +463,23 @@ location latitude:double longitude:double horizontal_accuracy:double = Location;
 //@type Type of the venue in the provider database; as defined by the sender
 venue location:location title:string address:string provider:string id:string type:string = Venue;
 
-//@description Describes a game
+//@description Describes a game. Use getInternalLink with internalLinkTypeGame to share the game
 //@id Unique game identifier
-//@short_name Game short name. To share a game use the URL https://t.me/{bot_username}?game={game_short_name}
+//@short_name Game short name
 //@title Game title
 //@text Game text, usually containing scoreboards for a game
 //@param_description Game description
 //@photo Game photo
 //@animation Game animation; may be null
 game id:int64 short_name:string title:string text:formattedText description:string photo:photo animation:animation = Game;
+
+//@description Describes a Web App. Use getInternalLink with internalLinkTypeWebApp to share the Web App
+//@short_name Web App short name
+//@title Web App title
+//@param_description Web App description
+//@photo Web App photo
+//@animation Web App animation; may be null
+webApp short_name:string title:string description:string photo:photo animation:animation = WebApp;
 
 //@description Describes a poll
 //@id Unique poll identifier
@@ -595,7 +604,7 @@ inputChatPhotoSticker sticker:chatPhotoSticker = InputChatPhoto;
 
 
 //@description Describes actions that a user is allowed to take in a chat
-//@can_send_messages True, if the user can send text messages, contacts, invoices, locations, and venues
+//@can_send_basic_messages True, if the user can send text messages, contacts, invoices, locations, and venues
 //@can_send_audios True, if the user can send music files
 //@can_send_documents True, if the user can send documents
 //@can_send_photos True, if the user can send audio photos
@@ -609,7 +618,7 @@ inputChatPhotoSticker sticker:chatPhotoSticker = InputChatPhoto;
 //@can_invite_users True, if the user can invite new users to the chat
 //@can_pin_messages True, if the user can pin messages
 //@can_manage_topics True, if the user can manage topics
-chatPermissions can_send_messages:Bool can_send_audios:Bool can_send_documents:Bool can_send_photos:Bool can_send_videos:Bool can_send_video_notes:Bool can_send_voice_notes:Bool can_send_polls:Bool can_send_other_messages:Bool can_add_web_page_previews:Bool can_change_info:Bool can_invite_users:Bool can_pin_messages:Bool can_manage_topics:Bool = ChatPermissions;
+chatPermissions can_send_basic_messages:Bool can_send_audios:Bool can_send_documents:Bool can_send_photos:Bool can_send_videos:Bool can_send_video_notes:Bool can_send_voice_notes:Bool can_send_polls:Bool can_send_other_messages:Bool can_add_web_page_previews:Bool can_change_info:Bool can_invite_users:Bool can_pin_messages:Bool can_manage_topics:Bool = ChatPermissions;
 
 //@description Describes rights of the administrator
 //@can_manage_chat True, if the administrator can get chat event log, get chat statistics, get message statistics in channels, get channel members, see anonymous administrators in supergroups and ignore slow mode. Implied by any other privilege; applicable to supergroups and channels only
@@ -683,7 +692,7 @@ user id:int53 first_name:string last_name:string usernames:usernames phone_numbe
 
 
 //@description Contains information about a bot
-//@share_text The text that is shown on the bot's profile page and is sent together with the link when users share the bot
+//@short_description The text that is shown on the bot's profile page and is sent together with the link when users share the bot
 //@param_description The text shown in the chat with the bot if the chat is empty
 //@photo Photo shown in the chat with the bot if the chat is empty; may be null
 //@animation Animation shown in the chat with the bot if the chat is empty; may be null
@@ -691,7 +700,7 @@ user id:int53 first_name:string last_name:string usernames:usernames phone_numbe
 //@commands List of the bot commands
 //@default_group_administrator_rights Default administrator rights for adding the bot to basic group and supergroup chats; may be null
 //@default_channel_administrator_rights Default administrator rights for adding the bot to channels; may be null
-botInfo share_text:string description:string photo:photo animation:animation menu_button:botMenuButton commands:vector<botCommand> default_group_administrator_rights:chatAdministratorRights default_channel_administrator_rights:chatAdministratorRights = BotInfo;
+botInfo short_description:string description:string photo:photo animation:animation menu_button:botMenuButton commands:vector<botCommand> default_group_administrator_rights:chatAdministratorRights default_channel_administrator_rights:chatAdministratorRights = BotInfo;
 
 //@description Contains full information about a user
 //@personal_photo User profile photo set by the current user for the contact; may be null. If null and user.profile_photo is null, then the photo is empty; otherwise, it is unknown.
@@ -992,6 +1001,13 @@ chatMessageSender sender:MessageSender needs_premium:Bool = ChatMessageSender;
 chatMessageSenders senders:vector<chatMessageSender> = ChatMessageSenders;
 
 
+//@description Represents a viewer of a message @user_id User identifier of the viewer @view_date Approximate point in time (Unix timestamp) when the message was viewed
+messageViewer user_id:int53 view_date:int32 = MessageViewer;
+
+//@description Represents a list of message viewers @viewers List of message viewers
+messageViewers viewers:vector<messageViewer> = MessageViewers;
+
+
 //@class MessageForwardOrigin @description Contains information about the origin of a forwarded message
 
 //@description The message was originally sent by a known user @sender_user_id Identifier of the user that originally sent the message
@@ -1063,8 +1079,8 @@ unreadReaction type:ReactionType sender_id:MessageSender is_big:Bool = UnreadRea
 
 //@class MessageSendingState @description Contains information about the sending state of the message
 
-//@description The message is being sent now, but has not yet been delivered to the server
-messageSendingStatePending = MessageSendingState;
+//@description The message is being sent now, but has not yet been delivered to the server @sending_id Non-persistent message sending identifier, specified by the application
+messageSendingStatePending sending_id:int32 = MessageSendingState;
 
 //@description The message failed to be sent
 //@error_code An error code; 0 if unknown
@@ -1139,6 +1155,36 @@ messageCalendarDay total_count:int32 message:message = MessageCalendarDay;
 messageCalendar total_count:int32 days:vector<messageCalendarDay> = MessageCalendar;
 
 
+//@class MessageSource @description Describes source of a message
+
+//@description The message is from a chat history
+messageSourceChatHistory = MessageSource;
+
+//@description The message is from a message thread history
+messageSourceMessageThreadHistory = MessageSource;
+
+//@description The message is from a forum topic history
+messageSourceForumTopicHistory = MessageSource;
+
+//@description The message is from chat, message thread or forum topic history preview
+messageSourceHistoryPreview = MessageSource;
+
+//@description The message is from a chat list or a forum topic list
+messageSourceChatList = MessageSource;
+
+//@description The message is from search results, including file downloads, local file list, outgoing document messages, calendar
+messageSourceSearch = MessageSource;
+
+//@description The message is from a chat event log
+messageSourceChatEventLog = MessageSource;
+
+//@description The message is from a notification
+messageSourceNotification = MessageSource;
+
+//@description The message is from some other source
+messageSourceOther = MessageSource;
+
+
 //@description Describes a sponsored message
 //@message_id Message identifier; unique for the chat to which the sponsored message belongs among both ordinary and sponsored messages
 //@is_recommended True, if the message needs to be labeled as "recommended" instead of "sponsored"
@@ -1147,7 +1193,9 @@ messageCalendar total_count:int32 days:vector<messageCalendarDay> = MessageCalen
 //@show_chat_photo True, if the sponsor's chat photo must be shown
 //@link An internal link to be opened when the sponsored message is clicked; may be null if the sponsor chat needs to be opened instead
 //@content Content of the message. Currently, can be only of the type messageText
-sponsoredMessage message_id:int53 is_recommended:Bool sponsor_chat_id:int53 sponsor_chat_info:chatInviteLinkInfo show_chat_photo:Bool link:InternalLinkType content:MessageContent = SponsoredMessage;
+//@sponsor_info If non-empty, information about the sponsor to be shown along with the message
+//@additional_info If non-empty, additional information about the sponsored message to be shown along with the message
+sponsoredMessage message_id:int53 is_recommended:Bool sponsor_chat_id:int53 sponsor_chat_info:chatInviteLinkInfo show_chat_photo:Bool link:InternalLinkType content:MessageContent sponsor_info:string additional_info:string = SponsoredMessage;
 
 //@description Contains a list of sponsored messages @messages List of sponsored messages @messages_between The minimum number of messages between shown sponsored messages, or 0 if only one sponsored message must be shown after all ordinary messages
 sponsoredMessages messages:vector<sponsoredMessage> messages_between:int32 = SponsoredMessages;
@@ -1500,16 +1548,22 @@ replyMarkupInlineKeyboard rows:vector<vector<inlineKeyboardButton>> = ReplyMarku
 
 //@class LoginUrlInfo @description Contains information about an inline button of type inlineKeyboardButtonTypeLoginUrl
 
-//@description An HTTP URL needs to be open @url The URL to open @skip_confirm True, if there is no need to show an ordinary open URL confirm
-loginUrlInfoOpen url:string skip_confirm:Bool = LoginUrlInfo;
+//@description An HTTP URL needs to be open @url The URL to open @skip_confirmation True, if there is no need to show an ordinary open URL confirmation
+loginUrlInfoOpen url:string skip_confirmation:Bool = LoginUrlInfo;
 
 //@description An authorization confirmation dialog needs to be shown to the user
 //@url An HTTP URL to be opened
 //@domain A domain of the URL
 //@bot_user_id User identifier of a bot linked with the website
-//@request_write_access True, if the user needs to be requested to give the permission to the bot to send them messages
+//@request_write_access True, if the user must be asked for the permission to the bot to send them messages
 loginUrlInfoRequestConfirmation url:string domain:string bot_user_id:int53 request_write_access:Bool = LoginUrlInfo;
 
+
+//@description Contains information about a Web App found by its short name
+//@web_app The Web App
+//@request_write_access True, if the user must be asked for the permission to the bot to send them messages
+//@skip_confirmation True, if there is no need to show an ordinary open URL confirmation before opening the Web App. The field must be ignored and confirmation must be shown anyway if the Web App link was hidden
+foundWebApp web_app:webApp request_write_access:Bool skip_confirmation:Bool = FoundWebApp;
 
 //@description Contains information about a Web App @launch_id Unique identifier for the Web App launch @url A Web App URL to open in a web view
 webAppInfo launch_id:int64 url:string = WebAppInfo;
@@ -2388,13 +2442,13 @@ messageGame game:game = MessageContent;
 //@description A message with a poll @poll The poll description
 messagePoll poll:poll = MessageContent;
 
-//@description A message with an invoice from a bot
+//@description A message with an invoice from a bot. Use getInternalLink with internalLinkTypeBotStart to share the invoice
 //@title Product title
 //@param_description Product description
 //@photo Product photo; may be null
 //@currency Currency for the product price
 //@total_amount Product total price in the smallest units of the currency
-//@start_parameter Unique invoice bot start_parameter. To share an invoice use the URL https://t.me/{bot_username}?start={start_parameter}
+//@start_parameter Unique invoice bot start_parameter to be passed to getInternalLink
 //@is_test True, if the invoice is a test invoice
 //@need_shipping_address True, if the shipping address must be specified
 //@receipt_message_id The identifier of the message with the receipt, after the product has been purchased
@@ -2526,8 +2580,8 @@ messageChatShared chat_id:int53 button_id:int32 = MessageContent;
 //@description The current user has connected a website by logging in using Telegram Login Widget on it @domain_name Domain name of the connected website
 messageWebsiteConnected domain_name:string = MessageContent;
 
-//@description The user allowed the bot to send messages
-messageBotWriteAccessAllowed = MessageContent;
+//@description The user allowed the bot to send messages @web_app Information about the Web App, which requested the access; may be null if none or the Web App was opened from the attachment menu
+messageBotWriteAccessAllowed web_app:webApp = MessageContent;
 
 //@description Data from a Web App has been sent to a bot @button_text Text of the keyboardButtonTypeWebApp button, which opened the Web App
 messageWebAppDataSent button_text:string = MessageContent;
@@ -2633,7 +2687,8 @@ messageSchedulingStateSendWhenOnline = MessageSchedulingState;
 //@protect_content Pass true if the content of the message must be protected from forwarding and saving; for bots only
 //@update_order_of_installed_sticker_sets Pass true if the user explicitly chosen a sticker or a custom emoji from an installed sticker set; applicable only to sendMessage and sendMessageAlbum
 //@scheduling_state Message scheduling state; pass null to send message immediately. Messages sent to a secret chat, live location messages and self-destructing messages can't be scheduled
-messageSendOptions disable_notification:Bool from_background:Bool protect_content:Bool update_order_of_installed_sticker_sets:Bool scheduling_state:MessageSchedulingState = MessageSendOptions;
+//@sending_id Non-persistent identifier, which will be returned back in messageSendingStatePending object and can be used to match sent messages and corresponding updateNewMessage updates
+messageSendOptions disable_notification:Bool from_background:Bool protect_content:Bool update_order_of_installed_sticker_sets:Bool scheduling_state:MessageSchedulingState sending_id:int32 = MessageSendOptions;
 
 //@description Options to be used when a message content is copied without reference to the original sender. Service messages and messageInvoice can't be copied
 //@send_copy True, if content of the message needs to be copied without reference to the original sender. Always true if the message is forwarded to a secret chat or is local
@@ -2945,9 +3000,9 @@ trendingStickerSets total_count:int32 sets:vector<stickerSetInfo> is_premium:Boo
 
 //@description Contains a list of similar emoji to search for in getStickers and searchStickers
 //@name Name of the category
-//@icon_custom_emoji_id Unique identifier of the custom emoji, which represents icon of the category
+//@icon Custom emoji sticker, which represents icon of the category
 //@emojis List of emojis in the category
-emojiCategory name:string icon_custom_emoji_id:int64 emojis:vector<string> = EmojiCategory;
+emojiCategory name:string icon:sticker emojis:vector<string> = EmojiCategory;
 
 //@description Represents a list of emoji categories @categories List of categories
 emojiCategories categories:vector<emojiCategory> = EmojiCategories;
@@ -3193,8 +3248,8 @@ firebaseAuthenticationSettingsIos device_token:string is_app_sandbox:Bool = Fire
 phoneNumberAuthenticationSettings allow_flash_call:Bool allow_missed_call:Bool is_current_phone_number:Bool allow_sms_retriever_api:Bool firebase_authentication_settings:FirebaseAuthenticationSettings authentication_tokens:vector<string> = PhoneNumberAuthenticationSettings;
 
 
-//@description Represents a reaction applied to a message @type Type of the reaction @sender_id Identifier of the chat member, applied the reaction
-addedReaction type:ReactionType sender_id:MessageSender = AddedReaction;
+//@description Represents a reaction applied to a message @type Type of the reaction @sender_id Identifier of the chat member, applied the reaction @date Point in time (Unix timestamp) when the reaction was added
+addedReaction type:ReactionType sender_id:MessageSender date:int32 = AddedReaction;
 
 //@description Represents a list of reactions added to a message @total_count The total number of found reactions @reactions The list of added reactions @next_offset The offset for the next request. If empty, there are no more results
 addedReactions total_count:int32 reactions:vector<addedReaction> next_offset:string = AddedReactions;
@@ -3270,7 +3325,7 @@ attachmentMenuBotColor light_color:int32 dark_color:int32 = AttachmentMenuBotCol
 //@supports_group_chats True, if the bot supports opening from attachment menu in basic group and supergroup chats
 //@supports_channel_chats True, if the bot supports opening from attachment menu in channel chats
 //@supports_settings True, if the bot supports "settings_button_pressed" event
-//@request_write_access True, if the user needs to be requested to give the permission to the bot to send them messages
+//@request_write_access True, if the user must be asked for the permission to the bot to send them messages
 //@name Name for the bot in attachment menu
 //@name_color Color to highlight selected name of the bot if appropriate; may be null
 //@default_icon Default attachment menu icon for the bot in SVG format; may be null
@@ -3509,13 +3564,25 @@ inlineQueryResultVideo id:string video:video title:string description:string = I
 inlineQueryResultVoiceNote id:string voice_note:voiceNote title:string = InlineQueryResult;
 
 
+//@class InlineQueryResultsButtonType @description Represents a type of a button in results of inline query
+
+//@description Describes the button that opens a private chat with the bot and sends a start message to the bot with the given parameter @parameter The parameter for the bot start message
+inlineQueryResultsButtonTypeStartBot parameter:string = InlineQueryResultsButtonType;
+
+//@description Describes the button that opens a Web App by calling getWebAppUrl @url An HTTP URL to pass to getWebAppUrl
+inlineQueryResultsButtonTypeWebApp url:string = InlineQueryResultsButtonType;
+
+
+//@description Represents a button to be shown above inline query results @text The text of the button @type Type of the button
+inlineQueryResultsButton text:string type:InlineQueryResultsButtonType = InlineQueryResultsButton;
+
+
 //@description Represents the results of the inline query. Use sendInlineQueryResultMessage to send the result of the query
 //@inline_query_id Unique identifier of the inline query
-//@next_offset The offset for the next request. If empty, there are no more results
+//@button Button to be shown above inline query results; may be null
 //@results Results of the query
-//@switch_pm_text If non-empty, this text must be shown on the button, which opens a private chat with the bot and sends the bot a start message with the switch_pm_parameter
-//@switch_pm_parameter Parameter for the bot start message
-inlineQueryResults inline_query_id:int64 next_offset:string results:vector<InlineQueryResult> switch_pm_text:string switch_pm_parameter:string = InlineQueryResults;
+//@next_offset The offset for the next request. If empty, there are no more results
+inlineQueryResults inline_query_id:int64 button:inlineQueryResultsButton results:vector<InlineQueryResult> next_offset:string = InlineQueryResults;
 
 
 //@class CallbackQueryPayload @description Represents a payload of a callback query
@@ -4522,6 +4589,13 @@ internalLinkTypeAuthenticationCode code:string = InternalLinkType;
 //@description The link is a link to a background. Call searchBackground with the given background name to process the link @background_name Name of the background
 internalLinkTypeBackground background_name:string = InternalLinkType;
 
+//@description The link is a link to a Telegram bot, which is supposed to be added to a channel chat as an administrator. Call searchPublicChat with the given bot username and check that the user is a bot,
+//-ask the current user to select a channel chat to add the bot to as an administrator. Then, call getChatMember to receive the current bot rights in the chat and if the bot already is an administrator,
+//-check that the current user can edit its administrator rights and combine received rights with the requested administrator rights. Then, show confirmation box to the user, and call setChatMemberStatus with the chosen chat and confirmed rights
+//@bot_username Username of the bot
+//@administrator_rights Expected administrator rights for the bot
+internalLinkTypeBotAddToChannel bot_username:string administrator_rights:chatAdministratorRights = InternalLinkType;
+
 //@description The link is a link to a chat with a Telegram bot. Call searchPublicChat with the given bot username, check that the user is a bot, show START button in the chat with the bot,
 //-and then call sendBotStartMessage with the given start parameter after the button is pressed
 //@bot_username Username of the bot
@@ -4539,13 +4613,6 @@ internalLinkTypeBotStart bot_username:string start_parameter:string autostart:Bo
 //@start_parameter The parameter to be passed to sendBotStartMessage
 //@administrator_rights Expected administrator rights for the bot; may be null
 internalLinkTypeBotStartInGroup bot_username:string start_parameter:string administrator_rights:chatAdministratorRights = InternalLinkType;
-
-//@description The link is a link to a Telegram bot, which is supposed to be added to a channel chat as an administrator. Call searchPublicChat with the given bot username and check that the user is a bot,
-//-ask the current user to select a channel chat to add the bot to as an administrator. Then, call getChatMember to receive the current bot rights in the chat and if the bot already is an administrator,
-//-check that the current user can edit its administrator rights and combine received rights with the requested administrator rights. Then, show confirmation box to the user, and call setChatMemberStatus with the chosen chat and confirmed rights
-//@bot_username Username of the bot
-//@administrator_rights Expected administrator rights for the bot
-internalLinkTypeBotAddToChannel bot_username:string administrator_rights:chatAdministratorRights = InternalLinkType;
 
 //@description The link is a link to the change phone number section of the app
 internalLinkTypeChangePhoneNumber = InternalLinkType;
@@ -4601,7 +4668,7 @@ internalLinkTypePassportDataRequest bot_user_id:int53 scope:string public_key:st
 //@phone_number Phone number value from the link
 internalLinkTypePhoneNumberConfirmation hash:string phone_number:string = InternalLinkType;
 
-//@description The link is a link to the Premium features screen of the applcation from which the user can subscribe to Telegram Premium. Call getPremiumFeatures with the given referrer to process the link @referrer Referrer specified in the link
+//@description The link is a link to the Premium features screen of the application from which the user can subscribe to Telegram Premium. Call getPremiumFeatures with the given referrer to process the link @referrer Referrer specified in the link
 internalLinkTypePremiumFeatures referrer:string = InternalLinkType;
 
 //@description The link is a link to the privacy and security section of the app settings
@@ -4654,6 +4721,13 @@ internalLinkTypeUserToken token:string = InternalLinkType;
 //@invite_hash If non-empty, invite hash to be used to join the video chat without being muted by administrators
 //@is_live_stream True, if the video chat is expected to be a live stream in a channel or a broadcast group
 internalLinkTypeVideoChat chat_username:string invite_hash:string is_live_stream:Bool = InternalLinkType;
+
+//@description The link is a link to a Web App. Call searchPublicChat with the given bot username, check that the user is a bot, then call searchWebApp with the received bot and the given web_app_short_name.
+//-Process received foundWebApp by showing a confirmation dialog if needed, then calling getWebAppLinkUrl and opening the returned URL
+//@bot_username Username of the bot that owns the Web App
+//@web_app_short_name Short name of the Web App
+//@start_parameter Start parameter to be passed to getWebAppLinkUrl
+internalLinkTypeWebApp bot_username:string web_app_short_name:string start_parameter:string = InternalLinkType;
 
 
 //@description Contains an HTTPS link to a message in a supergroup or channel, or a forum topic @link The link @is_public True, if the link will work for non-members of the chat
@@ -4993,12 +5067,12 @@ proxies proxies:vector<proxy> = Proxies;
 
 
 //@description A sticker to be added to a sticker set
-//@sticker File with the sticker; must fit in a 512x512 square. For WEBP stickers and masks the file must be in PNG format, which will be converted to WEBP server-side.
-//-Otherwise, the file must be local or uploaded within a week. See https://core.telegram.org/animated_stickers#technical-requirements for technical requirements
-//@emojis Emojis corresponding to the sticker
-//@format Sticker format
+//@sticker File with the sticker; must fit in a 512x512 square. For WEBP stickers the file must be in WEBP or PNG format, which will be converted to WEBP server-side.
+//-See https://core.telegram.org/animated_stickers#technical-requirements for technical requirements
+//@emojis String with 1-20 emoji corresponding to the sticker
 //@mask_position Position where the mask is placed; pass null if not specified
-inputSticker sticker:InputFile emojis:string format:StickerFormat mask_position:maskPosition = InputSticker;
+//@keywords List of up to 20 keywords with total length up to 64 characters, which can be used to find the sticker
+inputSticker sticker:InputFile emojis:string mask_position:maskPosition keywords:vector<string> = InputSticker;
 
 
 //@description Represents a date range @start_date Point in time (Unix timestamp) at which the date range begins @end_date Point in time (Unix timestamp) at which the date range ends
@@ -5486,6 +5560,9 @@ updateAnimationSearchParameters provider:string emojis:vector<string> = Update;
 //@description The list of suggested to the user actions has changed @added_actions Added suggested actions @removed_actions Removed suggested actions
 updateSuggestedActions added_actions:vector<SuggestedAction> removed_actions:vector<SuggestedAction> = Update;
 
+//@description Adding users to a chat has failed because of their privacy settings. An invite link can be shared with the users if appropriate @chat_id Chat identifier @user_ids Identifiers of users, which weren't added because of their privacy settings
+updateAddChatMembersPrivacyForbidden chat_id:int53 user_ids:vector<int53> = Update;
+
 //@description Autosave settings for some type of chats were updated @scope Type of chats for which autosave settings were updated @settings The new autosave settings; may be null if the settings are reset to default
 updateAutosaveSettings scope:AutosaveSettingsScope settings:scopeAutosaveSettings = Update;
 
@@ -5829,7 +5906,7 @@ getMessageThread chat_id:int53 message_id:int53 = MessageThreadInfo;
 //@description Returns viewers of a recent outgoing message in a basic group or a supergroup chat. For video notes and voice notes only users, opened content of the message, are returned. The method can be called if message.can_get_viewers == true
 //@chat_id Chat identifier
 //@message_id Identifier of the message
-getMessageViewers chat_id:int53 message_id:int53 = Users;
+getMessageViewers chat_id:int53 message_id:int53 = MessageViewers;
 
 //@description Returns information about a file; this is an offline request @file_id Identifier of the file to get
 getFile file_id:int32 = File;
@@ -6068,7 +6145,7 @@ getMessageLinkInfo url:string = MessageLinkInfo;
 
 //@description Translates a text to the given language. If the current user is a Telegram Premium user, then text formatting is preserved
 //@text Text to translate
-//@to_language_code ISO language code of the language to which the message is translated. Must be one of
+//@to_language_code Language code of the language to which the message is translated. Must be one of
 //-"af", "sq", "am", "ar", "hy", "az", "eu", "be", "bn", "bs", "bg", "ca", "ceb", "zh-CN", "zh", "zh-Hans", "zh-TW", "zh-Hant", "co", "hr", "cs", "da", "nl", "en", "eo", "et",
 //-"fi", "fr", "fy", "gl", "ka", "de", "el", "gu", "ht", "ha", "haw", "he", "iw", "hi", "hmn", "hu", "is", "ig", "id", "in", "ga", "it", "ja", "jv", "kn", "kk", "km", "rw", "ko",
 //-"ku", "ky", "lo", "la", "lv", "lt", "lb", "mk", "mg", "ms", "ml", "mt", "mi", "mr", "mn", "my", "ne", "no", "ny", "or", "ps", "fa", "pl", "pt", "pa", "ro", "ru", "sm", "gd", "sr",
@@ -6078,7 +6155,7 @@ translateText text:formattedText to_language_code:string = FormattedText;
 //@description Extracts text or caption of the given message and translates it to the given language. If the current user is a Telegram Premium user, then text formatting is preserved
 //@chat_id Identifier of the chat to which the message belongs
 //@message_id Identifier of the message
-//@to_language_code ISO language code of the language to which the message is translated. Must be one of
+//@to_language_code Language code of the language to which the message is translated. Must be one of
 //-"af", "sq", "am", "ar", "hy", "az", "eu", "be", "bn", "bs", "bg", "ca", "ceb", "zh-CN", "zh", "zh-Hans", "zh-TW", "zh-Hant", "co", "hr", "cs", "da", "nl", "en", "eo", "et",
 //-"fi", "fr", "fy", "gl", "ka", "de", "el", "gu", "ht", "ha", "haw", "he", "iw", "hi", "hmn", "hu", "is", "ig", "id", "in", "ga", "it", "ja", "jv", "kn", "kk", "km", "rw", "ko",
 //-"ku", "ky", "lo", "la", "lv", "lt", "lb", "mk", "mg", "ms", "ml", "mt", "mi", "mr", "mn", "my", "ne", "no", "ny", "or", "ps", "fa", "pl", "pt", "pa", "ro", "ru", "sm", "gd", "sr",
@@ -6465,17 +6542,31 @@ getInlineQueryResults bot_user_id:int53 chat_id:int53 user_location:location que
 //@description Sets the result of an inline query; for bots only
 //@inline_query_id Identifier of the inline query
 //@is_personal Pass true if results may be cached and returned only for the user that sent the query. By default, results may be returned to any user who sends the same query
+//@button Button to be shown above inline query results; pass null if none
 //@results The results of the query
 //@cache_time Allowed time to cache the results of the query, in seconds
 //@next_offset Offset for the next inline query; pass an empty string if there are no more results
-//@switch_pm_text If non-empty, this text must be shown on the button that opens a private chat with the bot and sends a start message to the bot with the parameter switch_pm_parameter
-//@switch_pm_parameter The parameter for the bot start message
-answerInlineQuery inline_query_id:int64 is_personal:Bool results:vector<InputInlineQueryResult> cache_time:int32 next_offset:string switch_pm_text:string switch_pm_parameter:string = Ok;
+answerInlineQuery inline_query_id:int64 is_personal:Bool button:inlineQueryResultsButton results:vector<InputInlineQueryResult> cache_time:int32 next_offset:string = Ok;
 
 
-//@description Returns an HTTPS URL of a Web App to open after keyboardButtonTypeWebApp button is pressed
+//@description Returns information about a Web App by its short name. Returns a 404 error if the Web App is not found
 //@bot_user_id Identifier of the target bot
-//@url The URL from the keyboardButtonTypeWebApp button
+//@web_app_short_name Short name of the Web App
+searchWebApp bot_user_id:int53 web_app_short_name:string = FoundWebApp;
+
+//@description Returns an HTTPS URL of a Web App to open after a link of the type internalLinkTypeWebApp is clicked
+//@chat_id Identifier of the chat in which the link was clicked; pass 0 if none
+//@bot_user_id Identifier of the target bot
+//@web_app_short_name Short name of the Web App
+//@start_parameter Start parameter from internalLinkTypeWebApp
+//@theme Preferred Web App theme; pass null to use the default theme
+//@application_name Short name of the application; 0-64 English letters, digits, and underscores
+//@allow_write_access Pass true if the current user allowed the bot to send them messages
+getWebAppLinkUrl chat_id:int53 bot_user_id:int53 web_app_short_name:string start_parameter:string theme:themeParameters application_name:string allow_write_access:Bool = HttpUrl;
+
+//@description Returns an HTTPS URL of a Web App to open after keyboardButtonTypeWebApp or inlineQueryResultsButtonTypeWebApp button is pressed
+//@bot_user_id Identifier of the target bot
+//@url The URL from the keyboardButtonTypeWebApp or inlineQueryResultsButtonTypeWebApp button
 //@theme Preferred Web App theme; pass null to use the default theme
 //@application_name Short name of the application; 0-64 English letters, digits, and underscores
 getWebAppUrl bot_user_id:int53 url:string theme:themeParameters application_name:string = HttpUrl;
@@ -6571,10 +6662,10 @@ closeChat chat_id:int53 = Ok;
 //@description Informs TDLib that messages are being viewed by the user. Sponsored messages must be marked as viewed only when the entire text of the message is shown on the screen (excluding the button).
 //-Many useful activities depend on whether the messages are currently being viewed or not (e.g., marking messages as read, incrementing a view counter, updating a view counter, removing deleted messages in supergroups and channels)
 //@chat_id Chat identifier
-//@message_thread_id If not 0, a message thread identifier in which the messages are being viewed
 //@message_ids The identifiers of the messages being viewed
-//@force_read Pass true to mark as read the specified messages even the chat is closed
-viewMessages chat_id:int53 message_thread_id:int53 message_ids:vector<int53> force_read:Bool = Ok;
+//@source Source of the message view
+//@force_read Pass true to mark as read the specified messages even the chat is closed; pass null to guess the source based on chat open state
+viewMessages chat_id:int53 message_ids:vector<int53> source:MessageSource force_read:Bool = Ok;
 
 //@description Informs TDLib that the message content has been opened (e.g., the user has opened a photo, video, document, location or venue, or has listened to an audio file or voice note message).
 //-An updateMessageContentOpened update will be generated if something has changed
@@ -6584,6 +6675,9 @@ openMessageContent chat_id:int53 message_id:int53 = Ok;
 
 //@description Informs TDLib that a message with an animated emoji was clicked by the user. Returns a big animated sticker to be played or a 404 error if usual animation needs to be played @chat_id Chat identifier of the message @message_id Identifier of the clicked message
 clickAnimatedEmojiMessage chat_id:int53 message_id:int53 = Sticker;
+
+//@description Returns an HTTPS or a tg: link with the given type. Can be called before authorization @type Expected type of the link @is_http Pass true to create an HTTPS link (only available for some link types); pass false to create a tg: link
+getInternalLink type:InternalLinkType is_http:Bool = HttpUrl;
 
 //@description Returns information about the type of an internal link. Returns a 404 error if the link is not internal. Can be called before authorization @link The link
 getInternalLinkType link:string = InternalLinkType;
@@ -6623,7 +6717,7 @@ createSupergroupChat supergroup_id:int53 force:Bool = Chat;
 createSecretChat secret_chat_id:int32 = Chat;
 
 //@description Creates a new basic group and sends a corresponding messageBasicGroupChatCreate. Returns the newly created chat
-//@user_ids Identifiers of users to be added to the basic group
+//@user_ids Identifiers of users to be added to the basic group; may be empty to create a basic group without other members
 //@title Title of the new basic group; 1-128 characters
 //@message_auto_delete_time Message auto-delete time value, in seconds; must be from 0 up to 365 * 86400 and be divisible by 86400. If 0, then messages aren't deleted automatically
 createNewBasicGroupChat user_ids:vector<int53> title:string message_auto_delete_time:int32 = Chat;
@@ -7511,6 +7605,25 @@ setDefaultGroupAdministratorRights default_group_administrator_rights:chatAdmini
 setDefaultChannelAdministratorRights default_channel_administrator_rights:chatAdministratorRights = Ok;
 
 
+//@description Sets the text shown in the chat with the bot if the chat is empty; bots only
+//@language_code A two-letter ISO 639-1 language code. If empty, the description will be shown to all users, for which language there are no dedicated description
+//@param_description New bot's description on the specified language
+setBotInfoDescription language_code:string description:string = Ok;
+
+//@description Returns the text shown in the chat with the bot if the chat is empty in the given language; bots only
+//@language_code A two-letter ISO 639-1 language code or an empty string
+getBotInfoDescription language_code:string = Text;
+
+//@description Sets the text shown on the bot's profile page and sent together with the link when users share the bot; bots only
+//@language_code A two-letter ISO 639-1 language code. If empty, the short description will be shown to all users, for which language there are no dedicated description
+//@short_description New bot's short description on the specified language
+setBotInfoShortDescription language_code:string short_description:string = Ok;
+
+//@description Returns the text shown on the bot's profile page and sent together with the link when users share the bot in the given language; bots only
+//@language_code A two-letter ISO 639-1 language code or an empty string
+getBotInfoShortDescription language_code:string = Text;
+
+
 //@description Returns all active sessions of the current user
 getActiveSessions = Sessions;
 
@@ -7696,7 +7809,7 @@ getLanguagePackStrings language_pack_id:string keys:vector<string> = LanguagePac
 //@description Fetches the latest versions of all strings from a language pack in the current localization target from the server. This method doesn't need to be called explicitly for the current used/base language packs. Can be called before authorization @language_pack_id Language pack identifier
 synchronizeLanguagePack language_pack_id:string = Ok;
 
-//@description Adds a custom server language pack to the list of installed language packs in current localization target. Can be called before authorization @language_pack_id Identifier of a language pack to be added; may be different from a name that is used in an "https://t.me/setlanguage/" link
+//@description Adds a custom server language pack to the list of installed language packs in current localization target. Can be called before authorization @language_pack_id Identifier of a language pack to be added
 addCustomServerLanguagePack language_pack_id:string = Ok;
 
 //@description Adds or changes a custom local language pack to the current localization target
@@ -7938,8 +8051,12 @@ checkPhoneNumberConfirmationCode code:string = Ok;
 setBotUpdatesStatus pending_update_count:int32 error_message:string = Ok;
 
 
-//@description Uploads a file with a sticker; returns the uploaded file @user_id Sticker file owner; ignored for regular users @sticker Sticker file to upload
-uploadStickerFile user_id:int53 sticker:inputSticker = File;
+//@description Uploads a file with a sticker; returns the uploaded file
+//@user_id Sticker file owner; ignored for regular users
+//@sticker_format Sticker format
+//@sticker File file to upload; must fit in a 512x512 square. For WEBP stickers the file must be in WEBP or PNG format, which will be converted to WEBP server-side.
+//-See https://core.telegram.org/animated_stickers#technical-requirements for technical requirements
+uploadStickerFile user_id:int53 sticker_format:StickerFormat sticker:InputFile = File;
 
 //@description Returns a suggested name for a new sticker set with a given title @title Sticker set title; 1-64 characters
 getSuggestedStickerSetName title:string = Text;
@@ -7951,22 +8068,36 @@ checkStickerSetName name:string = CheckStickerSetNameResult;
 //@user_id Sticker set owner; ignored for regular users
 //@title Sticker set title; 1-64 characters
 //@name Sticker set name. Can contain only English letters, digits and underscores. Must end with *"_by_<bot username>"* (*<bot_username>* is case insensitive) for bots; 1-64 characters
+//@sticker_format Format of the stickers in the set
 //@sticker_type Type of the stickers in the set
+//@needs_repainting Pass true if stickers in the sticker set must be repainted; for custom emoji sticker sets only
 //@stickers List of stickers to be added to the set; must be non-empty. All stickers must have the same format. For TGS stickers, uploadStickerFile must be used before the sticker is shown
 //@source Source of the sticker set; may be empty if unknown
-createNewStickerSet user_id:int53 title:string name:string sticker_type:StickerType stickers:vector<inputSticker> source:string = StickerSet;
+createNewStickerSet user_id:int53 title:string name:string sticker_format:StickerFormat sticker_type:StickerType needs_repainting:Bool stickers:vector<inputSticker> source:string = StickerSet;
 
-//@description Adds a new sticker to a set; for bots only. Returns the sticker set
+
+//@description Adds a new sticker to a set; for bots only
 //@user_id Sticker set owner
 //@name Sticker set name
 //@sticker Sticker to add to the set
-addStickerToSet user_id:int53 name:string sticker:inputSticker = StickerSet;
+addStickerToSet user_id:int53 name:string sticker:inputSticker = Ok;
 
-//@description Sets a sticker set thumbnail; for bots only. Returns the sticker set
+//@description Sets a sticker set thumbnail; for bots only
 //@user_id Sticker set owner
 //@name Sticker set name
 //@thumbnail Thumbnail to set in PNG, TGS, or WEBM format; pass null to remove the sticker set thumbnail. Thumbnail format must match the format of stickers in the set
-setStickerSetThumbnail user_id:int53 name:string thumbnail:InputFile = StickerSet;
+setStickerSetThumbnail user_id:int53 name:string thumbnail:InputFile = Ok;
+
+//@description Sets a custom emoji sticker set thumbnail; for bots only
+//@name Sticker set name
+//@custom_emoji_id Identifier of the custom emoji from the sticker set, which will be set as sticker set thumbnail; pass 0 to remove the sticker set thumbnail
+setCustomEmojiStickerSetThumbnail name:string custom_emoji_id:int64 = Ok;
+
+//@description Sets a sticker set title; for bots only @name Sticker set name @title New sticker set title
+setStickerSetTitle name:string title:string = Ok;
+
+//@description Deleted a sticker set; for bots only @name Sticker set name
+deleteStickerSet name:string = Ok;
 
 //@description Changes the position of a sticker in the set to which it belongs; for bots only. The sticker set must have been created by the bot
 //@sticker Sticker
@@ -7975,6 +8106,21 @@ setStickerPositionInSet sticker:InputFile position:int32 = Ok;
 
 //@description Removes a sticker from the set to which it belongs; for bots only. The sticker set must have been created by the bot @sticker Sticker
 removeStickerFromSet sticker:InputFile = Ok;
+
+//@description Changes the list of emoji corresponding to a sticker; for bots only. The sticker must belong to a regular or custom emoji sticker set created by the bot
+//@sticker Sticker
+//@emojis New string with 1-20 emoji corresponding to the sticker
+setStickerEmojis sticker:InputFile emojis:string = Ok;
+
+//@description Changes the list of keywords of a sticker; for bots only. The sticker must belong to a regular or custom emoji sticker set created by the bot
+//@sticker Sticker
+//@keywords List of up to 20 keywords with total length up to 64 characters, which can be used to find the sticker
+setStickerKeywords sticker:InputFile keywords:vector<string> = Ok;
+
+//@description Changes the mask position of a mask sticker; for bots only. The sticker must belong to a mask sticker set created by the bot
+//@sticker Sticker
+//@mask_position Position where the mask is placed; pass null to remove mask position
+setStickerMaskPosition sticker:InputFile mask_position:maskPosition = Ok;
 
 
 //@description Returns information about a file with a map thumbnail in PNG format. Only map thumbnail files with size less than 1MB can be downloaded
@@ -8048,8 +8194,6 @@ getPhoneNumberInfo phone_number_prefix:string = PhoneNumberInfo;
 //@phone_number_prefix The phone number prefix
 getPhoneNumberInfoSync language_code:string phone_number_prefix:string = PhoneNumberInfo;
 
-//@description Returns the link for downloading official Telegram application to be used when the current user invites friends to Telegram
-getApplicationDownloadLink = HttpUrl;
 
 //@description Returns information about a tg:// deep link. Use "tg://need_update_for_some_feature" or "tg:some_unsupported_feature" for testing. Returns a 404 error for unknown links. Can be called before authorization @link The link
 getDeepLinkInfo link:string = DeepLinkInfo;
@@ -8058,8 +8202,14 @@ getDeepLinkInfo link:string = DeepLinkInfo;
 //@description Returns application config, provided by the server. Can be called before authorization
 getApplicationConfig = JsonValue;
 
+//@description Adds server-provided application changelog as messages to the chat 777000 (Telegram); for official applications only @previous_application_version The previous application version
+addApplicationChangelog previous_application_version:string = Ok;
+
 //@description Saves application log event on the server. Can be called before authorization @type Event type @chat_id Optional chat identifier, associated with the event @data The log event data
 saveApplicationLogEvent type:string chat_id:int53 data:JsonValue = Ok;
+
+//@description Returns the link for downloading official Telegram application to be used when the current user invites friends to Telegram
+getApplicationDownloadLink = HttpUrl;
 
 
 //@description Adds a proxy server for network requests. Can be called before authorization
