@@ -12,12 +12,15 @@ var Cafe = {
   init: function(options) {
     Telegram.WebApp.ready();
     Cafe.apiUrl = options.apiUrl;
+    Cafe.mode = options.mode;
     Cafe.userId = options.userId;
     Cafe.userHash = options.userHash;
     Cafe.initLotties();
     $('body').show();
-    if (!Telegram.WebApp.initDataUnsafe ||
-        !Telegram.WebApp.initDataUnsafe.query_id) {
+    if ((!Telegram.WebApp.initDataUnsafe ||
+         !Telegram.WebApp.initDataUnsafe.query_id) &&
+        Cafe.mode != 'inline' &&
+        Cafe.mode != 'link') {
       Cafe.isClosed = true;
       $('body').addClass('closed');
       Cafe.showStatus('Cafe is temporarily closed');
@@ -167,7 +170,7 @@ var Cafe = {
       } else {
         mainButton.setParams({
           is_visible: !!Cafe.canPay,
-          text: 'PAY ' + Cafe.formatPrice(Cafe.totalPrice),
+          text: Cafe.mode == 'inline' ? 'CREATE ORDER' : (Cafe.mode == 'link' ? 'CHOOSE A CHAT…' : 'PAY ' + Cafe.formatPrice(Cafe.totalPrice)),
           color: '#31b545'
         }).hideProgress();
       }
@@ -265,6 +268,9 @@ var Cafe = {
         order_data: Cafe.getOrderData(),
         comment: comment
       };
+      if (Cafe.mode) {
+        params.mode = Cafe.mode;
+      }
       if (Cafe.userId && Cafe.userHash) {
         params.user_id = Cafe.userId;
         params.user_hash = Cafe.userHash;
@@ -277,7 +283,11 @@ var Cafe = {
       Cafe.apiRequest('makeOrder', params, function(result) {
         Cafe.toggleLoading(false);
         if (result.ok) {
-          if (invoiceSupported) {
+          if (Cafe.mode == 'inline') {
+            Telegram.WebApp.switchInlineQuery('my');
+          } else if (Cafe.mode == 'link') {
+            Telegram.WebApp.switchInlineQuery('my', ['users', 'groups']);
+          } else if (invoiceSupported) {
             Telegram.WebApp.openInvoice(result.invoice_url, function(status) {
               if (status == 'paid') {
                 Telegram.WebApp.close();
