@@ -49,8 +49,8 @@
 <blockquote>
 <p>For example, for an abridged version of the transport the client sends <code>0xef</code> as the first byte (<strong>important:</strong> only prior to the very first data packet), then packet length is encoded by a single byte (<code>0x01-0x7e</code> = data length divided by 4; or <code>0x7f</code> followed by 3 bytes (little endian) divided by 4) followed by the data themselves. In this case, server responses have the same form (although the server does not send <code>0xef</code>as the first byte).</p>
 </blockquote>
-<p>Detailed documentation on creating authorization keys is available <a href="/mtproto/auth_key">here &raquo;</a>.</p>
-<h4><a class="anchor" name="1-request-for-p-q-authorization" href="#1-request-for-p-q-authorization"><i class="anchor-icon"></i></a>1. Request for (p,q) Authorization</h4>
+<p>Detailed documentation on creating authorization keys is available <a href="/mtproto/auth_key">here »</a>.</p>
+<h4><a class="anchor" href="#1-request-for-pq-authorization" id="1-request-for-pq-authorization" name="1-request-for-pq-authorization"><i class="anchor-icon"></i></a>1. Request for (p,q) Authorization</h4>
 <pre><code>req_pq_multi#be7e8ef1 nonce:int128 = ResPQ;</code></pre>
 <table class="table">
 <thead>
@@ -98,14 +98,14 @@
 <pre><code>0000 | 00 00 00 00 00 00 00 00 4A 96 70 27 C4 7A E5 51
 0010 | 14 00 00 00 f1 8e 7e be 3E 05 49 82 8C CA 27 E9
 0020 | 66 B3 01 A4 8F EC E2 FC</code></pre>
-<h4><a class="anchor" name="2-a-response-from-the-server-has-been-received-with-the-followin" href="#2-a-response-from-the-server-has-been-received-with-the-followin"><i class="anchor-icon"></i></a>2. A response from the server has been received with the following content:</h4>
+<h4><a class="anchor" href="#2-a-response-from-the-server-has-been-received-with-the-following-content" id="2-a-response-from-the-server-has-been-received-with-the-following-content" name="2-a-response-from-the-server-has-been-received-with-the-following-content"><i class="anchor-icon"></i></a>2. A response from the server has been received with the following content:</h4>
 <pre><code>0000 | 00 00 00 00 00 00 00 00 01 C8 83 1E C9 7A E5 51
 0010 | 40 00 00 00 63 24 16 05 3E 05 49 82 8C CA 27 E9
 0020 | 66 B3 01 A4 8F EC E2 FC A5 CF 4D 33 F4 A1 1E A8
 0030 | 77 BA 4A A5 73 90 73 30 08 17 ED 48 94 1A 08 F9
 0040 | 81 00 00 00 15 C4 B5 1C 01 00 00 00 21 6B E8 6C
 0050 | 02 2B B4 C3</code></pre>
-<h5><a class="anchor" name="response-decomposition-using-the-following-formula" href="#response-decomposition-using-the-following-formula"><i class="anchor-icon"></i></a>Response decomposition using the following formula:</h5>
+<h5><a class="anchor" href="#response-decomposition-using-the-following-formula" id="response-decomposition-using-the-following-formula" name="response-decomposition-using-the-following-formula"><i class="anchor-icon"></i></a>Response decomposition using the following formula:</h5>
 <pre><code>resPQ#05162463 nonce:int128 server_nonce:int128 pq:string server_public_key_fingerprints:Vector long = ResPQ </code></pre>
 <table class="table">
 <thead>
@@ -180,10 +180,10 @@
 </tbody>
 </table>
 <p>The <strong>server_public_key</strong> public key has been selected whose fingerprint corresponds to the only one received from the server: <code>c3b42b026ce86b21</code>.</p>
-<h4><a class="anchor" name="3-pq-17ed48941a08f981-decomposed-into-2-prime-cofactors" href="#3-pq-17ed48941a08f981-decomposed-into-2-prime-cofactors"><i class="anchor-icon"></i></a>3. Pq = 17ED48941A08F981 decomposed into 2 prime cofactors:</h4>
+<h4><a class="anchor" href="#3-pq--17ed48941a08f981-decomposed-into-2-prime-cofactors" id="3-pq--17ed48941a08f981-decomposed-into-2-prime-cofactors" name="3-pq--17ed48941a08f981-decomposed-into-2-prime-cofactors"><i class="anchor-icon"></i></a>3. Pq = 17ED48941A08F981 decomposed into 2 prime cofactors:</h4>
 <pre><code>p = 494C553B
 q = 53911073</code></pre>
-<h4><a class="anchor" name="4-encrypted-data-generation" href="#4-encrypted-data-generation"><i class="anchor-icon"></i></a>4. encrypted_data Generation</h4>
+<h4><a class="anchor" href="#4-encrypted-data-generation" id="4-encrypted-data-generation" name="4-encrypted-data-generation"><i class="anchor-icon"></i></a>4. encrypted_data Generation</h4>
 <pre><code>p_q_inner_data#83c95aec pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data</code></pre>
 <table class="table">
 <thead>
@@ -243,7 +243,7 @@ q = 53911073</code></pre>
 <pre><code>SHA1 (data) = DB761C27718A2305044F71F2AD951629D78B2449
 RSA (data_with_hash, server_public_key) = 7BB0100A523161904D9C69FA04BC60DECFC5DD74B99995C768EB60D8716E2109BAF2D4601DAB6B09610DC11067BB89021E09471FCFA52DBD0F23204AD8CA8B012BF40A112F44695AB6C266955386114EF5211E6372227ADBD34995D3E0E5FF02EC63A43F9926878962F7C570E6A6E78BF8366AF917A5272675C46064BE62E3E202EFA8B1ADFB1C32A898C2987BE27B5F31D57C9BB963ABCB734B16F652CEDB4293CBB7C878A3A3FFAC9DBEA9DF7C67BC9E9508E111C78FC46E057F5C65ADE381D91FEE430A6B576A99BDF8551FDB1BE2B57069B1A45730618F27427E8A04720B4971EF4A9215983D68F2830C3EAA6E40385562F970D38A05C9F1246DC33438E6</code></pre>
 <p>The length of the final string was 256 bytes.</p>
-<h5><a class="anchor" name="request-to-start-diffie-hellman-key-exchange" href="#request-to-start-diffie-hellman-key-exchange"><i class="anchor-icon"></i></a>Request to Start Diffie-Hellman Key Exchange</h5>
+<h5><a class="anchor" href="#request-to-start-diffie-hellman-key-exchange" id="request-to-start-diffie-hellman-key-exchange" name="request-to-start-diffie-hellman-key-exchange"><i class="anchor-icon"></i></a>Request to Start Diffie-Hellman Key Exchange</h5>
 <pre><code>req_DH_params#d712e4be nonce:int128 server_nonce:int128 p:string q:string public_key_fingerprint:long encrypted_data:string = Server_DH_Params</code></pre>
 <table class="table">
 <thead>
@@ -313,7 +313,7 @@ RSA (data_with_hash, server_public_key) = 7BB0100A523161904D9C69FA04BC60DECFC5DD
 <td>encrypted_data</td>
 <td>80, 260</td>
 <td>See above</td>
-<td>See <a href="#generation-of-encrypted-data">“Generation of encrypted_data&quot;</a></td>
+<td>See <a href="#generation-of-encrypted-data">“Generation of encrypted_data"</a></td>
 </tr>
 </tbody>
 </table>
@@ -339,7 +339,7 @@ RSA (data_with_hash, server_public_key) = 7BB0100A523161904D9C69FA04BC60DECFC5DD
 0130 | 8A 04 72 0B 49 71 EF 4A 92 15 98 3D 68 F2 83 0C
 0140 | 3E AA 6E 40 38 55 62 F9 70 D3 8A 05 C9 F1 24 6D
 0150 | C3 34 38 E6</code></pre>
-<h4><a class="anchor" name="5-a-response-from-the-server-has-been-received-with-the-followin" href="#5-a-response-from-the-server-has-been-received-with-the-followin"><i class="anchor-icon"></i></a>5. A response from the server has been received with the following content:</h4>
+<h4><a class="anchor" href="#5-a-response-from-the-server-has-been-received-with-the-following-content" id="5-a-response-from-the-server-has-been-received-with-the-following-content" name="5-a-response-from-the-server-has-been-received-with-the-following-content"><i class="anchor-icon"></i></a>5. A response from the server has been received with the following content:</h4>
 <pre><code>0000 | 00 00 00 00 00 00 00 00 01 54 43 36 CB 7A E5 51
 0010 | 78 02 00 00 5C 07 E8 D0 3E 05 49 82 8C CA 27 E9
 0020 | 66 B3 01 A4 8F EC E2 FC A5 CF 4D 33 F4 A1 1E A8
@@ -381,7 +381,7 @@ RSA (data_with_hash, server_public_key) = 7BB0100A523161904D9C69FA04BC60DECFC5DD
 0260 | D5 AE 45 B9 48 32 AC 79 CE 7C 51 1D 19 4B C4 2B
 0270 | 70 EF A8 50 BB 15 C2 01 2C 52 15 CA BF E9 7C E6
 0280 | 6B 8D 87 34 D0 EE 75 9A 63 8A F0 13</code></pre>
-<h5><a class="anchor" name="response-decomposition-using-the-following-formula" href="#response-decomposition-using-the-following-formula"><i class="anchor-icon"></i></a>Response decomposition using the following formula:</h5>
+<h5><a class="anchor" href="#response-decomposition-using-the-following-formula" id="response-decomposition-using-the-following-formula" name="response-decomposition-using-the-following-formula"><i class="anchor-icon"></i></a>Response decomposition using the following formula:</h5>
 <pre><code>server_DH_params_fail#79cb045d nonce:int128 server_nonce:int128 new_nonce_hash:int128 = Server_DH_Params;
 server_DH_params_ok#d0e8075c nonce:int128 server_nonce:int128 encrypted_answer:string = Server_DH_Params;</code></pre>
 <table class="table">
@@ -434,16 +434,16 @@ server_DH_params_ok#d0e8075c nonce:int128 server_nonce:int128 encrypted_answer:s
 <td>encrypted_answer</td>
 <td>56, 596</td>
 <td>See below</td>
-<td>See <a href="#conversion-of-encrypted-answer-into-answer">“Decomposition of encrypted_answer&quot;</a></td>
+<td>See <a href="#conversion-of-encrypted-answer-into-answer">“Decomposition of encrypted_answer"</a></td>
 </tr>
 </tbody>
 </table>
-<h5><a class="anchor" name="conversion-of-encrypted-answer-into-answer" href="#conversion-of-encrypted-answer-into-answer"><i class="anchor-icon"></i></a>Conversion of encrypted_answer into <strong>answer</strong>:</h5>
+<h5><a class="anchor" href="#conversion-of-encrypted-answer-into-answer" id="conversion-of-encrypted-answer-into-answer" name="conversion-of-encrypted-answer-into-answer"><i class="anchor-icon"></i></a>Conversion of encrypted_answer into <strong>answer</strong>:</h5>
 <pre><code>encrypted_answer = 28A92FE20173B347A8BB324B5FAB2667C9A8BBCE6468D5B509A4CBDDC186240AC912CF7006AF8926DE606A2E74C0493CAA57741E6C82451F54D3E068F5CCC49B4444124B9666FFB405AAB564A3D01E67F6E912867C8D20D9882707DC330B17B4E0DD57CB53BFAAFA9EF5BE76AE6C1B9B6C51E2D6502A47C883095C46C81E3BE25F62427B585488BB3BF239213BF48EB8FE34C9A026CC8413934043974DB03556633038392CECB51F94824E140B98637730A4BE79A8F9DAFA39BAE81E1095849EA4C83467C92A3A17D997817C8A7AC61C3FF414DA37B7D66E949C0AEC858F048224210FCC61F11C3A910B431CCBD104CCCC8DC6D29D4A5D133BE639A4C32BBFF153E63ACA3AC52F2E4709B8AE01844B142C1EE89D075D64F69A399FEB04E656FE3675A6F8F412078F3D0B58DA15311C1A9F8E53B3CD6BB5572C294904B726D0BE337E2E21977DA26DD6E33270251C2CA29DFCC70227F0755F84CFDA9AC4B8DD5F84F1D1EB36BA45CDDC70444D8C213E4BD8F63B8AB95A2D0B4180DC91283DC063ACFB92D6A4E407CDE7C8C69689F77A007441D4A6A8384B666502D9B77FC68B5B43CC607E60A146223E110FCB43BC3C942EF981930CDC4A1D310C0B64D5E55D308D863251AB90502C3E46CC599E886A927CDA963B9EB16CE62603B68529EE98F9F5206419E03FB458EC4BD9454AA8F6BA777573CC54B328895B1DF25EAD9FB4CD5198EE022B2B81F388D281D5E5BC580107CA01A50665C32B552715F335FD76264FAD00DDD5AE45B94832AC79CE7C511D194BC42B70EFA850BB15C2012C5215CABFE97CE66B8D8734D0EE759A638AF013
 tmp_aes_key = F011280887C7BB01DF0FC4E17830E0B91FBB8BE4B2267CB985AE25F33B527253
 tmp_aes_iv = 3212D579EE35452ED23E0D0C92841AA7D31B2E9BDEF2151E80D15860311C85DB
 answer = BA0D89B53E0549828CCA27E966B301A48FECE2FCA5CF4D33F4A11EA877BA4AA57390733002000000FE000100C71CAEB9C6B1C9048E6C522F70F13F73980D40238E3E21C14934D037563D930F48198A0AA7C14058229493D22530F4DBFA336F6E0AC925139543AED44CCE7C3720FD51F69458705AC68CD4FE6B6B13ABDC9746512969328454F18FAF8C595F642477FE96BB2A941D5BCD1D4AC8CC49880708FA9B378E3C4F3A9060BEE67CF9A4A4A695811051907E162753B56B0F6B410DBA74D8A84B2A14B3144E0EF1284754FD17ED950D5965B4B9DD46582DB1178D169C6BC465B0D6FF9CA3928FEF5B9AE4E418FC15E83EBEA0F87FA9FF5EED70050DED2849F47BF959D956850CE929851F0D8115F635B105EE2E4E15D04B2454BF6F4FADF034B10403119CD8E3B92FCC5BFE000100262AABA621CC4DF587DC94CF8252258C0B9337DFB47545A49CDD5C9B8EAE7236C6CADC40B24E88590F1CC2CC762EBF1CF11DCC0B393CAAD6CEE4EE5848001C73ACBB1D127E4CB93072AA3D1C8151B6FB6AA6124B7CD782EAF981BDCFCE9D7A00E423BD9D194E8AF78EF6501F415522E44522281C79D906DDB79C72E9C63D83FB2A940FF779DFB5F2FD786FB4AD71C9F08CF48758E534E9815F634F1E3A80A5E1C2AF210C5AB762755AD4B2126DFA61A77FA9DA967D65DFD0AFB5CDF26C4D4E1A88B180F4E0D0B45BA1484F95CB2712B50BF3F5968D9D55C99C0FB9FB67BFF56D7D4481B634514FBA3488C4CDA2FC0659990E8E868B28632875A9AA703BCDCE8FCB7AE551</code></pre>
-<h5><a class="anchor" name="server-dh-inner-data-decomposition-using-the-following-formula" href="#server-dh-inner-data-decomposition-using-the-following-formula"><i class="anchor-icon"></i></a>Server_DH_inner_data decomposition using the following formula:</h5>
+<h5><a class="anchor" href="#server-dh-inner-data-decomposition-using-the-following-formula" id="server-dh-inner-data-decomposition-using-the-following-formula" name="server-dh-inner-data-decomposition-using-the-following-formula"><i class="anchor-icon"></i></a>Server_DH_inner_data decomposition using the following formula:</h5>
 <pre><code>server_DH_inner_data#b5890dba nonce:int128 server_nonce:int128 g:int dh_prime:string g_a:string server_time:int = Server_DH_inner_data;</code></pre>
 <table class="table">
 <thead>
@@ -483,13 +483,11 @@ answer = BA0D89B53E0549828CCA27E966B301A48FECE2FCA5CF4D33F4A11EA877BA4AA57390733
 <td>dh_prime</td>
 <td>40, 260</td>
 <td><code>C71CAEB9C6B1C9048E6C522F70F13F73</code> <code>980D40238E3E21C14934D037563D930F</code> <code>48198A0AA7C14058229493D22530F4DB</code> <code>FA336F6E0AC925139543AED44CCE7C37</code> <code>20FD51F69458705AC68CD4FE6B6B13AB</code> <code>DC9746512969328454F18FAF8C595F64</code> <code>2477FE96BB2A941D5BCD1D4AC8CC4988</code> <code>0708FA9B378E3C4F3A9060BEE67CF9A4</code> <code>A4A695811051907E162753B56B0F6B41</code> <code>0DBA74D8A84B2A14B3144E0EF1284754</code> <code>FD17ED950D5965B4B9DD46582DB1178D</code> <code>169C6BC465B0D6FF9CA3928FEF5B9AE4</code> <code>E418FC15E83EBEA0F87FA9FF5EED7005</code> <code>0DED2849F47BF959D956850CE929851F</code> <code>0D8115F635B105EE2E4E15D04B2454BF</code> <code>6F4FADF034B10403119CD8E3B92FCC5B</code></td>
-<td></td>
 </tr>
 <tr>
 <td>g_a</td>
 <td>300, 260</td>
 <td><code>262AABA621CC4DF587DC94CF8252258C</code> <code>0B9337DFB47545A49CDD5C9B8EAE7236</code> <code>C6CADC40B24E88590F1CC2CC762EBF1C</code> <code>F11DCC0B393CAAD6CEE4EE5848001C73</code> <code>ACBB1D127E4CB93072AA3D1C8151B6FB</code> <code>6AA6124B7CD782EAF981BDCFCE9D7A00</code> <code>E423BD9D194E8AF78EF6501F415522E4</code> <code>4522281C79D906DDB79C72E9C63D83FB</code> <code>2A940FF779DFB5F2FD786FB4AD71C9F0</code> <code>8CF48758E534E9815F634F1E3A80A5E1</code> <code>C2AF210C5AB762755AD4B2126DFA61A7</code> <code>7FA9DA967D65DFD0AFB5CDF26C4D4E1A</code> <code>88B180F4E0D0B45BA1484F95CB2712B5</code> <code>0BF3F5968D9D55C99C0FB9FB67BFF56D</code> <code>7D4481B634514FBA3488C4CDA2FC0659</code> <code>990E8E868B28632875A9AA703BCDCE8F</code></td>
-<td></td>
 </tr>
 <tr>
 <td>server_time</td>
@@ -499,9 +497,9 @@ answer = BA0D89B53E0549828CCA27E966B301A48FECE2FCA5CF4D33F4A11EA877BA4AA57390733
 </tr>
 </tbody>
 </table>
-<h4><a class="anchor" name="6-random-number-b-is-computed" href="#6-random-number-b-is-computed"><i class="anchor-icon"></i></a>6. Random number b is computed:</h4>
+<h4><a class="anchor" href="#6-random-number-b-is-computed" id="6-random-number-b-is-computed" name="6-random-number-b-is-computed"><i class="anchor-icon"></i></a>6. Random number b is computed:</h4>
 <pre><code>b = 6F620AFA575C9233EB4C014110A7BCAF49464F798A18A0981FEA1E05E8DA67D9681E0FD6DF0EDF0272AE3492451A84502F2EFC0DA18741A5FB80BD82296919A70FAA6D07CBBBCA2037EA7D3E327B61D585ED3373EE0553A91CBD29B01FA9A89D479CA53D57BDE3A76FBD922A923A0A38B922C1D0701F53FF52D7EA9217080163A64901E766EB6A0F20BC391B64B9D1DD2CD13A7D0C946A3A7DF8CEC9E2236446F646C42CFE2B60A2A8D776E56C8D7519B08B88ED0970E10D12A8C9E355D765F2B7BBB7B4CA9360083435523CB0D57D2B106FD14F94B4EEE79D8AC131CA56AD389C84FE279716F8124A543337FB9EA3D988EC5FA63D90A4BA3970E7A39E5C0DE5</code></pre>
-<h5><a class="anchor" name="generation-of-encrypted-data" href="#generation-of-encrypted-data"><i class="anchor-icon"></i></a>Generation of encrypted_data</h5>
+<h5><a class="anchor" href="#generation-of-encrypted-data" id="generation-of-encrypted-data" name="generation-of-encrypted-data"><i class="anchor-icon"></i></a>Generation of encrypted_data</h5>
 <pre><code>client_DH_inner_data#6643b654 nonce:int128 server_nonce:int128 retry_id:long g_b:string = Client_DH_Inner_Data</code></pre>
 <table class="table">
 <thead>
@@ -549,7 +547,7 @@ answer = BA0D89B53E0549828CCA27E966B301A48FECE2FCA5CF4D33F4A11EA877BA4AA57390733
 <pre><code>data_with_hash := SHA1(data) + data + (0-15 random bytes); such that the length be divisible by 16;
 AES256_ige_encrypt (data_with_hash, tmp_aes_key, tmp_aes_iv) = 928A4957D0463B525C1CC48AABAA030A256BE5C746792C84CA4C5A0DF60AC799048D98A38A8480EDCF082214DFC79DCB9EE34E206513E2B3BC1504CFE6C9ADA46BF9A03CA74F192EAF8C278454ADABC795A566615462D31817382984039505F71CB33A41E2527A4B1AC05107872FED8E3ABCEE1518AE965B0ED3AED7F67479155BDA8E4C286B64CDF123EC748CF289B1DB02D1907B562DF462D8582BA6F0A3022DC2D3504D69D1BA48B677E3A830BFAFD67584C8AA24E1344A8904E305F9587C92EF964F0083F50F61EAB4A393EAA33C9270294AEDC7732891D4EA1599F52311D74469D2112F4EDF3F342E93C8E87E812DC3989BAECFE6740A46077524C75093F5A5405736DE8937BB6E42C9A0DCF22CA53227D462BCCC2CFE94B6FE86AB7FBFA395021F66661AF7C0024CA2986CA03F3476905407D1EA9C010B763258DB1AA2CC7826D91334EFC1FDC665B67FE45ED0</code></pre>
 <p>The length of the final string was 336 bytes.</p>
-<h5><a class="anchor" name="request" href="#request"><i class="anchor-icon"></i></a>Request</h5>
+<h5><a class="anchor" href="#request" id="request" name="request"><i class="anchor-icon"></i></a>Request</h5>
 <pre><code>set_client_DH_params#f5045f1f nonce:int128 server_nonce:int128 encrypted_data:string = Set_client_DH_params_answer;</code></pre>
 <table class="table">
 <thead>
@@ -601,7 +599,7 @@ AES256_ige_encrypt (data_with_hash, tmp_aes_key, tmp_aes_iv) = 928A4957D0463B525
 <td>encrypted_data</td>
 <td>56, 340</td>
 <td>See above</td>
-<td>See <a href="#generation-of-encrypted-data">“Generation of encrypted_data&quot;</a></td>
+<td>See <a href="#generation-of-encrypted-data">“Generation of encrypted_data"</a></td>
 </tr>
 </tbody>
 </table>
@@ -630,11 +628,11 @@ AES256_ige_encrypt (data_with_hash, tmp_aes_key, tmp_aes_iv) = 928A4957D0463B525
 0160 | 66 66 1A F7 C0 02 4C A2 98 6C A0 3F 34 76 90 54
 0170 | 07 D1 EA 9C 01 0B 76 32 58 DB 1A A2 CC 78 26 D9
 0180 | 13 34 EF C1 FD C6 65 B6 7F E4 5E D0</code></pre>
-<h4><a class="anchor" name="7-computing-auth-key-using-formula-g-ab-mod-dh-prime" href="#7-computing-auth-key-using-formula-g-ab-mod-dh-prime"><i class="anchor-icon"></i></a>7. Computing auth_key using formula <code>g^{ab} mod dh_prime</code>:</h4>
+<h4><a class="anchor" href="#7-computing-auth-key-using-formula-gab-mod-dh-prime" id="7-computing-auth-key-using-formula-gab-mod-dh-prime" name="7-computing-auth-key-using-formula-gab-mod-dh-prime"><i class="anchor-icon"></i></a>7. Computing auth_key using formula <code>g^{ab} mod dh_prime</code>:</h4>
 <pre><code>auth_key = AB96E207C631300986F30EF97DF55E179E63C112675F0CE502EE76D74BBEE6CBD1E95772818881E9F2FF54BD52C258787474F6A7BEA61EABE49D1D01D55F64FC07BC31685716EC8FB46FEACF9502E42CFD6B9F45A08E90AA5C2B5933AC767CBE1CD50D8E64F89727CA4A1A5D32C0DB80A9FCDBDDD4F8D5A1E774198F1A4299F927C484FEEC395F29647E43C3243986F93609E23538C21871DF50E00070B3B6A8FA9BC15628E8B43FF977409A61CEEC5A21CF7DFB5A4CC28F5257BC30CD8F2FB92FBF21E28924065F50E0BBD5E11A420300E2C136B80E9826C6C5609B5371B7850AA628323B6422F3A94F6DFDE4C3DC1EA60F7E11EE63122B3F39CBD1A8430157</code></pre>
-<h4><a class="anchor" name="8-the-server-verifies-that-auth-key-hash-is-unique" href="#8-the-server-verifies-that-auth-key-hash-is-unique"><i class="anchor-icon"></i></a>8. The server verifies that auth_key_hash is unique.</h4>
+<h4><a class="anchor" href="#8-the-server-verifies-that-auth-key-hash-is-unique" id="8-the-server-verifies-that-auth-key-hash-is-unique" name="8-the-server-verifies-that-auth-key-hash-is-unique"><i class="anchor-icon"></i></a>8. The server verifies that auth_key_hash is unique.</h4>
 <p>The key is unique.</p>
-<h4><a class="anchor" name="9-a-response-from-the-server-has-been-received-with-the-followin" href="#9-a-response-from-the-server-has-been-received-with-the-followin"><i class="anchor-icon"></i></a>9. A response from the server has been received with the following content:</h4>
+<h4><a class="anchor" href="#9-a-response-from-the-server-has-been-received-with-the-following-content" id="9-a-response-from-the-server-has-been-received-with-the-following-content" name="9-a-response-from-the-server-has-been-received-with-the-following-content"><i class="anchor-icon"></i></a>9. A response from the server has been received with the following content:</h4>
 <pre><code>0000 | 00 00 00 00 00 00 00 00 01 30 AA C5 CE 7A E5 51
 0010 | 34 00 00 00 34 F7 CB 3B 3E 05 49 82 8C CA 27 E9
 0020 | 66 B3 01 A4 8F EC E2 FC A5 CF 4D 33 F4 A1 1E A8
@@ -676,11 +674,9 @@ dh_gen_fail#a69dae02 nonce:int128 server_nonce:int128 new_nonce_hash3:int128 = S
 <td>new_nonce_hash1</td>
 <td>36, 16</td>
 <td><code>CCEBC0217266E1EDEC7FB0A0EED6C220</code></td>
-<td></td>
 </tr>
 </tbody>
-</table>
-</div>
+</table></div>
   
 </div>
           
