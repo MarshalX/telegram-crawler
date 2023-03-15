@@ -609,6 +609,7 @@ var Auction = {
     });
     Aj.onUnload(function(state) {
       Main.destroyForm(state.$bidForm);
+      Main.destroyForm(state.$makeOfferForm);
       clearTimeout(state.updStateTo);
       state.needUpdate = false;
     });
@@ -1506,6 +1507,141 @@ var Sessions = {
       }
       if (result.ok) {
         $table_row.remove();
+      }
+    });
+  }
+};
+
+var Premium = {
+  init: function() {
+    Aj.onLoad(function(state) {
+      var cont = Aj.ajContainer;
+      $(cont).on('click.curPage', '.js-gift-premium-btn', Premium.eGiftPremium);
+      state.$giftPremiumPopup = $('.js-gift-premium-popup');
+      $(cont).on('submit.curPage', '.js-gift-premium-form', Premium.eGiftPremiumSubmit);
+      state.$giftPremiumForm = $('.js-gift-premium-form');
+      Main.initForm(state.$giftPremiumForm);
+      state.$premiumSearchField = $('.js-premium-search-field');
+      state.$premiumSearchForm = $('.js-premium-form');
+      state.$premiumSearchForm.on('submit', Premium.eSearchSubmit);
+      state.$premiumSearchForm.field('query').on('input', Premium.eSearchInput);
+      $('.js-form-clear', state.$premiumSearchForm).on('click', Premium.eSearchClear);
+    });
+    Aj.onUnload(function(state) {
+      Main.destroyForm(state.$giftPremiumForm);
+      state.$premiumSearchForm.off('submit', Premium.eSearchSubmit);
+      state.$premiumSearchForm.field('query').off('input', Premium.eSearchInput);
+      $('.js-form-clear', state.$premiumSearchForm).off('click', Premium.eSearchClear);
+    });
+  },
+  eSearchInput: function(e) {
+    var $field = Aj.state.$premiumSearchField;
+    $('.js-search-field-error').html('');
+    $field.removeClass('error');
+  },
+  eSearchClear: function(e) {
+    var $form = Aj.state.$premiumSearchForm;
+    var $field = Aj.state.$premiumSearchField;
+    $form.field('query').value('').prop('disabled', false);
+    $field.removeClass('found');
+    Premium.searchSubmit();
+  },
+  eSearchSubmit: function(e) {
+    e.preventDefault();
+    Premium.searchSubmit();
+  },
+  searchSubmit: function() {
+    var $form  = Aj.state.$premiumSearchForm;
+    var query  = $form.field('query').value();
+    var months = $form.field('months').value();
+    Aj.state.$premiumSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
+    Aj.showProgress();
+    Aj.apiRequest('searchPremiumGiftRecipient', {
+      query: query,
+      months: months
+    }, function(result) {
+      Aj.hideProgress();
+      Premium.updateResult(result);
+      Aj.state.$premiumSearchField.removeClass('loading');
+    });
+  },
+  updateResult: function(result) {
+    var $form  = Aj.state.$premiumSearchForm;
+    var $field = Aj.state.$premiumSearchField;
+    if (result.error) {
+      $('.js-search-field-error').html(result.error);
+      $field.addClass('error').removeClass('found');
+      $form.field('query').prop('disabled', false);
+    } else {
+      $('.js-search-field-error').html('');
+      $field.removeClass('error');
+      if (result.found) {
+        if (result.found.photo) {
+          $('.js-premium-search-photo', $field).html(result.found.photo);
+        }
+        if (result.found.name) {
+          var $form = Aj.state.$premiumSearchForm;
+          $form.field('query').value(result.found.name);
+        }
+        $form.field('recipient').value(result.found.recipient);
+        $field.addClass('found');
+        $form.field('query').prop('disabled', true);
+      } else {
+        $form.field('recipient').value('');
+        $field.removeClass('found');
+        $form.field('query').prop('disabled', false);
+      }
+    }
+    if (result.url) {
+      var loc = Aj.location(), path = loc.pathname + loc.search;
+      Aj.setLocation(result.url, true);
+    }
+  },
+  eGiftPremium: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    var $form     = Aj.state.$premiumSearchForm;
+    var recipient = $form.field('recipient').value();
+    var months    = $form.field('months').value();
+    Aj.apiRequest('initGiftPremiumRequest', {
+      recipient: recipient,
+      months: months
+    }, function(result) {
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      $('.js-recepient-name', Aj.state.$giftPremiumPopup).html(result.name);
+      $('.js-gift-premium-summary', Aj.state.$giftPremiumPopup).html(result.summary);
+      Aj.state.giftPrice = result.amount;
+      Aj.state.itemTitle = result.item_title;
+      Aj.state.$giftPremiumForm.field('id').value(result.req_id);
+      openPopup(Aj.state.$giftPremiumPopup);
+    });
+  },
+  eGiftPremiumSubmit: function(e) {
+    e.preventDefault();
+    var $form = $(this);
+    var item_title = Aj.state.itemTitle;
+    var req_id = $form.field('id').value();
+    closePopup(Aj.state.$giftPremiumPopup);
+    QR.showPopup({
+      request: {
+        method: 'getGiftPremiumLink',
+        params: {
+          id: req_id
+        }
+      },
+      title: l('WEB_POPUP_QR_PREMIUM_HEADER'),
+      description: l('WEB_POPUP_QR_PREMIUM_TEXT', {
+        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Main.wrapTonAmount(Aj.state.giftPrice) + '</span>'
+      }),
+      qr_label: item_title,
+      tk_label: l('WEB_POPUP_QR_PREMIUM_TK_BUTTON'),
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
+      onConfirm: function(by_server) {
+        if (by_server) {
+          showAlert(l('WEB_GIFT_PREMIUM_SENT'));
+        }
       }
     });
   }
