@@ -1565,6 +1565,8 @@ var EditAd = {
       state.textField.on('input.curPage', NewAd.onTextInput);
       state.promoteUrlField = state.$form.field('promote_url');
       state.promoteUrlField.on('change.curPage', NewAd.onPromoteUrlChange);
+      state.adInfoField = state.$form.field('ad_info');
+      state.adInfoField.on('change.curPage', NewAd.onAdInfoChange);
       NewAd.updateAdPreview(state.$form, state.previewData);
       Aj.onLoad(function(state) {
         state.initFormData = EditAd.getFormData(state.$form);
@@ -1942,6 +1944,7 @@ var EditAd = {
     var title       = $form.field('title').value();
     var text        = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
+    var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
 
     if (!title.length) {
@@ -1966,6 +1969,7 @@ var EditAd = {
       title: title,
       text: text,
       promote_url: promote_url,
+      ad_info: ad_info,
       cpm: cpm
     };
     if ($form.field('picture').prop('checked')) {

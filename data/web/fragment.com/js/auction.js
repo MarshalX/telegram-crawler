@@ -1526,12 +1526,14 @@ var Premium = {
       state.$premiumSearchForm.on('submit', Premium.eSearchSubmit);
       state.$premiumSearchForm.field('query').on('input', Premium.eSearchInput);
       $('.js-form-clear', state.$premiumSearchForm).on('click', Premium.eSearchClear);
+      $('input.radio', state.$premiumSearchForm).on('change', Premium.eRadioChanged);
     });
     Aj.onUnload(function(state) {
       Main.destroyForm(state.$giftPremiumForm);
       state.$premiumSearchForm.off('submit', Premium.eSearchSubmit);
       state.$premiumSearchForm.field('query').off('input', Premium.eSearchInput);
       $('.js-form-clear', state.$premiumSearchForm).off('click', Premium.eSearchClear);
+      $('input.radio', state.$premiumSearchForm).off('change', Premium.eRadioChanged);
     });
   },
   eSearchInput: function(e) {
@@ -1542,8 +1544,12 @@ var Premium = {
   eSearchClear: function(e) {
     var $form = Aj.state.$premiumSearchForm;
     var $field = Aj.state.$premiumSearchField;
+    $form.field('recipient').value('');
     $form.field('query').value('').prop('disabled', false);
     $field.removeClass('found');
+    Premium.searchSubmit();
+  },
+  eRadioChanged: function() {
     Premium.searchSubmit();
   },
   eSearchSubmit: function(e) {
@@ -1552,12 +1558,13 @@ var Premium = {
   },
   searchSubmit: function() {
     var $form  = Aj.state.$premiumSearchForm;
+    var recipient = $form.field('recipient').value();
     var query  = $form.field('query').value();
     var months = $form.field('months').value();
     Aj.state.$premiumSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
     Aj.showProgress();
     Aj.apiRequest('searchPremiumGiftRecipient', {
-      query: query,
+      query: recipient || query,
       months: months
     }, function(result) {
       Aj.hideProgress();
