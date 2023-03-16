@@ -1516,6 +1516,7 @@ var Premium = {
   init: function() {
     Aj.onLoad(function(state) {
       var cont = Aj.ajContainer;
+      $(cont).on('click.curPage', '.js-myself-link', Premium.eAcquireForMyself);
       $(cont).on('click.curPage', '.js-gift-premium-btn', Premium.eGiftPremium);
       state.$giftPremiumPopup = $('.js-gift-premium-popup');
       $(cont).on('submit.curPage', '.js-gift-premium-form', Premium.eGiftPremiumSubmit);
@@ -1526,15 +1527,56 @@ var Premium = {
       state.$premiumSearchForm.on('submit', Premium.eSearchSubmit);
       state.$premiumSearchForm.field('query').on('input', Premium.eSearchInput);
       $('.js-form-clear', state.$premiumSearchForm).on('click', Premium.eSearchClear);
-      $('input.radio', state.$premiumSearchForm).on('change', Premium.eRadioChanged);
+      state.$premiumSearchForm.on('change', '.js-premium-options input.radio', Premium.eRadioChanged);
+      state.$giftPremiumBtn = $('.js-gift-premium-btn');
+      state.updLastReq = +Date.now();
+      if (state.needUpdate) {
+        state.updStateTo = setTimeout(Premium.updateState, Main.UPDATE_PERIOD);
+      }
     });
     Aj.onUnload(function(state) {
+      clearTimeout(state.updStateTo);
+      state.needUpdate = false;
       Main.destroyForm(state.$giftPremiumForm);
       state.$premiumSearchForm.off('submit', Premium.eSearchSubmit);
       state.$premiumSearchForm.field('query').off('input', Premium.eSearchInput);
       $('.js-form-clear', state.$premiumSearchForm).off('click', Premium.eSearchClear);
-      $('input.radio', state.$premiumSearchForm).off('change', Premium.eRadioChanged);
+      state.$premiumSearchForm.off('change', '.js-premium-options input.radio', Premium.eRadioChanged);
     });
+  },
+  updateState: function() {
+    var now = +Date.now();
+    if (document.hasFocus() ||
+        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
+      Aj.state.updLastReq = now;
+      Aj.apiRequest('updatePremiumState', {
+        lv: Aj.state.lastVer,
+        dh: Aj.state.lastDh,
+      }, function(result) {
+        if (result.history_html) {
+          Premium.updateHistory(result.history_html);
+        }
+        if (result.options_html) {
+          Premium.updateOptions(result.options_html);
+        }
+        if (result.lv) {
+          Aj.state.lastVer = result.lv;
+          if (Aj.state.$sentPopup) {
+            closePopup(Aj.state.$sentPopup);
+          }
+        }
+        if (result.dh) {
+          Aj.state.lastDh = result.dh;
+        }
+        if (Aj.state.needUpdate) {
+          Aj.state.updStateTo = setTimeout(Premium.updateState, Main.UPDATE_PERIOD);
+        }
+      });
+    } else {
+      if (Aj.state.needUpdate) {
+        Aj.state.updStateTo = setTimeout(Premium.updateState, Main.CHECK_PERIOD);
+      }
+    }
   },
   eSearchInput: function(e) {
     var $field = Aj.state.$premiumSearchField;
@@ -1544,13 +1586,21 @@ var Premium = {
   eSearchClear: function(e) {
     var $form = Aj.state.$premiumSearchForm;
     var $field = Aj.state.$premiumSearchField;
+    var $btn   = Aj.state.$giftPremiumBtn;
     $form.field('recipient').value('');
     $form.field('query').value('').prop('disabled', false);
+    $form.removeClass('myself');
+    $btn.prop('disabled', true);
     $field.removeClass('found');
-    Premium.searchSubmit();
+    Premium.updateUrl();
+  },
+  eAcquireForMyself: function(e) {
+    e.preventDefault();
+    var result = {found: Aj.state.myselfFound};
+    Premium.updateResult(result);
   },
   eRadioChanged: function() {
-    Premium.searchSubmit();
+    Premium.updateUrl();
   },
   eSearchSubmit: function(e) {
     e.preventDefault();
@@ -1575,6 +1625,7 @@ var Premium = {
   updateResult: function(result) {
     var $form  = Aj.state.$premiumSearchForm;
     var $field = Aj.state.$premiumSearchField;
+    var $btn   = Aj.state.$giftPremiumBtn;
     if (result.error) {
       $('.js-search-field-error').html(result.error);
       $field.addClass('error').removeClass('found');
@@ -1590,19 +1641,46 @@ var Premium = {
           var $form = Aj.state.$premiumSearchForm;
           $form.field('query').value(result.found.name);
         }
+        $form.toggleClass('myself', result.found.myself);
         $form.field('recipient').value(result.found.recipient);
         $field.addClass('found');
         $form.field('query').prop('disabled', true);
+        $btn.prop('disabled', false);
       } else {
+        $form.removeClass('myself');
         $form.field('recipient').value('');
         $field.removeClass('found');
         $form.field('query').prop('disabled', false);
+        $btn.prop('disabled', true);
       }
     }
-    if (result.url) {
-      var loc = Aj.location(), path = loc.pathname + loc.search;
-      Aj.setLocation(result.url, true);
+    Premium.updateUrl();
+  },
+  updateUrl: function() {
+    var new_url = '';
+    var $form     = Aj.state.$premiumSearchForm;
+    var recipient = $form.field('recipient').value();
+    var months    = $form.field('months').value();
+    if (recipient) {
+      new_url += '&recipient=' + encodeURIComponent(recipient);
     }
+    if (months) {
+      new_url += '&months=' + encodeURIComponent(months);
+    }
+    if (new_url) {
+      new_url = '?' + new_url.substr(1);
+    }
+    var loc = Aj.location(), path = loc.pathname + loc.search;
+    Aj.setLocation(new_url, path != '/premium');
+  },
+  updateOptions: function(html) {
+    var $form  = Aj.state.$premiumSearchForm;
+    var months = $form.field('months').value();
+    $('.js-premium-options').replaceWith(html);
+    $form.field('months').value(months);
+  },
+  updateHistory: function(html) {
+    $('.js-premium-history').replaceWith(html);
   },
   eGiftPremium: function(e) {
     e.stopImmediatePropagation();
@@ -1647,10 +1725,11 @@ var Premium = {
       terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
       onConfirm: function(by_server) {
         if (by_server) {
-          showAlert(l('WEB_GIFT_PREMIUM_SENT'));
+          Aj.state.$sentPopup = showAlert(l('WEB_GIFT_PREMIUM_SENT'));
         }
       }
     });
+    Aj.state.needUpdate = true;
   }
 };
 

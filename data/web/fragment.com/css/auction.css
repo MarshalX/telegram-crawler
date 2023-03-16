@@ -31,6 +31,7 @@
   --btn-primary-bg-rgb: 36, 139, 218;
   --btn-primary-bg-color: rgb(var(--btn-primary-bg-rgb));
   --btn-primary-bg-hover-color: #207cc2;
+  --btn-primary-disabled-color: #a6d8ff;
   --btn-default-color: #fff;
   --btn-default-bg-color: #242e38;
   --btn-default-bg-hover-color: #293440;
@@ -156,6 +157,11 @@ i.icon {
   color: var(--btn-primary-color);
   background-color: var(--btn-primary-bg-hover-color);
 }
+.btn-primary[disabled] {
+  color: var(--btn-primary-disabled-color);
+  background-color: var(--btn-primary-bg-color);
+  opacity: 1;
+}
 .btn-default {
   color: var(--btn-default-color);
   background-color: var(--btn-default-bg-color);
@@ -255,8 +261,14 @@ i.icon {
   margin: 0px 19px 12px;
   color: var(--header-color);
 }
+.tm-main-form-label-extra {
+  font-size: 13px;
+  line-height: 20px;
+  margin: 2px 19px 13px;
+  float: right;
+}
 .tm-main-form-group {
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 .tm-form-radio-item {
   display: block;
@@ -538,12 +550,6 @@ i.icon {
   margin-right: 8px;
   margin-left: -1px;
 }
-.icon-telegram-premium {
-  width: 22px;
-  height: 30px;
-  background-image: var(--image-url-telegram-premium);
-  margin-left: 6px;
-}
 .icon-collectibles {
   width: 18px;
   height: 18px;
@@ -556,6 +562,29 @@ i.icon {
   background-image: var(--image-url-change-account);
   margin-right: 10px;
 }
+
+.icon-telegram-premium {
+  width: 22px;
+  height: 30px;
+  margin-left: 6px;
+}
+i.icon-telegram-premium {
+  background-image: var(--image-url-telegram-premium);
+}
+svg.icon-telegram-premium use {
+  fill: var(--header-tab-accent-color);
+  scale: 0.833;
+}
+.tm-qr-code-label .icon-telegram-premium {
+  margin: -4px 2px -2px;
+  width: 24px;
+  height: 34px;
+}
+.tm-qr-code-label svg.icon-telegram-premium use {
+  fill: currentColor;
+  scale: 0.9444;
+}
+
 .tm-header-tabs {
   display: flex;
   position: absolute;
@@ -1146,9 +1175,9 @@ a.tm-menu-link:focus {
   position: absolute;
   left: 0;
   top: 0;
-  margin: 9px 14px;
-  width: 36px;
-  height: 36px;
+  margin: 7px 10px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   overflow: hidden;
 }
@@ -1157,7 +1186,7 @@ a.tm-menu-link:focus {
   position: absolute;
   left: 0;
   top: 0;
-  margin: 17px 19px;
+  margin: 11px 14px;
   width: 20px;
   height: 20px;
 }
@@ -1179,6 +1208,9 @@ a.tm-menu-link:focus {
 }
 .found .tm-search-field-photo {
   display: inline-block;
+}
+.myself .tm-main-form-myself {
+  display: none;
 }
 .tm-search-field.found .tm-search-input {
   font-weight: bold;
@@ -1605,11 +1637,14 @@ a.tm-menu-link:focus {
   background-color: var(--table-bg-color);
 }
 .tm-table > tbody > tr > td .table-cell-value.tm-value {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.tm-table > tbody > tr > td:first-child .table-cell-value.tm-value {
+  font-size: 14px;
 }
 .tm-table > tbody > tr:first-child > td {
   border-top: none;
@@ -1660,7 +1695,12 @@ a.tm-menu-link:focus {
   color: #ff9953;
 }
 
-.tm-nowrap {
+.tm-inline-nowrap {
+  display: inline-block;
+  max-width: 100%;
+}
+.tm-nowrap,
+.tm-inline-nowrap {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -2911,6 +2951,9 @@ a.tm-table-action-link:hover {
     height: 36px;
     margin-left: 7px;
   }
+  svg.icon-telegram-premium use {
+    scale: 1;
+  }
 
   .tm-header-search-form {
     max-width: 274px;
@@ -2954,9 +2997,20 @@ a.tm-table-action-link:hover {
   .tm-main-premium .tm-main-search-form .tm-search-input {
     font-size: 15px;
   }
+  .tm-main-form-group {
+    margin-bottom: 28px;
+  }
   .tm-search-loading,
   .tm-search-clear {
     padding: 16px;
+  }
+  .tm-search-error-icon {
+    margin: 17px 19px;
+  }
+  .tm-search-field-photo {
+    margin: 9px 14px;
+    width: 36px;
+    height: 36px;
   }
 
   .icon-ton:before {
@@ -3094,6 +3148,9 @@ a.tm-table-action-link:hover {
     right: 20px;
   }
   .tm-table > tbody > tr > td .table-cell-value.tm-value {
+    font-size: 14px;
+  }
+  .tm-table > tbody > tr > td:first-child .table-cell-value.tm-value {
     font-size: 15px;
   }
   .table-cell-value-row > .table-cell-status-thin {
