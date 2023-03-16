@@ -1592,12 +1592,13 @@ var Premium = {
     $form.removeClass('myself');
     $btn.prop('disabled', true);
     $field.removeClass('found');
+    $('.js-search-field-error').html('');
+    $field.removeClass('error');
     Premium.updateUrl();
   },
   eAcquireForMyself: function(e) {
     e.preventDefault();
-    var result = {found: Aj.state.myselfFound};
-    Premium.updateResult(result);
+    Premium.updateResult(Aj.state.myselfResult);
   },
   eRadioChanged: function() {
     Premium.updateUrl();
@@ -1611,6 +1612,10 @@ var Premium = {
     var recipient = $form.field('recipient').value();
     var query  = $form.field('query').value();
     var months = $form.field('months').value();
+    if (!query.length) {
+      $form.field('query').focus();
+      return;
+    }
     Aj.state.$premiumSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
     Aj.showProgress();
     Aj.apiRequest('searchPremiumGiftRecipient', {
