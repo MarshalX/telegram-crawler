@@ -1528,6 +1528,7 @@ var Premium = {
       state.$premiumSearchForm.field('query').on('input', Premium.eSearchInput);
       $('.js-form-clear', state.$premiumSearchForm).on('click', Premium.eSearchClear);
       state.$premiumSearchForm.on('change', '.js-premium-options input.radio', Premium.eRadioChanged);
+      state.$giftPremiumForm.on('change', 'input.checkbox', Premium.eCheckboxChanged);
       state.$giftPremiumBtn = $('.js-gift-premium-btn');
       state.updLastReq = +Date.now();
       if (state.needUpdate) {
@@ -1542,6 +1543,7 @@ var Premium = {
       state.$premiumSearchForm.field('query').off('input', Premium.eSearchInput);
       $('.js-form-clear', state.$premiumSearchForm).off('click', Premium.eSearchClear);
       state.$premiumSearchForm.off('change', '.js-premium-options input.radio', Premium.eRadioChanged);
+      state.$giftPremiumForm.off('change', 'input.checkbox', Premium.eCheckboxChanged);
     });
   },
   updateState: function() {
@@ -1602,6 +1604,11 @@ var Premium = {
   },
   eRadioChanged: function() {
     Premium.updateUrl();
+  },
+  eCheckboxChanged: function() {
+    var $form = Aj.state.$giftPremiumForm;
+    var show_sender = $form.field('show_sender').prop('checked');
+    Aj.state.$giftPremiumPopup.toggleClass('show-sender', show_sender);
   },
   eSearchSubmit: function(e) {
     e.preventDefault();
@@ -1700,12 +1707,25 @@ var Premium = {
       if (result.error) {
         return showAlert(result.error);
       }
-      $('.js-recepient-name', Aj.state.$giftPremiumPopup).html(result.name);
-      $('.js-gift-premium-summary', Aj.state.$giftPremiumPopup).html(result.summary);
+      $('.js-gift-premium-content', Aj.state.$giftPremiumPopup).html(result.content);
+      $('.js-gift-premium-button', Aj.state.$giftPremiumPopup).html(result.button);
+      Aj.state.$giftPremiumPopup.toggleClass('iam-sender', result.myself);
       Aj.state.giftPrice = result.amount;
       Aj.state.itemTitle = result.item_title;
       Aj.state.$giftPremiumForm.field('id').value(result.req_id);
-      openPopup(Aj.state.$giftPremiumPopup);
+      RLottie.WORKERS_LIMIT = 1;
+      openPopup(Aj.state.$giftPremiumPopup, {
+        onOpen: function() {
+          $('.js-preview-sticker').each(function() {
+            RLottie.init(this, {playUntilEnd: true});
+          });
+        },
+        onClose: function() {
+          $('.js-preview-sticker').each(function() {
+            RLottie.destroy(this);
+          });
+        }
+      });
     });
   },
   eGiftPremiumSubmit: function(e) {
@@ -1713,12 +1733,14 @@ var Premium = {
     var $form = $(this);
     var item_title = Aj.state.itemTitle;
     var req_id = $form.field('id').value();
+    var show_sender = $form.field('show_sender').prop('checked');
     closePopup(Aj.state.$giftPremiumPopup);
     QR.showPopup({
       request: {
         method: 'getGiftPremiumLink',
         params: {
-          id: req_id
+          id: req_id,
+          show_sender: show_sender ? 1 : 0
         }
       },
       title: l('WEB_POPUP_QR_PREMIUM_HEADER'),
