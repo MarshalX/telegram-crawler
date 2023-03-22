@@ -376,7 +376,7 @@ var RLottie = (function () {
       return false;
     }
     initApi(function() {
-      initPlayer(el, options);
+      el && initPlayer(el, options);
     });
   }
 

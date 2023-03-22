@@ -7,8 +7,8 @@ var Main = {
     Aj.onLoad(function(state) {
       var cont = Aj.ajContainer;
       $(window).on('resize', Main.onResize);
-      $('.js-logo-hoverable').on('mouseover', Main.playLogo);
-      $('.js-logo-clickable').on('click', Main.playLogo);
+      $('.js-logo-hoverable').on('mouseover', Main.ePlayLogo);
+      $('.js-logo-clickable').on('click', Main.ePlayLogo);
       $('.js-logo-icon').on('animationend', Main.eLogoAnimEnd);
       $(cont).on('click.curPage', '.js-header-menu-button', Main.eHeaderMenu);
       $(cont).on('click.curPage', '.js-header-menu-close-button', Main.eHeaderMenuClose);
@@ -37,8 +37,8 @@ var Main = {
     Aj.onUnload(function(state) {
       clearTimeout(Aj.state.searchTimeout);
       $(window).off('resize', Main.onResize);
-      $('.js-logo-hoverable').off('mouseover', Main.playLogo);
-      $('.js-logo-clickable').off('click', Main.playLogo);
+      $('.js-logo-hoverable').off('mouseover', Main.ePlayLogo);
+      $('.js-logo-clickable').off('click', Main.ePlayLogo);
       $('.js-logo-icon').off('animationend', Main.eLogoAnimEnd);
       state.$mainSearchForm.off('submit', Main.eMainSearchSubmit);
       state.$mainSearchForm.field('query').off('input', Main.eMainSearchInput);
@@ -181,7 +181,9 @@ var Main = {
       var mainLogo = new Image();
       mainLogo.onload = function() {
         Aj.globalState.logoImageMain = main_url;
-        Main.playLogo(true);
+        $('.js-header-logo').each(function() {
+          Main.playLogo(this, true);
+        });
       };
       mainLogo.src = main_url;
       var url2 = '/img/TelemintLogoSprite2.svg';
@@ -198,10 +200,14 @@ var Main = {
       logo3.src = url3;
     }
   },
-  playLogo: function(main) {
-    if (!$('.js-logo').hasClass('play')) {
+  ePlayLogo: function(e) {
+    Main.playLogo(this);
+  },
+  playLogo: function(el, init_logo) {
+    var $el = $(el);
+    if (!$el.hasClass('play')) {
       var url = Aj.globalState.logoImageMain;
-      if (!main) {
+      if (!init_logo && $el.hasClass('js-random-logo')) {
         var rnd = Math.random();
         if (rnd > 0.9 && Aj.globalState.logoImage3) {
           url = Aj.globalState.logoImage3;
@@ -209,14 +215,14 @@ var Main = {
           url = Aj.globalState.logoImage2;
         }
       }
-      $('.js-logo').each(function() {
+      $el.each(function() {
         this.style.setProperty('--image-url-logo-icon-animated', 'url(\'' + url + '\')');
       });
-      $('.js-logo').addClass('play');
+      $el.addClass('play');
     }
   },
   eLogoAnimEnd: function(e) {
-    $('.js-logo').removeClass('play');
+    $(this).parents('.js-logo').removeClass('play');
   },
   eHeaderMenu: function(e) {
     e.preventDefault();
@@ -1162,8 +1168,7 @@ var Random = {
         if (result.done && Aj.state.$sentPopup) {
           closePopup(Aj.state.$sentPopup);
         }
-        if (Aj.state.needUpdate &&
-            result.need_update) {
+        if (Aj.state.needUpdate && result.need_update) {
           Aj.state.updStateTo = setTimeout(Random.updateState, Main.UPDATE_PERIOD);
         }
       });
@@ -1517,6 +1522,7 @@ var Premium = {
     Aj.onLoad(function(state) {
       var cont = Aj.ajContainer;
       $(cont).on('click.curPage', '.js-myself-link', Premium.eAcquireForMyself);
+      $(cont).on('click.curPage', '.js-another-gift-btn', Premium.eGiftMorePremium);
       $(cont).on('click.curPage', '.js-gift-premium-btn', Premium.eGiftPremium);
       state.$giftPremiumPopup = $('.js-gift-premium-popup');
       $(cont).on('submit.curPage', '.js-gift-premium-form', Premium.eGiftPremiumSubmit);
@@ -1534,6 +1540,13 @@ var Premium = {
       if (state.needUpdate) {
         state.updStateTo = setTimeout(Premium.updateState, Main.UPDATE_PERIOD);
       }
+      $(cont).on('click.curPage', '.js-preview-sticker', function() {
+        RLottie.playUntilEnd(this);
+      });
+      $('.js-preview-sticker').each(function() {
+        RLottie.init(this, {playUntilEnd: true});
+      });
+      RLottie.init();
     });
     Aj.onUnload(function(state) {
       clearTimeout(state.updStateTo);
@@ -1544,6 +1557,9 @@ var Premium = {
       $('.js-form-clear', state.$premiumSearchForm).off('click', Premium.eSearchClear);
       state.$premiumSearchForm.off('change', '.js-premium-options input.radio', Premium.eRadioChanged);
       state.$giftPremiumForm.off('change', 'input.checkbox', Premium.eCheckboxChanged);
+      $('.js-preview-sticker').each(function() {
+        RLottie.destroy(this);
+      });
     });
   },
   updateState: function() {
@@ -1552,14 +1568,22 @@ var Premium = {
         Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
       Aj.state.updLastReq = now;
       Aj.apiRequest('updatePremiumState', {
+        mode: Aj.state.mode,
         lv: Aj.state.lastVer,
         dh: Aj.state.lastDh,
       }, function(result) {
-        if (result.history_html) {
-          Premium.updateHistory(result.history_html);
+        if (result.mode) {
+          Aj.state.mode = result.mode;
         }
-        if (result.options_html) {
-          Premium.updateOptions(result.options_html);
+        if (result.html) {
+          Premium.updateContent(result.html);
+        } else {
+          if (result.history_html) {
+            Premium.updateHistory(result.history_html);
+          }
+          if (result.options_html) {
+            Premium.updateOptions(result.options_html);
+          }
         }
         if (result.lv) {
           Aj.state.lastVer = result.lv;
@@ -1570,7 +1594,7 @@ var Premium = {
         if (result.dh) {
           Aj.state.lastDh = result.dh;
         }
-        if (Aj.state.needUpdate) {
+        if (Aj.state.needUpdate && result.need_update) {
           Aj.state.updStateTo = setTimeout(Premium.updateState, Main.UPDATE_PERIOD);
         }
       });
@@ -1694,6 +1718,11 @@ var Premium = {
   updateHistory: function(html) {
     $('.js-premium-history').replaceWith(html);
   },
+  updateContent: function(html) {
+    $('.js-main-content').html(html).find('.js-preview-sticker').each(function() {
+      RLottie.init(this, {playUntilEnd: true});
+    });
+  },
   eGiftPremium: function(e) {
     e.stopImmediatePropagation();
     e.preventDefault();
@@ -1749,14 +1778,19 @@ var Premium = {
       }),
       qr_label: item_title,
       tk_label: l('WEB_POPUP_QR_PREMIUM_TK_BUTTON'),
-      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
-      onConfirm: function(by_server) {
-        if (by_server) {
-          Aj.state.$sentPopup = showAlert(l('WEB_GIFT_PREMIUM_SENT'));
-        }
-      }
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS')
     });
     Aj.state.needUpdate = true;
+  },
+  eGiftMorePremium: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    Aj.apiRequest('repeatPremium', {}, function(result) {
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      Aj.reload();
+    });
   }
 };
 
