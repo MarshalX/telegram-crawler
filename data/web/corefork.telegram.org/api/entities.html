@@ -81,7 +81,7 @@ UTF-8 is used by the MTProto and Bot API when transmitting and receiving fields 
 <pre><code>length := 0
 for byte in text {
     if (byte &amp; 0xc0) != 0x80 {
-        length += 1 + (byte &gt;= 0xf0)
+        length += (byte &gt;= 0xf0 ? 2 : 1)
     }
 }</code></pre>
 <p><strong>Note</strong>: the <em>length</em> of an entity <strong>must not</strong> include the length of trailing newlines or whitespaces, <code>rtrim</code> entities before computing their length: however, the next <em>offset</em> <strong>must</strong> include the length of newlines or whitespaces that precede it.  </p>
