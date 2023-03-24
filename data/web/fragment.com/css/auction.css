@@ -56,6 +56,8 @@
   --bg-hover-color: #212a33;
   --def-transition-duration: .2s;
   --def-transition: var(--def-transition-duration) ease;
+  --first-half-transition: .1s ease-out;
+  --second-half-transition: .1s ease-in .1s;
   --half-transition-duration: .15s;
   --inactive-bg-color: #212a33;
   --inactive-color: #354352;
@@ -2794,13 +2796,14 @@ a.tm-table-action-link:hover {
 .preview-sender-shown,
 .gift-premium-popup-container.show-sender .preview-sender-hidden,
 .gift-premium-popup-container.show-sender.iam-sender .preview-sender-shown {
-  transform: rotateX(180deg);
+  transition: transform var(--first-half-transition);
+  transform: scaleY(0);
 }
 .gift-premium-popup-container.show-sender .preview-sender-shown {
-  transform: rotateX(360deg);
+  transform: scaleY(1);
 }
 .gift-premium-popup-container.show-sender.iam-sender .preview-sender-hidden {
-  transform: rotateX(0deg);
+  transform: scaleY(1);
 }
 .tm-gift-premium-preview .preview-sender-name,
 .tm-gift-premium-preview .preview-sender-text {
@@ -2812,11 +2815,15 @@ a.tm-table-action-link:hover {
   font-size: 14px;
   line-height: 19px;
   font-weight: bold;
-  transition: transform var(--def-transition);
+  transition: transform var(--second-half-transition);
   backface-visibility: hidden;
 }
 .tm-gift-premium-preview .preview-sender-name.preview-sender-shown {
+  transition: transform var(--first-half-transition);
   margin-top: -19px;
+}
+.gift-premium-popup-container.show-sender .preview-sender-shown {
+  transition: transform var(--second-half-transition);
 }
 .tm-gift-premium-preview .preview-sender-text {
   font-size: 13px;
