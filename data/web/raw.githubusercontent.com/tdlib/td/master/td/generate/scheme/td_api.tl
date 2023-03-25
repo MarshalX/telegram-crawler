@@ -28,7 +28,7 @@ ok = Ok;
 //@length Length of the code
 authenticationCodeTypeTelegramMessage length:int32 = AuthenticationCodeType;
 
-//@description An authentication code is delivered via an SMS message to the specified phone number
+//@description An authentication code is delivered via an SMS message to the specified phone number; applications may not receive this type of code
 //@length Length of the code
 authenticationCodeTypeSms length:int32 = AuthenticationCodeType;
 
@@ -56,7 +56,7 @@ authenticationCodeTypeFragment url:string length:int32 = AuthenticationCodeType;
 authenticationCodeTypeFirebaseAndroid nonce:bytes length:int32 = AuthenticationCodeType;
 
 //@description An authentication code is delivered via Firebase Authentication to the official iOS application
-//@receipt Receipt of successful applikation token validation to compare with receipt from push notification
+//@receipt Receipt of successful application token validation to compare with receipt from push notification
 //@push_timeout Time after the next authentication method is supposed to be used if verification push notification isn't received, in seconds
 //@length Length of the code
 authenticationCodeTypeFirebaseIos receipt:string push_timeout:int32 length:int32 = AuthenticationCodeType;
@@ -85,6 +85,17 @@ emailAddressAuthenticationAppleId token:string = EmailAddressAuthentication;
 
 //@description An authentication token received through Google ID @token The token
 emailAddressAuthenticationGoogleId token:string = EmailAddressAuthentication;
+
+
+//@class EmailAddressResetState @description Describes reset state of a email address
+
+//@description Email address can be reset after the given period. Call resetAuthenticationEmailAddress to reset it and allow the user to authorize with a code sent to the user's phone number
+//@wait_period Time required to wait before the email address can be reset; 0 if the user is subscribed to Telegram Premium
+emailAddressResetStateAvailable wait_period:int32 = EmailAddressResetState;
+
+//@description Email address reset has already been requested. Call resetAuthenticationEmailAddress to check whether immediate reset is possible
+//@reset_in Left time before the email address will be reset, in seconds. updateAuthorizationState is not sent when this field changes
+emailAddressResetStatePending reset_in:int32 = EmailAddressResetState;
 
 
 //@description Represents a part of the text that needs to be formatted in some unusual way @offset Offset of the entity, in UTF-16 code units @length Length of the entity, in UTF-16 code units @type Type of the entity
@@ -119,8 +130,8 @@ authorizationStateWaitEmailAddress allow_apple_id:Bool allow_google_id:Bool = Au
 //@allow_apple_id True, if authorization through Apple ID is allowed
 //@allow_google_id True, if authorization through Google ID is allowed
 //@code_info Information about the sent authentication code
-//@next_phone_number_authorization_date Point in time (Unix timestamp) when the user will be able to authorize with a code sent to the user's phone number; 0 if unknown
-authorizationStateWaitEmailCode allow_apple_id:Bool allow_google_id:Bool code_info:emailAddressAuthenticationCodeInfo next_phone_number_authorization_date:int32 = AuthorizationState;
+//@email_address_reset_state Reset state of the email address; may be null if the email address can't be reset
+authorizationStateWaitEmailCode allow_apple_id:Bool allow_google_id:Bool code_info:emailAddressAuthenticationCodeInfo email_address_reset_state:EmailAddressResetState = AuthorizationState;
 
 //@description TDLib needs the user's authentication code to authorize. Call checkAuthenticationCode to check the code @code_info Information about the authorization code that was sent
 authorizationStateWaitCode code_info:authenticationCodeInfo = AuthorizationState;
@@ -5521,7 +5532,7 @@ updateSelectedBackground for_dark_theme:Bool background:background = Update;
 //@description The list of available chat themes has changed @chat_themes The new list of chat themes
 updateChatThemes chat_themes:vector<chatTheme> = Update;
 
-//@description Some language pack strings have been updated @localization_target Localization target to which the language pack belongs @language_pack_id Identifier of the updated language pack @strings List of changed language pack strings
+//@description Some language pack strings have been updated @localization_target Localization target to which the language pack belongs @language_pack_id Identifier of the updated language pack @strings List of changed language pack strings; empty if all strings have changed
 updateLanguagePackStrings localization_target:string language_pack_id:string strings:vector<languagePackString> = Update;
 
 //@description The connection state has changed. This update must be used only to show a human-readable description of the connection state @state The new connection state
@@ -5745,6 +5756,10 @@ requestQrCodeAuthentication other_user_ids:vector<int53> = Ok;
 //@last_name The last name of the user; 0-64 characters
 registerUser first_name:string last_name:string = Ok;
 
+//@description Resets the login email address. May return an error with a message "TASK_ALREADY_EXISTS" if reset is still pending.
+//-Works only when the current authorization state is authorizationStateWaitEmailCode and authorization_state.can_reset_email_address == true
+resetAuthenticationEmailAddress = Ok;
+
 //@description Checks the 2-step verification password for correctness. Works only when the current authorization state is authorizationStateWaitPassword @password The 2-step verification password to check
 checkAuthenticationPassword password:string = Ok;
 
@@ -5801,8 +5816,8 @@ getPasswordState = PasswordState;
 //@new_recovery_email_address New recovery email address; may be empty
 setPassword old_password:string new_password:string new_hint:string set_recovery_email_address:Bool new_recovery_email_address:string = PasswordState;
 
-//@description Changes the login email address of the user. The change will not be applied until the new login email address is confirmed with checkLoginEmailAddressCode.
-//-To use Apple ID/Google ID instead of a email address, call checkLoginEmailAddressCode directly
+//@description Changes the login email address of the user. The email address can be changed only if the current user already has login email and passwordState.login_email_address_pattern is non-empty.
+//-The change will not be applied until the new login email address is confirmed with checkLoginEmailAddressCode. To use Apple ID/Google ID instead of a email address, call checkLoginEmailAddressCode directly
 //@new_login_email_address New login email address
 setLoginEmailAddress new_login_email_address:string = EmailAddressAuthenticationCodeInfo;
 
@@ -6579,7 +6594,7 @@ sendWebAppData bot_user_id:int53 button_text:string data:string = Ok;
 
 //@description Informs TDLib that a Web App is being opened from attachment menu, a botMenuButton button, an internalLinkTypeAttachmentMenuBot link, or an inlineKeyboardButtonTypeWebApp button.
 //-For each bot, a confirmation alert about data sent to the bot must be shown once
-//@chat_id Identifier of the chat in which the Web App is opened
+//@chat_id Identifier of the chat in which the Web App is opened. The Web App can't be opened in secret chats
 //@bot_user_id Identifier of the bot, providing the Web App
 //@url The URL from an inlineKeyboardButtonTypeWebApp button, a botMenuButton button, or an internalLinkTypeAttachmentMenuBot link, or an empty string otherwise
 //@theme Preferred Web App theme; pass null to use the default theme
@@ -6663,8 +6678,8 @@ closeChat chat_id:int53 = Ok;
 //-Many useful activities depend on whether the messages are currently being viewed or not (e.g., marking messages as read, incrementing a view counter, updating a view counter, removing deleted messages in supergroups and channels)
 //@chat_id Chat identifier
 //@message_ids The identifiers of the messages being viewed
-//@source Source of the message view
-//@force_read Pass true to mark as read the specified messages even the chat is closed; pass null to guess the source based on chat open state
+//@source Source of the message view; pass null to guess the source based on chat open state
+//@force_read Pass true to mark as read the specified messages even the chat is closed
 viewMessages chat_id:int53 message_ids:vector<int53> source:MessageSource force_read:Bool = Ok;
 
 //@description Informs TDLib that the message content has been opened (e.g., the user has opened a photo, video, document, location or venue, or has listened to an audio file or voice note message).
@@ -8202,7 +8217,7 @@ getDeepLinkInfo link:string = DeepLinkInfo;
 //@description Returns application config, provided by the server. Can be called before authorization
 getApplicationConfig = JsonValue;
 
-//@description Adds server-provided application changelog as messages to the chat 777000 (Telegram); for official applications only @previous_application_version The previous application version
+//@description Adds server-provided application changelog as messages to the chat 777000 (Telegram); for official applications only. Returns a 404 error if nothing changed @previous_application_version The previous application version
 addApplicationChangelog previous_application_version:string = Ok;
 
 //@description Saves application log event on the server. Can be called before authorization @type Event type @chat_id Optional chat identifier, associated with the event @data The log event data
@@ -8282,6 +8297,9 @@ getUserSupportInfo user_id:int53 = UserSupportInfo;
 
 //@description Sets support information for the given user; for Telegram support only @user_id User identifier @message New information message
 setUserSupportInfo user_id:int53 message:formattedText = UserSupportInfo;
+
+//@description Returns localized name of the Telegram support user; for Telegram support only
+getSupportName = Text;
 
 
 //@description Does nothing; for testing only. This is an offline method. Can be called before authorization
