@@ -59,12 +59,11 @@
 <li><code>tg://path?query</code></li>
 </ul>
 <p>The <code>#fragment</code> part is always ignored.  </p>
-<p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code> is not equal to <code>www</code>, is not a single letter and is a valid username, it should be treated exactly as a <code>t.me/&lt;username&gt;/</code> link (generate a <code>t.me/&lt;username&gt;</code> link and append the rest of the path (if present) and the query string (if present)).  </p>
+<p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code> is not equal to <code>www</code>, is not a single letter and is a valid username, it should be treated exactly as a <code>t.me/&lt;username&gt;/</code> link (generate a <code>t.me/&lt;username&gt;/</code> link and append the rest of the path (if present) and the query string (if present)).  </p>
 <h3><a class="anchor" href="#public-username-links" id="public-username-links" name="public-username-links"><i class="anchor-icon"></i></a>Public username links</h3>
 <p>Used to link to public users, groups and channels, see <a href="/api/invites#public-usernames">here for more info on how to handle them »</a>.  </p>
 <p><code>t.me</code> syntax:</p>
-<pre><code>t.me/&lt;username&gt;
-&lt;username&gt;.t.me</code></pre>
+<pre><code>t.me/&lt;username&gt;</code></pre>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=&lt;username&gt;</code></pre>
 <p>Parameters:</p>
@@ -217,6 +216,12 @@ t.me/c/&lt;channel&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;messa
 </tr>
 </tbody>
 </table>
+<p>Note that since a <a href="/api/forum#forum-topics">forum topic</a> ID is actually the ID of the service message that created the topic, whenever the client resolves a <a href="#message-links">message link</a> that points to a <a href="/method/messageActionTopicCreate">messageActionTopicCreate</a> service message, it should open the topic, instead.<br>
+Also, if the message ID is <code>1</code> and the linked-to supergroup is a forum, the "General" topic should be opened instead of the first message of the supergroup.  </p>
+<h3><a class="anchor" href="#forum-topic-links" id="forum-topic-links" name="forum-topic-links"><i class="anchor-icon"></i></a>Forum topic links</h3>
+<p>Used to link to a specific <a href="/api/forum#forum-topics">forum topic</a>.  </p>
+<p>The syntax is exactly the same as for <a href="#message-links">message links</a>, because the topic ID is actually the ID of the service message that created the topic, so whenever the client resolves a <a href="#message-links">message link</a> that points to a <a href="/method/messageActionTopicCreate">messageActionTopicCreate</a> service message, it should open the topic, instead.  </p>
+<p>Also, if the message ID is <code>1</code> and the linked-to supergroup is a forum, the "General" topic should be opened instead of the first message of the supergroup.  </p>
 <h3><a class="anchor" href="#share-links" id="share-links" name="share-links"><i class="anchor-icon"></i></a>Share links</h3>
 <p>Used to share a prepared message and URL into a chosen chat's text field.<br>
 These links should be handled as follows:</p>
