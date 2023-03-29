@@ -1532,6 +1532,7 @@ var Premium = {
       state.$premiumSearchForm = $('.js-premium-form');
       state.$premiumSearchForm.on('submit', Premium.eSearchSubmit);
       state.$premiumSearchForm.field('query').on('input', Premium.eSearchInput);
+      state.$premiumSearchForm.field('query').on('change', Premium.eSearchChange);
       $('.js-form-clear', state.$premiumSearchForm).on('click', Premium.eSearchClear);
       state.$premiumSearchForm.on('change', '.js-premium-options input.radio', Premium.eRadioChanged);
       state.$giftPremiumForm.on('change', 'input.checkbox', Premium.eCheckboxChanged);
@@ -1554,6 +1555,7 @@ var Premium = {
       Main.destroyForm(state.$giftPremiumForm);
       state.$premiumSearchForm.off('submit', Premium.eSearchSubmit);
       state.$premiumSearchForm.field('query').off('input', Premium.eSearchInput);
+      state.$premiumSearchForm.field('query').on('change', Premium.eSearchChange);
       $('.js-form-clear', state.$premiumSearchForm).off('click', Premium.eSearchClear);
       state.$premiumSearchForm.off('change', '.js-premium-options input.radio', Premium.eRadioChanged);
       state.$giftPremiumForm.off('change', 'input.checkbox', Premium.eCheckboxChanged);
@@ -1608,6 +1610,9 @@ var Premium = {
     var $field = Aj.state.$premiumSearchField;
     $('.js-search-field-error').html('');
     $field.removeClass('error');
+  },
+  eSearchChange: function(e) {
+    Premium.searchSubmit();
   },
   eSearchClear: function(e) {
     var $form = Aj.state.$premiumSearchForm;
