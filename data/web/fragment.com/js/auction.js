@@ -1794,7 +1794,7 @@ var Premium = {
       if (result.error) {
         return showAlert(result.error);
       }
-      Aj.reload();
+      Aj.location('/premium');
     });
   }
 };

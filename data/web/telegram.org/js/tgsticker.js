@@ -68,7 +68,8 @@ var RLottie = (function () {
         }
       }
     }
-    var delay = now - lastRenderDate < 100 ? 16 : 500;
+    // var delay = !lastRenderDate || now - lastRenderDate < 100 ? 16 : 500;
+    var delay = 16;
     if (delay < 20 && isRAF) {
       mainLoopAf = requestAnimationFrame(mainLoop)
     } else {
@@ -296,6 +297,9 @@ var RLottie = (function () {
 
   function onFrame(reqId, frameNo, frame) {
     var rlPlayer = rlottie.players[reqId];
+    if (!rlPlayer || !rlPlayer.frames) {
+      return;
+    }
     if (!rlPlayer.frames[frameNo] &&
         (!frameNo || (rlPlayer.options.cachingModulo && ((reqId + frameNo) % rlPlayer.options.cachingModulo)))) {
       rlPlayer.frames[frameNo] = new Uint8ClampedArray(frame)
