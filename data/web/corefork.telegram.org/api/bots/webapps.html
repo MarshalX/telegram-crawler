@@ -153,6 +153,43 @@ The webview must be closed after invoking the <a href="/method/messages.sendWebV
 <p>To open them, clients should call <a href="/method/messages.requestWebView">messages.requestWebView</a>, and then open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
 <p>After loading the webview, until it is closed by a <a href="/api/web-events#web-app-close">web_app_close event</a>, the user client must invoke <a href="/method/messages.prolongWebView">messages.prolongWebView</a> every 60 seconds: if the method call returns <code>QUERY_ID_INVALID</code>, the webview must be closed.  </p>
 <p>The opened URL's fragment parameters already contain basic information about the user and a <code>query_id</code> parameter, that is exposed by the <a href="/bots/webapps">bot web apps JS library</a>: this <code>query_id</code> can then be used <strong>by the bot</strong> to invoke <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a>, passing an <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructor that will automatically send a message with optionally attached media, and even inline buttons on behalf of the user.  </p>
+<h3><a class="anchor" href="#bot-web-apps" id="bot-web-apps" name="bot-web-apps"><i class="anchor-icon"></i></a>Bot web apps</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/inputBotAppID'>inputBotAppID</a>#a920bd7a id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputBotApp'>InputBotApp</a>;
+<a href='/constructor/inputBotAppShortName'>inputBotAppShortName</a>#908c0407 bot_id:<a href='/type/InputUser'>InputUser</a> short_name:<a href='/type/string'>string</a> = <a href='/type/InputBotApp'>InputBotApp</a>;
+
+<a href='/constructor/botAppNotModified'>botAppNotModified</a>#5da674b7 = <a href='/type/BotApp'>BotApp</a>;
+<a href='/constructor/botApp'>botApp</a>#95fcd1d6 flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> short_name:<a href='/type/string'>string</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/type/Photo'>Photo</a> document:flags.0?<a href='/type/Document'>Document</a> hash:<a href='/type/long'>long</a> = <a href='/type/BotApp'>BotApp</a>;
+
+<a href='/constructor/messages.botApp'>messages.botApp</a>#eb50adf5 flags:<a href='/type/%23'>#</a> inactive:flags.0?<a href='/constructor/true'>true</a> request_write_access:flags.1?<a href='/constructor/true'>true</a> app:<a href='/type/BotApp'>BotApp</a> = <a href='/type/messages.BotApp'>messages.BotApp</a>;
+
+<a href='/constructor/appWebViewResultUrl'>appWebViewResultUrl</a>#3c1b4f0d url:<a href='/type/string'>string</a> = <a href='/type/AppWebViewResult'>AppWebViewResult</a>;
+
+---functions---
+
+<a href='/method/messages.getBotApp'>messages.getBotApp</a>#34fdc5c3 app:<a href='/type/InputBotApp'>InputBotApp</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.BotApp'>messages.BotApp</a>;
+
+<a href='/method/messages.requestAppWebView'>messages.requestAppWebView</a>#8c5a3b3c flags:<a href='/type/%23'>#</a> write_allowed:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> app:<a href='/type/InputBotApp'>InputBotApp</a> start_param:flags.1?<a href='/type/string'>string</a> theme_params:flags.2?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/AppWebViewResult'>AppWebViewResult</a>;
+
+<a href='/method/messages.prolongWebView'>messages.prolongWebView</a>#7ff34309 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> bot:<a href='/type/InputUser'>InputUser</a> query_id:<a href='/type/long'>long</a> reply_to_msg_id:flags.0?<a href='/type/int'>int</a> top_msg_id:flags.9?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Another way to open web apps is by using <a href="/api/links#bot-web-app-links">bot web app links »</a>.  </p>
+<p>These links are different from <a href="/api/links#bot-attachment-menu-links">bot attachment menu deep links »</a>, because they don't require the user to install an attachment menu, and a single bot can offer multiple web apps, distinguished by their <code>short_name</code>.  </p>
+<p>These links should be handled as follows:  </p>
+<ul>
+<li>Check if <code>bot_username</code> parameter of the link is indeed a bot username, if so then</li>
+<li>Invoke <a href="/method/messages.getBotApp">messages.getBotApp</a>, passing an <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a> with the <code>short_name</code> contained in the <code>appname</code> query string parameter.
+If the client has already encountered an app with this short name from the same bot before, pass the <code>hash</code> of the cached <a href="/constructor/botApp">botApp</a> constructor to <a href="/method/messages.getBotApp">messages.getBotApp</a>.</li>
+<li>If a <a href="/constructor/messages.botApp">messages.botApp</a> constructor is returned, open the web app by invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>, generating an <a href="/constructor/inputBotAppID">inputBotAppID</a> constructor from <code>id</code> and <code>access_hash</code> of the returned <a href="/constructor/botApp">botApp</a>, or from previously cached information if we already met the bot app and <a href="/constructor/botAppNotModified">botAppNotModified</a> was returned.  <ul>
+<li>If the client has clicked on the link in a Telegram chat, pass the chat's peer information into <code>peer</code>; otherwise pass the bot's peer information, instead.</li>
+<li>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>inactive</code> flag is set, ask confirmation from the user before opening the web app.</li>
+<li>If the <code>startapp</code> query string parameter is present, pass it to <code>start_param</code> when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</li>
+<li>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>request_write_access</code> flag is set, the bot is asking permission to send messages to the user: if the user agrees, set the <code>write_allowed</code> flag when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</li>
+</ul>
+</li>
+</ul>
+<p>Finally, open the webview using the <code>url</code> contained in the returned <a href="/constructor/appWebViewResultUrl">appWebViewResultUrl</a>.  </p>
+<p>Since there is no linked inline query, <code>web_app_data_send</code> events must be ignored.<br>
+The bot can, however, write to the user directly if it already has a chat with the user or if it requested permission via <code>request_write_access</code> and the user granted it with <code>write_allowed</code>.  </p>
 <h3><a class="anchor" href="#theme-parameters" id="theme-parameters" name="theme-parameters"><i class="anchor-icon"></i></a>Theme parameters</h3>
 <p>Bot web apps can be themed according to the following theme parameters, passed as a JSON object to the <code>theme_params</code> parameter of the <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and <a href="/method/messages.requestWebView">messages.requestWebView</a> methods.  </p>
 <p>This JSON object has the the following keys, containing color theme information (hex string, RGB, no alpha) to pass to the web app:</p>

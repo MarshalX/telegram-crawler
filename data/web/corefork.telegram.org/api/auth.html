@@ -51,9 +51,10 @@
 <p>To show a nicely formatted and validated phone number field, the <a href="/constructor/help.countriesList">help.countriesList</a> constructor can be obtained using the <a href="/method/help.getCountriesList">help.getCountriesList</a> method.<br>
 The <a href="/constructor/help.countriesList">help.countriesList</a> config is then used as described <a href="/api/config#country-information-and-login-phone-patterns">here »</a>.  </p>
 <p>Then, a text message containing an authorization code is sent to the user's phone using <a href="/method/auth.sendCode">auth.sendCode</a>.<br>
-However, this is not always the case, if logout tokens are used:  </p>
-<h4><a class="anchor" href="#logout-tokens" id="logout-tokens" name="logout-tokens"><i class="anchor-icon"></i></a>Logout tokens</h4>
+However, this is not always the case, if future auth tokens are used:  </p>
+<h4><a class="anchor" href="#future-auth-tokens" id="future-auth-tokens" name="future-auth-tokens"><i class="anchor-icon"></i></a>Future auth tokens</h4>
 <p>When invoking <a href="/method/auth.logOut">auth.logOut</a> on a previously authorized session with 2FA enabled, the server may return a <code>future_auth_token</code>, which should be stored in the local database.<br>
+A <code>future_auth_token</code> is also contained in the <a href="/constructor/auth.authorization">auth.authorization</a> returned when logging in.<br>
 At all times, the logout token database should contain at most 20 tokens: evict older tokens as new tokens are added.<br>
 When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all logout tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
 If any of the logout tokens matches the account we're trying to login into and the token hasn't expired, <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </p>

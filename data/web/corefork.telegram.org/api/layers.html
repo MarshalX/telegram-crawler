@@ -57,7 +57,7 @@
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/messages.getBotApp">messages.getBotApp</a> - </li>
+<li>Added <a href="/method/messages.getBotApp">messages.getBotApp</a> - Obtain information about a <a href="/api/bots/webapps#bot-web-apps">bot web app</a></li>
 <li>Added <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a> - Open a <a href="/bots/webapps">bot web app</a> from a <a href="/api/links#bot-web-app-links">bot web app deep link</a>, sending over user information after user confirmation.</li>
 <li>Added <a href="/method/bots.setBotInfo">bots.setBotInfo</a> - Set our about text and description (bots only)</li>
 <li>Added <a href="/method/bots.getBotInfo">bots.getBotInfo</a> - Get our about text and description (bots only)</li>
@@ -72,10 +72,10 @@
 <ul>
 <li>Added <a href="/constructor/inputBotAppID">inputBotAppID</a> - </li>
 <li>Added <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a> - </li>
-<li>Added <a href="/constructor/botAppNotModified">botAppNotModified</a> - </li>
-<li>Added <a href="/constructor/botApp">botApp</a> - </li>
+<li>Added <a href="/constructor/botAppNotModified">botAppNotModified</a> - Bot app info hasn't changed.</li>
+<li>Added <a href="/constructor/botApp">botApp</a> - Contains information about a <a href="/api/bots/webapps#bot-web-apps">bot web app</a>.</li>
 <li>Added <a href="/constructor/messages.botApp">messages.botApp</a> - </li>
-<li>Added <a href="/constructor/appWebViewResultUrl">appWebViewResultUrl</a> - </li>
+<li>Added <a href="/constructor/appWebViewResultUrl">appWebViewResultUrl</a> - Contains the link that must be used to open a <a href="/api/bots/webapps#bot-web-apps">bot web app</a>.</li>
 <li>Added <a href="/constructor/inlineBotWebView">inlineBotWebView</a> - </li>
 <li>Added <a href="/constructor/readParticipantDate">readParticipantDate</a> - </li>
 <li>Added <a href="/constructor/updateGroupInvitePrivacyForbidden">updateGroupInvitePrivacyForbidden</a> - </li>
@@ -189,7 +189,7 @@
 <li>Added <a href="/constructor/messages.translateResult">messages.translateResult</a> - </li>
 <li>Added <a href="/constructor/autoSaveSettings">autoSaveSettings</a> - </li>
 <li>Added <a href="/constructor/autoSaveException">autoSaveException</a> - </li>
-<li>Added <a href="/constructor/account.autoSaveSettings">account.autoSaveSettings</a> - </li>
+<li>Added <a href="/constructor/account.autoSaveSettings">account.autoSaveSettings</a> - Contains media autosave settings</li>
 <li>Added <a href="/constructor/updateAutoSaveSettings">updateAutoSaveSettings</a> - </li>
 </ul>
 <h5><a class="anchor" href="#changed-constructors" id="changed-constructors" name="changed-constructors"><i class="anchor-icon"></i></a>Changed Constructors</h5>
@@ -323,8 +323,8 @@
 <ul>
 <li>Added <a href="/method/channels.toggleAntiSpam">channels.toggleAntiSpam</a> - Enable or disable the <a href="/api/antispam">native antispam system</a>.</li>
 <li>Added <a href="/method/channels.reportAntiSpamFalsePositive">channels.reportAntiSpamFalsePositive</a> - Report a <a href="/api/antispam">native antispam</a> false positive</li>
-<li>Added <a href="/method/messages.setDefaultHistoryTTL">messages.setDefaultHistoryTTL</a> - </li>
-<li>Added <a href="/method/messages.getDefaultHistoryTTL">messages.getDefaultHistoryTTL</a> - </li>
+<li>Added <a href="/method/messages.setDefaultHistoryTTL">messages.setDefaultHistoryTTL</a> - Changes the default value of the Time-To-Live setting, applied to all new chats.</li>
+<li>Added <a href="/method/messages.getDefaultHistoryTTL">messages.getDefaultHistoryTTL</a> - Gets the default value of the Time-To-Live setting, applied to all new chats.</li>
 <li>Added <a href="/method/contacts.exportContactToken">contacts.exportContactToken</a> - Generates a <a href="/api/links#temporary-profile-links">temporary profile link</a> for the currently logged-in user.</li>
 <li>Added <a href="/method/contacts.importContactToken">contacts.importContactToken</a> - Obtain user info from a <a href="/api/links#temporary-profile-links">temporary profile link</a>.</li>
 </ul>
@@ -336,7 +336,7 @@
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/defaultHistoryTTL">defaultHistoryTTL</a> - </li>
+<li>Added <a href="/constructor/defaultHistoryTTL">defaultHistoryTTL</a> - Contains info about the default value of the Time-To-Live setting, applied to all new chats.</li>
 <li>Added <a href="/constructor/auth.codeTypeFragmentSms">auth.codeTypeFragmentSms</a> - </li>
 <li>Added <a href="/constructor/auth.sentCodeTypeFragmentSms">auth.sentCodeTypeFragmentSms</a> - </li>
 <li>Added <a href="/constructor/exportedContactToken">exportedContactToken</a> - Describes a <a href="/api/links#temporary-profile-links">temporary profile link</a>.</li>
@@ -402,10 +402,10 @@
 <li>Added <a href="/method/channels.toggleUsername">channels.toggleUsername</a> - Associate or dissociate a purchased <a href="https://fragment.com">fragment.com</a> username to a <a href="/api/channel">supergroup or channel</a>.</li>
 <li>Added <a href="/method/channels.deactivateAllUsernames">channels.deactivateAllUsernames</a> - Disable all purchased usernames of a supergroup or channel</li>
 <li>Added <a href="/method/channels.toggleForum">channels.toggleForum</a> - Enable or disable <a href="/api/forum">forum functionality</a> in a supergroup.</li>
-<li>Added <a href="/method/channels.createForumTopic">channels.createForumTopic</a> - Create a <a href="/api/forum">forum topic</a>.</li>
+<li>Added <a href="/method/channels.createForumTopic">channels.createForumTopic</a> - Create a <a href="/api/forum">forum topic</a>; requires <a href="/api/rights"><code>manage_topics</code> rights</a>.</li>
 <li>Added <a href="/method/channels.getForumTopics">channels.getForumTopics</a> - Get <a href="/api/forum">topics of a forum</a></li>
 <li>Added <a href="/method/channels.getForumTopicsByID">channels.getForumTopicsByID</a> - Get forum topics by their ID</li>
-<li>Added <a href="/method/channels.editForumTopic">channels.editForumTopic</a> - Edit <a href="/api/forum">forum topic</a></li>
+<li>Added <a href="/method/channels.editForumTopic">channels.editForumTopic</a> - Edit <a href="/api/forum">forum topic</a>; requires <a href="/api/rights"><code>manage_topics</code> rights</a>.</li>
 <li>Added <a href="/method/channels.updatePinnedForumTopic">channels.updatePinnedForumTopic</a> - Pin or unpin <a href="/api/forum">forum topics</a></li>
 <li>Added <a href="/method/channels.deleteTopicHistory">channels.deleteTopicHistory</a> - Delete message history of a <a href="/api/forum">forum topic</a></li>
 </ul>
@@ -437,7 +437,7 @@
 <li>Added <a href="/constructor/channelAdminLogEventActionDeleteTopic">channelAdminLogEventActionDeleteTopic</a> - </li>
 <li>Added <a href="/constructor/channelAdminLogEventActionPinTopic">channelAdminLogEventActionPinTopic</a> - </li>
 <li>Added <a href="/constructor/forumTopicDeleted">forumTopicDeleted</a> - </li>
-<li>Added <a href="/constructor/forumTopic">forumTopic</a> - </li>
+<li>Added <a href="/constructor/forumTopic">forumTopic</a> - Represents a <a href="/api/forum#forum-topics">forum topic</a>.</li>
 <li>Added <a href="/constructor/messages.forumTopics">messages.forumTopics</a> - </li>
 <li>Added <a href="/constructor/messageActionTopicCreate">messageActionTopicCreate</a> - </li>
 <li>Added <a href="/constructor/messageActionTopicEdit">messageActionTopicEdit</a> - </li>
@@ -1283,7 +1283,7 @@ Also, discussion group admins can now <a href="/api/discussion#requiring-users-t
 <a href="/method/messages.getAvailableReactions">messages.getAvailableReactions</a>#18dea0ac hash:<a href="/type/int">int</a> = <a href="/type/messages.AvailableReactions">messages.AvailableReactions</a>;
 <a href="/method/messages.setDefaultReaction">messages.setDefaultReaction</a>#d960c4d4 reaction:<a href="/type/string">string</a> = <a href="/type/Bool">Bool</a>;<br></code></pre></div>
 <h3><a class="anchor" href="#layer-135" id="layer-135" name="layer-135"><i class="anchor-icon"></i></a><a href="/schema?layer=135">Layer 135</a></h3>
-<p><a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#anonymous-posting-in-public-groups">Anonymous posting in public groups</a>, <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#protected-content-in-groups-and-channels">protected content</a>, <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#manage-connected-devices">device management</a>, <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#new-ways-to-log-in-via-call">login via missed call</a>, <a href="/constructor/inputKeyboardButtonUserProfile">mention users in inline buttons even if they don't have a username</a>, <a href="/api/auth#logout-tokens">logout tokens</a>, improvements to join requests and stickers.</p>
+<p><a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#anonymous-posting-in-public-groups">Anonymous posting in public groups</a>, <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#protected-content-in-groups-and-channels">protected content</a>, <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#manage-connected-devices">device management</a>, <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#new-ways-to-log-in-via-call">login via missed call</a>, <a href="/constructor/inputKeyboardButtonUserProfile">mention users in inline buttons even if they don't have a username</a>, <a href="/api/auth#future-auth-tokens">future auth tokens</a>, improvements to join requests and stickers.</p>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
@@ -1324,7 +1324,7 @@ Also, discussion group admins can now <a href="/api/discussion#requiring-users-t
 <li>Added <a href="/constructor/channelAdminLogEventActionSendMessage">channelAdminLogEventActionSendMessage</a> - A message was posted in a channel</li>
 <li>Added <a href="/constructor/auth.codeTypeMissedCall">auth.codeTypeMissedCall</a> - The next time, the authentication code will be delivered via an immediately canceled incoming call, handled manually by the user.</li>
 <li>Added <a href="/constructor/auth.sentCodeTypeMissedCall">auth.sentCodeTypeMissedCall</a> - The code will be sent via a flash phone call, that will be closed immediately. The last digits of the phone number that calls are the code that must be entered manually by the user.</li>
-<li>Added <a href="/constructor/auth.loggedOut">auth.loggedOut</a> - <a href="/api/auth#logout-tokens">Logout token »</a> to be used on subsequent authorizations</li>
+<li>Added <a href="/constructor/auth.loggedOut">auth.loggedOut</a> - <a href="/api/auth#future-auth-tokens">Future auth token »</a> to be used on subsequent authorizations</li>
 </ul>
 <h5><a class="anchor" href="#changed-constructors" id="changed-constructors" name="changed-constructors"><i class="anchor-icon"></i></a>Changed Constructors</h5>
 <ul>

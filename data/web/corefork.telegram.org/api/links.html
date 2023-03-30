@@ -830,18 +830,8 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 </table>
 <h3><a class="anchor" href="#bot-web-app-links" id="bot-web-app-links" name="bot-web-app-links"><i class="anchor-icon"></i></a>Bot web app links</h3>
 <p>Used to share <a href="/api/bots/webapps">bot web apps</a>.  </p>
-<p>These links should be handled as follows:  </p>
-<ul>
-<li>Check if <code>bot_username</code> is indeed a bot username, if so then</li>
-<li>Invoke <a href="/method/messages.getBotApp">messages.getBotApp</a>, passing an <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a> with the <code>short_name</code> contained in the <code>appname</code> query string parameter.</li>
-<li>If a <a href="/constructor/messages.botApp">messages.botApp</a> constructor is returned, open the web app by invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.<ul>
-<li>If the client has clicked on the link in a Telegram chat, pass the chat's peer information into <code>peer</code>; otherwise pass the bot's peer information, instead.</li>
-<li>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>inactive</code> flag is set, ask confirmation from the user before opening the web app.</li>
-<li>If the <code>startapp</code> query string parameter is present, pass it to <code>start_param</code> when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</li>
-<li>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>request_write_access</code> flag is set, the bot is asking permission to send messages to the user: if the user agrees, set the <code>write_allowed</code> flag when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</li>
-</ul>
-</li>
-</ul>
+<p>These links are different from <a href="#bot-attachment-menu-links">bot attachment menu deep links</a>, because they don't require the user to install an attachment menu, and a single bot can offer multiple web apps, distinguished by their <code>short_name</code>.  </p>
+<p>These links should be handled as specified in the <a href="/api/bots/webapps#bot-web-apps">bot web app documentation »</a>.  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;/&lt;short_name&gt;?startapp=&lt;start_parameter&gt;</code></pre>
 <p><code>tg:</code> syntax:</p>
