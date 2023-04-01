@@ -2517,6 +2517,10 @@ function checkFrameSize() {
         addClass(document.body, 'no_transitions');
         toggleClass(document.body, 'dark', !!new_options.dark);
         toggleClass(document.body, 'nodark', !new_options.dark);
+        var root = document.documentElement;
+        if (root && root.style) {
+          root.style.colorScheme = !new_options.dark ? 'light' : 'dark';
+        }
       }
       if (transition_off) {
         setTimeout(function() {
