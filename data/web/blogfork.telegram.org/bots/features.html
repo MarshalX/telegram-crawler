@@ -323,17 +323,20 @@ width=44% /></a>
 <blockquote>
 <p>Check out <a href="https://t.me/gamebot">@GameBot</a> and <a href="https://t.me/gamee">@gamee</a> for examples of what you can do using our Gaming Platform.</p>
 </blockquote>
-<h3><a class="anchor" name="stickers" href="#stickers"><i class="anchor-icon"></i></a>Stickers</h3>
-<p><a href="/stickers">Stickers</a> are a distinctive Telegram feature used by millions of users to share artwork every day. Stickers take many forms – ranging from <strong>basic images</strong> to smooth <strong>vector animations</strong> and high-detail <strong>.WEBM videos</strong>.</p>
-<p>All these formats are supported by our <a href="/bots/api#stickers">Bot API</a>, which allows bots to <strong>create</strong>, <strong>edit</strong>, <strong>delete</strong> and <strong>share</strong> new sticker packs on the fly. Telegram&#39;s <a href="/import-stickers">Import API</a> lets users <strong>migrate packs</strong> from other platforms and sticker apps.</p>
-<p>To create a <strong>new sticker pack</strong>, follow these simple steps:</p>
+<h3><a class="anchor" name="stickers-and-custom-emoji" href="#stickers-and-custom-emoji"><i class="anchor-icon"></i></a>Stickers and Custom Emoji</h3>
+<p><a href="https://core.telegram.org/stickers">Stickers</a> and <a href="https://telegram.org/blog/custom-emoji">Custom Emoji</a> are a distinctive Telegram feature used by millions of users to share artwork every day. Stickers and custom emoji take many forms – ranging from <strong>basic images</strong> to smooth <strong>vector animations</strong> and high-detail <strong>.WEBM videos</strong>.</p>
+<p>All these formats are supported by our <a href="api#stickers">Bot API</a>, which allows bots to <strong>create</strong>, <strong>edit</strong>, <strong>delete</strong> and <strong>share</strong> new artwork packs on the fly. Telegram&#39;s <a href="https://core.telegram.org/import-stickers">Import API</a> lets users <strong>migrate packs</strong> from other platforms and sticker apps.</p>
+<p><strong>Creating a new pack</strong><br>To create a <strong>new pack</strong>, simply:</p>
 <ul>
-<li><strong>Upload</strong> a new sticker file via <a href="/bots/api#uploadstickerfile">uploadStickerFile</a>. Repeat for all the stickers in the set. You will use the returned <a href="/bots/api#file">files</a> in the next step, so keep them around.</li>
-<li><strong>Create</strong> a new sticker pack via <a href="/bots/api#createnewstickerset">createStickerSet</a>. Attach the first sticker as a <a href="/bots/api#file">file</a> you collected in <strong>step 1</strong> and remember to only specify <strong>one</strong> of the three avaiable fields – <code>png_sticker</code>, <code>tgs_sticker</code> and <code>webm_sticker</code> – depending on which sticker format you uploaded.</li>
-<li><strong>Complete</strong> the pack by adding each remaining sticker in sequence via <a href="/bots/api#addstickertoset">addStickerToSet</a>.</li>
+<li><strong>Prepare</strong> your artwork following our <a href="https://core.telegram.org/stickers">technical requirements</a>.</li>
+<li><strong>Create</strong> a new sticker pack via <a href="api#createnewstickerset">createStickerSet</a>. Set <code>sticker_type</code> to <em>regular</em> to create a sticker pack or to <em>custom emoji</em> to create a pack of custom emoji. Attach the <a href="api#file">files</a> you wish to include in the pack as an array of <a href="https://core.telegram.org/bots#inputsticker">InputSticker</a></li>
+<li>You can use <a href="api#addstickertoset">addStickerToSet</a> to add stickers or emoji later on.</li>
 </ul>
+<p><strong>Additional features</strong><br>Regular stickers and custom emoji support <strong>keywords</strong> that users can type to quickly find the respective artwork – this can be useful when a sticker doesn&#39;t have obvious ties to a specific emoji. You can use the <code>keywords</code> parameter in <a href="https://core.telegram.org/bots#inputsticker">InputSticker</a> to specify them.</p>
+<p>Custom emoji additionally support <strong>adaptive colors</strong> – they will always match the current context (e.g., white on photos, accent color when used as status, etc.); to enable this feature, use the <code>needs_repainting</code> parameter in <a href="api#createnewstickerset">createStickerSet</a>.</p>
+<p>Once you&#39;re done creating and sharing your artwork, don&#39;t forget to check out our <a href="api#stickers">remaining sticker methods</a> to find out how to <a href="api#setstickersetthumb">edit</a>, <a href="api#deletestickerfromset">delete</a> and even <a href="api#setstickerpositioninset">reorder</a> your pack. </p>
 <blockquote>
-<p>Once you&#39;re done, don&#39;t forget to check out our <a href="/bots/api#stickers">remaining sticker methods</a> to find out how to <a href="/bots/api#setstickersetthumb">edit</a>, <a href="/bots/api#deletestickerfromset">delete</a> and even <a href="/bots/api#setstickerpositioninset">reorder</a> your pack.<br>Note that these methods will only work on packs <strong>created by the bot that is calling them</strong>.</p>
+<p>Note that these methods will only work on packs <strong>created by the bot that is calling them</strong>.</p>
 </blockquote>
 <h3><a class="anchor" name="language-support" href="#language-support"><i class="anchor-icon"></i></a>Language Support</h3>
 <p>Bots can tailor their interfaces to <strong>support multiple languages</strong> – updating inputs and information on the fly. A user’s <a href="/bots/api#user">language_code</a> is included in every relevant <a href="/bots/api#update">update</a> as an <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF language tag</a>, allowing bots to adapt accordingly. </p>
@@ -342,6 +345,7 @@ width=44% /></a>
 <li>Your interfaces, texts and <a href="/bots/api#answerinlinequery">inline results</a> should adapt seamlessly to the <em>language_code</em>, without user intervention.</li>
 <li>Connected <a href="/bots/webapps">WebApps</a> will receive the user&#39;s <em>language_code</em> – your HTML page should account for it.</li>
 <li><a href="/bots/html5-games">HTML5 Games</a> can obtain language information if you specify it as a <a href="/bots/games#using-url-parameters">URL parameter</a>. You can generate this parameter from the <em>language_code</em> field in the <a href="/bots/api#user">User</a> object served with the initial game <a href="/bots/api#callbackquery">CallbackQuery</a>.</li>
+<li>The bot&#39;s <strong>Description</strong> and <strong>About text</strong> can be natively localized with the respective <a href="https://core.telegram.org/bots/api#setmydescription">methods</a>.</li>
 <li>Command lists can also be specified for individual languages – more on this <a href="#commands">here</a>.</li>
 </ul>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
@@ -497,9 +501,12 @@ width=44% /></a>
 <p>You can also add a photo or video to this field with <code>Edit Description Picture</code> in <a href="https://t.me/botfather">@BotFather</a>.</p>
 </blockquote>
 <p>Additionally, just like normal users, bots also come with a <strong>short bio</strong> available on their profile. If you didn&#39;t specify this field while first creating your bot, you can set it at any time with the <code>/setabouttext</code> command in <a href="https://t.me/botfather">@BotFather</a>. Users can interact with many bots and they won&#39;t have access to their description after starting them – having a quick reminder of the bot&#39;s purpose can be very useful.</p>
+<blockquote>
+<p>Note that both the <strong>Description</strong> and the <strong>About text</strong> can be <a href="https://core.telegram.org/bots/api#setmydescription">natively localized</a> – each user will automatically see the correct translation for their language.</p>
+</blockquote>
 <p>Bots can also have a <strong>profile picture</strong> – you should pick something unique and original so that users can find it in their chat list at a glance.</p>
 <blockquote>
-<p>Once set, the description, about text and profile pic can be <strong>replaced</strong> but never fully <strong>removed</strong>.</p>
+<p>Once set, the bot profile picture can be <strong>replaced</strong> but never fully <strong>removed</strong>.</p>
 </blockquote>
 <h4><a class="anchor" name="generating-an-authentication-token" href="#generating-an-authentication-token"><i class="anchor-icon"></i></a>Generating an authentication token</h4>
 <p>If your existing token is <strong>compromised</strong> or <strong>you lost it</strong> for some reason, use the <code>/token</code> command to generate a new one.</p>
