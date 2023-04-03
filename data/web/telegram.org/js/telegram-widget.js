@@ -344,6 +344,7 @@
       iframe.setAttribute('scrolling', 'no');
       iframe.style.overflow = 'hidden';
     }
+    iframe.style.colorScheme = 'light dark';
     iframe.style.border = 'none';
     for (var prop in styles) {
       iframe.style[prop] = styles[prop];
