@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>photos.uploadContactProfilePhoto</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Upload a profile picture that will only be visible to a certain user, or suggest">
+    <meta property="description" content="Upload a custom profile picture for a contact, or suggest a new profile picture to a contact.">
     <meta property="og:title" content="photos.uploadContactProfilePhoto">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Upload a profile picture that will only be visible to a certain user, or suggest">
+    <meta property="og:description" content="Upload a custom profile picture for a contact, or suggest a new profile picture to a contact.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -42,7 +42,8 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/methods" >All Methods</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/method/photos.uploadContactProfilePhoto" >photos.uploadContactProfilePhoto</a></li></ul></div>
   <h1 id="dev_page_title">photos.uploadContactProfilePhoto</h1>
   
-  <div id="dev_page_content"><p>Upload a profile picture that will only be visible to a certain user, or suggest</p>
+  <div id="dev_page_content"><p>Upload a custom profile picture for a contact, or suggest a new profile picture to a contact.</p>
+<p>The <code>file</code>, <code>video</code> and <code>video_emoji_markup</code> flags are mutually exclusive.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -76,17 +77,17 @@
 <tr>
 <td><strong>suggest</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>If set, will send a <a href="/constructor/messageActionSuggestProfilePhoto">messageActionSuggestProfilePhoto</a> service message to <code>user_id</code>, suggesting them to use the specified profile picture; otherwise, will set a personal profile picture for the user (only visible to the current user).</td>
 </tr>
 <tr>
 <td><strong>save</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>If set, removes a previously set personal profile picture (does not affect suggested profile pictures, to remove them simply deleted the <a href="/constructor/messageActionSuggestProfilePhoto">messageActionSuggestProfilePhoto</a> service message with <a href="/method/messages.deleteMessages">messages.deleteMessages</a>).</td>
 </tr>
 <tr>
 <td><strong>user_id</strong></td>
 <td style="text-align: center;"><a href="/type/InputUser">InputUser</a></td>
-<td> </td>
+<td>The contact</td>
 </tr>
 <tr>
 <td><strong>file</strong></td>
@@ -101,12 +102,12 @@
 <tr>
 <td><strong>video_start_ts</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/double">double</a></td>
-<td>Floating point UNIX timestamp in seconds, indicating the frame of the video that should be used as static preview.</td>
+<td>Floating point UNIX timestamp in seconds, indicating the frame of the video/sticker that should be used as static preview; can only be used if <code>video</code> or <code>video_emoji_markup</code> is set.</td>
 </tr>
 <tr>
 <td><strong>video_emoji_markup</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/type/VideoSize">VideoSize</a></td>
-<td> </td>
+<td>Animated sticker profile picture, must contain either a <a href="/constructor/videoSizeEmojiMarkup">videoSizeEmojiMarkup</a> or a <a href="/constructor/videoSizeStickerMarkup">videoSizeStickerMarkup</a> constructor.</td>
 </tr>
 </tbody>
 </table>
@@ -131,8 +132,16 @@
 </table>
 <h3><a class="anchor" href="#bots-can-use-this-method" id="bots-can-use-this-method" name="bots-can-use-this-method"><i class="anchor-icon"></i></a>Bots can use this method</h3>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#messageactionsuggestprofilephoto" id="messageactionsuggestprofilephoto" name="messageactionsuggestprofilephoto"><i class="anchor-icon"></i></a><a href="/constructor/messageActionSuggestProfilePhoto">messageActionSuggestProfilePhoto</a></h4>
+<p>A new profile picture was suggested using <a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a>.</p>
+<h4><a class="anchor" href="#messagesdeletemessages" id="messagesdeletemessages" name="messagesdeletemessages"><i class="anchor-icon"></i></a><a href="/method/messages.deleteMessages">messages.deleteMessages</a></h4>
+<p>Deletes messages by their identifiers.</p>
 <h4><a class="anchor" href="#uploading-and-downloading-files" id="uploading-and-downloading-files" name="uploading-and-downloading-files"><i class="anchor-icon"></i></a><a href="/api/files">Uploading and Downloading Files</a></h4>
-<p>How to transfer large data batches correctly.</p></div>
+<p>How to transfer large data batches correctly.</p>
+<h4><a class="anchor" href="#videosizeemojimarkup" id="videosizeemojimarkup" name="videosizeemojimarkup"><i class="anchor-icon"></i></a><a href="/constructor/videoSizeEmojiMarkup">videoSizeEmojiMarkup</a></h4>
+<p>An <a href="/api/files#animated-profile-pictures">animated profile picture</a> based on a <a href="/api/custom-emoji">custom emoji sticker</a>.</p>
+<h4><a class="anchor" href="#videosizestickermarkup" id="videosizestickermarkup" name="videosizestickermarkup"><i class="anchor-icon"></i></a><a href="/constructor/videoSizeStickerMarkup">videoSizeStickerMarkup</a></h4>
+<p>An <a href="/api/files#animated-profile-pictures">animated profile picture</a> based on a <a href="/api/stickers">sticker</a>.</p></div>
   
 </div>
           
