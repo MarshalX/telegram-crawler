@@ -60,7 +60,22 @@ If the <a href="/constructor/documentAttributeCustomEmoji">documentAttributeCust
 <p>Note that when sending messages with attached custom emojis, the <a href="/constructor/messageEntityCustomEmoji">messageEntityCustomEmoji</a> <a href="/api/entities">entity »</a> must wrap exactly one regular emoji (the one contained in <a href="/constructor/documentAttributeCustomEmoji">documentAttributeCustomEmoji</a>.<code>alt</code>) in the related text, otherwise the server will ignore it.  </p>
 <p>Like stickers, custom emojis are organized in <a href="/api/stickers#stickersets">stickersets</a>: see the <a href="/api/stickers">stickers documentation »</a> for more info on how to work with them.</p>
 <p>To send a message with one or more custom emojis, create and attach <a href="/constructor/messageEntityCustomEmoji">messageEntityCustomEmoji</a> <a href="/api/entities">entities »</a> to a message.<br>
-Note that you can attach a maximum of <code>message_animated_emoji_max</code> custom emojis, as specified by the <a href="/api/config#message-animated-emoji-max">appConfig field »</a>.</p></div>
+Note that you can attach a maximum of <code>message_animated_emoji_max</code> custom emojis, as specified by the <a href="/api/config#message-animated-emoji-max">appConfig field »</a>.  </p>
+<h3><a class="anchor" href="#emoji-categories" id="emoji-categories" name="emoji-categories"><i class="anchor-icon"></i></a>Emoji categories</h3>
+<pre><code><a href='/constructor/messages.emojiGroupsNotModified'>messages.emojiGroupsNotModified</a>#6fb4ad87 = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;
+<a href='/constructor/messages.emojiGroups'>messages.emojiGroups</a>#881fb94b hash:<a href='/type/int'>int</a> groups:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/EmojiGroup'>EmojiGroup</a>&gt; = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;
+
+<a href='/constructor/emojiGroup'>emojiGroup</a>#7a9abda9 title:<a href='/type/string'>string</a> icon_emoji_id:<a href='/type/long'>long</a> emoticons:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/EmojiGroup'>EmojiGroup</a>;
+
+---functions---
+
+<a href='/method/messages.getEmojiGroups'>messages.getEmojiGroups</a>#7488ce5b hash:<a href='/type/int'>int</a> = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;
+<a href='/method/messages.getEmojiStatusGroups'>messages.getEmojiStatusGroups</a>#2ecd56cd hash:<a href='/type/int'>int</a> = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;
+<a href='/method/messages.getEmojiProfilePhotoGroups'>messages.getEmojiProfilePhotoGroups</a>#21a548f3 hash:<a href='/type/int'>int</a> = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;</code></pre>
+<p><a href="/method/messages.getEmojiGroups">messages.getEmojiGroups</a>, <a href="/method/messages.getEmojiStatusGroups">messages.getEmojiStatusGroups</a> and <a href="/method/messages.getEmojiProfilePhotoGroups">messages.getEmojiProfilePhotoGroups</a> may be used to fetch a categorized list of UTF-8 emojis.  </p>
+<p>Each category is described by a <code>title</code> (i.e. "Animals", "Faces", "Flags"), is represented by a single custom emoji (<code>icon_emoji_id</code>), and contains a list of UTF-8 emojis (<code>emoticons</code>).<br>
+These categories should be displayed in the custom emoji search bar, and when the user clicks on them, the client should display all custom emojis matching the <code>emoticons</code> for that category.  </p>
+<p><a href="/method/messages.getEmojiStatusGroups">messages.getEmojiStatusGroups</a> should be used when choosing a custom emoji to set as <a href="/api/emoji-status">emoji status</a>, <a href="/method/messages.getEmojiProfilePhotoGroups">messages.getEmojiProfilePhotoGroups</a> when choosing a custom emoji to set as <a href="/api/files#sticker-profile-pictures">profile picture</a>, <a href="/method/messages.getEmojiGroups">messages.getEmojiGroups</a> in all other cases when choosing a custom emoji.</p></div>
   
 </div>
           

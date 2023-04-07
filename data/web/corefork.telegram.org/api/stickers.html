@@ -345,13 +345,17 @@ Note that for <a href="/api/custom-emoji">custom emojis</a>, the flag should onl
 <pre><code><a href='/constructor/messages.stickersNotModified'>messages.stickersNotModified</a>#f1749a22 = <a href='/type/messages.Stickers'>messages.Stickers</a>;
 <a href='/constructor/messages.stickers'>messages.stickers</a>#30a6ec7e hash:<a href='/type/long'>long</a> stickers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.Stickers'>messages.Stickers</a>;
 
+<a href='/constructor/emojiListNotModified'>emojiListNotModified</a>#481eadfa = <a href='/type/EmojiList'>EmojiList</a>;
+<a href='/constructor/emojiList'>emojiList</a>#7a1e11d1 hash:<a href='/type/long'>long</a> document_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/EmojiList'>EmojiList</a>;
+
 ---functions---
 
-<a href='/method/messages.getStickers'>messages.getStickers</a>#d5a5d3a1 emoticon:<a href='/type/string'>string</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.Stickers'>messages.Stickers</a>;</code></pre>
+<a href='/method/messages.getStickers'>messages.getStickers</a>#d5a5d3a1 emoticon:<a href='/type/string'>string</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.Stickers'>messages.Stickers</a>;
+<a href='/method/messages.searchCustomEmoji'>messages.searchCustomEmoji</a>#2c11c0d7 emoticon:<a href='/type/string'>string</a> hash:<a href='/type/long'>long</a> = <a href='/type/EmojiList'>EmojiList</a>;</code></pre>
 <p>Clients should show a popup with a list of suggested stickers and <a href="/api/custom-emoji">custom emojis</a> when the user enters an emoji in the text bar.  </p>
-<p>If the <a href="/api/config#stickers-emoji-suggest-only-api"><code>stickers_emoji_suggest_only_api</code> app configuration parameter</a> is set to true, clients must invoke <a href="/method/messages.getStickers">messages.getStickers</a> to fetch a list of suggested stickers for the emoji.<br>
-The <a href="/api/config#stickers-emoji-cache-time">stickers_emoji_cache_time appConfig parameter</a> specifies the validity period of the local cache of <a href="/method/messages.getStickers">messages.getStickers</a>, also relevant when generating the pagination hash when invoking the method.  </p>
-<p>Otherwise, the following local logic should be used.  </p>
+<p><strong>If</strong> the <a href="/api/config#stickers-emoji-suggest-only-api"><code>stickers_emoji_suggest_only_api</code> app configuration parameter</a> is set to true, clients must invoke <a href="/method/messages.getStickers">messages.getStickers</a>/<a href="/method/messages.searchCustomEmoji">messages.searchCustomEmoji</a> to fetch a list of suggested stickers/<a href="/api/custom-emoji">custom emojis</a> for the emoji.<br>
+The <a href="/api/config#stickers-emoji-cache-time">stickers_emoji_cache_time appConfig parameter</a> specifies the validity period of the local cache of <a href="/method/messages.getStickers">messages.getStickers</a>/<a href="/method/messages.searchCustomEmoji">messages.searchCustomEmoji</a>, also relevant when generating the pagination hash when invoking the method.  </p>
+<p><strong>Otherwise</strong>, the following local logic should be used.  </p>
 <ul>
 <li>Construct two lists of recently used stickers, matching the emoji:<ul>
 <li>List <strong>a</strong>) Contains all non-Premium stickers.</li>
