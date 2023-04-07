@@ -155,10 +155,26 @@ The SHA256 hash of the file is computed, and it is passed along with the file's 
 <p>User profile pictures can be uploaded using the <a href="/method/photos.updateProfilePhoto">photos.uploadProfilePhoto</a> method: the actual profile picture has to be <a href="#uploading-files">uploaded as for normal files</a>.<br>
 <a href="/method/photos.updateProfilePhoto">photos.uploadProfilePhoto</a> can also be used to reupload previously uploaded profile pictures.  </p>
 <h4><a class="anchor" href="#animated-profile-pictures" id="animated-profile-pictures" name="animated-profile-pictures"><i class="anchor-icon"></i></a>Animated profile pictures</h4>
-<p>Animated profile pictures are also supported, by populating the <code>video</code> constructor: square MPEG4 videos up to <code>1080x1080</code> are supported, <code>800x800</code> is the recommended resolution.<br>
+<p>Animated profile pictures are also supported, by populating the <code>video</code> flag: square MPEG4 videos up to <code>1080x1080</code> are supported, <code>800x800</code> is the recommended resolution.<br>
 The <code>video_start_ts</code> is a floating point UNIX timestamp in seconds, indicating the frame of the video that should be used as static preview.  </p>
 <p><a href="/api/channel">Chat, channel and supergroup</a> profile photos and videos can be uploaded using <a href="/method/messages.editChatPhoto">messages.editChatPhoto</a> (<a href="/api/channel#basic-groups">basic groups</a>) or <a href="/method/channels.editPhoto">channels.editPhoto</a> (<a href="/api/channel">channels, supergroups</a>).<br>
 Use the <a href="/constructor/inputChatPhoto">inputChatPhoto</a> to reuse previously uploaded profile pictures.  </p>
+<h4><a class="anchor" href="#sticker-profile-pictures" id="sticker-profile-pictures" name="sticker-profile-pictures"><i class="anchor-icon"></i></a>Sticker profile pictures</h4>
+<p>Schema:</p>
+<pre><code><a href='/constructor/videoSizeEmojiMarkup'>videoSizeEmojiMarkup</a>#f85c413c emoji_id:<a href='/type/long'>long</a> background_colors:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/VideoSize'>VideoSize</a>;
+<a href='/constructor/videoSizeStickerMarkup'>videoSizeStickerMarkup</a>#da082fe stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> sticker_id:<a href='/type/long'>long</a> background_colors:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/VideoSize'>VideoSize</a>;
+
+<a href='/constructor/emojiListNotModified'>emojiListNotModified</a>#481eadfa = <a href='/type/EmojiList'>EmojiList</a>;
+<a href='/constructor/emojiList'>emojiList</a>#7a1e11d1 hash:<a href='/type/long'>long</a> document_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/EmojiList'>EmojiList</a>;
+
+---functions---
+
+<a href='/method/account.getDefaultProfilePhotoEmojis'>account.getDefaultProfilePhotoEmojis</a>#e2750328 hash:<a href='/type/long'>long</a> = <a href='/type/EmojiList'>EmojiList</a>;
+<a href='/method/account.getDefaultGroupPhotoEmojis'>account.getDefaultGroupPhotoEmojis</a>#915860ae hash:<a href='/type/long'>long</a> = <a href='/type/EmojiList'>EmojiList</a>;</code></pre>
+<p><a href="/api/stickers">Sticker</a> and <a href="/api/custom-emoji">custom emoji sticker</a>-based profile pictures are also supported, by populating the <code>video_emoji_markup</code> flag with either a <a href="/constructor/videoSizeStickerMarkup">videoSizeStickerMarkup</a> or a <a href="/constructor/videoSizeEmojiMarkup">videoSizeEmojiMarkup</a> constructor.  </p>
+<p>The profile picture should be rendered by placing the sticker at the center of a square canvas, in such a way that it occupies at most 67% of it. The background of the canvas is generated from <code>background_colors</code>, which contains a vector of 1, 2, 3 or 4 RBG-24 colors used to generate a solid (1), gradient (2) or freeform gradient (3, 4) background, similar to how <a href="/api/wallpapers#fill-types">fill wallpapers</a> are generated. The rotation angle for gradient backgrounds is 0.<br>
+If animated or video stickers/custom emojis are used, the <code>video_start_ts</code> flag can contain a floating point UNIX timestamp in seconds, indicating the frame of the profile picture that should be used as static preview.  </p>
+<p><a href="/method/account.getDefaultProfilePhotoEmojis">account.getDefaultProfilePhotoEmojis</a> may be used to fetch a list of suggested <a href="/api/custom-emoji">custom emojis</a> that can be used as profile pictures even by non-premium accounts; <a href="/method/account.getDefaultGroupPhotoEmojis">account.getDefaultGroupPhotoEmojis</a> is the counterpart for group profile pictures.</p>
 <h3><a class="anchor" href="#downloading-files" id="downloading-files" name="downloading-files"><i class="anchor-icon"></i></a>Downloading files</h3>
 <p>There are methods available to download files which have been successfully uploaded. The schema of the types and methods used is presented below:</p>
 <pre><code><a href='/constructor/upload.file'>upload.file</a>#96a18d5 type:<a href='/type/storage.FileType'>storage.FileType</a> mtime:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/upload.File'>upload.File</a>;
