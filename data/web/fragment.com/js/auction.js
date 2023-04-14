@@ -866,6 +866,7 @@ var Assets = {
     Aj.onLoad(function(state) {
       $(document).on('click.curPage', '.js-assign-btn', Assets.eAssignToTelegram);
       $(document).on('submit.curPage', '.js-assign-form', Assets.eAssignSubmit);
+      $(document).on('submit.curPage', '.js-bot-username-form', Assets.eBotUsernameSubmit);
       $(document).on('click.curPage', '.js-get-code-btn', Assets.eGetCode);
       $(document).on('click.curPage', '.js-put-to-auction-btn', Assets.ePutToAuction);
       $(document).on('submit.curPage', '.js-put-to-auction-form', Assets.ePutToAuctionSubmit);
@@ -875,6 +876,9 @@ var Assets = {
       $('.table-selectable-in-row').on('mouseover mouseout', Assets.eTableRowSelHovered);
       state.$assignPopup = $('.js-assign-popup');
       state.$assignForm = $('.js-assign-form');
+      state.$botUsernamePopup = $('.js-bot-username-popup');
+      state.$botUsernameForm = $('.js-bot-username-form');
+      state.$botUsernameWaitingPopup = $('.js-bot-username-waiting-popup');
 
       state.$putToAuctionPopup = $('.js-put-to-auction-popup');
       state.$putToAuctionForm = $('.js-put-to-auction-form');
@@ -887,6 +891,7 @@ var Assets = {
       $('.table-selectable-in-row').off('mouseover mouseout', Assets.eTableRowSelHovered);
       Main.destroyForm(state.$putToAuctionForm);
       Main.destroyForm(state.$sellUsernameForm);
+      clearTimeout(Aj.state.waitingTo);
     });
   },
   eTableRowSelHovered: function(e) {
@@ -934,6 +939,9 @@ var Assets = {
     var $form     = $(this);
     var username  = $form.field('username').value();
     var assign_to = $form.field('assign_to').value();
+    Assets.assignToTelegram(username, assign_to);
+  },
+  assignToTelegram: function(username, assign_to) {
     Aj.apiRequest('assignToTgAccount', {
       username: username,
       assign_to: assign_to
@@ -941,14 +949,57 @@ var Assets = {
       if (result.error) {
         return showAlert(result.error);
       }
-      closePopup();
-      $('.js-actions', Aj.ajContainer).each(function() {
-        if ($(this).attr('data-username') == username) {
-          $(this).attr('data-assigned-to', assign_to);
+      clearTimeout(Aj.state.waitingTo);
+      if (result.waiting) {
+        closePopup(Aj.state.$assignPopup);
+        closePopup(Aj.state.$botUsernamePopup);
+        if (Aj.state.$botUsernameWaitingPopup.hasClass('hide')) {
+          openPopup(Aj.state.$botUsernameWaitingPopup);
         }
-      });
-      if (result.msg) {
-        showAlert(result.msg);
+        Aj.state.waitingTo = setTimeout(Assets.assignToTelegram, 1000, username, assign_to);
+      } else if (result.need_pay) {
+        closePopup();
+        Aj.state.botUsername = result.username;
+        Aj.state.botUsernameFee = result.amount;
+        Aj.state.botUsernameAssignTo = assign_to;
+        $('.js-username', Aj.state.$botUsernamePopup).html('@' + result.username);
+        $('.js-amount', Aj.state.$botUsernamePopup).html(Main.wrapTonAmount(result.amount));
+        Aj.state.$botUsernameForm.field('id').value(result.req_id);
+        openPopup(Aj.state.$botUsernamePopup);
+      } else {
+        closePopup();
+        $('.js-actions', Aj.ajContainer).each(function() {
+          if ($(this).attr('data-username') == username) {
+            $(this).attr('data-assigned-to', assign_to);
+          }
+        });
+        if (result.msg) {
+          showAlert(result.msg);
+        }
+      }
+    });
+  },
+  eBotUsernameSubmit: function(e) {
+    e.preventDefault();
+    var $form = $(this);
+    var req_id = $form.field('id').value();
+    closePopup(Aj.state.$botUsernamePopup);
+    QR.showPopup({
+      request: {
+        method: 'getBotUsernameLink',
+        params: {
+          id: req_id
+        }
+      },
+      title: l('WEB_POPUP_QR_BOT_USERNAME_HEADER'),
+      description: l('WEB_POPUP_QR_BOT_USERNAME_TEXT', {
+        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Main.wrapTonAmount(Aj.state.botUsernameFee) + '</span>'
+      }),
+      qr_label: '@' + Aj.state.botUsername,
+      tk_label: l('WEB_POPUP_QR_BOT_USERNAME_TK_BUTTON'),
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
+      onConfirm: function(by_server) {
+        Assets.assignToTelegram(Aj.state.botUsername, Aj.state.botUsernameAssignTo);
       }
     });
   },
