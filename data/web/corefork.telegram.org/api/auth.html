@@ -49,15 +49,15 @@
 <h3><a class="anchor" href="#sending-a-verification-code" id="sending-a-verification-code" name="sending-a-verification-code"><i class="anchor-icon"></i></a>Sending a verification code</h3>
 <p>Example implementations: <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java">telegram for android</a>, <a href="https://github.com/tdlib/td/tree/master/td/telegram/SendCodeHelper.cpp">tdlib</a>.</p>
 <p>To show a nicely formatted and validated phone number field, the <a href="/constructor/help.countriesList">help.countriesList</a> constructor can be obtained using the <a href="/method/help.getCountriesList">help.getCountriesList</a> method.<br>
-The <a href="/constructor/help.countriesList">help.countriesList</a> config is then used as described <a href="/api/config#country-information-and-login-phone-patterns">here »</a>.  </p>
+The <a href="/constructor/help.countriesList">help.countriesList</a> config and other configuration values are then used as described <a href="/api/config#country-information-and-login-phone-patterns">here »</a>.  </p>
 <p>Then, a text message containing an authorization code is sent to the user's phone using <a href="/method/auth.sendCode">auth.sendCode</a>.<br>
 However, this is not always the case, if future auth tokens are used:  </p>
 <h4><a class="anchor" href="#future-auth-tokens" id="future-auth-tokens" name="future-auth-tokens"><i class="anchor-icon"></i></a>Future auth tokens</h4>
 <p>When invoking <a href="/method/auth.logOut">auth.logOut</a> on a previously authorized session with 2FA enabled, the server may return a <code>future_auth_token</code>, which should be stored in the local database.<br>
 A <code>future_auth_token</code> is also contained in the <a href="/constructor/auth.authorization">auth.authorization</a> returned when logging in.<br>
-At all times, the logout token database should contain at most 20 tokens: evict older tokens as new tokens are added.<br>
-When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all logout tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
-If any of the logout tokens matches the account we're trying to login into and the token hasn't expired, <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </p>
+At all times, the future auth token database should contain at most 20 tokens: evict older tokens as new tokens are added.<br>
+When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all future auth tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
+If any of the future auth tokens matches the account we're trying to login into and the token hasn't expired, <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </p>
 <p>Otherwise, the system will send an authorization code using the following logic:</p>
 <h4><a class="anchor" href="#code-types" id="code-types" name="code-types"><i class="anchor-icon"></i></a>Code types</h4>
 <pre><code><a href='/constructor/codeSettings'>codeSettings</a>#ad253d78 flags:<a href='/type/%23'>#</a> allow_flashcall:flags.0?<a href='/constructor/true'>true</a> current_number:flags.1?<a href='/constructor/true'>true</a> allow_app_hash:flags.4?<a href='/constructor/true'>true</a> allow_missed_call:flags.5?<a href='/constructor/true'>true</a> allow_firebase:flags.7?<a href='/constructor/true'>true</a> logout_tokens:flags.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; token:flags.8?<a href='/type/string'>string</a> app_sandbox:flags.8?<a href='/type/Bool'>Bool</a> = <a href='/type/CodeSettings'>CodeSettings</a>;
@@ -113,26 +113,29 @@ For example, the latter is required in newer versions of android, to use the <a 
 </tr>
 </tbody>
 </table>
-<p>The system will automatically choose how to send the authorization code; there are multiple possible ways the code can arrive, signaled to the client via the <code>type</code> field of the <a href="/type/auth.SentCodeType">auth.SentCodeType</a> constructor:</p>
+<p>The system will automatically choose how to send the authorization code; there are multiple possible ways the code can arrive, signaled to the client via the <code>type</code> field of the <a href="/type/auth.SentCodeType">auth.SentCodeType</a> constructor.  </p>
+<p>Note that when signing up or logging in using an SMS code/call, only the <a href="/constructor/auth.sentCodeTypeFirebaseSms">auth.sentCodeTypeFirebaseSms</a> code type may be used.<br>
+Currently, only official apps can receive <a href="/constructor/auth.sentCodeTypeFirebaseSms">auth.sentCodeTypeFirebaseSms</a> as a code type: this means that only the official applications can be used to sign up to Telegram, or receive the login code via SMS/call.<br>
+Third-party apps may log in using any of the other code delivery methods (Telegram codes, Fragment codes, email codes, future auth tokens, QR codes).</p>
 <ul>
 <li><a href="/constructor/auth.sentCodeTypeSetUpEmailRequired">auth.sentCodeTypeSetUpEmailRequired</a>: if the user logins often enough, Telegram will ask the user to verify an email that will be used to send the login code.<br>
 See <a href="#email-verification">here »</a> for more info on the verification process.</li>
-<li><a href="/constructor/auth.sentCodeTypeFragmentSms">auth.sentCodeTypeFragmentSms</a>: the code was sent via <a href="https://fragment.com">fragment.com</a>: open the specified <code>url</code> to log into <a href="https://fragment.com">fragment.com</a> with your wallet and view the code. The <code>fragment_prefixes</code> <a href="/api/config#client-configuration">client configuration parameter</a> contains a list of phone number prefixes for anonymous <a href="https://fragment.com">Fragment</a> usernames.</li>
+<li><a href="/constructor/auth.sentCodeTypeEmailCode">auth.sentCodeTypeEmailCode</a>: the code was sent to the configured login email.</li>
+<li><a href="/constructor/auth.sentCodeTypeFragmentSms">auth.sentCodeTypeFragmentSms</a>: the code was sent via <a href="https://fragment.com">fragment.com</a>: open the specified <code>url</code> to log into the <a href="https://fragment.com">Fragment</a> platform with your wallet and view the code.  </li>
+<li><a href="/constructor/auth.sentCodeTypeApp">auth.sentCodeTypeApp</a>: the code was sent as a Telegram service notification to all other logged-in sessions.</li>
 <li><a href="/constructor/auth.sentCodeTypeFirebaseSms">auth.sentCodeTypeFirebaseSms</a>: only for official apps, only used if the <a href="/constructor/codeSettings">codeSettings</a>.<code>allow_firebase</code> flag is set.  <ul>
 <li>On Android, the client must pass <a href="/constructor/auth.sentCodeTypeFirebaseSms">auth.sentCodeTypeFirebaseSms</a> to the <a href="https://developer.android.com/training/safetynet/attestation">SafetyNet Attestation API</a>, and then pass the obtained JWS object to <a href="/method/auth.requestFirebaseSms">auth.requestFirebaseSms</a>.<code>safety_net_token</code>, along with the <code>phone_number</code> and the <code>phone_code_hash</code>.<br>
 If the method returns <a href="/constructor/boolTrue">boolTrue</a>, the code will be sent via SMS; otherwise, the <code>next_type</code> authentication method must be used, with <a href="/method/auth.resendCode">auth.resendCode</a>.</li>
 <li>On iOS, the <code>receipt</code> and <code>push_timeout</code> fields of <a href="/constructor/auth.sentCodeTypeFirebaseSms">auth.sentCodeTypeFirebaseSms</a> are populated, </li>
 </ul>
 </li>
-<li><a href="/constructor/auth.sentCodeTypeEmailCode">auth.sentCodeTypeEmailCode</a>: the code was sent to the configured login email.</li>
-<li><a href="/constructor/auth.sentCodeTypeApp">auth.sentCodeTypeApp</a>: the code was sent as a Telegram service notification to all other logged-in sessions.</li>
 <li><a href="/constructor/auth.sentCodeTypeSms">auth.sentCodeTypeSms</a>: the code was sent via SMS.</li>
 <li><a href="/constructor/auth.sentCodeTypeCall">auth.sentCodeTypeCall</a>: the user will receive a phone call and a synthesized voice will tell the user the verification code to input.</li>
 <li><a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>: the code will be sent via a flash phone call, that will be closed immediately.<br>
 In this case, the phone code will then be the phone number itself, just make sure that the phone number matches the specified pattern (see <a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>).</li>
 <li><a href="/constructor/auth.sentCodeTypeMissedCall">auth.sentCodeTypeMissedCall</a>: the code will be sent via a flash phone call, that will be closed immediately.<br>
 The last digits of the phone number that calls are the code that must be entered manually by the user.</li>
-<li><a href="/constructor/auth.loggedOut">Logout tokens »</a>: <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code. </li>
+<li><a href="/constructor/auth.loggedOut">Future auth tokens »</a>: <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code. </li>
 </ul>
 <p>If the message takes too long (<code>timeout</code> seconds) to arrive at the phone, the <a href="/method/auth.resendCode">auth.resendCode</a> method may be invoked to resend a code of type <code>next_type</code>.
 If the same happens again, you can use <a href="/method/auth.resendCode">auth.resendCode</a> with the <code>next_type</code> returned by the previous call to <a href="/method/auth.resendCode">auth.resendCode</a>.
