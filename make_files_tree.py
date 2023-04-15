@@ -513,6 +513,8 @@ async def _fetch_and_track_mtproto(app, output_dir):
     configs['GetPremiumPromo'].status_entities = []
     configs['GetPremiumPromo'].period_options = []
 
+    configs['GetAppConfig'].hash = 'crawler'
+
     keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64', 'pending_suggestions'}
 
     def rem_rec(config):
@@ -539,7 +541,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
     for config_name in combined_filter:
         configs[config_name] = json.loads(str(configs[config_name]))
         rem_rec(configs[config_name])
-        configs[config_name] = json.dumps(configs[config_name], indent=4)
+        configs[config_name] = json.dumps(configs[config_name], ensure_ascii=False, indent=4)
 
     configs['GetConfig'].date = 0
     configs['GetConfig'].expires = 0
