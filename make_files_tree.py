@@ -453,7 +453,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
         # 'GetSupportName': await app.invoke(functions.help.GetSupportName()),
         # 'GetPassportConfig': await app.invoke(functions.help.GetPassportConfig(hash=0)),
         'GetCountriesList': await app.invoke(functions.help.GetCountriesList(lang_code='en', hash=0)),
-        'GetAppConfig': await app.invoke(functions.help.GetAppConfig()),
+        'GetAppConfig': await app.invoke(functions.help.GetAppConfig(hash=0)),
         # 'GetAppUpdate': await app.invoke(functions.help.GetAppUpdate(source='')),
         # 'AnimatedEmoji': await app.invoke(
         #     functions.messages.GetStickerSet(stickerset=InputStickerSetAnimatedEmoji(), hash=0)
@@ -543,6 +543,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
 
     configs['GetConfig'].date = 0
     configs['GetConfig'].expires = 0
+    configs['GetConfig'].autologin_token = 'crawler'
     configs['GetConfig'].dc_options = []
 
     for file, content in configs.items():
