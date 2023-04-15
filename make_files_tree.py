@@ -110,7 +110,7 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
         latest_id = res_json[0]['id']
         version = res_json[0]['version']
     else:
-        return
+        raise RuntimeError('AppCenter is down as always')
 
     logger.info(f'The latest appcenter release is {version} ({parameterized_url})')
 
@@ -118,7 +118,7 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
     if res_json:
         return res_json['download_url']
 
-    return None
+    raise RuntimeError('AppCenter is down as always')
 
 
 async def track_additional_files(
