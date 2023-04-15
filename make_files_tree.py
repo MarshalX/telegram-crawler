@@ -105,18 +105,18 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
 
             return await response.json(encoding='UTF-8')
 
-    json = await make_req(f'{base_url}/public_releases')
-    if json and json[0]:
-        latest_id = json[0]['id']
-        version = json[0]['version']
+    res_json = await make_req(f'{base_url}/public_releases')
+    if res_json and res_json[0]:
+        latest_id = res_json[0]['id']
+        version = res_json[0]['version']
     else:
         return
 
     logger.info(f'The latest appcenter release is {version} ({parameterized_url})')
 
-    json = await make_req(f'{base_url}/releases/{latest_id}')
-    if json:
-        return json['download_url']
+    res_json = await make_req(f'{base_url}/releases/{latest_id}')
+    if res_json:
+        return res_json['download_url']
 
     return None
 
@@ -373,23 +373,23 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
                     logger.debug(f'Resend cuz {response.status}')
                     new_offset = offset
                 else:
-                    json = await response.json(encoding='UTF-8')
-                    if 'more_html' in json and json['more_html']:
-                        json['more_html'] = re.sub(TRANSLATE_SUGGESTION_REGEX, '', json['more_html'])
+                    res_json = await response.json(encoding='UTF-8')
+                    if 'more_html' in res_json and res_json['more_html']:
+                        res_json['more_html'] = re.sub(TRANSLATE_SUGGESTION_REGEX, '', res_json['more_html'])
 
-                        soup = BeautifulSoup(json['more_html'], 'html.parser')
+                        soup = BeautifulSoup(res_json['more_html'], 'html.parser')
                         tr_items = soup.find_all('div', {'class': 'tr-key-row-wrap'})
                         for tr_item in tr_items:
-                            tr_key = tr_item.find_next('div', {'class': 'tr-value-key'}).text
+                            tr_key = tr_item.find('div', {'class': 'tr-value-key'}).text
 
-                            tr_url = tr_item.find_next('div', {'class': 'tr-key-row'})['data-href']
+                            tr_url = tr_item.find('div', {'class': 'tr-key-row'})['data-href']
                             tr_url = f'https://translations.telegram.org{tr_url}'
 
-                            tr_photo = tr_item.find_next('a', {'class': 'tr-value-photo'})
+                            tr_photo = tr_item.find('a', {'class': 'tr-value-photo'})
                             if tr_photo:
                                 tr_photo = css_parser.parseStyle(tr_photo['style']).backgroundImage[5:-2]
 
-                            tr_has_binding = tr_item.find_next('span', {'class': 'has-1binding binding'})
+                            tr_has_binding = tr_item.find('span', {'class': 'has-binding binding'})
                             tr_has_binding = tr_has_binding is not None
 
                             tr_values = tr_item.find_all('span', {'class': 'value'})
@@ -401,7 +401,7 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
                             content[tr_key] = {
                                 'url': tr_url,
                                 'photo_url': tr_photo,
-                                'has_binding': tr_has_binding is not None,
+                                'has_binding': tr_has_binding,
                                 'values': tr_values,
                             }
 
