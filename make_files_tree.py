@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import platform
+import random
 import re
 import shutil
 import zipfile
@@ -427,13 +428,17 @@ async def track_mtproto_methods():
         'in_memory': True
     }
 
-    app = Client('crawler', session_string=os.environ['TELEGRAM_SESSION'], **kw)
-    app_test = Client('crawler_test', session_string=os.environ['TELEGRAM_SESSION_TEST'], test_mode=True, **kw)
-    await app.start()
-    await app_test.start()
+    test_dc = 2
+    test_phone_prefix = '99966'
+    test_phone_suffix = random.randint(1000, 9999)
+    test_phone_number = f'{test_phone_prefix}{test_dc}{test_phone_suffix}'
+    test_phone_code = str(test_dc) * 5
 
-    await _fetch_and_track_mtproto(app, '')
-    await _fetch_and_track_mtproto(app_test, 'test')
+    app_test = Client('crawler_test', phone_number=test_phone_number, phone_code=test_phone_code, test_mode=True, **kw)
+    app = Client('crawler', session_string=os.environ['TELEGRAM_SESSION'], **kw)
+
+    await asyncio.gather(app_test.start(), app.start())
+    await asyncio.gather(_fetch_and_track_mtproto(app, ''), _fetch_and_track_mtproto(app_test, 'test'))
 
 
 async def _fetch_and_track_mtproto(app, output_dir):
