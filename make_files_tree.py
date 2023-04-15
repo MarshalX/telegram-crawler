@@ -430,7 +430,7 @@ async def track_mtproto_methods():
 
     test_dc = 2
     test_phone_prefix = '99966'
-    test_phone_suffix = random.randint(1000, 9999)
+    test_phone_suffix = os.environ.get('TELEGRAM_TEST_PHONE_SUFFIX', random.randint(1000, 9999))
     test_phone_number = f'{test_phone_prefix}{test_dc}{test_phone_suffix}'
     test_phone_code = str(test_dc) * 5
 
