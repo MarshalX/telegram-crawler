@@ -516,6 +516,8 @@ async def _fetch_and_track_mtproto(app, output_dir):
     configs['GetAppConfig'].hash = 'crawler'
 
     keys_to_hide = {'access_hash', 'autologin_token', 'file_reference', 'file_reference_base64', 'pending_suggestions'}
+    if app.test_mode:
+        keys_to_hide.add('dialog_filters_tooltip')
 
     def rem_rec(config):
         if not isinstance(config, dict):
