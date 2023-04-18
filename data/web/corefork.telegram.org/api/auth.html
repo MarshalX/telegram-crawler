@@ -56,7 +56,7 @@ However, this is not always the case, if future auth tokens are used:  </p>
 <h4><a class="anchor" href="#future-auth-tokens" id="future-auth-tokens" name="future-auth-tokens"><i class="anchor-icon"></i></a>Future auth tokens</h4>
 <p>When invoking <a href="/method/auth.logOut">auth.logOut</a> on a previously authorized session with 2FA enabled, the server may return a <code>future_auth_token</code>, which should be stored in the local database.<br>
 A <code>future_auth_token</code> is also contained in the <a href="/constructor/auth.authorization">auth.authorization</a> returned when logging in.<br>
-At all times, the future auth token database should contain at most 20 tokens: evict older tokens as new tokens are added.<br>
+At all times, the future auth token database should contain at most 20 tokens: evict older tokens as new tokens are added to stay below this limit.<br>
 When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all future auth tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
 If any of the future auth tokens matches the account we're trying to login into and the token hasn't expired, <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </p>
 <p>Otherwise, the system will send an authorization code using the following logic:</p>
@@ -84,7 +84,7 @@ If any of the future auth tokens matches the account we're trying to login into 
 <a href='/method/auth.requestFirebaseSms'>auth.requestFirebaseSms</a>#89464b50 flags:<a href='/type/%23'>#</a> phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> safety_net_token:flags.0?<a href='/type/string'>string</a> ios_push_secret:flags.1?<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p>The <a href="/method/auth.sendCode">auth.sendCode</a> method has parameters for enabling/disabling use of flash calls and missed calls, and allows passing an SMS token that will be included in the sent SMS.
 For example, the latter is required in newer versions of android, to use the <a href="https://developers.google.com/identity/sms-retriever/overview">android SMS receiver APIs</a>.</p>
-<p>The returned <a href="/type/auth.SentCode">auth.SentCode</a> object will contain multiple parameters:</p>
+<p>The returned <a href="/constructor/auth.sentCode">auth.sentCode</a> object will contain multiple parameters:</p>
 <table class="table">
 <tbody>
 <tr>
