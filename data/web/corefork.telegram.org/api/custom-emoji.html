@@ -75,7 +75,31 @@ Note that you can attach a maximum of <code>message_animated_emoji_max</code> cu
 <p><a href="/method/messages.getEmojiGroups">messages.getEmojiGroups</a>, <a href="/method/messages.getEmojiStatusGroups">messages.getEmojiStatusGroups</a> and <a href="/method/messages.getEmojiProfilePhotoGroups">messages.getEmojiProfilePhotoGroups</a> may be used to fetch a categorized list of UTF-8 emojis.  </p>
 <p>Each category is described by a <code>title</code> (i.e. "Animals", "Faces", "Flags"), is represented by a single custom emoji (<code>icon_emoji_id</code>), and contains a list of UTF-8 emojis (<code>emoticons</code>).<br>
 These categories should be displayed in the custom emoji search bar, and when the user clicks on them, the client should display all custom emojis matching the <code>emoticons</code> for that category.  </p>
-<p><a href="/method/messages.getEmojiStatusGroups">messages.getEmojiStatusGroups</a> should be used when choosing a custom emoji to set as <a href="/api/emoji-status">emoji status</a>, <a href="/method/messages.getEmojiProfilePhotoGroups">messages.getEmojiProfilePhotoGroups</a> when choosing a custom emoji to set as <a href="/api/files#sticker-profile-pictures">profile picture</a>, <a href="/method/messages.getEmojiGroups">messages.getEmojiGroups</a> in all other cases when choosing a custom emoji.</p></div>
+<p><a href="/method/messages.getEmojiStatusGroups">messages.getEmojiStatusGroups</a> should be used when choosing a custom emoji to set as <a href="/api/emoji-status">emoji status</a>, <a href="/method/messages.getEmojiProfilePhotoGroups">messages.getEmojiProfilePhotoGroups</a> when choosing a custom emoji to set as <a href="/api/files#sticker-profile-pictures">profile picture</a>, <a href="/method/messages.getEmojiGroups">messages.getEmojiGroups</a> in all other cases when choosing a custom emoji.  </p>
+<h3><a class="anchor" href="#emoji-keywords" id="emoji-keywords" name="emoji-keywords"><i class="anchor-icon"></i></a>Emoji keywords</h3>
+<pre><code><a href='/constructor/emojiKeyword'>emojiKeyword</a>#d5b3b9f9 keyword:<a href='/type/string'>string</a> emoticons:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/EmojiKeyword'>EmojiKeyword</a>;
+<a href='/constructor/emojiKeywordDeleted'>emojiKeywordDeleted</a>#236df622 keyword:<a href='/type/string'>string</a> emoticons:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/EmojiKeyword'>EmojiKeyword</a>;
+
+<a href='/constructor/emojiKeywordsDifference'>emojiKeywordsDifference</a>#5cc761bd lang_code:<a href='/type/string'>string</a> from_version:<a href='/type/int'>int</a> version:<a href='/type/int'>int</a> keywords:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/EmojiKeyword'>EmojiKeyword</a>&gt; = <a href='/type/EmojiKeywordsDifference'>EmojiKeywordsDifference</a>;
+
+<a href='/constructor/emojiLanguage'>emojiLanguage</a>#b3fb5361 lang_code:<a href='/type/string'>string</a> = <a href='/type/EmojiLanguage'>EmojiLanguage</a>;
+<a href='/constructor/emojiURL'>emojiURL</a>#a575739d url:<a href='/type/string'>string</a> = <a href='/type/EmojiURL'>EmojiURL</a>;
+
+---functions---
+
+<a href='/method/messages.getEmojiKeywords'>messages.getEmojiKeywords</a>#35a0e062 lang_code:<a href='/type/string'>string</a> = <a href='/type/EmojiKeywordsDifference'>EmojiKeywordsDifference</a>;
+<a href='/method/messages.getEmojiKeywordsDifference'>messages.getEmojiKeywordsDifference</a>#1508b6af lang_code:<a href='/type/string'>string</a> from_version:<a href='/type/int'>int</a> = <a href='/type/EmojiKeywordsDifference'>EmojiKeywordsDifference</a>;
+<a href='/method/messages.getEmojiKeywordsLanguages'>messages.getEmojiKeywordsLanguages</a>#4e9963b2 lang_codes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/EmojiLanguage'>EmojiLanguage</a>&gt;;
+
+<a href='/method/messages.getEmojiURL'>messages.getEmojiURL</a>#d5b10c26 lang_code:<a href='/type/string'>string</a> = <a href='/type/EmojiURL'>EmojiURL</a>;</code></pre>
+<p><a href="/method/messages.getEmojiKeywords">messages.getEmojiKeywords</a> may be used to fetch a localized list of keywords, associated to UTF-8 emojis.<br>
+Use these keywords to allow users to search both emojis and custom emojis by keyword, by displaying both the UTF-8 emojis associated to the keyword and the custom emojis associated to those UTF-8 emojis.  </p>
+<p>Additionally, custom emojis may also have a set of custom keywords, returned in the <a href="/api/stickers#stickersets">custom emoji stickerset information</a>:  </p>
+<pre><code><a href='/constructor/stickerKeyword'>stickerKeyword</a>#fcfeb29c document_id:<a href='/type/long'>long</a> keyword:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/StickerKeyword'>StickerKeyword</a>;
+
+<a href='/constructor/messages.stickerSet'>messages.stickerSet</a>#6e153f16 set:<a href='/type/StickerSet'>StickerSet</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; keywords:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerKeyword'>StickerKeyword</a>&gt; documents:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
+
+<a href='/constructor/stickerSetFullCovered'>stickerSetFullCovered</a>#40d13c0e set:<a href='/type/StickerSet'>StickerSet</a> packs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerPack'>StickerPack</a>&gt; keywords:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StickerKeyword'>StickerKeyword</a>&gt; documents:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/StickerSetCovered'>StickerSetCovered</a>;</code></pre></div>
   
 </div>
           
