@@ -190,6 +190,9 @@ var PostMessage = {
         console.warn('Callback #' + data._cb + ' not found');
       }
     }
+    else {
+      triggerEvent(window, 'tg:postmessage', {detail: data});
+    }
   }
 };
 
@@ -923,19 +926,29 @@ var frameLastHeight = null,
 function checkFrameSize() {
   var height, width, style;
   if (document.body) {
-    if (window.getComputedStyle) {
-      style = window.getComputedStyle(document.body);
-      height = style.height;
-      if (height.substr(-2) == 'px') {
-        height = height.slice(0, -2);
-      }
-      width = style.width;
-      if (width.substr(-2) == 'px') {
-        width = width.slice(0, -2);
+    if (TWidget.options.include_absolute_elems) {
+      if (document.body.querySelectorAll) {
+        document.body.querySelectorAll('*').forEach(function(el) {
+            var rect = el.getBoundingClientRect();
+            if (!width || width < rect.right) width = rect.right;
+            if (!height || height < rect.bottom) height = rect.bottom;
+        });
       }
     } else {
-      height = document.body.offsetHeight;
-      width = document.body.offsetWidth;
+      if (window.getComputedStyle) {
+        style = window.getComputedStyle(document.body);
+        height = style.height;
+        if (height.substr(-2) == 'px') {
+          height = height.slice(0, -2);
+        }
+        width = style.width;
+        if (width.substr(-2) == 'px') {
+          width = width.slice(0, -2);
+        }
+      } else {
+        height = document.body.offsetHeight;
+        width = document.body.offsetWidth;
+      }
     }
     var data = {event: 'resize'}, resized = false;
     if (TWidget.options.auto_height) {
