@@ -401,7 +401,7 @@ photo has_stickers:Bool minithumbnail:minithumbnail sizes:vector<photoSize> = Ph
 
 //@description Describes a sticker
 //@id Unique sticker identifier within the set; 0 if none
-//@set_id The identifier of the sticker set to which the sticker belongs; 0 if none
+//@set_id Identifier of the sticker set to which the sticker belongs; 0 if none
 //@width Sticker width; as defined by the sender
 //@height Sticker height; as defined by the sender
 //@emoji Emoji corresponding to the sticker
@@ -506,6 +506,22 @@ webApp short_name:string title:string description:string photo:photo animation:a
 poll id:int64 question:string options:vector<pollOption> total_voter_count:int32 recent_voter_user_ids:vector<int53> is_anonymous:Bool type:PollType open_period:int32 close_date:int32 is_closed:Bool = Poll;
 
 
+//@description Describes a chat background
+//@id Unique background identifier
+//@is_default True, if this is one of default backgrounds
+//@is_dark True, if the background is dark and is recommended to be used with dark theme
+//@name Unique background name
+//@document Document with the background; may be null. Null only for filled backgrounds
+//@type Type of the background
+background id:int64 is_default:Bool is_dark:Bool name:string document:document type:BackgroundType = Background;
+
+//@description Contains a list of backgrounds @backgrounds A list of backgrounds
+backgrounds backgrounds:vector<background> = Backgrounds;
+
+//@description Describes a background set for a specific chat @background The background @dark_theme_dimming Dimming of the background in dark themes, as a percentage; 0-100
+chatBackground background:background dark_theme_dimming:int32 = ChatBackground;
+
+
 //@description Describes a user profile photo
 //@id Photo identifier; 0 for an empty photo. Can be used to find a photo in a list of user profile photos
 //@small A small (160x160) user profile photo. The file can be downloaded only before the photo is changed
@@ -533,13 +549,14 @@ userTypeRegular = UserType;
 userTypeDeleted = UserType;
 
 //@description A bot (see https://core.telegram.org/bots)
+//@can_be_edited True, if the bot is owned by the current user and can be edited using the methods toggleBotUsernameIsActive, reorderBotActiveUsernames, setBotProfilePhoto, setBotName, setBotInfoDescription, and setBotInfoShortDescription
 //@can_join_groups True, if the bot can be invited to basic group and supergroup chats
 //@can_read_all_group_messages True, if the bot can read all messages in basic group or supergroup chats and not just those addressed to the bot. In private and channel chats a bot can always read all messages
 //@is_inline True, if the bot supports inline queries
 //@inline_query_placeholder Placeholder for inline queries (displayed on the application input field)
 //@need_location True, if the location of the user is expected to be sent with every inline query to this bot
 //@can_be_added_to_attachment_menu True, if the bot can be added to attachment menu
-userTypeBot can_join_groups:Bool can_read_all_group_messages:Bool is_inline:Bool inline_query_placeholder:string need_location:Bool can_be_added_to_attachment_menu:Bool = UserType;
+userTypeBot can_be_edited:Bool can_join_groups:Bool can_read_all_group_messages:Bool is_inline:Bool inline_query_placeholder:string need_location:Bool can_be_added_to_attachment_menu:Bool = UserType;
 
 //@description No information on the user besides the user identifier is available, yet this user has not been deleted. This object is extremely rare and must be handled like a deleted user. It is not possible to perform any actions on users of this type
 userTypeUnknown = UserType;
@@ -672,9 +689,9 @@ emojiStatuses emoji_statuses:vector<emojiStatus> = EmojiStatuses;
 
 
 //@description Describes usernames assigned to a user, a supergroup, or a channel
-//@active_usernames List of active usernames; the first one must be shown as the primary username. The order of active usernames can be changed with reorderActiveUsernames or reorderSupergroupActiveUsernames
-//@disabled_usernames List of currently disabled usernames; the username can be activated with toggleUsernameIsActive/toggleSupergroupUsernameIsActive
-//@editable_username The active username, which can be changed with setUsername/setSupergroupUsername
+//@active_usernames List of active usernames; the first one must be shown as the primary username. The order of active usernames can be changed with reorderActiveUsernames, reorderBotActiveUsernames or reorderSupergroupActiveUsernames
+//@disabled_usernames List of currently disabled usernames; the username can be activated with toggleUsernameIsActive, toggleBotUsernameIsActive, or toggleSupergroupUsernameIsActive
+//@editable_username The active username, which can be changed with setUsername or setSupergroupUsername
 usernames active_usernames:vector<string> disabled_usernames:vector<string> editable_username:string = Usernames;
 
 
@@ -711,7 +728,11 @@ user id:int53 first_name:string last_name:string usernames:usernames phone_numbe
 //@commands List of the bot commands
 //@default_group_administrator_rights Default administrator rights for adding the bot to basic group and supergroup chats; may be null
 //@default_channel_administrator_rights Default administrator rights for adding the bot to channels; may be null
-botInfo short_description:string description:string photo:photo animation:animation menu_button:botMenuButton commands:vector<botCommand> default_group_administrator_rights:chatAdministratorRights default_channel_administrator_rights:chatAdministratorRights = BotInfo;
+//@edit_commands_link The internal link, which can be used to edit bot commands; may be null
+//@edit_description_link The internal link, which can be used to edit bot description; may be null
+//@edit_description_media_link The internal link, which can be used to edit the photo or animation shown in the chat with the bot if the chat is empty; may be null
+//@edit_settings_link The internal link, which can be used to edit bot settings; may be null
+botInfo short_description:string description:string photo:photo animation:animation menu_button:botMenuButton commands:vector<botCommand> default_group_administrator_rights:chatAdministratorRights default_channel_administrator_rights:chatAdministratorRights edit_commands_link:InternalLinkType edit_description_link:InternalLinkType edit_description_media_link:InternalLinkType edit_settings_link:InternalLinkType = BotInfo;
 
 //@description Contains full information about a user
 //@personal_photo User profile photo set by the current user for the contact; may be null. If null and user.profile_photo is null, then the photo is empty; otherwise, it is unknown.
@@ -865,8 +886,12 @@ chatInviteLinkCount user_id:int53 invite_link_count:int32 revoked_invite_link_co
 //@description Contains a list of chat invite link counts @invite_link_counts List of invite link counts
 chatInviteLinkCounts invite_link_counts:vector<chatInviteLinkCount> = ChatInviteLinkCounts;
 
-//@description Describes a chat member joined a chat via an invite link @user_id User identifier @joined_chat_date Point in time (Unix timestamp) when the user joined the chat @approver_user_id User identifier of the chat administrator, approved user join request
-chatInviteLinkMember user_id:int53 joined_chat_date:int32 approver_user_id:int53 = ChatInviteLinkMember;
+//@description Describes a chat member joined a chat via an invite link
+//@user_id User identifier
+//@joined_chat_date Point in time (Unix timestamp) when the user joined the chat
+//@via_chat_folder_invite_link True, if the user has joined the chat using an invite link for a chat folder
+//@approver_user_id User identifier of the chat administrator, approved user join request
+chatInviteLinkMember user_id:int53 joined_chat_date:int32 via_chat_folder_invite_link:Bool approver_user_id:int53 = ChatInviteLinkMember;
 
 //@description Contains a list of chat members joined a chat via an invite link @total_count Approximate total number of chat members found @members List of chat members, joined a chat via an invite link
 chatInviteLinkMembers total_count:int32 members:vector<chatInviteLinkMember> = ChatInviteLinkMembers;
@@ -922,7 +947,7 @@ basicGroupFullInfo photo:chatPhoto description:string creator_user_id:int53 memb
 //@date Point in time (Unix timestamp) when the current user joined, or the point in time when the supergroup or channel was created, in case the user is not a member
 //@status Status of the current user in the supergroup or channel; custom title will always be empty
 //@member_count Number of members in the supergroup or channel; 0 if unknown. Currently, it is guaranteed to be known only if the supergroup or channel was received
-//-through searchPublicChats, searchChatsNearby, getInactiveSupergroupChats, getSuitableDiscussionChats, getGroupsInCommon, or getUserPrivacySettingRules
+//-through searchPublicChats, searchChatsNearby, getInactiveSupergroupChats, getSuitableDiscussionChats, getGroupsInCommon, getUserPrivacySettingRules, or in chatFolderInviteLinkInfo.missing_chat_ids
 //@has_linked_chat True, if the channel has a discussion group, or the supergroup is the designated discussion group for a channel
 //@has_location True, if the supergroup is connected to a location, i.e. the supergroup is a location-based supergroup
 //@sign_messages True, if messages sent to the channel need to contain information about the sender. This field is only applicable to channels
@@ -1289,14 +1314,17 @@ chatTypeSupergroup supergroup_id:int53 is_channel:Bool = ChatType;
 chatTypeSecret secret_chat_id:int32 user_id:int53 = ChatType;
 
 
-//@description Represents a filter of user chats
-//@title The title of the filter; 1-12 characters without line feeds
-//@icon_name The chosen icon name for short filter representation. If non-empty, must be one of "All", "Unread", "Unmuted", "Bots", "Channels", "Groups", "Private", "Custom", "Setup", "Cat", "Crown",
-//-"Favorite", "Flower", "Game", "Home", "Love", "Mask", "Party", "Sport", "Study", "Trade", "Travel", "Work", "Airplane", "Book", "Light", "Like", "Money", "Note", "Palette".
-//-If empty, use getChatFilterDefaultIconName to get default icon name for the filter
-//@pinned_chat_ids The chat identifiers of pinned chats in the filtered chat list. There can be up to getOption("chat_filter_chosen_chat_count_max") pinned and always included non-secret chats and the same number of secret chats, but the limit can be increased with Telegram Premium
-//@included_chat_ids The chat identifiers of always included chats in the filtered chat list. There can be up to getOption("chat_filter_chosen_chat_count_max") pinned and always included non-secret chats and the same number of secret chats, but the limit can be increased with Telegram Premium
-//@excluded_chat_ids The chat identifiers of always excluded chats in the filtered chat list. There can be up to getOption("chat_filter_chosen_chat_count_max") always excluded non-secret chats and the same number of secret chats, but the limit can be increased with Telegram Premium
+//@description Represents an icon for a chat folder @name The chosen icon name for short folder representation; one of "All", "Unread", "Unmuted", "Bots", "Channels", "Groups", "Private", "Custom", "Setup", "Cat", "Crown",
+//-"Favorite", "Flower", "Game", "Home", "Love", "Mask", "Party", "Sport", "Study", "Trade", "Travel", "Work", "Airplane", "Book", "Light", "Like", "Money", "Note", "Palette"
+chatFolderIcon name:string = ChatFolderIcon;
+
+//@description Represents a folder for user chats
+//@title The title of the folder; 1-12 characters without line feeds
+//@icon The chosen icon for the chat folder; may be null. If null, use getChatFolderDefaultIconName to get default icon name for the folder
+//@is_shareable True, if at least one link has been created for the folder
+//@pinned_chat_ids The chat identifiers of pinned chats in the folder. There can be up to getOption("chat_folder_chosen_chat_count_max") pinned and always included non-secret chats and the same number of secret chats, but the limit can be increased with Telegram Premium
+//@included_chat_ids The chat identifiers of always included chats in the folder. There can be up to getOption("chat_folder_chosen_chat_count_max") pinned and always included non-secret chats and the same number of secret chats, but the limit can be increased with Telegram Premium
+//@excluded_chat_ids The chat identifiers of always excluded chats in the folder. There can be up to getOption("chat_folder_chosen_chat_count_max") always excluded non-secret chats and the same number of secret chats, but the limit can be increased with Telegram Premium
 //@exclude_muted True, if muted chats need to be excluded
 //@exclude_read True, if read chats need to be excluded
 //@exclude_archived True, if archived chats need to be excluded
@@ -1305,20 +1333,35 @@ chatTypeSecret secret_chat_id:int32 user_id:int53 = ChatType;
 //@include_bots True, if bots need to be included
 //@include_groups True, if basic groups and supergroups need to be included
 //@include_channels True, if channels need to be included
-chatFilter title:string icon_name:string pinned_chat_ids:vector<int53> included_chat_ids:vector<int53> excluded_chat_ids:vector<int53> exclude_muted:Bool exclude_read:Bool exclude_archived:Bool include_contacts:Bool include_non_contacts:Bool include_bots:Bool include_groups:Bool include_channels:Bool = ChatFilter;
+chatFolder title:string icon:chatFolderIcon is_shareable:Bool pinned_chat_ids:vector<int53> included_chat_ids:vector<int53> excluded_chat_ids:vector<int53> exclude_muted:Bool exclude_read:Bool exclude_archived:Bool include_contacts:Bool include_non_contacts:Bool include_bots:Bool include_groups:Bool include_channels:Bool = ChatFolder;
 
-//@description Contains basic information about a chat filter
-//@id Unique chat filter identifier
-//@title The title of the filter; 1-12 characters without line feeds
-//@icon_name The chosen or default icon name for short filter representation. One of "All", "Unread", "Unmuted", "Bots", "Channels", "Groups", "Private", "Custom", "Setup", "Cat", "Crown",
-//-"Favorite", "Flower", "Game", "Home", "Love", "Mask", "Party", "Sport", "Study", "Trade", "Travel", "Work", "Airplane", "Book", "Light", "Like", "Money", "Note", "Palette"
-chatFilterInfo id:int32 title:string icon_name:string = ChatFilterInfo;
+//@description Contains basic information about a chat folder
+//@id Unique chat folder identifier
+//@title The title of the folder; 1-12 characters without line feeds
+//@icon The chosen or default icon for the chat folder
+//@has_my_invite_links True, if the chat folder has invite links created by the current user
+chatFolderInfo id:int32 title:string icon:chatFolderIcon has_my_invite_links:Bool = ChatFolderInfo;
 
-//@description Describes a recommended chat filter @filter The chat filter @param_description Chat filter description
-recommendedChatFilter filter:chatFilter description:string = RecommendedChatFilter;
+//@description Contains a chat folder invite link
+//@invite_link The chat folder invite link
+//@name Name of the link
+//@chat_ids Identifiers of chats, included in the link
+chatFolderInviteLink invite_link:string name:string chat_ids:vector<int53> = ChatFolderInviteLink;
 
-//@description Contains a list of recommended chat filters @chat_filters List of recommended chat filters
-recommendedChatFilters chat_filters:vector<recommendedChatFilter> = RecommendedChatFilters;
+//@description Represents a list of chat folder invite links @invite_links List of the invite links
+chatFolderInviteLinks invite_links:vector<chatFolderInviteLink> = ChatFolderInviteLinks;
+
+//@description Contains information about an invite link to a chat folder
+//@chat_folder_info Basic information about the chat folder; chat folder identifier will be 0 if the user didn't have the chat folder yet
+//@missing_chat_ids Identifiers of the chats from the link, which aren't added to the folder yet
+//@added_chat_ids Identifiers of the chats from the link, which are added to the folder already
+chatFolderInviteLinkInfo chat_folder_info:chatFolderInfo missing_chat_ids:vector<int53> added_chat_ids:vector<int53> = ChatFolderInviteLinkInfo;
+
+//@description Describes a recommended chat folder @folder The chat folder @param_description Chat folder description
+recommendedChatFolder folder:chatFolder description:string = RecommendedChatFolder;
+
+//@description Contains a list of recommended chat folders @chat_folders List of recommended chat folders
+recommendedChatFolders chat_folders:vector<recommendedChatFolder> = RecommendedChatFolders;
 
 
 //@class ChatList @description Describes a list of chats
@@ -1329,8 +1372,8 @@ chatListMain = ChatList;
 //@description A list of chats usually located at the top of the main chat list. Unmuted chats are automatically moved from the Archive to the Main chat list when a new message arrives
 chatListArchive = ChatList;
 
-//@description A list of chats belonging to a chat filter @chat_filter_id Chat filter identifier
-chatListFilter chat_filter_id:int32 = ChatList;
+//@description A list of chats added to a chat folder @chat_folder_id Chat folder identifier
+chatListFolder chat_folder_id:int32 = ChatList;
 
 //@description Contains a list of chat lists @chat_lists List of chat lists
 chatLists chat_lists:vector<ChatList> = ChatLists;
@@ -1395,6 +1438,7 @@ videoChat group_call_id:int32 has_participants:Bool default_participant_id:Messa
 //@notification_settings Notification settings for the chat
 //@available_reactions Types of reaction, available in the chat
 //@message_auto_delete_time Current message auto-delete or self-destruct timer setting for the chat, in seconds; 0 if disabled. Self-destruct timer in secret chats starts after the message or its content is viewed. Auto-delete timer in other chats starts from the send date
+//@background Background set for the chat; may be null if none
 //@theme_name If non-empty, name of a theme, set for the chat
 //@action_bar Information about actions which must be possible to do through the chat action bar; may be null
 //@video_chat Information about video chat of the chat
@@ -1402,7 +1446,7 @@ videoChat group_call_id:int32 has_participants:Bool default_participant_id:Messa
 //@reply_markup_message_id Identifier of the message from which reply markup needs to be used; 0 if there is no default custom reply markup in the chat
 //@draft_message A draft of a message in the chat; may be null
 //@client_data Application-specific data associated with the chat. (For example, the chat scroll position or local chat notification settings can be stored here.) Persistent if the message database is used
-chat id:int53 type:ChatType title:string photo:chatPhotoInfo permissions:chatPermissions last_message:message positions:vector<chatPosition> message_sender_id:MessageSender has_protected_content:Bool is_translatable:Bool is_marked_as_unread:Bool is_blocked:Bool has_scheduled_messages:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_be_reported:Bool default_disable_notification:Bool unread_count:int32 last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 unread_mention_count:int32 unread_reaction_count:int32 notification_settings:chatNotificationSettings available_reactions:ChatAvailableReactions message_auto_delete_time:int32 theme_name:string action_bar:ChatActionBar video_chat:videoChat pending_join_requests:chatJoinRequestsInfo reply_markup_message_id:int53 draft_message:draftMessage client_data:string = Chat;
+chat id:int53 type:ChatType title:string photo:chatPhotoInfo permissions:chatPermissions last_message:message positions:vector<chatPosition> message_sender_id:MessageSender has_protected_content:Bool is_translatable:Bool is_marked_as_unread:Bool is_blocked:Bool has_scheduled_messages:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_be_reported:Bool default_disable_notification:Bool unread_count:int32 last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 unread_mention_count:int32 unread_reaction_count:int32 notification_settings:chatNotificationSettings available_reactions:ChatAvailableReactions message_auto_delete_time:int32 background:chatBackground theme_name:string action_bar:ChatActionBar video_chat:videoChat pending_join_requests:chatJoinRequestsInfo reply_markup_message_id:int53 draft_message:draftMessage client_data:string = Chat;
 
 //@description Represents a list of chats @total_count Approximate total number of chats found @chat_ids List of chat identifiers
 chats total_count:int32 chat_ids:vector<int53> = Chats;
@@ -1518,8 +1562,8 @@ inlineKeyboardButtonTypeCallbackWithPassword data:bytes = InlineKeyboardButtonTy
 //@description A button with a game that sends a callback query to a bot. This button must be in the first column and row of the keyboard and can be attached only to a message with content of the type messageGame
 inlineKeyboardButtonTypeCallbackGame = InlineKeyboardButtonType;
 
-//@description A button that forces an inline query to the bot to be inserted in the input field @query Inline query to be sent to the bot @in_current_chat True, if the inline query must be sent from the current chat
-inlineKeyboardButtonTypeSwitchInline query:string in_current_chat:Bool = InlineKeyboardButtonType;
+//@description A button that forces an inline query to the bot to be inserted in the input field @query Inline query to be sent to the bot @target_chat Target chat from which to send the inline query
+inlineKeyboardButtonTypeSwitchInline query:string target_chat:TargetChat = InlineKeyboardButtonType;
 
 //@description A button to buy something. This button must be in the first column and row of the keyboard and can be attached only to a message with content of the type messageInvoice
 inlineKeyboardButtonTypeBuy = InlineKeyboardButtonType;
@@ -2520,6 +2564,9 @@ messagePinMessage message_id:int53 = MessageContent;
 //@description A screenshot of a message in the chat has been taken
 messageScreenshotTaken = MessageContent;
 
+//@description A new background was set in the chat @old_background_message_id Identifier of the message with a previously set same background; 0 if none. Can be an identifier of a deleted message @background The new background
+messageChatSetBackground old_background_message_id:int53 background:chatBackground = MessageContent;
+
 //@description A theme in the chat has been changed @theme_name If non-empty, name of a new theme, set for the chat. Otherwise, chat theme was reset to the default one
 messageChatSetTheme theme_name:string = MessageContent;
 
@@ -2573,11 +2620,14 @@ messagePaymentSuccessful invoice_chat_id:int53 invoice_message_id:int53 currency
 messagePaymentSuccessfulBot currency:string total_amount:int53 is_recurring:Bool is_first_recurring:Bool invoice_payload:bytes shipping_option_id:string order_info:orderInfo telegram_payment_charge_id:string provider_payment_charge_id:string = MessageContent;
 
 //@description Telegram Premium was gifted to the user
+//@gifter_user_id The identifier of a user that gifted Telegram Premium; 0 if the gift was anonymous
 //@currency Currency for the paid amount
 //@amount The paid amount, in the smallest units of the currency
+//@cryptocurrency Cryptocurrency used to pay for the gift; may be empty if none
+//@cryptocurrency_amount The paid amount, in the smallest units of the cryptocurrency
 //@month_count Number of month the Telegram Premium subscription will be active
 //@sticker A sticker to be shown in the message; may be null if unknown
-messageGiftedPremium currency:string amount:int53 month_count:int32 sticker:sticker = MessageContent;
+messageGiftedPremium gifter_user_id:int53 currency:string amount:int53 cryptocurrency:string cryptocurrency_amount:int64 month_count:int32 sticker:sticker = MessageContent;
 
 //@description A contact has registered with Telegram
 messageContactRegistered = MessageContent;
@@ -2597,7 +2647,7 @@ messageBotWriteAccessAllowed web_app:webApp = MessageContent;
 //@description Data from a Web App has been sent to a bot @button_text Text of the keyboardButtonTypeWebApp button, which opened the Web App
 messageWebAppDataSent button_text:string = MessageContent;
 
-//@description Data from a Web App has been received; for bots only @button_text Text of the keyboardButtonTypeWebApp button, which opened the Web App @data Received data
+//@description Data from a Web App has been received; for bots only @button_text Text of the keyboardButtonTypeWebApp button, which opened the Web App @data The data
 messageWebAppDataReceived button_text:string data:string = MessageContent;
 
 //@description Telegram Passport data has been sent to a bot @types List of Telegram Passport element types sent
@@ -3321,7 +3371,7 @@ speechRecognitionResultPending partial_text:string = SpeechRecognitionResult;
 //@description The speech recognition successfully finished @text Recognized text
 speechRecognitionResultText text:string = SpeechRecognitionResult;
 
-//@description The speech recognition failed @error Received error
+//@description The speech recognition failed @error Recognition error
 speechRecognitionResultError error:error = SpeechRecognitionResult;
 
 
@@ -3643,8 +3693,8 @@ chatEventPollStopped message:message = ChatEventAction;
 //@description A new member joined the chat
 chatEventMemberJoined = ChatEventAction;
 
-//@description A new member joined the chat via an invite link @invite_link Invite link used to join the chat
-chatEventMemberJoinedByInviteLink invite_link:chatInviteLink = ChatEventAction;
+//@description A new member joined the chat via an invite link @invite_link Invite link used to join the chat @via_chat_folder_invite_link True, if the user has joined the chat using an invite link for a chat folder
+chatEventMemberJoinedByInviteLink invite_link:chatInviteLink via_chat_folder_invite_link:Bool = ChatEventAction;
 
 //@description A new member was accepted to the chat by an administrator @approver_user_id User identifier of the chat administrator, approved user join request @invite_link Invite link used to join the chat; may be null
 chatEventMemberJoinedByRequest approver_user_id:int53 invite_link:chatInviteLink = ChatEventAction;
@@ -3845,11 +3895,11 @@ premiumLimitTypeSavedAnimationCount = PremiumLimitType;
 //@description The maximum number of favorite stickers
 premiumLimitTypeFavoriteStickerCount = PremiumLimitType;
 
-//@description The maximum number of chat filters
-premiumLimitTypeChatFilterCount = PremiumLimitType;
+//@description The maximum number of chat folders
+premiumLimitTypeChatFolderCount = PremiumLimitType;
 
-//@description The maximum number of pinned and always included, or always excluded chats in a chat filter
-premiumLimitTypeChatFilterChosenChatCount = PremiumLimitType;
+//@description The maximum number of pinned and always included, or always excluded chats in a chat folder
+premiumLimitTypeChatFolderChosenChatCount = PremiumLimitType;
 
 //@description The maximum number of pinned chats in the archive chat list
 premiumLimitTypePinnedArchivedChatCount = PremiumLimitType;
@@ -3859,6 +3909,12 @@ premiumLimitTypeCaptionLength = PremiumLimitType;
 
 //@description The maximum length of the user's bio
 premiumLimitTypeBioLength = PremiumLimitType;
+
+//@description The maximum number of invite links for a chat folder
+premiumLimitTypeChatFolderInviteLinkCount = PremiumLimitType;
+
+//@description The maximum number of added shareable chat folders
+premiumLimitTypeShareableChatFolderCount = PremiumLimitType;
 
 
 //@class PremiumFeature @description Describes a feature available to Premium users
@@ -4033,19 +4089,6 @@ backgroundTypePattern fill:BackgroundFill intensity:int32 is_inverted:Bool is_mo
 backgroundTypeFill fill:BackgroundFill = BackgroundType;
 
 
-//@description Describes a chat background
-//@id Unique background identifier
-//@is_default True, if this is one of default backgrounds
-//@is_dark True, if the background is dark and is recommended to be used with dark theme
-//@name Unique background name
-//@document Document with the background; may be null. Null only for filled backgrounds
-//@type Type of the background
-background id:int64 is_default:Bool is_dark:Bool name:string document:document type:BackgroundType = Background;
-
-//@description Contains a list of backgrounds @backgrounds A list of backgrounds
-backgrounds backgrounds:vector<background> = Backgrounds;
-
-
 //@class InputBackground @description Contains information about background to set
 
 //@description A background from a local file
@@ -4054,6 +4097,9 @@ inputBackgroundLocal background:InputFile = InputBackground;
 
 //@description A background from the server @background_id The background identifier
 inputBackgroundRemote background_id:int64 = InputBackground;
+
+//@description A background previously set in the chat; for chat backgrounds only @message_id Identifier of the message with the background
+inputBackgroundPrevious message_id:int53 = InputBackground;
 
 
 //@description Describes theme settings
@@ -4232,6 +4278,9 @@ pushMessageContentChatChangePhoto = PushMessageContent;
 
 //@description A chat title was edited @title New chat title
 pushMessageContentChatChangeTitle title:string = PushMessageContent;
+
+//@description A chat background was edited @is_same True, if the set background is the same as the background of the current user
+pushMessageContentChatSetBackground is_same:Bool = PushMessageContent;
 
 //@description A chat theme was edited @theme_name If non-empty, name of a new theme, set for the chat. Otherwise, the chat theme was reset to the default one
 pushMessageContentChatSetTheme theme_name:string = PushMessageContent;
@@ -4628,6 +4677,12 @@ internalLinkTypeBotStartInGroup bot_username:string start_parameter:string admin
 //@description The link is a link to the change phone number section of the app
 internalLinkTypeChangePhoneNumber = InternalLinkType;
 
+//@description The link is an invite link to a chat folder. Call checkChatFolderInviteLink with the given invite link to process the link @invite_link Internal representation of the invite link
+internalLinkTypeChatFolderInvite invite_link:string = InternalLinkType;
+
+//@description The link is a link to the folder section of the app settings
+internalLinkTypeChatFolderSettings = InternalLinkType;
+
 //@description The link is a chat invite link. Call checkChatInviteLink with the given invite link to process the link @invite_link Internal representation of the invite link
 internalLinkTypeChatInvite invite_link:string = InternalLinkType;
 
@@ -4636,9 +4691,6 @@ internalLinkTypeDefaultMessageAutoDeleteTimerSettings = InternalLinkType;
 
 //@description The link is a link to the edit profile section of the app settings
 internalLinkTypeEditProfileSettings = InternalLinkType;
-
-//@description The link is a link to the filter section of the app settings
-internalLinkTypeFilterSettings = InternalLinkType;
 
 //@description The link is a link to a game. Call searchPublicChat with the given bot username, check that the user is a bot, ask the current user to select a chat to send the game, and then call sendMessage with inputMessageGame
 //@bot_username Username of the bot that owns the game
@@ -5328,6 +5380,9 @@ updateChatPendingJoinRequests chat_id:int53 pending_join_requests:chatJoinReques
 //@reply_markup_message_id Identifier of the message from which reply markup needs to be used; 0 if there is no default custom reply markup in the chat
 updateChatReplyMarkup chat_id:int53 reply_markup_message_id:int53 = Update;
 
+//@description The chat background was changed @chat_id Chat identifier @background The new chat background; may be null if background was reset to default
+updateChatBackground chat_id:int53 background:chatBackground = Update;
+
 //@description The chat theme was changed @chat_id Chat identifier @theme_name The new name of the chat theme; may be empty if theme was reset to default
 updateChatTheme chat_id:int53 theme_name:string = Update;
 
@@ -5358,8 +5413,8 @@ updateChatIsBlocked chat_id:int53 is_blocked:Bool = Update;
 //@description A chat's has_scheduled_messages field has changed @chat_id Chat identifier @has_scheduled_messages New value of has_scheduled_messages
 updateChatHasScheduledMessages chat_id:int53 has_scheduled_messages:Bool = Update;
 
-//@description The list of chat filters or a chat filter has changed @chat_filters The new list of chat filters @main_chat_list_position Position of the main chat list among chat filters, 0-based
-updateChatFilters chat_filters:vector<chatFilterInfo> main_chat_list_position:int32 = Update;
+//@description The list of chat folders or a chat folder has changed @chat_folders The new list of chat folders @main_chat_list_position Position of the main chat list among chat folders, 0-based
+updateChatFolders chat_folders:vector<chatFolderInfo> main_chat_list_position:int32 = Update;
 
 //@description The number of online group members has changed. This update with non-zero number of online group members is sent only for currently opened chats.
 //-There is no guarantee that it will be sent just after the number of online users has changed
@@ -5645,9 +5700,10 @@ updatePollAnswer poll_id:int64 user_id:int53 option_ids:vector<int32> = Update;
 //@actor_user_id Identifier of the user, changing the rights
 //@date Point in time (Unix timestamp) when the user rights was changed
 //@invite_link If user has joined the chat using an invite link, the invite link; may be null
+//@via_chat_folder_invite_link True, if the user has joined the chat using an invite link for a chat folder
 //@old_chat_member Previous chat member
 //@new_chat_member New chat member
-updateChatMember chat_id:int53 actor_user_id:int53 date:int32 invite_link:chatInviteLink old_chat_member:chatMember new_chat_member:chatMember = Update;
+updateChatMember chat_id:int53 actor_user_id:int53 date:int32 invite_link:chatInviteLink via_chat_folder_invite_link:Bool old_chat_member:chatMember new_chat_member:chatMember = Update;
 
 //@description A user sent a join request to a chat; for bots only
 //@chat_id Chat identifier
@@ -5901,7 +5957,7 @@ getMessage chat_id:int53 message_id:int53 = Message;
 getMessageLocally chat_id:int53 message_id:int53 = Message;
 
 //@description Returns information about a message that is replied by a given message. Also, returns the pinned message, the game message, the invoice message, and the topic creation message for messages
-//-of the types messagePinMessage, messageGameScore, messagePaymentSuccessful, and topic messages without replied message respectively
+//-of the types messagePinMessage, messageGameScore, messagePaymentSuccessful, messageChatSetBackground and topic messages without replied message respectively
 //@chat_id Identifier of the chat the message belongs to
 //@message_id Identifier of the reply message
 getRepliedMessage chat_id:int53 message_id:int53 = Message;
@@ -6547,7 +6603,7 @@ shareChatWithBot chat_id:int53 message_id:int53 button_id:int32 shared_chat_id:i
 
 
 //@description Sends an inline query to a bot and returns its results. Returns an error with code 502 if the bot fails to answer the query before the query timeout expires
-//@bot_user_id The identifier of the target bot
+//@bot_user_id Identifier of the target bot
 //@chat_id Identifier of the chat where the query was sent
 //@user_location Location of the user; pass null if unknown or the bot doesn't need user's location
 //@query Text of the query
@@ -6589,7 +6645,7 @@ getWebAppUrl bot_user_id:int53 url:string theme:themeParameters application_name
 //@description Sends data received from a keyboardButtonTypeWebApp Web App to a bot
 //@bot_user_id Identifier of the target bot
 //@button_text Text of the keyboardButtonTypeWebApp button, which opened the Web App
-//@data Received data
+//@data The data
 sendWebAppData bot_user_id:int53 button_text:string data:string = Ok;
 
 //@description Informs TDLib that a Web App is being opened from attachment menu, a botMenuButton button, an internalLinkTypeAttachmentMenuBot link, or an inlineKeyboardButtonTypeWebApp button.
@@ -6762,26 +6818,65 @@ getChatListsToAddChat chat_id:int53 = ChatLists;
 //@chat_list The chat list. Use getChatListsToAddChat to get suitable chat lists
 addChatToList chat_id:int53 chat_list:ChatList = Ok;
 
-//@description Returns information about a chat filter by its identifier @chat_filter_id Chat filter identifier
-getChatFilter chat_filter_id:int32 = ChatFilter;
+//@description Returns information about a chat folder by its identifier @chat_folder_id Chat folder identifier
+getChatFolder chat_folder_id:int32 = ChatFolder;
 
-//@description Creates new chat filter. Returns information about the created chat filter. There can be up to getOption("chat_filter_count_max") chat filters, but the limit can be increased with Telegram Premium @filter Chat filter
-createChatFilter filter:chatFilter = ChatFilterInfo;
+//@description Creates new chat folder. Returns information about the created chat folder. There can be up to getOption("chat_folder_count_max") chat folders, but the limit can be increased with Telegram Premium @folder The new chat folder
+createChatFolder folder:chatFolder = ChatFolderInfo;
 
-//@description Edits existing chat filter. Returns information about the edited chat filter @chat_filter_id Chat filter identifier @filter The edited chat filter
-editChatFilter chat_filter_id:int32 filter:chatFilter = ChatFilterInfo;
+//@description Edits existing chat folder. Returns information about the edited chat folder @chat_folder_id Chat folder identifier @folder The edited chat folder
+editChatFolder chat_folder_id:int32 folder:chatFolder = ChatFolderInfo;
 
-//@description Deletes existing chat filter @chat_filter_id Chat filter identifier
-deleteChatFilter chat_filter_id:int32 = Ok;
+//@description Deletes existing chat folder @chat_folder_id Chat folder identifier @leave_chat_ids Identifiers of the chats to leave. The chats must be pinned or always included in the folder
+deleteChatFolder chat_folder_id:int32 leave_chat_ids:vector<int53> = Ok;
 
-//@description Changes the order of chat filters @chat_filter_ids Identifiers of chat filters in the new correct order @main_chat_list_position Position of the main chat list among chat filters, 0-based. Can be non-zero only for Premium users
-reorderChatFilters chat_filter_ids:vector<int32> main_chat_list_position:int32 = Ok;
+//@description Returns identifiers of pinned or always included chats from a chat folder, which are suggested to be left when the chat folder is deleted @chat_folder_id Chat folder identifier
+getChatFolderChatsToLeave chat_folder_id:int32 = Chats;
 
-//@description Returns recommended chat filters for the current user
-getRecommendedChatFilters = RecommendedChatFilters;
+//@description Changes the order of chat folders @chat_folder_ids Identifiers of chat folders in the new correct order @main_chat_list_position Position of the main chat list among chat folders, 0-based. Can be non-zero only for Premium users
+reorderChatFolders chat_folder_ids:vector<int32> main_chat_list_position:int32 = Ok;
 
-//@description Returns default icon name for a filter. Can be called synchronously @filter Chat filter
-getChatFilterDefaultIconName filter:chatFilter = Text;
+//@description Returns recommended chat folders for the current user
+getRecommendedChatFolders = RecommendedChatFolders;
+
+//@description Returns default icon name for a folder. Can be called synchronously @folder Chat folder
+getChatFolderDefaultIconName folder:chatFolder = ChatFolderIcon;
+
+//@description Returns identifiers of chats from a chat folder, suitable for adding to a chat folder invite link @chat_folder_id Chat folder identifier
+getChatsForChatFolderInviteLink chat_folder_id:int32 = Chats;
+
+//@description Creates a new invite link for a chat folder. A link can be created for a chat folder if it has only pinned and included chats
+//@chat_folder_id Chat folder identifier
+//@name Name of the link; 0-32 characters
+//@chat_ids Identifiers of chats to be accessible by the invite link. Use getChatsForChatFolderInviteLink to get suitable chats. Basic groups will be automatically converted to supergroups before link creation
+createChatFolderInviteLink chat_folder_id:int32 name:string chat_ids:vector<int53> = ChatFolderInviteLink;
+
+//@description Returns invite links created by the current user for a shareable chat folder @chat_folder_id Chat folder identifier
+getChatFolderInviteLinks chat_folder_id:int32 = ChatFolderInviteLinks;
+
+//@description Edits an invite link for a chat folder
+//@chat_folder_id Chat folder identifier
+//@invite_link Invite link to be edited
+//@name New name of the link; 0-32 characters
+//@chat_ids New identifiers of chats to be accessible by the invite link. Use getChatsForChatFolderInviteLink to get suitable chats. Basic groups will be automatically converted to supergroups before link editing
+editChatFolderInviteLink chat_folder_id:int32 invite_link:string name:string chat_ids:vector<int53> = ChatFolderInviteLink;
+
+//@description Deletes an invite link for a chat folder
+//@chat_folder_id Chat folder identifier
+//@invite_link Invite link to be deleted
+deleteChatFolderInviteLink chat_folder_id:int32 invite_link:string = Ok;
+
+//@description Checks the validity of an invite link for a chat folder and returns information about the corresponding chat folder @invite_link Invite link to be checked
+checkChatFolderInviteLink invite_link:string = ChatFolderInviteLinkInfo;
+
+//@description Adds a chat folder by an invite link @invite_link Invite link for the chat folder @chat_ids Identifiers of the chats added to the chat folder. The chats are automatically joined if they aren't joined yet
+addChatFolderByInviteLink invite_link:string chat_ids:vector<int53> = Ok;
+
+//@description Returns new chats added to a shareable chat folder by its owner. The method must be called at most once in getOption("chat_folder_new_chats_update_period") for the given chat folder @chat_folder_id Chat folder identifier
+getChatFolderNewChats chat_folder_id:int32 = Chats;
+
+//@description Process new chats added to a shareable chat folder by its owner @chat_folder_id Chat folder identifier @added_chat_ids Identifiers of the new chats, which are added to the chat folder. The chats are automatically joined if they aren't joined yet
+processChatFolderNewChats chat_folder_id:int32 added_chat_ids:vector<int53> = Ok;
 
 
 //@description Changes the chat title. Supported only for basic groups, supergroups and channels. Requires can_change_info administrator right
@@ -6804,6 +6899,13 @@ setChatMessageAutoDeleteTime chat_id:int53 message_auto_delete_time:int32 = Ok;
 //@chat_id Chat identifier
 //@permissions New non-administrator members permissions in the chat
 setChatPermissions chat_id:int53 permissions:chatPermissions = Ok;
+
+//@description Changes the background in a specific chat. Supported only in private and secret chats with non-deleted users
+//@chat_id Chat identifier
+//@background The input background to use; pass null to create a new filled background or to remove the current background
+//@type Background type; pass null to remove the current background
+//@dark_theme_dimming Dimming of the background in dark themes, as a percentage; 0-100
+setChatBackground chat_id:int53 background:InputBackground type:BackgroundType dark_theme_dimming:int32 = Ok;
 
 //@description Changes the chat theme. Supported only in private and secret chats @chat_id Chat identifier @theme_name Name of the new chat theme; pass an empty string to return the default theme
 setChatTheme chat_id:int53 theme_name:string = Ok;
@@ -6963,6 +7065,9 @@ toggleChatIsPinned chat_list:ChatList chat_id:int53 is_pinned:Bool = Ok;
 
 //@description Changes the order of pinned chats @chat_list Chat list in which to change the order of pinned chats @chat_ids The new list of pinned chats
 setPinnedChats chat_list:ChatList chat_ids:vector<int53> = Ok;
+
+//@description Traverse all chats in a chat list and marks all messages in the chats as read @chat_list Chat list in which to mark all chats as read
+readChatList chat_list:ChatList = Ok;
 
 
 //@description Returns information about a bot that can be added to attachment menu @bot_user_id Bot's user identifier
@@ -7620,23 +7725,50 @@ setDefaultGroupAdministratorRights default_group_administrator_rights:chatAdmini
 setDefaultChannelAdministratorRights default_channel_administrator_rights:chatAdministratorRights = Ok;
 
 
-//@description Sets the text shown in the chat with the bot if the chat is empty; bots only
+//@description Sets the name of a bot. Can be called only if userTypeBot.can_be_edited == true
+//@bot_user_id Identifier of the target bot
+//@language_code A two-letter ISO 639-1 language code. If empty, the description will be shown to all users, for which language there are no dedicated description
+//@name New bot's name on the specified language; 0-64 characters; must be non-empty if language code is empty
+setBotName bot_user_id:int53 language_code:string name:string = Ok;
+
+//@description Returns the name of a bot in the given language. Can be called only if userTypeBot.can_be_edited == true
+//@bot_user_id Identifier of the target bot
+//@language_code A two-letter ISO 639-1 language code or an empty string
+getBotName bot_user_id:int53 language_code:string = Text;
+
+//@description Changes a profile photo for a bot @bot_user_id Identifier of the target bot @photo Profile photo to set; pass null to delete the chat photo
+setBotProfilePhoto bot_user_id:int53 photo:InputChatPhoto = Ok;
+
+//@description Changes active state for a username of a bot. The editable username can't be disabled. May return an error with a message "USERNAMES_ACTIVE_TOO_MUCH" if the maximum number of active usernames has been reached. Can be called only if userTypeBot.can_be_edited == true
+//@bot_user_id Identifier of the target bot
+//@username The username to change
+//@is_active Pass true to activate the username; pass false to disable it
+toggleBotUsernameIsActive bot_user_id:int53 username:string is_active:Bool = Ok;
+
+//@description Changes order of active usernames of a bot. Can be called only if userTypeBot.can_be_edited == true @bot_user_id Identifier of the target bot @usernames The new order of active usernames. All currently active usernames must be specified
+reorderActiveBotUsernames bot_user_id:int53 usernames:vector<string> = Ok;
+
+//@description Sets the text shown in the chat with a bot if the chat is empty. Can be called only if userTypeBot.can_be_edited == true
+//@bot_user_id Identifier of the target bot
 //@language_code A two-letter ISO 639-1 language code. If empty, the description will be shown to all users, for which language there are no dedicated description
 //@param_description New bot's description on the specified language
-setBotInfoDescription language_code:string description:string = Ok;
+setBotInfoDescription bot_user_id:int53 language_code:string description:string = Ok;
 
-//@description Returns the text shown in the chat with the bot if the chat is empty in the given language; bots only
+//@description Returns the text shown in the chat with a bot if the chat is empty in the given language. Can be called only if userTypeBot.can_be_edited == true
+//@bot_user_id Identifier of the target bot
 //@language_code A two-letter ISO 639-1 language code or an empty string
-getBotInfoDescription language_code:string = Text;
+getBotInfoDescription bot_user_id:int53 language_code:string = Text;
 
-//@description Sets the text shown on the bot's profile page and sent together with the link when users share the bot; bots only
+//@description Sets the text shown on a bot's profile page and sent together with the link when users share the bot. Can be called only if userTypeBot.can_be_edited == true
+//@bot_user_id Identifier of the target bot
 //@language_code A two-letter ISO 639-1 language code. If empty, the short description will be shown to all users, for which language there are no dedicated description
 //@short_description New bot's short description on the specified language
-setBotInfoShortDescription language_code:string short_description:string = Ok;
+setBotInfoShortDescription bot_user_id:int53 language_code:string short_description:string = Ok;
 
-//@description Returns the text shown on the bot's profile page and sent together with the link when users share the bot in the given language; bots only
+//@description Returns the text shown on a bot's profile page and sent together with the link when users share the bot in the given language. Can be called only if userTypeBot.can_be_edited == true
+//@bot_user_id Identifier of the target bot
 //@language_code A two-letter ISO 639-1 language code or an empty string
-getBotInfoShortDescription language_code:string = Text;
+getBotInfoShortDescription bot_user_id:int53 language_code:string = Text;
 
 
 //@description Returns all active sessions of the current user
@@ -7798,7 +7930,7 @@ getBackgroundUrl name:string type:BackgroundType = HttpUrl;
 searchBackground name:string = Background;
 
 //@description Changes the background selected by the user; adds background to the list of installed backgrounds
-//@background The input background to use; pass null to create a new filled backgrounds or to remove the current background
+//@background The input background to use; pass null to create a new filled background or to remove the current background
 //@type Background type; pass null to use the default type of the remote background or to remove the current background
 //@for_dark_theme Pass true if the background is changed for a dark theme
 setBackground background:InputBackground type:BackgroundType for_dark_theme:Bool = Background;
