@@ -983,7 +983,7 @@ var Assets = {
         Aj.state.botUsernameFee = result.amount;
         Aj.state.botUsernameAssignTo = assign_to;
         $('.js-username', Aj.state.$botUsernamePopup).html('@' + result.username);
-        $('.js-amount', Aj.state.$botUsernamePopup).html(Main.wrapTonAmount(result.amount));
+        $('.js-amount', Aj.state.$botUsernamePopup).html(result.amount);
         Aj.state.$botUsernameForm.field('id').value(result.req_id);
         openPopup(Aj.state.$botUsernamePopup);
       } else {
