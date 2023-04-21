@@ -16,6 +16,7 @@ var Main = {
       $(cont).on('click.curPage', '.js-auction-unavail', Main.eAuctionUnavailable);
       $(cont).on('click.curPage', '.js-howitworks', Main.eHowitworks);
       $(cont).on('click.curPage', '.js-howofferworks', Main.eHowofferworks);
+      $(cont).on('click.curPage', '.js-bots-about', Main.eBotsAbout);
       $(cont).on('click.curPage', '.logout-link', Login.logOut);
       $(cont).on('click.curPage', '.ton-logout-link', Login.tonLogOut);
       $(cont).on('click.curPage', '.js-copy-code', Main.copyCode);
@@ -24,6 +25,7 @@ var Main = {
       state.$unavailPopup = $('.js-unavailable-popup');
       state.$howitworksPopup = $('.js-howitworks-popup');
       state.$howofferworksPopup = $('.js-howofferworks-popup');
+      state.$botsaboutPopup = $('.js-botsabout-popup');
       state.$mainSearchField = $('.js-main-search-field');
       state.$mainSearchForm = $('.js-main-search-form');
       state.$mainSearchForm.on('submit', Main.eMainSearchSubmit);
@@ -284,6 +286,24 @@ var Main = {
       }
     };
     openPopup(Aj.state.$howofferworksPopup, {
+      onOpen: function() {
+        $(document).on('keydown', onEnterPress);
+      },
+      onClose: function() {
+        $(document).off('keydown', onEnterPress);
+      }
+    });
+  },
+  eBotsAbout: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var onEnterPress = function(e) {
+      if (e.keyCode == Keys.RETURN) {
+        e.stopImmediatePropagation();
+        closePopup(Aj.state.$botsaboutPopup);
+      }
+    };
+    openPopup(Aj.state.$botsaboutPopup, {
       onOpen: function() {
         $(document).on('keydown', onEnterPress);
       },
