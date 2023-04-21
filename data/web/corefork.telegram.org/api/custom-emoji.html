@@ -92,8 +92,11 @@ These categories should be displayed in the custom emoji search bar, and when th
 <a href='/method/messages.getEmojiKeywordsLanguages'>messages.getEmojiKeywordsLanguages</a>#4e9963b2 lang_codes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/EmojiLanguage'>EmojiLanguage</a>&gt;;
 
 <a href='/method/messages.getEmojiURL'>messages.getEmojiURL</a>#d5b10c26 lang_code:<a href='/type/string'>string</a> = <a href='/type/EmojiURL'>EmojiURL</a>;</code></pre>
-<p><a href="/method/messages.getEmojiKeywords">messages.getEmojiKeywords</a> may be used to fetch a localized list of keywords, associated to UTF-8 emojis.<br>
-Use these keywords to allow users to search both emojis and custom emojis by keyword, by displaying both the UTF-8 emojis associated to the keyword and the custom emojis associated to those UTF-8 emojis.  </p>
+<p>First of all, invoke <a href="/method/messages.getEmojiKeywordsLanguages">messages.getEmojiKeywordsLanguages</a> to obtain a list of languages that must be used when fetching emoji keyword lists: usually the method will return the passed language codes (if localized) + <code>en</code> + some language codes for similar languages (if applicable).<br>
+Then, invoke <a href="/method/messages.getEmojiKeywords">messages.getEmojiKeywords</a> for all the returned language codes to fetch localized lists of keywords, associated to UTF-8 emojis.  </p>
+<p>Use the returned keywords to allow users to search both emojis and custom emojis by keyword, by displaying both the UTF-8 emojis associated to the keyword and the custom emojis associated to those UTF-8 emojis.  </p>
+<p>Invoke <a href="/method/messages.getEmojiKeywordsDifference">messages.getEmojiKeywordsDifference</a> regularly to fetch updates to locally stored keyword lists for all languages.  </p>
+<p><a href="/method/messages.getEmojiURL">messages.getEmojiURL</a> may be used to fetch an HTTP URL which can be used to automatically log in into translation platform and suggest new emoji keywords: the URL will be valid for 30 seconds after generation.  </p>
 <p>Additionally, custom emojis and non-mask stickers may also have a set of <em>custom</em> keywords, returned in the <a href="/api/stickers#stickersets">custom emoji stickerset information</a>:  </p>
 <pre><code><a href='/constructor/stickerKeyword'>stickerKeyword</a>#fcfeb29c document_id:<a href='/type/long'>long</a> keyword:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/StickerKeyword'>StickerKeyword</a>;
 
