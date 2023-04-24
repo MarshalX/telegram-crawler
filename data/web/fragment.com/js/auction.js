@@ -764,8 +764,8 @@ var Auction = {
         var mult    = Aj.state.offerFeeMult;
         var fee     = Math.ceil(amount * mult);
         var fee_val = Math.max(Aj.state.offerFeeMin, Math.min(fee, Aj.state.offerFeeMax));
-        Aj.state.offerFee = fee_val;
-        $('.js-amount_fee', Aj.state.$makeOfferForm).html(Main.wrapTonAmount(fee_val));
+        Aj.state.offerFee = Main.wrapTonAmount(fee_val);
+        $('.js-amount_fee', Aj.state.$makeOfferForm).html(Aj.state.offerFee);
       };
       openPopup(Aj.state.$makeOfferPopup, {
         onOpen: function() {
@@ -802,13 +802,13 @@ var Auction = {
       },
       title: l('WEB_POPUP_QR_OFFER_HEADER'),
       description: l('WEB_POPUP_QR_OFFER_TEXT', {
-        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Main.wrapTonAmount(Aj.state.offerFee) + '</span>'
+        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Aj.state.offerFee + '</span>'
       }),
       qr_label: item_title,
       tk_label: l('WEB_POPUP_QR_OFFER_TK_BUTTON'),
       terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
       onDataUpdate: function(data) {
-        $('.js-amount_fee', this).html(Main.wrapTonAmount(data.fee));
+        $('.js-amount_fee', this).html(data.fee);
       },
       onConfirm: function(by_server) {
         if (by_server) {
@@ -1013,7 +1013,7 @@ var Assets = {
       },
       title: l('WEB_POPUP_QR_BOT_USERNAME_HEADER'),
       description: l('WEB_POPUP_QR_BOT_USERNAME_TEXT', {
-        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Main.wrapTonAmount(Aj.state.botUsernameFee) + '</span>'
+        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Aj.state.botUsernameFee + '</span>'
       }),
       qr_label: '@' + Aj.state.botUsername,
       tk_label: l('WEB_POPUP_QR_BOT_USERNAME_TK_BUTTON'),
@@ -1850,7 +1850,7 @@ var Premium = {
       },
       title: l('WEB_POPUP_QR_PREMIUM_HEADER'),
       description: l('WEB_POPUP_QR_PREMIUM_TEXT', {
-        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Main.wrapTonAmount(Aj.state.giftPrice) + '</span>'
+        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Aj.state.giftPrice + '</span>'
       }),
       qr_label: item_title,
       tk_label: l('WEB_POPUP_QR_PREMIUM_TK_BUTTON'),
