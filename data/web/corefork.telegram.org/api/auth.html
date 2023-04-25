@@ -54,11 +54,15 @@ The <a href="/constructor/help.countriesList">help.countriesList</a> config and 
 <p>Then, a text message containing an authorization code is sent to the user's phone using <a href="/method/auth.sendCode">auth.sendCode</a>.<br>
 However, this is not always the case, if future auth tokens are used:  </p>
 <h4><a class="anchor" href="#future-auth-tokens" id="future-auth-tokens" name="future-auth-tokens"><i class="anchor-icon"></i></a>Future auth tokens</h4>
-<p>When invoking <a href="/method/auth.logOut">auth.logOut</a> on a previously authorized session with 2FA enabled, the server may return a <code>future_auth_token</code>, which should be stored in the local database.<br>
+<p>When invoking <a href="/method/auth.logOut">auth.logOut</a> on a previously authorized session, the server may return a <code>future_auth_token</code>, which should be stored in the local database.<br>
 A <code>future_auth_token</code> is also contained in the <a href="/constructor/auth.authorization">auth.authorization</a> returned when logging in.<br>
 At all times, the future auth token database should contain at most 20 tokens: evict older tokens as new tokens are added to stay below this limit.<br>
 When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all future auth tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
-If any of the future auth tokens matches the account we're trying to login into and the token hasn't expired, <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </p>
+If any of the future auth tokens matches the account we're trying to login into and the token hasn't expired:</p>
+<ul>
+<li>If <a href="/api/srp">2FA</a> is not enabled, <a href="/method/auth.sendCode">auth.sendCode</a> will is directly return an <a href="/constructor/auth.sentCodeSuccess">auth.sentCodeSuccess</a> constructor with session info, indicating the session is authorized.</li>
+<li>If <a href="/api/srp">2FA</a> is enabled, <a href="/method/auth.sendCode">auth.sendCode</a> will return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </li>
+</ul>
 <p>Otherwise, the system will send an authorization code using the following logic:</p>
 <h4><a class="anchor" href="#code-types" id="code-types" name="code-types"><i class="anchor-icon"></i></a>Code types</h4>
 <pre><code><a href='/constructor/codeSettings'>codeSettings</a>#ad253d78 flags:<a href='/type/%23'>#</a> allow_flashcall:flags.0?<a href='/constructor/true'>true</a> current_number:flags.1?<a href='/constructor/true'>true</a> allow_app_hash:flags.4?<a href='/constructor/true'>true</a> allow_missed_call:flags.5?<a href='/constructor/true'>true</a> allow_firebase:flags.7?<a href='/constructor/true'>true</a> logout_tokens:flags.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; token:flags.8?<a href='/type/string'>string</a> app_sandbox:flags.8?<a href='/type/Bool'>Bool</a> = <a href='/type/CodeSettings'>CodeSettings</a>;
