@@ -169,7 +169,8 @@ To cancel the verification code use <a href="/method/auth.cancelCode">auth.cance
 ---functions---
 
 <a href='/method/account.sendVerifyEmailCode'>account.sendVerifyEmailCode</a>#98e037bb purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> email:<a href='/type/string'>string</a> = <a href='/type/account.SentEmailCode'>account.SentEmailCode</a>;
-<a href='/method/account.verifyEmail'>account.verifyEmail</a>#32da4cf purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> verification:<a href='/type/EmailVerification'>EmailVerification</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;</code></pre>
+<a href='/method/account.verifyEmail'>account.verifyEmail</a>#32da4cf purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> verification:<a href='/type/EmailVerification'>EmailVerification</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;
+<a href='/method/auth.resetLoginEmail'>auth.resetLoginEmail</a>#7e960193 phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;</code></pre>
 <p>Telegram may return a <a href="/constructor/auth.sentCodeTypeSetUpEmailRequired">auth.sentCodeTypeSetUpEmailRequired</a> code type in the <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor returned by <a href="/method/auth.sendCode">auth.sendCode</a>.<br>
 In this case, clients should ask the user to verify an email address that will be used to receive the login code as follows:  </p>
 <ul>
@@ -204,6 +205,7 @@ After obtaining the ID token, call <a href="/method/account.verifyEmail">account
 <p>On success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return a <a href="/constructor/account.emailVerifiedLogin">account.emailVerifiedLogin</a> constructor with an <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor that should be handled <a href="#code-types">as usual »</a>.  </p>
 </li>
 </ul>
+<p>If the user cannot access their email address and <a href="/constructor/auth.sentCodeTypeEmailCode">auth.sentCodeTypeEmailCode</a>.<code>reset_pending_date</code> is not set, an email reset may be requested using <a href="/method/auth.resetLoginEmail">auth.resetLoginEmail</a>: this will populate</p>
 <p>To change the login email after login, pass <a href="/constructor/emailVerifyPurposeLoginChange">emailVerifyPurposeLoginChange</a> as <code>purpose</code>, following the exact same Google ID/Apple ID/email code login flow as above: on success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return an <a href="/constructor/account.emailVerified">account.emailVerified</a> constructor.</p>
 <h3><a class="anchor" href="#sign-insign-up" id="sign-insign-up" name="sign-insign-up"><i class="anchor-icon"></i></a>Sign in/sign up</h3>
 <p>When user enters verification code, the <a href="/method/auth.signIn">auth.signIn</a> method must be used to validate it and possibly sign user in.</p>
