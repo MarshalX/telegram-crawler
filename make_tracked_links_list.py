@@ -27,6 +27,7 @@ HIDDEN_URLS = {
     'desktop.telegram.org/changelog',
     'td.telegram.org/current',
     'td.telegram.org/current2',
+    'td.telegram.org/current5',    # tdx
 
     'osx.telegram.org/updates/versions.xml',    # stable
     'api.appcenter.ms/v0.1/public/sparkle/apps/6ed2ac30-49e1-4073-87c2-f1ffcb74e81f',   # beta
