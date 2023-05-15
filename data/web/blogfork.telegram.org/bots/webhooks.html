@@ -70,7 +70,7 @@
 </li>
 <li><h4><a class="anchor" name="an-open-port" href="#an-open-port"><i class="anchor-icon"></i></a>An open port</h4>
 <p>A webhook needs an open port on your server. We currently support the following ports: <strong>443, 80, 88</strong> and <strong>8443</strong>. Other ports are not supported and will not work. Make sure your bot is running on one of those supported ports, and that the bot is reachable via its public address.</p>
-<pre><code>If you want to limit access to Telegram only, please allow traffic from 149.154.167.197-233 (starting July 2019 please use: 149.154.160.0/20 and 91.108.4.0/22). 
+<pre><code>If you want to limit access to Telegram only, please allow traffic from 149.154.160.0/20 and 91.108.4.0/22. 
 Whenever something stops working in the future, please check this document again as 
 the range might expand or change.</code></pre>
 <p><a href="https://core.telegram.org/bots/webhooks#how-do-i-check-for-open-ports-or-limit-access-to-my-bot">How do I check for open ports or limit access to my bot?</a></p>
@@ -143,7 +143,9 @@ On a Debian based system the iptables-persistent package is be a good option.
 RHEL/CentOS offers a service iptables save -command.
 A quick online search for &quot;YOUROPERATINGSYSTEM save iptables&quot; also helps.</code></pre>
 <ul>
-<li>If you’re just looking for some hints on how to limit incoming traffic:<br><code>sudo iptables –A INPUT –i interfacename –p tcp –m iprange –src-range 149.154.167.197-149.154.167.233 –dport portnumber -j ACCEPT</code><br><strong>OR</strong><br><code>sudo ufw allow in on interfacename to any port portnumber proto tcp from 149.154.167.192/26</code><br>Allows incoming traffic to a specific interface and a specific port from a specific range of addresses. (ufw is using a subnet mask in the example, ranging from 192-255)</li>
+<li>If you’re just looking for some hints on how to limit incoming traffic:<br><code>sudo iptables –A INPUT –i interfacename –p tcp –m iprange -s 149.154.160.0/20,91.108.4.0/22 –dport portnumber -j ACCEPT</code><br><strong>OR</strong><pre><code>sudo ufw allow in on interfacename to any port portnumber proto tcp from 149.154.160.0/20
+sudo ufw allow in on interfacename to any port portnumber proto tcp from 91.108.4.0/22</code></pre>
+Allows incoming traffic to a specific interface and a specific port from a specific range of addresses. (ufw is using a subnet mask in the example, ranging from 192-255)</li>
 </ul>
 <p>That’s all for our examples. More information on best practices for setting up your firewall, on whichever operating system you prefer for your bot, is best found on the internet.</p>
 <h5><a class="anchor" name="ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhoo" href="#ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhoo"><i class="anchor-icon"></i></a>SSL/TLS, what is it and why do I have to handle this for a webhook?</h5>
