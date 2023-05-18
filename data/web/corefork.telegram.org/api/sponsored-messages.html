@@ -58,13 +58,15 @@ sponsoredMessage#fc25b828 flags:# recommended:flags.5?true show_peer_photo:flags
 <p><a href="https://t.me/durov/172">More about sponsored messages on Telegram</a></p>
 </blockquote>
 <h4><a class="anchor" href="#displaying-sponsored-messages" id="displaying-sponsored-messages" name="displaying-sponsored-messages"><i class="anchor-icon"></i></a>Displaying sponsored messages</h4>
-<p>Sponsored messages must be displayed below all other posts in the channel, after the user scrolls further down, past the last message. The promoted channel or bot specified in the <code>from_id</code> field must be displayed as the author of the message. The message should also contain one of the following buttons at the bottom:</p>
+<p>Sponsored messages must be displayed below all other posts in the channel, after the user scrolls further down, past the last message. The promoted channel or bot specified in the <code>from_id</code> or <code>chat_invite</code> mutually exclusive fields must be displayed as the author of the message. The message should also contain one of the following buttons at the bottom:</p>
 <ul>
 <li>==<strong>View Bot</strong>== — if a bot is being promoted. Tapping the button must open the chat with the bot. If <code>start_param</code> is specified, the app must use the <a href="/api/links#bot-links">deep linking mechanism</a> to open the bot.</li>
-<li>==<strong>View Channel</strong>== — if a channel is being promoted. Tapping the button must open the channel.</li>
+<li>==<strong>View Channel</strong>== — if a channel is being promoted. Tapping the button must open the channel using the <code>from_id</code> or by <a href="/api/invites#invite-links">importing</a> the <code>chat_invite_hash</code> <a href="/api/invites#invite-links">invitation link hash »</a>.</li>
 <li>==<strong>View Post</strong>== — if a channel is being promoted and <code>channel_post</code> is specified. Tapping the button must open the particular channel post.</li>
 </ul>
-<p>The message should be marked as "Recommended" instead of "Sponsored" if the <code>sponsored</code> flag is set.</p>
+<p>The message should be marked as "Recommended" instead of "Sponsored" if the <code>recommended</code> flag is set.  </p>
+<p>If the <code>show_peer_photo</code> flag is set, a profile photo bubble should be displayed for this message, like for messages sent in groups. The photo shown in the bubble is obtained either from the peer contained in <code>from_id</code>, or from <code>chat_invite</code>.  </p>
+<p>If the <code>sponsor_info</code> or <code>additional_info</code> flags are set, an additional "Sponsor info" menu item must be present in the message context menu (the menu that pops up when clicking on a button), that when clicked, displays the contents of the flags.  </p>
 <h4><a class="anchor" href="#counting-sponsored-message-views" id="counting-sponsored-message-views" name="counting-sponsored-message-views"><i class="anchor-icon"></i></a>Counting sponsored message views</h4>
 <p>Once the entire text is shown on the screen (excluding the button), <code>channels.viewSponsoredMessage</code> must be called with the <code>random_id</code> of this sponsored message.</p>
 <h4><a class="anchor" href="#testing-sponsored-messages" id="testing-sponsored-messages" name="testing-sponsored-messages"><i class="anchor-icon"></i></a>Testing sponsored messages</h4>
