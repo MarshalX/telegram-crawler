@@ -234,7 +234,7 @@
 </tr>
 <tr>
 <td><a href="/method/messages.addChatUser">messages.addChatUser</a></td>
-<td>Adds a user to a chat and sends a service message on it.</td>
+<td>Adds a user to a chat and sends a service message on it.<br><br>May also return 0-N updates of type <a href="/constructor/updateGroupInvitePrivacyForbidden">updateGroupInvitePrivacyForbidden</a>: it indicates we couldn't add a user to a chat because of their privacy settings; if required, an <a href="/api/invites">invite link</a> can be shared with the user, instead.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.deleteChatUser">messages.deleteChatUser</a></td>
@@ -242,7 +242,7 @@
 </tr>
 <tr>
 <td><a href="/method/messages.createChat">messages.createChat</a></td>
-<td>Creates a new chat.</td>
+<td>Creates a new chat.<br><br>May also return 0-N updates of type <a href="/constructor/updateGroupInvitePrivacyForbidden">updateGroupInvitePrivacyForbidden</a>: it indicates we couldn't add a user to a chat because of their privacy settings; if required, an <a href="/api/invites">invite link</a> can be shared with the user, instead.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.importChatInvite">messages.importChatInvite</a></td>
@@ -282,7 +282,7 @@
 </tr>
 <tr>
 <td><a href="/method/channels.inviteToChannel">channels.inviteToChannel</a></td>
-<td>Invite users to a channel/supergroup</td>
+<td>Invite users to a channel/supergroup<br><br>May also return 0-N updates of type <a href="/constructor/updateGroupInvitePrivacyForbidden">updateGroupInvitePrivacyForbidden</a>: it indicates we couldn't add a user to a chat because of their privacy settings; if required, an <a href="/api/invites">invite link</a> can be shared with the user, instead.</td>
 </tr>
 <tr>
 <td><a href="/method/channels.deleteChannel">channels.deleteChannel</a></td>
@@ -363,10 +363,6 @@
 <tr>
 <td><a href="/method/folders.editPeerFolders">folders.editPeerFolders</a></td>
 <td>Edit peers in <a href="/api/folders#peer-folders">peer folder</a></td>
-</tr>
-<tr>
-<td><a href="/method/folders.deleteFolder">folders.deleteFolder</a></td>
-<td>Delete a <a href="/api/folders#peer-folders">peer folder</a></td>
 </tr>
 <tr>
 <td><a href="/method/contacts.addContact">contacts.addContact</a></td>
@@ -478,7 +474,7 @@
 </tr>
 <tr>
 <td><a href="/method/messages.sendReaction">messages.sendReaction</a></td>
-<td>React to message</td>
+<td>React to message.<br><br>Starting from layer 159, the reaction will be sent from the peer specified using <a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.getMessagesReactions">messages.getMessagesReactions</a></td>
@@ -507,6 +503,58 @@
 <tr>
 <td><a href="/method/payments.assignPlayMarketTransaction">payments.assignPlayMarketTransaction</a></td>
 <td>Informs server about a purchase made through the Play Store: for official applications only.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a></td>
+<td>Get information about extended media</td>
+</tr>
+<tr>
+<td><a href="/method/channels.toggleForum">channels.toggleForum</a></td>
+<td>Enable or disable <a href="/api/forum">forum functionality</a> in a supergroup.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.createForumTopic">channels.createForumTopic</a></td>
+<td>Create a <a href="/api/forum">forum topic</a>; requires <a href="/api/rights"><code>manage_topics</code> rights</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.editForumTopic">channels.editForumTopic</a></td>
+<td>Edit <a href="/api/forum">forum topic</a>; requires <a href="/api/rights"><code>manage_topics</code> rights</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.updatePinnedForumTopic">channels.updatePinnedForumTopic</a></td>
+<td>Pin or unpin <a href="/api/forum">forum topics</a></td>
+</tr>
+<tr>
+<td><a href="/method/channels.reorderPinnedForumTopics">channels.reorderPinnedForumTopics</a></td>
+<td>Reorder pinned forum topics</td>
+</tr>
+<tr>
+<td><a href="/method/channels.toggleAntiSpam">channels.toggleAntiSpam</a></td>
+<td>Enable or disable the <a href="/api/antispam">native antispam system</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.toggleParticipantsHidden">channels.toggleParticipantsHidden</a></td>
+<td>Hide or display the participants list in a <a href="/api/channel">supergroup</a>.<br><br>The supergroup must have at least <code>hidden_members_group_size_min</code> participants in order to use this method, as specified by the <a href="/api/config#client-configuration">client configuration parameters »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a></td>
+<td>Send a chosen peer, as requested by a <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a> button.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.joinChatlistInvite">chatlists.joinChatlistInvite</a></td>
+<td>Import a <a href="/api/links#chat-folder-links">chat folder deep link »</a>, joining some or all the chats in the folder.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.joinChatlistUpdates">chatlists.joinChatlistUpdates</a></td>
+<td>Join channels and supergroups recently added to a <a href="/api/links#chat-folder-links">chat folder deep link »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.leaveChatlist">chatlists.leaveChatlist</a></td>
+<td>Delete a folder imported using a <a href="/api/links#chat-folder-links">chat folder deep link »</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a></td>
+<td>Set a custom <a href="/api/wallpapers">wallpaper »</a> in a specific private chat with another user.</td>
 </tr>
 </tbody>
 </table></div>

@@ -115,6 +115,11 @@
 <td>The message to reply to</td>
 </tr>
 <tr>
+<td><strong>top_msg_id</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.9?<a href="/type/int">int</a></td>
+<td>This field must contain the topic ID <strong>only</strong> when replying to messages in <a href="/api/forum#forum-topics">forum topics</a> different from the "General" topic (i.e. <code>reply_to_msg_id</code> is set and <code>reply_to_msg_id != topicID</code> and <code>topicID != 1</code>). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.</td>
+</tr>
+<tr>
 <td><strong>multi_media</strong></td>
 <td style="text-align: center;"><a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/InputSingleMedia">InputSingleMedia</a>&gt;</td>
 <td>The medias to send: note that they must be separately uploaded using <a href="/method/messages.uploadMedia">messages.uploadMedia</a> first, using raw <code>inputMediaUploaded*</code> constructors is not supported.</td>
@@ -157,6 +162,11 @@
 <td>400</td>
 <td>CHAT_FORWARDS_RESTRICTED</td>
 <td>You can't forward messages from a protected chat.</td>
+</tr>
+<tr>
+<td>403</td>
+<td>CHAT_SEND_MEDIA_FORBIDDEN</td>
+<td>You can't send media in this chat.</td>
 </tr>
 <tr>
 <td>403</td>
@@ -223,6 +233,16 @@
 <td>SLOWMODE_WAIT_%d</td>
 <td>Slowmode is enabled in this chat: wait %d seconds before sending another message to this chat.</td>
 </tr>
+<tr>
+<td>400</td>
+<td>TOPIC_DELETED</td>
+<td>The specified topic was deleted.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>USER_BANNED_IN_CHANNEL</td>
+<td>You're banned from sending messages in supergroups/channels.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#bots-can-use-this-method" id="bots-can-use-this-method" name="bots-can-use-this-method"><i class="anchor-icon"></i></a>Bots can use this method</h3>
@@ -231,6 +251,8 @@
 <p>How to handle message drafts</p>
 <h4><a class="anchor" href="#stickers" id="stickers" name="stickers"><i class="anchor-icon"></i></a><a href="/api/stickers">Stickers</a></h4>
 <p>Telegram clients support displaying static and animated stickers.</p>
+<h4><a class="anchor" href="#forums" id="forums" name="forums"><i class="anchor-icon"></i></a><a href="/api/forum">Forums</a></h4>
+<p>Telegram allows creating forums with multiple distinct topics.</p>
 <h4><a class="anchor" href="#messagesuploadmedia" id="messagesuploadmedia" name="messagesuploadmedia"><i class="anchor-icon"></i></a><a href="/method/messages.uploadMedia">messages.uploadMedia</a></h4>
 <p>Upload a file and associate it to a chat (without actually sending it to the chat)</p>
 <h4><a class="anchor" href="#uploading-and-downloading-files" id="uploading-and-downloading-files" name="uploading-and-downloading-files"><i class="anchor-icon"></i></a><a href="/api/files">Uploading and Downloading Files</a></h4>

@@ -110,6 +110,11 @@
 <td>ID of the message this message should reply to</td>
 </tr>
 <tr>
+<td><strong>top_msg_id</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.9?<a href="/type/int">int</a></td>
+<td>This field must contain the topic ID <strong>only</strong> when replying to messages in <a href="/api/forum#forum-topics">forum topics</a> different from the "General" topic (i.e. <code>reply_to_msg_id</code> is set and <code>reply_to_msg_id != topicID</code> and <code>topicID != 1</code>). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.</td>
+</tr>
+<tr>
 <td><strong>random_id</strong></td>
 <td style="text-align: center;"><a href="/type/long">long</a></td>
 <td>Random ID to avoid resending the same query</td>
@@ -164,9 +169,19 @@
 <td>You must be an admin in this chat to do this.</td>
 </tr>
 <tr>
+<td>403</td>
+<td>CHAT_GUEST_SEND_FORBIDDEN</td>
+<td>You join the discussion group before commenting, see <a href="/api/discussion#requiring-users-to-join-the-group">here »</a> for more info.</td>
+</tr>
+<tr>
 <td>400</td>
 <td>CHAT_RESTRICTED</td>
 <td>You can't send messages in this chat, you were restricted.</td>
+</tr>
+<tr>
+<td>403</td>
+<td>CHAT_SEND_AUDIOS_FORBIDDEN</td>
+<td>You can't send audio messages in this chat.</td>
 </tr>
 <tr>
 <td>403</td>
@@ -190,8 +205,18 @@
 </tr>
 <tr>
 <td>403</td>
+<td>CHAT_SEND_PHOTOS_FORBIDDEN</td>
+<td>You can't send photos in this chat.</td>
+</tr>
+<tr>
+<td>403</td>
 <td>CHAT_SEND_STICKERS_FORBIDDEN</td>
 <td>You can't send stickers in this chat.</td>
+</tr>
+<tr>
+<td>403</td>
+<td>CHAT_SEND_VOICES_FORBIDDEN</td>
+<td>You can't send voice recordings in this chat.</td>
 </tr>
 <tr>
 <td>403</td>
@@ -260,6 +285,11 @@
 </tr>
 <tr>
 <td>400</td>
+<td>TOPIC_DELETED</td>
+<td>The specified topic was deleted.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>USER_BANNED_IN_CHANNEL</td>
 <td>You're banned from sending messages in supergroups/channels.</td>
 </tr>
@@ -290,8 +320,12 @@
 <p>How to handle message drafts</p>
 <h4><a class="anchor" href="#config" id="config" name="config"><i class="anchor-icon"></i></a><a href="/constructor/config">config</a></h4>
 <p>Current configuration</p>
+<h4><a class="anchor" href="#forums" id="forums" name="forums"><i class="anchor-icon"></i></a><a href="/api/forum">Forums</a></h4>
+<p>Telegram allows creating forums with multiple distinct topics.</p>
 <h4><a class="anchor" href="#messagesgetinlinebotresults" id="messagesgetinlinebotresults" name="messagesgetinlinebotresults"><i class="anchor-icon"></i></a><a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a></h4>
 <p>Query an inline bot</p>
+<h4><a class="anchor" href="#discussion-groups" id="discussion-groups" name="discussion-groups"><i class="anchor-icon"></i></a><a href="/api/discussion">Discussion groups</a></h4>
+<p>Groups can be associated to a channel as a discussion group, to allow users to discuss about posts.</p>
 <h4><a class="anchor" href="#styled-text-with-message-entities" id="styled-text-with-message-entities" name="styled-text-with-message-entities"><i class="anchor-icon"></i></a><a href="/api/entities">Styled text with message entities</a></h4>
 <p>How to create styled text with message entities</p></div>
   

@@ -101,6 +101,11 @@
 <td>Whether the inline message that will be sent by the bot on behalf of the user once the web app interaction is <a href="/method/messages.sendWebViewResultMessage">terminated</a> should be sent in reply to this message ID.</td>
 </tr>
 <tr>
+<td><strong>top_msg_id</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.9?<a href="/type/int">int</a></td>
+<td>This field must contain the topic ID <strong>only</strong> when replying to messages in <a href="/api/forum#forum-topics">forum topics</a> different from the "General" topic (i.e. <code>reply_to_msg_id</code> is set and <code>reply_to_msg_id != topicID</code> and <code>topicID != 1</code>). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.</td>
+</tr>
+<tr>
 <td><strong>send_as</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.13?<a href="/type/InputPeer">InputPeer</a></td>
 <td>Open the web app as the specified peer</td>
@@ -116,7 +121,9 @@
 <p>Bots can offer users interactive HTML5 web apps to completely replace any website.</p>
 <h4><a class="anchor" href="#messagesrequestwebview" id="messagesrequestwebview" name="messagesrequestwebview"><i class="anchor-icon"></i></a><a href="/method/messages.requestWebView">messages.requestWebView</a></h4>
 <p>Open a <a href="/bots/webapps">bot web app</a>, sending over user information after user confirmation.</p>
-<p>After calling this method, until the user closes the webview, <a href="/method/messages.prolongWebView">messages.prolongWebView</a> must be called every 60 seconds.</p></div>
+<p>After calling this method, until the user closes the webview, <a href="/method/messages.prolongWebView">messages.prolongWebView</a> must be called every 60 seconds.</p>
+<h4><a class="anchor" href="#forums" id="forums" name="forums"><i class="anchor-icon"></i></a><a href="/api/forum">Forums</a></h4>
+<p>Telegram allows creating forums with multiple distinct topics.</p></div>
   
 </div>
           

@@ -59,11 +59,11 @@
 <li><code>tg://path?query</code></li>
 </ul>
 <p>The <code>#fragment</code> part is always ignored.  </p>
+<p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code> is not equal to <code>www</code>, is not a single letter and is a valid username, it should be treated exactly as a <code>t.me/&lt;username&gt;/</code> link (generate a <code>t.me/&lt;username&gt;/</code> link and append the rest of the path (if present) and the query string (if present)).  </p>
 <h3><a class="anchor" href="#public-username-links" id="public-username-links" name="public-username-links"><i class="anchor-icon"></i></a>Public username links</h3>
 <p>Used to link to public users, groups and channels, see <a href="/api/invites#public-usernames">here for more info on how to handle them »</a>.  </p>
 <p><code>t.me</code> syntax:</p>
-<pre><code>t.me/&lt;username&gt;
-&lt;username&gt;.t.me</code></pre>
+<pre><code>t.me/&lt;username&gt;</code></pre>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=&lt;username&gt;</code></pre>
 <p>Parameters:</p>
@@ -84,6 +84,30 @@
 </tbody>
 </table>
 <p>Note that <a href="#message-links">message links</a> have the same syntax, with extra parameters.  </p>
+<h3><a class="anchor" href="#temporary-profile-links" id="temporary-profile-links" name="temporary-profile-links"><i class="anchor-icon"></i></a>Temporary profile links</h3>
+<p>Used to link to user profiles, generated using <a href="/method/contacts.exportContactToken">contacts.exportContactToken</a>.<br>
+These links can be generated even for profiles that don't have a username, and they have an expiration date, specified by the <code>expires</code> field of the <a href="/constructor/exportedContactToken">exportedContactToken</a> constructor returned by <a href="/method/contacts.exportContactToken">contacts.exportContactToken</a>.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/contact/&lt;token&gt;</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://contact?token=&lt;token&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>token</code></td>
+<td style="text-align: center;">Required</td>
+<td>Profile token to import using <a href="/method/contacts.importContactToken">contacts.importContactToken</a>, will return user information.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#phone-number-links" id="phone-number-links" name="phone-number-links"><i class="anchor-icon"></i></a>Phone number links</h3>
 <p>Used to link to public and private users by their phone number.  </p>
 <p><code>t.me</code> syntax:</p>
@@ -133,12 +157,37 @@
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#chat-folder-links" id="chat-folder-links" name="chat-folder-links"><i class="anchor-icon"></i></a>Chat folder links</h3>
+<p>Used to invite users to private groups and channels, see <a href="/api/folders#shared-folders">here for more info on how to generate such links »</a>.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/addlist/&lt;slug&gt;</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://addlist?slug=&lt;slug&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>slug</code></td>
+<td style="text-align: center;">Required</td>
+<td>Invite slug to <a href="/api/folders#shared-folders">check or import »</a></td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#message-links" id="message-links" name="message-links"><i class="anchor-icon"></i></a>Message links</h3>
 <p>Used to link to specific messages in public or private groups and channels.  </p>
 <p><code>t.me</code> syntax (public links):  </p>
-<pre><code>t.me/&lt;username&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
+<pre><code>t.me/&lt;username&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;
+t.me/&lt;username&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
 <p><code>t.me</code> syntax (private links):  </p>
-<pre><code>t.me/c/&lt;channel&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
+<pre><code>t.me/c/&lt;channel&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;
+t.me/c/&lt;channel&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
 <p><code>tg:</code> syntax (public links):</p>
 <pre><code>tg://resolve?domain=&lt;username&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
 <p><code>tg:</code> syntax (private links):</p>
@@ -190,6 +239,12 @@
 </tr>
 </tbody>
 </table>
+<p>Note that since a <a href="/api/forum#forum-topics">forum topic</a> ID is actually the ID of the service message that created the topic, whenever the client resolves a <a href="#message-links">message link</a> that points to a <a href="/constructor/messageActionTopicCreate">messageActionTopicCreate</a> service message, it should open the topic, instead.<br>
+Also, if the message ID is <code>1</code> and the linked-to supergroup is a forum, the "General" topic should be opened instead of the first message of the supergroup.  </p>
+<h3><a class="anchor" href="#forum-topic-links" id="forum-topic-links" name="forum-topic-links"><i class="anchor-icon"></i></a>Forum topic links</h3>
+<p>Used to link to a specific <a href="/api/forum#forum-topics">forum topic</a>.  </p>
+<p>The syntax is exactly the same as for <a href="#message-links">message links</a>, because the topic ID is actually the ID of the service message that created the topic, so whenever the client resolves a <a href="#message-links">message link</a> that points to a <a href="/constructor/messageActionTopicCreate">messageActionTopicCreate</a> service message, it should open the topic, instead.  </p>
+<p>Also, if the message ID is <code>1</code> and the linked-to supergroup is a forum, the "General" topic should be opened instead of the first message of the supergroup.  </p>
 <h3><a class="anchor" href="#share-links" id="share-links" name="share-links"><i class="anchor-icon"></i></a>Share links</h3>
 <p>Used to share a prepared message and URL into a chosen chat's text field.<br>
 These links should be handled as follows:</p>
@@ -201,7 +256,7 @@ These links should be handled as follows:</p>
 </ul>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/share?url=&lt;url&gt;
-t.me/share/url?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
+t.me/share?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://msg_url?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
 <p>Parameters:</p>
@@ -262,11 +317,13 @@ tg://resolve?domain=&lt;username&gt;&amp;voicechat=&lt;invite_hash&gt;</code></p
 </tbody>
 </table>
 <h3><a class="anchor" href="#stickerset-links" id="stickerset-links" name="stickerset-links"><i class="anchor-icon"></i></a>Stickerset links</h3>
-<p>Used to import stickersets as described <a href="/api/stickers#installing-stickersets">here »</a>.</p>
+<p>Used to import stickersets or <a href="/api/custom-emoji">custom emoji</a> stickersets as described <a href="/api/stickers#installing-stickersets">here »</a>.</p>
 <p><code>t.me</code> syntax:</p>
-<pre><code>t.me/addstickers/&lt;slug&gt;</code></pre>
+<pre><code>t.me/addstickers/&lt;slug&gt;
+t.me/addemoji/&lt;slug&gt;</code></pre>
 <p><code>tg:</code> syntax:</p>
-<pre><code>tg://addstickers?set=&lt;slug&gt;</code></pre>
+<pre><code>tg://addstickers?set=&lt;slug&gt;
+tg://addemoji?set=&lt;slug&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
 <thead>
@@ -756,7 +813,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 <tr>
 <td><code>admin</code></td>
 <td style="text-align: center;">Optional for group links, required for channel links</td>
-<td>A combination of the following identifiers separated by <code>+</code>, each corresponding to the appropriate flag in the <a href="/constructor/chatAdminRights">chatAdminRights »</a> constructor: <br>- <code>change_info</code> - <a href="/constructor/chatAdminRights">chatAdminRights.change_info</a> <br>- <code>post_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.post_messages</a> <br>- <code>edit_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.edit_messages</a> <br>- <code>delete_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.delete_messages</a> <br>- <code>restrict_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.ban_users</a> <br>- <code>invite_users</code> - <a href="/constructor/chatAdminRights">chatAdminRights.invite_users</a> <br>- <code>pin_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.pin_messages</a> <br>- <code>promote_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.add_admins</a> <br>- <code>manage_video_chats</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_call</a> <br>- <code>anonymous</code> - <a href="/constructor/chatAdminRights">chatAdminRights.anonymous</a> <br>- <code>manage_chat</code> - <a href="/constructor/chatAdminRights">chatAdminRights.other</a></td>
+<td>A combination of the following identifiers separated by <code>+</code>, each corresponding to the appropriate flag in the <a href="/constructor/chatAdminRights">chatAdminRights »</a> constructor: <br>- <code>change_info</code> - <a href="/constructor/chatAdminRights">chatAdminRights.change_info</a> <br>- <code>post_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.post_messages</a> <br>- <code>edit_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.edit_messages</a> <br>- <code>delete_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.delete_messages</a> <br>- <code>restrict_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.ban_users</a> <br>- <code>invite_users</code> - <a href="/constructor/chatAdminRights">chatAdminRights.invite_users</a> <br>- <code>pin_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.pin_messages</a> <br>- <code>manage_topics</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_topics</a> <br>- <code>promote_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.add_admins</a> <br>- <code>manage_video_chats</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_call</a> <br>- <code>anonymous</code> - <a href="/constructor/chatAdminRights">chatAdminRights.anonymous</a> <br>- <code>manage_chat</code> - <a href="/constructor/chatAdminRights">chatAdminRights.other</a></td>
 </tr>
 </tbody>
 </table>
@@ -794,6 +851,41 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#named-bot-web-app-links" id="named-bot-web-app-links" name="named-bot-web-app-links"><i class="anchor-icon"></i></a>Named bot web app links</h3>
+<p>Used to share <a href="/api/bots/webapps#named-bot-web-apps">named bot web apps</a>.  </p>
+<p>These links are different from <a href="#bot-attachment-menu-links">bot attachment menu deep links</a>, because they don't require the user to install an attachment menu, and a single bot can offer multiple named web apps, distinguished by their <code>short_name</code>.  </p>
+<p>These links should be handled as specified in the <a href="/api/bots/webapps#named-bot-web-apps">named bot web app documentation »</a>.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;bot_username&gt;/&lt;short_name&gt;?startapp=&lt;start_parameter&gt;</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;appname=&lt;short_name&gt;&amp;startapp=&lt;start_parameter&gt;</code></pre>
+<p>Parameters: </p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bot_username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the bot that owns the <a href="/api/bots/games">game</a></td>
+</tr>
+<tr>
+<td><code>appname</code></td>
+<td style="text-align: center;">Required</td>
+<td>Web app short name, to pass to <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a>.<code>short_name</code> when invoking <a href="/method/messages.getBotApp">messages.getBotApp</a></td>
+</tr>
+<tr>
+<td><code>startapp</code></td>
+<td style="text-align: center;">Optional</td>
+<td><code>start_param</code> to pass to <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a></td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#settings-links" id="settings-links" name="settings-links"><i class="anchor-icon"></i></a>Settings links</h3>
 <h4><a class="anchor" href="#settings-link" id="settings-link" name="settings-link"><i class="anchor-icon"></i></a>Settings link</h4>
 <p>Used to bring the user to the app settings.  </p>
@@ -824,6 +916,16 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 <p>Used to bring the user to the privacy and security settings.  </p>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://settings/privacy</code></pre>
+<p>No parameters.</p>
+<h4><a class="anchor" href="#autodelete-settings-link" id="autodelete-settings-link" name="autodelete-settings-link"><i class="anchor-icon"></i></a>Autodelete settings link</h4>
+<p>Used to bring the user to the message autodeletion settings.  </p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://settings/auto_delete</code></pre>
+<p>No parameters.</p>
+<h4><a class="anchor" href="#profile-settings-link" id="profile-settings-link" name="profile-settings-link"><i class="anchor-icon"></i></a>Profile settings link</h4>
+<p>Used to bring the user to the profile settings menu.  </p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://settings/edit_profile</code></pre>
 <p>No parameters.</p>
 <h4><a class="anchor" href="#theme-settings-link" id="theme-settings-link" name="theme-settings-link"><i class="anchor-icon"></i></a>Theme settings link</h4>
 <p>Used to bring the user to the theme settings section of the app.  </p>

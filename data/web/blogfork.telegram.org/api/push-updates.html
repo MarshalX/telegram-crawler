@@ -53,7 +53,9 @@
 <li><code>1</code> - APNS (device token for apple push)</li>
 <li><code>2</code> - FCM (firebase token for google firebase)</li>
 <li><code>3</code> - MPNS (channel URI for microsoft push)</li>
-<li><code>4</code> - Deprecated: Simple push (endpoint for firefox's simple push API)</li>
+<li><code>4</code> - Simple push (endpoint for firefox's deprecated simple push API): note that this push type can also be used by an open source push notification spec like <a href="https://unifiedpush.org/">UnifiedPush »</a>.<br>
+Simple push works by sending a simple PUT request with a <code>version=number</code> payload to the specified HTTPS endpoint every time a relevant message is received: upon receiving such a notification, clients should connect to the MTProto API and fetch <a href="/api/updates">updates</a>.<br>
+(Note that the <code>number</code> won't necessarily be incremental in Telegram's implementation, just treat each distinct request as a signal that a new message is waiting to be fetched via MTProto).</li>
 <li><code>5</code> - Ubuntu phone (token for ubuntu push)</li>
 <li><code>6</code> - Blackberry (token for blackberry push)</li>
 <li><code>7</code> - MTProto separate session</li>

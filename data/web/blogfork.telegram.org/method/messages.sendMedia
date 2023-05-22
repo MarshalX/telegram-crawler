@@ -115,6 +115,11 @@
 <td>Message ID to which this message should reply to</td>
 </tr>
 <tr>
+<td><strong>top_msg_id</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.9?<a href="/type/int">int</a></td>
+<td>This field must contain the topic ID <strong>only</strong> when replying to messages in <a href="/api/forum#forum-topics">forum topics</a> different from the "General" topic (i.e. <code>reply_to_msg_id</code> is set and <code>reply_to_msg_id != topicID</code> and <code>topicID != 1</code>). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.</td>
+</tr>
+<tr>
 <td><strong>media</strong></td>
 <td style="text-align: center;"><a href="/type/InputMedia">InputMedia</a></td>
 <td>Attached media</td>
@@ -194,12 +199,12 @@
 <td>The provided channel is invalid.</td>
 </tr>
 <tr>
-<td>400</td>
+<td>406</td>
 <td>CHANNEL_PRIVATE</td>
 <td>You haven't joined this channel/supergroup.</td>
 </tr>
 <tr>
-<td>400</td>
+<td>403</td>
 <td>CHAT_ADMIN_REQUIRED</td>
 <td>You must be an admin in this chat to do this.</td>
 </tr>
@@ -220,6 +225,16 @@
 </tr>
 <tr>
 <td>403</td>
+<td>CHAT_SEND_AUDIOS_FORBIDDEN</td>
+<td>You can't send audio messages in this chat.</td>
+</tr>
+<tr>
+<td>403</td>
+<td>CHAT_SEND_DOCS_FORBIDDEN</td>
+<td>You can't send documents in this chat.</td>
+</tr>
+<tr>
+<td>403</td>
 <td>CHAT_SEND_GIFS_FORBIDDEN</td>
 <td>You can't send gifs in this chat.</td>
 </tr>
@@ -230,6 +245,11 @@
 </tr>
 <tr>
 <td>403</td>
+<td>CHAT_SEND_PHOTOS_FORBIDDEN</td>
+<td>You can't send photos in this chat.</td>
+</tr>
+<tr>
+<td>403</td>
 <td>CHAT_SEND_POLL_FORBIDDEN</td>
 <td>You can't send polls in this chat.</td>
 </tr>
@@ -237,6 +257,16 @@
 <td>403</td>
 <td>CHAT_SEND_STICKERS_FORBIDDEN</td>
 <td>You can't send stickers in this chat.</td>
+</tr>
+<tr>
+<td>403</td>
+<td>CHAT_SEND_VIDEOS_FORBIDDEN</td>
+<td>You can't send videos in this chat.</td>
+</tr>
+<tr>
+<td>403</td>
+<td>CHAT_SEND_VOICES_FORBIDDEN</td>
+<td>You can't send voice recordings in this chat.</td>
 </tr>
 <tr>
 <td>403</td>
@@ -449,6 +479,16 @@
 <td>Slowmode is enabled in this chat: wait %d seconds before sending another message to this chat.</td>
 </tr>
 <tr>
+<td>406</td>
+<td>TOPIC_CLOSED</td>
+<td>This topic was closed, you can't send messages to it anymore.</td>
+</tr>
+<tr>
+<td>406</td>
+<td>TOPIC_DELETED</td>
+<td>The specified topic was deleted.</td>
+</tr>
+<tr>
 <td>400</td>
 <td>TTL_MEDIA_INVALID</td>
 <td>Invalid media Time To Live was provided.</td>
@@ -472,6 +512,11 @@
 <td>400</td>
 <td>VIDEO_CONTENT_TYPE_INVALID</td>
 <td>The video's content type is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>VOICE_MESSAGES_FORBIDDEN</td>
+<td>This user's privacy settings forbid you from sending voice messages.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -499,12 +544,14 @@
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#stickers" id="stickers" name="stickers"><i class="anchor-icon"></i></a><a href="/api/stickers">Stickers</a></h4>
 <p>Telegram clients support displaying static and animated stickers.</p>
+<h4><a class="anchor" href="#forums" id="forums" name="forums"><i class="anchor-icon"></i></a><a href="/api/forum">Forums</a></h4>
+<p>Telegram allows creating forums with multiple distinct topics.</p>
 <h4><a class="anchor" href="#styled-text-with-message-entities" id="styled-text-with-message-entities" name="styled-text-with-message-entities"><i class="anchor-icon"></i></a><a href="/api/entities">Styled text with message entities</a></h4>
 <p>How to create styled text with message entities</p>
 <h4><a class="anchor" href="#scheduled-messages" id="scheduled-messages" name="scheduled-messages"><i class="anchor-icon"></i></a><a href="/api/scheduled-messages">Scheduled messages</a></h4>
 <p>Telegram allows scheduling messages</p>
 <h4><a class="anchor" href="#discussion-groups" id="discussion-groups" name="discussion-groups"><i class="anchor-icon"></i></a><a href="/api/discussion">Discussion groups</a></h4>
-<p><a href="/api/channel">Groups</a> can be associated to a <a href="/api/channel">channel</a> as a <a href="https://telegram.org/blog/privacy-discussions-web-bots">discussion group</a>, to allow users to discuss about posts.</p>
+<p>Groups can be associated to a channel as a discussion group, to allow users to discuss about posts.</p>
 <h4><a class="anchor" href="#file-references" id="file-references" name="file-references"><i class="anchor-icon"></i></a><a href="/api/file_reference">File references</a></h4>
 <p>How to handle file references.</p></div>
   

@@ -49,7 +49,7 @@
 <p>Nested entities are supported.</p>
 <h3><a class="anchor" href="#entity-length" id="entity-length" name="entity-length"><i class="anchor-icon"></i></a>Entity length</h3>
 <p>Special care must be taken to consider the length of strings when generating message entities as the number of <a href="https://en.wikipedia.org/wiki/UTF-16">UTF-16</a> code units, even if the message itself must be encoded using UTF-8.  </p>
-<p>Example implementations: <a href="https://github.com/tdlib/td/tree/master/td/telegram/MessageEntity.cpp">tdlib</a>, <a href="https://github.com/danog/MadelineProto/blob/stable/src/danog/MadelineProto/TL/Conversion/DOMEntities.php">MadelineProto</a>.</p>
+<p>Example implementations: <a href="https://github.com/tdlib/td/tree/master/td/telegram/MessageEntity.cpp">tdlib</a>, <a href="https://github.com/danog/MadelineProto/blob/v8/src/TL/Conversion/DOMEntities.php">MadelineProto</a>.</p>
 <h4><a class="anchor" href="#unicode-codepoints-and-encoding" id="unicode-codepoints-and-encoding" name="unicode-codepoints-and-encoding"><i class="anchor-icon"></i></a>Unicode codepoints and encoding</h4>
 <p>A <a href="https://en.wikipedia.org/wiki/Unicode">Unicode</a> <a href="https://en.wikipedia.org/wiki/Code_point">code point</a> is a number ranging from <code>0x0</code> to <code>0x10FFFF</code>, usually represented using <code>U+0000</code> to <code>U+10FFFF</code> syntax.<br>
 Unicode defines a codespace of 1,112,064 assignable code points within the <code>U+0000</code> to <code>U+10FFFF</code> range.<br>
@@ -81,11 +81,11 @@ UTF-8 is used by the MTProto and Bot API when transmitting and receiving fields 
 <pre><code>length := 0
 for byte in text {
     if (byte &amp; 0xc0) != 0x80 {
-        length += 1 + (byte &gt;= 0xf0)
+        length += (byte &gt;= 0xf0 ? 2 : 1)
     }
 }</code></pre>
 <p><strong>Note</strong>: the <em>length</em> of an entity <strong>must not</strong> include the length of trailing newlines or whitespaces, <code>rtrim</code> entities before computing their length: however, the next <em>offset</em> <strong>must</strong> include the length of newlines or whitespaces that precede it.  </p>
-<p>Example implementations: <a href="https://github.com/tdlib/td/tree/master/td/telegram/MessageEntity.cpp">tdlib</a>, <a href="https://github.com/danog/MadelineProto/blob/stable/src/danog/MadelineProto/TL/Conversion/DOMEntities.php">MadelineProto</a>.</p>
+<p>Example implementations: <a href="https://github.com/tdlib/td/tree/master/td/telegram/MessageEntity.cpp">tdlib</a>, <a href="https://github.com/danog/MadelineProto/blob/v8/src/TL/Conversion/DOMEntities.php">MadelineProto</a>.</p>
 <h3><a class="anchor" href="#allowed-entities" id="allowed-entities" name="allowed-entities"><i class="anchor-icon"></i></a>Allowed entities</h3>
 <p>For example the following HTML/Markdown aliases for message entities can be used:</p>
 <ul>

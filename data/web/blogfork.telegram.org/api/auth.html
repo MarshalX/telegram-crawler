@@ -46,43 +46,49 @@
 
 <p>Authorization is associated with a client's encryption key identifier: <strong>auth_key_id</strong>. No additional parameters need to be passed into methods following authorization. </p>
 <p>To log in as a <a href="/bots">bot</a>, follow <a href="/api/bots">these instructions »</a>.</p>
+<p>An alternative <a href="/api/qr-login">QR code-based login flow is also available »</a>.</p>
 <h3><a class="anchor" href="#sending-a-verification-code" id="sending-a-verification-code" name="sending-a-verification-code"><i class="anchor-icon"></i></a>Sending a verification code</h3>
 <p>Example implementations: <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java">telegram for android</a>, <a href="https://github.com/tdlib/td/tree/master/td/telegram/SendCodeHelper.cpp">tdlib</a>.</p>
 <p>To show a nicely formatted and validated phone number field, the <a href="/constructor/help.countriesList">help.countriesList</a> constructor can be obtained using the <a href="/method/help.getCountriesList">help.getCountriesList</a> method.<br>
-The <a href="/constructor/help.countriesList">help.countriesList</a> config is then used as described <a href="/api/config#country-information-and-login-phone-patterns">here »</a>.  </p>
+The <a href="/constructor/help.countriesList">help.countriesList</a> config and other configuration values are then used as described <a href="/api/config#country-information-and-login-phone-patterns">here »</a>.  </p>
 <p>Then, a text message containing an authorization code is sent to the user's phone using <a href="/method/auth.sendCode">auth.sendCode</a>.<br>
-However, this is not always the case, if logout tokens are used:  </p>
-<h4><a class="anchor" href="#logout-tokens" id="logout-tokens" name="logout-tokens"><i class="anchor-icon"></i></a>Logout tokens</h4>
-<p>When invoking <a href="/method/auth.logOut">auth.logOut</a> on a previously authorized session with 2FA enabled, the server may return a <code>future_auth_token</code>, which should be stored in the local database.<br>
-At all times, the logout token database should contain at most 20 tokens: evict older tokens as new tokens are added.<br>
-When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all logout tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
-If any of the logout tokens matches the account we're trying to login into and the token hasn't expired, <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </p>
+However, this is not always the case, if future auth tokens are used:  </p>
+<h4><a class="anchor" href="#future-auth-tokens" id="future-auth-tokens" name="future-auth-tokens"><i class="anchor-icon"></i></a>Future auth tokens</h4>
+<p>When invoking <a href="/method/auth.logOut">auth.logOut</a> on a previously authorized session, the server may return a <code>future_auth_token</code>, which should be stored in the local database.<br>
+A <code>future_auth_token</code> is also contained in the <a href="/constructor/auth.authorization">auth.authorization</a> returned when logging in.<br>
+At all times, the future auth token database should contain at most 20 tokens: evict older tokens as new tokens are added to stay below this limit.<br>
+When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all future auth tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
+If any of the future auth tokens matches the account we're trying to login into and the token hasn't expired:</p>
+<ul>
+<li>If <a href="/api/srp">2FA</a> is not enabled, <a href="/method/auth.sendCode">auth.sendCode</a> will is directly return an <a href="/constructor/auth.sentCodeSuccess">auth.sentCodeSuccess</a> constructor with session info, indicating the session is authorized.</li>
+<li>If <a href="/api/srp">2FA</a> is enabled, <a href="/method/auth.sendCode">auth.sendCode</a> will return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.  </li>
+</ul>
 <p>Otherwise, the system will send an authorization code using the following logic:</p>
 <h4><a class="anchor" href="#code-types" id="code-types" name="code-types"><i class="anchor-icon"></i></a>Code types</h4>
-<pre><code><a href='/constructor/auth.sentCodeTypeApp'>auth.sentCodeTypeApp</a>#3dbb5986 length:<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
+<pre><code><a href='/constructor/codeSettings'>codeSettings</a>#ad253d78 flags:<a href='/type/%23'>#</a> allow_flashcall:flags.0?<a href='/constructor/true'>true</a> current_number:flags.1?<a href='/constructor/true'>true</a> allow_app_hash:flags.4?<a href='/constructor/true'>true</a> allow_missed_call:flags.5?<a href='/constructor/true'>true</a> allow_firebase:flags.7?<a href='/constructor/true'>true</a> logout_tokens:flags.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; token:flags.8?<a href='/type/string'>string</a> app_sandbox:flags.8?<a href='/type/Bool'>Bool</a> = <a href='/type/CodeSettings'>CodeSettings</a>;
+
+<a href='/constructor/auth.sentCodeTypeApp'>auth.sentCodeTypeApp</a>#3dbb5986 length:<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
 <a href='/constructor/auth.sentCodeTypeSms'>auth.sentCodeTypeSms</a>#c000bba2 length:<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
 <a href='/constructor/auth.sentCodeTypeCall'>auth.sentCodeTypeCall</a>#5353e5a7 length:<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
 <a href='/constructor/auth.sentCodeTypeFlashCall'>auth.sentCodeTypeFlashCall</a>#ab03c6d9 pattern:<a href='/type/string'>string</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
 <a href='/constructor/auth.sentCodeTypeMissedCall'>auth.sentCodeTypeMissedCall</a>#82006484 prefix:<a href='/type/string'>string</a> length:<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
-<a href='/constructor/auth.sentCodeTypeEmailCode'>auth.sentCodeTypeEmailCode</a>#5a159841 flags:<a href='/type/%23'>#</a> apple_signin_allowed:flags.0?<a href='/constructor/true'>true</a> google_signin_allowed:flags.1?<a href='/constructor/true'>true</a> email_pattern:<a href='/type/string'>string</a> length:<a href='/type/int'>int</a> next_phone_login_date:flags.2?<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
-<a href='/constructor/auth.sentCodeTypeSetUpEmailRequired'>auth.sentCodeTypeSetUpEmailRequired</a>#a5491dea flags:<a href='/type/%23'>#</a> apple_signin_allowed:flags.0?<a href='/constructor/true'>true</a> google_signin_allowed:flags.1?<a href='/constructor/true'>true</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;</code></pre>
-<p>The system will automatically choose how to send the authorization code; there are multiple possible ways the code can arrive, signaled to the client via the <a href="/type/auth.SentCodeType">auth.SentCodeType</a> constructor returned by <a href="/method/auth.sendCode">auth.sendCode</a>:</p>
-<ul>
-<li><a href="/constructor/auth.sentCodeTypeSetUpEmailRequired">auth.sentCodeTypeSetUpEmailRequired</a>: if the user logins often enough, Telegram will ask the user to verify an email that will be used to send the login code.<br>
-See <a href="#email-verification">here »</a> for more info on the verification process.</li>
-<li><a href="/constructor/auth.sentCodeTypeEmailCode">auth.sentCodeTypeEmailCode</a>: the code was sent to the configured login email.</li>
-<li><a href="/constructor/auth.sentCodeTypeApp">auth.sentCodeTypeApp</a>: the code was sent as a Telegram service notification to all other logged-in sessions.</li>
-<li><a href="/constructor/auth.sentCodeTypeSms">auth.sentCodeTypeSms</a>: the code was sent via SMS.</li>
-<li><a href="/constructor/auth.sentCodeTypeCall">auth.sentCodeTypeCall</a>: the user will receive a phone call and a synthesized voice will tell the user the verification code to input.</li>
-<li><a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>: the code will be sent via a flash phone call, that will be closed immediately.<br>
-In this case, the phone code will then be the phone number itself, just make sure that the phone number matches the specified pattern (see <a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>).</li>
-<li><a href="/constructor/auth.sentCodeTypeMissedCall">auth.sentCodeTypeMissedCall</a>: the code will be sent via a flash phone call, that will be closed immediately.<br>
-The last digits of the phone number that calls are the code that must be entered manually by the user.</li>
-<li><a href="/constructor/auth.loggedOut">Logout tokens »</a>: <a href="/method/auth.sendCode">auth.sendCode</a> will directly return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, directly asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code. </li>
-</ul>
-<p>The <a href="/method/auth.sendCode">auth.sendCode</a> method also has parameters for enabling/disabling use of flash calls and missed calls, and allows passing an SMS token that will be included in the sent SMS.
+<a href='/constructor/auth.sentCodeTypeEmailCode'>auth.sentCodeTypeEmailCode</a>#f450f59b flags:<a href='/type/%23'>#</a> apple_signin_allowed:flags.0?<a href='/constructor/true'>true</a> google_signin_allowed:flags.1?<a href='/constructor/true'>true</a> email_pattern:<a href='/type/string'>string</a> length:<a href='/type/int'>int</a> reset_available_period:flags.3?<a href='/type/int'>int</a> reset_pending_date:flags.4?<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
+<a href='/constructor/auth.sentCodeTypeSetUpEmailRequired'>auth.sentCodeTypeSetUpEmailRequired</a>#a5491dea flags:<a href='/type/%23'>#</a> apple_signin_allowed:flags.0?<a href='/constructor/true'>true</a> google_signin_allowed:flags.1?<a href='/constructor/true'>true</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
+<a href='/constructor/auth.sentCodeTypeFragmentSms'>auth.sentCodeTypeFragmentSms</a>#d9565c39 url:<a href='/type/string'>string</a> length:<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
+<a href='/constructor/auth.sentCodeTypeFirebaseSms'>auth.sentCodeTypeFirebaseSms</a>#e57b1432 flags:<a href='/type/%23'>#</a> nonce:flags.0?<a href='/type/bytes'>bytes</a> receipt:flags.1?<a href='/type/string'>string</a> push_timeout:flags.1?<a href='/type/int'>int</a> length:<a href='/type/int'>int</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
+
+<a href='/constructor/auth.sentCode'>auth.sentCode</a>#5e002502 flags:<a href='/type/%23'>#</a> type:<a href='/type/auth.SentCodeType'>auth.SentCodeType</a> phone_code_hash:<a href='/type/string'>string</a> next_type:flags.1?<a href='/type/auth.CodeType'>auth.CodeType</a> timeout:flags.2?<a href='/type/int'>int</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
+<a href='/constructor/auth.sentCodeSuccess'>auth.sentCodeSuccess</a>#2390fe44 authorization:<a href='/type/auth.Authorization'>auth.Authorization</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
+
+---functions---
+
+<a href='/method/auth.sendCode'>auth.sendCode</a>#a677244f phone_number:<a href='/type/string'>string</a> api_id:<a href='/type/int'>int</a> api_hash:<a href='/type/string'>string</a> settings:<a href='/type/CodeSettings'>CodeSettings</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
+<a href='/method/auth.resendCode'>auth.resendCode</a>#3ef1a9bf phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
+
+<a href='/method/auth.requestFirebaseSms'>auth.requestFirebaseSms</a>#89464b50 flags:<a href='/type/%23'>#</a> phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> safety_net_token:flags.0?<a href='/type/string'>string</a> ios_push_secret:flags.1?<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The <a href="/method/auth.sendCode">auth.sendCode</a> method has parameters for enabling/disabling use of flash calls and missed calls, and allows passing an SMS token that will be included in the sent SMS.
 For example, the latter is required in newer versions of android, to use the <a href="https://developers.google.com/identity/sms-retriever/overview">android SMS receiver APIs</a>.</p>
-<p>The returned <a href="/type/auth.SentCode">auth.SentCode</a> object will contain multiple parameters:</p>
+<p>The returned <a href="/constructor/auth.sentCode">auth.sentCode</a> object will contain multiple parameters:</p>
 <table class="table">
 <tbody>
 <tr>
@@ -98,7 +104,7 @@ For example, the latter is required in newer versions of android, to use the <a 
 <tr>
 <td><strong>phone_code_hash</strong></td>
 <td style="text-align: center;"><a href="/type/string">string</a></td>
-<td>Phone code hash, to be stored and later re-used with <a href="/method/auth.signIn">auth.signIn</a></td>
+<td>Phone code hash, to be stored and re-used in later method calls</td>
 </tr>
 <tr>
 <td><strong>next_type</strong></td>
@@ -112,6 +118,35 @@ For example, the latter is required in newer versions of android, to use the <a 
 </tr>
 </tbody>
 </table>
+<p>The system will automatically choose how to send the authorization code; there are multiple possible ways the code can arrive, signaled to the client via the <code>type</code> field of the <a href="/type/auth.SentCodeType">auth.SentCodeType</a> constructor.  </p>
+<p>Note that in some conditions when signing up or logging in using an SMS code/call, only the <a href="/constructor/auth.sentCodeTypeFirebaseSms">auth.sentCodeTypeFirebaseSms</a> code type may be used.<br>
+Currently, only official apps can make use of Firebase SMS authentication: this means that in some conditions, only the official applications can receive a login/signup code via SMS/call.<br>
+Third-party apps may log in using any of the other code delivery methods (Telegram codes, Fragment codes, email codes, future auth tokens, <a href="/api/qr-login">QR codes</a>).</p>
+<ul>
+<li><a href="/constructor/auth.sentCodeTypeSetUpEmailRequired">auth.sentCodeTypeSetUpEmailRequired</a>: if the user logins often enough, Telegram will ask the user to verify an email that will be used to send the login code.<br>
+See <a href="#email-verification">here »</a> for more info on the verification process.</li>
+<li><a href="/constructor/auth.sentCodeTypeEmailCode">auth.sentCodeTypeEmailCode</a>: the code was sent to the configured login email.</li>
+<li><a href="/constructor/auth.sentCodeTypeFragmentSms">auth.sentCodeTypeFragmentSms</a>: the code was sent via <a href="https://fragment.com">fragment.com</a>: open the specified <code>url</code> to log into the <a href="https://fragment.com">Fragment</a> platform with your wallet and view the code.  </li>
+<li><a href="/constructor/auth.sentCodeTypeApp">auth.sentCodeTypeApp</a>: the code was sent as a Telegram service notification to all other logged-in sessions.</li>
+<li><a href="/constructor/auth.sentCodeTypeFirebaseSms">auth.sentCodeTypeFirebaseSms</a>: firebase login flow, only for official apps.  <ul>
+<li>On Android, can only be received if the <a href="/constructor/codeSettings">codeSettings</a>.<code>allow_firebase</code> flag is set.<br>
+The client must pass the received <a href="/constructor/auth.sentCodeTypeFirebaseSms">auth.sentCodeTypeFirebaseSms</a>.<code>nonce</code> to the <a href="https://developer.android.com/training/safetynet/attestation">SafetyNet Attestation API</a>, and then pass the obtained JWS object to <a href="/method/auth.requestFirebaseSms">auth.requestFirebaseSms</a>.<code>safety_net_token</code>, along with the <code>phone_number</code> and the <code>phone_code_hash</code>.<br>
+If the method returns <a href="/constructor/boolTrue">boolTrue</a>, the code will be sent via SMS; otherwise, the <code>next_type</code> authentication method must be used, with <a href="/method/auth.resendCode">auth.resendCode</a>.</li>
+<li>On iOS, can only be received if the device token for Apple Push was passed to <a href="/constructor/codeSettings">codeSettings</a>.<code>token</code>.<br>
+The client then waits for a new push notification for <a href="/constructor/auth.sentCodeTypeFirebaseSms">auth.sentCodeTypeFirebaseSms</a>.<code>push_timeout</code> seconds.<br>
+If a push notification isn't received within <code>push_timeout</code> seconds, the <code>next_type</code> authentication method must be used, with <a href="/method/auth.resendCode">auth.resendCode</a>.<br>
+If a push notification is received with <code>receipt</code> and <code>ios_push_secret</code> fields, and the value of the <code>receipt</code> field matches <a href="/constructor/codeSettings">codeSettings</a>.<code>receipt</code>, the value of <code>ios_push_secret</code> is passed to <a href="/method/auth.requestFirebaseSms">auth.requestFirebaseSms</a>.<code>ios_push_secret</code>, along with the <code>phone_number</code> and the <code>phone_code_hash</code>.<br>
+If the method returns <a href="/constructor/boolTrue">boolTrue</a>, the code will be sent via SMS; otherwise, the <code>next_type</code> authentication method must be used, with <a href="/method/auth.resendCode">auth.resendCode</a>.</li>
+</ul>
+</li>
+<li><a href="/constructor/auth.sentCodeTypeSms">auth.sentCodeTypeSms</a>: the code was sent via SMS.</li>
+<li><a href="/constructor/auth.sentCodeTypeCall">auth.sentCodeTypeCall</a>: the user will receive a phone call and a synthesized voice will tell the user the verification code to input.</li>
+<li><a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>: the code will be sent via a flash phone call, that will be closed immediately.<br>
+In this case, the phone code will then be the phone number itself, just make sure that the phone number matches the specified pattern (see <a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>).</li>
+<li><a href="/constructor/auth.sentCodeTypeMissedCall">auth.sentCodeTypeMissedCall</a>: the code will be sent via a flash phone call, that will be closed immediately.<br>
+The last digits of the phone number that calls are the code that must be entered manually by the user.</li>
+<li><a href="#future-auth-tokens">Future auth tokens »</a></li>
+</ul>
 <p>If the message takes too long (<code>timeout</code> seconds) to arrive at the phone, the <a href="/method/auth.resendCode">auth.resendCode</a> method may be invoked to resend a code of type <code>next_type</code>.
 If the same happens again, you can use <a href="/method/auth.resendCode">auth.resendCode</a> with the <code>next_type</code> returned by the previous call to <a href="/method/auth.resendCode">auth.resendCode</a>.
 To cancel the verification code use <a href="/method/auth.cancelCode">auth.cancelCode</a>.</p>
@@ -134,7 +169,8 @@ To cancel the verification code use <a href="/method/auth.cancelCode">auth.cance
 ---functions---
 
 <a href='/method/account.sendVerifyEmailCode'>account.sendVerifyEmailCode</a>#98e037bb purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> email:<a href='/type/string'>string</a> = <a href='/type/account.SentEmailCode'>account.SentEmailCode</a>;
-<a href='/method/account.verifyEmail'>account.verifyEmail</a>#32da4cf purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> verification:<a href='/type/EmailVerification'>EmailVerification</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;</code></pre>
+<a href='/method/account.verifyEmail'>account.verifyEmail</a>#32da4cf purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> verification:<a href='/type/EmailVerification'>EmailVerification</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;
+<a href='/method/auth.resetLoginEmail'>auth.resetLoginEmail</a>#7e960193 phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;</code></pre>
 <p>Telegram may return a <a href="/constructor/auth.sentCodeTypeSetUpEmailRequired">auth.sentCodeTypeSetUpEmailRequired</a> code type in the <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor returned by <a href="/method/auth.sendCode">auth.sendCode</a>.<br>
 In this case, clients should ask the user to verify an email address that will be used to receive the login code as follows:  </p>
 <ul>
@@ -169,6 +205,7 @@ After obtaining the ID token, call <a href="/method/account.verifyEmail">account
 <p>On success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return a <a href="/constructor/account.emailVerifiedLogin">account.emailVerifiedLogin</a> constructor with an <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor that should be handled <a href="#code-types">as usual »</a>.  </p>
 </li>
 </ul>
+<p>If the user cannot access their email address, an email reset may be requested using <a href="/method/auth.resetLoginEmail">auth.resetLoginEmail</a>.  </p>
 <p>To change the login email after login, pass <a href="/constructor/emailVerifyPurposeLoginChange">emailVerifyPurposeLoginChange</a> as <code>purpose</code>, following the exact same Google ID/Apple ID/email code login flow as above: on success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return an <a href="/constructor/account.emailVerified">account.emailVerified</a> constructor.</p>
 <h3><a class="anchor" href="#sign-insign-up" id="sign-insign-up" name="sign-insign-up"><i class="anchor-icon"></i></a>Sign in/sign up</h3>
 <p>When user enters verification code, the <a href="/method/auth.signIn">auth.signIn</a> method must be used to validate it and possibly sign user in.</p>

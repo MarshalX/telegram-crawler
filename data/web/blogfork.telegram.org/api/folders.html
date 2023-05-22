@@ -44,11 +44,11 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>Telegram allows placing chats into folders, based on their type, mute status, or other custom criteria, thanks to folder blacklists and whitelists.  </p>
+<p>Telegram allows placing chats into folders, based on their type, mute status, or other custom criteria, thanks to folder blacklists and whitelists: these folders may also be shared with other users.  </p>
 <h3><a class="anchor" href="#folders" id="folders" name="folders"><i class="anchor-icon"></i></a>Folders</h3>
-<p>In the API, folders are called "dialog filters"; in the UI, they are typically represented as tabs.  </p>
 <p>Schema:</p>
 <pre><code><a href='/constructor/dialogFilter'>dialogFilter</a>#7438f7e8 flags:<a href='/type/%23'>#</a> contacts:flags.0?<a href='/constructor/true'>true</a> non_contacts:flags.1?<a href='/constructor/true'>true</a> groups:flags.2?<a href='/constructor/true'>true</a> broadcasts:flags.3?<a href='/constructor/true'>true</a> bots:flags.4?<a href='/constructor/true'>true</a> exclude_muted:flags.11?<a href='/constructor/true'>true</a> exclude_read:flags.12?<a href='/constructor/true'>true</a> exclude_archived:flags.13?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> title:<a href='/type/string'>string</a> emoticon:flags.25?<a href='/type/string'>string</a> pinned_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; include_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; exclude_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/DialogFilter'>DialogFilter</a>;
+<a href='/constructor/dialogFilterChatlist'>dialogFilterChatlist</a>#d64a04a8 flags:<a href='/type/%23'>#</a> has_my_invites:flags.26?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> title:<a href='/type/string'>string</a> emoticon:flags.25?<a href='/type/string'>string</a> pinned_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; include_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/DialogFilter'>DialogFilter</a>;
 <a href='/constructor/dialogFilterDefault'>dialogFilterDefault</a>#363293ae = <a href='/type/DialogFilter'>DialogFilter</a>;
 
 <a href='/constructor/dialogFilterSuggested'>dialogFilterSuggested</a>#77744d4a filter:<a href='/type/DialogFilter'>DialogFilter</a> description:<a href='/type/string'>string</a> = <a href='/type/DialogFilterSuggested'>DialogFilterSuggested</a>;
@@ -64,7 +64,9 @@
 <a href='/method/messages.updateDialogFilter'>messages.updateDialogFilter</a>#1ad4a04a flags:<a href='/type/%23'>#</a> id:<a href='/type/int'>int</a> filter:flags.0?<a href='/type/DialogFilter'>DialogFilter</a> = <a href='/type/Bool'>Bool</a>;
 <a href='/method/messages.updateDialogFiltersOrder'>messages.updateDialogFiltersOrder</a>#c563c1e4 order:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Bool'>Bool</a>;
 
-<a href='/method/help.getAppConfig'>help.getAppConfig</a>#98914110 = <a href='/type/JSONValue'>JSONValue</a>;</code></pre>
+<a href='/method/help.getAppConfig'>help.getAppConfig</a>#61e3f854 hash:<a href='/type/int'>int</a> = <a href='/type/help.AppConfig'>help.AppConfig</a>;</code></pre>
+<p>In the API, folders are called "dialog filters".<br>
+In the UI, folders are typically represented as tabs.  </p>
 <p>On startup, clients call:</p>
 <ul>
 <li><a href="/method/messages.getDialogFilters">messages.getDialogFilters</a> to fetch a list of previously configured folders.</li>
@@ -74,13 +76,58 @@
 <p>The boolean under the <a href="/api/config#dialog-filters-tooltip"><code>dialog_filters_tooltip</code> JSON key</a> in the result of <a href="/method/help.getAppConfig">help.getAppConfig</a> can be used to determine whether a folder tooltip should be presented to the user right away.<br>
 The UI should then show a list of suggested folder combinations.  </p>
 <p>Once configuration is finished, apps call <a href="/method/messages.updateDialogFilter">messages.updateDialogFilter</a> to create or update existing folders.<br>
-As per the <a href="/constructor/dialogFilter">dialogFilter</a> constructor, folders have multiple flags that can be combined to determine which chats should be included in (or excluded from) the folder.<br>
+As per the <a href="/constructor/dialogFilter">dialogFilter</a>/<a href="/constructor/dialogFilterChatlist">dialogFilterChatlist</a> constructors, folders have multiple flags that can be combined to determine which chats should be included in (or excluded from) the folder, which emoji to use as icon for the folder and its name.<br>
 Folders can also have up to <code>dialogs_folder_pinned_limit_*</code> pinned chats, as determined by the <a href="/api/config#client-configuration">client configuration</a>.</p>
+<p><a href="/constructor/dialogFilterChatlist">dialogFilterChatlist</a> constructors are used to represent imported <a href="#shared-folders">shareable folders</a>.  </p>
 <p>To reorder existing folders, <a href="/method/messages.updateDialogFiltersOrder">messages.updateDialogFiltersOrder</a> should be used with the IDs of the various dialog filters.</p>
-<p>Premium users also have access to a <a href="/constructor/dialogFilterDefault">dialogFilterDefault</a> constructor, used only when reordering folders to indicate the default (all chats) folder.  </p>
+<p><a href="/api/premium">Premium</a> users also have access to a <a href="/constructor/dialogFilterDefault">dialogFilterDefault</a> constructor, used only when reordering folders to indicate the default (all chats) folder.  </p>
 <p>To delete folders, use <a href="/method/messages.updateDialogFilter">messages.updateDialogFilter</a> without populating the <code>filter</code> flag field.  </p>
 <p>Clients can receive <a href="/constructor/updateDialogFilter">updateDialogFilter</a>, <a href="/constructor/updateDialogFilterOrder">updateDialogFilterOrder</a> updates with new filter information, generated by other clients when modifying folder info.<br>
 Clients can also receive <a href="/constructor/updateDialogFilters">updateDialogFilters</a>, in which case folder info should be refetched manually using <a href="/method/messages.getDialogFilters">messages.getDialogFilters</a>.</p>
+<h4><a class="anchor" href="#shared-folders" id="shared-folders" name="shared-folders"><i class="anchor-icon"></i></a>Shared folders</h4>
+<pre><code><a href='/constructor/inputChatlistDialogFilter'>inputChatlistDialogFilter</a>#f3e0da33 filter_id:<a href='/type/int'>int</a> = <a href='/type/InputChatlist'>InputChatlist</a>;
+
+<a href='/constructor/exportedChatlistInvite'>exportedChatlistInvite</a>#0c5181ac flags:<a href='/type/%23'>#</a> title:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; = <a href='/type/ExportedChatlistInvite'>ExportedChatlistInvite</a>;
+
+<a href='/constructor/chatlists.exportedChatlistInvite'>chatlists.exportedChatlistInvite</a>#10e6e3a6 filter:<a href='/type/DialogFilter'>DialogFilter</a> invite:<a href='/type/ExportedChatlistInvite'>ExportedChatlistInvite</a> = <a href='/type/chatlists.ExportedChatlistInvite'>chatlists.ExportedChatlistInvite</a>;
+
+<a href='/constructor/chatlists.exportedInvites'>chatlists.exportedInvites</a>#10ab6dc7 invites:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ExportedChatlistInvite'>ExportedChatlistInvite</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/chatlists.ExportedInvites'>chatlists.ExportedInvites</a>;
+
+<a href='/constructor/chatlists.chatlistInviteAlready'>chatlists.chatlistInviteAlready</a>#fa87f659 filter_id:<a href='/type/int'>int</a> missing_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; already_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/chatlists.ChatlistInvite'>chatlists.ChatlistInvite</a>;
+<a href='/constructor/chatlists.chatlistInvite'>chatlists.chatlistInvite</a>#1dcd839d flags:<a href='/type/%23'>#</a> title:<a href='/type/string'>string</a> emoticon:flags.0?<a href='/type/string'>string</a> peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/chatlists.ChatlistInvite'>chatlists.ChatlistInvite</a>;
+
+<a href='/constructor/chatlists.chatlistUpdates'>chatlists.chatlistUpdates</a>#93bd878d missing_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/chatlists.ChatlistUpdates'>chatlists.ChatlistUpdates</a>;
+
+---functions---
+
+<a href='/method/chatlists.exportChatlistInvite'>chatlists.exportChatlistInvite</a>#8472478e chatlist:<a href='/type/InputChatlist'>InputChatlist</a> title:<a href='/type/string'>string</a> peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/chatlists.ExportedChatlistInvite'>chatlists.ExportedChatlistInvite</a>;
+
+<a href='/method/chatlists.getExportedInvites'>chatlists.getExportedInvites</a>#ce03da83 chatlist:<a href='/type/InputChatlist'>InputChatlist</a> = <a href='/type/chatlists.ExportedInvites'>chatlists.ExportedInvites</a>;
+<a href='/method/chatlists.editExportedInvite'>chatlists.editExportedInvite</a>#653db63d flags:<a href='/type/%23'>#</a> chatlist:<a href='/type/InputChatlist'>InputChatlist</a> slug:<a href='/type/string'>string</a> title:flags.1?<a href='/type/string'>string</a> peers:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/ExportedChatlistInvite'>ExportedChatlistInvite</a>;
+<a href='/method/chatlists.deleteExportedInvite'>chatlists.deleteExportedInvite</a>#719c5c5e chatlist:<a href='/type/InputChatlist'>InputChatlist</a> slug:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/chatlists.checkChatlistInvite'>chatlists.checkChatlistInvite</a>#41c10fff slug:<a href='/type/string'>string</a> = <a href='/type/chatlists.ChatlistInvite'>chatlists.ChatlistInvite</a>;
+<a href='/method/chatlists.joinChatlistInvite'>chatlists.joinChatlistInvite</a>#a6b1e39a slug:<a href='/type/string'>string</a> peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/chatlists.getChatlistUpdates'>chatlists.getChatlistUpdates</a>#89419521 chatlist:<a href='/type/InputChatlist'>InputChatlist</a> = <a href='/type/chatlists.ChatlistUpdates'>chatlists.ChatlistUpdates</a>;
+<a href='/method/chatlists.joinChatlistUpdates'>chatlists.joinChatlistUpdates</a>#e089f8f5 chatlist:<a href='/type/InputChatlist'>InputChatlist</a> peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;
+<a href='/method/chatlists.hideChatlistUpdates'>chatlists.hideChatlistUpdates</a>#66e486fb chatlist:<a href='/type/InputChatlist'>InputChatlist</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/chatlists.getLeaveChatlistSuggestions'>chatlists.getLeaveChatlistSuggestions</a>#fdbcd714 chatlist:<a href='/type/InputChatlist'>InputChatlist</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt;;
+<a href='/method/chatlists.leaveChatlist'>chatlists.leaveChatlist</a>#74fae13a chatlist:<a href='/type/InputChatlist'>InputChatlist</a> peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Folders may be shared using <a href="/api/links#chat-folder-links">chat folder deep links</a>.<br>
+These links are generated by invoking <a href="/method/chatlists.exportChatlistInvite">chatlists.exportChatlistInvite</a>, passing the ID of the folder that should be exported, along with a list of <code>peers</code> that should be included in the shared folder.<br>
+Only channels and groups/supergroups may be specified in the <code>peers</code> array; these channels and groups must be public, or the user must have permission to manage invite links. Basic groups will automatically be <a href="/api/channel#migration">converted to supergroups</a> when invoking the method.<br>
+An optional name for the shared link may also be specified using <code>title</code>.  </p>
+<p>Use <a href="/method/chatlists.getExportedInvites">chatlists.getExportedInvites</a> to list all links generated for a folder, use <a href="/method/chatlists.editExportedInvite">chatlists.editExportedInvite</a> to edit the title or list of <code>peers</code> of a specific link and <a href="/method/chatlists.deleteExportedInvite">chatlists.deleteExportedInvite</a> to revoke an exported link, preventing new users from importing it.  </p>
+<p>The maximum number of per-folder invites that can be created by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users is specified by the <code>chatlist_invites_limit_default</code>/<code>chatlist_invites_limit_premium</code> <a href="/api/config#chatlist-invites-limit-default">client configuration parameters »</a>.  </p>
+<p>Use <a href="/method/chatlists.checkChatlistInvite">chatlists.checkChatlistInvite</a> to obtain information about a chat folder deep link before importing it with <a href="/method/chatlists.joinChatlistInvite">chatlists.joinChatlistInvite</a>, specifying in <code>peers</code> which channels and groups to join (excluding inaccessible channels/supergroups, i.e. the user may not join a supergroup/channel where they were banned, corresponding to a <a href="/constructor/channelForbidden">channelForbidden</a> constructor).<br>
+If the user can't join any of the <code>peers</code> of a folder, the folder can't be imported.</p>
+<p>The maximum number of shareable folders that a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may join is specified by the <code>chatlists_joined_limit_default</code>/<code>chatlists_joined_limit_premium</code> <a href="/api/config#chatlists-joined-limit-default">client configuration parameters »</a>.  </p>
+<p>Users that import a folder should retrieve additions made to the peer list by invoking <a href="/method/chatlists.getChatlistUpdates">chatlists.getChatlistUpdates</a> at most every <code>chatlist_update_period</code> seconds (a <a href="/api/config#chatlist-update-period">client configuration parameter »</a>).<br>
+If the returned <code>missing_peers</code> list is non-empty, the client should present it to the user, who may choose to join all or a subset of them (excluding inaccessible channels/supergroups), passing them to the <code>peers</code> parameter of <a href="/method/chatlists.joinChatlistUpdates">chatlists.joinChatlistUpdates</a>.<br>
+If after excluding inaccessible peers and peers deselected by the user the <code>peers</code> list is empty, invoke <a href="/method/chatlists.hideChatlistUpdates">chatlists.hideChatlistUpdates</a> instead of <a href="/method/chatlists.joinChatlistUpdates">chatlists.joinChatlistUpdates</a>.</p>
+<p>When removing an imported folder, the list of included peers should be presented to the user prior to deletion, with the peers listed in <a href="/method/chatlists.getLeaveChatlistSuggestions">chatlists.getLeaveChatlistSuggestions</a> already pre-marked for deletion: the user may then choose to delete or keep some or all of the groups and channels of the folder when invoking <a href="/method/chatlists.leaveChatlist">chatlists.leaveChatlist</a> to delete the folder, specifying in <code>peers</code> the list of channels and groups from the folder that should also be removed.</p>
 <h3><a class="anchor" href="#peer-folders" id="peer-folders" name="peer-folders"><i class="anchor-icon"></i></a>Peer folders</h3>
 <p>The API also has another method for identifying groups of peers, used by archived chats.</p>
 <p>Schema:</p>
@@ -101,17 +148,15 @@ Clients can also receive <a href="/constructor/updateDialogFilters">updateDialog
 
 ---functions---
 
-<a href='/method/folders.editPeerFolders'>folders.editPeerFolders</a>#6847d0ab folder_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputFolderPeer'>InputFolderPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;
-<a href='/method/folders.deleteFolder'>folders.deleteFolder</a>#1c295881 folder_id:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
-<p>API peer folders are typically used only by <a href="https://telegram.org/blog/archive-and-new-design">archived chats</a>, and are really handy for distinguishing groups of peers, since most peer-related constructors (updates, chat info) will contain the <code>folder_id</code> assigned the the specified chat.  </p>
+<a href='/method/folders.editPeerFolders'>folders.editPeerFolders</a>#6847d0ab folder_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputFolderPeer'>InputFolderPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>API peer folders are typically used only by <a href="https://telegram.org/blog/archive-and-new-design">archived chats</a>, and are really handy for distinguishing groups of peers, since most peer-related constructors (updates, chat info) will contain the <code>folder_id</code> assigned the specified chat.  </p>
 <p>In Telegram apps, API peer folders are used only to implement the chat archive, identified by <code>folder_id</code> <code>1</code>; all other peers are in <code>folder_id</code> <code>0</code> by default; no other <code>folder_id</code> is allowed at the moment.</p>
 <ul>
 <li><a href="/method/folders.editPeerFolders">folders.editPeerFolders</a> can be used to add and remove peers from peer folders.</li>
-<li><a href="/method/folders.deleteFolder">folders.deleteFolder</a> can be used to delete peer folders, moving all peers previously present in that folder to the default <code>0</code> folder.</li>
 </ul>
 <p>Both methods return an <a href="/constructor/updates">updates</a> constructor, containing a single <a href="/constructor/updateFolderPeers">updateFolderPeers</a> with the new <code>folder_id</code> of moved peers.<br>
 Clients can also receive <a href="/constructor/updateFolderPeers">updateFolderPeers</a> as a normal <a href="/api/updates">update</a>, generated by other clients when modifying peer folders.</p>
-<p>Clients can then use <a href="/type/InputDialogPeer">InputDialogPeer</a> to refer either to a specific chat, or to all chats in a peer folder: the server will return a <a href="/type/DialogPeer">DialogPeer</a> in certain constructors for the same purpose.  </p></div>
+<p>Clients can then use <a href="/type/InputDialogPeer">InputDialogPeer</a> to refer either to a specific chat, or to all chats in a peer folder: the server will return a <a href="/type/DialogPeer">DialogPeer</a> in certain constructors for the same purpose.</p></div>
   
 </div>
           

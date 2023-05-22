@@ -231,6 +231,10 @@
 <td>Verify an email address.</td>
 </tr>
 <tr>
+<td><a href="/method/auth.resetLoginEmail">auth.resetLoginEmail</a></td>
+<td>Reset the <a href="https://core.telegram.org/api/auth#email-verification">login email »</a>.</td>
+</tr>
+<tr>
 <td><a href="/method/auth.checkPassword">auth.checkPassword</a></td>
 <td>Try logging to an account protected by a <a href="/api/srp">2FA password</a>.</td>
 </tr>
@@ -297,6 +301,14 @@
 <tr>
 <td><a href="/method/auth.signUp">auth.signUp</a></td>
 <td>Registers a validated phone number in the system.</td>
+</tr>
+<tr>
+<td><a href="/method/auth.requestFirebaseSms">auth.requestFirebaseSms</a></td>
+<td>Request an SMS code via Firebase.</td>
+</tr>
+<tr>
+<td><a href="/method/auth.importWebTokenAuthorization">auth.importWebTokenAuthorization</a></td>
+<td>Login by importing an authorization token</td>
 </tr>
 </tbody>
 </table>
@@ -388,7 +400,7 @@
 </tr>
 <tr>
 <td><a href="/method/help.getUserInfo">help.getUserInfo</a></td>
-<td>Internal use</td>
+<td>Can only be used by TSF members to obtain internal information.</td>
 </tr>
 </tbody>
 </table>
@@ -639,7 +651,7 @@
 </tr>
 <tr>
 <td><a href="/method/channels.inviteToChannel">channels.inviteToChannel</a></td>
-<td>Invite users to a channel/supergroup</td>
+<td>Invite users to a channel/supergroup<br><br>May also return 0-N updates of type <a href="/constructor/updateGroupInvitePrivacyForbidden">updateGroupInvitePrivacyForbidden</a>: it indicates we couldn't add a user to a chat because of their privacy settings; if required, an <a href="/api/invites">invite link</a> can be shared with the user, instead.</td>
 </tr>
 <tr>
 <td><a href="/method/channels.joinChannel">channels.joinChannel</a></td>
@@ -676,6 +688,10 @@
 <tr>
 <td><a href="/method/channels.toggleSlowMode">channels.toggleSlowMode</a></td>
 <td>Toggle supergroup slow mode: if enabled, users will only be able to send one message every <code>seconds</code> seconds</td>
+</tr>
+<tr>
+<td><a href="/method/channels.toggleParticipantsHidden">channels.toggleParticipantsHidden</a></td>
+<td>Hide or display the participants list in a <a href="/api/channel">supergroup</a>.<br><br>The supergroup must have at least <code>hidden_members_group_size_min</code> participants in order to use this method, as specified by the <a href="/api/config#client-configuration">client configuration parameters »</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -761,11 +777,11 @@
 </tr>
 <tr>
 <td><a href="/method/messages.addChatUser">messages.addChatUser</a></td>
-<td>Adds a user to a chat and sends a service message on it.</td>
+<td>Adds a user to a chat and sends a service message on it.<br><br>May also return 0-N updates of type <a href="/constructor/updateGroupInvitePrivacyForbidden">updateGroupInvitePrivacyForbidden</a>: it indicates we couldn't add a user to a chat because of their privacy settings; if required, an <a href="/api/invites">invite link</a> can be shared with the user, instead.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.createChat">messages.createChat</a></td>
-<td>Creates a new chat.</td>
+<td>Creates a new chat.<br><br>May also return 0-N updates of type <a href="/constructor/updateGroupInvitePrivacyForbidden">updateGroupInvitePrivacyForbidden</a>: it indicates we couldn't add a user to a chat because of their privacy settings; if required, an <a href="/api/invites">invite link</a> can be shared with the user, instead.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.deleteChatUser">messages.deleteChatUser</a></td>
@@ -790,10 +806,6 @@
 <tr>
 <td><a href="/method/messages.editChatTitle">messages.editChatTitle</a></td>
 <td>Changes chat name and sends a service message on it.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getAllChats">messages.getAllChats</a></td>
-<td>Get all chats, channels and supergroups</td>
 </tr>
 <tr>
 <td><a href="/method/messages.getChats">messages.getChats</a></td>
@@ -868,6 +880,53 @@
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-custom-animated-emojis" id="working-with-custom-animated-emojis" name="working-with-custom-animated-emojis"><i class="anchor-icon"></i></a>Working with <a href="/api/custom-emoji">custom animated emojis</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.getCustomEmojiDocuments">messages.getCustomEmojiDocuments</a></td>
+<td>Fetch <a href="/api/custom-emoji">custom emoji stickers »</a>.<br><br>Returns a list of <a href="/constructor/document">documents</a> with the animated custom emoji in TGS format, and a <a href="/constructor/documentAttributeCustomEmoji">documentAttributeCustomEmoji</a> attribute with the original emoji and info about the emoji stickerset this custom emoji belongs to.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getEmojiStickers">messages.getEmojiStickers</a></td>
+<td>Gets the list of currently installed <a href="/api/custom-emoji">custom emoji stickersets</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getFeaturedEmojiStickers">messages.getFeaturedEmojiStickers</a></td>
+<td>Gets featured custom emoji stickersets.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getEmojiGroups">messages.getEmojiGroups</a></td>
+<td>Represents a list of <a href="/api/custom-emoji#emoji-categories">emoji categories</a>, to be used when selecting <a href="/api/custom-emoji">custom emojis</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getEmojiStatusGroups">messages.getEmojiStatusGroups</a></td>
+<td>Represents a list of <a href="/api/custom-emoji#emoji-categories">emoji categories</a>, to be used when selecting custom emojis to set as <a href="/api">custom emoji status</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getEmojiProfilePhotoGroups">messages.getEmojiProfilePhotoGroups</a></td>
+<td>Represents a list of <a href="/api/custom-emoji#emoji-categories">emoji categories</a>, to be used when selecting custom emojis to set as <a href="/api/files#sticker-profile-pictures">profile picture</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.searchCustomEmoji">messages.searchCustomEmoji</a></td>
+<td>Look for <a href="/api/custom-emoji">custom emojis</a> associated to a UTF8 emoji</td>
+</tr>
+<tr>
+<td><a href="/method/account.getDefaultProfilePhotoEmojis">account.getDefaultProfilePhotoEmojis</a></td>
+<td>Get a set of suggested <a href="/api/custom-emoji">custom emoji stickers</a> that can be <a href="/api/files#sticker-profile-pictures">used as profile picture</a></td>
+</tr>
+<tr>
+<td><a href="/method/account.getDefaultGroupPhotoEmojis">account.getDefaultGroupPhotoEmojis</a></td>
+<td>Get a set of suggested <a href="/api/custom-emoji">custom emoji stickers</a> that can be <a href="/api/files#sticker-profile-pictures">used as group picture</a></td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-deep-links" id="working-with-deep-links" name="working-with-deep-links"><i class="anchor-icon"></i></a>Working with <a href="/api/links">deep links</a></h3>
 <table class="table">
 <thead>
@@ -888,6 +947,33 @@
 <tr>
 <td><a href="/method/help.getRecentMeUrls">help.getRecentMeUrls</a></td>
 <td>Get recently used <code>t.me</code> links.<br><br>When installing official applications from "Download Telegram" buttons present in <a href="https://t.me">t.me</a> pages, a referral parameter is passed to applications after installation.  <br>If, after downloading the application, the user creates a new account (instead of logging into an existing one), the referral parameter should be imported using this method, which returns the <a href="https://t.me">t.me</a> pages the user recently opened, before installing Telegram.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-emoji-keywords" id="working-with-emoji-keywords" name="working-with-emoji-keywords"><i class="anchor-icon"></i></a>Working with <a href="/api/custom-emoji#emoji-keywords">emoji keywords</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.getEmojiKeywords">messages.getEmojiKeywords</a></td>
+<td>Get localized <a href="/api/custom-emoji#emoji-keywords">emoji keywords »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getEmojiKeywordsDifference">messages.getEmojiKeywordsDifference</a></td>
+<td>Get changed <a href="/api/custom-emoji#emoji-keywords">emoji keywords »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getEmojiKeywordsLanguages">messages.getEmojiKeywordsLanguages</a></td>
+<td>Obtain a list of related languages that must be used when fetching <a href="/api/custom-emoji#emoji-keywords">emoji keyword lists »</a>.<br><br>Usually the method will return the passed language codes (if localized) + <code>en</code> + some language codes for similar languages (if applicable).</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getEmojiURL">messages.getEmojiURL</a></td>
+<td>Returns an HTTP URL which can be used to automatically log in into translation platform and suggest new <a href="/api/custom-emoji#emoji-keywords">emoji keywords »</a>. The URL will be valid for 30 seconds after generation.</td>
 </tr>
 </tbody>
 </table>
@@ -972,8 +1058,94 @@
 <td>Upload a file and associate it to a chat (without actually sending it to the chat)</td>
 </tr>
 <tr>
+<td><a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a></td>
+<td>Get information about extended media</td>
+</tr>
+<tr>
 <td><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a></td>
 <td>Get a document by its SHA256 hash, mainly used for gifs</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-forums" id="working-with-forums" name="working-with-forums"><i class="anchor-icon"></i></a>Working with <a href="/api/forum">forums</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/channels.toggleForum">channels.toggleForum</a></td>
+<td>Enable or disable <a href="/api/forum">forum functionality</a> in a supergroup.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.createForumTopic">channels.createForumTopic</a></td>
+<td>Create a <a href="/api/forum">forum topic</a>; requires <a href="/api/rights"><code>manage_topics</code> rights</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.getForumTopics">channels.getForumTopics</a></td>
+<td>Get <a href="/api/forum">topics of a forum</a></td>
+</tr>
+<tr>
+<td><a href="/method/channels.getForumTopicsByID">channels.getForumTopicsByID</a></td>
+<td>Get forum topics by their ID</td>
+</tr>
+<tr>
+<td><a href="/method/channels.editForumTopic">channels.editForumTopic</a></td>
+<td>Edit <a href="/api/forum">forum topic</a>; requires <a href="/api/rights"><code>manage_topics</code> rights</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.updatePinnedForumTopic">channels.updatePinnedForumTopic</a></td>
+<td>Pin or unpin <a href="/api/forum">forum topics</a></td>
+</tr>
+<tr>
+<td><a href="/method/channels.reorderPinnedForumTopics">channels.reorderPinnedForumTopics</a></td>
+<td>Reorder pinned forum topics</td>
+</tr>
+<tr>
+<td><a href="/method/channels.deleteTopicHistory">channels.deleteTopicHistory</a></td>
+<td>Delete message history of a <a href="/api/forum">forum topic</a></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-fragmentcom-usernames" id="working-with-fragmentcom-usernames" name="working-with-fragmentcom-usernames"><i class="anchor-icon"></i></a>Working with <a href="/api/fragment">fragment.com usernames</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/account.reorderUsernames">account.reorderUsernames</a></td>
+<td>Reorder usernames associated with the currently logged-in user.</td>
+</tr>
+<tr>
+<td><a href="/method/account.toggleUsername">account.toggleUsername</a></td>
+<td>Activate or deactivate a purchased <a href="https://fragment.com">fragment.com</a> username associated to the currently logged-in user.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.reorderUsernames">bots.reorderUsernames</a></td>
+<td>Reorder usernames associated to a bot we own.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.toggleUsername">bots.toggleUsername</a></td>
+<td>Activate or deactivate a purchased <a href="https://fragment.com">fragment.com</a> username associated to a bot we own.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.reorderUsernames">channels.reorderUsernames</a></td>
+<td>Reorder active usernames</td>
+</tr>
+<tr>
+<td><a href="/method/channels.toggleUsername">channels.toggleUsername</a></td>
+<td>Activate or deactivate a purchased <a href="https://fragment.com">fragment.com</a> username associated to a <a href="/api/channel">supergroup or channel</a> we own.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.deactivateAllUsernames">channels.deactivateAllUsernames</a></td>
+<td>Disable all purchased usernames of a supergroup or channel</td>
 </tr>
 </tbody>
 </table>
@@ -1015,7 +1187,7 @@
 </tr>
 <tr>
 <td><a href="/method/messages.sendReaction">messages.sendReaction</a></td>
-<td>React to message</td>
+<td>React to message.<br><br>Starting from layer 159, the reaction will be sent from the peer specified using <a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.getAvailableReactions">messages.getAvailableReactions</a></td>
@@ -1052,6 +1224,25 @@
 <tr>
 <td><a href="/method/messages.clearRecentReactions">messages.clearRecentReactions</a></td>
 <td>Clear recently used <a href="/api/reactions">message reactions</a></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-message-translation" id="working-with-message-translation" name="working-with-message-translation"><i class="anchor-icon"></i></a>Working with <a href="/api/translation">message translation</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.translateText">messages.translateText</a></td>
+<td>Translate a given text.<br><br><a href="/api/entities">Styled text entities</a> will only be preserved for <a href="/api/premium">Telegram Premium</a> users.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.togglePeerTranslations">messages.togglePeerTranslations</a></td>
+<td>Show or hide the <a href="/api/translation">real-time chat translation popup</a> for a certain chat</td>
 </tr>
 </tbody>
 </table>
@@ -1146,6 +1337,18 @@
 <tr>
 <td><a href="/method/stickers.createStickerSet">stickers.createStickerSet</a></td>
 <td>Create a stickerset, bots only.</td>
+</tr>
+<tr>
+<td><a href="/method/stickers.changeSticker">stickers.changeSticker</a></td>
+<td>Update the keywords, emojis or <a href="/api/stickers#mask-stickers">mask coordinates</a> of a sticker, bots only.</td>
+</tr>
+<tr>
+<td><a href="/method/stickers.renameStickerSet">stickers.renameStickerSet</a></td>
+<td>Renames a stickerset, bots only.</td>
+</tr>
+<tr>
+<td><a href="/method/stickers.deleteStickerSet">stickers.deleteStickerSet</a></td>
+<td>Deletes a stickerset we created, bots only.</td>
 </tr>
 <tr>
 <td><a href="/method/stickers.removeStickerFromSet">stickers.removeStickerFromSet</a></td>
@@ -1276,6 +1479,25 @@
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-temporary-profile-links" id="working-with-temporary-profile-links" name="working-with-temporary-profile-links"><i class="anchor-icon"></i></a>Working with <a href="/api/links#temporary-profile-links">temporary profile links</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/contacts.exportContactToken">contacts.exportContactToken</a></td>
+<td>Generates a <a href="/api/links#temporary-profile-links">temporary profile link</a> for the currently logged-in user.</td>
+</tr>
+<tr>
+<td><a href="/method/contacts.importContactToken">contacts.importContactToken</a></td>
+<td>Obtain user info from a <a href="/api/links#temporary-profile-links">temporary profile link</a>.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-updates" id="working-with-updates" name="working-with-updates"><i class="anchor-icon"></i></a>Working with <a href="/api/updates">updates</a></h3>
 <table class="table">
 <thead>
@@ -1355,6 +1577,10 @@
 <td><a href="/method/account.uploadWallPaper">account.uploadWallPaper</a></td>
 <td>Create and upload a new <a href="/api/wallpapers">wallpaper</a></td>
 </tr>
+<tr>
+<td><a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a></td>
+<td>Set a custom <a href="/api/wallpapers">wallpaper »</a> in a specific private chat with another user.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-web-app-bots-" id="working-with-web-app-bots-" name="working-with-web-app-bots-"><i class="anchor-icon"></i></a>Working with <a href="/bots/webapps">web app bots »</a></h3>
@@ -1385,6 +1611,14 @@
 <tr>
 <td><a href="/method/messages.sendWebViewData">messages.sendWebViewData</a></td>
 <td>Used by the user to relay data from an opened <a href="/api/bots/webapps">reply keyboard bot web app</a> to the bot that owns it.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.requestAppWebView">messages.requestAppWebView</a></td>
+<td>Open a <a href="/bots/webapps">bot web app</a> from a <a href="/api/links#named-bot-web-app-links">named bot web app deep link</a>, sending over user information after user confirmation.<br><br>After calling this method, until the user closes the webview, <a href="/method/messages.prolongWebView">messages.prolongWebView</a> must be called every 60 seconds.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getBotApp">messages.getBotApp</a></td>
+<td>Obtain information about a <a href="/api/bots/webapps#named-bot-web-apps">named bot web app</a></td>
 </tr>
 </tbody>
 </table>
@@ -1440,6 +1674,10 @@
 <td><a href="/method/messages.editInlineBotMessage">messages.editInlineBotMessage</a></td>
 <td>Edit an inline bot message</td>
 </tr>
+<tr>
+<td><a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a></td>
+<td>Send a chosen peer, as requested by a <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a> button.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-bots" id="working-with-bots" name="working-with-bots"><i class="anchor-icon"></i></a>Working with bots</h3>
@@ -1462,6 +1700,14 @@
 <tr>
 <td><a href="/method/bots.setBotCommands">bots.setBotCommands</a></td>
 <td>Set bot command list</td>
+</tr>
+<tr>
+<td><a href="/method/bots.setBotInfo">bots.setBotInfo</a></td>
+<td>Set localized name, about text and description of a bot (or of the current account, if called by a bot).</td>
+</tr>
+<tr>
+<td><a href="/method/bots.getBotInfo">bots.getBotInfo</a></td>
+<td>Get localized name, about text and description of a bot (or of the current account, if called by a bot).</td>
 </tr>
 </tbody>
 </table>
@@ -1594,29 +1840,6 @@
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#working-with-custom-animated-emojis" id="working-with-custom-animated-emojis" name="working-with-custom-animated-emojis"><i class="anchor-icon"></i></a>Working with custom animated emojis</h3>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="/method/messages.getCustomEmojiDocuments">messages.getCustomEmojiDocuments</a></td>
-<td>Fetch <a href="/api/custom-emoji">custom emoji stickers »</a>.<br><br>Returns a list of <a href="/constructor/document">documents</a> with the animated custom emoji in TGS format, and a <a href="/constructor/documentAttributeCustomEmoji">documentAttributeCustomEmoji</a> attribute with the original emoji and info about the emoji stickerset this custom emoji belongs to.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getEmojiStickers">messages.getEmojiStickers</a></td>
-<td>Gets the list of currently installed <a href="/api/custom-emoji">custom emoji stickersets</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getFeaturedEmojiStickers">messages.getFeaturedEmojiStickers</a></td>
-<td>Gets featured custom emoji stickersets.</td>
-</tr>
-</tbody>
-</table>
 <h3><a class="anchor" href="#working-with-dialogs" id="working-with-dialogs" name="working-with-dialogs"><i class="anchor-icon"></i></a>Working with dialogs</h3>
 <table class="table">
 <thead>
@@ -1703,33 +1926,6 @@
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#working-with-emoji-keywords" id="working-with-emoji-keywords" name="working-with-emoji-keywords"><i class="anchor-icon"></i></a>Working with emoji keywords</h3>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="/method/messages.getEmojiKeywords">messages.getEmojiKeywords</a></td>
-<td>Get localized emoji keywords</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getEmojiKeywordsDifference">messages.getEmojiKeywordsDifference</a></td>
-<td>Get changed emoji keywords</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getEmojiKeywordsLanguages">messages.getEmojiKeywordsLanguages</a></td>
-<td>Get info about an emoji keyword localization</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getEmojiURL">messages.getEmojiURL</a></td>
-<td>Returns an HTTP URL which can be used to automatically log in into translation platform and suggest new emoji replacements. The URL will be valid for 30 seconds after generation</td>
-</tr>
-</tbody>
-</table>
 <h3><a class="anchor" href="#working-with-folders" id="working-with-folders" name="working-with-folders"><i class="anchor-icon"></i></a>Working with folders</h3>
 <table class="table">
 <thead>
@@ -1756,12 +1952,52 @@
 <td>Update <a href="/api/folders">folder</a></td>
 </tr>
 <tr>
-<td><a href="/method/folders.deleteFolder">folders.deleteFolder</a></td>
-<td>Delete a <a href="/api/folders#peer-folders">peer folder</a></td>
-</tr>
-<tr>
 <td><a href="/method/folders.editPeerFolders">folders.editPeerFolders</a></td>
 <td>Edit peers in <a href="/api/folders#peer-folders">peer folder</a></td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.exportChatlistInvite">chatlists.exportChatlistInvite</a></td>
+<td>Export a <a href="/api/folders">folder »</a>, creating a <a href="/api/links#chat-folder-links">chat folder deep link »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.deleteExportedInvite">chatlists.deleteExportedInvite</a></td>
+<td>Delete a previously created <a href="/api/links#chat-folder-links">chat folder deep link »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.editExportedInvite">chatlists.editExportedInvite</a></td>
+<td>Edit a <a href="/api/links#chat-folder-links">chat folder deep link »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.getExportedInvites">chatlists.getExportedInvites</a></td>
+<td>List all <a href="/api/links#chat-folder-links">chat folder deep links »</a> associated to a folder</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.checkChatlistInvite">chatlists.checkChatlistInvite</a></td>
+<td>Obtain information about a <a href="/api/links#chat-folder-links">chat folder deep link »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.joinChatlistInvite">chatlists.joinChatlistInvite</a></td>
+<td>Import a <a href="/api/links#chat-folder-links">chat folder deep link »</a>, joining some or all the chats in the folder.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.getChatlistUpdates">chatlists.getChatlistUpdates</a></td>
+<td>Fetch new chats associated with an imported <a href="/api/links#chat-folder-links">chat folder deep link »</a>. Must be invoked at most every <code>chatlist_update_period</code> seconds (as per the related <a href="/api/config#chatlist-update-period">client configuration parameter »</a>).</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.joinChatlistUpdates">chatlists.joinChatlistUpdates</a></td>
+<td>Join channels and supergroups recently added to a <a href="/api/links#chat-folder-links">chat folder deep link »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.hideChatlistUpdates">chatlists.hideChatlistUpdates</a></td>
+<td>Dismiss new pending peers recently added to a <a href="/api/links#chat-folder-links">chat folder deep link »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.getLeaveChatlistSuggestions">chatlists.getLeaveChatlistSuggestions</a></td>
+<td>Returns identifiers of pinned or always included chats from a chat folder imported using a <a href="/api/links#chat-folder-links">chat folder deep link »</a>, which are suggested to be left when the chat folder is deleted.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.leaveChatlist">chatlists.leaveChatlist</a></td>
+<td>Delete a folder imported using a <a href="/api/links#chat-folder-links">chat folder deep link »</a></td>
 </tr>
 </tbody>
 </table>
@@ -1968,6 +2204,29 @@
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-media-autosave-settings" id="working-with-media-autosave-settings" name="working-with-media-autosave-settings"><i class="anchor-icon"></i></a>Working with media autosave settings</h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/account.getAutoSaveSettings">account.getAutoSaveSettings</a></td>
+<td>Get autosave settings</td>
+</tr>
+<tr>
+<td><a href="/method/account.saveAutoSaveSettings">account.saveAutoSaveSettings</a></td>
+<td>Modify autosave settings</td>
+</tr>
+<tr>
+<td><a href="/method/account.deleteAutoSaveExceptions">account.deleteAutoSaveExceptions</a></td>
+<td>Clear all peer-specific autosave settings.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-message-threads" id="working-with-message-threads" name="working-with-message-threads"><i class="anchor-icon"></i></a>Working with message <a href="/api/threads">threads</a></h3>
 <table class="table">
 <thead>
@@ -2111,10 +2370,6 @@
 <tr>
 <td><a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a></td>
 <td>Change the default peer that should be used when sending messages to a specific group</td>
-</tr>
-<tr>
-<td><a href="/method/messages.translateText">messages.translateText</a></td>
-<td>Translate a given text</td>
 </tr>
 <tr>
 <td><a href="/method/channels.getSendAs">channels.getSendAs</a></td>
@@ -2400,6 +2655,25 @@
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-the-native-anti-spam-system" id="working-with-the-native-anti-spam-system" name="working-with-the-native-anti-spam-system"><i class="anchor-icon"></i></a>Working with the <a href="/api/antispam">native anti-spam system</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/channels.toggleAntiSpam">channels.toggleAntiSpam</a></td>
+<td>Enable or disable the <a href="/api/antispam">native antispam system</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.reportAntiSpamFalsePositive">channels.reportAntiSpamFalsePositive</a></td>
+<td>Report a <a href="/api/antispam">native antispam</a> false positive</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-the-bot-menu-button-" id="working-with-the-bot-menu-button-" name="working-with-the-bot-menu-button-"><i class="anchor-icon"></i></a>Working with the bot <a href="/bots/webapps#launching-web-apps-from-the-menu-button">menu button »</a></h3>
 <table class="table">
 <thead>
@@ -2484,6 +2758,14 @@
 <td><a href="/method/account.updateStatus">account.updateStatus</a></td>
 <td>Updates online user status.</td>
 </tr>
+<tr>
+<td><a href="/method/messages.setDefaultHistoryTTL">messages.setDefaultHistoryTTL</a></td>
+<td>Changes the default value of the Time-To-Live setting, applied to all new chats.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getDefaultHistoryTTL">messages.getDefaultHistoryTTL</a></td>
+<td>Gets the default value of the Time-To-Live setting, applied to all new chats.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-user-profile-pictures" id="working-with-user-profile-pictures" name="working-with-user-profile-pictures"><i class="anchor-icon"></i></a>Working with user profile pictures</h3>
@@ -2509,7 +2791,11 @@
 </tr>
 <tr>
 <td><a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a></td>
-<td>Updates current user profile photo.</td>
+<td>Updates current user profile photo.<br><br>The <code>file</code>, <code>video</code> and <code>video_emoji_markup</code> flags are mutually exclusive.</td>
+</tr>
+<tr>
+<td><a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a></td>
+<td>Upload a custom profile picture for a contact, or suggest a new profile picture to a contact.<br><br>The <code>file</code>, <code>video</code> and <code>video_emoji_markup</code> flags are mutually exclusive.</td>
 </tr>
 </tbody>
 </table>
@@ -2528,7 +2814,7 @@
 </tr>
 <tr>
 <td><a href="/method/channels.updateUsername">channels.updateUsername</a></td>
-<td>Change the username of a supergroup/channel</td>
+<td>Change or remove the username of a supergroup/channel</td>
 </tr>
 <tr>
 <td><a href="/method/account.updateUsername">account.updateUsername</a></td>
