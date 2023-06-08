@@ -128,14 +128,14 @@ var Ads = {
     var $hint = $formGroup.find('>.pr-form-control-hint');
     var $msg = $formGroup.find('>.pr-form-control-msg');
     if (!$msg.size() && hint_text) {
-      $msg = $('<div class="pr-form-control-msg ohide" />');
+      $msg = $('<div class="pr-form-control-msg shide" />');
       $formGroup.find('>.pr-form-control-wrap').after($msg);
     }
     $msg.toggleClass('no-hint', !$hint.text().length);
     if (hint_text) {
-      $msg.html('<div class="pr-form-control-msg-text">' + hint_text + '</div>').redraw().fadeShow();
+      $msg.html('<div class="pr-form-control-msg-text">' + hint_text + '</div>').redraw().slideShow();
     } else {
-      $msg.fadeHide();
+      $msg.slideHide();
     }
     $formGroup.toggleClass('field-invalid', !!field_invalid);
   },
@@ -146,7 +146,7 @@ var Ads = {
         $fieldEl.trigger('click');
         $fieldEl.find('.items-list').addClass('collapsed');
         $fieldEl.removeClass('open');
-      } else {
+      } else if (!$fieldEl.is('[type="file"]')) {
         $fieldEl.focusAndSelect();
       }
     }
@@ -173,6 +173,13 @@ var Ads = {
       $time.removeAttr('datetime');
     });
   },
+  formatTableDate: function(timestamp) {
+    var date = new Date(timestamp * 1000);
+    var j = date.getDate();
+    var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()];
+    var y = date.getFullYear() % 100;
+    return j + ' ' + M + ' ' + y + ' ' + formatTime(timestamp * 1000);
+  },
   fieldInit: function(field) {
     $(field).on('focus blur keyup change input', Ads.eUpdateField);
     $(field).parents('.pr-search-input-wrap').find('.pr-search-reset').on('click', Ads.eClearField);
@@ -189,6 +196,8 @@ var Ads = {
     $('input.checkbox,input.radio', $form).on('focus blur', Ads.eUpdateField);
     $('.js-hint-tooltip', $form).on('mouseover mouseout click', Ads.eHintEvent);
     $('textarea.pr-form-control', $form).initAutosize();
+    $('.upload-input input', $form).on('change', Ads.eFileChange);
+    $('.upload-input .js-file-reset', $form).on('click', Ads.eFileReset);
     $(document).on('touchstart click', Ads.eHideAllHints);
     setTimeout(function(){ $form.removeClass('no-transition'); }, 100);
   },
@@ -199,11 +208,37 @@ var Ads = {
     $('input.checkbox,input.radio', $form).off('focus blur', Ads.eUpdateField);
     $('.js-hint-tooltip', $form).off('mouseover mouseout click', Ads.eHintEvent);
     $('textarea.pr-form-control', $form).destroyAutosize();
+    $('.upload-input input', $form).off('change', Ads.eFileChange);
+    $('.upload-input .js-file-reset', $form).off('click', Ads.eFileReset);
     $(document).off('touchstart click', Ads.eHideAllHints);
   },
   eClearField: function(e) {
     var $fieldEl = $(this).parents('.pr-search-input-wrap').find('.pr-search-input');
     $fieldEl.value('').trigger('input').focus();
+  },
+  eFileChange: function(e) {
+    var files = this.files || [];
+    var $field = $(this);
+    var $input = $field.parents('.upload-input');
+    var $fileName = $('.js-selected-value', $input);
+    if (files.length > 0) {
+      var file = files[0];
+      $field.data('file', file)
+      $fileName.attr('data-filename', file.name);
+      $input.addClass('selected');
+    } else {
+      $field.data('file', null);
+      $fileName.attr('data-filename', '');
+      $input.removeClass('selected');
+    }
+  },
+  eFileReset: function(e) {
+    var $input = $(this).parents('.upload-input');
+    var $field = $input.find('input');
+    var $fileName = $('.js-selected-value', $input);
+    $field.data('file', null).val('');
+    $fileName.attr('data-filename', '');
+    $input.removeClass('selected');
   },
   showHint: function($hint, delay, hide_delay) {
     hide_delay = hide_delay || 0;
@@ -283,6 +318,7 @@ var Ads = {
     options = options || {};
     $selectEl.data('selOpts', options);
     Aj.onLoad(function(state) {
+      var cachedData;
       $selectEl.initSelect({
         multiSelect: !options.noMultiSelect,
         noCloseOnSelect: false,
@@ -298,13 +334,23 @@ var Ads = {
         renderNoItems: function(q) {
           return q && options.l_no_items_found ? '<div class="select-list-no-results">' + options.l_no_items_found + '</div>' : '';
         },
-        getData: function() {
-          var data = options.items;
-          for (var i = 0; i < data.length; i++) {
-            var item = data[i];
-            item._values = [item.name.toLowerCase()];
+        getData: function(value) {
+          if (cachedData !== false && !cachedData) {
+            cachedData = false;
+            if (options.items) {
+              var data = options.items;
+              for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                item._values = [item.name.toLowerCase()];
+              }
+              cachedData = data;
+            }
           }
-          return data;
+          if (options.getData) {
+            return options.getData(value, cachedData, options.getDataOpts);
+          } else {
+            return cachedData;
+          }
         },
         onBlur: function(value) {
           options.onEnter && options.onEnter(field, value);
@@ -325,6 +371,24 @@ var Ads = {
     Aj.onUnload(function(state) {
       $selectEl.destroySelect();
     });
+  },
+  getSelectItems: function(method, need_fields) {
+    var _data = Aj.globalState.adsList;
+    if (_data === false) {
+      return false;
+    } else if (_data) {
+      return _data;
+    }
+    Aj.state.adsList = false;
+    Aj.state.adsListIsLoading = true;
+    if (Aj.state.initialAdsList) {
+      setTimeout(function() {
+        OwnerAds.processAdsList(Aj.state.initialAdsList);
+      }, 10);
+    } else {
+      OwnerAds.loadAdsList({offset: 0});
+    }
+    return false;
   },
   eLogOut: function(e) {
     e.preventDefault();
@@ -351,17 +415,37 @@ var NewAd = {
         if (selectData.channel_search) {
           Ads.initSelect(state.$form, selectData.field, {
             items: Aj.state[selectData.items_key] || [],
+            pairedField: selectData.paired_field || false,
             renderSelectedItem: function(val, item) {
               return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
             },
-            l_channels_limit: selectData.limit_lang_key ? l(selectData.limit_lang_key) : '',
             onEnter: NewAd.onChannelSearch,
             onUpdate: NewAd.onSelectUpdate,
             onChange: Ads.onSelectChange
           });
+        } else if (selectData.location_search) {
+          var $cFieldEl = state.$form.field(selectData.c_field).fieldEl();
+          $cFieldEl.data('l_field', selectData.field);
+          $cFieldEl.on('valueupdate', NewAd.updateLocationFields);
+          Ads.initSelect(state.$form, selectData.field, {
+            items: Aj.state[selectData.items_key] || [],
+            renderItem: function(item) {
+              return '<div class="select-list-item">' + (item.name + (item.region ? ', ' + item.region : '')) + '</div>';
+            },
+            getData: function(query, items, opts) {
+              return NewAd.getLocationData(items, opts.field, opts.c_field, query);
+            },
+            getDataOpts: {
+              field: selectData.field,
+              c_field: selectData.c_field,
+            },
+            onUpdate: NewAd.onSelectUpdate,
+            onChange: NewAd.onLocationSelectChange
+          });
         } else {
           Ads.initSelect(state.$form, selectData.field, {
             items: Aj.state[selectData.items_key] || [],
+            pairedField: selectData.paired_field || false,
             l_no_items_found: selectData.no_items_lang_key ? l(selectData.no_items_lang_key) : '',
             onUpdate: NewAd.onSelectUpdate,
             onChange: Ads.onSelectChange
@@ -377,6 +461,8 @@ var NewAd = {
       state.promoteUrlField.on('change.curPage', NewAd.onPromoteUrlChange);
       state.adInfoField = state.$form.field('ad_info');
       state.adInfoField.on('change.curPage', NewAd.onAdInfoChange);
+      state.targetTypeField = state.$form.field('target_type');
+      state.targetTypeField.fieldEl().on('change.curPage', NewAd.onTargetTypeChange);
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
       NewAd.updateAdPreview(state.$form, state.previewData);
@@ -408,7 +494,15 @@ var NewAd = {
       state.textField.off('.curPage');
       state.promoteUrlField.off('.curPage');
       state.adInfoField.off('.curPage');
+      state.targetTypeField.fieldEl().off('.curPage');
       state.confirmedCheckbox.off('.curPage');
+      for (var i = 0; i < state.selectList.length; i++) {
+        var selectData = state.selectList[i];
+        if (selectData.location_search) {
+          var $cFieldEl = state.$form.field(selectData.c_field).fieldEl();
+          $cFieldEl.off('valueupdate', NewAd.updateLocationFields);
+        }
+      }
       clearTimeout(state.saveDraftTo);
     });
   },
@@ -417,6 +511,14 @@ var NewAd = {
   },
   onAdInfoChange: function() {
     Ads.hideFieldError($(this));
+  },
+  onTargetTypeChange: function() {
+    var cur_type = this.value;
+    $('.pr-target-options', Aj.ajContainer).each(function() {
+      $(this).toggleClass('visible', $(this).attr('data-value') == cur_type);
+    });
+    NewAd.updateAdTargetOverview();
+    NewAd.saveDraftAuto(true);
   },
   onConfirmedChange: function() {
     $('.create-new-ad-btn', Aj.ajContainer).prop('disabled', !$(this).prop('checked'));
@@ -571,17 +673,102 @@ var NewAd = {
       }
     });
   },
-  onSelectUpdate: function(field, value, valueFull) {
-    var paired_field = null;
-    if (field == 'topics') {
-      paired_field = 'exclude_topics';
-    } else if (field == 'exclude_topics') {
-      paired_field = 'topics';
-    } else if (field == 'channels') {
-      paired_field = 'exclude_channels';
-    } else if (field == 'exclude_channels') {
-      paired_field = 'channels';
+  loadLocationData: function(params, opts, onUpdate, onReady) {
+    Aj.apiRequest('searchLocation', params, function(result) {
+      if (result.error) {
+        if (result.field) {
+          onReady && onReady();
+          var $field = Aj.state.$form.field(result.field);
+          if ($field.size()) {
+            Ads.showFieldError($field, result.error, true);
+            return false;
+          }
+        } else {
+          if (!opts.retry) opts.retry = 1;
+          else opts.retry++;
+          setTimeout(function(){ NewAd.loadLocationData(params, opts, onUpdate, onReady); }, opts.retry * 1000);
+        }
+      } else {
+        if (opts.retry) {
+          opts.retry = 0;
+        }
+        if (result.items) {
+          var locCache = Aj.globalState._locationCache;
+          var data_key = opts.key;
+          if (!locCache[data_key]) {
+            locCache[data_key] = [];
+          }
+          var items = result.items;
+          for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            item._values = [item.name.toLowerCase()];
+            locCache[data_key].push(item);
+          }
+          onUpdate && onUpdate();
+        }
+        if (result.next_offset) {
+          params.offset = result.next_offset;
+          NewAd.loadLocationData(params, opts, onUpdate, onReady);
+        } else {
+          onReady && onReady();
+        }
+      }
+    });
+  },
+  updateLocationFields: function(e, value, valueFull) {
+    var field = $(this).data('l_field');
+    var $fieldEl = Aj.state.$form.field(field);
+    if (!value.length) {
+      $fieldEl.trigger('reset');
     }
+  },
+  getLocationData: function(items, field, c_field, query) {
+    var $form = Aj.state.$form;
+    var $fieldEl = $form.field(field);
+    var $formGroup = $fieldEl.fieldEl().parents('.form-group');
+    var $cFieldEl = $form.field(c_field);
+    var c_value = $cFieldEl.data('value');
+    if (c_value.join) {
+      if (c_value.length > 1) {
+        Ads.showFieldError($cFieldEl, l('ADS_ERROR_LOCATION_COUNTRIES_TOO_MANY'));
+        return false;
+      }
+      c_value = c_value.join(';');
+    }
+    query = query.replace(/^\s+/, '');
+    if (!query.length || !c_value) {
+      return items;
+    }
+    if (!Aj.globalState._locationCache) {
+      Aj.globalState._locationCache = {};
+    }
+    var locCache = Aj.globalState._locationCache;
+    var data_key = c_value + '.' + query.substr(0, 1);
+    if (locCache[data_key] === false || locCache[data_key]) {
+      return locCache[data_key] ? locCache[data_key].concat(items) : items;
+    }
+    locCache[data_key] = false;
+    $formGroup.addClass('field-loading');
+    NewAd.loadLocationData({
+      countries: c_value,
+      query: query,
+      offset: 0
+    }, {key: data_key}, function() {
+      $fieldEl.trigger('contentchange');
+    }, function() {
+      $formGroup.removeClass('field-loading');
+      $fieldEl.trigger('dataready').trigger('datachange');
+    });
+    return false;
+  },
+  onLocationSelectChange: function(field, value, valueFull) {
+    var $fieldEl = Aj.state.$form.field(field);
+    Ads.hideFieldError($fieldEl);
+  },
+  onSelectUpdate: function(field, value, valueFull) {
+    var $fieldEl = Aj.state.$form.field(field);
+    var selOpts = $fieldEl.data('selOpts');
+    var paired_field = selOpts.pairedField;
     if (!paired_field) {
       NewAd.updateAdTargetOverview();
       return;
@@ -739,6 +926,7 @@ var NewAd = {
   },
   updateAdTargetOverview: function() {
     var len = {}, lang_params = {}, need_outside_cb = false;
+    var target_type = Aj.state.$form.field('target_type').value();
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
       var field = selectData.field;
@@ -765,39 +953,76 @@ var NewAd = {
       }
       Ads.hideFieldError($field);
     }
-    if ((len.langs || len.topics) && len.channels) {
-      if (len.langs) {
-        Ads.showFieldError(Aj.state.$form.field('langs'), l('ADS_ERROR_LANG_AND_CHANNEL_NOT_ALLOWED'));
-      } else if (len.topics) {
-        Ads.showFieldError(Aj.state.$form.field('topics'), l('ADS_ERROR_TOPIC_AND_CHANNEL_NOT_ALLOWED'));
-      }
-    } else if (!len.langs && len.topics) {
-      Ads.showFieldError(Aj.state.$form.field('langs'), l('ADS_ERROR_LANGUAGE_REQUIRED'));
-    }
     var overview = '';
-    if (!len.langs && !len.topics && !len.channels ||
-        (len.langs || len.topics) && len.channels ||
-        !len.langs && len.topics) {
-      overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
-    } else {
-      if (len.langs > 0) {
-        if (len.topics > 0) {
-          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_TOPICS', lang_params) + '</div>';
-        } else {
-          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_LANGS', lang_params) + '</div>';
+    if (target_type == 'channels') {
+      if ((len.langs || len.topics) && len.channels) {
+        if (len.langs) {
+          Ads.showFieldError(Aj.state.$form.field('langs'), l('ADS_ERROR_LANG_AND_CHANNEL_NOT_ALLOWED'));
+        } else if (len.topics) {
+          Ads.showFieldError(Aj.state.$form.field('topics'), l('ADS_ERROR_TOPIC_AND_CHANNEL_NOT_ALLOWED'));
+        }
+      } else if (!len.langs && len.topics) {
+        Ads.showFieldError(Aj.state.$form.field('langs'), l('ADS_ERROR_LANGUAGE_REQUIRED'));
+      }
+      if (!len.langs && !len.topics && !len.channels ||
+          (len.langs || len.topics) && len.channels ||
+          !len.langs && len.topics) {
+        overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
+      } else {
+        if (len.langs > 0) {
+          if (len.topics > 0) {
+            overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_TOPICS', lang_params) + '</div>';
+          } else {
+            overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_LANGS', lang_params) + '</div>';
+          }
+        }
+        if (len.channels > 0) {
+          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_CHANNELS', lang_params) + '</div>';
+        }
+        if (len.exclude_topics > 0) {
+          overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_TOPICS', lang_params) + '</div>';
+        }
+        if (len.exclude_channels > 0) {
+          overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_CHANNELS', lang_params) + '</div>';
         }
       }
-      if (len.channels > 0) {
-        overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_CHANNELS', lang_params) + '</div>';
+      $('.js-exclude-outside').toggleClass('hide', !need_outside_cb);
+    } else if (target_type == 'users') {
+      if (!len.locations && !len.countries && !len.user_langs && !len.user_topics && !len.audiences) {
+        overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
+      } else {
+        var user_targets = [];
+        if (len.locations > 0) {
+          user_targets.push(l('WEB_AD_TARGET_USER_LOCATIONS', lang_params));
+        } else {
+          lang_params.locations = lang_params.countries;
+          user_targets.push(l('WEB_AD_TARGET_USER_LOCATIONS', lang_params));
+        }
+        if (len.user_langs > 0) {
+          user_targets.push(l('WEB_AD_TARGET_USER_LANGS', lang_params));
+        }
+        if (len.user_topics > 0) {
+          user_targets.push(l('WEB_AD_TARGET_USER_TOPICS', lang_params));
+        }
+        if (len.audiences > 0) {
+          user_targets.push(l('WEB_AD_TARGET_AUDIENCES', lang_params));
+        }
+        if (user_targets.length > 1) {
+          var last_user_target = user_targets.pop();
+          user_targets[user_targets.length - 1] = l('WEB_AD_TARGET_AND', {item1: user_targets[user_targets.length - 1], item2: last_user_target});
+        }
+        overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS', {target: user_targets.join(', ')}) + '</div>';
+        if (len.exclude_user_topics > 0) {
+          overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_USER_EXCLUDE_TOPICS', lang_params) + '</div>';
+        }
+        if (len.exclude_audiences > 0) {
+          overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_AUDIENCES', lang_params) + '</div>';
+        }
       }
-      if (len.exclude_topics > 0) {
-        overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_TOPICS', lang_params) + '</div>';
-      }
-      if (len.exclude_channels > 0) {
-        overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_CHANNELS', lang_params) + '</div>';
-      }
+      $('.js-exclude-outside').addClass('hide');
+    } else {
+      overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
     }
-    $('.js-exclude-outside').toggleClass('hide', !need_outside_cb);
     $('.pr-target-overview', Aj.ajContainer).html(overview);
   },
   getFormData: function($form) {
@@ -809,7 +1034,8 @@ var NewAd = {
       $form.field('promote_url').value(),
       $form.field('ad_info').value(),
       $form.field('cpm').value(),
-      $form.field('budget').value()
+      $form.field('budget').value(),
+      $form.field('target_type').value()
     ];
     if ($form.field('picture').prop('checked')) {
       values.push('picture');
@@ -850,6 +1076,7 @@ var NewAd = {
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
     var budget      = Ads.amountFieldValue($form, 'budget');
+    var target_type = $form.field('target_type').value();
 
     if (!title.length) {
       $form.field('title').focus();
@@ -878,7 +1105,8 @@ var NewAd = {
       promote_url: promote_url,
       ad_info: ad_info,
       cpm: cpm,
-      budget: budget
+      budget: budget,
+      target_type: target_type
     };
     if ($form.field('picture').prop('checked')) {
       params.picture = 1;
@@ -932,6 +1160,7 @@ var NewAd = {
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
     var budget      = Ads.amountFieldValue($form, 'budget');
+    var target_type = $form.field('target_type').value();
 
     var curFormData = NewAd.getFormData($form);
     if (Aj.state.initFormData == curFormData) {
@@ -944,7 +1173,8 @@ var NewAd = {
       promote_url: promote_url,
       ad_info: ad_info,
       cpm: cpm,
-      budget: budget
+      budget: budget,
+      target_type: target_type
     };
     if ($form.field('picture').prop('checked')) {
       params.picture = 1;
@@ -1252,9 +1482,17 @@ var OwnerAds = {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
       state.$searchField = $('.pr-search-input');
+      state.$adsListTable = $('.pr-table');
       state.$searchResults = $('.pr-table tbody');
       Ads.fieldInit(state.$searchField);
       cont.on('click.curPage', '.pr-cell-sort', OwnerAds.eSortList);
+      cont.on('click.curPage', '.pr-table-settings', OwnerAds.eSettingsOpen);
+      cont.on('click.curPage', '.js-clone-ad-btn', EditAd.eCloneAd);
+      cont.on('click.curPage', '.delete-ad-btn', EditAd.deleteAd);
+      state.$tableColumnsPopup = $('.table-columns-popup');
+      state.$tableColumnsForm = $('.table-columns-form');
+      state.$tableColumnsForm.on('change.curPage', 'input.checkbox', OwnerAds.eColumnChange);
+      state.$tableColumnsForm.on('submit.curPage', preventDefault);
 
       state.$searchField.initSearch({
         $results: state.$searchResults,
@@ -1267,21 +1505,22 @@ var OwnerAds = {
         },
         renderItem: function(item, query) {
           var status_attrs = ' href="' + item.base_url + item.status_url + '" ' + (item.status_attrs || 'data-layer');
-          var tme_link = item.tme_path ? '<a href="https://t.me/' + item.tme_path + '" target="_blank">' + item.tme_path + '</a>' : '<span class="pr-no-tme-link">' + l('WEB_ADS_NO_TME_LINK') + '</span>';
-          return '<td><div class="pr-cell pr-cell-title"><a href="' + item.base_url + '">' + item.title + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + item.views_str + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + item.cpm_str + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + item.budget + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + item.target + '</a></div></td><td><div class="pr-cell">' + tme_link + '</div></td><td><div class="pr-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + OwnerAds.formatTableDate(item.date) + '</a></div></td>';
+          var title_class = 'pr-trg-type-' + item.trg_type;
+          var tme_link = item.tme_path ? '<a href="https://t.me/' + item.tme_path + '" target="_blank">t.me/' + item.tme_path + '</a>' : '<span class="pr-no-tme-link">' + l('WEB_ADS_NO_TME_LINK') + '</span>';
+          return '<td><div class="pr-cell pr-cell-title ' + title_class + '"><a href="' + item.base_url + '"class="pr-link">' + item.title + '</a><small style="display:var(--coldp-url,inline)"><br>' + tme_link + '</small></div></td><td style="display:var(--coldp-views,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + formatNumber(item.views) + '</a></div></td><td style="display:var(--coldp-joins,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + formatNumber(item.joins) + '</a></div></td><td style="display:var(--coldp-cpm,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + Ads.wrapAmount(item.cpm) + '</a></div></td><td style="display:var(--coldp-cps,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + Ads.wrapAmount(item.cps) + '</a></div></td><td style="display:var(--coldp-spent,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + Ads.wrapAmount(item.spent) + '</a></div></td><td style="display:var(--coldp-budget,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + Ads.wrapAmount(item.budget) + '</a></div></td><td style="display:var(--coldp-target,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + item.target + '</a></div></td><td style="display:var(--coldp-status,table-cell)"><div class="pr-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td style="display:var(--coldp-date,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + Ads.formatTableDate(item.date) + '</a></div></td><td><div class="pr-actions-cell">' + Aj.state.adsDropdownTpl.replace(/\{ad_id\}/g, item.ad_id).replace(/\{tme_path\}/g, item.tme_path).replace(/\{ad_text\}/g, item.text) + '</div></td>';
         },
         renderLoading: function() {
-          return '<tr><td colspan="8" class="pr-cell-empty"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
+          return '<tr><td colspan="100" class="pr-cell-empty"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
         },
         renderNoItems: function(query) {
           if (Aj.state.adsListIsLoading) {
-            return '<tr><td colspan="8" class="pr-cell-empty-full"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
+            return '<tr><td colspan="100" class="pr-cell-empty-full"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
           }
-          return '<tr><td colspan="8" class="pr-cell-empty-full"><div class="pr-cell">' + l('WEB_OWNER_NO_ADS') + '</div></td></tr>';
+          return '<tr><td colspan="100" class="pr-cell-empty-full"><div class="pr-cell">' + l('WEB_OWNER_NO_ADS') + '</div></td></tr>';
         },
         appendToItems: function(query, result_count) {
           if (Aj.state.adsListIsLoading && result_count > 0) {
-            return '<tr><td colspan="8" class="pr-cell-empty"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
+            return '<tr><td colspan="100" class="pr-cell-empty"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
           }
           return '';
         },
@@ -1293,14 +1532,8 @@ var OwnerAds = {
     Aj.onUnload(function(state) {
       Ads.fieldDestroy(state.$searchField);
       state.$searchField.destroySearch();
+      state.$tableColumnsForm.off('.curPage');
     });
-  },
-  formatTableDate: function(timestamp) {
-    var date = new Date(timestamp * 1000);
-    var j = date.getDate();
-    var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()];
-    var y = date.getFullYear() % 100;
-    return j + ' ' + M + ' ' + y + ' ' + formatTime(timestamp * 1000);
   },
   eSortList: function(e) {
     var $sortEl = $(this);
@@ -1314,6 +1547,31 @@ var OwnerAds = {
     }
     OwnerAds.updateAdsList();
     Aj.state.$searchField.trigger('datachange');
+  },
+  eSettingsOpen: function() {
+    openPopup(Aj.state.$tableColumnsPopup, {
+      closeByClickOutside: '.popup-no-close',
+    });
+  },
+  eColumnChange: function() {
+    var column = $(this).prop('name');
+    var checked = $(this).prop('checked');
+    Aj.state.$adsListTable.cssProp('--coldp-' + column, checked ? '' : 'none');
+    OwnerAds.submitColumns();
+  },
+  submitColumns: function() {
+    var $form = Aj.state.$tableColumnsForm;
+    var active_columns = [];
+    for (var i = 0; i < Aj.state.adsListAllColumns.length; i++) {
+      var column = Aj.state.adsListAllColumns[i];
+      if ($form.field(column).prop('checked')) {
+        active_columns.push(column);
+      }
+    }
+    Aj.apiRequest('saveAdsColumns', {
+      columns: active_columns.join(';')
+    });
+    return false;
   },
   updateAdsList: function() {
     if (Aj.state.adsList) {
@@ -2001,9 +2259,15 @@ var EditAd = {
     if ($button.prop('disabled')) {
       return false;
     }
+    var $item = $button.parents('li');
+    var ad_id = Aj.state.adId;
+    if ($item.size()) {
+      $item.parents('.open').find('.dropdown-toggle').dropdown('toggle');
+      ad_id = $(this).parents('[data-ad-id]').attr('data-ad-id');
+    }
     var params = {
       owner_id: Aj.state.ownerId,
-      ad_id: Aj.state.adId
+      ad_id: ad_id
     };
     var onSuccess = function(result) {
       $button.prop('disabled', false);
@@ -2025,7 +2289,7 @@ var EditAd = {
     return false;
   },
   deletePopup: function (confirm_text, onConfirm) {
-    var $confirm = $('<div class="popup-container hide alert-popup-container"><section class="pr-layer-popup pr-layer-delete-ad popup-no-close"><h3 class="pr-layer-header">' + l('WEB_DELETE_AD_CONFIRM_HEADER') + '</h3><p class="pr-layer-text"></p><div class="tgme_popup_buttons"><div class="tgme_popup_button popup-cancel-btn">' + l('WEB_POPUP_CANCEL_BTN') + '</div><div class="tgme_popup_button popup-primary-btn">' + l('WEB_DELETE_AD_CONFIRM_BUTTON') + '</div></div></section></div>');
+    var $confirm = $('<div class="popup-container hide alert-popup-container"><section class="pr-layer-popup pr-layer-delete-ad popup-no-close"><h3 class="pr-layer-header">' + l('WEB_DELETE_AD_CONFIRM_HEADER') + '</h3><p class="pr-layer-text"></p><div class="popup-buttons"><div class="popup-button popup-cancel-btn">' + l('WEB_POPUP_CANCEL_BTN') + '</div><div class="popup-button popup-primary-btn">' + l('WEB_DELETE_AD_CONFIRM_BUTTON') + '</div></div></section></div>');
     var confirm = function() {
       onConfirm && onConfirm($confirm);
       closePopup($confirm);
@@ -2048,9 +2312,15 @@ var EditAd = {
     if ($button.prop('disabled')) {
       return false;
     }
+    var $item = $button.parents('li');
+    var ad_id = Aj.state.adId;
+    if ($item.size()) {
+      $item.parents('.open').find('.dropdown-toggle').dropdown('toggle');
+      ad_id = $(this).parents('[data-ad-id]').attr('data-ad-id');
+    }
     var params = {
       owner_id: Aj.state.ownerId,
-      ad_id: Aj.state.adId
+      ad_id: ad_id
     };
     var onSuccess = function(result) {
       $button.prop('disabled', false);
@@ -2073,9 +2343,471 @@ var EditAd = {
   }
 };
 
+var TransferFunds = {
+  init: function() {
+    var cont = Aj.ajContainer;
+    Aj.onLoad(function(state) {
+      state.$form = $('form.add-funds-form', cont);
+      Ads.formInit(state.$form);
+      state.$form.on('submit', preventDefault);
+      cont.on('click.curPage', '.js-toggle-sign', TransferFunds.onToggleAmountSign);
+      cont.on('click.curPage', '.transfer-funds-btn', TransferFunds.eSubmitForm);
+      state.submitBtn = $('.transfer-funds-btn', cont);
+      state.amountField = state.$form.field('amount');
+      state.amountField.on('keyup.curPage change.curPage input.curPage', TransferFunds.onAmountChange);
+      state.decrAmountField = state.$form.field('decr_amount');
+      state.decrAmountField.on('keyup.curPage change.curPage input.curPage', TransferFunds.onAmountChange);
+      Ads.initSelect(state.$form, 'account', {
+        items: Aj.state.accountItems || [],
+        noMultiSelect: true,
+        renderSelectedItem: function(val, item) {
+          return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
+        },
+        onChange: Account.onChannelChange
+      });
+    });
+    Aj.onUnload(function(state) {
+      Ads.formDestroy(state.$form);
+      state.$form.off('submit', preventDefault);
+      state.amountField.off('.curPage');
+      clearTimeout(Aj.state.transferTo);
+    });
+  },
+  onToggleAmountSign: function(e) {
+    e.preventDefault();
+    Aj.state.$form.toggleClass('decr');
+    TransferFunds.onAmountChange();
+  },
+  onAmountChange: function() {
+    var decr = Aj.state.$form.hasClass('decr');
+    var amount = Ads.amountFieldValue(Aj.state.$form, decr ? 'decr_amount' : 'amount') || 0;
+    if (amount) {
+      var button_label = l(decr ? 'WEB_WITHDRAW_AMOUNT_BUTTON' : 'WEB_TRANSFER_AMOUNT_BUTTON', {amount: Ads.wrapAmount(amount)});
+    } else {
+      var button_label = l(decr ? 'WEB_WITHDRAW_FUNDS_BUTTON' : 'WEB_TRANSFER_FUNDS_BUTTON');
+    }
+    Aj.state.submitBtn.prop('disabled', !amount).html(button_label);
+  },
+  eSubmitForm: function(e) {
+    e.preventDefault();
+    var $form        = Aj.state.$form;
+    var $button      = $(this);
+    var decr         = $form.hasClass('decr');
+    var account_id   = $form.field('account').data('value');
+    var amount_field = decr ? 'decr_amount' : 'amount';
+    var amount       = Ads.amountFieldValue($form, amount_field);
+    if ($button.prop('disabled')) {
+      return false;
+    }
+    if (!account_id) {
+      $form.field('account').trigger('click');
+      return false;
+    }
+    if (amount === false) {
+      $form.field(amount_field).focus();
+      return false;
+    }
+
+    var method = decr ? 'transferWithdrawFunds' : 'transferFunds';
+    var params = {
+      owner_id: Aj.state.ownerId,
+      account_id: account_id,
+      amount: amount
+    };
+    var onSuccess = function(result) {
+      $button.prop('disabled', false);
+      if (result.error) {
+        if (result.field) {
+          var $field = $form.field(result.field);
+          if ($field.size()) {
+            Ads.showFieldError($field, result.error, true);
+            return false;
+          }
+        }
+        if (result.budget) {
+          $('.js-owner_budget').html(result.budget);
+        }
+        return showAlert(result.error);
+      }
+      if (result.confirm_text && result.confirm_hash) {
+        showConfirm(result.confirm_text, function() {
+          params.confirm_hash = result.confirm_hash;
+          $button.prop('disabled', true);
+          Aj.apiRequest(method, params, onSuccess);
+        }, result.confirm_btn);
+      } else if (result.request_id) {
+        $button.prop('disabled', true);
+        Aj.state.transferTo = setTimeout(function() {
+          params.request_id = result.request_id;
+          Aj.apiRequest(method, params, onSuccess);
+        }, 400);
+      } else if (result.redirect_to) {
+        Aj.location(result.redirect_to);
+      }
+    };
+    $button.prop('disabled', true);
+    Aj.apiRequest(method, params, onSuccess);
+    return false;
+  }
+};
+
+var Audiences = {
+  init: function() {
+    var cont = Aj.ajContainer;
+    Aj.onLoad(function(state) {
+      state.$searchField = $('.pr-search-input');
+      state.$searchResults = $('.pr-table tbody');
+      Ads.fieldInit(state.$searchField);
+      cont.on('click.curPage', '.pr-cell-sort', Audiences.eSortList);
+      cont.on('click.curPage', '.delete-audience-btn', Audiences.deleteAudience);
+
+      var listInited = false;
+      state.$searchField.initSearch({
+        $results: state.$searchResults,
+        emptyQueryEnabled: true,
+        updateOnInit: true,
+        resultsNotScrollable: true,
+        itemTagName: 'tr',
+        enterEnabled: function() {
+          return false;
+        },
+        renderItem: function(item, query) {
+          return '<td><div class="pr-cell pr-cell-title">' + item.title + '</div></td><td><div class="pr-cell">' + Ads.formatTableDate(item.date) + '</div></td><td><div class="pr-cell">' + item.used + '</div></td><td><div class="pr-cell">' + item.users + '</div></td><td><div class="pr-actions-cell">' + Aj.state.audienceDropdownTpl.replace(/{audience_id}/g, item.audience_id) + '</div></td>';
+        },
+        getData: function() {
+          if (!listInited) {
+            listInited = true;
+            var items = Aj.state.audiencesList;
+            for (var i = 0; i < items.length; i++) {
+              var item = items[i];
+              item.base_url = '/account/audience/' + item.audience_id;
+              item._values = [item.title.toLowerCase()];
+            }
+          }
+          return Aj.state.audiencesList;
+        }
+      });
+    });
+    Aj.onUnload(function(state) {
+      Ads.fieldDestroy(state.$searchField);
+      state.$searchField.destroySearch();
+    });
+  },
+  eSortList: function(e) {
+    var $sortEl = $(this);
+    var sortBy  = $sortEl.attr('data-sort-by');
+    var sortAsc = $sortEl.hasClass('sort-asc');
+    if (sortBy == Aj.state.audiencesListSortBy) {
+      Aj.state.audiencesListSortAsc = !sortAsc;
+    } else {
+      Aj.state.audiencesListSortBy = sortBy;
+      Aj.state.audiencesListSortAsc = false;
+    }
+    Audiences.updateAudiencesList();
+    Aj.state.$searchField.trigger('datachange');
+  },
+  updateAudiencesList: function() {
+    if (Aj.state.audiencesList) {
+      var sortBy  = Aj.state.audiencesListSortBy;
+      var sortAsc = Aj.state.audiencesListSortAsc;
+      $('.pr-cell-sort').each(function() {
+        var $sortEl = $(this);
+        var curSortBy  = $sortEl.attr('data-sort-by');
+        $sortEl.toggleClass('sort-active', sortBy == curSortBy);
+        $sortEl.toggleClass('sort-asc', sortAsc && sortBy == curSortBy);
+      });
+      Aj.state.audiencesList.sort(function(ad1, ad2) {
+        var v1 = sortAsc ? ad1 : ad2;
+        var v2 = sortAsc ? ad2 : ad1;
+        return (v1[sortBy] - v2[sortBy]) || (v1.date - v2.date);
+      });
+    }
+  },
+  updateAudience: function(audience) {
+    if (!Aj.state || !Aj.state.audiencesList) {
+      return;
+    }
+    var audiencesList = Aj.state.audiencesList;
+    for (var i = 0; i < audiencesList.length; i++) {
+      if (audience.owner_id == audiencesList[i].owner_id &&
+          audience.audience_id == audiencesList[i].audience_id) {
+        audience.base_url = '/account/audience/' + audience.audience_id;
+        audience._values = [audience.title.toLowerCase()];
+        audiencesList[i] = audience;
+        Audiences.updateAudiencesList();
+        Aj.state.$searchField.trigger('contentchange');
+        return;
+      }
+    }
+  },
+  initCreatePopup: function() {
+    var cont = Aj.layer;
+    Aj.onLayerLoad(function(layerState) {
+      layerState.$form = $('.pr-popup-edit-form', cont);
+      Ads.formInit(layerState.$form);
+      layerState.titleField = layerState.$form.field('title');
+      layerState.titleField.on('change.curPage', NewAd.onTitleChange);
+      Aj.layer.one('popup:open', function() {
+        layerState.titleField.focusAndSelect(true);
+      });
+      layerState.$form.on('submit', Audiences.eSubmitCreatePopupForm);
+      cont.on('click.curLayer', '.submit-form-btn', Audiences.eSubmitCreatePopupForm);
+    });
+    Aj.onLayerUnload(function(layerState) {
+      if (Aj.layerState.uploadRequestXhr) {
+        Aj.layerState.uploadRequestXhr.abort();
+      }
+      Ads.formDestroy(layerState.$form);
+      layerState.$form.off('submit', Audiences.eSubmitCreatePopupForm);
+      layerState.titleField.off('.curPage');
+    });
+  },
+  eSubmitCreatePopupForm: function(e) {
+    e.preventDefault();
+    var $form    = Aj.layerState.$form;
+    var owner_id = $form.field('owner_id').value();
+    var title    = $form.field('title').value();
+    var $fileEl  = $form.field('file');
+    var file     = $fileEl.data('file');
+    if ($form.data('disabled')) {
+      return false;
+    }
+    if (!title.length) {
+      $form.field('title').focus();
+      return false;
+    }
+    if (!file) {
+      $form.field('file').focus();
+      return false;
+    }
+    var params = {
+      owner_id: owner_id,
+      title:    title
+    };
+    var $formGroup = $fileEl.parents('.form-group');
+    $formGroup.addClass('field-loading');
+    $form.addClass('disabled').data('disabled', true);
+    Aj.layerState.uploadRequestXhr = Aj.uploadRequest('createAudience', file, params, function(result) {
+      Aj.layerState.uploadRequestXhr = null;
+      $form.removeClass('disabled').data('disabled', false);
+      $formGroup.removeClass('field-loading');
+      if (result.error) {
+        if (result.field) {
+          var $field = $form.field(result.field);
+          if ($field.size()) {
+            Ads.showFieldError($field, result.error, true);
+            return false;
+          }
+        }
+        return showAlert(result.error);
+      }
+      closePopup(Aj.layer);
+      if (result.audience && Aj.state.audiencesList) {
+        Aj.state.audiencesList.push(result.audience);
+        Audiences.updateAudience(result.audience);
+      }
+      if (result.audience_opt && Aj.state.audienceItems) {
+        Aj.state.audienceItems.push(result.audience_opt);
+        for (var i = 0; i < Aj.state.selectList.length; i++) {
+          var selectData = Aj.state.selectList[i];
+          if (selectData.items_key == 'audienceItems') {
+            var $fieldEl = Aj.state.$form.field(selectData.field);
+            $fieldEl.trigger('datachange');
+            if (selectData.add_new_audience) {
+              $fieldEl.trigger('selectval', [result.audience_opt, true]);
+            }
+          }
+        }
+      }
+    }, function(loaded, total) {
+      var progress = total ? loaded / total : 0;
+      $('.js-progress-value', $formGroup).html(Math.round(progress * 100) + '%');
+      $formGroup.each(function() {
+        this.style.setProperty('--upload-progress', progress);
+      });
+    });
+    return false;
+  },
+  initEditTitlePopup: function() {
+    var cont = Aj.layer;
+    Aj.onLayerLoad(function(layerState) {
+      layerState.$form = $('.pr-popup-edit-form', cont);
+      Ads.formInit(layerState.$form);
+      layerState.titleField = layerState.$form.field('title');
+      layerState.titleField.on('change.curPage', NewAd.onTitleChange);
+      Aj.layer.one('popup:open', function() {
+        layerState.titleField.focusAndSelect(true);
+      });
+      layerState.$form.on('submit', Audiences.eSubmitEditTitlePopupForm);
+      cont.on('click.curLayer', '.submit-form-btn', Audiences.eSubmitEditTitlePopupForm);
+    });
+    Aj.onLayerUnload(function(layerState) {
+      Ads.formDestroy(layerState.$form);
+      layerState.$form.off('submit', Audiences.eSubmitEditTitlePopupForm);
+      layerState.titleField.off('.curPage');
+    });
+  },
+  eSubmitEditTitlePopupForm: function(e) {
+    e.preventDefault();
+    var $form       = Aj.layerState.$form;
+    var owner_id    = $form.field('owner_id').value();
+    var audience_id = $form.field('audience_id').value();
+    var title       = $form.field('title').value();
+    if ($form.data('disabled')) {
+      return false;
+    }
+    if (!title.length) {
+      $form.field('title').focus();
+      return false;
+    }
+    var params = {
+      owner_id:    owner_id,
+      audience_id: audience_id,
+      title:       title
+    };
+    $form.data('disabled', true);
+    Aj.apiRequest('editAudienceTitle', params, function(result) {
+      $form.data('disabled', false);
+      if (result.error) {
+        if (result.field) {
+          var $field = $form.field(result.field);
+          if ($field.size()) {
+            Ads.showFieldError($field, result.error, true);
+            return false;
+          }
+        }
+        return showAlert(result.error);
+      }
+      closePopup(Aj.layer);
+      if (result.audience) {
+        Audiences.updateAudience(result.audience);
+      }
+    });
+    return false;
+  },
+  initUpdateUsersPopup: function() {
+    var cont = Aj.layer;
+    Aj.onLayerLoad(function(layerState) {
+      layerState.$form = $('.pr-popup-edit-form', cont);
+      Ads.formInit(layerState.$form);
+      layerState.$form.on('submit', Audiences.eSubmitUpdateUsersPopupForm);
+      cont.on('click.curLayer', '.submit-form-btn', Audiences.eSubmitUpdateUsersPopupForm);
+    });
+    Aj.onLayerUnload(function(layerState) {
+      if (Aj.layerState.uploadRequestXhr) {
+        Aj.layerState.uploadRequestXhr.abort();
+      }
+      Ads.formDestroy(layerState.$form);
+      layerState.$form.off('submit', Audiences.eSubmitUpdateUsersPopupForm);
+    });
+  },
+  eSubmitUpdateUsersPopupForm: function(e) {
+    e.preventDefault();
+    var $form       = Aj.layerState.$form;
+    var owner_id    = $form.field('owner_id').value();
+    var audience_id = $form.field('audience_id').value();
+    var $fileEl     = $form.field('file');
+    var file        = $fileEl.data('file');
+    if ($form.data('disabled')) {
+      return false;
+    }
+    if (!file) {
+      $form.field('file').focus();
+      return false;
+    }
+    var params = {
+      owner_id:    owner_id,
+      audience_id: audience_id
+    };
+    var $formGroup = $fileEl.parents('.form-group');
+    $formGroup.addClass('field-loading');
+    $form.addClass('disabled').data('disabled', true);
+    var method = Aj.layerState.updateMethod;
+    Aj.layerState.uploadRequestXhr = Aj.uploadRequest(method, file, params, function(result) {
+      Aj.layerState.uploadRequestXhr = null;
+      $form.removeClass('disabled').data('disabled', false);
+      $formGroup.removeClass('field-loading');
+      if (result.error) {
+        if (result.field) {
+          var $field = $form.field(result.field);
+          if ($field.size()) {
+            Ads.showFieldError($field, result.error, true);
+            return false;
+          }
+        }
+        return showAlert(result.error);
+      }
+      closePopup(Aj.layer);
+      if (result.audience) {
+        Audiences.updateAudience(result.audience);
+      }
+    }, function(loaded, total) {
+      var progress = total ? loaded / total : 0;
+      $('.js-progress-value', $formGroup).html(Math.round(progress * 100) + '%');
+      $formGroup.each(function() {
+        this.style.setProperty('--upload-progress', progress);
+      });
+    });
+    return false;
+  },
+  deletePopup: function (confirm_text, onConfirm) {
+    var $confirm = $('<div class="popup-container hide alert-popup-container"><section class="pr-layer-popup pr-layer-delete-ad popup-no-close"><h3 class="pr-layer-header">' + l('WEB_DELETE_AUDIENCE_CONFIRM_HEADER') + '</h3><p class="pr-layer-text"></p><div class="popup-buttons"><div class="popup-button popup-cancel-btn">' + l('WEB_POPUP_CANCEL_BTN') + '</div><div class="popup-button popup-primary-btn">' + l('WEB_DELETE_AUDIENCE_CONFIRM_BUTTON') + '</div></div></section></div>');
+    var confirm = function() {
+      onConfirm && onConfirm($confirm);
+      closePopup($confirm);
+    }
+    $('.pr-layer-text', $confirm).html(confirm_text);
+    var $primaryBtn = $('.popup-primary-btn', $confirm);
+    $primaryBtn.on('click', confirm);
+    $confirm.one('popup:close', function() {
+      $primaryBtn.off('click', confirm);
+      $confirm.remove();
+    });
+    openPopup($confirm, {
+      closeByClickOutside: '.popup-no-close',
+    });
+    return $confirm;
+  },
+  deleteAudience: function(e) {
+    e.preventDefault();
+    var $button = $(this);
+    if ($button.prop('disabled')) {
+      return false;
+    }
+    var $item = $button.parents('li');
+    var audience_id = Aj.state.audienceId;
+    if ($item.size()) {
+      $item.parents('.open').find('.dropdown-toggle').dropdown('toggle');
+      audience_id = $(this).parents('[data-audience-id]').attr('data-audience-id');
+    }
+    var params = {
+      owner_id: Aj.state.ownerId,
+      audience_id: audience_id
+    };
+    var onSuccess = function(result) {
+      $button.prop('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.confirm_text && result.confirm_hash) {
+        Audiences.deletePopup(result.confirm_text, function() {
+          params.confirm_hash = result.confirm_hash;
+          $button.prop('disabled', true);
+          Aj.apiRequest('deleteAudience', params, onSuccess);
+        });
+      } else if (result.redirect_to) {
+        Aj.location(result.redirect_to);
+      }
+    };
+    $button.prop('disabled', true);
+    Aj.apiRequest('deleteAudience', params, onSuccess);
+    return false;
+  }
+};
+
 
 
 (function(d){var c=function(a){this._options={checkOnLoad:!1,resetOnEnd:!1,loopCheckTime:50,loopMaxNumber:5,baitClass:"pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links ads-header ads-content",baitStyle:"width: 1px !important; height: 1px !important; position: absolute !important; left: -10000px !important; top: -1000px !important;"};this._var={version:"3.2.1",bait:null,checking:!1,loop:null,loopNumber:0,event:{detected:[],notDetected:[]}};void 0!==a&&this.setOption(a);var b=this;a=function(){setTimeout(function(){!0===b._options.checkOnLoad&&(null===b._var.bait&&b._creatBait(),setTimeout(function(){b.check()},1))},1)};void 0!==d.addEventListener?d.addEventListener("load",a,!1):d.attachEvent("onload",a)};c.prototype._options=null;c.prototype._var=null;c.prototype._bait=null;c.prototype.setOption=function(a,b){if(void 0!==b){var e=a;a={};a[e]=b}for(var f in a)this._options[f]=a[f];return this};c.prototype._creatBait=function(){var a=document.createElement("div");a.setAttribute("class",this._options.baitClass);a.setAttribute("style",this._options.baitStyle);this._var.bait=d.document.body.appendChild(a);this._var.bait.offsetParent;this._var.bait.offsetHeight;this._var.bait.offsetLeft;this._var.bait.offsetTop;this._var.bait.offsetWidth;this._var.bait.clientHeight;this._var.bait.clientWidth};c.prototype._destroyBait=function(){d.document.body.removeChild(this._var.bait);this._var.bait=null};c.prototype.check=function(a){void 0===a&&(a=!0);this._var.checking=!0;null===this._var.bait&&this._creatBait();var b=this;this._var.loopNumber=0;!0===a&&(this._var.loop=setInterval(function(){b._checkBait(a)},this._options.loopCheckTime));setTimeout(function(){b._checkBait(a)},1);return!0};c.prototype._checkBait=function(a){var b=!1;null===this._var.bait&&this._creatBait();if(null!==d.document.body.getAttribute("abp")||null===this._var.bait.offsetParent||0==this._var.bait.offsetHeight||0==this._var.bait.offsetLeft||0==this._var.bait.offsetTop||0==this._var.bait.offsetWidth||0==this._var.bait.clientHeight||0==this._var.bait.clientWidth)b=!0;if(void 0!==d.getComputedStyle){var e=d.getComputedStyle(this._var.bait,null);!e||"none"!=e.getPropertyValue("display")&&"hidden"!=e.getPropertyValue("visibility")||(b=!0)}!0===a&&(this._var.loopNumber++,this._var.loopNumber>=this._options.loopMaxNumber&&this._stopLoop());if(!0===b)this._stopLoop(),this._destroyBait(),this.emitEvent(!0),!0===a&&(this._var.checking=!1);else if(null===this._var.loop||!1===a)this._destroyBait(),this.emitEvent(!1),!0===a&&(this._var.checking=!1)};c.prototype._stopLoop=function(a){clearInterval(this._var.loop);this._var.loop=null;this._var.loopNumber=0};c.prototype.emitEvent=function(a){a=this._var.event[!0===a?"detected":"notDetected"];for(var b in a)if(a.hasOwnProperty(b))a[b]();!0===this._options.resetOnEnd&&this.clearEvent();return this};c.prototype.clearEvent=function(){this._var.event.detected=[];this._var.event.notDetected=[]};c.prototype.on=function(a){this._var.event.detected.push(a);return this};d.ABC=c;void 0===d.AB&&(d.AB=new c({checkOnLoad:!0,resetOnEnd:!0}))})(window);
 AB.on(function() {
-  openPopup('<div class="popup-container hide alert-popup-container"><section class="pr-layer-popup pr-layer-delete-ad popup-no-close"><h3 class="pr-layer-header">' + l('WEB_AB_WARNING_HEADER') + '</h3><p class="pr-layer-text">' + l('WEB_AB_WARNING_TEXT') + '</p><div class="tgme_popup_buttons"><div class="tgme_popup_button popup-cancel-btn">' + l('WEB_POPUP_CLOSE_BTN', 'Close') + '</div></div></section></div>');
+  openPopup('<div class="popup-container hide alert-popup-container"><section class="pr-layer-popup pr-layer-delete-ad popup-no-close"><h3 class="pr-layer-header">' + l('WEB_AB_WARNING_HEADER') + '</h3><p class="pr-layer-text">' + l('WEB_AB_WARNING_TEXT') + '</p><div class="popup-buttons"><div class="popup-button popup-cancel-btn">' + l('WEB_POPUP_CLOSE_BTN', 'Close') + '</div></div></section></div>');
 });

@@ -440,7 +440,7 @@
         isFocused = true;
         var value = $field.value();
         if (curValue != value ||
-            options.searchEnabled() && options.getData() === false) {
+            options.searchEnabled() && options.getData(value) === false) {
           valueChange();
         }
         open();
@@ -462,7 +462,7 @@
         curValue = value;
         console.log('valueChange', options.searchEnabled());
         if (options.searchEnabled()) {
-          var data = options.getData();
+          var data = options.getData(value);
           if (data === false) {
             if (!dataWaiting) {
               dataWaiting = true;
@@ -700,6 +700,7 @@
         $select.data('value', selValue);
         $select.data('valueFull', selValueFull);
         options.onChange && options.onChange(selValue, selValueFull);
+        $field.trigger('valuechange', [selValue, selValueFull]);
       }
 
       function toggleDD(open) {
@@ -762,6 +763,7 @@
         $('.selected-item', $selected).remove();
         $selected.prepend(html);
         options.onUpdate && options.onUpdate(getValue(), getValue(true));
+        $field.trigger('valueupdate', [getValue(), getValue(true)]);
       }
 
       var initTextarea = null;
@@ -796,8 +798,8 @@
           toggleDD(false);
         }
       }, options, {
-        getData: function() {
-          var data = options.getData();
+        getData: function(value) {
+          var data = options.getData(value);
           if (data === false) {
             return false;
           }
@@ -846,7 +848,7 @@
       var defValue = $select.defaultValue();
       var defSelected = defValue.length ? defValue.split(';') : [], dataMap = {};
       if (defSelected.length) {
-        var data = options.getData();
+        var data = options.getData('');
         if (data !== false) {
           for (var i = 0; i < data.length; i++) {
             var val = (data[i].prefix || '') + data[i].val;
@@ -1077,6 +1079,22 @@
         return $(this).text() || '';
       }
     }).get() || [];
+  };
+  $.fn.cssProp = function(prop, val) {
+    if (typeof val !== 'undefined') {
+      return this.each(function() {
+        if (this.style && this.style.setProperty) {
+          this.style.setProperty(prop, val);
+        }
+      });
+    }
+    return this.first().map(function() {
+      if (this.style && this.style.getPropertyValue) {
+        return this.style.getPropertyValue(prop);
+      } else {
+        return '';
+      }
+    }).get(0) || '';
   };
 
   $.fn.initTextarea = function(options) {

@@ -64,6 +64,7 @@ function ajInit(options) {
     setLayerLocation: setLayerLocation,
     reload: reload,
     apiRequest: apiRequest,
+    uploadRequest: uploadRequest,
     needAuth: needAuth,
     ajContainer: ajContainer,
     state: options.state || {},
@@ -124,8 +125,53 @@ function ajInit(options) {
           // was aborted
         } else if (xhr.status == 401) {
           location.href = '/auth';
-        } else {
+        } else if (xhr.readyState > 0) {
           location.reload();
+        }
+      }
+    });
+  }
+
+  function uploadRequest(method, file, params, onSuccess, onProgress) {
+    var data = new FormData();
+    data.append('file', file, file.name);
+    data.append('method', method);
+    for (var key in params) {
+      data.append(key, params[key]);
+    }
+    return $.ajax(Aj.apiUrl, {
+      type: 'POST',
+      data: data,
+      cache: false,
+      dataType: 'json',
+      processData: false,
+      contentType: false,
+      xhrFields: {
+        withCredentials: true
+      },
+      xhr: function() {
+        var xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener('progress', function(event) {
+          if (event.lengthComputable) {
+            onProgress && onProgress(event.loaded, event.total);
+          }
+        });
+        return xhr;
+      },
+      beforeSend: function(xhr) {
+        onProgress && onProgress(0, 1);
+      },
+      success: function(result) {
+        if (result._dlog) {
+          $('#dlog').append(result._dlog);
+        }
+        onSuccess && onSuccess(result);
+      },
+      error: function(xhr) {
+        if (xhr.status == 401) {
+          location.href = '/auth';
+        } else if (xhr.readyState > 0) {
+          onSuccess && onSuccess({error: 'Network error'});
         }
       }
     });
