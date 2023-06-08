@@ -15,11 +15,14 @@ COMMIT_SHA = os.environ['COMMIT_SHA']
 # COMMIT_SHA = 'e2d725c2b3813d7c170f50b0ab21424a71466f6d' # web res
 
 TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
+DISCORD_BOT_TOKEN = os.environ['DISCORD_BOT_TOKEN']
 GITHUB_PAT = os.environ['GITHUB_PAT']
 
 REPOSITORY = os.environ.get('REPOSITORY', 'MarshalX/telegram-crawler')
-CHAT_ID = os.environ.get('CHAT_ID', '@tgcrawl')
 ROOT_TREE_DIR = os.environ.get('ROOT_TREE_DIR', 'data')
+
+CHAT_ID = os.environ.get('CHAT_ID', '@tgcrawl')
+DISCORD_CHANNEL_ID = os.environ.get('DISCORD_CHANNEL_ID', '1116390634249523283')
 
 BASE_GITHUB_API = 'https://api.github.com/'
 GITHUB_LAST_COMMITS = 'repos/{repo}/commits/{sha}'
@@ -109,7 +112,7 @@ async def send_req_until_success(session: aiohttp.ClientSession, **kwargs) -> Tu
     raise RuntimeError('Surprise. Time is over')
 
 
-async def send_alert(session: aiohttp.ClientSession, text: str, thread_id=None) -> aiohttp.ClientResponse:
+async def send_telegram_alert(session: aiohttp.ClientSession, text: str, thread_id=None) -> aiohttp.ClientResponse:
     params = {
         'chat_id': CHAT_ID,
         'parse_mode': 'HTML',
@@ -122,6 +125,37 @@ async def send_alert(session: aiohttp.ClientSession, text: str, thread_id=None) 
     return await session.get(
         url=f'{BASE_TELEGRAM_API}{TELEGRAM_SEND_MESSAGE}'.format(token=TELEGRAM_BOT_TOKEN), params=params
     )
+
+
+async def send_discord_alert(
+        session: aiohttp.ClientSession, commit_hash: str, commit_url: str, fields: list, hashtags: str
+) -> aiohttp.ClientResponse:
+    url = f'https://discord.com/api/channels/{DISCORD_CHANNEL_ID}/messages'
+
+    headers = {
+        'Authorization': f'Bot {DISCORD_BOT_TOKEN}',
+    }
+
+    embed_data = {
+        'title': f'New changes in Telegram ({commit_hash})',
+        'color': 0xe685cc,
+        'url': commit_url,
+        'fields': fields,
+        'author': {
+            'name': 'Marshal',
+            'url': 'https://github.com/MarshalX',
+            'icon_url': 'https://avatars.githubusercontent.com/u/15520314?v=4',
+        },
+        'footer': {
+            'text': hashtags,
+        }
+    }
+
+    payload = {
+        'embed': embed_data
+    }
+
+    return await session.post(url=url, headers=headers, json=payload)
 
 
 async def main() -> None:
@@ -164,6 +198,7 @@ async def main() -> None:
         available_hashtags = AVAILABLE_HASHTAGS.copy()
 
         changes = {k: [] for k in STATUS_TO_EMOJI.keys()}
+        changes_md = {k: [] for k in STATUS_TO_EMOJI.keys()}
         for file in commit_files:
             for available_hashtag in available_hashtags:
                 pattern = HASHTAGS_PATTERNS[available_hashtag]
@@ -181,16 +216,26 @@ async def main() -> None:
 
             status = STATUS_TO_EMOJI[file['status']]
             changes[file['status']].append(f'{status} <code>{changed_url}</code>')
+            changes_md[file['status']].append(f'- {changed_url}')
 
+        discord_embed_fields = []
         for i, [status, text_list] in enumerate(changes.items()):
             if not text_list:
                 continue
 
             alert_text += '\n'.join(text_list[:ROW_PER_STATUS]) + '\n'
+            discord_field_value = '\n'.join(changes_md[status][:ROW_PER_STATUS]) + '\n'
 
             if len(text_list) > ROW_PER_STATUS:
                 count = len(text_list) - ROW_PER_STATUS
                 alert_text += f'And <b>{count}</b> {status} actions more..\n'
+                discord_field_value += f'And **{count}** {status} actions more..\n'
+
+            discord_embed_fields.append({
+                'name': f'{STATUS_TO_EMOJI[status]} {status.capitalize()}',
+                'value': discord_field_value,
+                'inline': False
+            })
 
             alert_text += '\n'
 
@@ -203,14 +248,19 @@ async def main() -> None:
         for hashtag, topic_thread_id in HASHTAG_TO_TOPIC.items():
             if hashtag in alert_hashtags:
                 logger.info(f'Sending alert to the forum. Topic: {topic_thread_id}')
-                telegram_response = await send_alert(session, alert_text, topic_thread_id)
+                telegram_response = await send_telegram_alert(session, alert_text, topic_thread_id)
                 logger.debug(await telegram_response.read())
 
+        hashtags = ' '.join([f'#{hashtag}' for hashtag in sorted(alert_hashtags)])
         if alert_hashtags:
-            alert_text += '\n\n' + ' '.join([f'#{hashtag}' for hashtag in sorted(alert_hashtags)])
+            alert_text += '\n\n' + hashtags
 
-        telegram_response = await send_alert(session, alert_text)
+        telegram_response = await send_telegram_alert(session, alert_text)
         logger.debug(await telegram_response.read())
+
+        commit_hash = commit_data['sha'][:7]
+        discord_response = await send_discord_alert(session, commit_hash, html_url, discord_embed_fields, hashtags)
+        logger.debug(await discord_response.read())
 
 
 if __name__ == '__main__':
