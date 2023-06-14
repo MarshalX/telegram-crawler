@@ -32,6 +32,8 @@ var Ads = {
       return amount_str;
     }
     var currency = l('WEB_ADS_DEF_CURRENCY_SIGN', '€');
+    var parts = amount_str.split('.');
+    amount_str = parts[0] + (parts[1].length ? '<span class="amount-frac">.' + parts[1] + '</span>' : '');
     return '<span class="amount-currency">' + currency + '</span>' + amount_str;
   },
   amountFieldValue: function($form, field) {
@@ -231,6 +233,7 @@ var Ads = {
       $fileName.attr('data-filename', '');
       $input.removeClass('selected');
     }
+    Ads.hideFieldError($field);
   },
   eFileReset: function(e) {
     var $input = $(this).parents('.upload-input');
@@ -239,6 +242,7 @@ var Ads = {
     $field.data('file', null).val('');
     $fileName.attr('data-filename', '');
     $input.removeClass('selected');
+    Ads.hideFieldError($field);
   },
   showHint: function($hint, delay, hide_delay) {
     hide_delay = hide_delay || 0;
@@ -317,7 +321,7 @@ var Ads = {
     var $selectInput = $('.input', $selectEl);
     options = options || {};
     $selectEl.data('selOpts', options);
-    Aj.onLoad(function(state) {
+    var onload = function(state) {
       var cachedData;
       $selectEl.initSelect({
         multiSelect: !options.noMultiSelect,
@@ -367,10 +371,17 @@ var Ads = {
         }
       });
       Ads.updateField($selectInput);
-    });
-    Aj.onUnload(function(state) {
+    };
+    var onunload = function(state) {
       $selectEl.destroySelect();
-    });
+    };
+    if (options.insideLayer) {
+      Aj.onLayerLoad(onload);
+      Aj.onLayerUnload(onunload);
+    } else {
+      Aj.onLoad(onload);
+      Aj.onUnload(onunload);
+    }
   },
   getSelectItems: function(method, need_fields) {
     var _data = Aj.globalState.adsList;
@@ -2459,9 +2470,13 @@ var Audiences = {
       state.$searchResults = $('.pr-table tbody');
       Ads.fieldInit(state.$searchField);
       cont.on('click.curPage', '.pr-cell-sort', Audiences.eSortList);
+      cont.on('click.curPage', '.js-create-audience-ad-btn', Audiences.createAudienceAd);
       cont.on('click.curPage', '.delete-audience-btn', Audiences.deleteAudience);
+      state.$searchResults.on('mouseover mouseout click', '.js-hint-tooltip', Ads.eHintEvent);
+      $(document).on('touchstart click', Ads.eHideAllHints);
 
-      var listInited = false;
+      state.listInited = false;
+      state.needUpdateState = false;
       state.$searchField.initSearch({
         $results: state.$searchResults,
         emptyQueryEnabled: true,
@@ -2472,23 +2487,30 @@ var Audiences = {
           return false;
         },
         renderItem: function(item, query) {
-          return '<td><div class="pr-cell pr-cell-title">' + item.title + '</div></td><td><div class="pr-cell">' + Ads.formatTableDate(item.date) + '</div></td><td><div class="pr-cell">' + item.used + '</div></td><td><div class="pr-cell">' + item.users + '</div></td><td><div class="pr-actions-cell">' + Aj.state.audienceDropdownTpl.replace(/{audience_id}/g, item.audience_id) + '</div></td>';
+          return '<td><div class="pr-cell pr-cell-title">' + item.title + '</div></td><td><div class="pr-cell">' + Ads.formatTableDate(item.date) + '</div></td><td><div class="pr-cell">' + item.used + '</div></td><td><div class="pr-hinted-cell">' + item.users + (item.processing_hint ? '<span class="pr-cell-hint js-hint-tooltip"><div class="pr-cell-hint-tooltip"><div class="bubble"></div>' + item.processing_hint + '</div></span>' : '') + '</div></td><td><div class="pr-actions-cell">' + (item.need_update ? '' : Aj.state.audienceDropdownTpl.replace(/{audience_id}/g, item.audience_id)) + '</div></td>';
         },
         getData: function() {
-          if (!listInited) {
-            listInited = true;
+          if (!state.listInited) {
+            state.listInited = true;
             var items = Aj.state.audiencesList;
             for (var i = 0; i < items.length; i++) {
               var item = items[i];
               item.base_url = '/account/audience/' + item.audience_id;
               item._values = [item.title.toLowerCase()];
+              if (item.need_update) {
+                state.needUpdateState = true;
+              }
             }
+            Audiences.updateAudiencesState();
           }
           return Aj.state.audiencesList;
         }
       });
     });
     Aj.onUnload(function(state) {
+      state.$searchResults.off('mouseover mouseout click', '.js-hint-tooltip', Ads.eHintEvent);
+      $(document).off('touchstart click', Ads.eHideAllHints);
+      clearTimeout(Aj.state.updateStateTo);
       Ads.fieldDestroy(state.$searchField);
       state.$searchField.destroySearch();
     });
@@ -2523,7 +2545,30 @@ var Audiences = {
       });
     }
   },
-  updateAudience: function(audience) {
+  updateAudiencesState: function() {
+    if (!Aj.state || !Aj.state.audiencesList || !Aj.state.needUpdateState) {
+      return;
+    }
+    Aj.state.needUpdateState = false;
+    Aj.state.updateStateTo = setTimeout(function() {
+      Aj.apiRequest('updateAudiencesState', {
+        owner_id: Aj.state.ownerId
+      }, function(result) {
+        if (result.error) {
+          return showAlert(result.error);
+        }
+        if (result.audiences) {
+          for (var i = 0; i < result.audiences.length; i++) {
+            Audiences.updateAudience(result.audiences[i], true);
+          }
+          Audiences.updateAudiencesList();
+          Aj.state.$searchField.trigger('contentchange');
+          Audiences.updateAudiencesState();
+        }
+      });
+    }, 400);
+  },
+  updateAudience: function(audience, no_update) {
     if (!Aj.state || !Aj.state.audiencesList) {
       return;
     }
@@ -2534,8 +2579,14 @@ var Audiences = {
         audience.base_url = '/account/audience/' + audience.audience_id;
         audience._values = [audience.title.toLowerCase()];
         audiencesList[i] = audience;
-        Audiences.updateAudiencesList();
-        Aj.state.$searchField.trigger('contentchange');
+        if (audience.need_update) {
+          Aj.state.needUpdateState = true;
+        }
+        if (!no_update) {
+          Audiences.updateAudiencesList();
+          Aj.state.$searchField.trigger('contentchange');
+          Audiences.updateAudiencesState();
+        }
         return;
       }
     }
@@ -2748,6 +2799,41 @@ var Audiences = {
         this.style.setProperty('--upload-progress', progress);
       });
     });
+    return false;
+  },
+  createAudienceAd: function(e) {
+    e.preventDefault();
+    var $button = $(this);
+    if ($button.prop('disabled')) {
+      return false;
+    }
+    var $item = $button.parents('li');
+    var audience_id = Aj.state.audienceId;
+    if ($item.size()) {
+      $item.parents('.open').find('.dropdown-toggle').dropdown('toggle');
+      audience_id = $(this).parents('[data-audience-id]').attr('data-audience-id');
+    }
+    var params = {
+      owner_id: Aj.state.ownerId,
+      audience_id: audience_id
+    };
+    var onSuccess = function(result) {
+      $button.prop('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.confirm_text && result.confirm_hash) {
+        showConfirm(result.confirm_text, function() {
+          params.confirm_hash = result.confirm_hash;
+          $button.prop('disabled', true);
+          Aj.apiRequest('createDraftFromAudience', params, onSuccess);
+        }, result.confirm_btn);
+      } else if (result.redirect_to) {
+        Aj.location(result.redirect_to);
+      }
+    };
+    $button.prop('disabled', true);
+    Aj.apiRequest('createDraftFromAudience', params, onSuccess);
     return false;
   },
   deletePopup: function (confirm_text, onConfirm) {

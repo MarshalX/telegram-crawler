@@ -807,6 +807,7 @@ a:hover img.emoji {
 }
 .pr-dropdown-wrap.with-icons ul.dropdown-menu > li > .pr-dropdown-item {
   padding-left: 50px;
+  padding-right: 25px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1334,8 +1335,8 @@ input.pr-form-control:focus {
   color: #fff;
 }
 .pr-form-select .pr-placeholder-label + .select .selected-item {
-  margin-top: 4px;
-  margin-bottom: 2px;
+  margin-top: 3px;
+  margin-bottom: 1px;
 }
 .pr-form-select.exclude-select .select .selected-item {
   background-color: #D75959;
@@ -1388,7 +1389,8 @@ input.pr-form-control:focus {
 .pr-form-select .select.select-disabled .pr-form-control[data-placeholder-disabled]:before {
   content: attr(data-placeholder-disabled);
 }
-.form-label > .pr-form-label-hint {
+.form-label > .pr-form-label-hint,
+.pr-hinted-cell > .pr-cell-hint {
   display: inline-block;
   vertical-align: top;
   position: relative;
@@ -1396,7 +1398,12 @@ input.pr-form-control:focus {
   border-radius: 9px;
   cursor: pointer;
 }
-.form-label > .pr-form-label-hint:before {
+.pr-hinted-cell > .pr-cell-hint {
+  margin: -2px 1px;
+  white-space: normal;
+}
+.form-label > .pr-form-label-hint:before,
+.pr-hinted-cell > .pr-cell-hint:before {
   content: '';
   display: inline-block;
   vertical-align: top;
@@ -1434,6 +1441,7 @@ input.pr-form-control:focus {
   pointer-events: none;
   opacity: 0;
 }
+.pr-cell-hint-tooltip,
 .pr-form-label-hint-tooltip,
 .pr-form-control-hint-tooltip {
   font-size: 13px;
@@ -1446,6 +1454,7 @@ input.pr-form-control:focus {
   width: max-content;
   max-width: 300px;
   max-width: min(350px, calc(100vw - 30px));
+  min-width: 60px;
   right: -8px;
   bottom: 100%;
   z-index: 1;
@@ -1456,6 +1465,11 @@ input.pr-form-control:focus {
   visibility: hidden;
   opacity: 0;
 }
+.pr-cell-hint-tooltip {
+  right: -15px;
+  margin-bottom: 7px;
+  text-align: left;
+}
 .pr-form-control-photo-wrap .pr-form-control-hint-tooltip {
   right: -4px;
 }
@@ -1465,11 +1479,13 @@ input.pr-form-control:focus {
   margin-bottom: 7px;
 }
 .form-label > .show-hint .pr-form-label-hint-tooltip,
+.pr-hinted-cell > .show-hint .pr-cell-hint-tooltip,
 .pr-form-control-wrap > .show-hint .pr-form-control-hint-tooltip {
   transform: translateY(0px);
   visibility: visible;
   opacity: 1;
 }
+.pr-cell-hint-tooltip > .bubble,
 .pr-form-label-hint-tooltip > .bubble,
 .pr-form-control-hint-tooltip > .bubble {
   position: absolute;
@@ -1480,6 +1496,7 @@ input.pr-form-control:focus {
   opacity: 0.85;
   z-index: -1;
 }
+.pr-cell-hint-tooltip > .bubble:after,
 .pr-form-label-hint-tooltip > .bubble:after,
 .pr-form-control-hint-tooltip > .bubble:after {
   content: '';
@@ -1839,6 +1856,35 @@ form > .form-group {
   padding-right: 0;
 }
 
+.pr-budget-form {
+  display: flex;
+  flex-direction: column;
+}
+.pr-budget-form .pr-form,
+.pr-budget-form .pr-info-block {
+  max-width: 100%;
+  align-self: center;
+}
+.pr-budget-form + .pr-form {
+  padding-top: 0;
+}
+.pr-budget-amount-wrap {
+  width: 220px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  background: #f2f5f7;
+  text-align: center;
+  margin: 0 auto;
+}
+.pr-budget-amount-wrap .pr-budget-count {
+  font-size: 22px;
+  line-height: 33px;
+  padding: 0;
+}
+.pr-budget-amount-wrap .pr-budget-label {
+  font-size: 13px;
+  line-height: 19px;
+}
 .pr-popup-edit-form {
   margin: 0 -9px;
 }
@@ -1848,6 +1894,24 @@ form > .form-group {
 .pr-form.pr-popup-cb-form .checkbox-item-block {
   padding: 8px 0;
   margin: 0;
+}
+@media (min-width: 992px) {
+  .pr-budget-form {
+    flex-direction: row;
+  }
+  .pr-budget-amount-wrap {
+    margin-left: 0;
+    margin-right: 30px;
+  }
+  .pr-budget-form {
+    padding: 25px 0 20px;
+  }
+  .pr-budget-form .pr-form {
+    padding: 0;
+  }
+  .pr-budget-form .pr-info-block {
+    margin: 0;
+  }
 }
 
 .add-funds-form .decr-group,
@@ -2586,15 +2650,15 @@ fieldset.pr-form-control-wrap .checkbox-item-block {
 }
 /*.pr-table > tbody > tr:nth-child(even) > td,
 .pr-table > tbody > tr:nth-child(even) > th {
-  background-color: #f0f3f5;
+  background-color: #f2f5f7;
 }
 .pr-table > thead + tbody > tr:nth-child(odd) > td,
 .pr-table > thead + tbody > tr:nth-child(odd) > th {
-  background-color: #f0f3f5;
+  background-color: #f2f5f7;
 }*/
 .pr-table > tbody > tr:nth-child(odd) > td,
 .pr-table > tbody > tr:nth-child(odd) > th {
-  background-color: #f0f3f5;
+  background-color: #f2f5f7;
 }
 /*.pr-table > thead + tbody > tr:nth-child(even) > td,
 .pr-table > thead + tbody > tr:nth-child(even) > th,*/
@@ -2691,6 +2755,9 @@ body.rtl .pr-sort-marker {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.pr-hinted-cell {
+  white-space: nowrap;
+}
 thead > tr > th > .pr-cell,
 thead > tr > td > .pr-cell {
   padding: 1px 0 0;
@@ -2704,7 +2771,8 @@ tbody > tr > td > .pr-cell {
   min-width: 180px;
   white-space: normal;
 }
-.pr-cell .pr-link {
+.pr-cell .pr-link,
+.pr-header-auth .pr-link {
   color: inherit;
 }
 .pr-cell-empty .pr-cell,
@@ -2753,7 +2821,7 @@ tbody > tr > td > .pr-cell {
   width: 18px;
   height: 18px;
   position: absolute;
-  left: 0;
+  left: -1px;
   top: 0;
   bottom: 0;
   margin: auto 0;
@@ -3233,7 +3301,7 @@ body.rtl .pr-review-ad-buttons .btn.dropdown-toggle:after {
 }
 .pr-page-tabs .pr-link-btn {
   line-height: 16px;
-  margin: 7px 12px;
+  margin: 6px 14px 5px;
 }
 .pr-page-tabs + .pr-form {
   padding-top: 16px;
@@ -3246,6 +3314,9 @@ body.rtl .pr-review-ad-buttons .btn.dropdown-toggle:after {
   .pr-page-tabs .pr-links {
     margin-top: 0;
   }
+}
+.pr-page-tabs .pr-links .pr-link-btn {
+  font-weight: normal;
 }
 .pr-tabs > li+li  {
   margin-left: 4px;
@@ -3285,7 +3356,7 @@ body.rtl .pr-review-ad-buttons .btn.dropdown-toggle:after {
   margin: 0 15px;
 }
 .pr-decline-block {
-  margin: 30px 15px -10px;
+  margin: 25px 13px 0px;
 }
 .pr-info-block:before,
 .pr-decline-block:before {
@@ -3419,7 +3490,7 @@ a.pr-popup-account:hover {
   line-height: 22px;
   font-weight: 600;
   -webkit-font-smoothing: antialiased;
-  padding: 10px 15px;
+  padding: 10px 13px;
   margin: 0;
 }
 .pr-page-header-wrap > .pr-page-header {
@@ -3478,7 +3549,7 @@ a.pr-popup-account:hover {
   font-size: 23px;
   line-height: 27px;
   font-weight: 500;
-  padding: 0 15px;
+  padding: 0 13px;
 }
 
 .amount-sign {
@@ -3487,6 +3558,9 @@ a.pr-popup-account:hover {
   padding-right: 3px;
   position: relative;
   top: -1px;
+}
+.amount-full .amount-frac {
+  font-size: 80%;
 }
 .pr-table .amount-sign {
   font-weight: 600;
@@ -3722,6 +3796,11 @@ a.pr-popup-account:hover {
 .pr-layer-popup .radio-item-block,
 .pr-layer-popup .checkbox-item-block {
   margin: 10px 0;
+}
+.pr-layer-popup .pr-popup-edit-form .radio-item-block,
+.pr-layer-popup .pr-popup-edit-form .checkbox-item-block {
+  margin-left: 9px;
+  margin-right: 9px;
 }
 .pr-layer-edit-title,
 .pr-layer-edit-cpm,
