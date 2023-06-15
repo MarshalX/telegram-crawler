@@ -2368,13 +2368,14 @@ var TransferFunds = {
       state.amountField.on('keyup.curPage change.curPage input.curPage', TransferFunds.onAmountChange);
       state.decrAmountField = state.$form.field('decr_amount');
       state.decrAmountField.on('keyup.curPage change.curPage input.curPage', TransferFunds.onAmountChange);
+      state.curAmountField = state.$form.hasClass('decr') ? 'decr_amount' : 'amount';
       Ads.initSelect(state.$form, 'account', {
         items: Aj.state.accountItems || [],
         noMultiSelect: true,
         renderSelectedItem: function(val, item) {
           return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
         },
-        onChange: Account.onChannelChange
+        onChange: TransferFunds.onAccountChange
       });
     });
     Aj.onUnload(function(state) {
@@ -2387,11 +2388,20 @@ var TransferFunds = {
   onToggleAmountSign: function(e) {
     e.preventDefault();
     Aj.state.$form.toggleClass('decr');
+    Aj.state.curAmountField = Aj.state.$form.hasClass('decr') ? 'decr_amount' : 'amount';
     TransferFunds.onAmountChange();
+    Aj.state.$form.field(Aj.state.curAmountField).focusAndSelectAll();
+  },
+  onAccountChange: function(field, value, valueFull) {
+    if (valueFull.budget) {
+      $('.js-sel_account_budget', Aj.state.$form).removeClass('disabled').html(valueFull.budget);
+    } else {
+      $('.js-sel_account_budget', Aj.state.$form).addClass('disabled').html(Ads.wrapAmount(0));
+    }
   },
   onAmountChange: function() {
-    var decr = Aj.state.$form.hasClass('decr');
-    var amount = Ads.amountFieldValue(Aj.state.$form, decr ? 'decr_amount' : 'amount') || 0;
+    var decr = Aj.state.curAmountField == 'decr_amount';
+    var amount = Ads.amountFieldValue(Aj.state.$form, Aj.state.curAmountField) || 0;
     if (amount) {
       var button_label = l(decr ? 'WEB_WITHDRAW_AMOUNT_BUTTON' : 'WEB_TRANSFER_AMOUNT_BUTTON', {amount: Ads.wrapAmount(amount)});
     } else {
