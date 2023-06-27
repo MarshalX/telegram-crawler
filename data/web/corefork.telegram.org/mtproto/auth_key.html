@@ -107,25 +107,13 @@ A <code>-444</code> error may also be returned if a test DC ID is passed in <cod
 </blockquote>
 <p>Here, encrypted_answer is obtained as follows:</p>
 <ul>
-<li>
-<p>new_nonce_hash := 128 lower-order bits of SHA1 (new_nonce);</p>
+<li>new_nonce_hash := 128 lower-order bits of SHA1 (new_nonce);</li>
+<li>answer := serialization <pre><code>server_DH_inner_data#b5890dba nonce:int128 server_nonce:int128 g:int dh_prime:string g_a:string server_time:int = Server_DH_inner_data;</code></pre>
 </li>
-<li>
-<p>answer := serialization </p>
-<pre><code>  server_DH_inner_data#b5890dba nonce:int128 server_nonce:int128 g:int dh_prime:string g_a:string server_time:int = Server_DH_inner_data;</code></pre>
-</li>
-<li>
-<p>answer_with_hash := SHA1(answer) + answer + (0-15 random bytes); such that the length be divisible by 16;</p>
-</li>
-<li>
-<p>tmp_aes_key := SHA1(new_nonce + server_nonce) + substr (SHA1(server_nonce + new_nonce), 0, 12);</p>
-</li>
-<li>
-<p>tmp_aes_iv := substr (SHA1(server_nonce + new_nonce), 12, 8) + SHA1(new_nonce + new_nonce) + substr (new_nonce, 0, 4);</p>
-</li>
-<li>
-<p>encrypted_answer := AES256_ige_encrypt (answer_with_hash, tmp_aes_key, tmp_aes_iv); here, tmp_aes_key is a 256-bit key, and  tmp_aes_iv is a 256-bit initialization vector. The same as in all the other instances that use AES encryption, the encrypted data is padded with random bytes to a length divisible by 16 immediately prior to encryption.</p>
-</li>
+<li>answer_with_hash := SHA1(answer) + answer + (0-15 random bytes); such that the length be divisible by 16;</li>
+<li>tmp_aes_key := SHA1(new_nonce + server_nonce) + substr (SHA1(server_nonce + new_nonce), 0, 12);</li>
+<li>tmp_aes_iv := substr (SHA1(server_nonce + new_nonce), 12, 8) + SHA1(new_nonce + new_nonce) + substr (new_nonce, 0, 4);</li>
+<li>encrypted_answer := AES256_ige_encrypt (answer_with_hash, tmp_aes_key, tmp_aes_iv); here, tmp_aes_key is a 256-bit key, and  tmp_aes_iv is a 256-bit initialization vector. The same as in all the other instances that use AES encryption, the encrypted data is padded with random bytes to a length divisible by 16 immediately prior to encryption.</li>
 </ul>
 <p>Following this step, new_nonce is still known to client and server only. The client is certain that it is the server that responded and that the response was generated specifically in response to client query req_DH_params, since the response data are encrypted using new_nonce.</p>
 <p>Client is expected to check whether <strong>p = dh_prime</strong> is a safe 2048-bit prime (meaning that both <strong>p</strong> and <strong>(p-1)/2</strong> are prime, and that 2^2047 &lt; p &lt; 2^2048), and that <strong>g</strong> generates a cyclic subgroup of prime order <strong>(p-1)/2</strong>, i.e. is a quadratic residue <strong>mod p</strong>. Since <strong>g</strong> is always equal to 2, 3, 4, 5, 6 or 7, this is easily done using quadratic reciprocity law, yielding a simple condition on <strong>p mod 4g</strong> -- namely, <strong>p mod 8 = 7</strong> for <strong>g = 2</strong>; <strong>p mod 3 = 2</strong> for <strong>g = 3</strong>; no extra condition for <strong>g = 4</strong>; <strong>p mod 5 = 1 or 4</strong> for <strong>g = 5</strong>; <strong>p mod 24 = 19 or 23</strong> for <strong>g = 6</strong>; and <strong>p mod 7 = 3, 5 or 6</strong> for <strong>g = 7</strong>. After <strong>g</strong> and <strong>p</strong> have been checked by the client, it makes sense to cache the result, so as not to repeat lengthy computations in future.</p>
@@ -138,19 +126,11 @@ A <code>-444</code> error may also be returned if a test DC ID is passed in <cod
 <pre><code>set_client_DH_params#f5045f1f nonce:int128 server_nonce:int128 encrypted_data:string = Set_client_DH_params_answer;</code></pre>
 <p>Here, encrypted_data is obtained thus:</p>
 <ul>
-<li>
-<p>g_b := pow(g, b) mod dh_prime;</p>
+<li>g_b := pow(g, b) mod dh_prime;</li>
+<li>data := serialization <pre><code>client_DH_inner_data#6643b654 nonce:int128 server_nonce:int128 retry_id:long g_b:string = Client_DH_Inner_Data</code></pre>
 </li>
-<li>
-<p>data := serialization </p>
-<pre><code>  client_DH_inner_data#6643b654 nonce:int128 server_nonce:int128 retry_id:long g_b:string = Client_DH_Inner_Data</code></pre>
-</li>
-<li>
-<p>data_with_hash := SHA1(data) + data + (0-15 random bytes); such that length be divisible by 16;</p>
-</li>
-<li>
-<p>encrypted_data := AES256_ige_encrypt (data_with_hash, tmp_aes_key, tmp_aes_iv);</p>
-</li>
+<li>data_with_hash := SHA1(data) + data + (0-15 random bytes); such that length be divisible by 16;</li>
+<li>encrypted_data := AES256_ige_encrypt (data_with_hash, tmp_aes_key, tmp_aes_iv);</li>
 </ul>
 <p>The retry_id field is equal to zero at the time of the first attempt; otherwise, it is equal to auth_key_aux_hash from the previous failed attempt (see Item  9).</p>
 <ol start="7">
