@@ -45,27 +45,19 @@
   <div id="dev_page_content"><p>The query format is described using <a href="/mtproto/serialize">Binary Data Serialization</a> and the <a href="/mtproto/TL">TL Language</a>. All large numbers are transmitted as strings containing the required sequence of bytes in big endian order. Hash functions, such as SHA1, return strings (of 20 bytes) which can also be interpreted as big endian numbers. Small numbers (<code>int</code>, <code>long</code>, <code>int128</code>, <code>int256</code>) are normally little endian; however, if they are part of SHA1, the bytes are not rearranged. This way, if <code>long</code> <code>x</code> is the 64 lower-order bits of SHA1 of string <code>s</code>, then the <em>final</em> 8 bytes of 20-byte string <code>SHA1(s)</code> are taken and interpreted as a 64-bit integer.</p>
 <p>Prior to sending off unencrypted messages (required in this instance to generate an authorization key), the client must undergo (p,q) authorization as follows.</p>
 <h4><a class="anchor" href="#dh-exchange-initiation" id="dh-exchange-initiation" name="dh-exchange-initiation"><i class="anchor-icon"></i></a>DH exchange initiation</h4>
-<ol>
-<li>Client sends query to server</li>
-</ol>
+<h5><a class="anchor" href="#1-client-sends-query-to-server" id="1-client-sends-query-to-server" name="1-client-sends-query-to-server"><i class="anchor-icon"></i></a>1) Client sends query to server</h5>
 <pre><code>req_pq_multi#be7e8ef1 nonce:int128 = ResPQ;</code></pre>
 <p>The value of <em>nonce</em> is selected randomly by the client (random number) and identifies the client within this communication. Following this step, it is known to all.</p>
-<ol start="2">
-<li>Server sends response of the form</li>
-</ol>
+<h5><a class="anchor" href="#2-server-sends-response-of-the-form" id="2-server-sends-response-of-the-form" name="2-server-sends-response-of-the-form"><i class="anchor-icon"></i></a>2) Server sends response of the form</h5>
 <pre><code>resPQ#05162463 nonce:int128 server_nonce:int128 pq:string server_public_key_fingerprints:Vector long = ResPQ;</code></pre>
 <p>Here, string pq is a representation of a natural number (in binary big endian format). This number is the product of two different odd prime numbers. Normally, pq is less than or equal to 2^63-1. The value of <em>server_nonce</em> is selected randomly by the server; following this step, it is known to all.</p>
 <p><code>server_public_key_fingerprints</code> is a list of public RSA key fingerprints (64 lower-order bits of SHA1 (server_public_key); the public key is represented as a bare type <code>rsa_public_key n:string e:string = RSAPublicKey</code>, where, as usual, n and e are numbers in big endian format serialized as strings of bytes, following which SHA1 is computed) received by the server.</p>
-<p>All subsequent messages contain the pair (nonce, server_nonce) both in the plain-text, and the encrypted portions which makes it possible to identify a “temporary session” — one run of the key generation protocol described on this page that uses the same (nonce, server_nonce) pair. An intruder could not create a parallel session with the server with the same parameters and reuse parts of server- or client-encrypted messages for its own purposes in such a parallel session, because a different server_nonce would be selected by the server for any new “temporary session”.</p>
+<p>All subsequent messages contain the pair (nonce, server_nonce) both in the plain-text, and the encrypted portions which makes it possible to identify a âtemporary sessionâ â one run of the key generation protocol described on this page that uses the same (nonce, server_nonce) pair. An intruder could not create a parallel session with the server with the same parameters and reuse parts of server- or client-encrypted messages for its own purposes in such a parallel session, because a different server_nonce would be selected by the server for any new âtemporary sessionâ.</p>
 <h4><a class="anchor" href="#proof-of-work" id="proof-of-work" name="proof-of-work"><i class="anchor-icon"></i></a>Proof of work</h4>
-<ol start="3">
-<li>Client decomposes pq into prime factors such that p &lt; q.</li>
-</ol>
+<h5><a class="anchor" href="#3-client-decomposes-pq-into-prime-factors-such-that-p--q" id="3-client-decomposes-pq-into-prime-factors-such-that-p--q" name="3-client-decomposes-pq-into-prime-factors-such-that-p--q"><i class="anchor-icon"></i></a>3) Client decomposes pq into prime factors such that p &lt; q.</h5>
 <p>This starts a round of Diffie-Hellman key exchanges.</p>
 <h4><a class="anchor" href="#presenting-proof-of-work-server-authentication" id="presenting-proof-of-work-server-authentication" name="presenting-proof-of-work-server-authentication"><i class="anchor-icon"></i></a>Presenting proof of work; Server authentication</h4>
-<ol start="4">
-<li>Client sends query to server</li>
-</ol>
+<h5><a class="anchor" href="#4-client-sends-query-to-server" id="4-client-sends-query-to-server" name="4-client-sends-query-to-server"><i class="anchor-icon"></i></a>4) Client sends query to server</h5>
 <pre><code>req_DH_params#d712e4be nonce:int128 server_nonce:int128 p:string q:string public_key_fingerprint:long encrypted_data:string = Server_DH_Params</code></pre>
 <p>Here, encrypted_data is obtained as follows:</p>
 <ul>
@@ -84,8 +76,8 @@
 </li>
 </ul>
 <p>Someone might intercept the query and replace it with their own, independently decomposing pq into factors instead of the client. The only field that it makes sense to modify is new_nonce which would be the one an intruder would have to re-generate (because an intruder cannot decrypt the encrypted data sent by the client). Since all subsequent messages are encrypted using new_nonce or contain new_nonce_hash, they will not be processed by the client (an intruder would not be able to make it look as though they had been generated by the server because they would not contain new_nonce). Therefore, this intercept will only result in the intruder's completing the authorization key generation protocol in place of the client and creating a new key (that has nothing to do with the client); however, the same effect could be achieved simply by creating a new key in one's own name.</p>
-<p>An alternative form of inner data (<code>p_q_inner_data_temp_dc</code>) is used to create temporary keys, that are only stored in the server RAM and are discarded after at most <code>expires_in</code> seconds. The server is free to discard its copy earlier. In all other respects the temporary key generation protocol is the same. After a temporary key is created, the client usually binds it to its principal authorisation key by means of the <a href="/method/auth.bindTempAuthKey">auth.bindTempAuthKey</a> method, and uses it for all client-server communication until it expires; then a new temporary key is generated. Thus Perfect Forward Secrecy (PFS) in client-server communication is achieved. <a href="/api/pfs">Read more about PFS »</a></p>
-<p>4.1) <code>RSA_PAD(data, server_public_key)</code> mentioned above is implemented as follows:</p>
+<p>An alternative form of inner data (<code>p_q_inner_data_temp_dc</code>) is used to create temporary keys, that are only stored in the server RAM and are discarded after at most <code>expires_in</code> seconds. The server is free to discard its copy earlier. In all other respects the temporary key generation protocol is the same. After a temporary key is created, the client usually binds it to its principal authorisation key by means of the <a href="/method/auth.bindTempAuthKey">auth.bindTempAuthKey</a> method, and uses it for all client-server communication until it expires; then a new temporary key is generated. Thus Perfect Forward Secrecy (PFS) in client-server communication is achieved. <a href="/api/pfs">Read more about PFS Â»</a></p>
+<h5><a class="anchor" href="#41-rsa-paddata-server-public-key-mentioned-above-is-implemented-as-follows" id="41-rsa-paddata-server-public-key-mentioned-above-is-implemented-as-follows" name="41-rsa-paddata-server-public-key-mentioned-above-is-implemented-as-follows"><i class="anchor-icon"></i></a>4.1) <code>RSA_PAD(data, server_public_key)</code> mentioned above is implemented as follows:</h5>
 <ul>
 <li>data_with_padding := data + random_padding_bytes; -- where random_padding_bytes are chosen so that the resulting length of data_with_padding is precisely 192 bytes, and data is the TL-serialized data to be encrypted as before. One has to check that data is not longer than 144 bytes.</li>
 <li>data_pad_reversed := BYTE_REVERSE(data_with_padding); -- is obtained from data_with_padding by reversing the byte order.</li>
@@ -97,9 +89,7 @@
 <li>The value of key_aes_encrypted is compared with the RSA-modulus of server_pubkey as a big-endian 2048-bit (256-byte) unsigned integer. If key_aes_encrypted turns out to be greater than or equal to the RSA modulus, the previous steps starting from the generation of new random temp_key are repeated. Otherwise the final step is performed:</li>
 <li>encrypted_data := RSA(key_aes_encrypted, server_pubkey); --  256-byte big-endian integer is elevated to the requisite power from the RSA public key modulo the RSA modulus, and the result is stored as a big-endian integer consisting of exactly 256 bytes (with leading zero bytes if required).</li>
 </ul>
-<ol start="5">
-<li>Server responds with:</li>
-</ol>
+<h5><a class="anchor" href="#5-server-responds-with" id="5-server-responds-with" name="5-server-responds-with"><i class="anchor-icon"></i></a>5) Server responds with:</h5>
 <pre><code>server_DH_params_ok#d0e8075c nonce:int128 server_nonce:int128 encrypted_answer:string = Server_DH_Params;</code></pre>
 <blockquote>
 <p>If the query is incorrect, the server returns a <code>-404</code> error and the handshake must be restarted (any subsequent request also returns <code>-404</code>, even if it is correct).<br>
@@ -120,9 +110,7 @@ A <code>-444</code> error may also be returned if a test DC ID is passed in <cod
 <p>If the verification takes too long time (which is the case for older mobile devices), one might initially run only 15 Miller--Rabin iterations for verifying primeness of <strong>p</strong> and <strong>(p - 1)/2</strong> with error probability not exceeding one billionth, and do more iterations later in the background.</p>
 <p>Another optimization is to embed into the client application code a small table with some known "good" couples <strong>(g,p)</strong> (or just known safe primes <strong>p</strong>, since the condition on <strong>g</strong> is easily verified during execution), checked during code generation phase, so as to avoid doing such verification during runtime altogether. Server changes these values rarely, thus one usually has to put the current value of server's <strong>dh_prime</strong> into such a table. For example, current value of <strong>dh_prime</strong> equals (in big-endian byte order)</p>
 <pre><code>C7 1C AE B9 C6 B1 C9 04 8E 6C 52 2F 70 F1 3F 73 98 0D 40 23 8E 3E 21 C1 49 34 D0 37 56 3D 93 0F 48 19 8A 0A A7 C1 40 58 22 94 93 D2 25 30 F4 DB FA 33 6F 6E 0A C9 25 13 95 43 AE D4 4C CE 7C 37 20 FD 51 F6 94 58 70 5A C6 8C D4 FE 6B 6B 13 AB DC 97 46 51 29 69 32 84 54 F1 8F AF 8C 59 5F 64 24 77 FE 96 BB 2A 94 1D 5B CD 1D 4A C8 CC 49 88 07 08 FA 9B 37 8E 3C 4F 3A 90 60 BE E6 7C F9 A4 A4 A6 95 81 10 51 90 7E 16 27 53 B5 6B 0F 6B 41 0D BA 74 D8 A8 4B 2A 14 B3 14 4E 0E F1 28 47 54 FD 17 ED 95 0D 59 65 B4 B9 DD 46 58 2D B1 17 8D 16 9C 6B C4 65 B0 D6 FF 9C A3 92 8F EF 5B 9A E4 E4 18 FC 15 E8 3E BE A0 F8 7F A9 FF 5E ED 70 05 0D ED 28 49 F4 7B F9 59 D9 56 85 0C E9 29 85 1F 0D 81 15 F6 35 B1 05 EE 2E 4E 15 D0 4B 24 54 BF 6F 4F AD F0 34 B1 04 03 11 9C D8 E3 B9 2F CC 5B</code></pre>
-<ol start="6">
-<li>Client computes random 2048-bit number <em>b</em> (using a sufficient amount of entropy) and sends the server a message</li>
-</ol>
+<h5><a class="anchor" href="#6-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message" id="6-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message" name="6-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message"><i class="anchor-icon"></i></a>6) Client computes random 2048-bit number <em>b</em> (using a sufficient amount of entropy) and sends the server a message</h5>
 <pre><code>set_client_DH_params#f5045f1f nonce:int128 server_nonce:int128 encrypted_data:string = Set_client_DH_params_answer;</code></pre>
 <p>Here, encrypted_data is obtained thus:</p>
 <ul>
@@ -133,18 +121,10 @@ A <code>-444</code> error may also be returned if a test DC ID is passed in <cod
 <li>encrypted_data := AES256_ige_encrypt (data_with_hash, tmp_aes_key, tmp_aes_iv);</li>
 </ul>
 <p>The retry_id field is equal to zero at the time of the first attempt; otherwise, it is equal to auth_key_aux_hash from the previous failed attempt (see Item  9).</p>
-<ol start="7">
-<li>
-<p>Thereafter, auth_key equals <code>pow(g, {ab}) mod dh_prime</code>; on the server, it is computed as <code>pow(g_b, a) mod dh_prime</code>, and on the client as <code>(g_a)^b mod dh_prime</code>.</p>
-</li>
-<li>
-<p>auth_key_hash is computed := 64 lower-order bits of SHA1 (auth_key). The server checks whether there already is another key with the same auth_key_hash and responds in one of the following ways.</p>
-</li>
-</ol>
+<h5><a class="anchor" href="#7-thereafter-auth-key-equals-powg-ab-mod-dh-prime-on-the-server-it-is-computed-as-powg-b-a-mod-dh-prime-and-on-the-client-as-g-ab-mod-dh-prime" id="7-thereafter-auth-key-equals-powg-ab-mod-dh-prime-on-the-server-it-is-computed-as-powg-b-a-mod-dh-prime-and-on-the-client-as-g-ab-mod-dh-prime" name="7-thereafter-auth-key-equals-powg-ab-mod-dh-prime-on-the-server-it-is-computed-as-powg-b-a-mod-dh-prime-and-on-the-client-as-g-ab-mod-dh-prime"><i class="anchor-icon"></i></a>7) Thereafter, auth_key equals <code>pow(g, {ab}) mod dh_prime</code>; on the server, it is computed as <code>pow(g_b, a) mod dh_prime</code>, and on the client as <code>(g_a)^b mod dh_prime</code>.</h5>
+<h5><a class="anchor" href="#8-auth-key-hash-is-computed--64-lower-order-bits-of-sha1-auth-key-the-server-checks-whether-there-already-is-another-key-with-the-same-auth-key-hash-and-responds-in-one-of-the-following-ways" id="8-auth-key-hash-is-computed--64-lower-order-bits-of-sha1-auth-key-the-server-checks-whether-there-already-is-another-key-with-the-same-auth-key-hash-and-responds-in-one-of-the-following-ways" name="8-auth-key-hash-is-computed--64-lower-order-bits-of-sha1-auth-key-the-server-checks-whether-there-already-is-another-key-with-the-same-auth-key-hash-and-responds-in-one-of-the-following-ways"><i class="anchor-icon"></i></a>8) auth_key_hash is computed := 64 lower-order bits of SHA1 (auth_key). The server checks whether there already is another key with the same auth_key_hash and responds in one of the following ways.</h5>
 <h4><a class="anchor" href="#dh-key-exchange-complete" id="dh-key-exchange-complete" name="dh-key-exchange-complete"><i class="anchor-icon"></i></a>DH key exchange complete</h4>
-<ol start="9">
-<li>Server responds in one of three ways:</li>
-</ol>
+<h5><a class="anchor" href="#9-server-responds-in-one-of-three-ways" id="9-server-responds-in-one-of-three-ways" name="9-server-responds-in-one-of-three-ways"><i class="anchor-icon"></i></a>9) Server responds in one of three ways:</h5>
 <pre><code>dh_gen_ok#3bcbf734 nonce:int128 server_nonce:int128 new_nonce_hash1:int128 = Set_client_DH_params_answer;
 dh_gen_retry#46dc1fb9 nonce:int128 server_nonce:int128 new_nonce_hash2:int128 = Set_client_DH_params_answer;
 dh_gen_fail#a69dae02 nonce:int128 server_nonce:int128 new_nonce_hash3:int128 = Set_client_DH_params_answer;</code></pre>
