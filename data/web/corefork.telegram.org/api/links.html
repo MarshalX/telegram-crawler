@@ -58,7 +58,7 @@
 <li><code>tg:path?query</code></li>
 <li><code>tg://path?query</code></li>
 </ul>
-<p>The <code>#fragment</code> part is always ignored.  </p>
+<p>The <code>#fragment</code> part is always ignored when parsing Telegram deep links.  </p>
 <p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code> is not equal to <code>www</code>, is not a single letter and is a valid username, it should be treated exactly as a <code>t.me/&lt;username&gt;/</code> link (generate a <code>t.me/&lt;username&gt;/</code> link and append the rest of the path (if present) and the query string (if present)).  </p>
 <h3><a class="anchor" href="#public-username-links" id="public-username-links" name="public-username-links"><i class="anchor-icon"></i></a>Public username links</h3>
 <p>Used to link to public users, groups and channels, see <a href="/api/invites#public-usernames">here for more info on how to handle them »</a>.  </p>
@@ -189,9 +189,9 @@ t.me/&lt;username&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment
 <pre><code>t.me/c/&lt;channel&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;
 t.me/c/&lt;channel&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;message_id&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
 <p><code>tg:</code> syntax (public links):</p>
-<pre><code>tg://resolve?domain=&lt;username&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
+<pre><code>tg://resolve?domain=&lt;username&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
 <p><code>tg:</code> syntax (private links):</p>
-<pre><code>tg://privatepost?channel=&lt;channelid&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
+<pre><code>tg://privatepost?channel=&lt;channelid&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
 <thead>
@@ -223,7 +223,7 @@ t.me/c/&lt;channel&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;messa
 <td>For albums/grouped media, if set indicates that this is a link to a specific media in the album; otherwise, it is a link to the entire album.</td>
 </tr>
 <tr>
-<td><code>thread</code></td>
+<td><code>thread_id</code></td>
 <td style="text-align: center;">Optional</td>
 <td>For <a href="/api/threads">message threads</a>, contains the thread ID.</td>
 </tr>
@@ -1221,6 +1221,27 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 <td><code>id</code></td>
 <td style="text-align: center;">Required</td>
 <td>User ID</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#emoji-links" id="emoji-links" name="emoji-links"><i class="anchor-icon"></i></a>Emoji links</h3>
+<p>Emoji links are merely an abstraction offered by the <a href="/bots/api">bot API</a> to simplify construction of <a href="/constructor/messageEntityCustomEmoji">messageEntityCustomEmoji</a> constructors, and should be ignored by normal clients.  </p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://emoji?id=&lt;id&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td style="text-align: center;">Required</td>
+<td><a href="/api/custom-emoji">Custom emoji ID</a></td>
 </tr>
 </tbody>
 </table>
