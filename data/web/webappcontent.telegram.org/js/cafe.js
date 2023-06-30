@@ -74,6 +74,7 @@ var Cafe = {
   },
   backBtnClicked: function() {
     Cafe.toggleMode(false);
+    document.activeElement && document.activeElement.blur();
   },
   getOrderItem: function(itemEl) {
     var id = itemEl.data('item-id');

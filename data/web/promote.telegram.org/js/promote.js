@@ -1485,6 +1485,63 @@ var Account = {
       }
     });
     return false;
+  },
+  initToken: function() {
+    var cont = Aj.ajContainer;
+    Aj.onLoad(function(state) {
+      cont.on('click.curPage', '.js-copy-token-btn', Account.eCopyToken);
+      cont.on('click.curPage', '.js-revoke-token-btn', Account.eRevokeToken);
+    });
+  },
+  eCopyToken: function(e) {
+    e.preventDefault();
+    copyToClipboard(Aj.state.token);
+    showToast(l('WEB_TOKEN_COPIED', 'Copied.'));
+  },
+  revokeTokenPopup: function (onConfirm) {
+    var $confirm = $('<div class="popup-container hide alert-popup-container"><section class="pr-layer-popup pr-layer-delete-ad popup-no-close"><p class="pr-layer-text">' + l('WEB_REVOKE_TOKEN_CONFIRM_TEXT') + '</p><div class="popup-buttons"><div class="popup-button popup-cancel-btn">' + l('WEB_CANCEL', 'Cancel') + '</div><div class="popup-button popup-primary-btn">' + l('WEB_REVOKE_TOKEN_CONFIRM_BUTTON') + '</div></div></section></div>');
+    var confirm = function() {
+      onConfirm && onConfirm($confirm);
+      closePopup($confirm);
+    }
+    var $primaryBtn = $('.popup-primary-btn', $confirm);
+    $primaryBtn.on('click', confirm);
+    $confirm.one('popup:close', function() {
+      $primaryBtn.off('click', confirm);
+      $confirm.remove();
+    });
+    openPopup($confirm, {
+      closeByClickOutside: '.popup-no-close',
+    });
+    return $confirm;
+  },
+  eRevokeToken: function(e) {
+    e.preventDefault();
+    var $btn = $(this);
+    if ($btn.data('disabled')) {
+      return false;
+    }
+    Account.revokeTokenPopup(function() {
+      $btn.data('disabled', true);
+      Aj.apiRequest('revokeToken', {
+        owner_id: Aj.state.ownerId
+      }, function(result) {
+        $btn.data('disabled', false);
+        if (result.error) {
+          return showAlert(result.error);
+        }
+        if (result.new_token) {
+          Aj.state.token = result.new_token;
+        }
+        if (result.new_token_value) {
+          $('.js-token-value', Aj.ajContainer).value(result.new_token_value);
+        }
+        if (result.toast) {
+          showToast(result.toast);
+        }
+      });
+    });
+    return false;
   }
 };
 
