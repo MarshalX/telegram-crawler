@@ -1005,7 +1005,7 @@ var NewAd = {
         var user_targets = [];
         if (len.locations > 0) {
           user_targets.push(l('WEB_AD_TARGET_USER_LOCATIONS', lang_params));
-        } else {
+        } else if (len.countries > 0) {
           lang_params.locations = lang_params.countries;
           user_targets.push(l('WEB_AD_TARGET_USER_LOCATIONS', lang_params));
         }
