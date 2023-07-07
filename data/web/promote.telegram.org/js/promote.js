@@ -999,7 +999,7 @@ var NewAd = {
       }
       $('.js-exclude-outside').toggleClass('hide', !need_outside_cb);
     } else if (target_type == 'users') {
-      if (!len.locations && !len.countries && !len.user_langs && !len.user_topics && !len.audiences) {
+      if (!len.locations && !len.countries) {
         overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
       } else {
         var user_targets = [];
