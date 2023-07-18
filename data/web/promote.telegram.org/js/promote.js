@@ -312,6 +312,9 @@ var Ads = {
     }
   },
   updateAdMessagePreviews: function(cont) {
+    $('.pr-review-ad-preview .tgme_widget_message_text tg-emoji', cont).each(function() {
+      TEmoji.init(this);
+    });
     $('.pr-review-ad-preview .tgme_widget_message_footer', cont).each(function() {
       Ads.updateTextShadow(this, '.js-message_text', '.js-message_info');
     });
@@ -474,6 +477,8 @@ var NewAd = {
       state.adInfoField.on('change.curPage', NewAd.onAdInfoChange);
       state.targetTypeField = state.$form.field('target_type');
       state.targetTypeField.fieldEl().on('change.curPage', NewAd.onTargetTypeChange);
+      state.pictureCheckbox = state.$form.field('picture');
+      state.pictureCheckbox.on('change.curPage', NewAd.onPictureChange);
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
       NewAd.updateAdPreview(state.$form, state.previewData);
@@ -507,6 +512,7 @@ var NewAd = {
       state.adInfoField.off('.curPage');
       state.targetTypeField.fieldEl().off('.curPage');
       state.confirmedCheckbox.off('.curPage');
+      state.pictureCheckbox.off('.curPage');
       for (var i = 0; i < state.selectList.length; i++) {
         var selectData = state.selectList[i];
         if (selectData.location_search) {
@@ -531,6 +537,10 @@ var NewAd = {
     NewAd.updateAdTargetOverview();
     NewAd.saveDraftAuto(true);
   },
+  onPictureChange: function() {
+    var $form = $(this.form);
+    NewAd.adPostCheck($form);
+  },
   onConfirmedChange: function() {
     $('.create-new-ad-btn', Aj.ajContainer).prop('disabled', !$(this).prop('checked'));
   },
@@ -540,11 +550,15 @@ var NewAd = {
     Ads.hideFieldError(textField);
     NewAd.adPostCheck($form);
   },
+  getAdTextLength: function(text) {
+    text = text.replace(/!\[(.*?)\]\(tg:\/\/emoji\?id=(\d+)\)/g, '$1');
+    return text.length;
+  },
   onTextInput: function() {
     var textField = $(this);
     var text = textField.value();
     var max_len = Aj.state.textMaxLength;
-    var symbols_left = max_len - text.length;
+    var symbols_left = max_len - NewAd.getAdTextLength(text);
     Ads.showFieldError(textField);
     if (text.indexOf('\n') >= 0) {
       Ads.showFieldHint(textField, l('ADS_ERROR_POST_NEW_LINES_NOT_ALLOWED'), true);
@@ -567,9 +581,11 @@ var NewAd = {
   adPostCheck: function($form) {
     var textField = $form.field('text');
     var promoteUrlField = $form.field('promote_url');
+    var cpmField = $form.field('cpm');
     var text = textField.value();
     var promote_url = promoteUrlField.value();
     var $formGroup = promoteUrlField.fieldEl().parents('.form-group');
+    var $cpmFormGroup = cpmField.fieldEl().parents('.form-group');
     if (!text && !promote_url) {
       return false;
     }
@@ -581,10 +597,15 @@ var NewAd = {
     if (Aj.state.adId) {
       params.ad_id = Aj.state.adId;
     }
+    if ($form.field('picture').prop('checked')) {
+      params.picture = 1;
+    }
     $formGroup.addClass('field-loading');
+    $cpmFormGroup.addClass('field-loading');
     Aj.apiRequest('checkAdPost', params, function(result) {
       Ads.hideFieldError(textField);
       Ads.hideFieldError(promoteUrlField);
+      $cpmFormGroup.removeClass('field-loading');
       $formGroup.removeClass('field-loading');
       if (result.promote_url) {
         var new_promote_url = promoteUrlField.value();
@@ -813,6 +834,7 @@ var NewAd = {
           $('.js-promote-photo', $previewPopup).html(previewData.photo);
           $('.js-promote-photo-tooltip', $previewPopup).html(previewData.from);
           $('.js-preview-text', $previewPopup).html(previewData.text);
+          $('.js-preview-text tg-emoji', $previewPopup).each(function(){ TEmoji.init(this); });
           $('.js-preview-button', $previewPopup).html(previewData.button);
           $('.js-preview-button', $previewPopup).attr('href', previewData.button_url);
           $('.js-preview-footer', $previewPopup).each(function() {
@@ -831,8 +853,11 @@ var NewAd = {
         $('.js-promote-photo-tooltip', Aj.state.$form).html(previewData.from);
         $('.js-picture-label', Aj.state.$form).html(previewData.picture_label);
         $('.js-picture-hint', Aj.state.$form).html(previewData.picture_hint);
+        $('.js-cpm-extra', Aj.state.$form).html(previewData.cpm_extra);
+        $('.js-cpm-extra-tooltip', Aj.state.$form).html(previewData.cpm_extra_tooltip);
       }
       $('.js-promote-photo', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
+      $('.js-cpm-extra', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-extra-cpm', !!(previewData && previewData.cpm_extra));
       $('.js-preview-link', Aj.state.$form).toggleClass('inactive', !previewData);
     }
   },
@@ -1893,6 +1918,8 @@ var EditAd = {
       state.promoteUrlField.on('change.curPage', NewAd.onPromoteUrlChange);
       state.adInfoField = state.$form.field('ad_info');
       state.adInfoField.on('change.curPage', NewAd.onAdInfoChange);
+      state.pictureCheckbox = state.$form.field('picture');
+      state.pictureCheckbox.on('change.curPage', NewAd.onPictureChange);
       NewAd.updateAdPreview(state.$form, state.previewData);
       Aj.onLoad(function(state) {
         state.initFormData = EditAd.getFormData(state.$form);
