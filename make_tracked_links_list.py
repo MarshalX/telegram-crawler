@@ -58,8 +58,8 @@ HIDDEN_URLS = {
     'fragment.com/js/auction.js',
 }
 ADDITIONAL_URLS = {
-    'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/mtproto.tl',
-    'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/Resources/tl/api.tl',
+    'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/SourceFiles/mtproto/scheme/mtproto.tl',
+    'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/SourceFiles/mtproto/scheme/api.tl',
     'raw.githubusercontent.com/tdlib/td/master/td/generate/scheme/telegram_api.tl',
     'raw.githubusercontent.com/tdlib/td/master/td/generate/scheme/secret_api.tl',
     'raw.githubusercontent.com/tdlib/td/master/td/generate/scheme/td_api.tl',
