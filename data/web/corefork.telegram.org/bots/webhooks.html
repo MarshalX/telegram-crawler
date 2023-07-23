@@ -81,12 +81,12 @@ the range might expand or change.</code></pre>
 <p><a href="https://core.telegram.org/bots/webhooks#how-do-i-check-for-open-ports-or-limit-access-to-my-bot">How do I check for open ports or limit access to my bot?</a></p>
 </li>
 <li>
-<h4><a class="anchor" href="#always-ssltls" id="always-ssltls" name="always-ssltls"><i class="anchor-icon"></i></a>Always SSL/TLS</h4>
+<h4><a class="anchor" href="#always-ssl-tls" id="always-ssl-tls" name="always-ssl-tls"><i class="anchor-icon"></i></a>Always SSL/TLS</h4>
 <p>A webhook requires SSL/TLS encryption, no matter which port is used. It's not possible to use a plain-text HTTP webhook. You shouldn't want to either, for the sake of your bot and users.
 <a href="https://core.telegram.org/bots/webhooks#ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhoo">SSL/TLS, why do I have to handle this for a webhook?</a></p>
 </li>
 <li>
-<h4><a class="anchor" href="#not-all-ssltls-is-equal" id="not-all-ssltls-is-equal" name="not-all-ssltls-is-equal"><i class="anchor-icon"></i></a>Not all SSL/TLS is equal</h4>
+<h4><a class="anchor" href="#not-all-ssl-tls-is-equal" id="not-all-ssl-tls-is-equal" name="not-all-ssl-tls-is-equal"><i class="anchor-icon"></i></a>Not all SSL/TLS is equal</h4>
 <p>We support any SSL/TLS version TLS1.2 and up for your webhook. This means that <strong>SSLV2/3/TLS1.0/TSL1.1 are NOT supported</strong>, due to security issues associated with those older versions.
 <a href="https://core.telegram.org/bots/webhooks#how-do-i-check-that-im-handling-the-right-version">How do I check that I’m handling the right version?</a></p>
 </li>
@@ -102,7 +102,7 @@ the range might expand or change.</code></pre>
 </li>
 <li>
 <h4><a class="anchor" href="#supported-certificates" id="supported-certificates" name="supported-certificates"><i class="anchor-icon"></i></a>Supported certificates</h4>
-<p>Not all verified certificates are supported. Certificates are based on a network of trust and come in a chain. Trusting your verified certificate means we have to trust the provider of that certificate, the Certificate Authority (and hence its root certificate). Before you pick a certificate provider, Check <a href="https://packages.ubuntu.com/bionic/all/ca-certificates/filelist">this list</a> to make sure that we actually trust their root certificate.
+<p>Not all verified certificates are supported. Certificates are based on a network of trust and come in a chain. Trusting your verified certificate means we have to trust the provider of that certificate, the Certificate Authority (and hence its root certificate). Before you pick a certificate provider, Check <a href="https://packages.ubuntu.com/jammy/all/ca-certificates/filelist">this list</a> to make sure that we actually trust their root certificate.
 <a href="https://core.telegram.org/bots/webhooks#an-untrusted-root">What if my root certificate isn’t on that list?</a></p>
 </li>
 <li>
@@ -198,7 +198,7 @@ sudo ufw allow in on interfacename to any port portnumber proto tcp from 91.108.
 </li>
 </ul>
 <p>That’s all for our examples. More information on best practices for setting up your firewall, on whichever operating system you prefer for your bot, is best found on the internet.</p>
-<h5><a class="anchor" href="#ssltls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhook" id="ssltls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhook" name="ssltls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhook"><i class="anchor-icon"></i></a>SSL/TLS, what is it and why do I have to handle this for a webhook?</h5>
+<h5><a class="anchor" href="#ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhook" id="ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhook" name="ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhook"><i class="anchor-icon"></i></a>SSL/TLS, what is it and why do I have to handle this for a webhook?</h5>
 <p>You’re already familiar with it in some form or another. Whenever you see that (nicely green) lock in your browser bar, you know it’s reasonably safe to assume that you’ve landed on the site you actually wanted to visit. If you see the green lock, that's SSL/TLS in action. If you want to learn more about how SSL/TLS works in general, it's best to search the internet.</p>
 <p>The main difference between getUpdates and a webhook is the way the connection takes place. getUpdates means you'll connect to our server, a webhook means we'll be connecting to your server instead. Connecting to your server has to be done secure, we have to know for sure it's you we're talking to after all. This means you'll have to handle all that server side encryption stuff, virtually presenting us with a green lock. If you use a web server for us to post to, you need to support SSL/TLS handling on the port/virtual host of your choice. An online search for "YOURWEBSERVER enable HTTPS" will help you.</p>
 <p>Not using a regular web server? Have a look at our <a href="https://core.telegram.org/bots/samples">example page</a>, most examples there include code for handling SSL/TLS in a webhook setup.</p>
@@ -263,7 +263,7 @@ You can add <code>-tls1_2</code> to force OpenSSL into using TLS1.2 when trying 
 <li>
 <h5><a class="anchor" href="#a-verified-supported-certificate" id="a-verified-supported-certificate" name="a-verified-supported-certificate"><i class="anchor-icon"></i></a>A verified, supported certificate</h5>
 <p>Using a verified certificate means you already have, or will obtain, a certificate backed by a trusted certificate authority (CA). There are many ways to acquire a verified certificate, paid or free. Two popular examples of free suppliers are <strong>StartSSL</strong> and <strong>Let’s Encrypt</strong>. You’re welcome to pick another. Just make sure first the supplier is likely to be supported.
-Check <a href="https://packages.ubuntu.com/bionic/all/ca-certificates/filelist">this list</a> before selecting a CA.
+Check <a href="https://packages.ubuntu.com/jammy/all/ca-certificates/filelist">this list</a> before selecting a CA.
 Once you’ve picked a CA and validated your identity with them, you can craft your certificate. This frequently starts by generating a CSR (Certificate Signing Request). Generating a CSR is done either through your host machine, or online via the tools provided by the CA.</p>
 </li>
 <li>
