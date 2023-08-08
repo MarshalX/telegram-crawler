@@ -1908,13 +1908,22 @@ var ReviewTargets = {
       cont.on('click.curPage', '.pr-search-reset', ReviewTargets.eClearSearch);
       cont.on('click.curPage', '.ad-approve-btn', ReviewTargets.eApproveAd);
       cont.on('click.curPage', '.ad-decline-btn', ReviewTargets.eDeclineAd);
-      $(window).on('scroll resize', ReviewAds.onScroll);
-      ReviewAds.onScroll();
+      $(window).on('scroll resize', ReviewTargets.onScroll);
+      ReviewTargets.onScroll();
     });
     Aj.onUnload(function(state) {
       state.$form.off('submit', ReviewTargets.onSubmit);
       Ads.fieldDestroy(state.$searchField);
-      $(window).off('scroll resize', ReviewAds.onScroll);
+      $(window).off('scroll resize', ReviewTargets.onScroll);
+    });
+  },
+  onScroll: function() {
+    $('.js-load-more').each(function() {
+      var $loadMore = $(this);
+      var top = $loadMore.offset().top - $(window).scrollTop();
+      if (top < $(window).height() * 2) {
+        ReviewTargets.load($loadMore);
+      }
     });
   },
   load: function($loadMore) {
@@ -1942,7 +1951,7 @@ var ReviewTargets = {
           var $loadMoreBtn = $('.pr-load-more', $loadMore);
           $loadMoreBtn.text($loadMoreBtn.data('old-text')).removeClass('dots-animated');
         }
-        ReviewAds.onScroll();
+        ReviewTargets.onScroll();
       }
     });
   },
