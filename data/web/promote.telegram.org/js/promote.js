@@ -1897,6 +1897,123 @@ var ReviewAds = {
   }
 };
 
+var ReviewTargets = {
+  init: function() {
+    var cont = Aj.ajContainer;
+    Aj.onLoad(function(state) {
+      state.$form = $('.pr-search-form', cont);
+      state.$form.on('submit', ReviewTargets.onSubmit);
+      state.$searchField = $('.pr-search-input', cont);
+      Ads.fieldInit(state.$searchField);
+      cont.on('click.curPage', '.pr-search-reset', ReviewTargets.eClearSearch);
+      cont.on('click.curPage', '.ad-approve-btn', ReviewTargets.eApproveAd);
+      cont.on('click.curPage', '.ad-decline-btn', ReviewTargets.eDeclineAd);
+      $(window).on('scroll resize', ReviewAds.onScroll);
+      ReviewAds.onScroll();
+    });
+    Aj.onUnload(function(state) {
+      state.$form.off('submit', ReviewTargets.onSubmit);
+      Ads.fieldDestroy(state.$searchField);
+      $(window).off('scroll resize', ReviewAds.onScroll);
+    });
+  },
+  load: function($loadMore) {
+    var offset = $loadMore.attr('data-offset');
+    if (!offset) {
+      $loadMore.remove();
+    }
+    if ($loadMore.data('loading')) {
+      return;
+    }
+    var params = Aj.state.filterParams;
+    params.offset_id = offset;
+    var $loadMoreBtn = $('.pr-load-more', $loadMore);
+    $loadMoreBtn.data('old-text', $loadMoreBtn.text()).text($loadMoreBtn.data('loading')).addClass('dots-animated');
+    $loadMore.data('loading', true);
+    Aj.apiRequest('loadReviewedTargets', params, function(result) {
+      $loadMore.data('loading', false);
+      if (result.targets_html) {
+        var $loadMoreCont = $loadMore.closest('.pr-review-list');
+        if ($loadMoreCont.size()) {
+          $loadMore.remove();
+          $loadMoreCont.append(result.targets_html);
+          Ads.updateAdMessagePreviews($loadMoreCont);
+        } else {
+          var $loadMoreBtn = $('.pr-load-more', $loadMore);
+          $loadMoreBtn.text($loadMoreBtn.data('old-text')).removeClass('dots-animated');
+        }
+        ReviewAds.onScroll();
+      }
+    });
+  },
+  onSubmit: function(e) {
+    e.preventDefault();
+    var href = this.action;
+    if (this.query.value) {
+      href += href.indexOf('?') >= 0 ? '&' : '?';
+      href += 'query=' + encodeURIComponent(this.query.value);
+    }
+    Aj.location(href);
+  },
+  eClearSearch: function(e) {
+    Aj.state.$form.submit();
+  },
+  eApproveAd: function(e) {
+    e.preventDefault();
+    var $target  = $(this).parents('.js-review-item');
+    var target   = $target.attr('data-target');
+    var $buttons = $target.find('.pr-btn');
+
+    if ($buttons.prop('disabled')) {
+      return false;
+    }
+    $buttons.prop('disabled', true);
+    Aj.apiRequest('approveTarget', {
+      target: target
+    }, function(result) {
+      $buttons.prop('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.status_html) {
+        $target.find('.js-review-target-status').html(result.status_html);
+      }
+      if (result.buttons_html) {
+        $target.find('.js-review-buttons').html(result.buttons_html);
+      }
+    });
+    return false;
+  },
+  eDeclineAd: function(e) {
+    e.preventDefault();
+    var $target   = $(this).parents('.js-review-item');
+    var target    = $target.attr('data-target');
+    var $buttons  = $target.find('.pr-btn');
+    var reason_id = $(this).attr('data-reason-id');
+
+    if ($buttons.prop('disabled')) {
+      return false;
+    }
+    $buttons.prop('disabled', true);
+    Aj.apiRequest('declineTarget', {
+      target: target,
+      reason_id: reason_id
+    }, function(result) {
+      $buttons.prop('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.status_html) {
+        $target.find('.js-review-target-status').html(result.status_html);
+      }
+      if (result.buttons_html) {
+        $target.find('.js-review-buttons').html(result.buttons_html);
+      }
+    });
+    return false;
+  }
+};
+
 var EditAd = {
   init: function() {
     var cont = Aj.ajContainer;
