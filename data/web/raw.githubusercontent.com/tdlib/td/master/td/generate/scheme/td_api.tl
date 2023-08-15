@@ -250,7 +250,7 @@ minithumbnail width:int32 height:int32 data:bytes = Minithumbnail;
 //@description The thumbnail is in JPEG format
 thumbnailFormatJpeg = ThumbnailFormat;
 
-//@description The thumbnail is in static GIF format. It will be used only for some bot inline results
+//@description The thumbnail is in static GIF format. It will be used only for some bot inline query results
 thumbnailFormatGif = ThumbnailFormat;
 
 //@description The thumbnail is in MPEG4 format. It will be used only for some animations and videos
@@ -746,7 +746,7 @@ botInfo short_description:string description:string photo:photo animation:animat
 //-If non-null and personal_photo is null, then it is the same photo as in user.profile_photo and chat.photo
 //@public_photo User profile photo visible if the main photo is hidden by privacy settings; may be null. If null and user.profile_photo is null, then the photo is empty; otherwise, it is unknown.
 //-If non-null and both photo and personal_photo are null, then it is the same photo as in user.profile_photo and chat.photo. This photo isn't returned in the list of user photos
-//@is_blocked True, if the user is blocked by the current user
+//@block_list Block list to which the user is added; may be null if none
 //@can_be_called True, if the user can be called
 //@supports_video_calls True, if a video call can be created with the user
 //@has_private_calls True, if the user can't be called due to their privacy settings
@@ -758,7 +758,7 @@ botInfo short_description:string description:string photo:photo animation:animat
 //@premium_gift_options The list of available options for gifting Telegram Premium to the user
 //@group_in_common_count Number of group chats where both the other user and the current user are a member; 0 for the current user
 //@bot_info For bots, information about the bot; may be null if the user isn't a bot
-userFullInfo personal_photo:chatPhoto photo:chatPhoto public_photo:chatPhoto is_blocked:Bool can_be_called:Bool supports_video_calls:Bool has_private_calls:Bool has_private_forwards:Bool has_restricted_voice_and_video_note_messages:Bool has_pinned_stories:Bool need_phone_number_privacy_exception:Bool bio:formattedText premium_gift_options:vector<premiumPaymentOption> group_in_common_count:int32 bot_info:botInfo = UserFullInfo;
+userFullInfo personal_photo:chatPhoto photo:chatPhoto public_photo:chatPhoto block_list:BlockList can_be_called:Bool supports_video_calls:Bool has_private_calls:Bool has_private_forwards:Bool has_restricted_voice_and_video_note_messages:Bool has_pinned_stories:Bool need_phone_number_privacy_exception:Bool bio:formattedText premium_gift_options:vector<premiumPaymentOption> group_in_common_count:int32 bot_info:botInfo = UserFullInfo;
 
 //@description Represents a list of users @total_count Approximate total number of users found @user_ids A list of user identifiers
 users total_count:int32 user_ids:vector<int53> = Users;
@@ -1473,10 +1473,10 @@ videoChat group_call_id:int32 has_participants:Bool default_participant_id:Messa
 //@last_message Last message in the chat; may be null if none or unknown
 //@positions Positions of the chat in chat lists
 //@message_sender_id Identifier of a user or chat that is selected to send messages in the chat; may be null if the user can't change message sender
+//@block_list Block list to which the chat is added; may be null if none
 //@has_protected_content True, if chat content can't be saved locally, forwarded, or copied
 //@is_translatable True, if translation of all messages in the chat must be suggested to the user
 //@is_marked_as_unread True, if the chat is marked as unread
-//@is_blocked True, if the chat is blocked by the current user and private messages from the chat can't be received
 //@has_scheduled_messages True, if the chat has scheduled messages
 //@can_be_deleted_only_for_self True, if the chat messages can be deleted only for the current user while other users will continue to see the messages
 //@can_be_deleted_for_all_users True, if the chat messages can be deleted for all users
@@ -1498,7 +1498,7 @@ videoChat group_call_id:int32 has_participants:Bool default_participant_id:Messa
 //@reply_markup_message_id Identifier of the message from which reply markup needs to be used; 0 if there is no default custom reply markup in the chat
 //@draft_message A draft of a message in the chat; may be null if none
 //@client_data Application-specific data associated with the chat. (For example, the chat scroll position or local chat notification settings can be stored here.) Persistent if the message database is used
-chat id:int53 type:ChatType title:string photo:chatPhotoInfo permissions:chatPermissions last_message:message positions:vector<chatPosition> message_sender_id:MessageSender has_protected_content:Bool is_translatable:Bool is_marked_as_unread:Bool is_blocked:Bool has_scheduled_messages:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_be_reported:Bool default_disable_notification:Bool unread_count:int32 last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 unread_mention_count:int32 unread_reaction_count:int32 notification_settings:chatNotificationSettings available_reactions:ChatAvailableReactions message_auto_delete_time:int32 background:chatBackground theme_name:string action_bar:ChatActionBar video_chat:videoChat pending_join_requests:chatJoinRequestsInfo reply_markup_message_id:int53 draft_message:draftMessage client_data:string = Chat;
+chat id:int53 type:ChatType title:string photo:chatPhotoInfo permissions:chatPermissions last_message:message positions:vector<chatPosition> message_sender_id:MessageSender block_list:BlockList has_protected_content:Bool is_translatable:Bool is_marked_as_unread:Bool has_scheduled_messages:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_be_reported:Bool default_disable_notification:Bool unread_count:int32 last_read_inbox_message_id:int53 last_read_outbox_message_id:int53 unread_mention_count:int32 unread_reaction_count:int32 notification_settings:chatNotificationSettings available_reactions:ChatAvailableReactions message_auto_delete_time:int32 background:chatBackground theme_name:string action_bar:ChatActionBar video_chat:videoChat pending_join_requests:chatJoinRequestsInfo reply_markup_message_id:int53 draft_message:draftMessage client_data:string = Chat;
 
 //@description Represents a list of chats @total_count Approximate total number of chats found @chat_ids List of chat identifiers
 chats total_count:int32 chat_ids:vector<int53> = Chats;
@@ -1532,7 +1532,7 @@ chatActionBarReportUnrelatedLocation = ChatActionBar;
 //@description The chat is a recently created group chat to which new members can be invited
 chatActionBarInviteMembers = ChatActionBar;
 
-//@description The chat is a private or secret chat, which can be reported using the method reportChat, or the other user can be blocked using the method toggleMessageSenderIsBlocked,
+//@description The chat is a private or secret chat, which can be reported using the method reportChat, or the other user can be blocked using the method setMessageSenderBlockList,
 //-or the other user can be added to the contact list using the method addContact. If the chat is a private chat with a user with an emoji status, then a notice about emoji status usage must be shown
 //@can_unarchive If true, the chat was automatically archived and can be moved back to the main chat list using addChatToList simultaneously with setting chat notification settings to default using setChatNotificationSettings
 //@distance If non-negative, the current user was found by the peer through searchChatsNearby and this is the distance between the users
@@ -3984,6 +3984,15 @@ premiumLimitTypeShareableChatFolderCount = PremiumLimitType;
 //@description The maximum number of active stories
 premiumLimitTypeActiveStoryCount = PremiumLimitType;
 
+//@description The maximum number of stories sent per week
+premiumLimitTypeWeeklySentStoryCount = PremiumLimitType;
+
+//@description The maximum number of stories sent per month
+premiumLimitTypeMonthlySentStoryCount = PremiumLimitType;
+
+//@description The maximum length of captions of sent stories
+premiumLimitTypeStoryCaptionLength = PremiumLimitType;
+
 
 //@class PremiumFeature @description Describes a feature available to Premium users
 
@@ -4017,7 +4026,7 @@ premiumFeatureAdvancedChatManagement = PremiumFeature;
 //@description A badge in the user's profile
 premiumFeatureProfileBadge = PremiumFeature;
 
-//@description A emoji status shown along with the user's name
+//@description An emoji status shown along with the user's name
 premiumFeatureEmojiStatus = PremiumFeature;
 
 //@description Profile photo animation on message and chat screens
@@ -4031,6 +4040,30 @@ premiumFeatureAppIcons = PremiumFeature;
 
 //@description Allowed to translate chat messages real-time
 premiumFeatureRealTimeChatTranslation = PremiumFeature;
+
+//@description Allowed to use many additional features for stories
+premiumFeatureUpgradedStories = PremiumFeature;
+
+
+//@class PremiumStoryFeature @description Describes a story feature available to Premium users
+
+//@description User stories are displayed before stories of non-premium contacts
+premiumStoryFeaturePriorityOrder = PremiumStoryFeature;
+
+//@description The ability to hide the fact that the user viewed other's stories
+premiumStoryFeatureStealthMode = PremiumStoryFeature;
+
+//@description The ability to check who opened the current user's stories after they expire
+premiumStoryFeaturePermanentViewsHistory = PremiumStoryFeature;
+
+//@description The ability to set custom expiration duration for stories
+premiumStoryFeatureCustomExpirationDuration = PremiumStoryFeature;
+
+//@description The ability to save other's unprotected stories
+premiumStoryFeatureSaveStories = PremiumStoryFeature;
+
+//@description The ability to use links and formatting in story caption
+premiumStoryFeatureLinksAndFormatting = PremiumStoryFeature;
 
 
 //@description Contains information about a limit, increased for Premium users @type The type of the limit @default_value Default value of the limit @premium_value Value of the limit for Premium users
@@ -4050,6 +4083,9 @@ premiumSourceLimitExceeded limit_type:PremiumLimitType = PremiumSource;
 
 //@description A user tried to use a Premium feature @feature The used feature
 premiumSourceFeature feature:PremiumFeature = PremiumSource;
+
+//@description A user tried to use a Premium story feature @feature The used feature
+premiumSourceStoryFeature feature:PremiumStoryFeature = PremiumSource;
 
 //@description A user opened an internal link of the type internalLinkTypePremiumFeatures @referrer The referrer from the link
 premiumSourceLink referrer:string = PremiumSource;
@@ -4188,6 +4224,24 @@ chatTheme name:string light_settings:themeSettings dark_settings:themeSettings =
 
 //@description Contains a list of hashtags @hashtags A list of hashtags
 hashtags hashtags:vector<string> = Hashtags;
+
+
+//@class CanSendStoryResult @description Represents result of checking whether the current user can send a story
+
+//@description A story can be sent
+canSendStoryResultOk = CanSendStoryResult;
+
+//@description The user must subscribe to Telegram Premium to be able to post stories
+canSendStoryResultPremiumNeeded = CanSendStoryResult;
+
+//@description The limit for the number of active stories exceeded. The user can buy Telegram Premium, delete an active story, or wait for the oldest story to expire
+canSendStoryResultActiveStoryLimitExceeded = CanSendStoryResult;
+
+//@description The weekly limit for the number of posted stories exceeded. The user needs to buy Telegram Premium or wait specified time @retry_after Time left before the user can send the next story
+canSendStoryResultWeeklyLimitExceeded retry_after:int32 = CanSendStoryResult;
+
+//@description The monthly limit for the number of posted stories exceeded. The user needs to buy Telegram Premium or wait specified time @retry_after Time left before the user can send the next story
+canSendStoryResultMonthlyLimitExceeded retry_after:int32 = CanSendStoryResult;
 
 
 //@class CanTransferOwnershipResult @description Represents result of checking whether the current session can be used to transfer a chat ownership to another user
@@ -4491,16 +4545,16 @@ jsonValueObject members:vector<jsonObjectMember> = JsonValue;
 
 //@class StoryPrivacySettings @description Describes privacy settings of a story
 
-//@description The story can be viewed by everyone
-storyPrivacySettingsEveryone = StoryPrivacySettings;
+//@description The story can be viewed by everyone @except_user_ids Identifiers of the users that can't see the story; always unknown and empty for non-owned stories
+storyPrivacySettingsEveryone except_user_ids:vector<int53> = StoryPrivacySettings;
 
-//@description The story can be viewed by all contacts except chosen users @except_user_ids User identifiers of the contacts that can't see the story; always empty for non-owned stories
+//@description The story can be viewed by all contacts except chosen users @except_user_ids User identifiers of the contacts that can't see the story; always unknown and empty for non-owned stories
 storyPrivacySettingsContacts except_user_ids:vector<int53> = StoryPrivacySettings;
 
 //@description The story can be viewed by all close friends
 storyPrivacySettingsCloseFriends = StoryPrivacySettings;
 
-//@description The story can be viewed by certain specified users @user_ids Identifiers of the users; always empty for non-owned stories
+//@description The story can be viewed by certain specified users @user_ids Identifiers of the users; always unknown and empty for non-owned stories
 storyPrivacySettingsSelectedContacts user_ids:vector<int53> = StoryPrivacySettings;
 
 
@@ -4901,6 +4955,65 @@ messageLink link:string is_public:Bool = MessageLink;
 messageLinkInfo is_public:Bool chat_id:int53 message_thread_id:int53 message:message media_timestamp:int32 for_album:Bool = MessageLinkInfo;
 
 
+//@description Represents a viewer of a story
+//@user_id User identifier of the viewer
+//@view_date Approximate point in time (Unix timestamp) when the story was viewed
+//@block_list Block list to which the user is added; may be null if none
+//@chosen_reaction_type Type of the reaction that was chosen by the user; may be null if none
+storyViewer user_id:int53 view_date:int32 block_list:BlockList chosen_reaction_type:ReactionType = StoryViewer;
+
+//@description Represents a list of story viewers
+//@total_count Approximate total number of story viewers found
+//@viewers List of story viewers
+//@next_offset The offset for the next request. If empty, there are no more results
+storyViewers total_count:int32 viewers:vector<storyViewer> next_offset:string = StoryViewers;
+
+
+//@description Describes position of a clickable rectangle area on a story media
+//@x_percentage The abscissa of the rectangle's center, as a percentage of the media width
+//@y_percentage The ordinate of the rectangle's center, as a percentage of the media height
+//@width_percentage The width of the rectangle, as a percentage of the media width
+//@height_percentage The ordinate of the rectangle's center, as a percentage of the media height
+//@rotation_angle Clockwise rotation angle of the rectangle, in degrees; 0-360
+storyAreaPosition x_percentage:double y_percentage:double width_percentage:double height_percentage:double rotation_angle:double = StoryAreaPosition;
+
+
+//@class StoryAreaType @description Describes type of a clickable rectangle area on a story media
+
+//@description An area pointing to a location @location The location
+storyAreaTypeLocation location:location = StoryAreaType;
+
+//@description An area pointing to a venue @venue Information about the venue
+storyAreaTypeVenue venue:venue = StoryAreaType;
+
+
+//@description Describes a clickable rectangle area on a story media @position Position of the area @type Type of the area
+storyArea position:storyAreaPosition type:StoryAreaType = StoryArea;
+
+
+//@class InputStoryAreaType @description Describes type of a clickable rectangle area on a story media to be added
+
+//@description An area pointing to a location @location The location
+inputStoryAreaTypeLocation location:location = InputStoryAreaType;
+
+//@description An area pointing to a venue found by the bot getOption("venue_search_bot_username")
+//@query_id Identifier of the inline query, used to found the venue
+//@result_id Identifier of the inline query result
+inputStoryAreaTypeFoundVenue query_id:int64 result_id:string = InputStoryAreaType;
+
+//@description An area pointing to a venue already added to the story
+//@venue_provider Provider of the venue
+//@venue_id Identifier of the venue in the provider database
+inputStoryAreaTypePreviousVenue venue_provider:string venue_id:string = InputStoryAreaType;
+
+
+//@description Describes a clickable rectangle area on a story media to be added @position Position of the area @type Type of the area
+inputStoryArea position:storyAreaPosition type:InputStoryAreaType = InputStoryArea;
+
+//@description Contains a list of story areas to be added @areas List of input story areas
+inputStoryAreas areas:vector<inputStoryArea> = InputStoryAreas;
+
+
 //@description Describes a video file sent in a story
 //@duration Duration of the video, in seconds
 //@width Video width
@@ -4952,13 +5065,15 @@ storyListArchive = StoryList;
 
 //@description Contains information about interactions with a story
 //@view_count Number of times the story was viewed
+//@reaction_count Number of reactions added to the story
 //@recent_viewer_user_ids Identifiers of at most 3 recent viewers of the story
-storyInteractionInfo view_count:int32 recent_viewer_user_ids:vector<int53> = StoryInteractionInfo;
+storyInteractionInfo view_count:int32 reaction_count:int32 recent_viewer_user_ids:vector<int53> = StoryInteractionInfo;
 
 //@description Represents a story
 //@id Unique story identifier among stories of the given sender
 //@sender_chat_id Identifier of the chat that posted the story
 //@date Point in time (Unix timestamp) when the story was published
+//@is_being_sent True, if the story is being sent by the current user
 //@is_being_edited True, if the story is being edited by the current user
 //@is_edited True, if the story was edited
 //@is_pinned True, if the story is saved in the sender's profile and will be available there after expiration
@@ -4968,10 +5083,12 @@ storyInteractionInfo view_count:int32 recent_viewer_user_ids:vector<int53> = Sto
 //@can_get_viewers True, if users viewed the story can be received through getStoryViewers
 //@has_expired_viewers True, if users viewed the story can't be received, because the story has expired more than getOption("story_viewers_expiration_delay") seconds ago
 //@interaction_info Information about interactions with the story; may be null if the story isn't owned or there were no interactions
+//@chosen_reaction_type Type of the chosen reaction; may be null if none
 //@privacy_settings Privacy rules affecting story visibility; may be approximate for non-owned stories
 //@content Content of the story
+//@areas Clickable areas to be shown on the story content
 //@caption Caption of the story
-story id:int32 sender_chat_id:int53 date:int32 is_being_edited:Bool is_edited:Bool is_pinned:Bool is_visible_only_for_self:Bool can_be_forwarded:Bool can_be_replied:Bool can_get_viewers:Bool has_expired_viewers:Bool interaction_info:storyInteractionInfo privacy_settings:StoryPrivacySettings content:StoryContent caption:formattedText = Story;
+story id:int32 sender_chat_id:int53 date:int32 is_being_sent:Bool is_being_edited:Bool is_edited:Bool is_pinned:Bool is_visible_only_for_self:Bool can_be_forwarded:Bool can_be_replied:Bool can_get_viewers:Bool has_expired_viewers:Bool interaction_info:storyInteractionInfo chosen_reaction_type:ReactionType privacy_settings:StoryPrivacySettings content:StoryContent areas:vector<storyArea> caption:formattedText = Story;
 
 //@description Represents a list of stories @total_count Approximate total number of stories found @stories The list of stories
 stories total_count:int32 stories:vector<story> = Stories;
@@ -4989,6 +5106,15 @@ storyInfo story_id:int32 date:int32 is_for_close_friends:Bool = StoryInfo;
 //@max_read_story_id Identifier of the last read active story
 //@stories Basic information about the stories; use getStory to get full information about the stories. The stories are in a chronological order (i.e., in order of increasing story identifiers)
 chatActiveStories chat_id:int53 list:StoryList order:int53 max_read_story_id:int32 stories:vector<storyInfo> = ChatActiveStories;
+
+
+//@class BlockList @description Describes a type of a block list
+
+//@description The main block list that disallows writing messages to the current user, receiving their status and photo, viewing of stories, and some other actions
+blockListMain = BlockList;
+
+//@description The block list that disallows viewing of stories of the current user
+blockListStories = BlockList;
 
 
 //@description Contains a part of a file @data File bytes
@@ -5602,8 +5728,8 @@ updateChatIsTranslatable chat_id:int53 is_translatable:Bool = Update;
 //@description A chat was marked as unread or was read @chat_id Chat identifier @is_marked_as_unread New value of is_marked_as_unread
 updateChatIsMarkedAsUnread chat_id:int53 is_marked_as_unread:Bool = Update;
 
-//@description A chat was blocked or unblocked @chat_id Chat identifier @is_blocked New value of is_blocked
-updateChatIsBlocked chat_id:int53 is_blocked:Bool = Update;
+//@description A chat was blocked or unblocked @chat_id Chat identifier @block_list Block list to which the chat is added; may be null if none
+updateChatBlockList chat_id:int53 block_list:BlockList = Update;
 
 //@description A chat's has_scheduled_messages field has changed @chat_id Chat identifier @has_scheduled_messages New value of has_scheduled_messages
 updateChatHasScheduledMessages chat_id:int53 has_scheduled_messages:Bool = Update;
@@ -5758,12 +5884,27 @@ updateStory story:story = Update;
 //@description A story became inaccessible @story_sender_chat_id Identifier of the chat that posted the story @story_id Story identifier
 updateStoryDeleted story_sender_chat_id:int53 story_id:int32 = Update;
 
+//@description A story has been successfully sent @story The sent story @old_story_id The previous temporary story identifier
+updateStorySendSucceeded story:story old_story_id:int32 = Update;
+
+//@description A story failed to send. If the story sending is canceled, then updateStoryDeleted will be received instead of this update
+//@story The failed to send story
+//@error The cause of the failure; may be null if unknown
+//@error_code An error code
+//@error_message Error message
+updateStorySendFailed story:story error:CanSendStoryResult error_code:int32 error_message:string = Update;
+
 //@description The list of active stories posted by a specific chat has changed
 //@active_stories The new list of active stories
 updateChatActiveStories active_stories:chatActiveStories = Update;
 
 //@description Number of chats in a story list has changed @story_list The story list @chat_count Approximate total number of chats with active stories in the list
 updateStoryListChatCount story_list:StoryList chat_count:int32 = Update;
+
+//@description Story stealth mode settings have changed
+//@active_until_date Point in time (Unix timestamp) until stealth mode is active; 0 if it is disabled
+//@cooldown_until_date Point in time (Unix timestamp) when stealth mode can be enabled again; 0 if there is no active cooldown
+updateStoryStealthMode active_until_date:int32 cooldown_until_date:int32 = Update;
 
 //@description An option changed its value @name The option name @value The new option value
 updateOption name:string value:OptionValue = Update;
@@ -6499,7 +6640,7 @@ sendBotStartMessage bot_user_id:int53 chat_id:int53 parameter:string = Message;
 //@reply_to Identifier of the replied message or story; pass null if none
 //@options Options to be used to send the message; pass null to use default options
 //@query_id Identifier of the inline query
-//@result_id Identifier of the inline result
+//@result_id Identifier of the inline query result
 //@hide_via_bot Pass true to hide the bot, via which the message is sent. Can be used only for bots getOption("animation_search_bot_username"), getOption("photo_search_bot_username"), and getOption("venue_search_bot_username")
 sendInlineQueryResultMessage chat_id:int53 message_thread_id:int53 reply_to:MessageReplyTo options:messageSendOptions query_id:int64 result_id:string hide_via_bot:Bool = Message;
 
@@ -6825,7 +6966,7 @@ shareChatWithBot chat_id:int53 message_id:int53 button_id:int32 shared_chat_id:i
 //@chat_id Identifier of the chat where the query was sent
 //@user_location Location of the user; pass null if unknown or the bot doesn't need user's location
 //@query Text of the query
-//@offset Offset of the first entry to return
+//@offset Offset of the first entry to return; use empty string to get the first chunk of results
 getInlineQueryResults bot_user_id:int53 chat_id:int53 user_location:location query:string offset:string = InlineQueryResults;
 
 //@description Sets the result of an inline query; for bots only
@@ -7303,20 +7444,25 @@ readChatList chat_list:ChatList = Ok;
 //@only_local Pass true to get only locally available information without sending network requests
 getStory story_sender_chat_id:int53 story_id:int32 only_local:Bool = Story;
 
-//@description Sends a new story. Returns a temporary story with identifier 0
+//@description Checks whether the current user can send a story
+canSendStory = CanSendStoryResult;
+
+//@description Sends a new story. Returns a temporary story
 //@content Content of the story
+//@areas Clickable rectangle areas to be shown on the story media; pass null if none
 //@caption Story caption; pass null to use an empty caption; 0-getOption("story_caption_length_max") characters
 //@privacy_settings The privacy settings for the story
-//@active_period Period after which the story is moved to archive, in seconds; must be one of 6 * 3600, 12 * 3600, 86400, 2 * 86400, 3 * 86400, or 7 * 86400 for Telegram Premium users, and 86400 otherwise
+//@active_period Period after which the story is moved to archive, in seconds; must be one of 6 * 3600, 12 * 3600, 86400, or 2 * 86400 for Telegram Premium users, and 86400 otherwise
 //@is_pinned Pass true to keep the story accessible after expiration
 //@protect_content Pass true if the content of the story must be protected from forwarding and screenshotting
-sendStory content:InputStoryContent caption:formattedText privacy_settings:StoryPrivacySettings active_period:int32 is_pinned:Bool protect_content:Bool = Story;
+sendStory content:InputStoryContent areas:inputStoryAreas caption:formattedText privacy_settings:StoryPrivacySettings active_period:int32 is_pinned:Bool protect_content:Bool = Story;
 
 //@description Changes content and caption of a previously sent story
 //@story_id Identifier of the story to edit
 //@content New content of the story; pass null to keep the current content
+//@areas New clickable rectangle areas to be shown on the story media; pass null to keep the current areas
 //@caption New story caption; pass null to keep the current caption
-editStory story_id:int32 content:InputStoryContent caption:formattedText = Ok;
+editStory story_id:int32 content:InputStoryContent areas:inputStoryAreas caption:formattedText = Ok;
 
 //@description Changes privacy settings of a previously sent story @story_id Identifier of the story @privacy_settings The new privacy settigs for the story
 setStoryPrivacySettings story_id:int32 privacy_settings:StoryPrivacySettings = Ok;
@@ -7366,13 +7512,24 @@ openStory story_sender_chat_id:int53 story_id:int32 = Ok;
 //@story_id The identifier of the story
 closeStory story_sender_chat_id:int53 story_id:int32 = Ok;
 
-//@description Returns viewers of a recent outgoing story. The method can be called if story.can_get_viewers == true. The views are returned in a reverse chronological order (i.e., in order of decreasing view_date)
-//-For optimal performance, the number of returned stories is chosen by TDLib
+//@description Returns reactions, which can be chosen for a story @row_size Number of reaction per row, 5-25
+getStoryAvailableReactions row_size:int32 = AvailableReactions;
+
+//@description Changes chosen reaction on a story
+//@story_sender_chat_id The identifier of the sender of the story
+//@story_id The identifier of the story
+//@reaction_type Type of the reaction to set; pass null to remove the reaction. `reactionTypeCustomEmoji` reactions can be used only by Telegram Premium users
+//@update_recent_reactions Pass true if the reaction needs to be added to recent reactions
+setStoryReaction story_sender_chat_id:int53 story_id:int32 reaction_type:ReactionType update_recent_reactions:Bool = Ok;
+
+//@description Returns viewers of a story. The method can be called if story.can_get_viewers == true
 //@story_id Story identifier
-//@offset_viewer A viewer from which to return next viewers; pass null to get results from the beginning
+//@query Query to search for in names and usernames of the viewers; may be empty to get all relevant viewers
+//@only_contacts Pass true to get only contacts; pass false to get all relevant viewers
+//@prefer_with_reaction Pass true to get viewers with reaction first; pass false to get viewers sorted just by view_date
+//@offset Offset of the first entry to return as received from the previous request; use empty string to get the first chunk of results
 //@limit The maximum number of story viewers to return
-//-For optimal performance, the number of returned stories is chosen by TDLib and can be smaller than the specified limit
-getStoryViewers story_id:int32 offset_viewer:messageViewer limit:int32 = MessageViewers;
+getStoryViewers story_id:int32 query:string only_contacts:Bool prefer_with_reaction:Bool offset:string limit:int32 = StoryViewers;
 
 //@description Reports a story to the Telegram moderators
 //@story_sender_chat_id The identifier of the sender of the story to report
@@ -7380,6 +7537,10 @@ getStoryViewers story_id:int32 offset_viewer:messageViewer limit:int32 = Message
 //@reason The reason for reporting the story
 //@text Additional report details; 0-1024 characters
 reportStory story_sender_chat_id:int53 story_id:int32 reason:ReportReason text:string = Ok;
+
+//@description Activates stealth mode for stories, which hides all views of stories from the current user in the last "story_stealth_mode_past_period" seconds
+//-and for the next "story_stealth_mode_future_period" seconds; for Telegram Premium users only
+activateStoryStealthMode = Ok;
 
 
 //@description Returns information about a bot that can be added to attachment menu @bot_user_id Bot's user identifier
@@ -7755,8 +7916,10 @@ getGroupCallStreams group_call_id:int32 = GroupCallStreams;
 getGroupCallStreamSegment group_call_id:int32 time_offset:int53 scale:int32 channel_id:int32 video_quality:GroupCallVideoQuality = FilePart;
 
 
-//@description Changes the block state of a message sender. Currently, only users and supergroup chats can be blocked @sender_id Identifier of a message sender to block/unblock @is_blocked New value of is_blocked
-toggleMessageSenderIsBlocked sender_id:MessageSender is_blocked:Bool = Ok;
+//@description Changes the block list of a message sender. Currently, only users and supergroup chats can be blocked
+//@sender_id Identifier of a message sender to block/unblock
+//@block_list New block list for the message sender; pass null to unblock the message sender
+setMessageSenderBlockList sender_id:MessageSender block_list:BlockList = Ok;
 
 //@description Blocks an original sender of a message in the Replies chat
 //@message_id The identifier of an incoming message in the Replies chat
@@ -7765,8 +7928,11 @@ toggleMessageSenderIsBlocked sender_id:MessageSender is_blocked:Bool = Ok;
 //@report_spam Pass true to report the sender to the Telegram moderators
 blockMessageSenderFromReplies message_id:int53 delete_message:Bool delete_all_messages:Bool report_spam:Bool = Ok;
 
-//@description Returns users and chats that were blocked by the current user @offset Number of users and chats to skip in the result; must be non-negative @limit The maximum number of users and chats to return; up to 100
-getBlockedMessageSenders offset:int32 limit:int32 = MessageSenders;
+//@description Returns users and chats that were blocked by the current user
+//@block_list Block list from which to return users
+//@offset Number of users and chats to skip in the result; must be non-negative
+//@limit The maximum number of users and chats to return; up to 100
+getBlockedMessageSenders block_list:BlockList offset:int32 limit:int32 = MessageSenders;
 
 
 //@description Adds a user to the contact list or edits an existing contact by their user identifier
