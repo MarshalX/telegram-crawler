@@ -3,6 +3,7 @@ var Ads = {
   init: function() {
     Aj.onLoad(function(state) {
       Ads.updateTime(Aj.ajContainer);
+      Ads.updateEmoji(Aj.ajContainer);
       Ads.updateAdMessagePreviews(Aj.ajContainer);
       $('.logout-link').on('click', Ads.eLogOut);
     });
@@ -175,6 +176,11 @@ var Ads = {
       $time.removeAttr('datetime');
     });
   },
+  updateEmoji: function(context) {
+    $('tg-emoji', context).each(function() {
+      TEmoji.init(this);
+    });
+  },
   formatTableDate: function(timestamp) {
     var date = new Date(timestamp * 1000);
     var j = date.getDate();
@@ -201,6 +207,7 @@ var Ads = {
     $('.upload-input input', $form).on('change', Ads.eFileChange);
     $('.upload-input .js-file-reset', $form).on('click', Ads.eFileReset);
     $(document).on('touchstart click', Ads.eHideAllHints);
+    $form.on('click.curPage', '.file-upload', stopImmediatePropagation);
     setTimeout(function(){ $form.removeClass('no-transition'); }, 100);
   },
   formDestroy: function(form) {
@@ -213,6 +220,7 @@ var Ads = {
     $('.upload-input input', $form).off('change', Ads.eFileChange);
     $('.upload-input .js-file-reset', $form).off('click', Ads.eFileReset);
     $(document).off('touchstart click', Ads.eHideAllHints);
+    $form.off('click.curPage', '.file-upload', stopImmediatePropagation);
   },
   eClearField: function(e) {
     var $fieldEl = $(this).parents('.pr-search-input-wrap').find('.pr-search-input');
@@ -422,6 +430,8 @@ var NewAd = {
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
       cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
+      cont.on('click.curPage', '.js-promote-photo', NewAd.eReplacePromotePhoto);
+      cont.on('change.curPage', '.js-promote-photo > .file-upload', NewAd.eUploadPromotePhoto);
       cont.on('click.curPage', '.clear-draft-btn', NewAd.eClearDraft);
       cont.on('click.curPage', '.create-new-ad-btn', NewAd.eSubmitForm);
       for (var i = 0; i < state.selectList.length; i++) {
@@ -473,6 +483,9 @@ var NewAd = {
       state.textField.on('input.curPage', NewAd.onTextInput);
       state.promoteUrlField = state.$form.field('promote_url');
       state.promoteUrlField.on('change.curPage', NewAd.onPromoteUrlChange);
+      state.websiteNameField = state.$form.field('website_name');
+      state.websiteNameField.on('change.curPage', NewAd.onWebsiteNameChange);
+      state.websitePhotoField = state.$form.field('website_photo');
       state.adInfoField = state.$form.field('ad_info');
       state.adInfoField.on('change.curPage', NewAd.onAdInfoChange);
       state.targetTypeField = state.$form.field('target_type');
@@ -509,6 +522,7 @@ var NewAd = {
       state.titleField.off('.curPage');
       state.textField.off('.curPage');
       state.promoteUrlField.off('.curPage');
+      state.websiteNameField.off('.curPage');
       state.adInfoField.off('.curPage');
       state.targetTypeField.fieldEl().off('.curPage');
       state.confirmedCheckbox.off('.curPage');
@@ -578,12 +592,22 @@ var NewAd = {
     Ads.hideFieldError(promoteUrlField);
     NewAd.adPostCheck($form);
   },
+  onWebsiteNameChange: function() {
+    var $form = $(this.form);
+    var websiteNameField = $form.field('website_name');
+    Ads.hideFieldError(websiteNameField);
+    NewAd.adPostCheck($form);
+  },
   adPostCheck: function($form) {
     var textField = $form.field('text');
     var promoteUrlField = $form.field('promote_url');
+    var websiteNameField = $form.field('website_name');
+    var websitePhotoField = $form.field('website_photo');
     var cpmField = $form.field('cpm');
     var text = textField.value();
     var promote_url = promoteUrlField.value();
+    var website_name = websiteNameField.value();
+    var website_photo = websitePhotoField.value();
     var $formGroup = promoteUrlField.fieldEl().parents('.form-group');
     var $cpmFormGroup = cpmField.fieldEl().parents('.form-group');
     if (!text && !promote_url) {
@@ -592,7 +616,9 @@ var NewAd = {
     var params = {
       owner_id: Aj.state.ownerId,
       text: text,
-      promote_url: promote_url
+      promote_url: promote_url,
+      website_name: website_name,
+      website_photo: website_photo
     };
     if (Aj.state.adId) {
       params.ad_id = Aj.state.adId;
@@ -605,13 +631,32 @@ var NewAd = {
     Aj.apiRequest('checkAdPost', params, function(result) {
       Ads.hideFieldError(textField);
       Ads.hideFieldError(promoteUrlField);
+      Ads.hideFieldError(websiteNameField);
       $cpmFormGroup.removeClass('field-loading');
       $formGroup.removeClass('field-loading');
       if (result.promote_url) {
+        result.promote_url = uncleanHTML(result.promote_url);
         var new_promote_url = promoteUrlField.value();
         if (!new_promote_url || promote_url == new_promote_url) {
           if (new_promote_url != result.promote_url) {
             promoteUrlField.value(result.promote_url);
+          }
+        }
+      }
+      if (result.website_name) {
+        result.website_name = uncleanHTML(result.website_name);
+        var new_website_name = websiteNameField.value();
+        if (!new_website_name || website_name == new_website_name) {
+          if (new_website_name != result.website_name) {
+            websiteNameField.value(result.website_name);
+          }
+        }
+      }
+      if (result.website_photo) {
+        var new_website_photo = websitePhotoField.value();
+        if (!new_website_photo || website_photo == new_website_photo) {
+          if (new_website_photo != result.website_photo) {
+            websitePhotoField.value(result.website_photo);
           }
         }
       }
@@ -648,6 +693,14 @@ var NewAd = {
         }
       }
       NewAd.updateAdPreview($form, result.preview_data);
+      NewAd.updateAdForm($form, result.is_website);
+      if (result.update_requested) {
+        setTimeout(function() {
+          if ($form.parents('body').size()) {
+            NewAd.adPostCheck($form);
+          }
+        }, 500);
+      }
       if (result.error) {
         if (result.field) {
           var $field = $form.field(result.field);
@@ -822,6 +875,44 @@ var NewAd = {
     e.preventDefault();
     NewAd.previewPopup();
   },
+  eReplacePromotePhoto: function(e) {
+    if (!$(this).hasClass('can-replace')) {
+      return;
+    }
+    e && e.stopImmediatePropagation();
+    e && e.preventDefault();
+    $('<input type="file" accept="image/jpeg,image/jpg,image/png" class="file-upload hide">').appendTo(this).click();
+  },
+  eUploadPromotePhoto: function(e) {
+    var $fileInput = $(this);
+    var $form = $(this).parents('form');
+    var files = this.files || [];
+    if (files.length > 0) {
+      var promoteUrlField = $form.field('promote_url');
+      var websitePhotoField = $form.field('website_photo');
+      var $formGroup = promoteUrlField.fieldEl().parents('.form-group');
+      var $promotePhoto = $('.js-promote-photo', $form);
+      $formGroup.addClass('field-loading');
+      var xhr = Upload.uploadFile(files[0], function onSuccess(result) {
+        $formGroup.removeClass('field-loading');
+        $fileInput.remove();
+        if (result.website_photo) {
+          websitePhotoField.value(result.website_photo);
+        }
+        if (result.photo_html) {
+          $promotePhoto.html(result.photo_html);
+          NewAd.adPostCheck($form);
+        }
+      }, function onProgress(loaded, total) {
+      }, function onError(error) {
+        $formGroup.removeClass('field-loading');
+        $fileInput.remove();
+        if (xhr.aborted) return;
+        showAlert(error);
+      });
+      $fileInput.data('xhr', xhr);
+    }
+  },
   updateAdPreview: function($form, previewData) {
     var $previewPopup = Aj.state.$previewPopup;
     var inPopup = $form.parents('.pr-layer-preview-ad').size() > 0;
@@ -830,13 +921,13 @@ var NewAd = {
       if ($previewPopup) {
         if (previewData) {
           $('.js-preview-from', $previewPopup).html(previewData.from);
-          $('.js-preview-from', $previewPopup).attr('href', previewData.from_url);
+          $('.js-preview-from', $previewPopup).attr('href', uncleanHTML(previewData.from_url));
           $('.js-promote-photo', $previewPopup).html(previewData.photo);
           $('.js-promote-photo-tooltip', $previewPopup).html(previewData.from);
           $('.js-preview-text', $previewPopup).html(previewData.text);
           $('.js-preview-text tg-emoji', $previewPopup).each(function(){ TEmoji.init(this); });
           $('.js-preview-button', $previewPopup).html(previewData.button);
-          $('.js-preview-button', $previewPopup).attr('href', previewData.button_url);
+          $('.js-preview-button', $previewPopup).attr('href', uncleanHTML(previewData.button_url));
           $('.js-preview-footer', $previewPopup).each(function() {
             Ads.updateTextShadow(this, '.ad-msg-text', '.label', 10);
           });
@@ -859,6 +950,34 @@ var NewAd = {
       $('.js-promote-photo', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
       $('.js-cpm-extra', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-extra-cpm', !!(previewData && previewData.cpm_extra));
       $('.js-preview-link', Aj.state.$form).toggleClass('inactive', !previewData);
+    }
+  },
+  updateAdForm: function($form, isWebsite) {
+    var $previewPopup = Aj.state.$previewPopup;
+    var inPopup = $form.parents('.pr-layer-preview-ad').size() > 0;
+    var $cont = false;
+    var $websiteNameField = false;
+    var $websitePhotoField = false;
+    if (inPopup) {
+      if ($previewPopup) {
+        $cont = $previewPopup;
+        $websiteNameField = $form.field('website_name');
+        $websitePhotoField = $form.field('website_photo');
+      }
+    } else {
+      $cont = Aj.state.$form;
+      $websiteNameField = Aj.state.$form.field('website_name');
+      $websitePhotoField = Aj.state.$form.field('website_photo');
+    }
+    if ($cont) {
+      $('.js-promote-photo', $cont).toggleClass('can-replace', !!isWebsite);
+      if (isWebsite) {
+        $('.js-website-name-wrap', $cont).slideShow();
+      } else {
+        $('.js-website-name-wrap', $cont).slideHide();
+        $websiteNameField.value('');
+        $websitePhotoField.value('');
+      }
     }
   },
   checkBeforePreviewPopupUnload: function(load_fn) {
@@ -886,10 +1005,13 @@ var NewAd = {
     var $form = state.$form;
     var text = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
+    var website_name = $form.field('website_name').value();
+    var website_photo = $form.field('website_photo').value();
     var picture_checked = $form.field('picture').prop('checked');
     var previewPictureChange = function() {
       $('.js-preview', $previewPopup).toggleClass('picture', !!$(this).prop('checked'));
     };
+    var website_name_hidden = $('.js-website-name-wrap', $form).isSlideHidden();
 
     var $previewForm = $('.pr-new-form', $previewPopup);
     Ads.formInit($previewForm);
@@ -902,10 +1024,16 @@ var NewAd = {
     state.previewPromoteUrlField = $previewForm.field('promote_url');
     state.previewPromoteUrlField.on('change.curPage', NewAd.onPromoteUrlChange);
     state.previewPromoteUrlField.value(promote_url);
+    state.previewWebsiteNameField = $previewForm.field('website_name');
+    state.previewWebsiteNameField.on('change.curPage', NewAd.onWebsiteNameChange);
+    state.previewWebsiteNameField.value(website_name);
+    state.previewWebsitePhotoField = $previewForm.field('website_photo');
+    state.previewWebsitePhotoField.value(website_photo);
     state.previewPictureCheckbox = $previewForm.field('picture');
     state.previewPictureCheckbox.on('change.curPage', previewPictureChange);
     state.previewPictureCheckbox.prop('checked', picture_checked);
     $('.js-preview', $previewPopup).toggleClass('picture', !!picture_checked);
+    $('.js-website-name-wrap', $previewPopup).toggleClass('shide', website_name_hidden);
 
     NewAd.updateAdPreview($previewForm, state.previewData);
     NewAd.adPostCheck($previewForm);
@@ -913,9 +1041,13 @@ var NewAd = {
     var previewSave = function() {
       var text = state.previewTextField.value();
       var promote_url = state.previewPromoteUrlField.value();
+      var website_name = state.previewWebsiteNameField.value();
+      var website_photo = state.previewWebsitePhotoField.value();
       var picture_checked = state.previewPictureCheckbox.prop('checked');
       $form.field('text').value(text).updateAutosize();
       $form.field('promote_url').value(promote_url);
+      $form.field('website_name').value(website_name);
+      $form.field('website_photo').value(website_photo);
       $form.field('picture').prop('checked', picture_checked);
       NewAd.updateAdPreview($form, state.popupPreviewData);
       NewAd.adPostCheck($form);
@@ -1068,6 +1200,8 @@ var NewAd = {
       $form.field('title').value(),
       $form.field('text').value(),
       $form.field('promote_url').value(),
+      $form.field('website_name').value(),
+      $form.field('website_photo').value(),
       $form.field('ad_info').value(),
       $form.field('cpm').value(),
       $form.field('budget').value(),
@@ -1093,7 +1227,9 @@ var NewAd = {
       if (!$previewForm.get(0)) return false;
       var values = [
         $previewForm.field('text').value(),
-        $previewForm.field('promote_url').value()
+        $previewForm.field('promote_url').value(),
+        $previewForm.field('website_name').value(),
+        $previewForm.field('website_photo').value()
       ];
       if ($previewForm.field('picture').prop('checked')) {
         values.push('picture');
@@ -1109,6 +1245,8 @@ var NewAd = {
     var title       = $form.field('title').value();
     var text        = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
+    var website_name = $form.field('website_name').value();
+    var website_photo = $form.field('website_photo').value();
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
     var budget      = Ads.amountFieldValue($form, 'budget');
@@ -1139,6 +1277,8 @@ var NewAd = {
       title: title,
       text: text,
       promote_url: promote_url,
+      website_name: website_name,
+      website_photo: website_photo,
       ad_info: ad_info,
       cpm: cpm,
       budget: budget,
@@ -1193,6 +1333,8 @@ var NewAd = {
     var title       = $form.field('title').value();
     var text        = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
+    var website_name = $form.field('website_name').value();
+    var website_photo = $form.field('website_photo').value();
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
     var budget      = Ads.amountFieldValue($form, 'budget');
@@ -1207,6 +1349,8 @@ var NewAd = {
       title: title,
       text: text,
       promote_url: promote_url,
+      website_name: website_name,
+      website_photo: website_photo,
       ad_info: ad_info,
       cpm: cpm,
       budget: budget,
@@ -1242,6 +1386,8 @@ var NewAd = {
     $form.field('title').value('');
     $form.field('text').value('');
     $form.field('promote_url').value('');
+    $form.field('website_name').value('');
+    $form.field('website_photo').value('');
     $form.field('ad_info').value('');
     $form.field('cpm').value('');
     $form.field('budget').value('');
@@ -1268,6 +1414,43 @@ var NewAd = {
       callback && callback();
     });
     return false;
+  }
+};
+
+var Upload = {
+  uploadFile: function(file, onSuccess, onProgress, onError) {
+    var data = new FormData();
+    data.append('file', file, file.name);
+    return $.ajax({
+      url: '/file/upload',
+      type: 'POST',
+      data: data,
+      cache: false,
+      dataType: 'json',
+      processData: false,
+      contentType: false,
+      xhr: function() {
+        var xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener('progress', function(event) {
+          if (event.lengthComputable) {
+            onProgress && onProgress(event.loaded, event.total);
+          }
+        });
+        return xhr;
+      },
+      beforeSend: function(xhr) {
+        onProgress && onProgress(0, 1);
+      },
+      success: function (result) {
+        if (result.error) {
+          return onError && onError(result.error);
+        }
+        onSuccess && onSuccess(result);
+      },
+      error: function (xhr) {
+        return onError && onError('Network error');
+      }
+    });
   }
 };
 
@@ -1599,8 +1782,25 @@ var OwnerAds = {
         renderItem: function(item, query) {
           var status_attrs = ' href="' + item.base_url + item.status_url + '" ' + (item.status_attrs || 'data-layer');
           var title_class = 'pr-trg-type-' + item.trg_type;
-          var tme_link = item.tme_path ? '<a href="https://t.me/' + item.tme_path + '" target="_blank">t.me/' + item.tme_path + '</a>' : '<span class="pr-no-tme-link">' + l('WEB_ADS_NO_TME_LINK') + '</span>';
-          return '<td><div class="pr-cell pr-cell-title ' + title_class + '"><a href="' + item.base_url + '"class="pr-link">' + item.title + '</a><small style="display:var(--coldp-url,inline)"><br>' + tme_link + '</small></div></td><td style="display:var(--coldp-views,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + formatNumber(item.views) + '</a></div></td><td style="display:var(--coldp-joins,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + formatNumber(item.joins) + '</a></div></td><td style="display:var(--coldp-cpm,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + Ads.wrapAmount(item.cpm) + '</a></div></td><td style="display:var(--coldp-cps,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + Ads.wrapAmount(item.cps) + '</a></div></td><td style="display:var(--coldp-spent,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + Ads.wrapAmount(item.spent) + '</a></div></td><td style="display:var(--coldp-budget,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + Ads.wrapAmount(item.budget) + '</a></div></td><td style="display:var(--coldp-target,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + item.target + '</a></div></td><td style="display:var(--coldp-status,table-cell)"><div class="pr-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td style="display:var(--coldp-date,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + Ads.formatTableDate(item.date) + '</a></div></td><td><div class="pr-actions-cell">' + Aj.state.adsDropdownTpl.replace(/\{ad_id\}/g, item.ad_id).replace(/\{tme_path\}/g, item.tme_path).replace(/\{ad_text\}/g, item.text) + '</div></td>';
+          if (item.tme_path) {
+            var promote_url = 'https://t.me/' + item.tme_path;
+            var promote_url_text = 't.me/' + item.tme_path;
+            var promote_link = '<a href="' + promote_url + '" target="_blank">' + promote_url_text + '</a>';
+          } else if (item.promote_url) {
+            var promote_url = item.promote_url;
+            var promote_url_text = promote_url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+            var promote_link = '<a href="' + promote_url + '" target="_blank">' + promote_url_text + '</a>';
+          } else {
+            var promote_url = '#';
+            var promote_url_text = l('WEB_ADS_NO_TME_LINK');
+            var promote_link = '<span class="pr-no-tme-link">' + promote_url_text + '</span>';
+          }
+          var joins = item.joins !== false ? formatNumber(item.joins) : '–';
+          var clicks = item.clicks !== false ? formatNumber(item.clicks) : '–';
+          var ctr = item.ctr !== false ? item.ctr + '%' : '–';
+          var cpc = item.cpc !== false ? Ads.wrapAmount(item.cpc) : '–';
+          var cps = item.cps !== false ? Ads.wrapAmount(item.cps) : '–';
+          return '<td><div class="pr-cell pr-cell-title ' + title_class + '"><a href="' + item.base_url + '"class="pr-link">' + item.title + '</a><small style="display:var(--coldp-url,inline)"><br>' + promote_link + '</small></div></td><td style="display:var(--coldp-views,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + formatNumber(item.views) + '</a></div></td><td style="display:var(--coldp-clicks,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + clicks + '</a></div></td><td style="display:var(--coldp-joins,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + joins + '</a></div></td><td style="display:var(--coldp-ctr,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + ctr + '</a></div></td><td style="display:var(--coldp-cpm,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + Ads.wrapAmount(item.cpm) + '</a></div></td><td style="display:var(--coldp-cpc,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + cpc + '</a></div></td><td style="display:var(--coldp-cps,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + cps + '</a></div></td><td style="display:var(--coldp-spent,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + Ads.wrapAmount(item.spent) + '</a></div></td><td style="display:var(--coldp-budget,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + Ads.wrapAmount(item.budget) + '</a></div></td><td style="display:var(--coldp-target,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + item.target + '</a></div></td><td style="display:var(--coldp-status,table-cell)"><div class="pr-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td style="display:var(--coldp-date,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + Ads.formatTableDate(item.date) + '</a></div></td><td><div class="pr-actions-cell">' + Aj.state.adsDropdownTpl.replace(/\{ad_id\}/g, item.ad_id).replace(/\{promote_url\}/g, promote_url).replace(/\{promote_url_text\}/g, promote_url_text).replace(/\{ad_text\}/g, item.text) + '</div></td>';
         },
         renderLoading: function() {
           return '<tr><td colspan="100" class="pr-cell-empty"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
@@ -2031,6 +2231,8 @@ var EditAd = {
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
       cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
+      cont.on('click.curPage', '.js-promote-photo', NewAd.eReplacePromotePhoto);
+      cont.on('change.curPage', '.js-promote-photo > .file-upload', NewAd.eUploadPromotePhoto);
       cont.on('click.curPage', '.edit-ad-btn', EditAd.eSubmitForm);
       cont.on('click.curPage', '.js-clone-ad-btn', EditAd.eCloneAd);
       cont.on('click.curPage', '.delete-ad-btn', EditAd.deleteAd);
@@ -2042,6 +2244,9 @@ var EditAd = {
       state.textField.on('input.curPage', NewAd.onTextInput);
       state.promoteUrlField = state.$form.field('promote_url');
       state.promoteUrlField.on('change.curPage', NewAd.onPromoteUrlChange);
+      state.websiteNameField = state.$form.field('website_name');
+      state.websiteNameField.on('change.curPage', NewAd.onWebsiteNameChange);
+      state.websitePhotoField = state.$form.field('website_photo');
       state.adInfoField = state.$form.field('ad_info');
       state.adInfoField.on('change.curPage', NewAd.onAdInfoChange);
       state.pictureCheckbox = state.$form.field('picture');
@@ -2069,6 +2274,7 @@ var EditAd = {
       state.titleField.off('.curPage');
       state.textField.off('.curPage');
       state.promoteUrlField.off('.curPage');
+      state.websiteNameField.off('.curPage');
     });
   },
   getFormData: function($form) {
@@ -2078,6 +2284,8 @@ var EditAd = {
       $form.field('title').value(),
       $form.field('text').value(),
       $form.field('promote_url').value(),
+      $form.field('website_name').value(),
+      $form.field('website_photo').value(),
       $form.field('cpm').value(),
     ];
     return values.join('|');
@@ -2423,6 +2631,8 @@ var EditAd = {
     var title       = $form.field('title').value();
     var text        = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
+    var website_name = $form.field('website_name').value();
+    var website_photo = $form.field('website_photo').value();
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
 
@@ -2448,6 +2658,8 @@ var EditAd = {
       title: title,
       text: text,
       promote_url: promote_url,
+      website_name: website_name,
+      website_photo: website_photo,
       ad_info: ad_info,
       cpm: cpm
     };
