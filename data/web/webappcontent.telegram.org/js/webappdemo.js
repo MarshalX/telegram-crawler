@@ -172,6 +172,33 @@ var DemoApp = {
     });
     return false;
   },
+  requestWriteAccess: function(el) {
+    Telegram.WebApp.requestWriteAccess(function(allowed) {
+      if (allowed) {
+        $(el).next('span').text('(Access granted)').attr('class', 'ok');
+      } else {
+        $(el).next('span').html('(User declined this request)').attr('class', 'err');
+      }
+    });
+  },
+  requestPhoneNumber: function(el) {
+    Telegram.WebApp.requestContact(function(sent) {
+      if (sent) {
+        $(el).next('span').text('(Phone number sent to the bot)').attr('class', 'ok');
+      } else {
+        $(el).next('span').html('(User declined this request)').attr('class', 'err');
+      }
+    });
+  },
+  requestServerTime: function(el) {
+    Telegram.WebApp.invokeCustomMethod('getCurrentTime', {}, function(err, time) {
+      if (err) {
+        $(el).next('span').html('(' + cleanHTML(err) + ')').attr('class', 'err');
+      } else {
+        $(el).next('span').text('(' + (new Date(time*1000)).toString() + ')').attr('class', 'ok');
+      }
+    });
+  },
   toggleMainButton: function(el) {
     if (DemoApp.MainButton.isVisible) {
       DemoApp.MainButton.hide();

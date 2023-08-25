@@ -408,12 +408,20 @@
     Utils.sessionStorageSet('themeParams', themeParams);
   }
 
-  function generateId(len) {
-    var id = '', chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', chars_len = chars.length;
-    for (var i = 0; i < len; i++) {
-      id += chars[Math.floor(Math.random() * chars_len)];
+  var webAppCallbacks = {};
+  function generateCallbackId(len) {
+    var tries = 100;
+    while (--tries) {
+      var id = '', chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', chars_len = chars.length;
+      for (var i = 0; i < len; i++) {
+        id += chars[Math.floor(Math.random() * chars_len)];
+      }
+      if (!webAppCallbacks[id]) {
+        webAppCallbacks[id] = {};
+        return id;
+      }
     }
-    return id;
+    throw Error('WebAppCallbackIdGenerateFailed');
   }
 
   var viewportHeight = false, viewportStableHeight = false, isExpanded = true;
@@ -949,6 +957,42 @@
     return hapticFeedback;
   })();
 
+  var CloudStorage = (function() {
+    var cloudStorage = {};
+
+    function invokeStorageMethod(method, params, callback) {
+      if (!versionAtLeast('6.9')) {
+        console.error('[Telegram.WebApp] CloudStorage is not supported in version ' + webAppVersion);
+        throw Error('WebAppMethodUnsupported');
+      }
+      invokeCustomMethod(method, params, callback);
+      return cloudStorage;
+    }
+
+    cloudStorage.setItem = function(key, value, callback) {
+      return invokeStorageMethod('saveStorageValue', {key: key, value: value}, callback);
+    };
+    cloudStorage.getItem = function(key, callback) {
+      return cloudStorage.getItems([key], callback ? function(err, res) {
+        if (err) callback(err);
+        else callback(res[key]);
+      } : null);
+    };
+    cloudStorage.getItems = function(keys, callback) {
+      return invokeStorageMethod('getStorageValues', {keys: keys}, callback);
+    };
+    cloudStorage.removeItem = function(key, callback) {
+      return cloudStorage.removeItems([key], callback);
+    };
+    cloudStorage.removeItems = function(keys, callback) {
+      return invokeStorageMethod('deleteStorageValues', {keys: keys}, callback);
+    };
+    cloudStorage.getKeys = function(callback) {
+      return invokeStorageMethod('getStorageKeys', {}, callback);
+    };
+    return cloudStorage;
+  })();
+
   var webAppInvoices = {};
   function onInvoiceClosed(eventType, eventData) {
     if (eventData.slug && webAppInvoices[eventData.slug]) {
@@ -1005,11 +1049,10 @@
     webAppScanQrPopupOpened = false;
   }
 
-  var webAppClipboardRequests = {};
   function onClipboardTextReceived(eventType, eventData) {
-    if (eventData.req_id && webAppClipboardRequests[eventData.req_id]) {
-      var requestData = webAppClipboardRequests[eventData.req_id];
-      delete webAppClipboardRequests[eventData.req_id];
+    if (eventData.req_id && webAppCallbacks[eventData.req_id]) {
+      var requestData = webAppCallbacks[eventData.req_id];
+      delete webAppCallbacks[eventData.req_id];
       var data = null;
       if (typeof eventData.data !== 'undefined') {
         data = eventData.data;
@@ -1022,6 +1065,64 @@
       });
     }
   }
+
+  var WebAppWriteAccessRequested = false;
+  function onWriteAccessRequested(eventType, eventData) {
+    if (WebAppWriteAccessRequested) {
+      var requestData = WebAppWriteAccessRequested;
+      WebAppWriteAccessRequested = false;
+      if (requestData.callback) {
+        requestData.callback(eventData.status == 'allowed');
+      }
+      receiveWebViewEvent('writeAccessRequested', {
+        status: eventData.status
+      });
+    }
+  }
+
+  var WebAppContactRequested = false;
+  function onPhoneRequested(eventType, eventData) {
+    if (WebAppContactRequested) {
+      var requestData = WebAppContactRequested;
+      WebAppContactRequested = false;
+      if (requestData.callback) {
+        requestData.callback(eventData.status == 'sent');
+      }
+      receiveWebViewEvent('contactRequested', {
+        status: eventData.status
+      });
+    }
+  }
+
+  function onCustomMethodInvoked(eventType, eventData) {
+    if (eventData.req_id && webAppCallbacks[eventData.req_id]) {
+      var requestData = webAppCallbacks[eventData.req_id];
+      delete webAppCallbacks[eventData.req_id];
+      var res = null, err = null;
+      if (typeof eventData.result !== 'undefined') {
+        res = eventData.result;
+      }
+      if (typeof eventData.error !== 'undefined') {
+        err = eventData.error;
+      }
+      if (requestData.callback) {
+        requestData.callback(err, res);
+      }
+    }
+  }
+
+  function invokeCustomMethod(method, params, callback) {
+    if (!versionAtLeast('6.9')) {
+      console.error('[Telegram.WebApp] Method invokeCustomMethod is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    var req_id = generateCallbackId(16);
+    var req_params = {req_id: req_id, method: method, params: params || {}};
+    webAppCallbacks[req_id] = {
+      callback: callback
+    };
+    WebView.postEvent('web_app_invoke_custom_method', false, req_params);
+  };
 
   if (!window.Telegram) {
     window.Telegram = {};
@@ -1088,6 +1189,10 @@
   });
   Object.defineProperty(WebApp, 'HapticFeedback', {
     value: HapticFeedback,
+    enumerable: true
+  });
+  Object.defineProperty(WebApp, 'CloudStorage', {
+    value: CloudStorage,
     enumerable: true
   });
   WebApp.setHeaderColor = function(color_key) {
@@ -1374,12 +1479,43 @@
       console.error('[Telegram.WebApp] Method readTextFromClipboard is not supported in version ' + webAppVersion);
       throw Error('WebAppMethodUnsupported');
     }
-    var req_id = generateId(16);
+    var req_id = generateCallbackId(16);
     var req_params = {req_id: req_id};
-    webAppClipboardRequests[req_id] = {
+    webAppCallbacks[req_id] = {
       callback: callback
     };
     WebView.postEvent('web_app_read_text_from_clipboard', false, req_params);
+  };
+  WebApp.requestWriteAccess = function (callback) {
+    if (!versionAtLeast('6.9')) {
+      console.error('[Telegram.WebApp] Method requestWriteAccess is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    if (WebAppWriteAccessRequested) {
+      console.error('[Telegram.WebApp] Write access is already requested');
+      throw Error('WebAppWriteAccessRequested');
+    }
+    WebAppWriteAccessRequested = {
+      callback: callback
+    };
+    WebView.postEvent('web_app_request_write_access');
+  };
+  WebApp.requestContact = function (callback) {
+    if (!versionAtLeast('6.9')) {
+      console.error('[Telegram.WebApp] Method requestContact is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    if (WebAppContactRequested) {
+      console.error('[Telegram.WebApp] Contact is already requested');
+      throw Error('WebAppContactRequested');
+    }
+    WebAppContactRequested = {
+      callback: callback
+    };
+    WebView.postEvent('web_app_request_phone');
+  };
+  WebApp.invokeCustomMethod = function (method, params, callback) {
+    invokeCustomMethod(method, params, callback);
   };
   WebApp.ready = function () {
     WebView.postEvent('web_app_ready');
@@ -1408,6 +1544,9 @@
   WebView.onEvent('qr_text_received', onQrTextReceived);
   WebView.onEvent('scan_qr_popup_closed', onScanQrPopupClosed);
   WebView.onEvent('clipboard_text_received', onClipboardTextReceived);
+  WebView.onEvent('write_access_requested', onWriteAccessRequested);
+  WebView.onEvent('phone_requested', onPhoneRequested);
+  WebView.onEvent('custom_method_invoked', onCustomMethodInvoked);
   WebView.postEvent('web_app_request_theme');
   WebView.postEvent('web_app_request_viewport');
 
