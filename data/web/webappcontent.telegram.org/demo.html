@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app.js?30"></script>
+    <script src="https://tg.dev/js/telegram-web-app.js?31"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -19,7 +19,7 @@
     </script>
     <link href="https://tg.dev/css/bootstrap.min.css?3" rel="stylesheet">
     <link href="https://tg.dev/css/bootstrap-extra.css?2" rel="stylesheet">
-    <link href="/css/webappdemo.css?6" rel="stylesheet">
+    <link href="/css/webappdemo.css?7" rel="stylesheet">
   </head>
   <body class="" style="visibility: hidden;">
       <section id="top_sect" class="second">
@@ -95,6 +95,29 @@
       <li>Notification: <a href="javascript:Telegram.WebApp.HapticFeedback.notificationOccurred('error');">error</a>, &nbsp; <a href="javascript:Telegram.WebApp.HapticFeedback.notificationOccurred('success');">success</a>, &nbsp; <a href="javascript:Telegram.WebApp.HapticFeedback.notificationOccurred('warning');">warning</a><br><br></li>
       <li>Selection: <a href="javascript:Telegram.WebApp.HapticFeedback.selectionChanged();">changed</a><br><br></li>
     </ul>
+    <p>Cloud storage:</p>
+    <form onsubmit="DemoApp.saveCloudForm(this, event);">
+      <table class="table table-bordered table-condensed text-left small">
+        <thead>
+          <tr>
+            <th width="20%">Key</th>
+            <th width="70%">Value</th>
+            <th width="10%"></th>
+          </tr>
+        </thead>
+        <tbody id="cloud_rows"></tbody>
+        <tfoot>
+          <tr>
+            <td><input type="text" name="key" /></td>
+            <td><input type="text" name="value" /></td>
+            <td>
+              <button type="submit">Save</button>
+              <button type="reset">Clear</button>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </form>
     <pre><code id="webview_data"></code></pre>
     <div class="hint">
       Data passed to webview.
@@ -113,7 +136,7 @@
   <div class="viewport-stable_border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?12"></script>
+    <script src="/js/webappdemo.js?14"></script>
     <script>
 Telegram.WebApp.onEvent('themeChanged', function() {
   $('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
@@ -207,7 +230,12 @@ Telegram.WebApp.onEvent('themeChanged', function() {
   $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
   $('body').attr('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
 });
-DemoApp.testClipboard(document.getElementById('clipboard_test'));
+try {
+  DemoApp.testClipboard(document.getElementById('clipboard_test'));
+} catch(e) {}
+try {
+  DemoApp.loadCloudKeys();
+} catch(e) {}
 
 </script>
   </body>
