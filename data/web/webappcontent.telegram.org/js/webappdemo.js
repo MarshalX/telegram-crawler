@@ -199,6 +199,87 @@ var DemoApp = {
       }
     });
   },
+  cloudStorageKeys: {},
+  cloudStorageItems: {},
+  editCloudRow: function(el, event) {
+    event.preventDefault();
+    var values = DemoApp.cloudStorageItems;
+    var key = $(el).parents('tr').attr('data-key');
+    el.form.reset();
+    el.form.key.value = key;
+    el.form.value.value = values[key];
+  },
+  deleteCloudRow: function(el, event) {
+    event.preventDefault();
+    var key = $(el).parents('tr').attr('data-key');
+    Telegram.WebApp.CloudStorage.removeItem(key, function(err, deleted) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else {
+        if (deleted) {
+          var index = DemoApp.cloudStorageKeys.indexOf(key);
+          if (index >= 0) {
+            DemoApp.cloudStorageKeys.splice(index, 1);
+          }
+          delete DemoApp.cloudStorageItems[key];
+        }
+        el.form.reset();
+        DemoApp.updateCloudRows();
+      }
+    });
+  },
+  saveCloudForm: function(form, event) {
+    event.preventDefault();
+    var key = form.key.value;
+    var value = form.value.value;
+    Telegram.WebApp.CloudStorage.setItem(key, value, function(err, saved) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else {
+        if (saved) {
+          if (typeof DemoApp.cloudStorageItems[key] === 'undefined') {
+            DemoApp.cloudStorageKeys.push(key);
+          }
+          DemoApp.cloudStorageItems[key] = value;
+        }
+        form.reset();
+        DemoApp.updateCloudRows();
+      }
+    });
+  },
+  updateCloudRows: function() {
+    var html = '';
+    var keys = DemoApp.cloudStorageKeys;
+    var values = DemoApp.cloudStorageItems;
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      html += '<tr data-key="'+cleanHTML(key)+'"><td>'+cleanHTML(key)+'</td><td>'+cleanHTML(values[key])+'</td><td><button onclick="DemoApp.editCloudRow(this, event);">Edit</button><button onclick="DemoApp.deleteCloudRow(this, event);">Delete</button></td></tr>';
+    }
+    $('#cloud_rows').html(html);
+  },
+  loadCloudKeys: function(el) {
+    Telegram.WebApp.CloudStorage.getKeys(function(err, keys) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else {
+        if (keys.length > 0) {
+          Telegram.WebApp.CloudStorage.getItems(keys, function(err, values) {
+            if (err) {
+              DemoApp.showAlert('Error: ' + err);
+            } else {
+              DemoApp.cloudStorageKeys = keys;
+              DemoApp.cloudStorageItems = {};
+              for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                DemoApp.cloudStorageItems[key] = values[key];
+              }
+              DemoApp.updateCloudRows();
+            }
+          });
+        }
+      }
+    });
+  },
   toggleMainButton: function(el) {
     if (DemoApp.MainButton.isVisible) {
       DemoApp.MainButton.hide();
@@ -308,6 +389,10 @@ var DemoAppViewport = {
     $('.viewport-stable_border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportStableHeight, 2) + ' | is_expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false'));
   }
 };
+
+function cleanHTML(value) {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, '<br/>');
+}
 
 function byteLength(str) {
   if (window.Blob) {

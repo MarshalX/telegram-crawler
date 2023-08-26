@@ -975,7 +975,7 @@
     cloudStorage.getItem = function(key, callback) {
       return cloudStorage.getItems([key], callback ? function(err, res) {
         if (err) callback(err);
-        else callback(res[key]);
+        else callback(null, res[key]);
       } : null);
     };
     cloudStorage.getItems = function(keys, callback) {
