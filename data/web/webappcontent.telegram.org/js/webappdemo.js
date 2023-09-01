@@ -334,7 +334,7 @@ var DemoApp = {
 
   apiRequest: function(method, data, onCallback) {
     var authData = DemoApp.initData || '';
-    $.ajax('/demo/api', {
+    $.ajax(DemoApp.apiUrl, {
       type: 'POST',
       data: $.extend(data, {_auth: authData, method: method}),
       dataType: 'json',
