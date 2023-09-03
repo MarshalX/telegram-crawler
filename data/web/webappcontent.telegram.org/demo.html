@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app.js?33"></script>
+    <script src="https://tg.dev/js/telegram-web-app.js?34"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -19,7 +19,7 @@
     </script>
     <link href="https://tg.dev/css/bootstrap.min.css?3" rel="stylesheet">
     <link href="https://tg.dev/css/bootstrap-extra.css?2" rel="stylesheet">
-    <link href="/css/webappdemo.css?7" rel="stylesheet">
+    <link href="/css/webappdemo.css?8" rel="stylesheet">
   </head>
   <body class="" style="visibility: hidden;">
       <section id="top_sect" class="second">
@@ -34,9 +34,10 @@
       <img id="peer_photo" class="chat_img" src="">
       <span id="peer_name"></span>
     </div>
-    <div class="sect_row">Header: <select id="header_color_sel">
+    <div class="sect_row">Header: <input type="color" id="header_color_input" /> <select id="header_color_sel">
         <option value="bg_color" selected>bg_color</option>
         <option value="secondary_bg_color">secondary_bg_color</option>
+        <option value="custom" id="header_color_val">custom...</option>
       </select></div>
     <div class="sect_row">Background: <input type="color" id="bg_color_input" /> <select id="bg_color_sel">
         <option value="bg_color" selected>bg_color</option>
@@ -199,12 +200,32 @@ Telegram.WebApp.onEvent('settingsButtonClicked', function() {
 var prev_bg_color_val = $('#bg_color_sel').val();
 $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
 $('body').attr('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+var prev_header_color_val = $('#header_color_sel').val();
+$('#header_color_input').val(Telegram.WebApp.headerColor);
+$('body').attr('style', '--header-color:' + Telegram.WebApp.headerColor);
+
 $('#header_color_sel').val('secondary_bg_color');
+$('#header_color_input').on('change', function(e) {
+  var color = e.target.value;
+  $('#header_color_val').text(color);
+  $('#header_color_sel').val('custom');
+  prev_header_color_val = $('#header_color_sel').val();
+  Telegram.WebApp.setHeaderColor(color);
+  $('body').attr('style', '--header-color:' + Telegram.WebApp.headerColor);
+});
 $('#header_color_sel').on('change', function(e) {
   var color_key = e.target.value;
-  $('#top_sect').toggleClass('second', color_key == 'secondary_bg_color');
-  Telegram.WebApp.setHeaderColor(color_key);
-  $('body').attr('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+  if (color_key == 'custom') {
+    $('#header_color_sel').val(prev_header_color_val);
+    $('#header_color_input').focus().click();
+  } else {
+    $('#header_color_val').text('custom...');
+    Telegram.WebApp.setHeaderColor(color_key);
+    $('#top_sect').toggleClass('second', color_key == 'secondary_bg_color');
+    $('body').attr('style', '--header-color:' + Telegram.WebApp.headerColor);
+    $('#header_color_input').val(Telegram.WebApp.headerColor);
+    prev_header_color_val = $('#header_color_sel').val();
+  }
 });
 $('#bg_color_input').on('change', function(e) {
   var color = e.target.value;

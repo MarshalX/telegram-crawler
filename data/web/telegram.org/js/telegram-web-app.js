@@ -457,37 +457,61 @@
     WebView.postEvent('web_app_setup_closing_behavior', false, {need_confirmation: isClosingConfirmationEnabled});
   }
 
-  var headerColorKey = 'bg_color';
+  var headerColorKey = 'bg_color', headerColor = null;
   function getHeaderColor() {
-    return themeParams[headerColorKey] || null;
+    if (headerColorKey == 'secondary_bg_color') {
+      return themeParams.secondary_bg_color;
+    } else if (headerColorKey == 'bg_color') {
+      return themeParams.bg_color;
+    }
+    return headerColor;
   }
   function setHeaderColor(color) {
     if (!versionAtLeast('6.1')) {
       console.warn('[Telegram.WebApp] Header color is not supported in version ' + webAppVersion);
       return;
     }
-    var color_key;
-    if (color == 'bg_color' || color == 'secondary_bg_color') {
-      color_key = color;
-    } else {
-      color_key = parseColorToHex(color);
+    if (!versionAtLeast('6.10')) {
       if (themeParams.bg_color &&
-          themeParams.bg_color == color_key) {
-        color_key = 'bg_color';
+          themeParams.bg_color == color) {
+        color = 'bg_color';
       } else if (themeParams.secondary_bg_color &&
-                 themeParams.secondary_bg_color == color_key) {
-        color_key = 'secondary_bg_color';
-      } else {
-        color_key = false;
+                 themeParams.secondary_bg_color == color) {
+        color = 'secondary_bg_color';
       }
     }
-    if (color_key != 'bg_color' &&
+    var head_color = null, color_key = null;
+    if (color == 'bg_color' || color == 'secondary_bg_color') {
+      color_key = color;
+    } else if (versionAtLeast('6.10')) {
+      head_color = parseColorToHex(color);
+      if (!head_color) {
+        console.error('[Telegram.WebApp] Header color format is invalid', color);
+        throw Error('WebAppHeaderColorInvalid');
+      }
+    }
+    if (!versionAtLeast('6.10') &&
+        color_key != 'bg_color' &&
         color_key != 'secondary_bg_color') {
       console.error('[Telegram.WebApp] Header color key should be one of Telegram.WebApp.themeParams.bg_color, Telegram.WebApp.themeParams.secondary_bg_color, \'bg_color\', \'secondary_bg_color\'', color);
       throw Error('WebAppHeaderColorKeyInvalid');
     }
     headerColorKey = color_key;
-    WebView.postEvent('web_app_set_header_color', false, {color_key: color_key});
+    headerColor = head_color;
+    updateHeaderColor();
+  }
+  var appHeaderColorKey = null, appHeaderColor = null;
+  function updateHeaderColor() {
+    if (appHeaderColorKey != headerColorKey ||
+        appHeaderColor != headerColor) {
+      appHeaderColorKey = headerColorKey;
+      appHeaderColor = headerColor;
+      if (appHeaderColor) {
+        WebView.postEvent('web_app_set_header_color', false, {color: headerColor});
+      } else {
+        WebView.postEvent('web_app_set_header_color', false, {color_key: headerColorKey});
+      }
+    }
   }
 
   var backgroundColor = 'bg_color';
@@ -1525,6 +1549,7 @@
 
   window.Telegram.WebApp = WebApp;
 
+  updateHeaderColor();
   updateBackgroundColor();
   setViewportHeight();
 
