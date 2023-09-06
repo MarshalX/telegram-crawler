@@ -913,7 +913,10 @@ chatInviteLinkMembers total_count:int32 members:vector<chatInviteLinkMember> = C
 //@member_user_ids User identifiers of some chat members that may be known to the current user
 //@creates_join_request True, if the link only creates join request
 //@is_public True, if the chat is a public supergroup or channel, i.e. it has a username or it is a location-based supergroup
-chatInviteLinkInfo chat_id:int53 accessible_for:int32 type:ChatType title:string photo:chatPhotoInfo description:string member_count:int32 member_user_ids:vector<int53> creates_join_request:Bool is_public:Bool = ChatInviteLinkInfo;
+//@is_verified True, if the chat is verified
+//@is_scam True, if many users reported this chat as a scam
+//@is_fake True, if many users reported this chat as a fake account
+chatInviteLinkInfo chat_id:int53 accessible_for:int32 type:ChatType title:string photo:chatPhotoInfo description:string member_count:int32 member_user_ids:vector<int53> creates_join_request:Bool is_public:Bool is_verified:Bool is_scam:Bool is_fake:Bool = ChatInviteLinkInfo;
 
 //@description Describes a user that sent a join request and waits for administrator approval @user_id User identifier @date Point in time (Unix timestamp) when the user sent the join request @bio A short bio of the user
 chatJoinRequest user_id:int53 date:int32 bio:string = ChatJoinRequest;
@@ -2701,8 +2704,10 @@ messageChatShared chat_id:int53 button_id:int32 = MessageContent;
 //@description The current user has connected a website by logging in using Telegram Login Widget on it @domain_name Domain name of the connected website
 messageWebsiteConnected domain_name:string = MessageContent;
 
-//@description The user allowed the bot to send messages @web_app Information about the Web App, which requested the access; may be null if none or the Web App was opened from the attachment menu
-messageBotWriteAccessAllowed web_app:webApp = MessageContent;
+//@description The user allowed the bot to send messages
+//@web_app Information about the Web App, which requested the access; may be null if none or the Web App was opened from the attachment menu
+//@by_request True, if user allowed the bot to send messages by an explicit call to allowBotToSendMessages
+messageBotWriteAccessAllowed web_app:webApp by_request:Bool = MessageContent;
 
 //@description Data from a Web App has been sent to a bot @button_text Text of the keyboardButtonTypeWebApp button, which opened the Web App
 messageWebAppDataSent button_text:string = MessageContent;
@@ -3155,9 +3160,10 @@ storyViewer user_id:int53 view_date:int32 block_list:BlockList chosen_reaction_t
 
 //@description Represents a list of story viewers
 //@total_count Approximate total number of story viewers found
+//@total_reaction_count Approximate total number of reactions set by found story viewers
 //@viewers List of story viewers
 //@next_offset The offset for the next request. If empty, there are no more results
-storyViewers total_count:int32 viewers:vector<storyViewer> next_offset:string = StoryViewers;
+storyViewers total_count:int32 total_reaction_count:int32 viewers:vector<storyViewer> next_offset:string = StoryViewers;
 
 
 //@description Describes position of a clickable rectangle area on a story media
@@ -5344,6 +5350,10 @@ topChatCategoryCalls = TopChatCategory;
 
 //@description A category containing frequently used chats used to forward messages
 topChatCategoryForwardChats = TopChatCategory;
+
+
+//@description Contains 0-based positions of matched objects @total_count Total number of matched objects @positions The positions of the matched objects
+foundPositions total_count:int32 positions:vector<int32> = FoundPositions;
 
 
 //@class TMeUrlType @description Describes the type of a URL linking to an internal Telegram entity
@@ -7997,6 +8007,13 @@ getUserProfilePhotos user_id:int53 offset:int32 limit:int32 = ChatPhotos;
 //@chat_id Chat identifier for which to return stickers. Available custom emoji stickers may be different for different chats
 getStickers sticker_type:StickerType query:string limit:int32 chat_id:int53 = Stickers;
 
+//@description Returns unique emoji that correspond to stickers to be found by the getStickers(sticker_type, query, 1000000, chat_id)
+//@sticker_type Type of the stickers to search for
+//@query Search query
+//@chat_id Chat identifier for which to find stickers
+//@return_only_main_emoji Pass true if only main emoji for each found sticker must be included in the result
+getAllStickerEmojis sticker_type:StickerType query:string chat_id:int53 return_only_main_emoji:Bool = Emojis;
+
 //@description Searches for stickers from public sticker sets that correspond to any of the given emoji
 //@sticker_type Type of the stickers to return
 //@emojis Space-separated list of emoji to search for; must be non-empty
@@ -8205,6 +8222,19 @@ setDefaultGroupAdministratorRights default_group_administrator_rights:chatAdmini
 
 //@description Sets default administrator rights for adding the bot to channel chats; for bots only @default_channel_administrator_rights Default administrator rights for adding the bot to channels; pass null to remove default rights
 setDefaultChannelAdministratorRights default_channel_administrator_rights:chatAdministratorRights = Ok;
+
+
+//@description Checks whether the specified bot can send messages to the user. Returns a 404 error if can't and the access can be granted by call to allowBotToSendMessages @bot_user_id Identifier of the target bot
+canBotSendMessages bot_user_id:int53 = Ok;
+
+//@description Allows the specified bot to send messages to the user @bot_user_id Identifier of the target bot
+allowBotToSendMessages bot_user_id:int53 = Ok;
+
+//@description Sends a custom request from a Web App
+//@bot_user_id Identifier of the bot
+//@method The method name
+//@parameters JSON-serialized method parameters
+sendWebAppCustomRequest bot_user_id:int53 method:string parameters:string = CustomRequestResult;
 
 
 //@description Sets the name of a bot. Can be called only if userTypeBot.can_be_edited == true
@@ -8798,6 +8828,14 @@ assignGooglePlayTransaction package_name:string store_product_id:string purchase
 
 //@description Accepts Telegram terms of services @terms_of_service_id Terms of service identifier
 acceptTermsOfService terms_of_service_id:string = Ok;
+
+
+//@description Searches specified query by word prefixes in the provided strings. Returns 0-based positions of strings that matched. Can be called synchronously
+//@strings The strings to search in for the query
+//@query Query to search for
+//@limit The maximum number of objects to return
+//@return_none_for_empty_query Pass true to receive no results for an empty query
+searchStringsByPrefix strings:vector<string> query:string limit:int32 return_none_for_empty_query:Bool = FoundPositions;
 
 
 //@description Sends a custom request; for bots only @method The method name @parameters JSON-serialized method parameters
