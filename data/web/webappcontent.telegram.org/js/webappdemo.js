@@ -10,6 +10,9 @@ var DemoApp = {
       text: 'CLOSE WEBVIEW',
       is_visible: true
     }).onClick(DemoApp.close);
+    Telegram.WebApp.onEvent('settingsButtonClicked', function() {
+      DemoApp.showAlert('Settings opened!');
+    });
   },
   expand: function() {
     Telegram.WebApp.expand();
