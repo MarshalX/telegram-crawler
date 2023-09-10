@@ -21,6 +21,7 @@ HIDDEN_URLS = {
 
     'telegram.org/privacy/gmailbot',
     'telegram.org/tos',
+    'telegram.org/tos/mini-apps',
     'telegram.org/tour',
     'telegram.org/evolution',
 
