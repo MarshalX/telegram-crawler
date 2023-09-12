@@ -471,7 +471,7 @@
       console.warn('[Telegram.WebApp] Header color is not supported in version ' + webAppVersion);
       return;
     }
-    if (!versionAtLeast('6.10')) {
+    if (!versionAtLeast('6.9')) {
       if (themeParams.bg_color &&
           themeParams.bg_color == color) {
         color = 'bg_color';
@@ -483,14 +483,14 @@
     var head_color = null, color_key = null;
     if (color == 'bg_color' || color == 'secondary_bg_color') {
       color_key = color;
-    } else if (versionAtLeast('6.10')) {
+    } else if (versionAtLeast('6.9')) {
       head_color = parseColorToHex(color);
       if (!head_color) {
         console.error('[Telegram.WebApp] Header color format is invalid', color);
         throw Error('WebAppHeaderColorInvalid');
       }
     }
-    if (!versionAtLeast('6.10') &&
+    if (!versionAtLeast('6.9') &&
         color_key != 'bg_color' &&
         color_key != 'secondary_bg_color') {
       console.error('[Telegram.WebApp] Header color key should be one of Telegram.WebApp.themeParams.bg_color, Telegram.WebApp.themeParams.secondary_bg_color, \'bg_color\', \'secondary_bg_color\'', color);
