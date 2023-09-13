@@ -555,7 +555,7 @@ userTypeDeleted = UserType;
 //@is_inline True, if the bot supports inline queries
 //@inline_query_placeholder Placeholder for inline queries (displayed on the application input field)
 //@need_location True, if the location of the user is expected to be sent with every inline query to this bot
-//@can_be_added_to_attachment_menu True, if the bot can be added to attachment menu
+//@can_be_added_to_attachment_menu True, if the bot can be added to attachment or side menu
 userTypeBot can_be_edited:Bool can_join_groups:Bool can_read_all_group_messages:Bool is_inline:Bool inline_query_placeholder:string need_location:Bool can_be_added_to_attachment_menu:Bool = UserType;
 
 //@description No information on the user besides the user identifier is available, yet this user has not been deleted. This object is extremely rare and must be handled like a deleted user. It is not possible to perform any actions on users of this type
@@ -902,10 +902,23 @@ chatInviteLinkMember user_id:int53 joined_chat_date:int32 via_chat_folder_invite
 //@description Contains a list of chat members joined a chat via an invite link @total_count Approximate total number of chat members found @members List of chat members, joined a chat via an invite link
 chatInviteLinkMembers total_count:int32 members:vector<chatInviteLinkMember> = ChatInviteLinkMembers;
 
+
+//@class InviteLinkChatType @description Describes the type of a chat to which points an invite link
+
+//@description The link is an invite link for a basic group
+inviteLinkChatTypeBasicGroup = InviteLinkChatType;
+
+//@description The link is an invite link for a supergroup
+inviteLinkChatTypeSupergroup = InviteLinkChatType;
+
+//@description The link is an invite link for a channel
+inviteLinkChatTypeChannel = InviteLinkChatType;
+
+
 //@description Contains information about a chat invite link
 //@chat_id Chat identifier of the invite link; 0 if the user has no access to the chat before joining
 //@accessible_for If non-zero, the amount of time for which read access to the chat will remain available, in seconds
-//@type Type of the chat; basic_group_id or supergroup_id can be 0 if the user has no access to the chat before joining
+//@type Type of the chat
 //@title Title of the chat
 //@photo Chat photo; may be null
 //@param_description Chat description
@@ -916,7 +929,8 @@ chatInviteLinkMembers total_count:int32 members:vector<chatInviteLinkMember> = C
 //@is_verified True, if the chat is verified
 //@is_scam True, if many users reported this chat as a scam
 //@is_fake True, if many users reported this chat as a fake account
-chatInviteLinkInfo chat_id:int53 accessible_for:int32 type:ChatType title:string photo:chatPhotoInfo description:string member_count:int32 member_user_ids:vector<int53> creates_join_request:Bool is_public:Bool is_verified:Bool is_scam:Bool is_fake:Bool = ChatInviteLinkInfo;
+chatInviteLinkInfo chat_id:int53 accessible_for:int32 type:InviteLinkChatType title:string photo:chatPhotoInfo description:string member_count:int32 member_user_ids:vector<int53> creates_join_request:Bool is_public:Bool is_verified:Bool is_scam:Bool is_fake:Bool = ChatInviteLinkInfo;
+
 
 //@description Describes a user that sent a join request and waits for administrator approval @user_id User identifier @date Point in time (Unix timestamp) when the user sent the join request @bio A short bio of the user
 chatJoinRequest user_id:int53 date:int32 bio:string = ChatJoinRequest;
@@ -1176,16 +1190,16 @@ messageReplyToStory story_sender_chat_id:int53 story_id:int32 = MessageReplyTo;
 //@unread_reactions Information about unread reactions added to the message
 //@reply_to Information about the message or the story this message is replying to; may be null if none
 //@message_thread_id If non-zero, the identifier of the message thread the message belongs to; unique within the chat to which the message belongs
-//@self_destruct_time The message's self-destruct time, in seconds; 0 if none. TDLib will send updateDeleteMessages or updateMessageContent once the time expires
-//@self_destruct_in Time left before the message self-destruct timer expires, in seconds. If the self-destruct timer isn't started yet, equals to the value of the self_destruct_time field
-//@auto_delete_in Time left before the message will be automatically deleted by message_auto_delete_time setting of the chat, in seconds; 0 if never. TDLib will send updateDeleteMessages or updateMessageContent once the time expires
+//@self_destruct_type The message's self-destruct type; may be null if none
+//@self_destruct_in Time left before the message self-destruct timer expires, in seconds; 0 if self-desctruction isn't scheduled yet
+//@auto_delete_in Time left before the message will be automatically deleted by message_auto_delete_time setting of the chat, in seconds; 0 if never
 //@via_bot_user_id If non-zero, the user identifier of the bot through which this message was sent
 //@author_signature For channel posts and anonymous group messages, optional author signature
 //@media_album_id Unique identifier of an album this message belongs to. Only audios, documents, photos and videos can be grouped together in albums
 //@restriction_reason If non-empty, contains a human-readable description of the reason why access to this message must be restricted
 //@content Content of the message
 //@reply_markup Reply markup for the message; may be null if none
-message id:int53 sender_id:MessageSender chat_id:int53 sending_state:MessageSendingState scheduling_state:MessageSchedulingState is_outgoing:Bool is_pinned:Bool can_be_edited:Bool can_be_forwarded:Bool can_be_saved:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_get_added_reactions:Bool can_get_statistics:Bool can_get_message_thread:Bool can_get_viewers:Bool can_get_media_timestamp_links:Bool can_report_reactions:Bool has_timestamped_media:Bool is_channel_post:Bool is_topic_message:Bool contains_unread_mention:Bool date:int32 edit_date:int32 forward_info:messageForwardInfo interaction_info:messageInteractionInfo unread_reactions:vector<unreadReaction> reply_to:MessageReplyTo message_thread_id:int53 self_destruct_time:int32 self_destruct_in:double auto_delete_in:double via_bot_user_id:int53 author_signature:string media_album_id:int64 restriction_reason:string content:MessageContent reply_markup:ReplyMarkup = Message;
+message id:int53 sender_id:MessageSender chat_id:int53 sending_state:MessageSendingState scheduling_state:MessageSchedulingState is_outgoing:Bool is_pinned:Bool can_be_edited:Bool can_be_forwarded:Bool can_be_saved:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_get_added_reactions:Bool can_get_statistics:Bool can_get_message_thread:Bool can_get_viewers:Bool can_get_media_timestamp_links:Bool can_report_reactions:Bool has_timestamped_media:Bool is_channel_post:Bool is_topic_message:Bool contains_unread_mention:Bool date:int32 edit_date:int32 forward_info:messageForwardInfo interaction_info:messageInteractionInfo unread_reactions:vector<unreadReaction> reply_to:MessageReplyTo message_thread_id:int53 self_destruct_type:MessageSelfDestructType self_destruct_in:double auto_delete_in:double via_bot_user_id:int53 author_signature:string media_album_id:int64 restriction_reason:string content:MessageContent reply_markup:ReplyMarkup = Message;
 
 //@description Contains a list of messages @total_count Approximate total number of messages found @messages List of messages; messages may be null
 messages total_count:int32 messages:vector<message> = Messages;
@@ -1671,9 +1685,10 @@ loginUrlInfoRequestConfirmation url:string domain:string bot_user_id:int53 reque
 
 //@description Contains information about a Web App found by its short name
 //@web_app The Web App
+//@supports_settings True, if the app supports "settings_button_pressed" event
 //@request_write_access True, if the user must be asked for the permission to the bot to send them messages
 //@skip_confirmation True, if there is no need to show an ordinary open URL confirmation before opening the Web App. The field must be ignored and confirmation must be shown anyway if the Web App link was hidden
-foundWebApp web_app:webApp request_write_access:Bool skip_confirmation:Bool = FoundWebApp;
+foundWebApp web_app:webApp supports_settings:Bool request_write_access:Bool skip_confirmation:Bool = FoundWebApp;
 
 //@description Contains information about a Web App @launch_id Unique identifier for the Web App launch @url A Web App URL to open in a web view
 webAppInfo launch_id:int64 url:string = WebAppInfo;
@@ -2807,6 +2822,15 @@ messageSchedulingStateSendAtDate send_date:int32 = MessageSchedulingState;
 messageSchedulingStateSendWhenOnline = MessageSchedulingState;
 
 
+//@class MessageSelfDestructType @description Describes when a message will be self-destructed
+
+//@description The message will be self-destructed in the specified time after its content was opened @self_destruct_time The message's self-destruct time, in seconds; must be between 0 and 60 in private chats
+messageSelfDestructTypeTimer self_destruct_time:int32 = MessageSelfDestructType;
+
+//@description The message can be opened only once and will be self-destructed once closed
+messageSelfDestructTypeImmediately = MessageSelfDestructType;
+
+
 //@description Options to be used when a message is sent
 //@disable_notification Pass true to disable notification for the message
 //@from_background Pass true if the message is sent from the background
@@ -2865,9 +2889,10 @@ inputMessageDocument document:InputFile thumbnail:inputThumbnail disable_content
 //@width Photo width
 //@height Photo height
 //@caption Photo caption; pass null to use an empty caption; 0-getOption("message_caption_length_max") characters
-//@self_destruct_time Photo self-destruct time, in seconds (0-60). A non-zero self-destruct time can be specified only in private chats
+//@self_destruct_type Photo self-destruct type; pass null if none; private chats only
 //@has_spoiler True, if the photo preview must be covered by a spoiler animation; not supported in secret chats
-inputMessagePhoto photo:InputFile thumbnail:inputThumbnail added_sticker_file_ids:vector<int32> width:int32 height:int32 caption:formattedText self_destruct_time:int32 has_spoiler:Bool = InputMessageContent;
+inputMessagePhoto photo:InputFile thumbnail:inputThumbnail added_sticker_file_ids:vector<int32> width:int32 height:int32 caption:formattedText self_destruct_type:MessageSelfDestructType has_spoiler:Bool = InputMessageContent;
+
 
 //@description A sticker message
 //@sticker Sticker to be sent
@@ -2886,9 +2911,9 @@ inputMessageSticker sticker:InputFile thumbnail:inputThumbnail width:int32 heigh
 //@height Video height
 //@supports_streaming True, if the video is supposed to be streamed
 //@caption Video caption; pass null to use an empty caption; 0-getOption("message_caption_length_max") characters
-//@self_destruct_time Video self-destruct time, in seconds (0-60). A non-zero self-destruct time can be specified only in private chats
+//@self_destruct_type Video self-destruct type; pass null if none; private chats only
 //@has_spoiler True, if the video preview must be covered by a spoiler animation; not supported in secret chats
-inputMessageVideo video:InputFile thumbnail:inputThumbnail added_sticker_file_ids:vector<int32> duration:int32 width:int32 height:int32 supports_streaming:Bool caption:formattedText self_destruct_time:int32 has_spoiler:Bool = InputMessageContent;
+inputMessageVideo video:InputFile thumbnail:inputThumbnail added_sticker_file_ids:vector<int32> duration:int32 width:int32 height:int32 supports_streaming:Bool caption:formattedText self_destruct_type:MessageSelfDestructType has_spoiler:Bool = InputMessageContent;
 
 //@description A video note message
 //@video_note Video note to be sent
@@ -3602,25 +3627,32 @@ speechRecognitionResultError error:error = SpeechRecognitionResult;
 //@description Describes a color to highlight a bot added to attachment menu @light_color Color in the RGB24 format for light themes @dark_color Color in the RGB24 format for dark themes
 attachmentMenuBotColor light_color:int32 dark_color:int32 = AttachmentMenuBotColor;
 
-//@description Represents a bot, which can be added to attachment menu
-//@bot_user_id User identifier of the bot added to attachment menu
+//@description Represents a bot, which can be added to attachment or side menu
+//@bot_user_id User identifier of the bot
 //@supports_self_chat True, if the bot supports opening from attachment menu in the chat with the bot
 //@supports_user_chats True, if the bot supports opening from attachment menu in private chats with ordinary users
 //@supports_bot_chats True, if the bot supports opening from attachment menu in private chats with other bots
 //@supports_group_chats True, if the bot supports opening from attachment menu in basic group and supergroup chats
 //@supports_channel_chats True, if the bot supports opening from attachment menu in channel chats
 //@supports_settings True, if the bot supports "settings_button_pressed" event
-//@request_write_access True, if the user must be asked for the permission to the bot to send them messages
+//@request_write_access True, if the user must be asked for the permission to send messages to the bot
+//@is_added True, if the bot was explicitly added by the user. If the bot isn't added then on the first bot launch toggleBotIsAddedToAttachmentMenu must be called and the bot must be added or removed
+//@show_in_attachment_menu True, if the bot must be shown in the attachment menu
+//@show_in_side_menu True, if the bot must be shown in the side menu menu
+//@show_disclaimer_in_side_menu True, if a disclaimer, why the bot is shown in the side menu, is needed
 //@name Name for the bot in attachment menu
 //@name_color Color to highlight selected name of the bot if appropriate; may be null
-//@default_icon Default attachment menu icon for the bot in SVG format; may be null
-//@ios_static_icon Attachment menu icon for the bot in SVG format for the official iOS app; may be null
-//@ios_animated_icon Attachment menu icon for the bot in TGS format for the official iOS app; may be null
-//@android_icon Attachment menu icon for the bot in TGS format for the official Android app; may be null
-//@macos_icon Attachment menu icon for the bot in TGS format for the official native macOS app; may be null
+//@default_icon Default icon for the bot in SVG format; may be null
+//@ios_static_icon Icon for the bot in SVG format for the official iOS app; may be null
+//@ios_animated_icon Icon for the bot in TGS format for the official iOS app; may be null
+//@ios_side_menu_icon Icon for the bot in PNG format for the official iOS app side menu; may be null
+//@android_icon Icon for the bot in TGS format for the official Android app; may be null
+//@android_side_menu_icon Icon for the bot in SVG format for the official Android app side menu; may be null
+//@macos_icon Icon for the bot in TGS format for the official native macOS app; may be null
+//@macos_side_menu_icon Icon for the bot in PNG format for the official macOS app side menu; may be null
 //@icon_color Color to highlight selected icon of the bot if appropriate; may be null
 //@web_app_placeholder Default placeholder for opened Web Apps in SVG format; may be null
-attachmentMenuBot bot_user_id:int53 supports_self_chat:Bool supports_user_chats:Bool supports_bot_chats:Bool supports_group_chats:Bool supports_channel_chats:Bool supports_settings:Bool request_write_access:Bool name:string name_color:attachmentMenuBotColor default_icon:file ios_static_icon:file ios_animated_icon:file android_icon:file macos_icon:file icon_color:attachmentMenuBotColor web_app_placeholder:file = AttachmentMenuBot;
+attachmentMenuBot bot_user_id:int53 supports_self_chat:Bool supports_user_chats:Bool supports_bot_chats:Bool supports_group_chats:Bool supports_channel_chats:Bool supports_settings:Bool request_write_access:Bool is_added:Bool show_in_attachment_menu:Bool show_in_side_menu:Bool show_disclaimer_in_side_menu:Bool name:string name_color:attachmentMenuBotColor default_icon:file ios_static_icon:file ios_animated_icon:file ios_side_menu_icon:file android_icon:file android_side_menu_icon:file macos_icon:file macos_side_menu_icon:file icon_color:attachmentMenuBotColor web_app_placeholder:file = AttachmentMenuBot;
 
 //@description Information about the message sent by answerWebAppQuery @inline_message_id Identifier of the sent inline message, if known
 sentWebAppMessage inline_message_id:string = SentWebAppMessage;
@@ -4714,7 +4746,7 @@ storyPrivacySettingsContacts except_user_ids:vector<int53> = StoryPrivacySetting
 storyPrivacySettingsCloseFriends = StoryPrivacySettings;
 
 //@description The story can be viewed by certain specified users @user_ids Identifiers of the users; always unknown and empty for non-owned stories
-storyPrivacySettingsSelectedContacts user_ids:vector<int53> = StoryPrivacySettings;
+storyPrivacySettingsSelectedUsers user_ids:vector<int53> = StoryPrivacySettings;
 
 
 //@class UserPrivacySettingRule @description Represents a single rule for managing user privacy settings
@@ -4846,6 +4878,7 @@ sessionTypeXbox = SessionType;
 //@id Session identifier
 //@is_current True, if this session is the current session
 //@is_password_pending True, if a 2-step verification password is needed to complete authorization of the session
+//@is_unconfirmed True, if the session wasn't confirmed from another session
 //@can_accept_secret_chats True, if incoming secret chats can be accepted by the session
 //@can_accept_calls True, if incoming calls can be accepted by the session
 //@type Session type based on the system and application version, which can be used to display a corresponding icon
@@ -4858,13 +4891,19 @@ sessionTypeXbox = SessionType;
 //@system_version Version of the operating system the application has been run or is running on, as provided by the application
 //@log_in_date Point in time (Unix timestamp) when the user has logged in
 //@last_active_date Point in time (Unix timestamp) when the session was last used
-//@ip IP address from which the session was created, in human-readable format
-//@country A two-letter country code for the country from which the session was created, based on the IP address
-//@region Region code from which the session was created, based on the IP address
-session id:int64 is_current:Bool is_password_pending:Bool can_accept_secret_chats:Bool can_accept_calls:Bool type:SessionType api_id:int32 application_name:string application_version:string is_official_application:Bool device_model:string platform:string system_version:string log_in_date:int32 last_active_date:int32 ip:string country:string region:string = Session;
+//@ip_address IP address from which the session was created, in human-readable format
+//@location A human-readable description of the location from which the session was created, based on the IP address
+session id:int64 is_current:Bool is_password_pending:Bool is_unconfirmed:Bool can_accept_secret_chats:Bool can_accept_calls:Bool type:SessionType api_id:int32 application_name:string application_version:string is_official_application:Bool device_model:string platform:string system_version:string log_in_date:int32 last_active_date:int32 ip_address:string location:string = Session;
 
 //@description Contains a list of sessions @sessions List of sessions @inactive_session_ttl_days Number of days of inactivity before sessions will automatically be terminated; 1-366 days
 sessions sessions:vector<session> inactive_session_ttl_days:int32 = Sessions;
+
+//@description Contains information about an unconfirmed session
+//@id Session identifier
+//@log_in_date Point in time (Unix timestamp) when the user has logged in
+//@device_model Model of the device that was used for the session creation, as provided by the application
+//@location A human-readable description of the location from which the session was created, based on the IP address
+unconfirmedSession id:int64 log_in_date:int32 device_model:string location:string = UnconfirmedSession;
 
 
 //@description Contains information about one website the current user is logged in with Telegram
@@ -4875,9 +4914,9 @@ sessions sessions:vector<session> inactive_session_ttl_days:int32 = Sessions;
 //@platform Operating system the browser is running on
 //@log_in_date Point in time (Unix timestamp) when the user was logged in
 //@last_active_date Point in time (Unix timestamp) when obtained authorization was last used
-//@ip IP address from which the user was logged in, in human-readable format
+//@ip_address IP address from which the user was logged in, in human-readable format
 //@location Human-readable description of a country and a region from which the user was logged in, based on the IP address
-connectedWebsite id:int64 domain_name:string bot_user_id:int53 browser:string platform:string log_in_date:int32 last_active_date:int32 ip:string location:string = ConnectedWebsite;
+connectedWebsite id:int64 domain_name:string bot_user_id:int53 browser:string platform:string log_in_date:int32 last_active_date:int32 ip_address:string location:string = ConnectedWebsite;
 
 //@description Contains a list of websites the current user is logged in with Telegram @websites List of connected websites
 connectedWebsites websites:vector<connectedWebsite> = ConnectedWebsites;
@@ -5041,7 +5080,7 @@ internalLinkTypePremiumFeatures referrer:string = InternalLinkType;
 internalLinkTypePrivacyAndSecuritySettings = InternalLinkType;
 
 //@description The link is a link to a proxy. Call addProxy with the given parameters to process the link and add the proxy
-//@server Proxy server IP address
+//@server Proxy server domain or IP address
 //@port Proxy server port
 //@type Type of the proxy
 internalLinkTypeProxy server:string port:int32 type:ProxyType = InternalLinkType;
@@ -5058,6 +5097,13 @@ internalLinkTypeRestorePurchases = InternalLinkType;
 
 //@description The link is a link to application settings
 internalLinkTypeSettings = InternalLinkType;
+
+//@description The link is a link to a bot, which can be installed to the side menu. Call searchPublicChat with the given bot username, check that the user is a bot and can be added to attachment menu.
+//-Then, use getAttachmentMenuBot to receive information about the bot. If the bot isn't added to side menu, then user needs to confirm adding the bot to side and attachment menu.
+//-If user confirms adding, then use toggleBotIsAddedToAttachmentMenu to add the bot. If the bot is added to attachment menu, then use getWebAppUrl with the given URL
+//@bot_username Username of the bot
+//@url URL to be passed to getWebAppUrl
+internalLinkTypeSideMenuBot bot_username:string url:string = InternalLinkType;
 
 //@description The link is a link to a sticker set. Call searchStickerSet with the given sticker set name to process the link and show the sticker set
 //@sticker_set_name Name of the sticker set
@@ -5094,7 +5140,8 @@ internalLinkTypeUserToken token:string = InternalLinkType;
 internalLinkTypeVideoChat chat_username:string invite_hash:string is_live_stream:Bool = InternalLinkType;
 
 //@description The link is a link to a Web App. Call searchPublicChat with the given bot username, check that the user is a bot, then call searchWebApp with the received bot and the given web_app_short_name.
-//-Process received foundWebApp by showing a confirmation dialog if needed, then calling getWebAppLinkUrl and opening the returned URL
+//-Process received foundWebApp by showing a confirmation dialog if needed. If the bot can be added to attachment or side menu, but isn't added yet, then show a mini-apps disclaimer instead of the dialog, and
+//-call toggleBotIsAddedToAttachmentMenu to add the bot to the menu before opening the Web App. If the user confirms, then call getWebAppLinkUrl and open the returned URL as a Web App
 //@bot_username Username of the bot that owns the Web App
 //@web_app_short_name Short name of the Web App
 //@start_parameter Start parameter to be passed to getWebAppLinkUrl
@@ -5449,7 +5496,7 @@ proxyTypeMtproto secret:string = ProxyType;
 
 //@description Contains information about a proxy server
 //@id Unique identifier of the proxy
-//@server Proxy server IP address
+//@server Proxy server domain or IP address
 //@port Proxy server port
 //@last_used_date Point in time (Unix timestamp) when the proxy was last used; 0 if never
 //@is_enabled True, if the proxy is enabled now
@@ -5958,7 +6005,10 @@ updateTermsOfService terms_of_service_id:string terms_of_service:termsOfService 
 //@description The list of users nearby has changed. The update is guaranteed to be sent only 60 seconds after a successful searchChatsNearby request @users_nearby The new list of users nearby
 updateUsersNearby users_nearby:vector<chatNearby> = Update;
 
-//@description The list of bots added to attachment menu has changed @bots The new list of bots added to attachment menu. The bots must not be shown on scheduled messages screen
+//@description The first unconfirmed session has changed @session The unconfirmed session; may be null if none
+updateUnconfirmedSession session:unconfirmedSession = Update;
+
+//@description The list of bots added to attachment or side menu has changed @bots The new list of bots. The bots must not be shown on scheduled messages screen
 updateAttachmentMenuBots bots:vector<attachmentMenuBot> = Update;
 
 //@description A message was sent by an opened Web App, so the Web App needs to be closed @web_app_launch_id Identifier of Web App launch
@@ -7004,9 +7054,9 @@ searchWebApp bot_user_id:int53 web_app_short_name:string = FoundWebApp;
 //@allow_write_access Pass true if the current user allowed the bot to send them messages
 getWebAppLinkUrl chat_id:int53 bot_user_id:int53 web_app_short_name:string start_parameter:string theme:themeParameters application_name:string allow_write_access:Bool = HttpUrl;
 
-//@description Returns an HTTPS URL of a Web App to open after keyboardButtonTypeWebApp or inlineQueryResultsButtonTypeWebApp button is pressed
+//@description Returns an HTTPS URL of a Web App to open from the side menu, a keyboardButtonTypeWebApp button, an inlineQueryResultsButtonTypeWebApp button, or an internalLinkTypeSideMenuBot link
 //@bot_user_id Identifier of the target bot
-//@url The URL from the keyboardButtonTypeWebApp or inlineQueryResultsButtonTypeWebApp button
+//@url The URL from a keyboardButtonTypeWebApp button, inlineQueryResultsButtonTypeWebApp button, an internalLinkTypeSideMenuBot link, or an empty when the bot is opened from the side menu
 //@theme Preferred Web App theme; pass null to use the default theme
 //@application_name Short name of the application; 0-64 English letters, digits, and underscores
 getWebAppUrl bot_user_id:int53 url:string theme:themeParameters application_name:string = HttpUrl;
@@ -7017,11 +7067,11 @@ getWebAppUrl bot_user_id:int53 url:string theme:themeParameters application_name
 //@data The data
 sendWebAppData bot_user_id:int53 button_text:string data:string = Ok;
 
-//@description Informs TDLib that a Web App is being opened from attachment menu, a botMenuButton button, an internalLinkTypeAttachmentMenuBot link, or an inlineKeyboardButtonTypeWebApp button.
+//@description Informs TDLib that a Web App is being opened from the attachment menu, a botMenuButton button, an internalLinkTypeAttachmentMenuBot link, or an inlineKeyboardButtonTypeWebApp button.
 //-For each bot, a confirmation alert about data sent to the bot must be shown once
 //@chat_id Identifier of the chat in which the Web App is opened. The Web App can't be opened in secret chats
 //@bot_user_id Identifier of the bot, providing the Web App
-//@url The URL from an inlineKeyboardButtonTypeWebApp button, a botMenuButton button, or an internalLinkTypeAttachmentMenuBot link, or an empty string otherwise
+//@url The URL from an inlineKeyboardButtonTypeWebApp button, a botMenuButton button, an internalLinkTypeAttachmentMenuBot link, or an empty string otherwise
 //@theme Preferred Web App theme; pass null to use the default theme
 //@application_name Short name of the application; 0-64 English letters, digits, and underscores
 //@message_thread_id If not 0, a message thread identifier in which the message will be sent
@@ -7553,10 +7603,10 @@ reportStory story_sender_chat_id:int53 story_id:int32 reason:ReportReason text:s
 activateStoryStealthMode = Ok;
 
 
-//@description Returns information about a bot that can be added to attachment menu @bot_user_id Bot's user identifier
+//@description Returns information about a bot that can be added to attachment or side menu @bot_user_id Bot's user identifier
 getAttachmentMenuBot bot_user_id:int53 = AttachmentMenuBot;
 
-//@description Adds or removes a bot to attachment menu. Bot can be added to attachment menu, only if userTypeBot.can_be_added_to_attachment_menu == true
+//@description Adds or removes a bot to attachment and side menu. Bot can be added to the menu, only if userTypeBot.can_be_added_to_attachment_menu == true
 //@bot_user_id Bot's user identifier
 //@is_added Pass true to add the bot to attachment menu; pass false to remove the bot from attachment menu
 //@allow_write_access Pass true if the current user allowed the bot to send them messages. Ignored if is_added is false
@@ -8292,6 +8342,9 @@ terminateSession session_id:int64 = Ok;
 //@description Terminates all other sessions of the current user
 terminateAllOtherSessions = Ok;
 
+//@description Confirms an unconfirmed session of the current user from another device @session_id Session identifier
+confirmSession session_id:int64 = Ok;
+
 //@description Toggles whether a session can accept incoming calls @session_id Session identifier @can_accept_calls Pass true to allow accepting incoming calls by the session; pass false otherwise
 toggleSessionCanAcceptCalls session_id:int64 can_accept_calls:Bool = Ok;
 
@@ -8882,7 +8935,7 @@ getApplicationDownloadLink = HttpUrl;
 
 
 //@description Adds a proxy server for network requests. Can be called before authorization
-//@server Proxy server IP address
+//@server Proxy server domain or IP address
 //@port Proxy server port
 //@enable Pass true to immediately enable the proxy
 //@type Proxy type
@@ -8890,7 +8943,7 @@ addProxy server:string port:int32 enable:Bool type:ProxyType = Proxy;
 
 //@description Edits an existing proxy server for network requests. Can be called before authorization
 //@proxy_id Proxy identifier
-//@server Proxy server IP address
+//@server Proxy server domain or IP address
 //@port Proxy server port
 //@enable Pass true to immediately enable the proxy
 //@type Proxy type
@@ -8984,7 +9037,7 @@ testSquareInt x:int32 = TestInt;
 testNetwork = Ok;
 
 //@description Sends a simple network request to the Telegram servers via proxy; for testing only. Can be called before authorization
-//@server Proxy server IP address
+//@server Proxy server domain or IP address
 //@port Proxy server port
 //@type Proxy type
 //@dc_id Identifier of a datacenter with which to test connection
