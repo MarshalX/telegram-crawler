@@ -2,6 +2,7 @@ var DemoApp = {
   initData: Telegram.WebApp.initData || '',
   initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
   MainButton: Telegram.WebApp.MainButton,
+  BackButton: Telegram.WebApp.BackButton,
 
   init: function(options) {
     $('body').css('visibility', '');
@@ -10,6 +11,9 @@ var DemoApp = {
       text: 'CLOSE WEBVIEW',
       is_visible: true
     }).onClick(DemoApp.close);
+    Telegram.WebApp.BackButton.onClick(function() {
+      DemoApp.showAlert('Back button pressed');
+    });
     Telegram.WebApp.onEvent('settingsButtonClicked', function() {
       DemoApp.showAlert('Settings opened!');
     });
@@ -292,6 +296,15 @@ var DemoApp = {
       el.innerHTML = 'Hide Main Button';
     }
   },
+  toggleBackButton: function(el) {
+    if (DemoApp.BackButton.isVisible) {
+      DemoApp.BackButton.hide();
+      el.innerHTML = 'Show Back Button';
+    } else {
+      DemoApp.BackButton.show();
+      el.innerHTML = 'Hide Back Button';
+    }
+  },
   showAlert: function(message) {
     Telegram.WebApp.showAlert(message);
   },
@@ -415,3 +428,22 @@ function round(val, d) {
   var k = Math.pow(10, d || 0);
   return Math.round(val * k) / k;
 }
+
+(function($) {
+  $.fn.cssProp = function(prop, val) {
+    if (typeof val !== 'undefined') {
+      return this.each(function() {
+        if (this.style && this.style.setProperty) {
+          this.style.setProperty(prop, val);
+        }
+      });
+    }
+    return this.first().map(function() {
+      if (this.style && this.style.getPropertyValue) {
+        return this.style.getPropertyValue(prop);
+      } else {
+        return '';
+      }
+    }).get(0) || '';
+  };
+})(jQuery);

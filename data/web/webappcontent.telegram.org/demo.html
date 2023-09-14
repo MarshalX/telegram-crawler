@@ -27,6 +27,7 @@
   <button id="with_webview_btn" onclick="DemoApp.sendMessage('', true);">Send «Hello, World!» with inline webview button</button>
   <button id="data_btn" onclick="DemoApp.sendTime(true);">Send current time to bot (x10)</button>
   <button onclick="DemoApp.expand();">Expand Webview</button>
+  <button onclick="DemoApp.toggleBackButton(this);">Show Back Button</button>
   <button onclick="DemoApp.toggleMainButton(this);">Hide Main Button</button>
   <input type="text" placeholder="Input text in regular input..." />
   <div class="input" contenteditable="true" data-placeholder="Input text in contenteditable field..."></div>
@@ -137,7 +138,7 @@
   <div class="viewport-stable_border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?16"></script>
+    <script src="/js/webappdemo.js?17"></script>
     <script>DemoApp.apiUrl = "/demo/api";
 
 Telegram.WebApp.onEvent('themeChanged', function() {
@@ -197,10 +198,10 @@ setViewportData();
 
 var prev_bg_color_val = $('#bg_color_sel').val();
 $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
-$('body').attr('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+$('body').cssProp('--bg-color', Telegram.WebApp.backgroundColor);
 var prev_header_color_val = $('#header_color_sel').val();
 $('#header_color_input').val(Telegram.WebApp.headerColor);
-$('body').attr('style', '--header-color:' + Telegram.WebApp.headerColor);
+$('body').cssProp('--header-color', Telegram.WebApp.headerColor);
 
 $('#header_color_sel').val('secondary_bg_color');
 $('#header_color_input').on('change', function(e) {
@@ -209,7 +210,7 @@ $('#header_color_input').on('change', function(e) {
   $('#header_color_sel').val('custom');
   prev_header_color_val = $('#header_color_sel').val();
   Telegram.WebApp.setHeaderColor(color);
-  $('body').attr('style', '--header-color:' + Telegram.WebApp.headerColor);
+  $('body').cssProp('--header-color', Telegram.WebApp.headerColor);
 });
 $('#header_color_sel').on('change', function(e) {
   var color_key = e.target.value;
@@ -220,7 +221,7 @@ $('#header_color_sel').on('change', function(e) {
     $('#header_color_val').text('custom...');
     Telegram.WebApp.setHeaderColor(color_key);
     $('#top_sect').toggleClass('second', color_key == 'secondary_bg_color');
-    $('body').attr('style', '--header-color:' + Telegram.WebApp.headerColor);
+    $('body').cssProp('--header-color', Telegram.WebApp.headerColor);
     $('#header_color_input').val(Telegram.WebApp.headerColor);
     prev_header_color_val = $('#header_color_sel').val();
   }
@@ -231,7 +232,7 @@ $('#bg_color_input').on('change', function(e) {
   $('#bg_color_sel').val('custom');
   prev_bg_color_val = $('#bg_color_sel').val();
   Telegram.WebApp.setBackgroundColor(color);
-  $('body').attr('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+  $('body').cssProp('--bg-color', Telegram.WebApp.backgroundColor);
 });
 $('#bg_color_sel').on('change', function(e) {
   var color_key = e.target.value;
@@ -241,14 +242,14 @@ $('#bg_color_sel').on('change', function(e) {
   } else {
     $('#bg_color_val').text('custom...');
     Telegram.WebApp.setBackgroundColor(color_key);
-    $('body').attr('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+    $('body').cssProp('--bg-color', Telegram.WebApp.backgroundColor);
     $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
     prev_bg_color_val = $('#bg_color_sel').val();
   }
 });
 Telegram.WebApp.onEvent('themeChanged', function() {
   $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
-  $('body').attr('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+  $('body').cssProp('--bg-color', Telegram.WebApp.backgroundColor);
 });
 try {
   DemoApp.testClipboard(document.getElementById('clipboard_test'));
