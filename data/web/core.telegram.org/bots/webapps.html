@@ -57,6 +57,14 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="september-14-2023" href="#september-14-2023"><i class="anchor-icon"></i></a>September 14, 2023</h4>
+<p><strong>Bot API 6.9</strong></p>
+<ul>
+<li>Added the ability to set any header color using the <em>setHeaderColor</em> method.</li>
+<li>Added the field <em>CloudStorage</em> and the methods <em>requestWriteAccess</em>, <em>requestContact</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the fields <em>added_to_attachment_menu</em>, <em>allows_write_to_pm</em> to the class <a href="#webappuser">WebAppUser</a>.</li>
+<li>Added the events <em>writeAccessRequested</em>, <em>contactRequested</em>.</li>
+</ul>
 <h4><a class="anchor" name="april-21-2023" href="#april-21-2023"><i class="anchor-icon"></i></a>April 21, 2023</h4>
 <p><strong>Bot API 6.7</strong></p>
 <ul>
@@ -165,7 +173,7 @@
 <blockquote>
 <p><strong>TL;DR:</strong> Mini Apps launched via <strong>web_app</strong> type <a href="/bots/api#inlinequeryresultsbutton">InlineQueryResultsButton</a> can be used anywhere in inline mode. Users can create content in a web interface and then seamlessly send it to the current chat via inline mode.</p>
 </blockquote>
-<p><sup><mark>NEW</mark></sup> You can use the <em>button</em> parameter in the <a href="/bots/api#answerinlinequery">answerInlineQuery</a> method to display a special &#39;Switch to Mini App&#39; button either above or in place of the inline results. This button will <strong>open a Mini App</strong> from the specified URL. Once done, you can call the <a href="#initializing-mini-apps">Telegram.WebApp.switchInlineQuery</a> method to send the user back to inline mode.</p>
+<p>You can use the <em>button</em> parameter in the <a href="/bots/api#answerinlinequery">answerInlineQuery</a> method to display a special &#39;Switch to Mini App&#39; button either above or in place of the inline results. This button will <strong>open a Mini App</strong> from the specified URL. Once done, you can call the <a href="#initializing-mini-apps">Telegram.WebApp.switchInlineQuery</a> method to send the user back to inline mode.</p>
 <p>Inline Mini Apps have <strong>no access</strong> to the chat – they can&#39;t read messages or send new ones on behalf of the user. To send messages, the user must be redirected to <strong>inline mode</strong> and actively pick a result.</p>
 <p><strong>Good for:</strong></p>
 <ul>
@@ -175,7 +183,7 @@
 <blockquote>
 <p><strong>TL;DR:</strong> Mini App Bots can be launched from a direct link in any chat. They support a <em>startapp</em> parameter and are aware of the current chat context.</p>
 </blockquote>
-<p><sup><mark>NEW</mark></sup> You can use direct links to <strong>open a Mini App</strong> directly in the current chat. If a non-empty <em>startapp</em> parameter is included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>.</p>
+<p>You can use direct links to <strong>open a Mini App</strong> directly in the current chat. If a non-empty <em>startapp</em> parameter is included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>.</p>
 <p>In this mode, Mini Apps can use the <em>chat_type</em> and <em>chat_instance</em> parameters to keep track of the current chat context. This introduces support for <strong>concurrent</strong> and <strong>shared</strong> usage by multiple chat members – to create live whiteboards, group orders, multiplayer games and similar apps.</p>
 <p>Mini Apps opened from a direct link have <strong>no access</strong> to the chat – they can&#39;t read messages or send new ones on behalf of the user. To send messages, the user must be redirected to <strong>inline mode</strong> and actively pick a result.</p>
 <p><strong>Examples</strong></p>
@@ -289,6 +297,11 @@
 <td>An object for controlling haptic feedback.</td>
 </tr>
 <tr>
+<td>CloudStorage <sup><mark>NEW</mark></sup></td>
+<td><a href="#cloudstorage">CloudStorage</a></td>
+<td>An object for controlling cloud storage.</td>
+</tr>
+<tr>
 <td>isVersionAtLeast(version)</td>
 <td>Function</td>
 <td>Returns true if the user&#39;s app supports a version of the Bot API that is equal to or higher than the version passed as the parameter.</td>
@@ -296,12 +309,12 @@
 <tr>
 <td>setHeaderColor(color)</td>
 <td>Function</td>
-<td><mark>Bot API 6.1+</mark> A method that sets the app header color. You can only pass <em>Telegram.WebApp.themeParams.bg_color</em> or <em>Telegram.WebApp.themeParams.secondary_bg_color</em> as a color or you can use keywords <em>bg_color</em>, <em>secondary_bg_color</em> instead.</td>
+<td><mark>Bot API 6.1+</mark> A method that sets the app header color in the <code>#RRGGBB</code> format. You can also use keywords <em>bg_color</em> and <em>secondary_bg_color</em>.<br><br>Up to <mark>Bot API 6.9</mark> You can only pass <em>Telegram.WebApp.themeParams.bg_color</em> or <em>Telegram.WebApp.themeParams.secondary_bg_color</em> as a color or <em>bg_color</em>, <em>secondary_bg_color</em> keywords.</td>
 </tr>
 <tr>
 <td>setBackgroundColor(color)</td>
 <td>Function</td>
-<td><mark>Bot API 6.1+</mark> A method that sets the app background color in the <code>#RRGGBB</code> format or you can use keywords <em>bg_color</em>, <em>secondary_bg_color</em> instead.</td>
+<td><mark>Bot API 6.1+</mark> A method that sets the app background color in the <code>#RRGGBB</code> format. You can also use keywords <em>bg_color</em> and <em>secondary_bg_color</em>.</td>
 </tr>
 <tr>
 <td>enableClosingConfirmation()</td>
@@ -329,7 +342,7 @@
 <td>A method used to send data to the bot. When this method is called, a service message is sent to the bot containing the data <em>data</em> of the length up to 4096 bytes, and the Mini App is closed. See the field <em>web_app_data</em> in the class <a href="/bots/api#message">Message</a>.<br><br><em>This method is only available for Mini Apps launched via a <a href="#keyboard-button-mini-apps">Keyboard button</a>.</em></td>
 </tr>
 <tr>
-<td>switchInlineQuery(query[, choose_chat_types]) <sup><mark>NEW</mark></sup></td>
+<td>switchInlineQuery(query[, choose_chat_types])</td>
 <td>Function</td>
 <td><mark>Bot API 6.7+</mark> A method that inserts the bot&#39;s username and the specified inline <em>query</em> in the current chat&#39;s input field. Query may be empty, in which case only the bot&#39;s username will be inserted. If an optional <em>choose_chat_types</em> parameter was passed, the client prompts the user to choose a specific chat, then opens that chat and inserts the bot&#39;s username and the specified inline query in the input field. You can specify which types of chats the user will be able to choose from. It can be one or more of the following types: <em>users</em>, <em>bots</em>, <em>groups</em>, <em>channels</em>.</td>
 </tr>
@@ -377,6 +390,16 @@
 <td>readTextFromClipboard([callback])</td>
 <td>Function</td>
 <td><mark>Bot API 6.4+</mark> A method that requests text from the clipboard. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>clipboardTextReceived</em>. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the text from the clipboard will be passed as the first argument.<br><br><em>Note: this method can be called only for Mini Apps launched from the attachment menu and only in response to a user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button).</em></td>
+</tr>
+<tr>
+<td>requestWriteAccess([callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that shows a native popup requesting permission for the bot to send messages to the user. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed and the first argument will be a boolean indicating whether the user granted this access.</td>
+</tr>
+<tr>
+<td>requestContact([callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that shows a native popup prompting the user for their phone number. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed and the first argument will be a boolean indicating whether the user shared its phone number.</td>
 </tr>
 <tr>
 <td>ready()</td>
@@ -683,6 +706,50 @@
 </tbody>
 </table>
 <p>All these methods return the HapticFeedback object so they can be chained.</p>
+<h4><a class="anchor" name="cloudstorage" href="#cloudstorage"><i class="anchor-icon"></i></a>CloudStorage</h4>
+<p><sup><mark>NEW</mark></sup> This object controls the cloud storage. Each bot can store up to 1024 items per user in the cloud storage.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>setItem(key, value[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that stores a value in the cloud storage using the specified key. The key should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. The value should contain 0-4096 characters. You can store up to 1024 keys in the cloud storage. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was stored.</td>
+</tr>
+<tr>
+<td>getItem(key, callback)</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that receives a value from the cloud storage using the specified key. The key should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the value will be passed as the second argument.</td>
+</tr>
+<tr>
+<td>getItems(keys, callback)</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that receives values from the cloud storage using the specified keys. The keys should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the values will be passed as the second argument.</td>
+</tr>
+<tr>
+<td>removeItem(key[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that removes a value from the cloud storage using the specified key. The key should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was removed.</td>
+</tr>
+<tr>
+<td>removeItems(keys[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that removes values from the cloud storage using the specified keys. The keys should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the values were removed.</td>
+</tr>
+<tr>
+<td>getKeys(callback)</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that receives the list of all keys stored in the cloud storage. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the list of keys will be passed as the second argument.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#cloudstorage">CloudStorage</a> object, so they can be chained.</p>
 <h4><a class="anchor" name="webappinitdata" href="#webappinitdata"><i class="anchor-icon"></i></a>WebAppInitData</h4>
 <p>This object contains data that is transferred to the Mini App when it is opened. It is empty if the Mini App was launched from a <a href="#keyboard-button-mini-apps">keyboard button</a> or from <a href="#inline-mode-mini-apps">inline mode</a>.</p>
 <table class="table">
@@ -715,12 +782,12 @@
 <td><em>Optional.</em> An object containing data about the chat where the bot was launched via the attachment menu. Returned for supergroups, channels and group chats – only for Mini Apps launched via the attachment menu.</td>
 </tr>
 <tr>
-<td>chat_type <sup><mark>NEW</mark></sup></td>
+<td>chat_type</td>
 <td>String</td>
 <td><em>Optional.</em> Type of the chat from which the Mini App was opened. Can be either “sender” for a private chat with the user opening the link, “private”, “group”, “supergroup”, or “channel”. Returned only for Mini Apps launched from direct links.</td>
 </tr>
 <tr>
-<td>chat_instance <sup><mark>NEW</mark></sup></td>
+<td>chat_instance</td>
 <td>String</td>
 <td><em>Optional.</em> Global identifier, uniquely corresponding to the chat from which the Mini App was opened. Returned only for Mini Apps launched from a direct link.</td>
 </tr>
@@ -790,7 +857,17 @@
 <tr>
 <td>is_premium</td>
 <td>True</td>
-<td><em>Optional</em>. <em>True</em>, if this user is a Telegram Premium user</td>
+<td><em>Optional</em>. <em>True</em>, if this user is a Telegram Premium user.</td>
+</tr>
+<tr>
+<td>added_to_attachment_menu <sup><mark>NEW</mark></sup></td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if this user added the bot to the attachment menu.</td>
+</tr>
+<tr>
+<td>allows_write_to_pm <sup><mark>NEW</mark></sup></td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if this user allowed the bot to message them.</td>
 </tr>
 <tr>
 <td>photo_url</td>
@@ -894,6 +971,14 @@ if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
 <tr>
 <td><code>clipboardTextReceived</code></td>
 <td><mark>Bot API 6.4+</mark> Occurrs when the <code>readTextFromClipboard</code> method is called.<br><em>eventHandler</em> receives an object with the single field <em>data</em> containing text data from the clipboard. If the clipboard contains non-text data, the field <em>data</em> will be an empty string. If the Mini App has no access to the clipboard, the field <em>data</em> will be <em>null</em>.</td>
+</tr>
+<tr>
+<td><code>writeAccessRequested</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 6.9+</mark> Occurs when the write permission was requested.<br><em>eventHandler</em> receives an object with the single field <em>status</em> containing one of the statuses:<br>- <strong>allowed</strong> – user granted write permission to the bot,<br>- <strong>cancelled</strong> – user declined this request.</td>
+</tr>
+<tr>
+<td><code>contactRequested</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 6.9+</mark> Occurrs when the user&#39;s phone number was requested.<br><em>eventHandler</em> receives an object with the single field <em>status</em> containing one of the statuses:<br>- <strong>sent</strong> – user shared their phone number with the bot,<br>- <strong>cancelled</strong> – user declined this request.</td>
 </tr>
 </tbody>
 </table>
