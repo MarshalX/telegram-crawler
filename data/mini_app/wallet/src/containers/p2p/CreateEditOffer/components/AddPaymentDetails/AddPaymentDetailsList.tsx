@@ -176,7 +176,7 @@ const AddPaymentDetails = () => {
                         (value) => value.name === 'BANKS',
                       )?.value as SbpBankRestDto[],
                     )}{' '}
-                    Â· {paymentMethod.currency}
+                    · {paymentMethod.currency}
                   </div>
                   <div className={themeClassName('cellPaymentDetailInfo')}>
                     {getRecipientNumberFromAttributes(paymentMethod.attributes)}

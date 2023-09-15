@@ -20,7 +20,7 @@ const CreatePayment = () => {
       <PaymentForm
         onCreate={onCreatePayment}
         name={paymentName}
-        paymentMethodName={`${paymentName} Â· ${currentCurrency}`}
+        paymentMethodName={`${paymentName} · ${currentCurrency}`}
         paymentMethodCode={currentPayment.code}
         currencyCode={currentCurrency}
         source="profile"

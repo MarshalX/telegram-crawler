@@ -218,7 +218,7 @@ const Send: FC = () => {
                 currency: assetCurrency,
               })}
             </span>
-            &nbsp;â‰ˆ&nbsp;
+            &nbsp;≈&nbsp;
             <span>{fiat}</span>
           </>
         );

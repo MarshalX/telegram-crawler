@@ -692,7 +692,7 @@ export default function HomePage() {
                                 value: createdStatusDate(order),
                                 t,
                                 languageCode,
-                              })} Â· #${order.number || 0}`}
+                              })} · #${order.number || 0}`}
                             </div>
                           </DetailCell>
                         </div>

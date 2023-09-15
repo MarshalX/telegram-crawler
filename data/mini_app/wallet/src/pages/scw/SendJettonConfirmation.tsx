@@ -146,7 +146,7 @@ const SendJettonConfirmation: FC = () => {
               <Mono>{address}</Mono>
             </NewDetailCell>
             <NewDetailCell header={t('send_confirmation.fee')}>
-              â‰ˆ{' '}
+              ≈{' '}
               {printCryptoAmount({
                 amount: AVERAGE_JETTON_TRANSFER_FEE,
                 currency: FrontendCryptoCurrencyEnum.Ton,

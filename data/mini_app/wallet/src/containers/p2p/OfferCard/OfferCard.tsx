@@ -405,7 +405,7 @@ const OfferCard = forwardRef<HTMLDivElement, Props>(
                   languageCode,
                   currencyDisplay: false,
                 })}{' '}
-                {orderAmountLimits.approximate ? '~' : 'â€“'}{' '}
+                {orderAmountLimits.approximate ? '~' : '–'}{' '}
                 {printFiatAmount({
                   amount: Number(orderAmountLimits.max),
                   currency: orderAmountLimits.currencyCode as FiatCurrency,

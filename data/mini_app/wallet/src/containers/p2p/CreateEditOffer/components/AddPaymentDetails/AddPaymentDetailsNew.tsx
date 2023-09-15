@@ -63,7 +63,7 @@ const AddPaymentDetails: FC = () => {
     <PaymentForm
       onCreate={handlePaymentDetailsCreate}
       name={paymentMethodName}
-      paymentMethodName={`${paymentMethodName} Â· ${draftOffer.quoteCurrencyCode}`}
+      paymentMethodName={`${paymentMethodName} · ${draftOffer.quoteCurrencyCode}`}
       paymentMethodCode={selectedPaymentMethodToAdd.code || ''}
       currencyCode={draftOffer.quoteCurrencyCode as FiatCurrency}
       source="ad"
