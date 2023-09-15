@@ -125,6 +125,12 @@ class SourceMapExtractor(object):
         remote_sourcemaps = []
         data, final_uri = self._get_remote_data(uri)
 
+        if final_uri.endswith('.js'):
+            print("Detecting sourcemaps in JS at %s" % final_uri)
+            # trick to not send the same request twice
+            self._enrich_with_remote_sourcemaps('tgcrawl', remote_sourcemaps, js_data=data, last_target_uri=final_uri)
+            return remote_sourcemaps
+
         # TODO: scan to see if this is a sourcemap instead of assuming HTML
         print("Detecting sourcemaps in HTML at %s" % final_uri)
         script_strainer = SoupStrainer("script", src=True)
@@ -136,35 +142,38 @@ class SourceMapExtractor(object):
         for script in soup:
             source = script['src']
             parsed_uri = urlparse(source)
-            next_target_uri = ""
             if parsed_uri.scheme != '':
                 next_target_uri = source
             else:
                 current_uri = urlparse(final_uri)
                 built_uri = current_uri.scheme + "://" + current_uri.netloc + source
                 next_target_uri = built_uri
-
-            js_data, last_target_uri = self._get_remote_data(next_target_uri)
-            # get last line of file
-            last_line = js_data.rstrip().split("\n")[-1]
-            regex = "\\/\\/#\s*sourceMappingURL=(.*)$"
-            matches = re.search(regex, last_line)
-            if matches:
-                asset = matches.groups(0)[0].strip()
-                asset_target = urlparse(asset)
-                if asset_target.scheme != '':
-                    print("Detected sourcemap at remote location %s" % asset)
-                    remote_sourcemaps.append(asset)
-                else:
-                    current_uri = urlparse(last_target_uri)
-                    asset_uri = current_uri.scheme + '://' + \
-                                current_uri.netloc + \
-                                os.path.dirname(current_uri.path) + \
-                                '/' + asset
-                    print("Detected sourcemap at remote location %s" % asset_uri)
-                    remote_sourcemaps.append(asset_uri)
+            self._enrich_with_remote_sourcemaps(next_target_uri, remote_sourcemaps)
 
         return remote_sourcemaps
+
+    def _enrich_with_remote_sourcemaps(self, next_target_uri, remote_sourcemaps, js_data=None, last_target_uri=None):
+        if last_target_uri is None or js_data is None:
+            js_data, last_target_uri = self._get_remote_data(next_target_uri)
+
+        # get last line of file
+        last_line = js_data.rstrip().split("\n")[-1]
+        regex = "\\/\\/#\s*sourceMappingURL=(.*)$"
+        matches = re.search(regex, last_line)
+        if matches:
+            asset = matches.groups(0)[0].strip()
+            asset_target = urlparse(asset)
+            if asset_target.scheme != '':
+                print("Detected sourcemap at remote location %s" % asset)
+                remote_sourcemaps.append(asset)
+            else:
+                current_uri = urlparse(last_target_uri)
+                asset_uri = current_uri.scheme + '://' + \
+                            current_uri.netloc + \
+                            os.path.dirname(current_uri.path) + \
+                            '/' + asset
+                print("Detected sourcemap at remote location %s" % asset_uri)
+                remote_sourcemaps.append(asset_uri)
 
     def _parse_sourcemap(self, target, is_str=False):
         map_data = ""

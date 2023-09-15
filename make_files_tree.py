@@ -352,34 +352,59 @@ async def download_telegram_android_beta_and_extract_resources(session: aiohttp.
     cleanup()
 
 
+def parse_string_with_possible_json(input_string) -> dict:
+    # chat gtp powered code:
+    try:
+        # Attempt to parse the entire input string as JSON
+        json_object = json.loads(input_string)
+    except json.JSONDecodeError as e:
+        # Regular expression to find JSON objects within the string
+        json_regex = r'{[^{}]*}'
+        matches = re.findall(json_regex, input_string)
+
+        if matches:
+            # Use the first match as the extracted JSON
+            json_object = json.loads(matches[0])
+        else:
+            raise ValueError('No JSON found within the input string.')
+
+    return json_object
+
+
 async def crawl_mini_app_wallet():
     crawled_data_folder = os.path.join(OUTPUT_MINI_APPS_FOLDER, 'wallet')
 
     def cleanup():
         os.path.isdir('wallet') and shutil.rmtree('wallet')
 
-    process = await asyncio.create_subprocess_exec(
-        'python', 'unwebpack_sourcemap.py', '--make-directory', '--detect', 'https://walletbot.me/', 'wallet',
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT
-    )
-    await process.communicate()
+    async def _run_unwebpack_sourcemap(url: str):
+        process = await asyncio.create_subprocess_exec(
+            'python', 'unwebpack_sourcemap.py', '--make-directory', '--detect', url, 'wallet',
+        )
+        await process.communicate()
 
-    if process.returncode != 0:
-        cleanup()
-        return
+        if process.returncode != 0:
+            cleanup()
+            raise RuntimeError('unwebpack_sourcemap failed')
+
+    crawled_unpacked_folder = os.path.join('wallet', 'webpack', 'wallet-react-form')
+
+    await _run_unwebpack_sourcemap('https://walletbot.me/')
+
+    webpack_chunks_db_path = os.path.join(crawled_unpacked_folder, 'webpack', 'runtime', 'get javascript chunk filename')
+    webpack_chunks_db = parse_string_with_possible_json(open(webpack_chunks_db_path, 'r').read())
+    for chunk_id, chunk_name in webpack_chunks_db.items():
+        await _run_unwebpack_sourcemap(f'https://walletbot.me/static/js/{chunk_id}.{chunk_name}.js')
 
     files_to_track = []
 
-    crawled_unpacked_folder = os.path.join('wallet', 'webpack', 'wallet-react-form', 'empty_0')
-    crawled_src_folder = os.path.join(crawled_unpacked_folder, 'src')
+    crawled_empty_0_folder = os.path.join(crawled_unpacked_folder, 'empty_0')
+    crawled_src_folder = os.path.join(crawled_empty_0_folder, 'src')
     for root, folders, files in os.walk(crawled_src_folder):
         for file in files:
-            files_to_track.append(os.path.join(root, file).replace(f'{crawled_unpacked_folder}/', ''))
+            files_to_track.append(os.path.join(root, file).replace(f'{crawled_empty_0_folder}/', ''))
 
-    await track_additional_files(
-        files_to_track, crawled_unpacked_folder, crawled_data_folder
-    )
+    await track_additional_files(files_to_track, crawled_empty_0_folder, crawled_data_folder)
 
     cleanup()
 
