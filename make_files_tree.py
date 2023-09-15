@@ -33,6 +33,7 @@ OUTPUT_SITES_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_SITES_F
 OUTPUT_CLIENTS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_CLIENTS_FOLDER', 'client/'))
 OUTPUT_RESOURCES_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_RESOURCES_FOLDER', 'web_res/'))
 OUTPUT_TRANSLATIONS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_RESOURCES_FOLDER', 'web_tr/'))
+OUTPUT_MINI_APPS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_MINI_APPS_FOLDER', 'mini_app/'))
 
 TRANSLATIONS_EN_CATEGORY_URL_REGEX = r'/en/[a-z_]+/[a-z_]+/$'
 
@@ -347,6 +348,38 @@ async def download_telegram_android_beta_and_extract_resources(session: aiohttp.
         'res/values/public.xml'
     ]
     await track_additional_files(files_to_track, 'android', crawled_data_folder)
+
+    cleanup()
+
+
+async def crawl_mini_app_wallet():
+    crawled_data_folder = os.path.join(OUTPUT_MINI_APPS_FOLDER, 'wallet')
+
+    def cleanup():
+        os.path.isdir('wallet') and shutil.rmtree('wallet')
+
+    process = await asyncio.create_subprocess_exec(
+        'python', 'unwebpack_sourcemap.py', '--make-directory', '--detect', 'https://walletbot.me/', 'wallet',
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.STDOUT
+    )
+    await process.communicate()
+
+    if process.returncode != 0:
+        cleanup()
+        return
+
+    files_to_track = []
+
+    crawled_unpacked_folder = os.path.join('wallet', 'webpack', 'wallet-react-form', 'empty_0')
+    crawled_src_folder = os.path.join(crawled_unpacked_folder, 'src')
+    for root, folders, files in os.walk(crawled_src_folder):
+        for file in files:
+            files_to_track.append(os.path.join(root, file).replace(f'{crawled_unpacked_folder}/', ''))
+
+    await track_additional_files(
+        files_to_track, crawled_unpacked_folder, crawled_data_folder
+    )
 
     cleanup()
 
@@ -713,6 +746,7 @@ async def start(mode: str):
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
             download_telegram_ios_beta_and_extract_resources(session),
+            crawl_mini_app_wallet(),
         )
         mode == 'web' and await asyncio.gather(
             crawl_web(session),
@@ -730,6 +764,9 @@ async def start(mode: str):
             download_telegram_android_beta_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
             download_telegram_ios_beta_and_extract_resources(session),
+        )
+        mode == 'mini_app' and await asyncio.gather(
+            crawl_mini_app_wallet(),
         )
 
 

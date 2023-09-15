@@ -35,6 +35,9 @@ jobs:
           - mode: client
             os: macos-12
 
+          - mode: mini_app
+            os: ubuntu-20.04
+
     steps:
 
       - name: Clone.
@@ -74,6 +77,7 @@ jobs:
           mv data/web_tr data_ci/web_tr
           mv data/client data_ci/client
           mv data/server data_ci/server
+          mv data/mini_app data_ci/mini_app
 
           rm -rf data
           mv data_ci data
@@ -88,6 +92,7 @@ jobs:
           mv data/web_tr data_ci/web_tr
           mv data/client data_ci/client
           mv data/server data_ci/server
+          mv data/mini_app data_ci/mini_app
 
           rm -rf data
           mv data_ci data
@@ -102,6 +107,7 @@ jobs:
           mv data/web_res data_ci/web_res
           mv data/server data_ci/server
           mv data/client data_ci/client
+          mv data/mini_app data_ci/mini_app
 
           rm -rf data
           mv data_ci data
@@ -116,6 +122,7 @@ jobs:
           mv data/web_res data_ci/web_res
           mv data/web_tr data_ci/web_tr
           mv data/client data_ci/client
+          mv data/mini_app data_ci/mini_app
 
           rm -rf data
           mv data_ci data
@@ -130,6 +137,22 @@ jobs:
           mv data/web_res data_ci/web_res
           mv data/web_tr data_ci/web_tr
           mv data/server data_ci/server
+          mv data/mini_app data_ci/mini_app
+
+          rm -rf data
+          mv data_ci data
+
+      - name: Prepare data.
+        if: matrix.mode == 'mini_app'
+        run: |
+          git checkout data
+          git pull
+
+          mv data/web data_ci/web
+          mv data/web_res data_ci/web_res
+          mv data/web_tr data_ci/web_tr
+          mv data/server data_ci/server
+          mv data/client data_ci/client
 
           rm -rf data
           mv data_ci data

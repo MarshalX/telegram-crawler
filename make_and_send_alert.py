@@ -44,7 +44,7 @@ STATUS_TO_EMOJI = {
 }
 
 AVAILABLE_HASHTAGS = {
-    'web_tr', 'web_res', 'web', 'server', 'test_server', 'client', 'ios', 'macos', 'android'
+    'web_tr', 'web_res', 'web', 'server', 'test_server', 'client', 'ios', 'macos', 'android', 'mini_app', 'wallet'
 }
 HASHTAGS_PATTERNS = {
     # regex will be more flexible. for example, in issue with double hashtag '#web #web_res' when data/res not changed
@@ -57,6 +57,8 @@ HASHTAGS_PATTERNS = {
     'ios': os.path.join(ROOT_TREE_DIR, 'client', 'ios-beta'),
     'macos': os.path.join(ROOT_TREE_DIR, 'client', 'macos-beta'),
     'android': os.path.join(ROOT_TREE_DIR, 'client', 'android-beta'),
+    'mini_app': os.path.join(ROOT_TREE_DIR, 'mini_app'),
+    'wallet': os.path.join(ROOT_TREE_DIR, 'mini_app', 'wallet'),
 }
 # order is important!
 PATHS_TO_REMOVE_FROM_ALERT = [
@@ -65,6 +67,7 @@ PATHS_TO_REMOVE_FROM_ALERT = [
     os.path.join(ROOT_TREE_DIR, 'web'),
     os.path.join(ROOT_TREE_DIR, 'server'),
     os.path.join(ROOT_TREE_DIR, 'client'),
+    os.path.join(ROOT_TREE_DIR, 'mini_app'),
 ]
 
 FORUM_CHAT_ID = '@tfcrawl'
@@ -76,6 +79,7 @@ HASHTAG_TO_TOPIC = {
     'ios': '2194',
     'macos': '2187',
     'android': '2190',
+    'wallet': '5685',
 }
 
 GITHUB_API_LIMIT_PER_HOUR = 5_000
