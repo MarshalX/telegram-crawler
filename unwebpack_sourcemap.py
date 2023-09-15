@@ -246,6 +246,7 @@ class SourceMapExtractor(object):
             return self._get_remote_data(result.url)
 
         if result.status_code == 200:
+            result.encoding = 'utf-8'
             return result.text, result.url
         else:
             print("WARNING: Got status code %d for URI %s" % (result.status_code, result.url))
