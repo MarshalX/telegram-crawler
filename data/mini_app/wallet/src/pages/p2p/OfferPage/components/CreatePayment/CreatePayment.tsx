@@ -61,7 +61,7 @@ const CreatePayment = () => {
         }}
         source="order"
         name={name}
-        paymentMethodName={`${name} · ${currency}`}
+        paymentMethodName={`${name} Â· ${currency}`}
         paymentMethodCode={code}
         currencyCode={currency}
       />

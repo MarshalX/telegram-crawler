@@ -1170,7 +1170,7 @@ const OfferForm: FC = () => {
                 </ListItemCell>
               </div>
             )}
-            <ListItemCell perenniallyСhevron onClick={goToOfferDetails}>
+            <ListItemCell perenniallyÐ¡hevron onClick={goToOfferDetails}>
               <div className={themeClassName('detailCellText')}>
                 {t('p2p.offer_page.ad_details')}
               </div>

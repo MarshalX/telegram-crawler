@@ -22,7 +22,7 @@ const useGetPaymentMethodName = () => {
         ? banks.map((bank) => bank.nameRu)
         : banks.map((bank) => bank.nameEn);
 
-    return `${name} Â· ${banksNames.join(', ')}`;
+    return `${name} (${banksNames.join(', ')})`;
   };
 
   return getPaymentMethodName;

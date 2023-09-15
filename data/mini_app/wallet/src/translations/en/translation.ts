@@ -40,8 +40,8 @@ export default ({
   "attaches_promo": {
     "title": "As easy as sending\na message in Telegram",
     "text": "Add @wallet to your menu and enjoy instant cryptocurrency transfers in Telegram without any fees.",
-    "side_menu_title_apple": "Add Wallet shortcut to the Telegram Settings",
-    "side_menu_title_material": "Add Wallet shortcut to the Telegram Side Menu",
+    "side_menu_title_apple": "Add Wallet shortcut to Telegram Settings",
+    "side_menu_title_material": "Add Wallet shortcut to Telegram Side Menu",
     "side_menu_text": "Store, send and exchange crypto assets inside Telegram."
   },
   "settings": {

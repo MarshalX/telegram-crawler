@@ -113,7 +113,7 @@ const PaymentsList = () => {
                               (value) => value.name === 'BANKS',
                             )?.value as SbpBankRestDto[],
                           )}{' '}
-                          · {payment.currency}
+                          Â· {payment.currency}
                           <br />
                           {getRecipientNumberFromAttributes(payment.attributes)}
                         </>

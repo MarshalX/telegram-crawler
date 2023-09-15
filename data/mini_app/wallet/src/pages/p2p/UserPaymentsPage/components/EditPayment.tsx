@@ -53,7 +53,7 @@ const EditPayment = () => {
           name={selectedPayment.name}
           paymentMethodName={`${getPaymentMethodName(
             selectedPayment.paymentMethod,
-          )} · ${selectedPayment?.currency}`}
+          )} Â· ${selectedPayment?.currency}`}
           currencyCode={selectedPayment?.currency as FiatCurrency}
           paymentId={selectedPayment?.id}
           paymentMethodCode={selectedPayment?.paymentMethod?.code || ''}
