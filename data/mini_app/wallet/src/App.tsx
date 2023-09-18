@@ -423,6 +423,7 @@ function App() {
     (state: RootState) => state.p2pUser,
   );
   const fiatCurrency = useAppSelector((state) => state.settings.fiatCurrency);
+  const scwAddress = useAppSelector((state) => state.scw.address);
   const { passcodeType, requiredOnOpen, openUnlocked } = useSelector(
     (state: RootState) => state.passcode,
   );
@@ -448,6 +449,12 @@ function App() {
     const navigateToSettings = () => {
       if (location.pathname === routePaths.SETTINGS_LANGUAGE) {
         window.history.back();
+      } else if (
+        matchPath(`${routePaths.SCW_MAIN}*`, location.pathname) &&
+        scwAddress
+      ) {
+        window.Telegram.WebApp.expand();
+        navigate(routePaths.SCW_SETTINGS);
       } else if (
         location.pathname !== routePaths.SETTINGS &&
         location.pathname !== routePaths.WV

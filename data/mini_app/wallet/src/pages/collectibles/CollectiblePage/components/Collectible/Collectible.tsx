@@ -49,9 +49,8 @@ const Collectible: FC<CollectibleProps> = ({ collectible }) => {
   const snackbarContext = useContext(SnackbarContext);
   const { botUsername } = useAppSelector((state) => state.wallet);
   const onShareClick = () => {
-    const collectibleUrl = generateTelegramLink(botUsername, {
-      startattach: generateStartAttach(`collectible_${collectible.address}`),
-      attach: 'wallet',
+    const collectibleUrl = generateTelegramLink(`${botUsername}/start`, {
+      startapp: generateStartAttach(`collectible_${collectible.address}`),
     });
 
     copyToClipboard(collectibleUrl).then(() => {
