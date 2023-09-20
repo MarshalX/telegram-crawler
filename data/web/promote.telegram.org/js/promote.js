@@ -1719,11 +1719,6 @@ var Account = {
     Aj.onLoad(function(state) {
       cont.on('click.curPage', '.js-copy-token-btn', Account.eCopyToken);
       cont.on('click.curPage', '.js-revoke-token-btn', Account.eRevokeToken);
-      state.$form = $('.api-edit-form', cont);
-      Ads.formInit(state.$form);
-      state.$form.on('submit', preventDefault);
-      cont.on('click.curPage', '.js-save-settings-btn', Account.eApiSubmitForm);
-      cont.on('change.curPage', '.pr-form-control', Account.onFieldChange);
     });
   },
   eCopyToken: function(e) {
@@ -1773,36 +1768,6 @@ var Account = {
           showToast(result.toast);
         }
       });
-    });
-    return false;
-  },
-  eApiSubmitForm: function(e) {
-    e.preventDefault();
-    var $form   = Aj.state.$form;
-    var $button = $(this);
-    var params = {
-      owner_id: Aj.state.ownerId,
-      ip_list:  $form.field('ip_list').value()
-    };
-    $button.prop('disabled', true);
-    Aj.apiRequest('saveApiSettings', params, function(result) {
-      $button.prop('disabled', false);
-      if (result.error) {
-        if (result.field) {
-          var $field = $form.field(result.field);
-          if ($field.size()) {
-            Ads.showFieldError($field, result.error, true);
-            return false;
-          }
-        }
-        return showAlert(result.error);
-      }
-      if (result.new_ip_list) {
-        $form.field('ip_list').value(result.new_ip_list).updateAutosize();
-      }
-      if (result.toast) {
-        showToast(result.toast);
-      }
     });
     return false;
   }
