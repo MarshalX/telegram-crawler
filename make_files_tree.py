@@ -534,6 +534,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
         sticker_set_short_names.add('PremiumGifts')
         sticker_set_short_names.add('StatusEmojiWhite')
     else:
+        sticker_set_short_names.add('UtyaDuckFull')
         sticker_set_short_names.add('GiftsPremium')
         sticker_set_short_names.add('StatusPack')
         sticker_set_short_names.add('RestrictedEmoji')
