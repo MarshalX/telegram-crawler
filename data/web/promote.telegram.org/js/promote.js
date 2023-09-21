@@ -1099,6 +1099,17 @@ var NewAd = {
     });
     return $previewPopup;
   },
+  isAudienceTargetOnly: function(len) {
+    if (!len.locations &&
+        !len.countries &&
+        !len.user_langs &&
+        !len.user_topics &&
+        !len.exclude_user_topics &&
+        len.audiences > 0) {
+      return true;
+    }
+    return false;
+  },
   updateAdTargetOverview: function() {
     var len = {}, lang_params = {}, need_outside_cb = false;
     var target_type = Aj.state.$form.field('target_type').value();
@@ -1163,7 +1174,8 @@ var NewAd = {
       }
       $('.js-exclude-outside').toggleClass('hide', !need_outside_cb);
     } else if (target_type == 'users') {
-      if (!len.locations && !len.countries) {
+      if (!len.locations && !len.countries && !(NewAd.isAudienceTargetOnly(len) &&
+         Aj.state.audienceTargetOnlyAvailable)) {
         overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
       } else {
         var user_targets = [];
