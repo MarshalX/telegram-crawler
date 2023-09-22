@@ -1226,6 +1226,7 @@ var NewAd = {
       $form.field('website_photo').value(),
       $form.field('ad_info').value(),
       $form.field('cpm').value(),
+      $form.field('views_per_user').value(),
       $form.field('budget').value(),
       $form.field('target_type').value()
     ];
@@ -1274,6 +1275,7 @@ var NewAd = {
     var website_photo = $form.field('website_photo').value();
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
+    var views_per_user = $form.field('views_per_user').value();
     var budget      = Ads.amountFieldValue($form, 'budget');
     var target_type = $form.field('target_type').value();
 
@@ -1306,6 +1308,7 @@ var NewAd = {
       website_photo: website_photo,
       ad_info: ad_info,
       cpm: cpm,
+      views_per_user: views_per_user,
       budget: budget,
       target_type: target_type
     };
@@ -1365,6 +1368,7 @@ var NewAd = {
     var website_photo = $form.field('website_photo').value();
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
+    var views_per_user = $form.field('views_per_user').value();
     var budget      = Ads.amountFieldValue($form, 'budget');
     var target_type = $form.field('target_type').value();
 
@@ -1381,6 +1385,7 @@ var NewAd = {
       website_photo: website_photo,
       ad_info: ad_info,
       cpm: cpm,
+      views_per_user: views_per_user,
       budget: budget,
       target_type: target_type
     };
@@ -2302,6 +2307,7 @@ var EditAd = {
       cont.on('change.curPage', '.js-promote-photo > .file-upload', NewAd.eUploadPromotePhoto);
       cont.on('click.curPage', '.edit-ad-btn', EditAd.eSubmitForm);
       cont.on('click.curPage', '.js-clone-ad-btn', EditAd.eCloneAd);
+      cont.on('click.curPage', '.js-send-to-review-btn', EditAd.eSendToReview);
       cont.on('click.curPage', '.delete-ad-btn', EditAd.deleteAd);
       cont.on('click.curPage', '.pr-form-select', EditAd.eSelectPlaceholder);
       state.titleField = state.$form.field('title');
@@ -2354,6 +2360,7 @@ var EditAd = {
       $form.field('website_name').value(),
       $form.field('website_photo').value(),
       $form.field('cpm').value(),
+      $form.field('views_per_user').value()
     ];
     return values.join('|');
   },
@@ -2702,6 +2709,7 @@ var EditAd = {
     var website_photo = $form.field('website_photo').value();
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
+    var views_per_user = $form.field('views_per_user').value();
 
     if (!title.length) {
       $form.field('title').focus();
@@ -2728,7 +2736,8 @@ var EditAd = {
       website_name: website_name,
       website_photo: website_photo,
       ad_info: ad_info,
-      cpm: cpm
+      cpm: cpm,
+      views_per_user: views_per_user
     };
     if ($form.field('picture').prop('checked')) {
       params.picture = 1;
@@ -2750,6 +2759,35 @@ var EditAd = {
       if (result.redirect_to) {
         Aj.location(result.redirect_to);
       }
+    });
+    return false;
+  },
+  eSendToReview: function(e) {
+    e.preventDefault();
+    var $button = $(this);
+    if ($button.prop('disabled')) {
+      return false;
+    }
+    var $item = $button.parents('li');
+    var ad_id = Aj.state.adId;
+    if ($item.size()) {
+      $item.parents('.open').find('.dropdown-toggle').dropdown('toggle');
+      ad_id = $(this).parents('[data-ad-id]').attr('data-ad-id');
+    }
+    var params = {
+      owner_id: Aj.state.ownerId,
+      ad_id: ad_id
+    };
+    $button.prop('disabled', true);
+    Aj.apiRequest('sendTargetToReview', params, function(result) {
+      $button.prop('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.toast) {
+        showToast(result.toast);
+      }
+      $button.parents('.pr-decline-block').slideHide('remove');
     });
     return false;
   },
