@@ -47,6 +47,7 @@
 <table class="table">
 <tbody>
 <tr>
+<td></td>
 <td><strong>in_seq_no</strong></td>
 <td><strong>out_seq_no</strong></td>
 </tr>
@@ -67,40 +68,41 @@
 <p>E.g., the first message the local client sends to any secret chat will have <strong>out_seq_no</strong> of <strong>0+x_out</strong>, the second one will have <strong>out_seq_no</strong> of <strong>2*1+x_out</strong>, and so on, where <strong>x_out</strong> is 0 if the chat was initiated by the remote client, 1 otherwise; similarly for the received messages, but there <strong>x_in</strong> is used instead of <strong>x_out</strong> and is equal to 0 if the chat was initiated by the local client, 1 otherwise. </p>
 </blockquote>
 <p>Raw sequence numbers will be used in the remaining part of this text, unless otherwise specified.</p>
-<h4><a class="anchor" href="#preventing-gaps" id="preventing-gaps" name="preventing-gaps"><i class="anchor-icon"></i></a>Preventing gaps</h4>
+<h4><a class="anchor" name="preventing-gaps" href="#preventing-gaps"><i class="anchor-icon"></i></a>Preventing gaps</h4>
 <p>Your client must ensure that all outgoing secret chat messages are queued on the server in the correct order. This is achieved by correctly placing them into the <a href="/method/invokeAfterMsgs">invokeAfterMsgs</a> chain. Failure to do this may result in gaps on the remote client, which may in turn lead to aborted secret chats. The local client must maintain the correct sequence of <strong>in_seq_no</strong> for the remote client. To achieve this, assign <strong>in_seq_no</strong> and <strong>out_seq_no</strong> to each message at the <em>exact</em> moment when the message is created, and never change them in the future.</p>
-<h2><a class="anchor" href="#security-checks" id="security-checks" name="security-checks"><i class="anchor-icon"></i></a>Security checks</h2>
-<h4><a class="anchor" href="#checking-out-seq-no" id="checking-out-seq-no" name="checking-out-seq-no"><i class="anchor-icon"></i></a>Checking out_seq_no</h4>
+<h2><a class="anchor" name="security-checks" href="#security-checks"><i class="anchor-icon"></i></a>Security checks</h2>
+<h4><a class="anchor" name="checking-out-seq-no" href="#checking-out-seq-no"><i class="anchor-icon"></i></a>Checking out_seq_no</h4>
 <p>Your client must check that it has received <em>each</em> message with the sequence number <strong>out_seq_no</strong> starting from 0 to some current point <strong>C</strong>. It should then expect the next message to have the sequence number <strong>out_seq_no=C+1</strong>. If the <strong>out_seq_no</strong> in the received message does not match this, the following needs to be done:</p>
 <ul>
 <li>If the received <strong>out_seq_no&lt;=C</strong>, the local client must drop the message (repeated message). The client should not check the contents of the message because the original message could have been deleted (see <a href="#deleting-unacknowledged-messages">Deleting unacknowledged messages</a>).</li>
 <li>If the received <strong>out_seq_no&gt;C+1</strong>, it most likely means that the server left out some messages due to a technical failure or due to the messages becoming obsolete. A temporary solution to this is to simply abort the secret chat. But since this may cause some existing older secret chats to be aborted, it is strongly recommended for the client to properly handle such <strong>seq_no</strong> gaps. Note that <strong>in_seq_no</strong> is not increased upon receipt of such a message; it is advanced only after all preceding gaps are filled.</li>
 </ul>
-<h4><a class="anchor" href="#proper-handling-of-gaps" id="proper-handling-of-gaps" name="proper-handling-of-gaps"><i class="anchor-icon"></i></a>Proper handling of gaps</h4>
-<p>In order to correctly handle incoming messages after a hole has been identified (when received <strong>out_seq_no&gt;C+1</strong>), it is necessary to put received messages with the wrong <strong>seq_no</strong> into a "waiting queue" on the local client, and to re-request the missing messages using the special constructor <a href="/constructor/decryptedMessageActionResend">decryptedMessageActionResend</a> <code>start_seq_no:<a href='/type/int'>int</a> end_seq_no:<a href='/type/int'>int</a> = <a href='/type/DecryptedMessageAction'>DecryptedMessageAction</a>;</code>. The sequence numbers used in this constructor must be ready for interpretation by the remote client and therefore <em>cannot</em> be in their raw form: you can easily get the necessary <strong>start_seq_no</strong> by adding 2 to the <strong>out_seq_no</strong> of the last message before the hole and the <strong>end_seq_no</strong> by subtracting 2 from the <strong>out_seq_no</strong> of the received message with the wrong sequence number.</p>
+<h4><a class="anchor" name="proper-handling-of-gaps" href="#proper-handling-of-gaps"><i class="anchor-icon"></i></a>Proper handling of gaps</h4>
+<p>In order to correctly handle incoming messages after a hole has been identified (when received <strong>out_seq_no&gt;C+1</strong>), it is necessary to put received messages with the wrong <strong>seq_no</strong> into a “waiting queue” on the local client, and to re-request the missing messages using the special constructor <a href="/constructor/decryptedMessageActionResend">decryptedMessageActionResend</a> <code>start_seq_no:int end_seq_no:int = DecryptedMessageAction;</code>. The sequence numbers used in this constructor must be ready for interpretation by the remote client and therefore <em>cannot</em> be in their raw form: you can easily get the necessary <strong>start_seq_no</strong> by adding 2 to the <strong>out_seq_no</strong> of the last message before the hole and the <strong>end_seq_no</strong> by subtracting 2 from the <strong>out_seq_no</strong> of the received message with the wrong sequence number.</p>
 <p>Each hole normally requires only one request to resend messages — if the remote client keeps sending out of sync messages, they should be put into the queue without sending a new request. Having received the missing messages, the local client must first interpret these messages in the right order by their <strong>seq_no</strong>. Once this is done, the client can proceed to interpret messages from the queue (again, in the right <strong>seq_no</strong> order).</p>
 <p>Special cases:</p>
 <ul>
 <li>Note that having <em>two</em> gaps simultaneously is very rare (provided that the remote client and server are operating normally) and it is acceptable to abort the secret chat in this situation.</li>
 <li>If a local client receives <a href="/constructor/decryptedMessageActionResend">decryptedMessageActionResend</a> but is unable to satisfy the request, it must abort the secret chat.</li>
 </ul>
-<h4><a class="anchor" href="#avoiding-concurrent-gaps" id="avoiding-concurrent-gaps" name="avoiding-concurrent-gaps"><i class="anchor-icon"></i></a>Avoiding concurrent gaps</h4>
+<h4><a class="anchor" name="avoiding-concurrent-gaps" href="#avoiding-concurrent-gaps"><i class="anchor-icon"></i></a>Avoiding concurrent gaps</h4>
 <p>In order to avoid getting stuck with concurrent gaps on both sides, <a href="/constructor/decryptedMessageActionResend">decryptedMessageActionResend</a> must always be interpreted <em>immediately upon receipt</em> in all cases, even if its <strong>out_seq_no&gt;=C+1</strong>. Note that each <a href="/constructor/decryptedMessageActionResend">decryptedMessageActionResend</a> must only be handled once, it must not be interpreted again when we interpret messages in the queue.</p>
-<h4><a class="anchor" href="#checking-and-handling-in-seq-no" id="checking-and-handling-in-seq-no" name="checking-and-handling-in-seq-no"><i class="anchor-icon"></i></a>Checking and handling in_seq_no</h4>
+<h4><a class="anchor" name="checking-and-handling-in-seq-no" href="#checking-and-handling-in-seq-no"><i class="anchor-icon"></i></a>Checking and handling in_seq_no</h4>
 <p><strong>in_seq_no</strong> of all received messages must be <em>valid</em>. To ensure this, perform the following checks:</p>
 <ul>
 <li><strong>in_seq_no</strong> must form a non-decreasing sequence of non-negative integer numbers.</li>
-<li><strong>in_seq_no</strong> must be valid at the moment of receiving the message, that is, if <strong>D</strong> is the <strong>out_seq_no</strong> of last message we sent, the received <strong>in_seq_no</strong> should not be greater than <strong>D + 1</strong>. This also allows us to insert the received message into its correct place in the secret chat. For example, imagine that the local client has sent 5 secret chat messages, and then receives a secret chat message with the text "Yes" and <strong>in_seq_no=2</strong>. In this situation the local client <em>must</em> place that message after the second message it sent. This makes manipulations with delayed messages impossible.</li>
+<li><strong>in_seq_no</strong> must be valid at the moment of receiving the message, that is, if <strong>D</strong> is the <strong>out_seq_no</strong> of last message we sent, the received <strong>in_seq_no</strong> should not be greater than <strong>D + 1</strong>. This also allows us to insert the received message into its correct place in the secret chat. For example, imagine that the local client has sent 5 secret chat messages, and then receives a secret chat message with the text “Yes” and <strong>in_seq_no=2</strong>. In this situation the local client <em>must</em> place that message after the second message it sent. This makes manipulations with delayed messages impossible.</li>
 </ul>
 <p>If <code>in_seq_no</code> contradicts these criteria, the local client is required to immediately abort the secret chat. This could happen only in case of malicious or buggy behaviour on either server or remote client side.</p>
-<h4><a class="anchor" href="#deleting-unacknowledged-messages" id="deleting-unacknowledged-messages" name="deleting-unacknowledged-messages"><i class="anchor-icon"></i></a>Deleting unacknowledged messages</h4>
+<h4><a class="anchor" name="deleting-unacknowledged-messages" href="#deleting-unacknowledged-messages"><i class="anchor-icon"></i></a>Deleting unacknowledged messages</h4>
 <p>In case the user on the local client has deleted a message <em>before</em> the server (or the remote client, if <a href="/constructor/decryptedMessageActionResend">decryptedMessageActionResend</a> is handled correctly) could acknowledge the message, for security reasons, you must:</p>
 <ul>
 <li>securely destroy the contents of the message (as in case of any other deleted Secret Chat message);</li>
 <li>change the local copy of the original message to <code>decryptedMessageActionDeleteMessages</code> with <strong>random_id</strong> equal to its own <strong>random_id</strong>;</li>
 <li>create a new outgoing message deleting the original message.</li>
 </ul>
-<p>This must be done because your client doesn't know whether the remote client really received the message or not. In the case the message was already received, it will be deleted by the second message; otherwise it must arrive as a "self-delete" message to maintain the correct sequence of seq_no.</p></div>
+<p>This must be done because your client doesn&#39;t know whether the remote client really received the message or not. In the case the message was already received, it will be deleted by the second message; otherwise it must arrive as a “self-delete” message to maintain the correct sequence of seq_no.</p>
+</div>
   
 </div>
           
