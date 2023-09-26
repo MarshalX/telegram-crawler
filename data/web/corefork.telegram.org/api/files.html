@@ -88,7 +88,9 @@
 <p>Note that the limit of uploadable file parts does not account for the <strong>part_size</strong>: thus the total file size limit can only be reached with the biggest possible <strong>part_size</strong> of 512KB, which is actually the recommended <strong>part_size</strong> to avoid excessive protocol overhead.  </p>
 <p>Each part should have a sequence number, <strong>file_part</strong>, with a value ranging from 0 to the value of the appropriate config parameter minus 1.  </p>
 <p>After the file has been partitioned you need to choose a method for saving it on the server. Use <a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> in case the full size of the file is more than <strong>10 MB</strong> and <a href="/method/upload.saveFilePart">upload.saveFilePart</a> for smaller files.</p>
-<p>Each call saves a portion of the data in a temporary location on the server to be used later. The storage life of each portion of data is between several minutes and several hours (depending on how busy the storage area is). After this time, the file part will become unavailable. To increase the time efficiency of a file save operation, we recommend using a call queue, so X pieces of the file are being saved at any given moment in time. Each successful operation to save a part invokes the method call to save the next part. The value of X can be tuned to achieve maximum performance.</p>
+<p>Each call saves a portion of the data in a temporary location on the server to be used later. The storage life of each portion of data is between several minutes and several hours (depending on how busy the storage area is). After this time, the file part will become unavailable.  </p>
+<p>To increase the time efficiency of a file save operation, we recommend using a call queue, so X pieces of the file are being saved at any given moment in time. Each successful operation to save a part invokes the method call to save the next part. The value of X can be tuned to achieve maximum performance.</p>
+<p>To further increase performance, multiple parallel call queues (i.e. a tunable number Y of queues) linked to separate TCP connections to the datacenters can be used to upload multiple chunks in parallel.  </p>
 <p>When using one of the methods mentioned above to save file parts, one of the following <a href="/api/errors#400-bad-request">data input errors</a> may be returned:</p>
 <ul>
 <li>FILE_PARTS_INVALID - Invalid number of parts. The value is not between <code>1..upload_max_fileparts_*</code></li>
@@ -110,6 +112,19 @@ After the entire file is successfully saved, the final method may be called and 
 <li>FILE_PARTS_INVALID: The number of file parts is invalid The value is not between 1 and <code>upload_max_fileparts_*</code>.</li>
 <li>FILE_PART_X_MISSING: Part X (where X is a number) of the file is missing from storage. Try repeating the method call to resave the part.</li>
 <li>MD5_CHECKSUM_INVALID: The file's MD5 checksum did not match the <strong>md5_checksum</strong> parameter</li>
+</ul>
+<h4><a class="anchor" href="#streamed-uploads" id="streamed-uploads" name="streamed-uploads"><i class="anchor-icon"></i></a>Streamed uploads</h4>
+<p>The API also supports streamed uploads, in cases where the length of the file is not known before starting the upload.  </p>
+<p>This is useful for example when converting a video, to avoid buffering the entire converted video on the filesystem, each part is uploaded immediately as soon as it is produced by the encoder.  </p>
+<p>Everything works similarly to <a href="#uploading-files">normal uploads</a>, with a few key differences:</p>
+<ul>
+<li>The client buffers up to <code>part_size</code> bytes before immediately uploading the part as described <a href="#uploading-files">in the previous section</a>.  </li>
+<li><a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> must always be used, even if the stream turns out to be smaller than 10MB.  </li>
+<li>The <code>file_total_parts</code> field must be set to <code>-1</code> for all parts except for the last one, using the following logic:<ul>
+<li>If the stream ends and the length of the buffered part is bigger than 0, upload it, setting <code>file_total_parts=ceil(totalFileSize/partSize)</code> (like for normal uploads)</li>
+<li>If the stream ends and the length of the buffered part is equal to 0, upload one more empty part (<code>strlen(bytes)=0</code>), setting <code>file_total_parts=ceil(totalFileSize/partSize)</code> (like for normal uploads)</li>
+</ul>
+</li>
 </ul>
 <h4><a class="anchor" href="#albums-grouped-media" id="albums-grouped-media" name="albums-grouped-media"><i class="anchor-icon"></i></a>Albums, grouped media</h4>
 <pre><code><a href='/constructor/inputMediaUploadedPhoto'>inputMediaUploadedPhoto</a>#1e287d04 flags:<a href='/type/%23'>#</a> spoiler:flags.2?<a href='/constructor/true'>true</a> file:<a href='/type/InputFile'>InputFile</a> stickers:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputDocument'>InputDocument</a>&gt; ttl_seconds:flags.1?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
