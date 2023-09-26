@@ -118,11 +118,12 @@ After the entire file is successfully saved, the final method may be called and 
 <p>This is useful for example when converting a video, to avoid buffering the entire converted video on the filesystem, each part is uploaded immediately as soon as it is produced by the encoder.  </p>
 <p>Everything works similarly to <a href="#uploading-files">normal uploads</a>, with a few key differences:</p>
 <ul>
-<li>The client buffers <code>part_size</code> bytes (or less if the stream ends) before immediately uploading the part as described <a href="#uploading-files">in the previous section</a>.  </li>
+<li>The client buffers <code>part_size</code> bytes (or less if the stream ends) before immediately uploading the part as described <a href="#uploading-files">in the previous section</a>.</li>
+<li>A <code>total_stream_size</code> variable must be used to keep track of the total number of bytes read from the stream.</li>
 <li><a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> must always be used, even if the stream turns out to be smaller than 10MB.  </li>
 <li>The <code>file_total_parts</code> field must be set to <code>-1</code> for all parts except for the last one, using the following logic:<ul>
-<li>If the stream ends and the length of the buffered part is bigger than 0, upload it, setting <code>file_total_parts=ceil(totalFileSize/partSize)</code> (like for normal uploads)</li>
-<li>If the stream ends and the length of the buffered part is equal to 0, upload one more empty part, setting <code>file_total_parts=ceil(totalFileSize/partSize)</code> (like for normal uploads)</li>
+<li>If the stream ends and the length of the buffered part is bigger than 0, upload it, setting <code>file_total_parts=ceil(total_stream_size/part_size)</code> (like for normal uploads)</li>
+<li>If the stream ends and the length of the buffered part is equal to 0, upload it anyway (upload an empty part), setting <code>file_total_parts=ceil(total_stream_size/part_size)</code> (like for normal uploads)</li>
 </ul>
 </li>
 </ul>
