@@ -1235,7 +1235,7 @@ var NewAd = {
     }
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
-      var vals = $form.field(selectData.field).data('value');
+      var vals = $form.field(selectData.field).data('value') || [];
       values.push(vals.join(';'));
     }
     if ($form.field('exclude_politic').prop('checked')) {
@@ -1317,7 +1317,7 @@ var NewAd = {
     }
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
-      var values = $form.field(selectData.field).data('value');
+      var values = $form.field(selectData.field).data('value') || [];
       params[selectData.field] = values.join(';');
     }
     if ($form.field('exclude_politic').prop('checked')) {
@@ -1394,7 +1394,7 @@ var NewAd = {
     }
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
-      var values = $form.field(selectData.field).data('value');
+      var values = $form.field(selectData.field).data('value') || [];
       params[selectData.field] = values.join(';');
     }
     if ($form.field('exclude_politic').prop('checked')) {
