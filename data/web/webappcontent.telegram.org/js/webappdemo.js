@@ -3,6 +3,7 @@ var DemoApp = {
   initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
   MainButton: Telegram.WebApp.MainButton,
   BackButton: Telegram.WebApp.BackButton,
+  SettingsButton: Telegram.WebApp.SettingsButton,
 
   init: function(options) {
     $('body').css('visibility', '');
@@ -14,7 +15,7 @@ var DemoApp = {
     Telegram.WebApp.BackButton.onClick(function() {
       DemoApp.showAlert('Back button pressed');
     });
-    Telegram.WebApp.onEvent('settingsButtonClicked', function() {
+    Telegram.WebApp.SettingsButton.onClick(function() {
       DemoApp.showAlert('Settings opened!');
     });
   },
@@ -303,6 +304,15 @@ var DemoApp = {
     } else {
       DemoApp.BackButton.show();
       el.innerHTML = 'Hide Back Button';
+    }
+  },
+  toggleSettingsButton: function(el) {
+    if (DemoApp.SettingsButton.isVisible) {
+      DemoApp.SettingsButton.hide();
+      el.innerHTML = 'Show Settings Button';
+    } else {
+      DemoApp.SettingsButton.show();
+      el.innerHTML = 'Hide Settings Button';
     }
   },
   showAlert: function(message) {
