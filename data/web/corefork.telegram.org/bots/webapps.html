@@ -916,8 +916,8 @@
 <p>You can verify the integrity of the data received by comparing the received <em>hash</em> parameter with the hexadecimal representation of the <a href="https://en.wikipedia.org/wiki/Hash-based_message_authentication_code">HMAC-SHA-256</a> signature of the <strong>data-check-string</strong> with the secret key, which is the <a href="https://en.wikipedia.org/wiki/Hash-based_message_authentication_code">HMAC-SHA-256</a> signature of the <a href="/bots#creating-a-new-bot">bot's token</a> with the constant string <code>WebAppData</code> used as a key.</p>
 <p><strong>Data-check-string</strong> is a chain of all received fields, sorted alphabetically, in the format <code>key=&lt;value&gt;</code> with a <a href="https://en.wikipedia.org/wiki/Newline">line feed</a> character ('\n', 0x0A) used as separator – e.g., <code>'auth_date=&lt;auth_date&gt;\nquery_id=&lt;query_id&gt;\nuser=&lt;user&gt;'</code>.</p>
 <p>The full check might look like:</p>
-<pre><code>data_check_string = ...
-<a href='/constructor/secret_key'>secret_key</a> = <a href='/type/HMAC_SHA256%28%3Cbot_token%26gt'>HMAC_SHA256(<bot_token&gt</a>;, "WebAppData")
+<pre><code>data_check_string := ...
+secret_key := HMAC_SHA256(&lt;bot_token&gt;, "WebAppData")
 if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
   // data is from Telegram
 }</code></pre>
