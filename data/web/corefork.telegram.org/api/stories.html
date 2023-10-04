@@ -45,7 +45,24 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Telegram users and channels can easily post and view <a href="https://telegram.org/blog/stories">stories</a> through the API.</p>
-<h2><a class="anchor" href="#posting-stories" id="posting-stories" name="posting-stories"><i class="anchor-icon"></i></a>Posting stories</h2></div>
+<h2><a class="anchor" href="#posting-stories" id="posting-stories" name="posting-stories"><i class="anchor-icon"></i></a>Posting stories</h2>
+<h2><a class="anchor" href="#stealth-mode" id="stealth-mode" name="stealth-mode"><i class="anchor-icon"></i></a>Stealth mode</h2>
+<p><a href="/api/premium">Premium users</a> may enable <a href="https://telegram.org/tour/stories#stealth-mode">stealth mode</a>, erasing their views from any stories they opened in the past <a href="/api/config#stories-stealth-past-period"><code>stories_stealth_past_period</code> seconds »</a>, and hiding their views on stories for the next <a href="/api/config#stories-stealth-future-period"><code>stories_stealth_future_period</code> seconds »</a>, as specified by the <a href="/api/config#client-configuration">client configuration »</a>.</p>
+<p>Schema:</p>
+<pre><code><a href='/constructor/storiesStealthMode'>storiesStealthMode</a>#712e27fd flags:<a href='/type/%23'>#</a> active_until_date:flags.0?<a href='/type/int'>int</a> cooldown_until_date:flags.1?<a href='/type/int'>int</a> = <a href='/type/StoriesStealthMode'>StoriesStealthMode</a>;
+
+<a href='/constructor/updateStoriesStealthMode'>updateStoriesStealthMode</a>#2c084dc1 stealth_mode:<a href='/type/StoriesStealthMode'>StoriesStealthMode</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/stories.activateStealthMode'>stories.activateStealthMode</a>#57bbd166 flags:<a href='/type/%23'>#</a> past:flags.0?<a href='/constructor/true'>true</a> future:flags.1?<a href='/constructor/true'>true</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Invoke <a href="/method/stories.activateStealthMode">stories.activateStealthMode</a> to activate stealth mode, passing the <code>past</code> flag to erase views from any stories opened in the past <a href="/api/config#stories-stealth-past-period"><code>stories_stealth_past_period</code> seconds »</a> and/or the <code>future</code> flag to hide future story views for the next <a href="/api/config#stories-stealth-future-period"><code>stories_stealth_future_period</code> seconds »</a>.  </p>
+<p>Clients can only invoke this method every <a href="/api/config#stories-stealth-cooldown-period"><code>stories_stealth_cooldown_period</code> seconds</a> as specified by the <a href="/api/config#client-configuration">client configuration</a>: invoking the method before the cooldown period has expired will trigger a <code>FLOOD_WAIT_X</code> error, with <code>X</code> being the number of seconds left before the cooldown period expires.  </p>
+<p>An <a href="/constructor/updateStoriesStealthMode">updateStoriesStealthMode</a> constructor will be returned, containing the following fields:</p>
+<ul>
+<li><code>active_until_date</code> - the date up to which stealth mode will be active</li>
+<li><code>cooldown_until_date</code> - the date starting from which the user will be allowed to call <a href="/method/stories.activateStealthMode">stories.activateStealthMode</a> again; calling the method earlier will return a <code>FLOOD_WAIT_X</code> error as specified above.</li>
+</ul></div>
   
 </div>
           
