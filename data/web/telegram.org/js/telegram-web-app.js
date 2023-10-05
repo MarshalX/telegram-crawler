@@ -1174,17 +1174,62 @@
     }
   }
 
+  function getRequestedContact(callback, timeout) {
+    var reqTo, fallbackTo, reqDelay = 0;
+    var reqInvoke = function() {
+      invokeCustomMethod('getRequestedContact', {}, function(err, res) {
+        if (res && res.length) {
+          clearTimeout(fallbackTo);
+          callback(res);
+        } else {
+          reqDelay += 50;
+          reqTo = setTimeout(reqInvoke, reqDelay);
+        }
+      });
+    };
+    var fallbackInvoke = function() {
+      clearTimeout(reqTo);
+      callback('');
+    };
+    fallbackTo = setTimeout(fallbackInvoke, timeout);
+    reqInvoke();
+  }
+
   var WebAppContactRequested = false;
   function onPhoneRequested(eventType, eventData) {
     if (WebAppContactRequested) {
       var requestData = WebAppContactRequested;
       WebAppContactRequested = false;
-      if (requestData.callback) {
-        requestData.callback(eventData.status == 'sent');
-      }
-      receiveWebViewEvent('contactRequested', {
+      var requestSent = eventData.status == 'sent';
+      var webViewEvent = {
         status: eventData.status
-      });
+      };
+      if (requestSent) {
+        getRequestedContact(function(res) {
+          if (res && res.length) {
+            webViewEvent.response = res;
+            webViewEvent.responseUnsafe = Utils.urlParseQueryString(res);
+            for (var key in webViewEvent.responseUnsafe) {
+              var val = webViewEvent.responseUnsafe[key];
+              try {
+                if (val.substr(0, 1) == '{' && val.substr(-1) == '}' ||
+                    val.substr(0, 1) == '[' && val.substr(-1) == ']') {
+                  webViewEvent.responseUnsafe[key] = JSON.parse(val);
+                }
+              } catch (e) {}
+            }
+          }
+          if (requestData.callback) {
+            requestData.callback(requestSent, webViewEvent);
+          }
+          receiveWebViewEvent('contactRequested', webViewEvent);
+        }, 3000);
+      } else {
+        if (requestData.callback) {
+          requestData.callback(requestSent, webViewEvent);
+        }
+        receiveWebViewEvent('contactRequested', webViewEvent);
+      }
     }
   }
 

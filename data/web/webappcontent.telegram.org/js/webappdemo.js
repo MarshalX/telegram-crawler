@@ -190,9 +190,9 @@ var DemoApp = {
     });
   },
   requestPhoneNumber: function(el) {
-    Telegram.WebApp.requestContact(function(sent) {
+    Telegram.WebApp.requestContact(function(sent, event) {
       if (sent) {
-        $(el).next('span').text('(Phone number sent to the bot)').attr('class', 'ok');
+        $(el).next('span').text('(Phone number sent to the bot' + (event && event.responseUnsafe && event.responseUnsafe.contact && event.responseUnsafe.contact.phone_number ? ': +' + event.responseUnsafe.contact.phone_number : '') + ')').attr('class', 'ok');
       } else {
         $(el).next('span').html('(User declined this request)').attr('class', 'err');
       }
