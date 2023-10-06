@@ -46,6 +46,25 @@
 
 <p>Telegram users and channels can easily post and view <a href="https://telegram.org/blog/stories">stories</a> through the API.</p>
 <h2><a class="anchor" href="#posting-stories" id="posting-stories" name="posting-stories"><i class="anchor-icon"></i></a>Posting stories</h2>
+<p>Schema:</p>
+<pre><code><a href='/constructor/inputPeerSelf'>inputPeerSelf</a>#7da07ec9 = <a href='/type/InputPeer'>InputPeer</a>;
+<a href='/constructor/inputPeerChannel'>inputPeerChannel</a>#27bcbbfc channel_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputPeer'>InputPeer</a>;
+
+<a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
+<a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
+
+---functions---
+
+<a href='/method/stories.canSendStory'>stories.canSendStory</a>#c7dfdfdd peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/stories.sendStory'>stories.sendStory</a>#bcb73644 flags:<a href='/type/%23'>#</a> pinned:flags.2?<a href='/constructor/true'>true</a> noforwards:flags.4?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> media_areas:flags.5?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:flags.0?<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; random_id:<a href='/type/long'>long</a> period:flags.3?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/stories.editStory'>stories.editStory</a>#b583ba46 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> media:flags.0?<a href='/type/InputMedia'>InputMedia</a> media_areas:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:flags.1?<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; = <a href='/type/Updates'>Updates</a>;
+<a href='/method/stories.deleteStories'>stories.deleteStories</a>#ae59db5f peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
+<p>Before posting a story, clients should invoke <a href="/method/stories.canSendStory">stories.canSendStory</a>, to make sure </p>
+<p>This methods returns <a href="/constructor/boolTrue">boolTrue</a> only if:</p>
+<ul>
+<li>The current user can is an administrator of the channel; otherwise, a <code>CHAT_ADMIN_REQUIRED</code> error is returned.</li>
+<li>The current user has <a href="/constructor/chatAdminRights"><code>post_stories</code> admin rights</a>, and the </li>
+</ul>
 <h2><a class="anchor" href="#stealth-mode" id="stealth-mode" name="stealth-mode"><i class="anchor-icon"></i></a>Stealth mode</h2>
 <p><a href="/api/premium">Premium users</a> may enable <a href="https://telegram.org/tour/stories#stealth-mode">stealth mode</a>, erasing their views from any stories they opened in the past <a href="/api/config#stories-stealth-past-period"><code>stories_stealth_past_period</code> seconds »</a>, and hiding their views on stories for the next <a href="/api/config#stories-stealth-future-period"><code>stories_stealth_future_period</code> seconds »</a>, as specified by the <a href="/api/config#client-configuration">client configuration »</a>.</p>
 <p>Schema:</p>
@@ -62,7 +81,51 @@
 <ul>
 <li><code>active_until_date</code> - the date up to which stealth mode will be active</li>
 <li><code>cooldown_until_date</code> - the date starting from which the user will be allowed to call <a href="/method/stories.activateStealthMode">stories.activateStealthMode</a> again; calling the method earlier will return a <code>FLOOD_WAIT_X</code> error as specified above.</li>
-</ul></div>
+</ul>
+<h2><a class="anchor" href="#channel-stories" id="channel-stories" name="channel-stories"><i class="anchor-icon"></i></a>Channel stories</h2>
+<p>Telegram users can grant their favorite channels the ability to post <a href="/api/stories">stories</a> by giving them boosts. <a href="/api/premium">Telegram Premium</a> now includes one boost that can be assigned to any channel.</p>
+<h3><a class="anchor" href="#boosts" id="boosts" name="boosts"><i class="anchor-icon"></i></a>Boosts</h3>
+<p>Channels level up as they gain more boosts – and for each level, they can post 1 additional story per day to their subscribers' story feeds.  </p>
+<p>Schema:</p>
+<pre><code><a href='/constructor/stories.canApplyBoostOk'>stories.canApplyBoostOk</a>#c3173587 = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
+<a href='/constructor/stories.canApplyBoostReplace'>stories.canApplyBoostReplace</a>#712c4655 current_boost:<a href='/type/Peer'>Peer</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
+
+<a href='/constructor/statsPercentValue'>statsPercentValue</a>#cbce2fe0 part:<a href='/type/double'>double</a> total:<a href='/type/double'>double</a> = <a href='/type/StatsPercentValue'>StatsPercentValue</a>;
+<a href='/constructor/stories.boostsStatus'>stories.boostsStatus</a>#66ea1fef flags:<a href='/type/%23'>#</a> my_boost:flags.2?<a href='/constructor/true'>true</a> level:<a href='/type/int'>int</a> current_level_boosts:<a href='/type/int'>int</a> boosts:<a href='/type/int'>int</a> next_level_boosts:flags.0?<a href='/type/int'>int</a> premium_audience:flags.1?<a href='/type/StatsPercentValue'>StatsPercentValue</a> = <a href='/type/stories.BoostsStatus'>stories.BoostsStatus</a>;
+
+<a href='/constructor/booster'>booster</a>#e9e6380 user_id:<a href='/type/long'>long</a> expires:<a href='/type/int'>int</a> = <a href='/type/Booster'>Booster</a>;
+
+<a href='/constructor/stories.boostersList'>stories.boostersList</a>#f3dd3d1d flags:<a href='/type/%23'>#</a> count:<a href='/type/int'>int</a> boosters:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Booster'>Booster</a>&gt; next_offset:flags.0?<a href='/type/string'>string</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.BoostersList'>stories.BoostersList</a>;
+
+---functions---
+
+<a href='/method/stories.canApplyBoost'>stories.canApplyBoost</a>#db05c1bd peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
+<a href='/method/stories.applyBoost'>stories.applyBoost</a>#f29d7c2b peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/stories.getBoostsStatus'>stories.getBoostsStatus</a>#4c449472 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.BoostsStatus'>stories.BoostsStatus</a>;
+
+<a href='/method/stories.getBoostersList'>stories.getBoostersList</a>#337ef980 peer:<a href='/type/InputPeer'>InputPeer</a> offset:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.BoostersList'>stories.BoostersList</a>;</code></pre>
+<p>Use <a href="/method/stories.applyBoost">stories.applyBoost</a> to boost a channel: before invoking this method, however, make sure to invoke <a href="/method/stories.canApplyBoost">stories.canApplyBoost</a> to check if a given channel can be boosted.  </p>
+<p>A <code>PREMIUM_ACCOUNT_REQUIRED</code> error will be returned when calling any of the two methods if the current account does not have a <a href="/api/premium">Telegram Premium</a> subscription.<br>
+A <code>BOOST_NOT_MODIFIED</code> RPC error will be returned when calling any of the two methods if the user is already boosting the specified channel.  </p>
+<p>Furthermore, the result of <a href="/method/stories.canApplyBoost">stories.canApplyBoost</a> can be:</p>
+<ul>
+<li><a href="/constructor/stories.canApplyBoostOk">stories.canApplyBoostOk</a> if the current user isn't boosting any channel, and can boost the specified channel.  </li>
+<li><a href="/constructor/stories.canApplyBoostReplace">stories.canApplyBoostReplace</a> if the user is already boosting another channel, containing the channel that the user is currently boosting.  </li>
+</ul>
+<p>After boosting a channel, the user may not change their boosted channel for a certain cooldown period: if the cooldown period isn't over yet, calls to any of the two methods will return a 420 <code>FLOOD_WAIT_X</code> error, indicating the number of seconds left before a different channel can be boosted.  </p>
+<p>Users may also invoke <a href="/method/stories.getBoostsStatus">stories.getBoostsStatus</a>, to get the current boost status of a channel as a <a href="/constructor/stories.boostsStatus">stories.boostsStatus</a> constructor, check out the <a href="/constructor/stories.boostsStatus">constructor page</a> for more info.</p>
+<p>Channel administrators may invoke <a href="/method/stories.getBoostersList">stories.getBoostersList</a> to fetch the list of users currently boosting the channel.</p>
+<h3><a class="anchor" href="#posting-stories-as-a-channel" id="posting-stories-as-a-channel" name="posting-stories-as-a-channel"><i class="anchor-icon"></i></a>Posting stories as a channel</h3>
+<pre><code><a href='/constructor/inputPeerChannel'>inputPeerChannel</a>#27bcbbfc channel_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputPeer'>InputPeer</a>;
+
+---functions---
+
+<a href='/method/stories.canSendStory'>stories.canSendStory</a>#c7dfdfdd peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/stories.sendStory'>stories.sendStory</a>#bcb73644 flags:<a href='/type/%23'>#</a> pinned:flags.2?<a href='/constructor/true'>true</a> noforwards:flags.4?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> media_areas:flags.5?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:flags.0?<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; random_id:<a href='/type/long'>long</a> period:flags.3?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/stories.editStory'>stories.editStory</a>#b583ba46 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> media:flags.0?<a href='/type/InputMedia'>InputMedia</a> media_areas:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:flags.1?<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; = <a href='/type/Updates'>Updates</a>;
+<a href='/method/stories.deleteStories'>stories.deleteStories</a>#ae59db5f peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
+<p>Everything works exactly the same as when <a href="#posting-stories">posting stories as a user</a>, with the only difference that clients should pass the appropriate <a href="/constructor/inputPeerChannel">inputPeerChannel</a> instead of <a href="/constructor/inputPeerSelf">inputPeerSelf</a> to <a href="/method/stories.canSendStory">stories.canSendStory</a>, <a href="/method/stories.sendStory">stories.sendStory</a> and all the other story methods, see the <a href="#posting-stories">main documentation »</a> for more info.</p></div>
   
 </div>
           
