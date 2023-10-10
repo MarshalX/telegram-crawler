@@ -218,7 +218,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
 
     executable_path = os.path.join(client_folder_name, 'Telegram.app/Contents/MacOS/Telegram')
     process = await asyncio.create_subprocess_exec(
-        f'strings', '-n', '7', '--', executable_path, stdout=asyncio.subprocess.PIPE
+        f'strings', '-n', '7', '-arch', 'x86_64', '--', executable_path, stdout=asyncio.subprocess.PIPE
     )
 
     stdout = b''
