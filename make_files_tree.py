@@ -216,6 +216,37 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
         save_hash_only=True
     )
 
+    executable_path = os.path.join(client_folder_name, 'Telegram.app/Contents/MacOS/Telegram')
+    process = await asyncio.create_subprocess_exec(
+        f'strings', '-n', '7', '--', executable_path, stdout=asyncio.subprocess.PIPE
+    )
+
+    stdout = b''
+    while process.returncode is None:
+        stdout_part = await process.stdout.read(1024)
+        if not stdout_part:
+            break
+
+        stdout += stdout_part
+
+    if process.returncode != 0:
+        cleanup2()
+        return
+
+    import string
+    binary_strings = stdout.decode('utf-8').split('\n')
+    special_chars = list(string.punctuation)
+    valid_strings = []
+    for string in binary_strings:
+        if sum([1 for char in string if char in special_chars]) > 5:
+            continue
+
+        valid_strings.append(string.strip())
+
+    valid_strings = sorted(list(set(valid_strings)))
+    with open(os.path.join(crawled_data_folder, 'strings.txt'), 'w', encoding='utf-8') as f:
+        f.write('\n'.join(valid_strings))
+
     cleanup2()
 
 
