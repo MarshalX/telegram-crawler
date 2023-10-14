@@ -1091,9 +1091,6 @@ messageForwardOriginHiddenUser sender_name:string = MessageForwardOrigin;
 //@author_signature Original post author signature
 messageForwardOriginChannel chat_id:int53 message_id:int53 author_signature:string = MessageForwardOrigin;
 
-//@description The message was imported from an exported message history @sender_name Name of the sender
-messageForwardOriginMessageImport sender_name:string = MessageForwardOrigin;
-
 
 //@class ReactionType @description Describes type of message reaction
 
@@ -1112,6 +1109,11 @@ reactionTypeCustomEmoji custom_emoji_id:int64 = ReactionType;
 //@from_message_id For messages forwarded to the chat with the current user (Saved Messages), to the Replies bot chat, or to the channel's discussion group, the identifier of the original message from which the new message was forwarded last time; 0 if unknown
 messageForwardInfo origin:MessageForwardOrigin date:int32 public_service_announcement_type:string from_chat_id:int53 from_message_id:int53 = MessageForwardInfo;
 
+//@description Contains information about a message created with importMessages
+//@sender_name Name of the original sender
+//@date Point in time (Unix timestamp) when the message was originally sent
+messageImportInfo sender_name:string date:int32 = MessageImportInfo;
+
 //@description Contains information about replies to a message
 //@reply_count Number of times the message was directly or indirectly replied
 //@recent_replier_ids Identifiers of at most 3 recent repliers to the message; available in channels with a discussion supergroup. The users and chats are expected to be inaccessible: only their photo and name will be available
@@ -1124,8 +1126,10 @@ messageReplyInfo reply_count:int32 recent_replier_ids:vector<MessageSender> last
 //@type Type of the reaction
 //@total_count Number of times the reaction was added
 //@is_chosen True, if the reaction is chosen by the current user
+//@used_sender_id Identifier of the message sender used by the current user to add the reaction; null if unknown or the reaction isn't chosen
 //@recent_sender_ids Identifiers of at most 3 recent message senders, added the reaction; available in private, basic group and supergroup chats
-messageReaction type:ReactionType total_count:int32 is_chosen:Bool recent_sender_ids:vector<MessageSender> = MessageReaction;
+messageReaction type:ReactionType total_count:int32 is_chosen:Bool used_sender_id:MessageSender recent_sender_ids:vector<MessageSender> = MessageReaction;
+
 
 //@description Contains information about interactions with a message
 //@view_count Number of times the message was viewed
@@ -1191,6 +1195,7 @@ messageReplyToStory story_sender_chat_id:int53 story_id:int32 = MessageReplyTo;
 //@date Point in time (Unix timestamp) when the message was sent
 //@edit_date Point in time (Unix timestamp) when the message was last edited
 //@forward_info Information about the initial message sender; may be null if none or unknown
+//@import_info Information about the initial message for messages created with importMessages; may be null if the message isn't imported
 //@interaction_info Information about interactions with the message; may be null if none
 //@unread_reactions Information about unread reactions added to the message
 //@reply_to Information about the message or the story this message is replying to; may be null if none
@@ -1204,7 +1209,7 @@ messageReplyToStory story_sender_chat_id:int53 story_id:int32 = MessageReplyTo;
 //@restriction_reason If non-empty, contains a human-readable description of the reason why access to this message must be restricted
 //@content Content of the message
 //@reply_markup Reply markup for the message; may be null if none
-message id:int53 sender_id:MessageSender chat_id:int53 sending_state:MessageSendingState scheduling_state:MessageSchedulingState is_outgoing:Bool is_pinned:Bool can_be_edited:Bool can_be_forwarded:Bool can_be_saved:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_get_added_reactions:Bool can_get_statistics:Bool can_get_message_thread:Bool can_get_viewers:Bool can_get_media_timestamp_links:Bool can_report_reactions:Bool has_timestamped_media:Bool is_channel_post:Bool is_topic_message:Bool contains_unread_mention:Bool date:int32 edit_date:int32 forward_info:messageForwardInfo interaction_info:messageInteractionInfo unread_reactions:vector<unreadReaction> reply_to:MessageReplyTo message_thread_id:int53 self_destruct_type:MessageSelfDestructType self_destruct_in:double auto_delete_in:double via_bot_user_id:int53 author_signature:string media_album_id:int64 restriction_reason:string content:MessageContent reply_markup:ReplyMarkup = Message;
+message id:int53 sender_id:MessageSender chat_id:int53 sending_state:MessageSendingState scheduling_state:MessageSchedulingState is_outgoing:Bool is_pinned:Bool can_be_edited:Bool can_be_forwarded:Bool can_be_saved:Bool can_be_deleted_only_for_self:Bool can_be_deleted_for_all_users:Bool can_get_added_reactions:Bool can_get_statistics:Bool can_get_message_thread:Bool can_get_viewers:Bool can_get_media_timestamp_links:Bool can_report_reactions:Bool has_timestamped_media:Bool is_channel_post:Bool is_topic_message:Bool contains_unread_mention:Bool date:int32 edit_date:int32 forward_info:messageForwardInfo import_info:messageImportInfo interaction_info:messageInteractionInfo unread_reactions:vector<unreadReaction> reply_to:MessageReplyTo message_thread_id:int53 self_destruct_type:MessageSelfDestructType self_destruct_in:double auto_delete_in:double via_bot_user_id:int53 author_signature:string media_album_id:int64 restriction_reason:string content:MessageContent reply_markup:ReplyMarkup = Message;
 
 //@description Contains a list of messages @total_count Approximate total number of messages found @messages List of messages; messages may be null
 messages total_count:int32 messages:vector<message> = Messages;
@@ -2722,13 +2727,8 @@ messageUserShared user_id:int53 button_id:int32 = MessageContent;
 //@description The current user shared a chat, which was requested by the bot @chat_id Identifier of the shared chat @button_id Identifier of the keyboard button with the request
 messageChatShared chat_id:int53 button_id:int32 = MessageContent;
 
-//@description The current user has connected a website by logging in using Telegram Login Widget on it @domain_name Domain name of the connected website
-messageWebsiteConnected domain_name:string = MessageContent;
-
-//@description The user allowed the bot to send messages
-//@web_app Information about the Web App, which requested the access; may be null if none or the Web App was opened from the attachment menu
-//@by_request True, if user allowed the bot to send messages by an explicit call to allowBotToSendMessages
-messageBotWriteAccessAllowed web_app:webApp by_request:Bool = MessageContent;
+//@description The user allowed the bot to send messages @reason The reason why the bot was allowed to write messages
+messageBotWriteAccessAllowed reason:BotWriteAccessAllowReason = MessageContent;
 
 //@description Data from a Web App has been sent to a bot @button_text Text of the keyboardButtonTypeWebApp button, which opened the Web App
 messageWebAppDataSent button_text:string = MessageContent;
@@ -3354,6 +3354,7 @@ chatActiveStories chat_id:int53 list:StoryList order:int53 max_read_story_id:int
 
 
 //@description Describes current boost status of a chat
+//@boost_url An HTTP URL, which can be used to boost the chat
 //@is_boosted True, if the current user has already boosted the chat
 //@level Current boost level of the chat
 //@boost_count The number of times the chat was boosted
@@ -3361,7 +3362,7 @@ chatActiveStories chat_id:int53 list:StoryList order:int53 max_read_story_id:int
 //@next_level_boost_count The number of boosts needed to reach the next level; 0 if the next level isn't available
 //@premium_member_count Approximate number of Telegram Premium subscribers joined the chat; always 0 if the current user isn't an administrator in the chat
 //@premium_member_percentage A percentage of Telegram Premium subscribers joined the chat; always 0 if the current user isn't an administrator in the chat
-chatBoostStatus is_boosted:Bool level:int32 boost_count:int32 current_level_boost_count:int32 next_level_boost_count:int32 premium_member_count:int32 premium_member_percentage:double = ChatBoostStatus;
+chatBoostStatus boost_url:string is_boosted:Bool level:int32 boost_count:int32 current_level_boost_count:int32 next_level_boost_count:int32 premium_member_count:int32 premium_member_percentage:double = ChatBoostStatus;
 
 //@description Describes a boost of a chat @user_id Identifier of a user that boosted the chat @expiration_date Point in time (Unix timestamp) when the boost will automatically expire if the user will not prolongate their Telegram Premium subscription
 chatBoost user_id:int53 expiration_date:int32 = ChatBoost;
@@ -3447,7 +3448,7 @@ callStateReady protocol:callProtocol servers:vector<callServer> config:string en
 callStateHangingUp = CallState;
 
 //@description The call has ended successfully
-//@reason The reason, why the call has ended
+//@reason The reason why the call has ended
 //@need_rating True, if the call rating must be sent to the server
 //@need_debug_information True, if the call debug information must be sent to the server
 //@need_log True, if the call log must be sent to the server
@@ -3598,8 +3599,12 @@ firebaseAuthenticationSettingsIos device_token:string is_app_sandbox:Bool = Fire
 phoneNumberAuthenticationSettings allow_flash_call:Bool allow_missed_call:Bool is_current_phone_number:Bool allow_sms_retriever_api:Bool firebase_authentication_settings:FirebaseAuthenticationSettings authentication_tokens:vector<string> = PhoneNumberAuthenticationSettings;
 
 
-//@description Represents a reaction applied to a message @type Type of the reaction @sender_id Identifier of the chat member, applied the reaction @date Point in time (Unix timestamp) when the reaction was added
-addedReaction type:ReactionType sender_id:MessageSender date:int32 = AddedReaction;
+//@description Represents a reaction applied to a message
+//@type Type of the reaction
+//@sender_id Identifier of the chat member, applied the reaction
+//@is_outgoing True, if the reaction was added by the current user
+//@date Point in time (Unix timestamp) when the reaction was added
+addedReaction type:ReactionType sender_id:MessageSender is_outgoing:Bool date:int32 = AddedReaction;
 
 //@description Represents a list of reactions added to a message @total_count The total number of found reactions @reactions The list of added reactions @next_offset The offset for the next request. If empty, there are no more results
 addedReactions total_count:int32 reactions:vector<addedReaction> next_offset:string = AddedReactions;
@@ -3696,6 +3701,21 @@ attachmentMenuBot bot_user_id:int53 supports_self_chat:Bool supports_user_chats:
 
 //@description Information about the message sent by answerWebAppQuery @inline_message_id Identifier of the sent inline message, if known
 sentWebAppMessage inline_message_id:string = SentWebAppMessage;
+
+
+//@class BotWriteAccessAllowReason @description Describes a reason why a bot was allowed to write messages to the current user
+
+//@description The user connected a website by logging in using Telegram Login Widget on it @domain_name Domain name of the connected website
+botWriteAccessAllowReasonConnectedWebsite domain_name:string = BotWriteAccessAllowReason;
+
+//@description The user added the bot to attachment or side menu using toggleBotIsAddedToAttachmentMenu
+botWriteAccessAllowReasonAddedToAttachmentMenu = BotWriteAccessAllowReason;
+
+//@description The user launched a Web App using getWebAppLinkUrl @web_app Information about the Web App
+botWriteAccessAllowReasonLaunchedWebApp web_app:webApp = BotWriteAccessAllowReason;
+
+//@description The user accepted bot's request to send messages with allowBotToSendMessages
+botWriteAccessAllowReasonAcceptedRequest = BotWriteAccessAllowReason;
 
 
 //@description Contains an HTTP URL @url The URL
