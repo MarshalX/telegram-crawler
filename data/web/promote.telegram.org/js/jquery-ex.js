@@ -1635,7 +1635,7 @@ function cleanHTML(value) {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, getBR());
 }
 function uncleanHTML(value) {
-  return $('<div>').html(value).text();
+  return $('<textarea>').html(value).val();
 }
 function cleanRE(value) {
   return value.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&");
