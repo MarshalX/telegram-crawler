@@ -147,7 +147,7 @@ var Main = {
       size = parseInt(size);
       while (this.scrollWidth > this.offsetWidth) {
         size -= 0.5;
-        if (size >= init_size * 0.75) {
+        if (size >= init_size * 0.65) {
           $(this).css('font-size', size + 'px');
         } else {
           break;
@@ -1563,6 +1563,29 @@ var MyBids = {
   }
 };
 
+var PremiumHistory = {
+  init: function() {
+    Aj.onLoad(function(state) {
+      $(document).on('click.curPage', '.js-load-more-rows', PremiumHistory.eLoadMoreRows);
+    });
+  },
+  eLoadMoreRows: function(e) {
+    e.preventDefault();
+    var $table    = $(this).closest('table');
+    var offset_id = $(this).attr('data-next-offset');
+    Aj.apiRequest('getPremiumHistory', {
+      type: Aj.state.type || '',
+      offset_id: offset_id
+    }, function(result) {
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      $('tbody', $table).append(result.body);
+      $('tfoot', $table).html(result.foot);
+    });
+  }
+};
+
 var Sessions = {
   init: function() {
     Aj.onLoad(function(state) {
@@ -1751,7 +1774,7 @@ var Premium = {
         }
         if (result.found.name) {
           var $form = Aj.state.$premiumSearchForm;
-          $form.field('query').value(result.found.name);
+          $form.field('query').value(uncleanHTML(result.found.name));
         }
         $form.toggleClass('myself', result.found.myself);
         $form.field('recipient').value(result.found.recipient);
@@ -1866,6 +1889,325 @@ var Premium = {
         return showAlert(result.error);
       }
       Aj.location('/premium');
+    });
+  }
+};
+
+var PremiumGiveaway = {
+  init: function() {
+    Aj.onLoad(function(state) {
+      var cont = Aj.ajContainer;
+      $(cont).on('click.curPage', '.js-another-giveaway-btn', PremiumGiveaway.eMoreGiveawayPremium);
+      $(cont).on('click.curPage', '.js-giveaway-premium-btn', PremiumGiveaway.eGiveawayPremium);
+      state.$giveawayPremiumPopup = $('.js-giveaway-premium-popup');
+      $(cont).on('submit.curPage', '.js-giveaway-premium-form', PremiumGiveaway.eGiveawayPremiumSubmit);
+      state.$giveawayPremiumForm = $('.js-giveaway-premium-form');
+      state.$premiumSearchField = $('.js-premium-search-field');
+      state.$premiumSearchForm = $('.js-premium-form');
+      state.$premiumSearchForm.on('submit', PremiumGiveaway.eSearchSubmit);
+      state.$premiumSearchForm.field('query').on('input', PremiumGiveaway.eSearchInput);
+      state.$premiumSearchForm.field('query').on('change', PremiumGiveaway.eSearchChange);
+      $('.js-form-clear', state.$premiumSearchForm).on('click', PremiumGiveaway.eSearchClear);
+      state.$premiumQuantityField = $('.js-premium-quantity-field');
+      state.$premiumSearchForm.field('quantity').on('change', PremiumGiveaway.eQuantityChanged);
+      state.$premiumSearchForm.on('change', '.js-premium-options input.radio', PremiumGiveaway.eRadioChanged);
+      state.$giveawayPremiumBtn = $('.js-giveaway-premium-btn');
+      state.curQuantity = state.$premiumSearchForm.field('quantity').value();
+      state.updLastReq = +Date.now();
+      if (state.needUpdate) {
+        state.updStateTo = setTimeout(PremiumGiveaway.updateState, Main.UPDATE_PERIOD);
+      }
+      $(cont).on('click.curPage', '.js-preview-sticker', function() {
+        RLottie.playUntilEnd(this);
+      });
+      $('.js-preview-sticker').each(function() {
+        RLottie.init(this, {playUntilEnd: true});
+      });
+      RLottie.init();
+    });
+    Aj.onUnload(function(state) {
+      clearTimeout(state.updStateTo);
+      state.needUpdate = false;
+      Main.destroyForm(state.$giveawayPremiumForm);
+      state.$premiumSearchForm.off('submit', PremiumGiveaway.eSearchSubmit);
+      state.$premiumSearchForm.field('query').off('input', PremiumGiveaway.eSearchInput);
+      state.$premiumSearchForm.field('query').on('change', PremiumGiveaway.eSearchChange);
+      $('.js-form-clear', state.$premiumSearchForm).off('click', PremiumGiveaway.eSearchClear);
+      state.$premiumSearchForm.field('quantity').off('change', PremiumGiveaway.eQuantityChanged);
+      state.$premiumSearchForm.off('change', '.js-premium-options input.radio', PremiumGiveaway.eRadioChanged);
+      state.$giveawayPremiumForm.off('change', 'input.checkbox', PremiumGiveaway.eCheckboxChanged);
+      $('.js-preview-sticker').each(function() {
+        RLottie.destroy(this);
+      });
+    });
+  },
+  updateState: function() {
+    var now = +Date.now();
+    if (document.hasFocus() ||
+        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
+      Aj.state.updLastReq = now;
+      Aj.apiRequest('updatePremiumGiveawayState', {
+        mode: Aj.state.mode,
+        lv: Aj.state.lastVer,
+        dh: Aj.state.lastDh,
+        quantity: Aj.state.curQuantity
+      }, function(result) {
+        if (result.mode) {
+          Aj.state.mode = result.mode;
+        }
+        if (result.html) {
+          PremiumGiveaway.updateContent(result.html);
+        } else {
+          if (result.history_html) {
+            PremiumGiveaway.updateHistory(result.history_html);
+          }
+          if (result.options_html) {
+            PremiumGiveaway.updateOptions(result.options_html);
+          }
+        }
+        if (result.lv) {
+          Aj.state.lastVer = result.lv;
+          if (Aj.state.$sentPopup) {
+            closePopup(Aj.state.$sentPopup);
+          }
+        }
+        if (result.dh) {
+          Aj.state.lastDh = result.dh;
+        }
+        if (Aj.state.needUpdate && result.need_update) {
+          Aj.state.updStateTo = setTimeout(PremiumGiveaway.updateState, Main.UPDATE_PERIOD);
+        }
+      });
+    } else {
+      if (Aj.state.needUpdate) {
+        Aj.state.updStateTo = setTimeout(PremiumGiveaway.updateState, Main.CHECK_PERIOD);
+      }
+    }
+  },
+  eSearchInput: function(e) {
+    var $field = Aj.state.$premiumSearchField;
+    $('.js-search-field-error').html('');
+    $field.removeClass('error');
+  },
+  eSearchChange: function(e) {
+    PremiumGiveaway.searchSubmit();
+  },
+  eSearchClear: function(e) {
+    var $form = Aj.state.$premiumSearchForm;
+    var $field = Aj.state.$premiumSearchField;
+    var $btn   = Aj.state.$giveawayPremiumBtn;
+    $form.field('recipient').value('');
+    $form.field('query').value('').prop('disabled', false);
+    $btn.prop('disabled', true);
+    $field.removeClass('found');
+    $('.js-search-field-error').html('');
+    $field.removeClass('error');
+    PremiumGiveaway.updateUrl();
+  },
+  eQuantityChanged: function() {
+    var $form  = Aj.state.$premiumSearchForm;
+    var quantity = +$form.field('quantity').value();
+    Aj.state.$premiumQuantityField.addClass('loading').removeClass('play').redraw().addClass('play');
+    Aj.apiRequest('updatePremiumGiveawayPrices', {
+      quantity: quantity
+    }, function(result) {
+      var $form  = Aj.state.$premiumSearchForm;
+      var $field = Aj.state.$premiumQuantityField;
+      var $btn   = Aj.state.$giveawayPremiumBtn;
+      if (result.error) {
+        $('.js-quantity-field-error').html(result.error);
+        $field.addClass('error').removeClass('found');
+        quantity = 0;
+      } else {
+        $('.js-quantity-field-error').html('');
+        $field.removeClass('error');
+      }
+      $('.js-boost-value').html(result.boosts);
+      if (result.button_label) {
+        $('.js-prepay-premium-label').html(result.button_label);
+      }
+      if (result.options_html) {
+        PremiumGiveaway.updateOptions(result.options_html);
+      }
+      if (result.dh) {
+        Aj.state.lastDh = result.dh;
+      }
+      if (quantity > 0 && $form.field('recipient').value()) {
+        $btn.prop('disabled', false);
+      } else {
+        $btn.prop('disabled', true);
+      }
+      Aj.state.curQuantity = quantity;
+      PremiumGiveaway.updateUrl();
+      Aj.state.$premiumQuantityField.removeClass('loading');
+    });
+  },
+  eRadioChanged: function() {
+    PremiumGiveaway.updateUrl();
+  },
+  eSearchSubmit: function(e) {
+    e.preventDefault();
+    PremiumGiveaway.searchSubmit();
+  },
+  searchSubmit: function() {
+    var $form  = Aj.state.$premiumSearchForm;
+    var recipient = $form.field('recipient').value();
+    var quantity = $form.field('quantity').value();
+    var query  = $form.field('query').value();
+    var months = $form.field('months').value();
+    if (!query.length) {
+      $form.field('query').focus();
+      return;
+    }
+    Aj.state.$premiumSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
+    Aj.showProgress();
+    Aj.apiRequest('searchPremiumGiveawayRecipient', {
+      query: recipient || query,
+      quantity: quantity,
+      months: months
+    }, function(result) {
+      Aj.hideProgress();
+      PremiumGiveaway.updateResult(result);
+      Aj.state.$premiumSearchField.removeClass('loading');
+    });
+  },
+  updateResult: function(result) {
+    var $form  = Aj.state.$premiumSearchForm;
+    var $field = Aj.state.$premiumSearchField;
+    var $btn   = Aj.state.$giveawayPremiumBtn;
+    if (result.error) {
+      $('.js-search-field-error').html(result.error);
+      $field.addClass('error').removeClass('found');
+      $form.field('query').prop('disabled', false);
+    } else {
+      $('.js-search-field-error').html('');
+      $field.removeClass('error');
+      if (result.found) {
+        if (result.found.photo) {
+          $('.js-premium-search-photo', $field).html(result.found.photo);
+        }
+        if (result.found.name) {
+          var $form = Aj.state.$premiumSearchForm;
+          $form.field('query').value(uncleanHTML(result.found.name));
+        }
+        $form.field('recipient').value(result.found.recipient);
+        $field.addClass('found');
+        $form.field('query').prop('disabled', true);
+        if (Aj.state.curQuantity > 0) {
+          $btn.prop('disabled', false);
+        } else {
+          $btn.prop('disabled', true);
+        }
+      } else {
+        $form.field('recipient').value('');
+        $field.removeClass('found');
+        $form.field('query').prop('disabled', false);
+        $btn.prop('disabled', true);
+      }
+    }
+    PremiumGiveaway.updateUrl();
+  },
+  updateUrl: function() {
+    var new_url = '';
+    var $form     = Aj.state.$premiumSearchForm;
+    var recipient = $form.field('recipient').value();
+    var quantity  = Aj.state.curQuantity;
+    var months    = $form.field('months').value();
+    if (recipient) {
+      new_url += '&recipient=' + encodeURIComponent(recipient);
+    }
+    if (quantity) {
+      new_url += '&quantity=' + encodeURIComponent(quantity);
+    }
+    if (months) {
+      new_url += '&months=' + encodeURIComponent(months);
+    }
+    if (new_url) {
+      new_url = '?' + new_url.substr(1);
+    }
+    var loc = Aj.location(), path = loc.pathname + loc.search;
+    Aj.setLocation(new_url, path != '/premium/giveaway');
+  },
+  updateOptions: function(html) {
+    var $form  = Aj.state.$premiumSearchForm;
+    var months = $form.field('months').value();
+    $('.js-premium-options').replaceWith(html);
+    $form.field('months').value(months);
+  },
+  updateHistory: function(html) {
+    $('.js-premium-history').replaceWith(html);
+  },
+  updateContent: function(html) {
+    $('.js-main-content').html(html).find('.js-preview-sticker').each(function() {
+      RLottie.init(this, {playUntilEnd: true});
+    });
+  },
+  eGiveawayPremium: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    var $form     = Aj.state.$premiumSearchForm;
+    var recipient = $form.field('recipient').value();
+    var quantity  = $form.field('quantity').value();
+    var months    = $form.field('months').value();
+    Aj.apiRequest('initGiveawayPremiumRequest', {
+      recipient: recipient,
+      quantity: quantity,
+      months: months
+    }, function(result) {
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      $('.js-giveaway-premium-content', Aj.state.$giveawayPremiumPopup).html(result.content);
+      $('.js-giveaway-premium-button', Aj.state.$giveawayPremiumPopup).html(result.button);
+      Aj.state.giveawayPrice = result.amount;
+      Aj.state.itemTitle = result.item_title;
+      Aj.state.$giveawayPremiumForm.field('id').value(result.req_id);
+      RLottie.WORKERS_LIMIT = 1;
+      openPopup(Aj.state.$giveawayPremiumPopup, {
+        onOpen: function() {
+          $('.js-preview-sticker').each(function() {
+            RLottie.init(this, {playUntilEnd: true});
+          });
+        },
+        onClose: function() {
+          $('.js-preview-sticker').each(function() {
+            RLottie.destroy(this);
+          });
+        }
+      });
+    });
+  },
+  eGiveawayPremiumSubmit: function(e) {
+    e.preventDefault();
+    var $form = $(this);
+    var item_title = Aj.state.itemTitle;
+    var req_id = $form.field('id').value();
+    closePopup(Aj.state.$giveawayPremiumPopup);
+    QR.showPopup({
+      request: {
+        method: 'getGiveawayPremiumLink',
+        params: {
+          id: req_id
+        }
+      },
+      title: l('WEB_POPUP_QR_GIVEAWAY_HEADER'),
+      description: l('WEB_POPUP_QR_GIVEAWAY_TEXT', {
+        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Aj.state.giveawayPrice + '</span>'
+      }),
+      qr_label: item_title,
+      tk_label: l('WEB_POPUP_QR_GIVEAWAY_TK_BUTTON'),
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS')
+    });
+    Aj.state.needUpdate = true;
+  },
+  eMoreGiveawayPremium: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    Aj.apiRequest('repeatPremiumGiveaway', {}, function(result) {
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      Aj.location('/premium/giveaway');
     });
   }
 };
