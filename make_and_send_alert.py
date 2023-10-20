@@ -121,6 +121,7 @@ async def send_telegram_alert(session: aiohttp.ClientSession, text: str, thread_
         'chat_id': CHAT_ID,
         'parse_mode': 'HTML',
         'text': text,
+        'disable_web_page_preview': 'True',
     }
     if thread_id:
         params['chat_id'] = FORUM_CHAT_ID
