@@ -5,6 +5,7 @@ import re
 from asyncio.exceptions import TimeoutError
 from html import unescape
 from time import time
+from typing import Set
 from urllib.parse import unquote
 
 import aiohttp
@@ -105,28 +106,25 @@ CRAWL_RULES = {
     'core.telegram.org': {
         'deny': {
             'bots/payments',
-
             'tdlib/docs/classtd',
-
             'validatedRequestedInfo',
+            'constructor/Updates',
         },
     },
     'corefork.telegram.org': {
         'deny': {
             'bots/payments',
-
             'tdlib/docs/classtd',
-
             'validatedRequestedInfo',
+            'constructor/Updates',
         },
     },
     'blogfork.telegram.org': {
         'deny': {
             'bots/payments',
-
             'tdlib/docs/classtd',
-
             'validatedRequestedInfo',
+            'constructor/Updates',
         },
     },
     'telegram.org': {
@@ -214,13 +212,13 @@ def should_exclude(url: str) -> bool:
     return exclude
 
 
-def find_absolute_links(html: str) -> set[str]:
+def find_absolute_links(html: str) -> Set[str]:
     absolute_links = set(re.findall(ABSOLUTE_LINK_REGEX, html))
 
     return {link for link in absolute_links if not should_exclude(link)}
 
 
-def find_relative_links(html: str, cur_link: str) -> set[str]:
+def find_relative_links(html: str, cur_link: str) -> Set[str]:
     matches = re.findall(DIRECT_LINK_REGEX, cur_link)
     if not matches:
         return set()
@@ -243,7 +241,7 @@ def find_relative_links(html: str, cur_link: str) -> set[str]:
     return relative_links
 
 
-def find_relative_scripts(code: str, cur_link: str) -> set[str]:
+def find_relative_scripts(code: str, cur_link: str) -> Set[str]:
     matches = re.findall(DIRECT_LINK_REGEX, cur_link)
     if not matches:
         return set()
@@ -265,7 +263,7 @@ def find_relative_scripts(code: str, cur_link: str) -> set[str]:
     return relative_links
 
 
-def cleanup_links(links: set[str]) -> set[str]:
+def cleanup_links(links: Set[str]) -> Set[str]:
     cleaned_links = set()
     for tmp_link in links:
         # normalize link
@@ -298,7 +296,7 @@ def cleanup_links(links: set[str]) -> set[str]:
     return cleaned_links
 
 
-def _is_x_content_type(content_types_set: set[str], content_type) -> bool:
+def _is_x_content_type(content_types_set: Set[str], content_type) -> bool:
     for match_content_type in content_types_set:
         if match_content_type in content_type:
             return True
@@ -421,7 +419,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
             logger.info(f'add {url} to LINKS_TO_TRACKABLE_RESOURCES (raw content)')
 
 
-async def start(url_list: set[str]):
+async def start(url_list: Set[str]):
     async with aiohttp.ClientSession(connector=CONNECTOR, headers=HEADERS) as session:
         await asyncio.gather(*[crawl(url, session) for url in url_list])
 

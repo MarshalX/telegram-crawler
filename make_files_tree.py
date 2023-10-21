@@ -747,6 +747,11 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
         content = re.sub(TON_RATE_REGEX, TON_RATE_TEMPLATE, content)
 
+        # there is a problem with the files with the same name (in the same path) but different case
+        # the content is random because of the async
+        # there is only one page with this problem, for now:
+        # - corefork.telegram.org/constructor/Updates
+        # - corefork.telegram.org/constructor/updates
         async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
             logger.info(f'Write to {filename}')
             await f.write(content)
