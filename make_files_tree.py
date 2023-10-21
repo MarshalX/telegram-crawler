@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import mimetypes
 import os
 import platform
 import random
@@ -709,8 +710,12 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         # sometimes it returns correct type. noice load balancing
         is_sucking_file = '/file/' in url and 'text' in response.content_type
 
-        # handle pure domains and html pages without ext in url
-        ext = '.html' if '.' not in url_parts[-1] or len(url_parts) == 1 else ''
+        # handle pure domains and html pages without ext in url as html do enable syntax highlighting
+        page_type, _ = mimetypes.guess_type(url)
+        if url.endswith('.tl'):
+            page_type = 'text/plain'
+
+        ext = '.html' if page_type is None or len(url_parts) == 1 else ''
 
         # I don't add ext by content type for images and so on cuz TG servers sucks.
         # Some servers do not return correct content type. Some servers do...
