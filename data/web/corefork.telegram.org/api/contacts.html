@@ -97,10 +97,15 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 <a href='/method/users.getFullUser'>users.getFullUser</a>#b60f5918 id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.UserFull'>users.UserFull</a>;
 
-<a href='/method/contacts.addContact'>contacts.addContact</a>#e8f463d0 flags:<a href='/type/%23'>#</a> add_phone_privacy_exception:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputUser'>InputUser</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> phone:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;
-<a href='/method/contacts.acceptContact'>contacts.acceptContact</a>#f831a20f id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<a href='/method/contacts.addContact'>contacts.addContact</a>#e8f463d0 flags:<a href='/type/%23'>#</a> add_phone_privacy_exception:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputUser'>InputUser</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> phone:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Telegram users may also be added to the contact list (even if we do not have access to their phone number!) using <a href="/method/contacts.addContact">contacts.addContact</a>.  </p>
-<p>Set the <code>add_phone_privacy_exception</code> flag if we wish to allow the other user to see our phone number: this flag <strong>must</strong> be set if the <code>need_contacts_exception</code> flag of [peerSettings] is set (see the <a href="/api/action-bar">action bar documentation »</a>).  </p>
+<p>Set the <code>add_phone_privacy_exception</code> flag if we wish to allow the other user to see our phone number: this flag <strong>must</strong> be set if the <code>need_contacts_exception</code> flag of [peerSettings] is set (see the <a href="/api/action-bar">action bar documentation for more info »</a>).  </p>
+<h2><a class="anchor" href="#share-our-phone-number" id="share-our-phone-number" name="share-our-phone-number"><i class="anchor-icon"></i></a>Share our phone number</h2>
+<pre><code>---functions---
+
+<a href='/method/contacts.acceptContact'>contacts.acceptContact</a>#f831a20f id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>This method is invoked if the user clicks on the add contact button in the <a href="/api/action-bar#add-contact">add contact chat bar</a>.  </p>
+<p>The bar is activated only if the other user has <a href="#adding-telegram-users-as-contacts">added us as a contact</a> using <a href="/method/contacts.addContact">contacts.addContact</a> without using a phone number, and none of the <code>add_contact</code>, <code>report_spam</code>, <code>block_contact</code> <a href="/api/action-bar">bar flags</a> are set, the <code>share_contact</code> flag are be set, indicating we can invoke <a href="/method/contacts.acceptContact">contacts.acceptContact</a> to share our phone number with the other user.  </p>
 <h2><a class="anchor" href="#fetching-the-contact-list" id="fetching-the-contact-list" name="fetching-the-contact-list"><i class="anchor-icon"></i></a>Fetching the contact list</h2>
 <p>Schema:</p>
 <pre><code><a href='/constructor/contact'>contact</a>#145ade0b user_id:<a href='/type/long'>long</a> mutual:<a href='/type/Bool'>Bool</a> = <a href='/type/Contact'>Contact</a>;
@@ -141,6 +146,7 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 ---functions---
 
 <a href='/method/contacts.search'>contacts.search</a>#11f812d8 q:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/contacts.Found'>contacts.Found</a>;</code></pre>
+<p>Use <a href="/method/contacts.search">contacts.search</a> to search within the contact list.  </p>
 <h2><a class="anchor" href="#deleting-contacts" id="deleting-contacts" name="deleting-contacts"><i class="anchor-icon"></i></a>Deleting contacts</h2>
 <p>Schema:</p>
 <pre><code>---functions---
