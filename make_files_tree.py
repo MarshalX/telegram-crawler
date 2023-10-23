@@ -99,9 +99,12 @@ async def download_file(url: str, path: str, session: aiohttp.ClientSession):
 async def get_download_link_of_latest_appcenter_release(parameterized_url: str, session: aiohttp.ClientSession):
     api_base = 'https://install.appcenter.ms/api/v0.1'
     base_url = f'{api_base}/{parameterized_url}'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/118.0',
+    }
 
     async def make_req(url):
-        async with session.get(url) as response:
+        async with session.get(url, headers=headers) as response:
             if response.status != 200:
                 return
 
