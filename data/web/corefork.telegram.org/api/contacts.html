@@ -100,6 +100,7 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 <a href='/method/contacts.addContact'>contacts.addContact</a>#e8f463d0 flags:<a href='/type/%23'>#</a> add_phone_privacy_exception:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputUser'>InputUser</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> phone:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Telegram users may also be added to the contact list (even if we do not have access to their phone number!) using <a href="/method/contacts.addContact">contacts.addContact</a>.  </p>
 <p>Set the <code>add_phone_privacy_exception</code> flag if we wish to allow the other user to see our phone number: this flag <strong>must</strong> be set if the <code>need_contacts_exception</code> flag of [peerSettings] is set (see the <a href="/api/action-bar">action bar documentation for more info »</a>).  </p>
+<p>The other user will be offered to also add us to the contact list via the <a href="/api/action-bar">add contact action bar</a>: if they accept, their phone number will be automatically added to our contact.  </p>
 <h2><a class="anchor" href="#share-our-phone-number" id="share-our-phone-number" name="share-our-phone-number"><i class="anchor-icon"></i></a>Share our phone number</h2>
 <pre><code>---functions---
 
@@ -121,7 +122,9 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 <a href='/method/contacts.getContacts'>contacts.getContacts</a>#5dd69e12 hash:<a href='/type/long'>long</a> = <a href='/type/contacts.Contacts'>contacts.Contacts</a>;
 
-<a href='/method/contacts.getSaved'>contacts.getSaved</a>#82f1e39f = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SavedContact'>SavedContact</a>&gt;;</code></pre>
+<a href='/method/contacts.getSaved'>contacts.getSaved</a>#82f1e39f = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SavedContact'>SavedContact</a>&gt;;
+
+<a href='/method/contacts.getContactIDs'>contacts.getContactIDs</a>#7adc669d hash:<a href='/type/long'>long</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
 <p>Use <a href="/method/contacts.getContacts">contacts.getContacts</a> to obtain all members of the contact list that have an associated Telegram account.  </p>
 <p>To obtain the <em>full</em> contact list, including contacts which do not have an associated Telegram account, use <a href="/method/contacts.getSaved">contacts.getSaved</a> in combination with a <a href="/api/takeout">takeout session »</a>.  </p>
 <h2><a class="anchor" href="#getting-contact-statuses" id="getting-contact-statuses" name="getting-contact-statuses"><i class="anchor-icon"></i></a>Getting contact statuses</h2>
@@ -153,23 +156,12 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 <a href='/method/contacts.deleteContacts'>contacts.deleteContacts</a>#96a0e00 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Updates'>Updates</a>;
 
-<a href='/method/contacts.deleteByPhones'>contacts.deleteByPhones</a>#1013fd9e phones:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/Bool'>Bool</a>;</code></pre>
+<a href='/method/contacts.deleteByPhones'>contacts.deleteByPhones</a>#1013fd9e phones:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/contacts.resetSaved'>contacts.resetSaved</a>#879537f1 = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p>Use <a href="/method/contacts.deleteContacts">contacts.deleteContacts</a> to delete contacts with an associated Telegram account; the returned <a href="/constructor/Updates">Updates</a> will contain updated user information.  </p>
-<p>Use <a href="/method/contacts.deleteByPhones">contacts.deleteByPhones</a> to delete contacts by their phone number, even if they don't have an associated Telegram account.</p>
-<h2><a class="anchor" href="#blocking-users" id="blocking-users" name="blocking-users"><i class="anchor-icon"></i></a>Blocking users</h2>
-<pre><code>---functions---
-
-<a href='/method/contacts.block'>contacts.block</a>#2e2e8734 flags:<a href='/type/%23'>#</a> my_stories_from:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/contacts.unblock'>contacts.unblock</a>#b550d328 flags:<a href='/type/%23'>#</a> my_stories_from:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/contacts.setBlocked'>contacts.setBlocked</a>#94c65c76 flags:<a href='/type/%23'>#</a> my_stories_from:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; limit:<a href='/type/int'>int</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/contacts.getBlocked'>contacts.getBlocked</a>#9a868f80 flags:<a href='/type/%23'>#</a> my_stories_from:flags.0?<a href='/constructor/true'>true</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/contacts.Blocked'>contacts.Blocked</a>;</code></pre>
-<h2><a class="anchor" href="#" id="" name=""><i class="anchor-icon"></i></a></h2>
-<pre><code>---functions---
-
-<a href='/method/contacts.getContactIDs'>contacts.getContactIDs</a>#7adc669d hash:<a href='/type/long'>long</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
-<a href='/method/contacts.resetSaved'>contacts.resetSaved</a>#879537f1 = <a href='/type/Bool'>Bool</a>;
-<a href='/method/contacts.getLocated'>contacts.getLocated</a>#d348bc44 flags:<a href='/type/%23'>#</a> background:flags.1?<a href='/constructor/true'>true</a> geo_point:<a href='/type/InputGeoPoint'>InputGeoPoint</a> self_expires:flags.0?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
-<a href='/method/contacts.blockFromReplies'>contacts.blockFromReplies</a>#29a8962c flags:<a href='/type/%23'>#</a> delete_message:flags.0?<a href='/constructor/true'>true</a> delete_history:flags.1?<a href='/constructor/true'>true</a> report_spam:flags.2?<a href='/constructor/true'>true</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;</code></pre></div>
+<p>Use <a href="/method/contacts.deleteByPhones">contacts.deleteByPhones</a> to delete contacts by their phone number, even if they don't have an associated Telegram account.  </p>
+<p>Use <a href="/method/contacts.resetSaved">contacts.resetSaved</a> to remove all contacts (both those with and without an associated Telegram account).</p></div>
   
 </div>
           
