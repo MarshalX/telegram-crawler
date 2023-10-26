@@ -86,18 +86,22 @@ Note that if any of the conditions changes in the period between the call to <a 
 <li><code>media</code>:  The story media.</li>
 <li><code>media_areas</code>: <a href="/api/stories#media-areas">Media areas</a> associated to the story, see <a href="/api/stories#media-areas">here »</a> for more info.</li>
 <li><code>privacy_rules</code>: A set of <a href="/api/privacy#privacy-rules">privacy rules »</a> for the story as an array of <a href="/type/InputPrivacyRule">InputPrivacyRule</a> constructors, indicating who can or can't view the story.</li>
-<li><code>expire</code>: Period after which the story is moved to archive (and <a href="#pinned-stories">to the profile</a> if <code>pinned</code> is set), in seconds; must be one of <code>6 * 3600</code>, <code>12 * 3600</code>, <code>86400</code>, or <code>2 * 86400</code> for Telegram Premium users, and <code>86400</code> otherwise.</li>
-<li><code>pinned</code>: Whether to also <a href="#pinned-stories">add the story to the profile</a> automatically upon expiration. If not set, the story will only be added to the archive. </li>
+<li><code>expire</code>: Period after which the story is moved to <a href="#pinnedarchived-stories">archive</a> (and <a href="#pinnedarchived-stories">to the profile</a> if <code>pinned</code> is set), in seconds; must be one of <code>6 * 3600</code>, <code>12 * 3600</code>, <code>86400</code>, or <code>2 * 86400</code> for Telegram Premium users, and <code>86400</code> otherwise.</li>
+<li><code>pinned</code>: Whether to also <a href="#pinned-stories">add the story to the profile</a> automatically upon expiration. If not set, the story will only be added to the <a href="#pinnedarchived-stories">archive</a>. </li>
 </ul>
 <p>A story may also be edited using <a href="/method/stories.editStory">stories.editStory</a>.  </p>
-<h3><a class="anchor" href="#pinned-stories" id="pinned-stories" name="pinned-stories"><i class="anchor-icon"></i></a>Pinned stories</h3>
-<pre><code>---functions---
+<h3><a class="anchor" href="#pinned-archived-stories" id="pinned-archived-stories" name="pinned-archived-stories"><i class="anchor-icon"></i></a>Pinned/archived stories</h3>
+<pre><code><a href='/constructor/stories.stories'>stories.stories</a>#5dd8c3c8 count:<a href='/type/int'>int</a> stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryItem'>StoryItem</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.Stories'>stories.Stories</a>;
+
+---functions---
 
 <a href='/method/stories.togglePinned'>stories.togglePinned</a>#9a75a1ef peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; pinned:<a href='/type/Bool'>Bool</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
 <a href='/method/stories.getStoriesArchive'>stories.getStoriesArchive</a>#b4352016 peer:<a href='/type/InputPeer'>InputPeer</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.Stories'>stories.Stories</a>;
 
 <a href='/method/stories.toggleAllStoriesHidden'>stories.toggleAllStoriesHidden</a>#7c2557c4 hidden:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
 <a href='/method/stories.togglePeerStoriesHidden'>stories.togglePeerStoriesHidden</a>#bd0415c4 peer:<a href='/type/InputPeer'>InputPeer</a> hidden:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<h3><a class="anchor" href="#preventing-users-from-seeing-your-stories" id="preventing-users-from-seeing-your-stories" name="preventing-users-from-seeing-your-stories"><i class="anchor-icon"></i></a>Preventing users from seeing your stories</h3>
+<p>Users may be individually block from seeing all of your stories by adding them to the <a href="/api/block">story blocklist »</a>.</p>
 <h2><a class="anchor" href="#deleting-stories" id="deleting-stories" name="deleting-stories"><i class="anchor-icon"></i></a>Deleting stories</h2>
 <pre><code>---functions---
 
@@ -120,7 +124,9 @@ Note that if any of the conditions changes in the period between the call to <a 
 
 <a href='/method/stories.getPeerStories'>stories.getPeerStories</a>#2c4ada50 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.PeerStories'>stories.PeerStories</a>;
 <a href='/method/stories.getAllReadPeerStories'>stories.getAllReadPeerStories</a>#9b5ae7f9 = <a href='/type/Updates'>Updates</a>;
-<a href='/method/stories.getPeerMaxIDs'>stories.getPeerMaxIDs</a>#535983c3 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
+<a href='/method/stories.getPeerMaxIDs'>stories.getPeerMaxIDs</a>#535983c3 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
+
+<a href='/method/inputReplyToStory'>inputReplyToStory</a>#15b0f283 user_id:<a href='/type/InputUser'>InputUser</a> story_id:<a href='/type/int'>int</a> = <a href='/type/InputReplyTo'>InputReplyTo</a>;</code></pre>
 <h2><a class="anchor" href="#media-areas" id="media-areas" name="media-areas"><i class="anchor-icon"></i></a>Media areas</h2>
 <p>Schema:</p>
 <pre><code><a href='/constructor/mediaAreaCoordinates'>mediaAreaCoordinates</a>#3d1ea4e x:<a href='/type/double'>double</a> y:<a href='/type/double'>double</a> w:<a href='/type/double'>double</a> h:<a href='/type/double'>double</a> rotation:<a href='/type/double'>double</a> = <a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a>;
