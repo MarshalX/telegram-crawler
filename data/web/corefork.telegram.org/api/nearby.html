@@ -2,14 +2,12 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>Nearby</title>
+    <title>Nearby users&amp;chats</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="How to work with geolocation-based features like geochats and the nearby users feature.
-Fetching nearby users &amp; geogroups…">
-    <meta property="og:title" content="Nearby">
+    <meta property="description" content="How to work with geolocation-based features like geochats and the nearby users feature.">
+    <meta property="og:title" content="Nearby users&amp;chats">
     <meta property="og:image" content="">
-    <meta property="og:description" content="How to work with geolocation-based features like geochats and the nearby users feature.
-Fetching nearby users &amp; geogroups…">
+    <meta property="og:description" content="How to work with geolocation-based features like geochats and the nearby users feature.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -41,8 +39,8 @@ Fetching nearby users &amp; geogroups…">
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/nearby" >Nearby</a></li></ul></div>
-  <h1 id="dev_page_title">Nearby</h1>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/nearby" >Nearby users&amp;chats</a></li></ul></div>
+  <h1 id="dev_page_title">Nearby users&amp;chats</h1>
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
@@ -54,7 +52,7 @@ Fetching nearby users &amp; geogroups…">
 
 <a href='/method/contacts.getLocated'>contacts.getLocated</a>#d348bc44 flags:<a href='/type/%23'>#</a> background:flags.1?<a href='/constructor/true'>true</a> geo_point:<a href='/type/InputGeoPoint'>InputGeoPoint</a> self_expires:flags.0?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Use <a href="/method/contacts.getLocated">contacts.getLocated</a> to fetch a list of nearby users and groups.  </p>
-<p>Do <strong>not</strong> set any of the <code>background</code>, <code>self_expires</code> flags: only populate <code>geo_point</code> with the current geolocation of the user: a list of users and geochats located nearby will be returned.  </p>
+<p>Do <strong>not</strong> set any of the <code>background</code>, <code>self_expires</code> flags: only populate <code>geo_point</code> with the current geolocation of the user: a list of users and geochats located nearby will be returned (<strong>without</strong> publishing the current location of the user).  </p>
 <p>This functionality is useful for example to <a href="/api/contacts#adding-telegram-users-as-contacts">exchange contacts</a> with a nearby Telegram user, or <a href="/method/channels.joinChannel">join</a> a location-based group chat, see <a href="https://telegram.org/blog/contacts-local-groups">here »</a> for more usecases.  </p>
 <p>See <a href="#creating-a-geogroup">here »</a> for more info on how to create a geogroup, and <a href="#advertising-our-current-location">here »</a> for more info on how to advertise our current location to other users.  </p>
 <h2><a class="anchor" href="#creating-a-geogroup" id="creating-a-geogroup" name="creating-a-geogroup"><i class="anchor-icon"></i></a>Creating a geogroup</h2>
@@ -78,8 +76,7 @@ Fetching nearby users &amp; geogroups…">
 <p>This flag is used to specify the expiration TTL of the passed geolocation (i.e. the geolocation will expire after <code>self_expires</code> seconds); pass `0x7fffffff`` to disable expiry, 0 to make the current geolocation private.  </p>
 <p>The method will also return a list of nearby users and chats, but only if the passed expiration TTL is not equal to zero.<br>
 Users may still fetch nearby users and chats without making their geolocation public by simply not setting the flag, see <a href="#fetching-nearby-users--geogroups">here »</a> for more info.  </p>
-<p>While the geolocation of the current user is public, clients should update it in the background every half-an-hour or so (or in any case before the expiration date specified with <code>self_expires</code>), while setting this flag.  </p>
-<p>If the new location is more than 1 KM away from the previous one, or if the previous location is unknown, the <code>background</code> flag should be set when invoking <a href="/method/contacts.getLocated">contacts.getLocated</a>.</p></div>
+<p>While the geolocation of the current user is public, clients should update it in the background every half-an-hour or so (or in any case before the expiration date specified with <code>self_expires</code>), while setting this flag: if the new location is more than 1 KM away from the previous one, or if the previous location is unknown, the <code>background</code> flag should be set.</p></div>
   
 </div>
           
