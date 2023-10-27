@@ -4,16 +4,10 @@
     <meta charset="utf-8">
     <title>Contacts</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Working with contacts.
-Importing phone contacts
-Schema:
-inputPhoneContact#f392b7f4 client_id:long phone:string first_name:string…">
+    <meta property="description" content="Working with contacts.">
     <meta property="og:title" content="Contacts">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Working with contacts.
-Importing phone contacts
-Schema:
-inputPhoneContact#f392b7f4 client_id:long phone:string first_name:string…">
+    <meta property="og:description" content="Working with contacts.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -51,7 +45,7 @@ inputPhoneContact#f392b7f4 client_id:long phone:string first_name:string…">
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Working with contacts.</p>
-<h2><a class="anchor" href="#importing-phone-contacts" id="importing-phone-contacts" name="importing-phone-contacts"><i class="anchor-icon"></i></a>Importing phone contacts</h2>
+<h3><a class="anchor" href="#importing-phone-contacts" id="importing-phone-contacts" name="importing-phone-contacts"><i class="anchor-icon"></i></a>Importing phone contacts</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/inputPhoneContact'>inputPhoneContact</a>#f392b7f4 client_id:<a href='/type/long'>long</a> phone:<a href='/type/string'>string</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> = <a href='/type/InputContact'>InputContact</a>;
 
@@ -79,7 +73,7 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 <li><code>popular_invites</code> - Contains info about popular contacts: each <a href="/constructor/popularContact">popularContact</a> constructor indicates that the contact with the specified <code>client_id</code> was imported <code>imported</code> times by that many Telegram users.</li>
 <li><code>retry_contacts</code> - List of contact ids that could not be imported due to a server-side system limitation and have to be reimported with another call to <a href="/constructor/contacts.importedContacts">contacts.importedContacts</a>.</li>
 </ul>
-<h2><a class="anchor" href="#adding-telegram-users-as-contacts" id="adding-telegram-users-as-contacts" name="adding-telegram-users-as-contacts"><i class="anchor-icon"></i></a>Adding Telegram users as contacts</h2>
+<h3><a class="anchor" href="#adding-telegram-users-as-contacts" id="adding-telegram-users-as-contacts" name="adding-telegram-users-as-contacts"><i class="anchor-icon"></i></a>Adding Telegram users as contacts</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/users.userFull'>users.userFull</a>#3b6d152e full_user:<a href='/type/UserFull'>UserFull</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/users.UserFull'>users.UserFull</a>;
 
@@ -101,13 +95,13 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 <p>Telegram users may also be added to the contact list (even if we do not have access to their phone number!) using <a href="/method/contacts.addContact">contacts.addContact</a>.  </p>
 <p>Set the <code>add_phone_privacy_exception</code> flag if we wish to allow the other user to see our phone number: this flag <strong>must</strong> be set if the <code>need_contacts_exception</code> flag of [peerSettings] is set (see the <a href="/api/action-bar">action bar documentation for more info »</a>).  </p>
 <p>The other user will be offered to also add us to the contact list via the <a href="/api/action-bar">add contact action bar</a>: if they accept, their phone number will be automatically added to our contact.  </p>
-<h2><a class="anchor" href="#share-our-phone-number" id="share-our-phone-number" name="share-our-phone-number"><i class="anchor-icon"></i></a>Share our phone number</h2>
+<h3><a class="anchor" href="#share-our-phone-number" id="share-our-phone-number" name="share-our-phone-number"><i class="anchor-icon"></i></a>Share our phone number</h3>
 <pre><code>---functions---
 
 <a href='/method/contacts.acceptContact'>contacts.acceptContact</a>#f831a20f id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>This method is invoked if the user clicks on the add contact button in the <a href="/api/action-bar#add-contact">add contact chat bar</a>.  </p>
 <p>The bar is activated only if the other user has <a href="#adding-telegram-users-as-contacts">added us as a contact</a> using <a href="/method/contacts.addContact">contacts.addContact</a> without using a phone number, and none of the <code>add_contact</code>, <code>report_spam</code>, <code>block_contact</code> <a href="/api/action-bar">bar flags</a> are set, the <code>share_contact</code> flag are be set, indicating we can invoke <a href="/method/contacts.acceptContact">contacts.acceptContact</a> to share our phone number with the other user.  </p>
-<h2><a class="anchor" href="#fetching-the-contact-list" id="fetching-the-contact-list" name="fetching-the-contact-list"><i class="anchor-icon"></i></a>Fetching the contact list</h2>
+<h3><a class="anchor" href="#fetching-the-contact-list" id="fetching-the-contact-list" name="fetching-the-contact-list"><i class="anchor-icon"></i></a>Fetching the contact list</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/contact'>contact</a>#145ade0b user_id:<a href='/type/long'>long</a> mutual:<a href='/type/Bool'>Bool</a> = <a href='/type/Contact'>Contact</a>;
 
@@ -127,7 +121,7 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 <a href='/method/contacts.getContactIDs'>contacts.getContactIDs</a>#7adc669d hash:<a href='/type/long'>long</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
 <p>Use <a href="/method/contacts.getContacts">contacts.getContacts</a> to obtain all members of the contact list that have an associated Telegram account.  </p>
 <p>To obtain the <em>full</em> contact list, including contacts which do not have an associated Telegram account, use <a href="/method/contacts.getSaved">contacts.getSaved</a> in combination with a <a href="/api/takeout">takeout session »</a>.  </p>
-<h2><a class="anchor" href="#getting-contact-statuses" id="getting-contact-statuses" name="getting-contact-statuses"><i class="anchor-icon"></i></a>Getting contact statuses</h2>
+<h3><a class="anchor" href="#getting-contact-statuses" id="getting-contact-statuses" name="getting-contact-statuses"><i class="anchor-icon"></i></a>Getting contact statuses</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/userStatusEmpty'>userStatusEmpty</a>#9d05049 = <a href='/type/UserStatus'>UserStatus</a>;
 <a href='/constructor/userStatusOnline'>userStatusOnline</a>#edb93949 expires:<a href='/type/int'>int</a> = <a href='/type/UserStatus'>UserStatus</a>;
@@ -142,7 +136,7 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 <a href='/method/contacts.getStatuses'>contacts.getStatuses</a>#c4a353ee = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ContactStatus'>ContactStatus</a>&gt;;</code></pre>
 <p>Use <a href="/method/contacts.getStatuses">contacts.getStatuses</a> to obtain the online statuses of all contacts with a phone number.</p>
-<h2><a class="anchor" href="#searching-for-contacts" id="searching-for-contacts" name="searching-for-contacts"><i class="anchor-icon"></i></a>Searching for contacts</h2>
+<h3><a class="anchor" href="#searching-for-contacts" id="searching-for-contacts" name="searching-for-contacts"><i class="anchor-icon"></i></a>Searching for contacts</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/contacts.found'>contacts.found</a>#b3134d9d my_results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.Found'>contacts.Found</a>;
 
@@ -150,7 +144,7 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 <a href='/method/contacts.search'>contacts.search</a>#11f812d8 q:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/contacts.Found'>contacts.Found</a>;</code></pre>
 <p>Use <a href="/method/contacts.search">contacts.search</a> to search within the contact list.  </p>
-<h2><a class="anchor" href="#deleting-contacts" id="deleting-contacts" name="deleting-contacts"><i class="anchor-icon"></i></a>Deleting contacts</h2>
+<h3><a class="anchor" href="#deleting-contacts" id="deleting-contacts" name="deleting-contacts"><i class="anchor-icon"></i></a>Deleting contacts</h3>
 <p>Schema:</p>
 <pre><code>---functions---
 

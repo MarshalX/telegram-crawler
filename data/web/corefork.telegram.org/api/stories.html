@@ -45,7 +45,7 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Telegram users and channels can easily post and view <a href="https://telegram.org/blog/stories">stories</a> through the API.</p>
-<h2><a class="anchor" href="#posting-stories" id="posting-stories" name="posting-stories"><i class="anchor-icon"></i></a>Posting stories</h2>
+<h3><a class="anchor" href="#posting-stories" id="posting-stories" name="posting-stories"><i class="anchor-icon"></i></a>Posting stories</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/inputPeerSelf'>inputPeerSelf</a>#7da07ec9 = <a href='/type/InputPeer'>InputPeer</a>;
 <a href='/constructor/inputPeerChannel'>inputPeerChannel</a>#27bcbbfc channel_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputPeer'>InputPeer</a>;
@@ -90,32 +90,48 @@ Note that if any of the conditions changes in the period between the call to <a 
 <li><code>pinned</code>: Whether to also <a href="#pinned-stories">add the story to the profile</a> automatically upon expiration. If not set, the story will only be added to the <a href="#pinnedarchived-stories">archive</a>. </li>
 </ul>
 <p>A story may also be edited using <a href="/method/stories.editStory">stories.editStory</a>.  </p>
-<h3><a class="anchor" href="#pinned-archived-stories" id="pinned-archived-stories" name="pinned-archived-stories"><i class="anchor-icon"></i></a>Pinned/archived stories</h3>
+<h4><a class="anchor" href="#pinned-archived-stories" id="pinned-archived-stories" name="pinned-archived-stories"><i class="anchor-icon"></i></a>Pinned/archived stories</h4>
 <pre><code><a href='/constructor/stories.stories'>stories.stories</a>#5dd8c3c8 count:<a href='/type/int'>int</a> stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryItem'>StoryItem</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.Stories'>stories.Stories</a>;
 
 ---functions---
 
 <a href='/method/stories.togglePinned'>stories.togglePinned</a>#9a75a1ef peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; pinned:<a href='/type/Bool'>Bool</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
+
 <a href='/method/stories.getStoriesArchive'>stories.getStoriesArchive</a>#b4352016 peer:<a href='/type/InputPeer'>InputPeer</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.Stories'>stories.Stories</a>;
 
-<a href='/method/stories.toggleAllStoriesHidden'>stories.toggleAllStoriesHidden</a>#7c2557c4 hidden:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/stories.togglePeerStoriesHidden'>stories.togglePeerStoriesHidden</a>#bd0415c4 peer:<a href='/type/InputPeer'>InputPeer</a> hidden:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
-<h3><a class="anchor" href="#preventing-users-from-seeing-your-stories" id="preventing-users-from-seeing-your-stories" name="preventing-users-from-seeing-your-stories"><i class="anchor-icon"></i></a>Preventing users from seeing your stories</h3>
-<p>Users may be individually block from seeing all of your stories by adding them to the <a href="/api/block">story blocklist »</a>.</p>
-<h2><a class="anchor" href="#deleting-stories" id="deleting-stories" name="deleting-stories"><i class="anchor-icon"></i></a>Deleting stories</h2>
+<a href='/method/stories.getPinnedStories'>stories.getPinnedStories</a>#5821a5dc peer:<a href='/type/InputPeer'>InputPeer</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.Stories'>stories.Stories</a>;</code></pre>
+<p>After an active story expires, it is automatically added to the story archive: stories in the story archive are only visible to the poster.  </p>
+<p>Use <a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a> to fetch stories in the story archive.  </p>
+<p>Archived stories may then be pinned on the profile, where they may be fetched using <a href="/method/stories.getPinnedStories">stories.getPinnedStories</a> by users who explicitly open your profile: use <a href="/method/stories.togglePinned">stories.togglePinned</a> to pin or unpin one or more stories to your profile.  </p>
+<p>Stories may also be autopinned upon expiration if the <code>pinned</code> flag is set <a href="#posting-stories">when posting them</a>.  </p>
+<h4><a class="anchor" href="#deleting-stories" id="deleting-stories" name="deleting-stories"><i class="anchor-icon"></i></a>Deleting stories</h4>
 <pre><code>---functions---
 
 <a href='/method/stories.deleteStories'>stories.deleteStories</a>#ae59db5f peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
-<p>Use the <a href="/method/stories.deleteStories">stories.deleteStories</a> method to delete one or more stories by their IDs, passed in <code>id</code>.</p>
-<h2><a class="anchor" href="#watching-stories" id="watching-stories" name="watching-stories"><i class="anchor-icon"></i></a>Watching stories</h2>
-<pre><code>---functions---
+<p>Use the <a href="/method/stories.deleteStories">stories.deleteStories</a> method to delete one or more active, pinned or archived stories by their IDs, passed in <code>id</code>.  </p>
+<h4><a class="anchor" href="#preventing-users-from-seeing-your-stories" id="preventing-users-from-seeing-your-stories" name="preventing-users-from-seeing-your-stories"><i class="anchor-icon"></i></a>Preventing users from seeing your stories</h4>
+<p>Users may be individually blocked from seeing all of your stories by adding them to the <a href="/api/block">story blocklist »</a>.</p>
+<h3><a class="anchor" href="#watching-stories" id="watching-stories" name="watching-stories"><i class="anchor-icon"></i></a>Watching stories</h3>
+<pre><code><a href='/constructor/storyItem'>storyItem</a>#44c457ce flags:<a href='/type/%23'>#</a> pinned:flags.5?<a href='/constructor/true'>true</a> public:flags.7?<a href='/constructor/true'>true</a> close_friends:flags.8?<a href='/constructor/true'>true</a> min:flags.9?<a href='/constructor/true'>true</a> noforwards:flags.10?<a href='/constructor/true'>true</a> edited:flags.11?<a href='/constructor/true'>true</a> contacts:flags.12?<a href='/constructor/true'>true</a> selected_contacts:flags.13?<a href='/constructor/true'>true</a> out:flags.16?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> expire_date:<a href='/type/int'>int</a> caption:flags.0?<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; media:<a href='/type/MessageMedia'>MessageMedia</a> media_areas:flags.14?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; privacy:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PrivacyRule'>PrivacyRule</a>&gt; views:flags.3?<a href='/type/StoryViews'>StoryViews</a> sent_reaction:flags.15?<a href='/type/Reaction'>Reaction</a> = <a href='/type/StoryItem'>StoryItem</a>;
+<a href='/constructor/storyItemSkipped'>storyItemSkipped</a>#ffadc913 flags:<a href='/type/%23'>#</a> close_friends:flags.8?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> expire_date:<a href='/type/int'>int</a> = <a href='/type/StoryItem'>StoryItem</a>;
+<a href='/constructor/storyItemDeleted'>storyItemDeleted</a>#51e6ee4f id:<a href='/type/int'>int</a> = <a href='/type/StoryItem'>StoryItem</a>;
+
+<a href='/constructor/peerStories'>peerStories</a>#9a35e999 flags:<a href='/type/%23'>#</a> peer:<a href='/type/Peer'>Peer</a> max_read_id:flags.0?<a href='/type/int'>int</a> stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryItem'>StoryItem</a>&gt; = <a href='/type/PeerStories'>PeerStories</a>;
+
+<a href='/constructor/storiesStealthMode'>storiesStealthMode</a>#712e27fd flags:<a href='/type/%23'>#</a> active_until_date:flags.0?<a href='/type/int'>int</a> cooldown_until_date:flags.1?<a href='/type/int'>int</a> = <a href='/type/StoriesStealthMode'>StoriesStealthMode</a>;
+
+<a href='/constructor/stories.allStories'>stories.allStories</a>#6efc5e81 flags:<a href='/type/%23'>#</a> has_more:flags.0?<a href='/constructor/true'>true</a> count:<a href='/type/int'>int</a> state:<a href='/type/string'>string</a> peer_stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PeerStories'>PeerStories</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; stealth_mode:<a href='/type/StoriesStealthMode'>StoriesStealthMode</a> = <a href='/type/stories.AllStories'>stories.AllStories</a>;
+
+<a href='/constructor/inputReplyToStory'>inputReplyToStory</a>#15b0f283 user_id:<a href='/type/InputUser'>InputUser</a> story_id:<a href='/type/int'>int</a> = <a href='/type/InputReplyTo'>InputReplyTo</a>;
+
+---functions---
 
 <a href='/method/stories.getAllStories'>stories.getAllStories</a>#eeb0d625 flags:<a href='/type/%23'>#</a> next:flags.1?<a href='/constructor/true'>true</a> hidden:flags.2?<a href='/constructor/true'>true</a> state:flags.0?<a href='/type/string'>string</a> = <a href='/type/stories.AllStories'>stories.AllStories</a>;
-<a href='/method/stories.getPinnedStories'>stories.getPinnedStories</a>#5821a5dc peer:<a href='/type/InputPeer'>InputPeer</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.Stories'>stories.Stories</a>;
+
 <a href='/method/stories.getStoriesByID'>stories.getStoriesByID</a>#5774ca74 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/stories.Stories'>stories.Stories</a>;
 <a href='/method/stories.readStories'>stories.readStories</a>#a556dac8 peer:<a href='/type/InputPeer'>InputPeer</a> max_id:<a href='/type/int'>int</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
-<a href='/method/stories.incrementStoryViews'>stories.incrementStoryViews</a>#b2028afb peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Bool'>Bool</a>;
 
+<a href='/method/stories.incrementStoryViews'>stories.incrementStoryViews</a>#b2028afb peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Bool'>Bool</a>;
 <a href='/method/stories.getStoryViewsList'>stories.getStoryViewsList</a>#7ed23c57 flags:<a href='/type/%23'>#</a> just_contacts:flags.0?<a href='/constructor/true'>true</a> reactions_first:flags.2?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> q:flags.1?<a href='/type/string'>string</a> id:<a href='/type/int'>int</a> offset:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.StoryViewsList'>stories.StoryViewsList</a>;
 
 <a href='/method/stories.getStoriesViews'>stories.getStoriesViews</a>#28e16cc8 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/stories.StoryViews'>stories.StoryViews</a>;
@@ -124,10 +140,20 @@ Note that if any of the conditions changes in the period between the call to <a 
 
 <a href='/method/stories.getPeerStories'>stories.getPeerStories</a>#2c4ada50 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.PeerStories'>stories.PeerStories</a>;
 <a href='/method/stories.getAllReadPeerStories'>stories.getAllReadPeerStories</a>#9b5ae7f9 = <a href='/type/Updates'>Updates</a>;
-<a href='/method/stories.getPeerMaxIDs'>stories.getPeerMaxIDs</a>#535983c3 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
+<a href='/method/stories.getPeerMaxIDs'>stories.getPeerMaxIDs</a>#535983c3 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
+<p>Stories s</p>
+<h4><a class="anchor" href="#hiding-stories-of-other-users" id="hiding-stories-of-other-users" name="hiding-stories-of-other-users"><i class="anchor-icon"></i></a>Hiding stories of other users</h4>
+<pre><code><a href='/constructor/user'>user</a>#abb5f120 flags:<a href='/type/%23'>#</a> self:flags.10?<a href='/constructor/true'>true</a> contact:flags.11?<a href='/constructor/true'>true</a> mutual_contact:flags.12?<a href='/constructor/true'>true</a> deleted:flags.13?<a href='/constructor/true'>true</a> bot:flags.14?<a href='/constructor/true'>true</a> bot_chat_history:flags.15?<a href='/constructor/true'>true</a> bot_nochats:flags.16?<a href='/constructor/true'>true</a> verified:flags.17?<a href='/constructor/true'>true</a> restricted:flags.18?<a href='/constructor/true'>true</a> min:flags.20?<a href='/constructor/true'>true</a> bot_inline_geo:flags.21?<a href='/constructor/true'>true</a> support:flags.23?<a href='/constructor/true'>true</a> scam:flags.24?<a href='/constructor/true'>true</a> apply_min_photo:flags.25?<a href='/constructor/true'>true</a> fake:flags.26?<a href='/constructor/true'>true</a> bot_attach_menu:flags.27?<a href='/constructor/true'>true</a> premium:flags.28?<a href='/constructor/true'>true</a> attach_menu_enabled:flags.29?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> bot_can_edit:flags2.1?<a href='/constructor/true'>true</a> close_friend:flags2.2?<a href='/constructor/true'>true</a> stories_hidden:flags2.3?<a href='/constructor/true'>true</a> stories_unavailable:flags2.4?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:flags.0?<a href='/type/long'>long</a> first_name:flags.1?<a href='/type/string'>string</a> last_name:flags.2?<a href='/type/string'>string</a> username:flags.3?<a href='/type/string'>string</a> phone:flags.4?<a href='/type/string'>string</a> photo:flags.5?<a href='/type/UserProfilePhoto'>UserProfilePhoto</a> status:flags.6?<a href='/type/UserStatus'>UserStatus</a> bot_info_version:flags.14?<a href='/type/int'>int</a> restriction_reason:flags.18?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; bot_inline_placeholder:flags.19?<a href='/type/string'>string</a> lang_code:flags.22?<a href='/type/string'>string</a> emoji_status:flags.30?<a href='/type/EmojiStatus'>EmojiStatus</a> usernames:flags2.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Username'>Username</a>&gt; stories_max_id:flags2.5?<a href='/type/int'>int</a> = <a href='/type/User'>User</a>;
 
-<a href='/method/inputReplyToStory'>inputReplyToStory</a>#15b0f283 user_id:<a href='/type/InputUser'>InputUser</a> story_id:<a href='/type/int'>int</a> = <a href='/type/InputReplyTo'>InputReplyTo</a>;</code></pre>
-<h2><a class="anchor" href="#media-areas" id="media-areas" name="media-areas"><i class="anchor-icon"></i></a>Media areas</h2>
+---functions---
+
+<a href='/method/stories.togglePeerStoriesHidden'>stories.togglePeerStoriesHidden</a>#bd0415c4 peer:<a href='/type/InputPeer'>InputPeer</a> hidden:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/stories.toggleAllStoriesHidden'>stories.toggleAllStoriesHidden</a>#7c2557c4 hidden:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Use <a href="/method/stories.toggleAllStoriesHidden">stories.togglePeerStoriesHidden</a> to hide the active stories of a user, preventing them from being displayed on the action bar on the homescreen.<br>
+When the stories of a user are marked as hidden, the <code>stories_hidden</code> flag is set on the related <a href="/constructor/user">user</a> constructor, and they should only be visible on the action bar when opening the <a href="/api/folders#peer-folders">archive folder</a>.  </p>
+<p>Note that the <a href="/api/folders#peer-folders">archive folder is the peer folder used for archived chats</a>: hidden stories are displayed there purely due to a UI implementation detail, not because they're actually added to the <a href="/api/folders#peer-folders">archive peer folder »</a> or the <a href="#pinnedarchived-stories">story archive »</a>, which are different things.  </p>
+<h3><a class="anchor" href="#media-areas" id="media-areas" name="media-areas"><i class="anchor-icon"></i></a>Media areas</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/mediaAreaCoordinates'>mediaAreaCoordinates</a>#3d1ea4e x:<a href='/type/double'>double</a> y:<a href='/type/double'>double</a> w:<a href='/type/double'>double</a> h:<a href='/type/double'>double</a> rotation:<a href='/type/double'>double</a> = <a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a>;
 
@@ -145,7 +171,7 @@ Note that if any of the conditions changes in the period between the call to <a 
 <p>Stories can have so-called "media areas": clickable rectangular areas with animated overlays on top of the story offering functionality like location tags or reactions.  </p>
 <p>The coordinates and size of each media area is specified in a <a href="/constructor/mediaAreaCoordinates">mediaAreaCoordinates</a> constructor attached to each <a href="/type/MediaArea">MediaArea</a>, see <a href="/constructor/mediaAreaCoordinates">the constructor page »</a> for more info.  </p>
 <p>After construction, the vector of <a href="/type/MediaArea">MediaArea</a> constructors can be passed to <a href="/method/stories.sendStory">stories.sendStory</a> or <a href="/method/stories.editStory">stories.editStory</a>.</p>
-<h3><a class="anchor" href="#location-tags" id="location-tags" name="location-tags"><i class="anchor-icon"></i></a>Location tags</h3>
+<h4><a class="anchor" href="#location-tags" id="location-tags" name="location-tags"><i class="anchor-icon"></i></a>Location tags</h4>
 <p>Schema:</p>
 <pre><code><a href='/constructor/geoPoint'>geoPoint</a>#b2a2f663 flags:<a href='/type/%23'>#</a> long:<a href='/type/double'>double</a> lat:<a href='/type/double'>double</a> access_hash:<a href='/type/long'>long</a> accuracy_radius:flags.0?<a href='/type/int'>int</a> = <a href='/type/GeoPoint'>GeoPoint</a>;
 
@@ -169,7 +195,7 @@ Note that this should be done transparently in a map UI, not in the usual inline
 </li>
 </ul>
 <p>Clients may also re-use an existing <a href="/constructor/mediaAreaVenue">mediaAreaVenue</a> from a previously uploaded story.</p>
-<h3><a class="anchor" href="#reactions" id="reactions" name="reactions"><i class="anchor-icon"></i></a>Reactions</h3>
+<h4><a class="anchor" href="#reactions" id="reactions" name="reactions"><i class="anchor-icon"></i></a>Reactions</h4>
 <p>Schema:</p>
 <pre><code><a href='/constructor/reactionEmoji'>reactionEmoji</a>#1b2286b8 emoticon:<a href='/type/string'>string</a> = <a href='/type/Reaction'>Reaction</a>;
 <a href='/constructor/reactionCustomEmoji'>reactionCustomEmoji</a>#8935fc73 document_id:<a href='/type/long'>long</a> = <a href='/type/Reaction'>Reaction</a>;
@@ -184,7 +210,7 @@ Note that this should be done transparently in a map UI, not in the usual inline
 If the <code>dark</code> flag is set, the background should by black.<br>
 If the <code>flipped</code> flag is set, the "tail" should be located on the left.</p>
 <p>Clicking it should invoke <a href="/method/stories.sendReaction">stories.sendReaction</a> as usual.</p>
-<h2><a class="anchor" href="#stealth-mode" id="stealth-mode" name="stealth-mode"><i class="anchor-icon"></i></a>Stealth mode</h2>
+<h3><a class="anchor" href="#stealth-mode" id="stealth-mode" name="stealth-mode"><i class="anchor-icon"></i></a>Stealth mode</h3>
 <p><a href="/api/premium">Premium users</a> may enable <a href="https://telegram.org/tour/stories#stealth-mode">stealth mode</a>, erasing their views from any stories they opened in the past <a href="/api/config#stories-stealth-past-period"><code>stories_stealth_past_period</code> seconds »</a>, and hiding their views on stories for the next <a href="/api/config#stories-stealth-future-period"><code>stories_stealth_future_period</code> seconds »</a>, as specified by the <a href="/api/config#client-configuration">client configuration »</a>.</p>
 <p>Schema:</p>
 <pre><code><a href='/constructor/storiesStealthMode'>storiesStealthMode</a>#712e27fd flags:<a href='/type/%23'>#</a> active_until_date:flags.0?<a href='/type/int'>int</a> cooldown_until_date:flags.1?<a href='/type/int'>int</a> = <a href='/type/StoriesStealthMode'>StoriesStealthMode</a>;
@@ -201,9 +227,9 @@ If the <code>flipped</code> flag is set, the "tail" should be located on the lef
 <li><code>active_until_date</code> - the date up to which stealth mode will be active</li>
 <li><code>cooldown_until_date</code> - the date starting from which the user will be allowed to call <a href="/method/stories.activateStealthMode">stories.activateStealthMode</a> again; calling the method earlier will return a <code>FLOOD_WAIT_X</code> error as specified above.</li>
 </ul>
-<h2><a class="anchor" href="#channel-stories" id="channel-stories" name="channel-stories"><i class="anchor-icon"></i></a>Channel stories</h2>
+<h3><a class="anchor" href="#channel-stories" id="channel-stories" name="channel-stories"><i class="anchor-icon"></i></a>Channel stories</h3>
 <p>Telegram users can grant their favorite channels the ability to post <a href="/api/stories">stories</a> by giving them boosts. <a href="/api/premium">Telegram Premium</a> now includes one boost that can be assigned to any channel.</p>
-<h3><a class="anchor" href="#boosts" id="boosts" name="boosts"><i class="anchor-icon"></i></a>Boosts</h3>
+<h4><a class="anchor" href="#boosts" id="boosts" name="boosts"><i class="anchor-icon"></i></a>Boosts</h4>
 <p>Channels level up as they gain more boosts – and for each level, they can post 1 additional story per day to their subscribers' story feeds.  </p>
 <p>Schema:</p>
 <pre><code><a href='/constructor/stories.canApplyBoostOk'>stories.canApplyBoostOk</a>#c3173587 = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
@@ -235,7 +261,7 @@ A <code>BOOST_NOT_MODIFIED</code> RPC error will be returned when calling any of
 <p>After boosting a channel, the user may not change their boosted channel for a certain cooldown period: if the cooldown period isn't over yet, calls to any of the two methods will return a 420 <code>FLOOD_WAIT_X</code> error, indicating the number of seconds left before a different channel can be boosted.  </p>
 <p>Users may also invoke <a href="/method/stories.getBoostsStatus">stories.getBoostsStatus</a>, to get the current boost status of a channel as a <a href="/constructor/stories.boostsStatus">stories.boostsStatus</a> constructor, check out the <a href="/constructor/stories.boostsStatus">constructor page</a> for more info.</p>
 <p>Channel administrators may invoke <a href="/method/stories.getBoostersList">stories.getBoostersList</a> to fetch the list of users currently boosting the channel.</p>
-<h3><a class="anchor" href="#posting-stories-as-a-channel" id="posting-stories-as-a-channel" name="posting-stories-as-a-channel"><i class="anchor-icon"></i></a>Posting stories as a channel</h3>
+<h4><a class="anchor" href="#posting-stories-as-a-channel" id="posting-stories-as-a-channel" name="posting-stories-as-a-channel"><i class="anchor-icon"></i></a>Posting stories as a channel</h4>
 <pre><code><a href='/constructor/inputPeerChannel'>inputPeerChannel</a>#27bcbbfc channel_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputPeer'>InputPeer</a>;
 
 <a href='/constructor/messages.chats'>messages.chats</a>#64ff9fd5 chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
