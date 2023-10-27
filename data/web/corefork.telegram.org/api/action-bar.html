@@ -63,7 +63,7 @@
 <p>Changes to the chat bar may also be notified by the server using <a href="/constructor/updatePeerSettings">updatePeerSettings</a>.  </p>
 <p>The currently active action bar may also be dismissed using <a href="/method/messages.hidePeerSettingsBar">messages.hidePeerSettingsBar</a>.  </p>
 <p>What follows is a list of the various (<em>mutually exclusive</em>) chat bar types, along with the <strong>condition</strong> used to identify each type, by checking the appropriate flags of <a href="/constructor/peerSettings">peerSettings</a>.  </p>
-<h2><a class="anchor" href="#report-spam-block-or-add-contact" id="report-spam-block-or-add-contact" name="report-spam-block-or-add-contact"><i class="anchor-icon"></i></a>Report spam, block or add contact</h2>
+<h3><a class="anchor" href="#report-spam-block-or-add-contact" id="report-spam-block-or-add-contact" name="report-spam-block-or-add-contact"><i class="anchor-icon"></i></a>Report spam, block or add contact</h3>
 <pre><code><a href='/constructor/inputReportReasonSpam'>inputReportReasonSpam</a>#58dbcab8 = <a href='/type/ReportReason'>ReportReason</a>;
 
 ---functions---
@@ -84,7 +84,7 @@ Optionally, the <a href="/constructor/peerSettings">peerSettings</a>.<code>need_
 </ul>
 <p><strong>Condition</strong>: the <a href="/constructor/peerSettings">peerSettings</a>.<code>report_spam</code>, <a href="/constructor/peerSettings">peerSettings</a>.<code>add_contact</code>, <a href="/constructor/peerSettings">peerSettings</a>.<code>block_contact</code> flags must all be set.</p>
 <p>Additionally, if the <a href="/constructor/peerSettings">peerSettings</a>.<code>geo_distance</code> flag is set, the bar should also display the distance between us and the user, indicating that the user found us by invoking <a href="/method/contacts.getLocated">contacts.getLocated</a>, because we are currently advertising our location with the same method.</p>
-<h2><a class="anchor" href="#report-spam-or-unarchive" id="report-spam-or-unarchive" name="report-spam-or-unarchive"><i class="anchor-icon"></i></a>Report spam or unarchive</h2>
+<h3><a class="anchor" href="#report-spam-or-unarchive" id="report-spam-or-unarchive" name="report-spam-or-unarchive"><i class="anchor-icon"></i></a>Report spam or unarchive</h3>
 <pre><code><a href='/constructor/inputReportReasonSpam'>inputReportReasonSpam</a>#58dbcab8 = <a href='/type/ReportReason'>ReportReason</a>;
 
 ---functions---
@@ -94,7 +94,7 @@ Optionally, the <a href="/constructor/peerSettings">peerSettings</a>.<code>need_
 <p>If the other user has an emoji status, then the bar should also show a notice, indicating that the emoji status is shown next to the user's name because they have purchased <a href="/api/premium">Telegram Premium</a> (i.e. this is useful to avoid issues if the user uses an emoji status similar to a verified checkmark).  </p>
 <p><strong>Condition</strong>: the <a href="/constructor/peerSettings">peerSettings</a>.<code>report_spam</code> flag must be set, and the <a href="/constructor/peerSettings">peerSettings</a>.<code>add_contact</code>, <a href="/constructor/peerSettings">peerSettings</a>.<code>block_contact</code> flags must <strong>not</strong> be set.</p>
 <p>Additionally, if the chat was automatically <a href="/api/folders#peer-folders">archived »</a> (according to <a href="/constructor/peerSettings">peerSettings</a>.<code>autoarchived</code>), an extra button can be shown to unarchive the chat <a href="/api/folders#peer-folders">as specified here »</a> instead of reporting it.</p>
-<h2><a class="anchor" href="#add-contact" id="add-contact" name="add-contact"><i class="anchor-icon"></i></a>Add contact</h2>
+<h3><a class="anchor" href="#add-contact" id="add-contact" name="add-contact"><i class="anchor-icon"></i></a>Add contact</h3>
 <pre><code>---functions---
 
 <a href='/method/contacts.addContact'>contacts.addContact</a>#e8f463d0 flags:<a href='/type/%23'>#</a> add_phone_privacy_exception:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputUser'>InputUser</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> phone:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
@@ -105,14 +105,14 @@ Optionally, the <a href="/constructor/peerSettings">peerSettings</a>.<code>need_
 <li>For private chats, the <code>block_contact</code> and <code>report_spam</code> flags must <strong>not</strong> be set.</li>
 </ul>
 <p>Optionally, the <a href="/constructor/peerSettings">peerSettings</a>.<code>need_contacts_exception</code> flag may also be set: if so, the <code>add_phone_privacy_exception</code> flag <strong>must</strong> be set if the user clicks on the add contact button, invoking <a href="/method/contacts.addContact">contacts.addContact</a>.  </p>
-<h2><a class="anchor" href="#share-phone-number" id="share-phone-number" name="share-phone-number"><i class="anchor-icon"></i></a>Share phone number</h2>
+<h3><a class="anchor" href="#share-phone-number" id="share-phone-number" name="share-phone-number"><i class="anchor-icon"></i></a>Share phone number</h3>
 <pre><code>---functions---
 
 <a href='/method/contacts.acceptContact'>contacts.acceptContact</a>#f831a20f id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>This action bar, associated to a private or secret chat, offers the user a button to share their phone number with the other user using <a href="/method/contacts.acceptContact">contacts.acceptContact</a>.  </p>
 <p><strong>Condition</strong>: the <a href="/constructor/peerSettings">peerSettings</a>.<code>share_contact</code> flag must be set.</p>
 <p>This flag is set and the bar is activated only if the other user has added us as a contact using <a href="/method/contacts.addContact">contacts.addContact</a>, without using a phone number, and none of the <code>add_contact</code>, <code>report_spam</code>, <code>block_contact</code> flags are set.</p>
-<h2><a class="anchor" href="#report-irrelevant-geolocation" id="report-irrelevant-geolocation" name="report-irrelevant-geolocation"><i class="anchor-icon"></i></a>Report irrelevant geolocation</h2>
+<h3><a class="anchor" href="#report-irrelevant-geolocation" id="report-irrelevant-geolocation" name="report-irrelevant-geolocation"><i class="anchor-icon"></i></a>Report irrelevant geolocation</h3>
 <pre><code><a href='/constructor/inputReportReasonGeoIrrelevant'>inputReportReasonGeoIrrelevant</a>#dbd4feed = <a href='/type/ReportReason'>ReportReason</a>;
 
 ---functions---
@@ -120,7 +120,7 @@ Optionally, the <a href="/constructor/peerSettings">peerSettings</a>.<code>need_
 <a href='/method/account.reportPeer'>account.reportPeer</a>#c5ba3d86 peer:<a href='/type/InputPeer'>InputPeer</a> reason:<a href='/type/ReportReason'>ReportReason</a> message:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p>This bar indicates that the associated location-based supergroup can be reported for having an unrelated location using a bar button that invokes <a href="/method/account.reportPeer">account.reportPeer</a> with <code>reason</code> <a href="/constructor/inputReportReasonGeoIrrelevant">inputReportReasonGeoIrrelevant</a>.  </p>
 <p><strong>Condition</strong>: the <a href="/constructor/peerSettings">peerSettings</a>.<code>report_geo</code> flag must be set.</p>
-<h2><a class="anchor" href="#invite-new-members" id="invite-new-members" name="invite-new-members"><i class="anchor-icon"></i></a>Invite new members</h2>
+<h3><a class="anchor" href="#invite-new-members" id="invite-new-members" name="invite-new-members"><i class="anchor-icon"></i></a>Invite new members</h3>
 <pre><code>---functions---
 
 <a href='/method/messages.addChatUser'>messages.addChatUser</a>#f24753e3 chat_id:<a href='/type/long'>long</a> user_id:<a href='/type/InputUser'>InputUser</a> fwd_limit:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
@@ -128,7 +128,7 @@ Optionally, the <a href="/constructor/peerSettings">peerSettings</a>.<code>need_
 <a href='/method/channels.inviteToChannel'>channels.inviteToChannel</a>#199f3a6c channel:<a href='/type/InputChannel'>InputChannel</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>This bar indicates that the associated group was created recently, and it offers a bar button to invite new members using <a href="/method/messages.addChatUser">messages.addChatUser</a> or <a href="/method/channels.inviteToChannel">channels.inviteToChannel</a>, depending on whether the associated peer is a <a href="/api/channel">group or a supergroup</a>.</p>
 <p><strong>Condition</strong>: the <a href="/constructor/peerSettings">peerSettings</a>.<code>invite_members</code> flag must be set.</p>
-<h2><a class="anchor" href="#an-admin-from-a-recent-join-request-is-contacting-you" id="an-admin-from-a-recent-join-request-is-contacting-you" name="an-admin-from-a-recent-join-request-is-contacting-you"><i class="anchor-icon"></i></a>An admin from a recent join request is contacting you</h2>
+<h3><a class="anchor" href="#an-admin-from-a-recent-join-request-is-contacting-you" id="an-admin-from-a-recent-join-request-is-contacting-you" name="an-admin-from-a-recent-join-request-is-contacting-you"><i class="anchor-icon"></i></a>An admin from a recent join request is contacting you</h3>
 <p>This bar indicates that the associated private or secret chat is a chat with an administrator of a <a href="/api/channel">group or channel</a> to which the user sent a <a href="/api/invites#join-requests">join request, see here for more info on join requests »</a>.  </p>
 <p><strong>Condition</strong>: the <code>request_chat_title</code> and <code>request_chat_date</code> fields of <a href="/constructor/peerSettings">peerSettings</a> must both be set; optionally <code>request_chat_broadcast</code> may also be set:</p>
 <ul>
