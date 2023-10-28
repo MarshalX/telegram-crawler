@@ -710,10 +710,16 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
 
         # handle pure domains and html pages without ext in url as html do enable syntax highlighting
         page_type, _ = mimetypes.guess_type(url)
+
+        ext = ''
+        if page_type:
+            ext = mimetypes.guess_extension(page_type) or ''
+            if ext != '' and url.endswith(ext):
+                ext = ''
+
         if url.endswith('.tl'):
             page_type = 'text/plain'
 
-        ext = ''
         if page_type is None or len(url_parts) == 1:
             ext = '.html'
             content_type = 'text/html'
@@ -735,7 +741,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         # Some servers do not return a correct content type.
         # Some servers do...
         if is_hashable_only or is_sucking_file:
-            ext = ''
+            ext = '.sha256'
 
         filename = os.path.join(output_dir, *url_parts) + ext
         os.makedirs(os.path.dirname(filename), exist_ok=True)
