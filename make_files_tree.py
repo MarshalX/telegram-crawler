@@ -706,29 +706,36 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         # bypass external slashes and so on
         url_parts = [p for p in url.split('/') if p not in ILLEGAL_PATH_CHARS]
 
-        is_hashable_only = is_hashable_only_content_type(response.content_type)
-        # amazing dirt for media files like
-        # telegram.org/file/811140591/1/q7zZHjgES6s/9d121a89ffb0015837
-        # with response content type HTML instead of image.
-        # shame on you.
-        # sometimes it returns a correct type. noice load balancing
-        is_sucking_file = '/file/' in url and 'text' in response.content_type
+        content_type = response.content_type
 
         # handle pure domains and html pages without ext in url as html do enable syntax highlighting
         page_type, _ = mimetypes.guess_type(url)
         if url.endswith('.tl'):
             page_type = 'text/plain'
 
-        ext = '.html' if page_type is None or len(url_parts) == 1 else ''
+        ext = ''
+        if page_type is None or len(url_parts) == 1:
+            ext = '.html'
+            content_type = 'text/html'
+
+        if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url) or 'td.telegram.org/current' in url:
+            ext = '.json'
+            content_type = 'application/json'
+
+        is_hashable_only = is_hashable_only_content_type(content_type)
+        # amazing dirt for media files like
+        # telegram.org/file/811140591/1/q7zZHjgES6s/9d121a89ffb0015837
+        # with response content type HTML instead of image.
+        # shame on you.
+        # sometimes it returns a correct type.
+        # noice load balancing
+        is_sucking_file = '/file/' in url and 'text' in content_type
 
         # I don't add ext by content type for images, and so on cuz TG servers suck.
         # Some servers do not return a correct content type.
         # Some servers do...
         if is_hashable_only or is_sucking_file:
             ext = ''
-
-        if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
-            ext = '.json'
 
         filename = os.path.join(output_dir, *url_parts) + ext
         os.makedirs(os.path.dirname(filename), exist_ok=True)
