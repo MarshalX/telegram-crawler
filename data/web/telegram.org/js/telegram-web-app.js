@@ -33,7 +33,9 @@
           return;
         }
         if (dataParsed.eventType == 'set_custom_style') {
-          iFrameStyle.innerHTML = dataParsed.eventData;
+          if (event.origin === 'https://web.telegram.org') {
+            iFrameStyle.innerHTML = dataParsed.eventData;
+          }
         } else {
           receiveEvent(dataParsed.eventType, dataParsed.eventData);
         }

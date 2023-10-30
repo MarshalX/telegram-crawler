@@ -39,7 +39,7 @@ var DemoApp = {
       $('button').prop('disabled', false);
       if (result.response) {
         if (result.response.ok) {
-          $('#btn_status').html('Message sent successfully!').addClass('ok').show();
+          $('#btn_status').text('Message sent successfully!').addClass('ok').show();
         } else {
           $('#btn_status').text(result.response.description).addClass('err').show();
           alert(result.response.description);
@@ -60,7 +60,7 @@ var DemoApp = {
       $('button').prop('disabled', false);
       if (result.response) {
         if (result.response.ok) {
-          $('#btn_status').html('Button changed!').addClass('ok').show();
+          $('#btn_status').text('Button changed!').addClass('ok').show();
           Telegram.WebApp.close();
         } else {
           $('#btn_status').text(result.response.description).addClass('err').show();
@@ -87,9 +87,9 @@ var DemoApp = {
       $('#webview_data_status').removeClass('status_need');
       DemoApp.apiRequest('checkInitData', {}, function(result) {
         if (result.ok) {
-          $('#webview_data_status').html('Hash is correct (async)').addClass('ok');
+          $('#webview_data_status').text('Hash is correct (async)').addClass('ok');
         } else {
-          $('#webview_data_status').html(result.error + ' (async)').addClass('err');
+          $('#webview_data_status').text(result.error + ' (async)').addClass('err');
         }
       });
     }
@@ -133,47 +133,47 @@ var DemoApp = {
   requestLocation: function(el) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function (position) {
-        $(el).next('span').html('(' + position.coords.latitude + ', ' + position.coords.longitude + ')').attr('class', 'ok');
+        $(el).next('span').text('(' + position.coords.latitude + ', ' + position.coords.longitude + ')').attr('class', 'ok');
       });
     } else {
-      $(el).next('span').html('Geolocation is not supported in this browser.').attr('class', 'err');
+      $(el).next('span').text('Geolocation is not supported in this browser.').attr('class', 'err');
     }
     return false;
   },
   requestVideo: function(el) {
     if (navigator.mediaDevices) {
       navigator.mediaDevices.getUserMedia({ audio: false, video: true }).then(function(stream) {
-        $(el).next('span').html('(Access granted)').attr('class', 'ok');
+        $(el).next('span').text('(Access granted)').attr('class', 'ok');
       });
     } else {
-      $(el).next('span').html('Media devices is not supported in this browser.').attr('class', 'err');
+      $(el).next('span').text('Media devices is not supported in this browser.').attr('class', 'err');
     }
     return false;
   },
   requestAudio: function(el) {
     if (navigator.mediaDevices) {
       navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream) {
-        $(el).next('span').html('(Access granted)').attr('class', 'ok');
+        $(el).next('span').text('(Access granted)').attr('class', 'ok');
       });
     } else {
-      $(el).next('span').html('Media devices is not supported in this browser.').attr('class', 'err');
+      $(el).next('span').text('Media devices is not supported in this browser.').attr('class', 'err');
     }
     return false;
   },
   requestAudioVideo: function(el) {
     if (navigator.mediaDevices) {
       navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(function(stream) {
-        $(el).next('span').html('(Access granted)').attr('class', 'ok');
+        $(el).next('span').text('(Access granted)').attr('class', 'ok');
       });
     } else {
-      $(el).next('span').html('Media devices is not supported in this browser.').attr('class', 'err');
+      $(el).next('span').text('Media devices is not supported in this browser.').attr('class', 'err');
     }
     return false;
   },
   testClipboard: function(el) {
     Telegram.WebApp.readTextFromClipboard(function(clipText) {
       if (clipText === null) {
-        $(el).next('span').html('Clipboard text unavailable.').attr('class', 'err');
+        $(el).next('span').text('Clipboard text unavailable.').attr('class', 'err');
       } else {
         $(el).next('span').text('(Read from clipboard: «' + clipText + '»)').attr('class', 'ok');
       }
@@ -185,7 +185,7 @@ var DemoApp = {
       if (allowed) {
         $(el).next('span').text('(Access granted)').attr('class', 'ok');
       } else {
-        $(el).next('span').html('(User declined this request)').attr('class', 'err');
+        $(el).next('span').text('(User declined this request)').attr('class', 'err');
       }
     });
   },
@@ -194,14 +194,14 @@ var DemoApp = {
       if (sent) {
         $(el).next('span').text('(Phone number sent to the bot' + (event && event.responseUnsafe && event.responseUnsafe.contact && event.responseUnsafe.contact.phone_number ? ': +' + event.responseUnsafe.contact.phone_number : '') + ')').attr('class', 'ok');
       } else {
-        $(el).next('span').html('(User declined this request)').attr('class', 'err');
+        $(el).next('span').text('(User declined this request)').attr('class', 'err');
       }
     });
   },
   requestServerTime: function(el) {
     Telegram.WebApp.invokeCustomMethod('getCurrentTime', {}, function(err, time) {
       if (err) {
-        $(el).next('span').html('(' + cleanHTML(err) + ')').attr('class', 'err');
+        $(el).next('span').text('(' + err + ')').attr('class', 'err');
       } else {
         $(el).next('span').text('(' + (new Date(time*1000)).toString() + ')').attr('class', 'ok');
       }
@@ -392,12 +392,11 @@ var DemoAppInitData = {
     // Telegram.WebApp.setHeaderColor('secondary_bg_color');
 
     Telegram.WebApp.onEvent('themeChanged', function() {
-      $('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
+      $('#theme_data').text(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
     });
-    $('#webview_data').html(JSON.stringify(DemoApp.initDataUnsafe, null, 2));
-    $('#theme_data').html(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
+    $('#webview_data').text(JSON.stringify(DemoApp.initDataUnsafe, null, 2));
+    $('#theme_data').text(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
     DemoApp.checkInitData();
-
 
   }
 };
