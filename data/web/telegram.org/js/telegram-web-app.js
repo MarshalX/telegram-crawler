@@ -45,7 +45,7 @@
       iFrameStyle = document.createElement('style');
       document.head.appendChild(iFrameStyle);
       try {
-        window.parent.postMessage(JSON.stringify({eventType: 'iframe_ready'}), '*');
+        window.parent.postMessage(JSON.stringify({eventType: 'iframe_ready', eventData: {reload_supported: true}}), '*');
       } catch (e) {}
     }
   } catch (e) {}
