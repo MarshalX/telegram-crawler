@@ -36,6 +36,8 @@
           if (event.origin === 'https://web.telegram.org') {
             iFrameStyle.innerHTML = dataParsed.eventData;
           }
+        } else if (dataParsed.eventType == 'reload_iframe') {
+          location.reload();
         } else {
           receiveEvent(dataParsed.eventType, dataParsed.eventData);
         }
