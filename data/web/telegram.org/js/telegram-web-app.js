@@ -37,6 +37,9 @@
             iFrameStyle.innerHTML = dataParsed.eventData;
           }
         } else if (dataParsed.eventType == 'reload_iframe') {
+          try {
+            window.parent.postMessage(JSON.stringify({eventType: 'iframe_will_reload'}), '*');
+          } catch (e) {}
           location.reload();
         } else {
           receiveEvent(dataParsed.eventType, dataParsed.eventData);
