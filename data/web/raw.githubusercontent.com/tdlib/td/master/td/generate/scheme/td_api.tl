@@ -2126,7 +2126,7 @@ webPageInstantView page_blocks:vector<PageBlock> view_count:int32 version:int32 
 //@embed_height Height of the embedded preview
 //@duration Duration of the content, in seconds
 //@author Author of the content
-//@has_large_media True, if the preview has large media and its appearance can be changed
+//@has_large_media True, if size of media in the preview can be changed
 //@show_large_media True, if large media preview must be shown
 //@skip_confirmation True, if there is no need to show an ordinary open URL confirmation, when opening the URL from the preview, because the URL is shown in the message text in clear
 //@show_above_text True, if the link preview must be shown above message text; otherwise, the link preview must be shown below the message text
@@ -6723,8 +6723,9 @@ getMessage chat_id:int53 message_id:int53 = Message;
 //@description Returns information about a message, if it is available without sending network request. This is an offline request @chat_id Identifier of the chat the message belongs to @message_id Identifier of the message to get
 getMessageLocally chat_id:int53 message_id:int53 = Message;
 
-//@description Returns information about a message that is replied by a given message. Also, returns the pinned message, the game message, the invoice message, and the topic creation message for messages
-//-of the types messagePinMessage, messageGameScore, messagePaymentSuccessful, messageChatSetBackground and topic messages without replied message respectively
+//@description Returns information about a message that is replied by a given message. Also, returns the pinned message, the game message, the invoice message,
+//-the message with a previously set same background, and the topic creation message for messages of the types
+//-messagePinMessage, messageGameScore, messagePaymentSuccessful, messageChatSetBackground and topic messages without replied message respectively
 //@chat_id Identifier of the chat the message belongs to
 //@message_id Identifier of the reply message
 getRepliedMessage chat_id:int53 message_id:int53 = Message;
