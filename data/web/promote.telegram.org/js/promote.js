@@ -494,6 +494,8 @@ var NewAd = {
       state.pictureCheckbox.on('change.curPage', NewAd.onPictureChange);
       state.excludePoliticCheckbox = state.$form.field('exclude_politic');
       state.excludePoliticCheckbox.on('change.curPage', NewAd.onExcludePoliticChange);
+      state.onlyPoliticCheckbox = state.$form.field('only_politic');
+      state.onlyPoliticCheckbox.on('change.curPage', NewAd.onOnlyPoliticChange);
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
       NewAd.updateAdPreview(state.$form, state.previewData);
@@ -530,6 +532,7 @@ var NewAd = {
       state.confirmedCheckbox.off('.curPage');
       state.pictureCheckbox.off('.curPage');
       state.excludePoliticCheckbox.off('.curPage');
+      state.onlyPoliticCheckbox.off('.curPage');
       for (var i = 0; i < state.selectList.length; i++) {
         var selectData = state.selectList[i];
         if (selectData.location_search) {
@@ -559,6 +562,16 @@ var NewAd = {
     NewAd.adPostCheck($form);
   },
   onExcludePoliticChange: function() {
+    if ($(this).prop('checked')) {
+      Aj.state.onlyPoliticCheckbox.prop('checked', false);
+    }
+    NewAd.updateAdTargetOverview();
+    NewAd.saveDraftAuto(true);
+  },
+  onOnlyPoliticChange: function() {
+    if ($(this).prop('checked')) {
+      Aj.state.excludePoliticCheckbox.prop('checked', false);
+    }
     NewAd.updateAdTargetOverview();
     NewAd.saveDraftAuto(true);
   },
@@ -859,6 +872,13 @@ var NewAd = {
   },
   onSelectUpdate: function(field, value, valueFull) {
     var $fieldEl = Aj.state.$form.field(field);
+    if (field == 'user_topics') {
+      var has_user_topics = $fieldEl.data('value').length > 0;
+      if (has_user_topics) {
+        Aj.state.onlyPoliticCheckbox.prop('checked', false);
+      }
+      Aj.state.onlyPoliticCheckbox.prop('disabled', has_user_topics);
+    }
     var selOpts = $fieldEl.data('selOpts');
     var paired_field = selOpts.pairedField;
     if (!paired_field) {
@@ -1198,7 +1218,11 @@ var NewAd = {
           var last_user_target = user_targets.pop();
           user_targets[user_targets.length - 1] = l('WEB_AD_TARGET_AND', {item1: user_targets[user_targets.length - 1], item2: last_user_target});
         }
-        overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS', {target: user_targets.join(', ')}) + '</div>';
+        if (Aj.state.onlyPoliticCheckbox.prop('checked')) {
+          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS_ONLY_POLITIC', {target: user_targets.join(', ')}) + '</div>';
+        } else {
+          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS', {target: user_targets.join(', ')}) + '</div>';
+        }
         if (len.exclude_user_topics > 0) {
           overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_USER_EXCLUDE_TOPICS', lang_params) + '</div>';
         }
@@ -1240,6 +1264,9 @@ var NewAd = {
     }
     if ($form.field('exclude_politic').prop('checked')) {
       values.push('exclude_politic');
+    }
+    if ($form.field('only_politic').prop('checked')) {
+      values.push('only_politic');
     }
     if ($form.field('exclude_outside').prop('checked')) {
       values.push('exclude_outside');
@@ -1323,6 +1350,9 @@ var NewAd = {
     if ($form.field('exclude_politic').prop('checked')) {
       params.exclude_politic = 1;
     }
+    if ($form.field('only_politic').prop('checked')) {
+      params.only_politic = 1;
+    }
     if ($form.field('exclude_outside').prop('checked')) {
       params.exclude_outside = 1;
     }
@@ -1400,6 +1430,9 @@ var NewAd = {
     if ($form.field('exclude_politic').prop('checked')) {
       params.exclude_politic = 1;
     }
+    if ($form.field('only_politic').prop('checked')) {
+      params.only_politic = 1;
+    }
     if ($form.field('exclude_outside').prop('checked')) {
       params.exclude_outside = 1;
     }
@@ -1433,6 +1466,7 @@ var NewAd = {
       var values = $form.field(selectData.field).trigger('reset');
     }
     $form.field('exclude_politic').prop('checked', false);
+    $form.field('only_politic').prop('checked', false);
     $form.field('exclude_outside').prop('checked', false);
     Aj.state.titleField.focusAndSelect();
     NewAd.updateAdPreview(Aj.state.$form, false);
