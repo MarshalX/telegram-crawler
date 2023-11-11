@@ -53,6 +53,10 @@
 <a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
 <a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
 
+<a href='/constructor/updateStory'>updateStory</a>#75b3b798 peer:<a href='/type/Peer'>Peer</a> story:<a href='/type/StoryItem'>StoryItem</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/updateStoryID'>updateStoryID</a>#1bf335b9 id:<a href='/type/int'>int</a> random_id:<a href='/type/long'>long</a> = <a href='/type/Update'>Update</a>;
+
 ---functions---
 
 <a href='/method/stories.canSendStory'>stories.canSendStory</a>#c7dfdfdd peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
@@ -89,6 +93,8 @@ Note that if any of the conditions changes in the period between the call to <a 
 <li><code>expire</code>: Period after which the story is moved to <a href="#pinnedarchived-stories">archive</a> (and <a href="#pinnedarchived-stories">to the profile</a> if <code>pinned</code> is set), in seconds; must be one of <code>6 * 3600</code>, <code>12 * 3600</code>, <code>86400</code>, or <code>2 * 86400</code> for Telegram Premium users, and <code>86400</code> otherwise.</li>
 <li><code>pinned</code>: Whether to also <a href="#pinned-stories">add the story to the profile</a> automatically upon expiration. If not set, the story will only be added to the <a href="#pinnedarchived-stories">archive</a>. </li>
 </ul>
+<p>Once a story is successfully uploaded, an <a href="/constructor/updateStoryID">updateStoryID</a> will be returned, indicating the story ID (<code>id</code>) that was attributed to the story (like for messages, <code>random_id</code> indicates the <code>random_id</code> that was passed to <a href="/constructor/stories.sendStory">stories.sendStory</a>: this way, you can tell which story was assigned a specific <code>id</code> by checking which <a href="/constructor/stories.sendStory">stories.sendStory</a> call has the returned <code>random_id</code>).  </p>
+<p>Also, posting a story will emit an <a href="/constructor/updateStory">updateStory</a> both for us, and for our subscribers/contacts (even if they have <a href="#hiding-stories-of-other-users">hidden</a> our stories).  </p>
 <p>A story may also be edited using <a href="/method/stories.editStory">stories.editStory</a>.  </p>
 <h4><a class="anchor" href="#pinned-archived-stories" id="pinned-archived-stories" name="pinned-archived-stories"><i class="anchor-icon"></i></a>Pinned/archived stories</h4>
 <pre><code><a href='/constructor/stories.stories'>stories.stories</a>#5dd8c3c8 count:<a href='/type/int'>int</a> stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryItem'>StoryItem</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.Stories'>stories.Stories</a>;
@@ -110,7 +116,7 @@ Note that if any of the conditions changes in the period between the call to <a 
 <a href='/method/stories.deleteStories'>stories.deleteStories</a>#ae59db5f peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
 <p>Use the <a href="/method/stories.deleteStories">stories.deleteStories</a> method to delete one or more active, pinned or archived stories by their IDs, passed in <code>id</code>.  </p>
 <h4><a class="anchor" href="#preventing-users-from-seeing-your-stories" id="preventing-users-from-seeing-your-stories" name="preventing-users-from-seeing-your-stories"><i class="anchor-icon"></i></a>Preventing users from seeing your stories</h4>
-<p>Users may be individually blocked from seeing all of your stories by adding them to the <a href="/api/block">story blocklist »</a>.</p>
+<p>Users may be individually blocked from seeing all of your stories by adding them to the <a href="/api/block">story blocklist »</a>.  </p>
 <h3><a class="anchor" href="#watching-stories" id="watching-stories" name="watching-stories"><i class="anchor-icon"></i></a>Watching stories</h3>
 <pre><code><a href='/constructor/storyItem'>storyItem</a>#44c457ce flags:<a href='/type/%23'>#</a> pinned:flags.5?<a href='/constructor/true'>true</a> public:flags.7?<a href='/constructor/true'>true</a> close_friends:flags.8?<a href='/constructor/true'>true</a> min:flags.9?<a href='/constructor/true'>true</a> noforwards:flags.10?<a href='/constructor/true'>true</a> edited:flags.11?<a href='/constructor/true'>true</a> contacts:flags.12?<a href='/constructor/true'>true</a> selected_contacts:flags.13?<a href='/constructor/true'>true</a> out:flags.16?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> expire_date:<a href='/type/int'>int</a> caption:flags.0?<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; media:<a href='/type/MessageMedia'>MessageMedia</a> media_areas:flags.14?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; privacy:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PrivacyRule'>PrivacyRule</a>&gt; views:flags.3?<a href='/type/StoryViews'>StoryViews</a> sent_reaction:flags.15?<a href='/type/Reaction'>Reaction</a> = <a href='/type/StoryItem'>StoryItem</a>;
 <a href='/constructor/storyItemSkipped'>storyItemSkipped</a>#ffadc913 flags:<a href='/type/%23'>#</a> close_friends:flags.8?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> expire_date:<a href='/type/int'>int</a> = <a href='/type/StoryItem'>StoryItem</a>;
@@ -121,6 +127,7 @@ Note that if any of the conditions changes in the period between the call to <a 
 <a href='/constructor/storiesStealthMode'>storiesStealthMode</a>#712e27fd flags:<a href='/type/%23'>#</a> active_until_date:flags.0?<a href='/type/int'>int</a> cooldown_until_date:flags.1?<a href='/type/int'>int</a> = <a href='/type/StoriesStealthMode'>StoriesStealthMode</a>;
 
 <a href='/constructor/stories.allStories'>stories.allStories</a>#6efc5e81 flags:<a href='/type/%23'>#</a> has_more:flags.0?<a href='/constructor/true'>true</a> count:<a href='/type/int'>int</a> state:<a href='/type/string'>string</a> peer_stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PeerStories'>PeerStories</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; stealth_mode:<a href='/type/StoriesStealthMode'>StoriesStealthMode</a> = <a href='/type/stories.AllStories'>stories.AllStories</a>;
+<a href='/constructor/stories.allStoriesNotModified'>stories.allStoriesNotModified</a>#1158fe3e flags:<a href='/type/%23'>#</a> state:<a href='/type/string'>string</a> stealth_mode:<a href='/type/StoriesStealthMode'>StoriesStealthMode</a> = <a href='/type/stories.AllStories'>stories.AllStories</a>;
 
 <a href='/constructor/inputReplyToStory'>inputReplyToStory</a>#15b0f283 user_id:<a href='/type/InputUser'>InputUser</a> story_id:<a href='/type/int'>int</a> = <a href='/type/InputReplyTo'>InputReplyTo</a>;
 
@@ -141,7 +148,21 @@ Note that if any of the conditions changes in the period between the call to <a 
 <a href='/method/stories.getPeerStories'>stories.getPeerStories</a>#2c4ada50 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.PeerStories'>stories.PeerStories</a>;
 <a href='/method/stories.getAllReadPeerStories'>stories.getAllReadPeerStories</a>#9b5ae7f9 = <a href='/type/Updates'>Updates</a>;
 <a href='/method/stories.getPeerMaxIDs'>stories.getPeerMaxIDs</a>#535983c3 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
-<p>Stories s</p>
+<p>Active stories of contacts and subscribed channels should be shown in the action bar of the homescreen.<br>
+Use <a href="/method/stories.getAllStories">stories.getAllStories</a> to fetch the full list of active stories. </p>
+<p>Optionally, the <code>hidden</code> flag can be set to fetch the <a href="#hiding-stories-of-other-users">hidden stories to be shown in the archived tab</a>.  </p>
+<p>Pagination using this method is a bit different from usual: a <code>state</code> string is used to maintain the pagination state.  </p>
+<ul>
+<li>Initially, neither the <code>next</code> or <code>state</code> flags should be set: upon completion, a new <code>state</code> string is returned and should be stored locally, associated either to the main or hidden story list (depending on the value of <code>hidden</code> we passed); pass the locally stored <code>state</code> to all future calls of the method.  </li>
+<li>If more stories are available, the <a href="/constructor/stories.allStories">stories.allStories</a>.<code>has_more</code> flag will be set: in this case, the client should re-call the method with the newly returned <code>state</code> <strong>and</strong> the <code>next</code> flag set to fetch a new <code>state</code> and the remaining stories from the chosen story list; the process should be repeated until no more stories are available (<code>no_more</code> will <strong>not</strong> be set).  </li>
+</ul>
+<p>Once the full story list is fetched, <a href="/constructor/stories.allStories">stories.allStories</a> can be called with the stored <code>state</code> <strong>without</strong> setting the <code>next</code> flag to check for updates in an active story list: if no changes have occurred since our last call, <a href="/method/stories.allStoriesNotModified">stories.allStoriesNotModified</a> is returned, otherwise <a href="/constructor/stories.allStories">stories.allStories</a> is returned (possibly requiring further pagination as described above).  </p>
+<p>Changes to the active stories list are contained in the <a href="/constructor/stories.allStories">stories.allStories</a>.<code>peer_stories</code> field: this field contains a vector of <a href="/constructor/peerStories">peerStories</a> constructors, one for each peer, containing the peer ID, the ID of the maximum read story (if any), and a list of <a href="/type/StoryItem">StoryItem</a> constructors of type:</p>
+<ul>
+<li><a href="/constructor/storyItem">storyItem</a> - Represents an active story</li>
+<li><a href="/constructor/storyItemSkipped">storyItemSkipped</a> - Represents an active story, whose</li>
+<li><a href="/constructor/storyItemDeleted">storyItemDeleted</a> - Represents a previously active story, that was now deleted (i.e. returned when fetching updates to the active story list with <code>state</code> set and <code>next</code> <strong>not</strong> set)</li>
+</ul>
 <h4><a class="anchor" href="#hiding-stories-of-other-users" id="hiding-stories-of-other-users" name="hiding-stories-of-other-users"><i class="anchor-icon"></i></a>Hiding stories of other users</h4>
 <pre><code><a href='/constructor/user'>user</a>#abb5f120 flags:<a href='/type/%23'>#</a> self:flags.10?<a href='/constructor/true'>true</a> contact:flags.11?<a href='/constructor/true'>true</a> mutual_contact:flags.12?<a href='/constructor/true'>true</a> deleted:flags.13?<a href='/constructor/true'>true</a> bot:flags.14?<a href='/constructor/true'>true</a> bot_chat_history:flags.15?<a href='/constructor/true'>true</a> bot_nochats:flags.16?<a href='/constructor/true'>true</a> verified:flags.17?<a href='/constructor/true'>true</a> restricted:flags.18?<a href='/constructor/true'>true</a> min:flags.20?<a href='/constructor/true'>true</a> bot_inline_geo:flags.21?<a href='/constructor/true'>true</a> support:flags.23?<a href='/constructor/true'>true</a> scam:flags.24?<a href='/constructor/true'>true</a> apply_min_photo:flags.25?<a href='/constructor/true'>true</a> fake:flags.26?<a href='/constructor/true'>true</a> bot_attach_menu:flags.27?<a href='/constructor/true'>true</a> premium:flags.28?<a href='/constructor/true'>true</a> attach_menu_enabled:flags.29?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> bot_can_edit:flags2.1?<a href='/constructor/true'>true</a> close_friend:flags2.2?<a href='/constructor/true'>true</a> stories_hidden:flags2.3?<a href='/constructor/true'>true</a> stories_unavailable:flags2.4?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:flags.0?<a href='/type/long'>long</a> first_name:flags.1?<a href='/type/string'>string</a> last_name:flags.2?<a href='/type/string'>string</a> username:flags.3?<a href='/type/string'>string</a> phone:flags.4?<a href='/type/string'>string</a> photo:flags.5?<a href='/type/UserProfilePhoto'>UserProfilePhoto</a> status:flags.6?<a href='/type/UserStatus'>UserStatus</a> bot_info_version:flags.14?<a href='/type/int'>int</a> restriction_reason:flags.18?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; bot_inline_placeholder:flags.19?<a href='/type/string'>string</a> lang_code:flags.22?<a href='/type/string'>string</a> emoji_status:flags.30?<a href='/type/EmojiStatus'>EmojiStatus</a> usernames:flags2.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Username'>Username</a>&gt; stories_max_id:flags2.5?<a href='/type/int'>int</a> = <a href='/type/User'>User</a>;
 
@@ -151,7 +172,7 @@ Note that if any of the conditions changes in the period between the call to <a 
 
 <a href='/method/stories.toggleAllStoriesHidden'>stories.toggleAllStoriesHidden</a>#7c2557c4 hidden:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p>Use <a href="/method/stories.toggleAllStoriesHidden">stories.togglePeerStoriesHidden</a> to hide the active stories of a user, preventing them from being displayed on the action bar on the homescreen.<br>
-When the stories of a user are marked as hidden, the <code>stories_hidden</code> flag is set on the related <a href="/constructor/user">user</a> constructor, and they should only be visible on the action bar when opening the <a href="/api/folders#peer-folders">archive folder</a>.  </p>
+When the stories of a user are marked as hidden, the <code>stories_hidden</code> flag is set on the related <a href="/constructor/user">user</a> constructor, and they should only be visible on the action bar when opening the <a href="/api/folders#peer-folders">archive folder</a>, by setting the <code>hidden</code> flag when calling <a href="/method/stories.getAllStories">stories.getAllStories</a>, see <a href="#watching-stories">here</a> for more info.  </p>
 <p>Note that the <a href="/api/folders#peer-folders">archive folder is the peer folder used for archived chats</a>: hidden stories are displayed there purely due to a UI implementation detail, not because they're actually added to the <a href="/api/folders#peer-folders">archive peer folder »</a> or the <a href="#pinnedarchived-stories">story archive »</a>, which are different things.  </p>
 <h3><a class="anchor" href="#media-areas" id="media-areas" name="media-areas"><i class="anchor-icon"></i></a>Media areas</h3>
 <p>Schema:</p>
@@ -202,12 +223,15 @@ Note that this should be done transparently in a map UI, not in the usual inline
 
 <a href='/constructor/mediaAreaSuggestedReaction'>mediaAreaSuggestedReaction</a>#14455871 flags:<a href='/type/%23'>#</a> dark:flags.0?<a href='/constructor/true'>true</a> flipped:flags.1?<a href='/constructor/true'>true</a> coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/MediaArea'>MediaArea</a>;
 
+<a href='/constructor/updateSentStoryReaction'>updateSentStoryReaction</a>#7d627683 peer:<a href='/type/Peer'>Peer</a> story_id:<a href='/type/int'>int</a> reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/Update'>Update</a>;
+
 ---functions---
 
 <a href='/method/stories.sendReaction'>stories.sendReaction</a>#7fd736b2 flags:<a href='/type/%23'>#</a> add_to_recent:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> story_id:<a href='/type/int'>int</a> reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Story <a href="/api/reactions">reactions</a> are implemented using a simple in-UI button that allows the user to send any reaction using <a href="/method/stories.sendReaction">stories.sendReaction</a>.  </p>
+<p>Sending this method will return an <a href="/constructor/updateSentStoryReaction">updateSentStoryReaction</a> update to all logged-in sessions.  </p>
 <p>However, the poster of a story may also use <a href="/constructor/mediaAreaSuggestedReaction">mediaAreaSuggestedReaction</a> <a href="#media-areas">media areas »</a> to suggest some specific reactions as simple clickable buttons: they're rendered as a round comic-style thought bubble with its "tail" on the right, white background and the <a href="/api/reactions">reaction »</a> from the <code>reaction</code> field located in its center.<br>
-If the <code>dark</code> flag is set, the background should by black.<br>
+If the <code>dark</code> flag is set, the background should be black.<br>
 If the <code>flipped</code> flag is set, the "tail" should be located on the left.</p>
 <p>Clicking it should invoke <a href="/method/stories.sendReaction">stories.sendReaction</a> as usual.</p>
 <h3><a class="anchor" href="#stealth-mode" id="stealth-mode" name="stealth-mode"><i class="anchor-icon"></i></a>Stealth mode</h3>
@@ -228,49 +252,7 @@ If the <code>flipped</code> flag is set, the "tail" should be located on the lef
 <li><code>cooldown_until_date</code> - the date starting from which the user will be allowed to call <a href="/method/stories.activateStealthMode">stories.activateStealthMode</a> again; calling the method earlier will return a <code>FLOOD_WAIT_X</code> error as specified above.</li>
 </ul>
 <h3><a class="anchor" href="#channel-stories" id="channel-stories" name="channel-stories"><i class="anchor-icon"></i></a>Channel stories</h3>
-<p>Telegram users can grant their favorite channels the ability to post <a href="/api/stories">stories</a> by giving them boosts. <a href="/api/premium">Telegram Premium</a> now includes one boost that can be assigned to any channel.</p>
-<h4><a class="anchor" href="#boosts" id="boosts" name="boosts"><i class="anchor-icon"></i></a>Boosts</h4>
-<p>Channels level up as they gain more boosts – and for each level, they can post 1 additional story per day to their subscribers' story feeds.  </p>
-<p>Schema:</p>
-<pre><code><a href='/constructor/stories.canApplyBoostOk'>stories.canApplyBoostOk</a>#c3173587 = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
-<a href='/constructor/stories.canApplyBoostReplace'>stories.canApplyBoostReplace</a>#712c4655 current_boost:<a href='/type/Peer'>Peer</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
-
-<a href='/constructor/statsPercentValue'>statsPercentValue</a>#cbce2fe0 part:<a href='/type/double'>double</a> total:<a href='/type/double'>double</a> = <a href='/type/StatsPercentValue'>StatsPercentValue</a>;
-<a href='/constructor/stories.boostsStatus'>stories.boostsStatus</a>#66ea1fef flags:<a href='/type/%23'>#</a> my_boost:flags.2?<a href='/constructor/true'>true</a> level:<a href='/type/int'>int</a> current_level_boosts:<a href='/type/int'>int</a> boosts:<a href='/type/int'>int</a> next_level_boosts:flags.0?<a href='/type/int'>int</a> premium_audience:flags.1?<a href='/type/StatsPercentValue'>StatsPercentValue</a> = <a href='/type/stories.BoostsStatus'>stories.BoostsStatus</a>;
-
-<a href='/constructor/booster'>booster</a>#e9e6380 user_id:<a href='/type/long'>long</a> expires:<a href='/type/int'>int</a> = <a href='/type/Booster'>Booster</a>;
-
-<a href='/constructor/stories.boostersList'>stories.boostersList</a>#f3dd3d1d flags:<a href='/type/%23'>#</a> count:<a href='/type/int'>int</a> boosters:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Booster'>Booster</a>&gt; next_offset:flags.0?<a href='/type/string'>string</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.BoostersList'>stories.BoostersList</a>;
-
----functions---
-
-<a href='/method/stories.canApplyBoost'>stories.canApplyBoost</a>#db05c1bd peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
-<a href='/method/stories.applyBoost'>stories.applyBoost</a>#f29d7c2b peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
-
-<a href='/method/stories.getBoostsStatus'>stories.getBoostsStatus</a>#4c449472 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.BoostsStatus'>stories.BoostsStatus</a>;
-
-<a href='/method/stories.getBoostersList'>stories.getBoostersList</a>#337ef980 peer:<a href='/type/InputPeer'>InputPeer</a> offset:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.BoostersList'>stories.BoostersList</a>;</code></pre>
-<p>Use <a href="/method/stories.applyBoost">stories.applyBoost</a> to boost a channel: before invoking this method, however, make sure to invoke <a href="/method/stories.canApplyBoost">stories.canApplyBoost</a> to check if a given channel can be boosted.  </p>
-<p>A <code>PREMIUM_ACCOUNT_REQUIRED</code> error will be returned when calling any of the two methods if the current account does not have a <a href="/api/premium">Telegram Premium</a> subscription.<br>
-A <code>BOOST_NOT_MODIFIED</code> RPC error will be returned when calling any of the two methods if the user is already boosting the specified channel.  </p>
-<p>Furthermore, the result of <a href="/method/stories.canApplyBoost">stories.canApplyBoost</a> can be:</p>
-<ul>
-<li><a href="/constructor/stories.canApplyBoostOk">stories.canApplyBoostOk</a> if the current user isn't boosting any channel, and can boost the specified channel.  </li>
-<li><a href="/constructor/stories.canApplyBoostReplace">stories.canApplyBoostReplace</a> if the user is already boosting another channel, containing the channel that the user is currently boosting.  </li>
-</ul>
-<p>After boosting a channel, the user may not change their boosted channel for a certain cooldown period: if the cooldown period isn't over yet, calls to any of the two methods will return a 420 <code>FLOOD_WAIT_X</code> error, indicating the number of seconds left before a different channel can be boosted.  </p>
-<p>Users may also invoke <a href="/method/stories.getBoostsStatus">stories.getBoostsStatus</a>, to get the current boost status of a channel as a <a href="/constructor/stories.boostsStatus">stories.boostsStatus</a> constructor, check out the <a href="/constructor/stories.boostsStatus">constructor page</a> for more info.</p>
-<p>Channel administrators may invoke <a href="/method/stories.getBoostersList">stories.getBoostersList</a> to fetch the list of users currently boosting the channel.</p>
-<h4><a class="anchor" href="#posting-stories-as-a-channel" id="posting-stories-as-a-channel" name="posting-stories-as-a-channel"><i class="anchor-icon"></i></a>Posting stories as a channel</h4>
-<pre><code><a href='/constructor/inputPeerChannel'>inputPeerChannel</a>#27bcbbfc channel_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputPeer'>InputPeer</a>;
-
-<a href='/constructor/messages.chats'>messages.chats</a>#64ff9fd5 chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
-
----functions---
-
-<a href='/method/stories.getChatsToSend'>stories.getChatsToSend</a>#a56a8b60 = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
-<p>Everything works exactly the same as when <a href="#posting-stories">posting stories as a user</a>, with the only difference that clients should pass the appropriate <a href="/constructor/inputPeerChannel">inputPeerChannel</a> instead of <a href="/constructor/inputPeerSelf">inputPeerSelf</a> to <a href="/method/stories.canSendStory">stories.canSendStory</a>, <a href="/method/stories.sendStory">stories.sendStory</a> and all the other story methods, see the <a href="#posting-stories">main documentation »</a> for more info.  </p>
-<p>Use <a href="/method/stories.getChatsToSend">stories.getChatsToSend</a> to obtain a list of channels where the user can post stories; <a href="/method/stories.canSendStory">stories.canSendStory</a> must still be used before uploading a story to make sure no other limit was reached, as described in the <a href="#posting-stories">main documentation »</a>.</p></div>
+<p>In order to obtain permission to post stories, channels must be boosted, see <a href="/api/boost">here »</a> for more info.</p></div>
   
 </div>
           

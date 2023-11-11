@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Channel boosts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram Premium users can grant their favorite channels additional features like the ability to post stories by giving them boosts.">
+    <meta property="og:title" content="Channel boosts">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram Premium users can grant their favorite channels additional features like the ability to post stories by giving them boosts.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?236" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/boost" >Channel boosts</a></li></ul></div>
+  <h1 id="dev_page_title">Channel boosts</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p><a href="/api/premium">Telegram Premium</a> users can grant their favorite channels additional features like the ability to post <a href="/api/stories">stories</a> by giving them <strong>boosts</strong>.  </p>
+<p>Channels level up as they gain more boosts – and for each level, they gain additional features.  </p>
+<p>Schema:</p>
+<pre><code><a href='/constructor/stories.canApplyBoostOk'>stories.canApplyBoostOk</a>#c3173587 = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
+<a href='/constructor/stories.canApplyBoostReplace'>stories.canApplyBoostReplace</a>#712c4655 current_boost:<a href='/type/Peer'>Peer</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
+
+<a href='/constructor/statsPercentValue'>statsPercentValue</a>#cbce2fe0 part:<a href='/type/double'>double</a> total:<a href='/type/double'>double</a> = <a href='/type/StatsPercentValue'>StatsPercentValue</a>;
+<a href='/constructor/stories.boostsStatus'>stories.boostsStatus</a>#66ea1fef flags:<a href='/type/%23'>#</a> my_boost:flags.2?<a href='/constructor/true'>true</a> level:<a href='/type/int'>int</a> current_level_boosts:<a href='/type/int'>int</a> boosts:<a href='/type/int'>int</a> next_level_boosts:flags.0?<a href='/type/int'>int</a> premium_audience:flags.1?<a href='/type/StatsPercentValue'>StatsPercentValue</a> = <a href='/type/stories.BoostsStatus'>stories.BoostsStatus</a>;
+
+<a href='/constructor/booster'>booster</a>#e9e6380 user_id:<a href='/type/long'>long</a> expires:<a href='/type/int'>int</a> = <a href='/type/Booster'>Booster</a>;
+
+<a href='/constructor/stories.boostersList'>stories.boostersList</a>#f3dd3d1d flags:<a href='/type/%23'>#</a> count:<a href='/type/int'>int</a> boosters:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Booster'>Booster</a>&gt; next_offset:flags.0?<a href='/type/string'>string</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.BoostersList'>stories.BoostersList</a>;
+
+---functions---
+
+<a href='/method/stories.canApplyBoost'>stories.canApplyBoost</a>#db05c1bd peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.CanApplyBoostResult'>stories.CanApplyBoostResult</a>;
+<a href='/method/stories.applyBoost'>stories.applyBoost</a>#f29d7c2b peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/stories.getBoostsStatus'>stories.getBoostsStatus</a>#4c449472 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.BoostsStatus'>stories.BoostsStatus</a>;
+
+<a href='/method/stories.getBoostersList'>stories.getBoostersList</a>#337ef980 peer:<a href='/type/InputPeer'>InputPeer</a> offset:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.BoostersList'>stories.BoostersList</a>;</code></pre>
+<p>Use <a href="/method/stories.applyBoost">stories.applyBoost</a> to boost a channel: before invoking this method, however, make sure to invoke <a href="/method/stories.canApplyBoost">stories.canApplyBoost</a> to check if a given channel can be boosted.  </p>
+<p>A <code>PREMIUM_ACCOUNT_REQUIRED</code> error will be returned when calling any of the two methods if the current account does not have a <a href="/api/premium">Telegram Premium</a> subscription.<br>
+A <code>BOOST_NOT_MODIFIED</code> RPC error will be returned when calling any of the two methods if the user is already boosting the specified channel.  </p>
+<p>Furthermore, the result of <a href="/method/stories.canApplyBoost">stories.canApplyBoost</a> can be:</p>
+<ul>
+<li><a href="/constructor/stories.canApplyBoostOk">stories.canApplyBoostOk</a> if the current user isn't boosting any channel, and can boost the specified channel.  </li>
+<li><a href="/constructor/stories.canApplyBoostReplace">stories.canApplyBoostReplace</a> if the user is already boosting another channel, containing the channel that the user is currently boosting.  </li>
+</ul>
+<p>After boosting a channel, the user may not change their boosted channel for a certain cooldown period: if the cooldown period isn't over yet, calls to any of the two methods will return a 420 <code>FLOOD_WAIT_X</code> error, indicating the number of seconds left before a different channel can be boosted.  </p>
+<p>Users may also invoke <a href="/method/stories.getBoostsStatus">stories.getBoostsStatus</a>, to get the current boost status of a channel as a <a href="/constructor/stories.boostsStatus">stories.boostsStatus</a> constructor, check out the <a href="/constructor/stories.boostsStatus">constructor page</a> for more info.</p>
+<p>Channel administrators may invoke <a href="/method/stories.getBoostersList">stories.getBoostersList</a> to fetch the list of users currently boosting the channel.</p>
+<h3><a class="anchor" href="#features" id="features" name="features"><i class="anchor-icon"></i></a>Features</h3>
+<h4><a class="anchor" href="#posting-stories-as-a-channel" id="posting-stories-as-a-channel" name="posting-stories-as-a-channel"><i class="anchor-icon"></i></a>Posting stories as a channel</h4>
+<p>With each boost, channels can post 1 additional story per day to their subscribers' story feeds.</p>
+<pre><code><a href='/constructor/inputPeerChannel'>inputPeerChannel</a>#27bcbbfc channel_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputPeer'>InputPeer</a>;
+
+<a href='/constructor/messages.chats'>messages.chats</a>#64ff9fd5 chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
+
+---functions---
+
+<a href='/method/stories.getChatsToSend'>stories.getChatsToSend</a>#a56a8b60 = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
+<p>Everything works exactly the same as when <a href="#posting-stories">posting stories as a user</a>, with the only difference that clients should pass the appropriate <a href="/constructor/inputPeerChannel">inputPeerChannel</a> instead of <a href="/constructor/inputPeerSelf">inputPeerSelf</a> to <a href="/method/stories.canSendStory">stories.canSendStory</a>, <a href="/method/stories.sendStory">stories.sendStory</a> and all the other story methods, see the <a href="/api/stories#posting-stories">main documentation »</a> for more info.  </p>
+<p>Use <a href="/method/stories.getChatsToSend">stories.getChatsToSend</a> to obtain a list of channels where the user can post stories; <a href="/method/stories.canSendStory">stories.canSendStory</a> must still be used before uploading a story to make sure no other limit was reached, as described in the <a href="/api/stories#posting-stories">main documentation »</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
