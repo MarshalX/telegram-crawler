@@ -54,28 +54,43 @@
 <a href='/method/account.initTakeoutSession'>account.initTakeoutSession</a>#8ef3eab0 flags:<a href='/type/%23'>#</a> contacts:flags.0?<a href='/constructor/true'>true</a> message_users:flags.1?<a href='/constructor/true'>true</a> message_chats:flags.2?<a href='/constructor/true'>true</a> message_megagroups:flags.3?<a href='/constructor/true'>true</a> message_channels:flags.4?<a href='/constructor/true'>true</a> files:flags.5?<a href='/constructor/true'>true</a> file_max_size:flags.5?<a href='/type/long'>long</a> = <a href='/type/account.Takeout'>account.Takeout</a>;
 
 invokeWithTakeout#aca9fd2e {X:Type} takeout_id:long query:!X = X;
-invokeWithMessagesRange#365275f2 {X:Type} range:MessageRange query:!X = X;
 
 <a href='/method/account.finishTakeoutSession'>account.finishTakeoutSession</a>#1d2652ee flags:<a href='/type/%23'>#</a> success:flags.0?<a href='/constructor/true'>true</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p>Use <a href="/method/account.initTakeoutSession">account.initTakeoutSession</a> to initialize a takeout session: pass the appropriate flags to enable usage of the corresponding methods, as described below.  </p>
 <p>When invoking the methods described below, each query must be wrapped using <a href="/method/invokeWithTakeout">invokeWithTakeout</a>, with the <code>id</code> returned by <a href="/method/account.initTakeoutSession">account.initTakeoutSession</a>.  </p>
 <p>After finishing the export, terminate the session using <a href="/method/account.finishTakeoutSession">account.finishTakeoutSession</a>.  </p>
-<h2><a class="anchor" href="#contacts" id="contacts" name="contacts"><i class="anchor-icon"></i></a>Contacts</h2>
+<h3><a class="anchor" href="#split-ranges" id="split-ranges" name="split-ranges"><i class="anchor-icon"></i></a>Split ranges</h3>
+<pre><code><a href='/constructor/messageRange'>messageRange</a>#ae30253 min_id:<a href='/type/int'>int</a> max_id:<a href='/type/int'>int</a> = <a href='/type/MessageRange'>MessageRange</a>;
+
+---functions---
+
+<a href='/method/messages.getSplitRanges'>messages.getSplitRanges</a>#1cff7e08 = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageRange'>MessageRange</a>&gt;;
+
+invokeWithMessagesRange#365275f2 {X:Type} range:MessageRange query:!X = X;</code></pre>
+<p>Some method calls require additional pagination using message ranges.  </p>
+<p>First of all, obtain a list of message ranges by invoking <a href="/method/messages.getSplitRanges">messages.getSplitRanges</a> (wrapping it in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> as usual).  </p>
+<p>Then, when invoking methods that require message range pagination, wrap the method using <a href="/method/invokeWithMessagesRange">invokeWithMessagesRange</a>, before also wrapping it in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> as usual.  </p>
+<p>Start by passing the first message range; continue passing the same message range while paginating using the <a href="/api/offset">usual <code>offset_*</code>, <code>limit</code>, etc parameters</a>; once there are no more results left, switch to the next message range, re-starting <code>offset_*</code>, <code>limit</code> pagination from the beginning.<br>
+Repeat until you've finished all message ranges.  </p>
+<h3><a class="anchor" href="#contacts" id="contacts" name="contacts"><i class="anchor-icon"></i></a>Contacts</h3>
 <pre><code><a href='/constructor/savedPhoneContact'>savedPhoneContact</a>#1142bd56 phone:<a href='/type/string'>string</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> = <a href='/type/SavedContact'>SavedContact</a>;
 
 ---functions---
 
 <a href='/method/contacts.getSaved'>contacts.getSaved</a>#82f1e39f = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SavedContact'>SavedContact</a>&gt;;</code></pre>
+<p>This method does <strong>not</strong> require pagination using <a href="#split-ranges">message ranges</a>.  </p>
 <p>Use <a href="/method/contacts.getSaved">contacts.getSaved</a> to export the full contact list, see <a href="/api/contacts#fetching-the-contact-list">here »</a> for another alternative method that may be used to fetch the full list of all contacts with a Telegram account, without using a takeout session.</p>
-<h2><a class="anchor" href="#left-channels" id="left-channels" name="left-channels"><i class="anchor-icon"></i></a>Left channels</h2>
+<h3><a class="anchor" href="#left-channels" id="left-channels" name="left-channels"><i class="anchor-icon"></i></a>Left channels</h3>
 <pre><code><a href='/constructor/messages.chats'>messages.chats</a>#64ff9fd5 chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
 <a href='/constructor/messages.chatsSlice'>messages.chatsSlice</a>#9cd81144 count:<a href='/type/int'>int</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
 
 ---functions---
 
 <a href='/method/channels.getLeftChannels'>channels.getLeftChannels</a>#8341ecc0 offset:<a href='/type/int'>int</a> = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
+<p>This method does <strong>not</strong> require pagination using <a href="#split-ranges">message ranges</a>.  </p>
 <p>Use <a href="/method/channels.getLeftChannels">channels.getLeftChannels</a> to get a list of channels or supergroups we left.</p>
-<h2><a class="anchor" href="#" id="" name=""><i class="anchor-icon"></i></a></h2></div>
+<h3><a class="anchor" href="#" id="" name=""><i class="anchor-icon"></i></a></h3>
+<p>This method <strong>requires</strong> pagination using <a href="#split-ranges">message ranges</a>.</p></div>
   
 </div>
           
