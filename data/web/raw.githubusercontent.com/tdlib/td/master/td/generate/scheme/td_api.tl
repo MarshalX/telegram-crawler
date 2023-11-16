@@ -699,7 +699,7 @@ premiumGiftCodePaymentOptions options:vector<premiumGiftCodePaymentOption> = Pre
 //@creator_id Identifier of a chat or a user that created the gift code
 //@creation_date Point in time (Unix timestamp) when the code was created
 //@is_from_giveaway True, if the gift code was created for a giveaway
-//@giveaway_message_id Identifier of the corresponding giveaway message; can be 0 or an identifier of a deleted message
+//@giveaway_message_id Identifier of the corresponding giveaway message in the creator_id chat; can be 0 or an identifier of a deleted message
 //@month_count Number of month the Telegram Premium subscription will be active after code activation
 //@user_id Identifier of a user for which the code was created; 0 if none
 //@use_date Point in time (Unix timestamp) when the code was activated; 0 if none
@@ -1127,7 +1127,7 @@ messageSenderChat chat_id:int53 = MessageSender;
 messageSenders total_count:int32 senders:vector<MessageSender> = MessageSenders;
 
 
-//@description Represents a message sender, which can be used to send messages in a chat @sender Available message senders @needs_premium True, if Telegram Premium is needed to use the message sender
+//@description Represents a message sender, which can be used to send messages in a chat @sender The message sender @needs_premium True, if Telegram Premium is needed to use the message sender
 chatMessageSender sender:MessageSender needs_premium:Bool = ChatMessageSender;
 
 //@description Represents a list of message senders, which can be used to send messages in a chat @senders List of available message senders
@@ -1195,7 +1195,7 @@ messageReplyInfo reply_count:int32 recent_replier_ids:vector<MessageSender> last
 //@type Type of the reaction
 //@total_count Number of times the reaction was added
 //@is_chosen True, if the reaction is chosen by the current user
-//@used_sender_id Identifier of the message sender used by the current user to add the reaction; null if unknown or the reaction isn't chosen
+//@used_sender_id Identifier of the message sender used by the current user to add the reaction; may be null if unknown or the reaction isn't chosen
 //@recent_sender_ids Identifiers of at most 3 recent message senders, added the reaction; available in private, basic group and supergroup chats
 messageReaction type:ReactionType total_count:int32 is_chosen:Bool used_sender_id:MessageSender recent_sender_ids:vector<MessageSender> = MessageReaction;
 
@@ -1474,7 +1474,7 @@ chatTypeBasicGroup basic_group_id:int53 = ChatType;
 //@description A supergroup or channel (with unlimited members) @supergroup_id Supergroup or channel identifier @is_channel True, if the supergroup is a channel
 chatTypeSupergroup supergroup_id:int53 is_channel:Bool = ChatType;
 
-//@description A secret chat with a user @secret_chat_id Secret chat identifier @user_id User identifier of the secret chat peer
+//@description A secret chat with a user @secret_chat_id Secret chat identifier @user_id User identifier of the other user in the secret chat
 chatTypeSecret secret_chat_id:int32 user_id:int53 = ChatType;
 
 
@@ -1656,7 +1656,7 @@ chatActionBarInviteMembers = ChatActionBar;
 //@description The chat is a private or secret chat, which can be reported using the method reportChat, or the other user can be blocked using the method setMessageSenderBlockList,
 //-or the other user can be added to the contact list using the method addContact. If the chat is a private chat with a user with an emoji status, then a notice about emoji status usage must be shown
 //@can_unarchive If true, the chat was automatically archived and can be moved back to the main chat list using addChatToList simultaneously with setting chat notification settings to default using setChatNotificationSettings
-//@distance If non-negative, the current user was found by the peer through searchChatsNearby and this is the distance between the users
+//@distance If non-negative, the current user was found by the other user through searchChatsNearby and this is the distance between the users
 chatActionBarReportAddBlock can_unarchive:Bool distance:int32 = ChatActionBar;
 
 //@description The chat is a private or secret chat and the other user can be added to the contact list using the method addContact
@@ -2974,7 +2974,7 @@ inputThumbnail thumbnail:InputFile width:int32 height:int32 = InputThumbnail;
 //@description The message will be sent at the specified date @send_date Point in time (Unix timestamp) when the message will be sent. The date must be within 367 days in the future
 messageSchedulingStateSendAtDate send_date:int32 = MessageSchedulingState;
 
-//@description The message will be sent when the peer will be online. Applicable to private chats only and when the exact online status of the peer is known
+//@description The message will be sent when the other user is online. Applicable to private chats only and when the exact online status of the other user is known
 messageSchedulingStateSendWhenOnline = MessageSchedulingState;
 
 
@@ -3035,7 +3035,7 @@ inputMessageAudio audio:InputFile album_cover_thumbnail:inputThumbnail duration:
 //@description A document message (general file)
 //@document Document to be sent
 //@thumbnail Document thumbnail; pass null to skip thumbnail uploading
-//@disable_content_type_detection If true, automatic file type detection will be disabled and the document will always be sent as file. Always true for files sent to secret chats
+//@disable_content_type_detection True, if automatic file type detection is disabled and the document must be sent as a file. Always true for files sent to secret chats
 //@caption Document caption; pass null to use an empty caption; 0-getOption("message_caption_length_max") characters
 inputMessageDocument document:InputFile thumbnail:inputThumbnail disable_content_type_detection:Bool caption:formattedText = InputMessageContent;
 
@@ -3633,7 +3633,7 @@ callStatePending is_created:Bool is_received:Bool = CallState;
 callStateExchangingKeys = CallState;
 
 //@description The call is ready to use
-//@protocol Call protocols supported by the peer
+//@protocol Call protocols supported by the other call participant
 //@servers List of available call servers
 //@config A JSON-encoded call config
 //@encryption_key Call encryption key
@@ -3687,7 +3687,7 @@ groupCallRecentSpeaker participant_id:MessageSender is_speaking:Bool = GroupCall
 //@id Group call identifier
 //@title Group call title
 //@scheduled_start_date Point in time (Unix timestamp) when the group call is supposed to be started by an administrator; 0 if it is already active or was ended
-//@enabled_start_notification True, if the group call is scheduled and the current user will receive a notification when the group call will start
+//@enabled_start_notification True, if the group call is scheduled and the current user will receive a notification when the group call starts
 //@is_active True, if the call is active
 //@is_rtmp_stream True, if the chat is an RTMP stream instead of an ordinary video chat
 //@is_joined True, if the call is joined
@@ -3770,7 +3770,7 @@ callProblemPixelatedVideo = CallProblem;
 
 //@description Describes a call
 //@id Call identifier, not persistent
-//@user_id Peer user identifier
+//@user_id User identifier of the other call participant
 //@is_outgoing True, if the call is outgoing
 //@is_video True, if the call is a video call
 //@state Call state
@@ -5990,8 +5990,8 @@ updateAuthorizationState authorization_state:AuthorizationState = Update;
 //@description A new message was received; can also be an outgoing message @message The new message
 updateNewMessage message:message = Update;
 
-//@description A request to send a message has reached the Telegram server. This doesn't mean that the message will be sent successfully or even that the send message request will be processed.
-//-This update will be sent only if the option "use_quick_ack" is set to true. This update may be sent multiple times for the same message
+//@description A request to send a message has reached the Telegram server. This doesn't mean that the message will be sent successfully.
+//-This update is sent only if the option "use_quick_ack" is set to true. This update may be sent multiple times for the same message
 //@chat_id The chat identifier of the sent message
 //@message_id A temporary message identifier
 updateMessageSendAcknowledged chat_id:int53 message_id:int53 = Update;
@@ -6051,7 +6051,7 @@ updateChatPhoto chat_id:int53 photo:chatPhotoInfo = Update;
 //@description A chat accent color has changed @chat_id Chat identifier @accent_color_id The new chat accent color identifier
 updateChatAccentColor chat_id:int53 accent_color_id:int32 = Update;
 
-//@description A chat's custom emoji for reply background has changed @chat_id Chat identifier @background_custom_emoji_id The new tdentifier of a custom emoji to be shown on the reply header background
+//@description A chat's custom emoji for reply background has changed @chat_id Chat identifier @background_custom_emoji_id The new identifier of a custom emoji to be shown on the reply header background; 0 if none
 updateChatBackgroundCustomEmoji chat_id:int53 background_custom_emoji_id:int64 = Update;
 
 //@description Chat permissions was changed @chat_id Chat identifier @permissions The new chat permissions
@@ -6140,7 +6140,7 @@ updateChatHasScheduledMessages chat_id:int53 has_scheduled_messages:Bool = Updat
 updateChatFolders chat_folders:vector<chatFolderInfo> main_chat_list_position:int32 = Update;
 
 //@description The number of online group members has changed. This update with non-zero number of online group members is sent only for currently opened chats.
-//-There is no guarantee that it will be sent just after the number of online users has changed
+//-There is no guarantee that it is sent just after the number of online users has changed
 //@chat_id Identifier of the chat
 //@online_member_count New number of online members in the chat, or 0 if unknown
 updateChatOnlineMemberCount chat_id:int53 online_member_count:int32 = Update;
@@ -8046,7 +8046,7 @@ cancelDownloadFile file_id:int32 only_if_pending:Bool = Ok;
 getSuggestedFileName file_id:int32 directory:string = Text;
 
 //@description Preliminary uploads a file to the cloud before sending it in a message, which can be useful for uploading of being recorded voice and video notes. Updates updateFile will be used
-//-to notify about upload progress and successful completion of the upload. The file will not have a persistent remote identifier until it will be sent in a message
+//-to notify about upload progress and successful completion of the upload. The file will not have a persistent remote identifier until it is sent in a message
 //@file File to upload
 //@file_type File type; pass null if unknown
 //@priority Priority of the upload (1-32). The higher the priority, the earlier the file will be uploaded. If the priorities of two files are equal, then the first one for which preliminaryUploadFile was called will be uploaded first
@@ -8267,7 +8267,7 @@ getGroupCall group_call_id:int32 = GroupCall;
 //@description Starts a scheduled group call @group_call_id Group call identifier
 startScheduledGroupCall group_call_id:int32 = Ok;
 
-//@description Toggles whether the current user will receive a notification when the group call will start; scheduled group calls only
+//@description Toggles whether the current user will receive a notification when the group call starts; scheduled group calls only
 //@group_call_id Group call identifier
 //@enabled_start_notification New value of the enabled_start_notification setting
 toggleGroupCallEnabledStartNotification group_call_id:int32 enabled_start_notification:Bool = Ok;
