@@ -27,6 +27,35 @@ var Ads = {
       Ads.updateField($fieldEl);
     }
   },
+  eUpdateDropdown: function(e) {
+    var $ddItemEl = $(this);
+    var $ddItemWrapEl = $ddItemEl.parents('li');
+    var $ddWrapEl = $ddItemEl.parents('.input-dropdown');
+    var $ddInputEl = $('.input', $ddWrapEl);
+    var value = $ddItemEl.data('value');
+    var label = $ddItemEl.html();
+    $('.dropdown-menu > li.selected', $ddWrapEl).removeClass('selected');
+    $ddItemWrapEl.addClass('selected');
+    $ddInputEl.data('value', value);
+    $ddInputEl.html(label);
+    $ddInputEl.trigger('ddchange');
+  },
+  eSetDropdownValue: function(e, val) {
+    var $ddInputEl = $(this);
+    var $ddWrapEl = $ddInputEl.parents('.input-dropdown');
+    $('.input-dropdown-item', $ddWrapEl).each(function() {
+      var $ddItemEl = $(this);
+      var $ddItemWrapEl = $ddItemEl.parents('li');
+      var value = $ddItemEl.data('value');
+      var label = $ddItemEl.html();
+      if (value == val) {
+        $('.dropdown-menu > li.selected', $ddWrapEl).removeClass('selected');
+        $ddItemWrapEl.addClass('selected');
+        $ddInputEl.data('value', value);
+        $ddInputEl.html(label);
+      }
+    });
+  },
   wrapAmount: function(value, no_currency, field_format) {
     var amount_str = formatNumber(value, 2, '.', field_format ? '' : ',');
     if (no_currency) {
@@ -202,6 +231,8 @@ var Ads = {
     $('.pr-form-control', $form).each(function(){ Ads.fieldInit(this); });
     $('.js-amount-input', $form).on('keyup change input', Ads.eUpdateAmountField);
     $('input.checkbox,input.radio', $form).on('focus blur', Ads.eUpdateField);
+    $('.input-dropdown', $form).on('click', '.input-dropdown-item', Ads.eUpdateDropdown);
+    $('.input-dropdown > .input', $form).on('selectval', Ads.eSetDropdownValue);
     $('.js-hint-tooltip', $form).on('mouseover mouseout click', Ads.eHintEvent);
     $('textarea.pr-form-control', $form).initAutosize();
     $('.upload-input input', $form).on('change', Ads.eFileChange);
@@ -215,6 +246,8 @@ var Ads = {
     $('.pr-form-control', $form).each(function(){ Ads.fieldDestroy(this); });
     $('.js-amount-input', $form).off('keyup change input', Ads.eUpdateAmountField);
     $('input.checkbox,input.radio', $form).off('focus blur', Ads.eUpdateField);
+    $('.input-dropdown', $form).off('click', '.input-dropdown-item', Ads.eUpdateDropdown);
+    $('.input-dropdown > .input', $form).off('selectval', Ads.eSetDropdownValue);
     $('.js-hint-tooltip', $form).off('mouseover mouseout click', Ads.eHintEvent);
     $('textarea.pr-form-control', $form).destroyAutosize();
     $('.upload-input input', $form).off('change', Ads.eFileChange);
@@ -486,6 +519,8 @@ var NewAd = {
       state.websiteNameField = state.$form.field('website_name');
       state.websiteNameField.on('change.curPage', NewAd.onWebsiteNameChange);
       state.websitePhotoField = state.$form.field('website_photo');
+      state.buttonField = state.$form.field('button');
+      state.buttonField.on('ddchange.curPage', NewAd.onButtonChange);
       state.adInfoField = state.$form.field('ad_info');
       state.adInfoField.on('change.curPage', NewAd.onAdInfoChange);
       state.targetTypeField = state.$form.field('target_type');
@@ -527,6 +562,7 @@ var NewAd = {
       state.textField.off('.curPage');
       state.promoteUrlField.off('.curPage');
       state.websiteNameField.off('.curPage');
+      state.buttonField.off('.curPage');
       state.adInfoField.off('.curPage');
       state.targetTypeField.fieldEl().off('.curPage');
       state.confirmedCheckbox.off('.curPage');
@@ -618,14 +654,22 @@ var NewAd = {
     Ads.hideFieldError(websiteNameField);
     NewAd.adPostCheck($form);
   },
-  adPostCheck: function($form) {
+  onButtonChange: function() {
+    var $form = $(this).parents('form');
+    var buttonField = $form.field('button');
+    Ads.hideFieldError(buttonField);
+    NewAd.adPostCheck($form);
+  },
+  adPostCheck: function($form, try_index) {
     var textField = $form.field('text');
     var promoteUrlField = $form.field('promote_url');
+    var buttonField = $form.field('button');
     var websiteNameField = $form.field('website_name');
     var websitePhotoField = $form.field('website_photo');
     var cpmField = $form.field('cpm');
     var text = textField.value();
     var promote_url = promoteUrlField.value();
+    var button = buttonField.data('value');
     var website_name = websiteNameField.value();
     var website_photo = websitePhotoField.value();
     var $formGroup = promoteUrlField.fieldEl().parents('.form-group');
@@ -637,6 +681,7 @@ var NewAd = {
       owner_id: Aj.state.ownerId,
       text: text,
       promote_url: promote_url,
+      button: button,
       website_name: website_name,
       website_photo: website_photo
     };
@@ -713,11 +758,12 @@ var NewAd = {
         }
       }
       NewAd.updateAdPreview($form, result.preview_data);
-      NewAd.updateAdForm($form, result.is_website);
-      if (result.update_requested) {
+      NewAd.updateAdForm($form, result.is_website, result.custom_button);
+      try_index = try_index || 0;
+      if (result.update_requested && try_index < 5) {
         setTimeout(function() {
           if ($form.parents('body').size()) {
-            NewAd.adPostCheck($form);
+            NewAd.adPostCheck($form, ++try_index);
           }
         }, 500);
       }
@@ -979,7 +1025,7 @@ var NewAd = {
       $('.js-preview-link', Aj.state.$form).toggleClass('inactive', !previewData);
     }
   },
-  updateAdForm: function($form, isWebsite) {
+  updateAdForm: function($form, isWebsite, customButton) {
     var $previewPopup = Aj.state.$previewPopup;
     var inPopup = $form.parents('.pr-layer-preview-ad').size() > 0;
     var $cont = false;
@@ -1004,6 +1050,11 @@ var NewAd = {
         $('.js-website-name-wrap', $cont).slideHide();
         $websiteNameField.value('');
         $websitePhotoField.value('');
+      }
+      if (customButton) {
+        $('.js-custom-button-wrap', $cont).slideShow();
+      } else {
+        $('.js-custom-button-wrap', $cont).slideHide();
       }
     }
   },
@@ -1032,6 +1083,7 @@ var NewAd = {
     var $form = state.$form;
     var text = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
+    var button = $form.field('button').data('value');
     var website_name = $form.field('website_name').value();
     var website_photo = $form.field('website_photo').value();
     var picture_checked = $form.field('picture').prop('checked');
@@ -1039,6 +1091,7 @@ var NewAd = {
       $('.js-preview', $previewPopup).toggleClass('picture', !!$(this).prop('checked'));
     };
     var website_name_hidden = $('.js-website-name-wrap', $form).isSlideHidden();
+    var custom_button_hidden = $('.js-custom-button-wrap', $form).isSlideHidden();
 
     var $previewForm = $('.pr-new-form', $previewPopup);
     Ads.formInit($previewForm);
@@ -1056,11 +1109,15 @@ var NewAd = {
     state.previewWebsiteNameField.value(website_name);
     state.previewWebsitePhotoField = $previewForm.field('website_photo');
     state.previewWebsitePhotoField.value(website_photo);
+    state.previewButtonField = $previewForm.field('button');
+    state.previewButtonField.on('ddchange.curPage', NewAd.onButtonChange);
+    state.previewButtonField.trigger('selectval', [button]);
     state.previewPictureCheckbox = $previewForm.field('picture');
     state.previewPictureCheckbox.on('change.curPage', previewPictureChange);
     state.previewPictureCheckbox.prop('checked', picture_checked);
     $('.js-preview', $previewPopup).toggleClass('picture', !!picture_checked);
     $('.js-website-name-wrap', $previewPopup).toggleClass('shide', website_name_hidden);
+    $('.js-custom-button-wrap', $previewPopup).toggleClass('shide', custom_button_hidden);
 
     NewAd.updateAdPreview($previewForm, state.previewData);
     NewAd.adPostCheck($previewForm);
@@ -1068,11 +1125,13 @@ var NewAd = {
     var previewSave = function() {
       var text = state.previewTextField.value();
       var promote_url = state.previewPromoteUrlField.value();
+      var button = state.previewButtonField.data('value');
       var website_name = state.previewWebsiteNameField.value();
       var website_photo = state.previewWebsitePhotoField.value();
       var picture_checked = state.previewPictureCheckbox.prop('checked');
       $form.field('text').value(text).updateAutosize();
       $form.field('promote_url').value(promote_url);
+      $form.field('button').trigger('selectval', [button]);
       $form.field('website_name').value(website_name);
       $form.field('website_photo').value(website_photo);
       $form.field('picture').prop('checked', picture_checked);
@@ -1245,6 +1304,7 @@ var NewAd = {
     var values = [
       $form.field('title').value(),
       $form.field('text').value(),
+      $form.field('button').data('value'),
       $form.field('promote_url').value(),
       $form.field('website_name').value(),
       $form.field('website_photo').value(),
@@ -1280,6 +1340,7 @@ var NewAd = {
       if (!$previewForm.get(0)) return false;
       var values = [
         $previewForm.field('text').value(),
+        $previewForm.field('button').data('value'),
         $previewForm.field('promote_url').value(),
         $previewForm.field('website_name').value(),
         $previewForm.field('website_photo').value()
@@ -1297,6 +1358,7 @@ var NewAd = {
     var $button     = $(this);
     var title       = $form.field('title').value();
     var text        = $form.field('text').value();
+    var button      = $form.field('button').data('value');
     var promote_url = $form.field('promote_url').value();
     var website_name = $form.field('website_name').value();
     var website_photo = $form.field('website_photo').value();
@@ -1330,6 +1392,7 @@ var NewAd = {
       owner_id: Aj.state.ownerId,
       title: title,
       text: text,
+      button: button,
       promote_url: promote_url,
       website_name: website_name,
       website_photo: website_photo,
@@ -1393,6 +1456,7 @@ var NewAd = {
     var $form       = Aj.state.$form;
     var title       = $form.field('title').value();
     var text        = $form.field('text').value();
+    var button      = $form.field('button').data('value');
     var promote_url = $form.field('promote_url').value();
     var website_name = $form.field('website_name').value();
     var website_photo = $form.field('website_photo').value();
@@ -1410,6 +1474,7 @@ var NewAd = {
       owner_id: Aj.state.ownerId,
       title: title,
       text: text,
+      button: button,
       promote_url: promote_url,
       website_name: website_name,
       website_photo: website_photo,
@@ -1454,6 +1519,7 @@ var NewAd = {
     var $form = Aj.state.$form;
     $form.field('title').value('');
     $form.field('text').value('');
+    $form.field('button').trigger('selectval', ['']);
     $form.field('promote_url').value('');
     $form.field('website_name').value('');
     $form.field('website_photo').value('');
@@ -2354,6 +2420,8 @@ var EditAd = {
       state.websiteNameField = state.$form.field('website_name');
       state.websiteNameField.on('change.curPage', NewAd.onWebsiteNameChange);
       state.websitePhotoField = state.$form.field('website_photo');
+      state.buttonField = state.$form.field('button');
+      state.buttonField.on('ddchange.curPage', NewAd.onButtonChange);
       state.adInfoField = state.$form.field('ad_info');
       state.adInfoField.on('change.curPage', NewAd.onAdInfoChange);
       state.pictureCheckbox = state.$form.field('picture');
@@ -2382,6 +2450,7 @@ var EditAd = {
       state.textField.off('.curPage');
       state.promoteUrlField.off('.curPage');
       state.websiteNameField.off('.curPage');
+      state.buttonField.off('.curPage');
     });
   },
   getFormData: function($form) {
@@ -2390,6 +2459,7 @@ var EditAd = {
     var values = [
       $form.field('title').value(),
       $form.field('text').value(),
+      $form.field('button').data('value'),
       $form.field('promote_url').value(),
       $form.field('website_name').value(),
       $form.field('website_photo').value(),
@@ -2738,6 +2808,7 @@ var EditAd = {
     var $button     = $(this);
     var title       = $form.field('title').value();
     var text        = $form.field('text').value();
+    var button      = $form.field('button').data('value');
     var promote_url = $form.field('promote_url').value();
     var website_name = $form.field('website_name').value();
     var website_photo = $form.field('website_photo').value();
@@ -2766,6 +2837,7 @@ var EditAd = {
       ad_id: Aj.state.adId,
       title: title,
       text: text,
+      button: button,
       promote_url: promote_url,
       website_name: website_name,
       website_photo: website_photo,

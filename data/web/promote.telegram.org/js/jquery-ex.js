@@ -101,22 +101,34 @@
     return this.toggleClass('ohide', state);
   };
   $.fn.slideShow = function(callback) {
-    return this.prepareSlideY(callback).removeClass('shide');
+    if (this.hasClass('shide')) {
+      return this.prepareSlideY(callback).removeClass('shide');
+    }
+    return this;
   };
   $.fn.slideHide = function(callback) {
     if (callback == 'remove') {
       callback = function(){ $(this).remove(); };
     }
-    return this.prepareSlideY(callback).addClass('shide');
+    if (!this.hasClass('shide')) {
+      return this.prepareSlideY(callback).addClass('shide');
+    }
+    return this;
   };
   $.fn.slideXShow = function(callback) {
-    return this.prepareSlideX(callback).removeClass('sxhide');
+    if (this.hasClass('sxhide')) {
+      return this.prepareSlideX(callback).removeClass('sxhide');
+    }
+    return this;
   };
   $.fn.slideXHide = function(callback) {
     if (callback == 'remove') {
       callback = function(){ $(this).remove(); };
     }
-    return this.prepareSlideX(callback).addClass('sxhide');
+    if (!this.hasClass('sxhide')) {
+      return this.prepareSlideX(callback).addClass('sxhide');
+    }
+    return this;
   };
   $.fn.isSlideHidden = function() {
     return this.hasClass('shide');
@@ -125,7 +137,10 @@
     if (state === true || state === false) {
       state = !state;
     }
-    return this.prepareSlideY(callback).toggleClass('shide', state);
+    if (!this.hasClass('shide') !== !state) {
+      return this.prepareSlideY(callback).toggleClass('shide', state);
+    }
+    return this;
   };
   $.fn.highlight = function(delay) {
     var $this = this;
