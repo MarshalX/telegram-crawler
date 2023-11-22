@@ -233,6 +233,23 @@ If the <code>unconfirmed</code> flag is set, clients should display a notificati
 <p>If the user clicks on the Yes button, invoke <a href="/method/account.changeAuthorizationSettings">account.changeAuthorizationSettings</a> with the new session's <code>hash</code> and the <code>confirmed</code> flag set, confirming the specified session.  </p>
 <p>If the user clicks on the No button, invoke <a href="/method/account.resetAuthorization">account.resetAuthorization</a> with the new session's <code>hash</code>, logging out the specified session.  </p>
 <p>If no action is taken by the user, the session will be autoconfirmed <code>authorization_autoconfirm_period</code> seconds after login (see the associated <a href="/api/config#authorization-autoconfirm-period">client configuration parameter »</a>).  </p>
+<h3><a class="anchor" href="#invalidating-login-codes" id="invalidating-login-codes" name="invalidating-login-codes"><i class="anchor-icon"></i></a>Invalidating login codes</h3>
+<p>Telegram's servers will automatically invalidate login codes if they are sent by the user to another Telegram chat, either by forwarding them or by sending them inside of a message: however, clients should also manually and immediately invalidate login codes if the user attempts to screenshot or forward a message sent by the login notification service user (ID <code>777000</code>) containing login codes.  </p>
+<p>If an incoming message that is:</p>
+<ul>
+<li>Sent by the login notification service user (ID <code>777000</code>)</li>
+<li>AND is a text message (not a media)</li>
+<li>AND contains one or more login codes, defined a sequence of 5 to 7 decimal digits, optionally interleaved with or followed by any number of <code>-</code> characters (<a href="https://github.com/tdlib/td/blob/07c1d53a6d3cb1fad58d2822e55eef6d57363581/td/telegram/MessagesManager.cpp#L6513">example implementation »</a>)</li>
+</ul>
+<p>Is either:</p>
+<ul>
+<li>Screenshotted by the user</li>
+<li>OR forwarded by the user to any chat</li>
+</ul>
+<p><a href="/method/account.invalidateSignInCodes">account.invalidateSignInCodes</a> should be invoked, passing the extracted login <code>codes</code> (excluding any <code>-</code> characeters).  </p>
+<pre><code>---functions---
+
+<a href='/method/account.invalidateSignInCodes'>account.invalidateSignInCodes</a>#ca8ae8ba codes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/Bool'>Bool</a>;</code></pre>
 <h3><a class="anchor" href="#test-accounts" id="test-accounts" name="test-accounts"><i class="anchor-icon"></i></a>Test Accounts</h3>
 <p>Each phone number is limited to only a certain amount of logins per day (e.g. 5, but this is subject to change) after which the API will return a FLOOD error until the next day. This might not be enough for testing the implementation of User Authorization flows in client applications.</p>
 <p>There are several reserved phone number prefixes for testing that your application handles redirects between DCs, sign up, sign in and 2FA flows correctly. These numbers are only available on <strong>Test DCs</strong> (their IP addresses for TCP transport are available in <a href="https://my.telegram.org/apps">API development tools</a> panel after <a href="https://core.telegram.org/api/obtaining_api_id#obtaining-api-id">api_id was obtained</a>, <a href="https://core.telegram.org/mtproto/transports#uri-format">URI format</a> for HTTPS/WebSocket transport).</p>
