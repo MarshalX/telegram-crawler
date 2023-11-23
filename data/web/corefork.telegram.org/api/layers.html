@@ -47,11 +47,10 @@
 <p>Below you will find information on schema changes. For more details on the use of layers, see <a href="/api/invoking#layers">Invoking API methods</a>.</p>
 <h3><a class="anchor" href="#layer-164" id="layer-164" name="layer-164"><i class="anchor-icon"></i></a><a href="/schema?layer=164">Layer 164</a></h3>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
-<p>Introducing <a href="/api/stories#stealth-mode">stealth mode for stories</a>, <a href="/api/stories#media-areas">story media areas</a>, <a href="/api/block">bulk blocklist modification methods</a>, <a href="/api/story#react-to-a-story">story reactions</a>, <a href="/api/boost">stories for channels</a> thanks to <a href="/api/boost">channel boosts</a>, <a href="/api/auth#confirming-login">explicit session confirmation</a>, <a href="/api/bots/webapps">mini apps</a>.</p>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
 <li>Added <a href="/method/stories.activateStealthMode">stories.activateStealthMode</a> - Activates <a href="/api/stories#stealth-mode">stories stealth mode</a>, see <a href="/api/stories#stealth-mode">here »</a> for more info.</li>
-<li>Added <a href="/method/contacts.setBlocked">contacts.setBlocked</a> - Replace the contents of an entire <a href="/api/contacts">blocklist, see here for more info »</a>.</li>
+<li>Added <a href="/method/contacts.setBlocked">contacts.setBlocked</a> - Replace the contents of an entire <a href="/api/block">blocklist, see here for more info »</a>.</li>
 <li>Added <a href="/method/stories.sendReaction">stories.sendReaction</a> - React to a story.</li>
 <li>Added <a href="/method/bots.canSendMessage">bots.canSendMessage</a> - </li>
 <li>Added <a href="/method/bots.allowSendMessage">bots.allowSendMessage</a> - </li>
@@ -97,7 +96,7 @@
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/updateNewAuthorization">updateNewAuthorization</a> - Authorized to the current user's account through an unknown device.</li>
+<li>Added <a href="/constructor/updateNewAuthorization">updateNewAuthorization</a> - A new session logged into the current user's account through an unknown device.</li>
 <li>Added <a href="/constructor/storiesStealthMode">storiesStealthMode</a> - Information about the current <a href="/api/stories#stealth-mode">stealth mode</a> session.</li>
 <li>Added <a href="/constructor/updateStoriesStealthMode">updateStoriesStealthMode</a> - Indicates that <a href="/api/stories#stealth-mode">stories stealth mode</a> was activated.</li>
 <li>Added <a href="/constructor/mediaAreaCoordinates">mediaAreaCoordinates</a> - Coordinates and size of a clicable rectangular area on top of a story.</li>
@@ -237,8 +236,8 @@
 <li>Added <a href="/method/stories.togglePinned">stories.togglePinned</a> - Pin or unpin one or more stories</li>
 <li>Added <a href="/method/stories.getAllStories">stories.getAllStories</a> - Fetch the List of active (or active and hidden) stories, see <a href="/api/stories#watching-stories">here »</a> for more info on watching stories.</li>
 <li>Added <a href="/method/stories.getUserStories">stories.getUserStories</a></li>
-<li>Added <a href="/method/stories.getPinnedStories">stories.getPinnedStories</a> - Fetch the <a href="/api/stories#pinnedarchived-stories">stories</a> pinned on a peer's profile.</li>
-<li>Added <a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a> - Fetch the <a href="/api/stories#pinnedarchived-stories">story archive »</a> of a peer we control.</li>
+<li>Added <a href="/method/stories.getPinnedStories">stories.getPinnedStories</a> - Fetch the <a href="/api/stories#pinned-or-archived-stories">stories</a> pinned on a peer's profile.</li>
+<li>Added <a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a> - Fetch the <a href="/api/stories#pinned-or-archived-stories">story archive »</a> of a peer we control.</li>
 <li>Added <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a> - Obtain full info about a set of <a href="/api/stories">stories</a> by their IDs.</li>
 <li>Added <a href="/method/stories.toggleAllStoriesHidden">stories.toggleAllStoriesHidden</a> - Hide the active stories of a specific peer, preventing them from being displayed on the action bar on the homescreen.</li>
 <li>Added <a href="/method/stories.getAllReadUserStories">stories.getAllReadUserStories</a></li>
@@ -272,7 +271,7 @@
 <li>Added <a href="/constructor/updateReadStories">updateReadStories</a> - Stories of a specific peer were marked as read.</li>
 <li>Added <a href="/constructor/stories.allStoriesNotModified">stories.allStoriesNotModified</a> - The list of active (or active and hidden) <a href="/api/stories#watching-stories">stories</a> has not changed.</li>
 <li>Added <a href="/constructor/stories.allStories">stories.allStories</a> - Full list of active (or active and hidden) <a href="/api/stories#watching-stories">stories</a>.</li>
-<li>Added <a href="/constructor/stories.stories">stories.stories</a> - List of <a href="/api/stories#pinnedarchived-stories">stories</a></li>
+<li>Added <a href="/constructor/stories.stories">stories.stories</a> - List of <a href="/api/stories#pinned-or-archived-stories">stories</a></li>
 <li>Added <a href="/constructor/stories.userStories">stories.userStories</a></li>
 <li>Added <a href="/constructor/inputPrivacyValueAllowCloseFriends">inputPrivacyValueAllowCloseFriends</a> - Allow only <a href="/api/privacy">close friends »</a></li>
 <li>Added <a href="/constructor/privacyValueAllowCloseFriends">privacyValueAllowCloseFriends</a> - Allow only <a href="/api/privacy">close friends »</a></li>
@@ -541,8 +540,8 @@ Bots may also now specify a custom peer filter when using <a href="/constructor/
 <h4><a class="anchor" href="#schema" id="schema" name="schema"><i class="anchor-icon"></i></a>Schema</h4>
 <div><pre><code><a href="/constructor/messagePeerReaction">messagePeerReaction</a>#8c79b63c flags:<a href="/type/%23">#</a> big:flags.0?<a href="/constructor/true">true</a> unread:flags.1?<a href="/constructor/true">true</a> peer_id:<a href="/type/Peer">Peer</a> date:<a href="/type/int">int</a> reaction:<a href="/type/Reaction">Reaction</a> = <a href="/type/MessagePeerReaction">MessagePeerReaction</a>;<br></code></pre></div>
 <h3><a class="anchor" href="#layer-154" id="layer-154" name="layer-154"><i class="anchor-icon"></i></a><a href="/schema?layer=154">Layer 154</a></h3>
-<p>Added support for <a href="/api/bots/webapps#named-bot-web-apps">named bot web apps</a>, which can be opened from a <a href="/api/links#named-bot-web-app-links">named bot web app deep link</a>.<br>
-<a href="/api/bots/webapps#simple-web-apps">Web apps</a> can now be opened by clicking on a <code>switch_webview</code> inline result, similar to <code>switch_pm</code> inline results.<br>
+<p>Added support for <a href="/api/bots/webapps#named-bot-mini-apps">named bot mini apps</a>, which can be opened from a <a href="/api/links#named-bot-mini-app-links">named bot mini app deep link</a>.<br>
+<a href="/api/bots/webapps#simple-mini-apps">Web apps</a> can now be opened by clicking on a <code>switch_webview</code> inline result, similar to <code>switch_pm</code> inline results.<br>
 Bots can now edit and localize their own about text and description.<br>
 The current <a href="/api/auth#future-auth-tokens">future auth token</a> is now directly returned in the <a href="/constructor/config">config</a> constructor, which was also cleaned up to remove redundant information already contained in the <a href="/api/config#client-configuration">appConfig configuration</a>.<br>
 <a href="/method/messages.getMessageReadParticipants">messages.getMessageReadParticipants</a> now returns a timestamp for each user, indicating when that user has read the specified message.</p>
@@ -551,8 +550,8 @@ The current <a href="/api/auth#future-auth-tokens">future auth token</a> is now 
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/messages.getBotApp">messages.getBotApp</a> - Obtain information about a <a href="/api/bots/webapps#named-bot-web-apps">named bot web app</a></li>
-<li>Added <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a> - Open a <a href="/bots/webapps">bot web app</a> from a <a href="/api/links#named-bot-web-app-links">named bot web app deep link</a>, sending over user information after user confirmation.</li>
+<li>Added <a href="/method/messages.getBotApp">messages.getBotApp</a> - Obtain information about a <a href="/api/bots/webapps#named-bot-mini-apps">named bot mini app</a></li>
+<li>Added <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a> - Open a <a href="/bots/webapps">bot mini app</a> from a <a href="/api/links#named-bot-mini-app-links">named bot mini app deep link</a>, sending over user information after user confirmation.</li>
 <li>Added <a href="/method/bots.setBotInfo">bots.setBotInfo</a> - Set localized name, about text and description of a bot (or of the current account, if called by a bot).</li>
 <li>Added <a href="/method/bots.getBotInfo">bots.getBotInfo</a> - Get localized name, about text and description of a bot (or of the current account, if called by a bot).</li>
 </ul>
@@ -564,13 +563,13 @@ The current <a href="/api/auth#future-auth-tokens">future auth token</a> is now 
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/inputBotAppID">inputBotAppID</a> - Used to fetch information about a <a href="/api/bots/webapps#named-bot-web-apps">named bot web app</a> by its ID</li>
-<li>Added <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a> - Used to fetch information about a <a href="/api/bots/webapps#named-bot-web-apps">named bot web app</a> by its short name</li>
+<li>Added <a href="/constructor/inputBotAppID">inputBotAppID</a> - Used to fetch information about a <a href="/api/bots/webapps#named-bot-mini-apps">named bot mini app</a> by its ID</li>
+<li>Added <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a> - Used to fetch information about a <a href="/api/bots/webapps#named-bot-mini-apps">named bot mini app</a> by its short name</li>
 <li>Added <a href="/constructor/botAppNotModified">botAppNotModified</a> - Bot app info hasn't changed.</li>
-<li>Added <a href="/constructor/botApp">botApp</a> - Contains information about a <a href="/api/bots/webapps#named-bot-web-apps">named bot web app</a>.</li>
-<li>Added <a href="/constructor/messages.botApp">messages.botApp</a> - Contains information about a <a href="/api/bots/webapps#named-bot-web-apps">named bot web app</a></li>
-<li>Added <a href="/constructor/appWebViewResultUrl">appWebViewResultUrl</a> - Contains the link that must be used to open a <a href="/api/bots/webapps#named-bot-web-apps">named bot web app</a>.</li>
-<li>Added <a href="/constructor/inlineBotWebView">inlineBotWebView</a> - Specifies a <a href="/api/bots/webapps#simple-web-apps">bot web app</a> button, shown on top of the inline query results list.</li>
+<li>Added <a href="/constructor/botApp">botApp</a> - Contains information about a <a href="/api/bots/webapps#named-bot-mini-apps">named bot mini app</a>.</li>
+<li>Added <a href="/constructor/messages.botApp">messages.botApp</a> - Contains information about a <a href="/api/bots/webapps#named-bot-mini-apps">named bot mini app</a></li>
+<li>Added <a href="/constructor/appWebViewResultUrl">appWebViewResultUrl</a> - Contains the link that must be used to open a <a href="/api/bots/webapps#named-bot-mini-apps">named bot mini app</a>.</li>
+<li>Added <a href="/constructor/inlineBotWebView">inlineBotWebView</a> - Specifies a <a href="/api/bots/webapps#simple-mini-apps">bot mini app</a> button, shown on top of the inline query results list.</li>
 <li>Added <a href="/constructor/readParticipantDate">readParticipantDate</a> - Contains info about when a certain participant has read a message</li>
 <li>Added <a href="/constructor/updateGroupInvitePrivacyForbidden">updateGroupInvitePrivacyForbidden</a> - 0-N updates of this type may be returned only when invoking <a href="/method/messages.addChatUser">messages.addChatUser</a>, <a href="/method/channels.inviteToChannel">channels.inviteToChannel</a> or <a href="/method/messages.createChat">messages.createChat</a>: it indicates we couldn't add a user to a chat because of their privacy settings; if required, an <a href="/api/invites">invite link</a> can be shared with the user, instead.</li>
 </ul>
@@ -754,7 +753,7 @@ Third-party apps may log in using any of the other code delivery methods (Telegr
 <a href="/method/account.deleteAutoSaveExceptions">account.deleteAutoSaveExceptions</a>#53bc0020 = <a href="/type/Bool">Bool</a>;<br></code></pre></div>
 <h3><a class="anchor" href="#layer-151" id="layer-151" name="layer-151"><i class="anchor-icon"></i></a><a href="/schema?layer=151">Layer 151</a></h3>
 <p>Introducing spoiler media, custom contact profile pictures, hidden supergroup participants and persistent bot keyboards.<br>
-<a href="/api/bots/attach">Attachment menu bot web apps</a> may now ask permission to write direct messages to the users that install them.</p>
+<a href="/api/bots/attach">Attachment menu bot mini apps</a> may now ask permission to write direct messages to the users that install them.</p>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
@@ -1084,7 +1083,7 @@ Added support for thread IDs in <a href="/api/links#message-links">message deep 
 <a href="/method/stickers.createStickerSet">stickers.createStickerSet</a>#9021ab67 flags:<a href="/type/%23">#</a> masks:flags.0?<a href="/constructor/true">true</a> animated:flags.1?<a href="/constructor/true">true</a> videos:flags.4?<a href="/constructor/true">true</a> emojis:flags.5?<a href="/constructor/true">true</a> text_color:flags.6?<a href="/constructor/true">true</a> user_id:<a href="/type/InputUser">InputUser</a> title:<a href="/type/string">string</a> short_name:<a href="/type/string">string</a> thumb:flags.2?<a href="/type/InputDocument">InputDocument</a> stickers:<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/InputStickerSetItem">InputStickerSetItem</a>&gt; software:flags.3?<a href="/type/string">string</a> = <a href="/type/messages.StickerSet">messages.StickerSet</a>;<br>
 <a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a>#84f80814 peer:<a href="/type/InputPeer">InputPeer</a> id:<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/int">int</a>&gt; = <a href="/type/Updates">Updates</a>;<br></code></pre></div>
 <h3><a class="anchor" href="#layer-145" id="layer-145" name="layer-145"><i class="anchor-icon"></i></a><a href="/schema?layer=145">Layer 145</a></h3>
-<p><a href="/api/emoji-status">Custom emoji statuses</a>, <a href="/api/reactions">custom emoji &amp; multiple message reactions</a>, <a href="/api/auth#email-verification">login via email</a>, <a href="/api/stickers#recent-stickersets">recent stickersets</a>, <a href="/api/premium">Telegram Premium</a> and <a href="/api/bots/webapps">bot web app</a> improvements.</p>
+<p><a href="/api/emoji-status">Custom emoji statuses</a>, <a href="/api/reactions">custom emoji &amp; multiple message reactions</a>, <a href="/api/auth#email-verification">login via email</a>, <a href="/api/stickers#recent-stickersets">recent stickersets</a>, <a href="/api/premium">Telegram Premium</a> and <a href="/api/bots/webapps">bot mini app</a> improvements.</p>
 <p>Added the following brand new documentation articles:</p>
 <ul>
 <li><a href="/api/links">Deep links</a></li>
@@ -1458,7 +1457,7 @@ Also, discussion group admins can now <a href="/api/discussion#requiring-users-t
 <p>Introducing:</p>
 <ul>
 <li><a href="/api/bots/attach">Attachment menus</a></li>
-<li><a href="/api/bots/webapps">Bot web apps</a></li>
+<li><a href="/api/bots/webapps">bot mini apps</a></li>
 <li><a href="/api/bots/menu">Custom bot menu buttons</a></li>
 <li><a href="/api/rights#suggested-bot-rights">Suggested bot admin rights</a></li>
 <li><a href="/api/ringtones">Ringtones</a></li>
@@ -1471,14 +1470,14 @@ Also, discussion group admins can now <a href="/api/discussion#requiring-users-t
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/messages.getAttachMenuBots">messages.getAttachMenuBots</a> - Returns installed attachment menu <a href="/api/bots/attach">bot web apps »</a></li>
-<li>Added <a href="/method/messages.getAttachMenuBot">messages.getAttachMenuBot</a> - Returns attachment menu entry for a <a href="/api/bots/attach">bot web app that can be launched from the attachment menu »</a></li>
+<li>Added <a href="/method/messages.getAttachMenuBots">messages.getAttachMenuBots</a> - Returns installed attachment menu <a href="/api/bots/attach">bot mini apps »</a></li>
+<li>Added <a href="/method/messages.getAttachMenuBot">messages.getAttachMenuBot</a> - Returns attachment menu entry for a <a href="/api/bots/attach">bot mini app that can be launched from the attachment menu »</a></li>
 <li>Added <a href="/method/messages.toggleBotInAttachMenu">messages.toggleBotInAttachMenu</a> - Enable or disable <a href="/api/bots/attach">web bot attachment menu »</a></li>
-<li>Added <a href="/method/messages.requestWebView">messages.requestWebView</a> - Open a <a href="/bots/webapps">bot web app</a>, sending over user information after user confirmation.</li>
+<li>Added <a href="/method/messages.requestWebView">messages.requestWebView</a> - Open a <a href="/bots/webapps">bot mini app</a>, sending over user information after user confirmation.</li>
 <li>Added <a href="/method/messages.prolongWebView">messages.prolongWebView</a> - Indicate to the server (from the user side) that the user is still using a web app.</li>
-<li>Added <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> - Open a <a href="/api/bots/webapps">bot web app</a>.</li>
+<li>Added <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> - Open a <a href="/api/bots/webapps">bot mini app</a>.</li>
 <li>Added <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a> - Terminate webview interaction started with <a href="/method/messages.requestWebView">messages.requestWebView</a>, sending the specified message to the chat on behalf of the user.</li>
-<li>Added <a href="/method/messages.sendWebViewData">messages.sendWebViewData</a> - Used by the user to relay data from an opened <a href="/api/bots/webapps">reply keyboard bot web app</a> to the bot that owns it.</li>
+<li>Added <a href="/method/messages.sendWebViewData">messages.sendWebViewData</a> - Used by the user to relay data from an opened <a href="/api/bots/webapps">reply keyboard bot mini app</a> to the bot that owns it.</li>
 <li>Added <a href="/method/bots.setBotMenuButton">bots.setBotMenuButton</a> - Sets the <a href="/api/bots/menu">menu button action »</a> for a given user or for all users</li>
 <li>Added <a href="/method/bots.getBotMenuButton">bots.getBotMenuButton</a> - Gets the menu button action for a given user or for all users, previously set using <a href="/method/bots.setBotMenuButton">bots.setBotMenuButton</a>; users can see this information in the <a href="/constructor/botInfo">botInfo</a> constructor.</li>
 <li>Added <a href="/method/account.getSavedRingtones">account.getSavedRingtones</a> - Fetch saved notification sounds</li>
@@ -1495,21 +1494,21 @@ Also, discussion group admins can now <a href="/api/discussion#requiring-users-t
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/attachMenuBotIconColor">attachMenuBotIconColor</a> - Represents an attachment menu icon color for <a href="/api/bots/attach">bot web apps »</a></li>
-<li>Added <a href="/constructor/attachMenuBotIcon">attachMenuBotIcon</a> - Represents an attachment menu icon for <a href="/api/bots/attach">bot web apps »</a></li>
-<li>Added <a href="/constructor/attachMenuBot">attachMenuBot</a> - Represents a <a href="/api/bots/attach">bot web app that can be launched from the attachment menu »</a></li>
-<li>Added <a href="/constructor/attachMenuBotsNotModified">attachMenuBotsNotModified</a> - The list of bot web apps hasn't changed</li>
-<li>Added <a href="/constructor/attachMenuBots">attachMenuBots</a> - Represents a list of <a href="/api/bots/attach">bot web apps that can be launched from the attachment menu »</a></li>
-<li>Added <a href="/constructor/attachMenuBotsBot">attachMenuBotsBot</a> - Represents a <a href="/api/bots/attach">bot web app that can be launched from the attachment menu »</a></li>
+<li>Added <a href="/constructor/attachMenuBotIconColor">attachMenuBotIconColor</a> - Represents an attachment menu icon color for <a href="/api/bots/attach">bot mini apps »</a></li>
+<li>Added <a href="/constructor/attachMenuBotIcon">attachMenuBotIcon</a> - Represents an attachment menu icon for <a href="/api/bots/attach">bot mini apps »</a></li>
+<li>Added <a href="/constructor/attachMenuBot">attachMenuBot</a> - Represents a <a href="/api/bots/attach">bot mini app that can be launched from the attachment menu »</a></li>
+<li>Added <a href="/constructor/attachMenuBotsNotModified">attachMenuBotsNotModified</a> - The list of bot mini apps hasn't changed</li>
+<li>Added <a href="/constructor/attachMenuBots">attachMenuBots</a> - Represents a list of <a href="/api/bots/attach">bot mini apps that can be launched from the attachment menu »</a></li>
+<li>Added <a href="/constructor/attachMenuBotsBot">attachMenuBotsBot</a> - Represents a <a href="/api/bots/attach">bot mini app that can be launched from the attachment menu »</a></li>
 <li>Added <a href="/constructor/updateAttachMenuBots">updateAttachMenuBots</a> - The list of installed <a href="/api/bots/attach">attachment menu entries »</a> has changed, use <a href="/method/messages.getAttachMenuBots">messages.getAttachMenuBots</a> to fetch the updated list.</li>
 <li>Added <a href="/constructor/webViewResultUrl">webViewResultUrl</a> - Contains the webview URL with appropriate theme and user info parameters added</li>
 <li>Added <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a> - Contains the webview URL with appropriate theme parameters added</li>
 <li>Added <a href="/constructor/webViewMessageSent">webViewMessageSent</a> - Info about a sent inline webview message</li>
 <li>Added <a href="/constructor/updateWebViewResultSent">updateWebViewResultSent</a> - Indicates to a bot that a webview was closed and an inline message was sent on behalf of the user using <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a></li>
-<li>Added <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a> - Button to open a <a href="/api/bots/webapps">bot web app</a> using <a href="/method/messages.requestWebView">messages.requestWebView</a>, sending over user information after user confirmation.</li>
-<li>Added <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> - Button to open a <a href="/api/bots/webapps">bot web app</a> using <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>, without sending user information to the web app.</li>
-<li>Added <a href="/constructor/messageActionWebViewDataSentMe">messageActionWebViewDataSentMe</a> - Data from an opened <a href="/api/bots/webapps">reply keyboard bot web app</a> was relayed to the bot that owns it (bot side service message).</li>
-<li>Added <a href="/constructor/messageActionWebViewDataSent">messageActionWebViewDataSent</a> - Data from an opened <a href="/api/bots/webapps">reply keyboard bot web app</a> was relayed to the bot that owns it (user side service message).</li>
+<li>Added <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a> - Button to open a <a href="/api/bots/webapps">bot mini app</a> using <a href="/method/messages.requestWebView">messages.requestWebView</a>, sending over user information after user confirmation.</li>
+<li>Added <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> - Button to open a <a href="/api/bots/webapps">bot mini app</a> using <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>, without sending user information to the web app.</li>
+<li>Added <a href="/constructor/messageActionWebViewDataSentMe">messageActionWebViewDataSentMe</a> - Data from an opened <a href="/api/bots/webapps">reply keyboard bot mini app</a> was relayed to the bot that owns it (bot side service message).</li>
+<li>Added <a href="/constructor/messageActionWebViewDataSent">messageActionWebViewDataSent</a> - Data from an opened <a href="/api/bots/webapps">reply keyboard bot mini app</a> was relayed to the bot that owns it (user side service message).</li>
 <li>Added <a href="/constructor/updateBotMenuButton">updateBotMenuButton</a> - The menu button behavior for the specified bot has changed</li>
 <li>Added <a href="/constructor/botMenuButtonDefault">botMenuButtonDefault</a> - Placeholder <a href="/api/bots/menu">bot menu button</a> never returned to users: see <a href="/api/bots/menu">the docs for more info</a>.</li>
 <li>Added <a href="/constructor/botMenuButtonCommands">botMenuButtonCommands</a> - <a href="/api/bots/menu">Bot menu button</a> that opens the bot command list when clicked.</li>
