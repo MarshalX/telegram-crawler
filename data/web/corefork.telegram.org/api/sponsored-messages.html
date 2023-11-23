@@ -5,11 +5,11 @@
     <title>Sponsored messages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="description" content="Related TL schema:
-sponsoredMessage#daafff6b flags:# recommended:flags.5?true show_peer_photo:flags.6?true random_id:bytes…">
+sponsoredWebPage#3db8ec63 flags:# url:string site_name:string photo:flags.0?Photo = SponsoredWebPage;…">
     <meta property="og:title" content="Sponsored messages">
     <meta property="og:image" content="">
     <meta property="og:description" content="Related TL schema:
-sponsoredMessage#daafff6b flags:# recommended:flags.5?true show_peer_photo:flags.6?true random_id:bytes…">
+sponsoredWebPage#3db8ec63 flags:# url:string site_name:string photo:flags.0?Photo = SponsoredWebPage;…">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -45,13 +45,17 @@ sponsoredMessage#daafff6b flags:# recommended:flags.5?true show_peer_photo:flags
   <h1 id="dev_page_title">Sponsored messages</h1>
   
   <div id="dev_page_content"><p>Related TL schema:</p>
-<pre><code><a href='/constructor/sponsoredMessage'>sponsoredMessage</a>#daafff6b flags:<a href='/type/%23'>#</a> recommended:flags.5?<a href='/constructor/true'>true</a> show_peer_photo:flags.6?<a href='/constructor/true'>true</a> random_id:<a href='/type/bytes'>bytes</a> from_id:flags.3?<a href='/type/Peer'>Peer</a> chat_invite:flags.4?<a href='/type/ChatInvite'>ChatInvite</a> chat_invite_hash:flags.4?<a href='/type/string'>string</a> channel_post:flags.2?<a href='/type/int'>int</a> start_param:flags.0?<a href='/type/string'>string</a> webpage:flags.9?<a href='/type/SponsoredWebPage'>SponsoredWebPage</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; sponsor_info:flags.7?<a href='/type/string'>string</a> additional_info:flags.8?<a href='/type/string'>string</a> = <a href='/type/SponsoredMessage'>SponsoredMessage</a>;
+<pre><code><a href='/constructor/sponsoredWebPage'>sponsoredWebPage</a>#3db8ec63 flags:<a href='/type/%23'>#</a> url:<a href='/type/string'>string</a> site_name:<a href='/type/string'>string</a> photo:flags.0?<a href='/type/Photo'>Photo</a> = <a href='/type/SponsoredWebPage'>SponsoredWebPage</a>;
+
+<a href='/constructor/sponsoredMessage'>sponsoredMessage</a>#daafff6b flags:<a href='/type/%23'>#</a> recommended:flags.5?<a href='/constructor/true'>true</a> show_peer_photo:flags.6?<a href='/constructor/true'>true</a> random_id:<a href='/type/bytes'>bytes</a> from_id:flags.3?<a href='/type/Peer'>Peer</a> chat_invite:flags.4?<a href='/type/ChatInvite'>ChatInvite</a> chat_invite_hash:flags.4?<a href='/type/string'>string</a> channel_post:flags.2?<a href='/type/int'>int</a> start_param:flags.0?<a href='/type/string'>string</a> webpage:flags.9?<a href='/type/SponsoredWebPage'>SponsoredWebPage</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; sponsor_info:flags.7?<a href='/type/string'>string</a> additional_info:flags.8?<a href='/type/string'>string</a> = <a href='/type/SponsoredMessage'>SponsoredMessage</a>;
+
 <a href='/constructor/messages.sponsoredMessages'>messages.sponsoredMessages</a>#c9ee1d87 flags:<a href='/type/%23'>#</a> posts_between:flags.0?<a href='/type/int'>int</a> messages:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SponsoredMessage'>SponsoredMessage</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.SponsoredMessages'>messages.SponsoredMessages</a>;
 
 ---functions---
 
 <a href='/method/channels.getSponsoredMessages'>channels.getSponsoredMessages</a>#ec210fbf channel:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/messages.SponsoredMessages'>messages.SponsoredMessages</a>;
-<a href='/method/channels.viewSponsoredMessage'>channels.viewSponsoredMessage</a>#beaedb94 channel:<a href='/type/InputChannel'>InputChannel</a> random_id:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<a href='/method/channels.viewSponsoredMessage'>channels.viewSponsoredMessage</a>#beaedb94 channel:<a href='/type/InputChannel'>InputChannel</a> random_id:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/channels.clickSponsoredMessage'>channels.clickSponsoredMessage</a>#18afbc93 channel:<a href='/type/InputChannel'>InputChannel</a> random_id:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <h4><a class="anchor" href="#getting-sponsored-messages" id="getting-sponsored-messages" name="getting-sponsored-messages"><i class="anchor-icon"></i></a>Getting sponsored messages</h4>
 <p>Each time the user opens a channel, <code>channels.getSponsoredMessages</code> must be called to receive <a href="https://promote.telegram.org">sponsored messages</a> available for this channel. The result must be cached for <strong>5 minutes</strong>.</p>
 <blockquote>
@@ -66,9 +70,18 @@ sponsoredMessage#daafff6b flags:# recommended:flags.5?true show_peer_photo:flags
 </ul>
 <p>The message should be marked as "Recommended" instead of "Sponsored" if the <code>recommended</code> flag is set.  </p>
 <p>If the <code>show_peer_photo</code> flag is set, a profile photo bubble should be displayed for this message, like for messages sent in groups. The photo shown in the bubble is obtained either from the peer contained in <code>from_id</code>, or from <code>chat_invite</code>.  </p>
+<p>If the <code>webpage</code> flag is set, an instant view webpage preview must also be shown for the specified website.</p>
 <p>If the <code>sponsor_info</code> or <code>additional_info</code> flags are set, an additional "Sponsor info" menu item must be present in the message context menu (the menu that pops up when clicking on a button), that when clicked, displays the contents of the flags.  </p>
 <h4><a class="anchor" href="#counting-sponsored-message-views" id="counting-sponsored-message-views" name="counting-sponsored-message-views"><i class="anchor-icon"></i></a>Counting sponsored message views</h4>
-<p>Once the entire text is shown on the screen (excluding the button), <code>channels.viewSponsoredMessage</code> must be called with the <code>random_id</code> of this sponsored message.</p>
+<p>Once the entire text is shown on the screen (excluding the button), <a href="/method/channels.viewSponsoredMessage">channels.viewSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message.</p>
+<h4><a class="anchor" href="#clicking-on-sponsored-messages" id="clicking-on-sponsored-messages" name="clicking-on-sponsored-messages"><i class="anchor-icon"></i></a>Clicking on sponsored messages</h4>
+<p>If the user either:</p>
+<ul>
+<li>Clicks on a link in the sponsored message</li>
+<li>Opens a sponsored chat or a sponsored website via the associated button</li>
+<li>Opens the sponsored chat via the sponsored message name, the sponsored message photo, or a mention in the sponsored message</li>
+</ul>
+<p><a href="/method/channels.clickSponsoredMessage">channels.clickSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message.</p>
 <h4><a class="anchor" href="#testing-sponsored-messages" id="testing-sponsored-messages" name="testing-sponsored-messages"><i class="anchor-icon"></i></a>Testing sponsored messages</h4>
 <p>For the channel <a href="https://t.me/SecretAdTestChannel">https://t.me/SecretAdTestChannel</a> the system will <strong>always</strong> return a sponsored message: promoting either a channel, a particular message in a channel, or a bot with a start parameter.</p>
 <hr>
