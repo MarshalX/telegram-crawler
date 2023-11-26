@@ -174,17 +174,30 @@ Note that eventual errors will not be sent as a <code>failed</code> event if the
 <p>These links are different from <a href="/api/links#bot-attachment-menu-links">bot attachment menu deep links »</a>, because they don't require the user to install an attachment menu, and a single bot can offer multiple Mini Apps, distinguished by their <code>short_name</code>.  </p>
 <p>These links should be handled as follows:  </p>
 <ul>
-<li>Check if <code>bot_username</code> parameter of the link is indeed a bot username, if so then</li>
-<li>Invoke <a href="/method/messages.getBotApp">messages.getBotApp</a>, passing an <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a> with the <code>short_name</code> contained in the <code>appname</code> query string parameter.
-If the client has already encountered an app with this short name from the same bot before, pass the <code>hash</code> of the cached <a href="/constructor/botApp">botApp</a> constructor to <a href="/method/messages.getBotApp">messages.getBotApp</a>.</li>
-<li>If a <a href="/constructor/messages.botApp">messages.botApp</a> constructor is returned and its <code>request_write_access</code> flag is set, show a prompt to the user, indicating that the bot is asking permission to send messages to the user.<br>
-If the user agrees, set the <code>write_allowed</code> flag when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a> in the next step.</li>
-<li>If a <a href="/constructor/messages.botApp">messages.botApp</a> constructor is returned, open the Mini App by invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>, generating an <a href="/constructor/inputBotAppID">inputBotAppID</a> constructor from <code>id</code> and <code>access_hash</code> of the returned <a href="/constructor/botApp">botApp</a>, or from previously cached information if we already met the bot app and <a href="/constructor/botAppNotModified">botAppNotModified</a> was returned.  <ul>
-<li>If the client has clicked on the link in a Telegram chat, pass the chat's peer information into <code>peer</code>; otherwise pass the bot's peer information, instead.</li>
-<li>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>inactive</code> flag is set, <strong>ask confirmation from the user</strong> before opening the Mini App; the <code>request_write_access</code> checkbox should be shown in this prompt, if needed.<br>
-Confirmation should <strong>always</strong> be asked, even if the <code>inactive</code> flag is not set, when opening the link from places where the full link is not visible (i.e. <a href="/constructor/messageEntityTextUrl">messageEntityTextUrl</a> text links, inline buttons etc.).  </li>
-<li>If the <code>startapp</code> query string parameter is present, pass it to <code>start_param</code> when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</li>
-<li>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>request_write_access</code> flag is set, the bot is asking permission to send messages to the user: if the user agrees, set the <code>write_allowed</code> flag when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</li>
+<li>
+<p>Check if <code>bot_username</code> parameter of the link is indeed a bot username, if so then</p>
+</li>
+<li>
+<p>Invoke <a href="/method/messages.getBotApp">messages.getBotApp</a>, passing an <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a> with the <code>short_name</code> contained in the <code>appname</code> query string parameter.
+If the client has already encountered an app with this short name from the same bot before, pass the <code>hash</code> of the cached <a href="/constructor/botApp">botApp</a> constructor to <a href="/method/messages.getBotApp">messages.getBotApp</a>.</p>
+</li>
+<li>
+<p>If a <a href="/constructor/messages.botApp">messages.botApp</a> constructor is returned, open the Mini App by invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>, generating an <a href="/constructor/inputBotAppID">inputBotAppID</a> constructor from <code>id</code> and <code>access_hash</code> of the returned <a href="/constructor/botApp">botApp</a>, or from previously cached information if we already met the bot app and <a href="/constructor/botAppNotModified">botAppNotModified</a> was returned.  </p>
+<ul>
+<li>
+<p>If the client has clicked on the link in a Telegram chat, pass the chat's peer information into <code>peer</code>; otherwise pass the bot's peer information, instead.</p>
+</li>
+<li>
+<p>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>request_write_access</code> flag is set, the bot is asking permission to send messages to the user: <strong>ask confirmation from the user</strong> with a prompt and a checkbox, and if the user agrees, set the <code>write_allowed</code> flag when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</p>
+</li>
+<li>
+<p>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>inactive</code> flag is set, <strong>ask confirmation from the user</strong> before opening the Mini App; the <code>request_write_access</code> checkbox should be shown in this prompt, if needed.<br>
+Confirmation should <strong>always</strong> be asked, even if the <code>inactive</code> flag is not set, when opening the link from places where the full link is not visible (i.e. <a href="/constructor/messageEntityTextUrl">messageEntityTextUrl</a> text links, inline buttons etc.).  </p>
+<p>Don't use two prompts if confirmation to open the Mini App is required <em>and</em> <code>request_write_access</code> is set, use just one prompt with an optional checkbox for <code>request_write_access</code>.  </p>
+</li>
+<li>
+<p>If the <code>startapp</code> query string parameter is present, pass it to <code>start_param</code> when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</p>
+</li>
 </ul>
 </li>
 </ul>
