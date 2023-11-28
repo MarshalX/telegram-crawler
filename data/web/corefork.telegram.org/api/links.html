@@ -59,7 +59,17 @@
 <li><code>tg://path?query</code></li>
 </ul>
 <p>The <code>#fragment</code> part is always ignored when parsing Telegram deep links.  </p>
-<p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code> is not equal to <code>www</code>, is not a single letter and is a valid username, it should be treated exactly as a <code>t.me/&lt;username&gt;/</code> link (generate a <code>t.me/&lt;username&gt;/</code> link and append the rest of the path (if present) and the query string (if present)).  </p>
+<p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code>:</p>
+<ul>
+<li>Is not equal to:<ul>
+<li><code>www</code></li>
+<li>Any of the values specified in <a href="https://github.com/tdlib/td/blob/07c1d53a6d3cb1fad58d2822e55eef6d57363581/td/telegram/LinkManager.cpp#L1099">this list »</a>.</li>
+</ul>
+</li>
+<li>AND is not a single letter</li>
+<li>AND is a valid username</li>
+</ul>
+<p>...it should be treated exactly as a <code>t.me/&lt;username&gt;/</code> link (generate a <code>t.me/&lt;username&gt;/</code> link and append the rest of the path (if present) and the query string (if present)).  </p>
 <h3><a class="anchor" href="#public-username-links" id="public-username-links" name="public-username-links"><i class="anchor-icon"></i></a>Public username links</h3>
 <p>Used to link to public users, groups and channels, see <a href="/api/invites#public-usernames">here for more info on how to handle them »</a>.  </p>
 <p><code>t.me</code> syntax:</p>
@@ -368,13 +378,15 @@ tg://addemoji?set=&lt;slug&gt;</code></pre>
 <p>Used by users to <a href="/api/boost">boost channels »</a>, granting them the ability to post stories.</p>
 <p>Use the channel information to boost the channel as described <a href="/api/boost">here »</a>.  </p>
 <p><code>t.me</code> syntax (public channels):</p>
-<pre><code>t.me/&lt;username&gt;?boost</code></pre>
+<pre><code>t.me/boost/&lt;username&gt;
+t.me/&lt;username&gt;?boost</code></pre>
 <p><code>t.me</code> syntax (private channels):</p>
-<pre><code>t.me/c/&lt;id&gt;?boost</code></pre>
+<pre><code>t.me/boost?c=&lt;id&gt;
+t.me/c/&lt;id&gt;?boost</code></pre>
 <p><code>tg:</code> syntax (public channels):</p>
 <pre><code>tg://boost?domain=&lt;username&gt;</code></pre>
 <p><code>tg:</code> syntax (private channels):</p>
-<pre><code>tg://boost?channel=&lt;channel&gt;</code></pre>
+<pre><code>tg://boost?channel=&lt;id&gt;</code></pre>
 <p>Parameters:</p>
 <table class="table">
 <thead>
@@ -886,12 +898,13 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 </table>
 <h3><a class="anchor" href="#named-bot-mini-app-links" id="named-bot-mini-app-links" name="named-bot-mini-app-links"><i class="anchor-icon"></i></a>Named bot mini app links</h3>
 <p>Used to share <a href="/api/bots/webapps#named-bot-mini-apps">named bot mini apps</a>.  </p>
-<p>These links are different from <a href="#bot-attachment-menu-links">bot attachment menu deep links</a>, because they don't require the user to install an attachment menu, and a single bot can offer multiple named mini apps, distinguished by their <code>short_name</code>.  </p>
+<p>These links are different from <a href="#bot-attachment-or-side-menu-links">bot attachment menu deep links</a>, because they don't require the user to install an attachment menu, and a single bot can offer multiple named mini apps, distinguished by their <code>short_name</code>.  </p>
 <p>These links should be handled as specified in the <a href="/api/bots/webapps#named-bot-mini-apps">named bot mini app documentation »</a>.  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;/&lt;short_name&gt;?startapp=&lt;start_parameter&gt;</code></pre>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;appname=&lt;short_name&gt;&amp;startapp=&lt;start_parameter&gt;</code></pre>
+<p>Note that <a href="#bot-attachment-or-side-menu-links">bot attachment or side menu links</a> have a similar syntax, <em>without</em> a <code>short_name</code> parameter.  </p>
 <p>Parameters: </p>
 <table class="table">
 <thead>
@@ -1091,7 +1104,7 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </tbody>
 </table>
 <h3><a class="anchor" href="#qr-code-login-links" id="qr-code-login-links" name="qr-code-login-links"><i class="anchor-icon"></i></a>QR code login links</h3>
-<p>Used by <a href="/api/qr-login">QR code login</a>.</p>
+<p>Used by the <a href="/api/qr-login">QR code login flow »</a>.</p>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://login?token=&lt;base64encodedtoken&gt;</code></pre>
 <p>Parameters:</p>
@@ -1111,24 +1124,47 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#bot-attachment-menu-links" id="bot-attachment-menu-links" name="bot-attachment-menu-links"><i class="anchor-icon"></i></a>Bot attachment menu links</h3>
-<p>Used to install and optionally open a <a href="/api/bots/attach">bot attachment menu »</a> in a certain chat.<br>
-For all link types, clients should:</p>
+<h3><a class="anchor" href="#bot-attachment-or-side-menu-links" id="bot-attachment-or-side-menu-links" name="bot-attachment-or-side-menu-links"><i class="anchor-icon"></i></a>Bot attachment or side menu links</h3>
+<p>Used to install and open a <a href="/api/bots/attach">bot attachment or side menu »</a> in a certain chat.<br>
+For all link types, clients should first <a href="/api/bots/attach">install the associated bot attachment or side menu entry as specified here »</a>, and if the user accepts the installation prompt, open the Mini App using the following logic, depending on the link subtype:</p>
+<h4><a class="anchor" href="#open-anywhere" id="open-anywhere" name="open-anywhere"><i class="anchor-icon"></i></a>Open anywhere</h4>
+<p>After installing the attachment/side menu entry globally, opens the associated mini app, regardless of the currently open Telegram chat (in fact, the Mini App should opened even if the client itself is minimized).  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;bot_username&gt;?startapp
+t.me/&lt;bot_username&gt;?startapp=&lt;start_parameter&gt;</code></pre>
+<p>Note that <a href="#named-bot-mini-app-links">named bot mini app links</a> have a similar syntax, with an additional <code>short_name</code> parameter.  </p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;startapp
+tg://resolve?domain=&lt;bot_username&gt;&amp;startapp=&lt;start_parameter&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bot_username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment/side menu entry</a></td>
+</tr>
+<tr>
+<td><code>start_parameter</code></td>
+<td style="text-align: center;">Optional</td>
+<td>If provided, should be passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code></td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#open-in-current-chat" id="open-in-current-chat" name="open-in-current-chat"><i class="anchor-icon"></i></a>Open in current chat</h4>
+<p>After installing the attachment/side menu entry globally, opens the associated mini app in the currently open chat.  </p>
+<p>If the current chat is not supported by the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field: </p>
 <ul>
-<li>Check that the associated bot username has an associated <a href="/api/bots/attach">attachment menu</a> as specified <a href="/api/bots/attach">here »</a>.</li>
-<li>If not installed, ask the user to <a href="/api/bots/attach">install the attachment menu »</a>.</li>
-<li>Check that the attachment menu can be opened in the chosen chat type by checking the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field.<ul>
-<li>If the chosen chat is supported, open the attachment menu <a href="/api/bots/webapps#normal-mini-apps">mini app »</a></li>
-<li>Otherwise:<ul>
-<li>If the user has just installed the attachment menu @ step 2, notify the user that the attachment menu was installed successfully.</li>
+<li>If the user has just installed the attachment menu in the previous step, notify the user that the attachment menu was installed successfully.</li>
 <li>Otherwise, notify the user that the attachment menu webapp can't be opened in the specified chat.</li>
 </ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4><a class="anchor" href="#open-in-current-chat" id="open-in-current-chat" name="open-in-current-chat"><i class="anchor-icon"></i></a>Open in current chat</h4>
-<p>Installs and opens an attachment menu mini app in the currently open chat.  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;?startattach
 t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;</code></pre>
@@ -1148,7 +1184,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 <tr>
 <td><code>bot_username</code></td>
 <td style="text-align: center;">Required</td>
-<td>Username of the bot that owns the <a href="/api/bots/attach">attachment menu</a></td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment/side menu entry</a></td>
 </tr>
 <tr>
 <td><code>start_parameter</code></td>
@@ -1158,7 +1194,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 </tbody>
 </table>
 <h4><a class="anchor" href="#open-in-specific-chat" id="open-in-specific-chat" name="open-in-specific-chat"><i class="anchor-icon"></i></a>Open in specific chat</h4>
-<p>Installs and opens an attachment menu mini app in a specific chat.  </p>
+<p>After installing the attachment/side menu entry globally, opens the associated mini app in a specific chat.  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;username&gt;?attach=&lt;bot_username&gt;
 t.me/&lt;username&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
@@ -1169,6 +1205,11 @@ t.me/+&lt;phone_number&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start
 tg://resolve?domain=&lt;username&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;
 tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;</code></pre>
+<p>If the specified chat is not supported by the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field: </p>
+<ul>
+<li>If the user has just installed the attachment menu in the previous step, notify the user that the attachment menu was installed successfully.</li>
+<li>Otherwise, notify the user that the attachment menu webapp can't be opened in the specified chat.</li>
+</ul>
 <p>Parameters:</p>
 <table class="table">
 <thead>
@@ -1182,17 +1223,17 @@ tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;star
 <tr>
 <td><code>username</code></td>
 <td style="text-align: center;">Required for <a href="#public-username-links">username links</a></td>
-<td>Username of chat where to open mini app</td>
+<td>Username of chat where to open the mini app</td>
 </tr>
 <tr>
 <td><code>phone_number</code></td>
 <td style="text-align: center;">Required for <a href="#phone-number-links">phone number links</a></td>
-<td>Phone number of private chat where to open mini app</td>
+<td>Phone number of private chat where to the open mini app</td>
 </tr>
 <tr>
 <td><code>bot_username</code></td>
 <td style="text-align: center;">Required</td>
-<td>Username of the bot that owns the <a href="/api/bots/attach">attachment menu</a></td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment/side menu</a></td>
 </tr>
 <tr>
 <td><code>start_parameter</code></td>
@@ -1202,7 +1243,7 @@ tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;star
 </tbody>
 </table>
 <h4><a class="anchor" href="#open-in-any-chat" id="open-in-any-chat" name="open-in-any-chat"><i class="anchor-icon"></i></a>Open in any chat</h4>
-<p>Installs an attachment menu, opens a dialog selection form that will open the attachment menu mini app in a specific chat.  </p>
+<p>After installing the attachment/side menu entry globally, opens a dialog selection form that will open the attachment menu mini app in a specific chat.  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;?startattach&amp;choose=users+bots+groups+channels
 t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels</code></pre>
@@ -1222,7 +1263,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 <tr>
 <td><code>bot_username</code></td>
 <td style="text-align: center;">Required</td>
-<td>Username of the bot that owns the <a href="/api/bots/attach">attachment menu</a></td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment/side menu</a></td>
 </tr>
 <tr>
 <td><code>start_parameter</code></td>
