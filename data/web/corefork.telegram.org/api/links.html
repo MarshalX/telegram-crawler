@@ -1128,7 +1128,7 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 <p>Used to install and open a <a href="/api/bots/attach">bot attachment or side menu »</a> in a certain chat.<br>
 For all link types, clients should first <a href="/api/bots/attach">install the associated bot attachment or side menu entry as specified here »</a>, and if the user accepts the installation prompt, open the Mini App using the following logic, depending on the link subtype:</p>
 <h4><a class="anchor" href="#open-anywhere" id="open-anywhere" name="open-anywhere"><i class="anchor-icon"></i></a>Open anywhere</h4>
-<p>After installing the attachment/side menu entry globally, opens the associated mini app, regardless of the currently open Telegram chat (in fact, the Mini App should opened even if the client itself is minimized).  </p>
+<p>After installing the attachment/side menu entry globally, opens the associated mini app using <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> with the <code>from_side_menu</code> flag set, regardless of the currently open Telegram chat (in fact, the Mini App should opened with that flag even if the client itself is minimized).  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;?startapp
 t.me/&lt;bot_username&gt;?startapp=&lt;start_parameter&gt;</code></pre>
@@ -1154,12 +1154,12 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startapp=&lt;start_parameter&gt;</c
 <tr>
 <td><code>start_parameter</code></td>
 <td style="text-align: center;">Optional</td>
-<td>If provided, should be passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code></td>
+<td>If provided, should be passed to <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>.<code>start_param</code></td>
 </tr>
 </tbody>
 </table>
 <h4><a class="anchor" href="#open-in-current-chat" id="open-in-current-chat" name="open-in-current-chat"><i class="anchor-icon"></i></a>Open in current chat</h4>
-<p>After installing the attachment/side menu entry globally, opens the associated mini app in the currently open chat.  </p>
+<p>After installing the attachment/side menu entry globally, opens the associated mini app using <a href="/method/messages.requestWebView">messages.requestWebView</a> in the currently open chat, by passing it to the <code>peer</code> parameter of <a href="/method/messages.requestWebView">messages.requestWebView</a>.  </p>
 <p>If the current chat is not supported by the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field: </p>
 <ul>
 <li>If the user has just installed the attachment menu in the previous step, notify the user that the attachment menu was installed successfully.</li>
@@ -1194,7 +1194,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 </tbody>
 </table>
 <h4><a class="anchor" href="#open-in-specific-chat" id="open-in-specific-chat" name="open-in-specific-chat"><i class="anchor-icon"></i></a>Open in specific chat</h4>
-<p>After installing the attachment/side menu entry globally, opens the associated mini app in a specific chat.  </p>
+<p>After installing the attachment/side menu entry globally, opens the associated mini app using <a href="/method/messages.requestWebView">messages.requestWebView</a> in a specific chat (passed to the <code>peer</code> parameter of <a href="/method/messages.requestWebView">messages.requestWebView</a>).  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;username&gt;?attach=&lt;bot_username&gt;
 t.me/&lt;username&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
@@ -1243,7 +1243,7 @@ tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;star
 </tbody>
 </table>
 <h4><a class="anchor" href="#open-in-any-chat" id="open-in-any-chat" name="open-in-any-chat"><i class="anchor-icon"></i></a>Open in any chat</h4>
-<p>After installing the attachment/side menu entry globally, opens a dialog selection form that will open the attachment menu mini app in a specific chat.  </p>
+<p>After installing the attachment/side menu entry globally, opens a dialog selection form that will open the attachment menu mini app using <a href="/method/messages.requestWebView">messages.requestWebView</a> in a specific chat (passed it to the <code>peer</code> parameter of <a href="/method/messages.requestWebView">messages.requestWebView</a>).  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;?startattach&amp;choose=users+bots+groups+channels
 t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels</code></pre>
