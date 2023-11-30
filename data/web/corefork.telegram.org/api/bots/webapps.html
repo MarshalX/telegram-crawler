@@ -92,7 +92,7 @@ Note that eventual errors will not be sent as a <code>failed</code> event if the
 <h4><a class="anchor" href="#popup-closed" id="popup-closed" name="popup-closed"><i class="anchor-icon"></i></a><code>popup_closed</code></h4>
 <p>Params: a JSON object with an optional <code>button_id</code> string field.</p>
 <p>Emitted when the user presses a button or cancels a popup brought up by a previous <a href="/api/web-events#web-app-open-popup"><code>web_app_open_popup</code> event »</a>.  </p>
-<h3><a class="anchor" href="#simple-mini-apps" id="simple-mini-apps" name="simple-mini-apps"><i class="anchor-icon"></i></a>Simple Mini Apps</h3>
+<h3><a class="anchor" href="#keyboard-button-mini-apps" id="keyboard-button-mini-apps" name="keyboard-button-mini-apps"><i class="anchor-icon"></i></a>Keyboard Button Mini Apps</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/replyKeyboardMarkup'>replyKeyboardMarkup</a>#85dd99d1 flags:<a href='/type/%23'>#</a> resize:flags.0?<a href='/constructor/true'>true</a> single_use:flags.1?<a href='/constructor/true'>true</a> selective:flags.2?<a href='/constructor/true'>true</a> persistent:flags.4?<a href='/constructor/true'>true</a> rows:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>&gt; placeholder:flags.3?<a href='/type/string'>string</a> = <a href='/type/ReplyMarkup'>ReplyMarkup</a>;
 
@@ -108,29 +108,21 @@ Note that eventual errors will not be sent as a <code>failed</code> event if the
 <a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#1a46500a flags:<a href='/type/%23'>#</a> from_switch_webview:flags.1?<a href='/constructor/true'>true</a> from_side_menu:flags.2?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:flags.3?<a href='/type/string'>string</a> start_param:flags.4?<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
 
 <a href='/method/messages.sendWebViewData'>messages.sendWebViewData</a>#dc0242c8 bot:<a href='/type/InputUser'>InputUser</a> random_id:<a href='/type/long'>long</a> button_text:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
-<p>Simple Mini Apps can only send data back to the bot through the MTProto API via a <a href="/api/web-events#web-app-data-send"><code>web_app_data_send</code> JS event »</a>.  </p>
-<p>Simple Mini Apps can be opened by invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>:</p>
-<ul>
-<li>From a <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> button click contained in a reply keyboard identified by a <a href="/constructor/replyKeyboardMarkup">replyKeyboardMarkup</a> constructor, passing the button's <code>url</code> to <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a></li>
-<li>Or by clicking on the <a href="/constructor/inlineBotWebView">inlineBotWebView</a> button on top of the inline result list, contained in <a href="/constructor/messages.botResults">messages.botResults</a>.<code>switch_webview</code>, returned by <a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a>, passing the <code>url</code> to <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>  </li>
-<li>Or by clicking on the installed <a href="/api/bots/attach">side menu entry »</a>, in which case only the <code>from_side_menu</code> flag should be set  </li>
-<li>Or by opening a <a href="/api/links#bot-attachment-or-side-menu-links"><code>startapp</code> link »</a>, in which case the <code>from_side_menu</code> flag should be set (even if the Mini App wasn't opened using the side menu entry, or if the client was minimized), and any eventual <code>start_parameter</code> from the link should also be passed to the <code>start_param</code> flag.  </li>
-</ul>
+<p>Keyboard Button Mini Apps should be opened when the user clicks a <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> contained in a reply keyboard identified by a <a href="/constructor/replyKeyboardMarkup">replyKeyboardMarkup</a> constructor, by invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> passing the button's <code>url</code> to the <code>url</code> parameter.  </p>
 <p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a>.  </p>
-<p>If and only if the Mini App was opened from a <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> reply keyboard button, upon receiving a <a href="/api/web-events#web-app-data-send"><code>web_app_data_send</code> JS event »</a> from the Mini App, clients should invoke <a href="/method/messages.sendWebViewData">messages.sendWebViewData</a>, passing the following arguments:</p>
+<p>Keyboard Button Mini Apps can send data back to the bot through the MTProto API via a <a href="/api/web-events#web-app-data-send"><code>web_app_data_send</code> JS event »</a>.  </p>
+<p>Upon receiving a <a href="/api/web-events#web-app-data-send"><code>web_app_data_send</code> JS event »</a> from the Mini App, clients should invoke <a href="/method/messages.sendWebViewData">messages.sendWebViewData</a>, passing the following arguments:</p>
 <ul>
 <li><code>bot</code> - Bot ID</li>
 <li><code>random_id</code> - Unique random ID to avoid resending the same event multiple times</li>
 <li><code>button_text</code> - Text of the <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> that was pressed to open the simple Mini App</li>
 <li><code>data</code> - Contents of the <code>data</code> field of the JS event.  </li>
 </ul>
-<p>Always ignore all <code>web_app_data_send</code> events received from <a href="/constructor/inlineBotWebView">inlineBotWebView</a> Mini Apps, as only <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> Mini Apps can send this event.</p>
 <p>Make sure to ignore all <code>web_app_data_send</code> events sent after the first one, <a href="/method/messages.sendWebViewData">messages.sendWebViewData</a> must be called only once. The webview must be closed after invoking the <a href="/method/messages.sendWebViewData">messages.sendWebViewData</a> method.  </p>
 <p>This will generate a <a href="/constructor/messageActionWebViewDataSent">messageActionWebViewDataSent</a> update for the user, and a <a href="/constructor/messageActionWebViewDataSentMe">messageActionWebViewDataSentMe</a> update for the bot, containing the event data.  </p>
-<h3><a class="anchor" href="#normal-mini-apps" id="normal-mini-apps" name="normal-mini-apps"><i class="anchor-icon"></i></a>Normal Mini Apps</h3>
+<h3><a class="anchor" href="#inline-button-mini-apps" id="inline-button-mini-apps" name="inline-button-mini-apps"><i class="anchor-icon"></i></a>Inline button Mini Apps</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/keyboardButtonWebView'>keyboardButtonWebView</a>#13767230 text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
-<a href='/constructor/botMenuButton'>botMenuButton</a>#c7b57ce6 text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/BotMenuButton'>BotMenuButton</a>;
 
 <a href='/constructor/webViewResultUrl'>webViewResultUrl</a>#c14557c query_id:<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
 
@@ -149,16 +141,69 @@ Note that eventual errors will not be sent as a <code>failed</code> event if the
 <a href='/method/messages.prolongWebView'>messages.prolongWebView</a>#b0d81a83 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> bot:<a href='/type/InputUser'>InputUser</a> query_id:<a href='/type/long'>long</a> reply_to:flags.0?<a href='/type/InputReplyTo'>InputReplyTo</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
 
 <a href='/method/messages.sendWebViewResultMessage'>messages.sendWebViewResultMessage</a>#a4314f5 bot_query_id:<a href='/type/string'>string</a> result:<a href='/type/InputBotInlineResult'>InputBotInlineResult</a> = <a href='/type/WebViewMessageSent'>WebViewMessageSent</a>;</code></pre>
-<p>Normal Mini Apps work similarly to <a href="/api/bots/inline">inline bots »</a>: they send messages on behalf of the user to the chat from which the query originated.</p>
-<p>Normal Mini Apps can be opened from:</p>
-<ul>
-<li>A <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a> button contained in an inline keyboard identified by a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> constructor: in this case, <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a>.<code>url</code> must be passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>url</code>.</li>
-<li>A <a href="/constructor/botMenuButton">botMenuButton</a> <a href="/api/bots/menu">menu button »</a>: in this case, the <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>from_bot_menu</code> flag should be set.</li>
-<li>An <a href="/api/bots/attach">attachment menu »</a>: in this case, no special flag should be set, unless the attachment menu is opened via a with a <a href="/api/links#bot-attachment-or-side-menu-links">bot attachment menu deep link</a>, in which case the <code>start_parameter</code> should be provided to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code>, if present.</li>
-</ul>
-<p>To open them, clients should call <a href="/method/messages.requestWebView">messages.requestWebView</a>, and then open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
+<p>Inline Button Mini Apps work similarly to <a href="/api/bots/inline">inline bots »</a>: they send messages on behalf of the user to the chat from which the query originated.</p>
+<p>When the user clicks on an <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a> inline button contained in an inline keyboard identified by a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> constructor, <a href="/method/messages.requestWebView">messages.requestWebView</a> should be invoked, passing <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a>.<code>url</code> must be passed to the method's <code>url</code> parameter.  </p>
+<p>Then, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
 <p>After loading the webview, until it is closed by a <a href="/api/web-events#web-app-close">web_app_close event</a>, the user client must invoke <a href="/method/messages.prolongWebView">messages.prolongWebView</a> every 60 seconds: if the method call returns <code>QUERY_ID_INVALID</code>, the webview must be closed.  </p>
 <p>The opened URL's fragment parameters already contain basic information about the user and a <code>query_id</code> parameter, that is exposed by the <a href="/bots/webapps">bot Mini Apps JS library</a>: this <code>query_id</code> can then be passed to the bot (within the Mini App itself, for example via an AJAX query or form submission to the server hosting the Mini App and the bot) and then used <strong>by the bot</strong> to invoke <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a>, passing an <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructor that will automatically send a message with optionally attached media, and even inline buttons on behalf of the user.  </p>
+<h3><a class="anchor" href="#menu-button-mini-apps" id="menu-button-mini-apps" name="menu-button-mini-apps"><i class="anchor-icon"></i></a>Menu button Mini Apps</h3>
+<p>Menu button Mini Apps work similarly to <a href="#inline-button-mini-apps">inline button Mini Apps »</a>: they send messages on behalf of the user to the chat from where the <a href="/api/bots/menu">bot menu button »</a> was clicked.  </p>
+<p>Menu button Mini Apps can be opened from a <a href="/constructor/botMenuButton">botMenuButton</a> <a href="/api/bots/menu">menu button »</a>: in this case, the <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>from_bot_menu</code> flag should be set, and the <a href="/constructor/botMenuButton">botMenuButton</a>.<code>url</code> field must be passed to the method's <code>url</code> parameter.  </p>
+<p>The full flow is identical to the flow for <a href="#inline-button-mini-apps">inline button Mini Apps »</a>, apart from the different flags passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>, as described above.</p>
+<h3><a class="anchor" href="#attachment-menu-mini-apps" id="attachment-menu-mini-apps" name="attachment-menu-mini-apps"><i class="anchor-icon"></i></a>Attachment menu Mini Apps</h3>
+<p>Attachment menu Mini Apps work similarly to <a href="#inline-button-mini-apps">inline button Mini Apps »</a>: they send messages on behalf of the user to the chat where the bot's <a href="/api/bots/attach">attachment menu »</a> was opened.  </p>
+<p>Attachment menu Mini Apps can be opened from an <a href="/api/bots/attach">attachment menu entry »</a>: in this case, no special flag should be set when invoking <a href="/method/messages.requestWebView">messages.requestWebView</a>.  </p>
+<p>Attachment menu Mini Apps can also be opened from a <a href="/api/links#bot-attachment-or-side-menu-links">bot attachment menu deep link</a>, in which case the <code>start_parameter</code> should be provided to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code>, if present.</p>
+<p>The full flow is identical to the flow for <a href="#inline-button-mini-apps">inline button Mini Apps »</a>, apart from the different flags passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>, as described above.</p>
+<h3><a class="anchor" href="#inline-mode-mini-apps" id="inline-mode-mini-apps" name="inline-mode-mini-apps"><i class="anchor-icon"></i></a>Inline mode Mini Apps</h3>
+<pre><code><a href='/constructor/messages.botResults'>messages.botResults</a>#e021f2f6 flags:<a href='/type/%23'>#</a> gallery:flags.0?<a href='/constructor/true'>true</a> query_id:<a href='/type/long'>long</a> next_offset:flags.1?<a href='/type/string'>string</a> switch_pm:flags.2?<a href='/type/InlineBotSwitchPM'>InlineBotSwitchPM</a> switch_webview:flags.3?<a href='/type/InlineBotWebView'>InlineBotWebView</a> results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotInlineResult'>BotInlineResult</a>&gt; cache_time:<a href='/type/int'>int</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.BotResults'>messages.BotResults</a>;
+
+<a href='/constructor/inlineBotWebView'>inlineBotWebView</a>#b57295d5 text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/InlineBotWebView'>InlineBotWebView</a>;
+
+<a href='/constructor/simpleWebViewResultUrl'>simpleWebViewResultUrl</a>#882f76bb url:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
+
+---functions---
+
+<a href='/method/messages.getInlineBotResults'>messages.getInlineBotResults</a>#514e999d flags:<a href='/type/%23'>#</a> bot:<a href='/type/InputUser'>InputUser</a> peer:<a href='/type/InputPeer'>InputPeer</a> geo_point:flags.0?<a href='/type/InputGeoPoint'>InputGeoPoint</a> query:<a href='/type/string'>string</a> offset:<a href='/type/string'>string</a> = <a href='/type/messages.BotResults'>messages.BotResults</a>;
+
+<a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#1a46500a flags:<a href='/type/%23'>#</a> from_switch_webview:flags.1?<a href='/constructor/true'>true</a> from_side_menu:flags.2?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:flags.3?<a href='/type/string'>string</a> start_param:flags.4?<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;</code></pre>
+<p>(Not to be confused with <a href="#inline-button-mini-apps">inline button mini apps »</a>).  </p>
+<p>Inline mode Mini Apps can be used to generate a custom set of inline results in response to a user's <a href="/api/bots/inline">inline query »</a> via a <a href="/api/web-events#web-app-switch-inline-query"><code>web_app_switch_inline_query</code> JS event »</a>.  </p>
+<p>Inline mode Mini Apps can be opened by clicking on an <a href="/constructor/inlineBotWebView">inlineBotWebView</a> button returned at the top of the inline result list, contained in <a href="/constructor/messages.botResults">messages.botResults</a>.<code>switch_webview</code>, returned by <a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a>.  </p>
+<p>Pass the <code>url</code> to <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>, while also setting the <code>from_switch_webview</code> flag.  </p>
+<p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a>.  </p>
+<p>Once the user has finished making their choices in the Mini App, a <a href="/api/web-events#web-app-switch-inline-query"><code>web_app_switch_inline_query</code> JS event »</a> should be emitted, containing a JSON object with the following fields:</p>
+<ul>
+<li><code>query</code> - The inline query that will be inserted in the chat's input field, after the bot's username.<br>
+May be an empty string, in which case just the bot's username will be inserted, triggering an empty inline query.</li>
+<li><code>chat_types</code> - An array of strings, containing a combination of <code>users</code>, <code>bots</code>, <code>groups</code>, <code>channels</code>.<br>
+If non-empty, the client should prompt the user to choose a specific chat of the specified type(s), then open the chosen chat and inserts the bot's username and the specified inline query in the input field.<br>
+The array values specify which types of chats the user will be able to choose from.<br>
+If empty, the current chat is used.  </li>
+</ul>
+<p>Upon receiving a <a href="/api/web-events#web-app-switch-inline-query"><code>web_app_switch_inline_query</code> JS event »</a> from the Mini App, the client should <a href="/api/bots/inline">make a new inline query »</a> to the same bot, with the newly specified <code>query</code>, either in the current chat or in the newly chosen chat, as specified by the <code>chat_types</code> field.  </p>
+<h3><a class="anchor" href="#side-menu-mini-apps" id="side-menu-mini-apps" name="side-menu-mini-apps"><i class="anchor-icon"></i></a>Side menu Mini Apps</h3>
+<pre><code><a href='/constructor/simpleWebViewResultUrl'>simpleWebViewResultUrl</a>#882f76bb url:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
+
+---functions---
+
+<a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#1a46500a flags:<a href='/type/%23'>#</a> from_switch_webview:flags.1?<a href='/constructor/true'>true</a> from_side_menu:flags.2?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:flags.3?<a href='/type/string'>string</a> start_param:flags.4?<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;</code></pre>
+<ul>
+<li>Or by clicking on the installed <a href="/api/bots/attach">side menu entry »</a>, in which case only the <code>from_side_menu</code> flag should be set  </li>
+</ul>
+<p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a>.  </p>
+<h3><a class="anchor" href="#direct-link-mini-apps" id="direct-link-mini-apps" name="direct-link-mini-apps"><i class="anchor-icon"></i></a>Direct link Mini Apps</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/simpleWebViewResultUrl'>simpleWebViewResultUrl</a>#882f76bb url:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
+
+---functions---
+
+<a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#1a46500a flags:<a href='/type/%23'>#</a> from_switch_webview:flags.1?<a href='/constructor/true'>true</a> from_side_menu:flags.2?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:flags.3?<a href='/type/string'>string</a> start_param:flags.4?<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;</code></pre>
+<p>Direct Link Mini Apps can be opened by invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>:</p>
+<ul>
+<li>Or by opening a <a href="/api/links#bot-attachment-or-side-menu-links"><code>startapp</code> link »</a>, in which case the <code>from_side_menu</code> flag should be set (even if the Mini App wasn't opened using the side menu entry, or if the client was minimized), and any eventual <code>start_parameter</code> from the link should also be passed to the <code>start_param</code> flag.  </li>
+</ul>
+<p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a>.  </p>
 <h3><a class="anchor" href="#named-bot-mini-apps" id="named-bot-mini-apps" name="named-bot-mini-apps"><i class="anchor-icon"></i></a>Named bot Mini Apps</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/inputBotAppID'>inputBotAppID</a>#a920bd7a id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputBotApp'>InputBotApp</a>;
