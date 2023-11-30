@@ -76,7 +76,7 @@ The GamingCommunication and bot mini apps libraries by default will use <code>'*
 </ul>
 </li>
 </ul>
-<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> when to open a native pop-up over the webview.</p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to open a native pop-up over the webview.</p>
 <p>By default, buttons should be displayed on one row.<br>
 If the mini app provides two buttons that can't fit horizontally on one row, display each button on a separate row.<br>
 If the mini app provides three buttons, always display each button on a separate row.  </p>
@@ -86,6 +86,50 @@ If the mini app provides three buttons, always display each button on a separate
 </ul>
 <p>Disable handling of this event if a popup is already being displayed, re-enable handling only after the <code>popup_closed</code> response event is emitted.<br>
 While handling is enabled, maximum 3 consecutive valid events of this type can be handled in a timespan of 3 seconds, ignore excess events.  </p>
+<h4><a class="anchor" href="#web-app-request-write-access" id="web-app-request-write-access" name="web-app-request-write-access"><i class="anchor-icon"></i></a><code>web_app_request_write_access</code></h4>
+<p>Event data: <code>null</code></p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask permission from the user to send them messages.  </p>
+<p>Upon receiving this event, clients should first invoke <a href="/method/bots.canSendMessage">bots.canSendMessage</a>, to check whether they have already granted the bot permission to write them in some way.  </p>
+<ul>
+<li>If the method returns <a href="/constructor/boolTrue">boolTrue</a>, a <a href="/api/bots/webapps#write-access-requested">write_access_requested event »</a> with <code>{"status": "allowed"}</code> should be sent to the Mini App.</li>
+<li>Otherwise, if the method returns <a href="/constructor/boolFalse">boolFalse</a>, a prompt should be shown to the user, indicating that the bot is asking permission to send messages to them.<br>
+If the user accepts, invoke <a href="/method/bots.allowSendMessage">bots.allowSendMessage</a>, and if the method call succeeds emit a <a href="/api/bots/webapps#write-access-requested">write_access_requested event »</a> with <code>{"status": "allowed"}</code>.<br>
+Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bots.allowSendMessage</a> call fails, emit a <a href="/api/bots/webapps#write-access-requested">write_access_requested event »</a> with <code>{"status": "cancelled"}</code>.</li>
+</ul>
+<h4><a class="anchor" href="#web-app-request-phone" id="web-app-request-phone" name="web-app-request-phone"><i class="anchor-icon"></i></a><code>web_app_request_phone</code></h4>
+<p>Event data: <code>null</code></p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the user to share their phone number as a contact.</p>
+<p>Upon receiving this event, clients should show a prompt to the user, indicating that the bot is asking them to share their phone number (optionally also asking the user to unblock the bot, if it's currently blocked).  </p>
+<p>If they accept, the user's phone number should be shared by sending a contact to the bot (unblocking it first, if it's currently blocked by the user); if all RPC queries (to unblock the bot, to send the message) succeed, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "sent"}</code>.  </p>
+<p>If the user refuses or any intermdiate method call fails, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "cancelled"}</code>.  </p>
+<h4><a class="anchor" href="#web-app-invoke-custom-method" id="web-app-invoke-custom-method" name="web-app-invoke-custom-method"><i class="anchor-icon"></i></a><code>web_app_invoke_custom_method</code></h4>
+<p>Event data: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - A string with the ID of the current request</li>
+<li><code>method</code> - A string, containing the name of the called custom method</li>
+<li><code>params</code> - An object containing the parameters of the method call</li>
+</ul>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to make custom method calls to Telegram's servers on behalf of the user.  </p>
+<p>This event should trigger a <a href="/method/bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a> request, passing the <code>method</code> to <code>custom_method</code>, and the <code>params</code> to <code>params</code>.  </p>
+<p>Upon receiving a reply, a <a href="/api/bots/webapps#custom-method-invoked">custom_method_invoked event »</a> should be emitted, with the following fields:</p>
+<ul>
+<li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_invoke_custom_method</code> object</li>
+<li><code>result</code> - The JSON data contained in the response of the <a href="/method/bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a> method, if the method call succeeded</li>
+<li><code>error</code> - The text of the RPC error, if the method call failed</li>
+</ul>
+<h4><a class="anchor" href="#web-app-read-text-from-clipboard" id="web-app-read-text-from-clipboard" name="web-app-read-text-from-clipboard"><i class="anchor-icon"></i></a><code>web_app_read_text_from_clipboard</code></h4>
+<p>Event data: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - A string with the ID of the current request</li>
+</ul>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to obtain the contents of the system clipboard.  </p>
+<p>Only for Mini Apps owned by bots added to the <a href="/api/bots/attach">attachment menu</a>, regardles of how the Mini App itself was launched, this event should trigger a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the following payload:  </p>
+<ul>
+<li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_read_text_from_clipboard</code> request</li>
+<li><code>data</code> - A string with the clipboard contents</li>
+</ul>
+<p>Note that user interactions must have a TTL of 10 seconds: events of this type must be ignored and a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must be sent if the last Mini App user interaction happened more than 10 seconds ago.  </p>
+<p>A <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must also be sent if the bot is not installed in the <a href="/api/bots/attach">attachment menu</a>.</p>
 <h4><a class="anchor" href="#web-app-setup-closing-behavior" id="web-app-setup-closing-behavior" name="web-app-setup-closing-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_closing_behavior</code></h4>
 <p>Event data: a JSON object with a boolean <code>need_confirmation</code>.</p>
 <p>If equal to <code>true</code>, the client should require user confirmation with a "Changes that you made may not be saved." popup with "Cancel"/"Close anyway" buttons before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
@@ -93,11 +137,16 @@ While handling is enabled, maximum 3 consecutive valid events of this type can b
 <p>Event data: a JSON object with a string <code>color</code> with a hex RGB color.  </p>
 <p>Used to set the mini app background and lower overscroll color.  </p>
 <h4><a class="anchor" href="#web-app-set-header-color" id="web-app-set-header-color" name="web-app-set-header-color"><i class="anchor-icon"></i></a><code>web_app_set_header_color</code></h4>
-<p>Event data: a JSON object with a string <code>color_key</code>, with of the following values:</p>
+<p>Event data: a JSON object with the following fields:</p>
 <ul>
+<li><code>color_key</code> - A string with one of the following values:<ul>
 <li><code>bg_color</code> - The <code>bg_color</code> from the <a href="/api/bots/webapps#theme-parameters">theme parameters</a> should be used.</li>
 <li><code>secondary_bg_color</code> - The <code>secondary_bg_color</code> from the <a href="/api/bots/webapps#theme-parameters">theme parameters</a> should be used.</li>
 </ul>
+</li>
+<li><code>color</code> - A color in hex RGB format (<code>#ffffff</code>).</li>
+</ul>
+<p>The two fields are mutually exclusive, if none of the two fields are provided the default header color is used.</p>
 <p>Used to set the mini app header and upper overscroll color.  </p>
 <h4><a class="anchor" href="#web-app-data-send" id="web-app-data-send" name="web-app-data-send"><i class="anchor-icon"></i></a><code>web_app_data_send</code></h4>
 <p>Event data: a JSON object with a string <code>data</code> field.  </p>

@@ -89,12 +89,39 @@ Note that eventual errors will not be sent as a <code>failed</code> event if the
 <h4><a class="anchor" href="#theme-changed" id="theme-changed" name="theme-changed"><i class="anchor-icon"></i></a><code>theme_changed</code></h4>
 <p>Params: a JSON object with the following fields:</p>
 <ul>
-<li><code>theme_params</code>: A <a href="#theme-parameters">theme parameters object »</a> (object)</li>
+<li><code>theme_params</code> - A <a href="#theme-parameters">theme parameters object »</a> (object)</li>
 </ul>
 <p>Emitted when requested by the Mini App using a <a href="/api/web-events#web-app-request-theme"><code>web_app_request_theme</code> event »</a>, or when the app theme changes.  </p>
 <h4><a class="anchor" href="#popup-closed" id="popup-closed" name="popup-closed"><i class="anchor-icon"></i></a><code>popup_closed</code></h4>
 <p>Params: a JSON object with an optional <code>button_id</code> string field.</p>
 <p>Emitted when the user presses a button or cancels a popup brought up by a previous <a href="/api/web-events#web-app-open-popup"><code>web_app_open_popup</code> event »</a>.  </p>
+<h4><a class="anchor" href="#write-access-requested" id="write-access-requested" name="write-access-requested"><i class="anchor-icon"></i></a><code>write_access_requested</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - <code>allowed</code> or <code>cancelled</code></li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-request-write-access"><code>web_app_request_write_access</code> event »</a>, indicating whether the user has allowed the bot to send messages to the user (<code>allowed</code>) or not (<code>cancelled</code>).  </p>
+<h4><a class="anchor" href="#phone-requested" id="phone-requested" name="phone-requested"><i class="anchor-icon"></i></a><code>phone_requested</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - <code>sent</code> or <code>cancelled</code></li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-request-phone"><code>web_app_request_phone</code> event »</a>, indicating whether the user has shared their phone number with the bot (<code>allowed</code>) or not (<code>cancelled</code>).  </p>
+<h4><a class="anchor" href="#custom-method-invoked" id="custom-method-invoked" name="custom-method-invoked"><i class="anchor-icon"></i></a><code>custom_method_invoked</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_invoke_custom_method</code> request</li>
+<li><code>result</code> - The JSON data contained in the response of the <a href="/method/bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a> method, if the method call succeeded</li>
+<li><code>error</code> - The text of the RPC error, if the method call failed</li>
+</ul>
+<p>Used by clients to reply to <a href="/api/web-events#web-app-invoke-custom-method"><code>web_app_invoke_custom_method</code> events »</a>.  </p>
+<h4><a class="anchor" href="#clipboard-text-received" id="clipboard-text-received" name="clipboard-text-received"><i class="anchor-icon"></i></a><code>clipboard_text_received</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_read_text_from_clipboard</code> request</li>
+<li><code>data</code> - A string with the clipboard contents (optional, if not provided consider the request failed)</li>
+</ul>
+<p>Used by clients to reply to <a href="/api/web-events#web-app-read-text-from-clipboard"><code>web_app_read_text_from_clipboard</code> events »</a>.  </p>
 <h3><a class="anchor" href="#keyboard-button-mini-apps" id="keyboard-button-mini-apps" name="keyboard-button-mini-apps"><i class="anchor-icon"></i></a>Keyboard Button Mini Apps</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/replyKeyboardMarkup'>replyKeyboardMarkup</a>#85dd99d1 flags:<a href='/type/%23'>#</a> resize:flags.0?<a href='/constructor/true'>true</a> single_use:flags.1?<a href='/constructor/true'>true</a> selective:flags.2?<a href='/constructor/true'>true</a> persistent:flags.4?<a href='/constructor/true'>true</a> rows:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>&gt; placeholder:flags.3?<a href='/type/string'>string</a> = <a href='/type/ReplyMarkup'>ReplyMarkup</a>;
@@ -253,7 +280,6 @@ Confirmation should <strong>always</strong> be asked, even if the <code>inactive
 </li>
 </ul>
 <p>Finally, open the webview using the <code>url</code> contained in the returned <a href="/constructor/appWebViewResultUrl">appWebViewResultUrl</a>.  </p>
-<p>The bot can write to the user directly if it already has a chat with the user or if it requested permission via <code>request_write_access</code> and the user granted it with <code>write_allowed</code>.  </p>
 <h3><a class="anchor" href="#theme-parameters" id="theme-parameters" name="theme-parameters"><i class="anchor-icon"></i></a>Theme parameters</h3>
 <p>Bot Mini Apps can be themed according to the following theme parameters, passed as a JSON object to the <code>theme_params</code> parameter of the <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and <a href="/method/messages.requestWebView">messages.requestWebView</a> methods.  </p>
 <p>This JSON object has the following keys, containing color theme information (hex string, RGB, no alpha) to pass to the Mini App:</p>
