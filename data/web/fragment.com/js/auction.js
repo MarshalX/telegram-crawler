@@ -1302,11 +1302,13 @@ var Random = {
 var LoginCodes = {
   init: function() {
     Aj.onLoad(function(state) {
+      $('.js-toggle-receive').on('change', LoginCodes.eToggleReceive);
       state.needUpdate = true;
       state.updLastReq = +Date.now();
       state.updStateTo = setTimeout(LoginCodes.updateState, Main.UPDATE_PERIOD);
     });
     Aj.onUnload(function(state) {
+      $('.js-toggle-receive').off('change', LoginCodes.eToggleReceive);
       clearTimeout(state.updStateTo);
       state.needUpdate = false;
     });
@@ -1337,6 +1339,14 @@ var LoginCodes = {
       }
 
     }
+  },
+  eToggleReceive: function() {
+    var can_receive = $(this).prop('checked');
+    $('.js-codes-main').toggleClass('codes-disabled', !can_receive);
+    Aj.apiRequest('toggleLoginCodes', {
+      number: Aj.state.number,
+      can_receive: can_receive ? 1 : 0
+    });
   }
 };
 
