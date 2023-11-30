@@ -188,10 +188,8 @@ If empty, the current chat is used.  </li>
 ---functions---
 
 <a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#1a46500a flags:<a href='/type/%23'>#</a> from_switch_webview:flags.1?<a href='/constructor/true'>true</a> from_side_menu:flags.2?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:flags.3?<a href='/type/string'>string</a> start_param:flags.4?<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;</code></pre>
-<ul>
-<li>Or by clicking on the installed <a href="/api/bots/attach">side menu entry »</a>, in which case only the <code>from_side_menu</code> flag should be set  </li>
-</ul>
-<p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a>.  </p>
+<p>Side menu Mini Apps can be opened by clicking on the installed <a href="/api/bots/attach">side menu entry »</a>.  </p>
+<p>This action must trigger a <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> query with the <code>from_side_menu</code> flag set: clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a>.  </p>
 <h3><a class="anchor" href="#direct-link-mini-apps" id="direct-link-mini-apps" name="direct-link-mini-apps"><i class="anchor-icon"></i></a>Direct link Mini Apps</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/simpleWebViewResultUrl'>simpleWebViewResultUrl</a>#882f76bb url:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;
@@ -199,10 +197,9 @@ If empty, the current chat is used.  </li>
 ---functions---
 
 <a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#1a46500a flags:<a href='/type/%23'>#</a> from_switch_webview:flags.1?<a href='/constructor/true'>true</a> from_side_menu:flags.2?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:flags.3?<a href='/type/string'>string</a> start_param:flags.4?<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;</code></pre>
-<p>Direct Link Mini Apps can be opened by invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>:</p>
-<ul>
-<li>Or by opening a <a href="/api/links#bot-attachment-or-side-menu-links"><code>startapp</code> link »</a>, in which case the <code>from_side_menu</code> flag should be set (even if the Mini App wasn't opened using the side menu entry, or if the client was minimized), and any eventual <code>start_parameter</code> from the link should also be passed to the <code>start_param</code> flag.  </li>
-</ul>
+<p>Direct Link Mini Apps can be opened by clicking on a <a href="/api/links#bot-attachment-or-side-menu-links"><code>startapp</code> link »</a>.  </p>
+<p>This action must trigger a <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> query with the <code>from_side_menu</code> flag set (like for <a href="#side-menu-mini-apps">side menu Mini Apps</a>), and any eventual <code>start_parameter</code> from the link should also be passed to the <code>start_param</code> flag.  </p>
+<p>Note that the app should be opened (with an installation prompt before, if needed) even if the client is minimized.  </p>
 <p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a>.  </p>
 <h3><a class="anchor" href="#named-bot-mini-apps" id="named-bot-mini-apps" name="named-bot-mini-apps"><i class="anchor-icon"></i></a>Named bot Mini Apps</h3>
 <p>Schema:</p>
@@ -222,7 +219,7 @@ If empty, the current chat is used.  </li>
 
 <a href='/method/messages.requestAppWebView'>messages.requestAppWebView</a>#8c5a3b3c flags:<a href='/type/%23'>#</a> write_allowed:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> app:<a href='/type/InputBotApp'>InputBotApp</a> start_param:flags.1?<a href='/type/string'>string</a> theme_params:flags.2?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/AppWebViewResult'>AppWebViewResult</a>;</code></pre>
 <p>Another way to open Mini Apps is by using <a href="/api/links#named-bot-mini-app-links">named bot Mini App links »</a>.  </p>
-<p>These links are different from <a href="/api/links#bot-attachment-or-side-menu-links">bot attachment menu deep links »</a>, because they don't require the user to install an attachment menu, and a single bot can offer multiple Mini Apps, distinguished by their <code>short_name</code>.  </p>
+<p>These links are different from all other Mini App links, because they don't require the user to install an attachment menu, and a single bot can offer multiple Mini Apps, distinguished by their <code>short_name</code>.  </p>
 <p>These links should be handled as follows:  </p>
 <ul>
 <li>
