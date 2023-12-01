@@ -48,10 +48,10 @@
 <p>They support <a href="https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots">seamless authorization</a>, <a href="https://core.telegram.org/bots/payments">integrated payments</a> via multiple payment providers (with <em>Google Pay</em> and <em>Apple Pay</em> out of the box), delivering tailored push notifications to users, and <a href="https://core.telegram.org/bots">much more</a>.</p>
 <p>This article offers a client-side overview of the implementation of bot mini apps using the MTProto API: see <a href="/bots/webapps">here for an overview of the mini-app side JS API »</a>.  </p>
 <h3><a class="anchor" href="#outgoing-events-mini-app-to-client" id="outgoing-events-mini-app-to-client" name="outgoing-events-mini-app-to-client"><i class="anchor-icon"></i></a>Outgoing events: Mini App to client</h3>
-<p>Both <a href="#simple-mini-apps">simple</a> and <a href="#normal-mini-apps">normal</a> Mini Apps can <em>send</em> web events starting with <code>web_app_</code>; see the <a href="/api/web-events">web event documentation for the full list of events that can be <em>sent</em> by the Mini App to the client »</a>.  </p>
+<p>Mini Apps can <em>send</em> web events starting with <code>web_app_</code>; see the <a href="/api/web-events">web event documentation for the full list of events that can be <em>sent</em> by the Mini App to the client »</a>.  </p>
 <h3><a class="anchor" href="#incoming-events-client-to-mini-app" id="incoming-events-client-to-mini-app" name="incoming-events-client-to-mini-app"><i class="anchor-icon"></i></a>Incoming events: Client to Mini App</h3>
 <p>Mini Apps can also <em>receive</em> events, by exposing a <code>window.Telegram.WebView.receiveEvent("event_name", params)</code> method.  </p>
-<p>Here's the full list of events that can be <em>received</em> by a Mini App from the client, by calling the <code>receiveEvent</code> method.  </p>
+<p>Here's the full list of events that can be <em>received</em> by a Mini App from the client, if the client invokes the <code>receiveEvent</code> method.  </p>
 <h4><a class="anchor" href="#main-button-pressed" id="main-button-pressed" name="main-button-pressed"><i class="anchor-icon"></i></a><code>main_button_pressed</code></h4>
 <p>Params: <code>null</code></p>
 <p>Sent by the client when the user presses the main button located at the bottom of the webview, handle this event only if the main button was <a href="/api/web-events#web-app-setup-main-button">previously configured by a <code>web_app_setup_main_button</code> event »</a>.</p>
@@ -206,7 +206,7 @@ Note that eventual errors will not be sent as a <code>failed</code> event if the
 <a href='/method/messages.getInlineBotResults'>messages.getInlineBotResults</a>#514e999d flags:<a href='/type/%23'>#</a> bot:<a href='/type/InputUser'>InputUser</a> peer:<a href='/type/InputPeer'>InputPeer</a> geo_point:flags.0?<a href='/type/InputGeoPoint'>InputGeoPoint</a> query:<a href='/type/string'>string</a> offset:<a href='/type/string'>string</a> = <a href='/type/messages.BotResults'>messages.BotResults</a>;
 
 <a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#1a46500a flags:<a href='/type/%23'>#</a> from_switch_webview:flags.1?<a href='/constructor/true'>true</a> from_side_menu:flags.2?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:flags.3?<a href='/type/string'>string</a> start_param:flags.4?<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;</code></pre>
-<p>(Not to be confused with <a href="#inline-button-mini-apps">inline button mini apps »</a>).  </p>
+<p>Not to be confused with <a href="#inline-button-mini-apps">inline button mini apps »</a>.  </p>
 <p>Inline mode Mini Apps can be used to generate a custom set of inline results in response to a user's <a href="/api/bots/inline">inline query »</a> via a <a href="/api/web-events#web-app-switch-inline-query"><code>web_app_switch_inline_query</code> JS event »</a>.  </p>
 <p>Inline mode Mini Apps can be opened by clicking on an <a href="/constructor/inlineBotWebView">inlineBotWebView</a> button returned at the top of the inline result list, contained in <a href="/constructor/messages.botResults">messages.botResults</a>.<code>switch_webview</code>, returned by <a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a>.  </p>
 <p>Pass the <code>url</code> to <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>, while also setting the <code>from_switch_webview</code> flag.  </p>
@@ -236,11 +236,11 @@ If empty, the current chat is used.  </li>
 ---functions---
 
 <a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#1a46500a flags:<a href='/type/%23'>#</a> from_switch_webview:flags.1?<a href='/constructor/true'>true</a> from_side_menu:flags.2?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:flags.3?<a href='/type/string'>string</a> start_param:flags.4?<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/SimpleWebViewResult'>SimpleWebViewResult</a>;</code></pre>
-<p>Direct Link Mini Apps can be opened by clicking on a <a href="/api/links#bot-attachment-or-side-menu-links"><code>startapp</code> link »</a>.  </p>
+<p>Direct Link Mini Apps can be opened by clicking on a <a href="/api/links#mini-app-links">Mini App link »</a>.  </p>
 <p>This action must trigger a <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> query with the <code>from_side_menu</code> flag set (like for <a href="#side-menu-mini-apps">side menu Mini Apps</a>), and any eventual <code>start_parameter</code> from the link should also be passed to the <code>start_param</code> flag.  </p>
 <p>Note that the app should be opened (with an installation prompt before, if needed) even if the client is minimized.  </p>
 <p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/simpleWebViewResultUrl">simpleWebViewResultUrl</a>.  </p>
-<h3><a class="anchor" href="#named-bot-mini-apps" id="named-bot-mini-apps" name="named-bot-mini-apps"><i class="anchor-icon"></i></a>Named bot Mini Apps</h3>
+<h3><a class="anchor" href="#named-mini-apps" id="named-mini-apps" name="named-mini-apps"><i class="anchor-icon"></i></a>Named Mini Apps</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/inputBotAppID'>inputBotAppID</a>#a920bd7a id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputBotApp'>InputBotApp</a>;
 <a href='/constructor/inputBotAppShortName'>inputBotAppShortName</a>#908c0407 bot_id:<a href='/type/InputUser'>InputUser</a> short_name:<a href='/type/string'>string</a> = <a href='/type/InputBotApp'>InputBotApp</a>;
@@ -257,7 +257,7 @@ If empty, the current chat is used.  </li>
 <a href='/method/messages.getBotApp'>messages.getBotApp</a>#34fdc5c3 app:<a href='/type/InputBotApp'>InputBotApp</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.BotApp'>messages.BotApp</a>;
 
 <a href='/method/messages.requestAppWebView'>messages.requestAppWebView</a>#8c5a3b3c flags:<a href='/type/%23'>#</a> write_allowed:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> app:<a href='/type/InputBotApp'>InputBotApp</a> start_param:flags.1?<a href='/type/string'>string</a> theme_params:flags.2?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/AppWebViewResult'>AppWebViewResult</a>;</code></pre>
-<p>Another way to open Mini Apps is by using <a href="/api/links#named-bot-mini-app-links">named bot Mini App links »</a>.  </p>
+<p>Another way to open Mini Apps is by using <a href="/api/links#named-mini-app-links">named Mini App links »</a>.  </p>
 <p>These links are different from all other Mini App links, because they don't require the user to install an attachment menu, and a single bot can offer multiple Mini Apps, distinguished by their <code>short_name</code>.  </p>
 <p>These links should be handled as follows:  </p>
 <ul>
