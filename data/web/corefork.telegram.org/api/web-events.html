@@ -128,8 +128,21 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 <li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_read_text_from_clipboard</code> request</li>
 <li><code>data</code> - A string with the clipboard contents</li>
 </ul>
-<p>Note that user interactions must have a TTL of 10 seconds: events of this type must be ignored and a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must be sent if the last Mini App user interaction happened more than 10 seconds ago.  </p>
+<p>Note that this method can be called only in response to a user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main or settings button).<br>
+Note that user interactions must have a TTL of 10 seconds: events of this type must be ignored and a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must be sent if the last Mini App user interaction (as described above) happened more than 10 seconds ago.  </p>
 <p>A <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must also be sent if the bot is not installed in the <a href="/api/bots/attach">attachment menu</a>.</p>
+<h4><a class="anchor" href="#web-app-open-scan-qr-popup" id="web-app-open-scan-qr-popup" name="web-app-open-scan-qr-popup"><i class="anchor-icon"></i></a><code>web_app_open_scan_qr_popup</code></h4>
+<p>Event data: a JSON object with the following fields:</p>
+<ul>
+<li><code>text</code> - Optional string, containing the text to be displayed under the 'Scan QR' heading, 0-64 characters.  </li>
+</ul>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to prompt the client to open the native QR code scanner and start continuously scanning for QR codes.  </p>
+<p>A <a href="/api/bots/webapps#qr-text-received"><code>qr_text_received</code> event »</a> should be emitted every time a new QR code is scanned, until the user closes the popup via the UI or the Mini App closes the popup with a <a href="#web-app-close-scan-qr-popup">web_app_close_scan_qr_popup</a> event.</p>
+<p>Closing the popup should emit a <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a>; the same event should be emitted if the scan QR code popup cannot be opened due to permission issues.  </p>
+<h4><a class="anchor" href="#web-app-close-scan-qr-popup" id="web-app-close-scan-qr-popup" name="web-app-close-scan-qr-popup"><i class="anchor-icon"></i></a><code>web_app_close_scan_qr_popup</code></h4>
+<p>Event data: <code>null</code></p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to prompt the client to close the native QR code scanner opened using <a href="#web-app-open-scan-qr-popup">web_app_open_scan_qr_popup</a>.  </p>
+<p>If the popup is currently open and was closed by this event or in any other way, a <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a> event should be emitted.  </p>
 <h4><a class="anchor" href="#web-app-setup-closing-behavior" id="web-app-setup-closing-behavior" name="web-app-setup-closing-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_closing_behavior</code></h4>
 <p>Event data: a JSON object with a boolean <code>need_confirmation</code>.</p>
 <p>If equal to <code>true</code>, the client should require user confirmation with a "Changes that you made may not be saved." popup with "Cancel"/"Close anyway" buttons before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
@@ -188,11 +201,15 @@ If empty, the current chat is used.  </li>
 </ul>
 <p>Used to trigger haptic feedback for a user interaction in a webapp.</p>
 <h4><a class="anchor" href="#web-app-open-link" id="web-app-open-link" name="web-app-open-link"><i class="anchor-icon"></i></a><code>web_app_open_link</code></h4>
-<p>Event data: a JSON object with a string <code>url</code> field.  </p>
+<p>Event data: a JSON object with the following fields:</p>
+<ul>
+<li><code>url</code> - The URL to open</li>
+<li><code>try_instant_view</code> - Optional boolean, if set, equal to <code>true</code> and the scheme of the URL is either <code>http</code> or <code>https</code>, the link should be opened in <a href="/methods#working-with-instant-view-pages">Instant View mode</a> if possible. </li>
+</ul>
 <p>Used to open a link in an external browser (or in a new tab for browser clients). The Mini App will not be closed.  </p>
-<p>Note that this method can be called only in response to the user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button).<br>
+<p>Note that this method can be called only in response to a user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main or settings button).<br>
 After opening the URL, further events of this type should be ignored until the user interacts again with the Mini App interface (as above).<br>
-Note that user interactions must have a TTL of 10 seconds: events of this type must be ignored if the last Mini App user interaction happened more than 10 seconds ago.</p>
+Note that user interactions must have a TTL of 1 second: events of this type must be ignored if the last Mini App user interaction happened more than 1 second ago.</p>
 <h4><a class="anchor" href="#web-app-open-tg-link" id="web-app-open-tg-link" name="web-app-open-tg-link"><i class="anchor-icon"></i></a><code>web_app_open_tg_link</code></h4>
 <p>Event data: a JSON object with a string <code>path_full</code> field, containing the path+query component of a <a href="/api/links">t.me deep link</a> (<code>url = 'https://t.me' + path_full</code>).  </p>
 <p>Used to open a <a href="/api/links">t.me deep link</a>. The Mini App must be closed.</p>
