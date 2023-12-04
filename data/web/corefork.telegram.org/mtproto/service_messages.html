@@ -83,9 +83,12 @@ future_salts#ae500895 req_msg_id:long now:int salts:vector&lt;future_salt&gt; = 
 <p>Works like ping. In addition, after this is received, the server starts a timer which will close the current connection disconnect_delay seconds later unless it receives a new message of the same type which automatically resets all previous timers. If the client sends these pings once every 60 seconds, for example, it may set disconnect_delay equal to 75 seconds. </p>
 <h4><a class="anchor" href="#request-to-destroy-session" id="request-to-destroy-session" name="request-to-destroy-session"><i class="anchor-icon"></i></a>Request to Destroy Session</h4>
 <p>Used by the client to notify the server that it may forget the data from a different session belonging to the same user (i. e. with the same auth_key_id). The result of this being applied to the current session is undefined.</p>
-<pre><code>destroy_session#e7512126 session_id:long = DestroySessionRes;
-destroy_session_ok#e22045fc session_id:long = DestroySessionRes;
-destroy_session_none#62d350c9 session_id:long = DestroySessionRes;</code></pre>
+<pre><code>destroy_session_ok#e22045fc session_id:long = DestroySessionRes;
+destroy_session_none#62d350c9 session_id:long = DestroySessionRes;
+
+---functions---
+
+destroy_session#e7512126 session_id:long = DestroySessionRes;</code></pre>
 <h4><a class="anchor" href="#new-session-creation-notification" id="new-session-creation-notification" name="new-session-creation-notification"><i class="anchor-icon"></i></a>New Session Creation Notification</h4>
 <p>The server notifies the client that a new session (from the server's standpoint) had to be created to handle a client message. If, after this, the server receives a message with an even smaller msg_id within the same session, a similar notification will be generated for this msg_id as well. No such notifications are generated for high msg_id values.</p>
 <pre><code>new_session_created#9ec20908 first_msg_id:long unique_id:long server_salt:long = NewSession</code></pre>
