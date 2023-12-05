@@ -2,10 +2,10 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>Takeout</title>
+    <title>Takeout API</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="description" content="Telegram&#39;s API allows users to export all of their information through the takeout API.">
-    <meta property="og:title" content="Takeout">
+    <meta property="og:title" content="Takeout API">
     <meta property="og:image" content="">
     <meta property="og:description" content="Telegram&#39;s API allows users to export all of their information through the takeout API.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
@@ -39,8 +39,8 @@
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/takeout" >Takeout</a></li></ul></div>
-  <h1 id="dev_page_title">Takeout</h1>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/takeout" >Takeout API</a></li></ul></div>
+  <h1 id="dev_page_title">Takeout API</h1>
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
@@ -72,6 +72,71 @@ invokeWithMessagesRange#365275f2 {X:Type} range:MessageRange query:!X = X;</code
 <p>Then, when invoking methods that require message range pagination, wrap the method using <a href="/method/invokeWithMessagesRange">invokeWithMessagesRange</a>, before also wrapping it in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> as usual.  </p>
 <p>Start by passing the first message range; continue passing the same message range while paginating using the <a href="/api/offsets">usual <code>offset_*</code>, <code>limit</code>, etc parameters</a>; once there are no more results left, switch to the next message range, re-starting <code>offset_*</code>, <code>limit</code> pagination from the beginning.<br>
 Repeat until you've finished all the message ranges that were returned by <a href="/method/messages.getSplitRanges">messages.getSplitRanges</a>.  </p>
+<h3><a class="anchor" href="#procedure" id="procedure" name="procedure"><i class="anchor-icon"></i></a>Procedure</h3>
+<p>Example implementation: <a href="https://github.com/telegramdesktop/tdesktop/tree/dev/Telegram/SourceFiles/export">tdesktop</a>.  </p>
+<p>Here's an overview of the steps required to export account information.  </p>
+<p>All requests must be wrapped in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> constructors, including <a href="/method/upload.getFile">upload.getFile</a> calls to save files.  </p>
+<p>Unless otherwise specified, all requests do <strong>not</strong> require pagination using <a href="#split-ranges">split ranges</a>.  </p>
+<ul>
+<li>
+<p>If the user wants to download messages from chats, groups or channels:</p>
+<ul>
+<li>
+<p>First of all, fetch and save the dialog list using <a href="#split-ranges">split ranges</a> and <a href="/method/messages.getDialogs">messages.getDialogs</a>; at the beginning of each split range, make an initial request with all offsets set to <code>0</code> and <code>limit=1</code> to fetch total dialog <code>count</code> to display a proper progress bar.  </p>
+</li>
+<li>
+<p><a href="#left-channels">Request and save info about left channels and supergroups</a> if the user wants to export channel and group messages.  </p>
+</li>
+<li>
+<p>For all dialogs, check if they match the dialog types chosen by the user, and if yes download all messages using <a href="#split-ranges">split ranges</a> and <a href="/method/messages.getHistory">messages.getHistory</a>; for each split range, make an initial request with all offsets set to <code>0</code> and <code>limit=1</code> to fetch the initial message count to display a proper progress bar.<br>
+Use the single message returned by the initial <code>limit=1</code> request to also skip ranges that don't have any messages, because an empty <code>messages</code> vector or a single <a href="/constructor/messageEmpty">messageEmpty</a> is returned.<br>
+If the user also chose to download only messages within a specific date interval, skip ranges whose:</p>
+<ul>
+<li>First message (returned by that same initial <code>limit=1</code> call) has a <code>date</code> smaller than the bottom of the specified date interval.   </li>
+<li>Last message (returned by a new call to <a href="/method/messages.getHistory">messages.getHistory</a> with <code>limit=1</code>, <code>offset_id=1</code>, <code>add_offset=-1</code>) has a <code>date</code> bigger than tha top of the specified date interval.</li>
+</ul>
+<p>For each downloaded and saved message, also download and save all attached media, including <a href="/api/custom-emoji">custom emojis</a> present in messages and captions, respecting the download filesize limits imposed by the user.  </p>
+<p>If the user chose to download only their own messages, not messages sent by other users, use <a href="/method/messages.search">messages.search</a> with <code>peer</code> set to <a href="/constructor/inputPeerSelf">inputPeerSelf</a> instead of <a href="/method/messages.getHistory">messages.getHistory</a>.  </p>
+</li>
+</ul>
+</li>
+<li>
+<p>If the user wants to export their <a href="/api/stories">stories</a>:</p>
+<ul>
+<li>Use <a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a> to fetch, download and store all posted stories, including <a href="/api/custom-emoji">custom emojis</a> present in captions.</li>
+</ul>
+</li>
+<li>
+<p>If the user wants to export personal info:</p>
+<ul>
+<li>Invoke and store the result of <a href="/method/users.getFullUser">users.getFullUser</a> with <a href="/constructor/inputUserSelf">inputUserSelf</a>.</li>
+</ul>
+</li>
+<li>
+<p>If the user wants to export their own profile pictures:</p>
+<ul>
+<li>Invoke <a href="/method/photos.getUserPhotos">photos.getUserPhotos</a> to fetch the list of and download all profile pictures.</li>
+</ul>
+</li>
+<li>
+<p>If the user wants to export their contact list: </p>
+<ul>
+<li>See <a href="#contacts">here »</a></li>
+</ul>
+</li>
+<li>
+<p>If the user wants to export their sessions: </p>
+<ul>
+<li>Invoke and store the result of <a href="/method/account.getAuthorizations">account.getAuthorizations</a> and <a href="/method/account.getWebAuthorizations">account.getWebAuthorizations</a></li>
+</ul>
+</li>
+<li>
+<p>If the user wants to export any other data not mentioned above, like for example personal data related to new Telegram features, that do not have any specific takeout methods in the Takeout API yet.</p>
+<ul>
+<li>Use <a href="/method/upload.getFile">upload.getFile</a> with <a href="/constructor/inputTakeoutFileLocation">inputTakeoutFileLocation</a>; this will download a JSON file that will contain all personal data related to features that do not have specialized takeout method yet.</li>
+</ul>
+</li>
+</ul>
 <h3><a class="anchor" href="#contacts" id="contacts" name="contacts"><i class="anchor-icon"></i></a>Contacts</h3>
 <pre><code><a href='/constructor/savedPhoneContact'>savedPhoneContact</a>#1142bd56 phone:<a href='/type/string'>string</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> = <a href='/type/SavedContact'>SavedContact</a>;
 
