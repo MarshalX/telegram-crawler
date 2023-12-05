@@ -92,10 +92,10 @@ Repeat until you've finished all the message ranges that were returned by <a hre
 Use the single message returned by the initial <code>limit=1</code> request to also skip ranges that don't have any messages, because an empty <code>messages</code> vector or a single <a href="/constructor/messageEmpty">messageEmpty</a> is returned.<br>
 If the user also chose to download only messages within a specific date interval, skip ranges whose:</p>
 <ul>
-<li>First message (returned by that same initial <code>limit=1</code> call) has a <code>date</code> smaller than the bottom of the specified date interval.   </li>
-<li>Last message (returned by a new call to <a href="/method/messages.getHistory">messages.getHistory</a> with <code>limit=1</code>, <code>offset_id=1</code>, <code>add_offset=-1</code>) has a <code>date</code> bigger than tha top of the specified date interval.</li>
+<li>Last message (returned by that same initial <code>limit=1</code> call) has a <code>date</code> bigger than the top of the specified date interval.</li>
+<li>First message (returned by a new call to <a href="/method/messages.getHistory">messages.getHistory</a> with <code>limit=1</code>, <code>offset_id=1</code>, <code>add_offset=-1</code>) has a <code>date</code> smaller than the bottom of the specified date interval.   </li>
 </ul>
-<p>For each downloaded and saved message, also download and save all attached media, including <a href="/api/custom-emoji">custom emojis</a> present in messages and captions, respecting the download filesize limits imposed by the user.  </p>
+<p>For each downloaded and saved message, also download and save all attached media, including <a href="/api/custom-emoji">custom emojis</a> present in messages and captions, respecting the per-file download filesize limits imposed by the user.  </p>
 <p>If the user chose to download only their own messages, not messages sent by other users, use <a href="/method/messages.search">messages.search</a> with <code>peer</code> set to <a href="/constructor/inputPeerSelf">inputPeerSelf</a> instead of <a href="/method/messages.getHistory">messages.getHistory</a>.  </p>
 </li>
 </ul>
@@ -133,11 +133,11 @@ If the user also chose to download only messages within a specific date interval
 <li>
 <p>If the user wants to export any other data not mentioned above, like for example personal data related to new Telegram features, that do not have any specific takeout methods in the Takeout API yet.</p>
 <ul>
-<li>Use <a href="/method/upload.getFile">upload.getFile</a> with <a href="/constructor/inputTakeoutFileLocation">inputTakeoutFileLocation</a>; this will download a JSON file that will contain all personal data related to features that do not have specialized takeout method yet.</li>
+<li>Use <a href="/method/upload.getFile">upload.getFile</a> with <a href="/constructor/inputTakeoutFileLocation">inputTakeoutFileLocation</a>; this will download a JSON file that will contain all personal data related to features that do not have a specialized takeout method yet.</li>
 </ul>
 </li>
 </ul>
-<h3><a class="anchor" href="#contacts" id="contacts" name="contacts"><i class="anchor-icon"></i></a>Contacts</h3>
+<h4><a class="anchor" href="#contacts" id="contacts" name="contacts"><i class="anchor-icon"></i></a>Contacts</h4>
 <pre><code><a href='/constructor/savedPhoneContact'>savedPhoneContact</a>#1142bd56 phone:<a href='/type/string'>string</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> = <a href='/type/SavedContact'>SavedContact</a>;
 
 ---functions---
@@ -145,7 +145,7 @@ If the user also chose to download only messages within a specific date interval
 <a href='/method/contacts.getSaved'>contacts.getSaved</a>#82f1e39f = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SavedContact'>SavedContact</a>&gt;;</code></pre>
 <p>This method does <strong>not</strong> require pagination using <a href="#split-ranges">message ranges</a>.  </p>
 <p>Use <a href="/method/contacts.getSaved">contacts.getSaved</a> to export the full contact list, see <a href="/api/contacts#fetching-the-contact-list">here »</a> for another alternative method that may be used to fetch the full list of all contacts with a Telegram account, without using a takeout session.</p>
-<h3><a class="anchor" href="#left-channels" id="left-channels" name="left-channels"><i class="anchor-icon"></i></a>Left channels</h3>
+<h4><a class="anchor" href="#left-channels" id="left-channels" name="left-channels"><i class="anchor-icon"></i></a>Left channels</h4>
 <pre><code><a href='/constructor/messages.chats'>messages.chats</a>#64ff9fd5 chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
 <a href='/constructor/messages.chatsSlice'>messages.chatsSlice</a>#9cd81144 count:<a href='/type/int'>int</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
 
