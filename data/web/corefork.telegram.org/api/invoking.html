@@ -70,7 +70,7 @@ These methods allow reducing the latency for calls which require strict ordering
 <p>They may be used, for example, when a client attempts to send messages that accumulated while waiting for the Internet connection to be restored for a long time. In this case, the 32-bit number <code>0xcb9f372d</code> must be added before the method number in each request, followed by a 64-bit message identifier, msg_id, which contains the previous request in the queue. </p>
 <p>The second method is similar, except it takes several messages that must be successfully processed before the current one.</p>
 <p>If the waiting period exceeds 0.5 seconds (this value may change in the future) and no result has appeared, the method will return the 400/500 <code>MSG_WAIT_TIMEOUT</code> error: handle this error by resending the request, still wrapped in the same <code>invokeAfterMsg</code>/<code>invokeAfterMsgs</code> constructor with the same <code>id</code>/<code>ids</code>.  </p>
-<p>If any of the previous queries mentioned in <code>msg_ids</code> or <code>msg_id</code> fails, a <code>MSG_WAIT_FAILED</code> error will be returned for the current request: the simplest way to handle it is to simply enforce local synchronization, by waiting for a response from all previous <code>msg_ids</code>/<code>msg_id</code> before resending the request.  </p>
+<p>If any of the previous queries mentioned in <code>msg_ids</code> or <code>msg_id</code> fails (i.e. an RPC error is emitted by a query, including <code>FLOOD_WAIT_</code> errors), a <code>MSG_WAIT_FAILED</code> error will be returned for the current request: the simplest way to handle it is to simply enforce local synchronization, by waiting for a response from all previous <code>msg_ids</code>/<code>msg_id</code> before resending the request.  </p>
 <p>If and only if any of the previous requests also failed with <code>MSG_WAIT_FAILED</code>/<code>MSG_WAIT_TIMEOUT</code> errors and require resending, wrap the current request in another <code>invokeAfterMsg</code>/<code>invokeAfterMsgs</code> constructor with the new IDs of the previous requests, resent along with the current one.  </p>
 <h4><a class="anchor" href="#scenario-1" id="scenario-1" name="scenario-1"><i class="anchor-icon"></i></a>Scenario 1</h4>
 <p>To clarify, assume the following sequence of queries:</p>
@@ -99,16 +99,28 @@ To recover the call queue, send the following new sequence of queries:</p>
 <li>msg_id=2; <code>messages.sendMessage message=b</code></li>
 <li>msg_id=3; <code>invokeAfterMsgs msg_ids=[1, 2] (messages.sendMessage message=c)</code></li>
 </ol>
-<h5><a class="anchor" href="#scenario-21" id="scenario-21" name="scenario-21"><i class="anchor-icon"></i></a>Scenario 2.1</h5>
-<p>If the first messages.sendMessage query with <code>msg_id=1</code> fails, the query with <code>msg_id=3</code> will fail with a <code>MSG_WAIT_FAILED</code> and will have to be resent as follows.    </p>
+<p>If either or both of the messages.sendMessage queries with <code>msg_id=1</code> and/or <code>msg_id=2</code> fail, the query with <code>msg_id=3</code> will also fail with a <code>MSG_WAIT_FAILED</code> and will have to be resent as follows.    </p>
 <p>To recover the call queue, first of all wait for a response from the queries with <code>msg_id=1</code> and <code>msg_id=2</code>.  </p>
-<p>Note how this is different from scenario 1, where we don't have to wait for a response from the previous queries: this is because in scenario 1, each <code>invokeAfterMsg</code> query was directly waiting for just one previous query, and any new query in the queue is chained to the previous <code>invokeAfterMsg</code>.<br>
-Thus, any failure of any query with <code>msg_id=N</code> in the chain immediately blocked execution of all queries with <code>msg_id &lt; N</code>.<br>
-In this case, however, we're waiting for two messages at the same time, and while the failure of any one of them causes </p>
-<p>Then, send the following new sequence of queries:</p>
-<ol>
+<p>Note how this is different from scenario 1, where we don't have to wait for a response from the previous queries: this is because in scenario 1, each <code>invokeAfterMsg</code> query was directly waiting for just one previous query, and any new query in the queue is chained to the previous <code>invokeAfterMsg</code>, thus any failure of any query with <code>msg_id=N</code> in the chain immediately blocked execution of all queries with <code>msg_id &lt;= N</code>.<br>
+In this case, however, we're waiting for two messages at the same time, and the failure of the query with <code>msg_id=1</code> does not prevent execution of the query with <code>msg_id=2</code>, and vice versa; thus when resending the query with <code>msg_id=3</code> we have to either:</p>
+<ul>
+<li>
+<p>Wait for replies (errors or successes) for <strong>all</strong> of the queries mentioned in <code>msg_ids</code>, and then send the following new query:  </p>
+<ul>
 <li>msg_id=4; <code>messages.sendMessage message=c</code> (resending the old query with <code>msg_id=3</code>)</li>
-</ol>
+</ul>
+</li>
+<li>
+<p>OR Wait for the receival of an RPC error for any of the queries mentioned in <code>msg_ids</code>, and then send the following new query:</p>
+<ul>
+<li>msg_id=4; <code>invokeAfterMsgs msg_ids=([1, 2] - [$errId]) (messages.sendMessage message=c)</code> (resending the old query with <code>msg_id=3</code>)</li>
+</ul>
+<p>I.e. resend the <code>invokeAfterMsgs</code> with all the initial <code>msg_ids</code> except for the one that failed.<br>
+It may be required to repeat the process if the newly sent <code>invokeAfterMsgs</code> also fails because the remaining query mentioned in <code>msg_ids</code> also failed (i.e. if queries <code>1</code> and <code>2</code> both fail at slightly different times).  </p>
+<p>Obviously the first option (waiting for replies (errors or successes) for <strong>all</strong> of the queries mentioned before proceeding) is the simplest.</p>
+</li>
+</ul>
+<p>An even simpler option is to always follow <a href="#scenario-1">Scenario 1</a>, never using <code>invokeAfterMsgs</code> and only using chained <code>invokeAfterMsg</code> calls, which avoids the use of this slightly more complicated logic.</p>
 <h4><a class="anchor" href="#helper-method-sequence" id="helper-method-sequence" name="helper-method-sequence"><i class="anchor-icon"></i></a>Helper Method Sequence</h4>
 <p><strong>Important:</strong> if the helper methods <strong>invokeAfterMsg</strong> / <strong>invokeAfterMsgs</strong> are used together with <strong>invokeWithLayerN</strong> or other helper methods, <strong>invokeAfterMsg</strong> / <strong>invokeAfterMsgs</strong> must always be the outermost wrapper.</p>
 <h3><a class="anchor" href="#data-compression" id="data-compression" name="data-compression"><i class="anchor-icon"></i></a>Data Compression</h3>
