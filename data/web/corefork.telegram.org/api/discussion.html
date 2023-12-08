@@ -66,10 +66,14 @@ The discussion group can be accessed in the client by clicking on the discuss bu
 Thus, the comment section of a particular post can be disabled by removing the autoforwarded channel post message from the discussion group.  </p>
 <p>A <a href="/constructor/messageReplies">messageReplies</a> constructor will be attached the channel post in the original channel, containing information about the comment section, specifically:</p>
 <ul>
-<li><code>messageReplies.channel_id</code> will contain the ID of the linked discussion supergroup</li>
-<li><code>messageReplies.recent_repliers</code> will contain information about the last few comment posters for a specific thread, to show a small list of commenter profile pictures in client previews.</li>
+<li><code>replies.channel_id</code> will contain the ID of the linked discussion supergroup</li>
+<li><code>replies.recent_repliers</code> will contain information about the last few comment posters for a specific thread, to show a small list of commenter profile pictures in client previews.</li>
+<li><code>replies.replies</code> will contains the total number of replies in the comment section.</li>
+<li><code>replies.max_id</code> will contain the ID of the latest message in the comment section.</li>
+<li><code>replies.replies_pts</code> will contain the PTS of the autoforwarded channel message that started the comment section.</li>
 </ul>
 <p>The same <a href="/constructor/messageReplies">messageReplies</a> constructor with the usual flags for a <a href="/api/threads">thread</a> (i.e. without <code>channel_id</code>, <code>recent_replies</code>) will also be present in the message automatically forwarded to the discussion group, as for all group messages that start a <a href="/api/threads">thread</a>.  </p>
+<p>The ID of the channel message that was autoforwaded to the discussion group can be fetched using the using the <code>replies.replies_pts</code> field of the channel post, or by fetching the last message in the discussion (<code>replies.max_id</code>); the ID of the autoforwarded channel message will be in <code>reply_to.reply_to_top_id</code>.</p>
 <h4><a class="anchor" href="#replies" id="replies" name="replies"><i class="anchor-icon"></i></a>@replies</h4>
 <pre><code><a href='/constructor/messageFwdHeader'>messageFwdHeader</a>#5f777dce flags:<a href='/type/%23'>#</a> imported:flags.7?<a href='/constructor/true'>true</a> from_id:flags.0?<a href='/type/Peer'>Peer</a> from_name:flags.5?<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> channel_post:flags.2?<a href='/type/int'>int</a> post_author:flags.3?<a href='/type/string'>string</a> saved_from_peer:flags.4?<a href='/type/Peer'>Peer</a> saved_from_msg_id:flags.4?<a href='/type/int'>int</a> psa_type:flags.6?<a href='/type/string'>string</a> = <a href='/type/MessageFwdHeader'>MessageFwdHeader</a>;
 
