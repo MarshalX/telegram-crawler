@@ -186,7 +186,8 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
         "AUTOARCHIVE_POPULAR",
         "VALIDATE_PASSWORD",
         "VALIDATE_PHONE_NUMBER",
-        "NEWCOMER_TICKS"
+        "NEWCOMER_TICKS",
+        "SETUP_PASSWORD"
     ],
     "autologin_domains": [
         "instantview.telegram.org",
@@ -219,7 +220,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "stickers_faved_limit_default": 5,
     "stickers_faved_limit_premium": 10,
     "dialog_filters_limit_default": 10,
-    "dialog_filters_limit_premium": 20,
+    "dialog_filters_limit_premium": 30,
     "dialog_filters_chats_limit_default": 100,
     "dialog_filters_chats_limit_premium": 200,
     "dialogs_pinned_limit_default": 5,
@@ -242,13 +243,15 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "reactions_in_chat_max": 100,
     "default_emoji_statuses_stickerset_id": "773947703670341676",
     "premium_promo_order": [
+        "peer_colors",
+        "wallpapers",
         "stories",
+        "more_upload",
         "double_limits",
         "voice_to_text",
         "faster_download",
         "translations",
         "animated_emoji",
-        "more_upload",
         "emoji_status",
         "profile_badge",
         "advanced_chat_management",
@@ -292,7 +295,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "stories_posting": "enabled",
     "stories_stealth_past_period": 300,
     "stories_stealth_future_period": 1500,
-    "stories_stealth_cooldown_period": 3600,
+    "stories_stealth_cooldown_period": 10800,
     "stories_sent_weekly_limit_default": 7,
     "stories_sent_weekly_limit_premium": 700,
     "stories_sent_monthly_limit_default": 30,
@@ -304,7 +307,20 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "stories_changelog_user_id": 777000,
     "authorization_autoconfirm_period": 604800,
     "stories_suggested_reactions_limit_default": 1,
-    "stories_suggested_reactions_limit_premium": 5
+    "stories_suggested_reactions_limit_premium": 5,
+    "giveaway_gifts_purchase_available": true,
+    "giveaway_add_peers_max": 10,
+    "giveaway_countries_max": 10,
+    "giveaway_boosts_per_premium": 4,
+    "giveaway_period_max": 604800,
+    "boosts_channel_level_max": 100,
+    "boosts_per_sent_gift": 3,
+    "quote_length_max": 1024,
+    "channel_color_level_min": 5,
+    "transcribe_audio_trial_weekly_number": 2,
+    "transcribe_audio_trial_duration_max": 300,
+    "recommended_channels_limit_default": 10,
+    "recommended_channels_limit_premium": 100
 }</code></pre>
 <p>Typical fields included in the resulting JSON object are:  </p>
 <h4><a class="anchor" href="#emojies-animated-zoom" id="emojies-animated-zoom" name="emojies-animated-zoom"><i class="anchor-icon"></i></a><code>emojies_animated_zoom</code></h4>
@@ -501,6 +517,19 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <h4><a class="anchor" href="#stories-entities" id="stories-entities" name="stories-entities"><i class="anchor-icon"></i></a><code>stories_entities</code></h4>
 <p>Whether <a href="/api/entities">styled text entities</a> and links in story text captions can be used by all users (<code>enabled</code>), only [Premium](/api/premium users) (<code>premium</code>), or no one (<code>disabled</code>). (string)</p>
 <p>This field is used both when posting stories, to indicate to the user whether they can use entities, and when viewing stories, to hide entities (client-side) on stories posted by users whose <a href="/api/premium">Premium</a> subscription has expired (if <code>stories_entities == "premium"</code> and <a href="/constructor/user">user</a>.<code>premium</code> is not set, or if <code>stories_entities == "disabled"</code>).  </p>
+<h4><a class="anchor" href="#giveaway-gifts-purchase-available" id="giveaway-gifts-purchase-available" name="giveaway-gifts-purchase-available"><i class="anchor-icon"></i></a><code>giveaway_gifts_purchase_available</code></h4>
+<h4><a class="anchor" href="#giveaway-add-peers-max" id="giveaway-add-peers-max" name="giveaway-add-peers-max"><i class="anchor-icon"></i></a><code>giveaway_add_peers_max</code></h4>
+<h4><a class="anchor" href="#giveaway-countries-max" id="giveaway-countries-max" name="giveaway-countries-max"><i class="anchor-icon"></i></a><code>giveaway_countries_max</code></h4>
+<h4><a class="anchor" href="#giveaway-boosts-per-premium" id="giveaway-boosts-per-premium" name="giveaway-boosts-per-premium"><i class="anchor-icon"></i></a><code>giveaway_boosts_per_premium</code></h4>
+<h4><a class="anchor" href="#giveaway-period-max" id="giveaway-period-max" name="giveaway-period-max"><i class="anchor-icon"></i></a><code>giveaway_period_max</code></h4>
+<h4><a class="anchor" href="#boosts-channel-level-max" id="boosts-channel-level-max" name="boosts-channel-level-max"><i class="anchor-icon"></i></a><code>boosts_channel_level_max</code></h4>
+<h4><a class="anchor" href="#boosts-per-sent-gift" id="boosts-per-sent-gift" name="boosts-per-sent-gift"><i class="anchor-icon"></i></a><code>boosts_per_sent_gift</code></h4>
+<h4><a class="anchor" href="#quote-length-max" id="quote-length-max" name="quote-length-max"><i class="anchor-icon"></i></a><code>quote_length_max</code></h4>
+<h4><a class="anchor" href="#channel-color-level-min" id="channel-color-level-min" name="channel-color-level-min"><i class="anchor-icon"></i></a><code>channel_color_level_min</code></h4>
+<h4><a class="anchor" href="#transcribe-audio-trial-weekly-number" id="transcribe-audio-trial-weekly-number" name="transcribe-audio-trial-weekly-number"><i class="anchor-icon"></i></a><code>transcribe_audio_trial_weekly_number</code></h4>
+<h4><a class="anchor" href="#transcribe-audio-trial-duration-max" id="transcribe-audio-trial-duration-max" name="transcribe-audio-trial-duration-max"><i class="anchor-icon"></i></a><code>transcribe_audio_trial_duration_max</code></h4>
+<h4><a class="anchor" href="#recommended-channels-limit-default" id="recommended-channels-limit-default" name="recommended-channels-limit-default"><i class="anchor-icon"></i></a><code>recommended_channels_limit_default</code></h4>
+<h4><a class="anchor" href="#recommended-channels-limit-premium" id="recommended-channels-limit-premium" name="recommended-channels-limit-premium"><i class="anchor-icon"></i></a><code>recommended_channels_limit_premium</code></h4>
 <h3><a class="anchor" href="#suggestions" id="suggestions" name="suggestions"><i class="anchor-icon"></i></a>Suggestions</h3>
 <p>The API can return a set of useful suggestions for users of graphical clients.  </p>
 <h4><a class="anchor" href="#basic-suggestions" id="basic-suggestions" name="basic-suggestions"><i class="anchor-icon"></i></a>Basic suggestions</h4>
@@ -525,6 +554,10 @@ A full list of these parameters can be seen in the <a href="#client-configuratio
 <li><code>"VALIDATE_PASSWORD"</code> - Users should make sure they still remember their <a href="/api/srp">2-step verification password</a>.</li>
 <li><code>"VALIDATE_PHONE_NUMBER"</code> - Users should check whether their <a href="/api/auth">authorization phone number</a> is correct and change the phone number if it is inaccessible.</li>
 <li><code>"NEWCOMER_TICKS"</code> - Show the user a hint about the meaning of one and two ticks on sent messages.</li>
+<li><code>"SETUP_PASSWORD"</code> - Show the user a hint, asking them to check whether they still remember their <a href="/api/srp">2FA password</a></li>
+<li><code>"PREMIUM_ANNUAL"</code> - Suggests the user to subscribe to the Premium subscription (with annual payments)</li>
+<li><code>"PREMIUM_UPGRADE"</code> - Suggests the user to upgrade their existing Premium subscription from monthly payments to annual payments</li>
+<li><code>"PREMIUM_RESTORE"</code> - Suggests the user to restore a recently expired Premium subscription</li>
 </ul>
 </li>
 </ul>
