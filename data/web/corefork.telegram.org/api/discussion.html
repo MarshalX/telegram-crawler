@@ -55,10 +55,14 @@
 
 <a href='/constructor/messageReplies'>messageReplies</a>#83d60fc2 flags:<a href='/type/%23'>#</a> comments:flags.0?<a href='/constructor/true'>true</a> replies:<a href='/type/int'>int</a> replies_pts:<a href='/type/int'>int</a> recent_repliers:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; channel_id:flags.0?<a href='/type/long'>long</a> max_id:flags.2?<a href='/type/int'>int</a> read_max_id:flags.3?<a href='/type/int'>int</a> = <a href='/type/MessageReplies'>MessageReplies</a>;
 
+<a href='/constructor/messages.discussionMessage'>messages.discussionMessage</a>#a6341782 flags:<a href='/type/%23'>#</a> messages:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Message'>Message</a>&gt; max_id:flags.0?<a href='/type/int'>int</a> read_inbox_max_id:flags.1?<a href='/type/int'>int</a> read_outbox_max_id:flags.2?<a href='/type/int'>int</a> unread_count:<a href='/type/int'>int</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.DiscussionMessage'>messages.DiscussionMessage</a>;
+
 ---functions---
 
 <a href='/method/channels.setDiscussionGroup'>channels.setDiscussionGroup</a>#40582bb2 broadcast:<a href='/type/InputChannel'>InputChannel</a> group:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/channels.getGroupsForDiscussion'>channels.getGroupsForDiscussion</a>#f5dad378 = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
+<a href='/method/channels.getGroupsForDiscussion'>channels.getGroupsForDiscussion</a>#f5dad378 = <a href='/type/messages.Chats'>messages.Chats</a>;
+
+<a href='/method/messages.getDiscussionMessage'>messages.getDiscussionMessage</a>#446972fd peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/messages.DiscussionMessage'>messages.DiscussionMessage</a>;</code></pre>
 <p>A discussion group can be associated to a channel using <a href="/method/channels.setDiscussionGroup">channels.setDiscussionGroup</a>.<br>
 The discussion group can be accessed in the client by clicking on the discuss button of the channel, or by accessing the <a href="/api/threads">comment section</a> of a specific post; the discussion group ID is also present in the <code>linked_chat_id</code> field of the <a href="/constructor/channelFull">channelFull</a> constructor.  </p>
 <p>All messages sent to the channel will also be forwarded to the linked group (with sender peer <code>from_id</code> equal to the peer of the linked channel); those messages will also be automatically <a href="/api/pin">pinned</a> in the group.  </p>
@@ -69,11 +73,12 @@ Thus, the comment section of a particular post can be disabled by removing the a
 <li><code>replies.channel_id</code> will contain the ID of the linked discussion supergroup</li>
 <li><code>replies.recent_repliers</code> will contain information about the last few comment posters for a specific thread, to show a small list of commenter profile pictures in client previews.</li>
 <li><code>replies.replies</code> will contains the total number of replies in the comment section.</li>
-<li><code>replies.max_id</code> will contain the ID of the latest message in the comment section.</li>
-<li><code>replies.replies_pts</code> will contain the PTS of the autoforwarded channel message that started the comment section.</li>
+<li><code>replies.max_id</code> <em>may</em> contain the ID of the latest message in the comment section, if any.</li>
+<li><code>replies.replies_pts</code> <em>may</em> contain the PTS of the autoforwarded channel message that started the comment section.</li>
 </ul>
 <p>The same <a href="/constructor/messageReplies">messageReplies</a> constructor with the usual flags for a <a href="/api/threads">thread</a> (i.e. without <code>channel_id</code>, <code>recent_replies</code>) will also be present in the message automatically forwarded to the discussion group, as for all group messages that start a <a href="/api/threads">thread</a>.  </p>
-<p>The ID of the channel message that was autoforwaded to the discussion group can be fetched using the using the <code>replies.replies_pts</code> field of the channel post, or by fetching the last message in the discussion (<code>replies.max_id</code>); the ID of the autoforwarded channel message will be in <code>reply_to.reply_to_top_id</code>.</p>
+<p>Use <a href="/method/messages.getDiscussionMessage">messages.getDiscussionMessage</a> to obtain the initial messages of the <a href="/api/threads">message thread</a> of the autoforwaded channel message in the linked discussion supergroup.  </p>
+<p>The messages are returned in a reverse chronological order (i.e., in order of decreasing message ID); thus the last message returned by the method will be the autoforwarded channel message that started the comment section.  </p>
 <h4><a class="anchor" href="#replies" id="replies" name="replies"><i class="anchor-icon"></i></a>@replies</h4>
 <pre><code><a href='/constructor/messageFwdHeader'>messageFwdHeader</a>#5f777dce flags:<a href='/type/%23'>#</a> imported:flags.7?<a href='/constructor/true'>true</a> from_id:flags.0?<a href='/type/Peer'>Peer</a> from_name:flags.5?<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> channel_post:flags.2?<a href='/type/int'>int</a> post_author:flags.3?<a href='/type/string'>string</a> saved_from_peer:flags.4?<a href='/type/Peer'>Peer</a> saved_from_msg_id:flags.4?<a href='/type/int'>int</a> psa_type:flags.6?<a href='/type/string'>string</a> = <a href='/type/MessageFwdHeader'>MessageFwdHeader</a>;
 
