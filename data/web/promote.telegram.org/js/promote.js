@@ -401,6 +401,7 @@ var Ads = {
           }
         },
         onBlur: function(value) {
+          options.onBlur && options.onBlur(field, options.getDataOpts);
           options.onEnter && options.onEnter(field, value);
         },
         onEnter: function(value) {
@@ -496,6 +497,7 @@ var NewAd = {
               field: selectData.field,
               c_field: selectData.c_field,
             },
+            onBlur: NewAd.onLocationSelectBlur,
             onUpdate: NewAd.onSelectUpdate,
             onChange: NewAd.onLocationSelectChange
           });
@@ -527,10 +529,14 @@ var NewAd = {
       state.targetTypeField.fieldEl().on('change.curPage', NewAd.onTargetTypeChange);
       state.pictureCheckbox = state.$form.field('picture');
       state.pictureCheckbox.on('change.curPage', NewAd.onPictureChange);
+      state.intersectTopicsCheckbox = state.$form.field('intersect_topics');
+      state.intersectTopicsCheckbox.on('change.curPage', NewAd.onIntersectTopicsChange);
       state.excludePoliticCheckbox = state.$form.field('exclude_politic');
       state.excludePoliticCheckbox.on('change.curPage', NewAd.onExcludePoliticChange);
       state.onlyPoliticCheckbox = state.$form.field('only_politic');
       state.onlyPoliticCheckbox.on('change.curPage', NewAd.onOnlyPoliticChange);
+      state.deviceField = state.$form.field('device');
+      state.deviceField.on('ddchange.curPage', NewAd.onDeviceChange);
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
       NewAd.updateAdPreview(state.$form, state.previewData);
@@ -567,8 +573,10 @@ var NewAd = {
       state.targetTypeField.fieldEl().off('.curPage');
       state.confirmedCheckbox.off('.curPage');
       state.pictureCheckbox.off('.curPage');
+      state.intersectTopicsCheckbox.off('.curPage');
       state.excludePoliticCheckbox.off('.curPage');
       state.onlyPoliticCheckbox.off('.curPage');
+      state.deviceField.off('.curPage');
       for (var i = 0; i < state.selectList.length; i++) {
         var selectData = state.selectList[i];
         if (selectData.location_search) {
@@ -596,6 +604,10 @@ var NewAd = {
   onPictureChange: function() {
     var $form = $(this.form);
     NewAd.adPostCheck($form);
+  },
+  onIntersectTopicsChange: function() {
+    NewAd.updateAdTargetOverview();
+    NewAd.saveDraftAuto(true);
   },
   onExcludePoliticChange: function() {
     if ($(this).prop('checked')) {
@@ -660,6 +672,13 @@ var NewAd = {
     Ads.hideFieldError(buttonField);
     NewAd.adPostCheck($form);
   },
+  onDeviceChange: function() {
+    var $form = $(this).parents('form');
+    var devideField = $form.field('devide');
+    Ads.hideFieldError(devideField);
+    NewAd.updateAdTargetOverview();
+    NewAd.saveDraftAuto(true);
+  },
   adPostCheck: function($form, try_index) {
     var textField = $form.field('text');
     var promoteUrlField = $form.field('promote_url');
@@ -667,6 +686,7 @@ var NewAd = {
     var websiteNameField = $form.field('website_name');
     var websitePhotoField = $form.field('website_photo');
     var cpmField = $form.field('cpm');
+    var deviceField = $form.field('device');
     var text = textField.value();
     var promote_url = promoteUrlField.value();
     var button = buttonField.data('value');
@@ -674,6 +694,7 @@ var NewAd = {
     var website_photo = websitePhotoField.value();
     var $formGroup = promoteUrlField.fieldEl().parents('.form-group');
     var $cpmFormGroup = cpmField.fieldEl().parents('.form-group');
+    var device = deviceField.data('value');
     if (!text && !promote_url) {
       return false;
     }
@@ -683,7 +704,8 @@ var NewAd = {
       promote_url: promote_url,
       button: button,
       website_name: website_name,
-      website_photo: website_photo
+      website_photo: website_photo,
+      device: device
     };
     if (Aj.state.adId) {
       params.ad_id = Aj.state.adId;
@@ -912,6 +934,17 @@ var NewAd = {
     });
     return false;
   },
+  onLocationSelectBlur: function(field, opts) {
+    var $form = Aj.state.$form;
+    var $cFieldEl = $form.field(opts.c_field);
+    var c_value = $cFieldEl.data('value');
+    if (c_value.join) {
+      if (c_value.length > 1) {
+        Ads.hideFieldError($cFieldEl);
+        return false;
+      }
+    }
+  },
   onLocationSelectChange: function(field, value, valueFull) {
     var $fieldEl = Aj.state.$form.field(field);
     Ads.hideFieldError($fieldEl);
@@ -919,11 +952,12 @@ var NewAd = {
   onSelectUpdate: function(field, value, valueFull) {
     var $fieldEl = Aj.state.$form.field(field);
     if (field == 'user_topics') {
-      var has_user_topics = $fieldEl.data('value').length > 0;
-      if (has_user_topics) {
-        Aj.state.onlyPoliticCheckbox.prop('checked', false);
+      var user_topics_cnt = $fieldEl.data('value').length;
+      if (user_topics_cnt > 1) {
+        $('.js-intersect-topics-wrap', Aj.state.$form).slideShow();
+      } else {
+        $('.js-intersect-topics-wrap', Aj.state.$form).slideHide();
       }
-      Aj.state.onlyPoliticCheckbox.prop('disabled', has_user_topics);
     }
     var selOpts = $fieldEl.data('selOpts');
     var paired_field = selOpts.pairedField;
@@ -1192,6 +1226,18 @@ var NewAd = {
   updateAdTargetOverview: function() {
     var len = {}, lang_params = {}, need_outside_cb = false;
     var target_type = Aj.state.$form.field('target_type').value();
+    var joinTargets = function(list, or, repeat) {
+      var lk = or ? 'WEB_AD_TARGET_OR' : 'WEB_AD_TARGET_AND';
+      if (repeat && list.length > 2) {
+        var last_item = list.pop();
+        return l(lk, {item1: joinTargets(list, or, repeat), item2: last_item});
+      }
+      if (list.length > 1) {
+        var last_item = list.pop();
+        list[list.length - 1] = l(lk, {item1: list[list.length - 1], item2: last_item});
+      }
+      return list.join(', ');
+    };
     for (var i = 0; i < Aj.state.selectList.length; i++) {
       var selectData = Aj.state.selectList[i];
       var field = selectData.field;
@@ -1208,16 +1254,16 @@ var NewAd = {
             need_outside_cb = true;
           }
         }
-        if (list.length > 1) {
-          var last_item = list.pop();
-          list[list.length - 1] = l('WEB_AD_TARGET_AND', {item1: list[list.length - 1], item2: last_item});
-        }
-        lang_params[field] = list.join(', ');
+        var list_or = (field == 'langs' || field == 'topics' || field == 'countries' || field == 'locations' || field == 'user_langs' || field == 'user_topics' && !Aj.state.intersectTopicsCheckbox.prop('checked') || field == 'user_channels' || field == 'audiences')
+        lang_params[field] = joinTargets(list, list_or);
       } else {
         lang_params[field] = '';
       }
       Ads.hideFieldError($field);
     }
+    len.device = Aj.state.$form.field('device').data('value');
+    lang_params.device = '<span class="value" dir="auto">' + Aj.state.$form.field('device').html() + '</span>';
+
     var overview = '';
     if (target_type == 'channels') {
       if ((len.langs || len.topics) && len.channels) {
@@ -1270,26 +1316,32 @@ var NewAd = {
         if (len.user_topics > 0) {
           user_targets.push(l('WEB_AD_TARGET_USER_TOPICS', lang_params));
         }
+        if (len.user_channels > 0) {
+          user_targets.push(l('WEB_AD_TARGET_USER_CHANNELS', lang_params));
+        }
         if (len.audiences > 0) {
           user_targets.push(l('WEB_AD_TARGET_AUDIENCES', lang_params));
         }
-        if (user_targets.length > 1) {
-          var last_user_target = user_targets.pop();
-          user_targets[user_targets.length - 1] = l('WEB_AD_TARGET_AND', {item1: user_targets[user_targets.length - 1], item2: last_user_target});
+        if (len.device) {
+          user_targets.push(l('WEB_AD_TARGET_DEVICE', lang_params));
         }
+        user_targets = joinTargets(user_targets, false, true);
         if (Aj.state.onlyPoliticCheckbox.prop('checked')) {
-          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS_ONLY_POLITIC', {target: user_targets.join(', ')}) + '</div>';
+          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS_ONLY_POLITIC', {target: user_targets}) + '</div>';
         } else {
-          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS', {target: user_targets.join(', ')}) + '</div>';
+          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS', {target: user_targets}) + '</div>';
         }
         if (len.exclude_user_topics > 0) {
           overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_USER_EXCLUDE_TOPICS', lang_params) + '</div>';
         }
-        if (Aj.state.excludePoliticCheckbox.prop('checked')) {
-          overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_POLITIC') + '</div>';
+        if (len.exclude_user_channels > 0) {
+          overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_USER_EXCLUDE_CHANNELS', lang_params) + '</div>';
         }
         if (len.exclude_audiences > 0) {
           overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_AUDIENCES', lang_params) + '</div>';
+        }
+        if (Aj.state.excludePoliticCheckbox.prop('checked')) {
+          overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_POLITIC') + '</div>';
         }
       }
       $('.js-exclude-outside').addClass('hide');
@@ -1312,7 +1364,8 @@ var NewAd = {
       $form.field('cpm').value(),
       $form.field('views_per_user').value(),
       $form.field('budget').value(),
-      $form.field('target_type').value()
+      $form.field('target_type').value(),
+      $form.field('device').data('value')
     ];
     if ($form.field('picture').prop('checked')) {
       values.push('picture');
@@ -1321,6 +1374,9 @@ var NewAd = {
       var selectData = Aj.state.selectList[i];
       var vals = $form.field(selectData.field).data('value') || [];
       values.push(vals.join(';'));
+    }
+    if ($form.field('intersect_topics').prop('checked')) {
+      values.push('intersect_topics');
     }
     if ($form.field('exclude_politic').prop('checked')) {
       values.push('exclude_politic');
@@ -1367,6 +1423,7 @@ var NewAd = {
     var views_per_user = $form.field('views_per_user').value();
     var budget      = Ads.amountFieldValue($form, 'budget');
     var target_type = $form.field('target_type').value();
+    var device      = $form.field('device').data('value');
 
     if (!title.length) {
       $form.field('title').focus();
@@ -1400,7 +1457,8 @@ var NewAd = {
       cpm: cpm,
       views_per_user: views_per_user,
       budget: budget,
-      target_type: target_type
+      target_type: target_type,
+      device: device
     };
     if ($form.field('picture').prop('checked')) {
       params.picture = 1;
@@ -1409,6 +1467,9 @@ var NewAd = {
       var selectData = Aj.state.selectList[i];
       var values = $form.field(selectData.field).data('value') || [];
       params[selectData.field] = values.join(';');
+    }
+    if ($form.field('intersect_topics').prop('checked')) {
+      params.intersect_topics = 1;
     }
     if ($form.field('exclude_politic').prop('checked')) {
       params.exclude_politic = 1;
@@ -1465,6 +1526,7 @@ var NewAd = {
     var views_per_user = $form.field('views_per_user').value();
     var budget      = Ads.amountFieldValue($form, 'budget');
     var target_type = $form.field('target_type').value();
+    var device      = $form.field('device').data('value');
 
     var curFormData = NewAd.getFormData($form);
     if (Aj.state.initFormData == curFormData) {
@@ -1482,7 +1544,8 @@ var NewAd = {
       cpm: cpm,
       views_per_user: views_per_user,
       budget: budget,
-      target_type: target_type
+      target_type: target_type,
+      device: device
     };
     if ($form.field('picture').prop('checked')) {
       params.picture = 1;
@@ -1491,6 +1554,9 @@ var NewAd = {
       var selectData = Aj.state.selectList[i];
       var values = $form.field(selectData.field).data('value') || [];
       params[selectData.field] = values.join(';');
+    }
+    if ($form.field('intersect_topics').prop('checked')) {
+      params.intersect_topics = 1;
     }
     if ($form.field('exclude_politic').prop('checked')) {
       params.exclude_politic = 1;
@@ -1534,6 +1600,7 @@ var NewAd = {
     $form.field('exclude_politic').prop('checked', false);
     $form.field('only_politic').prop('checked', false);
     $form.field('exclude_outside').prop('checked', false);
+    $form.field('device').trigger('selectval', ['']);
     Aj.state.titleField.focusAndSelect();
     NewAd.updateAdPreview(Aj.state.$form, false);
     var curFormData = NewAd.getFormData($form);
