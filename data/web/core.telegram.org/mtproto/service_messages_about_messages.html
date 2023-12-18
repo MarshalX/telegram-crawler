@@ -44,14 +44,13 @@ Receipt of virtually all messages (with the exception of some purely service one
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/service_messages" >Service messages</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/service_messages_about_messages" >﻿Service Messages about Messages</a></li></ul></div>
   <h1 id="dev_page_title">﻿Service Messages about Messages</h1>
   
-  <div id="dev_page_content"><h4><a class="anchor" href="#acknowledgment-of-receipt" id="acknowledgment-of-receipt" name="acknowledgment-of-receipt"><i class="anchor-icon"></i></a>Acknowledgment of Receipt</h4>
-<p>Receipt of virtually all messages (with the exception of some purely service ones as well as the plain-text messages used in the protocol for creating an authorization key) must be acknowledged.
-This requires the use of the following service message (not requiring an acknowledgment):</p>
+  <div id="dev_page_content"><h4><a class="anchor" name="acknowledgment-of-receipt" href="#acknowledgment-of-receipt"><i class="anchor-icon"></i></a>Acknowledgment of Receipt</h4>
+<p>Receipt of virtually all messages (with the exception of some purely service ones as well as the plain-text messages used in the protocol for creating an authorization key) must be acknowledged.<br>This requires the use of the following service message (not requiring an acknowledgment):</p>
 <pre><code>msgs_ack#62d6b459 msg_ids:Vector&lt;long&gt; = MsgsAck;</code></pre>
 <p>A server usually acknowledges the receipt of a message from a client (normally, an RPC query) using an RPC response. If a response is a long time coming, a server may first send a receipt acknowledgment, and somewhat later, the RPC response itself.</p>
 <p>A client normally acknowledges the receipt of a message from a server (usually, an RPC response) by adding an acknowledgment to the next RPC query if it is not transmitted too late (if it is generated, say, 60-120 seconds following the receipt of a message from the server). However, if for a long period of time there is no reason to send messages to the server or if there is a large number of unacknowledged messages from the server (say, over 16), the client transmits a stand-alone acknowledgment.  </p>
 <p>Max 8192 IDs are allowed per constructor.  </p>
-<h4><a class="anchor" href="#notice-of-ignored-error-message" id="notice-of-ignored-error-message" name="notice-of-ignored-error-message"><i class="anchor-icon"></i></a>Notice of Ignored Error Message</h4>
+<h4><a class="anchor" name="notice-of-ignored-error-message" href="#notice-of-ignored-error-message"><i class="anchor-icon"></i></a>Notice of Ignored Error Message</h4>
 <p>In certain cases, a server may notify a client that its incoming message was ignored for whatever reason. Note that such a notification cannot be generated unless a message is correctly decoded by the server.</p>
 <pre><code>bad_msg_notification#a7eff811 bad_msg_id:long bad_msg_seqno:int error_code:int = BadMsgNotification;
 bad_server_salt#edab447b bad_msg_id:long bad_msg_seqno:int error_code:int new_server_salt:long = BadMsgNotification;</code></pre>
@@ -71,14 +70,14 @@ bad_server_salt#edab447b bad_msg_id:long bad_msg_seqno:int error_code:int new_se
 </ul>
 <p>The intention is that error_code values are grouped (error_code &gt;&gt; 4): for example, the codes 0x40 - 0x4f  correspond to errors in container decomposition.</p>
 <p>Notifications of an ignored message do not require acknowledgment (i.e., are irrelevant).</p>
-<p><strong>Important:</strong> if server_salt has changed on the server or if client time is incorrect, any query will result in a notification in the above format. The client must check that it has, in fact, recently sent a message with the specified msg_id, and if that is the case, update its time correction value (the difference between the client's and the server's clocks) and the server salt based on msg_id and the server_salt notification, so as to use these to (re)send future messages. In the meantime, the original message (the one that caused the error message to be returned) must also be re-sent with a better msg_id and/or server_salt.</p>
+<p><strong>Important:</strong> if server_salt has changed on the server or if client time is incorrect, any query will result in a notification in the above format. The client must check that it has, in fact, recently sent a message with the specified msg_id, and if that is the case, update its time correction value (the difference between the client&#39;s and the server&#39;s clocks) and the server salt based on msg_id and the server_salt notification, so as to use these to (re)send future messages. In the meantime, the original message (the one that caused the error message to be returned) must also be re-sent with a better msg_id and/or server_salt.</p>
 <p>In addition, the client can update the server_salt value used to send messages to the server, based on the values of RPC responses or containers carrying an RPC response, provided that this RPC response is actually a match for the query sent recently. (If  there is doubt, it is best not to update since there is risk of a replay attack).</p>
-<h4><a class="anchor" href="#request-for-message-status-information" id="request-for-message-status-information" name="request-for-message-status-information"><i class="anchor-icon"></i></a>Request for Message Status Information</h4>
+<h4><a class="anchor" name="request-for-message-status-information" href="#request-for-message-status-information"><i class="anchor-icon"></i></a>Request for Message Status Information</h4>
 <p>If either party has not received information on the status of its outgoing messages for a while, it may explicitly request it from the other party:</p>
 <pre><code>msgs_state_req#da69fb52 msg_ids:Vector long = MsgsStateReq;</code></pre>
 <p>Max 8192 IDs are allowed per constructor.  </p>
 <p>The response to the query contains the following information:</p>
-<h4><a class="anchor" href="#informational-message-regarding-status-of-messages" id="informational-message-regarding-status-of-messages" name="informational-message-regarding-status-of-messages"><i class="anchor-icon"></i></a>Informational Message regarding Status of Messages</h4>
+<h4><a class="anchor" name="informational-message-regarding-status-of-messages" href="#informational-message-regarding-status-of-messages"><i class="anchor-icon"></i></a>Informational Message regarding Status of Messages</h4>
 <pre><code>msgs_state_info#04deb57d req_msg_id:long info:string = MsgsStateInfo;</code></pre>
 <p>Here, <code>info</code> is a string that contains exactly one byte of message status for each message from the incoming msg_ids list:</p>
 <ul>
@@ -93,26 +92,23 @@ bad_server_salt#edab447b bad_msg_id:long bad_msg_seqno:int error_code:int new_se
 <li>+128 = other party knows for a fact that message is already received</li>
 </ul>
 <p>This response does not require an acknowledgment. It is an acknowledgment of the relevant msgs_state_req, in and of itself.</p>
-<p>Note that if it turns out suddenly that the other party is missing a message that appears to have been sent to it, the message must not be re-sent on its own with the same msg_id. Instead, it can be either wrapped in a container, or the status of the message can be checked using msgs_state_req and if the message wasn't received, then it must be re-sent with a new msg_id.</p>
-<h4><a class="anchor" href="#voluntary-communication-of-status-of-messages" id="voluntary-communication-of-status-of-messages" name="voluntary-communication-of-status-of-messages"><i class="anchor-icon"></i></a>Voluntary Communication of Status of Messages</h4>
+<p>Note that if it turns out suddenly that the other party is missing a message that appears to have been sent to it, the message must not be re-sent on its own with the same msg_id. Instead, it can be either wrapped in a container, or the status of the message can be checked using msgs_state_req and if the message wasn&#39;t received, then it must be re-sent with a new msg_id.</p>
+<h4><a class="anchor" name="voluntary-communication-of-status-of-messages" href="#voluntary-communication-of-status-of-messages"><i class="anchor-icon"></i></a>Voluntary Communication of Status of Messages</h4>
 <p>Either party may voluntarily inform the other party of the status of the messages transmitted by the other party.</p>
 <pre><code>msgs_all_info#8cc0d131 msg_ids:Vector long info:string = MsgsAllInfo</code></pre>
 <p>All message codes known to this party are enumerated, with the exception of those for which the +128 and the +16 flags are set. However, if the +32 flag is set but not +64, then the message status will still be communicated.</p>
 <p>This message does not require an acknowledgment.</p>
-<h4><a class="anchor" href="#extended-voluntary-communication-of-status-of-one-message" id="extended-voluntary-communication-of-status-of-one-message" name="extended-voluntary-communication-of-status-of-one-message"><i class="anchor-icon"></i></a>Extended Voluntary Communication of Status of One Message</h4>
+<h4><a class="anchor" name="extended-voluntary-communication-of-status-of-one-message" href="#extended-voluntary-communication-of-status-of-one-message"><i class="anchor-icon"></i></a>Extended Voluntary Communication of Status of One Message</h4>
 <p>Normally used by the server to respond to the receipt of a duplicate msg_id, especially if a response to the message has already been generated and the response is large. If the response is small, the server may re-send the answer itself instead. This message can also be used as a notification instead of resending a large message.</p>
 <pre><code>msg_detailed_info#276d3ec6 msg_id:long answer_msg_id:long bytes:int status:int = MsgDetailedInfo;
 msg_new_detailed_info#809db6df answer_msg_id:long bytes:int status:int = MsgDetailedInfo;</code></pre>
 <p>The second version is used to notify of messages that were created on the server not in response to an RPC query (such as notifications of new messages) and were transmitted to the client some time ago, but not acknowledged.</p>
 <p>Currently, <code>status</code> is always zero. This may change in future.</p>
 <p>This message does not require an acknowledgment.</p>
-<h4><a class="anchor" href="#explicit-request-to-re-send-messages" id="explicit-request-to-re-send-messages" name="explicit-request-to-re-send-messages"><i class="anchor-icon"></i></a>Explicit Request to Re-Send Messages</h4>
+<h4><a class="anchor" name="explicit-request-to-re-send-messages" href="#explicit-request-to-re-send-messages"><i class="anchor-icon"></i></a>Explicit Request to Re-Send Messages</h4>
 <pre><code>msg_resend_req#7d861a08 msg_ids:Vector long = MsgResendReq;</code></pre>
-<p>The remote party immediately responds by re-sending the requested messages, normally using the same connection that was used to transmit the query. If at least one message with requested msg_id does not exist or has already been forgotten, or has been sent by the requesting party (known from parity), MsgsStateInfo is returned for all messages requested as if the MsgResendReq query had been a MsgsStateReq query as well.<br>
-Max 8192 IDs are allowed per constructor.  </p>
-<h4><a class="anchor" href="#explicit-request-to-re-send-answers" id="explicit-request-to-re-send-answers" name="explicit-request-to-re-send-answers"><i class="anchor-icon"></i></a>Explicit Request to Re-Send Answers</h4>
-<pre><code>msg_resend_ans_req#8610baeb msg_ids:Vector long = MsgResendReq;</code></pre>
-<p>The remote party immediately responds by re-sending <em>answers</em> to the requested messages, normally using the same connection that was used to transmit the query. <code>MsgsStateInfo</code> is returned for all messages requested as if the MsgResendReq query had been a <code>MsgsStateReq</code> query as well.</p></div>
+<p>The remote party immediately responds by re-sending the requested messages, normally using the same connection that was used to transmit the query. If at least one message with requested msg_id does not exist or has already been forgotten, or has been sent by the requesting party (known from parity), MsgsStateInfo is returned for all messages requested as if the MsgResendReq query had been a MsgsStateReq query as well.<br>Max 8192 IDs are allowed per constructor.  </p>
+</div>
   
 </div>
           
