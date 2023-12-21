@@ -105,8 +105,12 @@ You can also attach an inline keyboard to the message using the <code>reply_mark
 <p>For invoice messages, the <a href="/constructor/message">message</a> will also have a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> keyboard attached to it.
 The first button of the keyboard will always be a <a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> button.</p>
 <h4><a class="anchor" href="#22-getting-invoice-info-about-the-product" id="22-getting-invoice-info-about-the-product" name="22-getting-invoice-info-about-the-product"><i class="anchor-icon"></i></a>2.2 Getting invoice info about the product</h4>
-<pre><code><a href='/constructor/inputInvoiceMessage'>inputInvoiceMessage</a>#c5b56859 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<pre><code><a href='/constructor/inputStorePaymentPremiumGiveaway'>inputStorePaymentPremiumGiveaway</a>#7c9375e6 flags:<a href='/type/%23'>#</a> only_new_subscribers:flags.0?<a href='/constructor/true'>true</a> boost_peer:<a href='/type/InputPeer'>InputPeer</a> additional_peers:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; countries_iso2:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; random_id:<a href='/type/long'>long</a> until_date:<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a>;
+<a href='/constructor/inputStorePaymentPremiumGiftCode'>inputStorePaymentPremiumGiftCode</a>#a3805f3f flags:<a href='/type/%23'>#</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; boost_peer:flags.0?<a href='/type/InputPeer'>InputPeer</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a>;
+
+<a href='/constructor/inputInvoiceMessage'>inputInvoiceMessage</a>#c5b56859 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
 <a href='/constructor/inputInvoiceSlug'>inputInvoiceSlug</a>#c326caef slug:<a href='/type/string'>string</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoicePremiumGiftCode'>inputInvoicePremiumGiftCode</a>#98986c0d purpose:<a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a> option:<a href='/type/PremiumGiftCodeOption'>PremiumGiftCodeOption</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
 
 <a href='/constructor/invoice'>invoice</a>#5db95a15 flags:<a href='/type/%23'>#</a> test:flags.0?<a href='/constructor/true'>true</a> name_requested:flags.1?<a href='/constructor/true'>true</a> phone_requested:flags.2?<a href='/constructor/true'>true</a> email_requested:flags.3?<a href='/constructor/true'>true</a> shipping_address_requested:flags.4?<a href='/constructor/true'>true</a> flexible:flags.5?<a href='/constructor/true'>true</a> phone_to_provider:flags.6?<a href='/constructor/true'>true</a> email_to_provider:flags.7?<a href='/constructor/true'>true</a> recurring:flags.9?<a href='/constructor/true'>true</a> currency:<a href='/type/string'>string</a> prices:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/LabeledPrice'>LabeledPrice</a>&gt; max_tip_amount:flags.8?<a href='/type/long'>long</a> suggested_tip_amounts:flags.8?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; terms_url:flags.10?<a href='/type/string'>string</a> = <a href='/type/Invoice'>Invoice</a>;
 
@@ -128,6 +132,13 @@ The first button of the keyboard will always be a <a href="/constructor/keyboard
 <li><a href="/constructor/inputInvoiceSlug">inputInvoiceSlug</a><ul>
 <li>If the user opens an <a href="/api/links#invoice-links">invoice deep link</a>, contains the <code>slug</code> parameter</li>
 <li>If the client has to process a <a href="/api/premium">Telegram Premium</a> payment, contains the <a href="/api/config#premium-invoice-slug"><code>premium_invoice_slug</code> app config parameter »</a></li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoicePremiumGiftCode">inputInvoicePremiumGiftCode</a> <ul>
+<li>Used if the user wishes to start a channel <a href="/api/giveaway">giveaway</a> or send some <a href="/api/giveaway">giftcodes</a> to members of a channel, in exchange for <a href="/api/boosts">boosts</a>.<br>
+The <code>purpose</code> field should be populated with <a href="/constructor/inputStorePaymentPremiumGiveaway">inputStorePaymentPremiumGiveaway</a> for giveaways and <a href="/constructor/inputStorePaymentPremiumGiftCode">inputStorePaymentPremiumGiftCode</a> for gift codes.<br>
+The <code>option</code> field should be populated with one of the giveaway options returned by <a href="/method/payments.getPremiumGiftCodeOptions">payments.getPremiumGiftCodeOptions</a>.<br>
+See the <a href="/api/giveaways">giveaways »</a> documentation for more info.  </li>
 </ul>
 </li>
 </ul>
