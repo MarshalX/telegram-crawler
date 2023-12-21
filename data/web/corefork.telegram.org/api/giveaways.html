@@ -44,7 +44,7 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>Telegram <a href="/api/channel">channel</a> administrators may launch giveaways to randomly distribute <a href="/api/premium">Telegram Premium</a> subscriptions and other gifts among their followers, in exchange for <a href="/api/boosts">boosts</a>.</p>
+<p>Telegram <a href="/api/channel">channel</a> administrators may launch giveaways to randomly distribute <a href="/api/premium">Telegram Premium</a> subscriptions and other gifts among their followers, in exchange for <a href="/api/boost">boosts</a>.</p>
 <p>Schema:</p>
 <pre><code><a href='/constructor/premiumGiftCodeOption'>premiumGiftCodeOption</a>#257e962b flags:<a href='/type/%23'>#</a> users:<a href='/type/int'>int</a> months:<a href='/type/int'>int</a> store_product:flags.0?<a href='/type/string'>string</a> store_quantity:flags.1?<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/PremiumGiftCodeOption'>PremiumGiftCodeOption</a>;
 
@@ -89,8 +89,8 @@
 Additional channels that the user must join to participate to the giveaway can be specified in <code>additional_peers</code>.<br>
 The set of users that can participate to the giveaway can be restricted by passing an explicit whitelist of up to <a href="/api/config#giveaway-countries-max">giveaway_countries_max</a> countries, specified as two-letter ISO 3166-1 alpha-2 country codes in <code>countries_iso2</code>.<br>
 The end date of the giveaway must be specified in <code>until_date</code>; at that date, Telegram will randomly choose <code>option.users</code> subscribers according to the conditions specified above, and send them a Telegram Premium giftcode as a <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a> constructor, that should be used client-side to generate a <a href="/api/links#premium-giftcode-links">giftcode link</a> .<br>
-The channel specified in <code>boost_peer</code> will receive <a href="/api/config#giveaway-boosts-per-premium">giveaway_boosts_per_premium</a> <a href="/api/boosts">boosts</a> from each user, that cannot be reassigned to another channel for the duration of the gifted subscription.  </li>
-<li>or <a href="/constructor/inputStorePaymentPremiumGiftCode">inputStorePaymentPremiumGiftCode</a>, to gift <a href="/api/premium">Telegram Premium</a> subscriptions only to some specific subscribers (<code>purpose.users</code>) of the channel specified in <code>purpose.boost_peer</code>, which will receive <a href="/api/config#giveaway-boosts-per-premium">giveaway_boosts_per_premium</a> <a href="/api/boosts">boosts</a> from each user, that cannot be reassigned to another channel for the duration of the gifted subscription.  </li>
+The channel specified in <code>boost_peer</code> will receive <a href="/api/config#giveaway-boosts-per-premium">giveaway_boosts_per_premium</a> <a href="/api/boost">boosts</a> from each user, that cannot be reassigned to another channel for the duration of the gifted subscription.  </li>
+<li>or <a href="/constructor/inputStorePaymentPremiumGiftCode">inputStorePaymentPremiumGiftCode</a>, to gift <a href="/api/premium">Telegram Premium</a> subscriptions only to some specific subscribers (<code>purpose.users</code>) of the channel specified in <code>purpose.boost_peer</code>, which will receive <a href="/api/config#giveaway-boosts-per-premium">giveaway_boosts_per_premium</a> <a href="/api/boost">boosts</a> from each user, that cannot be reassigned to another channel for the duration of the gifted subscription.  </li>
 </ul>
 <p>Then, follow the <a href="/api/payments#22-getting-invoice-info-about-the-product">invoice payment flow as described in the payments documentation »</a>.  </p>
 <p>Two alternative payment flows are also available, offering more affordable pricing:</p>
@@ -115,7 +115,7 @@ The <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a>.<code
 <p>The <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a>.<code>slug</code> should be used to generate a <a href="/api/links#premium-giftcode-links">giftcode link</a>, that the user can use to redeem the subscription, or re-gift it to someone else.  </p>
 <p>Any user can invoke <a href="/method/payments.checkGiftCode">payments.checkGiftCode</a> with the link's slug to obtain info about the giveaway, such as the channel that gifted the subscription (<code>from_id</code>), and the user that originally received the gift (<code>to_id</code>).<br>
 This can also be useful to channel administrators to precisely determine the winners of a giveaway, for example if the giveaway also included some extra gifts apart from Premium subscriptions (<em>like Teslas</em>): the winners can simply send their link as undisputable proof that they won the giveaway, because the user that received the gift can be viewed in the <code>to_id</code> field returned by Telegram when invoking <a href="/method/payments.checkGiftCode">payments.checkGiftCode</a> on the slug.  </p>
-<p>To claim the <a href="/api/premium">Telegram Premium</a> subscription, simply invoke <a href="/method/payments.applyGiftCode">payments.applyGiftCode</a>.</p></div>
+<p>To claim the <a href="/api/premium">Telegram Premium</a> subscription, simply invoke <a href="/method/payments.applyGiftCode">payments.applyGiftCode</a>, passing the link's <code>slug</code>.</p></div>
   
 </div>
           
