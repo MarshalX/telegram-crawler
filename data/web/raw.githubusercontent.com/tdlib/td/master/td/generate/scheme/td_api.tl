@@ -2882,7 +2882,7 @@ messagePaymentSuccessfulBot currency:string total_amount:int53 is_recurring:Bool
 messageGiftedPremium gifter_user_id:int53 currency:string amount:int53 cryptocurrency:string cryptocurrency_amount:int64 month_count:int32 sticker:sticker = MessageContent;
 
 //@description A Telegram Premium gift code was created for the user
-//@creator_id Identifier of a chat or a user that created the gift code
+//@creator_id Identifier of a chat or a user that created the gift code; may be null if unknown
 //@is_from_giveaway True, if the gift code was created for a giveaway
 //@is_unclaimed True, if the winner for the corresponding Telegram Premium subscription wasn't chosen
 //@month_count Number of month the Telegram Premium subscription will be active after code activation
@@ -2901,7 +2901,7 @@ messagePremiumGiveawayCreated = MessageContent;
 messagePremiumGiveaway parameters:premiumGiveawayParameters winner_count:int32 month_count:int32 sticker:sticker = MessageContent;
 
 //@description A Telegram Premium giveaway has been completed for the chat
-//@giveaway_message_id Identifier of the message with the giveaway, can be an identifier of a deleted message
+//@giveaway_message_id Identifier of the message with the giveaway; can be 0 if the message was deleted
 //@winner_count Number of winners in the giveaway
 //@unclaimed_prize_count Number of undistributed prizes
 messagePremiumGiveawayCompleted giveaway_message_id:int53 winner_count:int32 unclaimed_prize_count:int32 = MessageContent;
