@@ -61,6 +61,7 @@
 <a href='/constructor/messageMediaGiveaway'>messageMediaGiveaway</a>#58260664 flags:<a href='/type/%23'>#</a> only_new_subscribers:flags.0?<a href='/constructor/true'>true</a> channels:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; countries_iso2:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; quantity:<a href='/type/int'>int</a> months:<a href='/type/int'>int</a> until_date:<a href='/type/int'>int</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
 
 <a href='/constructor/messageActionGiveawayLaunch'>messageActionGiveawayLaunch</a>#332ba9ed = <a href='/type/MessageAction'>MessageAction</a>;
+<a href='/constructor/messageActionGiveawayResults'>messageActionGiveawayResults</a>#2a9fadc5 winners_count:<a href='/type/int'>int</a> unclaimed_count:<a href='/type/int'>int</a> = <a href='/type/MessageAction'>MessageAction</a>;
 
 <a href='/constructor/messageActionGiftCode'>messageActionGiftCode</a>#d2cfdb0e flags:<a href='/type/%23'>#</a> via_giveaway:flags.0?<a href='/constructor/true'>true</a> unclaimed:flags.2?<a href='/constructor/true'>true</a> boost_peer:flags.1?<a href='/type/Peer'>Peer</a> months:<a href='/type/int'>int</a> slug:<a href='/type/string'>string</a> = <a href='/type/MessageAction'>MessageAction</a>;
 
@@ -106,12 +107,14 @@ Users may also use this method to simply gift subscriptions to contacts by <stro
 <ul>
 <li>
 <p>If the payment succeeds and we're launching a giveaway using <a href="/constructor/inputStorePaymentPremiumGiveaway">inputStorePaymentPremiumGiveaway</a>: a <a href="/constructor/messageActionGiveawayLaunch">messageActionGiveawayLaunch</a> service message and a media message containing a <a href="/constructor/messageMediaGiveaway">messageMediaGiveaway</a> will be sent to the channel.  </p>
-<p>Once the giveaway is over, the winners will automatically receive a <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a> service message from Telegram's service user, containing the <code>slug</code> that can be used to generate a <a href="/api/links#premium-giftcode-links">giftcode link</a> to redeem the Premium subscription.<br>
-The <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a>.<code>via_giveaway</code> will be set.  </p>
+<p>Once the giveaway is over, a <a href="/constructor/messageActionGiveawayResults">messageActionGiveawayResults</a> will be sent to the channel and the winners will automatically receive a <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a> service message from Telegram's service user, containing the <code>slug</code> that can be used to generate a <a href="/api/links#premium-giftcode-links">giftcode link</a> to redeem the Premium subscription.<br>
+The <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a>.<code>via_giveaway</code> flag will be set.  </p>
 </li>
 <li>
 <p>If the payment succeeds and we're simply gifting some subscriptions to specific users <a href="/constructor/inputStorePaymentPremiumGiftCode">inputStorePaymentPremiumGiftCode</a>: the specified users will automatically receive a <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a> service message from Telegram's service user, containing the <code>slug</code> that can be used to generate a <a href="/api/links#premium-giftcode-links">giftcode link</a> to redeem the Premium subscription.<br>
-The <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a>.<code>via_giveaway</code> will not be set.  </p>
+The <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a>.<code>via_giveaway</code> flag will not be set.  </p>
+<p>Note that if the payment was made on behalf of the user (i.e. if <code>boost_peer</code> was <strong>not</strong> set), then the users to which the gift was sent will instead receive a <a href="/constructor/messageService">messageService</a> from the user that sent the gift, containing a <a href="/constructor/messageActionGiftPremium">messageActionGiftPremium</a> constructor with further info about the price and duration of the gifted Telegram Premium subscription.<br>
+Clients should display this message, along with a sticker from the <a href="/constructor/inputStickerSetPremiumGifts">inputStickerSetPremiumGifts</a> <a href="/api/stickers">stickerset</a>: here's an <a href="https://telegram.org/blog/custom-emoji#gifting-telegram-premium">example</a>.  </p>
 </li>
 </ul>
 <p>The <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a>.<code>slug</code> should be used to generate a <a href="/api/links#premium-giftcode-links">giftcode link</a>, that the user can use to redeem the subscription, or re-gift it to someone else.  </p>
