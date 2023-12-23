@@ -6,6 +6,13 @@
 <item>
 <title>Telegram macOS</title>
 <description>• Bug fixes, minor improvements, and more.</description>
+<pubDate>2023-23-12 12:48:20</pubDate>
+<enclosure sparkle:version="257114" sparkle:shortVersionString="10.4" sparkle:dsaSignature="MC4CFQDjRmAsTgPWxl795wteRvWDVbK+uQIVALQCJ2MAhC3vacy6IOWYzYKZc9Jt" url="https://osx.telegram.org/updates/Telegram-10.4.257114.app.zip" length="95490279" forbidden="false" critical="false" environment="updates" fileName="Telegram-10.4.257114.app.zip" internalUrl="https://t.me/macos_stable_updates_files/234" dmgName="Telegram-10.4.257114.dmg" type="application/octet-stream"/>
+<sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+</item>
+<item>
+<title>Telegram macOS</title>
+<description>• Bug fixes, minor improvements, and more.</description>
 <pubDate>2023-23-12 06:08:03</pubDate>
 <enclosure sparkle:version="257111" sparkle:shortVersionString="10.4" sparkle:dsaSignature="MC4CFQDRCv0o6cD4eHmh+99R6Q4HNnJPjAIVAJf2FRYObBZjGM/v6pWRtyufHPsK" url="https://osx.telegram.org/updates/Telegram-10.4.257111.app.zip" length="95489973" forbidden="false" critical="false" environment="updates" fileName="Telegram-10.4.257111.app.zip" internalUrl="https://t.me/macos_stable_updates_files/233" dmgName="Telegram-10.4.257111.dmg" type="application/octet-stream"/>
 <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
@@ -134,13 +141,6 @@
 <description>• Bug fixes, minor improvements, and more.</description>
 <pubDate>2023-23-09 17:02:57</pubDate>
 <enclosure sparkle:version="252034" sparkle:shortVersionString="10.1" sparkle:dsaSignature="MC4CFQDZ6LqypltrFWESSFlFVnJHNRW98QIVAOEvISV2geQ85V5bjZ21TioCwoLc" url="https://osx.telegram.org/updates/Telegram-10.1.252034.app.zip" length="93151852" forbidden="false" critical="false" environment="updates" fileName="Telegram-10.1.252034.app.zip" internalUrl="https://t.me/macos_stable_updates_files/207" dmgName="Telegram-10.1.252034.dmg" type="application/octet-stream"/>
-<sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
-</item>
-<item>
-<title>Telegram macOS</title>
-<description>• Bug fixes, minor improvements, and more.</description>
-<pubDate>2023-22-09 21:10:28</pubDate>
-<enclosure sparkle:version="252033" sparkle:shortVersionString="10.1" sparkle:dsaSignature="MC4CFQCkkRO5r+cNDuIUkR/fl5H2pGt9cAIVALskxHRarhpbfmcI3WKwYha8xEci" url="https://osx.telegram.org/updates/Telegram-10.1.252033.app.zip" length="93152779" forbidden="false" critical="false" environment="updates" fileName="Telegram-10.1.252033.app.zip" internalUrl="https://t.me/macos_stable_updates_files/205" dmgName="Telegram-10.1.252033.dmg" type="application/octet-stream"/>
 <sparkle:minimumSystemVersion>10.12</sparkle:minimumSystemVersion>
 </item>
 </channel>
