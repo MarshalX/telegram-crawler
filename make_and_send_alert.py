@@ -244,7 +244,7 @@ async def main() -> None:
 
             alert_text += '\n'
 
-        alert_text += f'<a href="{html_url}">View diff on GitHub...</a>'
+        alert_text += f'Diff: {html_url}'
         logger.info(alert_text)
 
         if 'web_tr' in alert_hashtags or 'web_res' in alert_hashtags:
