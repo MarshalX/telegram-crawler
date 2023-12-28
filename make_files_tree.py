@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import mimetypes
 import os
 import platform
 import random
@@ -98,9 +99,12 @@ async def download_file(url: str, path: str, session: aiohttp.ClientSession):
 async def get_download_link_of_latest_appcenter_release(parameterized_url: str, session: aiohttp.ClientSession):
     api_base = 'https://install.appcenter.ms/api/v0.1'
     base_url = f'{api_base}/{parameterized_url}'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/118.0',
+    }
 
     async def make_req(url):
-        async with session.get(url) as response:
+        async with session.get(url, headers=headers) as response:
             if response.status != 200:
                 return
 
@@ -138,7 +142,6 @@ async def track_additional_files(
             content = get_hash(content)
         else:
             content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
-            content = re.sub(r'name="APKTOOL_DUMMY_.*" id', 'name="tgcrawl" id', content)
 
         filename = os.path.join(output_dir_name, file)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -358,7 +361,7 @@ async def download_telegram_android_beta_and_extract_resources(session: aiohttp.
         return
 
     await asyncio.gather(
-        download_file('https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar', 'tool.apk', session),
+        download_file('https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.9.0.jar', 'tool.apk', session),
         download_file(download_url, 'android.apk', session),
     )
 
@@ -661,7 +664,8 @@ def is_hashable_only_content_type(content_type) -> bool:
         'gif',
         'mp4',
         'webm',
-        'application/zip',
+        'zip',
+        'stream',
     )
 
     for hashable_only_content_type in hashable_only_content_types:
@@ -702,23 +706,42 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         # bypass external slashes and so on
         url_parts = [p for p in url.split('/') if p not in ILLEGAL_PATH_CHARS]
 
-        is_hashable_only = is_hashable_only_content_type(response.content_type)
+        content_type = response.content_type
+
+        # handle pure domains and html pages without ext in url as html do enable syntax highlighting
+        page_type, _ = mimetypes.guess_type(url)
+
+        ext = ''
+        if page_type:
+            ext = mimetypes.guess_extension(page_type) or ''
+            if ext != '' and url.endswith(ext):
+                ext = ''
+
+        if url.endswith('.tl'):
+            page_type = 'text/plain'
+
+        if page_type is None or len(url_parts) == 1:
+            ext = '.html'
+            content_type = 'text/html'
+
+        if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url) or 'td.telegram.org/current' in url:
+            ext = '.json'
+            content_type = 'application/json'
+
+        is_hashable_only = is_hashable_only_content_type(content_type)
         # amazing dirt for media files like
         # telegram.org/file/811140591/1/q7zZHjgES6s/9d121a89ffb0015837
-        # with response content type HTML instead of image. Shame on you
-        # sometimes it returns correct type. noice load balancing
-        is_sucking_file = '/file/' in url and 'text' in response.content_type
+        # with response content type HTML instead of image.
+        # shame on you.
+        # sometimes it returns a correct type.
+        # noice load balancing
+        is_sucking_file = '/file/' in url and 'text' in content_type
 
-        # handle pure domains and html pages without ext in url
-        ext = '.html' if '.' not in url_parts[-1] or len(url_parts) == 1 else ''
-
-        # I don't add ext by content type for images and so on cuz TG servers sucks.
-        # Some servers do not return correct content type. Some servers do...
+        # I don't add ext by content type for images, and so on cuz TG servers suck.
+        # Some servers do not return a correct content type.
+        # Some servers do...
         if is_hashable_only or is_sucking_file:
-            ext = ''
-
-        if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
-            ext = '.json'
+            ext = '.sha256'
 
         filename = os.path.join(output_dir, *url_parts) + ext
         os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -742,6 +765,11 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
         content = re.sub(TON_RATE_REGEX, TON_RATE_TEMPLATE, content)
 
+        # there is a problem with the files with the same name (in the same path) but different case
+        # the content is random because of the async
+        # there is only one page with this problem, for now:
+        # - corefork.telegram.org/constructor/Updates
+        # - corefork.telegram.org/constructor/updates
         async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
             logger.info(f'Write to {filename}')
             await f.write(content)
