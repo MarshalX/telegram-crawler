@@ -55,6 +55,79 @@ To learn how to create…">
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
 <h3><a class="anchor" name="2023" href="#2023"><i class="anchor-icon"></i></a>2023</h3>
+<h4><a class="anchor" name="december-29-2023" href="#december-29-2023"><i class="anchor-icon"></i></a>December 29, 2023</h4>
+<p><strong>Bot API 7.0</strong></p>
+<p><strong>Reactions</strong></p>
+<ul>
+<li>Added the classes <a href="/bots/api#reactiontypeemoji">ReactionTypeEmoji</a> and <a href="/bots/api#reactiontypecustomemoji">ReactionTypeCustomEmoji</a> representing different types of reaction.</li>
+<li>Added updates about a reaction change on a message with non-anonymous reactions, represented by the class <a href="/bots/api#messagereactionupdated">MessageReactionUpdated</a> and the field <em>message_reaction</em> in the class <a href="/bots/api#update">Update</a>. The bot must explicitly allow the update to receive it.</li>
+<li>Added updates about reaction changes on a message with anonymous reactions, represented by the class <a href="/bots/api#messagereactioncountupdated">MessageReactionCountUpdated</a> and the field <em>message_reaction_count</em> in the class <a href="/bots/api#update">Update</a>. The bot must explicitly allow the update to receive it.</li>
+<li>Added the method <a href="/bots/api#setmessagereaction">setMessageReaction</a> that allows bots to react to messages.</li>
+<li>Added the field <em>available_reactions</em> to the class <a href="/bots/api#chat">Chat</a>.</li>
+</ul>
+<p><strong>Replies 2.0</strong></p>
+<ul>
+<li>Added the ability to reply to messages in other chats or forum topics.</li>
+<li>Added the class <a href="/bots/api#externalreplyinfo">ExternalReplyInfo</a> and the field <em>external_reply</em> of type <a href="/bots/api#externalreplyinfo">ExternalReplyInfo</a> to the class <a href="/bots/api#message">Message</a>, containing information about a message that is replied to by the current message, but can be from another chat or forum topic.</li>
+<li>Added the ability to quote a part of the replied message.</li>
+<li>Added the class <a href="/bots/api#textquote">TextQuote</a> and the field <em>quote</em> of type <a href="/bots/api#textquote">TextQuote</a> to the class <em>Message</em>, which contains the part of the replied message text or caption that is quoted in the current message.</li>
+<li>Added the class <a href="/bots/api#replyparameters">ReplyParameters</a> and replaced parameters <em>reply_to_message_id</em> and <em>allow_sending_without_reply</em> in the methods <a href="/bots/api#copymessage">copyMessage</a>, <a href="/bots/api#sendmessage">sendMessage</a>, <a href="/bots/api#sendphoto">sendPhoto</a>, <a href="/bots/api#sendvideo">sendVideo</a>, <a href="/bots/api#sendanimation">sendAnimation</a>, <a href="/bots/api#sendaudio">sendAudio</a>, <a href="/bots/api#senddocument">sendDocument</a>, <a href="/bots/api#sendsticker">sendSticker</a>, <a href="/bots/api#sendvideonote">sendVideoNote</a>, <a href="/bots/api#sendvoice">sendVoice</a>, <a href="/bots/api#sendlocation">sendLocation</a>, <a href="/bots/api#sendvenue">sendVenue</a>, <a href="/bots/api#sendcontact">sendContact</a>, <a href="/bots/api#sendpoll">sendPoll</a>, <a href="/bots/api#senddice">sendDice</a>, <a href="/bots/api#sendinvoice">sendInvoice</a>, <a href="/bots/api#sendgame">sendGame</a>, and <a href="/bots/api#sendmediagroup">sendMediaGroup</a> with the field <em>reply_parameters</em> of type <a href="/bots/api#replyparameters">ReplyParameters</a>.</li>
+</ul>
+<p><strong>Link Preview Customization</strong></p>
+<ul>
+<li>Allowed to explicitly specify the URL that will be used for link preview generation in outgoing text messages.</li>
+<li>Allowed to position link previews above the message text.</li>
+<li>Allowed to choose media size in link previews.</li>
+<li>Added the class <a href="/bots/api#linkpreviewoptions">LinkPreviewOptions</a> and replaced the parameter <em>disable_web_page_preview</em> with <em>link_preview_options</em> in the methods <a href="/bots/api#sendmessage">sendMessage</a> and <a href="/bots/api#editmessagetext">editMessageText</a>.</li>
+<li>Replaced the field <em>disable_web_page_preview</em> with <em>link_preview_options</em> in the class <a href="/bots/api#inputtextmessagecontent">InputTextMessageContent</a>.</li>
+<li>Added the field <em>link_preview_options</em> to the class <a href="/bots/api#message">Message</a> with information about the link preview options used to send the message.</li>
+</ul>
+<p><strong>Block Quotation</strong></p>
+<ul>
+<li>Added support for “blockquote” entities in received messages.</li>
+<li>Added support for “blockquote” entity parsing in “MarkdownV2” and “HTML” parse modes.</li>
+<li>Allowed to explicitly specify “blockquote” entities in formatted texts.</li>
+</ul>
+<p><strong>Multiple Message Actions</strong></p>
+<ul>
+<li>Added the method <a href="/bots/api#deletemessages">deleteMessages</a> to allow the deletion of multiple messages in a single request.</li>
+<li>Added the method <a href="/bots/api#forwardmessages">forwardMessages</a> for forwarding of multiple messages in a single request.</li>
+<li>Added the method <a href="/bots/api#copymessages">copyMessages</a> for copying of multiple messages in a single request.</li>
+</ul>
+<p><strong>Request for multiple users</strong></p>
+<ul>
+<li>Renamed the class <em>KeyboardButtonRequestUser</em> to <a href="/bots/api#keyboardbuttonrequestusers">KeyboardButtonRequestUsers</a> and added the field <em>max_quantity</em> to it.</li>
+<li>Renamed the field <em>request_user</em> in the class <a href="/bots/api#keyboardbutton">KeyboardButton</a> to <em>request_users</em>. The old name will still work for backward compatibility.</li>
+<li>Added the class <a href="/bots/api#usersshared">UsersShared</a>.</li>
+<li>Replaced the field <em>user_shared</em> in the class <a href="/bots/api#message">Message</a> with the field <em>users_shared</em>.</li>
+</ul>
+<p><strong>Chat Boost</strong></p>
+<ul>
+<li>Added updates about chat boost changes, represented by the classes <a href="/bots/api#chatboostupdated">ChatBoostUpdated</a> and <a href="/bots/api#chatboostremoved">ChatBoostRemoved</a> and the fields <em>chat_boost</em> and <em>removed_chat_boost</em> in the class <a href="/bots/api#update">Update</a>. The bot must be an administrator in the chat to receive these updates.</li>
+<li>Added the classes <a href="/bots/api#chatboostsourcepremium">ChatBoostSourcePremium</a>, <a href="/bots/api#chatboostsourcegiftcode">ChatBoostSourceGiftCode</a> and <a href="/bots/api#chatboostsourcegiveaway">ChatBoostSourceGiveaway</a>, representing different sources of a chat boost.</li>
+<li>Added the method <a href="/bots/api#getuserchatboosts">getUserChatBoosts</a> for obtaining the list of all active boosts a user has contributed to a chat.</li>
+</ul>
+<p><strong>Giveaway</strong></p>
+<ul>
+<li>Added the class <a href="/bots/api#giveaway">Giveaway</a> and the field <em>giveaway</em> to the class <a href="/bots/api#message">Message</a> for messages about scheduled giveaways.</li>
+<li>Added the class <a href="/bots/api#giveawaycreated">GiveawayCreated</a> and the field <em>giveaway_created</em> to the class <a href="/bots/api#message">Message</a> for service messages about the creation of a scheduled giveaway.</li>
+<li>Added the class <a href="/bots/api#giveawaywinners">GiveawayWinners</a> and the field <em>giveaway_winners</em> to the class <a href="/bots/api#message">Message</a> for messages about the completion of a giveaway with public winners.</li>
+<li>Added the class <a href="/bots/api#giveawaycompleted">GiveawayCompleted</a> and the field <em>giveaway_completed</em> to the class <a href="/bots/api#message">Message</a> for service messages about the completion of a giveaway without public winners.</li>
+</ul>
+<p><strong>Web App Changes</strong></p>
+<ul>
+<li>Added the field <em>SettingsButton</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the fields <em>header_bg_color</em>, <em>accent_text_color</em>, <em>section_bg_color</em>, <em>section_header_text_color</em>, <em>subtitle_text_color</em>, <em>destructive_text_color</em> to the class <a href="/bots/webapps#themeparams">ThemeParams</a>.</li>
+<li>Web Apps no longer close when the method <em>WebApp.openTelegramLink</em> is called.</li>
+</ul>
+<p><strong>Other Changes</strong></p>
+<ul>
+<li>Added support for the fields <em>emoji_status_custom_emoji_id</em> and <em>emoji_status_expiration_date</em> in the class <a href="/bots/api#chat">Chat</a> for non-private chats.</li>
+<li>Added the fields <em>accent_color_id</em>, <em>background_custom_emoji_id</em>, <em>profile_accent_color_id</em>, and <em>profile_background_custom_emoji_id</em> to the class <a href="/bots/api#chat">Chat</a>.</li>
+<li>Added the field <em>has_visible_history</em> to the class <a href="/bots/api#chat">Chat</a>.</li>
+<li>Added the class <a href="/bots/api#messageorigin">MessageOrigin</a> and replaced the fields <em>forward_from</em>, <em>forward_from_chat</em>, <em>forward_from_message_id</em>, <em>forward_signature</em>, <em>forward_sender_name</em>, and <em>forward_date</em> with the field <em>forward_origin</em> of type <a href="/bots/api#messageorigin">MessageOrigin</a> in the class <a href="/bots/api#message">Message</a>.</li>
+<li>Improved documentation for the field <em>message</em> of the class <a href="/bots/api#callbackquery">callbackQuery</a> and the field <em>pinned_message</em> of the class <a href="/bots/api#message">Message</a> by adding the classes <a href="/bots/api#maybeinaccessiblemessage">MaybeInaccessibleMessage</a> and <a href="/bots/api#inaccessiblemessage">InaccessibleMessage</a>.</li>
+</ul>
 <h4><a class="anchor" name="september-22-2023" href="#september-22-2023"><i class="anchor-icon"></i></a>September 22, 2023</h4>
 <p><strong>Bot API 6.9</strong></p>
 <ul>

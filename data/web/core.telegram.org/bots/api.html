@@ -53,6 +53,79 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="december-29-2023" href="#december-29-2023"><i class="anchor-icon"></i></a>December 29, 2023</h4>
+<p><strong>Bot API 7.0</strong></p>
+<p><strong>Reactions</strong></p>
+<ul>
+<li>Added the classes <a href="#reactiontypeemoji">ReactionTypeEmoji</a> and <a href="#reactiontypecustomemoji">ReactionTypeCustomEmoji</a> representing different types of reaction.</li>
+<li>Added updates about a reaction change on a message with non-anonymous reactions, represented by the class <a href="#messagereactionupdated">MessageReactionUpdated</a> and the field <em>message_reaction</em> in the class <a href="#update">Update</a>. The bot must explicitly allow the update to receive it.</li>
+<li>Added updates about reaction changes on a message with anonymous reactions, represented by the class <a href="#messagereactioncountupdated">MessageReactionCountUpdated</a> and the field <em>message_reaction_count</em> in the class <a href="#update">Update</a>. The bot must explicitly allow the update to receive it.</li>
+<li>Added the method <a href="#setmessagereaction">setMessageReaction</a> that allows bots to react to messages.</li>
+<li>Added the field <em>available_reactions</em> to the class <a href="#chat">Chat</a>.</li>
+</ul>
+<p><strong>Replies 2.0</strong></p>
+<ul>
+<li>Added the ability to reply to messages in other chats or forum topics.</li>
+<li>Added the class <a href="#externalreplyinfo">ExternalReplyInfo</a> and the field <em>external_reply</em> of type <a href="#externalreplyinfo">ExternalReplyInfo</a> to the class <a href="#message">Message</a>, containing information about a message that is replied to by the current message, but can be from another chat or forum topic.</li>
+<li>Added the ability to quote a part of the replied message.</li>
+<li>Added the class <a href="#textquote">TextQuote</a> and the field <em>quote</em> of type <a href="#textquote">TextQuote</a> to the class <em>Message</em>, which contains the part of the replied message text or caption that is quoted in the current message.</li>
+<li>Added the class <a href="#replyparameters">ReplyParameters</a> and replaced parameters <em>reply_to_message_id</em> and <em>allow_sending_without_reply</em> in the methods <a href="#copymessage">copyMessage</a>, <a href="#sendmessage">sendMessage</a>, <a href="#sendphoto">sendPhoto</a>, <a href="#sendvideo">sendVideo</a>, <a href="#sendanimation">sendAnimation</a>, <a href="#sendaudio">sendAudio</a>, <a href="#senddocument">sendDocument</a>, <a href="#sendsticker">sendSticker</a>, <a href="#sendvideonote">sendVideoNote</a>, <a href="#sendvoice">sendVoice</a>, <a href="#sendlocation">sendLocation</a>, <a href="#sendvenue">sendVenue</a>, <a href="#sendcontact">sendContact</a>, <a href="#sendpoll">sendPoll</a>, <a href="#senddice">sendDice</a>, <a href="#sendinvoice">sendInvoice</a>, <a href="#sendgame">sendGame</a>, and <a href="#sendmediagroup">sendMediaGroup</a> with the field <em>reply_parameters</em> of type <a href="#replyparameters">ReplyParameters</a>.</li>
+</ul>
+<p><strong>Link Preview Customization</strong></p>
+<ul>
+<li>Allowed to explicitly specify the URL that will be used for link preview generation in outgoing text messages.</li>
+<li>Allowed to position link previews above the message text.</li>
+<li>Allowed to choose media size in link previews.</li>
+<li>Added the class <a href="#linkpreviewoptions">LinkPreviewOptions</a> and replaced the parameter <em>disable_web_page_preview</em> with <em>link_preview_options</em> in the methods <a href="#sendmessage">sendMessage</a> and <a href="#editmessagetext">editMessageText</a>.</li>
+<li>Replaced the field <em>disable_web_page_preview</em> with <em>link_preview_options</em> in the class <a href="#inputtextmessagecontent">InputTextMessageContent</a>.</li>
+<li>Added the field <em>link_preview_options</em> to the class <a href="#message">Message</a> with information about the link preview options used to send the message.</li>
+</ul>
+<p><strong>Block Quotation</strong></p>
+<ul>
+<li>Added support for “blockquote” entities in received messages.</li>
+<li>Added support for “blockquote” entity parsing in “MarkdownV2” and “HTML” parse modes.</li>
+<li>Allowed to explicitly specify “blockquote” entities in formatted texts.</li>
+</ul>
+<p><strong>Multiple Message Actions</strong></p>
+<ul>
+<li>Added the method <a href="#deletemessages">deleteMessages</a> to allow the deletion of multiple messages in a single request.</li>
+<li>Added the method <a href="#forwardmessages">forwardMessages</a> for forwarding of multiple messages in a single request.</li>
+<li>Added the method <a href="#copymessages">copyMessages</a> for copying of multiple messages in a single request.</li>
+</ul>
+<p><strong>Request for multiple users</strong></p>
+<ul>
+<li>Renamed the class <em>KeyboardButtonRequestUser</em> to <a href="#keyboardbuttonrequestusers">KeyboardButtonRequestUsers</a> and added the field <em>max_quantity</em> to it.</li>
+<li>Renamed the field <em>request_user</em> in the class <a href="#keyboardbutton">KeyboardButton</a> to <em>request_users</em>. The old name will still work for backward compatibility.</li>
+<li>Added the class <a href="#usersshared">UsersShared</a>.</li>
+<li>Replaced the field <em>user_shared</em> in the class <a href="#message">Message</a> with the field <em>users_shared</em>.</li>
+</ul>
+<p><strong>Chat Boost</strong></p>
+<ul>
+<li>Added updates about chat boost changes, represented by the classes <a href="#chatboostupdated">ChatBoostUpdated</a> and <a href="#chatboostremoved">ChatBoostRemoved</a> and the fields <em>chat_boost</em> and <em>removed_chat_boost</em> in the class <a href="#update">Update</a>. The bot must be an administrator in the chat to receive these updates.</li>
+<li>Added the classes <a href="#chatboostsourcepremium">ChatBoostSourcePremium</a>, <a href="#chatboostsourcegiftcode">ChatBoostSourceGiftCode</a> and <a href="#chatboostsourcegiveaway">ChatBoostSourceGiveaway</a>, representing different sources of a chat boost.</li>
+<li>Added the method <a href="#getuserchatboosts">getUserChatBoosts</a> for obtaining the list of all active boosts a user has contributed to a chat.</li>
+</ul>
+<p><strong>Giveaway</strong></p>
+<ul>
+<li>Added the class <a href="#giveaway">Giveaway</a> and the field <em>giveaway</em> to the class <a href="#message">Message</a> for messages about scheduled giveaways.</li>
+<li>Added the class <a href="#giveawaycreated">GiveawayCreated</a> and the field <em>giveaway_created</em> to the class <a href="#message">Message</a> for service messages about the creation of a scheduled giveaway.</li>
+<li>Added the class <a href="#giveawaywinners">GiveawayWinners</a> and the field <em>giveaway_winners</em> to the class <a href="#message">Message</a> for messages about the completion of a giveaway with public winners.</li>
+<li>Added the class <a href="#giveawaycompleted">GiveawayCompleted</a> and the field <em>giveaway_completed</em> to the class <a href="#message">Message</a> for service messages about the completion of a giveaway without public winners.</li>
+</ul>
+<p><strong>Web App Changes</strong></p>
+<ul>
+<li>Added the field <em>SettingsButton</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the fields <em>header_bg_color</em>, <em>accent_text_color</em>, <em>section_bg_color</em>, <em>section_header_text_color</em>, <em>subtitle_text_color</em>, <em>destructive_text_color</em> to the class <a href="/bots/webapps#themeparams">ThemeParams</a>.</li>
+<li>Web Apps no longer close when the method <em>WebApp.openTelegramLink</em> is called.</li>
+</ul>
+<p><strong>Other Changes</strong></p>
+<ul>
+<li>Added support for the fields <em>emoji_status_custom_emoji_id</em> and <em>emoji_status_expiration_date</em> in the class <a href="#chat">Chat</a> for non-private chats.</li>
+<li>Added the fields <em>accent_color_id</em>, <em>background_custom_emoji_id</em>, <em>profile_accent_color_id</em>, and <em>profile_background_custom_emoji_id</em> to the class <a href="#chat">Chat</a>.</li>
+<li>Added the field <em>has_visible_history</em> to the class <a href="#chat">Chat</a>.</li>
+<li>Added the class <a href="#messageorigin">MessageOrigin</a> and replaced the fields <em>forward_from</em>, <em>forward_from_chat</em>, <em>forward_from_message_id</em>, <em>forward_signature</em>, <em>forward_sender_name</em>, and <em>forward_date</em> with the field <em>forward_origin</em> of type <a href="#messageorigin">MessageOrigin</a> in the class <a href="#message">Message</a>.</li>
+<li>Improved documentation for the field <em>message</em> of the class <a href="#callbackquery">callbackQuery</a> and the field <em>pinned_message</em> of the class <a href="#message">Message</a> by adding the classes <a href="#maybeinaccessiblemessage">MaybeInaccessibleMessage</a> and <a href="#inaccessiblemessage">InaccessibleMessage</a>.</li>
+</ul>
 <h4><a class="anchor" name="september-22-2023" href="#september-22-2023"><i class="anchor-icon"></i></a>September 22, 2023</h4>
 <p><strong>Bot API 6.9</strong></p>
 <ul>
@@ -73,18 +146,6 @@ To learn how to create…">
 <li>Added the field <em>emoji_status_expiration_date</em> to the class <a href="#chat">Chat</a>.</li>
 <li>Added the method <a href="#unpinallgeneralforumtopicmessages">unpinAllGeneralForumTopicMessages</a>.</li>
 <li>Increased to 512 characters the maximum length of the <em>startapp</em> parameter in direct Web App links.</li>
-</ul>
-<h4><a class="anchor" name="april-21-2023" href="#april-21-2023"><i class="anchor-icon"></i></a>April 21, 2023</h4>
-<p><strong>Bot API 6.7</strong></p>
-<ul>
-<li>Added support for launching <a href="/bots/webapps">Web Apps</a> from inline query results by replacing the parameters <em>switch_pm_text</em> and <em>switch_pm_parameter</em> of the method <a href="#answerinlinequery">answerInlineQuery</a> with the parameter <em>button</em> of type <a href="#inlinequeryresultsbutton">InlineQueryResultsButton</a>.</li>
-<li>Added the field <em>web_app_name</em> to the class <a href="#writeaccessallowed">WriteAccessAllowed</a>.</li>
-<li>Added the field <em>switch_inline_query_chosen_chat</em> of the type <a href="#switchinlinequerychosenchat">SwitchInlineQueryChosenChat</a> to the class <a href="#inlinekeyboardbutton">InlineKeyboardButton</a>, which allows bots to switch to inline mode in a chosen chat of the given type.</li>
-<li>Added the field <em>via_chat_folder_invite_link</em> to the class <a href="#chatmemberupdated">ChatMemberUpdated</a>.</li>
-<li>Added the ability to set different bot names for different user languages using the method <a href="#setmyname">setMyName</a>.</li>
-<li>Added the ability to get the current bot name in the given language as the class <a href="#botname">BotName</a> using the method <a href="#getmyname">getMyName</a>.</li>
-<li>Added the ability to change bot settings from the bot&#39;s profile in official Telegram apps, including the ability to set animated profile photos.</li>
-<li>Added the ability to specify custom emoji entities using <a href="#html-style">HTML</a> and <a href="#markdownv2-style">MarkdownV2</a> formatting options for bots that purchased additional usernames on <a href="https://fragment.com">Fragment</a>.</li>
 </ul>
 <p><strong><a href="/bots/api-changelog">See earlier changes »</a></strong></p>
 <h3><a class="anchor" name="authorizing-your-bot" href="#authorizing-your-bot"><i class="anchor-icon"></i></a>Authorizing your bot</h3>
@@ -163,6 +224,16 @@ To learn how to create…">
 <td><em>Optional</em>. New version of a channel post that is known to the bot and was edited</td>
 </tr>
 <tr>
+<td>message_reaction</td>
+<td><a href="#messagereactionupdated">MessageReactionUpdated</a></td>
+<td><em>Optional</em>. A reaction to a message was changed by a user. The bot must be an administrator in the chat and must explicitly specify <code>&quot;message_reaction&quot;</code> in the list of <em>allowed_updates</em> to receive these updates. The update isn&#39;t received for reactions set by bots.</td>
+</tr>
+<tr>
+<td>message_reaction_count</td>
+<td><a href="#messagereactioncountupdated">MessageReactionCountUpdated</a></td>
+<td><em>Optional</em>. Reactions to a message with anonymous reactions were changed. The bot must be an administrator in the chat and must explicitly specify <code>&quot;message_reaction_count&quot;</code> in the list of <em>allowed_updates</em> to receive these updates.</td>
+</tr>
+<tr>
 <td>inline_query</td>
 <td><a href="#inlinequery">InlineQuery</a></td>
 <td><em>Optional</em>. New incoming <a href="#inline-mode">inline</a> query</td>
@@ -212,6 +283,16 @@ To learn how to create…">
 <td><a href="#chatjoinrequest">ChatJoinRequest</a></td>
 <td><em>Optional</em>. A request to join the chat has been sent. The bot must have the <em>can_invite_users</em> administrator right in the chat to receive these updates.</td>
 </tr>
+<tr>
+<td>chat_boost</td>
+<td><a href="#chatboostupdated">ChatBoostUpdated</a></td>
+<td><em>Optional</em>. A chat boost was added or changed. The bot must be an administrator in the chat to receive these updates.</td>
+</tr>
+<tr>
+<td>removed_chat_boost</td>
+<td><a href="#chatboostremoved">ChatBoostRemoved</a></td>
+<td><em>Optional</em>. A boost was removed from a chat. The bot must be an administrator in the chat to receive these updates.</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="getupdates" href="#getupdates"><i class="anchor-icon"></i></a>getUpdates</h4>
@@ -248,7 +329,7 @@ To learn how to create…">
 <td>allowed_updates</td>
 <td>Array of String</td>
 <td>Optional</td>
-<td>A JSON-serialized list of the update types you want your bot to receive. For example, specify <code>[&quot;message&quot;, &quot;edited_channel_post&quot;, &quot;callback_query&quot;]</code> to only receive updates of these types. See <a href="#update">Update</a> for a complete list of available update types. Specify an empty list to receive all update types except <em>chat_member</em> (default). If not specified, the previous setting will be used.<br><br>Please note that this parameter doesn&#39;t affect updates created before the call to the getUpdates, so unwanted updates may be received for a short period of time.</td>
+<td>A JSON-serialized list of the update types you want your bot to receive. For example, specify <code>[&quot;message&quot;, &quot;edited_channel_post&quot;, &quot;callback_query&quot;]</code> to only receive updates of these types. See <a href="#update">Update</a> for a complete list of available update types. Specify an empty list to receive all update types except <em>chat_member</em>, <em>message_reaction</em>, and <em>message_reaction_count</em> (default). If not specified, the previous setting will be used.<br><br>Please note that this parameter doesn&#39;t affect updates created before the call to the getUpdates, so unwanted updates may be received for a short period of time.</td>
 </tr>
 </tbody>
 </table>
@@ -296,7 +377,7 @@ To learn how to create…">
 <td>allowed_updates</td>
 <td>Array of String</td>
 <td>Optional</td>
-<td>A JSON-serialized list of the update types you want your bot to receive. For example, specify <code>[&quot;message&quot;, &quot;edited_channel_post&quot;, &quot;callback_query&quot;]</code> to only receive updates of these types. See <a href="#update">Update</a> for a complete list of available update types. Specify an empty list to receive all update types except <em>chat_member</em> (default). If not specified, the previous setting will be used.<br>Please note that this parameter doesn&#39;t affect updates created before the call to the setWebhook, so unwanted updates may be received for a short period of time.</td>
+<td>A JSON-serialized list of the update types you want your bot to receive. For example, specify <code>[&quot;message&quot;, &quot;edited_channel_post&quot;, &quot;callback_query&quot;]</code> to only receive updates of these types. See <a href="#update">Update</a> for a complete list of available update types. Specify an empty list to receive all update types except <em>chat_member</em>, <em>message_reaction</em>, and <em>message_reaction_count</em> (default). If not specified, the previous setting will be used.<br>Please note that this parameter doesn&#39;t affect updates created before the call to the setWebhook, so unwanted updates may be received for a short period of time.</td>
 </tr>
 <tr>
 <td>drop_pending_updates</td>
@@ -527,14 +608,39 @@ To learn how to create…">
 <td><em>Optional</em>. If non-empty, the list of all <a href="https://telegram.org/blog/topics-in-groups-collectible-usernames#collectible-usernames">active chat usernames</a>; for private chats, supergroups and channels. Returned only in <a href="#getchat">getChat</a>.</td>
 </tr>
 <tr>
+<td>available_reactions</td>
+<td>Array of <a href="#reactiontype">ReactionType</a></td>
+<td><em>Optional</em>. List of available reactions allowed in the chat. If omitted, then all <a href="#reactiontypeemoji">emoji reactions</a> are allowed. Returned only in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
+<td>accent_color_id</td>
+<td>Integer</td>
+<td><em>Optional</em>. Identifier of the accent color for the chat name and backgrounds of the chat photo, reply header, and link preview. See <a href="#accent-colors">accent colors</a> for more details. Returned only in <a href="#getchat">getChat</a>. Always returned in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
+<td>background_custom_emoji_id</td>
+<td>String</td>
+<td><em>Optional</em>. Custom emoji identifier of emoji chosen by the chat for the reply header and link preview background. Returned only in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
+<td>profile_accent_color_id</td>
+<td>Integer</td>
+<td><em>Optional</em>. Identifier of the accent color for the chat&#39;s profile background. See <a href="#profile-accent-colors">profile accent colors</a> for more details. Returned only in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
+<td>profile_background_custom_emoji_id</td>
+<td>String</td>
+<td><em>Optional</em>. Custom emoji identifier of the emoji chosen by the chat for its profile background. Returned only in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
 <td>emoji_status_custom_emoji_id</td>
 <td>String</td>
-<td><em>Optional</em>. Custom emoji identifier of emoji status of the other party in a private chat. Returned only in <a href="#getchat">getChat</a>.</td>
+<td><em>Optional</em>. Custom emoji identifier of the emoji status of the chat or the other party in a private chat. Returned only in <a href="#getchat">getChat</a>.</td>
 </tr>
 <tr>
 <td>emoji_status_expiration_date</td>
 <td>Integer</td>
-<td><em>Optional</em>. Expiration date of the emoji status of the other party in a private chat in Unix time, if any. Returned only in <a href="#getchat">getChat</a>.</td>
+<td><em>Optional</em>. Expiration date of the emoji status of the chat or the other party in a private chat, in Unix time, if any. Returned only in <a href="#getchat">getChat</a>.</td>
 </tr>
 <tr>
 <td>bio</td>
@@ -607,6 +713,11 @@ To learn how to create…">
 <td><em>Optional</em>. <em>True</em>, if messages from the chat can&#39;t be forwarded to other chats. Returned only in <a href="#getchat">getChat</a>.</td>
 </tr>
 <tr>
+<td>has_visible_history</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if new chat members will have access to old messages; available only to chat administrators. Returned only in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
 <td>sticker_set_name</td>
 <td>String</td>
 <td><em>Optional</em>. For supergroups, name of group sticker set. Returned only in <a href="#getchat">getChat</a>.</td>
@@ -662,42 +773,17 @@ To learn how to create…">
 <tr>
 <td>date</td>
 <td>Integer</td>
-<td>Date the message was sent in Unix time</td>
+<td>Date the message was sent in Unix time. It is always a positive number, representing a valid date.</td>
 </tr>
 <tr>
 <td>chat</td>
 <td><a href="#chat">Chat</a></td>
-<td>Conversation the message belongs to</td>
+<td>Chat the message belongs to</td>
 </tr>
 <tr>
-<td>forward_from</td>
-<td><a href="#user">User</a></td>
-<td><em>Optional</em>. For forwarded messages, sender of the original message</td>
-</tr>
-<tr>
-<td>forward_from_chat</td>
-<td><a href="#chat">Chat</a></td>
-<td><em>Optional</em>. For messages forwarded from channels or from anonymous administrators, information about the original sender chat</td>
-</tr>
-<tr>
-<td>forward_from_message_id</td>
-<td>Integer</td>
-<td><em>Optional</em>. For messages forwarded from channels, identifier of the original message in the channel</td>
-</tr>
-<tr>
-<td>forward_signature</td>
-<td>String</td>
-<td><em>Optional</em>. For forwarded messages that were originally sent in channels or by an anonymous chat administrator, signature of the message sender if present</td>
-</tr>
-<tr>
-<td>forward_sender_name</td>
-<td>String</td>
-<td><em>Optional</em>. Sender&#39;s name for messages forwarded from users who disallow adding a link to their account in forwarded messages</td>
-</tr>
-<tr>
-<td>forward_date</td>
-<td>Integer</td>
-<td><em>Optional</em>. For forwarded messages, date the original message was sent in Unix time</td>
+<td>forward_origin</td>
+<td><a href="#messageorigin">MessageOrigin</a></td>
+<td><em>Optional</em>. Information about the original message for forwarded messages</td>
 </tr>
 <tr>
 <td>is_topic_message</td>
@@ -712,7 +798,17 @@ To learn how to create…">
 <tr>
 <td>reply_to_message</td>
 <td><a href="#message">Message</a></td>
-<td><em>Optional</em>. For replies, the original message. Note that the Message object in this field will not contain further <em>reply_to_message</em> fields even if it itself is a reply.</td>
+<td><em>Optional</em>. For replies in the same chat and message thread, the original message. Note that the Message object in this field will not contain further <em>reply_to_message</em> fields even if it itself is a reply.</td>
+</tr>
+<tr>
+<td>external_reply</td>
+<td><a href="#externalreplyinfo">ExternalReplyInfo</a></td>
+<td><em>Optional</em>. Information about the message that is being replied to, which may come from another chat or forum topic</td>
+</tr>
+<tr>
+<td>quote</td>
+<td><a href="#textquote">TextQuote</a></td>
+<td><em>Optional</em>. For replies that quote part of the original message, the quoted part of the message</td>
 </tr>
 <tr>
 <td>via_bot</td>
@@ -748,6 +844,11 @@ To learn how to create…">
 <td>entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text</td>
+</tr>
+<tr>
+<td>link_preview_options</td>
+<td><a href="#linkpreviewoptions">LinkPreviewOptions</a></td>
+<td><em>Optional</em>. Options used for link preview generation for the message, if it is a text message and link preview options were changed</td>
 </tr>
 <tr>
 <td>animation</td>
@@ -896,8 +997,8 @@ To learn how to create…">
 </tr>
 <tr>
 <td>pinned_message</td>
-<td><a href="#message">Message</a></td>
-<td><em>Optional</em>. Specified message was pinned. Note that the Message object in this field will not contain further <em>reply_to_message</em> fields even if it is itself a reply.</td>
+<td><a href="#maybeinaccessiblemessage">MaybeInaccessibleMessage</a></td>
+<td><em>Optional</em>. Specified message was pinned. Note that the Message object in this field will not contain further <em>reply_to_message</em> fields even if it itself is a reply.</td>
 </tr>
 <tr>
 <td>invoice</td>
@@ -910,9 +1011,9 @@ To learn how to create…">
 <td><em>Optional</em>. Message is a service message about a successful payment, information about the payment. <a href="#payments">More about payments »</a></td>
 </tr>
 <tr>
-<td>user_shared</td>
-<td><a href="#usershared">UserShared</a></td>
-<td><em>Optional</em>. Service message: a user was shared with the bot</td>
+<td>users_shared</td>
+<td><a href="#usersshared">UsersShared</a></td>
+<td><em>Optional</em>. Service message: users were shared with the bot</td>
 </tr>
 <tr>
 <td>chat_shared</td>
@@ -970,6 +1071,26 @@ To learn how to create…">
 <td><em>Optional</em>. Service message: the &#39;General&#39; forum topic unhidden</td>
 </tr>
 <tr>
+<td>giveaway_created</td>
+<td><a href="#giveawaycreated">GiveawayCreated</a></td>
+<td><em>Optional</em>. Service message: a scheduled giveaway was created</td>
+</tr>
+<tr>
+<td>giveaway</td>
+<td><a href="#giveaway">Giveaway</a></td>
+<td><em>Optional</em>. The message is a scheduled giveaway message</td>
+</tr>
+<tr>
+<td>giveaway_winners</td>
+<td><a href="#giveawaywinners">GiveawayWinners</a></td>
+<td><em>Optional</em>. A giveaway with public winners was completed</td>
+</tr>
+<tr>
+<td>giveaway_completed</td>
+<td><a href="#giveawaycompleted">GiveawayCompleted</a></td>
+<td><em>Optional</em>. Service message: a giveaway without public winners was completed</td>
+</tr>
+<tr>
 <td>video_chat_scheduled</td>
 <td><a href="#videochatscheduled">VideoChatScheduled</a></td>
 <td><em>Optional</em>. Service message: video chat scheduled</td>
@@ -1019,6 +1140,40 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="inaccessiblemessage" href="#inaccessiblemessage"><i class="anchor-icon"></i></a>InaccessibleMessage</h4>
+<p>This object describes a message that was deleted or is otherwise inaccessible to the bot.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Chat the message belonged to</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>Integer</td>
+<td>Unique message identifier inside the chat</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Integer</td>
+<td>Always 0. The field can be used to differentiate regular and inaccessible messages.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="maybeinaccessiblemessage" href="#maybeinaccessiblemessage"><i class="anchor-icon"></i></a>MaybeInaccessibleMessage</h4>
+<p>This object describes a message that can be inaccessible to the bot. It can be one of</p>
+<ul>
+<li><a href="#message">Message</a></li>
+<li><a href="#inaccessiblemessage">InaccessibleMessage</a></li>
+</ul>
 <h4><a class="anchor" name="messageentity" href="#messageentity"><i class="anchor-icon"></i></a>MessageEntity</h4>
 <p>This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.</p>
 <table class="table">
@@ -1033,7 +1188,7 @@ To learn how to create…">
 <tr>
 <td>type</td>
 <td>String</td>
-<td>Type of the entity. Currently, can be “mention” (<code>@username</code>), “hashtag” (<code>#hashtag</code>), “cashtag” (<code>$USD</code>), “bot_command” (<code>/start@jobs_bot</code>), “url” (<code>https://telegram.org</code>), “email” (<code>do-not-reply@telegram.org</code>), “phone_number” (<code>+1-212-555-0123</code>), “bold” (<strong>bold text</strong>), “italic” (<em>italic text</em>), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users <a href="https://telegram.org/blog/edit#new-mentions">without usernames</a>), “custom_emoji” (for inline custom emoji stickers)</td>
+<td>Type of the entity. Currently, can be “mention” (<code>@username</code>), “hashtag” (<code>#hashtag</code>), “cashtag” (<code>$USD</code>), “bot_command” (<code>/start@jobs_bot</code>), “url” (<code>https://telegram.org</code>), “email” (<code>do-not-reply@telegram.org</code>), “phone_number” (<code>+1-212-555-0123</code>), “bold” (<strong>bold text</strong>), “italic” (<em>italic text</em>), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users <a href="https://telegram.org/blog/edit#new-mentions">without usernames</a>), “custom_emoji” (for inline custom emoji stickers)</td>
 </tr>
 <tr>
 <td>offset</td>
@@ -1064,6 +1219,350 @@ To learn how to create…">
 <td>custom_emoji_id</td>
 <td>String</td>
 <td><em>Optional</em>. For “custom_emoji” only, unique identifier of the custom emoji. Use <a href="#getcustomemojistickers">getCustomEmojiStickers</a> to get full information about the sticker</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="textquote" href="#textquote"><i class="anchor-icon"></i></a>TextQuote</h4>
+<p>This object contains information about the quoted part of a message that is replied to by the given message.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td>String</td>
+<td>Text of the quoted part of a message that is replied to by the given message</td>
+</tr>
+<tr>
+<td>entities</td>
+<td>Array of <a href="#messageentity">MessageEntity</a></td>
+<td><em>Optional</em>. Special entities that appear in the quote. Currently, only <em>bold</em>, <em>italic</em>, <em>underline</em>, <em>strikethrough</em>, <em>spoiler</em>, and <em>custom_emoji</em> entities are kept in quotes.</td>
+</tr>
+<tr>
+<td>position</td>
+<td>Integer</td>
+<td>Approximate quote position in the original message in UTF-16 code units as specified by the sender</td>
+</tr>
+<tr>
+<td>is_manual</td>
+<td>True</td>
+<td><em>Optional</em>. True, if the quote was chosen manually by the message sender. Otherwise, the quote was added automatically by the server.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="externalreplyinfo" href="#externalreplyinfo"><i class="anchor-icon"></i></a>ExternalReplyInfo</h4>
+<p>This object contains information about a message that is being replied to, which may come from another chat or forum topic.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>origin</td>
+<td><a href="#messageorigin">MessageOrigin</a></td>
+<td>Origin of the message replied to by the given message</td>
+</tr>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td><em>Optional</em>. Chat the original message belongs to. Available only if the chat is a supergroup or a channel.</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>Integer</td>
+<td><em>Optional</em>. Unique message identifier inside the original chat. Available only if the original chat is a supergroup or a channel.</td>
+</tr>
+<tr>
+<td>link_preview_options</td>
+<td><a href="#linkpreviewoptions">LinkPreviewOptions</a></td>
+<td><em>Optional</em>. Options used for link preview generation for the original message, if it is a text message</td>
+</tr>
+<tr>
+<td>animation</td>
+<td><a href="#animation">Animation</a></td>
+<td><em>Optional</em>. Message is an animation, information about the animation</td>
+</tr>
+<tr>
+<td>audio</td>
+<td><a href="#audio">Audio</a></td>
+<td><em>Optional</em>. Message is an audio file, information about the file</td>
+</tr>
+<tr>
+<td>document</td>
+<td><a href="#document">Document</a></td>
+<td><em>Optional</em>. Message is a general file, information about the file</td>
+</tr>
+<tr>
+<td>photo</td>
+<td>Array of <a href="#photosize">PhotoSize</a></td>
+<td><em>Optional</em>. Message is a photo, available sizes of the photo</td>
+</tr>
+<tr>
+<td>sticker</td>
+<td><a href="#sticker">Sticker</a></td>
+<td><em>Optional</em>. Message is a sticker, information about the sticker</td>
+</tr>
+<tr>
+<td>story</td>
+<td><a href="#story">Story</a></td>
+<td><em>Optional</em>. Message is a forwarded story</td>
+</tr>
+<tr>
+<td>video</td>
+<td><a href="#video">Video</a></td>
+<td><em>Optional</em>. Message is a video, information about the video</td>
+</tr>
+<tr>
+<td>video_note</td>
+<td><a href="#videonote">VideoNote</a></td>
+<td><em>Optional</em>. Message is a <a href="https://telegram.org/blog/video-messages-and-telescope">video note</a>, information about the video message</td>
+</tr>
+<tr>
+<td>voice</td>
+<td><a href="#voice">Voice</a></td>
+<td><em>Optional</em>. Message is a voice message, information about the file</td>
+</tr>
+<tr>
+<td>has_media_spoiler</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if the message media is covered by a spoiler animation</td>
+</tr>
+<tr>
+<td>contact</td>
+<td><a href="#contact">Contact</a></td>
+<td><em>Optional</em>. Message is a shared contact, information about the contact</td>
+</tr>
+<tr>
+<td>dice</td>
+<td><a href="#dice">Dice</a></td>
+<td><em>Optional</em>. Message is a dice with random value</td>
+</tr>
+<tr>
+<td>game</td>
+<td><a href="#game">Game</a></td>
+<td><em>Optional</em>. Message is a game, information about the game. <a href="#games">More about games »</a></td>
+</tr>
+<tr>
+<td>giveaway</td>
+<td><a href="#giveaway">Giveaway</a></td>
+<td><em>Optional</em>. Message is a scheduled giveaway, information about the giveaway</td>
+</tr>
+<tr>
+<td>giveaway_winners</td>
+<td><a href="#giveawaywinners">GiveawayWinners</a></td>
+<td><em>Optional</em>. A giveaway with public winners was completed</td>
+</tr>
+<tr>
+<td>invoice</td>
+<td><a href="#invoice">Invoice</a></td>
+<td><em>Optional</em>. Message is an invoice for a <a href="#payments">payment</a>, information about the invoice. <a href="#payments">More about payments »</a></td>
+</tr>
+<tr>
+<td>location</td>
+<td><a href="#location">Location</a></td>
+<td><em>Optional</em>. Message is a shared location, information about the location</td>
+</tr>
+<tr>
+<td>poll</td>
+<td><a href="#poll">Poll</a></td>
+<td><em>Optional</em>. Message is a native poll, information about the poll</td>
+</tr>
+<tr>
+<td>venue</td>
+<td><a href="#venue">Venue</a></td>
+<td><em>Optional</em>. Message is a venue, information about the venue</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="replyparameters" href="#replyparameters"><i class="anchor-icon"></i></a>ReplyParameters</h4>
+<p>Describes reply parameters for the message that is being sent.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>message_id</td>
+<td>Integer</td>
+<td>Identifier of the message that will be replied to in the current chat, or in the chat <em>chat_id</em> if it is specified</td>
+</tr>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td><em>Optional</em>. If the message to be replied to is from a different chat, unique identifier for the chat or username of the channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>allow_sending_without_reply</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> if the message should be sent even if the specified message to be replied to is not found; can be used only for replies in the same chat and forum topic.</td>
+</tr>
+<tr>
+<td>quote</td>
+<td>String</td>
+<td><em>Optional</em>. Quoted part of the message to be replied to; 0-1024 characters after entities parsing. The quote must be an exact substring of the message to be replied to, including <em>bold</em>, <em>italic</em>, <em>underline</em>, <em>strikethrough</em>, <em>spoiler</em>, and <em>custom_emoji</em> entities. The message will fail to send if the quote isn&#39;t found in the original message.</td>
+</tr>
+<tr>
+<td>quote_parse_mode</td>
+<td>String</td>
+<td><em>Optional</em>. Mode for parsing entities in the quote. See <a href="#formatting-options">formatting options</a> for more details.</td>
+</tr>
+<tr>
+<td>quote_entities</td>
+<td>Array of <a href="#messageentity">MessageEntity</a></td>
+<td><em>Optional</em>. A JSON-serialized list of special entities that appear in the quote. It can be specified instead of <em>quote_parse_mode</em>.</td>
+</tr>
+<tr>
+<td>quote_position</td>
+<td>Integer</td>
+<td><em>Optional</em>. Position of the quote in the original message in UTF-16 code units</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="messageorigin" href="#messageorigin"><i class="anchor-icon"></i></a>MessageOrigin</h4>
+<p>This object describes the origin of a message. It can be one of</p>
+<ul>
+<li><a href="#messageoriginuser">MessageOriginUser</a></li>
+<li><a href="#messageoriginhiddenuser">MessageOriginHiddenUser</a></li>
+<li><a href="#messageoriginchat">MessageOriginChat</a></li>
+<li><a href="#messageoriginchannel">MessageOriginChannel</a></li>
+</ul>
+<h4><a class="anchor" name="messageoriginuser" href="#messageoriginuser"><i class="anchor-icon"></i></a>MessageOriginUser</h4>
+<p>The message was originally sent by a known user.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the message origin, always “user”</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Integer</td>
+<td>Date the message was sent originally in Unix time</td>
+</tr>
+<tr>
+<td>sender_user</td>
+<td><a href="#user">User</a></td>
+<td>User that sent the message originally</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="messageoriginhiddenuser" href="#messageoriginhiddenuser"><i class="anchor-icon"></i></a>MessageOriginHiddenUser</h4>
+<p>The message was originally sent by an unknown user.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the message origin, always “hidden_user”</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Integer</td>
+<td>Date the message was sent originally in Unix time</td>
+</tr>
+<tr>
+<td>sender_user_name</td>
+<td>String</td>
+<td>Name of the user that sent the message originally</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="messageoriginchat" href="#messageoriginchat"><i class="anchor-icon"></i></a>MessageOriginChat</h4>
+<p>The message was originally sent on behalf of a chat to a group chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the message origin, always “chat”</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Integer</td>
+<td>Date the message was sent originally in Unix time</td>
+</tr>
+<tr>
+<td>sender_chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Chat that sent the message originally</td>
+</tr>
+<tr>
+<td>author_signature</td>
+<td>String</td>
+<td><em>Optional</em>. For messages originally sent by an anonymous chat administrator, original message author signature</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="messageoriginchannel" href="#messageoriginchannel"><i class="anchor-icon"></i></a>MessageOriginChannel</h4>
+<p>The message was originally sent to a channel chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the message origin, always “channel”</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Integer</td>
+<td>Date the message was sent originally in Unix time</td>
+</tr>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Channel chat to which the message was originally sent</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>Integer</td>
+<td>Unique message identifier inside the chat</td>
+</tr>
+<tr>
+<td>author_signature</td>
+<td>String</td>
+<td><em>Optional</em>. Signature of the original post author</td>
 </tr>
 </tbody>
 </table>
@@ -1819,8 +2318,8 @@ To learn how to create…">
 <p>This object represents a service message about General forum topic hidden in the chat. Currently holds no information.</p>
 <h4><a class="anchor" name="generalforumtopicunhidden" href="#generalforumtopicunhidden"><i class="anchor-icon"></i></a>GeneralForumTopicUnhidden</h4>
 <p>This object represents a service message about General forum topic unhidden in the chat. Currently holds no information.</p>
-<h4><a class="anchor" name="usershared" href="#usershared"><i class="anchor-icon"></i></a>UserShared</h4>
-<p>This object contains information about the user whose identifier was shared with the bot using a <a href="#keyboardbuttonrequestuser">KeyboardButtonRequestUser</a> button.</p>
+<h4><a class="anchor" name="usersshared" href="#usersshared"><i class="anchor-icon"></i></a>UsersShared</h4>
+<p>This object contains information about the users whose identifiers were shared with the bot using a <a href="#keyboardbuttonrequestusers">KeyboardButtonRequestUsers</a> button.</p>
 <table class="table">
 <thead>
 <tr>
@@ -1836,9 +2335,9 @@ To learn how to create…">
 <td>Identifier of the request</td>
 </tr>
 <tr>
-<td>user_id</td>
-<td>Integer</td>
-<td>Identifier of the shared user. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier. The bot may not have access to the user and could be unable to use this identifier, unless the user is already known to the bot by some other means.</td>
+<td>user_ids</td>
+<td>Array of Integer</td>
+<td>Identifiers of the shared users. These numbers may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting them. But they have at most 52 significant bits, so 64-bit integers or double-precision float types are safe for storing these identifiers. The bot may not have access to the users and could be unable to use these identifiers, unless the users are already known to the bot by some other means.</td>
 </tr>
 </tbody>
 </table>
@@ -1946,6 +2445,195 @@ To learn how to create…">
 <td>users</td>
 <td>Array of <a href="#user">User</a></td>
 <td>New members that were invited to the video chat</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="giveawaycreated" href="#giveawaycreated"><i class="anchor-icon"></i></a>GiveawayCreated</h4>
+<p>This object represents a service message about the creation of a scheduled giveaway. Currently holds no information.</p>
+<h4><a class="anchor" name="giveaway" href="#giveaway"><i class="anchor-icon"></i></a>Giveaway</h4>
+<p>This object represents a message about a scheduled giveaway.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chats</td>
+<td>Array of <a href="#chat">Chat</a></td>
+<td>The list of chats which the user must join to participate in the giveaway</td>
+</tr>
+<tr>
+<td>winners_selection_date</td>
+<td>Integer</td>
+<td>Point in time (Unix timestamp) when winners of the giveaway will be selected</td>
+</tr>
+<tr>
+<td>winner_count</td>
+<td>Integer</td>
+<td>The number of users which are supposed to be selected as winners of the giveaway</td>
+</tr>
+<tr>
+<td>only_new_members</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if only users who join the chats after the giveaway started should be eligible to win</td>
+</tr>
+<tr>
+<td>has_public_winners</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if the list of giveaway winners will be visible to everyone</td>
+</tr>
+<tr>
+<td>prize_description</td>
+<td>String</td>
+<td><em>Optional</em>. Description of additional giveaway prize</td>
+</tr>
+<tr>
+<td>country_codes</td>
+<td>Array of String</td>
+<td><em>Optional</em>. A list of two-letter <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country codes indicating the countries from which eligible users for the giveaway must come. If empty, then all users can participate in the giveaway. Users with a phone number that was bought on Fragment can always participate in giveaways.</td>
+</tr>
+<tr>
+<td>premium_subscription_month_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of months the Telegram Premium subscription won from the giveaway will be active for</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="giveawaywinners" href="#giveawaywinners"><i class="anchor-icon"></i></a>GiveawayWinners</h4>
+<p>This object represents a message about the completion of a giveaway with public winners.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>The chat that created the giveaway</td>
+</tr>
+<tr>
+<td>giveaway_message_id</td>
+<td>Integer</td>
+<td>Identifier of the messsage with the giveaway in the chat</td>
+</tr>
+<tr>
+<td>winners_selection_date</td>
+<td>Integer</td>
+<td>Point in time (Unix timestamp) when winners of the giveaway were selected</td>
+</tr>
+<tr>
+<td>winner_count</td>
+<td>Integer</td>
+<td>Total number of winners in the giveaway</td>
+</tr>
+<tr>
+<td>winners</td>
+<td>Array of <a href="#user">User</a></td>
+<td>List of up to 100 winners of the giveaway</td>
+</tr>
+<tr>
+<td>additional_chat_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of other chats the user had to join in order to be eligible for the giveaway</td>
+</tr>
+<tr>
+<td>premium_subscription_month_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of months the Telegram Premium subscription won from the giveaway will be active for</td>
+</tr>
+<tr>
+<td>unclaimed_prize_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. Number of undistributed prizes</td>
+</tr>
+<tr>
+<td>only_new_members</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if only users who had joined the chats after the giveaway started were eligible to win</td>
+</tr>
+<tr>
+<td>was_refunded</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if the giveaway was canceled because the payment for it was refunded</td>
+</tr>
+<tr>
+<td>prize_description</td>
+<td>String</td>
+<td><em>Optional</em>. Description of additional giveaway prize</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="giveawaycompleted" href="#giveawaycompleted"><i class="anchor-icon"></i></a>GiveawayCompleted</h4>
+<p>This object represents a service message about the completion of a giveaway without public winners.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>winner_count</td>
+<td>Integer</td>
+<td>Number of winners in the giveaway</td>
+</tr>
+<tr>
+<td>unclaimed_prize_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. Number of undistributed prizes</td>
+</tr>
+<tr>
+<td>giveaway_message</td>
+<td><a href="#message">Message</a></td>
+<td><em>Optional</em>. Message with the giveaway that was completed, if it wasn&#39;t deleted</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="linkpreviewoptions" href="#linkpreviewoptions"><i class="anchor-icon"></i></a>LinkPreviewOptions</h4>
+<p>Describes the options used for link preview generation.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>is_disabled</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the link preview is disabled</td>
+</tr>
+<tr>
+<td>url</td>
+<td>String</td>
+<td><em>Optional</em>. URL to use for the link preview. If empty, then the first URL found in the message text will be used</td>
+</tr>
+<tr>
+<td>prefer_small_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the media in the link preview is suppposed to be shrunk; ignored if the URL isn&#39;t explicitly specified or media size change isn&#39;t supported for the preview</td>
+</tr>
+<tr>
+<td>prefer_large_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the media in the link preview is suppposed to be enlarged; ignored if the URL isn&#39;t explicitly specified or media size change isn&#39;t supported for the preview</td>
+</tr>
+<tr>
+<td>show_above_text</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the link preview must be shown above the message text; otherwise, the link preview will be shown below the message text</td>
 </tr>
 </tbody>
 </table>
@@ -2086,9 +2774,9 @@ To learn how to create…">
 <td>Text of the button. If none of the optional fields are used, it will be sent as a message when the button is pressed</td>
 </tr>
 <tr>
-<td>request_user</td>
-<td><a href="#keyboardbuttonrequestuser">KeyboardButtonRequestUser</a></td>
-<td><em>Optional.</em> If specified, pressing the button will open a list of suitable users. Tapping on any user will send their identifier to the bot in a “user_shared” service message. Available in private chats only.</td>
+<td>request_users</td>
+<td><a href="#keyboardbuttonrequestusers">KeyboardButtonRequestUsers</a></td>
+<td><em>Optional.</em> If specified, pressing the button will open a list of suitable users. Identifiers of selected users will be sent to the bot in a “users_shared” service message. Available in private chats only.</td>
 </tr>
 <tr>
 <td>request_chat</td>
@@ -2118,8 +2806,8 @@ To learn how to create…">
 </tbody>
 </table>
 <p><strong>Note:</strong> <em>request_contact</em> and <em>request_location</em> options will only work in Telegram versions released after 9 April, 2016. Older clients will display <em>unsupported message</em>.<br><strong>Note:</strong> <em>request_poll</em> option will only work in Telegram versions released after 23 January, 2020. Older clients will display <em>unsupported message</em>.<br><strong>Note:</strong> <em>web_app</em> option will only work in Telegram versions released after 16 April, 2022. Older clients will display <em>unsupported message</em>.<br><strong>Note:</strong> <em>request_user</em> and <em>request_chat</em> options will only work in Telegram versions released after 3 February, 2023. Older clients will display <em>unsupported message</em>.</p>
-<h4><a class="anchor" name="keyboardbuttonrequestuser" href="#keyboardbuttonrequestuser"><i class="anchor-icon"></i></a>KeyboardButtonRequestUser</h4>
-<p>This object defines the criteria used to request a suitable user. The identifier of the selected user will be shared with the bot when the corresponding button is pressed. <a href="/bots/features#chat-and-user-selection">More about requesting users »</a></p>
+<h4><a class="anchor" name="keyboardbuttonrequestusers" href="#keyboardbuttonrequestusers"><i class="anchor-icon"></i></a>KeyboardButtonRequestUsers</h4>
+<p>This object defines the criteria used to request suitable users. The identifiers of the selected users will be shared with the bot when the corresponding button is pressed. <a href="/bots/features#chat-and-user-selection">More about requesting users »</a></p>
 <table class="table">
 <thead>
 <tr>
@@ -2132,17 +2820,22 @@ To learn how to create…">
 <tr>
 <td>request_id</td>
 <td>Integer</td>
-<td>Signed 32-bit identifier of the request, which will be received back in the <a href="#usershared">UserShared</a> object. Must be unique within the message</td>
+<td>Signed 32-bit identifier of the request that will be received back in the <a href="#usersshared">UsersShared</a> object. Must be unique within the message</td>
 </tr>
 <tr>
 <td>user_is_bot</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> to request a bot, pass <em>False</em> to request a regular user. If not specified, no additional restrictions are applied.</td>
+<td><em>Optional</em>. Pass <em>True</em> to request bots, pass <em>False</em> to request regular users. If not specified, no additional restrictions are applied.</td>
 </tr>
 <tr>
 <td>user_is_premium</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> to request a premium user, pass <em>False</em> to request a non-premium user. If not specified, no additional restrictions are applied.</td>
+<td><em>Optional</em>. Pass <em>True</em> to request premium users, pass <em>False</em> to request non-premium users. If not specified, no additional restrictions are applied.</td>
+</tr>
+<tr>
+<td>max_quantity</td>
+<td>Integer</td>
+<td><em>Optional</em>. The maximum number of users to be selected; 1-10. Defaults to 1.</td>
 </tr>
 </tbody>
 </table>
@@ -2424,8 +3117,8 @@ To learn how to create…">
 </tr>
 <tr>
 <td>message</td>
-<td><a href="#message">Message</a></td>
-<td><em>Optional</em>. Message with the callback button that originated the query. Note that message content and message date will not be available if the message is too old</td>
+<td><a href="#maybeinaccessiblemessage">MaybeInaccessibleMessage</a></td>
+<td><em>Optional</em>. Message sent by the bot with the callback button that originated the query</td>
 </tr>
 <tr>
 <td>inline_message_id</td>
@@ -2667,6 +3360,54 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="chatmemberupdated" href="#chatmemberupdated"><i class="anchor-icon"></i></a>ChatMemberUpdated</h4>
+<p>This object represents changes in the status of a chat member.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Chat the user belongs to</td>
+</tr>
+<tr>
+<td>from</td>
+<td><a href="#user">User</a></td>
+<td>Performer of the action, which resulted in the change</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Integer</td>
+<td>Date the change was done in Unix time</td>
+</tr>
+<tr>
+<td>old_chat_member</td>
+<td><a href="#chatmember">ChatMember</a></td>
+<td>Previous information about the chat member</td>
+</tr>
+<tr>
+<td>new_chat_member</td>
+<td><a href="#chatmember">ChatMember</a></td>
+<td>New information about the chat member</td>
+</tr>
+<tr>
+<td>invite_link</td>
+<td><a href="#chatinvitelink">ChatInviteLink</a></td>
+<td><em>Optional</em>. Chat invite link, which was used by the user to join the chat; for joining by invite link events only.</td>
+</tr>
+<tr>
+<td>via_chat_folder_invite_link</td>
+<td>Boolean</td>
+<td><em>Optional</em>. True, if the user joined the chat via a chat folder invite link</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="chatmember" href="#chatmember"><i class="anchor-icon"></i></a>ChatMember</h4>
 <p>This object contains information about one member of a chat. Currently, the following 6 types of chat members are supported:</p>
 <ul>
@@ -2870,7 +3611,7 @@ To learn how to create…">
 <tr>
 <td>can_send_messages</td>
 <td>Boolean</td>
-<td><em>True</em>, if the user is allowed to send text messages, contacts, invoices, locations and venues</td>
+<td><em>True</em>, if the user is allowed to send text messages, contacts, giveaways, giveaway winners, invoices, locations and venues</td>
 </tr>
 <tr>
 <td>can_send_audios</td>
@@ -2995,54 +3736,6 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
-<h4><a class="anchor" name="chatmemberupdated" href="#chatmemberupdated"><i class="anchor-icon"></i></a>ChatMemberUpdated</h4>
-<p>This object represents changes in the status of a chat member.</p>
-<table class="table">
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>chat</td>
-<td><a href="#chat">Chat</a></td>
-<td>Chat the user belongs to</td>
-</tr>
-<tr>
-<td>from</td>
-<td><a href="#user">User</a></td>
-<td>Performer of the action, which resulted in the change</td>
-</tr>
-<tr>
-<td>date</td>
-<td>Integer</td>
-<td>Date the change was done in Unix time</td>
-</tr>
-<tr>
-<td>old_chat_member</td>
-<td><a href="#chatmember">ChatMember</a></td>
-<td>Previous information about the chat member</td>
-</tr>
-<tr>
-<td>new_chat_member</td>
-<td><a href="#chatmember">ChatMember</a></td>
-<td>New information about the chat member</td>
-</tr>
-<tr>
-<td>invite_link</td>
-<td><a href="#chatinvitelink">ChatInviteLink</a></td>
-<td><em>Optional</em>. Chat invite link, which was used by the user to join the chat; for joining by invite link events only.</td>
-</tr>
-<tr>
-<td>via_chat_folder_invite_link</td>
-<td>Boolean</td>
-<td><em>Optional</em>. True, if the user joined the chat via a chat folder invite link</td>
-</tr>
-</tbody>
-</table>
 <h4><a class="anchor" name="chatjoinrequest" href="#chatjoinrequest"><i class="anchor-icon"></i></a>ChatJoinRequest</h4>
 <p>Represents a join request sent to a chat.</p>
 <table class="table">
@@ -3100,7 +3793,7 @@ To learn how to create…">
 <tr>
 <td>can_send_messages</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the user is allowed to send text messages, contacts, invoices, locations and venues</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to send text messages, contacts, giveaways, giveaway winners, invoices, locations and venues</td>
 </tr>
 <tr>
 <td>can_send_audios</td>
@@ -3189,6 +3882,162 @@ To learn how to create…">
 <td>address</td>
 <td>String</td>
 <td>Location address; 1-64 characters, as defined by the chat owner</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="reactiontype" href="#reactiontype"><i class="anchor-icon"></i></a>ReactionType</h4>
+<p>This object describes the type of a reaction. Currently, it can be one of</p>
+<ul>
+<li><a href="#reactiontypeemoji">ReactionTypeEmoji</a></li>
+<li><a href="#reactiontypecustomemoji">ReactionTypeCustomEmoji</a></li>
+</ul>
+<h4><a class="anchor" name="reactiontypeemoji" href="#reactiontypeemoji"><i class="anchor-icon"></i></a>ReactionTypeEmoji</h4>
+<p>The reaction is based on an emoji.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the reaction, always “emoji”</td>
+</tr>
+<tr>
+<td>emoji</td>
+<td>String</td>
+<td>Reaction emoji. Currently, it can be one of &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F918E.png" width="20" height="20" alt="👎" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/E29DA4.png" width="20" height="20" alt="❤" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F94A5.png" width="20" height="20" alt="🔥" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA5B0.png" width="20" height="20" alt="🥰" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F918F.png" width="20" height="20" alt="👏" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9881.png" width="20" height="20" alt="😁" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA494.png" width="20" height="20" alt="🤔" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4AF.png" width="20" height="20" alt="🤯" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F98B1.png" width="20" height="20" alt="😱" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4AC.png" width="20" height="20" alt="🤬" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F98A2.png" width="20" height="20" alt="😢" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8E89.png" width="20" height="20" alt="🎉" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4A9.png" width="20" height="20" alt="🤩" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4AE.png" width="20" height="20" alt="🤮" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F92A9.png" width="20" height="20" alt="💩" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F998F.png" width="20" height="20" alt="🙏" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F918C.png" width="20" height="20" alt="👌" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F958A.png" width="20" height="20" alt="🕊" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4A1.png" width="20" height="20" alt="🤡" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA5B1.png" width="20" height="20" alt="🥱" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA5B4.png" width="20" height="20" alt="🥴" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F988D.png" width="20" height="20" alt="😍" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F90B3.png" width="20" height="20" alt="🐳" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/E29DA4E2808DF09F94A5.png" width="20" height="20" alt="❤‍🔥" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8C9A.png" width="20" height="20" alt="🌚" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8CAD.png" width="20" height="20" alt="🌭" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F92AF.png" width="20" height="20" alt="💯" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4A3.png" width="20" height="20" alt="🤣" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/E29AA1.png" width="20" height="20" alt="⚡" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8D8C.png" width="20" height="20" alt="🍌" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8F86.png" width="20" height="20" alt="🏆" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9294.png" width="20" height="20" alt="💔" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4A8.png" width="20" height="20" alt="🤨" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9890.png" width="20" height="20" alt="😐" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8D93.png" width="20" height="20" alt="🍓" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8DBE.png" width="20" height="20" alt="🍾" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F928B.png" width="20" height="20" alt="💋" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9695.png" width="20" height="20" alt="🖕" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9888.png" width="20" height="20" alt="😈" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F98B4.png" width="20" height="20" alt="😴" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F98AD.png" width="20" height="20" alt="😭" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA493.png" width="20" height="20" alt="🤓" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F91BB.png" width="20" height="20" alt="👻" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F91A8E2808DF09F92BB.png" width="20" height="20" alt="👨‍💻" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9180.png" width="20" height="20" alt="👀" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8E83.png" width="20" height="20" alt="🎃" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9988.png" width="20" height="20" alt="🙈" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9887.png" width="20" height="20" alt="😇" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F98A8.png" width="20" height="20" alt="😨" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA49D.png" width="20" height="20" alt="🤝" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/E29C8D.png" width="20" height="20" alt="✍" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA497.png" width="20" height="20" alt="🤗" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FABA1.png" width="20" height="20" alt="🫡" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8E85.png" width="20" height="20" alt="🎅" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8E84.png" width="20" height="20" alt="🎄" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/E29883.png" width="20" height="20" alt="☃" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9285.png" width="20" height="20" alt="💅" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4AA.png" width="20" height="20" alt="🤪" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F97BF.png" width="20" height="20" alt="🗿" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F8692.png" width="20" height="20" alt="🆒" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9298.png" width="20" height="20" alt="💘" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9989.png" width="20" height="20" alt="🙉" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA684.png" width="20" height="20" alt="🦄" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F9898.png" width="20" height="20" alt="😘" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F928A.png" width="20" height="20" alt="💊" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F998A.png" width="20" height="20" alt="🙊" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F988E.png" width="20" height="20" alt="😎" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F91BE.png" width="20" height="20" alt="👾" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4B7E2808DE29982.png" width="20" height="20" alt="🤷‍♂" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4B7.png" width="20" height="20" alt="🤷" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09FA4B7E2808DE29980.png" width="20" height="20" alt="🤷‍♀" />&quot;, &quot;<img class="emoji" src="//telegram.org/img/emoji/40/F09F98A1.png" width="20" height="20" alt="😡" />&quot;</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="reactiontypecustomemoji" href="#reactiontypecustomemoji"><i class="anchor-icon"></i></a>ReactionTypeCustomEmoji</h4>
+<p>The reaction is based on a custom emoji.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the reaction, always “custom_emoji”</td>
+</tr>
+<tr>
+<td>custom_emoji</td>
+<td>String</td>
+<td>Custom emoji identifier</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="reactioncount" href="#reactioncount"><i class="anchor-icon"></i></a>ReactionCount</h4>
+<p>Represents a reaction added to a message along with the number of times it was added.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td><a href="#reactiontype">ReactionType</a></td>
+<td>Type of the reaction</td>
+</tr>
+<tr>
+<td>total_count</td>
+<td>Integer</td>
+<td>Number of times the reaction was added</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="messagereactionupdated" href="#messagereactionupdated"><i class="anchor-icon"></i></a>MessageReactionUpdated</h4>
+<p>This object represents a change of a reaction on a message performed by a user.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>The chat containing the message the user reacted to</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>Integer</td>
+<td>Unique identifier of the message inside the chat</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td><em>Optional</em>. The user that changed the reaction, if the user isn&#39;t anonymous</td>
+</tr>
+<tr>
+<td>actor_chat</td>
+<td><a href="#chat">Chat</a></td>
+<td><em>Optional</em>. The chat on behalf of which the reaction was changed, if the user is anonymous</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Integer</td>
+<td>Date of the change in Unix time</td>
+</tr>
+<tr>
+<td>old_reaction</td>
+<td>Array of <a href="#reactiontype">ReactionType</a></td>
+<td>Previous list of reaction types that were set by the user</td>
+</tr>
+<tr>
+<td>new_reaction</td>
+<td>Array of <a href="#reactiontype">ReactionType</a></td>
+<td>New list of reaction types that have been set by the user</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="messagereactioncountupdated" href="#messagereactioncountupdated"><i class="anchor-icon"></i></a>MessageReactionCountUpdated</h4>
+<p>This object represents reaction changes on a message with anonymous reactions.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>The chat containing the message</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>Integer</td>
+<td>Unique message identifier inside the chat</td>
+</tr>
+<tr>
+<td>date</td>
+<td>Integer</td>
+<td>Date of the change in Unix time</td>
+</tr>
+<tr>
+<td>reactions</td>
+<td>Array of <a href="#reactioncount">ReactionCount</a></td>
+<td>List of reactions that are present on the message</td>
 </tr>
 </tbody>
 </table>
@@ -3557,6 +4406,199 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="chatboostsource" href="#chatboostsource"><i class="anchor-icon"></i></a>ChatBoostSource</h4>
+<p>This object describes the source of a chat boost. It can be one of</p>
+<ul>
+<li><a href="#chatboostsourcepremium">ChatBoostSourcePremium</a></li>
+<li><a href="#chatboostsourcegiftcode">ChatBoostSourceGiftCode</a></li>
+<li><a href="#chatboostsourcegiveaway">ChatBoostSourceGiveaway</a></li>
+</ul>
+<h4><a class="anchor" name="chatboostsourcepremium" href="#chatboostsourcepremium"><i class="anchor-icon"></i></a>ChatBoostSourcePremium</h4>
+<p>The boost was obtained by subscribing to Telegram Premium or by gifting a Telegram Premium subscription to another user.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>source</td>
+<td>String</td>
+<td>Source of the boost, always “premium”</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td>User that boosted the chat</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatboostsourcegiftcode" href="#chatboostsourcegiftcode"><i class="anchor-icon"></i></a>ChatBoostSourceGiftCode</h4>
+<p>The boost was obtained by the creation of Telegram Premium gift codes to boost a chat. Each such code boosts the chat 4 times for the duration of the corresponding Telegram Premium subscription.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>source</td>
+<td>String</td>
+<td>Source of the boost, always “gift_code”</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td>User for which the gift code was created</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatboostsourcegiveaway" href="#chatboostsourcegiveaway"><i class="anchor-icon"></i></a>ChatBoostSourceGiveaway</h4>
+<p>The boost was obtained by the creation of a Telegram Premium giveaway. This boosts the chat 4 times for the duration of the corresponding Telegram Premium subscription.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>source</td>
+<td>String</td>
+<td>Source of the boost, always “giveaway”</td>
+</tr>
+<tr>
+<td>giveaway_message_id</td>
+<td>Integer</td>
+<td>Identifier of a message in the chat with the giveaway; the message could have been deleted already. May be 0 if the message isn&#39;t sent yet.</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td><em>Optional</em>. User that won the prize in the giveaway if any</td>
+</tr>
+<tr>
+<td>is_unclaimed</td>
+<td>True</td>
+<td><em>Optional</em>. True, if the giveaway was completed, but there was no user to win the prize</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatboost" href="#chatboost"><i class="anchor-icon"></i></a>ChatBoost</h4>
+<p>This object contains information about a chat boost.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boost_id</td>
+<td>String</td>
+<td>Unique identifier of the boost</td>
+</tr>
+<tr>
+<td>add_date</td>
+<td>Integer</td>
+<td>Point in time (Unix timestamp) when the chat was boosted</td>
+</tr>
+<tr>
+<td>expiration_date</td>
+<td>Integer</td>
+<td>Point in time (Unix timestamp) when the boost will automatically expire, unless the booster&#39;s Telegram Premium subscription is prolonged</td>
+</tr>
+<tr>
+<td>source</td>
+<td><a href="#chatboostsource">ChatBoostSource</a></td>
+<td>Source of the added boost</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatboostupdated" href="#chatboostupdated"><i class="anchor-icon"></i></a>ChatBoostUpdated</h4>
+<p>This object represents a boost added to a chat or changed.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Chat which was boosted</td>
+</tr>
+<tr>
+<td>boost</td>
+<td><a href="#chatboost">ChatBoost</a></td>
+<td>Infomation about the chat boost</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatboostremoved" href="#chatboostremoved"><i class="anchor-icon"></i></a>ChatBoostRemoved</h4>
+<p>This object represents a boost removed from a chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Chat which was boosted</td>
+</tr>
+<tr>
+<td>boost_id</td>
+<td>String</td>
+<td>Unique identifier of the boost</td>
+</tr>
+<tr>
+<td>remove_date</td>
+<td>Integer</td>
+<td>Point in time (Unix timestamp) when the boost was removed</td>
+</tr>
+<tr>
+<td>source</td>
+<td><a href="#chatboostsource">ChatBoostSource</a></td>
+<td>Source of the removed boost</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="userchatboosts" href="#userchatboosts"><i class="anchor-icon"></i></a>UserChatBoosts</h4>
+<p>This object represents a list of boosts added to a chat by a user.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boosts</td>
+<td>Array of <a href="#chatboost">ChatBoost</a></td>
+<td>The list of boosts added to the chat by the user</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="responseparameters" href="#responseparameters"><i class="anchor-icon"></i></a>ResponseParameters</h4>
 <p>Describes why a request was unsuccessful.</p>
 <table class="table">
@@ -3893,6 +4935,54 @@ To learn how to create…">
 <li>To use <a href="#sendvoice">sendVoice</a>, the file must have the type audio/ogg and be no more than 1MB in size. 1-20MB voice notes will be sent as files.</li>
 <li>Other configurations may work but we can&#39;t guarantee that they will.</li>
 </ul>
+<h4><a class="anchor" name="accent-colors" href="#accent-colors"><i class="anchor-icon"></i></a>Accent colors</h4>
+<p>Colors with identifiers 0 (red), 1 (orange), 2 (purple/violet), 3 (green), 4 (cyan), 5 (blue), 6 (pink) can be customized by app themes. Additionally, the following colors in RGB format are currently in use. </p>
+<p><table class="table table-hover table-bordered">
+<thead>
+<tr><th>Color identifier</th><th>Light colors</th><th>Dark colors</th></tr>
+</thead>
+<tbody>
+<tr><td>7</td><td>E15052 F9AE63</td><td>FF9380 992F37</td></tr>
+<tr><td>8</td><td>E0802B FAC534</td><td>ECB04E C35714</td></tr>
+<tr><td>9</td><td>A05FF3 F48FFF</td><td>C697FF 5E31C8</td></tr>
+<tr><td>10</td><td>27A910 A7DC57</td><td>A7EB6E 167E2D</td></tr>
+<tr><td>11</td><td>27ACCE 82E8D6</td><td>40D8D0 045C7F</td></tr>
+<tr><td>12</td><td>3391D4 7DD3F0</td><td>52BFFF 0B5494</td></tr>
+<tr><td>13</td><td>DD4371 FFBE9F</td><td>FF86A6 8E366E</td></tr>
+<tr><td>14</td><td>247BED F04856 FFFFFF</td><td>3FA2FE E5424F FFFFFF</td></tr>
+<tr><td>15</td><td>D67722 1EA011 FFFFFF</td><td>FF905E 32A527 FFFFFF</td></tr>
+<tr><td>16</td><td>179E42 E84A3F FFFFFF</td><td>66D364 D5444F FFFFFF</td></tr>
+<tr><td>17</td><td>2894AF 6FC456 FFFFFF</td><td>22BCE2 3DA240 FFFFFF</td></tr>
+<tr><td>18</td><td>0C9AB3 FFAD95 FFE6B5</td><td>22BCE2 FF9778 FFDA6B</td></tr>
+<tr><td>19</td><td>7757D6 F79610 FFDE8E</td><td>9791FF F2731D FFDB59</td></tr>
+<tr><td>20</td><td>1585CF F2AB1D FFFFFF</td><td>3DA6EB EEA51D FFFFFF</td></tr>
+</tbody>
+</table></p>
+<h4><a class="anchor" name="profile-accent-colors" href="#profile-accent-colors"><i class="anchor-icon"></i></a>Profile accent colors</h4>
+<p>Currently, the following colors in RGB format are in use for profile backgrounds. </p>
+<p><table class="table table-hover table-bordered">
+<thead>
+<tr><th>Color identifier</th><th>Light colors</th><th>Dark colors</th></tr>
+</thead>
+<tbody>
+<tr><td>0</td><td>BA5650</td><td>9C4540</td></tr>
+<tr><td>1</td><td>C27C3E</td><td>945E2C</td></tr>
+<tr><td>2</td><td>956AC8</td><td>715099</td></tr>
+<tr><td>3</td><td>49A355</td><td>33713B</td></tr>
+<tr><td>4</td><td>3E97AD</td><td>387E87</td></tr>
+<tr><td>5</td><td>5A8FBB</td><td>477194</td></tr>
+<tr><td>6</td><td>B85378</td><td>944763</td></tr>
+<tr><td>7</td><td>7F8B95</td><td>435261</td></tr>
+<tr><td>8</td><td>C9565D D97C57</td><td>994343 AC583E</td></tr>
+<tr><td>9</td><td>CF7244 CC9433</td><td>8F552F A17232</td></tr>
+<tr><td>10</td><td>9662D4 B966B6</td><td>634691 9250A2</td></tr>
+<tr><td>11</td><td>3D9755 89A650</td><td>296A43 5F8F44</td></tr>
+<tr><td>12</td><td>3D95BA 50AD98</td><td>306C7C 3E987E</td></tr>
+<tr><td>13</td><td>538BC2 4DA8BD</td><td>38618C 458BA1</td></tr>
+<tr><td>14</td><td>B04F74 D1666D</td><td>884160 A65259</td></tr>
+<tr><td>15</td><td>637482 7B8A97</td><td>53606E 384654</td></tr>
+</tbody>
+</table></p>
 <h4><a class="anchor" name="inline-mode-objects" href="#inline-mode-objects"><i class="anchor-icon"></i></a>Inline mode objects</h4>
 <p>Objects and methods used in the inline mode are described in the <a href="#inline-mode">Inline mode section</a>.</p>
 <h3><a class="anchor" name="available-methods" href="#available-methods"><i class="anchor-icon"></i></a>Available methods</h3>
@@ -3948,10 +5038,10 @@ To learn how to create…">
 <td>A JSON-serialized list of special entities that appear in message text, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
-<td>disable_web_page_preview</td>
-<td>Boolean</td>
+<td>link_preview_options</td>
+<td><a href="#linkpreviewoptions">LinkPreviewOptions</a></td>
 <td>Optional</td>
-<td>Disables link previews for links in this message</td>
+<td>Link preview generation options for the message</td>
 </tr>
 <tr>
 <td>disable_notification</td>
@@ -3966,16 +5056,10 @@ To learn how to create…">
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -3986,14 +5070,15 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="formatting-options" href="#formatting-options"><i class="anchor-icon"></i></a>Formatting options</h4>
-<p>The Bot API supports basic formatting for messages. You can use bold, italic, underlined, strikethrough, and spoiler text, as well as inline links and pre-formatted code in your bots&#39; messages. Telegram clients will render them accordingly. You can specify text entities directly, or use markdown-style or HTML-style formatting.</p>
+<p>The Bot API supports basic formatting for messages. You can use bold, italic, underlined, strikethrough, spoiler text, block quotations as well as inline links and pre-formatted code in your bots&#39; messages. Telegram clients will render them accordingly. You can specify text entities directly, or use markdown-style or HTML-style formatting.</p>
 <p>Note that Telegram clients will display an <strong>alert</strong> to the user before opening an inline link (&#39;Open this link?&#39; together with the full URL).</p>
-<p>Message entities can be nested, providing following restrictions are met:<br>- If two entities have common characters, then one of them is fully contained inside another.<br>- <em>bold</em>, <em>italic</em>, <em>underline</em>, <em>strikethrough</em>, and <em>spoiler</em> entities can contain and can be part of any other entities, except <em>pre</em> and <em>code</em>.<br>- All other entities can&#39;t contain each other.</p>
+<p>Message entities can be nested, providing following restrictions are met:<br>- If two entities have common characters, then one of them is fully contained inside another.<br>- <em>bold</em>, <em>italic</em>, <em>underline</em>, <em>strikethrough</em>, and <em>spoiler</em> entities can contain and can be part of any other entities, except <em>pre</em> and <em>code</em>.<br>- <em>blockquote</em> entities can&#39;t be nested.<br>- All other entities can&#39;t contain each other.</p>
 <p>Links <code>tg://user?id=&lt;user_id&gt;</code> can be used to mention a user by their ID without using a username. Please note:</p>
 <ul>
 <li>These links will work <strong>only</strong> if they are used inside an inline link or in an inline keyboard button. For example, they will not work, when used in a message text.</li>
 <li>Unless the user is a member of the chat where they were mentioned, these mentions are only guaranteed to work if the user has contacted the bot in private in the past or has sent a callback query to the bot via an inline button and doesn&#39;t have Forwarded Messages privacy enabled for the bot.</li>
 </ul>
+<p>You can find the list of programming and markup languages for which syntax highlighting is supported at <a href="https://github.com/TelegramMessenger/libprisma#supported-languages">libprisma#supported-languages</a>.</p>
 <h6><a class="anchor" name="markdownv2-style" href="#markdownv2-style"><i class="anchor-icon"></i></a>MarkdownV2 style</h6>
 <p>To use this mode, pass <em>MarkdownV2</em> in the <em>parse_mode</em> field. Use the following syntax in your message:</p>
 <pre><code>*bold \*text*
@@ -4011,7 +5096,10 @@ pre-formatted fixed-width code block
 ```
 ```python
 pre-formatted fixed-width code block written in the Python programming language
-```</code></pre>
+```
+&gt;Block quotation started
+&gt;Block quotation continued
+&gt;The last line of the block quotation</code></pre>
 <p>Please note:</p>
 <ul>
 <li>Any character with code between 1 and 126 inclusively can be escaped anywhere with a preceding &#39;\&#39; character, in which case it is treated as an ordinary character and not a part of the markup. This implies that &#39;\&#39; character usually must be escaped with a preceding &#39;\&#39; character.</li>
@@ -4035,7 +5123,8 @@ pre-formatted fixed-width code block written in the Python programming language
 &lt;tg-emoji emoji-id=&quot;5368324170671202286&quot;&gt;<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍" />&lt;/tg-emoji&gt;
 &lt;code&gt;inline fixed-width code&lt;/code&gt;
 &lt;pre&gt;pre-formatted fixed-width code block&lt;/pre&gt;
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;pre-formatted fixed-width code block written in the Python programming language&lt;/code&gt;&lt;/pre&gt;</code></pre>
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;pre-formatted fixed-width code block written in the Python programming language&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;Block quotation started\nBlock quotation continued\nThe last line of the block quotation&lt;/blockquote&gt;</code></pre>
 <p>Please note:</p>
 <ul>
 <li>Only the tags mentioned above are currently supported.</li>
@@ -4063,12 +5152,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <p>Please note:</p>
 <ul>
 <li>Entities must not be nested, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
-<li>There is no way to specify underline and strikethrough entities, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
+<li>There is no way to specify “underline”, “strikethrough”, “spoiler”, “blockquote” and “custom_emoji” entities, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
 <li>To escape characters &#39;_&#39;, &#39;*&#39;, &#39;`&#39;, &#39;[&#39; outside of an entity, prepend the characters &#39;\&#39; before them.</li>
 <li>Escaping inside entities is not allowed, so entity must be closed first and reopened again: use <code>_snake_\__case_</code> for italic <code>snake_case</code> and <code>*2*\**2=4*</code> for bold <code>2*2=4</code>.</li>
 </ul>
 <h4><a class="anchor" name="forwardmessage" href="#forwardmessage"><i class="anchor-icon"></i></a>forwardMessage</h4>
-<p>Use this method to forward messages of any kind. Service messages can&#39;t be forwarded. On success, the sent <a href="#message">Message</a> is returned.</p>
+<p>Use this method to forward messages of any kind. Service messages and messages with protected content can&#39;t be forwarded. On success, the sent <a href="#message">Message</a> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4117,8 +5206,58 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="forwardmessages" href="#forwardmessages"><i class="anchor-icon"></i></a>forwardMessages</h4>
+<p>Use this method to forward multiple messages of any kind. If some of the specified messages can&#39;t be found or forwarded, they are skipped. Service messages and messages with protected content can&#39;t be forwarded. Album grouping is kept for forwarded messages. On success, an array of <a href="#messageid">MessageId</a> of the sent messages is returned.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
+<td>from_chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the chat where the original messages were sent (or channel username in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_ids</td>
+<td>Array of Integer</td>
+<td>Yes</td>
+<td>Identifiers of 1-100 messages in the chat <em>from_chat_id</em> to forward. The identifiers must be specified in a strictly increasing order.</td>
+</tr>
+<tr>
+<td>disable_notification</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Sends the messages <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the forwarded messages from forwarding and saving</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="copymessage" href="#copymessage"><i class="anchor-icon"></i></a>copyMessage</h4>
-<p>Use this method to copy messages of any kind. Service messages and invoice messages can&#39;t be copied. A quiz <a href="#poll">poll</a> can be copied only if the value of the field <em>correct_option_id</em> is known to the bot. The method is analogous to the method <a href="#forwardmessage">forwardMessage</a>, but the copied message doesn&#39;t have a link to the original message. Returns the <a href="#messageid">MessageId</a> of the sent message on success.</p>
+<p>Use this method to copy messages of any kind. Service messages, giveaway messages, giveaway winners messages, and invoice messages can&#39;t be copied. A quiz <a href="#poll">poll</a> can be copied only if the value of the field <em>correct_option_id</em> is known to the bot. The method is analogous to the method <a href="#forwardmessage">forwardMessage</a>, but the copied message doesn&#39;t have a link to the original message. Returns the <a href="#messageid">MessageId</a> of the sent message on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4184,22 +5323,72 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
 <td><a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a> or <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a> or <a href="#replykeyboardremove">ReplyKeyboardRemove</a> or <a href="#forcereply">ForceReply</a></td>
 <td>Optional</td>
 <td>Additional interface options. A JSON-serialized object for an <a href="/bots/features#inline-keyboards">inline keyboard</a>, <a href="/bots/features#keyboards">custom reply keyboard</a>, instructions to remove reply keyboard or to force a reply from the user.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="copymessages" href="#copymessages"><i class="anchor-icon"></i></a>copyMessages</h4>
+<p>Use this method to copy messages of any kind. If some of the specified messages can&#39;t be found or copied, they are skipped. Service messages, giveaway messages, giveaway winners messages, and invoice messages can&#39;t be copied. A quiz <a href="#poll">poll</a> can be copied only if the value of the field <em>correct_option_id</em> is known to the bot. The method is analogous to the method <a href="#forwardmessages">forwardMessages</a>, but the copied messages don&#39;t have a link to the original message. Album grouping is kept for copied messages. On success, an array of <a href="#messageid">MessageId</a> of the sent messages is returned.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of the forum; for forum supergroups only</td>
+</tr>
+<tr>
+<td>from_chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the chat where the original messages were sent (or channel username in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_ids</td>
+<td>Array of Integer</td>
+<td>Yes</td>
+<td>Identifiers of 1-100 messages in the chat <em>from_chat_id</em> to copy. The identifiers must be specified in a strictly increasing order.</td>
+</tr>
+<tr>
+<td>disable_notification</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Sends the messages <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent messages from forwarding and saving</td>
+</tr>
+<tr>
+<td>remove_caption</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> to copy the messages without their captions</td>
 </tr>
 </tbody>
 </table>
@@ -4270,16 +5459,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -4375,16 +5558,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -4467,16 +5644,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -4583,16 +5754,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -4693,16 +5858,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -4779,16 +5938,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -4859,16 +6012,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -4921,16 +6068,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent messages from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the messages are a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 </tbody>
 </table>
@@ -5007,16 +6148,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -5111,16 +6246,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -5191,16 +6320,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -5319,16 +6442,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -5381,16 +6498,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -5433,6 +6544,44 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>String</td>
 <td>Yes</td>
 <td>Type of action to broadcast. Choose one, depending on what the user is about to receive: <em>typing</em> for <a href="#sendmessage">text messages</a>, <em>upload_photo</em> for <a href="#sendphoto">photos</a>, <em>record_video</em> or <em>upload_video</em> for <a href="#sendvideo">videos</a>, <em>record_voice</em> or <em>upload_voice</em> for <a href="#sendvoice">voice notes</a>, <em>upload_document</em> for <a href="#senddocument">general files</a>, <em>choose_sticker</em> for <a href="#sendsticker">stickers</a>, <em>find_location</em> for <a href="#sendlocation">location data</a>, <em>record_video_note</em> or <em>upload_video_note</em> for <a href="#sendvideonote">video notes</a>.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="setmessagereaction" href="#setmessagereaction"><i class="anchor-icon"></i></a>setMessageReaction</h4>
+<p>Use this method to change the chosen reactions on a message. Service messages can&#39;t be reacted to. Automatically forwarded messages from a channel to its discussion group have the same available reactions as messages in the channel. In albums, bots must react to the first message. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Identifier of the target message</td>
+</tr>
+<tr>
+<td>reaction</td>
+<td>Array of <a href="#reactiontype">ReactionType</a></td>
+<td>Optional</td>
+<td>New list of reaction types to set on the message. Currently, as non-premium users, bots can set up to one reaction per message. A custom emoji reaction can be used if it is either already present on the message or explicitly allowed by chat administrators.</td>
+</tr>
+<tr>
+<td>is_big</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> to set the reaction with a big animation</td>
 </tr>
 </tbody>
 </table>
@@ -6227,7 +7376,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="getchat" href="#getchat"><i class="anchor-icon"></i></a>getChat</h4>
-<p>Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username of a user, group or channel, etc.). Returns a <a href="#chat">Chat</a> object on success.</p>
+<p>Use this method to get up to date information about the chat. Returns a <a href="#chat">Chat</a> object on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -6713,6 +7862,32 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="getuserchatboosts" href="#getuserchatboosts"><i class="anchor-icon"></i></a>getUserChatBoosts</h4>
+<p>Use this method to get the list of boosts added to a chat by a user. Requires administrator rights in the chat. Returns a <a href="#userchatboosts">UserChatBoosts</a> object.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the chat or username of the channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier of the target user</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="setmycommands" href="#setmycommands"><i class="anchor-icon"></i></a>setMyCommands</h4>
 <p>Use this method to change the list of the bot&#39;s commands. See <a href="/bots/features#commands">this manual</a> for more details about bot commands. Returns <em>True</em> on success.</p>
 <table class="table">
@@ -7081,10 +8256,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>A JSON-serialized list of special entities that appear in message text, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
-<td>disable_web_page_preview</td>
-<td>Boolean</td>
+<td>link_preview_options</td>
+<td><a href="#linkpreviewoptions">LinkPreviewOptions</a></td>
 <td>Optional</td>
-<td>Disables link previews for links in this message</td>
+<td>Link preview generation options for the message</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -7396,6 +8571,32 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="deletemessages" href="#deletemessages"><i class="anchor-icon"></i></a>deleteMessages</h4>
+<p>Use this method to delete multiple messages simultaneously. If some of the specified messages can&#39;t be found, they are skipped. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_ids</td>
+<td>Array of Integer</td>
+<td>Yes</td>
+<td>Identifiers of 1-100 messages to delete. See <a href="#deletemessage">deleteMessage</a> for limitations on which messages can be deleted</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" name="stickers" href="#stickers"><i class="anchor-icon"></i></a>Stickers</h3>
 <p>The following methods and objects allow your bot to handle stickers and sticker sets.</p>
 <h4><a class="anchor" name="sticker" href="#sticker"><i class="anchor-icon"></i></a>Sticker</h4>
@@ -7649,16 +8850,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -9595,9 +10790,9 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><em>Optional</em>. List of special entities that appear in message text, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
-<td>disable_web_page_preview</td>
-<td>Boolean</td>
-<td><em>Optional</em>. Disables link previews for links in the sent message</td>
+<td>link_preview_options</td>
+<td><a href="#linkpreviewoptions">LinkPreviewOptions</a></td>
+<td><em>Optional</em>. Link preview generation options for the message</td>
 </tr>
 </tbody>
 </table>
@@ -10091,16 +11286,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -10389,7 +11578,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>country_code</td>
 <td>String</td>
-<td>Two-letter ISO 3166-1 alpha-2 country code</td>
+<td>Two-letter <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country code</td>
 </tr>
 <tr>
 <td>state</td>
@@ -11155,16 +12344,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
-<td>reply_to_message_id</td>
-<td>Integer</td>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
-<td>If the message is a reply, ID of the original message</td>
-</tr>
-<tr>
-<td>allow_sending_without_reply</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the message should be sent even if the specified replied-to message is not found</td>
+<td>Description of the message to reply to</td>
 </tr>
 <tr>
 <td>reply_markup</td>
