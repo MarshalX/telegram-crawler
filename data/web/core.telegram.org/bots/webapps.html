@@ -57,6 +57,13 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="december-29-2023" href="#december-29-2023"><i class="anchor-icon"></i></a>December 29, 2023</h4>
+<p><strong>Bot API 7.0</strong></p>
+<ul>
+<li>Added the field <em>SettingsButton</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the fields <em>header_bg_color</em>, <em>accent_text_color</em>, <em>section_bg_color</em>, <em>section_header_text_color</em>, <em>subtitle_text_color</em>, <em>destructive_text_color</em> to the class <a href="#themeparams">ThemeParams</a>.</li>
+<li>Mini Apps no longer close when the method <em>WebApp.openTelegramLink</em> is called.</li>
+</ul>
 <h4><a class="anchor" name="september-22-2023" href="#september-22-2023"><i class="anchor-icon"></i></a>September 22, 2023</h4>
 <p><strong>Bot API 6.9</strong></p>
 <ul>
@@ -69,7 +76,7 @@
 <h4><a class="anchor" name="april-21-2023" href="#april-21-2023"><i class="anchor-icon"></i></a>April 21, 2023</h4>
 <p><strong>Bot API 6.7</strong></p>
 <ul>
-<li>Added support for launching mini apps from inline query results and from a direct link.</li>
+<li>Added support for launching Mini Apps from inline query results and from a direct link.</li>
 <li>Added the method <em>switchInlineQuery</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
 </ul>
 <h4><a class="anchor" name="december-30-2022" href="#december-30-2022"><i class="anchor-icon"></i></a>December 30, 2022</h4>
@@ -293,6 +300,11 @@
 <td>An object for controlling the main button, which is displayed at the bottom of the Mini App in the Telegram interface.</td>
 </tr>
 <tr>
+<td>SettingsButton</td>
+<td><a href="#settingsbutton">SettingsButton</a></td>
+<td>An object for controlling the Settings item in the context menu of the Mini App in the Telegram interface.</td>
+</tr>
+<tr>
 <td>HapticFeedback</td>
 <td><a href="#hapticfeedback">HapticFeedback</a></td>
 <td>An object for controlling haptic feedback.</td>
@@ -355,7 +367,7 @@
 <tr>
 <td>openTelegramLink(url)</td>
 <td>Function</td>
-<td>A method that opens a telegram link inside Telegram app. The Mini App <em>will</em> be closed.</td>
+<td>A method that opens a telegram link inside the Telegram app. The Mini App will <em>not</em> be closed after this method is called.<br><br>Up to <mark>Bot API 7.0</mark> The Mini App <em>will</em> be closed after this method is called.</td>
 </tr>
 <tr>
 <td>openInvoice(url[, callback])</td>
@@ -431,39 +443,34 @@
 </thead>
 <tbody>
 <tr>
-<td>bg_color</td>
+<td>header_bg_color</td>
 <td>String</td>
-<td><em>Optional</em>. Background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-bg-color)</code>.</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Header background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-header-bg-color)</code>.</td>
 </tr>
 <tr>
-<td>text_color</td>
+<td>accent_text_color</td>
 <td>String</td>
-<td><em>Optional</em>. Main text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-text-color)</code>.</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Accent text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-accent-text-color)</code>.</td>
 </tr>
 <tr>
-<td>hint_color</td>
+<td>section_bg_color</td>
 <td>String</td>
-<td><em>Optional</em>. Hint text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-hint-color)</code>.</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Background color for the section in the <code>#RRGGBB</code> format. It is recommended to use this in conjunction with <em>secondary_bg_color</em>.<br>Also available as the CSS variable <code>var(--tg-theme-section-bg-color)</code>.</td>
 </tr>
 <tr>
-<td>link_color</td>
+<td>section_header_text_color</td>
 <td>String</td>
-<td><em>Optional</em>. Link color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-link-color)</code>.</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Header text color for the section in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-section-header-text-color)</code>.</td>
 </tr>
 <tr>
-<td>button_color</td>
+<td>subtitle_text_color</td>
 <td>String</td>
-<td><em>Optional</em>. Button color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-button-color)</code>.</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Subtitle text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-subtitle-text-color)</code>.</td>
 </tr>
 <tr>
-<td>button_text_color</td>
+<td>destructive_text_color</td>
 <td>String</td>
-<td><em>Optional</em>. Button text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-button-text-color)</code>.</td>
-</tr>
-<tr>
-<td>secondary_bg_color</td>
-<td>String</td>
-<td><em>Optional</em>. <mark>Bot API 6.1+</mark> Secondary background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-secondary-bg-color)</code>.</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Text color for destructive actions in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-destructive-text-color)</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -678,6 +685,45 @@
 </tbody>
 </table>
 <p>All these methods return the MainButton object so they can be chained.</p>
+<h4><a class="anchor" name="settingsbutton" href="#settingsbutton"><i class="anchor-icon"></i></a>SettingsButton</h4>
+<p>This object controls the <strong>Settings</strong> item in the context menu of the Mini App in the Telegram interface.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isVisible</td>
+<td>Boolean</td>
+<td>Shows whether the context menu item is visible. Set to <em>false</em> by default.</td>
+</tr>
+<tr>
+<td>onClick(callback)</td>
+<td>Function</td>
+<td><mark>Bot API 7.0+</mark> A method that sets the press event handler for the Settings item in the context menu. An alias for <code>Telegram.WebApp.onEvent(&#39;settingsButtonClicked&#39;, callback)</code></td>
+</tr>
+<tr>
+<td>offClick(callback)</td>
+<td>Function</td>
+<td><mark>Bot API 7.0+</mark> A method that removes the press event handler from the Settings item in the context menu. An alias for <code>Telegram.WebApp.offEvent(&#39;settingsButtonClicked&#39;, callback)</code></td>
+</tr>
+<tr>
+<td>show()</td>
+<td>Function</td>
+<td><mark>Bot API 7.0+</mark> A method to make the Settings item in the context menu visible.</td>
+</tr>
+<tr>
+<td>hide()</td>
+<td>Function</td>
+<td><mark>Bot API 7.0+</mark> A method to hide the Settings item in the context menu.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#settingsbutton">SettingsButton</a> object so they can be chained.</p>
 <h4><a class="anchor" name="hapticfeedback" href="#hapticfeedback"><i class="anchor-icon"></i></a>HapticFeedback</h4>
 <p>This object controls haptic feedback.</p>
 <table class="table">
