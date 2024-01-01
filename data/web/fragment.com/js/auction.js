@@ -1048,7 +1048,9 @@ var Assets = {
         username: username,
         auction: true
       }, function(result) {
-        if (result.confirm_message) {
+        if (result.error) {
+          return showAlert(result.error);
+        } else if (result.confirm_message) {
           showConfirm(result.confirm_message, function() {
             doPutToAuction();
           }, result.confirm_button);
@@ -1148,7 +1150,9 @@ var Assets = {
         username: username,
         auction: false
       }, function(result) {
-        if (result.confirm_message) {
+        if (result.error) {
+          return showAlert(result.error);
+        } else if (result.confirm_message) {
           showConfirm(result.confirm_message, function() {
             doSellUsername();
           }, result.confirm_button);
