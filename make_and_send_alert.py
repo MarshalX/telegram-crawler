@@ -121,6 +121,7 @@ async def send_telegram_alert(session: aiohttp.ClientSession, text: str, thread_
         'chat_id': CHAT_ID,
         'parse_mode': 'HTML',
         'text': text,
+        'disable_web_page_preview': 1,
     }
     if thread_id:
         params['chat_id'] = FORUM_CHAT_ID
@@ -193,6 +194,7 @@ async def main() -> None:
         if not commit_files:
             return
 
+        commit_hash = commit_data['sha'][:7]
         html_url = commit_data['html_url']
 
         alert_text = f'<b>New changes of Telegram</b>\n\n'
@@ -243,7 +245,8 @@ async def main() -> None:
 
             alert_text += '\n'
 
-        alert_text += f'<a href="{html_url}">View diff on GitHub...</a>'
+        link_text = f'GitHub · MarshalX/telegram-crawler@{commit_hash}'
+        alert_text += f'<a href="{html_url}">{link_text}</a>'
         logger.info(alert_text)
 
         if 'web_tr' in alert_hashtags or 'web_res' in alert_hashtags:
@@ -262,7 +265,6 @@ async def main() -> None:
         telegram_response = await send_telegram_alert(session, alert_text)
         logger.debug(await telegram_response.read())
 
-        commit_hash = commit_data['sha'][:7]
         discord_response = await send_discord_alert(session, commit_hash, html_url, discord_embed_fields, hashtags)
         logger.debug(await discord_response.read())
 
