@@ -44,7 +44,7 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>Telegram allows users to set an emoticon or a <a href="/api/custom-emoji">custom emoji</a> as status, to show next to their name in chats and profiles.</p>
+<p>Telegram allows users and channels to set an emoticon or a <a href="/api/custom-emoji">custom emoji</a> as status, to show next to their name in chats and profiles.</p>
 <h3><a class="anchor" href="#setting-an-emoji-status" id="setting-an-emoji-status" name="setting-an-emoji-status"><i class="anchor-icon"></i></a>Setting an emoji status</h3>
 <pre><code><a href='/constructor/emojiStatusEmpty'>emojiStatusEmpty</a>#2de11aae = <a href='/type/EmojiStatus'>EmojiStatus</a>;
 <a href='/constructor/emojiStatus'>emojiStatus</a>#929b619d document_id:<a href='/type/long'>long</a> = <a href='/type/EmojiStatus'>EmojiStatus</a>;
@@ -73,6 +73,14 @@
 <p>The newly set <a href="/type/EmojiStatus">EmojiStatus</a> constructor will be contained in the <code>emoji_status</code> field of the <a href="/constructor/user">user</a> constructor, and other users will receive an <a href="/constructor/updateUserEmojiStatus">updateUserEmojiStatus</a>.  </p>
 <p>Other logged-in clients will also receive an <a href="/constructor/updateRecentEmojiStatuses">updateRecentEmojiStatuses</a> update, indicating that the recent status emoji list has changed.  </p>
 <p>Recently used emoji statuses can be fetched using <a href="/method/account.getRecentEmojiStatuses">account.getRecentEmojiStatuses</a>, and the list can be cleared using <a href="/method/account.clearRecentEmojiStatuses">account.clearRecentEmojiStatuses</a>.  </p>
+<h4><a class="anchor" href="#setting-an-emoji-status-in-channels" id="setting-an-emoji-status-in-channels" name="setting-an-emoji-status-in-channels"><i class="anchor-icon"></i></a>Setting an emoji status in channels</h4>
+<pre><code><a href='/constructor/emojiList'>emojiList</a>#7a1e11d1 hash:<a href='/type/long'>long</a> document_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/EmojiList'>EmojiList</a>;
+
+---functions---
+
+<a href='/method/account.getChannelRestrictedStatusEmojis'>account.getChannelRestrictedStatusEmojis</a>#35a9e0d5 hash:<a href='/type/long'>long</a> = <a href='/type/EmojiList'>EmojiList</a>;</code></pre>
+<p>After reaching at least the <a href="/api/boost">boost level</a> specified in the <a href="/api/config#channel-emoji-status-level-min"><code>channel_emoji_status_level_min</code> config parameter</a>, channels gain the ability to change their status emoji <a href="#setting-an-emoji-status">just as described above</a>.  </p>
+<p>The only difference is that some specific <a href="/api/custom-emoji">custom emojis</a> cannot be used as channel statuses: use <a href="/method/account.getChannelRestrictedStatusEmojis">account.getChannelRestrictedStatusEmojis</a> to fetch the full list of IDs of custom emojis that cannot be used in channel statuses.</p>
 <h3><a class="anchor" href="#featured-emoji-status-stickersets" id="featured-emoji-status-stickersets" name="featured-emoji-status-stickersets"><i class="anchor-icon"></i></a>Featured emoji status stickersets</h3>
 <pre><code><a href='/constructor/emojiStatus'>emojiStatus</a>#929b619d document_id:<a href='/type/long'>long</a> = <a href='/type/EmojiStatus'>EmojiStatus</a>;
 
@@ -83,9 +91,11 @@
 
 ---functions---
 
-<a href='/method/account.getDefaultEmojiStatuses'>account.getDefaultEmojiStatuses</a>#d6753386 hash:<a href='/type/long'>long</a> = <a href='/type/account.EmojiStatuses'>account.EmojiStatuses</a>;</code></pre>
+<a href='/method/account.getDefaultEmojiStatuses'>account.getDefaultEmojiStatuses</a>#d6753386 hash:<a href='/type/long'>long</a> = <a href='/type/account.EmojiStatuses'>account.EmojiStatuses</a>;
+<a href='/method/account.getChannelDefaultEmojiStatuses'>account.getChannelDefaultEmojiStatuses</a>#7727a7d5 hash:<a href='/type/long'>long</a> = <a href='/type/account.EmojiStatuses'>account.EmojiStatuses</a>;</code></pre>
 <p>A set of standard statuses can be fetched by passing <a href="/constructor/inputStickerSetEmojiDefaultStatuses">inputStickerSetEmojiDefaultStatuses</a> to <a href="/method/messages.getStickerSet">messages.getStickerSet</a>, as specified in the <a href="/api/stickers">stickerset documentation »</a>.  </p>
-<p><a href="/method/account.getDefaultEmojiStatuses">account.getDefaultEmojiStatuses</a> can also be used to get a list of featured emoji statuses, from multiple featured custom emoji stickersets.</p></div>
+<p><a href="/method/account.getDefaultEmojiStatuses">account.getDefaultEmojiStatuses</a> can also be used to get a list of featured emoji statuses, from multiple featured custom emoji stickersets.<br>
+<a href="/method/account.getChannelDefaultEmojiStatuses">account.getChannelDefaultEmojiStatuses</a> is the equivalent method for channel emoji statuses.</p></div>
   
 </div>
           

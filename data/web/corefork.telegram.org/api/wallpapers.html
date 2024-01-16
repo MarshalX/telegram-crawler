@@ -51,7 +51,10 @@
 <ul>
 <li><a href="#image-wallpapers">Image wallpapers</a></li>
 <li><a href="#pattern-wallpapers">Pattern wallpapers</a></li>
-<li><a href="#fill-wallpapers">Fill wallpapers</a></li>
+<li><a href="#fill-wallpapers">Fill wallpapers</a><ul>
+<li><a href="#fill-wallpapers">Channel wallpapers</a></li>
+</ul>
+</li>
 </ul>
 <p>Fill and pattern wallpapers are generated using one of three <a href="#fill-types">fill types</a>.</p>
 <h4><a class="anchor" href="#image-wallpapers" id="image-wallpapers" name="image-wallpapers"><i class="anchor-icon"></i></a>Image wallpapers</h4>
@@ -83,6 +86,11 @@ The <code>settings</code> field describes the transforms that should be applied 
 <h4><a class="anchor" href="#fill-wallpapers" id="fill-wallpapers" name="fill-wallpapers"><i class="anchor-icon"></i></a>Fill wallpapers</h4>
 <pre><code><a href='/constructor/wallPaperNoFile'>wallPaperNoFile</a>#e0804116 id:<a href='/type/long'>long</a> flags:<a href='/type/%23'>#</a> default:flags.1?<a href='/constructor/true'>true</a> dark:flags.4?<a href='/constructor/true'>true</a> settings:flags.2?<a href='/type/WallPaperSettings'>WallPaperSettings</a> = <a href='/type/WallPaper'>WallPaper</a>;</code></pre>
 <p>Fill wallpapers are simple wallpapers described by the <a href="/constructor/wallPaperNoFile">wallPaperNoFile</a> constructor, containing only the <a href="#fill-types">fill</a> specified by the <code>settings</code> field.  </p>
+<h5><a class="anchor" href="#channel-wallpapers" id="channel-wallpapers" name="channel-wallpapers"><i class="anchor-icon"></i></a>Channel wallpapers</h5>
+<pre><code><a href='/constructor/wallPaperSettings'>wallPaperSettings</a>#372efcd0 flags:<a href='/type/%23'>#</a> blur:flags.1?<a href='/constructor/true'>true</a> motion:flags.2?<a href='/constructor/true'>true</a> background_color:flags.0?<a href='/type/int'>int</a> second_background_color:flags.4?<a href='/type/int'>int</a> third_background_color:flags.5?<a href='/type/int'>int</a> fourth_background_color:flags.6?<a href='/type/int'>int</a> intensity:flags.3?<a href='/type/int'>int</a> rotation:flags.4?<a href='/type/int'>int</a> emoticon:flags.7?<a href='/type/string'>string</a> = <a href='/type/WallPaperSettings'>WallPaperSettings</a>;</code></pre>
+<p><a href="#fill-wallpapers">Fill wallpapers</a> with an <code>emoticon</code> contained in the associated wallpaper <code>settings</code> indicate a channel wallpaper, that can be <a href="#installing-wallpapers-in-a-specific-chat-or-channel">installed »</a> in channels that have enough boosts, <a href="#installing-wallpapers-in-a-specific-chat-or-channel">see here »</a> for more info.  </p>
+<p>The full list of channel wallpapers can be fetched using <a href="/method/account.getChatThemes">account.getChatThemes</a>.  </p>
+<p>Channels may also set any custom wallpaper (not just the ones returned by <a href="/method/account.getChatThemes">account.getChatThemes</a>) after reaching a higher boost level, <a href="#installing-wallpapers-in-a-specific-chat-or-channel">see here »</a> for more info.  </p>
 <h3><a class="anchor" href="#fill-types" id="fill-types" name="fill-types"><i class="anchor-icon"></i></a>Fill types</h3>
 <p>Fill and pattern wallpapers are generated using one of three fill types:  </p>
 <ul>
@@ -147,7 +155,7 @@ Note that calling this method will also automatically save the wallpaper, if it'
 <li><a href="/constructor/inputWallPaper">inputWallPaper</a> otherwise, using the ID and access hash fields of a full <a href="/constructor/wallPaper">wallPaper</a>.<br>
 As mentioned earlier, <a href="#fill-wallpapers">fill wallpapers</a> can't be saved to the server using <a href="/method/account.installWallPaper">account.installWallPaper</a> or <a href="/method/account.saveWallPaper">account.saveWallPaper</a>: an <a href="/constructor/inputWallPaperNoFile">inputWallPaperNoFile</a> is available for fill wallpapers but can <strong>only</strong> be used when working with <a href="/api/themes">themes »</a> or when using <a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a> as follows.</li>
 </ul>
-<h4><a class="anchor" href="#installing-wallpapers-in-a-specific-chat" id="installing-wallpapers-in-a-specific-chat" name="installing-wallpapers-in-a-specific-chat"><i class="anchor-icon"></i></a>Installing wallpapers in a specific chat</h4>
+<h4><a class="anchor" href="#installing-wallpapers-in-a-specific-chat-or-channel" id="installing-wallpapers-in-a-specific-chat-or-channel" name="installing-wallpapers-in-a-specific-chat-or-channel"><i class="anchor-icon"></i></a>Installing wallpapers in a specific chat or channel</h4>
 <pre><code><a href='/constructor/messageActionSetChatWallPaper'>messageActionSetChatWallPaper</a>#5060a3f4 flags:<a href='/type/%23'>#</a> same:flags.0?<a href='/constructor/true'>true</a> for_both:flags.1?<a href='/constructor/true'>true</a> wallpaper:<a href='/type/WallPaper'>WallPaper</a> = <a href='/type/MessageAction'>MessageAction</a>;
 
 <a href='/constructor/updatePeerWallpaper'>updatePeerWallpaper</a>#ae3f101d flags:<a href='/type/%23'>#</a> wallpaper_overridden:flags.1?<a href='/constructor/true'>true</a> peer:<a href='/type/Peer'>Peer</a> wallpaper:flags.0?<a href='/type/WallPaper'>WallPaper</a> = <a href='/type/Update'>Update</a>;
@@ -168,7 +176,10 @@ This will change the wallpaper for both sides of the chat, without requiring con
 If the other user does not like the new wallpaper we have chosen for them, they can re-set their previous wallpaper just on their side, by invoking <a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a>, providing only the <code>revert</code> flag (and obviously the <code>peer</code> parameter).  </p>
 <p>Note that in order to pass <a href="#image-wallpapers">image</a> or <a href="#pattern-wallpapers">pattern</a> wallpapers to <a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a>, the <code>for_chat</code> flag must be set when <a href="#uploading-wallpapers">uploading them with account.uploadWallPaper</a>.  </p>
 <p>Also note that unlike <a href="/method/account.installWallPaper">account.installWallPaper</a> or <a href="/method/account.saveWallPaper">account.saveWallPaper</a>, <a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a> accepts <a href="#fill-wallpapers">fill wallpapers</a> as well.</p>
-<p>Wallpaper changes will also emit an <a href="/constructor/updatePeerWallpaper">updatePeerWallpaper</a> update.</p></div>
+<p>Wallpaper changes will also emit an <a href="/constructor/updatePeerWallpaper">updatePeerWallpaper</a> update.</p>
+<p>After reaching at least the <a href="/api/boost">boost level</a> specified in the <a href="/api/config#channel-wallpaper-level-min"><code>channel_wallpaper_level_min</code> config parameter</a>, channels gain the ability to set one of the <a href="#channel-wallpapers">fill channel wallpapers returned by account.getChatThemes (see » for more info)</a>.  </p>
+<p>After reaching at least the boost level specified in the <a href="/api/config#channel-custom-wallpaper-level-min"><code>channel_custom_wallpaper_level_min</code> config parameter</a>, channels gain the ability to set any custom <a href="/api/wallpapers">wallpaper</a>, not just fill channel wallpapers.  </p>
+<p>When setting channel wallpapers, do <strong>not</strong> set the <code>for_both</code> flag.</p></div>
   
 </div>
           
