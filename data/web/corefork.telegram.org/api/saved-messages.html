@@ -59,6 +59,8 @@
 <a href='/constructor/messages.savedDialogsSlice'>messages.savedDialogsSlice</a>#44ba9dd9 count:<a href='/type/int'>int</a> dialogs:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SavedDialog'>SavedDialog</a>&gt; messages:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Message'>Message</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.SavedDialogs'>messages.SavedDialogs</a>;
 <a href='/constructor/messages.savedDialogsNotModified'>messages.savedDialogsNotModified</a>#c01f6fe8 count:<a href='/type/int'>int</a> = <a href='/type/messages.SavedDialogs'>messages.SavedDialogs</a>;
 
+<a href='/constructor/savedDialog'>savedDialog</a>#bd87cb6c flags:<a href='/type/%23'>#</a> pinned:flags.2?<a href='/constructor/true'>true</a> peer:<a href='/type/Peer'>Peer</a> top_message:<a href='/type/int'>int</a> = <a href='/type/SavedDialog'>SavedDialog</a>;
+
 ---functions---
 
 <a href='/method/messages.getSavedDialogs'>messages.getSavedDialogs</a>#5381d21a flags:<a href='/type/%23'>#</a> exclude_pinned:flags.0?<a href='/constructor/true'>true</a> offset_date:<a href='/type/int'>int</a> offset_id:<a href='/type/int'>int</a> offset_peer:<a href='/type/InputPeer'>InputPeer</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.SavedDialogs'>messages.SavedDialogs</a>;
@@ -73,12 +75,44 @@
 <a href='/method/messages.getSearchCounters'>messages.getSearchCounters</a>#1bbcf300 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> saved_peer_id:flags.2?<a href='/type/InputPeer'>InputPeer</a> top_msg_id:flags.0?<a href='/type/int'>int</a> filters:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessagesFilter'>MessagesFilter</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/messages.SearchCounter'>messages.SearchCounter</a>&gt;;
 <a href='/method/messages.getSearchResultsCalendar'>messages.getSearchResultsCalendar</a>#6aa3f6bd flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> saved_peer_id:flags.2?<a href='/type/InputPeer'>InputPeer</a> filter:<a href='/type/MessagesFilter'>MessagesFilter</a> offset_id:<a href='/type/int'>int</a> offset_date:<a href='/type/int'>int</a> = <a href='/type/messages.SearchResultsCalendar'>messages.SearchResultsCalendar</a>;
 <a href='/method/messages.getSearchResultsPositions'>messages.getSearchResultsPositions</a>#9c7f2f10 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> saved_peer_id:flags.2?<a href='/type/InputPeer'>InputPeer</a> filter:<a href='/type/MessagesFilter'>MessagesFilter</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/messages.SearchResultsPositions'>messages.SearchResultsPositions</a>;</code></pre>
-<p>Messages sent and forwarded from various users (including ourselves) to Saved Messages are automatically categorized by their original sender into a saved dialog list, quite similar to the main dialog list used to normally interact with chats.  </p>
-<p>To add new dialogs to the main dialog list a user has to write to them (or join a channel/chat, etc.).<br>
-To add new dialogs to the saved dialog list, simply forward or send messages to <a href="/constructor/inputPeerSelf">inputPeerSelf</a> (the current user): the original sender of the forwarded message will be the dialog peer, and the saved dialog's messages will be only the messages from that peer that were forwarded to Saved Messages.  </p>
-<p>Saving messages from users with forward privacy enabled will add them to a saved dialog entry of a special anonymous user with <code>id=2666000</code>, sending new messages directly to ourselves will add them to a saved dialog entry with ourselves.  </p>
+<p>Messages sent and forwarded from various users (including ourselves) to Saved Messages are automatically categorized by their original dialog into a saved dialog list, quite similar to the normal dialog list used to normally interact with chats.  </p>
+<p>To add new dialogs to the normal dialog list a user has to write to them (or join a channel/chat, etc.).<br>
+To add new dialogs to the saved dialog list, simply forward messages from any normal dialog to <a href="/constructor/inputPeerSelf">inputPeerSelf</a> (the current user): the forwarded messages (including outgoing ones) will be added to a saved dialog with the same ID of the original dialog.</p>
+<p>This includes outgoing messages, for example assume the following:</p>
+<ul>
+<li>Our user <code>id</code> is equal to <code>11111111</code></li>
+<li>We send a message A with ID <code>10</code> to a <a href="/api/channel">supergroup</a> with <code>id=-100122222222</code> (bot API format, equivalent to a <a href="/constructor/peerChannel">peerChannel</a> with ID <code>122222222</code>) </li>
+<li>Another user with <code>id=133333333</code> replies <code>B</code> to our previous message, message ID <code>11</code></li>
+<li>We forward both messages <code>A</code> and <code>B</code> with IDs <code>10</code> and <code>11</code> to <a href="/constructor/inputPeerSelf">inputPeerSelf</a>, which will:<ul>
+<li>Create a new <a href="/constructor/savedDialog">savedDialog</a> with <code>peer=-100122222222</code> (if it doesn't exist already because we already forwarded messages from that supergroup)</li>
+<li>Generate two messages:<ul>
+<li>Message <code>A</code>:<ul>
+<li><code>id</code>: an unrelated message ID, the next one in the common ID sequence, for example <code>1234</code></li>
+<li><code>peer_id</code>: <code>11111111</code></li>
+<li><code>saved_peer_id</code>: <code>-100122222222</code></li>
+<li><code>fwd_from.from_id</code>: <code>11111111</code></li>
+<li><code>fwd_from.saved_from_peer</code>: <code>-100122222222</code></li>
+<li><code>fwd_from.saved_from_msg_id</code>: <code>10</code></li>
+</ul>
+</li>
+<li>Message <code>B</code>:<ul>
+<li><code>id</code>: an unrelated message ID, the next one in the common ID sequence, for example <code>1235</code></li>
+<li><code>reply_to.reply_to_msg_id</code>: <code>1234</code></li>
+<li><code>peer_id</code>: <code>11111111</code></li>
+<li><code>saved_peer_id</code>: <code>-100122222222</code></li>
+<li><code>fwd_from.from_id</code>: <code>133333333</code></li>
+<li><code>fwd_from.saved_from_peer</code>: <code>-100122222222</code></li>
+<li><code>fwd_from.saved_from_msg_id</code>: <code>11</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Saving messages from private chats with users with forward privacy enabled will add them to a saved dialog entry of a special anonymous user with <code>id=2666000</code>.  </p>
+<p>Sending (not forwarding) new messages directly to ourselves will add them to a saved dialog entry with ourselves.  </p>
 <p>A set of methods can then be used to obtain this dialog list, pin/unpin dialogs inside of it, view and remove messages from saved dialogs: <a href="/method/messages.getSavedDialogs">messages.getSavedDialogs</a>, <a href="/method/messages.getSavedHistory">messages.getSavedHistory</a>, <a href="/method/messages.deleteSavedHistory">messages.deleteSavedHistory</a>, <a href="/method/messages.getPinnedSavedDialogs">messages.getPinnedSavedDialogs</a>, <a href="/method/messages.toggleSavedDialogPin">messages.toggleSavedDialogPin</a>, <a href="/method/messages.reorderPinnedSavedDialogs">messages.reorderPinnedSavedDialogs</a> work just like their counterparts <a href="/method/messages.getDialogs">messages.getDialogs</a>, <a href="/method/messages.getHistory">messages.getHistory</a>, <a href="/method/messages.deleteHistory">messages.deleteHistory</a>, <a href="/method/messages.getPinnedDialogs">messages.getPinnedDialogs</a>, <a href="/method/messages.toggleDialogPin">messages.toggleDialogPin</a>, <a href="/method/messages.reorderPinnedDialogs">messages.reorderPinnedDialogs</a>, with the sole difference that they affect the saved dialog list, instead of the main dialog list.  </p>
-<p>Messages fetched from a saved dialog will have <code>peer</code>=<a href="/constructor/inputPeerSelf">inputPeerSelf</a> and the <code>saved_peer_id</code> flag set to the ID of the saved dialog.</p>
 <p>To search for messages within a saved dialog, use the usual <a href="/method/messages.search">messages.search</a>, <a href="/method/messages.search">messages.search</a>, <a href="/method/messages.getSearchResultsCalendar">messages.getSearchResultsCalendar</a>, <a href="/method/messages.getSearchResultsPositions">messages.getSearchResultsPositions</a> methods with <code>peer</code>=<a href="/constructor/inputPeerSelf">inputPeerSelf</a> and <code>saved_peer_id=id of the saved dialog</code>.</p></div>
   
 </div>
