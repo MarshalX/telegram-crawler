@@ -96,39 +96,19 @@ MTProto v.1.0 is deprecated and is currently being phased out.</p>
 <h4><a class="anchor" href="#message-identifier-msg-id" id="message-identifier-msg-id" name="message-identifier-msg-id"><i class="anchor-icon"></i></a>Message Identifier (msg_id)</h4>
 <p>A (time-dependent) 64-bit number used uniquely to identify a message within a session. Client message identifiers are divisible by 4, server message identifiers modulo 4 yield 1 if the message is a response to a client message, and 3 otherwise. Client message identifiers must increase monotonically (within a single session), the same as server message identifiers, and must approximately equal unixtime*2^32. This way, a message identifier points to the approximate moment in time the message was created. A message is rejected over 300 seconds after it is created or 30 seconds before it is created (this is needed to protect from replay attacks). In this situation, it must be re-sent with a different identifier (or placed in a container with a higher identifier). The identifier of a message container must be strictly greater than those of its nested messages.</p>
 <p><strong>Important</strong>: to counter replay-attacks the lower 32 bits of <strong>msg_id</strong> passed by the client must not be empty and must present a fractional part of the time point when the message was created.</p>
-<h4><a class="anchor" href="#content-related-message" id="content-related-message" name="content-related-message"><i class="anchor-icon"></i></a>Content-related Message</h4>
-<p>A message requiring an explicit acknowledgment. These include all the user and many service messages, virtually all with the exception of containers and acknowledgments. </p>
 <h4><a class="anchor" href="#message-sequence-number-msg-seqno" id="message-sequence-number-msg-seqno" name="message-sequence-number-msg-seqno"><i class="anchor-icon"></i></a>Message Sequence Number (msg_seqno)</h4>
-<p>A 32-bit number equal to twice the number of “content-related” messages (those requiring acknowledgment, and in particular those that are not containers) created by the sender prior to this message and subsequently incremented by one if the current message is a content-related message. A container is always generated after its entire contents; therefore, its sequence number is greater than or equal to the sequence numbers of the messages contained in it.</p>
-<p>Specifically, here's a full list of the MTProto-level constructors that are <strong>not</strong> content-related:</p>
-<ul>
-<li><code>rpc_drop_answer</code></li>
-<li><code>rpc_answer_unknown</code></li>
-<li><code>rpc_answer_dropped_running</code></li>
-<li><code>rpc_answer_dropped</code></li>
-<li><code>get_future_salts</code></li>
-<li><code>future_salt</code></li>
-<li><code>future_salts</code></li>
-<li><code>ping</code></li>
-<li><code>pong</code></li>
-<li><code>ping_delay_disconnect</code></li>
-<li><code>destroy_session</code></li>
-<li><code>destroy_session_ok</code></li>
-<li><code>destroy_session_none</code></li>
-<li><code>msg_container</code></li>
-<li><code>msg_copy</code></li>
-<li><code>gzip_packed</code></li>
-<li><code>http_wait</code></li>
-<li><code>msgs_ack</code></li>
-<li><code>bad_msg_notification</code></li>
-<li><code>bad_server_salt</code></li>
-<li><code>msgs_state_req</code></li>
-<li><code>msgs_state_info</code></li>
-<li><code>msgs_all_info</code></li>
-<li><code>msg_detailed_info</code></li>
-<li><code>msg_new_detailed_info</code></li>
-<li><code>msg_resend_req</code></li>
-</ul>
+<p>A 32-bit number equal to twice the number of <a href="#content-related-message">content-related »</a> messages created by the sender prior to this message and subsequently incremented by one if the current message is a content-related message. </p>
+<p>The seqno of a content-related message is thus <code>msg.seqNo = (current_seqno*2)+1</code> (and after generating it, the local <code>current_seqno</code> counter must be incremented by 1), the seqno of a non-content related message is <code>msg.seqNo = (current_seqno*2)</code> (<code>current_seqno</code> must <strong>not</strong> be incremented by 1 after generation).  </p>
+<p>Thus, the content-relatedness of an incoming MTProto message can simply be determined by checking the value of the least-significant bit of the seqno of the message (<code>message.isContentRelated = (message.seqNo &amp; 1) == 1</code>).  </p>
+<p>A container is always generated after its entire contents; therefore, its sequence number is greater than or equal to the sequence numbers of the messages contained in it.  </p>
+<h5><a class="anchor" href="#content-related-message" id="content-related-message" name="content-related-message"><i class="anchor-icon"></i></a>Content-related Message</h5>
+<p>When receiving an MTProto message that is marked as content-related by setting the least-significant bit of the <a href="#message-sequence-number-msg_seqno">seqno</a>, the receiving party <strong>must</strong> acknowledge it in some way.  </p>
+<p>On the client side, must be done through <code>msgs_ack</code> constructors.  </p>
+<p>On the server side, this is usually done through <code>msgs_ack</code> constructors, but may also be done using the reply of a method, or an error, or some other way, as specified by the documentation of each method or constructor.  </p>
+<p>When a TCP transport is used, the content-relatedness of constructors affects the server's behavior: the server will resend not-yet acknowledged content-related messages to a new connection when the current connection is closed and then re-opened.  </p>
+<p>A client <strong>must always</strong> mark all API-level RPC queries as content-related, or else a <a href="/mtproto/service_messages_about_messages#notice-of-ignored-error-message">bad_msg_notification</a> with <code>error_code=35</code> will be emitted.  </p>
+<p>A client <strong>must never</strong> mark <code>msgs_ack</code>, <code>msg_container</code>, <code>msg_copy</code>, <code>gzip_packed</code> constructors (i.e. <a href="/mtproto/service_messages#containers">containers</a> and acknowledgments) as content-related, or else a <a href="/mtproto/service_messages_about_messages#notice-of-ignored-error-message">bad_msg_notification</a> with <code>error_code=34</code> will be emitted.  </p>
+<p>A client <em>may</em> mark any other constructor except the four specified above as content-related.  </p>
 <h4><a class="anchor" href="#message-key-msg-key" id="message-key-msg-key" name="message-key-msg-key"><i class="anchor-icon"></i></a>Message Key (msg_key)</h4>
 <p>In <strong>MTProto 2.0</strong>, the middle 128 bits of the SHA-256 hash of the message to be encrypted (including the internal header and the <em>padding bytes</em> for MTProto 2.0), prepended by a 32-byte fragment of the authorization key.</p>
 <p>In <strong>MTProto 1.0</strong>, message key was defined differently, as the lower 128 bits of the SHA-1 hash of the message to be encrypted, with padding bytes excluded from the computation of the hash. Authorization key was not involved in this computation.</p>
