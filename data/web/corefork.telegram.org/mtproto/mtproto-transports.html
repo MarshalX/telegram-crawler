@@ -107,11 +107,11 @@ Then, payloads are wrapped in the following envelope:</p>
 <li>Length: payload length, divided by four, and encoded as 3 length bytes (little endian); same as for a normal abridged envelope.</li>
 <li>Payload: the MTProto payload</li>
 </ul>
-<p>The server will send quick ACK tokens by bswapping them (i.e. inverting the order of the 4 bytes of the ACK token) and sending them as a standlone 4-byte packet without a length header.  </p>
+<p>The server will send quick ACK tokens by bswapping them (i.e. inverting the order of the 4 bytes of the ACK token) and sending them as a standalone 4-byte packet without a length header.  </p>
 <pre><code>+----+
 |dcba|
 +----+</code></pre>
-<p>These quick ACK packets can be easily distinguished from normal abridged packets because the first byte will always have the most-significant bit set (because quick ACK tokens have the most-significant bit of the last byte set, and since they are bswapped the last byte will come first), as the length/header of normal payload packets coming from the server is always less than or equal to 127 (thus the most-significant bit is not set for normal payloads).  </p>
+<p>These quick ACK packets can be easily distinguished from normal abridged packets because the first byte will always have the most-significant bit set (because quick ACK tokens have the most-significant bit of the last byte set, and since they are bswapped the last byte will come first), and the length/header of normal payload packets coming from the server is always less than or equal to 127 (thus the most-significant bit is not set for normal payloads).  </p>
 <h3><a class="anchor" href="#intermediate" id="intermediate" name="intermediate"><i class="anchor-icon"></i></a>Intermediate</h3>
 <p>In case 4-byte data alignment is needed, an <em>intermediate</em> version of the original protocol may be used.</p>
 <ul>
@@ -131,7 +131,7 @@ Then, payloads are wrapped in the following envelope:</p>
 </ul>
 <p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
 <p>To request a quick ACK from the server for an encrypted MTProto payload, add <code>0x80000000</code> to the <code>len</code> field before encoding it (equivalent to doing <code>len = len | (1 &lt;&lt; 31)</code>, i.e. set the most-significant bit of the length).  </p>
-<p>The server will send quick ACK tokens as a standlone 4-byte packet without a length header.</p>
+<p>The server will send quick ACK tokens as a standalone 4-byte packet without a length header.</p>
 <pre><code>+----+
 |abcd|
 +----+</code></pre>
@@ -176,7 +176,7 @@ Then, payloads are wrapped in the following envelope:</p>
 <p>Additionally, the following transport features can be used: </p>
 <h4><a class="anchor" href="#quick-ack" id="quick-ack" name="quick-ack"><i class="anchor-icon"></i></a>Quick ack</h4>
 <p>Some of the TCP transports listed above support quick ACKs: quick ACKs are a way for clients to get quick receipt acknowledgements for packets.  </p>
-<p>To request a quick ack for a specific outgoing payload, clients must set the MSB of the appropriate field in the transport envelope (as described in the documentation for each transport protocol above).  </p>
+<p>To request a quick ack for a specific outgoing payload, clients must set the MSB of an appropriate field in the transport envelope (as described in the documentation for each transport protocol above).  </p>
 <p>Also, clients must generate and store a quick ACK token, associating it with the outgoing MTProto payload, by:</p>
 <ul>
 <li>Taking the first 32 bits of the SHA256 of the encrypted portion of the payload prepended by 32 bytes from the authorization key (the same hash generated when computing the <a href="/mtproto/description#message-key-msg-key">message key</a>, except that instead of taking the middle 128 bits, the first 32 bits are taken instead).  </li>
