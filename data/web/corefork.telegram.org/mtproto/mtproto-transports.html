@@ -154,6 +154,14 @@ Then, payloads are wrapped in the following envelope:</p>
 <li>Payload: the MTProto payload</li>
 <li>Padding: A random padding string of length <code>0-15</code></li>
 </ul>
+<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
+<p>To request a quick ACK from the server for an encrypted MTProto payload, add <code>0x80000000</code> to the <code>len</code> field before encoding it (equivalent to doing <code>len = len | (1 &lt;&lt; 31)</code>, i.e. set the most-significant bit of the length).  </p>
+<p>The server will send quick ACK tokens as a standalone 8 to 16-byte packet (excluding the length of the packet itself, encoded as usual), containing a 4-byte header with all bits set, followed by the ACK token (<code>abcd</code>), followed by 0 to 8 random padding bytes.</p>
+<pre><code>+----+----+----+----...----+
+|tlen|FFFF|abcd|  padding  |
++----+----+----+----...----+</code></pre>
+<p>These quick ACK packets can be easily distinguished from normal intermediate padded packets because their length will be always smaller than or equal to 16, smaller than any MTProto packet.<br>
+They can be distinguished from transport errors because the first 4 bytes of the payload are equal to <code>0xFFFFFFFF</code>, not a valid transport error.  </p>
 <h3><a class="anchor" href="#full" id="full" name="full"><i class="anchor-icon"></i></a>Full</h3>
 <p>The basic MTProto transport protocol</p>
 <ul>
