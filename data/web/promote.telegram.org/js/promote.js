@@ -435,7 +435,6 @@ var Ads = {
         },
         onBlur: function(value) {
           options.onBlur && options.onBlur(field, options.getDataOpts);
-          options.onEnter && options.onEnter(field, value);
         },
         onEnter: function(value) {
           options.onEnter && options.onEnter(field, value);
