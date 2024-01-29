@@ -3578,6 +3578,7 @@ var TransferFunds = {
         renderSelectedItem: function(val, item) {
           return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
         },
+        onEnter: TransferFunds.onAccountSearch,
         onChange: TransferFunds.onAccountChange
       });
     });
@@ -3594,6 +3595,58 @@ var TransferFunds = {
     Aj.state.curAmountField = Aj.state.$form.hasClass('decr') ? 'decr_amount' : 'amount';
     TransferFunds.onAmountChange();
     Aj.state.$form.field(Aj.state.curAmountField).focusAndSelectAll();
+  },
+  onAccountSearch: function(field, value) {
+    var $fieldEl = Aj.state.$form.field(field);
+    var $formGroup = $fieldEl.fieldEl().parents('.form-group');
+    var prev_value = $fieldEl.data('prevval');
+    if (prev_value && prev_value == value) {
+      return false;
+    }
+    var owner_id = Aj.state.ownerId;
+    $fieldEl.data('prevval', value);
+    Ads.hideFieldError($fieldEl);
+    if (!value) {
+      return false;
+    }
+    $formGroup.addClass('field-loading');
+    Aj.apiRequest('searchAccountForTransfer', {
+      owner_id: owner_id,
+      query: value
+    }, function(result) {
+      $formGroup.removeClass('field-loading');
+      if (result.error) {
+        Ads.showFieldError($fieldEl, result.error);
+        return false;
+      }
+      if (result.account) {
+        $fieldEl.trigger('selectval', [result.account, true]);
+        $fieldEl.data('prevval', '');
+      }
+      else if (result.confirm_text) {
+        showConfirm(result.confirm_text, function() {
+          TransferFunds.linkAccount($fieldEl, owner_id, result.link_owner_id);
+        }, result.confirm_btn);
+      }
+    });
+  },
+  linkAccount: function($fieldEl, owner_id, link_owner_id) {
+    Aj.apiRequest('linkAccount', {
+      owner_id: owner_id,
+      link_owner_id: link_owner_id
+    }, function(result) {
+      if (result.error) {
+        Ads.showFieldError($fieldEl, result.error);
+        return false;
+      }
+      if (result.ok) {
+        showAlert(result.ok);
+      }
+      if (result.account) {
+        $fieldEl.trigger('selectval', [result.account, true]);
+        $fieldEl.data('prevval', '');
+      }
+    });
   },
   onAccountChange: function(field, value, valueFull) {
     if (valueFull.budget) {
