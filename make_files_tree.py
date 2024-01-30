@@ -515,6 +515,17 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
 
 
 async def track_mtproto_methods():
+    #####################
+    # PATH BROKEN PYROGRAM
+    import pkgutil
+    from pathlib import Path
+    pyrogram_path = Path(pkgutil.get_loader('pyrogram').path).parent
+    broken_class_path = os.path.join(pyrogram_path, 'raw', 'types', 'story_fwd_header.py')
+    with open(broken_class_path, 'w', encoding='UTF-8') as f:
+        # I rly don't want to fix bug in pyrogram about using reserved words as argument names
+        f.write('class StoryFwdHeader: ...')
+    #####################
+
     from pyrogram import Client
 
     kw = {
@@ -540,12 +551,6 @@ async def track_mtproto_methods():
 async def _fetch_and_track_mtproto(app, output_dir):
     from pyrogram.raw import functions
     from pyrogram.raw.types import InputStickerSetShortName
-
-    from pyrogram.raw import types
-    from pathlib import Path
-    with open(os.path.join(Path(types.__file__).parent, 'story_fwd_header.py'), 'w', encoding='UTF-8') as f:
-        # I rly don't want to fix bug in pyrogram about using reserved words as argument names
-        f.write('class StoryFwdHeader: ...')
 
     configs = {
         'GetConfig': await app.invoke(functions.help.GetConfig()),
