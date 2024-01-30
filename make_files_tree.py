@@ -541,6 +541,12 @@ async def _fetch_and_track_mtproto(app, output_dir):
     from pyrogram.raw import functions
     from pyrogram.raw.types import InputStickerSetShortName
 
+    from pyrogram.raw import types
+    from pathlib import Path
+    with open(os.path.join(Path(types.__file__).parent, 'story_fwd_header.py'), 'w', encoding='UTF-8') as f:
+        # I rly don't want to fix bug in pyrogram about using reserved words as argument names
+        f.write('class StoryFwdHeader: ...')
+
     configs = {
         'GetConfig': await app.invoke(functions.help.GetConfig()),
         'GetCdnConfig': await app.invoke(functions.help.GetCdnConfig()),
