@@ -404,6 +404,7 @@ var Ads = {
         multiSelect: !options.noMultiSelect,
         noCloseOnSelect: false,
         noCloseOnEnter: !!options.onEnter,
+        enterOnClose: true,
         enterEnabled: function() {
           return !!options.onEnter;
         },
@@ -3292,8 +3293,9 @@ var EditAd = {
     Aj.onLoad(function(state) {
       state.$form = $('.pr-incr-budget-form', cont);
       Ads.formInit(state.$form);
-      state.budgetField = state.$form.field('budget');
       state.$form.on('submit', EditAd.eSubmitIncrBudgetForm);
+      Aj.state.isDecr = Aj.state.$form.hasClass('decr');
+      cont.on('click.curPage', '.js-toggle-sign', EditAd.onToggleAmountSign);
       cont.on('click.curPage', '.submit-form-btn', EditAd.eSubmitIncrBudgetForm);
     });
     Aj.onUnload(function(state) {
@@ -3301,36 +3303,41 @@ var EditAd = {
       state.$form.off('submit', EditAd.eSubmitIncrBudgetForm);
     });
   },
+  onToggleAmountSign: function(e) {
+    e.preventDefault();
+    if ($(this).hasClass('disabled')) {
+      EditAd.checkIncrBudgetForm(this, !Aj.state.isDecr);
+    } else {
+      Aj.state.isDecr = !Aj.state.isDecr;
+      Aj.state.$form.toggleClass('decr', Aj.state.isDecr);
+      var amountField = Aj.state.isDecr ? 'decr_amount' : 'amount';
+      Aj.state.$form.field(amountField).focusAndSelectAll();
+    }
+  },
   eSubmitIncrBudgetForm: function(e) {
     e.preventDefault();
     var $form    = Aj.state.$form;
     var owner_id = $form.field('owner_id').value();
     var ad_id    = $form.field('ad_id').value();
-    var budget   = Ads.amountFieldValue($form, 'budget');
+    var amountField = Aj.state.isDecr ? 'decr_amount' : 'amount';
+    var amount   = Ads.amountFieldValue($form, amountField);
 
     if ($form.data('disabled')) {
       return false;
     }
-    if (budget === false) {
-      $form.field('budget').focus();
+    if (amount === false) {
+      $form.field(amountField).focus();
       return false;
     }
     var params = {
       owner_id: owner_id,
       ad_id:    ad_id,
-      budget:   budget
+      amount:   amount
     };
     $form.data('disabled', true);
-    Aj.apiRequest('incrAdBudget', params, function(result) {
+    Aj.apiRequest(Aj.state.isDecr ? 'decrAdBudget' : 'incrAdBudget', params, function(result) {
       $form.data('disabled', false);
       if (result.error) {
-        if (result.field) {
-          var $field = $form.field(result.field);
-          if ($field.size()) {
-            Ads.showFieldError($field, result.error, true);
-            return false;
-          }
-        }
         return showAlert(result.error);
       }
       Aj.state.$form.reset();
@@ -3343,6 +3350,29 @@ var EditAd = {
       if (result.history) {
         $('.js-history').html(result.history);
       }
+    });
+    return false;
+  },
+  checkIncrBudgetForm: function(link, isDecr) {
+    var $form    = Aj.state.$form;
+    var owner_id = $form.field('owner_id').value();
+    var ad_id    = $form.field('ad_id').value();
+
+    if ($form.data('disabled')) {
+      return false;
+    }
+    var params = {
+      owner_id: owner_id,
+      ad_id:    ad_id,
+      check_only: 1
+    };
+    $form.data('disabled', true);
+    Aj.apiRequest(isDecr ? 'decrAdBudget' : 'incrAdBudget', params, function(result) {
+      $form.data('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      $(link).removeClass('disabled').trigger('click');
     });
     return false;
   },
@@ -4735,6 +4765,18 @@ AB.on(function() {
         state.$input.val(val).trigger('change');
       }
     }
+    function getDateValue(d) {
+      if (isNaN(d) || d === null) {
+        return '';
+      }
+      var y = d.getFullYear();
+      var m = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'][d.getMonth()];
+      var d = d.getDate();
+      if (d < 10) {
+        d = '0' + d;
+      }
+      return y + '-' + m + '-' + d;
+    }
 
     function onFocusValue(e) {
       var state = $(this).data('state');
@@ -4822,7 +4864,13 @@ AB.on(function() {
     }
 
     function setValue(state, value) {
-      var curD = (value instanceof Date) ? value : new Date('2013-08-14T' + value);
+      var curDate = '';
+      if (state.$date) {
+        curDate = state.$date.value();
+      } else {
+        curDate = getDateValue(new Date);
+      }
+      var curD = (value instanceof Date) ? value : new Date(curDate + 'T' + value);
       if (isNaN(curD)) {
         state.curHours = 0;
         state.curMinutes = 0;

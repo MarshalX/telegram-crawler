@@ -432,7 +432,7 @@
             options.$results.animOff();
           }
           options.$results.addClass('collapsed');
-          options.onClose && options.onClose();
+          options.onClose && options.onClose(curValue);
           if (no_anim) {
             options.$results.animOn();
           }
@@ -809,7 +809,10 @@
         onOpen: function() {
           toggleDD(true);
         },
-        onClose: function() {
+        onClose: function(curValue) {
+          if (options.enterOnClose) {
+            options.onEnter && options.onEnter(curValue);
+          }
           toggleDD(false);
         }
       }, options, {
