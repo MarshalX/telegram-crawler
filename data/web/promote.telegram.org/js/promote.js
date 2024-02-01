@@ -3034,9 +3034,9 @@ var EditAd = {
     Aj.onLayerLoad(function(layerState) {
       layerState.$form = $('.pr-popup-edit-form', cont);
       Ads.formInit(layerState.$form);
-      layerState.budgetField = layerState.$form.field('budget');
+      layerState.amountField = layerState.$form.field('amount');
       Aj.layer.one('popup:open', function() {
-        layerState.budgetField.focusAndSelect(true);
+        layerState.amountField.focusAndSelect(true);
       });
       layerState.$form.on('submit', EditAd.eSubmitEditBudgetPopupForm);
       cont.on('click.curLayer', '.submit-form-btn', EditAd.eSubmitEditBudgetPopupForm);
@@ -3051,19 +3051,19 @@ var EditAd = {
     var $form    = Aj.layerState.$form;
     var owner_id = $form.field('owner_id').value();
     var ad_id    = $form.field('ad_id').value();
-    var budget   = Ads.amountFieldValue($form, 'budget');
+    var amount   = Ads.amountFieldValue($form, 'amount');
 
     if ($form.data('disabled')) {
       return false;
     }
-    if (budget === false) {
-      $form.field('budget').focus();
+    if (amount === false) {
+      $form.field('amount').focus();
       return false;
     }
     var params = {
       owner_id: owner_id,
       ad_id:    ad_id,
-      budget:   budget,
+      amount:   amount,
       popup:    1
     };
     $form.data('disabled', true);
