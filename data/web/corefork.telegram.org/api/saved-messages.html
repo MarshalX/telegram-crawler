@@ -112,17 +112,17 @@ To add new dialogs to the saved dialog list, simply forward messages from any no
 </ul>
 <p>Saving messages from private chats with users with forward privacy enabled will add them to a saved dialog entry of a special anonymous user with <code>id=2666000</code>.  </p>
 <p>Clients may use the following pseudocode to manually populate the <code>saved_peer_id</code> of old <code>layer &lt; 170</code> <a href="/constructor/message">message</a>s stored in the <strong>local</strong> database.  </p>
-<pre><code class="language-java">// user_id is the ID of the current user.
+<pre><code>// user_id is the ID of the current user.
 
 if (message.peer_id == user_id) {
   if (message.fwd_from.saved_from_peer) {
     message.saved_peer_id = message.fwd_from.saved_from_peer
   } elseif (message.fwd_from.from_id) {
-    <a href='/constructor/message.saved_peer_id'>message.saved_peer_id</a> = <a href='/constructor/user_id'>user_id</a>;
+    message.saved_peer_id = user_id;
   } elseif (message.fwd_from.from_name) {
-    <a href='/constructor/message.saved_peer_id'>message.saved_peer_id</a> = <a href='/type/2666000'>2666000</a>;
+    message.saved_peer_id = 2666000;
   } else {
-    <a href='/constructor/message.saved_peer_id'>message.saved_peer_id</a> = <a href='/constructor/user_id'>user_id</a>;
+    message.saved_peer_id = user_id;
   }
 }</code></pre>
 <p>Sending (not forwarding from another dialog) new messages directly to ourselves will add them to a saved dialog entry with ourselves.  </p>
