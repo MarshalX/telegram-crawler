@@ -72,7 +72,20 @@ sponsoredWebPage#3db8ec63 flags:# url:string site_name:string photo:flags.0?Phot
 <li>The contents of the <code>button_text</code> field — if the <code>button_text</code> field is set.</li>
 </ul>
 <p>The message should be marked as "Recommended" instead of "Sponsored" if the <code>recommended</code> flag is set.  </p>
-<p>If the <code>show_peer_photo</code> flag is set, a profile photo bubble should be displayed for this message, like for messages sent in groups. The photo shown in the bubble and the sender name are obtained either from the peer contained in <code>from_id</code>, or from <code>chat_invite</code>, or from the <code>webpage</code> constructor (<code>webpage.photo</code> as profile picture, <code>webpage.site_name</code> as sender name), whichever is set.  </p>
+<p>A profile photo bubble should be displayed for the sponsored message, like for messages sent in groups, using:</p>
+<ul>
+<li><code>app.photo</code>, if the <code>app</code> flag is set, otherwise</li>
+<li><code>webpage.photo</code>, if the <code>webpage</code> flag is set, otherwise</li>
+<li>The profile picture of the chat in <code>chat_invite</code>, if the <code>chat_invite</code> flag is set, otherwise</li>
+<li><code>webpage.photo</code>, if the <code>webpage</code> flag is set, otherwise</li>
+<li>The profile picture of the peer in <code>from_id</code>, if the <code>show_peer_photo</code> flag is set.</li>
+</ul>
+<p>A sender name should be displayed for the sponsored message, like for messages sent in groups, using:</p>
+<ul>
+<li><code>app.title</code>, if the <code>app</code> flag is set, otherwise</li>
+<li><code>webpage.site_name</code>, if the <code>webpage</code> flag is set, otherwise</li>
+<li>The title of the chat in <code>chat_invite</code>, if the <code>chat_invite</code> flag is set.</li>
+</ul>
 <p>If the <code>sponsor_info</code> or <code>additional_info</code> flags are set, an additional "Sponsor info" menu item must be present in the message context menu (the menu that pops up when clicking on a button), that when clicked, displays the contents of the flags.  </p>
 <h4><a class="anchor" href="#counting-sponsored-message-views" id="counting-sponsored-message-views" name="counting-sponsored-message-views"><i class="anchor-icon"></i></a>Counting sponsored message views</h4>
 <p>Once the entire text is shown on the screen (excluding the button), <a href="/method/channels.viewSponsoredMessage">channels.viewSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message.</p>
