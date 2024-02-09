@@ -92,11 +92,12 @@ The attachment/side menu list should also be refreshed if the user changes the a
 Thus, before launching the mini app when clicking on a <a href="/api/links#bot-attachment-or-side-menu-links">attachment/side menu deep link</a>, the client should show a prompt to the user, asking to add the mini app to the attachment/side menu.<br>
 Note that if the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>side_menu_disclaimer_needed</code> flag is set, an additional mandatory checkbox to accept the <a href="https://telegram.org/tos/mini-apps">mini apps TOS</a> and a disclaimer indicating that this Mini App is not affiliated to Telegram should be shown in the installation prompt.<br>
 If the user accepts, invoke <a href="/method/messages.toggleBotInAttachMenu">messages.toggleBotInAttachMenu</a> with the <code>write_allowed</code> flag set and proceed to the next step, otherwise abort the process.  </li>
-<li>...is not set, proceed to the next step unconditionally.  </li>
+<li>...is not set, and the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>side_menu_disclaimer_needed</code> flag is still set, an additional mandatory checkbox to accept the <a href="https://telegram.org/tos/mini-apps">mini apps TOS</a> and a disclaimer indicating that this Mini App is not affiliated to Telegram should be shown.<br>
+If the user accepts, proceed to the next step, otherwise abort the process.  </li>
 </ul>
 </li>
 <li>Open the Mini App:<ul>
-<li>If the link is a <a href="/api/links#mini-app-links">direct mini app link</a>, open the Mini App regardless of the currently open Telegram chat (in fact, the Mini App should opened even if the client itself is minimized), as specified <a href="/api/bots/webapps#direct-link-mini-apps">here »</a>.  </li>
+<li>If the link is a <a href="/api/links#direct-mini-app-links">direct mini app link</a>, open the Mini App regardless of the currently open Telegram chat (in fact, the Mini App should opened even if the client itself is minimized), as specified <a href="/api/bots/webapps#direct-link-mini-apps">here »</a>.  </li>
 <li>For <a href="/api/links#bot-attachment-or-side-menu-links">attachment/side menu links</a>, check that the attachment menu can be opened in the chosen chat type by checking the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field.  <ul>
 <li>If the chosen chat is supported, open the <a href="/api/bots/webapps#attachment-menu-mini-apps">attachment menu mini app »</a> as specified <a href="/api/bots/webapps#attachment-menu-mini-apps">here »</a>.</li>
 <li>Otherwise:<ul>
