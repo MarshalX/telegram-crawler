@@ -59,7 +59,17 @@
 <li><code>tg://path?query</code></li>
 </ul>
 <p>The <code>#fragment</code> part is always ignored when parsing Telegram deep links.  </p>
-<p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code> is not equal to <code>www</code>, is not a single letter and is a valid username, it should be treated exactly as a <code>t.me/&lt;username&gt;/</code> link (generate a <code>t.me/&lt;username&gt;/</code> link and append the rest of the path (if present) and the query string (if present)).  </p>
+<p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code>:</p>
+<ul>
+<li>Is not equal to:<ul>
+<li><code>www</code></li>
+<li>Any of the values specified in <a href="https://github.com/tdlib/td/blob/07c1d53a6d3cb1fad58d2822e55eef6d57363581/td/telegram/LinkManager.cpp#L1099">this list »</a>.</li>
+</ul>
+</li>
+<li>AND is not a single letter</li>
+<li>AND is a valid username</li>
+</ul>
+<p>...it should be treated exactly as a <code>t.me/&lt;username&gt;/</code> link (generate a <code>t.me/&lt;username&gt;/</code> link and append the rest of the path (if present) and the query string (if present)).  </p>
 <h3><a class="anchor" href="#public-username-links" id="public-username-links" name="public-username-links"><i class="anchor-icon"></i></a>Public username links</h3>
 <p>Used to link to public users, groups and channels, see <a href="/api/invites#public-usernames">here for more info on how to handle them »</a>.  </p>
 <p><code>t.me</code> syntax:</p>
@@ -281,7 +291,7 @@ t.me/share?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#video-chatlivestream-links" id="video-chatlivestream-links" name="video-chatlivestream-links"><i class="anchor-icon"></i></a>Video chat/Livestream links</h3>
+<h3><a class="anchor" href="#video-chat-livestream-links" id="video-chat-livestream-links" name="video-chat-livestream-links"><i class="anchor-icon"></i></a>Video chat/Livestream links</h3>
 <p>Used to join video/voice chats in groups, and livestreams in channels.<br>
 Such links are generated using <a href="/method/phone.exportGroupCallInvite">phone.exportGroupCallInvite</a>.<br>
 Note that <code>voicechat</code> links are deprecated, the API will always export <code>videochat</code> links for video and voice chats in groups, clients should support parsing the old link format only for backwards compatibility.  </p>
@@ -361,6 +371,69 @@ tg://addemoji?set=&lt;slug&gt;</code></pre>
 <td><code>slug</code></td>
 <td style="text-align: center;">Required</td>
 <td>Stickerset short name, used when <a href="/api/stickers#installing-stickersets">installing stickers</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#story-links" id="story-links" name="story-links"><i class="anchor-icon"></i></a>Story links</h3>
+<p>Used to link to a <a href="/api/stories">Telegram Story »</a>, generated using the procedure <a href="/api/links#story-links">specified here »</a>.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;username&gt;/s/&lt;story_id&gt;</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;username&gt;&amp;story=&lt;story_id&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the user or channel that posted the story.</td>
+</tr>
+<tr>
+<td><code>story_id</code></td>
+<td style="text-align: center;">Required</td>
+<td>ID of the <a href="/api/stories#watching-stories">Telegram Story to be fetched and viewed as described here »</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#boost-links" id="boost-links" name="boost-links"><i class="anchor-icon"></i></a>Boost links</h3>
+<p>Used by users to <a href="/api/boost">boost channels »</a>, granting them the ability to post stories and further perks.</p>
+<p>Use the channel information to boost the channel as described <a href="/api/boost">here »</a>.  </p>
+<p><code>t.me</code> syntax (public channels):</p>
+<pre><code>t.me/boost/&lt;username&gt;
+t.me/&lt;username&gt;?boost</code></pre>
+<p><code>t.me</code> syntax (private channels):</p>
+<pre><code>t.me/boost?c=&lt;id&gt;
+t.me/c/&lt;id&gt;?boost</code></pre>
+<p><code>tg:</code> syntax (public channels):</p>
+<pre><code>tg://boost?domain=&lt;username&gt;</code></pre>
+<p><code>tg:</code> syntax (private channels):</p>
+<pre><code>tg://boost?channel=&lt;id&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required for public links</td>
+<td>Channel username.</td>
+</tr>
+<tr>
+<td><code>channel</code></td>
+<td style="text-align: center;">Required for private links</td>
+<td>Channel ID.</td>
 </tr>
 </tbody>
 </table>
@@ -751,11 +824,11 @@ tg://bg?slug=&lt;slug&gt;&amp;intensity=&lt;intensity&gt;&amp;bg_color=&lt;hex_c
 <tr>
 <td><code>parameter</code></td>
 <td style="text-align: center;">Optional</td>
-<td>Start parameter, up to 64 <a href="https://en.wikipedia.org/wiki/Base64#The_URL_applications">base64url</a> characters: if provided and the <code>bot_username</code> is indeed a bot, the text input bar should be replaced with a <code>Start</code> button (even if the user has already started the bot) that should invoke <a href="/method/messages.startBot">messages.startBot</a> with the appropriate <code>parameter</code> once clicked.</td>
+<td>Start parameter, up to 64 <a href="https://en.wikipedia.org/wiki/Base64#The_URL_applications">base64url</a> characters: if provided and the <code>bot_username</code> is indeed a bot, the text input bar should be replaced with a <code>Start</code> button (even if the user has already started the bot) that should invoke <a href="/method/messages.startBot">messages.startBot</a> with the appropriate <code>parameter</code> once clicked. Note that if the <code>bot_username</code> is equal to the <a href="/api/config#premium-bot-username"><code>premium_bot_username</code> configuration value »</a>, clicking on this link should immediately invoke <a href="/method/messages.startBot">messages.startBot</a> with the appropriate <code>parameter</code>.</td>
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#groupchannel-bot-links" id="groupchannel-bot-links" name="groupchannel-bot-links"><i class="anchor-icon"></i></a>Group/channel bot links</h3>
+<h3><a class="anchor" href="#group-channel-bot-links" id="group-channel-bot-links" name="group-channel-bot-links"><i class="anchor-icon"></i></a>Group/channel bot links</h3>
 <p>Used to add bots to groups or channels.<br>
 First of all, check that the <code>&lt;bot_username&gt;</code> indeed links to a bot.<br>
 Then, for group links:</p>
@@ -813,7 +886,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 <tr>
 <td><code>admin</code></td>
 <td style="text-align: center;">Optional for group links, required for channel links</td>
-<td>A combination of the following identifiers separated by <code>+</code>, each corresponding to the appropriate flag in the <a href="/constructor/chatAdminRights">chatAdminRights »</a> constructor: <br>- <code>change_info</code> - <a href="/constructor/chatAdminRights">chatAdminRights.change_info</a> <br>- <code>post_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.post_messages</a> <br>- <code>edit_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.edit_messages</a> <br>- <code>delete_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.delete_messages</a> <br>- <code>restrict_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.ban_users</a> <br>- <code>invite_users</code> - <a href="/constructor/chatAdminRights">chatAdminRights.invite_users</a> <br>- <code>pin_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.pin_messages</a> <br>- <code>manage_topics</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_topics</a> <br>- <code>promote_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.add_admins</a> <br>- <code>manage_video_chats</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_call</a> <br>- <code>anonymous</code> - <a href="/constructor/chatAdminRights">chatAdminRights.anonymous</a> <br>- <code>manage_chat</code> - <a href="/constructor/chatAdminRights">chatAdminRights.other</a></td>
+<td>A combination of the following identifiers separated by <code>+</code>, each corresponding to the appropriate flag in the <a href="/constructor/chatAdminRights">chatAdminRights »</a> constructor: <br>- <code>change_info</code> - <a href="/constructor/chatAdminRights">chatAdminRights.change_info</a> <br>- <code>post_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.post_messages</a> <br>- <code>edit_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.edit_messages</a> <br>- <code>delete_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.delete_messages</a> <br>- <code>restrict_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.ban_users</a> <br>- <code>invite_users</code> - <a href="/constructor/chatAdminRights">chatAdminRights.invite_users</a> <br>- <code>pin_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.pin_messages</a> <br>- <code>manage_topics</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_topics</a> <br>- <code>promote_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.add_admins</a> <br>- <code>manage_video_chats</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_call</a> <br>- <code>anonymous</code> - <a href="/constructor/chatAdminRights">chatAdminRights.anonymous</a> <br>- <code>manage_chat</code> - <a href="/constructor/chatAdminRights">chatAdminRights.other</a> <br>- <code>post_stories</code> - <a href="/constructor/chatAdminRights">chatAdminRights.post_stories</a> <br>- <code>edit_stories</code> - <a href="/constructor/chatAdminRights">chatAdminRights.edit_stories</a> <br>- <code>delete_stories</code> - <a href="/constructor/chatAdminRights">chatAdminRights.delete_stories</a></td>
 </tr>
 </tbody>
 </table>
@@ -848,41 +921,6 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 <td><code>short_name</code></td>
 <td style="text-align: center;">Required</td>
 <td>Game short name</td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" href="#named-bot-web-app-links" id="named-bot-web-app-links" name="named-bot-web-app-links"><i class="anchor-icon"></i></a>Named bot web app links</h3>
-<p>Used to share <a href="/api/bots/webapps#named-bot-web-apps">named bot web apps</a>.  </p>
-<p>These links are different from <a href="#bot-attachment-menu-links">bot attachment menu deep links</a>, because they don't require the user to install an attachment menu, and a single bot can offer multiple named web apps, distinguished by their <code>short_name</code>.  </p>
-<p>These links should be handled as specified in the <a href="/api/bots/webapps#named-bot-web-apps">named bot web app documentation »</a>.  </p>
-<p><code>t.me</code> syntax:</p>
-<pre><code>t.me/&lt;bot_username&gt;/&lt;short_name&gt;?startapp=&lt;start_parameter&gt;</code></pre>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;appname=&lt;short_name&gt;&amp;startapp=&lt;start_parameter&gt;</code></pre>
-<p>Parameters: </p>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th style="text-align: center;">Optional</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>bot_username</code></td>
-<td style="text-align: center;">Required</td>
-<td>Username of the bot that owns the <a href="/api/bots/games">game</a></td>
-</tr>
-<tr>
-<td><code>appname</code></td>
-<td style="text-align: center;">Required</td>
-<td>Web app short name, to pass to <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a>.<code>short_name</code> when invoking <a href="/method/messages.getBotApp">messages.getBotApp</a></td>
-</tr>
-<tr>
-<td><code>startapp</code></td>
-<td style="text-align: center;">Optional</td>
-<td><code>start_param</code> to pass to <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a></td>
 </tr>
 </tbody>
 </table>
@@ -1036,6 +1074,28 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#premium-multigift-links" id="premium-multigift-links" name="premium-multigift-links"><i class="anchor-icon"></i></a>Premium multigift links</h3>
+<p>Used to bring the user to the screen used for gifting Telegram Premium subscriptions to friends, see <a href="/api/giveaways">here for more info on gifting Telegram Premium to multiple users »</a>.  </p>
+<p>This link is used to invite users to gift Premium subscription to other users, see <a href="#premium-giftcode-links">here »</a> for the different link type containing the actual giftcodes that can be used to import a gifted Telegram Premium subscription.  </p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://premium_multigift?ref=&lt;referrer&gt;</code></pre>
+<p>Parameters: </p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>referrer</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Used by official apps for analytics using <a href="/method/help.saveAppLog">help.saveAppLog</a>.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#premium-referrer-links" id="premium-referrer-links" name="premium-referrer-links"><i class="anchor-icon"></i></a>Premium referrer links</h3>
 <p>Used by official apps to show the <a href="/api/premium">Telegram Premium</a> subscription page.  </p>
 <p><code>tg:</code> syntax:</p>
@@ -1057,8 +1117,31 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#premium-giftcode-links" id="premium-giftcode-links" name="premium-giftcode-links"><i class="anchor-icon"></i></a>Premium giftcode links</h3>
+<p>Used to process <a href="/api/giveaways">Telegram Premium giftcode links</a>.  </p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://giftcode?slug=&lt;slug&gt;</code></pre>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/giftcode/&lt;slug&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>slug</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Gift code slug to be passed to <a href="/method/payments.checkGiftCode">payments.checkGiftCode</a> to obtain further info, and eventually to <a href="/method/payments.applyGiftCode">payments.applyGiftCode</a> to apply it. See the <a href="/api/giveaways">giveaways</a> documentation for more info.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#qr-code-login-links" id="qr-code-login-links" name="qr-code-login-links"><i class="anchor-icon"></i></a>QR code login links</h3>
-<p>Used by <a href="/api/qr-login">QR code login</a>.</p>
+<p>Used by the <a href="/api/qr-login">QR code login flow »</a>.</p>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://login?token=&lt;base64encodedtoken&gt;</code></pre>
 <p>Parameters:</p>
@@ -1078,24 +1161,85 @@ These links are used to confirm ownership of the phone number, to prevent accoun
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#bot-attachment-menu-links" id="bot-attachment-menu-links" name="bot-attachment-menu-links"><i class="anchor-icon"></i></a>Bot attachment menu links</h3>
-<p>Used to install and optionally open a <a href="/api/bots/attach">bot attachment menu »</a> in a certain chat.<br>
-For all link types, clients should:</p>
+<h3><a class="anchor" href="#mini-app-links" id="mini-app-links" name="mini-app-links"><i class="anchor-icon"></i></a>Mini App links</h3>
+<p>Used to install and open a <a href="/api/bots/attach">bot attachment or side menu »</a>.<br>
+Clients should first <a href="/api/bots/attach">install the associated bot attachment or side menu entry as specified here »</a>, and if the user accepts the installation prompt, open the Mini App using the following logic.  </p>
+<p>After installing the attachment/side menu entry globally, opens the associated mini app using <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> with the <code>from_side_menu</code> flag set, regardless of the currently open Telegram chat (in fact, the Mini App should opened with that flag even if the client itself is minimized).  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;bot_username&gt;?startapp
+t.me/&lt;bot_username&gt;?startapp=&lt;start_parameter&gt;</code></pre>
+<p>Note that <a href="#direct-mini-app-links">Direct Mini App links</a> have a similar syntax, with an additional <code>short_name</code> parameter to identify a specific Mini App owned by the bot.  </p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;startapp
+tg://resolve?domain=&lt;bot_username&gt;&amp;startapp=&lt;start_parameter&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bot_username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment/side menu entry</a></td>
+</tr>
+<tr>
+<td><code>start_parameter</code></td>
+<td style="text-align: center;">Optional</td>
+<td>If provided, should be passed to <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>.<code>start_param</code></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#direct-mini-app-links" id="direct-mini-app-links" name="direct-mini-app-links"><i class="anchor-icon"></i></a>Direct mini app links</h3>
+<p>Used to share <a href="/api/bots/webapps#direct-link-mini-apps">Direct link Mini apps</a>.  </p>
+<p>These links are different from <a href="#bot-attachment-or-side-menu-links">bot attachment menu deep links</a>, because they don't require the user to install an attachment menu, and a single bot can offer multiple named mini apps, distinguished by their <code>short_name</code>.  </p>
+<p>These links should be handled as specified in the <a href="/api/bots/webapps#direct-link-mini-apps">direct link Mini Apps documentation »</a>.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;bot_username&gt;/&lt;short_name&gt;?startapp=&lt;start_parameter&gt;</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;appname=&lt;short_name&gt;&amp;startapp=&lt;start_parameter&gt;</code></pre>
+<p>Note that <a href="#mini-app-links">Mini App links</a> have a similar syntax, <em>without</em> a <code>short_name</code> parameter.  </p>
+<p>Parameters: </p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bot_username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the bot that owns the <a href="/api/bots/games">game</a></td>
+</tr>
+<tr>
+<td><code>appname</code></td>
+<td style="text-align: center;">Required</td>
+<td>Mini app short name, to pass to <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a>.<code>short_name</code> when invoking <a href="/method/messages.getBotApp">messages.getBotApp</a></td>
+</tr>
+<tr>
+<td><code>startapp</code></td>
+<td style="text-align: center;">Optional</td>
+<td><code>start_param</code> to pass to <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#bot-attachment-or-side-menu-links" id="bot-attachment-or-side-menu-links" name="bot-attachment-or-side-menu-links"><i class="anchor-icon"></i></a>Bot attachment or side menu links</h3>
+<p>Used to install and open a <a href="/api/bots/attach">bot attachment or side menu »</a> in a certain chat.<br>
+For all link types, clients should first <a href="/api/bots/attach">install the associated bot attachment or side menu entry as specified here »</a>, and if the user accepts the installation prompt, open the Mini App using the following logic, depending on the link subtype:</p>
+<h4><a class="anchor" href="#open-in-current-chat" id="open-in-current-chat" name="open-in-current-chat"><i class="anchor-icon"></i></a>Open in current chat</h4>
+<p>After installing the attachment/side menu entry globally, opens the associated mini app using <a href="/method/messages.requestWebView">messages.requestWebView</a> in the currently open chat, by passing it to the <code>peer</code> parameter of <a href="/method/messages.requestWebView">messages.requestWebView</a>.  </p>
+<p>If the current chat is not supported by the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field: </p>
 <ul>
-<li>Check that the associated bot username has an associated <a href="/api/bots/attach">attachment menu</a> as specified <a href="/api/bots/attach">here »</a>.</li>
-<li>If not installed, ask the user to <a href="/api/bots/attach">install the attachment menu »</a>.</li>
-<li>Check that the attachment menu can be opened in the chosen chat type by checking the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field.<ul>
-<li>If the chosen chat is supported, open the attachment menu <a href="/api/bots/webapps#normal-web-apps">web app »</a></li>
-<li>Otherwise:<ul>
-<li>If the user has just installed the attachment menu @ step 2, notify the user that the attachment menu was installed successfully.</li>
+<li>If the user has just installed the attachment menu in the previous step, notify the user that the attachment menu was installed successfully.</li>
 <li>Otherwise, notify the user that the attachment menu webapp can't be opened in the specified chat.</li>
 </ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4><a class="anchor" href="#open-in-current-chat" id="open-in-current-chat" name="open-in-current-chat"><i class="anchor-icon"></i></a>Open in current chat</h4>
-<p>Installs and opens an attachment menu web app in the currently open chat.  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;?startattach
 t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;</code></pre>
@@ -1115,7 +1259,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 <tr>
 <td><code>bot_username</code></td>
 <td style="text-align: center;">Required</td>
-<td>Username of the bot that owns the <a href="/api/bots/attach">attachment menu</a></td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment/side menu entry</a></td>
 </tr>
 <tr>
 <td><code>start_parameter</code></td>
@@ -1125,7 +1269,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 </tbody>
 </table>
 <h4><a class="anchor" href="#open-in-specific-chat" id="open-in-specific-chat" name="open-in-specific-chat"><i class="anchor-icon"></i></a>Open in specific chat</h4>
-<p>Installs and opens an attachment menu web app in a specific chat.  </p>
+<p>After installing the attachment/side menu entry globally, opens the associated mini app using <a href="/method/messages.requestWebView">messages.requestWebView</a> in a specific chat (passed to the <code>peer</code> parameter of <a href="/method/messages.requestWebView">messages.requestWebView</a>).  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;username&gt;?attach=&lt;bot_username&gt;
 t.me/&lt;username&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
@@ -1136,6 +1280,11 @@ t.me/+&lt;phone_number&gt;?attach=&lt;bot_username&gt;&amp;startattach=&lt;start
 tg://resolve?domain=&lt;username&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;
 tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;</code></pre>
+<p>If the specified chat is not supported by the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field: </p>
+<ul>
+<li>If the user has just installed the attachment menu in the previous step, notify the user that the attachment menu was installed successfully.</li>
+<li>Otherwise, notify the user that the attachment menu webapp can't be opened in the specified chat.</li>
+</ul>
 <p>Parameters:</p>
 <table class="table">
 <thead>
@@ -1149,17 +1298,17 @@ tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;star
 <tr>
 <td><code>username</code></td>
 <td style="text-align: center;">Required for <a href="#public-username-links">username links</a></td>
-<td>Username of chat where to open web app</td>
+<td>Username of chat where to open the mini app</td>
 </tr>
 <tr>
 <td><code>phone_number</code></td>
 <td style="text-align: center;">Required for <a href="#phone-number-links">phone number links</a></td>
-<td>Phone number of private chat where to open web app</td>
+<td>Phone number of private chat where to the open mini app</td>
 </tr>
 <tr>
 <td><code>bot_username</code></td>
 <td style="text-align: center;">Required</td>
-<td>Username of the bot that owns the <a href="/api/bots/attach">attachment menu</a></td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment/side menu</a></td>
 </tr>
 <tr>
 <td><code>start_parameter</code></td>
@@ -1169,7 +1318,7 @@ tg://resolve?phone=&lt;phone_number&gt;&amp;attach=&lt;bot_username&gt;&amp;star
 </tbody>
 </table>
 <h4><a class="anchor" href="#open-in-any-chat" id="open-in-any-chat" name="open-in-any-chat"><i class="anchor-icon"></i></a>Open in any chat</h4>
-<p>Installs an attachment menu, opens a dialog selection form that will open the attachment menu web app in a specific chat.  </p>
+<p>After installing the attachment/side menu entry globally, opens a dialog selection form that will open the attachment menu mini app using <a href="/method/messages.requestWebView">messages.requestWebView</a> in a specific chat (passed it to the <code>peer</code> parameter of <a href="/method/messages.requestWebView">messages.requestWebView</a>).  </p>
 <p><code>t.me</code> syntax:</p>
 <pre><code>t.me/&lt;bot_username&gt;?startattach&amp;choose=users+bots+groups+channels
 t.me/&lt;bot_username&gt;?startattach=&lt;start_parameter&gt;&amp;choose=users+bots+groups+channels</code></pre>
@@ -1189,7 +1338,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 <tr>
 <td><code>bot_username</code></td>
 <td style="text-align: center;">Required</td>
-<td>Username of the bot that owns the <a href="/api/bots/attach">attachment menu</a></td>
+<td>Username of the bot that owns the <a href="/api/bots/attach">attachment/side menu</a></td>
 </tr>
 <tr>
 <td><code>start_parameter</code></td>

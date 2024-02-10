@@ -52,8 +52,8 @@
 <p>Other advantages may include saving some potential CPU cycles and an increase in response time, these things however depend heavily on the usage pattern of your bot.</p>
 <p>Setting a webhook means you supplying Telegram with a location in the form of a URL, on which your bot listens for updates. We need to be able to connect and post updates to that URL. </p>
 <p>To ensure that we can do that, there are some basic requirements:</p>
-<h3><a class="anchor" name="the-short-version" href="#the-short-version"><i class="anchor-icon"></i></a>The short version</h3>
-<p>You&#39;ll need a server that:</p>
+<h3><a class="anchor" href="#the-short-version" id="the-short-version" name="the-short-version"><i class="anchor-icon"></i></a>The short version</h3>
+<p>You'll need a server that:</p>
 <ul>
 <li>Supports IPv4, IPv6 is currently not supported for webhooks.</li>
 <li>Accepts incoming POSTs from subnets <code>149.154.160.0/20</code> and <code>91.108.4.0/22</code> on port 443, 80, 88, or 8443. </li>
@@ -62,120 +62,187 @@
 <li>Uses a CN or SAN that matches the domain you’ve supplied on setup.</li>
 <li>Supplies all intermediate certificates to complete a verification chain.</li>
 </ul>
-<p>That’s almost all there’s to it.<br>If you decide to limit traffic to our specific range of addresses, keep an eye on this document whenever you seem to run into trouble. Our IP-range might change in the future. </p>
-<h3><a class="anchor" name="the-longer-version" href="#the-longer-version"><i class="anchor-icon"></i></a>The longer version</h3>
+<p>That’s almost all there’s to it.
+If you decide to limit traffic to our specific range of addresses, keep an eye on this document whenever you seem to run into trouble. Our IP-range might change in the future. </p>
+<h3><a class="anchor" href="#the-longer-version" id="the-longer-version" name="the-longer-version"><i class="anchor-icon"></i></a>The longer version</h3>
 <ul>
-<li><h4><a class="anchor" name="a-domain-name" href="#a-domain-name"><i class="anchor-icon"></i></a>A domain name</h4>
-<p>Setting a webhook needs a URL for us to post to. For that you&#39;ll need a server with a domain name. If you don&#39;t have one, you&#39;ll need to obtain one first. Telegram currently doesn&#39;t offer hosting or domain name services. There are quite a few VPS/Web hosting providers around the internet, feel free to pick one to your liking.<br>If you&#39;re using a self-signed certificate, you may use the IP as a CN, instead of the domain name.<br><a href="https://core.telegram.org/bots/webhooks#how-do-i-get-a-server-with-a-domain-name">How do I get a server with a domain name?</a></p>
+<li>
+<h4><a class="anchor" href="#a-domain-name" id="a-domain-name" name="a-domain-name"><i class="anchor-icon"></i></a>A domain name</h4>
+<p>Setting a webhook needs a URL for us to post to. For that you'll need a server with a domain name. If you don't have one, you'll need to obtain one first. Telegram currently doesn't offer hosting or domain name services. There are quite a few VPS/Web hosting providers around the internet, feel free to pick one to your liking.
+If you're using a self-signed certificate, you may use the IP as a CN, instead of the domain name.
+<a href="https://core.telegram.org/bots/webhooks#how-do-i-get-a-server-with-a-domain-name">How do I get a server with a domain name?</a></p>
 </li>
-<li><h4><a class="anchor" name="an-open-port" href="#an-open-port"><i class="anchor-icon"></i></a>An open port</h4>
+<li>
+<h4><a class="anchor" href="#an-open-port" id="an-open-port" name="an-open-port"><i class="anchor-icon"></i></a>An open port</h4>
 <p>A webhook needs an open port on your server. We currently support the following ports: <strong>443, 80, 88</strong> and <strong>8443</strong>. Other ports are not supported and will not work. Make sure your bot is running on one of those supported ports, and that the bot is reachable via its public address.</p>
 <pre><code>If you want to limit access to Telegram only, please allow traffic from 149.154.160.0/20 and 91.108.4.0/22. 
 Whenever something stops working in the future, please check this document again as 
 the range might expand or change.</code></pre>
 <p><a href="https://core.telegram.org/bots/webhooks#how-do-i-check-for-open-ports-or-limit-access-to-my-bot">How do I check for open ports or limit access to my bot?</a></p>
 </li>
-<li><h4><a class="anchor" name="always-ssl-tls" href="#always-ssl-tls"><i class="anchor-icon"></i></a>Always SSL/TLS</h4>
-<p>A webhook requires SSL/TLS encryption, no matter which port is used. It&#39;s not possible to use a plain-text HTTP webhook. You shouldn&#39;t want to either, for the sake of your bot and users.<br><a href="https://core.telegram.org/bots/webhooks#ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhoo">SSL/TLS, why do I have to handle this for a webhook?</a></p>
+<li>
+<h4><a class="anchor" href="#always-ssl-tls" id="always-ssl-tls" name="always-ssl-tls"><i class="anchor-icon"></i></a>Always SSL/TLS</h4>
+<p>A webhook requires SSL/TLS encryption, no matter which port is used. It's not possible to use a plain-text HTTP webhook. You shouldn't want to either, for the sake of your bot and users.
+<a href="https://core.telegram.org/bots/webhooks#ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhoo">SSL/TLS, why do I have to handle this for a webhook?</a></p>
 </li>
-<li><h4><a class="anchor" name="not-all-ssl-tls-is-equal" href="#not-all-ssl-tls-is-equal"><i class="anchor-icon"></i></a>Not all SSL/TLS is equal</h4>
-<p>We support any SSL/TLS version TLS1.2 and up for your webhook. This means that <strong>SSLV2/3/TLS1.0/TSL1.1 are NOT supported</strong>, due to security issues associated with those older versions.<br><a href="https://core.telegram.org/bots/webhooks#how-do-i-check-that-im-handling-the-right-version">How do I check that I’m handling the right version?</a></p>
+<li>
+<h4><a class="anchor" href="#not-all-ssl-tls-is-equal" id="not-all-ssl-tls-is-equal" name="not-all-ssl-tls-is-equal"><i class="anchor-icon"></i></a>Not all SSL/TLS is equal</h4>
+<p>We support any SSL/TLS version TLS1.2 and up for your webhook. This means that <strong>SSLV2/3/TLS1.0/TSL1.1 are NOT supported</strong>, due to security issues associated with those older versions.
+<a href="https://core.telegram.org/bots/webhooks#how-do-i-check-that-im-handling-the-right-version">How do I check that I’m handling the right version?</a></p>
 </li>
-<li><h4><a class="anchor" name="ssl-needs-a-certificate" href="#ssl-needs-a-certificate"><i class="anchor-icon"></i></a>SSL needs a certificate</h4>
-<p>The common name (CN) of your certificate (self-signed or verified) has to match the domain name where your bot is hosted. You may also use a subject alternative name (SAN), that matches the domain for your webhook. Server Name Indication (SNI)-routing is supported. If you&#39;re using a self-signed certificate, you may use the IP as a CN, instead of the domain name.<br><a href="https://core.telegram.org/bots/webhooks#a-certificate-where-do-i-get-one-and-how">A certificate, where do I get one, and how?</a></p>
+<li>
+<h4><a class="anchor" href="#ssl-needs-a-certificate" id="ssl-needs-a-certificate" name="ssl-needs-a-certificate"><i class="anchor-icon"></i></a>SSL needs a certificate</h4>
+<p>The common name (CN) of your certificate (self-signed or verified) has to match the domain name where your bot is hosted. You may also use a subject alternative name (SAN), that matches the domain for your webhook. Server Name Indication (SNI)-routing is supported. If you're using a self-signed certificate, you may use the IP as a CN, instead of the domain name.
+<a href="https://core.telegram.org/bots/webhooks#a-certificate-where-do-i-get-one-and-how">A certificate, where do I get one, and how?</a></p>
 </li>
-<li><h4><a class="anchor" name="verified-or-self-signed" href="#verified-or-self-signed"><i class="anchor-icon"></i></a>Verified or self-signed</h4>
-<p>A certificate can either be verified or self-signed. Setting a webhook with a self-signed certificate differs a little from setting a webhook with a verified certificate. Ensure you&#39;re using the correct setup for the type of certificate you&#39;ve chosen for your webhook.<br><a href="https://core.telegram.org/bots/webhooks#how-do-i-set-a-webhook-for-either-type">How do I set a webhook for either type?</a></p>
+<li>
+<h4><a class="anchor" href="#verified-or-self-signed" id="verified-or-self-signed" name="verified-or-self-signed"><i class="anchor-icon"></i></a>Verified or self-signed</h4>
+<p>A certificate can either be verified or self-signed. Setting a webhook with a self-signed certificate differs a little from setting a webhook with a verified certificate. Ensure you're using the correct setup for the type of certificate you've chosen for your webhook.
+<a href="https://core.telegram.org/bots/webhooks#how-do-i-set-a-webhook-for-either-type">How do I set a webhook for either type?</a></p>
 </li>
-<li><h4><a class="anchor" name="supported-certificates" href="#supported-certificates"><i class="anchor-icon"></i></a>Supported certificates</h4>
-<p>Not all verified certificates are supported. Certificates are based on a network of trust and come in a chain. Trusting your verified certificate means we have to trust the provider of that certificate, the Certificate Authority (and hence its root certificate). Before you pick a certificate provider, Check <a href="https://packages.ubuntu.com/bionic/all/ca-certificates/filelist">this list</a> to make sure that we actually trust their root certificate.<br><a href="https://core.telegram.org/bots/webhooks#an-untrusted-root">What if my root certificate isn’t on that list?</a></p>
+<li>
+<h4><a class="anchor" href="#supported-certificates" id="supported-certificates" name="supported-certificates"><i class="anchor-icon"></i></a>Supported certificates</h4>
+<p>Not all verified certificates are supported. Certificates are based on a network of trust and come in a chain. Trusting your verified certificate means we have to trust the provider of that certificate, the Certificate Authority (and hence its root certificate). Before you pick a certificate provider, Check <a href="https://packages.ubuntu.com/jammy/all/ca-certificates/filelist">this list</a> to make sure that we actually trust their root certificate.
+<a href="https://core.telegram.org/bots/webhooks#an-untrusted-root">What if my root certificate isn’t on that list?</a></p>
 </li>
-<li><h4><a class="anchor" name="an-untrusted-root" href="#an-untrusted-root"><i class="anchor-icon"></i></a>An Untrusted root</h4>
-<p>Ok, so you already had a certificate installed and just discovered it’s not on our list.<br>Start by ignoring it, and just try to set it. We occasionally add extra root certificates to keep up with popular demand, so the list isn&#39;t always exhaustive. Unlucky after all? We&#39;ll allow you to supply an unsupported root certificate when setting the webhook. This method is nearly identical to setting a self-signed certificate webhook. Instead of your self-signed certificate you&#39;ll be sending us the root certificate as inputFile.<br><a href="https://core.telegram.org/bots/webhooks#setting-a-verified-webhook-with-an-untrusted-root">Setting a verified webhook with an untrusted root</a></p>
+<li>
+<h4><a class="anchor" href="#an-untrusted-root" id="an-untrusted-root" name="an-untrusted-root"><i class="anchor-icon"></i></a>An Untrusted root</h4>
+<p>Ok, so you already had a certificate installed and just discovered it’s not on our list.
+Start by ignoring it, and just try to set it. We occasionally add extra root certificates to keep up with popular demand, so the list isn't always exhaustive. Unlucky after all? We'll allow you to supply an unsupported root certificate when setting the webhook. This method is nearly identical to setting a self-signed certificate webhook. Instead of your self-signed certificate you'll be sending us the root certificate as inputFile.
+<a href="https://core.telegram.org/bots/webhooks#setting-a-verified-webhook-with-an-untrusted-root">Setting a verified webhook with an untrusted root</a></p>
 </li>
-<li><h4><a class="anchor" name="intermediate-certificates" href="#intermediate-certificates"><i class="anchor-icon"></i></a>Intermediate certificates</h4>
-<p>Some verified certificates require an intermediate certificate. In this construction the provider of your verified certificate has used their root certificate to sign an intermediate certificate. This intermediate certificate is then used to sign your verified certificate. You&#39;ll need to provide the intermediate certificate for us to be able to verify the chain of trust. CA&#39;s that use this type of chain supply an intermediate certificate.<br><a href="https://core.telegram.org/bots/webhooks#supplying-an-intermediate-certificate">Supplying an intermediate certificate</a></p>
+<li>
+<h4><a class="anchor" href="#intermediate-certificates" id="intermediate-certificates" name="intermediate-certificates"><i class="anchor-icon"></i></a>Intermediate certificates</h4>
+<p>Some verified certificates require an intermediate certificate. In this construction the provider of your verified certificate has used their root certificate to sign an intermediate certificate. This intermediate certificate is then used to sign your verified certificate. You'll need to provide the intermediate certificate for us to be able to verify the chain of trust. CA's that use this type of chain supply an intermediate certificate.
+<a href="https://core.telegram.org/bots/webhooks#supplying-an-intermediate-certificate">Supplying an intermediate certificate</a></p>
 </li>
-<li><h4><a class="anchor" name="more-information" href="#more-information"><i class="anchor-icon"></i></a>More information</h4>
-<p>Since we know webhooks can be a tad overwhelming, we’re working on a little digital assistant that’ll try and help you with the most common problems, it&#39;s not nearly perfect, but you may try using @CanOfWormsBot to check if your chain of certificates is installed correctly before contacting support.</p>
+<li>
+<h4><a class="anchor" href="#more-information" id="more-information" name="more-information"><i class="anchor-icon"></i></a>More information</h4>
+<p>Since we know webhooks can be a tad overwhelming, we’re working on a little digital assistant that’ll try and help you with the most common problems, it's not nearly perfect, but you may try using @CanOfWormsBot to check if your chain of certificates is installed correctly before contacting support.</p>
 </li>
-<li><h4><a class="anchor" name="testing-your-bot" href="#testing-your-bot"><i class="anchor-icon"></i></a>Testing your bot</h4>
+<li>
+<h4><a class="anchor" href="#testing-your-bot" id="testing-your-bot" name="testing-your-bot"><i class="anchor-icon"></i></a>Testing your bot</h4>
 <p>We took the liberty of adding a <a href="https://core.telegram.org/bots/webhooks#testing-your-bot-with-updates">set of example updates</a>. They come in handy when testing your bot, no matter which method of getting updates you might be using.</p>
 </li>
-<li><h4><a class="anchor" name="don-39t-panic" href="#don-39t-panic"><i class="anchor-icon"></i></a>Don&#39;t panic.</h4>
-<p>If by now you&#39;re looking for your fishing gear because we&#39;ve mentioned ports and hooks or you&#39;re about to Google what kind of bait URL and TLS exactly are, this guide might not be completely for you. You’re quite likely still a brilliant bot programmer, don’t worry. Perhaps this whole webhook thing is just new to you, not all is lost. If you currently have a working getUpdates situation, it&#39;s a good idea to pick up this guide again on a rainy Sunday afternoon and take your time to read up on some subjects around the internet. This <a href="http://www.douglasadams.com/creations/hhgg.html">guide</a> can only contain a finite amount of information after all.</p>
+<li>
+<h4><a class="anchor" href="#dont-panic" id="dont-panic" name="dont-panic"><i class="anchor-icon"></i></a>Don't panic.</h4>
+<p>If by now you're looking for your fishing gear because we've mentioned ports and hooks or you're about to Google what kind of bait URL and TLS exactly are, this guide might not be completely for you. You’re quite likely still a brilliant bot programmer, don’t worry. Perhaps this whole webhook thing is just new to you, not all is lost. If you currently have a working getUpdates situation, it's a good idea to pick up this guide again on a rainy Sunday afternoon and take your time to read up on some subjects around the internet. This <a href="http://www.douglasadams.com/creations/hhgg.html">guide</a> can only contain a finite amount of information after all.</p>
 </li>
 </ul>
-<h3><a class="anchor" name="the-verbose-version" href="#the-verbose-version"><i class="anchor-icon"></i></a>The verbose version</h3>
-<h5><a class="anchor" name="how-do-i-get-a-server-with-a-domain-name" href="#how-do-i-get-a-server-with-a-domain-name"><i class="anchor-icon"></i></a>How do I get a server with a domain name?</h5>
+<h3><a class="anchor" href="#the-verbose-version" id="the-verbose-version" name="the-verbose-version"><i class="anchor-icon"></i></a>The verbose version</h3>
+<h5><a class="anchor" href="#how-do-i-get-a-server-with-a-domain-name" id="how-do-i-get-a-server-with-a-domain-name" name="how-do-i-get-a-server-with-a-domain-name"><i class="anchor-icon"></i></a>How do I get a server with a domain name?</h5>
 <p>If you use a webhook, we have to deliver requests to your bot to a server we can reach. So yes, you need a server we can connect to. It can be anywhere in the galaxy, if you ensure we can reach the server by domain name (or at least via IP for a self-signed certificate), it will work just fine.</p>
-<p>There are quite a few ways to get this done, as a novice however it&#39;s likely that you&#39;re not directly jumping at the chance of crafting this from scratch. Actually, as a novice, we recommend you don&#39;t. It&#39;s likely to be a complex and long ride.</p>
+<p>There are quite a few ways to get this done, as a novice however it's likely that you're not directly jumping at the chance of crafting this from scratch. Actually, as a novice, we recommend you don't. It's likely to be a complex and long ride.</p>
 <p><strong>If you got stuck here, make a choice:</strong></p>
 <ul>
-<li><p>You use getUpdates at the moment and it works, keep it that way. Especially if you&#39;re running your bot from a nice machine that does well. There is nothing wrong with using getUpdates.</p>
+<li>
+<p>You use getUpdates at the moment and it works, keep it that way. Especially if you're running your bot from a nice machine that does well. There is nothing wrong with using getUpdates.</p>
 </li>
-<li><p>Go with a hosted service and let a bunch of professionals worry about things like registering a domain, setting up DNS, a web server, securing it and so on.</p>
+<li>
+<p>Go with a hosted service and let a bunch of professionals worry about things like registering a domain, setting up DNS, a web server, securing it and so on.</p>
 </li>
 </ul>
-<pre><code>If you&#39;re going with a hosted service, make sure to look for a hosting provider that 
+<pre><code>If you're going with a hosted service, make sure to look for a hosting provider that 
 not only supports your code’s needs, for example: support for your PHP version,
 but one that also handles SSL and allows you to create/deploy certificates.</code></pre>
 <ul>
 <li>Go crazy, dive on the internet and start reading. Once you’re confident that you’ve got all the basic theories down, find yourself a nice hosted VPS or roll your own machine at home and get back to us here.</li>
 </ul>
-<h5><a class="anchor" name="how-do-i-check-for-open-ports-or-limit-access-to-my-bot" href="#how-do-i-check-for-open-ports-or-limit-access-to-my-bot"><i class="anchor-icon"></i></a>How do I check for open ports or limit access to my bot?</h5>
+<h5><a class="anchor" href="#how-do-i-check-for-open-ports-or-limit-access-to-my-bot" id="how-do-i-check-for-open-ports-or-limit-access-to-my-bot" name="how-do-i-check-for-open-ports-or-limit-access-to-my-bot"><i class="anchor-icon"></i></a>How do I check for open ports or limit access to my bot?</h5>
 <p>So you have the hosting thing down and all is good so far, however, when you enter the address of your bot in your browser it seems unreachable.</p>
-<p>Explaining every firewall or web server solution in detail isn&#39;t possible for us, which we hope you understand. If you’re running a hosted solution, you’re more likely to have a nice UI where you configure these settings. Head to your configuration panel and check all of them. If you’re on a Linux based VPS with shell access, we have some tips for you:</p>
+<p>Explaining every firewall or web server solution in detail isn't possible for us, which we hope you understand. If you’re running a hosted solution, you’re more likely to have a nice UI where you configure these settings. Head to your configuration panel and check all of them. If you’re on a Linux based VPS with shell access, we have some tips for you:</p>
 <ul>
-<li>Make sure your bot process is indeed configured to listen on the port you&#39;re using.<br><code>netstat –ln | grep portnumber</code><br>Shows you if your bot is actually listening for incoming requests on the port you expect.<br><code>sudo lsof -i | grep process name</code><br>Is a simple way to check if that’s actually being listened on by the process your bot is using.</li>
-</ul>
-<ul>
-<li>Make sure it’s listening  correctly.<br>Your bot has to listen on the address you’ve exposed to the outside <code>(your public IP)</code>, it can also listen on all addresses <code>(*: or 0.0.0.0)</code>.<br>The <code>netstat</code> and <code>lsof</code>-commands mentioned above assist in checking this. If nothing shows up, it is time to check your configuration and fix it. Set the correct IP, make sure it’s listening on a supported port and fire away! Just use a Web Browser to check if you’re reachable. The problem can be in the configuration of your bot, your web server virtual host configuration, or the servers binding configuration.</li>
-</ul>
-<ul>
-<li><p>If you still can’t reach your address, check your firewall.<br><code>sudo iptables –L</code><br><strong>OR</strong><br><code>sudo ufw status verbose</code> (Ubuntu)<br>Gives you some insight in the current firewall settings.</p>
+<li>
+<p>Make sure your bot process is indeed configured to listen on the port you're using.
+<code>netstat –ln | grep portnumber</code>
+Shows you if your bot is actually listening for incoming requests on the port you expect.
+<code>sudo lsof -i | grep process name</code>
+Is a simple way to check if that’s actually being listened on by the process your bot is using.</p>
 </li>
-<li><p>If it looks like you’re blocking incoming traffic, let’s fix that.<br><code>sudo iptables –A INPUT –p tcp –m tcp –dport portnumber -j ACCEPT</code><br><strong>OR</strong><br><code>sudo ufw allow portnumber/tcp</code><br>Allows incoming traffic on all interfaces to the specified tcp port.<br><code>sudo iptables –A INPUT –i interfacename –p tcp –m tcp –dport portnumber -j ACCEPT</code><br><strong>OR</strong><br><code>sudo ufw allow in on interfacename to any port portnumber proto tcp</code><br>Allows incoming traffic to a specific interface and a specific port from everywhere.<br><code>sudo ifconfig</code><br>Helps you find the interface with the public address you’re going to use.</p>
+<li>
+<p>Make sure it’s listening  correctly.
+Your bot has to listen on the address you’ve exposed to the outside <code>(your public IP)</code>, it can also listen on all addresses <code>(*: or 0.0.0.0)</code>. 
+The <code>netstat</code> and <code>lsof</code>-commands mentioned above assist in checking this. If nothing shows up, it is time to check your configuration and fix it. Set the correct IP, make sure it’s listening on a supported port and fire away! Just use a Web Browser to check if you’re reachable. The problem can be in the configuration of your bot, your web server virtual host configuration, or the servers binding configuration.</p>
+</li>
+<li>
+<p>If you still can’t reach your address, check your firewall.
+<code>sudo iptables –L</code> 
+<strong>OR</strong>
+<code>sudo ufw status verbose</code> (Ubuntu) 
+Gives you some insight in the current firewall settings.</p>
+</li>
+<li>
+<p>If it looks like you’re blocking incoming traffic, let’s fix that.
+<code>sudo iptables –A INPUT –p tcp –m tcp –dport portnumber -j ACCEPT</code>
+<strong>OR</strong>
+<code>sudo ufw allow portnumber/tcp</code> 
+Allows incoming traffic on all interfaces to the specified tcp port.
+<code>sudo iptables –A INPUT –i interfacename –p tcp –m tcp –dport portnumber -j ACCEPT</code>
+<strong>OR</strong>
+<code>sudo ufw allow in on interfacename to any port portnumber proto tcp</code>
+Allows incoming traffic to a specific interface and a specific port from everywhere.
+<code>sudo ifconfig</code>
+Helps you find the interface with the public address you’re going to use.</p>
 </li>
 </ul>
 <pre><code>If you use iptables, make sure to actually SAVE after changing the configuration.
 On a Debian based system the iptables-persistent package is be a good option.
 RHEL/CentOS offers a service iptables save -command.
-A quick online search for &quot;YOUROPERATINGSYSTEM save iptables&quot; also helps.</code></pre>
+A quick online search for "YOUROPERATINGSYSTEM save iptables" also helps.</code></pre>
 <ul>
-<li>If you’re just looking for some hints on how to limit incoming traffic:<br><code>sudo iptables –A INPUT –i interfacename –p tcp –m iprange -s 149.154.160.0/20,91.108.4.0/22 –dport portnumber -j ACCEPT</code><br><strong>OR</strong><pre><code>sudo ufw allow in on interfacename to any port portnumber proto tcp from 149.154.160.0/20
+<li>If you’re just looking for some hints on how to limit incoming traffic:
+<code>sudo iptables –A INPUT –i interfacename –p tcp –m iprange -s 149.154.160.0/20,91.108.4.0/22 –dport portnumber -j ACCEPT</code>
+<strong>OR</strong><pre><code>sudo ufw allow in on interfacename to any port portnumber proto tcp from 149.154.160.0/20
 sudo ufw allow in on interfacename to any port portnumber proto tcp from 91.108.4.0/22</code></pre>
-Allows incoming traffic to a specific interface and a specific port from a specific range of addresses. (ufw is using a subnet mask in the example, ranging from 192-255)</li>
+<p>Allows incoming traffic to a specific interface and a specific port from a specific range of addresses. (ufw is using a subnet mask in the example, ranging from 192-255)</p>
+</li>
 </ul>
 <p>That’s all for our examples. More information on best practices for setting up your firewall, on whichever operating system you prefer for your bot, is best found on the internet.</p>
-<h5><a class="anchor" name="ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhoo" href="#ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhoo"><i class="anchor-icon"></i></a>SSL/TLS, what is it and why do I have to handle this for a webhook?</h5>
-<p>You’re already familiar with it in some form or another. Whenever you see that (nicely green) lock in your browser bar, you know it’s reasonably safe to assume that you’ve landed on the site you actually wanted to visit. If you see the green lock, that&#39;s SSL/TLS in action. If you want to learn more about how SSL/TLS works in general, it&#39;s best to search the internet.</p>
-<p>The main difference between getUpdates and a webhook is the way the connection takes place. getUpdates means you&#39;ll connect to our server, a webhook means we&#39;ll be connecting to your server instead. Connecting to your server has to be done secure, we have to know for sure it&#39;s you we&#39;re talking to after all. This means you&#39;ll have to handle all that server side encryption stuff, virtually presenting us with a green lock. If you use a web server for us to post to, you need to support SSL/TLS handling on the port/virtual host of your choice. An online search for “YOURWEBSERVER enable HTTPS” will help you.</p>
+<h5><a class="anchor" href="#ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhook" id="ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhook" name="ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhook"><i class="anchor-icon"></i></a>SSL/TLS, what is it and why do I have to handle this for a webhook?</h5>
+<p>You’re already familiar with it in some form or another. Whenever you see that (nicely green) lock in your browser bar, you know it’s reasonably safe to assume that you’ve landed on the site you actually wanted to visit. If you see the green lock, that's SSL/TLS in action. If you want to learn more about how SSL/TLS works in general, it's best to search the internet.</p>
+<p>The main difference between getUpdates and a webhook is the way the connection takes place. getUpdates means you'll connect to our server, a webhook means we'll be connecting to your server instead. Connecting to your server has to be done secure, we have to know for sure it's you we're talking to after all. This means you'll have to handle all that server side encryption stuff, virtually presenting us with a green lock. If you use a web server for us to post to, you need to support SSL/TLS handling on the port/virtual host of your choice. An online search for "YOURWEBSERVER enable HTTPS" will help you.</p>
 <p>Not using a regular web server? Have a look at our <a href="https://core.telegram.org/bots/samples">example page</a>, most examples there include code for handling SSL/TLS in a webhook setup.</p>
-<h5><a class="anchor" name="how-do-i-check-that-im-handling-the-right-version" href="#how-do-i-check-that-im-handling-the-right-version"><i class="anchor-icon"></i></a>How do I check that I’m handling the right version?</h5>
+<h5><a class="anchor" href="#how-do-i-check-that-im-handling-the-right-version" id="how-do-i-check-that-im-handling-the-right-version" name="how-do-i-check-that-im-handling-the-right-version"><i class="anchor-icon"></i></a>How do I check that I’m handling the right version?</h5>
 <p>You just read up on the whole SSL/TLS stuff, figured out that it’s not all that bad to setup and we add some more requirements. Here are some tips to check if you’re indeed supporting at least TLS1.2.</p>
 <ul>
-<li><p>Several online services exist that allow you to check your certificate installation,<br>They give you an overview of your supported TLS versions/Cipher suites and other details. Search online for <strong>Symantec crypto report</strong> or <strong>Qualys ssl</strong>. Both supply tools to verify your setup.</p>
+<li>
+<p>Several online services exist that allow you to check your certificate installation,
+They give you an overview of your supported TLS versions/Cipher suites and other details. Search online for <strong>Symantec crypto report</strong> or <strong>Qualys ssl</strong>. Both supply tools to verify your setup.</p>
 </li>
-<li><p>Checking locally can also be done, in several ways, here are three options,</p>
+<li>
+<p>Checking locally can also be done, in several ways, here are three options,</p>
 <ul>
-<li><p>Go simple:<br>Using Chrome as a browser? Open up the URL to your bot and inspect the certificate details. If you’re supporting TLS Chrome tells you so in the security overview tab. Other browsers are likely able to give you similar basic information.</p>
+<li>
+<p>Go simple:
+Using Chrome as a browser? Open up the URL to your bot and inspect the certificate details. If you’re supporting TLS Chrome tells you so in the security overview tab. Other browsers are likely able to give you similar basic information.</p>
 </li>
-<li><p>Using curl:<br><code>curl --tlsv1.2 -v -k https://yourbotdomain:yourbotport/</code><br>You can add <code>--tlsv1.2</code> to force curl into using TLS1.2 when trying to connect. <code>-k</code> is optional and used to check against a self-signed certificate. <code>yourbotdomain</code> is the public hostname your webhook is running on. For local testing purposes you can also use the IP. <code>yourbotport</code> is the port you’re using.</p>
+<li>
+<p>Using curl:
+<code>curl --tlsv1.2 -v -k https://yourbotdomain:yourbotport/</code>
+You can add <code>--tlsv1.2</code> to force curl into using TLS1.2 when trying to connect. <code>-k</code> is optional and used to check against a self-signed certificate. <code>yourbotdomain</code> is the public hostname your webhook is running on. For local testing purposes you can also use the IP. <code>yourbotport</code> is the port you’re using.</p>
 </li>
-<li><p>Using OpenSSL<br><code>openssl s_client -tls1_2 -connect yourbotdomain:yourbotport -servername yourbotdomain</code><br>You can add <code>-tls1_2</code> to force OpenSSL into using TLS1.2 when trying to connect. <code>yourbotdomain</code> is the public hostname your webhook is running on. For local testing purposes you can also use the IP. <code>yourbotport</code> is the port you’re using. Note that https:// isn’t used for OpenSSL. <code>-servername</code> is optional, and included here for some shared hosters, which use SNI to route traffic to the correct domain. When SNI is used you’ll notice that your server appears to be returning a certificate for a different domain than your own. Adding <code>-servername yourbotdomain</code> ensures that SNI negotiation is done, and the correct certificate is returned.</p>
+<li>
+<p>Using OpenSSL
+<code>openssl s_client -tls1_2 -connect yourbotdomain:yourbotport -servername yourbotdomain</code>
+You can add <code>-tls1_2</code> to force OpenSSL into using TLS1.2 when trying to connect. <code>yourbotdomain</code> is the public hostname your webhook is running on. For local testing purposes you can also use the IP. <code>yourbotport</code> is the port you’re using. Note that https:// isn’t used for OpenSSL. <code>-servername</code> is optional, and included here for some shared hosters, which use SNI to route traffic to the correct domain. When SNI is used you’ll notice that your server appears to be returning a certificate for a different domain than your own. Adding <code>-servername yourbotdomain</code> ensures that SNI negotiation is done, and the correct certificate is returned.</p>
 </li>
 </ul>
 </li>
-<li><p>Some additional configuration pointers</p>
+<li>
+<p>Some additional configuration pointers</p>
 <ul>
-<li>Forcing TLS in your virtual host on Apache:<br><code>SSLProtocol -all +TLSv1.2</code></li>
-<li>Forcing TLS in your virtual host on Nginx:<br><code>ssl_protocols TLSv1.2;</code></li>
-<li>Force TLS for your Java virtual machine through system properties:<br><code>-Dhttps.protocols=TLSv1.2 -Djdk.tls.client.protocols=TLSv1.2</code></li>
-<li>Enabling ssl debug for your JVM:<br><code>-Djavax.net.debug=ssl,handshake,record</code></li>
+<li>Forcing TLS in your virtual host on Apache:
+<code>SSLProtocol -all +TLSv1.2</code></li>
+<li>Forcing TLS in your virtual host on Nginx:
+<code>ssl_protocols TLSv1.2;</code></li>
+<li>Force TLS for your Java virtual machine through system properties:
+<code>-Dhttps.protocols=TLSv1.2 -Djdk.tls.client.protocols=TLSv1.2</code></li>
+<li>Enabling ssl debug for your JVM:
+<code>-Djavax.net.debug=ssl,handshake,record</code></li>
 </ul>
 </li>
-<li><p>Other tools that may help in debugging issues:</p>
+<li>
+<p>Other tools that may help in debugging issues:</p>
 <ul>
 <li><strong>Wireshark</strong>: excellent packet capturing</li>
 <li><strong>Tcpdump</strong>: equally excellent and doesn’t need a GUI</li>
@@ -184,18 +251,26 @@ Allows incoming traffic to a specific interface and a specific port from a speci
 </ul>
 </li>
 </ul>
-<h5><a class="anchor" name="a-certificate-where-do-i-get-one-and-how" href="#a-certificate-where-do-i-get-one-and-how"><i class="anchor-icon"></i></a>A certificate, where do I get one and how?</h5>
+<h5><a class="anchor" href="#a-certificate-where-do-i-get-one-and-how" id="a-certificate-where-do-i-get-one-and-how" name="a-certificate-where-do-i-get-one-and-how"><i class="anchor-icon"></i></a>A certificate, where do I get one and how?</h5>
 <p>You need a certificate, pick on of these types;</p>
 <ul>
-<li><a href="https://core.telegram.org/bots/webhooks#a-verified-supported-certificate">A verified, supported certificate</a></li>
-<li><p><a href="https://core.telegram.org/bots/webhooks#a-self-signed-certificate">A self-signed certificate</a></p>
+<li>
+<p><a href="https://core.telegram.org/bots/webhooks#a-verified-supported-certificate">A verified, supported certificate</a></p>
 </li>
-<li><h5><a class="anchor" name="a-verified-supported-certificate" href="#a-verified-supported-certificate"><i class="anchor-icon"></i></a>A verified, supported certificate</h5>
-<p>Using a verified certificate means you already have, or will obtain, a certificate backed by a trusted certificate authority (CA). There are many ways to acquire a verified certificate, paid or free. Two popular examples of free suppliers are <strong>StartSSL</strong> and <strong>Let’s Encrypt</strong>. You’re welcome to pick another. Just make sure first the supplier is likely to be supported.<br>Check <a href="https://packages.ubuntu.com/bionic/all/ca-certificates/filelist">this list</a> before selecting a CA.<br>Once you’ve picked a CA and validated your identity with them, you can craft your certificate. This frequently starts by generating a CSR (Certificate Signing Request). Generating a CSR is done either through your host machine, or online via the tools provided by the CA.</p>
+<li>
+<p><a href="https://core.telegram.org/bots/webhooks#a-self-signed-certificate">A self-signed certificate</a></p>
 </li>
-<li><p>Here is an example (PEM format output).</p>
+<li>
+<h5><a class="anchor" href="#a-verified-supported-certificate" id="a-verified-supported-certificate" name="a-verified-supported-certificate"><i class="anchor-icon"></i></a>A verified, supported certificate</h5>
+<p>Using a verified certificate means you already have, or will obtain, a certificate backed by a trusted certificate authority (CA). There are many ways to acquire a verified certificate, paid or free. Two popular examples of free suppliers are <strong>StartSSL</strong> and <strong>Let’s Encrypt</strong>. You’re welcome to pick another. Just make sure first the supplier is likely to be supported.
+Check <a href="https://packages.ubuntu.com/jammy/all/ca-certificates/filelist">this list</a> before selecting a CA.
+Once you’ve picked a CA and validated your identity with them, you can craft your certificate. This frequently starts by generating a CSR (Certificate Signing Request). Generating a CSR is done either through your host machine, or online via the tools provided by the CA.</p>
+</li>
+<li>
+<p>Here is an example (PEM format output).</p>
 <ul>
-<li>Using OpenSSL:<br><code>openssl req -newkey rsa:2048 -keyout yourprivatekey.key -out yoursigningrequest.csr</code></li>
+<li>Using OpenSSL:
+<code>openssl req -newkey rsa:2048 -keyout yourprivatekey.key -out yoursigningrequest.csr</code></li>
 </ul>
 </li>
 </ul>
@@ -208,7 +283,7 @@ You are about to be asked to enter information that will be incorporated
 into your certificate request.
 What you are about to enter is what is called a Distinguished Name or a DN.
 There are quite a few fields but you can leave some blank
-For some fields there will be a default value,If you enter &#39;.&#39;,
+For some fields there will be a default value,If you enter '.',
 the field will be left blank.-----
 Country Name (2 letter code) [AU]:
 State or Province Name (full name) [Some-State]:
@@ -217,30 +292,32 @@ Organization Name (eg, company) [Internet Widgits Pty Ltd]:
 Organizational Unit Name (eg, section) []:
 Common Name (e.g. server FQDN or YOUR name) []: yourbotdomainname
 Email Address []:
-Please enter the following &#39;extra&#39; attributes
+Please enter the following 'extra' attributes
 to be sent with your certificate request
 A challenge password []:
 An optional company name []:
 ---</code></pre>
 <ul>
-<li><p>Another example:</p>
+<li>
+<p>Another example:</p>
 <ul>
-<li>Using Java keytool:<br><code>keytool -genkey -alias yourbotdomainname -keyalg RSA -keystore yourkeystore.jks -keysize 2048</code></li>
+<li>Using Java keytool:
+<code>keytool -genkey -alias yourbotdomainname -keyalg RSA -keystore yourkeystore.jks -keysize 2048</code></li>
 </ul>
 </li>
 </ul>
 <pre><code>---
-Enter keystore password:  
+Enter keystore password:  
 Re-enter new password: 
-What is your first and last name?  [Unknown]: yourbotdomainname
-What is the name of your organizational unit?  [Unknown]:  
-What is the name of your organization?  [Unknown]:  
-What is the name of your City or Locality?  [Unknown]:  
-What is the name of your State or Province?  [Unknown]:  
-What is the two-letter country code for this unit?  [Unknown]:  
-Is CN=test.telegram.org, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown correct?  
-[no]:  yes
-Enter key password for yourbotdomainname   
+What is your first and last name?  [Unknown]: yourbotdomainname
+What is the name of your organizational unit?  [Unknown]:  
+What is the name of your organization?  [Unknown]:  
+What is the name of your City or Locality?  [Unknown]:  
+What is the name of your State or Province?  [Unknown]:  
+What is the two-letter country code for this unit?  [Unknown]:  
+Is CN=test.telegram.org, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown correct?  
+[no]:  yes
+Enter key password for yourbotdomainname   
 (RETURN if same as keystore password): 
 ---</code></pre>
 <p>This generates the initial keystore, from which you can then create a CSR like this:</p>
@@ -248,65 +325,83 @@ Enter key password for yourbotdomainname
 <pre><code>---
 Enter keystore password:
 ---</code></pre>
-<p>To validate your certificate the Common Name (CN) has to match your webhook domain. Example, if you’re using <a href="https://www.example.com/example.php"><a href="https://www.example.com/example.php">https://www.example.com/example.php</a></a> as a webhook address, the certificate CN has to be <a href="http://www.example.com">www.example.com</a>.<br>So you need an <strong>exact match</strong> of the FQDN you’re setting for the webhook</p>
+<p>To validate your certificate the Common Name (CN) has to match your webhook domain. Example, if you’re using <a href="https://www.example.com/example.php">https://www.example.com/example.php</a> as a webhook address, the certificate CN has to be <a href="http://www.example.com">www.example.com</a>. 
+So you need an <strong>exact match</strong> of the FQDN you’re setting for the webhook</p>
 <p>There is an exception, if you’re using a SAN (Subject Alternative Name) the webhook address can either match the CN of your certificate, <strong>OR</strong> one of the SANs provided in the certificate. In most cases you’ll be using the CN.</p>
 <p>Create your CSR and supply the contents of the file to your CA. Most CA’s are kind enough to give you an example command of the input format they expect.</p>
-<p><code>cat yoursigningrequest.csr</code> <strong>or</strong> <code>cat yourbotdomainname.csr</code><br>Lets you have a look at the CSR we just generated:</p>
+<p><code>cat yoursigningrequest.csr</code> <strong>or</strong> <code>cat yourbotdomainname.csr</code>
+Lets you have a look at the CSR we just generated:</p>
 <div>
-    <a href="/file/811140281/1/5le8eVE7mPk.261973/25ba8c07609aef2310" target="_blank"><img src="/file/811140281/1/5le8eVE7mPk.261973/25ba8c07609aef2310" title="csrexample.jpg, 255.83Kb" height="60%" width="60%" class="dev_page_image" /></a>
+    <a href="/file/811140281/1/5le8eVE7mPk.261973/25ba8c07609aef2310" target="_blank"><img src="/file/811140281/1/5le8eVE7mPk.261973/25ba8c07609aef2310" title="csrexample.jpg, 255.83Kb" height="60%" width="60%" class="dev_page_image"></a>
 </div>
-
 <p>That doesn’t seem to informative, but we can deduce that the file is in PEM format (ASCII base64 encoded) and contains a certificate signing request. Luckily it is possible to look at the human readable contents of the CSR. Use the following commands to double check if all fields are set correctly.</p>
 <ul>
-<li><p>Using OpenSSL<br><code>openssl req -text -noout -verify -in yoursigningrequest.csr</code></p>
+<li>
+<p>Using OpenSSL
+<code>openssl req -text -noout -verify -in yoursigningrequest.csr</code></p>
 </li>
-<li><p>Using Java keytool<br><code>keytool -printcertreq -v -file yourbotdomainname.csr</code></p>
+<li>
+<p>Using Java keytool
+<code>keytool -printcertreq -v -file yourbotdomainname.csr</code></p>
 </li>
 </ul>
 <p>Verify your CSR and supply it to your CA to get a certificate. We’ll use StartSSL as an example here. StartSSL allows you to set up to 5 names (SAN), Their intermediate certificate is also needed for a webhook to work, which makes for a nice complete example. </p>
 <p>Go to the certificates wizard, enter the required hostname(s) for your SSL certificate (this is the CN you’ve also set in the CSR and an optional SAN).</p>
 <div>
-    <a href="/file/811140045/1/wtVcG_IghfI.78937/51e72042b1df5f28b5" target="_blank"><img src="/file/811140045/1/wtVcG_IghfI.78937/51e72042b1df5f28b5" title="sslcertwiz.jpg, 77.09Kb" height="75%" width="75%" class="dev_page_image" /></a>
+    <a href="/file/811140045/1/wtVcG_IghfI.78937/51e72042b1df5f28b5" target="_blank"><img src="/file/811140045/1/wtVcG_IghfI.78937/51e72042b1df5f28b5" title="sslcertwiz.jpg, 77.09Kb" height="75%" width="75%" class="dev_page_image"></a>
 </div>
-
-<p>In the example above we’ve chosen to set a CN <code>(test.telegram.org)</code>, but also a SAN <code>(sanexample.telegram.org)</code> The CN given has to match the CN used for generating the CSR.<br>Set your CN (and optional SAN) and copy the contents of the yoursigningrequest.csr file.</p>
+<p>In the example above we’ve chosen to set a CN <code>(test.telegram.org)</code>, but also a SAN <code>(sanexample.telegram.org)</code> The CN given has to match the CN used for generating the CSR.
+Set your CN (and optional SAN) and copy the contents of the yoursigningrequest.csr file.</p>
 <div>
-    <a href="/file/811140068/1/5qVIwLYnqd8.116971/87a6da7b70e377f899" target="_blank"><img src="/file/811140068/1/5qVIwLYnqd8.116971/87a6da7b70e377f899" title="sslcertwiz1.jpg, 114.23Kb" height="75%" width="75%" class="dev_page_image" /></a>
+    <a href="/file/811140068/1/5qVIwLYnqd8.116971/87a6da7b70e377f899" target="_blank"><img src="/file/811140068/1/5qVIwLYnqd8.116971/87a6da7b70e377f899" title="sslcertwiz1.jpg, 114.23Kb" height="75%" width="75%" class="dev_page_image"></a>
 </div>
-
 <p>Paste the contents, submit and you’re done.</p>
 <div>
-    <a href="/file/811140069/2/MVKz66N9t4o.53664/7130b06124c18c9e94" target="_blank"><img src="/file/811140069/2/MVKz66N9t4o.53664/7130b06124c18c9e94" title="sslcertwiz2.jpg, 52.41Kb" height="75%" width="75%" class="dev_page_image" /></a>
+    <a href="/file/811140069/2/MVKz66N9t4o.53664/7130b06124c18c9e94" target="_blank"><img src="/file/811140069/2/MVKz66N9t4o.53664/7130b06124c18c9e94" title="sslcertwiz2.jpg, 52.41Kb" height="75%" width="75%" class="dev_page_image"></a>
 </div>
-
-<p>Now you can download the created certificate directly. In the example used above you’ll receive a zip file with several PEM certificates. The root, intermediate and yourdomain certificate.<br>You need the <code>intermediate</code> and <code>yourdomain</code> to set a webhook with a StartSSL certificate.</p>
+<p>Now you can download the created certificate directly. In the example used above you’ll receive a zip file with several PEM certificates. The root, intermediate and yourdomain certificate. 
+You need the <code>intermediate</code> and <code>yourdomain</code> to set a webhook with a StartSSL certificate.</p>
 <p>You can inspect the set of certificates you’ve just downloaded.</p>
 <ul>
-<li><p>Here are some example commands:</p>
+<li>
+<p>Here are some example commands:</p>
 <ul>
-<li><p>Using OpenSSL:<br><code>openssl x509 -in yourdomain.crt -text -noout</code></p>
+<li>
+<p>Using OpenSSL:
+<code>openssl x509 -in yourdomain.crt -text -noout</code></p>
 </li>
-<li><p>Using Java keytool:<br><code>keytool -printcert -v -yourdomain.crt</code></p>
+<li>
+<p>Using Java keytool:
+<code>keytool -printcert -v -yourdomain.crt</code></p>
 </li>
-<li><p>Using Windows:<br>StartSSL supplies certificates in PEM format with a .crt extension, on Windows you can view the contents of them with a quick double click. Extract the files or open the “Otherserver.zip” and double click each of the certificates for inspection. The details tab supplies you with extra information.<br>Make sure you have a correct CN in the <code>Subject</code>-field of the <code>yourdomain</code>-certificate. If you&#39;re using a SAN, make sure that it is listed in the Subject <code>Alternative Name</code>-field.</p>
+<li>
+<p>Using Windows:
+StartSSL supplies certificates in PEM format with a .crt extension, on Windows you can view the contents of them with a quick double click. Extract the files or open the "Otherserver.zip" and double click each of the certificates for inspection. The details tab supplies you with extra information.
+Make sure you have a correct CN in the <code>Subject</code>-field of the <code>yourdomain</code>-certificate. If you're using a SAN, make sure that it is listed in the Subject <code>Alternative Name</code>-field.</p>
 </li>
 </ul>
 </li>
 </ul>
 <div>
-    <a href="/file/811140010/2/omTlwQW_Wpk.133258/5db0b29d43f5558413" target="_blank"><img src="/file/811140010/2/omTlwQW_Wpk.133258/5db0b29d43f5558413" title="wincert.jpg, 130.13Kb" height="50%" width="50%" class="dev_page_image" /></a>
+    <a href="/file/811140010/2/omTlwQW_Wpk.133258/5db0b29d43f5558413" target="_blank"><img src="/file/811140010/2/omTlwQW_Wpk.133258/5db0b29d43f5558413" title="wincert.jpg, 130.13Kb" height="50%" width="50%" class="dev_page_image"></a>
 </div>
-
 <p>With your fresh certificates at hand, you can now continue setting your webhook.</p>
 <ul>
-<li><h5><a class="anchor" name="a-self-signed-certificate" href="#a-self-signed-certificate"><i class="anchor-icon"></i></a>A self-signed certificate</h5>
+<li>
+<h5><a class="anchor" href="#a-self-signed-certificate" id="a-self-signed-certificate" name="a-self-signed-certificate"><i class="anchor-icon"></i></a>A self-signed certificate</h5>
 <p>Using a self-signed certificate means you’ll forfeit on the chain of trust backed by a CA. Instead you are the CA. For this to work, a slight difference in setup is required. Because Telegram will have no chain of trust to verify your certificate, you have to use the generated public certificate as an input file when setting the webhook. Keep in mind that the certificate file has to be uploaded as <strong>multipart/form</strong> data in <strong>PEM encoded (ASCII BASE64)</strong> format.</p>
 </li>
-<li><p>First let’s generate some certificates:</p>
+<li>
+<p>First let’s generate some certificates:</p>
 <ul>
-<li><p>Using OpenSSL:<br><code>openssl req -newkey rsa:2048 -sha256 -nodes -keyout YOURPRIVATE.key -x509 -days 365 -out YOURPUBLIC.pem -subj &quot;/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=YOURDOMAIN.EXAMPLE&quot;</code><br>You’ll end up with 2 files, a private key and the public certificate file. Use <strong>YOURPUBLIC.PEM</strong> as input file for setting the webhook.</p>
+<li>
+<p>Using OpenSSL:
+<code>openssl req -newkey rsa:2048 -sha256 -nodes -keyout YOURPRIVATE.key -x509 -days 365 -out YOURPUBLIC.pem -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=YOURDOMAIN.EXAMPLE"</code>
+You’ll end up with 2 files, a private key and the public certificate file. Use <strong>YOURPUBLIC.PEM</strong> as input file for setting the webhook.</p>
 </li>
-<li><p>Using Java keytool:<br><code>keytool -genkey -keyalg RSA -alias YOURDOMAIN.EXAMPLE -keystore YOURJKS.jks -storepass YOURPASSWORD -validity 360 -keysize 2048</code></p>
+<li>
+<p>Using Java keytool:
+<code>keytool -genkey -keyalg RSA -alias YOURDOMAIN.EXAMPLE -keystore YOURJKS.jks -storepass YOURPASSWORD -validity 360 -keysize 2048</code></p>
 <pre><code>What is your first and last name?
 [test.telegram.org]:
 What is the name of your organizational unit?
@@ -319,20 +414,27 @@ What is the name of your State or Province?
 [Unknown]:  
 What is the two-letter country code for this unit?
 [Unknown]:  
-Is CN=test.telegram.org, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown correct?
-[no]: yes</code></pre>
+Is CN=test.telegram.org, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown correct?</code></pre>
 <p>Once done you’ll need 2 more commands to export the public certificate file from the generated store (you’ll be using the store for your JVM and the PEM for setting the webhook)</p>
 </li>
-<li><p>Convert the JKS to pkcs12 (intermediate step for conversion to PEM):<br><code>keytool -importkeystore -srckeystore YOURJKS.jks -destkeystore YOURPKCS.p12 -srcstoretype jks -deststoretype pkcs12</code></p>
+<li>
+<p>Convert the JKS to pkcs12 (intermediate step for conversion to PEM):
+<code>keytool -importkeystore -srckeystore YOURJKS.jks -destkeystore YOURPKCS.p12 -srcstoretype jks -deststoretype pkcs12</code></p>
 </li>
-<li><p>Convert PKCS12 to PEM (requires OpenSSL)<br><code>openssl pkcs12 -in YOURPKCS.p12 -out YOURPEM.pem -nokeys</code></p>
+<li>
+<p>Convert PKCS12 to PEM (requires OpenSSL)
+<code>openssl pkcs12 -in YOURPKCS.p12 -out YOURPEM.pem -nokeys</code></p>
 </li>
-<li><p>Using Windows:<br>Creating a self-signed certificate using Windows native utilities is also possible, although OpenSSL binaries for Windows are available online.<br><code>certreq -new TEMPLATE.txt RequestFileOut generates a CSR.</code></p>
+<li>
+<p>Using Windows:
+Creating a self-signed certificate using Windows native utilities is also possible, although OpenSSL binaries for Windows are available online.
+<code>certreq -new TEMPLATE.txt RequestFileOut generates a CSR.</code></p>
 </li>
-<li><p>TEMPLATE.txt example file:</p>
+<li>
+<p>TEMPLATE.txt example file:</p>
 <pre><code>[NewRequest]
 ; At least one value must be set in this section
-Subject = &quot;CN=DOMAIN.EXAMPLE&quot;
+Subject = "CN=DOMAIN.EXAMPLE"
 KeyLength = 2048
 KeyAlgorithm = RSA
 HashAlgorithm = sha256
@@ -344,52 +446,73 @@ Exportable = true ;makes the private key exportable with the PFX</code></pre>
 </ul>
 </li>
 </ul>
-<p>A self-signed certificate is generated and installed, to use the certificate for a self-signed webhook you&#39;ll have to export it in PEM format.</p>
+<p>A self-signed certificate is generated and installed, to use the certificate for a self-signed webhook you'll have to export it in PEM format.</p>
 <ul>
-<li><p>Windows continued:</p>
+<li>
+<p>Windows continued:</p>
 <ul>
-<li><p>You can have a look at the certificates in your store with:<br><code>certutil -store -user my</code></p>
+<li>
+<p>You can have a look at the certificates in your store with:
+<code>certutil -store -user my</code></p>
 </li>
-<li><p>To export the installed certificate in DER format (intermediate step for conversion to PEM):<br><code>certutil -user -store -split my SERIALNUMBER YOURDER.der</code></p>
+<li>
+<p>To export the installed certificate in DER format (intermediate step for conversion to PEM):
+<code>certutil -user -store -split my SERIALNUMBER YOURDER.der</code></p>
 </li>
-<li><p>Now you can convert the certificate to PEM:<br><code>certutil -encode YOURDER.der YOURPEM.pem</code><br>Remember that only the public certificate is needed as input for the self-signed webhook certificate parameter.<br><code>certmgr.msc</code> can also be used as a GUI to export the public part of self-signed certificate to PEM.</p>
+<li>
+<p>Now you can convert the certificate to PEM:
+<code>certutil -encode YOURDER.der YOURPEM.pem</code>
+Remember that only the public certificate is needed as input for the self-signed webhook certificate parameter. 
+<code>certmgr.msc</code> can also be used as a GUI to export the public part of self-signed certificate to PEM.</p>
 </li>
 </ul>
 </li>
 </ul>
-<p>After following the above you&#39;ll end up with a nice self-signed certificate. You’ll still have to set the webhook, and handle SSL correctly.</p>
-<h5><a class="anchor" name="how-do-i-set-a-webhook-for-either-type" href="#how-do-i-set-a-webhook-for-either-type"><i class="anchor-icon"></i></a>How do I set a webhook for either type?</h5>
+<p>After following the above you'll end up with a nice self-signed certificate. You’ll still have to set the webhook, and handle SSL correctly.</p>
+<h5><a class="anchor" href="#how-do-i-set-a-webhook-for-either-type" id="how-do-i-set-a-webhook-for-either-type" name="how-do-i-set-a-webhook-for-either-type"><i class="anchor-icon"></i></a>How do I set a webhook for either type?</h5>
 <p>The setWebhook method is needed for both types. For a verified certificate with a trusted root CA, it’s enough to use the setWebhook method with just the URL parameter.</p>
 <ul>
-<li>A curl example for a verified certificate:<br><code>curl -F &quot;url=https://&lt;YOURDOMAIN.EXAMPLE&gt;/&lt;WEBHOOKLOCATION&gt;&quot; https://api.telegram.org/bot&lt;YOURTOKEN&gt;/setWebhook</code></li>
+<li>A curl example for a verified certificate:
+<code>curl -F "url=https://&lt;YOURDOMAIN.EXAMPLE&gt;/&lt;WEBHOOKLOCATION&gt;" https://api.telegram.org/bot&lt;YOURTOKEN&gt;/setWebhook</code></li>
 </ul>
 <p>For a self-signed certificate an extra parameter is needed, <code>certificate</code>, with the public certificate in PEM format as data.</p>
 <ul>
-<li>A curl example for a self-signed certificate:<br><code>curl -F &quot;url=https://&lt;YOURDOMAIN.EXAMPLE&gt;/&lt;WEBHOOKLOCATION&gt;&quot; -F &quot;certificate=@&lt;YOURCERTIFICATE&gt;.pem&quot; https://api.telegram.org/bot&lt;YOURTOKEN&gt;/setWebhook</code></li>
+<li>A curl example for a self-signed certificate:
+<code>curl -F "url=https://&lt;YOURDOMAIN.EXAMPLE&gt;/&lt;WEBHOOKLOCATION&gt;" -F "certificate=@&lt;YOURCERTIFICATE&gt;.pem" https://api.telegram.org/bot&lt;YOURTOKEN&gt;/setWebhook</code></li>
 </ul>
 <p>The <code>-F</code> means we’re using the <code>multipart/form-data</code>-type to supply the certificate, the type of the certificate parameter is <a href="https://core.telegram.org/bots/api#inputfile">inputFile</a>. Make sure that you’re supplying the correct type.</p>
 <p>Both parameters for the setWebhook method are classed as optional. Calling the method with an empty URL parameter can be used to clear a previously set webhook.</p>
 <ul>
-<li>A curl example to clear a previous webhook :<br><code>curl -F &quot;url=&quot; https://api.telegram.org/bot&lt;YOURTOKEN&gt;/setWebhook</code></li>
+<li>A curl example to clear a previous webhook :
+<code>curl -F "url=" https://api.telegram.org/bot&lt;YOURTOKEN&gt;/setWebhook</code></li>
 </ul>
 <p>Keep in mind that the URL parameter starts with <code>https://</code> when setting a webhook. By default that means we’re knocking at your door on port 443. If you want to use another port (80,88 or 8443), you’ll have to specify the port in the URL parameter.</p>
 <ul>
-<li>Example:<br><code>url=https://&lt;YOURDOMAIN.EXAMPLE&gt;:88/&lt;WEBHOOKLOCATION&gt;</code></li>
+<li>Example: 
+<code>url=https://&lt;YOURDOMAIN.EXAMPLE&gt;:88/&lt;WEBHOOKLOCATION&gt;</code></li>
 </ul>
-<h5><a class="anchor" name="setting-a-verified-webhook-with-an-untrusted-root" href="#setting-a-verified-webhook-with-an-untrusted-root"><i class="anchor-icon"></i></a>Setting a verified webhook with an untrusted root</h5>
-<p>If you already have a verified certificate and our servers don’t trust your root CA, we have an alternative way for you to set a webhook. Instead of using the setWebhook method <strong>without</strong> the <code>certificate</code> parameter, you can use the self-signed method. Your CA&#39;s root certificate has to be used as an inputFile for the <code>certificate</code> parameter.</p>
+<h5><a class="anchor" href="#setting-a-verified-webhook-with-an-untrusted-root" id="setting-a-verified-webhook-with-an-untrusted-root" name="setting-a-verified-webhook-with-an-untrusted-root"><i class="anchor-icon"></i></a>Setting a verified webhook with an untrusted root</h5>
+<p>If you already have a verified certificate and our servers don’t trust your root CA, we have an alternative way for you to set a webhook. Instead of using the setWebhook method <strong>without</strong> the <code>certificate</code> parameter, you can use the self-signed method. Your CA's root certificate has to be used as an inputFile for the <code>certificate</code> parameter.</p>
 <ul>
-<li>A curl example to supply an untrusted root certificate:<br><code>curl -F &quot;url=https://&lt;YOURDOMAIN.EXAMPLE&gt;&quot; -F &quot;certificate=@&lt;YOURCAROOTCERTIFICATE&gt;.pem&quot; https://api.telegram.org/bot&lt;YOURTOKEN&gt;/setWebhook</code><br>Before you can do this, you need the root certificate of your certificate’s CA. Most CA’s supply their root certificates in several different formats (PEM/DER/etc.). Visit your CA’s website, and download the Root certificate indicated for your verified certificate.</li>
+<li>A curl example to supply an untrusted root certificate:
+<code>curl -F "url=https://&lt;YOURDOMAIN.EXAMPLE&gt;" -F "certificate=@&lt;YOURCAROOTCERTIFICATE&gt;.pem" https://api.telegram.org/bot&lt;YOURTOKEN&gt;/setWebhook </code>
+Before you can do this, you need the root certificate of your certificate’s CA. Most CA’s supply their root certificates in several different formats (PEM/DER/etc.). Visit your CA’s website, and download the Root certificate indicated for your verified certificate.</li>
 </ul>
 <p>You can use these commands to quickly convert a DER formatted root certificate to PEM:</p>
 <ul>
-<li><p>Using OpenSSL:<br><code>openssl x509 -inform der -in root.cer -out root.pem</code></p>
+<li>
+<p>Using OpenSSL:
+<code>openssl x509 -inform der -in root.cer -out root.pem</code></p>
 </li>
-<li><p>Using Java keytool:<br><code>keytool -import -alias Root -keystore YOURKEYSTORE.JKS -trustcacerts -file ROOTCERT.CER</code><br>The root certificate needs to be imported in your keystore first:<br><code>keytool -exportcert -alias Root -file &lt;YOURROOTPEMFILE.PEM&gt; -rfc -keystore YOURKEYSTORE.JKS</code></p>
+<li>
+<p>Using Java keytool:
+<code>keytool -import -alias Root -keystore YOURKEYSTORE.JKS -trustcacerts -file ROOTCERT.CER</code>
+The root certificate needs to be imported in your keystore first:
+<code>keytool -exportcert -alias Root -file &lt;YOURROOTPEMFILE.PEM&gt; -rfc -keystore YOURKEYSTORE.JKS</code></p>
 </li>
 </ul>
 <p>Once done, set your webhook with the root-pem-file and you’ll be good to go. If you need more pointers, have a look at the <a href="https://core.telegram.org/bots/webhooks#a-self-signed-certificate">self-signed</a> part of this guide.</p>
-<h5><a class="anchor" name="supplying-an-intermediate-certificate" href="#supplying-an-intermediate-certificate"><i class="anchor-icon"></i></a>Supplying an intermediate certificate</h5>
+<h5><a class="anchor" href="#supplying-an-intermediate-certificate" id="supplying-an-intermediate-certificate" name="supplying-an-intermediate-certificate"><i class="anchor-icon"></i></a>Supplying an intermediate certificate</h5>
 <p>Once you’ve crafted your certificate, your CA might present you with a nice bundle. Most bundles contain a root certificate, your public certificate and sometimes an <strong>intermediate</strong> certificate. StartSSL is one of many CA’s that’ll supply such an intermediate beast. This certificate has to be supplied in the chain of certificates you’re presenting to us when we connect to your server. If an intermediate was used to sign your certificate but isn’t supplied to our servers, we won’t be able to verify the chain of trust and your webhook will not work.</p>
 <p>If your webhook isn’t working and you’re wondering if the chain is complete:</p>
 <ul>
@@ -400,360 +523,373 @@ Both supply tools to verify your setup.</code></pre>
 </ul>
 <p>Here’s an example of a complete chain, note that in this case 2 intermediate certificates have been supplied.</p>
 <div>
-    <a href="/file/811140157/1/FsbXbc0yPJA.49297/5812f355ecfcda764a" target="_blank"><img src="/file/811140157/1/FsbXbc0yPJA.49297/5812f355ecfcda764a" title="startsslexample.jpg, 48.14Kb" height="75%" width="75%" class="dev_page_image" /></a>
+    <a href="/file/811140157/1/FsbXbc0yPJA.49297/5812f355ecfcda764a" target="_blank"><img src="/file/811140157/1/FsbXbc0yPJA.49297/5812f355ecfcda764a" title="startsslexample.jpg, 48.14Kb" height="75%" width="75%" class="dev_page_image"></a>
 </div>
-
 <p>Even though your browser might not complain when visiting your page, an incomplete chain will not work for your webhook. If your chain is incomplete we have some tips to add them to your current setup:</p>
 <ul>
-<li><p>Apache:<br>Add the intermediate certificate to the end of the file configured in the <code>SSLCertificateFile</code> directive of your virtual host configuration. If you’re using an older version than Apache 2.4.8, you may use the <code>SSLCertificateChainFile</code> directive instead.</p>
+<li>
+<p>Apache:
+Add the intermediate certificate to the end of the file configured in the <code>SSLCertificateFile</code> directive of your virtual host configuration. If you’re using an older version than Apache 2.4.8, you may use the <code>SSLCertificateChainFile</code> directive instead.</p>
 </li>
-<li><p>Nginx:<br>Add the intermediate certificate to the end of the file configured in the <code>ssl_certificate_key</code> directive of your virtual host configuration.</p>
+<li>
+<p>Nginx: 
+Add the intermediate certificate to the end of the file configured in the <code>ssl_certificate_key</code> directive of your virtual host configuration.</p>
 </li>
-<li><p>A quick command for doing this correctly:<br><code>cat your_domain_name.pem intermediate.pem &gt;&gt; bundle.pem</code><br>Make sure the order is correct, expect failure otherwise.</p>
+<li>
+<p>A quick command for doing this correctly:
+<code>cat your_domain_name.pem intermediate.pem &gt;&gt; bundle.pem</code>
+Make sure the order is correct, expect failure otherwise.</p>
 </li>
-<li><p>Java keytool:<br><code>keytool -import -trustcacerts -alias intermediate -file intermediate.pem -keystore YOURKEYSTORE.jks</code></p>
+<li>
+<p>Java keytool:
+<code>keytool -import -trustcacerts -alias intermediate -file intermediate.pem -keystore YOURKEYSTORE.jks</code></p>
 </li>
 </ul>
-<p>The end result of all this is a complete certificate chain, backed by either a root certificate we trust or, in the case of an untrusted root, a root certificate you&#39;re supplying to us. Make sure to verify your setup again after adding the intermediate, once done, you&#39;re good to go!</p>
-<h5><a class="anchor" name="testing-your-bot-with-updates" href="#testing-your-bot-with-updates"><i class="anchor-icon"></i></a>Testing your bot with updates</h5>
+<p>The end result of all this is a complete certificate chain, backed by either a root certificate we trust or, in the case of an untrusted root, a root certificate you're supplying to us. Make sure to verify your setup again after adding the intermediate, once done, you're good to go!</p>
+<h5><a class="anchor" href="#testing-your-bot-with-updates" id="testing-your-bot-with-updates" name="testing-your-bot-with-updates"><i class="anchor-icon"></i></a>Testing your bot with updates</h5>
 <ul>
-<li><p>Update examples<br>A set of example updates, which comes in handy for testing your bot.</p>
+<li>
+<p>Update examples
+A set of example updates, which comes in handy for testing your bot.</p>
 <ul>
-<li><p>Message with text using curl:</p>
-<pre><code>curl --tlsv1.2 -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test&quot;,
-     &quot;username&quot;:&quot;Test&quot;
+<li>
+<p>Message with text using curl:</p>
+<pre><code>curl --tlsv1.2 -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test",
+     "username":"Test"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test&quot;,
-     &quot;username&quot;:&quot;Test&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test",
+     "username":"Test"
   },
-  &quot;text&quot;:&quot;/start&quot;
+  "text":"/start"
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 <p><code>--tlsv1.2</code> will force using TLS1.2.</p>
 </li>
-<li><p>Message with text using Postman:</p>
-<div>
-<a href="/file/811140789/2/DmiZPh1t6z0.269328/98525b6835f0a91432" target="_blank"><img src="/file/811140789/2/DmiZPh1t6z0.269328/98525b6835f0a91432" title="postmanfakeupdate.jpg, 263.02Kb" class="dev_page_image" /></a>
-</div>
+<li>
+<p>Message with text using Postman:</p>
 </li>
 </ul>
+<div>
+  <a href="/file/811140789/2/DmiZPh1t6z0.269328/98525b6835f0a91432" target="_blank"><img src="/file/811140789/2/DmiZPh1t6z0.269328/98525b6835f0a91432" title="postmanfakeupdate.jpg, 263.02Kb" class="dev_page_image"></a>
+</div>
 </li>
-<li><p>More examples in curl:</p>
+<li>
+<p>More examples in curl:</p>
 <ul>
-<li>Message with text:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Message with text:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "type": "private",
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;text&quot;:&quot;/start&quot;
+  "text":"/start"
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Forwarded message:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Forwarded message:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "type": "private",
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;forward_from&quot;: {
-     &quot;last_name&quot;:&quot;Forward Lastname&quot;,
-     &quot;id&quot;: 222222,
-     &quot;first_name&quot;:&quot;Forward Firstname&quot;
+  "forward_from": {
+     "last_name":"Forward Lastname",
+     "id": 222222,
+     "first_name":"Forward Firstname"
   },
-  &quot;forward_date&quot;:1441645550,
-  &quot;text&quot;:&quot;/start&quot;
+  "forward_date":1441645550,
+  "text":"/start"
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Forwarded channel message:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Forwarded channel message:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;forward_from&quot;: {
-     &quot;id&quot;: -10000000000,
-     &quot;type&quot;: &quot;channel&quot;,
-     &quot;title&quot;: &quot;Test channel&quot;
+  "forward_from": {
+     "id": -10000000000,
+     "type": "channel",
+     "title": "Test channel"
   },
-  &quot;forward_date&quot;:1441645550,
-  &quot;text&quot;:&quot;/start&quot;
+  "forward_date":1441645550,
+  "text":"/start"
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Message with a reply:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Message with a reply:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;text&quot;:&quot;/start&quot;,
-  &quot;reply_to_message&quot;:{
-      &quot;date&quot;:1441645000,
-      &quot;chat&quot;:{
-          &quot;last_name&quot;:&quot;Reply Lastname&quot;,
-          &quot;type&quot;: &quot;private&quot;,
-          &quot;id&quot;:1111112,
-          &quot;first_name&quot;:&quot;Reply Firstname&quot;,
-          &quot;username&quot;:&quot;Testusername&quot;
+  "text":"/start",
+  "reply_to_message":{
+      "date":1441645000,
+      "chat":{
+          "last_name":"Reply Lastname",
+          "type": "private",
+          "id":1111112,
+          "first_name":"Reply Firstname",
+          "username":"Testusername"
       },
-      &quot;message_id&quot;:1334,
-      &quot;text&quot;:&quot;Original&quot;
+      "message_id":1334,
+      "text":"Original"
   }
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Edited message:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;edited_message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Edited message:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"edited_message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;text&quot;:&quot;Edited text&quot;,
-  &quot;edit_date&quot;: 1441646600
+  "text":"Edited text",
+  "edit_date": 1441646600
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Message with entities:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Message with entities:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;text&quot;:&quot;Bold and italics&quot;,
-  &quot;entities&quot;: [
+  "text":"Bold and italics",
+  "entities": [
       {
-          &quot;type&quot;: &quot;italic&quot;,
-          &quot;offset&quot;: 9,
-          &quot;length&quot;: 7
+          "type": "italic",
+          "offset": 9,
+          "length": 7
       },
       {
-          &quot;type&quot;: &quot;bold&quot;,
-          &quot;offset&quot;: 0,
-          &quot;length&quot;: 4
+          "type": "bold",
+          "offset": 0,
+          "length": 4
       }
       ]
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Message with audio:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Message with audio:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;audio&quot;: {
-      &quot;file_id&quot;: &quot;AwADBAADbXXXXXXXXXXXGBdhD2l6_XX&quot;,
-      &quot;duration&quot;: 243,
-      &quot;mime_type&quot;: &quot;audio/mpeg&quot;,
-      &quot;file_size&quot;: 3897500,
-      &quot;title&quot;: &quot;Test music file&quot;
+  "audio": {
+      "file_id": "AwADBAADbXXXXXXXXXXXGBdhD2l6_XX",
+      "duration": 243,
+      "mime_type": "audio/mpeg",
+      "file_size": 3897500,
+      "title": "Test music file"
   }
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Voice message:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Voice message:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;voice&quot;: {
-      &quot;file_id&quot;: &quot;AwADBAADbXXXXXXXXXXXGBdhD2l6_XX&quot;,
-      &quot;duration&quot;: 5,
-      &quot;mime_type&quot;: &quot;audio/ogg&quot;,
-      &quot;file_size&quot;: 23000
+  "voice": {
+      "file_id": "AwADBAADbXXXXXXXXXXXGBdhD2l6_XX",
+      "duration": 5,
+      "mime_type": "audio/ogg",
+      "file_size": 23000
   }
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Message with a document:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;message&quot;:{
-  &quot;date&quot;:1441645532,
-  &quot;chat&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Message with a document:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"message":{
+  "date":1441645532,
+  "chat":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;message_id&quot;:1365,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+  "message_id":1365,
+  "from":{
+     "last_name":"Test Lastname",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;document&quot;: {
-      &quot;file_id&quot;: &quot;AwADBAADbXXXXXXXXXXXGBdhD2l6_XX&quot;,
-      &quot;file_name&quot;: &quot;Testfile.pdf&quot;,
-      &quot;mime_type&quot;: &quot;application/pdf&quot;,
-      &quot;file_size&quot;: 536392
+  "document": {
+      "file_id": "AwADBAADbXXXXXXXXXXXGBdhD2l6_XX",
+      "file_name": "Testfile.pdf",
+      "mime_type": "application/pdf",
+      "file_size": 536392
   }
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Inline query:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;inline_query&quot;:{
-  &quot;id&quot;: 134567890097,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Inline query:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"inline_query":{
+  "id": 134567890097,
+  "from":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;query&quot;: &quot;inline query&quot;,
-  &quot;offset&quot;: &quot;&quot;
+  "query": "inline query",
+  "offset": ""
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Chosen inline query:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;chosen_inline_result&quot;:{
-  &quot;result_id&quot;: &quot;12&quot;,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Chosen inline query:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"chosen_inline_result":{
+  "result_id": "12",
+  "from":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;query&quot;: &quot;inline query&quot;,
-  &quot;inline_message_id&quot;: &quot;1234csdbsk4839&quot;
+  "query": "inline query",
+  "inline_message_id": "1234csdbsk4839"
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
 </li>
-<li>Callback query:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-&quot;update_id&quot;:10000,
-&quot;callback_query&quot;:{
-  &quot;id&quot;: &quot;4382bfdwdsb323b2d9&quot;,
-  &quot;from&quot;:{
-     &quot;last_name&quot;:&quot;Test Lastname&quot;,
-     &quot;type&quot;: &quot;private&quot;,
-     &quot;id&quot;:1111111,
-     &quot;first_name&quot;:&quot;Test Firstname&quot;,
-     &quot;username&quot;:&quot;Testusername&quot;
+<li>Callback query:<pre><code>curl -v -k -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache"  -d '{
+"update_id":10000,
+"callback_query":{
+  "id": "4382bfdwdsb323b2d9",
+  "from":{
+     "last_name":"Test Lastname",
+     "type": "private",
+     "id":1111111,
+     "first_name":"Test Firstname",
+     "username":"Testusername"
   },
-  &quot;data&quot;: &quot;Data from button callback&quot;,
-  &quot;inline_message_id&quot;: &quot;1234csdbsk4839&quot;
+  "data": "Data from button callback",
+  "inline_message_id": "1234csdbsk4839"
 }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-That&#39;s all we have for now!</li>
+}' "https://YOUR.BOT.URL:YOURPORT/"</code></pre>
+<p>That's all we have for now!</p>
+</li>
 </ul>
 </li>
-</ul>
-</div>
+</ul></div>
   
 </div>
           

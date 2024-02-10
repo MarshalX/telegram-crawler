@@ -83,16 +83,35 @@ OR
 +-+---+----...----+</code></pre>
 <p>Before sending <em>anything</em> into the underlying socket (see <a href="transports">transports</a>), the client must first send <code>0xef</code> as the first byte (the server <strong>will not</strong> send <code>0xef</code> as the first byte in the first reply).<br>
 Then, payloads are wrapped in the following envelope:</p>
+<p>If the packet length divided by four is smaller than 127:</p>
 <ul>
-<li>Length: payload length, divided by four, and encoded as a single byte, only if the resulting packet length is a value between <code>0x01..0x7e</code>.</li>
+<li>Length: payload length, divided by four, and encoded as a single byte</li>
 <li>Payload: the MTProto payload</li>
 </ul>
-<p>If the packet length divided by four is bigger than or equal to 127 (&gt;= <code>0x7f</code>), the following envelope must be used, instead:</p>
+<p>If the packet length divided by four is bigger than or equal to 127, the following envelope must be used, instead:</p>
 <ul>
-<li>Header: A single byte of value <code>0x7f</code></li>
+<li>Header: A single byte of value <code>0x7f</code> (127)</li>
 <li>Length: payload length, divided by four, and encoded as 3 length bytes (little endian)</li>
 <li>Payload: the MTProto payload</li>
 </ul>
+<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
+<p>To request a quick ACK from the server for an encrypted MTProto payload, use the following envelope for <em>outgoing</em> messages, instead of the one specified above.</p>
+<p>If the packet length divided by four is smaller than 127:</p>
+<ul>
+<li>Length: payload length, divided by four, plus 128, and encoded as a single byte (<code>(length/2)+128</code> or <code>(length &gt;&gt; 2) | (1 &lt;&lt; 7)</code>); i.e. the most significant bit must be set.</li>
+<li>Payload: the MTProto payload</li>
+</ul>
+<p>If the packet length divided by four is bigger than or equal to 127, the following envelope must be used, instead:</p>
+<ul>
+<li>Header: A single byte of value <code>0xff</code> (255)</li>
+<li>Length: payload length, divided by four, and encoded as 3 length bytes (little endian); same as for a normal abridged envelope.</li>
+<li>Payload: the MTProto payload</li>
+</ul>
+<p>The server will send quick ACK tokens by bswapping them (i.e. inverting the order of the 4 bytes of the ACK token) and sending them as a standalone 4-byte packet without a length header.  </p>
+<pre><code>+----+
+|dcba|
++----+</code></pre>
+<p>These quick ACK packets can be easily distinguished from normal abridged packets because the first byte will always have the most-significant bit set (because quick ACK tokens have the most-significant bit of the last byte set, and since they are bswapped the last byte will come first), and the length/header of normal payload packets coming from the server is always less than or equal to 127 (thus the most-significant bit is not set for normal payloads).  </p>
 <h3><a class="anchor" href="#intermediate" id="intermediate" name="intermediate"><i class="anchor-icon"></i></a>Intermediate</h3>
 <p>In case 4-byte data alignment is needed, an <em>intermediate</em> version of the original protocol may be used.</p>
 <ul>
@@ -110,6 +129,13 @@ Then, payloads are wrapped in the following envelope:</p>
 <li>Length: payload length encoded as 4 length bytes (little endian)</li>
 <li>Payload: the MTProto payload</li>
 </ul>
+<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
+<p>To request a quick ACK from the server for an encrypted MTProto payload, add <code>0x80000000</code> to the <code>len</code> field before encoding it (equivalent to doing <code>len = len | (1 &lt;&lt; 31)</code>, i.e. set the most-significant bit of the length).  </p>
+<p>The server will send quick ACK tokens as a standalone 4-byte packet without a length header.</p>
+<pre><code>+----+
+|abcd|
++----+</code></pre>
+<p>These quick ACK packets can be easily distinguished from normal intermediate packets because quick ACK tokens always have the most-significant bit of the last byte set, and trying to decode an ACK token as a little-endian 32-bit integer will always yield a value bigger than or equal to <code>0x80000000</code>, which can never be a valid packet length.  </p>
 <h3><a class="anchor" href="#padded-intermediate" id="padded-intermediate" name="padded-intermediate"><i class="anchor-icon"></i></a>Padded intermediate</h3>
 <p>Padded version of the <a href="#intermediate">intermediate protocol</a>, to use with <a href="#transport-obfuscation">obfuscation enabled</a> to <strong>bypass ISP blocks</strong>.</p>
 <ul>
@@ -128,6 +154,14 @@ Then, payloads are wrapped in the following envelope:</p>
 <li>Payload: the MTProto payload</li>
 <li>Padding: A random padding string of length <code>0-15</code></li>
 </ul>
+<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
+<p>To request a quick ACK from the server for an encrypted MTProto payload, add <code>0x80000000</code> to the <code>len</code> field before encoding it (equivalent to doing <code>len = len | (1 &lt;&lt; 31)</code>, i.e. set the most-significant bit of the length).  </p>
+<p>The server will send quick ACK tokens as a standalone 8 to 16-byte packet (excluding the length of the packet itself, encoded as usual), containing a 4-byte header with all bits set, followed by the ACK token (<code>abcd</code>), followed by 0 to 8 random padding bytes.</p>
+<pre><code>+----+----+----+----...----+
+|tlen|FFFF|abcd|  padding  |
++----+----+----+----...----+</code></pre>
+<p>These quick ACK packets can be easily distinguished from normal intermediate padded packets because their length will be always smaller than or equal to 16, smaller than any MTProto packet.<br>
+They can be distinguished from transport errors because the first 4 bytes of the payload are equal to <code>0xFFFFFFFF</code>, not a valid transport error.  </p>
 <h3><a class="anchor" href="#full" id="full" name="full"><i class="anchor-icon"></i></a>Full</h3>
 <p>The basic MTProto transport protocol</p>
 <ul>
@@ -149,17 +183,25 @@ Then, payloads are wrapped in the following envelope:</p>
 <h3><a class="anchor" href="#transport-features" id="transport-features" name="transport-features"><i class="anchor-icon"></i></a>Transport features</h3>
 <p>Additionally, the following transport features can be used: </p>
 <h4><a class="anchor" href="#quick-ack" id="quick-ack" name="quick-ack"><i class="anchor-icon"></i></a>Quick ack</h4>
-<p>These MTProto transport protocols have support for quick acknowledgment.
-In this case, the client sets the highest-order length bit in the query packet, and the server responds with a special 4 bytes as a separate packet. 
-They are the 32 higher-order bits of SHA256 of the encrypted portion of the packet prepended by 32 bytes from the authorization key (the same hash as computed for verifying the message key), with the most significant bit set to make clear that this is not the length of a regular server response packet; if the abridged version is used, bswap is applied to these four bytes.</p>
+<p>Some of the TCP transports listed above support quick ACKs: quick ACKs are a way for clients to get quick receipt acknowledgements for packets.  </p>
+<p>To request a quick ack for a specific outgoing payload, clients must set the MSB of an appropriate field in the transport envelope (as described in the documentation for each transport protocol above).  </p>
+<p>Also, clients must generate and store a quick ACK token, associating it with the outgoing MTProto payload, by:</p>
+<ul>
+<li>Taking the first 32 bits of the SHA256 of the encrypted portion of the payload prepended by 32 bytes from the authorization key (the same hash generated when computing the <a href="/mtproto/description#message-key-msg-key">message key</a>, except that instead of taking the middle 128 bits, the first 32 bits are taken instead).  </li>
+<li>Setting the MSB of the last byte to 1: in other words, treat the 32 bits generated above as a little-endian integer, then add <code>0x80000000</code> to it (i.e. <code>ack_token = msg_key_long[0:4] | (1 &lt;&lt; 31)</code> on a little-endian system).  </li>
+</ul>
+<p>Once the payload is successfully received, decrypted and accepted for processing by the server, the server will send back the same quick ACK token we generated above, using the encoding described in the documentation for each transport protocol.  </p>
+<p>Note that reception of a quick ACK <strong>does not</strong> indicate that any of the RPC queries contained in the message have succeeded, failed or finished execution at all, it simply indicates that they have been received, decrypted and accepted for processing by the server.  </p>
+<p>The server will still send <code>msgs_ack</code> constructors for content-related constructors and methods contained in payloads which were quick ACKed, as well as replies/errors for methods and constructors, as usual.  </p>
 <h4><a class="anchor" href="#transport-errors" id="transport-errors" name="transport-errors"><i class="anchor-icon"></i></a>Transport errors</h4>
-<p>In the event of a transport error (missing auth key, transport flood, etc.), the server may send a packet with a signed little-endian number of 4 bytes, whose <strong>absolute value</strong> contains the error code (the error itself is actually negative).  </p>
-<p>For example, error Code 403 corresponds to situations where the corresponding HTTP error would have been returned by the HTTP protocol.</p>
-<p>Error 404 (auth key not found) is returned when the specified auth key ID cannot be found by the DC.</p>
-<p>Error 429 (transport flood) is returned when too many transport connections are established to the same IP in a too short lapse of time, or if any of the <a href="/mtproto/service_messages#simple-container">container</a>/<a href="/mtproto/service_messages_about_messages#acknowledgment-of-receipt">service message limits</a> are reached.</p>
-<p>Error 444 (invalid DC) is returned while <a href="/mtproto/auth_key#presenting-proof-of-work-server-authentication">creating an auth key</a>, <a href="#transport-obfuscation">connecting to an MTProxy</a> or in other contexts if an invalid DC ID is specified.</p>
+<p>In the event of a transport error (missing auth key, transport flood, etc.), the server may send a packet (framed as an MTProto payload by the chosen MTProto transport) with a signed little-endian number of 4 bytes, whose <strong>absolute value</strong> contains the error code (the error itself is actually negative).  </p>
+<p>For example, error Code 403 corresponds to situations where the corresponding HTTP error would have been returned by the HTTP protocol.  </p>
+<p>Error 404 (auth key not found) is returned when the specified auth key ID cannot be found by the DC, during the initial MTProto handshake if any of the specified queries is incorrect, or during normal operation for example if some MTProto fields are incorrect (i.e. the MTProto packet length is bigger than the transport-specified packet length, and so on).  </p>
+<p>Error 429 (transport flood) is returned when too many transport connections are established to the same IP in a too short lapse of time, or if any of the <a href="/mtproto/service_messages#simple-container">container</a>/<a href="/mtproto/service_messages_about_messages#acknowledgment-of-receipt">service message limits</a> are reached.  </p>
+<p>Error 444 (invalid DC) is returned while <a href="/mtproto/auth_key#presenting-proof-of-work-server-authentication">creating an auth key</a>, <a href="#transport-obfuscation">connecting to an MTProxy</a> or in other contexts if an invalid DC ID is specified.  </p>
+<p>When using the <a href="/mtproto/transports#http">HTTP</a>/<a href="/mtproto/transports#https">HTTPS</a> transports, transport errors are not transmitted as specified above, instead they are simply returned as normal HTTP status codes (and the HTTP payload must be ignored).  </p>
 <h4><a class="anchor" href="#transport-obfuscation" id="transport-obfuscation" name="transport-obfuscation"><i class="anchor-icon"></i></a>Transport obfuscation</h4>
-<p>Transport obfuscation is required to use the <a href="transports#websocket">websocket transports</a>.</p>
+<p>Transport obfuscation is required to use the <a href="transports#websocket">WebSocket transports</a>.</p>
 <p>Transport obfuscation to <strong>prevent ISP blocks</strong> is implemented using the following protocol, situated under the MTProto transport in the ISO/OSI stack, see the <a href="/mtproto#recap">recap</a>; this means that the payload is first wrapped in the <a href="/mtproto/mtproto-transports">MTProto transport envelope</a> (all transports are supported), and then obfuscated: </p>
 <p>Prior to establishing the connection (and eventually sending the protocol header of a specific <a href="/mtproto/mtproto-transports">MTProto transport</a>), a 64-byte (512-bit) <strong>random</strong> initialization payload is generated.
 During the generation process, special care must be taken in order to avoid a situation where that the first int (first four bytes) of the random string are equal to one of the known protocol identifiers (see above).<br>
@@ -182,12 +224,12 @@ In other words, reuse the two encryption and decryption <strong>AES-256-CTR</str
 <p>The first thing that must be encrypted using the encryption key is the initialization payload itself.
 Then bytes <code>56-64</code> of the encrypted initialization payload are substituted in the original initialization payload: this is the part that contains the constant MTProto transport protocol identifier and the DC ID (<strong>only for MTProxies</strong>).</p>
 <p>The final initialization payload must then be sent in the socket as <strong>first 64 bytes</strong> after the TCP handshake.</p>
-<p>Example pseudocode for the generation of an MTProxy connection payload (media DC 4) using the obfuscated <a href="#padded-intermediate">padded intermediate</a> transport.
+<p>Example pseudocode for the generation of an MTProxy connection payload (media DC 4) using the obfuscated <a href="#padded-intermediate">padded intermediate</a> transport.<br>
 <strong>Warning</strong>: do not use the specified proxy secret in any MTProxy exposed on the internet.</p>
 <pre><code>protocol := 0xdddddddd
 dc := 0xfcff
 
-while 1:
+while True:
     init := (56 random bytes) + protocol + dc + (2 random bytes)
 
     if init[0] == 0xef:
