@@ -65,6 +65,7 @@ blogfork.telegram.org/api/push-updates
 blogfork.telegram.org/api/qr-login
 blogfork.telegram.org/api/reactions
 blogfork.telegram.org/api/recent-actions
+blogfork.telegram.org/api/recommend
 blogfork.telegram.org/api/rights
 blogfork.telegram.org/api/ringtones
 blogfork.telegram.org/api/saved-messages
@@ -530,6 +531,7 @@ blogfork.telegram.org/constructor/inputMediaStory
 blogfork.telegram.org/constructor/inputMediaUploadedDocument
 blogfork.telegram.org/constructor/inputMediaUploadedPhoto
 blogfork.telegram.org/constructor/inputMediaVenue
+blogfork.telegram.org/constructor/inputMediaWebPage
 blogfork.telegram.org/constructor/inputMessageCallbackQuery
 blogfork.telegram.org/constructor/inputMessageEntityMentionName
 blogfork.telegram.org/constructor/inputMessageID
@@ -614,6 +616,7 @@ blogfork.telegram.org/constructor/inputSingleMedia
 blogfork.telegram.org/constructor/inputStickerSetAnimatedEmoji
 blogfork.telegram.org/constructor/inputStickerSetAnimatedEmojiAnimations
 blogfork.telegram.org/constructor/inputStickerSetDice
+blogfork.telegram.org/constructor/inputStickerSetEmojiChannelDefaultStatuses
 blogfork.telegram.org/constructor/inputStickerSetEmojiDefaultStatuses
 blogfork.telegram.org/constructor/inputStickerSetEmojiDefaultTopicIcons
 blogfork.telegram.org/constructor/inputStickerSetEmojiGenericAnimations
@@ -913,6 +916,8 @@ blogfork.telegram.org/constructor/payments.ValidatedRequestedInfo
 blogfork.telegram.org/constructor/payments.bankCardData
 blogfork.telegram.org/constructor/payments.checkedGiftCode
 blogfork.telegram.org/constructor/payments.exportedInvoice
+blogfork.telegram.org/constructor/payments.giveawayInfo
+blogfork.telegram.org/constructor/payments.giveawayInfoResults
 blogfork.telegram.org/constructor/payments.paymentForm
 blogfork.telegram.org/constructor/payments.paymentReceipt
 blogfork.telegram.org/constructor/payments.paymentResult
@@ -972,6 +977,7 @@ blogfork.telegram.org/constructor/premiumGiftCodeOption
 blogfork.telegram.org/constructor/premiumGiftOption
 blogfork.telegram.org/constructor/premiumSubscriptionOption
 blogfork.telegram.org/constructor/prepaidGiveaway
+blogfork.telegram.org/constructor/privacyKeyAbout
 blogfork.telegram.org/constructor/privacyKeyAddedByPhone
 blogfork.telegram.org/constructor/privacyKeyChatInvite
 blogfork.telegram.org/constructor/privacyKeyForwards
@@ -1366,6 +1372,7 @@ blogfork.telegram.org/method/account.getAuthorizationForm
 blogfork.telegram.org/method/account.getAuthorizations
 blogfork.telegram.org/method/account.getAutoDownloadSettings
 blogfork.telegram.org/method/account.getAutoSaveSettings
+blogfork.telegram.org/method/account.getChannelDefaultEmojiStatuses
 blogfork.telegram.org/method/account.getChannelRestrictedStatusEmojis
 blogfork.telegram.org/method/account.getChatThemes
 blogfork.telegram.org/method/account.getContactSignUpNotification
@@ -1461,11 +1468,13 @@ blogfork.telegram.org/method/auth.sendCode
 blogfork.telegram.org/method/auth.sendInvites
 blogfork.telegram.org/method/auth.signIn
 blogfork.telegram.org/method/auth.signUp
+blogfork.telegram.org/method/bots.allowSendMessage
 blogfork.telegram.org/method/bots.answerWebhookJSONQuery
 blogfork.telegram.org/method/bots.canSendMessage
 blogfork.telegram.org/method/bots.getBotCommands
 blogfork.telegram.org/method/bots.getBotInfo
 blogfork.telegram.org/method/bots.getBotMenuButton
+blogfork.telegram.org/method/bots.invokeWebViewCustomMethod
 blogfork.telegram.org/method/bots.reorderUsernames
 blogfork.telegram.org/method/bots.resetBotCommands
 blogfork.telegram.org/method/bots.sendCustomRequest
@@ -1531,6 +1540,7 @@ blogfork.telegram.org/method/channels.toggleSlowMode
 blogfork.telegram.org/method/channels.toggleUsername
 blogfork.telegram.org/method/channels.toggleViewForumAsMessages
 blogfork.telegram.org/method/channels.updateColor
+blogfork.telegram.org/method/channels.updateEmojiStatus
 blogfork.telegram.org/method/channels.updatePinnedForumTopic
 blogfork.telegram.org/method/channels.updateUsername
 blogfork.telegram.org/method/channels.viewSponsoredMessage
@@ -1810,6 +1820,7 @@ blogfork.telegram.org/method/payments.checkGiftCode
 blogfork.telegram.org/method/payments.clearSavedInfo
 blogfork.telegram.org/method/payments.exportInvoice
 blogfork.telegram.org/method/payments.getBankCardData
+blogfork.telegram.org/method/payments.getGiveawayInfo
 blogfork.telegram.org/method/payments.getPaymentForm
 blogfork.telegram.org/method/payments.getPaymentReceipt
 blogfork.telegram.org/method/payments.getPremiumGiftCodeOptions
@@ -1883,6 +1894,7 @@ blogfork.telegram.org/method/stories.exportStoryLink
 blogfork.telegram.org/method/stories.getAllReadPeerStories
 blogfork.telegram.org/method/stories.getAllStories
 blogfork.telegram.org/method/stories.getChatsToSend
+blogfork.telegram.org/method/stories.getPeerMaxIDs
 blogfork.telegram.org/method/stories.getPeerStories
 blogfork.telegram.org/method/stories.getPinnedStories
 blogfork.telegram.org/method/stories.getStoriesArchive
@@ -2359,6 +2371,7 @@ blogfork.telegram.org/type/messages.VotesList
 blogfork.telegram.org/type/payments.BankCardData
 blogfork.telegram.org/type/payments.CheckedGiftCode
 blogfork.telegram.org/type/payments.ExportedInvoice
+blogfork.telegram.org/type/payments.GiveawayInfo
 blogfork.telegram.org/type/payments.PaymentForm
 blogfork.telegram.org/type/payments.PaymentReceipt
 blogfork.telegram.org/type/payments.PaymentResult
@@ -2469,6 +2482,7 @@ core.telegram.org/api/push-updates
 core.telegram.org/api/qr-login
 core.telegram.org/api/reactions
 core.telegram.org/api/recent-actions
+core.telegram.org/api/recommend
 core.telegram.org/api/rights
 core.telegram.org/api/ringtones
 core.telegram.org/api/saved-messages
@@ -2938,6 +2952,7 @@ core.telegram.org/constructor/inputMediaStory
 core.telegram.org/constructor/inputMediaUploadedDocument
 core.telegram.org/constructor/inputMediaUploadedPhoto
 core.telegram.org/constructor/inputMediaVenue
+core.telegram.org/constructor/inputMediaWebPage
 core.telegram.org/constructor/inputMessageCallbackQuery
 core.telegram.org/constructor/inputMessageEntityMentionName
 core.telegram.org/constructor/inputMessageID
@@ -3022,6 +3037,7 @@ core.telegram.org/constructor/inputSingleMedia
 core.telegram.org/constructor/inputStickerSetAnimatedEmoji
 core.telegram.org/constructor/inputStickerSetAnimatedEmojiAnimations
 core.telegram.org/constructor/inputStickerSetDice
+core.telegram.org/constructor/inputStickerSetEmojiChannelDefaultStatuses
 core.telegram.org/constructor/inputStickerSetEmojiDefaultStatuses
 core.telegram.org/constructor/inputStickerSetEmojiDefaultTopicIcons
 core.telegram.org/constructor/inputStickerSetEmojiGenericAnimations
@@ -3321,6 +3337,8 @@ core.telegram.org/constructor/payments.ValidatedRequestedInfo
 core.telegram.org/constructor/payments.bankCardData
 core.telegram.org/constructor/payments.checkedGiftCode
 core.telegram.org/constructor/payments.exportedInvoice
+core.telegram.org/constructor/payments.giveawayInfo
+core.telegram.org/constructor/payments.giveawayInfoResults
 core.telegram.org/constructor/payments.paymentForm
 core.telegram.org/constructor/payments.paymentReceipt
 core.telegram.org/constructor/payments.paymentResult
@@ -3373,6 +3391,8 @@ core.telegram.org/constructor/pollAnswerVoters
 core.telegram.org/constructor/pollResults
 core.telegram.org/constructor/popularContact
 core.telegram.org/constructor/postAddress
+core.telegram.org/constructor/postInteractionCountersMessage
+core.telegram.org/constructor/postInteractionCountersStory
 core.telegram.org/constructor/premium.boostsList
 core.telegram.org/constructor/premium.boostsStatus
 core.telegram.org/constructor/premium.myBoosts
@@ -3380,6 +3400,7 @@ core.telegram.org/constructor/premiumGiftCodeOption
 core.telegram.org/constructor/premiumGiftOption
 core.telegram.org/constructor/premiumSubscriptionOption
 core.telegram.org/constructor/prepaidGiveaway
+core.telegram.org/constructor/privacyKeyAbout
 core.telegram.org/constructor/privacyKeyAddedByPhone
 core.telegram.org/constructor/privacyKeyChatInvite
 core.telegram.org/constructor/privacyKeyForwards
@@ -3776,6 +3797,7 @@ core.telegram.org/method/account.getAuthorizationForm
 core.telegram.org/method/account.getAuthorizations
 core.telegram.org/method/account.getAutoDownloadSettings
 core.telegram.org/method/account.getAutoSaveSettings
+core.telegram.org/method/account.getChannelDefaultEmojiStatuses
 core.telegram.org/method/account.getChannelRestrictedStatusEmojis
 core.telegram.org/method/account.getChatThemes
 core.telegram.org/method/account.getContactSignUpNotification
@@ -3871,11 +3893,13 @@ core.telegram.org/method/auth.sendCode
 core.telegram.org/method/auth.sendInvites
 core.telegram.org/method/auth.signIn
 core.telegram.org/method/auth.signUp
+core.telegram.org/method/bots.allowSendMessage
 core.telegram.org/method/bots.answerWebhookJSONQuery
 core.telegram.org/method/bots.canSendMessage
 core.telegram.org/method/bots.getBotCommands
 core.telegram.org/method/bots.getBotInfo
 core.telegram.org/method/bots.getBotMenuButton
+core.telegram.org/method/bots.invokeWebViewCustomMethod
 core.telegram.org/method/bots.reorderUsernames
 core.telegram.org/method/bots.resetBotCommands
 core.telegram.org/method/bots.sendCustomRequest
@@ -3941,6 +3965,7 @@ core.telegram.org/method/channels.toggleSlowMode
 core.telegram.org/method/channels.toggleUsername
 core.telegram.org/method/channels.toggleViewForumAsMessages
 core.telegram.org/method/channels.updateColor
+core.telegram.org/method/channels.updateEmojiStatus
 core.telegram.org/method/channels.updatePinnedForumTopic
 core.telegram.org/method/channels.updateUsername
 core.telegram.org/method/channels.viewSponsoredMessage
@@ -4220,6 +4245,7 @@ core.telegram.org/method/payments.checkGiftCode
 core.telegram.org/method/payments.clearSavedInfo
 core.telegram.org/method/payments.exportInvoice
 core.telegram.org/method/payments.getBankCardData
+core.telegram.org/method/payments.getGiveawayInfo
 core.telegram.org/method/payments.getPaymentForm
 core.telegram.org/method/payments.getPaymentReceipt
 core.telegram.org/method/payments.getPremiumGiftCodeOptions
@@ -4293,6 +4319,7 @@ core.telegram.org/method/stories.exportStoryLink
 core.telegram.org/method/stories.getAllReadPeerStories
 core.telegram.org/method/stories.getAllStories
 core.telegram.org/method/stories.getChatsToSend
+core.telegram.org/method/stories.getPeerMaxIDs
 core.telegram.org/method/stories.getPeerStories
 core.telegram.org/method/stories.getPinnedStories
 core.telegram.org/method/stories.getStoriesArchive
@@ -4582,6 +4609,7 @@ core.telegram.org/type/PollAnswerVoters
 core.telegram.org/type/PollResults
 core.telegram.org/type/PopularContact
 core.telegram.org/type/PostAddress
+core.telegram.org/type/PostInteractionCounters
 core.telegram.org/type/PremiumGiftCodeOption
 core.telegram.org/type/PremiumGiftOption
 core.telegram.org/type/PremiumSubscriptionOption
@@ -4781,6 +4809,7 @@ core.telegram.org/type/messages.VotesList
 core.telegram.org/type/payments.BankCardData
 core.telegram.org/type/payments.CheckedGiftCode
 core.telegram.org/type/payments.ExportedInvoice
+core.telegram.org/type/payments.GiveawayInfo
 core.telegram.org/type/payments.PaymentForm
 core.telegram.org/type/payments.PaymentReceipt
 core.telegram.org/type/payments.PaymentResult
@@ -6968,6 +6997,7 @@ corefork.telegram.org/type/MessageAction
 corefork.telegram.org/type/MessageEntity
 corefork.telegram.org/type/MessageExtendedMedia
 corefork.telegram.org/type/MessageFwdHeader
+corefork.telegram.org/type/MessageInteractionCounters
 corefork.telegram.org/type/MessageMedia
 corefork.telegram.org/type/MessagePeerReaction
 corefork.telegram.org/type/MessagePeerVote
