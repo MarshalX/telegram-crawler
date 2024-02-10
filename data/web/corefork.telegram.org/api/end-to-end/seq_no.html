@@ -47,7 +47,6 @@
 <table class="table">
 <tbody>
 <tr>
-<td> </td>
 <td><strong>in_seq_no</strong></td>
 <td><strong>out_seq_no</strong></td>
 </tr>
@@ -78,7 +77,7 @@
 <li>If the received <strong>out_seq_no&gt;C+1</strong>, it most likely means that the server left out some messages due to a technical failure or due to the messages becoming obsolete. A temporary solution to this is to simply abort the secret chat. But since this may cause some existing older secret chats to be aborted, it is strongly recommended for the client to properly handle such <strong>seq_no</strong> gaps. Note that <strong>in_seq_no</strong> is not increased upon receipt of such a message; it is advanced only after all preceding gaps are filled.</li>
 </ul>
 <h4><a class="anchor" href="#proper-handling-of-gaps" id="proper-handling-of-gaps" name="proper-handling-of-gaps"><i class="anchor-icon"></i></a>Proper handling of gaps</h4>
-<p>In order to correctly handle incoming messages after a hole has been identified (when received <strong>out_seq_no&gt;C+1</strong>), it is necessary to put received messages with the wrong <strong>seq_no</strong> into a "waiting queue" on the local client, and to re-request the missing messages using the special constructor <a href="/constructor/decryptedMessageActionResend">decryptedMessageActionResend</a>. The sequence numbers used in this constructor must be ready for interpretation by the remote client and therefore <em>cannot</em> be in their raw form: you can easily get the necessary <strong>start_seq_no</strong> by adding 2 to the <strong>out_seq_no</strong> of the last message before the hole and the <strong>end_seq_no</strong> by subtracting 2 from the <strong>out_seq_no</strong> of the received message with the wrong sequence number.</p>
+<p>In order to correctly handle incoming messages after a hole has been identified (when received <strong>out_seq_no&gt;C+1</strong>), it is necessary to put received messages with the wrong <strong>seq_no</strong> into a "waiting queue" on the local client, and to re-request the missing messages using the special constructor <a href="/constructor/decryptedMessageActionResend">decryptedMessageActionResend</a> <code>start_seq_no:<a href='/type/int'>int</a> end_seq_no:<a href='/type/int'>int</a> = <a href='/type/DecryptedMessageAction'>DecryptedMessageAction</a>;</code>. The sequence numbers used in this constructor must be ready for interpretation by the remote client and therefore <em>cannot</em> be in their raw form: you can easily get the necessary <strong>start_seq_no</strong> by adding 2 to the <strong>out_seq_no</strong> of the last message before the hole and the <strong>end_seq_no</strong> by subtracting 2 from the <strong>out_seq_no</strong> of the received message with the wrong sequence number.</p>
 <p>Each hole normally requires only one request to resend messages — if the remote client keeps sending out of sync messages, they should be put into the queue without sending a new request. Having received the missing messages, the local client must first interpret these messages in the right order by their <strong>seq_no</strong>. Once this is done, the client can proceed to interpret messages from the queue (again, in the right <strong>seq_no</strong> order).</p>
 <p>Special cases:</p>
 <ul>

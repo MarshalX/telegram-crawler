@@ -44,9 +44,7 @@
   
   <div id="dev_page_content"><p>If <a href="/method/contacts.toggleTopPeers">enabled</a>, the rating of <a href="/constructor/topPeer">top peers</a> indicates the relevance of a frequently used peer in a certain <a href="/type/TopPeerCategory">category</a> (frequently messaged users, frequently used bots, inline bots, frequently visited channels and so on).</p>
 <p>Schema: </p>
-<pre><code><a href='/constructor/topPeer'>topPeer</a>#edcdc05b peer:<a href='/type/Peer'>Peer</a> rating:<a href='/type/double'>double</a> = <a href='/type/TopPeer'>TopPeer</a>;
-
-<a href='/constructor/topPeerCategoryBotsPM'>topPeerCategoryBotsPM</a>#ab661b5b = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
+<pre><code><a href='/constructor/topPeerCategoryBotsPM'>topPeerCategoryBotsPM</a>#ab661b5b = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
 <a href='/constructor/topPeerCategoryBotsInline'>topPeerCategoryBotsInline</a>#148677e2 = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
 <a href='/constructor/topPeerCategoryCorrespondents'>topPeerCategoryCorrespondents</a>#637b7ed = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
 <a href='/constructor/topPeerCategoryGroups'>topPeerCategoryGroups</a>#bd17a14a = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
@@ -54,6 +52,8 @@
 <a href='/constructor/topPeerCategoryPhoneCalls'>topPeerCategoryPhoneCalls</a>#1e76a78c = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
 <a href='/constructor/topPeerCategoryForwardUsers'>topPeerCategoryForwardUsers</a>#a8406ca9 = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
 <a href='/constructor/topPeerCategoryForwardChats'>topPeerCategoryForwardChats</a>#fbeec0f0 = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
+
+<a href='/constructor/topPeer'>topPeer</a>#edcdc05b peer:<a href='/type/Peer'>Peer</a> rating:<a href='/type/double'>double</a> = <a href='/type/TopPeer'>TopPeer</a>;
 
 <a href='/constructor/topPeerCategoryPeers'>topPeerCategoryPeers</a>#fb834291 category:<a href='/type/TopPeerCategory'>TopPeerCategory</a> count:<a href='/type/int'>int</a> peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/TopPeer'>TopPeer</a>&gt; = <a href='/type/TopPeerCategoryPeers'>TopPeerCategoryPeers</a>;
 
@@ -63,7 +63,10 @@
 
 ---functions---
 
-<a href='/method/contacts.getTopPeers'>contacts.getTopPeers</a>#973478b6 flags:<a href='/type/%23'>#</a> correspondents:flags.0?<a href='/constructor/true'>true</a> bots_pm:flags.1?<a href='/constructor/true'>true</a> bots_inline:flags.2?<a href='/constructor/true'>true</a> phone_calls:flags.3?<a href='/constructor/true'>true</a> forward_users:flags.4?<a href='/constructor/true'>true</a> forward_chats:flags.5?<a href='/constructor/true'>true</a> groups:flags.10?<a href='/constructor/true'>true</a> channels:flags.15?<a href='/constructor/true'>true</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/contacts.TopPeers'>contacts.TopPeers</a>;</code></pre>
+<a href='/method/contacts.toggleTopPeers'>contacts.toggleTopPeers</a>#8514bdda enabled:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/contacts.getTopPeers'>contacts.getTopPeers</a>#973478b6 flags:<a href='/type/%23'>#</a> correspondents:flags.0?<a href='/constructor/true'>true</a> bots_pm:flags.1?<a href='/constructor/true'>true</a> bots_inline:flags.2?<a href='/constructor/true'>true</a> phone_calls:flags.3?<a href='/constructor/true'>true</a> forward_users:flags.4?<a href='/constructor/true'>true</a> forward_chats:flags.5?<a href='/constructor/true'>true</a> groups:flags.10?<a href='/constructor/true'>true</a> channels:flags.15?<a href='/constructor/true'>true</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/contacts.TopPeers'>contacts.TopPeers</a>;
+<a href='/method/contacts.resetTopPeerRating'>contacts.resetTopPeerRating</a>#1ae373ac category:<a href='/type/TopPeerCategory'>TopPeerCategory</a> peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Use <a href="/method/contacts.toggleTopPeers">contacts.toggleTopPeers</a> to enable or disable top peer ratings.  </p>
 <p>The rate delta is computed by taking the time delta between the last time the user used a certain peer and the last time the rating for that peer was received and dividing it by the <a href="/constructor/config">exponential decay from config</a>.</p>
 <p>Example:
 Client-side, every time a user opens chat <code>123456789</code> the following operation must be done on the cached top peer info.</p>
@@ -72,7 +75,8 @@ Client-side, every time a user opens chat <code>123456789</code> the following o
 <li><code>normalizeRate</code> is an arbitrary time in the recent past.
 When ratings are received from the server using <a href="/method/contacts.getTopPeers">contacts.getTopPeers</a> and the schema described above, it is the time when they were received.</li>
 </ul>
-<pre><code>topPeer.rating += e^((dateOpened - normalizeRate) / config.rating_e_decay)</code></pre></div>
+<pre><code>topPeer.rating += e^((dateOpened - normalizeRate) / config.rating_e_decay)</code></pre>
+<p>Use <a href="/method/contacts.resetTopPeerRating">contacts.resetTopPeerRating</a> to reset the top peer rating of a certain peer, in a certain category.</p></div>
   
 </div>
           

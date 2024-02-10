@@ -110,19 +110,19 @@
 <td>Whether to move used stickersets to top, <a href="/api/stickers#recent-stickersets">see here for more info on this flag »</a></td>
 </tr>
 <tr>
+<td><strong>invert_media</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.16?<a href="/constructor/true">true</a></td>
+<td>If set, any eventual webpage preview will be shown on top of the message instead of at the bottom.</td>
+</tr>
+<tr>
 <td><strong>peer</strong></td>
 <td style="text-align: center;"><a href="/type/InputPeer">InputPeer</a></td>
 <td>The destination where the message will be sent</td>
 </tr>
 <tr>
-<td><strong>reply_to_msg_id</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/int">int</a></td>
-<td>The message ID to which this message will reply to</td>
-</tr>
-<tr>
-<td><strong>top_msg_id</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.9?<a href="/type/int">int</a></td>
-<td>This field must contain the topic ID <strong>only</strong> when replying to messages in <a href="/api/forum#forum-topics">forum topics</a> different from the "General" topic (i.e. <code>reply_to_msg_id</code> is set and <code>reply_to_msg_id != topicID</code> and <code>topicID != 1</code>). <br>If the replied-to message is deleted before the method finishes execution, the value in this field will be used to send the message to the correct topic, instead of the "General" topic.</td>
+<td><strong>reply_to</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/InputReplyTo">InputReplyTo</a></td>
+<td>If set, indicates that the message should be sent in reply to the specified message or story.</td>
 </tr>
 <tr>
 <td><strong>message</strong></td>
@@ -170,6 +170,11 @@
 <tbody>
 <tr>
 <td>400</td>
+<td>ADMIN_RIGHTS_EMPTY</td>
+<td>The chatAdminRights constructor passed in keyboardButtonRequestPeer.peer_type.user_admin_rights has no rights set (i.e. flags is 0).</td>
+</tr>
+<tr>
+<td>400</td>
 <td>BOT_DOMAIN_INVALID</td>
 <td>Bot domain invalid.</td>
 </tr>
@@ -192,6 +197,11 @@
 <td>400</td>
 <td>BUTTON_URL_INVALID</td>
 <td>Button URL invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>BUTTON_USER_INVALID</td>
+<td>The <code>user_id</code> passed to inputKeyboardButtonUserProfile is invalid!</td>
 </tr>
 <tr>
 <td>400</td>
@@ -240,6 +250,11 @@
 </tr>
 <tr>
 <td>400</td>
+<td>DOCUMENT_INVALID</td>
+<td>The specified document is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>ENCRYPTION_DECLINED</td>
 <td>The secret chat was declined.</td>
 </tr>
@@ -284,6 +299,11 @@
 <td>Invalid message ID provided.</td>
 </tr>
 <tr>
+<td>500</td>
+<td>MSG_WAIT_FAILED</td>
+<td>A waiting call returned an error.</td>
+</tr>
+<tr>
 <td>406</td>
 <td>PAYMENT_UNSUPPORTED</td>
 <td>A detailed description of the error will be received separately as described <a href="/api/errors#406-not-acceptable">here »</a>.</td>
@@ -304,6 +324,11 @@
 <td>Invalid poll option provided.</td>
 </tr>
 <tr>
+<td>406</td>
+<td>PRIVACY_PREMIUM_REQUIRED</td>
+<td>You need a <a href="/api/premium">Telegram Premium subscription</a> to send a message to this user.</td>
+</tr>
+<tr>
 <td>500</td>
 <td>RANDOM_ID_DUPLICATE</td>
 <td>You provided a random ID that was already used.</td>
@@ -317,6 +342,16 @@
 <td>400</td>
 <td>REPLY_MARKUP_TOO_LONG</td>
 <td>The specified reply_markup is too long.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>REPLY_TO_INVALID</td>
+<td>The specified <code>reply_to</code> field is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>REPLY_TO_USER_INVALID</td>
+<td>The replied-to user is invalid.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -347,6 +382,11 @@
 <td>420</td>
 <td>SLOWMODE_WAIT_%d</td>
 <td>Slowmode is enabled in this chat: wait %d seconds before sending another message to this chat.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>STORY_ID_INVALID</td>
+<td>The specified story ID is invalid.</td>
 </tr>
 <tr>
 <td>406</td>
@@ -389,8 +429,6 @@
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#stickers" id="stickers" name="stickers"><i class="anchor-icon"></i></a><a href="/api/stickers">Stickers</a></h4>
 <p>Telegram clients support displaying static and animated stickers.</p>
-<h4><a class="anchor" href="#forums" id="forums" name="forums"><i class="anchor-icon"></i></a><a href="/api/forum">Forums</a></h4>
-<p>Telegram allows creating forums with multiple distinct topics.</p>
 <h4><a class="anchor" href="#styled-text-with-message-entities" id="styled-text-with-message-entities" name="styled-text-with-message-entities"><i class="anchor-icon"></i></a><a href="/api/entities">Styled text with message entities</a></h4>
 <p>How to create styled text with message entities</p>
 <h4><a class="anchor" href="#scheduled-messages" id="scheduled-messages" name="scheduled-messages"><i class="anchor-icon"></i></a><a href="/api/scheduled-messages">Scheduled messages</a></h4>
@@ -400,7 +438,9 @@
 <h4><a class="anchor" href="#discussion-groups" id="discussion-groups" name="discussion-groups"><i class="anchor-icon"></i></a><a href="/api/discussion">Discussion groups</a></h4>
 <p>Groups can be associated to a channel as a discussion group, to allow users to discuss about posts.</p>
 <h4><a class="anchor" href="#error-handling" id="error-handling" name="error-handling"><i class="anchor-icon"></i></a><a href="/api/errors">Error handling </a></h4>
-<p>How to handle API return errors correctly.</p></div>
+<p>How to handle API return errors correctly.</p>
+<h4><a class="anchor" href="#telegram-premium" id="telegram-premium" name="telegram-premium"><i class="anchor-icon"></i></a><a href="/api/premium">Telegram Premium</a></h4>
+<p>Telegram Premium is an optional subscription service that unlocks additional exclusive client-side and API-side features, while helping support the development of the app.</p></div>
   
 </div>
           

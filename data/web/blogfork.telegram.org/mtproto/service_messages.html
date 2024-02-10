@@ -82,9 +82,12 @@ future_salts#ae500895 req_msg_id:long now:int salts:vector&lt;future_salt&gt; = 
 <p>Works like ping. In addition, after this is received, the server starts a timer which will close the current connection disconnect_delay seconds later unless it receives a new message of the same type which automatically resets all previous timers. If the client sends these pings once every 60 seconds, for example, it may set disconnect_delay equal to 75 seconds. </p>
 <h4><a class="anchor" name="request-to-destroy-session" href="#request-to-destroy-session"><i class="anchor-icon"></i></a>Request to Destroy Session</h4>
 <p>Used by the client to notify the server that it may forget the data from a different session belonging to the same user (i. e. with the same auth_key_id). The result of this being applied to the current session is undefined.</p>
-<pre><code>destroy_session#e7512126 session_id:long = DestroySessionRes;
-destroy_session_ok#e22045fc session_id:long = DestroySessionRes;
-destroy_session_none#62d350c9 session_id:long = DestroySessionRes;</code></pre>
+<pre><code>destroy_session_ok#e22045fc session_id:long = DestroySessionRes;
+destroy_session_none#62d350c9 session_id:long = DestroySessionRes;
+
+---functions---
+
+destroy_session#e7512126 session_id:long = DestroySessionRes;</code></pre>
 <h4><a class="anchor" name="new-session-creation-notification" href="#new-session-creation-notification"><i class="anchor-icon"></i></a>New Session Creation Notification</h4>
 <p>The server notifies the client that a new session (from the server&#39;s standpoint) had to be created to handle a client message. If, after this, the server receives a message with an even smaller msg_id within the same session, a similar notification will be generated for this msg_id as well. No such notifications are generated for high msg_id values.</p>
 <pre><code>new_session_created#9ec20908 first_msg_id:long unique_id:long server_salt:long = NewSession</code></pre>
@@ -99,7 +102,7 @@ destroy_session_none#62d350c9 session_id:long = DestroySessionRes;</code></pre>
 <p>Here message refers to any message together with its length and msg_id:</p>
 <pre><code>message msg_id:long seqno:int bytes:int body:Object = Message;</code></pre>
 <p><code>bytes</code> is the number of bytes in the body serialization.<br>All messages in a container must have msg_id lower than that of the container itself. A container does not require an acknowledgment and may not carry other simple containers. When messages are re-sent, they may be combined into a container in a different manner or sent individually.</p>
-<p>MTProto container can have at have at most <code>1024</code> messages. Clients should group acknowledgments, state requests and message resend requests into three separate <a href="/mtproto/service_messages_about_messages#acknowledgment-of-receipt"><code>msgs_ack</code></a>, <a href="https://core.telegram.org/mtproto/service_messages_about_messages#request-for-message-status-information"><code>msgs_state_req</code></a>, <a href="/mtproto/service_messages_about_messages#explicit-request-to-re-send-messages"><code>msg_resend_req</code></a> service messages with at most 8192 IDs each.</p>
+<p>MTProto container can have at have at most <code>1024</code> messages. Clients should group acknowledgments, state requests and message resend requests into three separate <a href="/mtproto/service_messages_about_messages#acknowledgment-of-receipt"><code>msgs_ack</code></a>, <a href="https://core.telegram.org/mtproto/service_messages_about_messages#request-for-message-status-information"><code>msgs_state_req</code></a>, <a href="/mtproto/service_messages_about_messages#explicit-request-to-re-send-messages"><code>msg_resend_req</code></a> service messages with at most 8192 IDs each.  </p>
 <p>Empty containers are also allowed. They are used by the server, for example, to respond to an HTTP request when the timeout specified in http_wait expires, and there are no messages to transmit. </p>
 <p><a href="https://github.com/tdlib/td/blob/master/td/mtproto/SessionConnection.cpp">Example implementation</a>.  </p>
 <h4><a class="anchor" name="message-copies" href="#message-copies"><i class="anchor-icon"></i></a>Message Copies</h4>
@@ -120,6 +123,15 @@ destroy_session_none#62d350c9 session_id:long = DestroySessionRes;</code></pre>
 <p>This message does not require a response or an acknowledgement. If the container transmitted over HTTP carries several such messages, the behavior is undefined (in fact, the latest parameter will be used). </p>
 <p>If no <code>http_wait</code> is present in container, default values <code>max_delay=0</code> (milliseconds), <code>wait_after=0</code> (milliseconds), and <code>max_wait=25000</code> (milliseconds) are used. </p>
 <p>If the client&#39;s ping of the server takes a long time, it may make sense to set <code>max_delay</code> to a value that is comparable in magnitude to ping time.</p>
+<h2><a class="anchor" name="destruction-of-a-permanent-auth-key" href="#destruction-of-a-permanent-auth-key"><i class="anchor-icon"></i></a>Destruction of a permanent auth key</h2>
+<pre><code>destroy_auth_key_ok#f660e1d4 = DestroyAuthKeyRes;
+destroy_auth_key_none#0a9f2259 = DestroyAuthKeyRes;
+destroy_auth_key_fail#ea109b13 = DestroyAuthKeyRes;
+
+---functions---
+
+destroy_auth_key#d1435160 = DestroyAuthKeyRes;</code></pre>
+<p><code>destroy_auth_key</code> should be called whenever a permanent auth key isn&#39;t needed anymore, such as after the user was logged out.  </p>
 </div>
   
 </div>
