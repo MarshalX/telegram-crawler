@@ -53,6 +53,17 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="february-16-2024" href="#february-16-2024"><i class="anchor-icon"></i></a>February 16, 2024</h4>
+<p><strong>Bot API 7.1</strong></p>
+<ul>
+<li>Added support for the administrator rights <em>can_post_stories</em>, <em>can_edit_stories</em>, <em>can_delete_stories</em> in supergroups.</li>
+<li>Added the class <a href="#chatboostadded">ChatBoostAdded</a> and the field <em>boost_added</em> to the class <a href="#message">Message</a> for service messages about a user boosting a chat.</li>
+<li>Added the field <em>sender_boost_count</em> to the class <a href="#message">Message</a>.</li>
+<li>Added the field <em>reply_to_story</em> to the class <a href="#message">Message</a>.</li>
+<li>Added the fields <em>chat</em> and <em>id</em> to the class <a href="#story">Story</a>.</li>
+<li>Added the field <em>unrestrict_boost_count</em> to the class <a href="#chat">Chat</a>.</li>
+<li>Added the field <em>custom_emoji_sticker_set_name</em> to the class <a href="#chat">Chat</a>.</li>
+</ul>
 <h4><a class="anchor" name="december-29-2023" href="#december-29-2023"><i class="anchor-icon"></i></a>December 29, 2023</h4>
 <p><strong>Bot API 7.0</strong></p>
 <p><strong>Reactions</strong></p>
@@ -137,15 +148,6 @@ To learn how to create…">
 <li>Added Web App events <em>writeAccessRequested</em> and <em>contactRequested</em>.</li>
 <li>Added the fields <em>from_request</em> and <em>from_attachment_menu</em> to the class <a href="#writeaccessallowed">WriteAccessAllowed</a>.</li>
 <li>Added the fields <em>added_to_attachment_menu</em> and <em>allows_write_to_pm</em> to the class <a href="/bots/webapps#webappuser">WebAppUser</a>.</li>
-</ul>
-<h4><a class="anchor" name="august-18-2023" href="#august-18-2023"><i class="anchor-icon"></i></a>August 18, 2023</h4>
-<p><strong>Bot API 6.8</strong></p>
-<ul>
-<li>Added the field <em>story</em> to the class <a href="#message">Message</a> for messages with forwarded stories. Currently, it holds no information.</li>
-<li>Added the field <em>voter_chat</em> to the class <a href="#pollanswer">PollAnswer</a>, to contain channel chat voters in <a href="#poll">Polls</a>. For backward compatibility, the field <em>user</em> in such objects will contain the user 136817688 (<a href="https://t.me/Channel_Bot">@Channel_Bot</a>).</li>
-<li>Added the field <em>emoji_status_expiration_date</em> to the class <a href="#chat">Chat</a>.</li>
-<li>Added the method <a href="#unpinallgeneralforumtopicmessages">unpinAllGeneralForumTopicMessages</a>.</li>
-<li>Increased to 512 characters the maximum length of the <em>startapp</em> parameter in direct Web App links.</li>
 </ul>
 <p><strong><a href="/bots/api-changelog">See earlier changes »</a></strong></p>
 <h3><a class="anchor" name="authorizing-your-bot" href="#authorizing-your-bot"><i class="anchor-icon"></i></a>Authorizing your bot</h3>
@@ -693,6 +695,11 @@ To learn how to create…">
 <td><em>Optional</em>. For supergroups, the minimum allowed delay between consecutive messages sent by each unprivileged user; in seconds. Returned only in <a href="#getchat">getChat</a>.</td>
 </tr>
 <tr>
+<td>unrestrict_boost_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. For supergroups, the minimum number of boosts that a non-administrator user needs to add in order to ignore slow mode and chat permissions. Returned only in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
 <td>message_auto_delete_time</td>
 <td>Integer</td>
 <td><em>Optional</em>. The time after which all messages sent to the chat will be automatically deleted; in seconds. Returned only in <a href="#getchat">getChat</a>.</td>
@@ -726,6 +733,11 @@ To learn how to create…">
 <td>can_set_sticker_set</td>
 <td>True</td>
 <td><em>Optional</em>. <em>True</em>, if the bot can change the group sticker set. Returned only in <a href="#getchat">getChat</a>.</td>
+</tr>
+<tr>
+<td>custom_emoji_sticker_set_name</td>
+<td>String</td>
+<td><em>Optional</em>. For supergroups, the name of the group&#39;s custom emoji sticker set. Custom emoji from this set can be used by all users and bots in the group. Returned only in <a href="#getchat">getChat</a>.</td>
 </tr>
 <tr>
 <td>linked_chat_id</td>
@@ -771,6 +783,11 @@ To learn how to create…">
 <td><em>Optional</em>. Sender of the message, sent on behalf of a chat. For example, the channel itself for channel posts, the supergroup itself for messages from anonymous group administrators, the linked channel for messages automatically forwarded to the discussion group. For backward compatibility, the field <em>from</em> contains a fake sender user in non-channel chats, if the message was sent on behalf of a chat.</td>
 </tr>
 <tr>
+<td>sender_boost_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. If the sender of the message boosted the chat, the number of boosts added by the user</td>
+</tr>
+<tr>
 <td>date</td>
 <td>Integer</td>
 <td>Date the message was sent in Unix time. It is always a positive number, representing a valid date.</td>
@@ -809,6 +826,11 @@ To learn how to create…">
 <td>quote</td>
 <td><a href="#textquote">TextQuote</a></td>
 <td><em>Optional</em>. For replies that quote part of the original message, the quoted part of the message</td>
+</tr>
+<tr>
+<td>reply_to_story</td>
+<td><a href="#story">Story</a></td>
+<td><em>Optional</em>. For replies to a story, the original story</td>
 </tr>
 <tr>
 <td>via_bot</td>
@@ -1039,6 +1061,11 @@ To learn how to create…">
 <td>proximity_alert_triggered</td>
 <td><a href="#proximityalerttriggered">ProximityAlertTriggered</a></td>
 <td><em>Optional</em>. Service message. A user in the chat triggered another user&#39;s proximity alert while sharing Live Location.</td>
+</tr>
+<tr>
+<td>boost_added</td>
+<td><a href="#chatboostadded">ChatBoostAdded</a></td>
+<td><em>Optional</em>. Service message: user boosted the chat</td>
 </tr>
 <tr>
 <td>forum_topic_created</td>
@@ -1764,7 +1791,28 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="story" href="#story"><i class="anchor-icon"></i></a>Story</h4>
-<p>This object represents a message about a forwarded story in the chat. Currently holds no information.</p>
+<p>This object represents a story.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Chat that posted the story</td>
+</tr>
+<tr>
+<td>id</td>
+<td>Integer</td>
+<td>Unique identifier for the story in the chat</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="video" href="#video"><i class="anchor-icon"></i></a>Video</h4>
 <p>This object represents a video file.</p>
 <table class="table">
@@ -2256,6 +2304,24 @@ To learn how to create…">
 <td>message_auto_delete_time</td>
 <td>Integer</td>
 <td>New auto-delete time for messages in the chat; in seconds</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="chatboostadded" href="#chatboostadded"><i class="anchor-icon"></i></a>ChatBoostAdded</h4>
+<p>This object represents a service message about a user boosting a chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boost_count</td>
+<td>Integer</td>
+<td>Number of boosts added by the user</td>
 </tr>
 </tbody>
 </table>
@@ -3290,7 +3356,7 @@ To learn how to create…">
 <tr>
 <td>can_manage_chat</td>
 <td>Boolean</td>
-<td><em>True</em>, if the administrator can access the chat event log, boost list in channels, see channel members, report spam messages, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege</td>
+<td><em>True</em>, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages and ignore slow mode. Implied by any other administrator privilege.</td>
 </tr>
 <tr>
 <td>can_delete_messages</td>
@@ -3323,6 +3389,21 @@ To learn how to create…">
 <td><em>True</em>, if the user is allowed to invite new users to the chat</td>
 </tr>
 <tr>
+<td>can_post_stories</td>
+<td>Boolean</td>
+<td><em>True</em>, if the administrator can post stories to the chat</td>
+</tr>
+<tr>
+<td>can_edit_stories</td>
+<td>Boolean</td>
+<td><em>True</em>, if the administrator can edit stories posted by other users</td>
+</tr>
+<tr>
+<td>can_delete_stories</td>
+<td>Boolean</td>
+<td><em>True</em>, if the administrator can delete stories posted by other users</td>
+</tr>
+<tr>
 <td>can_post_messages</td>
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the administrator can post messages in the channel, or access channel statistics; channels only</td>
@@ -3336,21 +3417,6 @@ To learn how to create…">
 <td>can_pin_messages</td>
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the user is allowed to pin messages; groups and supergroups only</td>
-</tr>
-<tr>
-<td>can_post_stories</td>
-<td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the administrator can post stories in the channel; channels only</td>
-</tr>
-<tr>
-<td>can_edit_stories</td>
-<td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the administrator can edit stories posted by other users; channels only</td>
-</tr>
-<tr>
-<td>can_delete_stories</td>
-<td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the administrator can delete stories posted by other users; channels only</td>
 </tr>
 <tr>
 <td>can_manage_topics</td>
@@ -3484,7 +3550,7 @@ To learn how to create…">
 <tr>
 <td>can_manage_chat</td>
 <td>Boolean</td>
-<td><em>True</em>, if the administrator can access the chat event log, boost list in channels, see channel members, report spam messages, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege</td>
+<td><em>True</em>, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages and ignore slow mode. Implied by any other administrator privilege.</td>
 </tr>
 <tr>
 <td>can_delete_messages</td>
@@ -3517,6 +3583,21 @@ To learn how to create…">
 <td><em>True</em>, if the user is allowed to invite new users to the chat</td>
 </tr>
 <tr>
+<td>can_post_stories</td>
+<td>Boolean</td>
+<td><em>True</em>, if the administrator can post stories to the chat</td>
+</tr>
+<tr>
+<td>can_edit_stories</td>
+<td>Boolean</td>
+<td><em>True</em>, if the administrator can edit stories posted by other users</td>
+</tr>
+<tr>
+<td>can_delete_stories</td>
+<td>Boolean</td>
+<td><em>True</em>, if the administrator can delete stories posted by other users</td>
+</tr>
+<tr>
 <td>can_post_messages</td>
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the administrator can post messages in the channel, or access channel statistics; channels only</td>
@@ -3530,21 +3611,6 @@ To learn how to create…">
 <td>can_pin_messages</td>
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the user is allowed to pin messages; groups and supergroups only</td>
-</tr>
-<tr>
-<td>can_post_stories</td>
-<td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the administrator can post stories in the channel; channels only</td>
-</tr>
-<tr>
-<td>can_edit_stories</td>
-<td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the administrator can edit stories posted by other users; channels only</td>
-</tr>
-<tr>
-<td>can_delete_stories</td>
-<td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the administrator can delete stories posted by other users; channels only</td>
 </tr>
 <tr>
 <td>can_manage_topics</td>
@@ -5098,7 +5164,9 @@ pre-formatted fixed-width code block written in the Python programming language
 ```
 &gt;Block quotation started
 &gt;Block quotation continued
-&gt;The last line of the block quotation</code></pre>
+&gt;The last line of the block quotation**
+&gt;The second block quotation started right after the previous\r
+&gt;The third block quotation started right after the previous</code></pre>
 <p>Please note:</p>
 <ul>
 <li>Any character with code between 1 and 126 inclusively can be escaped anywhere with a preceding &#39;\&#39; character, in which case it is treated as an ordinary character and not a part of the markup. This implies that &#39;\&#39; character usually must be escaped with a preceding &#39;\&#39; character.</li>
@@ -6785,7 +6853,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>can_manage_chat</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the administrator can access the chat event log, boost list in channels, see channel members, report spam messages, see anonymous administrators in supergroups and ignore slow mode. Implied by any other administrator privilege</td>
+<td>Pass <em>True</em> if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages and ignore slow mode. Implied by any other administrator privilege.</td>
 </tr>
 <tr>
 <td>can_delete_messages</td>
@@ -6824,6 +6892,24 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Pass <em>True</em> if the administrator can invite new users to the chat</td>
 </tr>
 <tr>
+<td>can_post_stories</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the administrator can post stories to the chat</td>
+</tr>
+<tr>
+<td>can_edit_stories</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the administrator can edit stories posted by other users</td>
+</tr>
+<tr>
+<td>can_delete_stories</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the administrator can delete stories posted by other users</td>
+</tr>
+<tr>
 <td>can_post_messages</td>
 <td>Boolean</td>
 <td>Optional</td>
@@ -6840,24 +6926,6 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Pass <em>True</em> if the administrator can pin messages, supergroups only</td>
-</tr>
-<tr>
-<td>can_post_stories</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the administrator can post stories in the channel; channels only</td>
-</tr>
-<tr>
-<td>can_edit_stories</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the administrator can edit stories posted by other users; channels only</td>
-</tr>
-<tr>
-<td>can_delete_stories</td>
-<td>Boolean</td>
-<td>Optional</td>
-<td>Pass <em>True</em> if the administrator can delete stories posted by other users; channels only</td>
 </tr>
 <tr>
 <td>can_manage_topics</td>
