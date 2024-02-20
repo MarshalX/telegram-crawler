@@ -351,11 +351,28 @@ async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.Clie
     cleanup2()
 
 
+async def download_telegram_android_and_extract_resources(session: aiohttp.ClientSession) -> None:
+    await download_telegram_android_stable_dl_and_extract_resources(session)
+    await download_telegram_android_beta_and_extract_resources(session)
+
+
+async def download_telegram_android_stable_dl_and_extract_resources(session: aiohttp.ClientSession):
+    download_url = 'https://telegram.org/dl/android/apk'
+
+    await _download_telegram_android_and_extract_resources(session, download_url, 'android-stable-dl')
+
+
 async def download_telegram_android_beta_and_extract_resources(session: aiohttp.ClientSession):
     parameterized_url = 'apps/drklo-2kb-ghpo/telegram-beta-2/distribution_groups/all-users-of-telegram-beta-2'
     download_url = await get_download_link_of_latest_appcenter_release(parameterized_url, session)
 
-    crawled_data_folder = os.path.join(OUTPUT_CLIENTS_FOLDER, 'android-beta')
+    await _download_telegram_android_and_extract_resources(session, download_url, 'android-beta')
+
+
+async def _download_telegram_android_and_extract_resources(
+        session: aiohttp.ClientSession, download_url: str, folder_name: str
+):
+    crawled_data_folder = os.path.join(OUTPUT_CLIENTS_FOLDER, folder_name)
 
     if not download_url:
         return
@@ -861,7 +878,7 @@ async def start(mode: str):
             track_mtproto_methods(),
         )
         mode == 'client' and await asyncio.gather(
-            download_telegram_android_beta_and_extract_resources(session),
+            download_telegram_android_and_extract_resources(session),
             download_telegram_macos_beta_and_extract_resources(session),
             download_telegram_ios_beta_and_extract_resources(session),
         )

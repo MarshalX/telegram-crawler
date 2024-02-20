@@ -44,7 +44,8 @@ STATUS_TO_EMOJI = {
 }
 
 AVAILABLE_HASHTAGS = {
-    'web_tr', 'web_res', 'web', 'server', 'test_server', 'client', 'ios', 'macos', 'android', 'mini_app', 'wallet'
+    'web_tr', 'web_res', 'web', 'server', 'test_server', 'client',
+    'ios', 'macos', 'android', 'android_dl', 'mini_app', 'wallet'
 }
 HASHTAGS_PATTERNS = {
     # regex will be more flexible. for example, in issue with double hashtag '#web #web_res' when data/res not changed
@@ -57,6 +58,7 @@ HASHTAGS_PATTERNS = {
     'ios': os.path.join(ROOT_TREE_DIR, 'client', 'ios-beta'),
     'macos': os.path.join(ROOT_TREE_DIR, 'client', 'macos-beta'),
     'android': os.path.join(ROOT_TREE_DIR, 'client', 'android-beta'),
+    'android_dl': os.path.join(ROOT_TREE_DIR, 'client', 'android-stable-dl'),
     'mini_app': os.path.join(ROOT_TREE_DIR, 'mini_app'),
     'wallet': os.path.join(ROOT_TREE_DIR, 'mini_app', 'wallet'),
 }
@@ -79,6 +81,7 @@ HASHTAG_TO_TOPIC = {
     'ios': '2194',
     'macos': '2187',
     'android': '2190',
+    'android_dl': '12235',
     'wallet': '5685',
 }
 
