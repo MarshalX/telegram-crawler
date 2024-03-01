@@ -18,8 +18,7 @@ var Main = {
       $(cont).on('click.curPage', '.js-howofferworks', Main.eHowofferworks);
       $(cont).on('click.curPage', '.js-bots-about', Main.eBotsAbout);
       $(cont).on('click.curPage', '.logout-link', Login.logOut);
-      $(cont).on('click.curPage', '.ton-auth-link', Wallet.eTonAuth);
-      $(cont).on('click.curPage', '.ton-logout-link', Wallet.eLogOut);
+      $(cont).on('click.curPage', '.ton-logout-link', Login.tonLogOut);
       $(cont).on('click.curPage', '.js-copy-code', Main.copyCode);
       $(cont).on('click.curPage', '.js-main-search-dd-item', Main.eMainSearchDDSelected);
       state.$headerMenu = $('.js-header-menu');
@@ -598,173 +597,14 @@ var Login = {
       location.reload();
     });
     return false;
-  }
-};
-
-var Wallet = {
-  init: function(options) {
-    Aj.globalState.tonConnectAuthAddress = options.address || false;
-    Aj.globalState.tonConnectProof = options.ton_proof || '';
-    Aj.globalState.tonConnectVersion = options.version || 1;
-    if (Aj.globalState.tonConnectVersion == 2) {
-      var tonConnectUI = Aj.globalState.tonConnectUI;
-      if (!tonConnectUI) {
-        tonConnectUI = Aj.globalState.tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-          manifestUrl: location.origin + '/tonconnect-manifest.json',
-          actionsConfiguration: {
-            modals: ['before'],
-            notifications: [],
-            returnStrategy: 'back'
-          },
-          uiPreferences: {
-            theme: 'DARK',
-            borderRadius: 's',
-            colorsSet: {
-              'DARK': {
-                accent: '#4db2ff',
-                background: {
-                  primary: '#1a2026',
-                  qr: '#fff',
-                  tint: '#242e38'
-                },
-                connectButton: {
-                  background: '#248bda',
-                  foreground: '#fff'
-                },
-                icon: {
-                  error: '#ff5863',
-                },
-                text: {
-                  primary: '#fff',
-                  secondary: '#8794a1'
-                }
-              }
-            }
-          }
-        });
-        tonConnectUI.setConnectRequestParameters({
-          value: { tonProof: Aj.globalState.tonConnectProof }
-        });
-        tonConnectUI.connectionRestored.then(function() {
-          if (!Aj.globalState.tonConnectInited) {
-            Wallet.checkWallet();
-            Aj.globalState.tonConnectInited = true;
-          }
-          console.log('connected', tonConnectUI.connected);
-        });
-        tonConnectUI.onStatusChange(function(wallet) {
-          if (Aj.globalState.tonConnectInited) {
-            if (wallet &&
-                wallet.account &&
-                wallet.connectItems &&
-                wallet.connectItems.tonProof &&
-                wallet.connectItems.tonProof.proof) {
-              Aj.apiRequest('checkTonProofAuth', {
-                account: JSON.stringify(wallet.account),
-                proof:   JSON.stringify(wallet.connectItems.tonProof.proof)
-              }, function(result) {
-                if (result.verified) {
-                  location.reload();
-                } else {
-                  Wallet.disconnect();
-                }
-                console.log('verified', result.verified);
-              });
-            } else {
-              Wallet.checkWallet();
-            }
-          }
-        });
-      } else {
-        Wallet.checkWallet();
-      }
-    }
   },
-  sendTransaction: function(options) {
-    if (Aj.globalState.tonConnectVersion == 2) {
-      var tonConnectUI = Aj.globalState.tonConnectUI;
-      var sendTransaction = function(transaction) {
-        tonConnectUI.sendTransaction(transaction).then(function(transaction) {
-          options.onConfirm && options.onConfirm(true);
-        }).catch(function(){});
-      };
-      if (!tonConnectUI.connected) {
-        tonConnectUI.openModal();
-      } else if (options.request) {
-        var req = options.request, params = $.extend({transaction: 1}, req.params);
-        Aj.apiRequest(req.method, params, function(result) {
-          if (result.error) {
-            return showAlert(result.error);
-          }
-          sendTransaction(result.transaction);
-        });
-      } else if (options.transaction) {
-        sendTransaction(options.transaction);
-      }
-    } else {
-      QR.showPopup(options);
-    }
-  },
-  eTonAuth: function(e) {
-    e.stopImmediatePropagation();
-    e.preventDefault();
-    if (Aj.globalState.tonConnectVersion == 2) {
-      var tonConnectUI = Aj.globalState.tonConnectUI;
-      if (!tonConnectUI.connected) {
-        tonConnectUI.openModal();
-      }
-    } else {
-      QR.showPopup({
-        request: {
-          method: 'getTonAuthLink'
-        },
-        title: l('WEB_POPUP_TON_AUTH_HEADER'),
-        description: l('WEB_POPUP_TON_AUTH_TEXT'),
-        hint: l('WEB_POPUP_TON_AUTH_HINT'),
-        tk_label: l('WEB_POPUP_TON_AUTH_BUTTON'),
-        onConfirm: function() {
-          location.reload();
-        }
-      });
-    }
-  },
-  eLogOut: function(e) {
+  tonLogOut: function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    Wallet.disconnect();
-    return false;
-  },
-  checkWallet: function() {
-    if (Aj.globalState.tonConnectVersion == 2) {
-      var authAddress = Aj.globalState.tonConnectAuthAddress,
-          wallet = Aj.globalState.tonConnectUI.wallet;
-      if (wallet && wallet.account) {
-        if (!authAddress || authAddress != wallet.account.address) {
-          Wallet.disconnect();
-        }
-      } else {
-        if (authAddress) {
-          Wallet.logOut();
-        }
-      }
-    }
-  },
-  disconnect: function() {
-    var tonConnectUI = Aj.globalState.tonConnectUI;
-    if (tonConnectUI && tonConnectUI.connected) {
-      tonConnectUI.disconnect().then(function() {
-        if (Aj.globalState.tonConnectAuthAddress) {
-          Wallet.logOut();
-        }
-      });
-    } else {
-      Wallet.logOut();
-    }
-  },
-  logOut: function() {
     Aj.apiRequest('tonLogOut', {}, function(result) {
       location.reload();
     });
+    return false;
   }
 };
 
@@ -853,7 +693,7 @@ var Auction = {
       return;
     }
     closePopup(Aj.state.$bidPopup);
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getBidLink',
         params: {
@@ -882,7 +722,7 @@ var Auction = {
     var username = Aj.state.username;
     var item_title = Aj.state.itemTitle;
     var amount   = $(this).attr('data-bid-amount');
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getBidLink',
         params: {
@@ -952,7 +792,7 @@ var Auction = {
       return;
     }
     closePopup(Aj.state.$makeOfferPopup);
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getOfferLink',
         params: {
@@ -1164,7 +1004,7 @@ var Assets = {
     var $form = $(this);
     var req_id = $form.field('id').value();
     closePopup(Aj.state.$botUsernamePopup);
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getBotUsernameLink',
         params: {
@@ -1230,7 +1070,7 @@ var Assets = {
     var min_amount = Main.amountFieldValue($form, 'min_bid_value');
     var max_amount = Main.amountFieldValue($form, 'max_price_value');
     closePopup(Aj.state.$putToAuctionPopup);
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getStartAuctionLink',
         params: {
@@ -1262,7 +1102,7 @@ var Assets = {
     var $actions = $(this).closest('.js-actions');
     var username = $actions.attr('data-username');
     var item_title = $actions.attr('data-item-title');
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getCancelAuctionLink',
         params: {
@@ -1331,7 +1171,7 @@ var Assets = {
     var item_title = Aj.state.$sellUsernameForm.data('item_title');
     var sell_amount = Main.amountFieldValue($form, 'sell_value');
     closePopup(Aj.state.$sellUsernamePopup);
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getStartAuctionLink',
         params: {
@@ -1417,7 +1257,7 @@ var Random = {
     e.preventDefault();
     var item_title = Aj.state.itemTitle;
     var amount = Aj.state.price;
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getRandomNumberLink',
         params: {}
@@ -1706,8 +1546,7 @@ var Account = {
     $form.data('loading', true);
     Aj.apiRequest('startConverting', {
       id: req_id,
-      bid: amount,
-      transaction: 1
+      bid: amount
     }, function(result) {
       $form.data('loading', false);
       Account.processConverting(result);
@@ -1824,7 +1663,7 @@ var Premium = {
       Main.destroyForm(state.$giftPremiumForm);
       state.$premiumSearchForm.off('submit', Premium.eSearchSubmit);
       state.$premiumSearchForm.field('query').off('input', Premium.eSearchInput);
-      state.$premiumSearchForm.field('query').off('change', Premium.eSearchChange);
+      state.$premiumSearchForm.field('query').on('change', Premium.eSearchChange);
       $('.js-form-clear', state.$premiumSearchForm).off('click', Premium.eSearchClear);
       state.$premiumSearchForm.off('change', '.js-premium-options input.radio', Premium.eRadioChanged);
       state.$giftPremiumForm.off('change', 'input.checkbox', Premium.eCheckboxChanged);
@@ -2038,7 +1877,7 @@ var Premium = {
     var req_id = $form.field('id').value();
     var show_sender = $form.field('show_sender').prop('checked');
     closePopup(Aj.state.$giftPremiumPopup);
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getGiftPremiumLink',
         params: {
@@ -2106,7 +1945,7 @@ var PremiumGiveaway = {
       Main.destroyForm(state.$giveawayPremiumForm);
       state.$premiumSearchForm.off('submit', PremiumGiveaway.eSearchSubmit);
       state.$premiumSearchForm.field('query').off('input', PremiumGiveaway.eSearchInput);
-      state.$premiumSearchForm.field('query').off('change', PremiumGiveaway.eSearchChange);
+      state.$premiumSearchForm.field('query').on('change', PremiumGiveaway.eSearchChange);
       $('.js-form-clear', state.$premiumSearchForm).off('click', PremiumGiveaway.eSearchClear);
       state.$premiumSearchForm.field('quantity').off('change', PremiumGiveaway.eQuantityChanged);
       state.$premiumSearchForm.off('change', '.js-premium-options input.radio', PremiumGiveaway.eRadioChanged);
@@ -2358,7 +2197,7 @@ var PremiumGiveaway = {
     var item_title = Aj.state.itemTitle;
     var req_id = $form.field('id').value();
     closePopup(Aj.state.$giveawayPremiumPopup);
-    Wallet.sendTransaction({
+    QR.showPopup({
       request: {
         method: 'getGiveawayPremiumLink',
         params: {
@@ -2383,215 +2222,6 @@ var PremiumGiveaway = {
         return showAlert(result.error);
       }
       Aj.location('/premium/giveaway');
-    });
-  }
-};
-
-var Ads = {
-  init: function() {
-    Aj.onLoad(function(state) {
-      var cont = Aj.ajContainer;
-      $(cont).on('click.curPage', '.js-more-funds-btn', Ads.eAddMoreFunds);
-      $(cont).on('click.curPage', '.js-recharge-btn', Ads.eRechargeAccount);
-      state.$rechargeForm = $('.js-recharge-form', cont);
-      state.$searchField = $('.js-account-search-field', cont);
-      Main.initForm(state.$rechargeForm);
-      state.$rechargeForm.on('submit', Ads.eSearchSubmit);
-      state.$rechargeForm.field('query').on('input', Ads.eSearchInput);
-      state.$rechargeForm.field('query').on('change', Ads.eSearchChange);
-      $('.js-form-clear', state.$rechargeForm).on('click', Ads.eSearchClear);
-      state.$rechargeBtn = $('.js-recharge-btn', cont);
-      state.updLastReq = +Date.now();
-      if (state.needUpdate) {
-        state.updStateTo = setTimeout(Ads.updateState, Main.UPDATE_PERIOD);
-      }
-    });
-    Aj.onUnload(function(state) {
-      clearTimeout(state.updStateTo);
-      state.needUpdate = false;
-      Main.destroyForm(state.$giftPremiumForm);
-      state.$rechargeForm.off('submit', Ads.eSearchSubmit);
-      state.$rechargeForm.field('query').off('input', Ads.eSearchInput);
-      state.$rechargeForm.field('query').off('change', Ads.eSearchChange);
-      $('.js-form-clear', state.$rechargeForm).off('click', Ads.eSearchClear);
-    });
-  },
-  updateState: function() {
-    var now = +Date.now();
-    if (document.hasFocus() ||
-        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
-      Aj.state.updLastReq = now;
-      Aj.apiRequest('updateAdsState', {
-        mode: Aj.state.mode
-      }, function(result) {
-        if (result.mode) {
-          Aj.state.mode = result.mode;
-        }
-        if (result.html) {
-          Ads.updateContent(result.html);
-        } else {
-          if (result.history_html) {
-            Ads.updateHistory(result.history_html);
-          }
-        }
-        if (result.lv) {
-          Aj.state.lastVer = result.lv;
-          if (Aj.state.$sentPopup) {
-            closePopup(Aj.state.$sentPopup);
-          }
-        }
-        if (Aj.state.needUpdate && result.need_update) {
-          Aj.state.updStateTo = setTimeout(Ads.updateState, Main.UPDATE_PERIOD);
-        }
-      });
-    } else {
-      if (Aj.state.needUpdate) {
-        Aj.state.updStateTo = setTimeout(Ads.updateState, Main.CHECK_PERIOD);
-      }
-    }
-  },
-  eSearchInput: function(e) {
-    var $field = Aj.state.$searchField;
-    $('.js-search-field-error').html('');
-    $field.removeClass('error');
-  },
-  eSearchChange: function(e) {
-    Ads.searchSubmit();
-  },
-  eSearchClear: function(e) {
-    var $form = Aj.state.$rechargeForm;
-    var $field = Aj.state.$searchField;
-    var $btn   = Aj.state.$rechargeBtn;
-    $form.field('account').value('');
-    $form.field('query').value('').prop('disabled', false);
-    $btn.prop('disabled', true);
-    $field.removeClass('found');
-    $('.js-search-field-error').html('');
-    $field.removeClass('error');
-    Ads.updateUrl();
-    $form.field('query').focus();
-  },
-  eSearchSubmit: function(e) {
-    e.preventDefault();
-    Ads.searchSubmit();
-  },
-  searchSubmit: function() {
-    var $form  = Aj.state.$rechargeForm;
-    var account = $form.field('account').value();
-    var query  = $form.field('query').value();
-    if (!query.length) {
-      $form.field('query').focus();
-      return;
-    }
-    Aj.state.$searchField.addClass('loading').removeClass('play').redraw().addClass('play');
-    Aj.showProgress();
-    Aj.apiRequest('searchAdsAccount', {
-      query: account || query
-    }, function(result) {
-      Aj.hideProgress();
-      Ads.updateResult(result);
-      Aj.state.$searchField.removeClass('loading');
-    });
-  },
-  updateResult: function(result) {
-    var $form  = Aj.state.$rechargeForm;
-    var $field = Aj.state.$searchField;
-    var $btn   = Aj.state.$rechargeBtn;
-    if (result.error) {
-      $('.js-search-field-error').html(result.error);
-      $field.addClass('error').removeClass('found');
-      $form.field('query').prop('disabled', false);
-    } else {
-      $('.js-search-field-error').html('');
-      $field.removeClass('error');
-      if (result.found) {
-        if (result.found.photo) {
-          $('.js-account-search-photo', $field).html(result.found.photo);
-        }
-        if (result.found.name) {
-          var $form = Aj.state.$rechargeForm;
-          $form.field('query').value(uncleanHTML(result.found.name));
-        }
-        $form.field('account').value(result.found.account);
-        $field.addClass('found');
-        $form.field('query').prop('disabled', true);
-        $btn.prop('disabled', false);
-      } else {
-        $form.field('account').value('');
-        $field.removeClass('found');
-        $form.field('query').prop('disabled', false);
-        $btn.prop('disabled', true);
-      }
-    }
-    Ads.updateUrl();
-  },
-  updateUrl: function() {
-    var new_url = '';
-    var $form   = Aj.state.$rechargeForm;
-    var account = $form.field('account').value();
-    if (account) {
-      new_url += '&account=' + encodeURIComponent(account);
-    }
-    if (new_url) {
-      new_url = '?' + new_url.substr(1);
-    }
-    var loc = Aj.location(), path = loc.pathname + loc.search;
-    if (!new_url) {
-      new_url = loc.pathname;
-    }
-    Aj.setLocation(new_url, path != '/ads');
-  },
-  updateHistory: function(html) {
-    $('.js-premium-history').replaceWith(html);
-  },
-  updateContent: function(html) {
-    $('.js-main-content').html(html).find('.js-preview-sticker').each(function() {
-      RLottie.init(this, {playUntilEnd: true});
-    });
-  },
-  eRechargeAccount: function(e) {
-    e.stopImmediatePropagation();
-    e.preventDefault();
-    var $form   = Aj.state.$rechargeForm;
-    var account = $form.field('account').value();
-    var amount  = Main.amountFieldValue($form, 'amount_value');
-    if (amount === false || amount <= 0) {
-      $form.field('amount_value').focus();
-      return;
-    }
-    Aj.apiRequest('initAdsRechargeRequest', {
-      account: account,
-      amount: amount
-    }, function(result) {
-      if (result.error) {
-        return showAlert(result.error);
-      }
-      Wallet.sendTransaction({
-        request: {
-          method: 'getAdsRechargeLink',
-          params: {
-            id: result.req_id
-          }
-        },
-        title: l('WEB_POPUP_QR_ADS_RECHARGE_HEADER'),
-        description: l('WEB_POPUP_QR_ADS_RECHARGE_TEXT', {
-          amount: '<span class="icon-before icon-ton-text js-amount_fee">' + result.amount + '</span>'
-        }),
-        qr_label: result.item_title,
-        tk_label: l('WEB_POPUP_QR_ADS_RECHARGE_TK_BUTTON'),
-        terms_label: l('WEB_POPUP_QR_PROCEED_TERMS')
-      });
-      Aj.state.needUpdate = true;
-    });
-  },
-  eAddMoreFunds: function(e) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    Aj.apiRequest('repeatAdsAddFunds', {}, function(result) {
-      if (result.error) {
-        return showAlert(result.error);
-      }
-      Aj.location('/ads');
     });
   }
 };
