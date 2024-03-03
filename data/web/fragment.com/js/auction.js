@@ -616,6 +616,7 @@ var Wallet = {
             notifications: [],
             returnStrategy: 'back'
           },
+          enableAndroidBackHandler: false,
           uiPreferences: {
             theme: 'DARK',
             borderRadius: 's',
