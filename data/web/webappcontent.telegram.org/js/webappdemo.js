@@ -288,6 +288,74 @@ var DemoApp = {
       }
     });
   },
+  biometricInit: function(el) {
+    var biometricManager = Telegram.WebApp.BiometricManager;
+    if (!DemoApp.biometricInited) {
+      DemoApp.biometricInited = true;
+      Telegram.WebApp.onEvent('biometricManagerUpdated', function() {
+        $('#bm_inited').text(biometricManager.isInited ? 'true' : 'false');
+        $('#bm_available').text(biometricManager.isBiometricAvailable ? 'true' : 'false');
+        $('#bm_type').text(biometricManager.biometricType || '');
+        $('#bm_access_requested').text(biometricManager.isAccessRequested ? 'true' : 'false');
+        $('#bm_access_granted').text(biometricManager.isAccessGranted ? 'true' : 'false');
+        $('#bm_token_saved').text(biometricManager.isBiometricTokenSaved ? 'true' : 'false');
+      });
+    }
+    biometricManager.init();
+  },
+  biometricRequestAccess: function(el) {
+    var biometricManager = Telegram.WebApp.BiometricManager;
+    if (!biometricManager.isInited) {
+      return DemoApp.showAlert('Biometric not inited yet!');
+    }
+    biometricManager.requestAccess(function(access_granted) {
+      if (access_granted) {
+        $(el).next('span').text('(Access granted)').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(Request declined)').attr('class', 'err');
+      }
+    });
+  },
+  biometricRequestAuth: function(el) {
+    var biometricManager = Telegram.WebApp.BiometricManager;
+    if (!biometricManager.isInited) {
+      return DemoApp.showAlert('Biometric not inited yet!');
+    }
+    biometricManager.authenticate(function(success, token) {
+      if (success) {
+        $(el).next('span').text('(Success, token: ' + token + ')').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(Auth failed)').attr('class', 'err');
+      }
+    });
+  },
+  biometricSetToken: function(el) {
+    var biometricManager = Telegram.WebApp.BiometricManager;
+    if (!biometricManager.isInited) {
+      return DemoApp.showAlert('Biometric not inited yet!');
+    }
+    var token = parseInt(Math.random().toString().substr(2)).toString(16);
+    biometricManager.updateBiometricToken(token, function(updated) {
+      if (updated) {
+        $(el).next('span').text('(Updated)').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(Failed)').attr('class', 'err');
+      }
+    });
+  },
+  biometricRemoveToken: function(el) {
+    var biometricManager = Telegram.WebApp.BiometricManager;
+    if (!biometricManager.isInited) {
+      return DemoApp.showAlert('Biometric not inited yet!');
+    }
+    biometricManager.updateBiometricToken('', function(updated) {
+      if (updated) {
+        $(el).next('span').text('(Removed)').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(Failed)').attr('class', 'err');
+      }
+    });
+  },
   toggleMainButton: function(el) {
     if (DemoApp.MainButton.isVisible) {
       DemoApp.MainButton.hide();

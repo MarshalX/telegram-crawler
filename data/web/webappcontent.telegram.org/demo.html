@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app.js?41"></script>
+    <script src="https://tg.dev/js/telegram-web-app.js?42"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -19,7 +19,7 @@
     </script>
     <link href="https://tg.dev/css/bootstrap.min.css?3" rel="stylesheet">
     <link href="https://tg.dev/css/bootstrap-extra.css?2" rel="stylesheet">
-    <link href="/css/webappdemo.css?10" rel="stylesheet">
+    <link href="/css/webappdemo.css?11" rel="stylesheet">
   </head>
   <body class="" style="visibility: hidden;">
       <section id="top_sect" class="second">
@@ -121,6 +121,18 @@
         </tfoot>
       </table>
     </form>
+    <p>Biometrics:</p>
+    <div class="columns">
+      <ul>
+        <li>isInited: <span class="txt" id="bm_inited">false</span></li>
+        <li>available: <span class="txt" id="bm_available">false</span></li>
+        <li>type: <span class="txt" id="bm_type"></span></li>
+        <li>access_requested: <span class="txt" id="bm_access_requested">false</span> (<a href="javascript:;" onclick="return DemoApp.biometricRequestAccess(this);">Request access</a>) <span></span></li>
+        <li>access_granted: <span class="txt" id="bm_access_granted">false</span></li>
+        <li>token_saved: <span class="txt" id="bm_token_saved">false</span> (<a href="javascript:;" onclick="return DemoApp.biometricSetToken(this);">Set token</a>, <a href="javascript:;" onclick="return DemoApp.biometricRemoveToken(this);">Remove token</a>) <span></span></li>
+        <li><a href="javascript:;" onclick="return DemoApp.biometricRequestAuth(this);">Request auth</a> <span></span></li>
+      </ul>
+    </div>
     <pre><code id="webview_data"></code></pre>
     <div class="hint">
       Data passed to webview.
@@ -139,7 +151,7 @@
   <div class="viewport-stable_border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?22"></script>
+    <script src="/js/webappdemo.js?23"></script>
     <script>DemoApp.apiUrl = "/demo/api";
 
 Telegram.WebApp.onEvent('themeChanged', function() {
@@ -257,6 +269,9 @@ try {
 } catch(e) {}
 try {
   DemoApp.loadCloudKeys();
+} catch(e) {}
+try {
+  DemoApp.biometricInit();
 } catch(e) {}
 
 </script>

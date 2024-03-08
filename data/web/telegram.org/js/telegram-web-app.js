@@ -1094,6 +1094,231 @@
     return cloudStorage;
   })();
 
+  var BiometricManager = (function() {
+    var isInited = false;
+    var isBiometricAvailable = false;
+    var biometricType = 'unknown';
+    var isAccessRequested = false;
+    var isAccessGranted = false;
+    var isBiometricTokenSaved = false;
+
+    var biometricManager = {};
+    Object.defineProperty(biometricManager, 'isInited', {
+      get: function(){ return isInited; },
+      enumerable: true
+    });
+    Object.defineProperty(biometricManager, 'isBiometricAvailable', {
+      get: function(){ return isInited && isBiometricAvailable; },
+      enumerable: true
+    });
+    Object.defineProperty(biometricManager, 'biometricType', {
+      get: function(){ return biometricType || 'unknown'; },
+      enumerable: true
+    });
+    Object.defineProperty(biometricManager, 'isAccessRequested', {
+      get: function(){ return isAccessRequested; },
+      enumerable: true
+    });
+    Object.defineProperty(biometricManager, 'isAccessGranted', {
+      get: function(){ return isAccessRequested && isAccessGranted; },
+      enumerable: true
+    });
+    Object.defineProperty(biometricManager, 'isBiometricTokenSaved', {
+      get: function(){ return isBiometricTokenSaved; },
+      enumerable: true
+    });
+
+    var initRequestState = {callbacks: []};
+    var accessRequestState = false;
+    var authRequestState = false;
+    var tokenRequestState = false;
+
+    WebView.onEvent('biometry_info_received',  onBiometryInfoReceived);
+    WebView.onEvent('biometry_auth_requested', onBiometryAuthRequested);
+    WebView.onEvent('biometry_token_updated',  onBiometryTokenUpdated);
+
+    function onBiometryInfoReceived(eventType, eventData) {
+      isInited = true;
+      if (eventData.available) {
+        isBiometricAvailable = true;
+        biometricType = eventData.type || 'unknown';
+        if (eventData.access_requested) {
+          isAccessRequested = true;
+          isAccessGranted = !!eventData.access_granted;
+          isBiometricTokenSaved = !!eventData.token_saved;
+        } else {
+          isAccessRequested = false;
+          isAccessGranted = false;
+          isBiometricTokenSaved = false;
+        }
+      } else {
+        isBiometricAvailable = false;
+        biometricType = 'unknown';
+        isAccessRequested = false;
+        isAccessGranted = false;
+        isBiometricTokenSaved = false;
+      }
+
+      if (initRequestState.callbacks.length > 0) {
+        for (var i = 0; i < initRequestState.callbacks.length; i++) {
+          var callback = initRequestState.callbacks[i];
+          callback();
+        }
+      }
+      if (accessRequestState) {
+        var state = accessRequestState;
+        accessRequestState = false;
+        if (state.callback) {
+          state.callback(isAccessGranted);
+        }
+      }
+      receiveWebViewEvent('biometricManagerUpdated');
+    }
+    function onBiometryAuthRequested() {
+      var isAuthenticated = (eventData.status == 'authorized'),
+          biometricToken = eventData.token || '';
+      if (authRequestState) {
+        var state = authRequestState;
+        authRequestState = false;
+        if (state.callback) {
+          state.callback(isAuthenticated, isAuthenticated ? biometricToken : null);
+        }
+      }
+      receiveWebViewEvent('biometricAuthRequested', isAuthenticated ? {
+        isAuthenticated: true,
+        biometricToken: biometricToken
+      } : {
+        isAuthenticated: false
+      });
+    }
+    function onBiometryTokenUpdated() {
+      var applied = false;
+      if (isBiometricAvailable &&
+          isAccessRequested) {
+        if (eventData.status == 'updated') {
+          isBiometricTokenSaved = true;
+          applied = true;
+        }
+        else if (eventData.status == 'removed') {
+          isBiometricTokenSaved = false;
+          applied = true;
+        }
+      }
+      if (tokenRequestState) {
+        var state = tokenRequestState;
+        tokenRequestState = false;
+        if (state.callback) {
+          state.callback(applied);
+        }
+      }
+      receiveWebViewEvent('biometricTokenUpdated', {
+        isUpdated: applied
+      });
+    }
+
+    function checkVersion() {
+      if (!versionAtLeast('7.2')) {
+        console.warn('[Telegram.WebApp] BiometricManager is not supported in version ' + webAppVersion);
+        return false;
+      }
+      return true;
+    }
+
+    biometricManager.init = function(callback) {
+      if (!checkVersion()) {
+        return biometricManager;
+      }
+      if (isInited) {
+        return biometricManager;
+      }
+      if (callback) {
+        initRequestState.callbacks.push(callback);
+      }
+      WebView.postEvent('web_app_biometry_get_info', false);
+      return biometricManager;
+    };
+    biometricManager.requestAccess = function(callback) {
+      if (!checkVersion()) {
+        return biometricManager;
+      }
+      if (!isInited) {
+        console.error('[Telegram.WebApp] BiometricManager should be inited before using.');
+        throw Error('WebAppBiometricManagerNotInited');
+      }
+      if (!isBiometricAvailable) {
+        console.error('[Telegram.WebApp] Biometrics is not available on this device.');
+        throw Error('WebAppBiometricManagerBiometricsNotAvailable');
+      }
+      if (accessRequestState) {
+        console.error('[Telegram.WebApp] Access is already requested');
+        throw Error('WebAppBiometricManagerAccessRequested');
+      }
+      accessRequestState = {
+        callback: callback
+      };
+      WebView.postEvent('web_app_biometry_request_access', false);
+      return biometricManager;
+    };
+    biometricManager.authenticate = function(callback) {
+      if (!checkVersion()) {
+        return biometricManager;
+      }
+      if (!isInited) {
+        console.error('[Telegram.WebApp] BiometricManager should be inited before using.');
+        throw Error('WebAppBiometricManagerNotInited');
+      }
+      if (!isBiometricAvailable) {
+        console.error('[Telegram.WebApp] Biometrics is not available on this device.');
+        throw Error('WebAppBiometricManagerBiometricsNotAvailable');
+      }
+      if (!isAccessGranted) {
+        console.error('[Telegram.WebApp] Biometric access was not granted by the user.');
+        throw Error('WebAppBiometricManagerBiometricAccessNotGranted');
+      }
+      if (authRequestState) {
+        console.error('[Telegram.WebApp] Authentication request is already in progress.');
+        throw Error('WebAppBiometricManagerAuthenticationRequested');
+      }
+      authRequestState = {
+        callback: callback
+      };
+      WebView.postEvent('web_app_biometry_request_auth', false);
+      return biometricManager;
+    };
+    biometricManager.saveBiometricToken = function(token, callback) {
+      if (!checkVersion()) {
+        return biometricManager;
+      }
+      token = token || '';
+      if (token.length > 1024) {
+        console.error('[Telegram.WebApp] Token is too long', token);
+        throw Error('WebAppBiometricManagerTokenInvalid');
+      }
+      if (!isInited) {
+        console.error('[Telegram.WebApp] BiometricManager should be inited before using.');
+        throw Error('WebAppBiometricManagerNotInited');
+      }
+      if (!isBiometricAvailable) {
+        console.error('[Telegram.WebApp] Biometrics is not available on this device.');
+        throw Error('WebAppBiometricManagerBiometricsNotAvailable');
+      }
+      if (!isAccessGranted) {
+        console.error('[Telegram.WebApp] Biometric access was not granted by the user.');
+        throw Error('WebAppBiometricManagerBiometricAccessNotGranted');
+      }
+      if (tokenRequestState) {
+        console.error('[Telegram.WebApp] Token request is already in progress.');
+        throw Error('WebAppBiometricManagerTokenUpdateRequested');
+      }
+      tokenRequestState = {
+        callback: callback
+      };
+      WebView.postEvent('web_app_biometry_update_token', false, {token: token});
+      return biometricManager;
+    };
+    return biometricManager;
+  })();
+
   var webAppInvoices = {};
   function onInvoiceClosed(eventType, eventData) {
     if (eventData.slug && webAppInvoices[eventData.slug]) {
@@ -1343,6 +1568,10 @@
   });
   Object.defineProperty(WebApp, 'CloudStorage', {
     value: CloudStorage,
+    enumerable: true
+  });
+  Object.defineProperty(WebApp, 'BiometricManager', {
+    value: BiometricManager,
     enumerable: true
   });
   WebApp.setHeaderColor = function(color_key) {
