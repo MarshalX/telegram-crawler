@@ -1174,7 +1174,7 @@
       }
       receiveWebViewEvent('biometricManagerUpdated');
     }
-    function onBiometryAuthRequested() {
+    function onBiometryAuthRequested(eventType, eventData) {
       var isAuthenticated = (eventData.status == 'authorized'),
           biometricToken = eventData.token || '';
       if (authRequestState) {
@@ -1191,7 +1191,7 @@
         isAuthenticated: false
       });
     }
-    function onBiometryTokenUpdated() {
+    function onBiometryTokenUpdated(eventType, eventData) {
       var applied = false;
       if (isBiometricAvailable &&
           isAccessRequested) {
@@ -1285,7 +1285,7 @@
       WebView.postEvent('web_app_biometry_request_auth', false);
       return biometricManager;
     };
-    biometricManager.saveBiometricToken = function(token, callback) {
+    biometricManager.updateBiometricToken = function(token, callback) {
       if (!checkVersion()) {
         return biometricManager;
       }

@@ -321,6 +321,7 @@ var DemoApp = {
     if (!biometricManager.isInited) {
       return DemoApp.showAlert('Biometric not inited yet!');
     }
+    $(el).next('span').text('').attr('class', '');
     biometricManager.authenticate(function(success, token) {
       if (success) {
         $(el).next('span').text('(Success, token: ' + token + ')').attr('class', 'ok');
@@ -337,6 +338,7 @@ var DemoApp = {
     var token = parseInt(Math.random().toString().substr(2)).toString(16);
     biometricManager.updateBiometricToken(token, function(updated) {
       if (updated) {
+        $('#bm_token_saved').text(biometricManager.isBiometricTokenSaved ? 'true' : 'false');
         $(el).next('span').text('(Updated)').attr('class', 'ok');
       } else {
         $(el).next('span').text('(Failed)').attr('class', 'err');
@@ -350,6 +352,7 @@ var DemoApp = {
     }
     biometricManager.updateBiometricToken('', function(updated) {
       if (updated) {
+        $('#bm_token_saved').text(biometricManager.isBiometricTokenSaved ? 'true' : 'false');
         $(el).next('span').text('(Removed)').attr('class', 'ok');
       } else {
         $(el).next('span').text('(Failed)').attr('class', 'err');
