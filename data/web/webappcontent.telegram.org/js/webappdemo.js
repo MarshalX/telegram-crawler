@@ -339,7 +339,7 @@ var DemoApp = {
     biometricManager.updateBiometricToken(token, function(updated) {
       if (updated) {
         $('#bm_token_saved').text(biometricManager.isBiometricTokenSaved ? 'true' : 'false');
-        $(el).next('span').text('(Updated)').attr('class', 'ok');
+        $(el).nextAll('span').text('(Updated: ' + token + ')').attr('class', 'ok');
       } else {
         $(el).next('span').text('(Failed)').attr('class', 'err');
       }
