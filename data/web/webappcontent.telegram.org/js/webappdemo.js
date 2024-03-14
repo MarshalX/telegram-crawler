@@ -299,6 +299,7 @@ var DemoApp = {
         $('#bm_access_requested').text(biometricManager.isAccessRequested ? 'true' : 'false');
         $('#bm_access_granted').text(biometricManager.isAccessGranted ? 'true' : 'false');
         $('#bm_token_saved').text(biometricManager.isBiometricTokenSaved ? 'true' : 'false');
+        $('#bm_device_id').text(biometricManager.deviceId || '');
         $('#bm_settings').toggle(!!(biometricManager.isAvailable && biometricManager.isAccessRequested && !biometricManager.isAccessGranted));
       });
     }

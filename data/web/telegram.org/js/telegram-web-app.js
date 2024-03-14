@@ -1101,6 +1101,7 @@
     var isAccessRequested = false;
     var isAccessGranted = false;
     var isBiometricTokenSaved = false;
+    var deviceId = '';
 
     var biometricManager = {};
     Object.defineProperty(biometricManager, 'isInited', {
@@ -1125,6 +1126,10 @@
     });
     Object.defineProperty(biometricManager, 'isBiometricTokenSaved', {
       get: function(){ return isBiometricTokenSaved; },
+      enumerable: true
+    });
+    Object.defineProperty(biometricManager, 'deviceId', {
+      get: function(){ return deviceId || ''; },
       enumerable: true
     });
 
@@ -1158,6 +1163,7 @@
         isAccessGranted = false;
         isBiometricTokenSaved = false;
       }
+      deviceId = eventData.device_id || '';
 
       if (initRequestState.callbacks.length > 0) {
         for (var i = 0; i < initRequestState.callbacks.length; i++) {
