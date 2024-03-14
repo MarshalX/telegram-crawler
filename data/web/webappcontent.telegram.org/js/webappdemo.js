@@ -299,6 +299,7 @@ var DemoApp = {
         $('#bm_access_requested').text(biometricManager.isAccessRequested ? 'true' : 'false');
         $('#bm_access_granted').text(biometricManager.isAccessGranted ? 'true' : 'false');
         $('#bm_token_saved').text(biometricManager.isBiometricTokenSaved ? 'true' : 'false');
+        $('#bm_settings').toggle(!!(biometricManager.isAvailable && biometricManager.isAccessRequested && !biometricManager.isAccessGranted));
       });
     }
     biometricManager.init();
@@ -308,7 +309,7 @@ var DemoApp = {
     if (!biometricManager.isInited) {
       return DemoApp.showAlert('Biometric not inited yet!');
     }
-    biometricManager.requestAccess(function(access_granted) {
+    biometricManager.requestAccess({reason: 'The bot uses biometrics for testing purposes.'}, function(access_granted) {
       if (access_granted) {
         $(el).next('span').text('(Access granted)').attr('class', 'ok');
       } else {
@@ -322,13 +323,25 @@ var DemoApp = {
       return DemoApp.showAlert('Biometric not inited yet!');
     }
     $(el).next('span').text('').attr('class', '');
-    biometricManager.authenticate(function(success, token) {
+    biometricManager.authenticate({reason: 'The bot requests biometrics for testing purposes.'}, function(success, token) {
       if (success) {
         $(el).next('span').text('(Success, token: ' + token + ')').attr('class', 'ok');
       } else {
         $(el).next('span').text('(Auth failed)').attr('class', 'err');
       }
     });
+  },
+  biometricOpenSettings: function(el) {
+    var biometricManager = Telegram.WebApp.BiometricManager;
+    if (!biometricManager.isInited) {
+      return DemoApp.showAlert('Biometric not inited yet!');
+    }
+    if (!biometricManager.isAvailable ||
+        !biometricManager.isAccessRequested ||
+        biometricManager.isAccessGranted) {
+      return false;
+    }
+    biometricManager.openSettings();
   },
   biometricSetToken: function(el) {
     var biometricManager = Telegram.WebApp.BiometricManager;

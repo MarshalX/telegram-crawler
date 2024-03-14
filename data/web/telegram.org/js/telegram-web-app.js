@@ -1224,6 +1224,14 @@
       return true;
     }
 
+    function checkInit() {
+      if (!isInited) {
+        console.error('[Telegram.WebApp] BiometricManager should be inited before using.');
+        throw Error('WebAppBiometricManagerNotInited');
+      }
+      return true;
+    }
+
     biometricManager.init = function(callback) {
       if (!checkVersion()) {
         return biometricManager;
@@ -1237,14 +1245,11 @@
       WebView.postEvent('web_app_biometry_get_info', false);
       return biometricManager;
     };
-    biometricManager.requestAccess = function(callback) {
+    biometricManager.requestAccess = function(params, callback) {
       if (!checkVersion()) {
         return biometricManager;
       }
-      if (!isInited) {
-        console.error('[Telegram.WebApp] BiometricManager should be inited before using.');
-        throw Error('WebAppBiometricManagerNotInited');
-      }
+      checkInit();
       if (!isBiometricAvailable) {
         console.error('[Telegram.WebApp] Biometrics is not available on this device.');
         throw Error('WebAppBiometricManagerBiometricsNotAvailable');
@@ -1253,20 +1258,29 @@
         console.error('[Telegram.WebApp] Access is already requested');
         throw Error('WebAppBiometricManagerAccessRequested');
       }
+      var popup_params = {};
+      if (typeof params.reason !== 'undefined') {
+        var reason = strTrim(params.reason);
+        if (reason.length > 128) {
+          console.error('[Telegram.WebApp] Biometric reason is too long', reason);
+          throw Error('WebAppBiometricRequestAccessParamInvalid');
+        }
+        if (reason.length > 0) {
+          popup_params.reason = reason;
+        }
+      }
+
       accessRequestState = {
         callback: callback
       };
-      WebView.postEvent('web_app_biometry_request_access', false);
+      WebView.postEvent('web_app_biometry_request_access', false, popup_params);
       return biometricManager;
     };
-    biometricManager.authenticate = function(callback) {
+    biometricManager.authenticate = function(params, callback) {
       if (!checkVersion()) {
         return biometricManager;
       }
-      if (!isInited) {
-        console.error('[Telegram.WebApp] BiometricManager should be inited before using.');
-        throw Error('WebAppBiometricManagerNotInited');
-      }
+      checkInit();
       if (!isBiometricAvailable) {
         console.error('[Telegram.WebApp] Biometrics is not available on this device.');
         throw Error('WebAppBiometricManagerBiometricsNotAvailable');
@@ -1279,10 +1293,22 @@
         console.error('[Telegram.WebApp] Authentication request is already in progress.');
         throw Error('WebAppBiometricManagerAuthenticationRequested');
       }
+      var popup_params = {};
+      if (typeof params.reason !== 'undefined') {
+        var reason = strTrim(params.reason);
+        if (reason.length > 128) {
+          console.error('[Telegram.WebApp] Biometric reason is too long', reason);
+          throw Error('WebAppBiometricRequestAccessParamInvalid');
+        }
+        if (reason.length > 0) {
+          popup_params.reason = reason;
+        }
+      }
+
       authRequestState = {
         callback: callback
       };
-      WebView.postEvent('web_app_biometry_request_auth', false);
+      WebView.postEvent('web_app_biometry_request_auth', false, popup_params);
       return biometricManager;
     };
     biometricManager.updateBiometricToken = function(token, callback) {
@@ -1294,10 +1320,7 @@
         console.error('[Telegram.WebApp] Token is too long', token);
         throw Error('WebAppBiometricManagerTokenInvalid');
       }
-      if (!isInited) {
-        console.error('[Telegram.WebApp] BiometricManager should be inited before using.');
-        throw Error('WebAppBiometricManagerNotInited');
-      }
+      checkInit();
       if (!isBiometricAvailable) {
         console.error('[Telegram.WebApp] Biometrics is not available on this device.');
         throw Error('WebAppBiometricManagerBiometricsNotAvailable');
@@ -1314,6 +1337,26 @@
         callback: callback
       };
       WebView.postEvent('web_app_biometry_update_token', false, {token: token});
+      return biometricManager;
+    };
+    biometricManager.openSettings = function() {
+      if (!checkVersion()) {
+        return biometricManager;
+      }
+      checkInit();
+      if (!isBiometricAvailable) {
+        console.error('[Telegram.WebApp] Biometrics is not available on this device.');
+        throw Error('WebAppBiometricManagerBiometricsNotAvailable');
+      }
+      if (!isAccessRequested) {
+        console.error('[Telegram.WebApp] Biometric access was not requested yet.');
+        throw Error('WebAppBiometricManagerBiometricsAccessNotRequested');
+      }
+      if (isAccessGranted) {
+        console.warn('[Telegram.WebApp] Biometric access was granted by the user, no need to go to settings.');
+        return biometricManager;
+      }
+      WebView.postEvent('web_app_biometry_open_settings', false);
       return biometricManager;
     };
     return biometricManager;
