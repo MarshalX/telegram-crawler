@@ -81,13 +81,18 @@ var Ads = {
     if (no_currency) {
       return amount_str;
     }
-    var currency = l('WEB_ADS_DEF_CURRENCY_SIGN', '€');
+    var currency_str = Aj.state.ownerCurrency || '<span class="amount-currency currency-euro">€</span>';
     var parts = amount_str.split('.');
     amount_str = parts[0] + (parts[1].length ? '<span class="amount-frac">.' + parts[1] + '</span>' : '');
-    return '<span class="amount-currency">' + currency + '</span>' + amount_str;
+    return currency_str + amount_str;
+  },
+  wrapEurAmount: function(value, field_format) {
+    var rate = Aj.state.ownerCurrencyRate || 1;
+    value = Math.round(value * rate * 100) / 100;
+    return '<span class="amount-sign">~</span><span class="amount-currency currency-euro">€</span>' + formatNumber(value, (value % 1) && value < 1000 ? 2 : 0, '.', field_format ? '' : ',');
   },
   amountFieldValue: function($form, field) {
-    var $fieldEl   = $form.field(field);
+    var $fieldEl = field ? $form.field(field) : $($form);
     var minValue = $fieldEl.attr('data-min') || null;
     var maxValue = $fieldEl.attr('data-max') || null;
     var decPoint = $fieldEl.attr('data-dec-point') || '.';
@@ -98,7 +103,7 @@ var Ads = {
       float_value.split(decPoint).join('.');
     }
     float_value = parseFloat(float_value);
-    if (isNaN(float_value) || float_value >= 1e12) {
+    if (isNaN(float_value) || float_value >= 1e9) {
       return false;
     }
     if (minValue !== null && float_value < minValue ||
@@ -106,6 +111,19 @@ var Ads = {
       return false;
     } else {
       return float_value;
+    }
+  },
+  updateAmountEurValue: function(field) {
+    var $eurEl = $('~*>.js-amount-eur', field);
+    if (Aj.state.ownerCurrencyRate) {
+      var float_value = Ads.amountFieldValue(field);
+      if (float_value !== false && $(field).value()) {
+        $eurEl.addClass('active').html(Ads.wrapEurAmount(float_value));
+      } else {
+        $eurEl.removeClass('active');
+      }
+    } else {
+      $eurEl.removeClass('active');
     }
   },
   eUpdateAmountField: function(e) {
@@ -150,7 +168,7 @@ var Ads = {
       float_value.split(decPoint).join('.');
     }
     float_value = parseFloat(float_value);
-    var is_invalid = (isNaN(float_value) || float_value >= 1e12);
+    var is_invalid = (isNaN(float_value) || float_value >= 1e9);
     if (minValue !== null && float_value < minValue ||
         maxValue !== null && float_value > maxValue ||
         is_invalid) {
@@ -163,6 +181,7 @@ var Ads = {
         this.value = Ads.wrapAmount(float_value, true, true);
       }
     }
+    Ads.updateAmountEurValue(this);
   },
   updateField: function($fieldEl, focused) {
     var $formGroup = $fieldEl.fieldEl().parents('.form-group');
@@ -2109,6 +2128,7 @@ var Account = {
         $form.field('channel').trigger('click');
         return false;
       }
+      params.currency = $form.field('currency').value();
     }
     for (var i = 0; i < Account.formFields.length; i++) {
       var field = Account.formFields[i];
@@ -3679,7 +3699,7 @@ var TransferFunds = {
   },
   onAccountChange: function(field, value, valueFull) {
     if (valueFull.budget) {
-      $('.js-sel_account_budget', Aj.state.$form).removeClass('disabled').html(valueFull.budget);
+      $('.js-sel_account_budget', Aj.state.$form).toggleClass('disabled', !!valueFull.disabled).html(valueFull.budget);
     } else {
       $('.js-sel_account_budget', Aj.state.$form).addClass('disabled').html(Ads.wrapAmount(0));
     }

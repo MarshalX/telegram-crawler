@@ -1035,7 +1035,8 @@ a:hover img.emoji {
 }
 .pr-header {
   padding: 8px 15px;
-  line-height: 20px;
+  --line-height: 20px;
+  line-height: var(--line-height);
   border-bottom: 1px solid #e6e6e6;
   display: flex;
   align-items: center;
@@ -1341,7 +1342,8 @@ body.rtl .pr-owner-balance-photo {
 }
 .pr-owner-balance-content {
   font-size: 14px;
-  line-height: 18px;
+  --line-height: 18px;
+  line-height: var(--line-height);
   margin: 0 0 0 47px;
 }
 .pr-owner-balance-name {
@@ -1562,7 +1564,8 @@ input.pr-form-control:focus {
 }
 .form-label > .show-hint .pr-form-label-hint-tooltip,
 .pr-hinted-cell > .show-hint .pr-cell-hint-tooltip,
-.pr-form-control-wrap > .show-hint .pr-form-control-hint-tooltip {
+.pr-form-control-wrap > .show-hint .pr-form-control-hint-tooltip,
+.pr-form-control-amount-extra > .show-hint .pr-form-control-hint-tooltip {
   transform: translateY(0px);
   visibility: visible;
   opacity: 1;
@@ -1989,10 +1992,19 @@ form > .sanim > .form-group {
 .pr-form .form-group-slim .radio-group {
   padding: 0 15px 5px;
 }
+.pr-form .form-group-slim .radio-group.two-column {
+  display: flex;
+}
 .pr-form .form-group-slim .radio-group .radio-item-block {
   margin: 12px 0 5px;
 }
+.pr-form .form-group-slim .radio-group.two-column .radio-item-block {
+  flex-grow: 1;
+}
 .pr-form .form-group-slim .radio-group .radio-item-block + .radio-item-block {
+  margin-top: 0;
+}
+.pr-form .form-group-slim .radio-group.two-column .radio-item-block {
   margin-top: 0;
 }
 .pr-form .form-group-link-wrap,
@@ -2108,8 +2120,7 @@ form > .sanim > .form-group {
 }
 .pr-budget-amount-wrap .pr-budget-count {
   font-size: 22px;
-  line-height: 33px;
-  padding: 0;
+  --line-height: 33px;
 }
 .pr-budget-count .amount-full.disabled {
   opacity: 0.3;
@@ -2158,7 +2169,10 @@ form > .sanim > .form-group {
   display: block;
 }
 .form-group.decr-group .pr-form-control {
-  padding-left: 45px;
+  padding-left: 42px;
+}
+.form-group.decr-group .pr-form-control-wrap .pr-form-control-prefix {
+  width: 42px;
 }
 
 .pr-account-button-wrap {
@@ -2288,27 +2302,52 @@ a.pr-account-button-wrap:focus {
 }
 .pr-form-control-wrap .pr-form-control-prefix {
   position: absolute;
-  padding: 11px 0 11px 13px;
+  width: 30px;
+  padding: 11px 0 11px 4px;
+  text-align: center;
   pointer-events: none;
 }
 .field-disabled .pr-form-control-wrap .pr-form-control-prefix {
   color: #919699;
 }
+.pr-form-control-wrap .pr-form-control-prefix .currency-euro {
+  letter-spacing: normal;
+}
+.pr-form-control-wrap .pr-form-control-prefix .currency-ton {
+  margin-left: 0;
+  margin-right: 0;
+}
 .pr-form-control-amount input.pr-form-control,
 .pr-form-control-amount .input.pr-form-control {
   padding-left: 30px;
-  padding-right: 70px;
+  padding-right: 150px;
 }
-.pr-form-control-amount .pr-form-control-cpm-extra {
+.pr-form-control-amount .pr-form-control-amount-extra {
+  display: flex;
   position: absolute;
   top: 0;
   right: 0;
-  padding: 10px;
+  bottom: 0;
+  transition: opacity .2s ease, visibility .2s ease;
+  pointer-events: none;
+}
+.pr-form-control-wrap .pr-form-control-amount-eur {
+  padding: 11px 10px 11px 0;
+  color: #919699;
   opacity: 0;
   visibility: hidden;
   transition: opacity .2s ease;
   pointer-events: none;
+}
+.pr-form-control-wrap .pr-form-control-amount-eur.active {
+  opacity: 1;
+  visibility: visible;
+}
+.pr-form-control-amount .pr-form-control-cpm-extra {
+  padding: 10px 10px 10px 0;
+  pointer-events: auto;
   cursor: pointer;
+  display: none;
 }
 .pr-extra-cpm-badge {
   font-size: 12px;
@@ -2319,14 +2358,12 @@ a.pr-account-button-wrap:focus {
   border-radius: 4px;
   padding: 2px 7px;
   text-align: center;
+  overflow: hidden;
 }
 .pr-form-control-amount.has-extra-cpm .pr-form-control-cpm-extra {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity .2s ease;
-  pointer-events: auto;
+  display: inline-block;
 }
-.field-loading .pr-form-control-amount.has-extra-cpm .pr-form-control-cpm-extra {
+.field-loading .pr-form-control-amount .pr-form-control-amount-extra {
   pointer-events: none;
   opacity: 0;
 }
@@ -3048,6 +3085,7 @@ body.rtl .pr-sort-marker {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  line-height: var(--line-height);
 }
 .pr-hinted-cell {
   white-space: nowrap;
@@ -3055,11 +3093,11 @@ body.rtl .pr-sort-marker {
 thead > tr > th > .pr-cell,
 thead > tr > td > .pr-cell {
   padding: 1px 0 0;
-  line-height: 13px;
+  --line-height: 13px;
 }
 tbody > tr > th > .pr-cell,
 tbody > tr > td > .pr-cell {
-  line-height: 15px;
+  --line-height: 15px;
 }
 .pr-cell-wrap {
   min-width: 180px;
@@ -3451,7 +3489,8 @@ a.ad-declined:focus {
   margin-top: 4px;
 }
 .pr-review-ad-info {
-  line-height: 20px;
+  --line-height: 20px;
+  line-height: var(--line-height);
   padding: 0 0 14px;
   max-width: 100%;
 }
@@ -4361,7 +4400,8 @@ a.pr-popup-account:hover {
 
 .pr-budget-count {
   font-size: 23px;
-  line-height: 27px;
+  --line-height: 27px;
+  line-height: var(--line-height);
   font-weight: 500;
   padding: 0 13px;
 }
@@ -4380,10 +4420,6 @@ a.pr-popup-account:hover {
   font-weight: 600;
   -webkit-font-smoothing: antialiased;
 }
-.amount-currency:after {
-  content: ' ';
-  margin-right: -1px;
-}
 .pr-amount {
   color: #777;
 }
@@ -4393,6 +4429,33 @@ a.pr-popup-account:hover {
 .pr-amount-decr {
   color: #d75959;
 }
+
+.amount-currency.currency-euro {
+  letter-spacing: 0.17em;
+}
+.amount-currency.currency-ton {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  width: 1.1em;
+  height: var(--line-height, auto);
+  margin-left: -1px;
+  margin-right: 0.075em;
+  white-space: nowrap;
+  text-indent: -500%;
+  overflow: hidden;
+}
+.amount-currency.currency-ton svg.currency-ton-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  display: inline-block;
+  vertical-align: top;
+  height: auto;
+}
+
 
 
 .popup-container {
@@ -4543,6 +4606,10 @@ a.pr-popup-account:hover {
 .tgme_popup_buttons {
   display: flex;
   justify-content: flex-end;
+}
+.tgme_popup_button {
+  line-height: 18px;
+  --line-height: 18px;
 }
 
 .toast-container {

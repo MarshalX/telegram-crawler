@@ -300,7 +300,7 @@ var DemoApp = {
         $('#bm_access_granted').text(biometricManager.isAccessGranted ? 'true' : 'false');
         $('#bm_token_saved').text(biometricManager.isBiometricTokenSaved ? 'true' : 'false');
         $('#bm_device_id').text(biometricManager.deviceId || '');
-        $('#bm_settings').toggle(!!(biometricManager.isAvailable && biometricManager.isAccessRequested && !biometricManager.isAccessGranted));
+        $('#bm_settings').toggle(biometricManager.isBiometricAvailable && biometricManager.isAccessRequested && !biometricManager.isAccessGranted);
       });
     }
     biometricManager.init();
@@ -337,7 +337,7 @@ var DemoApp = {
     if (!biometricManager.isInited) {
       return DemoApp.showAlert('Biometric not inited yet!');
     }
-    if (!biometricManager.isAvailable ||
+    if (!biometricManager.isBiometricAvailable ||
         !biometricManager.isAccessRequested ||
         biometricManager.isAccessGranted) {
       return false;
