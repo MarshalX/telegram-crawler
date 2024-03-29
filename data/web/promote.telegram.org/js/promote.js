@@ -523,7 +523,7 @@ var NewAd = {
   init: function() {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
-      state.$form = $('.pr-new-form', cont);
+      state.$form = $('.js-ad-form', cont);
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
       cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
@@ -1282,7 +1282,7 @@ var NewAd = {
     var website_name_hidden = $('.js-website-name-wrap', $form).isSlideHidden();
     var custom_button_hidden = $('.js-custom-button-wrap', $form).isSlideHidden();
 
-    var $previewForm = $('.pr-new-form', $previewPopup);
+    var $previewForm = $('.js-ad-form', $previewPopup);
     Ads.formInit($previewForm);
     $previewForm.on('submit', preventDefault);
 
@@ -1439,7 +1439,7 @@ var NewAd = {
     }
     var target_type = $form.field('target_type').value();
 
-    var $scheduleForm = $('.pr-new-form', $schedulePopup);
+    var $scheduleForm = $('.js-ad-form', $schedulePopup);
     Ads.formInit($scheduleForm);
     $scheduleForm.on('submit', preventDefault);
 
@@ -1695,7 +1695,7 @@ var NewAd = {
   getPreviewFormData: function($form) {
     if (Aj.state.$previewPopup) {
       var $previewPopup = Aj.state.$previewPopup;
-      var $previewForm = $('.pr-new-form', $previewPopup);
+      var $previewForm = $('.js-ad-form', $previewPopup);
       if (!$previewForm.get(0)) return false;
       var values = [
         $previewForm.field('text').value(),
@@ -2838,7 +2838,7 @@ var EditAd = {
   init: function() {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
-      state.$form = $('.pr-new-form', cont);
+      state.$form = $('.js-ad-form', cont);
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
       cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
