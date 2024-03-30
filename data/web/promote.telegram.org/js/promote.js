@@ -2120,6 +2120,9 @@ var Account = {
     var $form   = Aj.state.$form;
     var $button = $(this);
     var params = {};
+    if (Aj.state.forOwnerId) {
+      params.for_owner_id = Aj.state.forOwnerId;
+    }
     if (Aj.state.ownerId) {
       params.owner_id = Aj.state.ownerId;
     } else {
@@ -2128,7 +2131,6 @@ var Account = {
         $form.field('channel').trigger('click');
         return false;
       }
-      params.currency = $form.field('currency').value();
     }
     for (var i = 0; i < Account.formFields.length; i++) {
       var field = Account.formFields[i];
