@@ -57,6 +57,11 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="march-31-2024" href="#march-31-2024"><i class="anchor-icon"></i></a>March 31, 2024</h4>
+<p><strong>Bot API 7.2</strong></p>
+<ul>
+<li>Added the field <em>BiometricManager</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+</ul>
 <h4><a class="anchor" name="december-29-2023" href="#december-29-2023"><i class="anchor-icon"></i></a>December 29, 2023</h4>
 <p><strong>Bot API 7.0</strong></p>
 <ul>
@@ -300,7 +305,7 @@
 <td>An object for controlling the main button, which is displayed at the bottom of the Mini App in the Telegram interface.</td>
 </tr>
 <tr>
-<td>SettingsButton <sup><mark>NEW</mark></sup></td>
+<td>SettingsButton</td>
 <td><a href="#settingsbutton">SettingsButton</a></td>
 <td>An object for controlling the Settings item in the context menu of the Mini App in the Telegram interface.</td>
 </tr>
@@ -313,6 +318,11 @@
 <td>CloudStorage</td>
 <td><a href="#cloudstorage">CloudStorage</a></td>
 <td>An object for controlling cloud storage.</td>
+</tr>
+<tr>
+<td>BiometricManager <sup><mark>NEW</mark></sup></td>
+<td><a href="#biometricmanager">BiometricManager</a></td>
+<td>An object for controlling biometrics on the device.</td>
 </tr>
 <tr>
 <td>isVersionAtLeast(version)</td>
@@ -478,32 +488,32 @@
 <td><em>Optional</em>. <mark>Bot API 6.1+</mark> Secondary background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-secondary-bg-color)</code>.</td>
 </tr>
 <tr>
-<td>header_bg_color <sup><mark>NEW</mark></sup></td>
+<td>header_bg_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Header background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-header-bg-color)</code>.</td>
 </tr>
 <tr>
-<td>accent_text_color <sup><mark>NEW</mark></sup></td>
+<td>accent_text_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Accent text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-accent-text-color)</code>.</td>
 </tr>
 <tr>
-<td>section_bg_color <sup><mark>NEW</mark></sup></td>
+<td>section_bg_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Background color for the section in the <code>#RRGGBB</code> format. It is recommended to use this in conjunction with <em>secondary_bg_color</em>.<br>Also available as the CSS variable <code>var(--tg-theme-section-bg-color)</code>.</td>
 </tr>
 <tr>
-<td>section_header_text_color <sup><mark>NEW</mark></sup></td>
+<td>section_header_text_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Header text color for the section in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-section-header-text-color)</code>.</td>
 </tr>
 <tr>
-<td>subtitle_text_color <sup><mark>NEW</mark></sup></td>
+<td>subtitle_text_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Subtitle text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-subtitle-text-color)</code>.</td>
 </tr>
 <tr>
-<td>destructive_text_color <sup><mark>NEW</mark></sup></td>
+<td>destructive_text_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Text color for destructive actions in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-destructive-text-color)</code>.</td>
 </tr>
@@ -721,7 +731,7 @@
 </table>
 <p>All these methods return the MainButton object so they can be chained.</p>
 <h4><a class="anchor" name="settingsbutton" href="#settingsbutton"><i class="anchor-icon"></i></a>SettingsButton</h4>
-<p><sup><mark>NEW</mark></sup> This object controls the <strong>Settings</strong> item in the context menu of the Mini App in the Telegram interface.</p>
+<p>This object controls the <strong>Settings</strong> item in the context menu of the Mini App in the Telegram interface.</p>
 <table class="table">
 <thead>
 <tr>
@@ -832,6 +842,116 @@
 </tbody>
 </table>
 <p>All these methods return the <a href="#cloudstorage">CloudStorage</a> object, so they can be chained.</p>
+<h4><a class="anchor" name="biometricmanager" href="#biometricmanager"><i class="anchor-icon"></i></a>BiometricManager</h4>
+<p><sup><mark>NEW</mark></sup> This object controls biometrics on the device. Before the first use of this object, it needs to be initialized using the <em>init</em> method.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isInited</td>
+<td>Boolean</td>
+<td><mark>Bot API 7.2+</mark> Shows whether biometrics object is initialized.</td>
+</tr>
+<tr>
+<td>isBiometricAvailable</td>
+<td>Boolean</td>
+<td><mark>Bot API 7.2+</mark> Shows whether biometrics is available on the current device.</td>
+</tr>
+<tr>
+<td>biometricType</td>
+<td>String</td>
+<td><mark>Bot API 7.2+</mark> The type of biometrics currently available on the device. Can be one of these values:<br>- <em>finger</em>, fingerprint-based biometrics,<br>- <em>face</em>, face-based biometrics,<br>- <em>unknown</em>, biometrics of an unknown type.</td>
+</tr>
+<tr>
+<td>isAccessRequested</td>
+<td>Boolean</td>
+<td><mark>Bot API 7.2+</mark> Shows whether permission to use biometrics has been requested.</td>
+</tr>
+<tr>
+<td>isAccessGranted</td>
+<td>Boolean</td>
+<td><mark>Bot API 7.2+</mark> Shows whether permission to use biometrics has been granted.</td>
+</tr>
+<tr>
+<td>isBiometricTokenSaved</td>
+<td>Boolean</td>
+<td><mark>Bot API 7.2+</mark> Shows whether the token is saved in secure storage on the device.</td>
+</tr>
+<tr>
+<td>deviceId</td>
+<td>String</td>
+<td><mark>Bot API 7.2+</mark> A unique device identifier that can be used to match the token to the device.</td>
+</tr>
+<tr>
+<td>init([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that initializes the BiometricManager object. It should be called before the object&#39;s first use. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the object is initialized.</td>
+</tr>
+<tr>
+<td>requestAccess(params[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that requests permission to use biometrics according to the <em>params</em> argument of type <a href="#biometricrequestaccessparams">BiometricRequestAccessParams</a>. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the first argument will be a boolean indicating whether the user granted access.</td>
+</tr>
+<tr>
+<td>authenticate(params[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that authenticates the user using biometrics according to the <em>params</em> argument of type <a href="#biometricauthenticateparams">BiometricAuthenticateParams</a>. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the first argument will be a boolean indicating whether the user authenticated successfully. If so, the second argument will be a biometric token.</td>
+</tr>
+<tr>
+<td>updateBiometricToken(token, [callback])</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that updates the biometric token in secure storage on the device. To remove the token, pass an empty string. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the first argument will be a boolean indicating whether the token was updated.</td>
+</tr>
+<tr>
+<td>openSettings()</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that opens the biometric access settings for bots. Useful when you need to request biometrics access to users who haven&#39;t granted it yet.<br><br><em>Note that this method can be called only in response to user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button)</em></td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#biometricmanager">BiometricManager</a> object so they can be chained.</p>
+<h4><a class="anchor" name="biometricrequestaccessparams" href="#biometricrequestaccessparams"><i class="anchor-icon"></i></a>BiometricRequestAccessParams</h4>
+<p>This object describes the native popup for requesting permission to use biometrics.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reason</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed to a user in the popup describing why the bot needs access to biometrics, 0-128 characters.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="biometricauthenticateparams" href="#biometricauthenticateparams"><i class="anchor-icon"></i></a>BiometricAuthenticateParams</h4>
+<p>This object describes the native popup for authenticating the user using biometrics.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reason</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed to a user in the popup describing why you are asking them to authenticate and what action you will be taking based on that authentication, 0-128 characters.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="webappinitdata" href="#webappinitdata"><i class="anchor-icon"></i></a>WebAppInitData</h4>
 <p>This object contains data that is transferred to the Mini App when it is opened. It is empty if the Mini App was launched from a <a href="#keyboard-button-mini-apps">keyboard button</a> or from <a href="#inline-mode-mini-apps">inline mode</a>.</p>
 <table class="table">
@@ -1061,6 +1181,18 @@ if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
 <tr>
 <td><code>contactRequested</code></td>
 <td><mark>Bot API 6.9+</mark> Occurrs when the user&#39;s phone number was requested.<br><em>eventHandler</em> receives an object with the single field <em>status</em> containing one of the statuses:<br>- <strong>sent</strong> – user shared their phone number with the bot,<br>- <strong>cancelled</strong> – user declined this request.</td>
+</tr>
+<tr>
+<td><code>biometricManagerUpdated</code></td>
+<td><mark>Bot API 7.2+</mark> Occurs whenever BiometricManager object is changed.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>biometricAuthRequested</code></td>
+<td><mark>Bot API 7.2+</mark> Occurs whenever biometric authentication was requested.<br><em>eventHandler</em> receives an object with the field <em>isAuthenticated</em> containing a boolean indicating whether the user was authenticated successfully. If <em>isAuthenticated</em> is true, the field <em>biometricToken</em> will contain the biometric token stored in secure storage on the device.</td>
+</tr>
+<tr>
+<td><code>biometricTokenUpdated</code></td>
+<td><mark>Bot API 7.2+</mark> Occurs whenever the biometric token was updated.<br><em>eventHandler</em> receives an object with the single field <em>isUpdated</em>, containing a boolean indicating whether the token was updated.</td>
 </tr>
 </tbody>
 </table>

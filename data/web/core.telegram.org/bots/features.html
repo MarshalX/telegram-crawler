@@ -66,6 +66,7 @@
 </li>
 <li><a href="#integration"><strong>Integration</strong></a><ul>
 <li><a href="#web-apps">Web Apps</a></li>
+<li><a href="#bots-for-business">Bots for Business</a></li>
 <li><a href="#payments">Payments</a></li>
 <li><a href="#web-login">Web Login</a></li>
 <li><a href="#html5-games">HTML5 Games</a></li>
@@ -238,6 +239,7 @@ width=44% /></a>
 <p>There are various ways of futher integrating bots with Telegram and other services.</p>
 <ul>
 <li>Use <a href="#web-apps">Web Apps</a> to replace any website.</li>
+<li>Build tools and integrate <a href="#bots-for-business">business services</a>.</li>
 <li>Accept <a href="#payments">Payments</a> via dozens of integrated third-party payment providers.</li>
 <li>Connect to Telegram using the <a href="#web-login">Web Login</a> functionality.</li>
 <li>Create gaming bots by integrating <a href="#html5-games">HTML5 Games</a>.</li>
@@ -255,6 +257,28 @@ width=44% /></a>
 </div>
 
 <p>If you develop a <strong>Web App</strong>, be sure to follow our <a href="webapps#design-guidelines">design guidelines</a> – you&#39;ll want your custom interface to <strong>seamlessly integrate</strong> into the app to provide users the best possible experience.</p>
+<h4><a class="anchor" name="bots-for-business" href="#bots-for-business"><i class="anchor-icon"></i></a>Bots for Business</h4>
+<p>Bots can enable <strong>Business Mode</strong>, allowing <a href="https://telegram.org/blog/telegram-business">Telegram Business</a> subscribers to connect them to their account – to streamline and automate private chat management and interactions with their clients.</p>
+<p>The <strong>account owner</strong> can specify which chats your bot can access – within those chats, the bot will receive all updates, except service messages and messages sent by itself and other bots. Depending on the business connection settings, your bot may also be able to <strong>send messages</strong> and do other actions on behalf of the account owner in chats that were active in the last 24h.</p>
+<p>Here is a quick start guide to integrate your bot with Telegram Business:</p>
+<ul>
+<li>Enable <strong>Business Mode</strong> for your bot in <a href="https://t.me/botfather">@BotFather</a>.</li>
+<li>Handle incoming <a href="https://core.telegram.org/bots#businessconnection">BusinessConnection</a> updates, signaling that a user has <em>established</em>, <em>edited</em> or <em>ended</em> a Business Connection with your bot. </li>
+<li>Process business messages by handling <code>business_message</code>, <code>edited_business_message</code> and <code>deleted_business_messages</code> updates. </li>
+<li>Check your bot’s write permissions via <code>can_reply</code> in the latest <a href="https://core.telegram.org/bots#businessconnection">BusinessConnection</a> update.</li>
+<li>If allowed to, use the <code>business_connection_id</code> field in <a href="https://core.telegram.org/bots#sendmessage">sendMessage</a>, <a href="https://core.telegram.org/bots#sendchataction">sendChatAction</a> and other send methods to communicate on behalf of the Business user.</li>
+</ul>
+<p>Users who <strong>connect your bot</strong> to their account will see a <strong>quick action bar</strong> at the top of each managed chat – tapping on “Manage Bot” will redirect them to your bot, which will receive a deep link message in the format <code>/start bizChat&lt;user_chat_id&gt;</code>.</p>
+<div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400238/1/x875tPT245w.58064/1b426d3eda0a923c03" style="max-width: 600px;" title="" alt="Chatbots for Business">
+  <source src="/file/400780400382/1/BVN6m4W5a6w.4289566.mp4/9dc47caab261eaade4" type="video/mp4">
+ </video>
+</div>
+
+
+<blockquote>
+<p>Please keep in mind that operating bots on Telegram is subject to the <a href="https://telegram.org/tos/bot-developers">Telegram Bot Developer Terms of Service</a>. Specifically, for Telegram Business, make sure you have read and understood <a href="https://telegram.org/tos/bot-developers#5-4-telegram-business">Section 5.4</a>.</p>
+</blockquote>
 <h3><a class="anchor" name="payments" href="#payments"><i class="anchor-icon"></i></a>Payments</h3>
 <p>Telegram bots can accept payments with a sleek, streamlined interface that collects all necessary data from the user. Telegram <strong>doesn&#39;t collect</strong> any payment data – like the user&#39;s credit card information – and sends it directly to one of the supported <a href="payments#supported-payment-providers">payment providers</a>.</p>
 <p>Here is a <strong>quick start guide</strong> to implement payments:</p>
