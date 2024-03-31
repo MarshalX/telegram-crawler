@@ -237,6 +237,26 @@ var Main = {
     e.preventDefault();
     closePopup(Aj.state.$headerMenu);
   },
+  openSimplePopup: function($popup) {
+    var onEnterPress = function(e) {
+      if (e.keyCode == Keys.RETURN) {
+        e.stopImmediatePropagation();
+        closePopup($popup);
+      }
+    };
+    var onClose = function(e) {
+      e.stopImmediatePropagation();
+      closePopup($popup);
+    };
+    openPopup($popup, {
+      onOpen: function() {
+        $(document).on('keydown', onEnterPress);
+      },
+      onClose: function() {
+        $(document).off('keydown', onEnterPress);
+      }
+    });
+  },
   eAuctionUnavailable: function(e) {
     e.preventDefault();
     var username = $(this).attr('data-username');
@@ -262,56 +282,17 @@ var Main = {
   eHowitworks: function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    var onEnterPress = function(e) {
-      if (e.keyCode == Keys.RETURN) {
-        e.stopImmediatePropagation();
-        closePopup(Aj.state.$howitworksPopup);
-      }
-    };
-    openPopup(Aj.state.$howitworksPopup, {
-      onOpen: function() {
-        $(document).on('keydown', onEnterPress);
-      },
-      onClose: function() {
-        $(document).off('keydown', onEnterPress);
-      }
-    });
+    Main.openSimplePopup(Aj.state.$howitworksPopup);
   },
   eHowofferworks: function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    var onEnterPress = function(e) {
-      if (e.keyCode == Keys.RETURN) {
-        e.stopImmediatePropagation();
-        closePopup(Aj.state.$howofferworksPopup);
-      }
-    };
-    openPopup(Aj.state.$howofferworksPopup, {
-      onOpen: function() {
-        $(document).on('keydown', onEnterPress);
-      },
-      onClose: function() {
-        $(document).off('keydown', onEnterPress);
-      }
-    });
+    Main.openSimplePopup(Aj.state.$howofferworksPopup);
   },
   eBotsAbout: function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    var onEnterPress = function(e) {
-      if (e.keyCode == Keys.RETURN) {
-        e.stopImmediatePropagation();
-        closePopup(Aj.state.$botsaboutPopup);
-      }
-    };
-    openPopup(Aj.state.$botsaboutPopup, {
-      onOpen: function() {
-        $(document).on('keydown', onEnterPress);
-      },
-      onClose: function() {
-        $(document).off('keydown', onEnterPress);
-      }
-    });
+    Main.openSimplePopup(Aj.state.$botsaboutPopup);
   },
   amountFieldValue: function($form, field) {
     var $fieldEl = field ? $form.field(field) : $form;
@@ -684,9 +665,14 @@ var Wallet = {
   sendTransaction: function(options) {
     if (Aj.globalState.tonConnectVersion == 2) {
       var tonConnectUI = Aj.globalState.tonConnectUI;
-      var sendTransaction = function(transaction) {
+      var sendTransaction = function(data) {
+        var transaction = data.transaction;
         tonConnectUI.sendTransaction(transaction).then(function(transaction) {
           options.onConfirm && options.onConfirm(true);
+          if (data.confirm_method) {
+            var params = $.extend({boc: transaction.boc}, data.confirm_params);
+            Aj.apiRequest(data.confirm_method, params);
+          }
         }).catch(function(){});
       };
       if (!tonConnectUI.connected) {
@@ -697,10 +683,10 @@ var Wallet = {
           if (result.error) {
             return showAlert(result.error);
           }
-          sendTransaction(result.transaction);
+          sendTransaction(result);
         });
       } else if (options.transaction) {
-        sendTransaction(options.transaction);
+        sendTransaction(options);
       }
     } else {
       QR.showPopup(options);
@@ -2392,15 +2378,17 @@ var Ads = {
   init: function() {
     Aj.onLoad(function(state) {
       var cont = Aj.ajContainer;
+      $(cont).on('click.curPage', '.js-pay-for-ads', Ads.ePayForAds);
+      $(cont).on('click.curPage', '.js-howtopay-ton', Ads.eHowToPayTon);
+      $(cont).on('click.curPage', '.js-get-ad-rewards', Ads.eGetAdRewards);
+      state.$payForAdsPopup = $('.js-pay-for-ads-popup');
+      state.$howToPayTonPopup = $('.js-how-to-pay-ton-popup');
+      state.$howToGetRewardsPopup = $('.js-how-to-get-rewards-popup');
+
       $(cont).on('click.curPage', '.js-more-funds-btn', Ads.eAddMoreFunds);
       $(cont).on('click.curPage', '.js-recharge-btn', Ads.eRechargeAccount);
       state.$rechargeForm = $('.js-recharge-form', cont);
-      state.$searchField = $('.js-account-search-field', cont);
       Main.initForm(state.$rechargeForm);
-      state.$rechargeForm.on('submit', Ads.eSearchSubmit);
-      state.$rechargeForm.field('query').on('input', Ads.eSearchInput);
-      state.$rechargeForm.field('query').on('change', Ads.eSearchChange);
-      $('.js-form-clear', state.$rechargeForm).on('click', Ads.eSearchClear);
       state.$rechargeBtn = $('.js-recharge-btn', cont);
       state.updLastReq = +Date.now();
       if (state.needUpdate) {
@@ -2410,12 +2398,23 @@ var Ads = {
     Aj.onUnload(function(state) {
       clearTimeout(state.updStateTo);
       state.needUpdate = false;
-      Main.destroyForm(state.$giftPremiumForm);
-      state.$rechargeForm.off('submit', Ads.eSearchSubmit);
-      state.$rechargeForm.field('query').off('input', Ads.eSearchInput);
-      state.$rechargeForm.field('query').off('change', Ads.eSearchChange);
-      $('.js-form-clear', state.$rechargeForm).off('click', Ads.eSearchClear);
+      Main.destroyForm(state.$rechargeForm);
     });
+  },
+  ePayForAds: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    Main.openSimplePopup(Aj.state.$payForAdsPopup);
+  },
+  eHowToPayTon: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    Main.openSimplePopup(Aj.state.$howToPayTonPopup);
+  },
+  eGetAdRewards: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    Main.openSimplePopup(Aj.state.$howToGetRewardsPopup);
   },
   updateState: function() {
     var now = +Date.now();
@@ -2450,97 +2449,6 @@ var Ads = {
         Aj.state.updStateTo = setTimeout(Ads.updateState, Main.CHECK_PERIOD);
       }
     }
-  },
-  eSearchInput: function(e) {
-    var $field = Aj.state.$searchField;
-    $('.js-search-field-error').html('');
-    $field.removeClass('error');
-  },
-  eSearchChange: function(e) {
-    Ads.searchSubmit();
-  },
-  eSearchClear: function(e) {
-    var $form = Aj.state.$rechargeForm;
-    var $field = Aj.state.$searchField;
-    var $btn   = Aj.state.$rechargeBtn;
-    $form.field('account').value('');
-    $form.field('query').value('').prop('disabled', false);
-    $btn.prop('disabled', true);
-    $field.removeClass('found');
-    $('.js-search-field-error').html('');
-    $field.removeClass('error');
-    Ads.updateUrl();
-    $form.field('query').focus();
-  },
-  eSearchSubmit: function(e) {
-    e.preventDefault();
-    Ads.searchSubmit();
-  },
-  searchSubmit: function() {
-    var $form  = Aj.state.$rechargeForm;
-    var account = $form.field('account').value();
-    var query  = $form.field('query').value();
-    if (!query.length) {
-      $form.field('query').focus();
-      return;
-    }
-    Aj.state.$searchField.addClass('loading').removeClass('play').redraw().addClass('play');
-    Aj.showProgress();
-    Aj.apiRequest('searchAdsAccount', {
-      query: account || query
-    }, function(result) {
-      Aj.hideProgress();
-      Ads.updateResult(result);
-      Aj.state.$searchField.removeClass('loading');
-    });
-  },
-  updateResult: function(result) {
-    var $form  = Aj.state.$rechargeForm;
-    var $field = Aj.state.$searchField;
-    var $btn   = Aj.state.$rechargeBtn;
-    if (result.error) {
-      $('.js-search-field-error').html(result.error);
-      $field.addClass('error').removeClass('found');
-      $form.field('query').prop('disabled', false);
-    } else {
-      $('.js-search-field-error').html('');
-      $field.removeClass('error');
-      if (result.found) {
-        if (result.found.photo) {
-          $('.js-account-search-photo', $field).html(result.found.photo);
-        }
-        if (result.found.name) {
-          var $form = Aj.state.$rechargeForm;
-          $form.field('query').value(uncleanHTML(result.found.name));
-        }
-        $form.field('account').value(result.found.account);
-        $field.addClass('found');
-        $form.field('query').prop('disabled', true);
-        $btn.prop('disabled', false);
-      } else {
-        $form.field('account').value('');
-        $field.removeClass('found');
-        $form.field('query').prop('disabled', false);
-        $btn.prop('disabled', true);
-      }
-    }
-    Ads.updateUrl();
-  },
-  updateUrl: function() {
-    var new_url = '';
-    var $form   = Aj.state.$rechargeForm;
-    var account = $form.field('account').value();
-    if (account) {
-      new_url += '&account=' + encodeURIComponent(account);
-    }
-    if (new_url) {
-      new_url = '?' + new_url.substr(1);
-    }
-    var loc = Aj.location(), path = loc.pathname + loc.search;
-    if (!new_url) {
-      new_url = loc.pathname;
-    }
-    Aj.setLocation(new_url, path != '/ads');
   },
   updateHistory: function(html) {
     $('.js-premium-history').replaceWith(html);
@@ -2592,7 +2500,11 @@ var Ads = {
       if (result.error) {
         return showAlert(result.error);
       }
-      Aj.location('/ads');
+      if (result.redirect_to) {
+        Aj.reload();
+      } else {
+
+      }
     });
   }
 };
