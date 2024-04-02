@@ -405,11 +405,8 @@ var Ads = {
     }
   },
   updateAdMessagePreviews: function(cont) {
-    $('.pr-review-ad-preview .tgme_widget_message_text tg-emoji', cont).each(function() {
+    $('.pr-review-ad-preview .js-preview-text tg-emoji', cont).each(function() {
       TEmoji.init(this);
-    });
-    $('.pr-review-ad-preview .tgme_widget_message_footer', cont).each(function() {
-      Ads.updateTextShadow(this, '.js-message_text', '.js-message_info');
     });
   },
   initSelect: function($form, field, options) {
@@ -1195,7 +1192,7 @@ var NewAd = {
           $('.js-preview-button', $previewPopup).html(previewData.button);
           $('.js-preview-button', $previewPopup).attr('href', uncleanHTML(previewData.button_url));
           $('.js-preview-footer', $previewPopup).each(function() {
-            Ads.updateTextShadow(this, '.ad-msg-text', '.label', 10);
+            Ads.updateTextShadow(this, '.js-preview-text', '.label', 10);
           });
           $('.js-picture-label', $previewPopup).html(previewData.picture_label);
           $('.js-picture-hint', $previewPopup).html(previewData.picture_hint);
@@ -1340,7 +1337,7 @@ var NewAd = {
     $cancelBtn.on('click', previewCancel);
     $previewPopup.one('popup:open', function() {
       $('.pr-preview-ad-message .ad-msg-date', $previewPopup).each(function() {
-        Ads.updateTextShadow(this, '.ad-msg-text', '.label', 10);
+        Ads.updateTextShadow(this, '.js-preview-text', '.label', 10);
       });
       state.previewTextField.updateAutosize();
       state.initPreviewFormData = NewAd.getPreviewFormData();
