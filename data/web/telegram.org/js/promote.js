@@ -535,6 +535,8 @@ var NewAd = {
       cont.on('click.curPage', '.js-activate-date-remove', NewAd.eRemoveStartDate);
       cont.on('click.curPage', '.js-deactivate-date-remove', NewAd.eRemoveEndDate);
       cont.on('click.curPage', '.js-open-schedule', NewAd.eOpenSchedule);
+      cont.on('click.curPage', '.js-channels-deselect', NewAd.eDeselectChannels);
+      cont.on('click.curPage', '.js-similar-channels-link', NewAd.eOpenSimilarChannels);
       $('.js-schedule-overview', state.$form).html(NewAd.scheduleOverview(state.$form));
       for (var i = 0; i < state.selectList.length; i++) {
         var selectData = state.selectList[i];
@@ -611,6 +613,7 @@ var NewAd = {
       state.deviceField.on('ddchange.curPage', NewAd.onDeviceChange);
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
+      state.similarChannelsPopup = $('.js-similar-channels-popup', cont);
       NewAd.updateAdPreview(state.$form, state.previewData);
       NewAd.updateAdTargetOverview();
       setTimeout(function() {
@@ -1060,6 +1063,10 @@ var NewAd = {
     if (field == 'user_topics') {
       var user_topics_cnt = $fieldEl.data('value').length;
       $('.js-intersect-topics-wrap', Aj.state.$form).slideToggle(user_topics_cnt > 1);
+    } else if (field == 'channels') {
+      var channels_cnt = $fieldEl.data('value').length;
+      $('.js-similar-channels-link-wrap', Aj.state.$form).slideToggle(channels_cnt > 0 && channels_cnt < 10);
+      $('.js-channels-deselect', Aj.state.$form).toggleClass('hide', channels_cnt < 2);
     }
     var selOpts = $fieldEl.data('selOpts');
     var paired_field = selOpts.pairedField;
@@ -1079,6 +1086,102 @@ var NewAd = {
       });
     }
     NewAd.updateAdTargetOverview();
+  },
+  eDeselectChannels: function(e) {
+    e.preventDefault();
+    Aj.state.$form.field('channels').trigger('reset');
+  },
+  eOpenSimilarChannels: function(e) {
+    e.preventDefault();
+    var $link = $(this);
+    var $fieldEl = Aj.state.$form.field('channels');
+    var values   = $fieldEl.data('value') || [];
+    if (!values.length || $link.data('loading')) {
+      return false;
+    }
+    var channels = values.join(';');
+    openPopup(Aj.state.similarChannelsPopup, {
+      closeByClickOutside: '.popup-no-close',
+      onOpen: function() {
+        var $list = $('.js-similar-channels-list', this);
+        var $loading = $('.js-similar-channels-loading', this);
+        var $button = $('.js-add-similar-channels', this);
+        $list.on('scroll', NewAd.onSimiralChannelsScroll);
+        $list.on('change', 'input.checkbox', NewAd.eSimiralChannelChange);
+        $button.on('click', NewAd.eAddSimiralChannels);
+        $button.addClass('hide');
+        $loading.removeClass('hide');
+        $list.html('').trigger('scroll').data('channels', {}).addClass('hide');
+        Aj.apiRequest('getSimilarChannels', {
+          channels: channels
+        }, function(result) {
+          if (result.error) {
+            showAlert(result.error);
+            return false;
+          }
+          if (result.channels) {
+            $button.removeClass('hide');
+            var html = '', channel_items = {};
+            for (var i = 0; i < result.channels.length; i++) {
+              var item = result.channels[i];
+              html += item.cb_item;
+              channel_items['ch' + item.id] = item;
+            }
+            $loading.addClass('hide');
+            $list.html(html).data('channel_items', channel_items).removeClass('hide').trigger('scroll');
+            NewAd.updateSimiralChannelButton();
+          }
+        });
+      },
+      onClose: function() {
+        var $list = $('.js-similar-channels-list', this);
+        var $button = $('.js-add-similar-channels', this);
+        $list.off('scroll', NewAd.onSimiralChannelsScroll);
+        $list.off('change', 'input.checkbox', NewAd.eSimiralChannelChange);
+        $button.off('click', NewAd.eAddSimiralChannels);
+      }
+    });
+  },
+  onSimiralChannelsScroll: function() {
+    $(this).toggleClass('topscroll', this.scrollTop > 0);
+    $(this).toggleClass('bottomscroll', this.scrollTop < this.scrollHeight - this.clientHeight);
+  },
+  eSimiralChannelChange: function() {
+    NewAd.updateSimiralChannelButton();
+  },
+  updateSimiralChannelButton: function() {
+    var $popup = Aj.state.similarChannelsPopup;
+    var $list = $('.js-similar-channels-list', $popup);
+    var $button = $('.js-add-similar-channels', $popup);
+    var count = 0;
+    $('input.checkbox', $list).each(function() {
+      if ($(this).prop('checked')) {
+        count++;
+      }
+    });
+    $button.html(l('WEB_ADD_N_SIMILAR_CHANNELS', {n: count}));
+    $button.toggleClass('disabled', !count);
+  },
+  eAddSimiralChannels: function() {
+    var $popup = Aj.state.similarChannelsPopup;
+    var $list = $('.js-similar-channels-list', $popup);
+    var $button = $('.js-add-similar-channels', $popup);
+    var channel_items = $list.data('channel_items');
+    var $fieldEl = Aj.state.$form.field('channels');
+    $('input.checkbox', $list).each(function() {
+      if ($(this).prop('checked')) {
+        var name = $(this).prop('name');
+        var channel = channel_items[name];
+        var item = {
+          val: channel.id,
+          name: channel.title,
+          photo: channel.photo,
+          username: channel.username
+        };
+        $fieldEl.trigger('selectval', [item, true]);
+      }
+    });
+    closePopup($popup);
   },
   ePreviewAd: function(e) {
     e.preventDefault();
@@ -2373,8 +2476,8 @@ var OwnerAds = {
       cont.on('click.curPage', '.pr-table-settings', OwnerAds.eSettingsOpen);
       cont.on('click.curPage', '.js-clone-ad-btn', EditAd.eCloneAd);
       cont.on('click.curPage', '.delete-ad-btn', EditAd.deleteAd);
-      state.$tableColumnsPopup = $('.table-columns-popup');
-      state.$tableColumnsForm = $('.table-columns-form');
+      state.$tableColumnsPopup = $('.js-table-columns-popup');
+      state.$tableColumnsForm = $('.js-table-columns-form');
       state.$tableColumnsForm.on('change.curPage', 'input.checkbox', OwnerAds.eColumnChange);
       state.$tableColumnsForm.on('submit.curPage', preventDefault);
 
@@ -2588,6 +2691,8 @@ var ReviewAds = {
       cont.on('click.curPage', '.pr-search-reset', ReviewAds.eClearSearch);
       cont.on('click.curPage', '.ad-approve-btn', ReviewAds.eApproveAd);
       cont.on('click.curPage', '.ad-decline-btn', ReviewAds.eDeclineAd);
+      cont.on('click.curPage', '.js-translate-ad', ReviewAds.eTranslateAd);
+      cont.on('click.curPage', '.js-show-original-ad', ReviewAds.eOriginalAd);
       $(window).on('scroll resize', ReviewAds.onScroll);
       ReviewAds.onScroll();
     });
@@ -2703,6 +2808,44 @@ var ReviewAds = {
         $ad.find('.js-review-buttons').html(result.buttons_html);
       }
     });
+    return false;
+  },
+  eTranslateAd: function(e) {
+    e.preventDefault();
+    var $ad       = $(this).parents('.js-review-item');
+    var owner_id  = $ad.attr('data-owner-id');
+    var ad_id     = $ad.attr('data-ad-id');
+
+    if ($ad.attr('translated')) {
+      $ad.addClass('ad-translated');
+      return false;
+    }
+    if ($ad.attr('translating')) {
+      return false;
+    }
+    $ad.addClass('ad-translating');
+    $ad.attr('translating', true);
+    Aj.apiRequest('translateAd', {
+      owner_id: owner_id,
+      ad_id: ad_id
+    }, function(result) {
+      $ad.attr('translating', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      $ad.removeClass('ad-translating').addClass('ad-translated');
+      $ad.attr('translated', true);
+      if (result.preview_html) {
+        $('.js-translated-ad', $ad).prepend(result.preview_html);
+        Ads.updateAdMessagePreviews($ad);
+      }
+    });
+    return false;
+  },
+  eOriginalAd: function(e) {
+    e.preventDefault();
+    var $ad = $(this).parents('.js-review-item');
+    $ad.removeClass('ad-translated');
     return false;
   }
 };
