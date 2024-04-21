@@ -1820,9 +1820,9 @@ var Premium = {
       });
     });
   },
-  updateState: function(force) {
+  updateState: function() {
     var now = +Date.now();
-    if (document.hasFocus() || force ||
+    if (document.hasFocus() ||
         Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
       Aj.state.updLastReq = now;
       Aj.apiRequest('updatePremiumState', {
@@ -2039,10 +2039,7 @@ var Premium = {
       }),
       qr_label: item_title,
       tk_label: l('WEB_POPUP_QR_PREMIUM_TK_BUTTON'),
-      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
-      onConfirm: function(by_server) {
-        Premium.updateState(true);
-      }
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS')
     });
     Aj.state.needUpdate = true;
   },
@@ -2106,9 +2103,9 @@ var PremiumGiveaway = {
       });
     });
   },
-  updateState: function(force) {
+  updateState: function() {
     var now = +Date.now();
-    if (document.hasFocus() || force ||
+    if (document.hasFocus() ||
         Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
       Aj.state.updLastReq = now;
       Aj.apiRequest('updatePremiumGiveawayState', {
@@ -2361,10 +2358,7 @@ var PremiumGiveaway = {
       }),
       qr_label: item_title,
       tk_label: l('WEB_POPUP_QR_GIVEAWAY_TK_BUTTON'),
-      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
-      onConfirm: function(by_server) {
-        PremiumGiveaway.updateState(true);
-      }
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS')
     });
     Aj.state.needUpdate = true;
   },
@@ -2390,13 +2384,6 @@ var Ads = {
       state.$payForAdsPopup = $('.js-pay-for-ads-popup');
       state.$howToPayTonPopup = $('.js-how-to-pay-ton-popup');
       state.$howToGetRewardsPopup = $('.js-how-to-get-rewards-popup');
-    });
-  },
-  initPay: function() {
-    Aj.onLoad(function(state) {
-      var cont = Aj.ajContainer;
-      $(cont).on('click.curPage', '.js-howtopay-ton', Ads.eHowToPayTon);
-      state.$howToPayTonPopup = $('.js-how-to-pay-ton-popup');
 
       $(cont).on('click.curPage', '.js-more-funds-btn', Ads.eAddMoreFunds);
       $(cont).on('click.curPage', '.js-recharge-btn', Ads.eRechargeAccount);
@@ -2404,37 +2391,14 @@ var Ads = {
       Main.initForm(state.$rechargeForm);
       state.$rechargeBtn = $('.js-recharge-btn', cont);
       state.updLastReq = +Date.now();
-      state.canUpdate = true;
       if (state.needUpdate) {
         state.updStateTo = setTimeout(Ads.updateState, Main.UPDATE_PERIOD);
       }
     });
     Aj.onUnload(function(state) {
       clearTimeout(state.updStateTo);
-      state.canUpdate = false;
+      state.needUpdate = false;
       Main.destroyForm(state.$rechargeForm);
-    });
-  },
-  initWithdraw: function() {
-    Aj.onLoad(function(state) {
-      var cont = Aj.ajContainer;
-      $(cont).on('click.curPage', '.js-howtopay-ton', Ads.eHowToPayTon);
-      state.$howToPayTonPopup = $('.js-how-to-pay-ton-popup');
-
-      $(cont).on('click.curPage', '.js-withdraw-btn', Ads.eWithdrawRevenue);
-      state.$withdrawForm = $('.js-withdraw-form', cont);
-      Main.initForm(state.$withdrawForm);
-      state.$withdrawBtn = $('.js-withdraw-btn', cont);
-      state.updLastReq = +Date.now();
-      state.canUpdate = true;
-      if (state.needUpdate) {
-        state.updStateTo = setTimeout(Ads.updateWithdrawState, Main.UPDATE_PERIOD);
-      }
-    });
-    Aj.onUnload(function(state) {
-      clearTimeout(state.updStateTo);
-      state.canUpdate = false;
-      Main.destroyForm(state.$withdrawForm);
     });
   },
   ePayForAds: function(e) {
@@ -2452,9 +2416,9 @@ var Ads = {
     e.stopImmediatePropagation();
     Main.openSimplePopup(Aj.state.$howToGetRewardsPopup);
   },
-  updateState: function(force) {
+  updateState: function() {
     var now = +Date.now();
-    if (document.hasFocus() || force ||
+    if (document.hasFocus() ||
         Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
       Aj.state.updLastReq = now;
       Aj.apiRequest('updateAdsState', {
@@ -2476,40 +2440,13 @@ var Ads = {
             closePopup(Aj.state.$sentPopup);
           }
         }
-        Aj.state.needUpdate = result.need_update;
-        if (Aj.state.canUpdate && Aj.state.needUpdate) {
+        if (Aj.state.needUpdate && result.need_update) {
           Aj.state.updStateTo = setTimeout(Ads.updateState, Main.UPDATE_PERIOD);
         }
       });
     } else {
-      if (Aj.state.canUpdate && Aj.state.needUpdate) {
+      if (Aj.state.needUpdate) {
         Aj.state.updStateTo = setTimeout(Ads.updateState, Main.CHECK_PERIOD);
-      }
-    }
-  },
-  updateWithdrawState: function(force) {
-    var now = +Date.now();
-    if (document.hasFocus() || force ||
-        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
-      Aj.state.updLastReq = now;
-      Aj.apiRequest('updateAdsRevenueWithdrawalState', {
-        transaction: Aj.state.transaction,
-        mode: Aj.state.mode
-      }, function(result) {
-        if (result.mode) {
-          Aj.state.mode = result.mode;
-        }
-        if (result.html) {
-          Ads.updateContent(result.html);
-        }
-        Aj.state.needUpdate = result.need_update;
-        if (Aj.state.canUpdate && Aj.state.needUpdate) {
-          Aj.state.updStateTo = setTimeout(Ads.updateWithdrawState, Main.UPDATE_PERIOD);
-        }
-      });
-    } else {
-      if (Aj.state.canUpdate && Aj.state.needUpdate) {
-        Aj.state.updStateTo = setTimeout(Ads.updateWithdrawState, Main.CHECK_PERIOD);
       }
     }
   },
@@ -2551,10 +2488,7 @@ var Ads = {
         }),
         qr_label: result.item_title,
         tk_label: l('WEB_POPUP_QR_ADS_RECHARGE_TK_BUTTON'),
-        terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
-        onConfirm: function(by_server) {
-          Ads.updateState(true);
-        }
+        terms_label: l('WEB_POPUP_QR_PROCEED_TERMS')
       });
       Aj.state.needUpdate = true;
     });
@@ -2572,46 +2506,6 @@ var Ads = {
 
       }
     });
-  },
-  eWithdrawRevenue: function(e) {
-    e.stopImmediatePropagation();
-    e.preventDefault();
-    var $form       = Aj.state.$withdrawForm;
-    var transaction = $form.field('transaction').value();
-    var wallet_address = $form.field('wallet_address').value();
-    var params = {
-      transaction: transaction,
-      wallet_address: wallet_address
-    };
-    if ($form.data('disabled')) {
-      return false;
-    }
-    var onSuccess = function(result) {
-        $form.data('disabled', false);
-      if (result.error) {
-        return showAlert(result.error);
-      }
-      if (result.confirm_message && result.confirm_hash) {
-        showConfirm(result.confirm_message, function() {
-          params.confirm_hash = result.confirm_hash;
-          $form.data('disabled', true);
-          Aj.apiRequest('initAdsRevenueWithdrawalRequest', params, onSuccess);
-        }, result.confirm_button);
-      } else {
-        if (result.mode) {
-          Aj.state.mode = result.mode;
-        }
-        if (result.html) {
-          Ads.updateContent(result.html);
-        }
-        Aj.state.needUpdate = result.need_update;
-        if (Aj.state.canUpdate && Aj.state.needUpdate) {
-          Aj.state.updStateTo = setTimeout(Ads.updateWithdrawState, Main.UPDATE_PERIOD);
-        }
-      }
-    };
-    $form.data('disabled', true);
-    Aj.apiRequest('initAdsRevenueWithdrawalRequest', params, onSuccess);
   }
 };
 
