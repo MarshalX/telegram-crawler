@@ -518,9 +518,13 @@ function ajInit(options) {
     return true;
   }
 
-  function _location(href) {
+  function _location(href, replace) {
     if (typeof href !== 'undefined') {
-      loadPage(loc(href), true);
+      var url = loc(href);
+      var push_state = !replace;
+      if (!loadPage(url, push_state)) {
+        changeLocation(url, push_state);
+      }
     } else {
       return loc(curLocation.href);
     }
@@ -562,7 +566,7 @@ function ajInit(options) {
   }
 
   function reload() {
-    _location(_location());
+    _location(_location(), true);
   }
 
   function historyJump(delta) {
