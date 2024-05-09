@@ -2093,6 +2093,7 @@ var NewAd = {
 var Upload = {
   uploadFile: function(file, onSuccess, onProgress, onError) {
     var data = new FormData();
+    data.append('owner_id', Aj.state.ownerId);
     data.append('file', file, file.name);
     return $.ajax({
       url: '/file/upload',
