@@ -643,6 +643,7 @@ var Wallet = {
                 wallet.connectItems.tonProof.proof) {
               Aj.apiRequest('checkTonProofAuth', {
                 account: JSON.stringify(wallet.account),
+                device:  JSON.stringify(wallet.device),
                 proof:   JSON.stringify(wallet.connectItems.tonProof.proof)
               }, function(result) {
                 if (result.verified) {
@@ -665,12 +666,17 @@ var Wallet = {
   sendTransaction: function(options) {
     if (Aj.globalState.tonConnectVersion == 2) {
       var tonConnectUI = Aj.globalState.tonConnectUI;
+      var wallet = tonConnectUI.wallet || {};
       var sendTransaction = function(data) {
         var transaction = data.transaction;
         tonConnectUI.sendTransaction(transaction).then(function(transaction) {
           options.onConfirm && options.onConfirm(true);
           if (data.confirm_method) {
-            var params = $.extend({boc: transaction.boc}, data.confirm_params);
+            var params = $.extend({
+              account: JSON.stringify(wallet.account),
+              device: JSON.stringify(wallet.device),
+              boc: transaction.boc
+            }, data.confirm_params);
             Aj.apiRequest(data.confirm_method, params);
           }
         }).catch(function(){});
@@ -678,7 +684,11 @@ var Wallet = {
       if (!tonConnectUI.connected) {
         tonConnectUI.openModal();
       } else if (options.request) {
-        var req = options.request, params = $.extend({transaction: 1}, req.params);
+        var req = options.request, params = $.extend({
+          account: JSON.stringify(wallet.account),
+          device: JSON.stringify(wallet.device),
+          transaction: 1
+        }, req.params);
         Aj.apiRequest(req.method, params, function(result) {
           if (result.error) {
             return showAlert(result.error);
@@ -2562,15 +2572,12 @@ var Ads = {
   eAddMoreFunds: function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
+    var href = this.href;
     Aj.apiRequest('repeatAdsAddFunds', {}, function(result) {
       if (result.error) {
         return showAlert(result.error);
       }
-      if (result.redirect_to) {
-        Aj.reload();
-      } else {
-
-      }
+      Aj.location(href);
     });
   },
   eWithdrawRevenue: function(e) {
