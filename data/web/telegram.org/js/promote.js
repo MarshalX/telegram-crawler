@@ -1287,13 +1287,15 @@ var NewAd = {
       if ($previewPopup) {
         if (previewData) {
           $('.js-preview-from', $previewPopup).html(previewData.from);
-          $('.js-preview-from', $previewPopup).attr('href', uncleanHTML(previewData.from_url));
+          $('.js-preview-wrap', $previewPopup).attr('href', uncleanHTML(previewData.button_url));
+          for (var i = 1; i <= 3; i++) {
+            $('.js-preview-wrap', $previewPopup).cssProp('--preview-color' + i, (previewData.accent_colors || [])[i - 1] || '');
+          }
           $('.js-promote-photo', $previewPopup).html(previewData.photo);
           $('.js-promote-photo-tooltip', $previewPopup).html(previewData.from);
           $('.js-preview-text', $previewPopup).html(previewData.text);
           $('.js-preview-text tg-emoji', $previewPopup).each(function(){ TEmoji.init(this); });
           $('.js-preview-button', $previewPopup).html(previewData.button);
-          $('.js-preview-button', $previewPopup).attr('href', uncleanHTML(previewData.button_url));
           $('.js-preview-footer', $previewPopup).each(function() {
             Ads.updateTextShadow(this, '.js-preview-text', '.label', 10);
           });
