@@ -2780,6 +2780,7 @@ var ReviewAds = {
       if (result.buttons_html) {
         $ad.find('.js-review-buttons').html(result.buttons_html);
       }
+      $ad.find('.js-reports-badge').hide();
     });
     return false;
   },
@@ -2810,6 +2811,7 @@ var ReviewAds = {
       if (result.buttons_html) {
         $ad.find('.js-review-buttons').html(result.buttons_html);
       }
+      $ad.find('.js-reports-badge').hide();
     });
     return false;
   },
