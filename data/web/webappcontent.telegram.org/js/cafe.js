@@ -16,7 +16,8 @@ var Cafe = {
     Cafe.userId = options.userId;
     Cafe.userHash = options.userHash;
     Cafe.initLotties();
-    $('body').show();
+    var starsSupported = Telegram.WebApp.isVersionAtLeast('7.4');
+    $('body').toggleClass('stars-supported', starsSupported).show();
     if ((!Telegram.WebApp.initDataUnsafe ||
          !Telegram.WebApp.initDataUnsafe.query_id) &&
         Cafe.mode != 'inline' &&
@@ -29,6 +30,7 @@ var Cafe = {
     $('.js-item-lottie').on('click', Cafe.eLottieClicked);
     $('.js-item-incr-btn').on('click', Cafe.eIncrClicked);
     $('.js-item-decr-btn').on('click', Cafe.eDecrClicked);
+    $('.js-item-buy-btn').on('click', Cafe.eBuyClicked);
     $('.js-order-edit').on('click', Cafe.eEditClicked);
     $('.js-status').on('click', Cafe.eStatusClicked);
     $('.js-order-comment-field').each(function() {
@@ -67,6 +69,12 @@ var Cafe = {
     Telegram.WebApp.HapticFeedback.impactOccurred('light');
     var itemEl = $(this).parents('.js-item');
     Cafe.incrClicked(itemEl, -1);
+  },
+  eBuyClicked: function(e) {
+    e.preventDefault();
+    Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    var itemEl = $(this).parents('.js-item');
+    Cafe.buyClicked(itemEl);
   },
   eEditClicked: function(e) {
     e.preventDefault();
@@ -199,7 +207,7 @@ var Cafe = {
   getOrderData: function() {
     var order_data = [];
     $('.js-item').each(function() {
-      var itemEl = $(this)
+      var itemEl = $(this);
       var id    = itemEl.data('item-id');
       var count = +itemEl.data('item-count') || 0;
       if (count > 0) {
@@ -312,6 +320,51 @@ var Cafe = {
     } else {
       Cafe.toggleMode(true);
     }
+  },
+  buyClicked: function(itemEl) {
+    if (Cafe.isLoading || Cafe.isClosed) {
+      return false;
+    }
+    var id = itemEl.data('item-id');
+    var params = {
+      item_id: id
+    };
+    if (Cafe.mode) {
+      params.mode = Cafe.mode;
+    }
+    if (Cafe.userId && Cafe.userHash) {
+      params.user_id = Cafe.userId;
+      params.user_hash = Cafe.userHash;
+    }
+    var invoiceSupported = Telegram.WebApp.isVersionAtLeast('6.1');
+    if (invoiceSupported) {
+      params.invoice = 1;
+    }
+    Cafe.toggleLoading(true);
+    Cafe.apiRequest('buyItem', params, function(result) {
+      Cafe.toggleLoading(false);
+      if (result.ok) {
+        if (invoiceSupported) {
+          Telegram.WebApp.openInvoice(result.invoice_url, function(status) {
+            if (status == 'paid') {
+              Telegram.WebApp.close();
+            } else if (status == 'failed') {
+              Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+              Cafe.showStatus('Payment has been failed.');
+            } else {
+              Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
+              Cafe.showStatus('You have cancelled this order.');
+            }
+          });
+        } else {
+          Telegram.WebApp.close();
+        }
+      }
+      if (result.error) {
+        Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+        Cafe.showStatus(result.error);
+      }
+    });
   },
   eStatusClicked: function() {
     Cafe.hideStatus();
