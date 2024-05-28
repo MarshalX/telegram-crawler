@@ -53,6 +53,21 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="may-28-2024" href="#may-28-2024"><i class="anchor-icon"></i></a>May 28, 2024</h4>
+<p><strong>Bot API 7.4</strong></p>
+<ul>
+<li>Added support for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a> by introducing the new currency “XTR”.</li>
+<li>The parameter <em>provider_token</em> of the methods <a href="#sendinvoice">sendInvoice</a> and <a href="#createinvoicelink">createInvoiceLink</a> must be omitted for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</li>
+<li>The field <em>provider_token</em> in the class <a href="#inputinvoicemessagecontent">InputInvoiceMessageContent</a> must be omitted for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</li>
+<li>Added the method <a href="#refundstarpayment">refundStarPayment</a>.</li>
+<li>Added the field <em>effect_id</em> to the class <a href="#message">Message</a>.</li>
+<li>Added the parameter <em>message_effect_id</em> to the methods <a href="#sendmessage">sendMessage</a>, <a href="#sendphoto">sendPhoto</a>, <a href="#sendvideo">sendVideo</a>, <a href="#sendanimation">sendAnimation</a>, <a href="#sendaudio">sendAudio</a>, <a href="#senddocument">sendDocument</a>, <a href="#sendsticker">sendSticker</a>, <a href="#sendvideonote">sendVideoNote</a>, <a href="#sendvoice">sendVoice</a>, <a href="#sendlocation">sendLocation</a>, <a href="#sendvenue">sendVenue</a>, <a href="#sendcontact">sendContact</a>, <a href="#sendpoll">sendPoll</a>, <a href="#senddice">sendDice</a>, <a href="#sendinvoice">sendInvoice</a>, <a href="#sendgame">sendGame</a>, and <a href="#sendmediagroup">sendMediaGroup</a>.</li>
+<li>Added the field <em>show_caption_above_media</em> to the classes <a href="#message">Message</a>, <a href="#inputmediaanimation">InputMediaAnimation</a>, <a href="#inputmediaphoto">InputMediaPhoto</a>, <a href="#inputmediavideo">InputMediaVideo</a>, <a href="#inlinequeryresultgif">InlineQueryResultGif</a>, <a href="#inlinequeryresultmpeg4gif">InlineQueryResultMpeg4Gif</a>, <a href="#inlinequeryresultphoto">InlineQueryResultPhoto</a>, <a href="#inlinequeryresultvideo">InlineQueryResultVideo</a>, <a href="#inlinequeryresultcachedgif">InlineQueryResultCachedGif</a>, <a href="#inlinequeryresultcachedmpeg4gif">InlineQueryResultCachedMpeg4Gif</a>, <a href="#inlinequeryresultcachedphoto">InlineQueryResultCachedPhoto</a>, and <a href="#inlinequeryresultcachedvideo">InlineQueryResultCachedVideo</a>.</li>
+<li>Added the parameter <em>show_caption_above_media</em> to the methods <a href="#sendanimation">sendAnimation</a>, <a href="#sendphoto">sendPhoto</a>, <a href="#sendvideo">sendVideo</a>, <a href="#copymessage">copyMessage</a>, and <a href="#editmessagecaption">editMessageCaption</a>.</li>
+<li>Added support for “expandable_blockquote” entities in received messages.</li>
+<li>Added support for “expandable_blockquote” entity parsing in “MarkdownV2” and “HTML” parse modes.</li>
+<li>Allowed to explicitly specify “expandable_blockquote” entities in formatted texts.</li>
+</ul>
 <h4><a class="anchor" name="may-6-2024" href="#may-6-2024"><i class="anchor-icon"></i></a>May 6, 2024</h4>
 <p><strong>Bot API 7.3</strong></p>
 <ul>
@@ -1043,6 +1058,11 @@ To learn how to create…">
 <td><em>Optional</em>. Options used for link preview generation for the message, if it is a text message and link preview options were changed</td>
 </tr>
 <tr>
+<td>effect_id</td>
+<td>String</td>
+<td><em>Optional</em>. Unique identifier of the message effect added to the message</td>
+</tr>
+<tr>
 <td>animation</td>
 <td><a href="#animation">Animation</a></td>
 <td><em>Optional</em>. Message is an animation, information about the animation. For backward compatibility, when this field is set, the <em>document</em> field will also be set</td>
@@ -1096,6 +1116,11 @@ To learn how to create…">
 <td>caption_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. For messages with a caption, special entities like usernames, URLs, bot commands, etc. that appear in the caption</td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>True</td>
+<td><em>Optional</em>. True, if the caption must be shown above the message media</td>
 </tr>
 <tr>
 <td>has_media_spoiler</td>
@@ -1390,7 +1415,7 @@ To learn how to create…">
 <tr>
 <td>type</td>
 <td>String</td>
-<td>Type of the entity. Currently, can be “mention” (<code>@username</code>), “hashtag” (<code>#hashtag</code>), “cashtag” (<code>$USD</code>), “bot_command” (<code>/start@jobs_bot</code>), “url” (<code>https://telegram.org</code>), “email” (<code>do-not-reply@telegram.org</code>), “phone_number” (<code>+1-212-555-0123</code>), “bold” (<strong>bold text</strong>), “italic” (<em>italic text</em>), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users <a href="https://telegram.org/blog/edit#new-mentions">without usernames</a>), “custom_emoji” (for inline custom emoji stickers)</td>
+<td>Type of the entity. Currently, can be “mention” (<code>@username</code>), “hashtag” (<code>#hashtag</code>), “cashtag” (<code>$USD</code>), “bot_command” (<code>/start@jobs_bot</code>), “url” (<code>https://telegram.org</code>), “email” (<code>do-not-reply@telegram.org</code>), “phone_number” (<code>+1-212-555-0123</code>), “bold” (<strong>bold text</strong>), “italic” (<em>italic text</em>), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users <a href="https://telegram.org/blog/edit#new-mentions">without usernames</a>), “custom_emoji” (for inline custom emoji stickers)</td>
 </tr>
 <tr>
 <td>offset</td>
@@ -3334,7 +3359,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="keyboardbutton" href="#keyboardbutton"><i class="anchor-icon"></i></a>KeyboardButton</h4>
-<p>This object represents one button of the reply keyboard. For simple text buttons, <em>String</em> can be used instead of this object to specify the button text. The optional fields <em>web_app</em>, <em>request_users</em>, <em>request_chat</em>, <em>request_contact</em>, <em>request_location</em>, and <em>request_poll</em> are mutually exclusive.</p>
+<p>This object represents one button of the reply keyboard. At most one of the optional fields must be used to specify type of the button. For simple text buttons, <em>String</em> can be used instead of this object to specify the button text.</p>
 <table class="table">
 <thead>
 <tr>
@@ -3558,7 +3583,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="inlinekeyboardbutton" href="#inlinekeyboardbutton"><i class="anchor-icon"></i></a>InlineKeyboardButton</h4>
-<p>This object represents one button of an inline keyboard. You <strong>must</strong> use exactly one of the optional fields.</p>
+<p>This object represents one button of an inline keyboard. Exactly one of the optional fields must be used to specify type of the button.</p>
 <table class="table">
 <thead>
 <tr>
@@ -3616,7 +3641,7 @@ To learn how to create…">
 <tr>
 <td>pay</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Specify <em>True</em>, to send a <a href="#payments">Pay button</a>.<br><br><strong>NOTE:</strong> This type of button <strong>must</strong> always be the first button in the first row and can only be used in invoice messages.</td>
+<td><em>Optional</em>. Specify <em>True</em>, to send a <a href="#payments">Pay button</a>. Substrings “<img class="emoji" src="//telegram.org/img/emoji/40/E2AD90.png" width="20" height="20" alt="⭐" />” and “XTR” in the buttons&#39;s text will be replaced with a Telegram Star icon.<br><br><strong>NOTE:</strong> This type of button <strong>must</strong> always be the first button in the first row and can only be used in invoice messages.</td>
 </tr>
 </tbody>
 </table>
@@ -5474,6 +5499,11 @@ To learn how to create…">
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
 <td>has_spoiler</td>
 <td>Boolean</td>
 <td><em>Optional</em>. Pass <em>True</em> if the photo needs to be covered with a spoiler animation</td>
@@ -5520,6 +5550,11 @@ To learn how to create…">
 <td>caption_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
 </tr>
 <tr>
 <td>width</td>
@@ -5588,6 +5623,11 @@ To learn how to create…">
 <td>caption_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
 </tr>
 <tr>
 <td>width</td>
@@ -5868,6 +5908,12 @@ To learn how to create…">
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
+</tr>
+<tr>
 <td>reply_parameters</td>
 <td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
@@ -5884,7 +5930,7 @@ To learn how to create…">
 <h4><a class="anchor" name="formatting-options" href="#formatting-options"><i class="anchor-icon"></i></a>Formatting options</h4>
 <p>The Bot API supports basic formatting for messages. You can use bold, italic, underlined, strikethrough, spoiler text, block quotations as well as inline links and pre-formatted code in your bots&#39; messages. Telegram clients will render them accordingly. You can specify text entities directly, or use markdown-style or HTML-style formatting.</p>
 <p>Note that Telegram clients will display an <strong>alert</strong> to the user before opening an inline link (&#39;Open this link?&#39; together with the full URL).</p>
-<p>Message entities can be nested, providing following restrictions are met:<br>- If two entities have common characters, then one of them is fully contained inside another.<br>- <em>bold</em>, <em>italic</em>, <em>underline</em>, <em>strikethrough</em>, and <em>spoiler</em> entities can contain and can be part of any other entities, except <em>pre</em> and <em>code</em>.<br>- <em>blockquote</em> entities can&#39;t be nested.<br>- All other entities can&#39;t contain each other.</p>
+<p>Message entities can be nested, providing following restrictions are met:<br>- If two entities have common characters, then one of them is fully contained inside another.<br>- <em>bold</em>, <em>italic</em>, <em>underline</em>, <em>strikethrough</em>, and <em>spoiler</em> entities can contain and can be part of any other entities, except <em>pre</em> and <em>code</em>.<br>- <em>blockquote</em> and <em>expandable_blockquote</em> entities can&#39;t be nested.<br>- All other entities can&#39;t contain each other.</p>
 <p>Links <code>tg://user?id=&lt;user_id&gt;</code> can be used to mention a user by their identifier without using a username. Please note:</p>
 <ul>
 <li>These links will work <strong>only</strong> if they are used inside an inline link or in an inline keyboard button. For example, they will not work, when used in a message text.</li>
@@ -5911,16 +5957,22 @@ pre-formatted fixed-width code block written in the Python programming language
 ```
 &gt;Block quotation started
 &gt;Block quotation continued
-&gt;The last line of the block quotation**
-&gt;The second block quotation started right after the previous\r
-&gt;The third block quotation started right after the previous</code></pre>
+&gt;Block quotation continued
+&gt;Block quotation continued
+&gt;The last line of the block quotation
+**&gt;The expandable block quotation started right after the previous block quotation
+&gt;It is separated from the previous block quotation by an empty bold entity
+&gt;Expandable block quotation continued
+&gt;Hidden by default part of the expandable block quotation started
+&gt;Expandable block quotation continued
+&gt;The last line of the expandable block quotation with the expandability mark||</code></pre>
 <p>Please note:</p>
 <ul>
 <li>Any character with code between 1 and 126 inclusively can be escaped anywhere with a preceding &#39;\&#39; character, in which case it is treated as an ordinary character and not a part of the markup. This implies that &#39;\&#39; character usually must be escaped with a preceding &#39;\&#39; character.</li>
 <li>Inside <code>pre</code> and <code>code</code> entities, all &#39;`&#39; and &#39;\&#39; characters must be escaped with a preceding &#39;\&#39; character.</li>
 <li>Inside the <code>(...)</code> part of the inline link and custom emoji definition, all &#39;)&#39; and &#39;\&#39; must be escaped with a preceding &#39;\&#39; character.</li>
 <li>In all other places characters &#39;_&#39;, &#39;*&#39;, &#39;[&#39;, &#39;]&#39;, &#39;(&#39;, &#39;)&#39;, &#39;~&#39;, &#39;`&#39;, &#39;&gt;&#39;, &#39;#&#39;, &#39;+&#39;, &#39;-&#39;, &#39;=&#39;, &#39;|&#39;, &#39;{&#39;, &#39;}&#39;, &#39;.&#39;, &#39;!&#39; must be escaped with the preceding character &#39;\&#39;.</li>
-<li>In case of ambiguity between <code>italic</code> and <code>underline</code> entities <code>__</code> is always greadily treated from left to right as beginning or end of <code>underline</code> entity, so instead of <code>___italic underline___</code> use <code>___italic underline_\r__</code>, where <code>\r</code> is a character with code 13, which will be ignored.</li>
+<li>In case of ambiguity between <code>italic</code> and <code>underline</code> entities <code>__</code> is always greadily treated from left to right as beginning or end of an <code>underline</code> entity, so instead of <code>___italic underline___</code> use <code>___italic underline_**__</code>, adding an empty bold entity as a separator.</li>
 <li>A valid emoji must be provided as an alternative value for the custom emoji. The emoji will be shown instead of the custom emoji in places where a custom emoji cannot be displayed (e.g., system notifications) or if the message is forwarded by a non-premium user. It is recommended to use the emoji from the <strong>emoji</strong> field of the custom emoji <a href="#sticker">sticker</a>.</li>
 <li>Custom emoji entities can only be used by bots that purchased additional usernames on <a href="https://fragment.com">Fragment</a>.</li>
 </ul>
@@ -5938,7 +5990,8 @@ pre-formatted fixed-width code block written in the Python programming language
 &lt;code&gt;inline fixed-width code&lt;/code&gt;
 &lt;pre&gt;pre-formatted fixed-width code block&lt;/pre&gt;
 &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;pre-formatted fixed-width code block written in the Python programming language&lt;/code&gt;&lt;/pre&gt;
-&lt;blockquote&gt;Block quotation started\nBlock quotation continued\nThe last line of the block quotation&lt;/blockquote&gt;</code></pre>
+&lt;blockquote&gt;Block quotation started\nBlock quotation continued\nThe last line of the block quotation&lt;/blockquote&gt;
+&lt;blockquote expandable&gt;Expandable block quotation started\nExpandable block quotation continued\nExpandable block quotation continued\nHidden by default part of the block quotation started\nExpandable block quotation continued\nThe last line of the block quotation&lt;/blockquote&gt;</code></pre>
 <p>Please note:</p>
 <ul>
 <li>Only the tags mentioned above are currently supported.</li>
@@ -5966,7 +6019,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <p>Please note:</p>
 <ul>
 <li>Entities must not be nested, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
-<li>There is no way to specify “underline”, “strikethrough”, “spoiler”, “blockquote” and “custom_emoji” entities, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
+<li>There is no way to specify “underline”, “strikethrough”, “spoiler”, “blockquote”, “expandable_blockquote” and “custom_emoji” entities, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
 <li>To escape characters &#39;_&#39;, &#39;*&#39;, &#39;`&#39;, &#39;[&#39; outside of an entity, prepend the characters &#39;\&#39; before them.</li>
 <li>Escaping inside entities is not allowed, so entity must be closed first and reopened again: use <code>_snake_\__case_</code> for italic <code>snake_case</code> and <code>*2*\**2=4*</code> for bold <code>2*2=4</code>.</li>
 </ul>
@@ -6261,6 +6314,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>A JSON-serialized list of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
 <td>has_spoiler</td>
 <td>Boolean</td>
 <td>Optional</td>
@@ -6277,6 +6336,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -6384,6 +6449,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
+</tr>
+<tr>
 <td>reply_parameters</td>
 <td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
@@ -6474,6 +6545,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -6568,6 +6645,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>A JSON-serialized list of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
 <td>has_spoiler</td>
 <td>Boolean</td>
 <td>Optional</td>
@@ -6590,6 +6673,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -6684,6 +6773,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>A JSON-serialized list of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
 <td>has_spoiler</td>
 <td>Boolean</td>
 <td>Optional</td>
@@ -6700,6 +6795,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -6788,6 +6889,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
+</tr>
+<tr>
 <td>reply_parameters</td>
 <td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
@@ -6868,6 +6975,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
+</tr>
+<tr>
 <td>reply_parameters</td>
 <td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
@@ -6928,6 +7041,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent messages from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -7014,6 +7133,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -7120,6 +7245,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
+</tr>
+<tr>
 <td>reply_parameters</td>
 <td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
@@ -7198,6 +7329,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -7340,6 +7477,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
+</tr>
+<tr>
 <td>reply_parameters</td>
 <td><a href="#replyparameters">ReplyParameters</a></td>
 <td>Optional</td>
@@ -7400,6 +7543,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -9248,6 +9397,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>A JSON-serialized list of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em>, if the caption must be shown above the message media. Supported only for animation, photo and video messages.</td>
+</tr>
+<tr>
 <td>reply_markup</td>
 <td><a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a></td>
 <td>Optional</td>
@@ -9785,6 +9940,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -10510,6 +10671,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
 <td>reply_markup</td>
 <td><a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a></td>
 <td><em>Optional</em>. <a href="/bots/features#inline-keyboards">Inline keyboard</a> attached to the message</td>
@@ -10591,6 +10757,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>caption_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -10676,6 +10847,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
 <td>reply_markup</td>
 <td><a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a></td>
 <td><em>Optional</em>. <a href="/bots/features#inline-keyboards">Inline keyboard</a> attached to the message</td>
@@ -10745,6 +10921,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>caption_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
 </tr>
 <tr>
 <td>video_width</td>
@@ -11316,6 +11497,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
 <td>reply_markup</td>
 <td><a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a></td>
 <td><em>Optional</em>. <a href="/bots/features#inline-keyboards">Inline keyboard</a> attached to the message</td>
@@ -11374,6 +11560,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
 </tr>
 <tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
 <td>reply_markup</td>
 <td><a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a></td>
 <td><em>Optional</em>. <a href="/bots/features#inline-keyboards">Inline keyboard</a> attached to the message</td>
@@ -11430,6 +11621,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>caption_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -11594,6 +11790,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>caption_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -11918,22 +12119,22 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>provider_token</td>
 <td>String</td>
-<td>Payment provider token, obtained via <a href="https://t.me/botfather">@BotFather</a></td>
+<td><em>Optional</em>. Payment provider token, obtained via <a href="https://t.me/botfather">@BotFather</a>. Pass an empty string for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>currency</td>
 <td>String</td>
-<td>Three-letter ISO 4217 currency code, see <a href="/bots/payments#supported-currencies">more on currencies</a></td>
+<td>Three-letter ISO 4217 currency code, see <a href="/bots/payments#supported-currencies">more on currencies</a>. Pass “XTR” for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>prices</td>
 <td>Array of <a href="#labeledprice">LabeledPrice</a></td>
-<td>Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)</td>
+<td>Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.). Must contain exactly one item for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>max_tip_amount</td>
 <td>Integer</td>
-<td><em>Optional</em>. The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0</td>
+<td><em>Optional</em>. The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>suggested_tip_amounts</td>
@@ -11968,37 +12169,37 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>need_name</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if you require the user&#39;s full name to complete the order</td>
+<td><em>Optional</em>. Pass <em>True</em> if you require the user&#39;s full name to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>need_phone_number</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if you require the user&#39;s phone number to complete the order</td>
+<td><em>Optional</em>. Pass <em>True</em> if you require the user&#39;s phone number to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>need_email</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if you require the user&#39;s email address to complete the order</td>
+<td><em>Optional</em>. Pass <em>True</em> if you require the user&#39;s email address to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>need_shipping_address</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if you require the user&#39;s shipping address to complete the order</td>
+<td><em>Optional</em>. Pass <em>True</em> if you require the user&#39;s shipping address to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>send_phone_number_to_provider</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if the user&#39;s phone number should be sent to provider</td>
+<td><em>Optional</em>. Pass <em>True</em> if the user&#39;s phone number should be sent to the provider. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>send_email_to_provider</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if the user&#39;s email address should be sent to provider</td>
+<td><em>Optional</em>. Pass <em>True</em> if the user&#39;s email address should be sent to the provider. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>is_flexible</td>
 <td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if the final price depends on the shipping method</td>
+<td><em>Optional</em>. Pass <em>True</em> if the final price depends on the shipping method. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -12132,26 +12333,26 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>provider_token</td>
 <td>String</td>
-<td>Yes</td>
-<td>Payment provider token, obtained via <a href="https://t.me/botfather">@BotFather</a></td>
+<td>Optional</td>
+<td>Payment provider token, obtained via <a href="https://t.me/botfather">@BotFather</a>. Pass an empty string for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>currency</td>
 <td>String</td>
 <td>Yes</td>
-<td>Three-letter ISO 4217 currency code, see <a href="/bots/payments#supported-currencies">more on currencies</a></td>
+<td>Three-letter ISO 4217 currency code, see <a href="/bots/payments#supported-currencies">more on currencies</a>. Pass “XTR” for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>prices</td>
 <td>Array of <a href="#labeledprice">LabeledPrice</a></td>
 <td>Yes</td>
-<td>Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)</td>
+<td>Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.). Must contain exactly one item for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>max_tip_amount</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0</td>
+<td>The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>suggested_tip_amounts</td>
@@ -12199,43 +12400,43 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>need_name</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if you require the user&#39;s full name to complete the order</td>
+<td>Pass <em>True</em> if you require the user&#39;s full name to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>need_phone_number</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if you require the user&#39;s phone number to complete the order</td>
+<td>Pass <em>True</em> if you require the user&#39;s phone number to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>need_email</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if you require the user&#39;s email address to complete the order</td>
+<td>Pass <em>True</em> if you require the user&#39;s email address to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>need_shipping_address</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if you require the user&#39;s shipping address to complete the order</td>
+<td>Pass <em>True</em> if you require the user&#39;s shipping address to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>send_phone_number_to_provider</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the user&#39;s phone number should be sent to provider</td>
+<td>Pass <em>True</em> if the user&#39;s phone number should be sent to the provider. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>send_email_to_provider</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the user&#39;s email address should be sent to provider</td>
+<td>Pass <em>True</em> if the user&#39;s email address should be sent to the provider. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>is_flexible</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the final price depends on the shipping method</td>
+<td>Pass <em>True</em> if the final price depends on the shipping method. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>disable_notification</td>
@@ -12248,6 +12449,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -12296,26 +12503,26 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>provider_token</td>
 <td>String</td>
-<td>Yes</td>
-<td>Payment provider token, obtained via <a href="https://t.me/botfather">BotFather</a></td>
+<td>Optional</td>
+<td>Payment provider token, obtained via <a href="https://t.me/botfather">@BotFather</a>. Pass an empty string for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>currency</td>
 <td>String</td>
 <td>Yes</td>
-<td>Three-letter ISO 4217 currency code, see <a href="/bots/payments#supported-currencies">more on currencies</a></td>
+<td>Three-letter ISO 4217 currency code, see <a href="/bots/payments#supported-currencies">more on currencies</a>. Pass “XTR” for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>prices</td>
 <td>Array of <a href="#labeledprice">LabeledPrice</a></td>
 <td>Yes</td>
-<td>Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)</td>
+<td>Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.). Must contain exactly one item for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>max_tip_amount</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0</td>
+<td>The maximum accepted amount for tips in the <em>smallest units</em> of the currency (integer, <strong>not</strong> float/double). For example, for a maximum tip of <code>US$ 1.45</code> pass <code>max_tip_amount = 145</code>. See the <em>exp</em> parameter in <a href="/bots/payments/currencies.json">currencies.json</a>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0. Not supported for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>suggested_tip_amounts</td>
@@ -12357,43 +12564,43 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>need_name</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if you require the user&#39;s full name to complete the order</td>
+<td>Pass <em>True</em> if you require the user&#39;s full name to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>need_phone_number</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if you require the user&#39;s phone number to complete the order</td>
+<td>Pass <em>True</em> if you require the user&#39;s phone number to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>need_email</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if you require the user&#39;s email address to complete the order</td>
+<td>Pass <em>True</em> if you require the user&#39;s email address to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>need_shipping_address</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if you require the user&#39;s shipping address to complete the order</td>
+<td>Pass <em>True</em> if you require the user&#39;s shipping address to complete the order. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>send_phone_number_to_provider</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the user&#39;s phone number should be sent to the provider</td>
+<td>Pass <em>True</em> if the user&#39;s phone number should be sent to the provider. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>send_email_to_provider</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the user&#39;s email address should be sent to the provider</td>
+<td>Pass <em>True</em> if the user&#39;s email address should be sent to the provider. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td>is_flexible</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> if the final price depends on the shipping method</td>
+<td>Pass <em>True</em> if the final price depends on the shipping method. Ignored for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -12467,6 +12674,32 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="refundstarpayment" href="#refundstarpayment"><i class="anchor-icon"></i></a>refundStarPayment</h4>
+<p>Refunds a successful payment in <a href="https://t.me/BotNews/90">Telegram Stars</a>. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Identifier of the user whose payment will be refunded</td>
+</tr>
+<tr>
+<td>telegram_payment_charge_id</td>
+<td>String</td>
+<td>Yes</td>
+<td>Telegram payment identifier</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="labeledprice" href="#labeledprice"><i class="anchor-icon"></i></a>LabeledPrice</h4>
 <p>This object represents a portion of the price for goods or services.</p>
 <table class="table">
@@ -12519,7 +12752,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>currency</td>
 <td>String</td>
-<td>Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code</td>
+<td>Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code, or “XTR” for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a></td>
 </tr>
 <tr>
 <td>total_amount</td>
@@ -12646,7 +12879,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>currency</td>
 <td>String</td>
-<td>Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code</td>
+<td>Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code, or “XTR” for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a></td>
 </tr>
 <tr>
 <td>total_amount</td>
@@ -12737,7 +12970,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>currency</td>
 <td>String</td>
-<td>Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code</td>
+<td>Three-letter ISO 4217 <a href="/bots/payments#supported-currencies">currency</a> code, or “XTR” for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a></td>
 </tr>
 <tr>
 <td>total_amount</td>
@@ -13312,6 +13545,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
