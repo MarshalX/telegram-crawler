@@ -2762,25 +2762,50 @@ var ReviewAds = {
     var ad_id    = $ad.attr('data-ad-id');
     var $buttons = $ad.find('.pr-btn');
 
+    var method, params = {};
+    var $similar_wrap = $(this).parents('.js-review-similar-wrap');
+    if ($similar_wrap.size()) {
+      var ads_list = [];
+      $('.js-review-item', $similar_wrap).each(function() {
+        var owner_id = $(this).attr('data-owner-id');
+        var ad_id    = $(this).attr('data-ad-id');
+        ads_list.push(owner_id + '/' + ad_id);
+      });
+      method = 'approveAds';
+      params.ads = ads_list.join(';');
+      params.similar_hash = $similar_wrap.attr('data-similar-hash');
+    } else {
+      method = 'approveAd';
+      params.owner_id = owner_id;
+      params.ad_id = ad_id;
+    }
+
     if ($buttons.prop('disabled')) {
       return false;
     }
     $buttons.prop('disabled', true);
-    Aj.apiRequest('approveAd', {
-      owner_id: owner_id,
-      ad_id: ad_id
-    }, function(result) {
+    Aj.apiRequest(method, params, function(result) {
       $buttons.prop('disabled', false);
       if (result.error) {
         return showAlert(result.error);
       }
-      if (result.status_html) {
-        $ad.find('.js-review-ad-status').html(result.status_html);
+      if (result.similar_status_html) {
+        $ad.find('.js-review-similar-status').html(result.similar_status_html);
+        ReviewAds.updateSimilarAds($ad, '', '');
+        $ad.scrollIntoView();
+      } else {
+        if (result.status_html) {
+          $ad.find('.js-review-ad-status').html(result.status_html);
+        }
+        if (result.buttons_html) {
+          $ad.find('.js-review-buttons').html(result.buttons_html);
+        }
+        $ad.find('.js-review-similar-status').html('');
+        if (result.similar_html) {
+          ReviewAds.updateSimilarAds($ad, result.similar_html, result.similar_hash);
+        }
+        $ad.find('.js-reports-badge').hide();
       }
-      if (result.buttons_html) {
-        $ad.find('.js-review-buttons').html(result.buttons_html);
-      }
-      $ad.find('.js-reports-badge').hide();
     });
     return false;
   },
@@ -2792,28 +2817,64 @@ var ReviewAds = {
     var $buttons  = $ad.find('.pr-btn');
     var reason_id = $(this).attr('data-reason-id');
 
+    var method, params = {
+      reason_id: reason_id
+    };
+    var $similar_wrap = $(this).parents('.js-review-similar-wrap');
+    if ($similar_wrap.size()) {
+      var ads_list = [];
+      $('.js-review-item', $similar_wrap).each(function() {
+        var owner_id = $(this).attr('data-owner-id');
+        var ad_id    = $(this).attr('data-ad-id');
+        ads_list.push(owner_id + '/' + ad_id);
+      });
+      method = 'declineAds';
+      params.ads = ads_list.join(';');
+      params.similar_hash = $similar_wrap.attr('data-similar-hash');
+    } else {
+      method = 'declineAd';
+      params.owner_id = owner_id;
+      params.ad_id = ad_id;
+    }
+
     if ($buttons.prop('disabled')) {
       return false;
     }
     $buttons.prop('disabled', true);
-    Aj.apiRequest('declineAd', {
-      owner_id: owner_id,
-      ad_id: ad_id,
-      reason_id: reason_id
-    }, function(result) {
+    Aj.apiRequest(method, params, function(result) {
       $buttons.prop('disabled', false);
       if (result.error) {
         return showAlert(result.error);
       }
-      if (result.status_html) {
-        $ad.find('.js-review-ad-status').html(result.status_html);
+      if (result.similar_status_html) {
+        $ad.find('.js-review-similar-status').html(result.similar_status_html);
+        ReviewAds.updateSimilarAds($ad, '', '');
+        $ad.scrollIntoView();
+      } else {
+        if (result.status_html) {
+          $ad.find('.js-review-ad-status').html(result.status_html);
+        }
+        if (result.buttons_html) {
+          $ad.find('.js-review-buttons').html(result.buttons_html);
+        }
+        $ad.find('.js-review-similar-status').html('');
+        if (result.similar_html) {
+          ReviewAds.updateSimilarAds($ad, result.similar_html, result.similar_hash);
+        }
+        $ad.find('.js-reports-badge').hide();
       }
-      if (result.buttons_html) {
-        $ad.find('.js-review-buttons').html(result.buttons_html);
-      }
-      $ad.find('.js-reports-badge').hide();
     });
     return false;
+  },
+  updateSimilarAds: function($ad, similar_html, similar_hash) {
+    var cont = Aj.ajContainer;
+    var $similar_wrap = $ad.find('.js-review-similar-wrap');
+    $similar_wrap.html(similar_html).attr('data-similar-hash', similar_hash);
+    $('.js-review-item', $similar_wrap).each(function() {
+      var owner_id = $(this).attr('data-owner-id');
+      var ad_id    = $(this).attr('data-ad-id');
+      $('.js-review-list > .js-review-item[data-owner-id="' + owner_id + '"][data-ad-id="' + ad_id + '"]', cont).remove();
+    });
   },
   eTranslateAd: function(e) {
     e.preventDefault();
