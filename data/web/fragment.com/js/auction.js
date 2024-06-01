@@ -1463,13 +1463,14 @@ var Random = {
 var LoginCodes = {
   init: function() {
     Aj.onLoad(function(state) {
-      $('.js-toggle-receive').on('change', LoginCodes.eToggleReceive);
+      var cont = Aj.ajContainer;
+      $(cont).on('change.curPage', '.js-toggle-receive', LoginCodes.eToggleReceive);
+      $(cont).on('click.curPage', '.js-terminate-sessions-btn', LoginCodes.eTerminateSessions);
       state.needUpdate = true;
       state.updLastReq = +Date.now();
       state.updStateTo = setTimeout(LoginCodes.updateState, Main.UPDATE_PERIOD);
     });
     Aj.onUnload(function(state) {
-      $('.js-toggle-receive').off('change', LoginCodes.eToggleReceive);
       clearTimeout(state.updStateTo);
       state.needUpdate = false;
     });
@@ -1507,6 +1508,29 @@ var LoginCodes = {
     Aj.apiRequest('toggleLoginCodes', {
       number: Aj.state.number,
       can_receive: can_receive ? 1 : 0
+    });
+  },
+  eTerminateSessions: function(e) {
+    e.preventDefault();
+    LoginCodes.terminateSessions();
+  },
+  terminateSessions: function(terminate_hash) {
+    Aj.apiRequest('terminatePhoneSessions', {
+      number: Aj.state.number,
+      terminate_hash: terminate_hash
+    }, function(result) {
+      if (result.error) {
+        return showAlert(result.error);
+      } else if (result.terminate_hash) {
+        showConfirm(result.confirm_message, function() {
+          LoginCodes.terminateSessions(result.terminate_hash);
+        }, result.confirm_button);
+      } else {
+        $('.js-terminate-sessions-wrap').hide();
+        if (result.msg) {
+          showAlert(result.msg);
+        }
+      }
     });
   }
 };
