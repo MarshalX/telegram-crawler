@@ -2,7 +2,9 @@ import asyncio
 import logging
 import os
 import re
+from asyncio import Queue
 from asyncio.exceptions import TimeoutError
+from functools import cache
 from html import unescape
 from time import time
 from typing import Set
@@ -10,6 +12,7 @@ from urllib.parse import unquote
 
 import aiohttp
 from aiohttp import ClientConnectorError, ServerDisconnectedError
+
 
 PROTOCOL = 'https://'
 BASE_URL = 'telegram.org'
@@ -21,11 +24,12 @@ HIDDEN_URLS = {
     'corefork.telegram.org/getProxyConfig',
 
     'telegram.org/privacy/gmailbot',
-    'telegram.org/tos',
     'telegram.org/tos/mini-apps',
     'telegram.org/tos/p2pl',
     'telegram.org/tour',
     'telegram.org/evolution',
+    'telegram.org/tos/bots',
+    'telegram.org/tos/business',
 
     'desktop.telegram.org/changelog',
     'td.telegram.org/current',
@@ -133,6 +137,8 @@ CRAWL_RULES = {
             r'apps$',
             r'img/emoji/.+',
             r'img/StickerExample.psd$',
+            r'/privacy$',  # geolocation depended
+            r'/tos$',  # geolocation depended
         },
     },
     'webz.telegram.org': {
@@ -180,7 +186,7 @@ HEADERS = {
     'TE': 'trailers',
 }
 
-logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s  %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 VISITED_LINKS = set()
@@ -188,7 +194,11 @@ LINKS_TO_TRACK = set()
 LINKS_TO_TRANSLATIONS = set()
 LINKS_TO_TRACKABLE_RESOURCES = set()
 
+WORKERS_COUNT = 30
+WORKERS_TASK_QUEUE = Queue()
 
+
+@cache
 def should_exclude(url: str) -> bool:
     direct_link = re.findall(DIRECT_LINK_REGEX, url)[0]
     domain_rules = CRAWL_RULES.get(direct_link)
@@ -209,6 +219,9 @@ def should_exclude(url: str) -> bool:
         if re.search(regex, url):
             exclude = False
             break
+
+    if exclude:
+        logger.debug('Exclude %s by rules', url)
 
     return exclude
 
@@ -254,7 +267,7 @@ def find_relative_scripts(code: str, cur_link: str) -> Set[str]:
         # dirty magic for specific cases
         if '/' in link:    # path to file from the root
             url = f'{direct_cur_link}/{link}'
-        else:   # its relative link from current folder. Not from the root
+        else:   # it is a relative link from the current folder. not from the root
             current_folder_link, *_ = cur_link.rsplit('/', 1)
             url = f'{current_folder_link}/{link}'
 
@@ -341,17 +354,18 @@ class ServerSideError(Exception):
     pass
 
 
-async def crawl(url: str, session: aiohttp.ClientSession):
-    while True:
+async def crawl_worker(session: aiohttp.ClientSession):
+    while not WORKERS_TASK_QUEUE.empty():
+        url = WORKERS_TASK_QUEUE.get_nowait()
+
         try:
             await _crawl(url, session)
         except (ServerSideError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
             logger.warning(f'Client or timeout error. Retrying {url}')
 
+            WORKERS_TASK_QUEUE.put_nowait(url)
             if url in VISITED_LINKS:
                 VISITED_LINKS.remove(url)
-        else:
-            break
 
 
 async def _crawl(url: str, session: aiohttp.ClientSession):
@@ -360,7 +374,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
     VISITED_LINKS.add(url)
 
     try:
-        logger.info(f'[{len(VISITED_LINKS)}] Process {url}')
+        logger.debug('[%s] Process %s', len(VISITED_LINKS), url)
         async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
             content_type = response.headers.get('content-type')
 
@@ -372,20 +386,20 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
             if response.status not in {200, 304}:
                 if response.status != 302:
                     content = await response.text(encoding='UTF-8')
-                    logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
+                    logger.warning(f'Skip {url} because status code == {response.status}. Content: {content}')
                 return
 
             if is_textable_content_type(content_type):
-                # raw content will be cached by aiohttp. Don't worry about it
+                # aiohttp will cache raw content. we don't worry about it
                 raw_content = await response.read()
                 content = await response.text(encoding='UTF-8')
 
                 if is_translation_url(url):
                     LINKS_TO_TRANSLATIONS.add(url)
-                    logger.info(f'add {url} to LINKS_TO_TRANSLATIONS')
+                    logger.debug('Add %s to LINKS_TO_TRANSLATIONS', url)
                 else:
                     LINKS_TO_TRACK.add(url)
-                    logger.info(f'add {url} to LINKS_TO_TRACK')
+                    logger.debug('Add %s to LINKS_TO_TRACK', url)
 
                 absolute_links = cleanup_links(find_absolute_links(content))
 
@@ -396,33 +410,40 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
                 relative_links = cleanup_links(relative_links_finder(content, url))
 
                 sub_links = absolute_links | relative_links
-                await asyncio.gather(*[crawl(url, session) for url in sub_links])
+                for sub_url in sub_links:
+                    if sub_url not in VISITED_LINKS:
+                        WORKERS_TASK_QUEUE.put_nowait(sub_url)
             elif is_trackable_content_type(content_type):
                 LINKS_TO_TRACKABLE_RESOURCES.add(url)
-                logger.info(f'add {url} to LINKS_TO_TRACKABLE_RESOURCES')
+                logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES', url)
             else:
                 # for example, zip with update of macOS client
-                logger.info(f'Unhandled type: {content_type} from {url}')
+                logger.warning(f'Unhandled type: {content_type} from {url}')
 
-            # telegram url can work with and without trailing slash (no redirect). P.S. not on every subdomain ;d
-            # so this is a problem when we have random behavior with link will be added
-            # this if resolve this issue. If available both link we prefer without trailing slash
+            # telegram url can work with and without a trailing slash (no redirect).
+            # note: not on every subdomain ;d
+            # so this is a problem when we have random behavior with a link will be added
+            # this if resolve this issue.
+            # if available both links, we prefer without a trailing slash
             for links_set in (LINKS_TO_TRACK, LINKS_TO_TRANSLATIONS, LINKS_TO_TRACKABLE_RESOURCES):
                 without_trailing_slash = url[:-1:] if url.endswith('/') else url
                 if without_trailing_slash in links_set and f'{without_trailing_slash}/' in links_set:
                     links_set.remove(f'{without_trailing_slash}/')
-                    logger.info(f'remove {without_trailing_slash}/')
+                    logger.debug('Remove %s/', without_trailing_slash)
     except UnicodeDecodeError:
         logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
 
         if raw_content.startswith(b'GIF'):
             LINKS_TO_TRACKABLE_RESOURCES.add(url)
-            logger.info(f'add {url} to LINKS_TO_TRACKABLE_RESOURCES (raw content)')
+            logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES (raw content)', url)
 
 
 async def start(url_list: Set[str]):
+    for url in url_list:
+        WORKERS_TASK_QUEUE.put_nowait(url)
+
     async with aiohttp.ClientSession(connector=CONNECTOR, headers=HEADERS) as session:
-        await asyncio.gather(*[crawl(url, session) for url in url_list])
+        await asyncio.gather(*[crawl_worker(session) for _ in range(WORKERS_COUNT)])
 
 
 if __name__ == '__main__':
@@ -443,8 +464,8 @@ if __name__ == '__main__':
         CURRENT_URL_LIST = LINKS_TO_TRACK | LINKS_TO_TRACKABLE_RESOURCES | LINKS_TO_TRANSLATIONS
 
         logger.info(f'Is equal: {OLD_URL_LIST == CURRENT_URL_LIST}')
-        logger.info(f'Deleted: {OLD_URL_LIST - CURRENT_URL_LIST}')
-        logger.info(f'Added: {CURRENT_URL_LIST - OLD_URL_LIST}')
+        logger.info(f'Deleted ({len(OLD_URL_LIST - CURRENT_URL_LIST)}): {OLD_URL_LIST - CURRENT_URL_LIST}')
+        logger.info(f'Added ({len(CURRENT_URL_LIST - OLD_URL_LIST)}): {CURRENT_URL_LIST - OLD_URL_LIST}')
     except IOError:
         pass
 
