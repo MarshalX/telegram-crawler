@@ -167,48 +167,50 @@ function formatNumber(number, decimals, decPoint, thousandsSep) {
   return s.join(dec)
 }
 
-function statsFormatAxisAmountTpl(tpl, value) {
-  if (value % 1000000 > 0) {
-    var decimals = 2;
-    while (value % Math.pow(10, 6 - decimals)) {
+function statsFormatAxisAmountTpl(tpl, factor, value, decimals) {
+  if (value % factor > 0) {
+    decimals = decimals || 0;
+    var max_decimals = Math.log10(factor);
+    while (value % Math.pow(10, max_decimals - decimals)) {
       decimals++;
       if (decimals >= 3) break;
     }
-    value = formatNumber(value / 1000000, decimals, '.', ',');
+    value = formatNumber(value / factor, decimals, '.', ',');
   } else {
-    value = statsFormatKMBT(value / 1000000);
+    value = statsFormatKMBT(value / factor);
   }
   return tpl.replace('{value}', value);
 }
 
-function statsFormatAxisAmountFn(tpl) {
+function statsFormatAxisAmountFn(tpl, factor, decimals) {
   return function(value) {
-    return statsFormatAxisAmountTpl(tpl, value);
+    return statsFormatAxisAmountTpl(tpl, factor, value, decimals || 0);
   };
 }
 
 function statsFormatAxisAmount(value) {
-  return statsFormatAxisAmountTpl('€ {value}', value);
+  return statsFormatAxisAmountTpl('€ {value}', 1000000, value, 2);
 }
 
-function statsFormatAmountTpl(tpl, value) {
-  var decimals = 2;
-  while (value % Math.pow(10, 6 - decimals) &&
-         value < Math.pow(10, 10 - decimals)) {
+function statsFormatAmountTpl(tpl, factor, value, decimals) {
+  decimals = decimals || 0;
+  var max_decimals = Math.log10(factor);
+  while (value % Math.pow(10, max_decimals - decimals) &&
+         value < Math.pow(10, max_decimals + 4 - decimals)) {
     decimals++;
   }
-  value = formatNumber(value / 1000000, decimals, '.', ',');
+  value = formatNumber(value / factor, decimals, '.', ',');
   return tpl.replace('{value}', value);
 }
 
-function statsFormatAmountFn(tpl) {
+function statsFormatAmountFn(tpl, factor, decimals) {
   return function(value) {
-    return statsFormatAmountTpl(tpl, value);
+    return statsFormatAmountTpl(tpl, factor, value, decimals || 0);
   };
 }
 
 function statsFormatAmount(value) {
-  return statsFormatAmountTpl('€ {value}', value);
+  return statsFormatAmountTpl('€ {value}', 1000000, value, 2);
 }
 
 function statsFormat5min(time) {

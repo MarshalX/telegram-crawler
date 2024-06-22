@@ -76,14 +76,21 @@ var Ads = {
     if (m < 10) m = '0' + m;
     return date_value + 'T' + time_value + (tz_offset ? (is_pos ? '+' : '-') + h + m : 'Z');
   },
+  ownerCurrencyDecimals: function() {
+    if (typeof Aj.state.ownerCurrencyDecimals === 'undefined') {
+      return 2;
+    }
+    return Aj.state.ownerCurrencyDecimals;
+  },
   wrapAmount: function(value, no_currency, field_format) {
-    var amount_str = formatNumber(value, 2, '.', field_format ? '' : ',');
+    var decimals = Ads.ownerCurrencyDecimals();
+    var amount_str = formatNumber(value, decimals, '.', field_format ? '' : ',');
     if (no_currency) {
       return amount_str;
     }
     var currency_str = Aj.state.ownerCurrency || '<span class="amount-currency currency-euro">€</span>';
     var parts = amount_str.split('.');
-    amount_str = parts[0] + (parts[1].length ? '<span class="amount-frac">.' + parts[1] + '</span>' : '');
+    amount_str = parts[0] + (parts.length > 1 && parts[1].length ? '<span class="amount-frac">.' + parts[1] + '</span>' : '');
     return currency_str + amount_str;
   },
   wrapEurAmount: function(value, field_format) {
@@ -96,6 +103,7 @@ var Ads = {
     var minValue = $fieldEl.attr('data-min') || null;
     var maxValue = $fieldEl.attr('data-max') || null;
     var decPoint = $fieldEl.attr('data-dec-point') || '.';
+    var decimals = $fieldEl.attr('data-decimals') || Ads.ownerCurrencyDecimals();
     var value    = $fieldEl.value();
 
     var float_value = value.length ? value : '0';
@@ -131,7 +139,7 @@ var Ads = {
     var minValue = $fieldEl.attr('data-min') || null;
     var maxValue = $fieldEl.attr('data-max') || null;
     var decPoint = $fieldEl.attr('data-dec-point') || '.';
-    var decimals = $fieldEl.attr('data-decimals') || 2;
+    var decimals = $fieldEl.attr('data-decimals') || Ads.ownerCurrencyDecimals();
     var sel_dir   = this.selectionDirection;
     var sel_start = this.selectionStart;
     var sel_end   = this.selectionEnd;
@@ -144,7 +152,7 @@ var Ads = {
     var decimal_len = 0;
     for (var i = 0; i < value.length; i++) {
       var char = value[i];
-      if ((char == '.' || char == ',') && !has_decimal) {
+      if ((char == '.' || char == ',') && !has_decimal && decimals > 0) {
         if (!chars_len) {
           new_value += '0';
           if (i < sel_start) new_sel_start++;
@@ -152,7 +160,7 @@ var Ads = {
         }
         has_decimal = true;
         new_value += decPoint;
-      } else if (char >= '0' && char <= '9' && decimal_len < decimals) {
+      } else if (char >= '0' && char <= '9' && (!has_decimal || decimal_len < decimals)) {
         new_value += char;
         if (has_decimal) decimal_len++;
         else chars_len++;
@@ -1104,11 +1112,13 @@ var NewAd = {
       closeByClickOutside: '.popup-no-close',
       onOpen: function() {
         var $list = $('.js-similar-channels-list', this);
+        var $empty = $('.js-similar-channels-empty', this);
         var $loading = $('.js-similar-channels-loading', this);
         var $button = $('.js-add-similar-channels', this);
         $list.on('scroll', NewAd.onSimiralChannelsScroll);
         $list.on('change', 'input.checkbox', NewAd.eSimiralChannelChange);
         $button.on('click', NewAd.eAddSimiralChannels);
+        $empty.addClass('hide');
         $button.addClass('hide');
         $loading.removeClass('hide');
         $list.html('').trigger('scroll').data('channels', {}).addClass('hide');
@@ -1120,15 +1130,17 @@ var NewAd = {
             return false;
           }
           if (result.channels) {
-            $button.removeClass('hide');
             var html = '', channel_items = {};
             for (var i = 0; i < result.channels.length; i++) {
               var item = result.channels[i];
               html += item.cb_item;
               channel_items['ch' + item.id] = item;
             }
+            var has_items = channel_items > 0;
+            $empty.toggleClass('hide', has_items);
+            $button.toggleClass('hide', !has_items);
             $loading.addClass('hide');
-            $list.html(html).data('channel_items', channel_items).removeClass('hide').trigger('scroll');
+            $list.html(html).data('channel_items', channel_items).toggleClass('hide', !has_items).trigger('scroll');
             NewAd.updateSimiralChannelButton();
           }
         });
@@ -2464,6 +2476,70 @@ var Account = {
       }
     });
     return false;
+  },
+  initAddStarsPopup: function() {
+    var cont = Aj.layer;
+    Aj.onLayerLoad(function(layerState) {
+      layerState.$form = $('.pr-popup-edit-form', cont);
+      Ads.formInit(layerState.$form);
+      layerState.amountField = layerState.$form.field('amount');
+      Aj.layer.one('popup:open', function() {
+        layerState.amountField.focusAndSelect(true);
+      });
+      layerState.$form.on('submit', Account.eSubmitAddStarsPopupForm);
+      cont.on('click.curLayer', '.submit-form-btn', Account.eSubmitAddStarsPopupForm);
+    });
+    Aj.onLayerUnload(function(layerState) {
+      Ads.formDestroy(layerState.$form);
+      layerState.$form.off('submit', Account.eSubmitAddStarsPopupForm);
+      clearTimeout(Aj.layerState.addStarsTo);
+    });
+  },
+  eSubmitAddStarsPopupForm: function(e) {
+    e.preventDefault();
+    var $form    = Aj.layerState.$form;
+    var owner_id = $form.field('owner_id').value();
+    var amount   = Ads.amountFieldValue($form, 'amount');
+
+    if ($form.data('disabled')) {
+      return false;
+    }
+    if (amount === false) {
+      $form.field('amount').focus();
+      return false;
+    }
+    var params = {
+      owner_id: owner_id,
+      amount:   amount
+    };
+    var onSuccess = function(result) {
+      $form.data('disabled', false);
+      if (result.error) {
+        if (result.field) {
+          var $field = $form.field(result.field);
+          if ($field.size()) {
+            Ads.showFieldError($field, result.error, true);
+            return false;
+          }
+        }
+        return showAlert(result.error);
+      }
+      if (result.request_id) {
+        $form.data('disabled', true);
+        Aj.layerState.addStarsTo = setTimeout(function() {
+          params.request_id = result.request_id;
+          Aj.apiRequest('incrStarsBudget', params, onSuccess);
+        }, 400);
+      } else {
+        closePopup(Aj.layer);
+        if (result.redirect_to) {
+          Aj.location(result.redirect_to);
+        }
+      }
+    };
+    $form.data('disabled', true);
+    Aj.apiRequest('incrStarsBudget', params, onSuccess);
+    return false;
   }
 };
 
@@ -3311,6 +3387,9 @@ var EditAd = {
       if (result.ad) {
         OwnerAds.updateAd(result.ad);
       }
+      if (result.header_owner_budget) {
+        $('.js-header_owner_budget').html(result.header_owner_budget);
+      }
       if (result.owner_budget) {
         $('.js-owner_budget').html(result.owner_budget);
       }
@@ -3569,6 +3648,9 @@ var EditAd = {
         return showAlert(result.error);
       }
       Aj.state.$form.reset();
+      if (result.header_owner_budget) {
+        $('.js-header_owner_budget').html(result.header_owner_budget);
+      }
       if (result.owner_budget) {
         $('.js-owner_budget').html(result.owner_budget);
       }
