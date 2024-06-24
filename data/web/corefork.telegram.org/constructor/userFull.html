@@ -129,12 +129,12 @@
 <tr>
 <td><strong>contact_require_premium</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.29?<a href="/constructor/true">true</a></td>
-<td>If set, we can only write to this user if we are subscribed to <a href="/api/premium">Telegram Premium</a>, or if they're a mutual contact (<a href="/constructor/user">user</a>.<code>mutual_contact</code>). <br>To set this flag for ourselves invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a>, setting the <code>settings.new_noncontact_peers_require_premium</code> flag.</td>
+<td>If set, we can only write to this user if we already have a private chat with them, if we are subscribed to <a href="/api/premium">Telegram Premium</a>, or if they're a mutual contact (<a href="/constructor/user">user</a>.<code>mutual_contact</code>).  <br>All the secondary conditions listed above must be checked separately to verify whether we can still write to the user, even if this flag is set (i.e. a mutual contact will have this flag set even if we can still write to them, and so on...). <br>To set this flag for ourselves invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a>, setting the <code>settings.new_noncontact_peers_require_premium</code> flag.</td>
 </tr>
 <tr>
 <td><strong>read_dates_private</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.30?<a href="/constructor/true">true</a></td>
-<td>If set, users that cannot see our exact last online date due to the current value of the <a href="/constructor/inputPrivacyKeyStatusTimestamp">inputPrivacyKeyStatusTimestamp</a> key will receive a <code>403</code>  <code>USER_PRIVACY_RESTRICTED</code> error when invoking <a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a> to fetch the exact read date of one of their messages.  <br>To set this flag for ourselves invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a>, setting the <code>settings.hide_read_marks</code> flag.</td>
+<td>If set, we cannot fetch the exact read date of messages we send to this user using <a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a>. <br>To set this flag for ourselves invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a>, setting the <code>settings.hide_read_marks</code> flag.</td>
 </tr>
 <tr>
 <td><strong>flags2</strong></td>
@@ -304,8 +304,6 @@
 <p>Indicates info about a certain user</p>
 <h4><a class="anchor" href="#accountsetglobalprivacysettings" id="accountsetglobalprivacysettings" name="accountsetglobalprivacysettings"><i class="anchor-icon"></i></a><a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a></h4>
 <p>Set global privacy settings</p>
-<h4><a class="anchor" href="#inputprivacykeystatustimestamp" id="inputprivacykeystatustimestamp" name="inputprivacykeystatustimestamp"><i class="anchor-icon"></i></a><a href="/constructor/inputPrivacyKeyStatusTimestamp">inputPrivacyKeyStatusTimestamp</a></h4>
-<p>Whether people will be able to see your exact last online timestamp</p>
 <h4><a class="anchor" href="#messagesgetoutboxreaddate" id="messagesgetoutboxreaddate" name="messagesgetoutboxreaddate"><i class="anchor-icon"></i></a><a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a></h4>
 <h4><a class="anchor" href="#pinned-messages" id="pinned-messages" name="pinned-messages"><i class="anchor-icon"></i></a><a href="/api/pin">Pinned messages</a></h4>
 <p>Telegram allows pinning multiple messages on top of a specific chat.</p>
