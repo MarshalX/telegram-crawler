@@ -64,14 +64,14 @@
 <a href='/method/stories.editStory'>stories.editStory</a>#b583ba46 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> media:flags.0?<a href='/type/InputMedia'>InputMedia</a> media_areas:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:flags.1?<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; = <a href='/type/Updates'>Updates</a>;
 
 <a href='/method/stories.getChatsToSend'>stories.getChatsToSend</a>#a56a8b60 = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
-<p>Before posting a story, clients should invoke <a href="/method/stories.canSendStory">stories.canSendStory</a>, to make sure they can send stories to the specified <code>peer</code> (which can be <a href="/constructor/inputPeerSelf">inputPeerSelf</a> to send the story as a normal user and <a href="/constructor/inputPeerChannel">inputPeerChannel</a> to send a story as a channel).  </p>
-<p>Use <a href="/method/stories.getChatsToSend">stories.getChatsToSend</a> to obtain a list of channels where the user can post stories; <a href="/method/stories.canSendStory">stories.canSendStory</a> must still be used before uploading a story to make sure no other limit was reached, as described in the <a href="/api/stories#posting-stories">main documentation »</a>.
-Note that in order to obtain permission to post stories as a channel, it must be boosted, first, see <a href="/api/boost">here »</a> for more info.  </p>
+<p>Before posting a story, clients should invoke <a href="/method/stories.canSendStory">stories.canSendStory</a>, to make sure they can send stories to the specified <code>peer</code> (which can be <a href="/constructor/inputPeerSelf">inputPeerSelf</a> to send the story as a normal user and <a href="/constructor/inputPeerChannel">inputPeerChannel</a> to send a story as a channel or supergroup).  </p>
+<p>Use <a href="/method/stories.getChatsToSend">stories.getChatsToSend</a> to obtain a list of channels/supergroups where the user can post stories; <a href="/method/stories.canSendStory">stories.canSendStory</a> must still be used before uploading a story to make sure no other limit was reached, as described in the <a href="/api/stories#posting-stories">main documentation »</a>.
+Note that in order to obtain permission to post stories as a channel/supergroup, it must be boosted, first, see <a href="/api/boost">here »</a> for more info.  </p>
 <p><a href="/method/stories.canSendStory">stories.canSendStory</a> returns <a href="/constructor/boolTrue">boolTrue</a> only if:</p>
 <ul>
-<li>If we're trying to send a story as a channel:<ul>
-<li>The current user is an administrator of the channel and has <a href="/constructor/chatAdminRights"><code>post_stories</code> admin rights</a>; otherwise, a <code>CHAT_ADMIN_REQUIRED</code> error is returned.</li>
-<li>AND the channel has <a href="/api/boost">received enough boosts to post the story »</a>; otherwise, a <code>BOOSTS_REQUIRED</code> error is returned.</li>
+<li>If we're trying to send a story as a channel/supergroup:<ul>
+<li>The current user is an administrator of the channel/supergroup and has <a href="/constructor/chatAdminRights"><code>post_stories</code> admin rights</a>; otherwise, a <code>CHAT_ADMIN_REQUIRED</code> error is returned.</li>
+<li>AND the channel/supergroup has <a href="/api/boost">received enough boosts to post the story »</a>; otherwise, a <code>BOOSTS_REQUIRED</code> error is returned.</li>
 </ul>
 </li>
 <li>If we're trying to send a story as the current user:<ul>
@@ -147,7 +147,7 @@ Note that if any of the conditions changes in the period between the call to <a 
 
 <a href='/method/stories.getAllReadPeerStories'>stories.getAllReadPeerStories</a>#9b5ae7f9 = <a href='/type/Updates'>Updates</a>;
 <a href='/method/stories.getPeerMaxIDs'>stories.getPeerMaxIDs</a>#535983c3 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
-<p>Active stories of contacts, subscribed channels and the <a href="/api/config#stories-changelog-user-id">changelog user</a> should be shown in the action bar of the homescreen.<br>
+<p>Active stories of contacts, subscribed channels/supergroups and the <a href="/api/config#stories-changelog-user-id">changelog user</a> should be shown in the action bar of the homescreen.<br>
 Use <a href="/method/stories.getAllStories">stories.getAllStories</a> to fetch the full list of active stories. </p>
 <p>Optionally, the <code>hidden</code> flag can be set to fetch the <a href="#hiding-stories-of-other-users">hidden stories to be shown in the archived tab</a>, instead of the main story list.  </p>
 <p>Pagination using this method is a bit different from usual: a <code>state</code> string is used to maintain the pagination state.  </p>
@@ -213,16 +213,16 @@ When the stories of a user are marked as hidden, the <code>stories_hidden</code>
 
 <a href='/method/stories.getStoriesViews'>stories.getStoriesViews</a>#28e16cc8 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/stories.StoryViews'>stories.StoryViews</a>;</code></pre>
 <p>Use <a href="/method/stories.getStoryViewsList">stories.getStoryViewsList</a> to obtain the full list of users that have interacted with a specific story we posted as a user, returned as a list of <a href="/type/StoryView">StoryView</a> constructors; pass the returned <code>next_offset</code> (if present) to <code>offset</code> to paginate through the results; the full list is available at all times only to <a href="/api/premium">Premium</a> users, and will be deleted on stories posted by non-<a href="/api/premium">Premium</a> users <a href="/api/config#story-viewers-expire-period">story_viewers_expire_period »</a> seconds after the story expires; if it's still viewable, the <code>has_viewers</code> flag will be set.  </p>
-<p>The above method can only be used for stories posted by users, to fetch almost the exact same information for stories posted by channels, use <a href="/method/stories.getStoryReactionsList">stories.getStoryReactionsList</a>: the data returned by both methods is actually almost exactly the same, the only difference is that:</p>
+<p>The above method can only be used for stories posted by users, to fetch almost the exact same information for stories posted by channels/supergroups, use <a href="/method/stories.getStoryReactionsList">stories.getStoryReactionsList</a>: the data returned by both methods is actually almost exactly the same, the only difference is that:</p>
 <ul>
 <li><a href="/method/stories.getStoryViewsList">stories.getStoryViewsList</a> can only be used for stories posted by the current user and also contains view and <a href="/api/block">blocklist</a> information.  </li>
-<li><a href="/method/stories.getStoryReactionsList">stories.getStoryReactionsList</a> can only be used for stories posted by channels we're an admin of and does not contain view information</li>
+<li><a href="/method/stories.getStoryReactionsList">stories.getStoryReactionsList</a> can only be used for stories posted by channels/supergroups we're an admin of and does not contain view information</li>
 </ul>
 <p>For the rest, both methods return information about:</p>
 <ul>
 <li>Story reactions: <a href="/constructor/storyView">storyView</a>/<a href="/constructor/storyReaction">storyReaction</a></li>
 <li>Story forwards as a message to a public chat/channel: <a href="/constructor/storyViewPublicForward">storyViewPublicForward</a>/<a href="/constructor/storyReactionPublicForward">storyReactionPublicForward</a></li>
-<li>Story reposts (as a story to a public channel/user): <a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a>/<a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a></li>
+<li>Story reposts (as a story to a public channel/supergroup/user): <a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a>/<a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a></li>
 </ul>
 <p>Additionally, <a href="/method/stories.getStoriesViews">stories.getStoriesViews</a> can be used to obtain info about the view count, forward count, reactions and recent viewers list of one or more stories, using a single, unpaginated method call, obviously potentially returning less info than <a href="/method/stories.getStoryViewsList">stories.getStoryViewsList</a>.  </p>
 <h3><a class="anchor" href="#replying-to-stories" id="replying-to-stories" name="replying-to-stories"><i class="anchor-icon"></i></a>Replying to stories</h3>
