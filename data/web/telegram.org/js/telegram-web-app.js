@@ -1700,7 +1700,14 @@
     var url = a.href;
     options = options || {};
     if (versionAtLeast('6.1')) {
-      WebView.postEvent('web_app_open_link', false, {url: url, try_instant_view: versionAtLeast('6.4') && !!options.try_instant_view});
+      var params = {url: url};
+      if (versionAtLeast('6.4') && options.try_instant_view) {
+        params.try_instant_view = true;
+      }
+      if (versionAtLeast('7.6') && options.try_browser) {
+        params.try_browser = options.try_browser;
+      }
+      WebView.postEvent('web_app_open_link', false, params);
     } else {
       window.open(url, '_blank');
     }
