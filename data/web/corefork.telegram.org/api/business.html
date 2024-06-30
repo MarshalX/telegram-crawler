@@ -131,7 +131,7 @@ The timezone ID is contained <a href="/constructor/timezone">timezone</a>.<code>
 <p>Businesses may advertise their location using <a href="/method/account.updateBusinessLocation">account.updateBusinessLocation</a>; this information is then returned to users in <a href="/constructor/userFull">userFull</a>.<code>business_location</code>.  </p>
 <p>The method takes two parameters:</p>
 <ul>
-<li><code>address</code> - Mandatory when setting/updating the location, contains a textual description of the address (max 64 UTF-8 chars).</li>
+<li><code>address</code> - Mandatory when setting/updating the location, contains a textual description of the address (max 96 UTF-8 chars).</li>
 <li><code>geo_point</code> - Optional, contains a set of geographical coordinates.</li>
 </ul>
 <p>To remove business location information invoke the method without setting any of the parameters.  </p>
@@ -289,7 +289,32 @@ This will also emit an <a href="/constructor/updateDeleteQuickReply">updateDelet
 <p>Telegram Business allows to configure a set of "away" messages, automatically sent to users writing to us when we're offline, during closing hours, while we're on vacation, or in some other custom time period when we cannot immediately answer to the user.  </p>
 <p>Use <a href="/method/account.updateBusinessAwayMessage">account.updateBusinessAwayMessage</a> to set a (list of) away messages in <code>message</code>; to disable greetings, call the method without populating the <code>message</code> field.  </p>
 <p>If populated, the <code>message</code> field must contain a <a href="/constructor/inputBusinessAwayMessage">inputBusinessAwayMessage</a>, see <a href="/constructor/inputBusinessAwayMessage">the constructor page »</a> for a description of its contents.  </p>
-<p>The currently configured business away message can be fetched by the current user through <a href="/constructor/userFull">userFull</a>.<code>business_away_message</code>, represented by a <a href="/constructor/businessAwayMessage">businessAwayMessage constructor »</a>, equivalent to the input counterpart.</p></div>
+<p>The currently configured business away message can be fetched by the current user through <a href="/constructor/userFull">userFull</a>.<code>business_away_message</code>, represented by a <a href="/constructor/businessAwayMessage">businessAwayMessage constructor »</a>, equivalent to the input counterpart.  </p>
+<h3><a class="anchor" href="#connected-bots" id="connected-bots" name="connected-bots"><i class="anchor-icon"></i></a>Connected bots</h3>
+<pre><code><a href='/constructor/inputBusinessBotRecipients'>inputBusinessBotRecipients</a>#c4e5921e flags:<a href='/type/%23'>#</a> existing_chats:flags.0?<a href='/constructor/true'>true</a> new_chats:flags.1?<a href='/constructor/true'>true</a> contacts:flags.2?<a href='/constructor/true'>true</a> non_contacts:flags.3?<a href='/constructor/true'>true</a> exclude_selected:flags.5?<a href='/constructor/true'>true</a> users:flags.4?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; exclude_users:flags.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/InputBusinessBotRecipients'>InputBusinessBotRecipients</a>;
+
+<a href='/constructor/connectedBot'>connectedBot</a>#bd068601 flags:<a href='/type/%23'>#</a> can_reply:flags.0?<a href='/constructor/true'>true</a> bot_id:<a href='/type/long'>long</a> recipients:<a href='/type/BusinessBotRecipients'>BusinessBotRecipients</a> = <a href='/type/ConnectedBot'>ConnectedBot</a>;
+
+<a href='/constructor/account.connectedBots'>account.connectedBots</a>#17d7f87b connected_bots:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ConnectedBot'>ConnectedBot</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/account.ConnectedBots'>account.ConnectedBots</a>;
+
+<a href='/constructor/businessBotRecipients'>businessBotRecipients</a>#b88cf373 flags:<a href='/type/%23'>#</a> existing_chats:flags.0?<a href='/constructor/true'>true</a> new_chats:flags.1?<a href='/constructor/true'>true</a> contacts:flags.2?<a href='/constructor/true'>true</a> non_contacts:flags.3?<a href='/constructor/true'>true</a> exclude_selected:flags.5?<a href='/constructor/true'>true</a> users:flags.4?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; exclude_users:flags.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/BusinessBotRecipients'>BusinessBotRecipients</a>;
+
+<a href='/constructor/botBusinessConnection'>botBusinessConnection</a>#896433b4 flags:<a href='/type/%23'>#</a> can_reply:flags.0?<a href='/constructor/true'>true</a> disabled:flags.1?<a href='/constructor/true'>true</a> connection_id:<a href='/type/string'>string</a> user_id:<a href='/type/long'>long</a> dc_id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> = <a href='/type/BotBusinessConnection'>BotBusinessConnection</a>;
+
+<a href='/constructor/updateBotBusinessConnect'>updateBotBusinessConnect</a>#8ae5c97a connection:<a href='/type/BotBusinessConnection'>BotBusinessConnection</a> qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+<a href='/constructor/updateBotNewBusinessMessage'>updateBotNewBusinessMessage</a>#9ddb347c flags:<a href='/type/%23'>#</a> connection_id:<a href='/type/string'>string</a> message:<a href='/type/Message'>Message</a> reply_to_message:flags.0?<a href='/type/Message'>Message</a> qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+<a href='/constructor/updateBotEditBusinessMessage'>updateBotEditBusinessMessage</a>#7df587c flags:<a href='/type/%23'>#</a> connection_id:<a href='/type/string'>string</a> message:<a href='/type/Message'>Message</a> reply_to_message:flags.0?<a href='/type/Message'>Message</a> qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+<a href='/constructor/updateBotDeleteBusinessMessage'>updateBotDeleteBusinessMessage</a>#a02a982e connection_id:<a href='/type/string'>string</a> peer:<a href='/type/Peer'>Peer</a> messages:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+invokeWithBusinessConnection#dd289f8e {X:Type} connection_id:string query:!X = X;
+
+<a href='/method/account.updateConnectedBot'>account.updateConnectedBot</a>#43d8521d flags:<a href='/type/%23'>#</a> can_reply:flags.0?<a href='/constructor/true'>true</a> deleted:flags.1?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> recipients:<a href='/type/InputBusinessBotRecipients'>InputBusinessBotRecipients</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/account.getConnectedBots'>account.getConnectedBots</a>#4ea4c80f = <a href='/type/account.ConnectedBots'>account.ConnectedBots</a>;
+
+<a href='/method/account.toggleConnectedBotPaused'>account.toggleConnectedBotPaused</a>#646e1097 peer:<a href='/type/InputPeer'>InputPeer</a> paused:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/account.disablePeerConnectedBot'>account.disablePeerConnectedBot</a>#5e437ed9 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;</code></pre></div>
   
 </div>
           
