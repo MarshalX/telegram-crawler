@@ -1700,14 +1700,14 @@
     var url = a.href;
     options = options || {};
     if (versionAtLeast('6.1')) {
-      var params = {url: url};
+      var req_params = {url: url};
       if (versionAtLeast('6.4') && options.try_instant_view) {
-        params.try_instant_view = true;
+        req_params.try_instant_view = true;
       }
       if (versionAtLeast('7.6') && options.try_browser) {
-        params.try_browser = options.try_browser;
+        req_params.try_browser = options.try_browser;
       }
-      WebView.postEvent('web_app_open_link', false, params);
+      WebView.postEvent('web_app_open_link', false, req_params);
     } else {
       window.open(url, '_blank');
     }
@@ -1958,8 +1958,13 @@
   WebApp.expand = function () {
     WebView.postEvent('web_app_expand');
   };
-  WebApp.close = function () {
-    WebView.postEvent('web_app_close');
+  WebApp.close = function (options) {
+    options = options || {};
+    var req_params = {};
+    if (versionAtLeast('7.6') && options.return_back) {
+      req_params.return_back = true;
+    }
+    WebView.postEvent('web_app_close', false, req_params);
   };
 
   window.Telegram.WebApp = WebApp;
