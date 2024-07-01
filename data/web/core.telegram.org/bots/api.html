@@ -53,6 +53,20 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="july-1-2024" href="#july-1-2024"><i class="anchor-icon"></i></a>July 1, 2024</h4>
+<p><strong>Bot API 7.6</strong></p>
+<ul>
+<li>Added the classes <a href="#paidmedia">PaidMedia</a>, <a href="#paidmediainfo">PaidMediaInfo</a>, <a href="#paidmediapreview">PaidMediaPreview</a>, <a href="#paidmediaphoto">PaidMediaPhoto</a> and <a href="#paidmediavideo">PaidMediaVideo</a>, containing information about paid media.</li>
+<li>Added the method <a href="#sendpaidmedia">sendPaidMedia</a> and the classes <a href="#inputpaidmedia">InputPaidMedia</a>, <a href="#inputpaidmediaphoto">InputPaidMediaPhoto</a> and <a href="#inputpaidmediavideo">InputPaidMediaVideo</a>, to support sending paid media.</li>
+<li>Documented that the methods <a href="#copymessage">copyMessage</a> and <a href="#copymessages">copyMessages</a> cannot be used to copy paid media.</li>
+<li>Added the field <em>can_send_paid_media</em> to the class <a href="#chatfullinfo">ChatFullInfo</a>.</li>
+<li>Added the field <em>paid_media</em> to the classes <a href="#message">Message</a> and <a href="#externalreplyinfo">ExternalReplyInfo</a>.</li>
+<li>Added the class <a href="#transactionpartnertelegramads">TransactionPartnerTelegramAds</a>, containing information about Telegram Star transactions involving the Telegram Ads Platform.</li>
+<li>Added the field <em>invoice_payload</em> to the class <a href="#transactionpartneruser">TransactionPartnerUser</a>, containing the bot-specified invoice payload.</li>
+<li>Changed the default opening mode for <a href="/bots/webapps#direct-link-mini-apps">Direct Link Mini Apps</a>.</li>
+<li>Added support for launching Web Apps via <code>t.me</code> link in the class <a href="#menubuttonwebapp">MenuButtonWebApp</a>.</li>
+<li>Added the field <em>section_separator_color</em> to the class <a href="/bots/webapps#themeparams">ThemeParams</a>.</li>
+</ul>
 <h4><a class="anchor" name="june-18-2024" href="#june-18-2024"><i class="anchor-icon"></i></a>June 18, 2024</h4>
 <p><strong>Bot API 7.5</strong></p>
 <ul>
@@ -786,6 +800,11 @@ To learn how to create…">
 <td><em>Optional</em>. Default chat member permissions, for groups and supergroups</td>
 </tr>
 <tr>
+<td>can_send_paid_media</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if paid media messages can be sent or forwarded to the channel chat. The field is available only for channel chats.</td>
+</tr>
+<tr>
 <td>slow_mode_delay</td>
 <td>Integer</td>
 <td><em>Optional</em>. For supergroups, the minimum allowed delay between consecutive messages sent by each unprivileged user; in seconds</td>
@@ -1004,6 +1023,11 @@ To learn how to create…">
 <td><em>Optional</em>. Message is a general file, information about the file</td>
 </tr>
 <tr>
+<td>paid_media</td>
+<td><a href="#paidmediainfo">PaidMediaInfo</a></td>
+<td><em>Optional</em>. Message contains paid media; information about the paid media</td>
+</tr>
+<tr>
 <td>photo</td>
 <td>Array of <a href="#photosize">PhotoSize</a></td>
 <td><em>Optional</em>. Message is a photo, available sizes of the photo</td>
@@ -1036,7 +1060,7 @@ To learn how to create…">
 <tr>
 <td>caption</td>
 <td>String</td>
-<td><em>Optional</em>. Caption for the animation, audio, document, photo, video or voice</td>
+<td><em>Optional</em>. Caption for the animation, audio, document, paid media, photo, video or voice</td>
 </tr>
 <tr>
 <td>caption_entities</td>
@@ -1455,6 +1479,11 @@ To learn how to create…">
 <td><em>Optional</em>. Message is a general file, information about the file</td>
 </tr>
 <tr>
+<td>paid_media</td>
+<td><a href="#paidmediainfo">PaidMediaInfo</a></td>
+<td><em>Optional</em>. Message contains paid media; information about the paid media</td>
+</tr>
+<tr>
 <td>photo</td>
 <td>Array of <a href="#photosize">PhotoSize</a></td>
 <td><em>Optional</em>. Message is a photo, available sizes of the photo</td>
@@ -1781,32 +1810,32 @@ To learn how to create…">
 <tr>
 <td>width</td>
 <td>Integer</td>
-<td>Video width as defined by sender</td>
+<td>Video width as defined by the sender</td>
 </tr>
 <tr>
 <td>height</td>
 <td>Integer</td>
-<td>Video height as defined by sender</td>
+<td>Video height as defined by the sender</td>
 </tr>
 <tr>
 <td>duration</td>
 <td>Integer</td>
-<td>Duration of the video in seconds as defined by sender</td>
+<td>Duration of the video in seconds as defined by the sender</td>
 </tr>
 <tr>
 <td>thumbnail</td>
 <td><a href="#photosize">PhotoSize</a></td>
-<td><em>Optional</em>. Animation thumbnail as defined by sender</td>
+<td><em>Optional</em>. Animation thumbnail as defined by the sender</td>
 </tr>
 <tr>
 <td>file_name</td>
 <td>String</td>
-<td><em>Optional</em>. Original animation filename as defined by sender</td>
+<td><em>Optional</em>. Original animation filename as defined by the sender</td>
 </tr>
 <tr>
 <td>mime_type</td>
 <td>String</td>
-<td><em>Optional</em>. MIME type of the file as defined by sender</td>
+<td><em>Optional</em>. MIME type of the file as defined by the sender</td>
 </tr>
 <tr>
 <td>file_size</td>
@@ -1839,27 +1868,27 @@ To learn how to create…">
 <tr>
 <td>duration</td>
 <td>Integer</td>
-<td>Duration of the audio in seconds as defined by sender</td>
+<td>Duration of the audio in seconds as defined by the sender</td>
 </tr>
 <tr>
 <td>performer</td>
 <td>String</td>
-<td><em>Optional</em>. Performer of the audio as defined by sender or by audio tags</td>
+<td><em>Optional</em>. Performer of the audio as defined by the sender or by audio tags</td>
 </tr>
 <tr>
 <td>title</td>
 <td>String</td>
-<td><em>Optional</em>. Title of the audio as defined by sender or by audio tags</td>
+<td><em>Optional</em>. Title of the audio as defined by the sender or by audio tags</td>
 </tr>
 <tr>
 <td>file_name</td>
 <td>String</td>
-<td><em>Optional</em>. Original filename as defined by sender</td>
+<td><em>Optional</em>. Original filename as defined by the sender</td>
 </tr>
 <tr>
 <td>mime_type</td>
 <td>String</td>
-<td><em>Optional</em>. MIME type of the file as defined by sender</td>
+<td><em>Optional</em>. MIME type of the file as defined by the sender</td>
 </tr>
 <tr>
 <td>file_size</td>
@@ -1897,17 +1926,17 @@ To learn how to create…">
 <tr>
 <td>thumbnail</td>
 <td><a href="#photosize">PhotoSize</a></td>
-<td><em>Optional</em>. Document thumbnail as defined by sender</td>
+<td><em>Optional</em>. Document thumbnail as defined by the sender</td>
 </tr>
 <tr>
 <td>file_name</td>
 <td>String</td>
-<td><em>Optional</em>. Original filename as defined by sender</td>
+<td><em>Optional</em>. Original filename as defined by the sender</td>
 </tr>
 <tr>
 <td>mime_type</td>
 <td>String</td>
-<td><em>Optional</em>. MIME type of the file as defined by sender</td>
+<td><em>Optional</em>. MIME type of the file as defined by the sender</td>
 </tr>
 <tr>
 <td>file_size</td>
@@ -1963,17 +1992,17 @@ To learn how to create…">
 <tr>
 <td>width</td>
 <td>Integer</td>
-<td>Video width as defined by sender</td>
+<td>Video width as defined by the sender</td>
 </tr>
 <tr>
 <td>height</td>
 <td>Integer</td>
-<td>Video height as defined by sender</td>
+<td>Video height as defined by the sender</td>
 </tr>
 <tr>
 <td>duration</td>
 <td>Integer</td>
-<td>Duration of the video in seconds as defined by sender</td>
+<td>Duration of the video in seconds as defined by the sender</td>
 </tr>
 <tr>
 <td>thumbnail</td>
@@ -1983,12 +2012,12 @@ To learn how to create…">
 <tr>
 <td>file_name</td>
 <td>String</td>
-<td><em>Optional</em>. Original filename as defined by sender</td>
+<td><em>Optional</em>. Original filename as defined by the sender</td>
 </tr>
 <tr>
 <td>mime_type</td>
 <td>String</td>
-<td><em>Optional</em>. MIME type of the file as defined by sender</td>
+<td><em>Optional</em>. MIME type of the file as defined by the sender</td>
 </tr>
 <tr>
 <td>file_size</td>
@@ -2021,12 +2050,12 @@ To learn how to create…">
 <tr>
 <td>length</td>
 <td>Integer</td>
-<td>Video width and height (diameter of the video message) as defined by sender</td>
+<td>Video width and height (diameter of the video message) as defined by the sender</td>
 </tr>
 <tr>
 <td>duration</td>
 <td>Integer</td>
-<td>Duration of the video in seconds as defined by sender</td>
+<td>Duration of the video in seconds as defined by the sender</td>
 </tr>
 <tr>
 <td>thumbnail</td>
@@ -2064,17 +2093,126 @@ To learn how to create…">
 <tr>
 <td>duration</td>
 <td>Integer</td>
-<td>Duration of the audio in seconds as defined by sender</td>
+<td>Duration of the audio in seconds as defined by the sender</td>
 </tr>
 <tr>
 <td>mime_type</td>
 <td>String</td>
-<td><em>Optional</em>. MIME type of the file as defined by sender</td>
+<td><em>Optional</em>. MIME type of the file as defined by the sender</td>
 </tr>
 <tr>
 <td>file_size</td>
 <td>Integer</td>
 <td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="paidmediainfo" href="#paidmediainfo"><i class="anchor-icon"></i></a>PaidMediaInfo</h4>
+<p>Describes the paid media added to a message.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>star_count</td>
+<td>Integer</td>
+<td>The number of Telegram Stars that must be paid to buy access to the media</td>
+</tr>
+<tr>
+<td>paid_media</td>
+<td>Array of <a href="#paidmedia">PaidMedia</a></td>
+<td>Information about the paid media</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="paidmedia" href="#paidmedia"><i class="anchor-icon"></i></a>PaidMedia</h4>
+<p>This object describes paid media. Currently, it can be one of</p>
+<ul>
+<li><a href="#paidmediapreview">PaidMediaPreview</a></li>
+<li><a href="#paidmediaphoto">PaidMediaPhoto</a></li>
+<li><a href="#paidmediavideo">PaidMediaVideo</a></li>
+</ul>
+<h4><a class="anchor" name="paidmediapreview" href="#paidmediapreview"><i class="anchor-icon"></i></a>PaidMediaPreview</h4>
+<p>The paid media isn&#39;t available before the payment.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the paid media, always “preview”</td>
+</tr>
+<tr>
+<td>width</td>
+<td>Integer</td>
+<td><em>Optional</em>. Media width as defined by the sender</td>
+</tr>
+<tr>
+<td>height</td>
+<td>Integer</td>
+<td><em>Optional</em>. Media height as defined by the sender</td>
+</tr>
+<tr>
+<td>duration</td>
+<td>Integer</td>
+<td><em>Optional</em>. Duration of the media in seconds as defined by the sender</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="paidmediaphoto" href="#paidmediaphoto"><i class="anchor-icon"></i></a>PaidMediaPhoto</h4>
+<p>The paid media is a photo.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the paid media, always “photo”</td>
+</tr>
+<tr>
+<td>photo</td>
+<td>Array of <a href="#photosize">PhotoSize</a></td>
+<td>The photo</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="paidmediavideo" href="#paidmediavideo"><i class="anchor-icon"></i></a>PaidMediaVideo</h4>
+<p>The paid media is a video.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the paid media, always “video”</td>
+</tr>
+<tr>
+<td>video</td>
+<td><a href="#video">Video</a></td>
+<td>The video</td>
 </tr>
 </tbody>
 </table>
@@ -2168,7 +2306,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="inputpolloption" href="#inputpolloption"><i class="anchor-icon"></i></a>InputPollOption</h4>
-<p>This object contains information about one answer option in a poll to send.</p>
+<p>This object contains information about one answer option in a poll to be sent.</p>
 <table class="table">
 <thead>
 <tr>
@@ -2325,12 +2463,12 @@ To learn how to create…">
 <tr>
 <td>latitude</td>
 <td>Float</td>
-<td>Latitude as defined by sender</td>
+<td>Latitude as defined by the sender</td>
 </tr>
 <tr>
 <td>longitude</td>
 <td>Float</td>
-<td>Longitude as defined by sender</td>
+<td>Longitude as defined by the sender</td>
 </tr>
 <tr>
 <td>horizontal_accuracy</td>
@@ -5070,7 +5208,7 @@ To learn how to create…">
 <tr>
 <td>web_app</td>
 <td><a href="#webappinfo">WebAppInfo</a></td>
-<td>Description of the Web App that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method <a href="#answerwebappquery">answerWebAppQuery</a>.</td>
+<td>Description of the Web App that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method <a href="#answerwebappquery">answerWebAppQuery</a>. Alternatively, a <code>t.me</code> link to a Web App of the bot can be specified in the object instead of the Web App&#39;s URL, in which case the Web App will be opened as if the user pressed the link.</td>
 </tr>
 </tbody>
 </table>
@@ -5685,6 +5823,83 @@ To learn how to create…">
 </table>
 <h4><a class="anchor" name="inputfile" href="#inputfile"><i class="anchor-icon"></i></a>InputFile</h4>
 <p>This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data in the usual way that files are uploaded via the browser.</p>
+<h4><a class="anchor" name="inputpaidmedia" href="#inputpaidmedia"><i class="anchor-icon"></i></a>InputPaidMedia</h4>
+<p>This object describes the paid media to be sent. Currently, it can be one of</p>
+<ul>
+<li><a href="#inputpaidmediaphoto">InputPaidMediaPhoto</a></li>
+<li><a href="#inputpaidmediavideo">InputPaidMediaVideo</a></li>
+</ul>
+<h4><a class="anchor" name="inputpaidmediaphoto" href="#inputpaidmediaphoto"><i class="anchor-icon"></i></a>InputPaidMediaPhoto</h4>
+<p>The paid media to send is a photo.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the media, must be <em>photo</em></td>
+</tr>
+<tr>
+<td>media</td>
+<td>String</td>
+<td>File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="inputpaidmediavideo" href="#inputpaidmediavideo"><i class="anchor-icon"></i></a>InputPaidMediaVideo</h4>
+<p>The paid media to send is a video.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the media, must be <em>video</em></td>
+</tr>
+<tr>
+<td>media</td>
+<td>String</td>
+<td>File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>thumbnail</td>
+<td><a href="#inputfile">InputFile</a> or String</td>
+<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>width</td>
+<td>Integer</td>
+<td><em>Optional</em>. Video width</td>
+</tr>
+<tr>
+<td>height</td>
+<td>Integer</td>
+<td><em>Optional</em>. Video height</td>
+</tr>
+<tr>
+<td>duration</td>
+<td>Integer</td>
+<td><em>Optional</em>. Video duration in seconds</td>
+</tr>
+<tr>
+<td>supports_streaming</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> if the uploaded video is suitable for streaming</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="sending-files" href="#sending-files"><i class="anchor-icon"></i></a>Sending files</h4>
 <p>There are three ways to send files (photos, stickers, audio, media, etc.):</p>
 <ol>
@@ -6050,7 +6265,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="copymessage" href="#copymessage"><i class="anchor-icon"></i></a>copyMessage</h4>
-<p>Use this method to copy messages of any kind. Service messages, giveaway messages, giveaway winners messages, and invoice messages can&#39;t be copied. A quiz <a href="#poll">poll</a> can be copied only if the value of the field <em>correct_option_id</em> is known to the bot. The method is analogous to the method <a href="#forwardmessage">forwardMessage</a>, but the copied message doesn&#39;t have a link to the original message. Returns the <a href="#messageid">MessageId</a> of the sent message on success.</p>
+<p>Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can&#39;t be copied. A quiz <a href="#poll">poll</a> can be copied only if the value of the field <em>correct_option_id</em> is known to the bot. The method is analogous to the method <a href="#forwardmessage">forwardMessage</a>, but the copied message doesn&#39;t have a link to the original message. Returns the <a href="#messageid">MessageId</a> of the sent message on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -6136,7 +6351,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="copymessages" href="#copymessages"><i class="anchor-icon"></i></a>copyMessages</h4>
-<p>Use this method to copy messages of any kind. If some of the specified messages can&#39;t be found or copied, they are skipped. Service messages, giveaway messages, giveaway winners messages, and invoice messages can&#39;t be copied. A quiz <a href="#poll">poll</a> can be copied only if the value of the field <em>correct_option_id</em> is known to the bot. The method is analogous to the method <a href="#forwardmessages">forwardMessages</a>, but the copied messages don&#39;t have a link to the original message. Album grouping is kept for copied messages. On success, an array of <a href="#messageid">MessageId</a> of the sent messages is returned.</p>
+<p>Use this method to copy messages of any kind. If some of the specified messages can&#39;t be found or copied, they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can&#39;t be copied. A quiz <a href="#poll">poll</a> can be copied only if the value of the field <em>correct_option_id</em> is known to the bot. The method is analogous to the method <a href="#forwardmessages">forwardMessages</a>, but the copied messages don&#39;t have a link to the original message. Album grouping is kept for copied messages. On success, an array of <a href="#messageid">MessageId</a> of the sent messages is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -6911,6 +7126,86 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>String</td>
 <td>Optional</td>
 <td>Unique identifier of the message effect to be added to the message; for private chats only</td>
+</tr>
+<tr>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
+<td>Optional</td>
+<td>Description of the message to reply to</td>
+</tr>
+<tr>
+<td>reply_markup</td>
+<td><a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a> or <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a> or <a href="#replykeyboardremove">ReplyKeyboardRemove</a> or <a href="#forcereply">ForceReply</a></td>
+<td>Optional</td>
+<td>Additional interface options. A JSON-serialized object for an <a href="/bots/features#inline-keyboards">inline keyboard</a>, <a href="/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="sendpaidmedia" href="#sendpaidmedia"><i class="anchor-icon"></i></a>sendPaidMedia</h4>
+<p>Use this method to send paid media to channel chats. On success, the sent <a href="#message">Message</a> is returned.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>star_count</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>The number of Telegram Stars that must be paid to buy access to the media</td>
+</tr>
+<tr>
+<td>media</td>
+<td>Array of <a href="#inputpaidmedia">InputPaidMedia</a></td>
+<td>Yes</td>
+<td>A JSON-serialized array describing the media to be sent; up to 10 items</td>
+</tr>
+<tr>
+<td>caption</td>
+<td>String</td>
+<td>Optional</td>
+<td>Media caption, 0-1024 characters after entities parsing</td>
+</tr>
+<tr>
+<td>parse_mode</td>
+<td>String</td>
+<td>Optional</td>
+<td>Mode for parsing entities in the media caption. See <a href="#formatting-options">formatting options</a> for more details.</td>
+</tr>
+<tr>
+<td>caption_entities</td>
+<td>Array of <a href="#messageentity">MessageEntity</a></td>
+<td>Optional</td>
+<td>A JSON-serialized list of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
+<td>disable_notification</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
 </tr>
 <tr>
 <td>reply_parameters</td>
@@ -12889,7 +13184,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>invoice_payload</td>
 <td>String</td>
-<td>Bot specified invoice payload</td>
+<td>Bot-specified invoice payload</td>
 </tr>
 <tr>
 <td>shipping_option_id</td>
@@ -12937,7 +13232,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>invoice_payload</td>
 <td>String</td>
-<td>Bot specified invoice payload</td>
+<td>Bot-specified invoice payload</td>
 </tr>
 <tr>
 <td>shipping_address</td>
@@ -12980,7 +13275,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>invoice_payload</td>
 <td>String</td>
-<td>Bot specified invoice payload</td>
+<td>Bot-specified invoice payload</td>
 </tr>
 <tr>
 <td>shipping_option_id</td>
@@ -13068,10 +13363,39 @@ pre-formatted fixed-width code block written in the Python programming language
 <h4><a class="anchor" name="transactionpartner" href="#transactionpartner"><i class="anchor-icon"></i></a>TransactionPartner</h4>
 <p>This object describes the source of a transaction, or its recipient for outgoing transactions. Currently, it can be one of</p>
 <ul>
-<li><a href="#transactionpartnerfragment">TransactionPartnerFragment</a></li>
 <li><a href="#transactionpartneruser">TransactionPartnerUser</a></li>
+<li><a href="#transactionpartnerfragment">TransactionPartnerFragment</a></li>
+<li><a href="#transactionpartnertelegramads">TransactionPartnerTelegramAds</a></li>
 <li><a href="#transactionpartnerother">TransactionPartnerOther</a></li>
 </ul>
+<h4><a class="anchor" name="transactionpartneruser" href="#transactionpartneruser"><i class="anchor-icon"></i></a>TransactionPartnerUser</h4>
+<p>Describes a transaction with a user.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the transaction partner, always “user”</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#user">User</a></td>
+<td>Information about the user</td>
+</tr>
+<tr>
+<td>invoice_payload</td>
+<td>String</td>
+<td><em>Optional</em>. Bot-specified invoice payload</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="transactionpartnerfragment" href="#transactionpartnerfragment"><i class="anchor-icon"></i></a>TransactionPartnerFragment</h4>
 <p>Describes a withdrawal transaction with Fragment.</p>
 <table class="table">
@@ -13095,8 +13419,8 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
-<h4><a class="anchor" name="transactionpartneruser" href="#transactionpartneruser"><i class="anchor-icon"></i></a>TransactionPartnerUser</h4>
-<p>Describes a transaction with a user.</p>
+<h4><a class="anchor" name="transactionpartnertelegramads" href="#transactionpartnertelegramads"><i class="anchor-icon"></i></a>TransactionPartnerTelegramAds</h4>
+<p>Describes a withdrawal transaction to the Telegram Ads platform.</p>
 <table class="table">
 <thead>
 <tr>
@@ -13109,12 +13433,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>type</td>
 <td>String</td>
-<td>Type of the transaction partner, always “user”</td>
-</tr>
-<tr>
-<td>user</td>
-<td><a href="#user">User</a></td>
-<td>Information about the user</td>
+<td>Type of the transaction partner, always “telegram_ads”</td>
 </tr>
 </tbody>
 </table>
