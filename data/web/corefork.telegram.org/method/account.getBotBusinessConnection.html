@@ -4,38 +4,10 @@
     <meta charset="utf-8">
     <title>account.getBotBusinessConnection</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Parameters
-Name
-Type
-Description
-connection_id
-string
- 
-Result
-Updates
-Possible errors
-Code
-Type
-Description
-400
-CONNE…">
+    <meta property="description" content="Bots may invoke this method to re-fetch the updateBotBusinessConnect constructor associated with a specific business connection_id…">
     <meta property="og:title" content="account.getBotBusinessConnection">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Parameters
-Name
-Type
-Description
-connection_id
-string
- 
-Result
-Updates
-Possible errors
-Code
-Type
-Description
-400
-CONNE…">
+    <meta property="og:description" content="Bots may invoke this method to re-fetch the updateBotBusinessConnect constructor associated with a specific business connection_id…">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -70,7 +42,11 @@ CONNE…">
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/methods" >All Methods</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/method/account.getBotBusinessConnection" >account.getBotBusinessConnection</a></li></ul></div>
   <h1 id="dev_page_title">account.getBotBusinessConnection</h1>
   
-  <div id="dev_page_content"><p><div class="clearfix">
+  <div id="dev_page_content"><p>Bots may invoke this method to re-fetch the <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> constructor associated with a specific <a href="/api/business#connected-bots">business <code>connection_id</code>, see here »</a> for more info on connected business bots.<br>
+This is needed for example for freshly logged in bots that are receiving some <a href="/constructor/updateBotNewBusinessMessage">updateBotNewBusinessMessage</a>, etc. updates because some users have already connected to the bot before it could login.<br>
+In this case, the bot is receiving messages from the business connection, but it hasn't cached the associated <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> with info about the connection (can it reply to messages? etc.) yet, and cannot receive the old ones because they were sent when the bot wasn't logged into the session yet.<br>
+This method can be used to fetch info about a not-yet-cached business connection, and should not be invoked if the info is already cached or to fetch changes, as eventual changes will automatically be sent as new <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> updates to the bot using the usual <a href="/api/updates">update delivery methods »</a>.</p>
+<p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
       <a class="dropdown-toggle"  onclick="return dropdownClick(this, event)" href="#">Layer 181 <b class="caret"></b></a>
@@ -104,7 +80,7 @@ CONNE…">
 <tr>
 <td><strong>connection_id</strong></td>
 <td style="text-align: center;"><a href="/type/string">string</a></td>
-<td> </td>
+<td><a href="/api/business#connected-bots">Business connection ID »</a>.</td>
 </tr>
 </tbody>
 </table>
