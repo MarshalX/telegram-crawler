@@ -248,13 +248,13 @@
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
 <li>Added <a href="/method/invokeWithBusinessConnection">invokeWithBusinessConnection</a> - </li>
-<li>Added <a href="/method/account.getBotBusinessConnection">account.getBotBusinessConnection</a> - </li>
+<li>Added <a href="/method/account.getBotBusinessConnection">account.getBotBusinessConnection</a> - Bots may invoke this method to re-fetch the <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> constructor associated with a specific <a href="/api/business#connected-bots">business <code>connection_id</code>, see here »</a> for more info on connected business bots.  </li>
 <li>Added <a href="/method/account.updateBusinessIntro">account.updateBusinessIntro</a> - </li>
 <li>Added <a href="/method/stickers.replaceSticker">stickers.replaceSticker</a> - </li>
 <li>Added <a href="/method/messages.getMyStickers">messages.getMyStickers</a> - </li>
 <li>Added <a href="/method/fragment.getCollectibleInfo">fragment.getCollectibleInfo</a> - </li>
-<li>Added <a href="/method/account.toggleConnectedBotPaused">account.toggleConnectedBotPaused</a> - </li>
-<li>Added <a href="/method/account.disablePeerConnectedBot">account.disablePeerConnectedBot</a> - Permanently disconnect a specific chat from all <a href="/api/business#connected-bots">business bots »</a> (equivalent to specifying it in <code>recipients.exclude_users</code> during initial configuration with <a href="/method/account.updateConnectedBot">account.updateConnectedBot »</a>); to reconnect of a chat disconnected using this method the user must reconnect the entire bot by invoking <a href="/method/account.updateConnectedBot">account.updateConnectedBot »</a>.  </li>
+<li>Added <a href="/method/account.toggleConnectedBotPaused">account.toggleConnectedBotPaused</a> - Pause or unpause a specific chat, temporarily disconnecting it from all <a href="/api/business#connected-bots">business bots »</a>.</li>
+<li>Added <a href="/method/account.disablePeerConnectedBot">account.disablePeerConnectedBot</a> - Permanently disconnect a specific chat from all <a href="/api/business#connected-bots">business bots »</a> (equivalent to specifying it in <code>recipients.exclude_users</code> during initial configuration with <a href="/method/account.updateConnectedBot">account.updateConnectedBot »</a>); to reconnect of a chat disconnected using this method the user must reconnect the entire bot by invoking <a href="/method/account.updateConnectedBot">account.updateConnectedBot »</a>.</li>
 <li>Added <a href="/method/account.updateBirthday">account.updateBirthday</a> - </li>
 <li>Added <a href="/method/contacts.getBirthdays">contacts.getBirthdays</a> - </li>
 <li>Added <a href="/method/account.createBusinessChatLink">account.createBusinessChatLink</a> - </li>
@@ -433,8 +433,8 @@
 <li>Added <a href="/method/help.getTimezonesList">help.getTimezonesList</a> - </li>
 <li>Added <a href="/method/account.updateBusinessWorkHours">account.updateBusinessWorkHours</a> - Specify a set of <a href="/api/business#opening-hours">Telegram Business opening hours</a>.  </li>
 <li>Added <a href="/method/account.updateBusinessLocation">account.updateBusinessLocation</a> - <a href="/api/business#location">Businesses »</a> may advertise their location using this method, see <a href="/api/business#location">here »</a> for more info.</li>
-<li>Added <a href="/method/account.updateBusinessGreetingMessage">account.updateBusinessGreetingMessage</a> - </li>
-<li>Added <a href="/method/account.updateBusinessAwayMessage">account.updateBusinessAwayMessage</a> - </li>
+<li>Added <a href="/method/account.updateBusinessGreetingMessage">account.updateBusinessGreetingMessage</a> - Set a list of <a href="/api/business#greeting-messages">Telegram Business greeting messages</a>.</li>
+<li>Added <a href="/method/account.updateBusinessAwayMessage">account.updateBusinessAwayMessage</a> - Set a list of <a href="/api/business#away-messages">Telegram Business away messages</a>.</li>
 <li>Added <a href="/method/messages.getQuickReplies">messages.getQuickReplies</a> - Fetch basic info about all existing <a href="/api/business#quick-reply-shortcuts">quick reply shortcuts</a>.</li>
 <li>Added <a href="/method/messages.reorderQuickReplies">messages.reorderQuickReplies</a> - Reorder <a href="/api/business#quick-reply-shortcuts">quick reply shortcuts</a>.</li>
 <li>Added <a href="/method/messages.checkQuickReplyShortcut">messages.checkQuickReplyShortcut</a> - Before offering the user the choice to add a message to a <a href="/api/business#quick-reply-shortcuts">quick reply shortcut</a>, to make sure that none of the limits specified <a href="/api/business#quick-reply-shortcuts">here »</a> were reached.</li>
@@ -443,8 +443,8 @@
 <li>Added <a href="/method/messages.getQuickReplyMessages">messages.getQuickReplyMessages</a> - </li>
 <li>Added <a href="/method/messages.sendQuickReplyMessages">messages.sendQuickReplyMessages</a> - </li>
 <li>Added <a href="/method/messages.deleteQuickReplyMessages">messages.deleteQuickReplyMessages</a> - Delete one or more messages from a <a href="/api/business#quick-reply-shortcuts">quick reply shortcut</a>. This will also emit an <a href="/constructor/updateDeleteQuickReplyMessages">updateDeleteQuickReplyMessages</a> update.</li>
-<li>Added <a href="/method/account.updateConnectedBot">account.updateConnectedBot</a> - </li>
-<li>Added <a href="/method/account.getConnectedBots">account.getConnectedBots</a> - </li>
+<li>Added <a href="/method/account.updateConnectedBot">account.updateConnectedBot</a> - Connect a <a href="/api/business#connected-bots">business bot »</a> to the current account, or to change the current connection settings.  </li>
+<li>Added <a href="/method/account.getConnectedBots">account.getConnectedBots</a> - List all currently connected <a href="/api/business#connected-bots">business bots »</a></li>
 <li>Added <a href="/method/messages.toggleDialogFilterTags">messages.toggleDialogFilterTags</a> - </li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
@@ -574,7 +574,7 @@
 <li>Added <a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a> - </li>
 <li>Added <a href="/method/users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a> - Check whether we can write to the specified user (non-<a href="/api/premium">Premium</a> users only).</li>
 <li>Added <a href="/method/channels.setBoostsToUnblockRestrictions">channels.setBoostsToUnblockRestrictions</a> - </li>
-<li>Added <a href="/method/channels.setEmojiStickers">channels.setEmojiStickers</a> - </li>
+<li>Added <a href="/method/channels.setEmojiStickers">channels.setEmojiStickers</a> - Set a <a href="/api/custom-emoji">custom emoji stickerset</a> for supergroups. Only usable after reaching at least the <a href="/api/boost">boost level »</a> specified in the <a href="/api/config#group-emoji-stickers-level-min"><code>group_emoji_stickers_level_min</code> »</a> config parameter.</li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
