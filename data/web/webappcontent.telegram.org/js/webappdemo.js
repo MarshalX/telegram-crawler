@@ -400,6 +400,15 @@ var DemoApp = {
       el.innerHTML = 'Hide Settings Button';
     }
   },
+  toggleSwipeBehavior: function(el) {
+    if (Telegram.WebApp.isVerticalSwipesEnabled) {
+      Telegram.WebApp.disableVerticalSwipes();
+      el.innerHTML = 'Enable Vertical Swypes';
+    } else {
+      Telegram.WebApp.enableVerticalSwipes();
+      el.innerHTML = 'Disable Vertical Swypes';
+    }
+  },
   showAlert: function(message) {
     Telegram.WebApp.showAlert(message);
   },

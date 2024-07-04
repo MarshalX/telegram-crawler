@@ -464,6 +464,16 @@
     WebView.postEvent('web_app_setup_closing_behavior', false, {need_confirmation: isClosingConfirmationEnabled});
   }
 
+  var isVerticalSwipesEnabled = true;
+  function toggleVerticalSwipes(enable_swipes) {
+    if (!versionAtLeast('7.6')) {
+      console.warn('[Telegram.WebApp] Changing swipes behavior is not supported in version ' + webAppVersion);
+      return;
+    }
+    isVerticalSwipesEnabled = !!enable_swipes;
+    WebView.postEvent('web_app_setup_swipe_behavior', false, {allow_vertical_swipe: isVerticalSwipesEnabled});
+  }
+
   var headerColorKey = 'bg_color', headerColor = null;
   function getHeaderColor() {
     if (headerColorKey == 'secondary_bg_color') {
@@ -1422,6 +1432,7 @@
   }
   function onScanQrPopupClosed(eventType, eventData) {
     webAppScanQrPopupOpened = false;
+    receiveWebViewEvent('scanQrPopupClosed');
   }
 
   function onClipboardTextReceived(eventType, eventData) {
@@ -1589,6 +1600,11 @@
     get: function(){ return isClosingConfirmationEnabled; },
     enumerable: true
   });
+  Object.defineProperty(WebApp, 'isVerticalSwipesEnabled', {
+    set: function(val){ toggleVerticalSwipes(val); },
+    get: function(){ return isVerticalSwipesEnabled; },
+    enumerable: true
+  });
   Object.defineProperty(WebApp, 'headerColor', {
     set: function(val){ setHeaderColor(val); },
     get: function(){ return getHeaderColor(); },
@@ -1634,6 +1650,12 @@
   };
   WebApp.disableClosingConfirmation = function() {
     WebApp.isClosingConfirmationEnabled = false;
+  };
+  WebApp.enableVerticalSwipes = function() {
+    WebApp.isVerticalSwipesEnabled = true;
+  };
+  WebApp.disableVerticalSwipes = function() {
+    WebApp.isVerticalSwipesEnabled = false;
   };
   WebApp.isVersionAtLeast = function(ver) {
     return versionAtLeast(ver);
