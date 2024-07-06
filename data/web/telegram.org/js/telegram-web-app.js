@@ -466,7 +466,7 @@
 
   var isVerticalSwipesEnabled = true;
   function toggleVerticalSwipes(enable_swipes) {
-    if (!versionAtLeast('7.6')) {
+    if (!versionAtLeast('7.7')) {
       console.warn('[Telegram.WebApp] Changing swipes behavior is not supported in version ' + webAppVersion);
       return;
     }
