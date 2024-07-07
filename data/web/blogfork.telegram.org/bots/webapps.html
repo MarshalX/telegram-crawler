@@ -57,6 +57,12 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="july-7-2024" href="#july-7-2024"><i class="anchor-icon"></i></a>July 7, 2024</h4>
+<p><strong>Bot API 7.7</strong></p>
+<ul>
+<li>Added the field <em>isVerticalSwipesEnabled</em> and the methods <em>enableVerticalSwipes</em>, <em>disableVerticalSwipes</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the event <em>scanQrPopupClosed</em>.</li>
+</ul>
 <h4><a class="anchor" name="july-1-2024" href="#july-1-2024"><i class="anchor-icon"></i></a>July 1, 2024</h4>
 <p><strong>Bot API 7.6</strong></p>
 <ul>
@@ -409,7 +415,7 @@
 <tr>
 <td>showScanQrPopup(params[, callback])</td>
 <td>Function</td>
-<td><mark>Bot API 6.4+</mark> A method that shows a native popup for scanning a QR code described by the <em>params</em> argument of the type <a href="#scanqrpopupparams">ScanQrPopupParams</a>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>qrTextReceived</em> every time the scanner catches a code with text data. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the text from the QR code will be passed as the first argument. Returning <em>true</em> inside this callback function causes the popup to be closed.</td>
+<td><mark>Bot API 6.4+</mark> A method that shows a native popup for scanning a QR code described by the <em>params</em> argument of the type <a href="#scanqrpopupparams">ScanQrPopupParams</a>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>qrTextReceived</em> every time the scanner catches a code with text data. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the text from the QR code will be passed as the first argument. Returning <em>true</em> inside this callback function causes the popup to be closed. Starting from <mark>Bot API 7.7</mark>, the Mini App will receive the <em>scanQrPopupClosed</em> event if the user closes the native popup for scanning a QR code.</td>
 </tr>
 <tr>
 <td>closeScanQrPopup()</td>
@@ -445,6 +451,21 @@
 <td>close()</td>
 <td>Function</td>
 <td>A method that closes the Mini App.</td>
+</tr>
+<tr>
+<td>isVerticalSwipesEnabled</td>
+<td>Boolean</td>
+<td><em>True</em>, if vertical swipes to close or minimize the Mini App are enabled. <em>False</em>, if vertical swipes to close or minimize the Mini App are disabled. In any case, the user will still be able to minimize and close the Mini App by swiping the Mini App&#39;s header.</td>
+</tr>
+<tr>
+<td>enableVerticalSwipes()</td>
+<td>Function</td>
+<td><mark>Bot API 7.7+</mark> A method that enables vertical swipes to close or minimize the Mini App. For user convenience, it is recommended to always enable swipes unless they conflict with the Mini App&#39;s own gestures.</td>
+</tr>
+<tr>
+<td>disableVerticalSwipes()</td>
+<td>Function</td>
+<td><mark>Bot API 7.7+</mark> A method that disables vertical swipes to close or minimize the Mini App. This method is useful if your Mini App uses swipe gestures that may conflict with the gestures for minimizing and closing the app.</td>
 </tr>
 </tbody>
 </table>
@@ -1182,6 +1203,10 @@ if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
 <tr>
 <td><code>qrTextReceived</code></td>
 <td><mark>Bot API 6.4+</mark> Occurs when the QR code scanner catches a code with text data.<br><em>eventHandler</em> receives an object with the single field <em>data</em> containing text data from the QR code.</td>
+</tr>
+<tr>
+<td><code>scanQrPopupClosed</code></td>
+<td><mark>Bot API 7.7+</mark> Occurs when the QR code scanner popup is closed by the user.<br><em>eventHandler</em> receives no parameters.</td>
 </tr>
 <tr>
 <td><code>clipboardTextReceived</code></td>
