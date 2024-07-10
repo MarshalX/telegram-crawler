@@ -103,7 +103,38 @@ For example, when displaying the chat photo gallery, we could display a <code>ph
 ---functions---
 
 <a href='/method/messages.getSearchCounters'>messages.getSearchCounters</a>#1bbcf300 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> saved_peer_id:flags.2?<a href='/type/InputPeer'>InputPeer</a> top_msg_id:flags.0?<a href='/type/int'>int</a> filters:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessagesFilter'>MessagesFilter</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/messages.SearchCounter'>messages.SearchCounter</a>&gt;;</code></pre>
-<p>Chat counters with filters can also be returned without fetching the actual messages, as seen in the schema above.</p></div>
+<p>Chat counters with filters can also be returned without fetching the actual messages, as seen in the schema above.</p>
+<h3><a class="anchor" href="#global-search" id="global-search" name="global-search"><i class="anchor-icon"></i></a>Global search</h3>
+<pre><code><a href='/constructor/messages.messages'>messages.messages</a>#8c718e87 messages:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Message'>Message</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.Messages'>messages.Messages</a>;
+<a href='/constructor/messages.messagesSlice'>messages.messagesSlice</a>#3a54685e flags:<a href='/type/%23'>#</a> inexact:flags.1?<a href='/constructor/true'>true</a> count:<a href='/type/int'>int</a> next_rate:flags.0?<a href='/type/int'>int</a> offset_id_offset:flags.2?<a href='/type/int'>int</a> messages:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Message'>Message</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.Messages'>messages.Messages</a>;
+<a href='/constructor/messages.channelMessages'>messages.channelMessages</a>#c776ba4e flags:<a href='/type/%23'>#</a> inexact:flags.1?<a href='/constructor/true'>true</a> pts:<a href='/type/int'>int</a> count:<a href='/type/int'>int</a> offset_id_offset:flags.2?<a href='/type/int'>int</a> messages:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Message'>Message</a>&gt; topics:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ForumTopic'>ForumTopic</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.Messages'>messages.Messages</a>;
+<a href='/constructor/messages.messagesNotModified'>messages.messagesNotModified</a>#74535f21 count:<a href='/type/int'>int</a> = <a href='/type/messages.Messages'>messages.Messages</a>;
+
+<a href='/constructor/messages.chats'>messages.chats</a>#64ff9fd5 chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
+
+---functions---
+
+<a href='/method/messages.searchGlobal'>messages.searchGlobal</a>#4bc6589a flags:<a href='/type/%23'>#</a> broadcasts_only:flags.1?<a href='/constructor/true'>true</a> folder_id:flags.0?<a href='/type/int'>int</a> q:<a href='/type/string'>string</a> filter:<a href='/type/MessagesFilter'>MessagesFilter</a> min_date:<a href='/type/int'>int</a> max_date:<a href='/type/int'>int</a> offset_rate:<a href='/type/int'>int</a> offset_peer:<a href='/type/InputPeer'>InputPeer</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/messages.Messages'>messages.Messages</a>;
+
+<a href='/method/channels.getChannelRecommendations'>channels.getChannelRecommendations</a>#25a71742 flags:<a href='/type/%23'>#</a> channel:flags.0?<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
+<p>The global search view should be split into two tabs, a "Chats" tab (containing results from all private/secret chats, private/public groups, private/public channels), and a "Channels" tab (containing results from private/public channels) only.  </p>
+<p>The "Chats" is split in the following sections:</p>
+<ul>
+<li><code>Frequent contacts</code>: Contains avatars and names of the most frequently used users, sorted <a href="/api/top-rating">as specified here »</a>.  </li>
+<li><code>Recent</code>: Contains avatars and names of the most frequently used peers (users+chats+channels), sorted <a href="/api/top-rating">as specified here »</a>.  </li>
+</ul>
+<p>Searching when in the "Chats" tab should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a>, replacing the previously mentioned sections with a list of peers (avatar+name+returned message, max one row per peer).  </p>
+<p>The "Channels" tab is split in the following sections:</p>
+<ul>
+<li><code>Channels you joined</code>: Contains avatars and names of the most frequently used channels, sorted <a href="/api/top-rating">as specified here »</a>.  </li>
+<li><code>Similar channels</code>: Contains avatars and names of recommended public channels, similar to the ones the current user has already joined, fetched using <a href="/method/channels.getChannelRecommendations">channels.getChannelRecommendations</a> without setting the <code>channel</code> flag, see <a href="/api/recommend">here »</a> for more info.  </li>
+</ul>
+<p>Searching when in the "Channels" tab should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a> with the <code>broadcasts_only</code> flag set, replacing the previously mentioned sections with a list of peers (avatar+name+returned message, max one row per peer).  </p>
+<h4><a class="anchor" href="#global-hashtag-search" id="global-hashtag-search" name="global-hashtag-search"><i class="anchor-icon"></i></a>Global hashtag search</h4>
+<pre><code>---functions---
+
+<a href='/method/channels.searchPosts'>channels.searchPosts</a>#d19f987b hashtag:<a href='/type/string'>string</a> offset_rate:<a href='/type/int'>int</a> offset_peer:<a href='/type/InputPeer'>InputPeer</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/messages.Messages'>messages.Messages</a>;</code></pre>
+<p>A special <a href="/method/channels.searchPosts">channels.searchPosts</a> method is available to globally search for posts from public channels (<em>including</em> those we aren't a member of), containing a specific hashtag (which should be passed in the <code>hashtag</code> field without the <code>#</code>).</p></div>
   
 </div>
           
