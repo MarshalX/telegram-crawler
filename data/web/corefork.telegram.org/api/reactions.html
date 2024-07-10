@@ -77,7 +77,7 @@ Reactions should be sent in <strong>ascending order</strong> (new reactions at t
 The <a href="/api/config#reactions-uniq-max">reactions_uniq_max</a> configuration field also indicates the maximum number of unique reactions that can be added to a message: for example, if there are 2000 <img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍" /> and 1000 custom emoji <img class="emoji" src="//telegram.org/img/emoji/40/F09F9881.png" width="20" height="20" alt="😁" /> reactions and reactions_uniq_max = 2, you can't add a <img class="emoji" src="//telegram.org/img/emoji/40/F09F918E.png" width="20" height="20" alt="👎" /> reaction, because that would raise the number of unique reactions to 3 &gt; 2.  </p>
 <p>The <code>big</code> flag can be optionally set to elicit a bigger reaction.<br>
 Send a <a href="/constructor/reactionEmoji">reactionEmoji</a> to react using a normal emoji, and a <a href="/constructor/reactionCustomEmoji">reactionCustomEmoji</a> to react using a <a href="/api/custom-emoji">custom emoji</a>.<br>
-Message authors will receive an <a href="/constructor/updateMessageReactions">updateMessageReactions</a> update when a user reacts to their message.  </p>
+Message authors will receive an <a href="/constructor/updateMessageReactions">updateMessageReactions</a> update when a user reacts to their message, if enabled as specified <a href="#notifications-about-reactions">here »</a>.  </p>
 <p><a href="/method/messages.getMessagesReactions">messages.getMessagesReactions</a> can be used to fetch a full list of reactions for one or more messages.<br>
 Apps should short-poll reactions for visible messages (that weren't sent by the user) once every 15-30 seconds, but only if <code>message.reactions</code> is set.  </p>
 <p>In groups, <a href="/method/messages.getMessageReactionsList">messages.getMessageReactionsList</a> can be used to fetch the reaction list, along with the sender of each reaction.<br>
@@ -87,6 +87,23 @@ Use <a href="/method/messages.readReactions">messages.readReactions</a> to mark 
 <p>For <a href="/api/saved-messages">saved messages</a>, if the <code>reactions_as_tags</code> flag of <a href="/constructor/messageReactions">messageReactions</a> is set, or if there are no reactions, all present and future reactions should be treated as <a href="/api/saved-messages#tags">message tags, see here » for more info</a>.</p>
 <h3><a class="anchor" href="#react-to-a-story" id="react-to-a-story" name="react-to-a-story"><i class="anchor-icon"></i></a>React to a story</h3>
 <p>See <a href="/api/stories#reactions">here »</a> for more info on how to react to a story.</p>
+<h3><a class="anchor" href="#notifications-about-reactions" id="notifications-about-reactions" name="notifications-about-reactions"><i class="anchor-icon"></i></a>Notifications about reactions</h3>
+<pre><code><a href='/constructor/reactionNotificationsFromContacts'>reactionNotificationsFromContacts</a>#bac3a61a = <a href='/type/ReactionNotificationsFrom'>ReactionNotificationsFrom</a>;
+<a href='/constructor/reactionNotificationsFromAll'>reactionNotificationsFromAll</a>#4b9e22a0 = <a href='/type/ReactionNotificationsFrom'>ReactionNotificationsFrom</a>;
+
+<a href='/constructor/reactionsNotifySettings'>reactionsNotifySettings</a>#56e34970 flags:<a href='/type/%23'>#</a> messages_notify_from:flags.0?<a href='/type/ReactionNotificationsFrom'>ReactionNotificationsFrom</a> stories_notify_from:flags.1?<a href='/type/ReactionNotificationsFrom'>ReactionNotificationsFrom</a> sound:<a href='/type/NotificationSound'>NotificationSound</a> show_previews:<a href='/type/Bool'>Bool</a> = <a href='/type/ReactionsNotifySettings'>ReactionsNotifySettings</a>;
+
+<a href='/constructor/updateNewStoryReaction'>updateNewStoryReaction</a>#1824e40b story_id:<a href='/type/int'>int</a> peer:<a href='/type/Peer'>Peer</a> reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/Update'>Update</a>;
+<a href='/constructor/updateMessageReactions'>updateMessageReactions</a>#5e1b3cb8 flags:<a href='/type/%23'>#</a> peer:<a href='/type/Peer'>Peer</a> msg_id:<a href='/type/int'>int</a> top_msg_id:flags.0?<a href='/type/int'>int</a> reactions:<a href='/type/MessageReactions'>MessageReactions</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/account.setReactionsNotifySettings'>account.setReactionsNotifySettings</a>#316ce548 settings:<a href='/type/ReactionsNotifySettings'>ReactionsNotifySettings</a> = <a href='/type/ReactionsNotifySettings'>ReactionsNotifySettings</a>;
+<a href='/method/account.getReactionsNotifySettings'>account.getReactionsNotifySettings</a>#6dd654c = <a href='/type/ReactionsNotifySettings'>ReactionsNotifySettings</a>;</code></pre>
+<p>Users may choose to receive notifications about reactions sent to their messages and stories by any user, or only by contacts.  </p>
+<p>These reaction notification settings may be changed using <a href="/method/account.setReactionsNotifySettings">account.setReactionsNotifySettings</a>, and fetched using <a href="/method/account.getReactionsNotifySettings">account.getReactionsNotifySettings</a>.  </p>
+<p>A custom <a href="/api/ringtones">notification sound »</a> may also be set for reactions in the <code>sound</code> field of the <a href="/constructor/reactionsNotifySettings">reactionsNotifySettings</a>.  </p>
+<p>If <code>show_previews=false</code>, <a href="/api/push-updates">push notifications</a> about reactions will not </p>
 <h3><a class="anchor" href="#animated-normal-emojis" id="animated-normal-emojis" name="animated-normal-emojis"><i class="anchor-icon"></i></a>Animated normal emojis</h3>
 <pre><code><a href='/constructor/reactionEmoji'>reactionEmoji</a>#1b2286b8 emoticon:<a href='/type/string'>string</a> = <a href='/type/Reaction'>Reaction</a>;
 
@@ -157,13 +174,15 @@ The <code>add_to_recent</code> flag of <a href="/method/messages.sendReaction">m
 
 <a href='/constructor/config'>config</a>#cc1a241e flags:<a href='/type/%23'>#</a> default_p2p_contacts:flags.3?<a href='/constructor/true'>true</a> preload_featured_stickers:flags.4?<a href='/constructor/true'>true</a> revoke_pm_inbox:flags.6?<a href='/constructor/true'>true</a> blocked_mode:flags.8?<a href='/constructor/true'>true</a> force_try_ipv6:flags.14?<a href='/constructor/true'>true</a> date:<a href='/type/int'>int</a> expires:<a href='/type/int'>int</a> test_mode:<a href='/type/Bool'>Bool</a> this_dc:<a href='/type/int'>int</a> dc_options:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DcOption'>DcOption</a>&gt; dc_txt_domain_name:<a href='/type/string'>string</a> chat_size_max:<a href='/type/int'>int</a> megagroup_size_max:<a href='/type/int'>int</a> forwarded_count_max:<a href='/type/int'>int</a> online_update_period_ms:<a href='/type/int'>int</a> offline_blur_timeout_ms:<a href='/type/int'>int</a> offline_idle_timeout_ms:<a href='/type/int'>int</a> online_cloud_timeout_ms:<a href='/type/int'>int</a> notify_cloud_delay_ms:<a href='/type/int'>int</a> notify_default_delay_ms:<a href='/type/int'>int</a> push_chat_period_ms:<a href='/type/int'>int</a> push_chat_limit:<a href='/type/int'>int</a> edit_time_limit:<a href='/type/int'>int</a> revoke_time_limit:<a href='/type/int'>int</a> revoke_pm_time_limit:<a href='/type/int'>int</a> rating_e_decay:<a href='/type/int'>int</a> stickers_recent_limit:<a href='/type/int'>int</a> channels_read_media_period:<a href='/type/int'>int</a> tmp_sessions:flags.0?<a href='/type/int'>int</a> call_receive_timeout_ms:<a href='/type/int'>int</a> call_ring_timeout_ms:<a href='/type/int'>int</a> call_connect_timeout_ms:<a href='/type/int'>int</a> call_packet_timeout_ms:<a href='/type/int'>int</a> me_url_prefix:<a href='/type/string'>string</a> autoupdate_url_prefix:flags.7?<a href='/type/string'>string</a> gif_search_username:flags.9?<a href='/type/string'>string</a> venue_search_username:flags.10?<a href='/type/string'>string</a> img_search_username:flags.11?<a href='/type/string'>string</a> static_maps_provider:flags.12?<a href='/type/string'>string</a> caption_length_max:<a href='/type/int'>int</a> message_length_max:<a href='/type/int'>int</a> webfile_dc_id:<a href='/type/int'>int</a> suggested_lang_code:flags.2?<a href='/type/string'>string</a> lang_pack_version:flags.2?<a href='/type/int'>int</a> base_lang_pack_version:flags.2?<a href='/type/int'>int</a> reactions_default:flags.15?<a href='/type/Reaction'>Reaction</a> autologin_token:flags.16?<a href='/type/string'>string</a> = <a href='/type/Config'>Config</a>;
 
+<a href='/constructor/updateConfig'>updateConfig</a>#a229dd06 = <a href='/type/Update'>Update</a>;
+
 ---functions---
 
 <a href='/method/messages.setDefaultReaction'>messages.setDefaultReaction</a>#4f47a016 reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/Bool'>Bool</a>;
 
 <a href='/method/help.getConfig'>help.getConfig</a>#c4f9186b = <a href='/type/Config'>Config</a>;</code></pre>
 <p><a href="/method/messages.setDefaultReaction">messages.setDefaultReaction</a> can be used to change the default emoji reaction to use in the quick reaction menu.<br>
-This value is synced across devices and can be fetched using <a href="/method/help.getConfig">help.getConfig</a>, <code>reactions_default</code> field.</p></div>
+This value is synced across devices through <a href="/constructor/updateConfig">updateConfig</a> and can be fetched using <a href="/method/help.getConfig">help.getConfig</a>, <code>reactions_default</code> field.</p></div>
   
 </div>
           
