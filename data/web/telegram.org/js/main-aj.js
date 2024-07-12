@@ -1101,6 +1101,10 @@ function l(lang_key, params, def_value) {
       i = 1;
     }
     var numeric_option = numeric_options[i] || '#';
+    if (params.__format_number && window.formatNumber) {
+      var decimals = params.__format_number === true ? 0 : params.__format_number;
+      number = formatNumber(number, decimals, '.', ',');
+    }
     return numeric_option.replace(/#/g, number);
   });
   value = value.replace(/\{([A-Za-z_\-\d]{1,32}):(.{1,256}?)\}/g, function(lang_value, token, options) {
@@ -1114,6 +1118,10 @@ function l(lang_key, params, def_value) {
       i = 0;
     }
     var numeric_option = numeric_options[i] || '#';
+    if (params.__format_number && window.formatNumber) {
+      var decimals = params.__format_number === true ? 0 : params.__format_number;
+      number = formatNumber(number, decimals, '.', ',');
+    }
     return numeric_option.replace(/#/g, number);
   });
   for (var param in params) {
