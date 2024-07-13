@@ -100,6 +100,20 @@
 </ul>
 <p>They're identified by <code>mime_type</code> field of the associated <a href="/constructor/document">document</a>, always equal to <code>application/x-tgsticker</code>.</p>
 <p>See <a href="/stickers#creating-animations">here »</a> for tips on how to create the perfect animated sticker, and <a href="#creating-stickersets">here »</a> for info on how to upload it using the API.</p>
+<h5><a class="anchor" href="#premium-animated-sticker-effects" id="premium-animated-sticker-effects" name="premium-animated-sticker-effects"><i class="anchor-icon"></i></a>Premium animated sticker effects</h5>
+<pre><code><a href='/constructor/document'>document</a>#8fd4c4d8 flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/long'>long</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
+
+<a href='/constructor/videoSize'>videoSize</a>#de33b094 flags:<a href='/type/%23'>#</a> type:<a href='/type/string'>string</a> w:<a href='/type/int'>int</a> h:<a href='/type/int'>int</a> size:<a href='/type/int'>int</a> video_start_ts:flags.0?<a href='/type/double'>double</a> = <a href='/type/VideoSize'>VideoSize</a>;
+
+<a href='/constructor/inputDocumentFileLocation'>inputDocumentFileLocation</a>#bad07584 id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> thumb_size:<a href='/type/string'>string</a> = <a href='/type/InputFileLocation'>InputFileLocation</a>;</code></pre>
+<p>Some animated stickers also have an attached animated effect (as another Lottie animation), that should be played once the sticker is inside the viewport.  </p>
+<p>This effect is larger than the sticker itself, and should be located <em>under</em> the main sticker animation, but also <em>over</em> any other nearby UI element.  </p>
+<p>It should be played the first time the sticker scrolls into view; it should be played again if the chat is closed and then opened again.  </p>
+<p>Premium stickers may only be <em>sent</em> by users with a <a href="/api/premium">Premium</a> subscription, and the animated effect should be played by all users, including those without a Premium subscription.  </p>
+<p>A premium sticker is identified by the presence of a <a href="/constructor/videoSize">videoSize</a> of <code>type=f</code> in the sticker's main <a href="/constructor/document">document</a>.<br>
+The lottie file of the animated effect may be fetched by using <a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a> with <code>thumb_size=f</code>, as specified <a href="/api/files#downloading-files">here »</a>.  </p>
+<p>Note that <a href="/api/effects">animated message effects »</a> can also re-use the animated effect of a premium sticker.  </p>
+<p>Also, premium animated stickers may be sent with an extra <a href="/api/effects">animated message effect »</a>, in which case both the effect of the sticker and the additional effect should be played simultaneously.  </p>
 <h4><a class="anchor" href="#video-stickers" id="video-stickers" name="video-stickers"><i class="anchor-icon"></i></a>Video stickers</h4>
 <p>Video stickers are <a href="https://en.wikipedia.org/wiki/VP9">VP9</a> videos with the following specs:</p>
 <ul>
