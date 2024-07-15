@@ -33,12 +33,9 @@ var Main = {
       state.$mainSearchForm.field('query').on('input', Main.eMainSearchInput);
       state.mainSearchCache = {};
       $('.js-form-clear', state.$mainSearchForm).on('click', Main.eMainSearchClear);
-      $('.js-x-scrollable').on('scroll', Main.eXScrollableUpdate);
-      $(window).on('resize', Main.eXScrollablesUpdate);
       Main.updateTime();
       Main.initViewport();
       Main.initLogo();
-      Main.eXScrollablesUpdate();
     });
     Aj.onUnload(function(state) {
       clearTimeout(Aj.state.searchTimeout);
@@ -49,8 +46,6 @@ var Main = {
       state.$mainSearchForm.off('submit', Main.eMainSearchSubmit);
       state.$mainSearchForm.field('query').off('input', Main.eMainSearchInput);
       $('.js-form-clear', state.$mainSearchForm).off('click', Main.eMainSearchClear);
-      $('.js-x-scrollable').off('scroll', Main.eXScrollableUpdate);
-      $(window).off('resize', Main.eXScrollablesUpdate);
     });
   },
   initForm: function(form) {
@@ -241,15 +236,6 @@ var Main = {
   eHeaderMenuClose: function(e) {
     e.preventDefault();
     closePopup(Aj.state.$headerMenu);
-  },
-  eXScrollableUpdate: function() {
-    $(this).toggleClass('leftscroll', this.scrollLeft > 0);
-    $(this).toggleClass('rightscroll', this.scrollLeft < this.scrollWidth - this.clientWidth);
-  },
-  eXScrollablesUpdate: function() {
-    $('.js-x-scrollable').each(function() {
-      Main.eXScrollableUpdate.apply(this);
-    });
   },
   openSimplePopup: function($popup) {
     var onEnterPress = function(e) {
@@ -1923,7 +1909,7 @@ var Premium = {
     var $field = Aj.state.$premiumSearchField;
     var $btn   = Aj.state.$giftPremiumBtn;
     $form.field('recipient').value('');
-    $form.field('query').value('').prop('disabled', false).focus();
+    $form.field('query').value('').prop('disabled', false);
     $form.removeClass('myself');
     $btn.prop('disabled', true);
     $field.removeClass('found');
@@ -2210,7 +2196,7 @@ var PremiumGiveaway = {
     var $field = Aj.state.$premiumSearchField;
     var $btn   = Aj.state.$giveawayPremiumBtn;
     $form.field('recipient').value('');
-    $form.field('query').value('').prop('disabled', false).focus();
+    $form.field('query').value('').prop('disabled', false);
     $btn.prop('disabled', true);
     $field.removeClass('found');
     $('.js-search-field-error').html('');
@@ -2661,351 +2647,6 @@ var Ads = {
 };
 
 var Stars = {
-  init: function() {
-    Aj.onLoad(function(state) {
-      var cont = Aj.ajContainer;
-      $(cont).on('click.curPage', '.js-myself-link', Stars.eBuyForMyself);
-      $(cont).on('click.curPage', '.js-more-stars-btn', Stars.eBuyMoreStats);
-      $(cont).on('click.curPage', '.js-stars-buy-btn', Stars.eBuyStars);
-      $(cont).on('click.curPage', '.js-more-options', Stars.eShowMoreOptions);
-      state.$starsBuyPopup = $('.js-buy-stars-popup');
-      $(cont).on('submit.curPage', '.js-buy-stars-form', Stars.eBuyStarsSubmit);
-      state.$starsBuyForm = $('.js-buy-stars-form');
-      state.$starsSearchField = $('.js-stars-search-field');
-      state.$starsSearchForm = $('.js-stars-form');
-      state.$starsSearchForm.on('submit', Stars.eSearchSubmit);
-      state.$starsSearchForm.field('query').on('input', Stars.eSearchInput);
-      state.$starsSearchForm.field('query').on('change', Stars.eSearchChange);
-      $('.js-form-clear', state.$starsSearchForm).on('click', Stars.eSearchClear);
-      state.$starsQuantityField = $('.js-stars-quantity-field');
-      $(cont).on('click.curPage', '.js-quantity-clear', Stars.eQuantityClear);
-      state.$starsSearchForm.field('quantity').on('change', Stars.eQuantityChanged);
-      state.$starsSearchForm.on('change', '.js-stars-options input.radio', Stars.eRadioChanged);
-      state.$starsBuyForm.on('change', 'input.checkbox', Stars.eCheckboxChanged);
-      state.$starsBuyBtn = $('.js-stars-buy-btn');
-      state.curQuantity = state.$starsSearchForm.field('quantity').value();
-      state.curStars = state.$starsSearchForm.field('stars').value();
-      state.updLastReq = +Date.now();
-      if (state.needUpdate) {
-        state.updStateTo = setTimeout(Stars.updateState, Main.UPDATE_PERIOD);
-      }
-      $(cont).on('click.curPage', '.js-preview-sticker', function() {
-        RLottie.playUntilEnd(this);
-      });
-      $('.js-preview-sticker').each(function() {
-        RLottie.init(this, {playUntilEnd: true});
-      });
-      RLottie.init();
-    });
-    Aj.onUnload(function(state) {
-      clearTimeout(state.updStateTo);
-      state.needUpdate = false;
-      Main.destroyForm(state.$starsSearchForm);
-      state.$starsSearchForm.off('submit', Stars.eSearchSubmit);
-      state.$starsSearchForm.field('query').off('input', Stars.eSearchInput);
-      state.$starsSearchForm.field('query').off('change', Stars.eSearchChange);
-      $('.js-form-clear', state.$starsSearchForm).off('click', Stars.eSearchClear);
-      state.$starsSearchForm.field('quantity').off('change', Stars.eQuantityChanged);
-      state.$starsSearchForm.off('change', '.js-stars-options input.radio', Stars.eRadioChanged);
-      state.$starsBuyForm.off('change', 'input.checkbox', Stars.eCheckboxChanged);
-      $('.js-preview-sticker').each(function() {
-        RLottie.destroy(this);
-      });
-    });
-  },
-  updateState: function(force) {
-    var now = +Date.now();
-    if (document.hasFocus() || force ||
-        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
-      Aj.state.updLastReq = now;
-      Aj.apiRequest('updateStarsBuyState', {
-        mode: Aj.state.mode,
-        lv: Aj.state.lastVer,
-        dh: Aj.state.lastDh
-      }, function(result) {
-        if (result.mode) {
-          Aj.state.mode = result.mode;
-        }
-        if (result.html) {
-          Stars.updateContent(result.html);
-        } else {
-          if (result.history_html) {
-            Stars.updateHistory(result.history_html);
-          }
-          if (result.options_html) {
-            Stars.updateOptions(result.options_html);
-          }
-        }
-        if (result.lv) {
-          Aj.state.lastVer = result.lv;
-          if (Aj.state.$sentPopup) {
-            closePopup(Aj.state.$sentPopup);
-          }
-        }
-        if (result.dh) {
-          Aj.state.lastDh = result.dh;
-        }
-        if (Aj.state.needUpdate && result.need_update) {
-          Aj.state.updStateTo = setTimeout(Stars.updateState, Main.UPDATE_PERIOD);
-        }
-      });
-    } else {
-      if (Aj.state.needUpdate) {
-        Aj.state.updStateTo = setTimeout(Stars.updateState, Main.CHECK_PERIOD);
-      }
-    }
-  },
-  eSearchInput: function(e) {
-    var $field = Aj.state.$starsSearchForm;
-    $('.js-search-field-error').html('');
-    $field.removeClass('error');
-  },
-  eSearchChange: function(e) {
-    Stars.searchSubmit();
-  },
-  eSearchClear: function(e) {
-    var $form = Aj.state.$starsSearchForm;
-    var $field = Aj.state.$starsSearchField;
-    var $btn   = Aj.state.$starsBuyBtn;
-    $form.field('recipient').value('');
-    $form.field('query').value('').prop('disabled', false).focus();
-    $form.removeClass('myself');
-    $btn.prop('disabled', true);
-    $field.removeClass('found');
-    $('.js-search-field-error').html('');
-    $field.removeClass('error');
-    Stars.updateUrl();
-  },
-  eQuantityClear: function() {
-    Stars.clearQuantity(true);
-  },
-  clearQuantity: function(need_focus) {
-    var $form = Aj.state.$starsSearchForm;
-    var $field = $form.field('quantity');
-    $field.value('');
-    if (need_focus) {
-      $field.focus();
-    }
-    Aj.state.curQuantity = 0;
-    $('.js-quantity-field-error').html('');
-    $('.js-cur-price').html('');
-    Stars.updateButton();
-    Stars.updateUrl();
-  },
-  eQuantityChanged: function() {
-    var $form = Aj.state.$starsSearchForm;
-    var stars = +$form.field('stars').value();
-    var quantity = +$form.field('quantity').value();
-    $('.js-cur-price').html('');
-    Aj.state.$starsQuantityField.addClass('loading').removeClass('play').redraw().addClass('play');
-    Aj.apiRequest('updateStarsPrices', {
-      stars: stars,
-      quantity: quantity
-    }, function(result) {
-      if (result.error) {
-        $('.js-quantity-field-error').html(result.error);
-        quantity = 0;
-      } else {
-        $('.js-quantity-field-error').html('');
-      }
-      $('.js-cur-price').html(result.cur_price);
-      if (result.options_html) {
-        Stars.updateOptions(result.options_html);
-      }
-      if (result.dh) {
-        Aj.state.lastDh = result.dh;
-      }
-      Aj.state.curQuantity = quantity;
-      Aj.state.$starsQuantityField.removeClass('loading');
-      Aj.state.curStars = 0;
-      $('.js-stars-options input.radio:checked').prop('checked', false);
-      Stars.updateButton();
-      Stars.updateUrl();
-    });
-  },
-  eBuyForMyself: function(e) {
-    e.preventDefault();
-    Stars.updateResult(Aj.state.myselfResult);
-  },
-  eShowMoreOptions: function(e) {
-    e.preventDefault();
-    Stars.toggleOptions(true);
-  },
-  toggleOptions: function(expand) {
-    Aj.state.$starsSearchForm.toggleClass('options-expanded', expand).toggleClass('options-collapsed', !expand);
-  },
-  eRadioChanged: function() {
-    Stars.clearQuantity();
-    Aj.state.curStars = this.value;
-    Stars.updateButton();
-    Stars.updateUrl();
-  },
-  eCheckboxChanged: function() {
-    var $form = Aj.state.$starsBuyForm;
-    var show_sender = $form.field('show_sender').prop('checked');
-    Aj.state.$starsBuyPopup.toggleClass('show-sender', show_sender);
-  },
-  updateButton: function() {
-    var $form    = Aj.state.$starsSearchForm;
-    var quantity = Aj.state.curQuantity || Aj.state.curStars;
-    var btn_label = l('WEB_BUY_N_TELEGRAM_STARS_BUTTON', {n: quantity || 0, __format_number: true});
-    $('.js-stars-btn-label').html(btn_label);
-    Aj.state.$starsBuyBtn.prop('disabled', !quantity || !$form.field('recipient').value());
-  },
-  eSearchSubmit: function(e) {
-    e.preventDefault();
-    Stars.searchSubmit();
-  },
-  searchSubmit: function() {
-    var $form  = Aj.state.$starsSearchForm;
-    var recipient = $form.field('recipient').value();
-    var quantity = $form.field('quantity').value();
-    var query  = $form.field('query').value();
-    if (!query.length) {
-      $form.field('query').focus();
-      return;
-    }
-    Aj.state.$starsSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
-    Aj.showProgress();
-    Aj.apiRequest('searchStarsRecipient', {
-      query: recipient || query,
-      quantity: quantity
-    }, function(result) {
-      Aj.hideProgress();
-      Stars.updateResult(result);
-      Aj.state.$starsSearchField.removeClass('loading');
-    });
-  },
-  updateResult: function(result) {
-    var $form  = Aj.state.$starsSearchForm;
-    var $field = Aj.state.$starsSearchField;
-    var $btn   = Aj.state.$starsBuyBtn;
-    if (result.error) {
-      $('.js-search-field-error').html(result.error);
-      $field.addClass('error').removeClass('found');
-      $form.field('query').prop('disabled', false);
-    } else {
-      $('.js-search-field-error').html('');
-      $field.removeClass('error');
-      if (result.found) {
-        if (result.found.photo) {
-          $('.js-stars-search-photo', $field).html(result.found.photo);
-        }
-        if (result.found.name) {
-          var $form = Aj.state.$starsSearchForm;
-          $form.field('query').value(uncleanHTML(result.found.name));
-        }
-        $form.toggleClass('myself', result.found.myself);
-        $form.field('recipient').value(result.found.recipient);
-        $field.addClass('found');
-        $form.field('query').prop('disabled', true);
-      } else {
-        $form.removeClass('myself');
-        $form.field('recipient').value('');
-        $field.removeClass('found');
-        $form.field('query').prop('disabled', false);
-      }
-      Stars.updateButton();
-    }
-    Stars.updateUrl();
-  },
-  updateUrl: function() {
-    var new_url = '';
-    var $form     = Aj.state.$starsSearchForm;
-    var recipient = $form.field('recipient').value();
-    var stars     = $form.field('stars').value();
-    var quantity  = Aj.state.curQuantity || stars;
-    if (recipient) {
-      new_url += '&recipient=' + encodeURIComponent(recipient);
-    }
-    if (quantity) {
-      new_url += '&quantity=' + encodeURIComponent(quantity);
-    }
-    if (new_url) {
-      new_url = '?' + new_url.substr(1);
-    }
-    var loc = Aj.location(), path = loc.pathname + loc.search;
-    Aj.setLocation(new_url, path != '/stars');
-  },
-  updateOptions: function(html) {
-    var $form  = Aj.state.$starsSearchForm;
-    var stars = $form.field('stars').value();
-    $('.js-premium-options').replaceWith(html);
-    $form.field('stars').value(stars);
-  },
-  eBuyStars: function(e) {
-    e.stopImmediatePropagation();
-    e.preventDefault();
-    var $form     = Aj.state.$starsSearchForm;
-    var recipient = $form.field('recipient').value();
-    var quantity  = $form.field('quantity').value();
-    var stars     = $form.field('stars').value();
-    Aj.apiRequest('initBuyStarsRequest', {
-      recipient: recipient,
-      quantity: quantity || stars
-    }, function(result) {
-      if (result.error) {
-        return showAlert(result.error);
-      }
-      $('.js-buy-stars-content', Aj.state.$starsBuyPopup).html(result.content);
-      $('.js-buy-stars-button', Aj.state.$starsBuyPopup).html(result.button);
-      Aj.state.$starsBuyPopup.toggleClass('iam-sender', result.myself);
-      Aj.state.starsPrice = result.amount;
-      Aj.state.itemTitle = result.item_title;
-      Aj.state.$starsBuyForm.field('id').value(result.req_id);
-      RLottie.WORKERS_LIMIT = 1;
-      openPopup(Aj.state.$starsBuyPopup, {
-        onOpen: function() {
-          $('.js-preview-sticker').each(function() {
-            RLottie.init(this, {playUntilEnd: true});
-          });
-        },
-        onClose: function() {
-          $('.js-preview-sticker').each(function() {
-            RLottie.destroy(this);
-          });
-        }
-      });
-    });
-  },
-  eBuyStarsSubmit: function(e) {
-    e.preventDefault();
-    var $form = $(this);
-    var item_title = Aj.state.itemTitle;
-    var req_id = $form.field('id').value();
-    var show_sender = $form.field('show_sender').prop('checked');
-    closePopup(Aj.state.$starsBuyPopup);
-    Wallet.sendTransaction({
-      request: {
-        method: 'getBuyStarsLink',
-        params: {
-          id: req_id,
-          show_sender: show_sender ? 1 : 0
-        }
-      },
-      title: l('WEB_POPUP_QR_STARS_HEADER'),
-      description: l('WEB_POPUP_QR_STARS_TEXT', {
-        amount: '<span class="icon-before icon-ton-text js-amount_fee">' + Aj.state.starsPrice + '</span>'
-      }),
-      qr_label: item_title,
-      tk_label: l('WEB_POPUP_QR_STARS_TK_BUTTON'),
-      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
-      onConfirm: function(by_server) {
-        Stars.updateState(true);
-      }
-    });
-    Aj.state.needUpdate = true;
-  },
-  eBuyMoreStats: function(e) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    Aj.apiRequest('repeatStars', {}, function(result) {
-      if (result.error) {
-        return showAlert(result.error);
-      }
-      Aj.location('/stars');
-    });
-  },
   initWithdraw: function() {
     Aj.onLoad(function(state) {
       var cont = Aj.ajContainer;
