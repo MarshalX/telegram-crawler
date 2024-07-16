@@ -82,8 +82,16 @@ var Ads = {
     }
     return Aj.state.ownerCurrencyDecimals;
   },
-  wrapAmount: function(value, no_currency, field_format) {
-    var decimals = Ads.ownerCurrencyDecimals();
+  wrapAmount: function(value, no_currency, field_format, decimals) {
+    var base_decimals = Ads.ownerCurrencyDecimals();
+    if (typeof decimals === 'undefined') {
+      decimals = base_decimals;
+    }
+    while (decimals > base_decimals) {
+      var val = Math.round(value * Math.pow(10, decimals));
+      if (val % 10) break;
+      decimals--;
+    }
     var amount_str = formatNumber(value, decimals, '.', field_format ? '' : ',');
     if (no_currency) {
       return amount_str;
@@ -186,7 +194,7 @@ var Ads = {
     }
     if (e.type == 'change') {
       if (new_value.length && !is_invalid) {
-        this.value = Ads.wrapAmount(float_value, true, true);
+        this.value = Ads.wrapAmount(float_value, true, true, decimals);
       }
     }
     Ads.updateAmountEurValue(this);
