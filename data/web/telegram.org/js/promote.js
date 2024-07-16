@@ -4006,7 +4006,7 @@ var TransferFunds = {
     var decr = Aj.state.curAmountField == 'decr_amount';
     var amount = Ads.amountFieldValue(Aj.state.$form, Aj.state.curAmountField) || 0;
     if (amount) {
-      var button_label = l(decr ? 'WEB_WITHDRAW_AMOUNT_BUTTON' : 'WEB_TRANSFER_AMOUNT_BUTTON', {amount: Ads.wrapAmount(amount)});
+      var button_label = l(decr ? 'WEB_WITHDRAW_AMOUNT_BUTTON' : 'WEB_TRANSFER_AMOUNT_BUTTON', {amount: Ads.wrapAmount(amount, false, false, 6)});
     } else {
       var button_label = l(decr ? 'WEB_WITHDRAW_FUNDS_BUTTON' : 'WEB_TRANSFER_FUNDS_BUTTON');
     }
