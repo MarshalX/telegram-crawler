@@ -2,12 +2,12 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>Collectible usernames</title>
+    <title>Collectibles</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Telegram users can make it easy for others to contact them or find their public groups and channels via usernames: clients can also assign multiple collectible usernames to accounts, supergroups and channels they own.">
-    <meta property="og:title" content="Collectible usernames">
+    <meta property="description" content="Telegram users can make it easy for others to contact them or find their public groups and channels via usernames: clients can also assign multiple Fragment &amp;raquo; collectible usernames to accounts, supergroups and channels they own; Fragment &amp;raquo; also allows purchasing phone number collectibles that can be used to register Telegram accounts.">
+    <meta property="og:title" content="Collectibles">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Telegram users can make it easy for others to contact them or find their public groups and channels via usernames: clients can also assign multiple collectible usernames to accounts, supergroups and channels they own.">
+    <meta property="og:description" content="Telegram users can make it easy for others to contact them or find their public groups and channels via usernames: clients can also assign multiple Fragment &amp;raquo; collectible usernames to accounts, supergroups and channels they own; Fragment &amp;raquo; also allows purchasing phone number collectibles that can be used to register Telegram accounts.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -39,12 +39,13 @@
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/fragment" >Collectible usernames</a></li></ul></div>
-  <h1 id="dev_page_title">Collectible usernames</h1>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/fragment" >Collectibles</a></li></ul></div>
+  <h1 id="dev_page_title">Collectibles</h1>
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>Telegram users can make it easy for others to contact them or find their public groups and channels via <a href="https://telegram.org/faq#usernames-and-t-me">usernames</a>: clients can also assign multiple <strong>collectible usernames</strong> to accounts, supergroups and channels they own.  </p>
+<p>Telegram users can make it easy for others to contact them or find their public groups and channels via <a href="https://telegram.org/faq#usernames-and-t-me">usernames</a>: clients can also assign multiple <a href="https://fragment.com">Fragment »</a> <strong>collectible usernames</strong> to accounts, supergroups and channels they own; <a href="https://fragment.com">Fragment »</a> also allows purchasing phone number collectibles that can be used to register Telegram accounts.  </p>
+<h3><a class="anchor" href="#collectible-usernames" id="collectible-usernames" name="collectible-usernames"><i class="anchor-icon"></i></a>Collectible usernames</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/username'>username</a>#b4073647 flags:<a href='/type/%23'>#</a> editable:flags.0?<a href='/constructor/true'>true</a> active:flags.1?<a href='/constructor/true'>true</a> username:<a href='/type/string'>string</a> = <a href='/type/Username'>Username</a>;
 
@@ -73,7 +74,19 @@ The first username in the <code>usernames</code> vector must be shown in-UI as t
 <p>Immediately after association, a username is marked as not <code>active</code> (i.e. only the owner can see it in the <code>usernames</code> list): use <a href="/method/account.toggleUsername">account.toggleUsername</a>, <a href="/method/bots.toggleUsername">bots.toggleUsername</a> or <a href="/method/channels.toggleUsername">channels.toggleUsername</a> to mark it as active.<br>
 Note that you can't mark as inactive the basic (non-collectible) username, if any.  </p>
 <p><a href="/method/channels.deactivateAllUsernames">channels.deactivateAllUsernames</a> may also be used to mark as inactive all collectible usernames associated to a certain supergroup or channel: useful for example when making a group or channel private, by first invoking <a href="/method/channels.updateUsername">channels.updateUsername</a> with an empty username to remove the editable username (if present), and then invoking this method to remove all associated collectible usernames.  </p>
-<p>Use <a href="/method/account.reorderUsernames">account.reorderUsernames</a>/<a href="/method/bots.reorderUsernames">bots.reorderUsernames</a>/<a href="/method/channels.reorderUsernames">channels.reorderUsernames</a> to change the order of the usernames associated to an account, channel or supergroup: all currently active usernames must be specified.</p></div>
+<p>Use <a href="/method/account.reorderUsernames">account.reorderUsernames</a>/<a href="/method/bots.reorderUsernames">bots.reorderUsernames</a>/<a href="/method/channels.reorderUsernames">channels.reorderUsernames</a> to change the order of the usernames associated to an account, channel or supergroup: all currently active usernames must be specified.  </p>
+<h3><a class="anchor" href="#fetching-info-about-fragment-collectibles" id="fetching-info-about-fragment-collectibles" name="fetching-info-about-fragment-collectibles"><i class="anchor-icon"></i></a>Fetching info about Fragment collectibles</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/inputCollectibleUsername'>inputCollectibleUsername</a>#e39460a9 username:<a href='/type/string'>string</a> = <a href='/type/InputCollectible'>InputCollectible</a>;
+<a href='/constructor/inputCollectiblePhone'>inputCollectiblePhone</a>#a2e214a4 phone:<a href='/type/string'>string</a> = <a href='/type/InputCollectible'>InputCollectible</a>;
+
+<a href='/constructor/fragment.collectibleInfo'>fragment.collectibleInfo</a>#6ebdff91 purchase_date:<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> crypto_currency:<a href='/type/string'>string</a> crypto_amount:<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/fragment.CollectibleInfo'>fragment.CollectibleInfo</a>;
+
+---functions---
+
+<a href='/method/fragment.getCollectibleInfo'>fragment.getCollectibleInfo</a>#be1e85ba collectible:<a href='/type/InputCollectible'>InputCollectible</a> = <a href='/type/fragment.CollectibleInfo'>fragment.CollectibleInfo</a>;</code></pre>
+<p><a href="/method/fragment.getCollectibleInfo">fragment.getCollectibleInfo</a> may be used to fetch info about <a href="https://fragment.com">Fragment</a> collectible owned by us or other users (i.e. the purchase date &amp; price).  </p>
+<p>The collectible must be visible to the current user, for example it can be a Fragment user/phone number collectible we own, or a Fragment username that another user has enabled on their account, or another user's Fragment phone number that we can see thanks to the owner's <a href="/api/privacy">privacy settings</a>.</p></div>
   
 </div>
           
