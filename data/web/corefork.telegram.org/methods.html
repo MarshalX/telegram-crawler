@@ -207,6 +207,14 @@ Look for updates of telegram&#39;s terms of service…">
 <td><a href="/method/invokeWithoutUpdates">invokeWithoutUpdates</a></td>
 <td>Invoke a request without subscribing the used connection for <a href="/api/updates">updates</a> (this is enabled by default for <a href="/api/files">file queries</a>).</td>
 </tr>
+<tr>
+<td><a href="/method/invokeWithGooglePlayIntegrity">invokeWithGooglePlayIntegrity</a></td>
+<td> </td>
+</tr>
+<tr>
+<td><a href="/method/invokeWithApnsSecret">invokeWithApnsSecret</a></td>
+<td> </td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#registration-authorization" id="registration-authorization" name="registration-authorization"><i class="anchor-icon"></i></a>Registration/Authorization</h3>
@@ -297,6 +305,10 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/auth.sendCode">auth.sendCode</a></td>
 <td>Send the verification code for login</td>
+</tr>
+<tr>
+<td><a href="/method/auth.reportMissingCode">auth.reportMissingCode</a></td>
+<td> </td>
 </tr>
 <tr>
 <td><a href="/method/auth.signIn">auth.signIn</a></td>
@@ -570,8 +582,31 @@ Look for updates of telegram&#39;s terms of service…">
 <td>Permanently disconnect a specific chat from all <a href="/api/business#connected-bots">business bots »</a> (equivalent to specifying it in <code>recipients.exclude_users</code> during initial configuration with <a href="/method/account.updateConnectedBot">account.updateConnectedBot »</a>); to reconnect of a chat disconnected using this method the user must reconnect the entire bot by invoking <a href="/method/account.updateConnectedBot">account.updateConnectedBot »</a>.</td>
 </tr>
 <tr>
+<td><a href="/method/account.getBotBusinessConnection">account.getBotBusinessConnection</a></td>
+<td>Bots may invoke this method to re-fetch the <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> constructor associated with a specific <a href="/api/business#connected-bots">business <code>connection_id</code>, see here »</a> for more info on connected business bots.  <br>This is needed for example for freshly logged in bots that are receiving some <a href="/constructor/updateBotNewBusinessMessage">updateBotNewBusinessMessage</a>, etc. updates because some users have already connected to the bot before it could login.  <br>In this case, the bot is receiving messages from the business connection, but it hasn't cached the associated <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> with info about the connection (can it reply to messages? etc.) yet, and cannot receive the old ones because they were sent when the bot wasn't logged into the session yet.  <br>This method can be used to fetch info about a not-yet-cached business connection, and should not be invoked if the info is already cached or to fetch changes, as eventual changes will automatically be sent as new <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> updates to the bot using the usual <a href="/api/updates">update delivery methods »</a>.</td>
+</tr>
+<tr>
 <td><a href="/method/invokeWithBusinessConnection">invokeWithBusinessConnection</a></td>
 <td>Invoke a method using a <a href="/api/business#connected-bots">Telegram Business Bot connection, see here » for more info, including a list of the methods that can be wrapped in this constructor</a>.<br><br>Make sure to always send queries wrapped in a <code>invokeWithBusinessConnection</code> to the datacenter ID, specified in the <code>dc_id</code> field of the <a href="/constructor/botBusinessConnection">botBusinessConnection</a> that is being used.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-telegram-business-greeting-and-away-messages" id="working-with-telegram-business-greeting-and-away-messages" name="working-with-telegram-business-greeting-and-away-messages"><i class="anchor-icon"></i></a>Working with <a href="/api/business">Telegram Business greeting and away messages</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/account.updateBusinessGreetingMessage">account.updateBusinessGreetingMessage</a></td>
+<td>Set a list of <a href="/api/business#greeting-messages">Telegram Business greeting messages</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/account.updateBusinessAwayMessage">account.updateBusinessAwayMessage</a></td>
+<td>Set a list of <a href="/api/business#away-messages">Telegram Business away messages</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -2954,6 +2989,10 @@ Look for updates of telegram&#39;s terms of service…">
 <td>View and search recently sent media.  <br>This method does not support pagination.</td>
 </tr>
 <tr>
+<td><a href="/method/channels.searchPosts">channels.searchPosts</a></td>
+<td>Globally search for posts from public <a href="/api/channel">channels »</a> (<em>including</em> those we aren't a member of) containing a specific hashtag.</td>
+</tr>
+<tr>
 <td><a href="/method/messages.sendMedia">messages.sendMedia</a></td>
 <td>Send a media</td>
 </tr>
@@ -3215,6 +3254,36 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-the-telegram-business-intro-" id="working-with-the-telegram-business-intro-" name="working-with-the-telegram-business-intro-"><i class="anchor-icon"></i></a>Working with the <a href="/api/business#business-introduction">Telegram Business intro »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/account.updateBusinessIntro">account.updateBusinessIntro</a></td>
+<td>Set or remove the <a href="/api/business#business-introduction">Telegram Business introduction »</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-the-telegram-business-location" id="working-with-the-telegram-business-location" name="working-with-the-telegram-business-location"><i class="anchor-icon"></i></a>Working with the <a href="/api/business#%C3%B2ocation">Telegram Business location</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/account.updateBusinessLocation">account.updateBusinessLocation</a></td>
+<td><a href="/api/business#location">Businesses »</a> may advertise their location using this method, see <a href="/api/business#location">here »</a> for more info.<br><br>To remove business location information invoke the method without setting any of the parameters.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-the-attachment-menu--of-mini-bot-apps-" id="working-with-the-attachment-menu--of-mini-bot-apps-" name="working-with-the-attachment-menu--of-mini-bot-apps-"><i class="anchor-icon"></i></a>Working with the <a href="/bots/webapps#launching-mini-apps-from-the-attachment-menu">attachment menu »</a> of <a href="/bots/webapps">mini bot apps »</a></h3>
 <table class="table">
 <thead>
@@ -3280,6 +3349,45 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-the-privacy-settings" id="working-with-the-privacy-settings" name="working-with-the-privacy-settings"><i class="anchor-icon"></i></a>Working with the <a href="/api/privacy">privacy settings</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/account.getPrivacy">account.getPrivacy</a></td>
+<td>Get privacy settings of current account</td>
+</tr>
+<tr>
+<td><a href="/method/account.setPrivacy">account.setPrivacy</a></td>
+<td>Change privacy settings of current account</td>
+</tr>
+<tr>
+<td><a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a></td>
+<td>Set global privacy settings</td>
+</tr>
+<tr>
+<td><a href="/method/account.getGlobalPrivacySettings">account.getGlobalPrivacySettings</a></td>
+<td>Get global privacy settings</td>
+</tr>
+<tr>
+<td><a href="/method/users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a></td>
+<td>Check whether we can write to the specified user (non-<a href="/api/premium">Premium</a> users only), see <a href="/api/privacy#require-premium-for-new-non-contact-users">here »</a> for more info on the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.setDefaultHistoryTTL">messages.setDefaultHistoryTTL</a></td>
+<td>Changes the default value of the Time-To-Live setting, applied to all new chats.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getDefaultHistoryTTL">messages.getDefaultHistoryTTL</a></td>
+<td>Gets the default value of the Time-To-Live setting, applied to all new chats.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-the-takeout-api-see-here--for-more-info" id="working-with-the-takeout-api-see-here--for-more-info" name="working-with-the-takeout-api-see-here--for-more-info"><i class="anchor-icon"></i></a>Working with the <a href="/api/takeout">takeout API, see here » for more info</a>.</h3>
 <table class="table">
 <thead>
@@ -3312,6 +3420,57 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/invokeWithTakeout">invokeWithTakeout</a></td>
 <td>Invoke a method within a <a href="/api/takeout">takeout session, see here » for more info</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-the-user-profile" id="working-with-the-user-profile" name="working-with-the-user-profile"><i class="anchor-icon"></i></a>Working with the <a href="/api/profile">user profile</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/photos.deletePhotos">photos.deletePhotos</a></td>
+<td>Deletes profile photos. The method returns a list of successfully deleted photo IDs.</td>
+</tr>
+<tr>
+<td><a href="/method/photos.getUserPhotos">photos.getUserPhotos</a></td>
+<td>Returns the list of user photos.</td>
+</tr>
+<tr>
+<td><a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a></td>
+<td>Installs a previously uploaded photo as a profile photo.</td>
+</tr>
+<tr>
+<td><a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a></td>
+<td>Updates current user profile photo.<br><br>The <code>file</code>, <code>video</code> and <code>video_emoji_markup</code> flags are mutually exclusive.</td>
+</tr>
+<tr>
+<td><a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a></td>
+<td>Upload a custom profile picture for a contact, or suggest a new profile picture to a contact.<br><br>The <code>file</code>, <code>video</code> and <code>video_emoji_markup</code> flags are mutually exclusive.</td>
+</tr>
+<tr>
+<td><a href="/method/account.updateProfile">account.updateProfile</a></td>
+<td>Updates user profile.</td>
+</tr>
+<tr>
+<td><a href="/method/account.updateBirthday">account.updateBirthday</a></td>
+<td>Update our <a href="/api/profile#birthday">birthday, see here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/contacts.getBirthdays">contacts.getBirthdays</a></td>
+<td>Fetch all users with birthdays that fall within +1/-1 days, relative to the current day: this method should be invoked by clients every 6-8 hours, and if the result is non-empty, it should be used to appropriately update locally cached birthday information in <a href="/constructor/user">user</a>.<code>birthday</code>.<br><br><a href="/api/profile#birthday">See here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/account.updatePersonalChannel">account.updatePersonalChannel</a></td>
+<td>Associate (or remove) a personal <a href="/api/channel">channel »</a>, that will be listed on our personal <a href="/api/profile#personal-channel">profile page »</a>.<br><br>Changing it will emit an <a href="/constructor/updateUser">updateUser</a> update.</td>
+</tr>
+<tr>
+<td><a href="/method/account.updateStatus">account.updateStatus</a></td>
+<td>Updates online user status.</td>
 </tr>
 </tbody>
 </table>
@@ -3360,10 +3519,6 @@ Look for updates of telegram&#39;s terms of service…">
 <td>Get days to live of account</td>
 </tr>
 <tr>
-<td><a href="/method/account.getPrivacy">account.getPrivacy</a></td>
-<td>Get privacy settings of current account</td>
-</tr>
-<tr>
 <td><a href="/method/account.resetAuthorization">account.resetAuthorization</a></td>
 <td>Log out an active <a href="/api/auth">authorized session</a> by its hash</td>
 </tr>
@@ -3379,34 +3534,6 @@ Look for updates of telegram&#39;s terms of service…">
 <td><a href="/method/account.setAccountTTL">account.setAccountTTL</a></td>
 <td>Set account self-destruction period</td>
 </tr>
-<tr>
-<td><a href="/method/account.setPrivacy">account.setPrivacy</a></td>
-<td>Change privacy settings of current account</td>
-</tr>
-<tr>
-<td><a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a></td>
-<td>Set global privacy settings</td>
-</tr>
-<tr>
-<td><a href="/method/account.getGlobalPrivacySettings">account.getGlobalPrivacySettings</a></td>
-<td>Get global privacy settings</td>
-</tr>
-<tr>
-<td><a href="/method/account.updateProfile">account.updateProfile</a></td>
-<td>Updates user profile.</td>
-</tr>
-<tr>
-<td><a href="/method/account.updateStatus">account.updateStatus</a></td>
-<td>Updates online user status.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.setDefaultHistoryTTL">messages.setDefaultHistoryTTL</a></td>
-<td>Changes the default value of the Time-To-Live setting, applied to all new chats.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getDefaultHistoryTTL">messages.getDefaultHistoryTTL</a></td>
-<td>Gets the default value of the Time-To-Live setting, applied to all new chats.</td>
-</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-timezones" id="working-with-timezones" name="working-with-timezones"><i class="anchor-icon"></i></a>Working with timezones</h3>
@@ -3421,37 +3548,6 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/help.getTimezonesList">help.getTimezonesList</a></td>
 <td>Returns timezone information that may be used elsewhere in the API, such as to set <a href="/api/business#opening-hours">Telegram Business opening hours »</a>.</td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" href="#working-with-user-profile-pictures" id="working-with-user-profile-pictures" name="working-with-user-profile-pictures"><i class="anchor-icon"></i></a>Working with user profile pictures</h3>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="/method/photos.deletePhotos">photos.deletePhotos</a></td>
-<td>Deletes profile photos. The method returns a list of successfully deleted photo IDs.</td>
-</tr>
-<tr>
-<td><a href="/method/photos.getUserPhotos">photos.getUserPhotos</a></td>
-<td>Returns the list of user photos.</td>
-</tr>
-<tr>
-<td><a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a></td>
-<td>Installs a previously uploaded photo as a profile photo.</td>
-</tr>
-<tr>
-<td><a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a></td>
-<td>Updates current user profile photo.<br><br>The <code>file</code>, <code>video</code> and <code>video_emoji_markup</code> flags are mutually exclusive.</td>
-</tr>
-<tr>
-<td><a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a></td>
-<td>Upload a custom profile picture for a contact, or suggest a new profile picture to a contact.<br><br>The <code>file</code>, <code>video</code> and <code>video_emoji_markup</code> flags are mutually exclusive.</td>
 </tr>
 </tbody>
 </table>
@@ -3500,32 +3596,8 @@ Look for updates of telegram&#39;s terms of service…">
 <td> </td>
 </tr>
 <tr>
-<td><a href="/method/users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a></td>
-<td>Check whether we can write to the specified user (non-<a href="/api/premium">Premium</a> users only), see <a href="/api/privacy#require-premium-for-new-non-contact-users">here »</a> for more info on the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/account.updateBusinessLocation">account.updateBusinessLocation</a></td>
-<td><a href="/api/business#location">Businesses »</a> may advertise their location using this method, see <a href="/api/business#location">here »</a> for more info.<br><br>To remove business location information invoke the method without setting any of the parameters.</td>
-</tr>
-<tr>
-<td><a href="/method/account.updateBusinessGreetingMessage">account.updateBusinessGreetingMessage</a></td>
-<td>Set a list of <a href="/api/business#greeting-messages">Telegram Business greeting messages</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/account.updateBusinessAwayMessage">account.updateBusinessAwayMessage</a></td>
-<td>Set a list of <a href="/api/business#away-messages">Telegram Business away messages</a>.</td>
-</tr>
-<tr>
 <td><a href="/method/messages.toggleDialogFilterTags">messages.toggleDialogFilterTags</a></td>
 <td> </td>
-</tr>
-<tr>
-<td><a href="/method/account.getBotBusinessConnection">account.getBotBusinessConnection</a></td>
-<td>Bots may invoke this method to re-fetch the <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> constructor associated with a specific <a href="/api/business#connected-bots">business <code>connection_id</code>, see here »</a> for more info on connected business bots.  <br>This is needed for example for freshly logged in bots that are receiving some <a href="/constructor/updateBotNewBusinessMessage">updateBotNewBusinessMessage</a>, etc. updates because some users have already connected to the bot before it could login.  <br>In this case, the bot is receiving messages from the business connection, but it hasn't cached the associated <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> with info about the connection (can it reply to messages? etc.) yet, and cannot receive the old ones because they were sent when the bot wasn't logged into the session yet.  <br>This method can be used to fetch info about a not-yet-cached business connection, and should not be invoked if the info is already cached or to fetch changes, as eventual changes will automatically be sent as new <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> updates to the bot using the usual <a href="/api/updates">update delivery methods »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/account.updateBusinessIntro">account.updateBusinessIntro</a></td>
-<td>Set or remove the <a href="/api/business#business-introduction">Telegram Business introduction »</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/stickers.replaceSticker">stickers.replaceSticker</a></td>
@@ -3540,18 +3612,6 @@ Look for updates of telegram&#39;s terms of service…">
 <td> </td>
 </tr>
 <tr>
-<td><a href="/method/account.updateBirthday">account.updateBirthday</a></td>
-<td>Update our <a href="/api/profile#birthday">birthday, see here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/contacts.getBirthdays">contacts.getBirthdays</a></td>
-<td>Fetch all users with birthdays that fall within +1/-1 days, relative to the current day: this method should be invoked by clients every 6-8 hours, and if the result is non-empty, it should be used to appropriately update locally cached birthday information in <a href="/constructor/user">user</a>.<code>birthday</code>.<br><br><a href="/api/profile#birthday">See here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/account.updatePersonalChannel">account.updatePersonalChannel</a></td>
-<td>Associate (or remove) a personal <a href="/api/channel">channel »</a>, that will be listed on our personal <a href="/api/profile#personal-channel">profile page »</a>.<br><br>Changing it will emit an <a href="/constructor/updateUser">updateUser</a> update.</td>
-</tr>
-<tr>
 <td><a href="/method/channels.reportSponsoredMessage">channels.reportSponsoredMessage</a></td>
 <td> </td>
 </tr>
@@ -3562,22 +3622,6 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/account.toggleSponsoredMessages">account.toggleSponsoredMessages</a></td>
 <td>Disable or re-enable Telegram ads for the current <a href="/api/premium">Premium</a> account.<br><br>Useful for business owners that may want to launch and view their own Telegram ads via the <a href="https://ads.telegram.org">Telegram ad platform »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/auth.reportMissingCode">auth.reportMissingCode</a></td>
-<td> </td>
-</tr>
-<tr>
-<td><a href="/method/invokeWithGooglePlayIntegrity">invokeWithGooglePlayIntegrity</a></td>
-<td> </td>
-</tr>
-<tr>
-<td><a href="/method/invokeWithApnsSecret">invokeWithApnsSecret</a></td>
-<td> </td>
-</tr>
-<tr>
-<td><a href="/method/channels.searchPosts">channels.searchPosts</a></td>
-<td>Globally search for posts from public <a href="/api/channel">channels »</a> (<em>including</em> those we aren't a member of) containing a specific hashtag.</td>
 </tr>
 </tbody>
 </table></div>
