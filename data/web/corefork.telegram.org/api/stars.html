@@ -46,28 +46,55 @@
 
 <p>Mini app developers and content creators can use the Telegram Stars they've earned to <a href="https://telegram.org/blog/mini-app-bar-paid-media-and-more#rewards-for-content-creators-and-developers">receive rewards in Toncoin</a> – or buy <strong>Telegram Ads</strong> at <a href="https://telegram.org/blog/mini-app-bar-paid-media-and-more#subsidized-ads-for-creators-and-developers">special discounted rates</a>.</p>
 <p>This page describes the methods used to buy and withdraw Telegram Stars, as well as view detailed revenue stats.  </p>
-<h3><a class="anchor" href="#buying-telegram-stars" id="buying-telegram-stars" name="buying-telegram-stars"><i class="anchor-icon"></i></a>Buying Telegram Stars</h3>
-<pre><code><a href='/constructor/starsTopupOption'>starsTopupOption</a>#bd915c0 flags:<a href='/type/%23'>#</a> extended:flags.1?<a href='/constructor/true'>true</a> stars:<a href='/type/long'>long</a> store_product:flags.0?<a href='/type/string'>string</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/StarsTopupOption'>StarsTopupOption</a>;
+<h3><a class="anchor" href="#balance-and-transaction-history" id="balance-and-transaction-history" name="balance-and-transaction-history"><i class="anchor-icon"></i></a>Balance and transaction history</h3>
+<pre><code><a href='/constructor/starsTransactionPeerAppStore'>starsTransactionPeerAppStore</a>#b457b375 = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
+<a href='/constructor/starsTransactionPeerPlayMarket'>starsTransactionPeerPlayMarket</a>#7b560a0b = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
+<a href='/constructor/starsTransactionPeerPremiumBot'>starsTransactionPeerPremiumBot</a>#250dbaf8 = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
+<a href='/constructor/starsTransactionPeerFragment'>starsTransactionPeerFragment</a>#e92fd902 = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
+<a href='/constructor/starsTransactionPeer'>starsTransactionPeer</a>#d80da15d peer:<a href='/type/Peer'>Peer</a> = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
+<a href='/constructor/starsTransactionPeerUnsupported'>starsTransactionPeerUnsupported</a>#95f2bfe4 = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
 
 <a href='/constructor/starsTransaction'>starsTransaction</a>#cc7079b2 flags:<a href='/type/%23'>#</a> refund:flags.3?<a href='/constructor/true'>true</a> id:<a href='/type/string'>string</a> stars:<a href='/type/long'>long</a> date:<a href='/type/int'>int</a> peer:<a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a> title:flags.0?<a href='/type/string'>string</a> description:flags.1?<a href='/type/string'>string</a> photo:flags.2?<a href='/type/WebDocument'>WebDocument</a> = <a href='/type/StarsTransaction'>StarsTransaction</a>;
 
 <a href='/constructor/payments.starsStatus'>payments.starsStatus</a>#8cf4ee60 flags:<a href='/type/%23'>#</a> balance:<a href='/type/long'>long</a> history:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StarsTransaction'>StarsTransaction</a>&gt; next_offset:flags.0?<a href='/type/string'>string</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.StarsStatus'>payments.StarsStatus</a>;
 
-<a href='/constructor/updateStarsBalance'>updateStarsBalance</a>#fb85198 balance:<a href='/type/long'>long</a> = <a href='/type/Update'>Update</a>;
-
-<a href='/constructor/inputStorePaymentStars'>inputStorePaymentStars</a>#4f0ee8df flags:<a href='/type/%23'>#</a> stars:<a href='/type/long'>long</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a>;
-inputInvoicePremiumStars purpose:InputStorePaymentPurpose option:StarsTopupOption = InputInvoice;
-
+<a href='/constructor/updateStarsBalance'>updateStarsBalance</a>#0fb85198 balance:<a href='/type/long'>long</a> = <a href='/type/Update'>Update</a>;
 
 ---functions---
-
-<a href='/method/payments.getStarsTopupOptions'>payments.getStarsTopupOptions</a>#c00ec7d3 = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StarsTopupOption'>StarsTopupOption</a>&gt;;
 
 <a href='/method/payments.getStarsStatus'>payments.getStarsStatus</a>#104fcfa7 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/payments.StarsStatus'>payments.StarsStatus</a>;
 
 <a href='/method/payments.getStarsTransactions'>payments.getStarsTransactions</a>#673ac2f9 flags:<a href='/type/%23'>#</a> inbound:flags.0?<a href='/constructor/true'>true</a> outbound:flags.1?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> offset:<a href='/type/string'>string</a> = <a href='/type/payments.StarsStatus'>payments.StarsStatus</a>;</code></pre>
-<p>There is also a store-based subscription flow based on <a href="/method/payments.assignAppStoreTransaction">payments.assignAppStoreTransaction</a>/<a href="/method/payments.assignPlayMarketTransaction">payments.assignPlayMarketTransaction</a>, but it's currently not available to third-party apps (unlike the flow described above, which can be used by all clients).</p>
-<h3><a class="anchor" href="#using-telegram-stars" id="using-telegram-stars" name="using-telegram-stars"><i class="anchor-icon"></i></a>Using Telegram Stars</h3></div>
+<p>Use <a href="/method/payments.getStarsStatus">payments.getStarsStatus</a> to get the current stars balance of the current account (with peer=<a href="/constructor/inputPeerSelf">inputPeerSelf</a>), or the stars balance of the bot specified in <code>peer</code>.<br>
+The method will also return the last 5 <a href="/constructor/starsTransaction">star transactions »</a>.<br>
+To return all <a href="/constructor/starsTransaction">star transactions »</a> (and optionally search using filters), use <a href="/method/payments.getStarsTransactions">payments.getStarsTransactions</a>.  </p>
+<p>Changes in the star balance (through <a href="#buying-stars">topups</a> or <a href="#using-stars">purchases</a>) will be notified by the server via an <a href="/constructor/updateStarsBalance">updateStarsBalance</a> update.</p>
+<h3><a class="anchor" href="#buying-stars" id="buying-stars" name="buying-stars"><i class="anchor-icon"></i></a>Buying stars</h3>
+<pre><code><a href='/constructor/starsTopupOption'>starsTopupOption</a>#bd915c0 flags:<a href='/type/%23'>#</a> extended:flags.1?<a href='/constructor/true'>true</a> stars:<a href='/type/long'>long</a> store_product:flags.0?<a href='/type/string'>string</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/StarsTopupOption'>StarsTopupOption</a>;
+
+<a href='/constructor/inputInvoiceStars'>inputInvoiceStars</a>#1da33ad8 option:<a href='/type/StarsTopupOption'>StarsTopupOption</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+
+---functions---
+
+<a href='/method/payments.getStarsTopupOptions'>payments.getStarsTopupOptions</a>#c00ec7d3 = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StarsTopupOption'>StarsTopupOption</a>&gt;;</code></pre>
+<p>To purchase telegram stars, first invoke the <a href="/method/payments.getStarsTopupOptions">payments.getStarsTopupOptions</a> method, to obtain a list of topup options as <a href="/constructor/starsTopupOption">starsTopupOption</a> constructors.  </p>
+<p>Once the user has chosen a specific star topup option, invoke <a href="/method/payments.getPaymentForm">payments.getPaymentForm</a>, passing an <a href="/constructor/inputInvoiceStars">inputInvoiceStars</a>, with the chosen <a href="/constructor/starsTopupOption">starsTopupOption</a>.</p>
+<p>Then, follow the <a href="/api/payments#22-getting-invoice-info-about-the-product">invoice payment flow as described in the payments documentation »</a>.  </p>
+<p>More alternative payment flows are also available:</p>
+<ul>
+<li>Payment via <a href="https://fragment.com">Fragment</a>, which also allows making larger purchases.</li>
+<li>The store-based subscription flow based on <a href="/method/payments.assignAppStoreTransaction">payments.assignAppStoreTransaction</a>/<a href="/method/payments.assignPlayMarketTransaction">payments.assignPlayMarketTransaction</a>, currently not available to third-party apps.  </li>
+</ul>
+<h3><a class="anchor" href="#using-stars" id="using-stars" name="using-stars"><i class="anchor-icon"></i></a>Using stars</h3>
+<pre><code><a href='/constructor/payments.paymentFormStars'>payments.paymentFormStars</a>#7bf6b15c flags:<a href='/type/%23'>#</a> form_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:flags.5?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;
+
+<a href='/constructor/payments.paymentReceiptStars'>payments.paymentReceiptStars</a>#dabbf83a flags:<a href='/type/%23'>#</a> date:<a href='/type/int'>int</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:flags.2?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> transaction_id:<a href='/type/string'>string</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentReceipt'>payments.PaymentReceipt</a>;
+
+---functions---
+
+<a href='/method/payments.sendStarsForm'>payments.sendStarsForm</a>#02bb731d flags:<a href='/type/%23'>#</a> form_id:<a href='/type/long'>long</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> = <a href='/type/payments.PaymentResult'>payments.PaymentResult</a>;
+
+<a href='/method/payments.refundStarsCharge'>payments.refundStarsCharge</a>#25ae8f4a user_id:<a href='/type/InputUser'>InputUser</a> charge_id:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre></div>
   
 </div>
           
