@@ -89,7 +89,7 @@
 <tr>
 <td><strong>hide_read_marks</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/constructor/true">true</a></td>
-<td>If set, (only) users that cannot see <em>our</em> exact last online date due to the current value of the <a href="/constructor/inputPrivacyKeyStatusTimestamp">inputPrivacyKeyStatusTimestamp</a> key will receive a <code>403 USER_PRIVACY_RESTRICTED</code> error when invoking <a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a> to fetch the exact read date of one of their messages. <br>The <a href="/constructor/userFull">userFull</a>.<code>read_dates_private</code> flag will be set for users that have this flag enabled.</td>
+<td>If this flag is set, the <a href="/constructor/inputPrivacyKeyStatusTimestamp">inputPrivacyKeyStatusTimestamp</a> key will also apply to the ability to use <a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a> on messages sent to us. <br>Meaning, users that cannot see <em>our</em> exact last online date due to the current value of the <a href="/constructor/inputPrivacyKeyStatusTimestamp">inputPrivacyKeyStatusTimestamp</a> key will receive a <code>403 USER_PRIVACY_RESTRICTED</code> error when invoking <a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a> to fetch the exact read date of a message they sent to us. <br>The <a href="/constructor/userFull">userFull</a>.<code>read_dates_private</code> flag will be set for users that have this flag enabled.</td>
 </tr>
 <tr>
 <td><strong>new_noncontact_peers_require_premium</strong></td>
@@ -107,6 +107,11 @@
 <p>Whether people will be able to see our exact last online timestamp.</p>
 <p>Note that if <em>we</em> decide to hide our exact last online timestamp to someone <strong>and</strong> we do not have a <a href="/api/premium">Premium</a> subscription, we won't be able to see the exact last online timestamp of <em>any</em> user, including those that do share it with us.</p>
 <h4><a class="anchor" href="#messagesgetoutboxreaddate" id="messagesgetoutboxreaddate" name="messagesgetoutboxreaddate"><i class="anchor-icon"></i></a><a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a></h4>
+<p>Get the exact read date of one of our messages, sent to a private chat with another user.</p>
+<p>Can be only done for private outgoing messages not older than <a href="/api/config#pm-read-date-expire-period">appConfig.pm_read_date_expire_period »</a>.</p>
+<p>If the <code>peer</code>'s <a href="/constructor/userFull">userFull</a>.<code>read_dates_private</code> flag is set, we will not be able to fetch the exact read date of messages we send to them, and a <code>USER_PRIVACY_RESTRICTED</code> RPC error will be emitted.<br>
+The exact read date of messages might still be unavailable for other reasons, see <a href="/constructor/globalPrivacySettings">here »</a> for more info.<br>
+To set <a href="/constructor/userFull">userFull</a>.<code>read_dates_private</code> for ourselves invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a>, setting the <code>settings.hide_read_marks</code> flag.</p>
 <h4><a class="anchor" href="#userfull" id="userfull" name="userfull"><i class="anchor-icon"></i></a><a href="/constructor/userFull">userFull</a></h4>
 <p>Extended user info</p>
 <h4><a class="anchor" href="#usersgetispremiumrequiredtocontact" id="usersgetispremiumrequiredtocontact" name="usersgetispremiumrequiredtocontact"><i class="anchor-icon"></i></a><a href="/method/users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a></h4>

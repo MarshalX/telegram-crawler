@@ -134,7 +134,7 @@
 <tr>
 <td><strong>read_dates_private</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.30?<a href="/constructor/true">true</a></td>
-<td>If set, we cannot fetch the exact read date of messages we send to this user using <a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a>.  <br>The exact read date of messages might still be unavailable for other reasons, see <a href="/constructor/globalPrivacySettings">here »</a> for more info.  <br>To set this flag for ourselves invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a>, setting the <code>settings.hide_read_marks</code> flag.</td>
+<td>If set, we cannot fetch the exact read date of messages we send to this user using <a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a>.  <br>The exact read date of messages might still be unavailable for other reasons, see <a href="/method/messages.getOutboxReadDate">here »</a> for more info.  <br>To set this flag for ourselves invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a>, setting the <code>settings.hide_read_marks</code> flag.</td>
 </tr>
 <tr>
 <td><strong>flags2</strong></td>
@@ -307,8 +307,11 @@
 <h4><a class="anchor" href="#accountsetglobalprivacysettings" id="accountsetglobalprivacysettings" name="accountsetglobalprivacysettings"><i class="anchor-icon"></i></a><a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a></h4>
 <p>Set global privacy settings</p>
 <h4><a class="anchor" href="#messagesgetoutboxreaddate" id="messagesgetoutboxreaddate" name="messagesgetoutboxreaddate"><i class="anchor-icon"></i></a><a href="/method/messages.getOutboxReadDate">messages.getOutboxReadDate</a></h4>
-<h4><a class="anchor" href="#globalprivacysettings" id="globalprivacysettings" name="globalprivacysettings"><i class="anchor-icon"></i></a><a href="/constructor/globalPrivacySettings">globalPrivacySettings</a></h4>
-<p>Global privacy settings</p>
+<p>Get the exact read date of one of our messages, sent to a private chat with another user.</p>
+<p>Can be only done for private outgoing messages not older than <a href="/api/config#pm-read-date-expire-period">appConfig.pm_read_date_expire_period »</a>.</p>
+<p>If the <code>peer</code>'s <a href="/constructor/userFull">userFull</a>.<code>read_dates_private</code> flag is set, we will not be able to fetch the exact read date of messages we send to them, and a <code>USER_PRIVACY_RESTRICTED</code> RPC error will be emitted.<br>
+The exact read date of messages might still be unavailable for other reasons, see <a href="/constructor/globalPrivacySettings">here »</a> for more info.<br>
+To set <a href="/constructor/userFull">userFull</a>.<code>read_dates_private</code> for ourselves invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a>, setting the <code>settings.hide_read_marks</code> flag.</p>
 <h4><a class="anchor" href="#business" id="business" name="business"><i class="anchor-icon"></i></a><a href="/api/business">Business</a></h4>
 <p>Users can turn their Telegram account into a business account, gaining access to business features such as opening hours, location, quick replies, automated messages, custom start pages, chatbot support, and more.</p>
 <h4><a class="anchor" href="#pinned-messages" id="pinned-messages" name="pinned-messages"><i class="anchor-icon"></i></a><a href="/api/pin">Pinned messages</a></h4>
