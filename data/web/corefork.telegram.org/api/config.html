@@ -369,13 +369,8 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "intro_description_length_limit": 70,
     "business_chat_links_limit": 100,
     "channel_restrict_sponsored_level_min": 50,
-    "channel_revenue_withdrawal_enabled": true,
     "dismissed_suggestions": [],
     "stories_pinned_to_top_count_max": 3,
-    "stars_purchase_blocked": false,
-    "stories_area_url_max": 3,
-    "stars_revenue_withdrawal_min": 1000,
-    "stars_paid_post_amount_max": 2500,
     "can_edit_factcheck": false,
     "factcheck_length_limit": 1024,
     "web_app_allowed_protocols": [
@@ -415,7 +410,9 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
 <h4><a class="anchor" href="#autoarchive-setting-available" id="autoarchive-setting-available" name="autoarchive-setting-available"><i class="anchor-icon"></i></a><code>autoarchive_setting_available</code></h4>
 <p>Whether clients <em>can</em> invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a> with <a href="/constructor/globalPrivacySettings"><code>globalPrivacySettings.archive_and_mute_new_noncontact_peers = boolTrue</code></a>, to automatically archive and mute new incoming chats from non-contacts. (boolean)</p>
 <h4><a class="anchor" href="#pending-suggestions" id="pending-suggestions" name="pending-suggestions"><i class="anchor-icon"></i></a><code>pending_suggestions</code></h4>
-<p>Contains a list of suggestions that should be actively shown as a tooltip to the user. (Array of strings, possible values shown <a href="#suggestions">in the suggestions section »</a>.  </p>
+<p>Contains a list of suggestions that should be actively shown as a tooltip to the user. (Array of strings, possible values shown <a href="#suggestions">in the suggestions section »</a>).  </p>
+<h4><a class="anchor" href="#dismissed-suggestions" id="dismissed-suggestions" name="dismissed-suggestions"><i class="anchor-icon"></i></a><code>dismissed_suggestions</code></h4>
+<p>Contains a list of <a href="#inverted-suggestions">inverted suggestions</a> that were <a href="/api/config#dismissing-suggestions">dismissed</a> by the user. (Array of strings, possible values shown <a href="#inverted-suggestions">in the inverted suggestions section »</a>).  </p>
 <h4><a class="anchor" href="#topics-pinned-limit" id="topics-pinned-limit" name="topics-pinned-limit"><i class="anchor-icon"></i></a><code>topics_pinned_limit</code></h4>
 <p>Maximum number of <a href="/api/forum#forum-topics">topics</a> that can be pinned in a single <a href="/api/forum">forum</a>. (integer)</p>
 <h4><a class="anchor" href="#telegram-antispam-user-id" id="telegram-antispam-user-id" name="telegram-antispam-user-id"><i class="anchor-icon"></i></a><code>telegram_antispam_user_id</code></h4>
@@ -658,15 +655,10 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <p>Indicates the file download speedup enjoyed by <a href="/api/premium">Premium subscribers</a>, used <a href="/api/files#downloading-files">as specified here »</a> in the Premium modal shown when receiving <code>FLOOD_WAIT_PREMIUM_X</code> errors during file downloads. (integer)</p>
 <h4><a class="anchor" href="#upload-premium-speedup-notify-period" id="upload-premium-speedup-notify-period" name="upload-premium-speedup-notify-period"><i class="anchor-icon"></i></a><code>upload_premium_speedup_notify_period</code></h4>
 <p>The Premium modal shown when receiving <code>FLOOD_WAIT_PREMIUM_X</code> errors during file uploads/downloads should be shown at most every <code>upload_premium_speedup_notify_period</code> seconds.  (integer)</p>
-<h4><a class="anchor" href="#channel-revenue-withdrawal-enabled" id="channel-revenue-withdrawal-enabled" name="channel-revenue-withdrawal-enabled"><i class="anchor-icon"></i></a><code>channel_revenue_withdrawal_enabled</code></h4>
-<h4><a class="anchor" href="#dismissed-suggestions" id="dismissed-suggestions" name="dismissed-suggestions"><i class="anchor-icon"></i></a><code>dismissed_suggestions</code></h4>
 <h4><a class="anchor" href="#stories-pinned-to-top-count-max" id="stories-pinned-to-top-count-max" name="stories-pinned-to-top-count-max"><i class="anchor-icon"></i></a><code>stories_pinned_to_top_count_max</code></h4>
 <p>The maximum number of <a href="/api/stories#pinned-or-archived-stories">stories that can be pinned on top of the profile »</a>.  </p>
-<h4><a class="anchor" href="#stars-purchase-blocked" id="stars-purchase-blocked" name="stars-purchase-blocked"><i class="anchor-icon"></i></a><code>stars_purchase_blocked</code></h4>
-<h4><a class="anchor" href="#stories-area-url-max" id="stories-area-url-max" name="stories-area-url-max"><i class="anchor-icon"></i></a><code>stories_area_url_max</code></h4>
-<h4><a class="anchor" href="#stars-revenue-withdrawal-min" id="stars-revenue-withdrawal-min" name="stars-revenue-withdrawal-min"><i class="anchor-icon"></i></a><code>stars_revenue_withdrawal_min</code></h4>
-<h4><a class="anchor" href="#stars-paid-post-amount-max" id="stars-paid-post-amount-max" name="stars-paid-post-amount-max"><i class="anchor-icon"></i></a><code>stars_paid_post_amount_max</code></h4>
 <h4><a class="anchor" href="#web-app-allowed-protocols" id="web-app-allowed-protocols" name="web-app-allowed-protocols"><i class="anchor-icon"></i></a><code>web_app_allowed_protocols</code></h4>
+<p>Specifies a list of allowed schemes for URLs received in <a href="/api/web-events#web-app-open-link">web_app_open_link events</a>. (array of strings)</p>
 <h3><a class="anchor" href="#suggestions" id="suggestions" name="suggestions"><i class="anchor-icon"></i></a>Suggestions</h3>
 <p>The API can return a set of useful suggestions for users of graphical clients.  </p>
 <h4><a class="anchor" href="#basic-suggestions" id="basic-suggestions" name="basic-suggestions"><i class="anchor-icon"></i></a>Basic suggestions</h4>
@@ -698,10 +690,15 @@ A full list of these parameters can be seen in the <a href="#client-configuratio
 <li><code>"PREMIUM_CHRISTMAS"</code> - Suggests the user to <a href="/api/premium#gifting-telegram-premium">gift Telegram Premium</a> subscription to friends for Christmas.</li>
 <li><code>"PREMIUM_GRACE"</code> -  Suggests the user to extend their expiring Telegram Premium subscription</li>
 <li><code>"BIRTHDAY_SETUP"</code> - Suggests the user to set a <a href="/api/profile#birthday">birthday »</a>.</li>
-<li><code>"BIRTHDAY_CONTACTS_TODAY"</code> - If set, indicates that the user has <strong>hidden</strong> the tooltip that recommends to gift a Telegram Premium subscription to contacts on their <a href="/api/profile#birthday">birthday »</a> (i.e. unlike the other suggestions, this is an inverted suggestion used to <em>hide</em> a tooltip, not display it).<br>
-This suggestion can be <em>enabled</em> by invoking <a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> when the user hides the tooltip, but it is also automatically enabled by the server if the user gifts one or more Telegram Premium subscriptions to friends with birthdays falling within the next/previous 24 hours.  </li>
 </ul>
 </li>
+</ul>
+<h4><a class="anchor" href="#inverted-suggestions" id="inverted-suggestions" name="inverted-suggestions"><i class="anchor-icon"></i></a>Inverted suggestions</h4>
+<p>These suggestions are <em>enabled by default</em>, and are never returned in the <code>pending_suggestions</code> field of the <a href="#client-configuration">client configuration object</a>.  </p>
+<p>They can be dismissed by invoking <a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> as usual, but unlike <a href="#basic-suggestions">basic suggestions</a>, once dismissed they will appear in the <code>dismissed_suggestions</code> field of the <a href="#client-configuration">client configuration object</a>.  </p>
+<ul>
+<li><code>"BIRTHDAY_CONTACTS_TODAY"</code> - If not dismissed, indicates that the client should display the tooltip that recommends to gift a Telegram Premium subscription to contacts on their <a href="/api/profile#birthday">birthday »</a>.<br>
+This suggestion can be dismissed by invoking <a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> when the user hides the tooltip, but it is also automatically dismissed by the server if the user gifts one or more Telegram Premium subscriptions to friends with birthdays falling within the next/previous 24 hours.  </li>
 </ul>
 <h4><a class="anchor" href="#channel-suggestions" id="channel-suggestions" name="channel-suggestions"><i class="anchor-icon"></i></a>Channel suggestions</h4>
 <pre><code><a href='/constructor/messages.chatFull'>messages.chatFull</a>#e5d7d19c full_chat:<a href='/type/ChatFull'>ChatFull</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.ChatFull'>messages.ChatFull</a>;
