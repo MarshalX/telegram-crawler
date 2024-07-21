@@ -99,6 +99,10 @@
 <li>FILE_PART_EMPTY: The file part sent is empty</li>
 <li>FILE_PART_SIZE_INVALID - 512KB cannot be evenly divided by <strong>part_size</strong></li>
 <li>FILE_PART_SIZE_CHANGED - The part size is different from the size of one of the previous parts in the same file</li>
+<li>FLOOD_PREMIUM_WAIT_X: Indicates that upload speed is limited because the current account does not have a <a href="/api/premium">Premium</a> subscription, and that the query must be automatically repeated by the client after X seconds.<br>
+When receiving this error, clients should display the <a href="/api/premium">Telegram Premium subscription modal</a>, offering the user to purchase a Premium subscription to increase upload speed <a href="/api/config#upload-premium-speedup-upload">upload_premium_speedup_upload »</a> times.<br>
+Note that this modal should only be displayed if the file that is being uploaded is currently visible to the user; if it isn't, the modal should be displayed once the loading/already loaded media becomes visible.<br>
+Also, this modal should only be shown <strong>at most</strong> every <a href="/api/config#upload-premium-speedup-notify-period">upload_premium_speedup_notify_period »</a>, to avoid bombarding the user with this popup for every file whose upload is slowed down.  </li>
 </ul>
 <p>While the parts are being uploaded, an <a href="https://en.wikipedia.org/wiki/MD5">MD5 hash</a> of the file contents can also be computed to be used later as the <strong>md5_checksum</strong> parameter in the <a href="/constructor/inputFile">inputFile</a> constructor (since it is checked only by the server, for encrypted secret chat files it must be generated from the encrypted file).<br>
 After the entire file is successfully saved, the final method may be called and passed the generated <a href="/type/InputFile">inputFile</a> object. In case the <a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> method is used, the <a href="/constructor/inputFileBig">inputFileBig</a> constructor must be passed, in other cases use <a href="/constructor/inputFile">inputFile</a>.</p>
@@ -319,6 +323,11 @@ The file download operation may also return one of the following <a href="/api/e
 <li>OFFSET_INVALID: The <strong>offset</strong> value is invalid</li>
 <li>LIMIT_INVALID: The <strong>limit</strong> value is invalid</li>
 <li>FILE_MIGRATE_X: The file is in the datacenter No. X</li>
+<li>FLOOD_WAIT_X: Repeat the query after X seconds</li>
+<li>FLOOD_PREMIUM_WAIT_X: Indicates that download speed is limited because the current account does not have a <a href="/api/premium">Premium</a> subscription, and that the query must be automatically repeated by the client after X seconds.<br>
+When receiving this error, clients should display the <a href="/api/premium">Telegram Premium subscription modal</a>, offering the user to purchase a Premium subscription to increase download speed <a href="/api/config#upload-premium-speedup-download">upload_premium_speedup_download »</a> times.<br>
+Note that this modal should only be displayed if the file that is being downloaded is currently visible to the user; if it isn't, the modal should be displayed once the loading/already loaded media becomes visible.<br>
+Also, this modal should only be shown <strong>at most</strong> every <a href="/api/config#upload-premium-speedup-notify-period">upload_premium_speedup_notify_period »</a>, to avoid bombarding the user with this popup for every file whose download is slowed down.  </li>
 </ul>
 <h4><a class="anchor" href="#verifying-downloaded-chunks" id="verifying-downloaded-chunks" name="verifying-downloaded-chunks"><i class="anchor-icon"></i></a>Verifying downloaded chunks</h4>
 <pre><code><a href='/constructor/fileHash'>fileHash</a>#f39b035c offset:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/bytes'>bytes</a> = <a href='/type/FileHash'>FileHash</a>;
