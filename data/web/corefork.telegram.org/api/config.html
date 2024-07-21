@@ -188,13 +188,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "dialog_filters_enabled": true,
     "dialog_filters_tooltip": true,
     "autoarchive_setting_available": true,
-    "pending_suggestions": [
-        "AUTOARCHIVE_POPULAR",
-        "VALIDATE_PASSWORD",
-        "VALIDATE_PHONE_NUMBER",
-        "NEWCOMER_TICKS",
-        "SETUP_PASSWORD"
-    ],
+    "pending_suggestions": [],
     "autologin_domains": [
         "instantview.telegram.org",
         "translations.telegram.org",
@@ -203,14 +197,20 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
         "bugs.telegram.org",
         "suggestions.telegram.org",
         "themes.telegram.org",
-        "promote.telegram.org"
+        "promote.telegram.org",
+        "ads.telegram.org"
     ],
-    "url_auth_domains": [],
+    "url_auth_domains": [
+        "web.telegram.org",
+        "web.t.me",
+        "k.t.me",
+        "a.t.me"
+    ],
     "round_video_encoding": {
         "diameter": 384,
         "video_bitrate": 1000,
         "audio_bitrate": 64,
-        "max_size": 16777216
+        "max_size": 12582912
     },
     "chat_read_mark_expire_period": 604800,
     "chat_read_mark_size_threshold": 100,
@@ -236,7 +236,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "channels_public_limit_default": 10,
     "channels_public_limit_premium": 20,
     "caption_length_limit_default": 1024,
-    "caption_length_limit_premium": 2048,
+    "caption_length_limit_premium": 4096,
     "upload_max_fileparts_default": 4000,
     "upload_max_fileparts_premium": 8000,
     "about_length_limit_default": 70,
@@ -252,20 +252,38 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
         "stories",
         "more_upload",
         "double_limits",
+        "business",
+        "last_seen",
         "voice_to_text",
         "faster_download",
         "translations",
         "animated_emoji",
         "emoji_status",
+        "saved_tags",
+        "peer_colors",
+        "wallpapers",
         "profile_badge",
+        "message_privacy",
         "advanced_chat_management",
         "no_ads",
         "app_icons",
         "infinite_reactions",
         "animated_userpics",
         "premium_stickers",
-        "wallpapers",
-        "peer_colors"
+        "effects"
+    ],
+    "business_promo_order": [
+        "business_location",
+        "business_hours",
+        "quick_replies",
+        "greeting_message",
+        "away_message",
+        "business_links",
+        "business_intro",
+        "business_bots",
+        "emoji_status",
+        "folder_tags",
+        "stories"
     ],
     "premium_bot_username": "PremiumBot",
     "whitelisted_domains": [
@@ -293,6 +311,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "chatlist_update_period": 300,
     "small_queue_max_active_operations_count": 5,
     "large_queue_max_active_operations_count": 2,
+    "story_expire_period": 86400,
     "story_viewers_expire_period": 86400,
     "story_expiring_limit_default": 3,
     "story_expiring_limit_premium": 100,
@@ -307,7 +326,9 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "stories_sent_monthly_limit_default": 30,
     "stories_sent_monthly_limit_premium": 3000,
     "stories_venue_search_username": "foursquare",
+    "stories_all_hidden": false,
     "stories_entities": "premium",
+    "stories_export_nopublic_link": true,
     "stories_changelog_user_id": 777000,
     "authorization_autoconfirm_period": 604800,
     "stories_suggested_reactions_limit_default": 1,
@@ -320,7 +341,8 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "boosts_channel_level_max": 100,
     "boosts_per_sent_gift": 3,
     "quote_length_max": 1024,
-    "transcribe_audio_trial_weekly_number": 2,
+    "channel_color_level_min": 5,
+    "transcribe_audio_trial_weekly_number": 0,
     "transcribe_audio_trial_duration_max": 300,
     "recommended_channels_limit_default": 10,
     "recommended_channels_limit_premium": 100,
@@ -331,7 +353,35 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "channel_custom_wallpaper_level_min": 10,
     "saved_dialogs_pinned_limit_default": 5,
     "saved_dialogs_pinned_limit_premium": 100,
-    "pm_read_date_expire_period": 604800
+    "pm_read_date_expire_period": 604800,
+    "group_transcribe_level_min": 6,
+    "group_emoji_stickers_level_min": 4,
+    "group_profile_bg_icon_level_min": 5,
+    "group_emoji_status_level_min": 8,
+    "group_wallpaper_level_min": 9,
+    "group_custom_wallpaper_level_min": 10,
+    "quick_replies_limit": 100,
+    "quick_reply_messages_limit": 20,
+    "upload_premium_speedup_upload": 10,
+    "upload_premium_speedup_download": 10,
+    "upload_premium_speedup_notify_period": 3600,
+    "intro_title_length_limit": 32,
+    "intro_description_length_limit": 70,
+    "business_chat_links_limit": 100,
+    "channel_restrict_sponsored_level_min": 50,
+    "channel_revenue_withdrawal_enabled": true,
+    "dismissed_suggestions": [],
+    "stories_pinned_to_top_count_max": 3,
+    "stars_purchase_blocked": false,
+    "stories_area_url_max": 3,
+    "stars_revenue_withdrawal_min": 1000,
+    "stars_paid_post_amount_max": 2500,
+    "can_edit_factcheck": false,
+    "factcheck_length_limit": 1024,
+    "web_app_allowed_protocols": [
+        "http",
+        "https"
+    ]
 }</code></pre>
 <p>Typical fields included in the resulting JSON object are:  </p>
 <h4><a class="anchor" href="#emojies-animated-zoom" id="emojies-animated-zoom" name="emojies-animated-zoom"><i class="anchor-icon"></i></a><code>emojies_animated_zoom</code></h4>
@@ -466,6 +516,8 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <p>The maximum UTF-8 length of bios of <a href="/api/premium">Premium</a> users (integer)</p>
 <h4><a class="anchor" href="#premium-promo-order" id="premium-promo-order" name="premium-promo-order"><i class="anchor-icon"></i></a><code>premium_promo_order</code></h4>
 <p>Array of string identifiers, indicating the order of <a href="/api/premium">Telegram Premium</a> features in the Telegram Premium promotion popup, <a href="/api/premium#telegram-premium-features">see here for the possible values »</a></p>
+<h4><a class="anchor" href="#business-promo-order" id="business-promo-order" name="business-promo-order"><i class="anchor-icon"></i></a><code>business_promo_order</code></h4>
+<p>Array of string identifiers, indicating the order of <a href="/api/business">Telegram Business</a> features in the Telegram Business promotion popup, <a href="/api/business#business-features-promo-page">see here for the possible values »</a></p>
 <h4><a class="anchor" href="#premium-bot-username" id="premium-bot-username" name="premium-bot-username"><i class="anchor-icon"></i></a><code>premium_bot_username</code></h4>
 <p>Contains the username of the official <a href="/api/premium">Telegram Premium</a> bot that may be used to buy a <a href="/api/premium">Telegram Premium</a> subscription, see <a href="/api/premium">here for detailed instructions »</a> (string)</p>
 <h4><a class="anchor" href="#premium-invoice-slug" id="premium-invoice-slug" name="premium-invoice-slug"><i class="anchor-icon"></i></a><code>premium_invoice_slug</code></h4>

@@ -397,7 +397,31 @@ This method can be used to fetch info about a not-yet-cached business connection
 <p>Since Telegram Business is currently included with the <a href="/api/premium">Telegram Premium</a> subscription, and Telegram Premium subscribers do not see <a href="/api/sponsored-messages">sponsored messages in channels</a>.  </p>
 <p>This may be problematic for business owners that may want to launch and view their own Telegram ads via the <a href="https://ads.telegram.org">Telegram ad platform »</a>.  </p>
 <p>For this reason, the Telegram Business settings page should contain a toggle to re-enable Telegram ads for the current account, which should trigger a call to <a href="/method/account.toggleSponsoredMessages">account.toggleSponsoredMessages</a>.  </p>
-<p>The current value of the toggle will be stored in <a href="/constructor/userFull">userFull</a>.<code>sponsored_enabled</code>.</p></div>
+<p>The current value of the toggle will be stored in <a href="/constructor/userFull">userFull</a>.<code>sponsored_enabled</code>.  </p>
+<h3><a class="anchor" href="#folder-tags" id="folder-tags" name="folder-tags"><i class="anchor-icon"></i></a>Folder tags</h3>
+<p>Telegram Business users can use <a href="/api/folder#folder-tags">folder tags, see here »</a> for more info.  </p>
+<h3><a class="anchor" href="#business-features-promo-page" id="business-features-promo-page" name="business-features-promo-page"><i class="anchor-icon"></i></a>Business features promo page</h3>
+<p>Telegram Business offers a set of additional features and raised limits: clients should be aware of the current subscription status to accordingly modify client behavior.  </p>
+<pre><code>---functions---
+
+<a href='/method/help.getAppConfig'>help.getAppConfig</a>#61e3f854 hash:<a href='/type/int'>int</a> = <a href='/type/help.AppConfig'>help.AppConfig</a>;</code></pre>
+<p>Clients should show a Telegram Business button in the settings.<br>
+Clicking on this button in the settings should open a Telegram Business modal.  </p>
+<p><a href="/method/help.getAppConfig">help.getAppConfig</a> to fetch info on how to build the Telegram Business modal, returning a list of Business feature identifiers in the <a href="/api/config#business-promo-order"><code>business_promo_order</code> appConfig field</a>: the modal should contain a row for each returned feature, ordered as specified in the returned array.  </p>
+<p>Possible feature identifiers:</p>
+<ul>
+<li><code>business_location</code> - Business users can set a <a href="#location">business location</a></li>
+<li><code>business_hours</code> - Business users can set <a href="#opening-hours">opening hours</a></li>
+<li><code>quick_replies</code> - Business users can create and use <a href="#quick-reply-shortcuts">quick reply shortcuts</a></li>
+<li><code>greeting_message</code> - Business users can set a <a href="#greeting-messages">greeting message</a></li>
+<li><code>away_message</code> - Business users can set an <a href="#away-messages">away message</a></li>
+<li><code>business_links</code> - Business users can create <a href="#business-chat-links">business chat links</a></li>
+<li><code>business_intro</code> - Business users can set a custom <a href="#business-introduction">business chat introduction</a></li>
+<li><code>business_bots</code> - Business users can <a href="#connected-bots">connect business bots to their account</a></li>
+<li><code>emoji_status</code> - Business users can set a <a href="/api/emoji-status">custom emoji status</a>.  </li>
+<li><code>folder_tags</code> - Business users can enable <a href="/api/folders#folder-tags">folder tags</a>.  </li>
+<li><code>stories</code> - Business users have many additional <a href="/api/stories">story features</a>.</li>
+</ul></div>
   
 </div>
           
