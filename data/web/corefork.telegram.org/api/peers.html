@@ -45,10 +45,12 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Many constructors in the API need to be stored in a local database upon reception and should only ever be updated reactively (passively) when received via updates or by other means (as specified in the documentation), to avoid overloading the server by continuously requesting changes for the same unchanged information.  </p>
-<p><a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a>, <a href="/constructor/channel">channel</a> constructors and their full counterparts <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a>, <a href="/constructor/channelFull">channelFull</a> are especially important, because they contain important information about users, chats and channels (from now on, <em>peers</em>), and most importantly the <code>access_hash</code> value, <strong>required</strong> to interact with peers in the API.  </p>
+<p><a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a>, <a href="/constructor/channel">channel</a> constructors and their full counterparts <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a>, <a href="/constructor/channelFull">channelFull</a> are especially important, because they contain important information about users, bots, chats and channels (from now on, <em>peers</em>), and most importantly the <code>access_hash</code> value, <strong>required</strong> to interact with peers in the API.  </p>
 <p>This page describes exactly how and when should the local databases of the constructors listed above be refreshed.  </p>
 <h3><a class="anchor" href="#peer-info-database" id="peer-info-database" name="peer-info-database"><i class="anchor-icon"></i></a>Peer info database</h3>
 <p>The peer info database needs to be updated every time a new constructor of type <a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> and <a href="/constructor/channel">channel</a> is received.  </p>
+<p>These constructors are received when interacting with the API (i.e. in common chats, through the search function, <a href="/api/invites#public-usernames">username resolution</a>, <a href="/api/links#temporary-profile-links">temporary profile links</a>, and so on...).  </p>
+<p>Unless specified otherwise (see the constructor pages for the special cases), when updating the local peer database, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).  </p>
 <p>The peer info database contains:  </p>
 <ul>
 <li>
@@ -65,14 +67,26 @@ In this case, a single table <em>can</em> be used for all peer types, but since 
 <li>
 <p>The <code>access_hash</code>, the second most important field of all, used to generate <a href="/type/InputPeer">InputPeer</a>, <a href="/type/inputUser">inputUser</a>, <a href="/type/inputChat">inputChat</a>, <a href="/type/inputChannel">inputChannel</a> constructors used to interact with peers in the API.<br>
 Note that <a href="/constructor/chat">chat</a>s (<a href="/api/channel">basic groups »</a>) do not have an access hash.<br>
-<a href="/constructor/user">user</a>s and <a href="/constructor/channel">channel</a>s (<a href="/api/channel">supergroups and channels »</a>) have an access hash, but it can come in three flavors:</p>
+<a href="/constructor/user">user</a>s and <a href="/constructor/channel">channel</a>s (<a href="/api/channel">supergroups and channels »</a>) have an access hash, but it can come in these versions:</p>
 <ul>
 <li>Full access hash: can be used everywhere in the API.</li>
 <li>Min access hash: received from <a href="/api/min">min constructors »</a>, can only be used to fetch the profile pictures using <a href="/constructor/inputPeerPhotoFileLocation"><code>inputPeerPhotoFileLocation</code> »</a>.  </li>
-<li>Zero access hash: equal to <code>0</code>, may only be used by bots as fallback in certain conditions if a full or min access hash is not available in the database yet.</li>
+<li>From-message access hash: not a real access hash, constructed as specified <a href="/api/min">here »</a>, must be used when only a min access hash is available locally, but a full access hash is required. </li>
+<li>Zero access hash: equal to <code>0</code>, must be used by bots when only a min access hash (or no access hash) is available locally, but a full access hash is required. </li>
 </ul>
+<p>The access hash versions listed above are listed in descending priority, and if a version with higher priority is currently cached, it must not be overwritten with a lower priority version.   </p>
+<p>Access hashes are received when interacting with the API (i.e. in common chats, through the search function, <a href="/api/invites#public-usernames">username resolution</a>, <a href="/api/links#temporary-profile-links">temporary profile links</a>, and so on...): if you have only a user/channel/supergroup ID without any kind of access hash, you <strong>cannot</strong> interact with that peer.<br>
+Access hashes may not be reused across different accounts or different sessions of the same account.<br>
+This is a core spam prevention feature of Telegram.  </p>
+<p>Clients and client APIs should <strong>not</strong> expose access hashes to users, as they cannot be reused outside of the current session, and the user should not be burdened with storing them, when the client can perfectly do the job by itself.  </p>
 </li>
-</ul></div>
+<li>
+<p>Various other fields commonly used by the client, as specified in the constructor pages (<a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> and <a href="/constructor/channel">channel</a>).
+As specified in the constructor docs, some of the fields must not be overwritten if a <a href="/api/min">min constructor</a> is received, and a change in some other fields must trigger invalidation of the <a href="#full-info-database">full info database »</a>.  </p>
+</li>
+</ul>
+<h3><a class="anchor" href="#full-info-database" id="full-info-database" name="full-info-database"><i class="anchor-icon"></i></a>Full info database</h3>
+<p>The full info database needs to be updated every time a new constructor of type <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a> and <a href="/constructor/channel">channel</a> is received, by completely replacing the locally cached entry.</p></div>
   
 </div>
           
