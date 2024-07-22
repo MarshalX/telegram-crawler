@@ -2,12 +2,12 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>Page not found</title>
+    <title>Bot API dialog IDs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="">
-    <meta property="og:title" content="Page not found">
+    <meta property="description" content="How to convert MTProto peer IDs to bot API dialog IDs and vice versa.">
+    <meta property="og:title" content="Bot API dialog IDs">
     <meta property="og:image" content="">
-    <meta property="og:description" content="">
+    <meta property="og:description" content="How to convert MTProto peer IDs to bot API dialog IDs and vice versa.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -39,10 +39,37 @@
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li></li></ul></div>
-  <h1 id="dev_page_title">Page not found</h1>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/bots%2Fids" >Bot API dialog IDs</a></li></ul></div>
+  <h1 id="dev_page_title">Bot API dialog IDs</h1>
   
-  <div id="dev_page_content">The page has not been saved</div>
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>The <code>id</code> field of <a href="/api/peers">peers »</a> (i.e. users, chats, channels) contain three distinct sequences of unique 64-bit IDs used to identify a specific user, chat or channel.  </p>
+<p>The ID sequences of users, chats and channels <strong>overlap</strong>, so it is a good idea to transform the peer IDs to bot API dialog IDs as specified below.  </p>
+<p>A bot API dialog ID is a single, unique peer ID sequence derived from the user, chat and channel ID sequences, maintaining uniqueness across all of them.  </p>
+<p>It's a good idea to transform peer IDs to bot dialog API IDs even if you do decide to use separate databases to <a href="/api/peers">store info about peers</a>, as it will make IDs more visually recognizable both for you and your users, as well as guarantee compatibility with the bot API.</p>
+<p>Example implementation: <a href="https://github.com/tdlib/td/blob/cb164927417f22811c74cd8678ed4a5ab7cb80ba/td/telegram/DialogId.cpp">tdlib (bot API)</a>, <a href="https://github.com/danog/tg-dialog-id">MadelineProto</a>.  </p>
+<h3><a class="anchor" href="#user-ids" id="user-ids" name="user-ids"><i class="anchor-icon"></i></a>User IDs</h3>
+<p><a href="/constructor/user">User</a> IDs in the MTProto API range from 0 to <code>0xffffffffff</code> (inclusive).  </p>
+<p>To convert MTProto user IDs to bot API dialog IDs, do the following:</p>
+<pre><code>$botApiId = $userId; // Do nothing</code></pre>
+<p>To convert bot API dialog IDs to MTProto user IDs, do the following:</p>
+<pre><code>assert($botApiId &gt; 0 &amp;&amp; $botApiId &lt;= `0xffffffffff`);
+$userId = $botApiId;</code></pre>
+<h3><a class="anchor" href="#chat-ids" id="chat-ids" name="chat-ids"><i class="anchor-icon"></i></a>Chat IDs</h3>
+<p><a href="/constructor/chat">Chat</a> IDs in the MTProto API range from 0 to <code>999999999999</code> (inclusive).  </p>
+<p>To convert MTProto chat IDs to bot API dialog IDs, do the following:</p>
+<pre><code>$botApiId = -$chatId;</code></pre>
+<p>To convert bot API dialog IDs to MTProto chat IDs, do the following:</p>
+<pre><code>assert($botApiId &lt; 0 &amp;&amp; $botApiId &gt;= -999999999999);
+$userId = -$botApiId;</code></pre>
+<h3><a class="anchor" href="#supergroup-channel-ids" id="supergroup-channel-ids" name="supergroup-channel-ids"><i class="anchor-icon"></i></a>Supergroup/channel IDs</h3>
+<p><a href="/constructor/channel">Supergroup/channel</a> IDs in the MTProto API range from 0 to <code>997852516352</code> (inclusive).  </p>
+<p>To convert MTProto chat IDs to bot API dialog IDs, do the following:</p>
+<pre><code>$botApiId = -1000000000000 - $chatId;</code></pre>
+<p>To convert bot API dialog IDs to MTProto chat IDs, do the following:</p>
+<pre><code>assert(-1000000000000 &lt;= $botApiId &lt; 0 &amp;&amp; $botApiId !== );
+$userId = -$botApiId;</code></pre></div>
   
 </div>
           
@@ -109,8 +136,11 @@
 </div>
     </div>
     <script src="/js/main.js?47"></script>
-    
-    <script>backToTopInit("Go up");
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
 removePreloadInit();
 </script>
   </body>
