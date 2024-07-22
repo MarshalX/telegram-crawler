@@ -204,7 +204,7 @@
 <tr>
 <td><strong>access_hash</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/long">long</a></td>
-<td>Access hash of the user. <br>When updating the <a href="/api/peers">local peer database</a>, generate a virtual flag called <code>min_access_hash</code>, which is: <br>- Set to <code>true</code> if <code>min</code> is set AND <br>   - The <code>phone</code> <em>flag</em> is <strong>not</strong> set OR <br>   - The <code>phone</code> <em>flag</em> is set and the associated phone number string is <strong>non-empty</strong> <br>- Set to <code>false</code> otherwise. <br><br>Then, apply both <code>access_hash</code> and <code>min_access_hash</code> to the local database if: <br>- <code>min_access_hash</code> is false OR <br>- <code>min_access_hash</code> is true AND <br>   - There is no locally cached object for this user OR <br>   - The cached object's <code>min_access_hash</code> is also true.</td>
+<td>Access hash of the user. <br>When updating the <a href="/api/peers">local peer database</a>, generate a virtual flag called <code>min_access_hash</code>, which is: <br>- Set to <code>true</code> if <code>min</code> is set AND <br>   - The <code>phone</code> <em>flag</em> is <strong>not</strong> set OR <br>   - The <code>phone</code> <em>flag</em> is set and the associated phone number string is <strong>non-empty</strong> <br>- Set to <code>false</code> otherwise. <br><br>Then, apply both <code>access_hash</code> and <code>min_access_hash</code> to the local database if: <br>- <code>min_access_hash</code> is false <!-- OR <br>- `min_access_hash` is true AND <br>&nbsp; &nbsp;- There is no locally cached object for this user OR <br>&nbsp; &nbsp;- The cached object's `min_access_hash` is also true. <br>Note that an access hash may not be used in the API if the `min_access_hash` field is equal to `true`.  --></td>
 </tr>
 <tr>
 <td><strong>first_name</strong></td>
@@ -234,7 +234,7 @@
 <tr>
 <td><strong>status</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.6?<a href="/type/UserStatus">UserStatus</a></td>
-<td>Online status of user</td>
+<td>Online status of user. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>min</code> flag of the locally cached user entry is set OR <br>   - The locally cached user entry is equal to <a href="/constructor/userStatusEmpty">userStatusEmpty</a>.</td>
 </tr>
 <tr>
 <td><strong>bot_info_version</strong></td>
