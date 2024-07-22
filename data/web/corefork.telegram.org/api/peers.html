@@ -88,7 +88,12 @@
 <p>The peer info database needs to be updated every time a new constructor of type <a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> and <a href="/constructor/channel">channel</a> (and their <code>forbidden</code> counterparts, used for peers that the user can't access, but can view basic info about) is received.  </p>
 <p>These constructors are received when interacting with the API (i.e. in common chats, through the search function, <a href="/api/invites#public-usernames">username resolution</a>, <a href="/api/links#temporary-profile-links">temporary profile links</a>, and so on...).  </p>
 <p>Unless specified otherwise (see the constructor pages for the special cases), when updating the local peer database, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).  </p>
-<p>Information about <em>already cached</em> peers may be refreshed using the <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/messages.getChats">messages.getChats</a>, <a href="/method/channels.getChannels">channels.getChannels</a>, all requiring the previously cached <code>access_hash</code> (read on for more info).  </p>
+<p>Information about <em>already cached</em> peers must be refreshed in certain conditions using the bulked <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/messages.getChats">messages.getChats</a>, <a href="/method/channels.getChannels">channels.getChannels</a> methods, all requiring the previously cached <code>access_hash</code> (read on for more info).  </p>
+<p>Peer info must be refreshed <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, and so on...):  </p>
+<ul>
+<li>When 
+Do not refresh peer information in any other case, a</li>
+</ul>
 <p>The peer info database contains the following information:  </p>
 <ul>
 <li>The <a href="#peer-id">peer ID »</a></li>
@@ -106,7 +111,7 @@ In this case, a single table <em>can</em> be used for all peer types, but since 
 </ul>
 <p>It's a good idea to transform peer IDs to <a href="/api/bots/ids">bot API IDs</a> even if you do decide to use separate databases, as it will make IDs more visually recognizable both for you and your users, as well as guarantee compatibility with the bot API.</p>
 <h4><a class="anchor" href="#access-hash" id="access-hash" name="access-hash"><i class="anchor-icon"></i></a>Access hash</h4>
-<p>The <code>access_hash</code> is, the second most important field stored in the <a href="#peer-info-database">peer database</a>, used to generate <a href="/type/InputPeer">InputPeer</a>, <a href="/type/inputUser">inputUser</a>, <a href="/type/inputChat">inputChat</a>, <a href="/type/inputChannel">inputChannel</a> constructors used to interact with peers in the API.<br>
+<p>The <code>access_hash</code> is, the second most important field stored in the <a href="#peer-info-database">peer database</a>, used to generate <a href="/type/InputPeer">InputPeer</a>, <a href="/type/inputUser">inputUser</a>, <a href="/type/inputChannel">inputChannel</a> constructors used to interact with peers in the API.<br>
 Note that <a href="/constructor/chat">chat</a>s (<a href="/api/channel">basic groups »</a>) do not have or need an access hash.<br>
 <a href="/constructor/user">user</a>s and <a href="/constructor/channel">channel</a>s (<a href="/api/channel">supergroups and channels »</a>) have an access hash, and it can come in various flavors:</p>
 <ul>
