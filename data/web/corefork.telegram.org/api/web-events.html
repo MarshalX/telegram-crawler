@@ -62,7 +62,10 @@ The GamingCommunication and bot mini apps libraries by default will use <code>'*
 <h3><a class="anchor" href="#event-types" id="event-types" name="event-types"><i class="anchor-icon"></i></a>Event types</h3>
 <p><code>eventType</code> is a simple string indicating the event type, and <code>eventData</code> is a payload with an object that will be parsed by the Telegram app.</p>
 <h4><a class="anchor" href="#web-app-close" id="web-app-close" name="web-app-close"><i class="anchor-icon"></i></a><code>web_app_close</code></h4>
-<p>No event payload.  </p>
+<p>No event payload, OR a JSON object with the following fields (which should be properly validated by the client).</p>
+<ul>
+<li><code>return_back</code> - If true, the client should return to the previous activity. (boolean, optional)</li>
+</ul>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> when the mini app webview should be closed.</p>
 <h4><a class="anchor" href="#web-app-open-popup" id="web-app-open-popup" name="web-app-open-popup"><i class="anchor-icon"></i></a><code>web_app_open_popup</code></h4>
 <p>Event data: a JSON object with the following fields (which should be properly validated by the client).</p>
@@ -102,6 +105,32 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 <p>Upon receiving this event, clients should show a prompt to the user, indicating that the bot is asking them to share their phone number (optionally also asking the user to unblock the bot, if it's currently blocked).  </p>
 <p>If they accept, the user's phone number should be shared by sending a contact to the bot (unblocking it first, if it's currently blocked by the user); if all RPC queries (to unblock the bot, to send the message) succeed, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "sent"}</code>.  </p>
 <p>If the user refuses or any intermdiate method call fails, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "cancelled"}</code>.  </p>
+<h4><a class="anchor" href="#web-app-biometry-get-info" id="web-app-biometry-get-info" name="web-app-biometry-get-info"><i class="anchor-icon"></i></a><code>web_app_biometry_get_info</code></h4>
+<p>Event data: <code>null</code></p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the client to initialize the biometric authentication manager object for the current bot, emitting a <a href="/api/bots/webapps#biometry-info-received"><code>biometry_info_received</code> event »</a> on completion.  </p>
+<p>This request should just initialize the client-side state, i.e. by checking if biometric authentication is even available or not, it should not ask the user anything.  </p>
+<h4><a class="anchor" href="#web-app-biometry-request-access" id="web-app-biometry-request-access" name="web-app-biometry-request-access"><i class="anchor-icon"></i></a><code>web_app_biometry_request_access</code></h4>
+<p>Event data: a JSON object, with an optional <code>reason</code> string field, containing the reason why the bot is asking to use biometric authentication.  </p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the user permission to use biometric authentication, emitting a <a href="/api/bots/webapps#biometry-info-received"><code>biometry_info_received</code> event »</a> on completion.  </p>
+<p>This request should not actually prompt biometric authentication, it should just ask the user permission to use them, and a popup should be shown <strong>only</strong> if the user hasn't already allowed or denied the usage of biometric authentication for the bot associated to the mini app.  </p>
+<h4><a class="anchor" href="#web-app-biometry-update-token" id="web-app-biometry-update-token" name="web-app-biometry-update-token"><i class="anchor-icon"></i></a><code>web_app_biometry_update_token</code></h4>
+<p>Event data: a JSON object with the following fields:</p>
+<ul>
+<li><code>token</code> - The new token (string, max 1024 chars), or an empty string to remove it.  </li>
+<li><code>reason</code> - Optional string field, containing the reason why the bot is asking to authenticate using biometrics.  </li>
+</ul>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to authenticate using biometrics and store the biometric token securely stored on-device, emitting a <a href="/api/bots/webapps#biometry-token-updated"><code>biometry_token_updated</code> event »</a> on completion.  </p>
+<p>This token (which may be for example the private key of a cryptocurrency wallet, or some other data the app must keep safe) must be safely stored by the Telegram client, associating it to the bot that owns the mini app.  </p>
+<p>For example, the token may be directly stored in the on-device secure storage, accessible only after biometric authentication, or it may be stored to normal, non-secure storage, but <strong>in encrypted form</strong>, encrypted using the key returned from the device's secure storage after biometric authentication (for example on Android, using the CryptoObject returned by <a href="https://developer.android.com/reference/android/hardware/biometrics/BiometricPrompt.AuthenticationResult#getCryptoObject\(\)">the biometric prompt authentication result</a>).  </p>
+<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-token-updated"><code>biometry_token_updated</code> event »</a>.  </p>
+<h4><a class="anchor" href="#web-app-biometry-request-auth" id="web-app-biometry-request-auth" name="web-app-biometry-request-auth"><i class="anchor-icon"></i></a><code>web_app_biometry_request_auth</code></h4>
+<p>Event data: a JSON object, with an optional <code>reason</code> string field, containing the reason why the bot is asking to authenticate using biometrics.  </p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to authenticate using biometrics, emitting a <a href="/api/bots/webapps#biometry-auth-requested"><code>biometry_auth_requested</code> event »</a> on completion, containing either the error, or the decrypted <a href="#web-app-biometry-update-token">previously stored biometric token »</a> (or an empty string if no token was configured yet).  </p>
+<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-auth-requested"><code>biometry_auth_requested</code> event »</a>.  </p>
+<h4><a class="anchor" href="#web-app-biometry-open-settings" id="web-app-biometry-open-settings" name="web-app-biometry-open-settings"><i class="anchor-icon"></i></a><code>web_app_biometry_open_settings</code></h4>
+<p>Event data: <code>null</code></p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to open the biometric authentication settings page for bots, useful when the app needs to request biometrics access from users who have previously denied it.</p>
+<p>Note that this event should only be handled in response to user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button), and it must be handled at most once a second.  </p>
 <h4><a class="anchor" href="#web-app-invoke-custom-method" id="web-app-invoke-custom-method" name="web-app-invoke-custom-method"><i class="anchor-icon"></i></a><code>web_app_invoke_custom_method</code></h4>
 <p>Event data: a JSON object with the following fields:</p>
 <ul>
@@ -205,6 +234,21 @@ If empty, the current chat is used.  </li>
 <ul>
 <li><code>url</code> - The URL to open</li>
 <li><code>try_instant_view</code> - Optional boolean, if set, equal to <code>true</code> and the scheme of the URL is either <code>http</code> or <code>https</code>, the link should be opened in <a href="/methods#working-with-instant-view-pages">Instant View mode</a> if possible. </li>
+<li><code>try_browser</code> - Optional string, if set, must contain one of the following browser identifiers, and the client should attempt to open the link using the specified browser (if it's currently installed on the device): <ul>
+<li><code>google-chrome</code> or <code>chrome</code> - Google Chrome</li>
+<li><code>mozilla-firefox</code> or <code>firefox</code> - Firefox</li>
+<li><code>microsoft-edge</code> or <code>edge</code> - Microsoft Edge</li>
+<li><code>opera</code> - Opera</li>
+<li><code>opera-mini</code> - Opera Mini</li>
+<li><code>brave</code> or <code>brave-browser</code> - Brave Browser</li>
+<li><code>duckduckgo</code> or <code>duckduckgo-browser</code> - Duckduckgo Browser</li>
+<li><code>samsung</code> or <code>samsung-browser</code> - Samsung Browser</li>
+<li><code>vivaldi</code> or <code>vivaldi-browser</code> - Vivaldi</li>
+<li><code>kiwi</code> or <code>ĸiwi-browser</code> - Kiwi</li>
+<li><code>uc</code> or <code>uc-browser</code> - UC browser</li>
+<li><code>tor</code> or <code>tor-browser</code> - TOR browser</li>
+</ul>
+</li>
 </ul>
 <p>Used to open a link in an external browser (or in a new tab for browser clients). The Mini App will not be closed.  </p>
 <p>Only URLs with the scheme equal to one of the schemes specified in <a href="/api/config#web-app-allowed-protocols">web_app_allowed_protocols</a> may be opened.  </p>
