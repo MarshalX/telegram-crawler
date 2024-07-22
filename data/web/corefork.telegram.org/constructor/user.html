@@ -42,7 +42,9 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/user" >user</a></li></ul></div>
   <h1 id="dev_page_title">user</h1>
   
-  <div id="dev_page_content"><p>Indicates info about a certain user</p>
+  <div id="dev_page_content"><p>Indicates info about a certain user.</p>
+<p>Unless specified otherwise, when updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).  </p>
+<p>See <a href="https://github.com/tdlib/td/blob/cb164927417f22811c74cd8678ed4a5ab7cb80ba/td/telegram/UserManager.cpp#L2267">here »</a> for an implementation of the logic to use when updating the <a href="/api/peers">local user peer database</a>.  </p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -79,7 +81,7 @@
 <tr>
 <td><strong>contact</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.11?<a href="/constructor/true">true</a></td>
-<td>Whether this user is a contact</td>
+<td>Whether this user is a contact <br>When updating the <a href="/api/peers">local peer database</a>, do not apply changes to this field if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>mutual_contact</strong></td>
@@ -94,7 +96,7 @@
 <tr>
 <td><strong>bot</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/constructor/true">true</a></td>
-<td>Is this user a bot?</td>
+<td>Is this user a bot? <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID.</td>
 </tr>
 <tr>
 <td><strong>bot_chat_history</strong></td>
@@ -154,7 +156,7 @@
 <tr>
 <td><strong>premium</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.28?<a href="/constructor/true">true</a></td>
-<td>Whether this user is a Telegram Premium user</td>
+<td>Whether this user is a Telegram Premium user <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID. <br>Changes to this flag if the <code>self</code> flag is set should also trigger the following calls, to refresh the respective caches: <br>- <a href="/method/help.getConfig">help.getConfig</a> <br>- <a href="/method/messages.getTopReactions">messages.getTopReactions</a> if the <code>bot</code> flag is <strong>not</strong> set</td>
 </tr>
 <tr>
 <td><strong>attach_menu_enabled</strong></td>
@@ -169,7 +171,7 @@
 <tr>
 <td><strong>bot_can_edit</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.1?<a href="/constructor/true">true</a></td>
-<td>Whether we can edit the profile picture, name, about text and description of this bot because we own it. <br>When updating the <a href="/api/peers">local peer database</a>, do not apply changes to this field if the <code>min</code> flag is set.</td>
+<td>Whether we can edit the profile picture, name, about text and description of this bot because we own it. <br>When updating the <a href="/api/peers">local peer database</a>, do not apply changes to this field if the <code>min</code> flag is set. <br>Changes to this flag (if <code>min</code> is not set) should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID.</td>
 </tr>
 <tr>
 <td><strong>close_friend</strong></td>
@@ -204,7 +206,7 @@
 <tr>
 <td><strong>access_hash</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/long">long</a></td>
-<td>Access hash of the user. <br>When updating the <a href="/api/peers">local peer database</a>, generate a virtual flag called <code>min_access_hash</code>, which is: <br>- Set to <code>true</code> if <code>min</code> is set AND <br>   - The <code>phone</code> <em>flag</em> is <strong>not</strong> set OR <br>   - The <code>phone</code> <em>flag</em> is set and the associated phone number string is <strong>non-empty</strong> <br>- Set to <code>false</code> otherwise. <br><br>Then, apply both <code>access_hash</code> and <code>min_access_hash</code> to the local database if: <br>- <code>min_access_hash</code> is false <!-- OR <br>- `min_access_hash` is true AND <br>&nbsp; &nbsp;- There is no locally cached object for this user OR <br>&nbsp; &nbsp;- The cached object's `min_access_hash` is also true. <br>Note that an access hash may not be used in the API if the `min_access_hash` field is equal to `true`.  --></td>
+<td>Access hash of the user. <br>If this flag is set, when updating the <a href="/api/peers">local peer database</a>, generate a virtual flag called <code>min_access_hash</code>, which is: <br>- Set to <code>true</code> if <code>min</code> is set AND <br>   - The <code>phone</code> <em>flag</em> is <strong>not</strong> set OR <br>   - The <code>phone</code> <em>flag</em> is set and the associated phone number string is <strong>non-empty</strong> <br>- Set to <code>false</code> otherwise. <br><br>Then, apply both <code>access_hash</code> and <code>min_access_hash</code> to the local database if: <br>- <code>min_access_hash</code> is false OR <br>- <code>min_access_hash</code> is true AND <br>   - There is no locally cached object for this user OR <br>   - There is no <code>access_hash</code> in the local cache OR <br>   - The cached object's <code>min_access_hash</code> is also true <br>If the final merged object stored to the database has the <code>min_access_hash</code> field set to true, the related <code>access_hash</code> is <strong>only</strong> suitable to use in <a href="/constructor/inputPeerPhotoFileLocation"><code>inputPeerPhotoFileLocation</code> »</a>, to directly <a href="/api/files">download the profile pictures</a> of users, everywhere else a <code>inputPeer*FromMessage</code> constructor will have to be generated as specified <a href="/api/min">here »</a>. <br>Bots can also use min access hashes in some conditions, by passing <code>0</code> instead of the min access hash.</td>
 </tr>
 <tr>
 <td><strong>first_name</strong></td>
@@ -264,7 +266,7 @@
 <tr>
 <td><strong>usernames</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.0?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/Username">Username</a>&gt;</td>
-<td>Additional usernames. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>min</code> flag of the locally cached user entry is set.</td>
+<td>Additional usernames. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>min</code> flag of the locally cached user entry is set. <br>Changes to this flag (if the above conditions are respected) should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID.</td>
 </tr>
 <tr>
 <td><strong>stories_max_id</strong></td>
