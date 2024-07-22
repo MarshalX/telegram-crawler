@@ -272,9 +272,59 @@ Note that eventual errors will not be sent as a <code>failed</code> event if the
 <li><code>status</code> - <code>sent</code> or <code>cancelled</code></li>
 </ul>
 <p>Used by clients to reply to a <a href="/api/web-events#web-app-request-phone"><code>web_app_request_phone</code> event »</a>, indicating whether the user has shared their phone number with the bot (<code>allowed</code>) or not (<code>cancelled</code>).  </p>
-<h4><a class="anchor" href="#biometry-auth-requested" id="biometry-auth-requested" name="biometry-auth-requested"><i class="anchor-icon"></i></a><code>biometry_auth_requested</code></h4>
-<h4><a class="anchor" href="#biometry-token-updated" id="biometry-token-updated" name="biometry-token-updated"><i class="anchor-icon"></i></a><code>biometry_token_updated</code></h4>
 <h4><a class="anchor" href="#biometry-info-received" id="biometry-info-received" name="biometry-info-received"><i class="anchor-icon"></i></a><code>biometry_info_received</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li>
+<p><code>available</code> - boolean, if true, indicates that biometric authentication is available on the current device.</p>
+</li>
+<li>
+<p><code>type</code> - optional string, set if <code>available</code> is true, contains the type of biometric authentication, one of:</p>
+<ul>
+<li><code>finger</code> - fingerprint-based biometrics</li>
+<li><code>face</code> - face-based biometrics</li>
+<li><code>unknown</code> - biometrics of an unknown type</li>
+</ul>
+</li>
+<li>
+<p><code>access_requested</code> - boolean, indicates whether the app has previously requested permission to use biometrics through a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a></p>
+</li>
+<li>
+<p><code>access_granted</code> - boolean, indicates whether the user has granted the app permission to use biometrics in response to a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>.<br>
+If false and <code>access_requested</code> is true, may indicate that: </p>
+<ul>
+<li>The user has simply cancelled the permission popup, in which case a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a> can be emitted to re-open the popup</li>
+<li>The user has denied the app permission to use biometrics, in which case the app should open a prompt notifying the user that the biometric settings must be changed to use biometrics, and if the user clicks on the in-app confirm button, a <a href="/api/web-events#web-app-biometry-open-settings">web_app_biometry_open_settings event »</a> must be emitted.</li>
+</ul>
+<p>Since there is currently no way for apps to distinguish the above two cases, apps must assume the user has denied permission to use biometrics if <code>access_granted</code> is false and <code>access_requested</code> is true.  </p>
+</li>
+<li>
+<p><code>token_saved</code> - boolean, whether a token was safely stored on-device by a previous <a href="/api/web-events#web-app-biometry-update-token">web_app_biometry_update_token event »</a>.  </p>
+</li>
+<li>
+<p><code>device_id</code> - string, a unique device identifier that can be used to match the token to the device.</p>
+</li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-biometry-get-info"><code>web_app_biometry_get_info</code> event »</a> or a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>.  </p>
+<h4><a class="anchor" href="#biometry-token-updated" id="biometry-token-updated" name="biometry-token-updated"><i class="anchor-icon"></i></a><code>biometry_token_updated</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - string, one of:<ul>
+<li><code>updated</code> - If the token was successfully updated.</li>
+<li><code>removed</code> - If the token was successfully removed.</li>
+<li><code>failed</code> - If biometric authentication failed, or the app doesn't have permission to use biometrics (a <a href="#biometry-info-received">biometry_info_received event »</a> event will also be emitted if the app hasn't previously initialized the state using <a href="/api/web-events#web-app-biometry-get-info"><code>web_app_biometry_get_info</code> event »</a> or a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>).  </li>
+</ul>
+</li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-biometry-update-token"><code>web_app_biometry_update_token</code> event »</a>.  </p>
+<h4><a class="anchor" href="#biometry-auth-requested" id="biometry-auth-requested" name="biometry-auth-requested"><i class="anchor-icon"></i></a><code>biometry_auth_requested</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - string, either <code>authorized</code> or <code>failed</code>.<br>
+If <code>failed</code>, a <a href="#biometry-info-received">biometry_info_received event »</a> event will also be emitted if the app hasn't previously initialized the state using <a href="/api/web-events#web-app-biometry-get-info"><code>web_app_biometry_get_info</code> event »</a> or a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>.  </li>
+<li><code>token</code> - optional string, set if <code>status</code> is <code>authorized</code>, contains the token previously set using the <a href="/api/web-events#web-app-biometry-update-token"><code>web_app_biometry_update_token</code> event »</a>.  </li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-biometry-request-auth"><code>web_app_biometry_request_auth</code> biometric authentication request »</a>.  </p>
 <h4><a class="anchor" href="#custom-method-invoked" id="custom-method-invoked" name="custom-method-invoked"><i class="anchor-icon"></i></a><code>custom_method_invoked</code></h4>
 <p>Params: a JSON object with the following fields:</p>
 <ul>
