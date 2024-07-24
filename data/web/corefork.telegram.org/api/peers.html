@@ -111,7 +111,13 @@ Info about these IDs may be fetched with the zero access hash even by users.  </
 <p>After invoking <a href="/method/bots.setBotInfo">bots.setBotInfo</a> after changing <code>name</code> (but <strong>not</strong> the <code>about</code> or the <code>description</code>, as changing those fields already triggers a refresh of the full info database, and with it the peer database), for the bot whose info we changed</p>
 </li>
 <li>
-<p>After receiving a <code>CHAT_FORWARDS_RESTRICTED</code> error when forwarding messages from a chat, to refresh info about the source chat.</p>
+<p>After receiving a <code>CHAT_FORWARDS_RESTRICTED</code> error when forwarding messages from a chat, to refresh info about the source chat (i.e. the fact that we received this error means that the client didn't locally prevent the user from forwarding a message from the protected chat, because the locally cached <a href="/constructor/channel">channel</a>.<code>noforwards</code>/<a href="/constructor/chat">chat</a>.<code>noforwards</code> flag is out of date).</p>
+</li>
+<li>
+<p>After receiving a <code>CHAT_GUEST_SEND_FORBIDDEN</code> error when sending messages to a <a href="/api/discussion">discussion group</a>, to refresh info about the discussion group (i.e. the fact that we received this error means that the client didn't locally prevent the non-member user from sending a message to a discussion group where only members can send messages, because the locally cached <a href="/constructor/channel">channel</a>.<code>join_to_send</code> flag is out of date).</p>
+</li>
+<li>
+<p>After receiving a <code>USER_NOT_PARTICIPANT</code> error when calling <a href="/method/channels.leaveChannel">channels.leaveChannel</a>, to refresh info about the channel/supergroup (i.e. the fact that we received this error means that the client tried to leave a channel/supergroup they're not a member of, and the client didn't try to prevent this locally because its <a href="/constructor/channel">channel</a> constructor is out of date).  </p>
 </li>
 <li>
 <p>After invoking the following methods (both if the call succeds and after receiving a <code>USERNAME_NOT_MODIFIED</code> error, which is also a success):</p>
@@ -123,7 +129,7 @@ Info about these IDs may be fetched with the zero access hash even by users.  </
 <p>Info should <strong>only</strong> be manually refreshed with a call to <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/channels.getChannels">channels.getChannels</a> if the new username order/active username cannot be applied locally (i.e. the method call successfully set as active some username that isn't associated to the peer in our local cache, and so on), otherwise the <code>username</code> and <code>usernames</code> fields of the peer info database should be updated locally, using the info that was passed to the toggle/reorder methods by the user.  </p>
 </li>
 </ul>
-<p>Do not refresh peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.  </p>
+<p><strong>Do not</strong> manually refresh peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.  </p>
 <p>The peer info database contains the following information:  </p>
 <ul>
 <li>The <a href="#peer-id">peer ID »</a></li>
@@ -174,8 +180,14 @@ As specified in the constructor docs, some of the fields must not be overwritten
 <a href='/method/users.getFullUser'>users.getFullUser</a>#b60f5918 id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.UserFull'>users.UserFull</a>;
 <a href='/method/messages.getFullChat'>messages.getFullChat</a>#aeb00b34 chat_id:<a href='/type/long'>long</a> = <a href='/type/messages.ChatFull'>messages.ChatFull</a>;
 <a href='/method/channels.getFullChannel'>channels.getFullChannel</a>#8736a09 channel:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/messages.ChatFull'>messages.ChatFull</a>;</code></pre>
-<p>The full info database needs to be updated every time a new constructor of type <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a> and <a href="/constructor/channelFull">channelFull</a> is received, by completely replacing the locally cached entry.  </p>
-<p>These constructors may only be received with a manual call to</p></div>
+<p>The full info database contains info from the <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a> and <a href="/constructor/channelFull">channelFull</a> constructors.  </p>
+<p>To populate the full info database for a peer, manually invoke <a href="/method/users.getFullUser">users.getFullUser</a>, <a href="/method/messages.getFullChat">messages.getFullChat</a>, <a href="/method/channels.getFullChannel">channels.getFullChannel</a>, all requiring the previously cached <a href="#access-hash">access_hash »</a> <em>when the client needs to use one of the full info fields</em>.  </p>
+<p>Full info must be manually refreshed and stored to the database with a method call to the above methods <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, and so on...): </p>
+<ul>
+<li>The client needs full info for some operation, but it's not cached.</li>
+<li>Some event (specified <a href="#peer-info-database">here »</a>) changes the value of a field of one of the following constructors cached in the (non-full) peer database</li>
+</ul>
+<p><strong>Do not</strong> refresh full peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.</p></div>
   
 </div>
           
