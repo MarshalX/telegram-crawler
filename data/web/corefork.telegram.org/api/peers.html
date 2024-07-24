@@ -85,18 +85,36 @@
 <a href='/method/users.getUsers'>users.getUsers</a>#d91a548 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt;;
 <a href='/method/messages.getChats'>messages.getChats</a>#49e9528f id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
 <a href='/method/channels.getChannels'>channels.getChannels</a>#a7f6bbb id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputChannel'>InputChannel</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
+<p>The peer info database contains the following information:  </p>
+<ul>
+<li>The <a href="#peer-id">peer ID »</a></li>
+<li>The <a href="#access-hash">access hash »</a></li>
+<li><a href="#other-info">Other info »</a></li>
+</ul>
+<p>And it must be populated as follows:</p>
+<ul>
+<li><a href="#saving-constructors">By saving received user, chat, channel constructors »</a></li>
+<li><a href="#handling-certain-updates">By handling certain updates »</a></li>
+<li><a href="#manual-refreshes">By manual refreshes »</a></li>
+</ul>
+<h4><a class="anchor" href="#saving-constructors" id="saving-constructors" name="saving-constructors"><i class="anchor-icon"></i></a>Saving constructors</h4>
 <p>The peer info database needs to be updated every time a new constructor of type <a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> and <a href="/constructor/channel">channel</a> (and their <code>forbidden</code> counterparts, used for peers that the user can't access, but can view basic info about) is received.  </p>
 <p>These constructors are received when interacting with the API (i.e. in common chats, through the search function, <a href="/api/invites#public-usernames">username resolution</a>, <a href="/api/links#temporary-profile-links">temporary profile links</a>, and so on...).  </p>
 <p>Unless specified otherwise (see the constructor pages for the special cases), when updating the local peer database, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).  </p>
+<h4><a class="anchor" href="#handling-certain-updates" id="handling-certain-updates" name="handling-certain-updates"><i class="anchor-icon"></i></a>Handling certain updates</h4>
 <p>Some updates should trigger an update of a small subset of the info contained in the peer database:</p>
 <ul>
 <li><a href="/constructor/updateUserStatus">updateUserStatus</a> - Update <a href="/constructor/user">user</a>.<code>status</code></li>
 <li><a href="/constructor/updateUserName">updateUserName</a>- Update <a href="/constructor/user">user</a>.<code>first_name</code>/<code>last_name</code>/<code>username</code>/<code>usernames</code></li>
+<li><a href="/constructor/updatePeerBlocked">updatePeerBlocked</a> - Update <a href="/constructor/userFull">userFull</a>.<code>blocked</code>, <a href="/constructor/channelFull">channelFull</a>.<code>blocked</code></li>
+<li><a href="/constructor/updatePeerSettings">updatePeerSettings</a> - Update <a href="/constructor/userFull">userFull</a>.<code>settings</code></li>
+<li><a href="/constructor/updatePeerWallpaper">updatePeerWallpaper</a> - Update <a href="/constructor/userFull">userFull</a>.<code>wallpaper</code>, <a href="/constructor/channelFull">channelFull</a>.<code>wallpaper</code></li>
 <li><a href="/constructor/updateUserEmojiStatus">updateUserEmojiStatus</a> - Update <a href="/constructor/user">user</a>.<code>emoji_status</code></li>
 <li><a href="/constructor/updateChatParticipants">updateChatParticipants</a> - Update <a href="/constructor/chat">chat</a>.<code>participants_count</code>, <a href="/constructor/chatFull">chatFull</a>.<code>participants</code>.  </li>
 <li><a href="/constructor/updateChatParticipant">updateChatParticipant</a> - Update <a href="/constructor/chat">chat</a>.<code>participants_count</code>, <a href="/constructor/chatFull">chatFull</a>.<code>participants</code>.  </li>
 <li><a href="/constructor/updateChannelAvailableMessages">updateChannelAvailableMessages</a> - Update <a href="/constructor/channel">channel</a>.<code>hidden_prehistory</code></li>
 </ul>
+<h4><a class="anchor" href="#manual-refreshes" id="manual-refreshes" name="manual-refreshes"><i class="anchor-icon"></i></a>Manual refreshes</h4>
 <p>Information about <em>already cached</em> peers must be refreshed manually in certain conditions using the bulked <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/messages.getChats">messages.getChats</a>, <a href="/method/channels.getChannels">channels.getChannels</a> methods, all requiring the previously cached <code>access_hash</code> (read on for more info).  </p>
 <p>Peer info must be manually refreshed with a method call to the above methods <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, and so on...):  </p>
 <ul>
@@ -130,12 +148,6 @@ Info about these IDs may be fetched with the zero access hash even by users.  </
 </li>
 </ul>
 <p><strong>Do not</strong> manually refresh peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.  </p>
-<p>The peer info database contains the following information:  </p>
-<ul>
-<li>The <a href="#peer-id">peer ID »</a></li>
-<li>The <a href="#access-hash">access hash »</a></li>
-<li><a href="#other-info">Other info »</a></li>
-</ul>
 <h4><a class="anchor" href="#peer-id" id="peer-id" name="peer-id"><i class="anchor-icon"></i></a>Peer ID</h4>
 <p>The peer <code>id</code> is a unique 64-bit ID used to identify a specific user, chat or channel.  </p>
 <p>This field should be used as primary key in the channel, chat and user databases.  </p>
@@ -181,11 +193,13 @@ As specified in the constructor docs, some of the fields must not be overwritten
 <a href='/method/messages.getFullChat'>messages.getFullChat</a>#aeb00b34 chat_id:<a href='/type/long'>long</a> = <a href='/type/messages.ChatFull'>messages.ChatFull</a>;
 <a href='/method/channels.getFullChannel'>channels.getFullChannel</a>#8736a09 channel:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/messages.ChatFull'>messages.ChatFull</a>;</code></pre>
 <p>The full info database contains info from the <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a> and <a href="/constructor/channelFull">channelFull</a> constructors.  </p>
-<p>To populate the full info database for a peer, manually invoke <a href="/method/users.getFullUser">users.getFullUser</a>, <a href="/method/messages.getFullChat">messages.getFullChat</a>, <a href="/method/channels.getFullChannel">channels.getFullChannel</a>, all requiring the previously cached <a href="#access-hash">access_hash »</a> <em>when the client needs to use one of the full info fields</em>.  </p>
-<p>Full info must be manually refreshed and stored to the database with a method call to the above methods <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, and so on...): </p>
+<p>To populate the full info database for a peer, invoke <a href="/method/users.getFullUser">users.getFullUser</a>, <a href="/method/messages.getFullChat">messages.getFullChat</a>, <a href="/method/channels.getFullChannel">channels.getFullChannel</a>, all requiring the previously cached <a href="#access-hash">access_hash »</a>.  </p>
+<p>Populate the full info database only when the client needs some data from a full constructor, <strong>and</strong> there is no entry already in the database.  </p>
+<p>Full peer info stored to the database must be refreshed <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, or every time the entry is accessed, <strong>do not</strong> use TTLs to expire the database entries, and so on...): </p>
 <ul>
-<li>The client needs full info for some operation, but it's not cached.</li>
-<li>Some event (specified <a href="#peer-info-database">here »</a>) changes the value of a field of one of the following constructors cached in the (non-full) peer database</li>
+<li>Some event (specified <a href="#peer-info-database">here »</a>) changes the value of a specific subset of fields of an entry in the (non-full!) <a href="#peer-info-database">peer info database »</a>.<br>
+The relative full info entry should only be invalidated when some specific fields of the locally cached <a href="/constructor/user">user</a>/<a href="/constructor/channel">channel</a> are changed, see the documentation in the constructor pages for the full list.  </li>
+<li>After invoking <a href="/method/bots.setBotInfo">bots.setBotInfo</a> after changing <code>about</code> or <code>description</code> (but <strong>not</strong> <code>name</code>), for the bot whose info we changed.</li>
 </ul>
 <p><strong>Do not</strong> refresh full peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.</p></div>
   
