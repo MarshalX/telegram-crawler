@@ -88,14 +88,39 @@
 <p>The peer info database needs to be updated every time a new constructor of type <a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> and <a href="/constructor/channel">channel</a> (and their <code>forbidden</code> counterparts, used for peers that the user can't access, but can view basic info about) is received.  </p>
 <p>These constructors are received when interacting with the API (i.e. in common chats, through the search function, <a href="/api/invites#public-usernames">username resolution</a>, <a href="/api/links#temporary-profile-links">temporary profile links</a>, and so on...).  </p>
 <p>Unless specified otherwise (see the constructor pages for the special cases), when updating the local peer database, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).  </p>
-<p>Information about <em>already cached</em> peers must be refreshed in certain conditions using the bulked <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/messages.getChats">messages.getChats</a>, <a href="/method/channels.getChannels">channels.getChannels</a> methods, all requiring the previously cached <code>access_hash</code> (read on for more info).  </p>
-<p>Peer info must be refreshed <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, and so on...):  </p>
+<p>Some updates should trigger an update of a small subset of the info contained in the peer database:</p>
 <ul>
-<li>When passively receiving an <a href="/constructor/updateUser">updateUser</a>, <a href="/constructor/updateChat">updateChat</a>, <a href="/constructor/updateChannel">updateChannel</a>, and some other updates, as specified <a href="/type/Update">here »</a></li>
-<li>When fetching info about one of the following internal user IDs, if the info isn't already cached or if the cached info is <code>min</code>: 777000 (service notifications user), 1271266957 (replies bot), 1087968824 (anonymous bot), 136817688 (channel bot), 5434988373 (antispam bot).<br>
-Info about these IDs may be fetched with the zero access hash even by users.  </li>
-<li>After invoking <a href="/method/bots.setBotInfo">bots.setBotInfo</a> after changing <code>name</code> (but <strong>not</strong> the <code>about</code> or the <code>description</code>, as changing those fields already triggers a refresh of the full info database, and with it the peer database), for the bot whose info we changed</li>
-<li>After receiving a <code>CHAT_FORWARDS_RESTRICTED</code> error when forwarding messages to a chat</li>
+<li><a href="/constructor/updateUserStatus">updateUserStatus</a> - Update <a href="/constructor/user">user</a>.<code>status</code></li>
+<li><a href="/constructor/updateUserName">updateUserName</a>- Update <a href="/constructor/user">user</a>.<code>first_name</code>/<code>last_name</code>/<code>username</code>/<code>usernames</code></li>
+<li><a href="/constructor/updateUserEmojiStatus">updateUserEmojiStatus</a> - Update <a href="/constructor/user">user</a>.<code>emoji_status</code></li>
+<li><a href="/constructor/updateChatParticipants">updateChatParticipants</a> - Update <a href="/constructor/chat">chat</a>.<code>participants_count</code>, <a href="/constructor/chatFull">chatFull</a>.<code>participants</code>.  </li>
+<li><a href="/constructor/updateChatParticipant">updateChatParticipant</a> - Update <a href="/constructor/chat">chat</a>.<code>participants_count</code>, <a href="/constructor/chatFull">chatFull</a>.<code>participants</code>.  </li>
+<li><a href="/constructor/updateChannelAvailableMessages">updateChannelAvailableMessages</a> - Update <a href="/constructor/channel">channel</a>.<code>hidden_prehistory</code></li>
+</ul>
+<p>Information about <em>already cached</em> peers must be refreshed manually in certain conditions using the bulked <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/messages.getChats">messages.getChats</a>, <a href="/method/channels.getChannels">channels.getChannels</a> methods, all requiring the previously cached <code>access_hash</code> (read on for more info).  </p>
+<p>Peer info must be manually refreshed with a method call to the above methods <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, and so on...):  </p>
+<ul>
+<li>
+<p>When passively receiving an <a href="/constructor/updateUser">updateUser</a>, <a href="/constructor/updateChat">updateChat</a>, <a href="/constructor/updateChannel">updateChannel</a>, and some other updates, as specified <a href="/type/Update">here »</a></p>
+</li>
+<li>
+<p>When fetching info about one of the following internal user IDs, if the info isn't already cached or if the cached info is <code>min</code>: 777000 (service notifications user), 1271266957 (replies bot), 1087968824 (anonymous bot), 136817688 (channel bot), 5434988373 (antispam bot).<br>
+Info about these IDs may be fetched with the zero access hash even by users.  </p>
+</li>
+<li>
+<p>After invoking <a href="/method/bots.setBotInfo">bots.setBotInfo</a> after changing <code>name</code> (but <strong>not</strong> the <code>about</code> or the <code>description</code>, as changing those fields already triggers a refresh of the full info database, and with it the peer database), for the bot whose info we changed</p>
+</li>
+<li>
+<p>After receiving a <code>CHAT_FORWARDS_RESTRICTED</code> error when forwarding messages from a chat, to refresh info about the source chat.</p>
+</li>
+<li>
+<p>After invoking the following methods (both if the call succeds and after receiving a <code>USERNAME_NOT_MODIFIED</code> error, which is also a success):</p>
+<ul>
+<li><a href="/method/account.toggleUsername">account.toggleUsername</a>, <a href="/method/account.reorderUsernames">account.reorderUsernames</a> - For ourselves</li>
+<li><a href="/method/bots.toggleUsername">bots.toggleUsername</a>, <a href="/method/bots.reorderUsernames">bots.reorderUsernames</a> - For the bot whose username we updated</li>
+</ul>
+<p>Info should <strong>only</strong> be manually refreshed with a call to <a href="/method/users.getUsers">users.getUsers</a> if the new username order/active username cannot be applied locally (i.e. the methods successfully set as active some username that isn't associated to the user in our local cache, and so on), otherwise the <code>username</code> and <code>usernames</code> fields of the peer info database should be updated locally, using the info that was passed to to the toggle/reorder methods by the user.  </p>
+</li>
 </ul>
 <p>Do not refresh peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.  </p>
 <p>The peer info database contains the following information:  </p>
