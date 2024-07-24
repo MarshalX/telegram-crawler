@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>user</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Indicates info about a certain user">
+    <meta property="description" content="Indicates info about a certain user.  Unless specified otherwise, when updating the local peer database, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren&#39;t set in the new constructor).  See here » for an implementation of the logic to use when updating the local user peer database.">
     <meta property="og:title" content="user">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Indicates info about a certain user">
+    <meta property="og:description" content="Indicates info about a certain user.  Unless specified otherwise, when updating the local peer database, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren&#39;t set in the new constructor).  See here » for an implementation of the logic to use when updating the local user peer database.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -43,8 +43,8 @@
   <h1 id="dev_page_title">user</h1>
   
   <div id="dev_page_content"><p>Indicates info about a certain user.</p>
-<p>Unless specified otherwise, when updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).  </p>
-<p>See <a href="https://github.com/tdlib/td/blob/cb164927417f22811c74cd8678ed4a5ab7cb80ba/td/telegram/UserManager.cpp#L2267">here »</a> for an implementation of the logic to use when updating the <a href="/api/peers">local user peer database</a>.  </p>
+<p>Unless specified otherwise, when updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
+<p>See <a href="https://github.com/tdlib/td/blob/cb164927417f22811c74cd8678ed4a5ab7cb80ba/td/telegram/UserManager.cpp#L2267">here »</a> for an implementation of the logic to use when updating the <a href="/api/peers">local user peer database</a>.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -141,7 +141,7 @@
 <tr>
 <td><strong>apply_min_photo</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.25?<a href="/constructor/true">true</a></td>
-<td>If set and <code>min</code> is set, the value of <code>photo</code> <strong>can</strong> be used to update the local database, see the documentation of that flag for more info.</td>
+<td>If set and <code>min</code> is set, the value of <code>photo</code>    <strong>can</strong> be used to update the local database, see the documentation of that flag for more info.</td>
 </tr>
 <tr>
 <td><strong>fake</strong></td>
@@ -156,7 +156,7 @@
 <tr>
 <td><strong>premium</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.28?<a href="/constructor/true">true</a></td>
-<td>Whether this user is a Telegram Premium user <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID. <br>Changes to this flag if the <code>self</code> flag is set should also trigger the following calls, to refresh the respective caches: <br>- <a href="/method/help.getConfig">help.getConfig</a> <br>- <a href="/method/messages.getTopReactions">messages.getTopReactions</a> if the <code>bot</code> flag is <strong>not</strong> set</td>
+<td>Whether this user is a Telegram Premium user <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID. <br>Changes to this flag if the <code>self</code> flag is set should also trigger the following calls, to refresh the respective caches: <br>- <a href="/method/help.getConfig">help.getConfig</a>    <br>- <a href="/method/messages.getTopReactions">messages.getTopReactions</a> if the <code>bot</code> flag is <strong>not</strong> set</td>
 </tr>
 <tr>
 <td><strong>attach_menu_enabled</strong></td>
@@ -206,37 +206,37 @@
 <tr>
 <td><strong>access_hash</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/long">long</a></td>
-<td>Access hash of the user, see <a href="/api/peers#access-hash">here »</a> for more info. <br>If this flag is set, when updating the <a href="/api/peers">local peer database</a>, generate a virtual flag called <code>min_access_hash</code>, which is: <br>- Set to <code>true</code> if <code>min</code> is set AND <br>   - The <code>phone</code> <em>flag</em> is <strong>not</strong> set OR <br>   - The <code>phone</code> <em>flag</em> is set and the associated phone number string is <strong>non-empty</strong> <br>- Set to <code>false</code> otherwise. <br><br>Then, apply both <code>access_hash</code> and <code>min_access_hash</code> to the local database if: <br>- <code>min_access_hash</code> is false OR <br>- <code>min_access_hash</code> is true AND <br>   - There is no locally cached object for this user OR <br>   - There is no <code>access_hash</code> in the local cache OR <br>   - The cached object's <code>min_access_hash</code> is also true <br>If the final merged object stored to the database has the <code>min_access_hash</code> field set to true, the related <code>access_hash</code> is <strong>only</strong> suitable to use in <a href="/constructor/inputPeerPhotoFileLocation"><code>inputPeerPhotoFileLocation</code> »</a>, to directly <a href="/api/files">download the profile pictures</a> of users, everywhere else a <code>inputPeer*FromMessage</code> constructor will have to be generated as specified <a href="/api/min">here »</a>. <br>Bots can also use min access hashes in some conditions, by passing <code>0</code> instead of the min access hash.</td>
+<td>Access hash of the user, see <a href="/api/peers#access-hash">here »</a> for more info. <br>If this flag is set, when updating the <a href="/api/peers">local peer database</a>, generate a virtual flag called <code>min_access_hash</code>, which is: <br>- Set to <code>true</code> if <code>min</code> is set AND <br>- The <code>phone</code>    <em>flag</em> is <strong>not</strong> set OR <br>- The <code>phone</code>    <em>flag</em> is set and the associated phone number string is <strong>non-empty</strong>    <br>- Set to <code>false</code> otherwise. <br><br>Then, apply both <code>access_hash</code> and <code>min_access_hash</code> to the local database if: <br>- <code>min_access_hash</code> is false OR <br>- <code>min_access_hash</code> is true AND <br>- There is no locally cached object for this user OR <br>- There is no <code>access_hash</code> in the local cache OR <br>- The cached object's <code>min_access_hash</code> is also true <br>If the final merged object stored to the database has the <code>min_access_hash</code> field set to true, the related <code>access_hash</code> is <strong>only</strong> suitable to use in <a href="/constructor/inputPeerPhotoFileLocation"><code>inputPeerPhotoFileLocation</code> »</a>, to directly <a href="/api/files">download the profile pictures</a> of users, everywhere else a <code>inputPeer*FromMessage</code> constructor will have to be generated as specified <a href="/api/min">here »</a>. <br>Bots can also use min access hashes in some conditions, by passing <code>0</code> instead of the min access hash.</td>
 </tr>
 <tr>
 <td><strong>first_name</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/string">string</a></td>
-<td>First name. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>min</code> flag of the locally cached user entry is set.</td>
+<td>First name. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>- The <code>min</code> flag of the locally cached user entry is set.</td>
 </tr>
 <tr>
 <td><strong>last_name</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/string">string</a></td>
-<td>Last name. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>min</code> flag of the locally cached user entry is set.</td>
+<td>Last name. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>- The <code>min</code> flag of the locally cached user entry is set.</td>
 </tr>
 <tr>
 <td><strong>username</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/type/string">string</a></td>
-<td>Main active username. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>min</code> flag of the locally cached user entry is set.</td>
+<td>Main active username. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>- The <code>min</code> flag of the locally cached user entry is set.</td>
 </tr>
 <tr>
 <td><strong>phone</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/type/string">string</a></td>
-<td>Phone number. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>min</code> flag of the locally cached user entry is set.</td>
+<td>Phone number. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>- The <code>min</code> flag of the locally cached user entry is set.</td>
 </tr>
 <tr>
 <td><strong>photo</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/type/UserProfilePhoto">UserProfilePhoto</a></td>
-<td>Profile picture of user. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>apply_min_photo</code> flag is set OR <br>   - The <code>min</code> flag of the locally cached user entry is set.</td>
+<td>Profile picture of user. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>- The <code>apply_min_photo</code> flag is set OR <br>- The <code>min</code> flag of the locally cached user entry is set.</td>
 </tr>
 <tr>
 <td><strong>status</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.6?<a href="/type/UserStatus">UserStatus</a></td>
-<td>Online status of user. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>min</code> flag of the locally cached user entry is set OR <br>   - The locally cached user entry is equal to <a href="/constructor/userStatusEmpty">userStatusEmpty</a>.</td>
+<td>Online status of user. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>- The <code>min</code> flag of the locally cached user entry is set OR <br>- The locally cached user entry is equal to <a href="/constructor/userStatusEmpty">userStatusEmpty</a>.</td>
 </tr>
 <tr>
 <td><strong>bot_info_version</strong></td>
@@ -266,7 +266,7 @@
 <tr>
 <td><strong>usernames</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.0?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/Username">Username</a>&gt;</td>
-<td>Additional usernames. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>   - The <code>min</code> flag of the locally cached user entry is set. <br>Changes to this flag (if the above conditions are respected) should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID.</td>
+<td>Additional usernames. <br>When updating the <a href="/api/peers">local peer database</a>, apply changes to this field only if: <br>- The <code>min</code> flag is not set OR <br>- The <code>min</code> flag is set AND <br>- The <code>min</code> flag of the locally cached user entry is set. <br>Changes to this flag (if the above conditions are respected) should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID.</td>
 </tr>
 <tr>
 <td><strong>stories_max_id</strong></td>
@@ -288,10 +288,18 @@
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
 <p><a href="/type/User">User</a></p>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#peer-database" id="peer-database" name="peer-database"><i class="anchor-icon"></i></a><a href="/api/peers">Peer database</a></h4>
+<p>Many constructors in the API need to be stored in a local database upon reception and should only ever be updated reactively (passively) when received via updates or by other means (as specified in the documentation), to avoid overloading the server by continuously requesting changes for the same unchanged information.</p>
+<h4><a class="anchor" href="#userfull" id="userfull" name="userfull"><i class="anchor-icon"></i></a><a href="/constructor/userFull">userFull</a></h4>
+<p>Extended user info</p>
 <h4><a class="anchor" href="#min-constructors" id="min-constructors" name="min-constructors"><i class="anchor-icon"></i></a><a href="/api/min">Min constructors</a></h4>
 <p>In some situations user and channel constructors have reduced set of fields present (although id is always there) and min flag set.</p>
 <h4><a class="anchor" href="#bot-attachment-menu-and-side-menu-entries" id="bot-attachment-menu-and-side-menu-entries" name="bot-attachment-menu-and-side-menu-entries"><i class="anchor-icon"></i></a><a href="/api/bots/attach">Bot attachment menu and side menu entries</a></h4>
 <p>Bots can install attachment menu and side menu entries, offering conveniently accessible, versatile web apps.</p>
+<h4><a class="anchor" href="#helpgetconfig" id="helpgetconfig" name="helpgetconfig"><i class="anchor-icon"></i></a><a href="/method/help.getConfig">help.getConfig</a></h4>
+<p>Returns current configuration, including data center configuration.</p>
+<h4><a class="anchor" href="#messagesgettopreactions" id="messagesgettopreactions" name="messagesgettopreactions"><i class="anchor-icon"></i></a><a href="/method/messages.getTopReactions">messages.getTopReactions</a></h4>
+<p>Got popular <a href="/api/reactions">message reactions</a></p>
 <h4><a class="anchor" href="#privacy" id="privacy" name="privacy"><i class="anchor-icon"></i></a><a href="/api/privacy">Privacy</a></h4>
 <p>Telegram allows users to specify granular privacy settings, choosing which users can or can't interact with them in certain ways.</p>
 <h4><a class="anchor" href="#stories" id="stories" name="stories"><i class="anchor-icon"></i></a><a href="/api/stories">Stories</a></h4>
@@ -299,15 +307,21 @@
 <h4><a class="anchor" href="#telegram-premium" id="telegram-premium" name="telegram-premium"><i class="anchor-icon"></i></a><a href="/api/premium">Telegram Premium</a></h4>
 <p>Telegram Premium is an optional subscription service that unlocks additional exclusive client-side and API-side features, while helping support the development of the app.</p>
 <h4><a class="anchor" href="#user" id="user" name="user"><i class="anchor-icon"></i></a><a href="/constructor/user">user</a></h4>
-<p>Indicates info about a certain user</p>
+<p>Indicates info about a certain user.</p>
+<p>Unless specified otherwise, when updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
+<p>See <a href="https://github.com/tdlib/td/blob/cb164927417f22811c74cd8678ed4a5ab7cb80ba/td/telegram/UserManager.cpp#L2267">here »</a> for an implementation of the logic to use when updating the <a href="/api/peers">local user peer database</a>.</p>
 <h4><a class="anchor" href="#usersgetispremiumrequiredtocontact" id="usersgetispremiumrequiredtocontact" name="usersgetispremiumrequiredtocontact"><i class="anchor-icon"></i></a><a href="/method/users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a></h4>
 <p>Check whether we can write to the specified user (non-<a href="/api/premium">Premium</a> users only), see <a href="/api/privacy#require-premium-for-new-non-contact-users">here »</a> for more info on the full flow.</p>
 <h4><a class="anchor" href="#accountsetglobalprivacysettings" id="accountsetglobalprivacysettings" name="accountsetglobalprivacysettings"><i class="anchor-icon"></i></a><a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a></h4>
 <p>Set global privacy settings</p>
 <h4><a class="anchor" href="#business" id="business" name="business"><i class="anchor-icon"></i></a><a href="/api/business">Business</a></h4>
 <p>Users can turn their Telegram account into a business account, gaining access to business features such as opening hours, location, quick replies, automated messages, custom start pages, chatbot support, and more.</p>
-<h4><a class="anchor" href="#userfull" id="userfull" name="userfull"><i class="anchor-icon"></i></a><a href="/constructor/userFull">userFull</a></h4>
-<p>Extended user info</p>
+<h4><a class="anchor" href="#inputpeerphotofilelocation" id="inputpeerphotofilelocation" name="inputpeerphotofilelocation"><i class="anchor-icon"></i></a><a href="/constructor/inputPeerPhotoFileLocation">inputPeerPhotoFileLocation</a></h4>
+<p>Location of profile photo of channel/group/supergroup/user</p>
+<h4><a class="anchor" href="#uploading-and-downloading-files" id="uploading-and-downloading-files" name="uploading-and-downloading-files"><i class="anchor-icon"></i></a><a href="/api/files">Uploading and Downloading Files</a></h4>
+<p>How to transfer large data batches correctly.</p>
+<h4><a class="anchor" href="#userstatusempty" id="userstatusempty" name="userstatusempty"><i class="anchor-icon"></i></a><a href="/constructor/userStatusEmpty">userStatusEmpty</a></h4>
+<p>User status has not been set yet.</p>
 <h4><a class="anchor" href="#emoji-status" id="emoji-status" name="emoji-status"><i class="anchor-icon"></i></a><a href="/api/emoji-status">Emoji status</a></h4>
 <p>Telegram allows users to set an emoticon or a custom emoji as status, to show next to their name in chats and profiles.</p>
 <h4><a class="anchor" href="#accent-colors" id="accent-colors" name="accent-colors"><i class="anchor-icon"></i></a><a href="/api/colors">Accent colors</a></h4>
