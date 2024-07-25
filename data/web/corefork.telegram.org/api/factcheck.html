@@ -53,7 +53,12 @@
 ---functions---
 
 <a href='/method/messages.getFactCheck'>messages.getFactCheck</a>#b9cdc5ee peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FactCheck'>FactCheck</a>&gt;;</code></pre>
-<p>Fact-checks are represented by <a href="/constructor/factCheck">factCheck</a> constructors, optionally contained in the <code>factcheck</code> field of the <a href="/constructor/message">message</a> constructor.  </p>
+<p>Fact-checks are represented by <a href="/constructor/factCheck">factCheck</a> constructors, contained in the <code>factcheck</code> field of the <a href="/constructor/message">message</a> constructor.  </p>
+<p>Sometimes (i.e. for performance reasons), even if a message <em>does</em> have a factcheck, it may not be returned in the <code>text</code> field of the <a href="/constructor/factCheck">factCheck</a> associated to the <a href="/constructor/message">message</a>: in this case, the <a href="/constructor/factCheck">factCheck</a>.<code>need_check</code> flag will be set and the <code>country</code>/<code>text</code> flags won't be set, and the client should request the full text of the fact check manually using <a href="/method/messages.getFactCheck">messages.getFactCheck</a> when the message scrolls into view.  </p>
+<p>These manual requests should be bundled: every time a new ID is added to the queue of factchecks to manually fetch, postpone fetching by 80ms.  </p>
+<p>Store all <em>full</em> (i.e. those with a <code>country</code>/<code>text</code>) factchecks in a local database, using the <code>hash</code> as key.<br>
+Avoid fetching <em>min</em> (i.e. those where <code>need_check</code> is set) factchecks if a factcheck with the same <code>hash</code> is already cached in the local database.  </p>
+<p>Example implementation: <a href="https://github.com/DrKLO/Telegram/blob/5fa5549a4a7f48476be29cc0facf68990ea10f62/TMessagesProj/src/main/java/org/telegram/messenger/FactCheckController.java">android</a>.</p>
 <h3><a class="anchor" href="#editing-fact-checks" id="editing-fact-checks" name="editing-fact-checks"><i class="anchor-icon"></i></a>Editing fact-checks</h3>
 <pre><code><a href='/constructor/factCheck'>factCheck</a>#b89bfccf flags:<a href='/type/%23'>#</a> need_check:flags.0?<a href='/constructor/true'>true</a> country:flags.1?<a href='/type/string'>string</a> text:flags.1?<a href='/type/TextWithEntities'>TextWithEntities</a> hash:<a href='/type/long'>long</a> = <a href='/type/FactCheck'>FactCheck</a>;
 
