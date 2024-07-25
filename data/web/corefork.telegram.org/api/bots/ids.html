@@ -44,9 +44,10 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>The <code>id</code> field of <a href="/api/peers">peers »</a> (i.e. users, chats, channels) contain three distinct sequences of unique 64-bit IDs used to identify a specific user, chat or channel.  </p>
-<p>The ID sequences of users, chats and channels <strong>overlap</strong>, so it is a good idea to transform the peer IDs to bot API dialog IDs as specified below.  </p>
-<p>A bot API dialog ID is a single, unique 64-bit peer ID sequence derived from the user, chat and channel ID sequences, maintaining uniqueness across all of them.  </p>
+<p>The <code>id</code> field of <a href="/api/peers">peers »</a> (i.e. users, chats, channels, secret chats) contain four distinct sequences of unique 64-bit IDs used to identify a specific user, chat, channel or secret chat.  </p>
+<p>The ID sequences of users, chats, channels and secret chats <strong>overlap</strong>, so it is a good idea to transform the peer IDs to bot API dialog IDs as specified below.  </p>
+<p>A bot API dialog ID is a single, unique 64-bit peer ID sequence derived from the user, chat, channel and secret chat ID sequences, maintaining uniqueness across all of them.<br>
+Bot API dialog IDs are already used in the <a href="/bots/api">bot API</a> and in the underlying <a href="https://github.com/tdlib/td">tdlib</a> library to identify peers.  </p>
 <p>As specified above, a bot API dialog ID may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But, thanks to the ranges of the underlying MTProto IDs (specified below), it has at most 52 significant bits, so a 64-bit integer or even a double-precision float type are safe for storing this identifier.  </p>
 <p>More specifically, a bot API dialog ID ranges from <code>-2002147483648</code> to <code>1099511627775</code>.  </p>
 <p>It's a good idea to transform peer IDs to bot dialog API IDs even if you do decide to use separate databases to <a href="/api/peers">store info about peers</a>, as it will make IDs more visually recognizable both for you and your users, as well as guarantee compatibility with the bot API, and allow your client to easily identify the type of a peer just by using its ID, thanks to the range checks specified below.</p>
@@ -69,11 +70,12 @@ $chatId = -$botApiChatId;</code></pre>
 <pre><code>$botApiChannelId = -(1000000000000 + $channelId);
 $channelId = -$botApiChannelId - 1000000000000;</code></pre>
 <h3><a class="anchor" href="#secret-chat-ids" id="secret-chat-ids" name="secret-chat-ids"><i class="anchor-icon"></i></a>Secret chat IDs</h3>
-<p><a href="/api/end-to-end">Secret chat IDs</a> in the MTProto API range from <code>-2147483648</code> to <code>2147483647</code> (inclusive, treat the secret chat ID as a signed 32-bit integer).  </p>
+<p><a href="/api/end-to-end">Secret chat IDs</a> in the MTProto API range from <code>-2147483648</code> to <code>2147483647</code> (inclusive, treat the secret chat ID as a signed little-endian 32-bit integer).  </p>
 <p>To convert MTProto chat IDs to bot API chat secret chat IDs, subtract <code>2000000000000</code>.  </p>
 <p>Before conversion, always validate that they fall within the range specified above (appropriately transformed for bot API secret chat dialog IDs, i.e. <code>-2002147483648</code> to <code>-1997852516353</code> inclusively).  </p>
 <pre><code>$botApiSecretChatId = $secretChatId - 2000000000000;
-$secretChatId = $botApiSecretChatId + 2000000000000;</code></pre></div>
+$secretChatId = $botApiSecretChatId + 2000000000000;</code></pre>
+<p>Note: while the official instance of the bot API does not support secret chats, the underlying <a href="https://github.com/tdlib/td/">tdlib</a> library does support them, and uses the format mentioned above for secret chat IDs.</p></div>
   
 </div>
           
