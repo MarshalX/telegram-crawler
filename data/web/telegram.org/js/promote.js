@@ -1040,8 +1040,9 @@ var NewAd = {
     if (!Aj.globalState._locationCache) {
       Aj.globalState._locationCache = {};
     }
+    var query_char = query.substr(0, 1);
     var locCache = Aj.globalState._locationCache;
-    var data_key = c_value + '.' + query.substr(0, 1);
+    var data_key = c_value + '.' + query_char;
     if (locCache[data_key] === false || locCache[data_key]) {
       return locCache[data_key] ? locCache[data_key].concat(items) : items;
     }
@@ -1049,7 +1050,7 @@ var NewAd = {
     $formGroup.addClass('field-loading');
     NewAd.loadLocationData({
       countries: c_value,
-      query: query,
+      query: query_char,
       offset: 0
     }, {key: data_key}, function() {
       $fieldEl.trigger('contentchange');
