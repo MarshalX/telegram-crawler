@@ -1971,6 +1971,57 @@
     };
     WebView.postEvent('web_app_request_phone');
   };
+  WebApp.shareToStory = function (media_url, params) {
+    params = params || {};
+    if (!versionAtLeast('7.8')) {
+      console.error('[Telegram.WebApp] Method shareToStory is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    var a = document.createElement('A');
+    a.href = media_url;
+    if (a.protocol != 'http:' &&
+        a.protocol != 'https:') {
+      console.error('[Telegram.WebApp] Media url protocol is not supported', url);
+      throw Error('WebAppMediaUrlInvalid');
+    }
+    var share_params = {};
+    share_params.media_url = a.href;
+    if (typeof params.text !== 'undefined') {
+      var text = strTrim(params.text);
+      if (text.length > 2048) {
+        console.error('[Telegram.WebApp] Text is too long', text);
+        throw Error('WebAppShareToStoryParamInvalid');
+      }
+      if (text.length > 0) {
+        share_params.text = text;
+      }
+    }
+    if (typeof params.widget_link !== 'undefined') {
+      params.widget_link = params.widget_link || {};
+      a.href = params.widget_link.url;
+      if (a.protocol != 'http:' &&
+          a.protocol != 'https:') {
+        console.error('[Telegram.WebApp] Link protocol is not supported', url);
+        throw Error('WebAppShareToStoryParamInvalid');
+      }
+      var widget_link = {
+        url: a.href
+      };
+      if (typeof params.widget_link.name !== 'undefined') {
+        var link_name = strTrim(params.widget_link.name);
+        if (link_name.length > 48) {
+          console.error('[Telegram.WebApp] Link name is too long', link_name);
+          throw Error('WebAppShareToStoryParamInvalid');
+        }
+        if (link_name.length > 0) {
+          widget_link.name = link_name;
+        }
+      }
+      share_params.widget_link = widget_link;
+    }
+
+    WebView.postEvent('web_app_share_to_story', false, share_params);
+  };
   WebApp.invokeCustomMethod = function (method, params, callback) {
     invokeCustomMethod(method, params, callback);
   };
