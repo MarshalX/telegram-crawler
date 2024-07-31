@@ -57,6 +57,12 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="july-31-2024" href="#july-31-2024"><i class="anchor-icon"></i></a>July 31, 2024</h4>
+<p><strong>Bot API 7.8</strong></p>
+<ul>
+<li>Added the option for bots to set a <a href="#launching-the-main-mini-app">Main Mini App</a>, which can be previewed and launched directly from a button in the bot&#39;s profile or a link.</li>
+<li>Added the method <em>shareToStory</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+</ul>
 <h4><a class="anchor" name="july-7-2024" href="#july-7-2024"><i class="anchor-icon"></i></a>July 7, 2024</h4>
 <p><strong>Bot API 7.7</strong></p>
 <ul>
@@ -144,7 +150,7 @@
 </ul>
 <hr>
 <h3><a class="anchor" name="implementing-mini-apps" href="#implementing-mini-apps"><i class="anchor-icon"></i></a>Implementing Mini Apps</h3>
-<p>Telegram currently supports six different ways of launching Mini Apps: from a <a href="#keyboard-button-mini-apps">keyboard button</a>, from an <a href="#inline-button-mini-apps">inline button</a>, from the <a href="#launching-mini-apps-from-the-menu-button">bot menu button</a>, via <a href="#inline-mode-mini-apps">inline mode</a>, from a <a href="#direct-link-mini-apps">direct link</a> – and even from the <a href="#launching-mini-apps-from-the-attachment-menu">attachment menu</a>.</p>
+<p>Telegram currently supports seven different ways of launching Mini Apps: the main Mini App from a <a href="#launching-the-main-mini-app">profile button</a>, from a <a href="#keyboard-button-mini-apps">keyboard button</a>, from an <a href="#inline-button-mini-apps">inline button</a>, from the <a href="#launching-mini-apps-from-the-menu-button">bot menu button</a>, via <a href="#inline-mode-mini-apps">inline mode</a>, from a <a href="#direct-link-mini-apps">direct link</a> – and even from the <a href="#launching-mini-apps-from-the-attachment-menu">attachment menu</a>.</p>
 <div>
   <a href="/file/464001388/10b1a/IYpn0wWfggw.1156850/fd9a32baa81dcecbe4" target="_blank"><img src="/file/464001388/10b1a/IYpn0wWfggw.1156850/fd9a32baa81dcecbe4" title="" alt="Types of buttons" class="dev_page_image" /></a>
 </div>
@@ -193,6 +199,29 @@
 <p>Apart from this, Mini Apps opened via the menu button work in the exact same way as when <a href="#inline-button-mini-apps">using inline buttons</a>.</p>
 <blockquote>
 <p><a href="https://t.me/durgerkingbot">@DurgerKingBot</a> allows launching its Mini App both from an inline button and from the menu button.</p>
+</blockquote>
+<h4><a class="anchor" name="launching-the-main-mini-app" href="#launching-the-main-mini-app"><i class="anchor-icon"></i></a>Launching the main Mini App</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> If your bot is a mini app, you can add a prominent <strong>Launch app</strong> button as well as high-quality demo videos and screenshots to the bot’s profile. To do this, go to <a href="https://t.me/botfather">@BotFather</a> and set the mini app as your bot&#39;s main app.</p>
+</blockquote>
+<p>If your bot is a mini app, you can unlock a number of features that streamline and simplify the way in which users view and interact with it. To do this, go to <a href="https://t.me/botfather">@BotFather</a> and set the mini app as your bot&#39;s <strong>Main App</strong>.</p>
+<p>After setting a main mini app, you&#39;ll be able to upload detailed <strong>media preview demos</strong> to publicly highlight your app&#39;s key features on its profile. A <strong>Launch app</strong> button will also appear, allowing users to open your app directly from its profile.</p>
+<blockquote>
+<p>Bots that enabled a main mini app will be displayed in the <em>Apps</em> tab of the search for users who have launched them.</p>
+</blockquote>
+<p>A bot&#39;s <strong>main Mini App</strong> can also be opened in the current chat by direct link in the format <code>https://t.me/botusername?startapp</code>. If a non-empty <em>startapp</em> parameter is included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>. </p>
+<p><strong>Examples</strong></p>
+<p><code>https://t.me/botusername?startapp</code><br><code>https://t.me/botusername?startapp=command</code><br><code>https://t.me/botusername?startapp=command&amp;mode=compact</code></p>
+<p>In this mode, Mini Apps can use the <em>chat_type</em> and <em>chat_instance</em> parameters to keep track of the current chat context. This introduces support for <strong>concurrent</strong> and <strong>shared</strong> usage by multiple chat members – to create live whiteboards, group orders, multiplayer games and similar apps.</p>
+<p>By default, the main Mini App opens to full-screen height, and users cannot reduce them to half-height. However, you can change this behavior via <a href="https://t.me/botfather">@BotFather</a> or by including the parameter <code>mode=compact</code> in the link to the Mini App, in which case it will open to half-screen height by default.</p>
+<p><strong>Good for:</strong></p>
+<ul>
+<li>Fully-fledged web services and integrations that any user can open in one tap.</li>
+<li>Cooperative, multiplayer or teamwork-oriented services within a chat context.</li>
+<li>The use cases are effectively <strong>unlimited</strong>.</li>
+</ul>
+<blockquote>
+<p>Successful bots which <strong>enable</strong> a main Mini App and <strong>accept payments</strong> in <a href="https://core.telegram.org/bots/payments-stars">Telegram Stars</a> may be featured in the Telegram <a href="https://t.me/BotNews/99">Mini App Store</a>. To increase the chances of being featured, we recommend uploading high-quality media showcasing your app on your bot&#39;s profile and following our <a href="#design-guidelines">design guidelines</a>.</p>
 </blockquote>
 <h4><a class="anchor" name="inline-mode-mini-apps" href="#inline-mode-mini-apps"><i class="anchor-icon"></i></a>Inline Mode Mini Apps</h4>
 <blockquote>
@@ -413,6 +442,11 @@
 <td><mark>Bot API 6.1+</mark> A method that opens an invoice using the link <em>url</em>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>invoiceClosed</em> when the invoice is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the invoice status will be passed as the first argument.</td>
 </tr>
 <tr>
+<td>shareToStory(media_url[, params])</td>
+<td>Function</td>
+<td><mark>Bot API 7.8+</mark> A method that opens the native story editor with the media specified in the <em>media_url</em> parameter as an HTTPS URL. An optional <em>params</em> argument of the type <a href="#storyshareparams">StoryShareParams</a> describes additional sharing settings.</td>
+</tr>
+<tr>
 <td>showPopup(params[, callback])</td>
 <td>Function</td>
 <td><mark>Bot API 6.2+</mark> A method that shows a native popup described by the <em>params</em> argument of the type <a href="#popupparams">PopupParams</a>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>popupClosed</em> when the popup is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the field <em>id</em> of the pressed button will be passed as the first argument.</td>
@@ -557,6 +591,70 @@
 </div>
 
 
+<h4><a class="anchor" name="storyshareparams" href="#storyshareparams"><i class="anchor-icon"></i></a>StoryShareParams</h4>
+<p>This object describes additional sharing settings for the native story editor.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. The caption to be added to the media, 0-200 characters for regular users and 0-2048 characters for <a href="https://telegram.org/faq_premium#telegram-premium">premium</a> subscribers.</td>
+</tr>
+<tr>
+<td>widget_link</td>
+<td><a href="#storywidgetlink">StoryWidgetLink</a></td>
+<td><em>Optional</em>. An object that describes a widget link to be included in the story. Note that only <a href="https://telegram.org/faq_premium#telegram-premium">premium</a> subscribers can post stories with links.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="storywidgetlink" href="#storywidgetlink"><i class="anchor-icon"></i></a>StoryWidgetLink</h4>
+<p>This object describes a widget link to be included in the story.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>url</td>
+<td>String</td>
+<td>The URL to be included in the story.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td><em>Optional</em>. The name to be displayed for the widget link, 0-48 characters.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="scanqrpopupparams" href="#scanqrpopupparams"><i class="anchor-icon"></i></a>ScanQrPopupParams</h4>
+<p>This object describes the native popup for scanning QR codes.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed under the &#39;Scan QR&#39; heading, 0-64 characters.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="popupparams" href="#popupparams"><i class="anchor-icon"></i></a>PopupParams</h4>
 <p>This object describes the native popup.</p>
 <table class="table">
@@ -582,24 +680,6 @@
 <td>buttons</td>
 <td>Array of <a href="#popupbutton">PopupButton</a></td>
 <td><em>Optional</em>. List of buttons to be displayed in the popup, 1-3 buttons. Set to <em>[{“type”:“close”}]</em> by default.</td>
-</tr>
-</tbody>
-</table>
-<h4><a class="anchor" name="scanqrpopupparams" href="#scanqrpopupparams"><i class="anchor-icon"></i></a>ScanQrPopupParams</h4>
-<p>This object describes the native popup for scanning QR codes.</p>
-<table class="table">
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>text</td>
-<td>String</td>
-<td><em>Optional</em>. The text to be displayed under the &#39;Scan QR&#39; heading, 0-64 characters.</td>
 </tr>
 </tbody>
 </table>

@@ -53,6 +53,14 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="july-31-2024" href="#july-31-2024"><i class="anchor-icon"></i></a>July 31, 2024</h4>
+<p><strong>Bot API 7.8</strong></p>
+<ul>
+<li>Added the option for bots to set a <a href="/bots/webapps#launching-the-main-mini-app">Main Mini App</a>, which can be previewed and launched directly from a button in the bot&#39;s profile or a link.</li>
+<li>Added the method <em>shareToStory</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the field <em>has_main_web_app</em> to the class <a href="#user">User</a>, which is returned in the response to <a href="#getme">getMe</a>.</li>
+<li>Added the parameter <em>business_connection_id</em> to the methods <a href="#pinchatmessage">pinChatMessage</a> and <a href="#unpinchatmessage">unpinChatMessage</a>, allowing bots to manage pinned messages on behalf of a business account.</li>
+</ul>
 <h4><a class="anchor" name="july-7-2024" href="#july-7-2024"><i class="anchor-icon"></i></a>July 7, 2024</h4>
 <p><strong>Bot API 7.7</strong></p>
 <ul>
@@ -99,22 +107,6 @@ To learn how to create…">
 <li>Added support for “expandable_blockquote” entities in received messages.</li>
 <li>Added support for “expandable_blockquote” entity parsing in “MarkdownV2” and “HTML” parse modes.</li>
 <li>Allowed to explicitly specify “expandable_blockquote” entities in formatted texts.</li>
-</ul>
-<h4><a class="anchor" name="may-6-2024" href="#may-6-2024"><i class="anchor-icon"></i></a>May 6, 2024</h4>
-<p><strong>Bot API 7.3</strong></p>
-<ul>
-<li>Added support for <a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a> with <em>url</em>, <em>login_url</em>, and <em>callback_game</em> buttons for messages sent on behalf of a business account.</li>
-<li>Added the field <em>via_join_request</em> to the class <a href="#chatmemberupdated">ChatMemberUpdated</a>.</li>
-<li>Added support for live locations that can be edited indefinitely, allowing 0x7FFFFFFF to be used as <em>live_period</em>.</li>
-<li>Added the parameter <em>live_period</em> to the method <a href="#editmessagelivelocation">editMessageLiveLocation</a>.</li>
-<li>Added the field <em>question_entities</em> to the class <a href="#poll">Poll</a>.</li>
-<li>Added the field <em>text_entities</em> to the class <a href="#polloption">PollOption</a>.</li>
-<li>Added the parameters <em>question_parse_mode</em> and <em>question_entities</em> to the method <a href="#sendpoll">sendPoll</a>.</li>
-<li>Added the class <a href="#inputpolloption">InputPollOption</a> and changed the type of the parameter <em>options</em> in the method <a href="#sendpoll">sendPoll</a> to Array of <a href="#inputpolloption">InputPollOption</a>.</li>
-<li>Added the classes <a href="#chatbackground">ChatBackground</a>, <a href="#backgroundtype">BackgroundType</a>, <a href="#backgroundfill">BackgroundFill</a> and the field <em>chat_background_set</em> of type <a href="#chatbackground">ChatBackground</a> to the class <a href="#message">Message</a>, describing service messages about background changes.</li>
-<li>Split out the class <a href="#chatfullinfo">ChatFullInfo</a> from the class <a href="#chat">Chat</a> and changed the return type of the method <a href="#getchat">getChat</a> to <a href="#chatfullinfo">ChatFullInfo</a>.</li>
-<li>Added the field <em>max_reaction_count</em> to the class <a href="#chatfullinfo">ChatFullInfo</a>.</li>
-<li>Documented that .MP3 and .M4A files can be used as voice messages.</li>
 </ul>
 <p><strong><a href="/bots/api-changelog">See earlier changes »</a></strong></p>
 <h3><a class="anchor" name="authorizing-your-bot" href="#authorizing-your-bot"><i class="anchor-icon"></i></a>Authorizing your bot</h3>
@@ -542,6 +534,11 @@ To learn how to create…">
 <td>can_connect_to_business</td>
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the bot can be connected to a Telegram Business account to receive its messages. Returned only in <a href="#getme">getMe</a>.</td>
+</tr>
+<tr>
+<td>has_main_web_app</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the bot has a main Web App. Returned only in <a href="#getme">getMe</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -8541,6 +8538,12 @@ pre-formatted fixed-width code block written in the Python programming language
 </thead>
 <tbody>
 <tr>
+<td>business_connection_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the business connection on behalf of which the message will be pinned</td>
+</tr>
+<tr>
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
@@ -8573,6 +8576,12 @@ pre-formatted fixed-width code block written in the Python programming language
 </thead>
 <tbody>
 <tr>
+<td>business_connection_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the business connection on behalf of which the message will be unpinned</td>
+</tr>
+<tr>
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
@@ -8582,7 +8591,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>message_id</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>Identifier of a message to unpin. If not specified, the most recent pinned message (by sending date) will be unpinned.</td>
+<td>Identifier of the message to unpin. Required if <em>business_connection_id</em> is specified. If not specified, the most recent pinned message (by sending date) will be unpinned.</td>
 </tr>
 </tbody>
 </table>
