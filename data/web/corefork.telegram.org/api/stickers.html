@@ -78,6 +78,7 @@
 <li><a href="/api/reactions">Reactions »</a></li>
 <li><a href="#mask-stickers">Mask stickers »</a></li>
 </ul>
+<p>A single stickerset can contain a mix of <a href="#static-stickers">static</a>, <a href="#animated-stickers">animated</a> and <a href="#video-stickers">video</a> stickers.</p>
 <h4><a class="anchor" href="#static-stickers" id="static-stickers" name="static-stickers"><i class="anchor-icon"></i></a>Static stickers</h4>
 <p>Static stickers are <a href="https://en.wikipedia.org/wiki/WebP">WebP</a> images with the following specs:</p>
 <ul>
@@ -254,14 +255,13 @@ Use <a href="/method/messages.getEmojiStickers">messages.getEmojiStickers</a> to
 <a href='/method/stickers.changeStickerPosition'>stickers.changeStickerPosition</a>#ffb6d4ca sticker:<a href='/type/InputDocument'>InputDocument</a> position:<a href='/type/int'>int</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;
 <a href='/method/stickers.setStickerSetThumb'>stickers.setStickerSetThumb</a>#a76a5392 flags:<a href='/type/%23'>#</a> stickerset:<a href='/type/InputStickerSet'>InputStickerSet</a> thumb:flags.0?<a href='/type/InputDocument'>InputDocument</a> thumb_document_id:flags.1?<a href='/type/long'>long</a> = <a href='/type/messages.StickerSet'>messages.StickerSet</a>;</code></pre>
 <p>Bots and users can create stickersets by using the following methods.<br>
-Users can also create stickersets by interacting with the official <a href="https://t.me/stickers">@stickers</a> bot.  </p>
+The <a href="https://t.me/stickers">@stickers</a> bot which could be previously used to edit stickers is now <strong>deprecated</strong>, the in-app editor (invoking the following methods) should now be used, instead.  </p>
 <p>Note that unofficial bots <strong>must</strong> append a <code>"_by_&lt;bot_username&gt;"</code> prefix to the stickerset short name when creating stickersets.
-Also note that users can't directly modify stickersets created using <a href="/method/stickers.createStickerSet">stickers.createStickerSet</a>, and must use the <a href="https://t.me/stickers">@stickers</a> bot, instead: only the sticker creation+shortname methods are available directly to users to allow <a href="/import-stickers">importing stickers using the stickers SDK</a>.  </p>
+Users and bots can directly modify stickersets created using <a href="/method/stickers.createStickerSet">stickers.createStickerSet</a> and <a href="https://t.me/stickers">@stickers</a>: stickersets owned by the current user/bot will have the <code>creator</code> flag set.  </p>
+<p>Use <a href="/method/messages.getMyStickers">messages.getMyStickers</a> to fetch the stickersets created by the current account.  </p>
 <p>Use <a href="/method/messages.uploadMedia">messages.uploadMedia</a> to upload stickers and thumbnails, if you don't already have access to a previously uploaded <a href="/constructor/document">document</a>.  </p>
 <p>Use <a href="/method/stickers.checkShortName">stickers.checkShortName</a> to check if a given short name is available, and <a href="/method/stickers.suggestShortName">stickers.suggestShortName</a> to let the server suggest a short name, given the stickerset title.</p>
-<p>Use <a href="/method/stickers.createStickerSet">stickers.createStickerSet</a> to create normal, <a href="#animated-stickers">animated</a>, <a href="#video-stickers">video</a> or <a href="#mask-stickers">mask</a> stickersets.<br>
-<a href="/api/custom-emoji">Custom emoji</a> stickersets can only be created using the <a href="https://t.me/stickers">@stickers</a> bot for now.  </p>
-<p>Use <a href="/method/messages.getMyStickers">messages.getMyStickers</a> to fetch the stickersets created by the current account.  </p>
+<p>Use <a href="/method/stickers.createStickerSet">stickers.createStickerSet</a> to create normal, <a href="#mask-stickers">mask</a> and <a href="/api/custom-emoji">custom emoji</a> stickersets, <em>also</em> when <a href="/import-stickers">importing stickers using the stickers SDK</a>.  </p>
 <p>Use <a href="/method/stickers.addStickerToSet">stickers.addStickerToSet</a> to add stickers to the stickerset.<br>
 Use <a href="/method/stickers.replaceSticker">stickers.replaceSticker</a> to replace a sticker in a stickerset (no need to pass the actual stickerset ID here).<br>
 Use <a href="/method/stickers.addStickerToSet">stickers.setStickerSetThumb</a> to edit the stickerset thumbnail after creation.<br>
