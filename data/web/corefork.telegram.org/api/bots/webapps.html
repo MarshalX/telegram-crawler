@@ -275,35 +275,18 @@ Note that eventual errors will not be sent as a <code>failed</code> event if the
 <h4><a class="anchor" href="#biometry-info-received" id="biometry-info-received" name="biometry-info-received"><i class="anchor-icon"></i></a><code>biometry_info_received</code></h4>
 <p>Params: a JSON object with the following fields:</p>
 <ul>
-<li>
-<p><code>available</code> - boolean, if true, indicates that biometric authentication is available on the current device.</p>
-</li>
-<li>
-<p><code>type</code> - optional string, set if <code>available</code> is true, contains the type of biometric authentication, one of:</p>
-<ul>
+<li><code>available</code> - boolean, if true, indicates that biometric authentication is available on the current device.</li>
+<li><code>type</code> - optional string, set if <code>available</code> is true, contains the type of biometric authentication, one of:<ul>
 <li><code>finger</code> - fingerprint-based biometrics</li>
 <li><code>face</code> - face-based biometrics</li>
 <li><code>unknown</code> - biometrics of an unknown type</li>
 </ul>
 </li>
-<li>
-<p><code>access_requested</code> - boolean, indicates whether the app has previously requested permission to use biometrics through a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a></p>
-</li>
-<li>
-<p><code>access_granted</code> - boolean, indicates whether the user has granted the app permission to use biometrics in response to a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>.<br>
-If false and <code>access_requested</code> is true, may indicate that: </p>
-<ul>
-<li>The user has simply cancelled the permission popup, in which case a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a> can be emitted to re-open the popup</li>
-<li>The user has denied the app permission to use biometrics, in which case the app should open a prompt notifying the user that the biometric settings must be changed to use biometrics, and if the user clicks on the in-app confirm button, a <a href="/api/web-events#web-app-biometry-open-settings">web_app_biometry_open_settings event »</a> must be emitted.</li>
-</ul>
-<p>Since there is currently no way for apps to distinguish the above two cases, apps must assume the user has denied permission to use biometrics if <code>access_granted</code> is false and <code>access_requested</code> is true.  </p>
-</li>
-<li>
-<p><code>token_saved</code> - boolean, whether a token was safely stored on-device by a previous <a href="/api/web-events#web-app-biometry-update-token">web_app_biometry_update_token event »</a>.  </p>
-</li>
-<li>
-<p><code>device_id</code> - string, a unique device identifier that can be used to match the token to the device.</p>
-</li>
+<li><code>access_requested</code> - boolean, indicates whether the app has previously requested permission to use biometrics through a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a></li>
+<li><code>access_granted</code> - boolean, indicates whether the user has granted the app permission to use biometrics in response to a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>.<br>
+If false and <code>access_requested</code> is true, the user has denied the app permission to use biometrics, in which case the app should open a prompt notifying the user that the biometric settings must be changed to use biometrics, and if the user clicks on the in-app confirm button, a <a href="/api/web-events#web-app-biometry-open-settings">web_app_biometry_open_settings event »</a> must be emitted.</li>
+<li><code>token_saved</code> - boolean, whether a token was safely stored on-device by a previous <a href="/api/web-events#web-app-biometry-update-token">web_app_biometry_update_token event »</a>.  </li>
+<li><code>device_id</code> - string, a unique device identifier that can be used to match the token to the device.</li>
 </ul>
 <p>Used by clients to reply to a <a href="/api/web-events#web-app-biometry-get-info"><code>web_app_biometry_get_info</code> event »</a> or a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>.  </p>
 <h4><a class="anchor" href="#biometry-token-updated" id="biometry-token-updated" name="biometry-token-updated"><i class="anchor-icon"></i></a><code>biometry_token_updated</code></h4>
