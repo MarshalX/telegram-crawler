@@ -82,8 +82,6 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
 <p>Example value of <a href="/constructor/help.appConfig">help.appConfig</a>.<code>config</code>:  </p>
 <pre><code class="language-json">{
     "test": 1,
-    "keep_alive_service": true,
-    "background_connection": true,
     "emojies_animated_zoom": 0.625,
     "emojies_send_dice": [
         "\ud83c\udfb2",
@@ -204,6 +202,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
         "web.telegram.org",
         "web.t.me",
         "k.t.me",
+        "z.t.me",
         "a.t.me"
     ],
     "round_video_encoding": {
@@ -369,18 +368,28 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "intro_description_length_limit": 70,
     "business_chat_links_limit": 100,
     "channel_restrict_sponsored_level_min": 50,
+    "channel_revenue_withdrawal_enabled": true,
     "dismissed_suggestions": [],
     "stories_pinned_to_top_count_max": 3,
-    "can_edit_factcheck": false,
-    "factcheck_length_limit": 1024,
-    "channel_revenue_withdrawal_enabled": true,
-    "stars_purchase_blocked": true,
+    "stars_purchase_blocked": false,
+    "stories_area_url_max": 3,
+    "stars_revenue_withdrawal_min": 1000,
+    "stars_paid_post_amount_max": 2500,
     "web_app_allowed_protocols": [
         "http",
         "https"
-    ]
+    ],
+    "bot_preview_medias_max": 12,
+    "ton_proxy_address": "magic.org",
+    "weather_search_username": "StoryWeatherBot",
+    "story_weather_preload": true,
+    "stars_gifts_enabled": true
 }</code></pre>
-<p>Typical fields included in the resulting JSON object are:  </p>
+<p>The fields included in the resulting JSON object are:  </p>
+<h4><a class="anchor" href="#weather-search-username" id="weather-search-username" name="weather-search-username"><i class="anchor-icon"></i></a><code>weather_search_username</code></h4>
+<p>Contains the username of the bot used to query the current weather, to use in <a href="/api/stories#weather">weather media areas as specified here »</a>. (string)</p>
+<h4><a class="anchor" href="#story-weather-preload" id="story-weather-preload" name="story-weather-preload"><i class="anchor-icon"></i></a><code>story_weather_preload</code></h4>
+<p>If set and true, clients should preload the current weather on startup (as opposed to only when creating a <a href="/api/stories#weather">weather media area</a>) by querying the bot specified in <a href="#weather-search-username">weather_search_username</a>. (boolean)</p>
 <h4><a class="anchor" href="#emojies-animated-zoom" id="emojies-animated-zoom" name="emojies-animated-zoom"><i class="anchor-icon"></i></a><code>emojies_animated_zoom</code></h4>
 <p><a href="/api/animated-emojis">Animated emojis</a> and <a href="/api/dice">animated dice</a> should be scaled by this factor before being shown to the user (float)</p>
 <h4><a class="anchor" href="#keep-alive-service" id="keep-alive-service" name="keep-alive-service"><i class="anchor-icon"></i></a><code>keep_alive_service</code></h4>
@@ -585,6 +594,8 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <h4><a class="anchor" href="#stories-entities" id="stories-entities" name="stories-entities"><i class="anchor-icon"></i></a><code>stories_entities</code></h4>
 <p>Whether <a href="/api/entities">styled text entities</a> and links in story text captions can be used by all users (<code>enabled</code>), only [Premium](/api/premium users) (<code>premium</code>), or no one (<code>disabled</code>). (string)</p>
 <p>This field is used both when posting stories, to indicate to the user whether they can use entities, and when viewing stories, to hide entities (client-side) on stories posted by users whose <a href="/api/premium">Premium</a> subscription has expired (if <code>stories_entities == "premium"</code> and <a href="/constructor/user">user</a>.<code>premium</code> is not set, or if <code>stories_entities == "disabled"</code>).  </p>
+<h4><a class="anchor" href="#stories-area-url-max" id="stories-area-url-max" name="stories-area-url-max"><i class="anchor-icon"></i></a><code>stories_area_url_max</code></h4>
+<p>Maximum number of <a href="/api/stories#media-areas">URL media areas »</a> that can be added to a posted story. (integer)</p>
 <h4><a class="anchor" href="#giveaway-gifts-purchase-available" id="giveaway-gifts-purchase-available" name="giveaway-gifts-purchase-available"><i class="anchor-icon"></i></a><code>giveaway_gifts_purchase_available</code></h4>
 <p>Whether <a href="/api/giveaways">giveaways</a> can be started by the current user. (boolean)</p>
 <h4><a class="anchor" href="#giveaway-add-peers-max" id="giveaway-add-peers-max" name="giveaway-add-peers-max"><i class="anchor-icon"></i></a><code>giveaway_add_peers_max</code></h4>
