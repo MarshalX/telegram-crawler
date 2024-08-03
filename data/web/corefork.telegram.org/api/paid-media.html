@@ -68,6 +68,10 @@ To send albums, do <strong>not</strong> use <a href="/method/messages.sendMultiM
 
 <a href='/constructor/messageMediaPaidMedia'>messageMediaPaidMedia</a>#a8852491 stars_amount:<a href='/type/long'>long</a> extended_media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageExtendedMedia'>MessageExtendedMedia</a>&gt; = <a href='/type/MessageMedia'>MessageMedia</a>;
 
+<a href='/constructor/inputInvoiceMessage'>inputInvoiceMessage</a>#c5b56859 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+
+<a href='/constructor/inputMediaInvoice'>inputMediaInvoice</a>#405fef0d flags:<a href='/type/%23'>#</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:flags.0?<a href='/type/InputWebDocument'>InputWebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> payload:<a href='/type/bytes'>bytes</a> provider:flags.3?<a href='/type/string'>string</a> provider_data:<a href='/type/DataJSON'>DataJSON</a> start_param:flags.1?<a href='/type/string'>string</a> extended_media:flags.2?<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
 <a href='/constructor/updateMessageExtendedMedia'>updateMessageExtendedMedia</a>#d5a41724 peer:<a href='/type/Peer'>Peer</a> msg_id:<a href='/type/int'>int</a> extended_media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageExtendedMedia'>MessageExtendedMedia</a>&gt; = <a href='/type/Update'>Update</a>;
 
 <a href='/constructor/messageMediaInvoice'>messageMediaInvoice</a>#f6a548d3 flags:<a href='/type/%23'>#</a> shipping_address_requested:flags.1?<a href='/constructor/true'>true</a> test:flags.3?<a href='/constructor/true'>true</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:flags.0?<a href='/type/WebDocument'>WebDocument</a> receipt_msg_id:flags.2?<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> start_param:<a href='/type/string'>string</a> extended_media:flags.4?<a href='/type/MessageExtendedMedia'>MessageExtendedMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
@@ -76,7 +80,17 @@ To send albums, do <strong>not</strong> use <a href="/method/messages.sendMultiM
 
 ---functions---
 
-<a href='/method/messages.getExtendedMedia'>messages.getExtendedMedia</a>#84f80814 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre></div>
+<a href='/method/messages.getExtendedMedia'>messages.getExtendedMedia</a>#84f80814 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Paid media is represented by a <a href="/constructor/messageMediaPaidMedia">messageMediaPaidMedia</a> constructor, containing:</p>
+<ul>
+<li>In <code>stars_amount</code>, the price of the media in <a href="/api/stars">Telegram Stars</a></li>
+<li>In <code>extended_media</code>, a vector of <a href="/type/MessageExtendedMedia">MessageExtendedMedia</a> constructors, which will <strong>all</strong> be either:<ul>
+<li><a href="/constructor/messageExtendedMediaPreview">messageExtendedMediaPreview</a>, for media the current user hasn't bought yet, <strong>optionally</strong> contains basic info about the media (width, height, <a href="/api/files#stripped-thumbnails">extremely low resolution thumbnail</a>, video duration for videos).  </li>
+<li><a href="/constructor/messageExtendedMedia">messageExtendedMedia</a>, for media the current user has already purchased, containing the actual <a href="/constructor/messageMediaPhoto">messageMediaPhoto</a>/<a href="/constructor/messageMediaVideo">messageMediaVideo</a> that can be downloaded and viewed <a href="/api/files">as usual »</a>.  </li>
+</ul>
+</li>
+</ul>
+<p>To purchase paid media, follow the <a href="/api/payments#22-getting-invoice-info-about-the-product">usual payment flow »</a>, passing an <a href="/constructor/inputInvoiceMessage">inputInvoiceMessage</a> with the peer and message ID of the paid media.</p></div>
   
 </div>
           
