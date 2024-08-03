@@ -246,6 +246,18 @@ When the stories of a user are marked as hidden, the <code>stories_hidden</code>
 <p>Stories may be reposted by using <a href="/method/stories.sendStory">stories.sendStory</a>, populating the <code>fwd_from_story</code> field with the original story ID and the <code>fwd_from_id</code> with the peer that posted the original story.  </p>
 <p>The user may modify the story (for example by overlaying a round video reaction on top of the media); either way, the modified or the original media must be passed to the <code>media</code> field as usual, and the <code>fwd_modified</code> flag must be set if the media was modified.  </p>
 <p>Reposted stories will have the <a href="/constructor/storyItem">storyItem</a> set and populated with a <a href="/constructor/storyFwdHeader">storyFwdHeader</a> constructor, containing info about the original story.</p>
+<h3><a class="anchor" href="#searching-stories" id="searching-stories" name="searching-stories"><i class="anchor-icon"></i></a>Searching stories</h3>
+<pre><code><a href='/constructor/foundStory'>foundStory</a>#e87acbc0 peer:<a href='/type/Peer'>Peer</a> story:<a href='/type/StoryItem'>StoryItem</a> = <a href='/type/FoundStory'>FoundStory</a>;
+
+<a href='/constructor/stories.foundStories'>stories.foundStories</a>#e2de7737 flags:<a href='/type/%23'>#</a> count:<a href='/type/int'>int</a> stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FoundStory'>FoundStory</a>&gt; next_offset:flags.0?<a href='/type/string'>string</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.FoundStories'>stories.FoundStories</a>;
+
+---functions---
+
+<a href='/method/stories.searchPosts'>stories.searchPosts</a>#6cea116a flags:<a href='/type/%23'>#</a> hashtag:flags.0?<a href='/type/string'>string</a> area:flags.1?<a href='/type/MediaArea'>MediaArea</a> offset:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.FoundStories'>stories.FoundStories</a>;</code></pre>
+<p><a href="/method/stories.searchPosts">stories.searchPosts</a> may be used to globally search for stories from all users (even non-contacts and other peers we've never seen before) using either a hashtag passed to <code>hashtag</code> (without the <code>#</code>) or a <a href="#location-tags">location tag</a> passed to <code>area</code>.  </p>
+<p>Global search should be automatically triggered when clicking on a hashtag in the description of a story, or when clicking on a <a href="#location-tags">location tag</a>.  </p>
+<p>Either <code>hashtag</code> or <code>area</code> must always be set when invoking the method, <code>offset</code> must initially be an empty string.<br>
+Paginate the results by re-calling the method, passing to <code>offset</code> the <a href="/constructor/stories.foundStories">stories.foundStories</a>.<code>next_offset</code> field returned by the previous call.  </p>
 <h3><a class="anchor" href="#reporting-stories" id="reporting-stories" name="reporting-stories"><i class="anchor-icon"></i></a>Reporting stories</h3>
 <pre><code><a href='/constructor/inputReportReasonSpam'>inputReportReasonSpam</a>#58dbcab8 = <a href='/type/ReportReason'>ReportReason</a>;
 <a href='/constructor/inputReportReasonViolence'>inputReportReasonViolence</a>#1e22c78d = <a href='/type/ReportReason'>ReportReason</a>;
@@ -315,6 +327,7 @@ Note that this should be done transparently in a map UI, not in the usual inline
 </li>
 </ul>
 <p>Clients may only re-use existing <a href="/constructor/mediaAreaVenue">mediaAreaVenue</a>s when repositioning a pre-existing location tag when editing a story; use <a href="/constructor/inputMediaAreaVenue">inputMediaAreaVenue</a> when posting a new story or adding a new location tag to an existing story.</p>
+<p><a href="#searching-stories">Global story search »</a> should be automatically triggered when clicking on a location, passing the <a href="/constructor/mediaAreaGeoPoint">mediaAreaGeoPoint</a>/<a href="/constructor/mediaAreaVenue">mediaAreaVenue</a> to <a href="/method/stories.searchPosts">stories.searchPosts</a>.  </p>
 <h4><a class="anchor" href="#reactions" id="reactions" name="reactions"><i class="anchor-icon"></i></a>Reactions</h4>
 <p>Schema:</p>
 <pre><code><a href='/constructor/reactionEmoji'>reactionEmoji</a>#1b2286b8 emoticon:<a href='/type/string'>string</a> = <a href='/type/Reaction'>Reaction</a>;
