@@ -91,6 +91,10 @@
 <li>Added <a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a> - </li>
 <li>Added <a href="/method/messages.requestMainWebView">messages.requestMainWebView</a> - </li>
 </ul>
+<h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
+<ul>
+<li>Added <strong>bots_app</strong> parameter in <a href="/method/contacts.getTopPeers">contacts.getTopPeers</a></li>
+</ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
 <li>Added <a href="/constructor/inputStorePaymentStarsTopup">inputStorePaymentStarsTopup</a> - </li>
@@ -133,6 +137,7 @@
 <a href="/constructor/mediaAreaWeather">mediaAreaWeather</a>#49a6549c coordinates:<a href="/type/MediaAreaCoordinates">MediaAreaCoordinates</a> emoji:<a href="/type/string">string</a> temperature_c:<a href="/type/double">double</a> color:<a href="/type/int">int</a> = <a href="/type/MediaArea">MediaArea</a>;<br>
 <a href="/constructor/inputFileStoryDocument">inputFileStoryDocument</a>#62dc8b48 id:<a href="/type/InputDocument">InputDocument</a> = <a href="/type/InputFile">InputFile</a>;<br>
 ---functions---<br>
+<a href="/method/contacts.getTopPeers">contacts.getTopPeers</a>#973478b6 flags:<a href="/type/%23">#</a> correspondents:flags.0?<a href="/constructor/true">true</a> bots_pm:flags.1?<a href="/constructor/true">true</a> bots_inline:flags.2?<a href="/constructor/true">true</a> phone_calls:flags.3?<a href="/constructor/true">true</a> forward_users:flags.4?<a href="/constructor/true">true</a> forward_chats:flags.5?<a href="/constructor/true">true</a> groups:flags.10?<a href="/constructor/true">true</a> channels:flags.15?<a href="/constructor/true">true</a> bots_app:flags.16?<a href="/constructor/true">true</a> offset:<a href="/type/int">int</a> limit:<a href="/type/int">int</a> hash:<a href="/type/long">long</a> = <a href="/type/contacts.TopPeers">contacts.TopPeers</a>;<br>
 <a href="/method/payments.getStarsGiftOptions">payments.getStarsGiftOptions</a>#d3c96bc8 flags:<a href="/type/%23">#</a> user_id:flags.0?<a href="/type/InputUser">InputUser</a> = <a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/StarsGiftOption">StarsGiftOption</a>&gt;;<br>
 <a href="/method/bots.getPopularAppBots">bots.getPopularAppBots</a>#c2510192 offset:<a href="/type/string">string</a> limit:<a href="/type/int">int</a> = <a href="/type/bots.PopularAppBots">bots.PopularAppBots</a>;
 <a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>#17aeb75a bot:<a href="/type/InputUser">InputUser</a> lang_code:<a href="/type/string">string</a> media:<a href="/type/InputMedia">InputMedia</a> = <a href="/type/BotPreviewMedia">BotPreviewMedia</a>;
@@ -143,11 +148,11 @@
 <a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a>#a2a5594d bot:<a href="/type/InputUser">InputUser</a> = <a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/BotPreviewMedia">BotPreviewMedia</a>&gt;;<br>
 <a href="/method/messages.requestMainWebView">messages.requestMainWebView</a>#c9e01e7b flags:<a href="/type/%23">#</a> compact:flags.7?<a href="/constructor/true">true</a> peer:<a href="/type/InputPeer">InputPeer</a> bot:<a href="/type/InputUser">InputUser</a> start_param:flags.1?<a href="/type/string">string</a> theme_params:flags.0?<a href="/type/DataJSON">DataJSON</a> platform:<a href="/type/string">string</a> = <a href="/type/WebViewResult">WebViewResult</a>;<br></code></pre></div>
 <h3><a class="anchor" href="#layer-184" id="layer-184" name="layer-184"><i class="anchor-icon"></i></a><a href="/schema?layer=184">Layer 184</a></h3>
-<p>Add a service message for <a href="/api/payments#6-refunds">refunds</a>.  </p>
+<p>Add a service message for <a href="/api/payments#6-refunds">refunds</a>.</p>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/messageActionPaymentRefunded">messageActionPaymentRefunded</a> -</li>
+<li>Added <a href="/constructor/messageActionPaymentRefunded">messageActionPaymentRefunded</a> - Describes a payment refund (service message received by both users and bots).</li>
 </ul>
 <h4><a class="anchor" href="#schema" id="schema" name="schema"><i class="anchor-icon"></i></a>Schema</h4>
 <div><pre><code><a href="/constructor/messageActionPaymentRefunded">messageActionPaymentRefunded</a>#41b3e202 flags:<a href="/type/%23">#</a> peer:<a href="/type/Peer">Peer</a> currency:<a href="/type/string">string</a> total_amount:<a href="/type/long">long</a> payload:flags.0?<a href="/type/bytes">bytes</a> charge:<a href="/type/PaymentCharge">PaymentCharge</a> = <a href="/type/MessageAction">MessageAction</a>;<br></code></pre></div>
@@ -158,14 +163,14 @@
 <li><a href="/api/stars#paying-for-ads">Pay for advertisements using Telegram Stars »</a></li>
 <li><a href="/api/bots/webapps">Mini Apps</a> may now be opened directly in compact mode by passing the <code>compact</code> flag to <a href="/method/messages.requestWebView">messages.requestWebView</a>, <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>, <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.<br>
 This <code>compact</code> flag should always be set if the new <code>mode</code> parameter of <a href="/api/links#mini-app-links">mini app links</a>, <a href="/api/links#mini-app-links">mini app links</a> and <a href="/api/links#direct-mini-app-links">direct mini app links</a> is equal to <code>compact</code>.<br>
-If the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a> does <em>not</em> have the <code>fullsize</code> flag set, the app should be opened in compact mode (even if compact mode wasn't explictly requested, since the default fullsize/compact mode can also be changed through <a href="https://t.me/botfather">@botfather</a>).  </li>
+If the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a> does <em>not</em> have the <code>fullsize</code> flag set, the app should be opened in compact mode (even if compact mode wasn't explictly requested, since the default fullsize/compact mode can also be changed through <a href="https://t.me/botfather">@botfather</a>).</li>
 <li>Device integrity verification improvements for official apps.</li>
 </ul>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/payments.getStarsRevenueAdsAccountUrl">payments.getStarsRevenueAdsAccountUrl</a> - </li>
-<li>Added <a href="/method/payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a> - </li>
+<li>Added <a href="/method/payments.getStarsRevenueAdsAccountUrl">payments.getStarsRevenueAdsAccountUrl</a> - Returns a URL for a Telegram Ad platform account that can be used to set up advertisements for channel/bot in <code>peer</code>, paid using the Telegram Stars owned by the specified <code>peer</code>, see <a href="/api/stars#paying-for-ads">here »</a> for more info.</li>
+<li>Added <a href="/method/payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a> - Obtain info about <a href="/api/stars#balance-and-transaction-history">Telegram Star transactions »</a> using specific transaction IDs.</li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
@@ -179,9 +184,9 @@ If the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a> doe
 <ul>
 <li>Added <a href="/constructor/inputMediaPaidMedia">inputMediaPaidMedia</a> - </li>
 <li>Added <a href="/constructor/messageMediaPaidMedia">messageMediaPaidMedia</a> - </li>
-<li>Added <a href="/constructor/starsTransactionPeerAds">starsTransactionPeerAds</a> - </li>
-<li>Added <a href="/constructor/payments.starsRevenueAdsAccountUrl">payments.starsRevenueAdsAccountUrl</a> - </li>
-<li>Added <a href="/constructor/inputStarsTransaction">inputStarsTransaction</a> - </li>
+<li>Added <a href="/constructor/starsTransactionPeerAds">starsTransactionPeerAds</a> - Describes a <a href="/api/stars">Telegram Star</a> transaction used to pay for <a href="/api/stars#paying-for-ads">Telegram ads as specified here »</a>.</li>
+<li>Added <a href="/constructor/payments.starsRevenueAdsAccountUrl">payments.starsRevenueAdsAccountUrl</a> - Contains a URL leading to a page where the user will be able to place ads for the channel/bot, paying using <a href="/api/stars#paying-for-ads">Telegram Stars</a>.</li>
+<li>Added <a href="/constructor/inputStarsTransaction">inputStarsTransaction</a> - Used to fetch info about a <a href="/api/stars#balance-and-transaction-history">Telegram Star transaction »</a>.</li>
 </ul>
 <h5><a class="anchor" href="#changed-constructors" id="changed-constructors" name="changed-constructors"><i class="anchor-icon"></i></a>Changed Constructors</h5>
 <ul>
@@ -227,6 +232,7 @@ If the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a> doe
 <ul>
 <li><a href="/api/stars#revenue-statistics">Telegram Star revenue statistics »</a></li>
 <li><a href="/api/stars#withdrawing-revenue">Telegram Star withdrawal »</a></li>
+<li><a href="/api/stars#balance-and-transaction-history">Telegram Star transaction details »</a></li>
 <li><a href="/api/stories#searching-stories">Global story search »</a></li>
 <li><a href="/api/stories#urls">URL media areas »</a></li>
 <li><a href="/api/stories#location-tags">Addresses in geolocation (non-venue) media areas »</a></li>
@@ -239,11 +245,10 @@ If the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a> doe
 <ul>
 <li>Added <a href="/method/stories.searchPosts">stories.searchPosts</a> - Globally search for <a href="/api/stories">stories</a> using a hashtag or a <a href="/api/stories#location-tags">location media area</a>, see <a href="/api/stories#searching-stories">here »</a> for more info on the full flow.</li>
 <li>Added <a href="/method/payments.getStarsRevenueStats">payments.getStarsRevenueStats</a> - </li>
-<li>Added <a href="/method/payments.getStarsRevenueWithdrawalUrl">payments.getStarsRevenueWithdrawalUrl</a> - </li>
+<li>Added <a href="/method/payments.getStarsRevenueWithdrawalUrl">payments.getStarsRevenueWithdrawalUrl</a> - Withdraw funds from a channel or bot's <a href="/api/stars#withdrawing-revenue">star balance »</a>.</li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
-<li>Added <strong>bots_app</strong> parameter in <a href="/method/contacts.getTopPeers">contacts.getTopPeers</a></li>
 <li>Added <strong>effect</strong> parameter in <a href="/method/messages.saveDraft">messages.saveDraft</a></li>
 <li>Added <strong>ascending</strong>, <strong>limit</strong> parameters in <a href="/method/payments.getStarsTransactions">payments.getStarsTransactions</a></li>
 </ul>
@@ -254,10 +259,10 @@ If the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a> doe
 <li>Added <a href="/constructor/stories.foundStories">stories.foundStories</a> - Stories found using <a href="/api/stories#searching-stories">global story search »</a>.</li>
 <li>Added <a href="/constructor/geoPointAddress">geoPointAddress</a> - Address optionally associated to a <a href="/constructor/geoPoint">geoPoint</a>.</li>
 <li>Added <a href="/constructor/updateBusinessBotCallbackQuery">updateBusinessBotCallbackQuery</a> - A callback button sent via a <a href="/api/business#connected-bots">business connection</a> was pressed, and the button data was sent to the bot that created the button.</li>
-<li>Added <a href="/constructor/starsRevenueStatus">starsRevenueStatus</a> - </li>
-<li>Added <a href="/constructor/payments.starsRevenueStats">payments.starsRevenueStats</a> - </li>
-<li>Added <a href="/constructor/payments.starsRevenueWithdrawalUrl">payments.starsRevenueWithdrawalUrl</a> - </li>
-<li>Added <a href="/constructor/updateStarsRevenueStatus">updateStarsRevenueStatus</a> - </li>
+<li>Added <a href="/constructor/starsRevenueStatus">starsRevenueStatus</a> - Describes <a href="/api/stars">Telegram Star revenue balances »</a>.</li>
+<li>Added <a href="/constructor/payments.starsRevenueStats">payments.starsRevenueStats</a> - <a href="/api/stars">Star revenue statistics, see here »</a> for more info.</li>
+<li>Added <a href="/constructor/payments.starsRevenueWithdrawalUrl">payments.starsRevenueWithdrawalUrl</a> - Contains the URL to use to <a href="/api/stars#withdrawing-revenue">withdraw Telegram Star revenue</a>.</li>
+<li>Added <a href="/constructor/updateStarsRevenueStatus">updateStarsRevenueStatus</a> - The <a href="/api/stars#revenue-statistics">Telegram Star balance of a channel/bot we own has changed »</a>.</li>
 </ul>
 <h5><a class="anchor" href="#changed-constructors" id="changed-constructors" name="changed-constructors"><i class="anchor-icon"></i></a>Changed Constructors</h5>
 <ul>
@@ -281,7 +286,6 @@ If the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a> doe
 <a href="/constructor/payments.starsRevenueWithdrawalUrl">payments.starsRevenueWithdrawalUrl</a>#1dab80b7 url:<a href="/type/string">string</a> = <a href="/type/payments.StarsRevenueWithdrawalUrl">payments.StarsRevenueWithdrawalUrl</a>;<br>
 <a href="/constructor/updateStarsRevenueStatus">updateStarsRevenueStatus</a>#a584b019 peer:<a href="/type/Peer">Peer</a> status:<a href="/type/StarsRevenueStatus">StarsRevenueStatus</a> = <a href="/type/Update">Update</a>;<br>
 ---functions---<br>
-<a href="/method/contacts.getTopPeers">contacts.getTopPeers</a>#973478b6 flags:<a href="/type/%23">#</a> correspondents:flags.0?<a href="/constructor/true">true</a> bots_pm:flags.1?<a href="/constructor/true">true</a> bots_inline:flags.2?<a href="/constructor/true">true</a> phone_calls:flags.3?<a href="/constructor/true">true</a> forward_users:flags.4?<a href="/constructor/true">true</a> forward_chats:flags.5?<a href="/constructor/true">true</a> groups:flags.10?<a href="/constructor/true">true</a> channels:flags.15?<a href="/constructor/true">true</a> bots_app:flags.16?<a href="/constructor/true">true</a> offset:<a href="/type/int">int</a> limit:<a href="/type/int">int</a> hash:<a href="/type/long">long</a> = <a href="/type/contacts.TopPeers">contacts.TopPeers</a>;<br>
 <a href="/method/messages.saveDraft">messages.saveDraft</a>#d372c5ce flags:<a href="/type/%23">#</a> no_webpage:flags.1?<a href="/constructor/true">true</a> invert_media:flags.6?<a href="/constructor/true">true</a> reply_to:flags.4?<a href="/type/InputReplyTo">InputReplyTo</a> peer:<a href="/type/InputPeer">InputPeer</a> message:<a href="/type/string">string</a> entities:flags.3?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/MessageEntity">MessageEntity</a>&gt; media:flags.5?<a href="/type/InputMedia">InputMedia</a> effect:flags.7?<a href="/type/long">long</a> = <a href="/type/Bool">Bool</a>;<br>
 <a href="/method/payments.getStarsTransactions">payments.getStarsTransactions</a>#97938d5a flags:<a href="/type/%23">#</a> inbound:flags.0?<a href="/constructor/true">true</a> outbound:flags.1?<a href="/constructor/true">true</a> ascending:flags.2?<a href="/constructor/true">true</a> peer:<a href="/type/InputPeer">InputPeer</a> offset:<a href="/type/string">string</a> limit:<a href="/type/int">int</a> = <a href="/type/payments.StarsStatus">payments.StarsStatus</a>;<br>
 <a href="/method/stories.searchPosts">stories.searchPosts</a>#6cea116a flags:<a href="/type/%23">#</a> hashtag:flags.0?<a href="/type/string">string</a> area:flags.1?<a href="/type/MediaArea">MediaArea</a> offset:<a href="/type/string">string</a> limit:<a href="/type/int">int</a> = <a href="/type/stories.FoundStories">stories.FoundStories</a>;<br>
