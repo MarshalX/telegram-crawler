@@ -96,7 +96,16 @@ To return all <a href="/constructor/starsTransaction">star transactions »</a> (
 <a href='/method/payments.sendStarsForm'>payments.sendStarsForm</a>#02bb731d flags:<a href='/type/%23'>#</a> form_id:<a href='/type/long'>long</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> = <a href='/type/payments.PaymentResult'>payments.PaymentResult</a>;
 
 <a href='/method/payments.refundStarsCharge'>payments.refundStarsCharge</a>#25ae8f4a user_id:<a href='/type/InputUser'>InputUser</a> charge_id:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
-<p>The full flow to follow to make purchases using Telegram Stars is described along the traditional payment flow in the <a href="/api/payments">payments documentation »</a>: all invoices and constructors working with currency amounts will use the currency code <code>XTR</code>, and the amounts will be in Telegram Stars.</p></div>
+<p>The full flow to follow to make purchases using Telegram Stars is described along the traditional payment flow in the <a href="/api/payments">payments documentation »</a>: all invoices and constructors working with currency amounts will use the currency code <code>XTR</code>, and the amounts will be in Telegram Stars.  </p>
+<h3><a class="anchor" href="#withdrawal" id="withdrawal" name="withdrawal"><i class="anchor-icon"></i></a>Withdrawal</h3>
+<pre><code><a href='/constructor/payments.starsRevenueWithdrawalUrl'>payments.starsRevenueWithdrawalUrl</a>#1dab80b7 url:<a href='/type/string'>string</a> = <a href='/type/payments.StarsRevenueWithdrawalUrl'>payments.StarsRevenueWithdrawalUrl</a>;
+
+---functions---
+
+<a href='/method/payments.getStarsRevenueWithdrawalUrl'>payments.getStarsRevenueWithdrawalUrl</a>#13bbe8b3 peer:<a href='/type/InputPeer'>InputPeer</a> stars:<a href='/type/long'>long</a> password:<a href='/type/InputCheckPasswordSRP'>InputCheckPasswordSRP</a> = <a href='/type/payments.StarsRevenueWithdrawalUrl'>payments.StarsRevenueWithdrawalUrl</a>;</code></pre>
+<p>To withdraw funds from the star balance of a channel or bot we own, invoke <a href="/method/payments.getStarsRevenueWithdrawalUrl">payments.getStarsRevenueWithdrawalUrl</a>, passing the current account's <a href="/api/srp">2FA password</a> as an <a href="/type/InputCheckPasswordSRP">InputCheckPasswordSRP</a> constructor, generated <a href="/api/srp">as specified here »</a>.  </p>
+<p>Only the channel/bot owner can invoke this method, and only if the balance is bigger than or equal to <a href="/api/config#stars-revenue-withdrawal-min">stars_revenue_withdrawal_min »</a>.  </p>
+<p>The method will return a unique URL to a <a href="https://fragment.com/ads">Fragment</a> page where the user will be able to specify and submit the address of the TON wallet where the funds will be sent.</p></div>
   
 </div>
           

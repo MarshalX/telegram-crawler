@@ -80,18 +80,18 @@
 <p>The transaction history may be fetched using <a href="/method/stats.getBroadcastRevenueTransactions">stats.getBroadcastRevenueTransactions</a>, which will return a vector of <a href="/type/BroadcastRevenueTransaction">BroadcastRevenueTransaction</a> constructors, one of:</p>
 <ul>
 <li><a href="/constructor/broadcastRevenueTransactionProceeds">broadcastRevenueTransactionProceeds</a> - Describes earnings from sponsored messages in a channel in some time frame</li>
-<li><a href="/constructor/broadcastRevenueTransactionWithdrawal">broadcastRevenueTransactionWithdrawal</a> - Describes a <a href="#withdrawing-funds">withdrawal</a> of ad earnings</li>
+<li><a href="/constructor/broadcastRevenueTransactionWithdrawal">broadcastRevenueTransactionWithdrawal</a> - Describes a <a href="#withdrawing-revenue">withdrawal</a> of ad earnings</li>
 <li><a href="/constructor/broadcastRevenueTransactionRefund">broadcastRevenueTransactionRefund</a> - Describes a refund for failed withdrawal of ad earnings</li>
 </ul>
 <p>The server will also emit an <a href="/constructor/updateBroadcastRevenueTransactions">updateBroadcastRevenueTransactions</a> every time a new transaction is added: if the client is currently in the Monetization tab of the channel, this update should apply the new balances (contained in the update), and refresh the transaction list using <a href="/method/stats.getBroadcastRevenueTransactions">stats.getBroadcastRevenueTransactions</a>.  </p>
 <p>Note that all balances and currency amounts and graph values are in the smallest unit of the chosen cryptocurrency (currently nanotons for TONs, so to obtain a value in USD divide the chosen amount by <code>10^9</code>, and then divide by <code>usd_rate</code>).  </p>
-<h3><a class="anchor" href="#withdrawing-funds" id="withdrawing-funds" name="withdrawing-funds"><i class="anchor-icon"></i></a>Withdrawing funds</h3>
+<h3><a class="anchor" href="#withdrawing-revenue" id="withdrawing-revenue" name="withdrawing-revenue"><i class="anchor-icon"></i></a>Withdrawing revenue</h3>
 <pre><code><a href='/constructor/stats.broadcastRevenueWithdrawalUrl'>stats.broadcastRevenueWithdrawalUrl</a>#ec659737 url:<a href='/type/string'>string</a> = <a href='/type/stats.BroadcastRevenueWithdrawalUrl'>stats.BroadcastRevenueWithdrawalUrl</a>;
 
 ---functions---
 
 <a href='/method/stats.getBroadcastRevenueWithdrawalUrl'>stats.getBroadcastRevenueWithdrawalUrl</a>#2a65ef73 channel:<a href='/type/InputChannel'>InputChannel</a> password:<a href='/type/InputCheckPasswordSRP'>InputCheckPasswordSRP</a> = <a href='/type/stats.BroadcastRevenueWithdrawalUrl'>stats.BroadcastRevenueWithdrawalUrl</a>;</code></pre>
-<p>To withdraw funds from a channel's ad revenue balance, invoke <a href="/method/stats.getBroadcastRevenueWithdrawalUrl">stats.getBroadcastRevenueWithdrawalUrl</a>, passing the current account's <a href="/api/srp">2FA password</a> as an <a href="/type/InputCheckPasswordSRP">InputCheckPasswordSRP</a> constructor, generated <a href="/api/srp">as specified here »</a>.  </p>
+<p>To withdraw a channel's ad revenue, invoke <a href="/method/stats.getBroadcastRevenueWithdrawalUrl">stats.getBroadcastRevenueWithdrawalUrl</a>, passing the current account's <a href="/api/srp">2FA password</a> as an <a href="/type/InputCheckPasswordSRP">InputCheckPasswordSRP</a> constructor, generated <a href="/api/srp">as specified here »</a>.  </p>
 <p>Only the channel owner can invoke this method, and only if the <a href="/api/config#channel-revenue-withdrawal-enabled">channel_revenue_withdrawal_enabled field is equal to <code>true</code> »</a>.  </p>
 <p>The method will return a unique URL to a <a href="https://fragment.com/ads">Fragment</a> page where the user will be able to specify and submit the address of the TON wallet where the funds will be sent.  </p>
 <h4><a class="anchor" href="#disable-ads-on-the-channel" id="disable-ads-on-the-channel" name="disable-ads-on-the-channel"><i class="anchor-icon"></i></a>Disable ads on the channel</h4>
