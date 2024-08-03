@@ -135,12 +135,12 @@ For example, when displaying the chat photo gallery, we could display a <code>ph
 <a href='/method/contacts.getTopPeers'>contacts.getTopPeers</a>#973478b6 flags:<a href='/type/%23'>#</a> correspondents:flags.0?<a href='/constructor/true'>true</a> bots_pm:flags.1?<a href='/constructor/true'>true</a> bots_inline:flags.2?<a href='/constructor/true'>true</a> phone_calls:flags.3?<a href='/constructor/true'>true</a> forward_users:flags.4?<a href='/constructor/true'>true</a> forward_chats:flags.5?<a href='/constructor/true'>true</a> groups:flags.10?<a href='/constructor/true'>true</a> channels:flags.15?<a href='/constructor/true'>true</a> bots_app:flags.16?<a href='/constructor/true'>true</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/contacts.TopPeers'>contacts.TopPeers</a>;
 
 <a href='/method/messages.searchGlobal'>messages.searchGlobal</a>#4bc6589a flags:<a href='/type/%23'>#</a> broadcasts_only:flags.1?<a href='/constructor/true'>true</a> folder_id:flags.0?<a href='/type/int'>int</a> q:<a href='/type/string'>string</a> filter:<a href='/type/MessagesFilter'>MessagesFilter</a> min_date:<a href='/type/int'>int</a> max_date:<a href='/type/int'>int</a> offset_rate:<a href='/type/int'>int</a> offset_peer:<a href='/type/InputPeer'>InputPeer</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/messages.Messages'>messages.Messages</a>;</code></pre>
-<p>Contains results from all private/secret chats, private/public groups, private/public channels, split in the following sections:</p>
+<p>Contains results (peers and messages) from all private/secret chats, private/public groups, private/public channels, split in the following sections:</p>
 <ul>
 <li><code>Frequent contacts</code>: Contains avatars and names of the most frequently used users, sorted <a href="/api/top-rating">as specified here »</a> (<a href="/constructor/topPeerCategoryCorrespondents">topPeerCategoryCorrespondents</a> category).  </li>
 <li><code>Recent</code>: Contains avatars and names of the most frequently used peers (users+chats+channels), sorted <a href="/api/top-rating">as specified here »</a> (<a href="/constructor/topPeerCategoryCorrespondents">topPeerCategoryCorrespondents</a>, <a href="/constructor/topPeerCategoryBotsPM">topPeerCategoryBotsPM</a>, <a href="/constructor/topPeerCategoryGroups">topPeerCategoryGroups</a>, <a href="/constructor/topPeerCategoryChannels">topPeerCategoryChannels</a> categories).  </li>
 </ul>
-<p>Searching when in the "Chats" tab should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a>, replacing the previously mentioned sections with a list of peers (avatar+name+returned message, max one row per peer).  </p>
+<p>Searching when in the "Chats" tab should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a>, replacing the previously mentioned sections with a list of peers (avatar+name) and messages (max one message per peer).  </p>
 <h4><a class="anchor" href="#channels-tab" id="channels-tab" name="channels-tab"><i class="anchor-icon"></i></a>Channels tab</h4>
 <pre><code><a href='/constructor/topPeerCategoryChannels'>topPeerCategoryChannels</a>#161d9628 = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
 
@@ -194,6 +194,29 @@ For example, when displaying the chat photo gallery, we could display a <code>ph
 <li><code>Popular apps</code>: Contains avatars, names and MAU counters of the <a href="/api/bots/webapps#main-mini-apps">Main Mini Apps</a> of the bots returned by <a href="/method/bots.getPopularAppBots">bots.getPopularAppBots</a>.  </li>
 </ul>
 <p>Searching when in the "Apps" tab should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a>, replacing the previously mentioned sections with a list of avatars, names and MAU counters (from <a href="/constructor/user">user</a>.<code>bot_active_users</code>) for <a href="/api/bots/webapps#main-mini-apps">Main Mini Apps</a> of the returned bots (clients should only use the returned <code>users</code> field, filtering for bots with the <a href="/constructor/user">user</a>.<code>bot_has_main_app</code> flag set).  </p>
+<h4><a class="anchor" href="#media-tab" id="media-tab" name="media-tab"><i class="anchor-icon"></i></a>Media tab</h4>
+<p>Searches for photo+video messages.  </p>
+<p>Searching should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a> with the <a href="/constructor/inputMessagesFilterPhotoVideo">inputMessagesFilterPhotoVideo</a> filter, rendering the results as specified in the <a href="#chats-tab">chats tab</a>.  </p>
+<p>Initially, the tab should be populated with the results returned by passing an empty string in <code>q</code>.  </p>
+<h4><a class="anchor" href="#downloads-tab" id="downloads-tab" name="downloads-tab"><i class="anchor-icon"></i></a>Downloads tab</h4>
+<p>Contains a locally generated list of recently downloaded media (of any kind) from all peers.  </p>
+<p>Searching should locally search within this list.  </p>
+<h4><a class="anchor" href="#links-tab" id="links-tab" name="links-tab"><i class="anchor-icon"></i></a>Links tab</h4>
+<p>Searches for messages with links.  </p>
+<p>Searching should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a> with the <a href="/constructor/inputMessagesFilterUrl">inputMessagesFilterUrl</a> filter, rendering the results as specified in the <a href="#chats-tab">chats tab</a>.  </p>
+<p>Initially, the tab should be populated with the results returned by passing an empty string in <code>q</code>.  </p>
+<h4><a class="anchor" href="#files-tab" id="files-tab" name="files-tab"><i class="anchor-icon"></i></a>Files tab</h4>
+<p>Searches for messages with files.  </p>
+<p>Searching should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a> with the <a href="/constructor/inputMessagesFilterDocument">inputMessagesFilterDocument</a> filter, rendering the results as specified in the <a href="#chats-tab">chats tab</a>.  </p>
+<p>Initially, the tab should be populated with the results returned by passing an empty string in <code>q</code>.  </p>
+<h4><a class="anchor" href="#music-tab" id="music-tab" name="music-tab"><i class="anchor-icon"></i></a>Music tab</h4>
+<p>Searches for music files.  </p>
+<p>Searching should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a> with the <a href="/constructor/inputMessagesFilterMusic">inputMessagesFilterMusic</a> filter, rendering the results as specified in the <a href="#chats-tab">chats tab</a>.  </p>
+<p>Initially, the tab should be populated with the results returned by passing an empty string in <code>q</code>.  </p>
+<h4><a class="anchor" href="#voice-messages-tab" id="voice-messages-tab" name="voice-messages-tab"><i class="anchor-icon"></i></a>Voice messages tab</h4>
+<p>Searches for voice messages.  </p>
+<p>Searching should invoke <a href="/method/messages.searchGlobal">messages.searchGlobal</a> with the <a href="/constructor/inputMessagesFilterVoice">inputMessagesFilterVoice</a> filter, rendering the results as specified in the <a href="#chats-tab">chats tab</a>.  </p>
+<p>Initially, the tab should be populated with the results returned by passing an empty string in <code>q</code>.  </p>
 <h3><a class="anchor" href="#global-hashtag-search" id="global-hashtag-search" name="global-hashtag-search"><i class="anchor-icon"></i></a>Global hashtag search</h3>
 <pre><code>---functions---
 
