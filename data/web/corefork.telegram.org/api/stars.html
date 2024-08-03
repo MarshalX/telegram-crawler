@@ -55,6 +55,7 @@
 <a href='/constructor/starsTransactionPeerPremiumBot'>starsTransactionPeerPremiumBot</a>#250dbaf8 = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
 <a href='/constructor/starsTransactionPeerFragment'>starsTransactionPeerFragment</a>#e92fd902 = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
 <a href='/constructor/starsTransactionPeer'>starsTransactionPeer</a>#d80da15d peer:<a href='/type/Peer'>Peer</a> = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
+<a href='/constructor/starsTransactionPeerAds'>starsTransactionPeerAds</a>#60682812 = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
 <a href='/constructor/starsTransactionPeerUnsupported'>starsTransactionPeerUnsupported</a>#95f2bfe4 = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
 
 <a href='/constructor/starsTransaction'>starsTransaction</a>#2db5418f flags:<a href='/type/%23'>#</a> refund:flags.3?<a href='/constructor/true'>true</a> pending:flags.4?<a href='/constructor/true'>true</a> failed:flags.6?<a href='/constructor/true'>true</a> gift:flags.10?<a href='/constructor/true'>true</a> id:<a href='/type/string'>string</a> stars:<a href='/type/long'>long</a> date:<a href='/type/int'>int</a> peer:<a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a> title:flags.0?<a href='/type/string'>string</a> description:flags.1?<a href='/type/string'>string</a> photo:flags.2?<a href='/type/WebDocument'>WebDocument</a> transaction_date:flags.5?<a href='/type/int'>int</a> transaction_url:flags.5?<a href='/type/string'>string</a> bot_payload:flags.7?<a href='/type/bytes'>bytes</a> msg_id:flags.8?<a href='/type/int'>int</a> extended_media:flags.9?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageMedia'>MessageMedia</a>&gt; = <a href='/type/StarsTransaction'>StarsTransaction</a>;
@@ -130,8 +131,10 @@ To return all <a href="/constructor/starsTransaction">star transactions »</a> (
 <p>To withdraw funds from the star balance of a channel or bot we own, invoke <a href="/method/payments.getStarsRevenueWithdrawalUrl">payments.getStarsRevenueWithdrawalUrl</a>, passing the current account's <a href="/api/srp">2FA password</a> as an <a href="/type/InputCheckPasswordSRP">InputCheckPasswordSRP</a> constructor, generated <a href="/api/srp">as specified here »</a>.  </p>
 <p>Only the channel/bot owner can invoke this method, and only if the balance is bigger than or equal to <a href="/api/config#stars-revenue-withdrawal-min">stars_revenue_withdrawal_min »</a> and the <code>status.withdrawal_enabled</code> flag returned by <a href="/method/payments.getStarsRevenueStats">payments.getStarsRevenueStats</a> is set.  </p>
 <p>The method will return a unique URL to a <a href="https://fragment.com/">Fragment</a> page where the user will be able to specify and submit the address of the TON wallet where the funds will be sent.  </p>
-<h3><a class="anchor" href="#paying-for-ads-using-telegram-stars" id="paying-for-ads-using-telegram-stars" name="paying-for-ads-using-telegram-stars"><i class="anchor-icon"></i></a>Paying for ads using Telegram Stars</h3>
-<pre><code><a href='/constructor/payments.starsRevenueAdsAccountUrl'>payments.starsRevenueAdsAccountUrl</a>#394e7f21 url:<a href='/type/string'>string</a> = <a href='/type/payments.StarsRevenueAdsAccountUrl'>payments.StarsRevenueAdsAccountUrl</a>;
+<h3><a class="anchor" href="#paying-for-ads" id="paying-for-ads" name="paying-for-ads"><i class="anchor-icon"></i></a>Paying for ads</h3>
+<pre><code><a href='/constructor/starsTransactionPeerAds'>starsTransactionPeerAds</a>#60682812 = <a href='/type/StarsTransactionPeer'>StarsTransactionPeer</a>;
+
+<a href='/constructor/payments.starsRevenueAdsAccountUrl'>payments.starsRevenueAdsAccountUrl</a>#394e7f21 url:<a href='/type/string'>string</a> = <a href='/type/payments.StarsRevenueAdsAccountUrl'>payments.StarsRevenueAdsAccountUrl</a>;
 
 ---functions---
 
@@ -139,7 +142,8 @@ To return all <a href="/constructor/starsTransaction">star transactions »</a> (
 <p>Channel/bot owners may place Telegram advertisements for channels/bots they own using the Telegram Ad platform, paying using <strong>Stars</strong> at a special rate with a <strong>30% discount</strong> – creating a <strong>cost-effective</strong> way of reaching new users.  </p>
 <p>To use Stars for ads, go to your bot's or channels' Balance or Monetization section and tap '<em>Buy Ads</em>'.<br>
 Clicking on the button should invoke <a href="/method/payments.getStarsRevenueAdsAccountUrl">payments.getStarsRevenueAdsAccountUrl</a> (passing the bot/channel in <code>peer</code>).<br>
-The returned <code>url</code> will lead to a page where the user will be able to place ads for the channel/bot passed in <code>peer</code>.</p></div>
+The returned <code>url</code> will lead to a page where the user will be able to place ads for the channel/bot passed in <code>peer</code>.  </p>
+<p><a href="#balance-and-transaction-history">Transactions</a> for ad payments will be of type <a href="/constructor/starsTransactionPeerAds">starsTransactionPeerAds</a>.</p></div>
   
 </div>
           
