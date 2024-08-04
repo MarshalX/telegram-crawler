@@ -89,19 +89,29 @@ To send albums, do <strong>not</strong> use <a href="/method/messages.sendMultiM
 <p>To purchase paid media, follow the <a href="/api/payments#22-getting-invoice-info-about-the-product">usual payment flow »</a>, passing an <a href="/constructor/inputInvoiceMessage">inputInvoiceMessage</a> with the peer and message ID of the paid media.  </p>
 <p>Once the payment succeds, an <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> will be emitted, replacing the <a href="/constructor/messageExtendedMediaPreview">messageExtendedMediaPreview</a> constructors associated with the message with <a href="/constructor/messageExtendedMedia">messageExtendedMedia</a> constructors.<br>
 No other updates will be emitted (i.e. <strong>no</strong> <a href="/constructor/updateEditChannelMessage">updateEditChannelMessage</a> updates will be emitted for the message containing the paid media, even if re-fetching the same messages through other means like <a href="/method/messages.getHistory">messages.getHistory</a> <em>will</em> return the revealed <a href="/constructor/messageExtendedMedia">messageExtendedMedia</a> constructors).</p>
+<p>The associated <a href="/constructor/starsTransaction">starsTransaction</a> that will be generated will be of type <a href="/constructor/starsTransactionPeer">starsTransactionPeer</a> (with <code>peer</code> equal to the channel), <code>msg_id</code> equal to the message ID of the paid media and <code>extended_media</code> set to the revealed paid media.  </p>
 <p><strong>Note</strong>: the <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> update does not have a <code>pts</code>/<code>qts</code> field.<br>
 This means that this update can only be received passively via the socket (<a href="/api/updates#event-sequences">see here »</a>), and it <strong>cannot</strong> be returned by <a href="/method/updates.getDifference">updates.getDifference</a> or <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a>.<br>
-This implies that if a certain client is offline, and another session purchases a paid media, the first client will not receive the revealed <a href="/constructor/messageExtendedMedia">messageExtendedMedia</a> constructors when it reconnects to the server, and it would have no way to know that a paid media can be revealed to the user.  </p>
+This implies that if a certain client is offline, and another session purchases a paid media, the first client will not receive the revealed <a href="/constructor/messageExtendedMedia">messageExtendedMedia</a> constructors when it reconnects to the server, and it would have no way to know that a cached paid media can be revealed to the user.  </p>
 <p>To bypass this issue, if:</p>
 <ul>
-<li>One or more messages containing not-yet-bought paid media are visible to the user</li>
-<li>From the messages selected above, include only messages received <em>before</em> the client last went offline (i.e. exclude paid media messages that were received and cached via updates or getHistory/getMessages N seconds ago, and the client connected to the server M &gt;= N seconds ago)</li>
-<li>From the messages selected above, include only messages for which <a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a> was called more than 15 seconds ago.  </li>
-<li>For all messages satisfying the above conditions, make a single query to <a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a>, aggregating matching message IDs in <code>id</code>.<br>
+<li>
+<p>One or more messages containing not-yet-bought paid media are visible to the user.</p>
+</li>
+<li>
+<p>From the messages selected above, include only messages received <em>before</em> the client last went offline (i.e. exclude paid media messages that were received and cached via updates or getHistory/getMessages/etc N seconds ago, and the client connected to the server M &gt;= N seconds ago).</p>
+</li>
+<li>
+<p>From the messages selected above, include only messages for which <a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a> was called more than 15 seconds ago.  </p>
+</li>
+<li>
+<p>For all messages satisfying the above conditions, make a single query to <a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a>, aggregating matching message IDs in <code>id</code>.<br>
 The method will return an array of <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> updates, only for passed messages containing <strong>already bought</strong> paid media.<br>
-No information will be returned for passed messages containing not yet bought paid media, or not containing paid media.  </li>
-</ul>
-<p>The associated <a href="/constructor/starsTransaction">starsTransaction</a> that will be generated will be of type <a href="/constructor/starsTransactionPeer">starsTransactionPeer</a> (with <code>peer</code> equal to the channel), <code>msg_id</code> equal to the message ID of the paid media and <code>extended_media</code> set to the revealed paid media.</p></div>
+No information will be returned for passed messages containing not yet bought paid media, or not containing paid media.  </p>
+<p>Repeat the method call every 15 seconds if at least one of the messages satisfying the above conditions is still visible. 
+Repeat the method call immediately if a new paid message satisfying the above conditions scrolls into view.</p>
+</li>
+</ul></div>
   
 </div>
           
