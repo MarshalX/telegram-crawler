@@ -119,7 +119,7 @@
 <p>Peer info must be manually refreshed with a method call to the above methods <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, and so on...):  </p>
 <ul>
 <li>
-<p>When passively receiving an <a href="/constructor/updateUser">updateUser</a>, <a href="/constructor/updateChat">updateChat</a>, <a href="/constructor/updateChannel">updateChannel</a>, and some other updates, as specified <a href="/type/Update">here »</a></p>
+<p>When receiving an <a href="/constructor/updateUser">updateUser</a>, <a href="/constructor/updateChat">updateChat</a>, <a href="/constructor/updateChannel">updateChannel</a>, and some other updates, as specified <a href="/type/Update">here »</a></p>
 </li>
 <li>
 <p>When fetching info about one of the following internal user IDs, if the info isn't already cached or if the cached info is <code>min</code>: 777000 (service notifications user), 1271266957 (replies bot), 1087968824 (anonymous bot), 136817688 (channel bot), 5434988373 (antispam bot).<br>
@@ -145,6 +145,17 @@ Info about these IDs may be fetched with the zero access hash even by users.  </
 <li><a href="/method/channels.toggleUsername">channels.toggleUsername</a>, <a href="/method/channels.reorderUsernames">channels.reorderUsernames</a> - For the channel whose username we updated</li>
 </ul>
 <p>Info should <strong>only</strong> be manually refreshed with a call to <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/channels.getChannels">channels.getChannels</a> if the new username order/active username cannot be applied locally (i.e. the method call successfully set as active some username that isn't associated to the peer in our local cache, and so on), otherwise the <code>username</code> and <code>usernames</code> fields of the peer info database should be updated locally, using the info that was passed to the toggle/reorder methods by the user.  </p>
+</li>
+<li>
+<p>After invoking the following methods, if the user for whom we set the profile photo is <strong>not</strong> returned in <a href="/constructor/photos.photo">photos.photo</a>.<code>users</code>:</p>
+<ul>
+<li><a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a></li>
+<li><a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a></li>
+<li><a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a> - Only if <code>suggest</code> is not set</li>
+</ul>
+</li>
+<li>
+<p>After invoking <a href="/method/photos.deletePhotos">photos.deletePhotos</a>, if the local cache doesn't have any more photos left for the current user after removing the ones passed to the method.  </p>
 </li>
 </ul>
 <p><strong>Do not</strong> manually refresh peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.  </p>
