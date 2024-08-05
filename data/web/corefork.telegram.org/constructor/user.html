@@ -91,12 +91,12 @@
 <tr>
 <td><strong>deleted</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.13?<a href="/constructor/true">true</a></td>
-<td>Whether the account of this user was deleted. <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID.</td>
+<td>Whether the account of this user was deleted. <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID, see <a href="/api/peers#full-info-database">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><strong>bot</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/constructor/true">true</a></td>
-<td>Is this user a bot? <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID.</td>
+<td>Is this user a bot? <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID, see <a href="/api/peers#full-info-database">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><strong>bot_chat_history</strong></td>
@@ -156,7 +156,7 @@
 <tr>
 <td><strong>premium</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.28?<a href="/constructor/true">true</a></td>
-<td>Whether this user is a Telegram Premium user <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID. <br>Changes to this flag if the <code>self</code> flag is set should also trigger the following calls, to refresh the respective caches: <br>- The <a href="/method/help.getConfig">help.getConfig</a> cache <br>- The <a href="/method/messages.getTopReactions">messages.getTopReactions</a> cache if the <code>bot</code> flag is <strong>not</strong> set</td>
+<td>Whether this user is a Telegram Premium user <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID, see <a href="/api/peers#full-info-database">here »</a> for more info. <br>Changes to this flag if the <code>self</code> flag is set should also trigger the following calls, to refresh the respective caches: <br>- The <a href="/method/help.getConfig">help.getConfig</a> cache <br>- The <a href="/method/messages.getTopReactions">messages.getTopReactions</a> cache if the <code>bot</code> flag is <strong>not</strong> set</td>
 </tr>
 <tr>
 <td><strong>attach_menu_enabled</strong></td>
@@ -246,7 +246,7 @@
 <tr>
 <td><strong>bot_info_version</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/type/int">int</a></td>
-<td>Version of the <a href="/constructor/userFull">bot_info field in userFull</a>, incremented every time it changes. <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID.</td>
+<td>Version of the <a href="/constructor/userFull">bot_info field in userFull</a>, incremented every time it changes. <br>Changes to this flag should invalidate the local <a href="/constructor/userFull">userFull</a> cache for this user ID, see <a href="/api/peers#full-info-database">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><strong>restriction_reason</strong></td>
@@ -302,6 +302,7 @@
 <p>Many constructors in the API need to be stored in a local database upon reception and should only ever be updated reactively (passively) when received via updates or by other means (as specified in the documentation), to avoid overloading the server by continuously requesting changes for the same unchanged information.</p>
 <h4><a class="anchor" href="#userfull" id="userfull" name="userfull"><i class="anchor-icon"></i></a><a href="/constructor/userFull">userFull</a></h4>
 <p>Extended user info</p>
+<p>When updating the <a href="/api/peers">local peer database »</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
 <h4><a class="anchor" href="#min-constructors" id="min-constructors" name="min-constructors"><i class="anchor-icon"></i></a><a href="/api/min">Min constructors</a></h4>
 <p>In some situations user and channel constructors have reduced set of fields present (although id is always there) and min flag set.</p>
 <h4><a class="anchor" href="#bot-attachment-menu-and-side-menu-entries" id="bot-attachment-menu-and-side-menu-entries" name="bot-attachment-menu-and-side-menu-entries"><i class="anchor-icon"></i></a><a href="/api/bots/attach">Bot attachment menu and side menu entries</a></h4>

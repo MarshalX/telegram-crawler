@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>channel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Channel/supergroup info">
+    <meta property="description" content="Channel/supergroup info  When updating the local peer database, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren&#39;t set in the new constructor).  The only exception to the above rule is when the min flag is set, in which case only the following fields must be applied over any locally stored version:  - title - megagroup - color - photo - username - usernames - has_geo - noforwards - emoji_status - has_link - slow_mode_enabled - scam - fake - gigagroup - forum - level - restricted - restriction_reason - join_to_send - join_request - is_verified - default_banned_rights  See here » for an implementation of the logic to use when updating the local user peer database.">
     <meta property="og:title" content="channel">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Channel/supergroup info">
+    <meta property="og:description" content="Channel/supergroup info  When updating the local peer database, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren&#39;t set in the new constructor).  The only exception to the above rule is when the min flag is set, in which case only the following fields must be applied over any locally stored version:  - title - megagroup - color - photo - username - usernames - has_geo - noforwards - emoji_status - has_link - slow_mode_enabled - scam - fake - gigagroup - forum - level - restricted - restriction_reason - join_to_send - join_request - is_verified - default_banned_rights  See here » for an implementation of the logic to use when updating the local user peer database.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -43,13 +43,13 @@
   <h1 id="dev_page_title">channel</h1>
   
   <div id="dev_page_content"><p>Channel/supergroup info</p>
-<p>When updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).  </p>
-<p>The only exception to the above rule is when the <code>min</code> flag is set, in which case <strong>only</strong> the following fields must be applied over any locally stored version: </p>
+<p>When updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
+<p>The only exception to the above rule is when the <code>min</code> flag is set, in which case <strong>only</strong> the following fields must be applied over any locally stored version:</p>
 <ul>
 <li><code>title</code></li>
 <li><code>megagroup</code></li>
 <li><code>color</code></li>
-<li><code>photo</code> </li>
+<li><code>photo</code></li>
 <li><code>username</code></li>
 <li><code>usernames</code></li>
 <li><code>has_geo</code></li>
@@ -196,7 +196,7 @@
 <tr>
 <td><strong>forum</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.30?<a href="/constructor/true">true</a></td>
-<td>Whether this supergroup is a <a href="/api/forum">forum</a> <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID, see <a href="/api/peers#full-info-database">here »</a> for more info.</td>
+<td>Whether this supergroup is a <a href="/api/forum">forum</a>. <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID, see <a href="/api/peers#full-info-database">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><strong>flags2</strong></td>
@@ -301,19 +301,24 @@
 <tr>
 <td><strong>level</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.10?<a href="/type/int">int</a></td>
-<td><a href="/api/boost">Boost level</a> <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID, see <a href="/api/peers#full-info-database">here »</a> for more info.</td>
+<td><a href="/api/boost">Boost level</a>. <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID, see <a href="/api/peers#full-info-database">here »</a> for more info.</td>
 </tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
 <p><a href="/type/Chat">Chat</a></p>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#channelfull" id="channelfull" name="channelfull"><i class="anchor-icon"></i></a><a href="/constructor/channelFull">channelFull</a></h4>
+<p>Full info about a <a href="/api/channel#channels">channel</a>, <a href="/api/channel#supergroups">supergroup</a> or <a href="/api/channel#gigagroups">gigagroup</a>.</p>
+<p>When updating the <a href="/api/peers">local peer database »</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
+<h4><a class="anchor" href="#peer-database" id="peer-database" name="peer-database"><i class="anchor-icon"></i></a><a href="/api/peers">Peer database</a></h4>
+<p>Many constructors in the API need to be stored in a local database upon reception and should only ever be updated reactively (passively) when received via updates or by other means (as specified in the documentation), to avoid overloading the server by continuously requesting changes for the same unchanged information.</p>
 <h4><a class="anchor" href="#min-constructors" id="min-constructors" name="min-constructors"><i class="anchor-icon"></i></a><a href="/api/min">Min constructors</a></h4>
 <p>In some situations user and channel constructors have reduced set of fields present (although id is always there) and min flag set.</p>
-<h4><a class="anchor" href="#channels-supergroups-gigagroups-and-basic-groups" id="channels-supergroups-gigagroups-and-basic-groups" name="channels-supergroups-gigagroups-and-basic-groups"><i class="anchor-icon"></i></a><a href="/api/channel">Channels, supergroups, gigagroups and basic groups</a></h4>
-<p>How to handle channels, supergroups, gigagroups, basic groups, and what's the difference between them.</p>
 <h4><a class="anchor" href="#discussion-groups" id="discussion-groups" name="discussion-groups"><i class="anchor-icon"></i></a><a href="/api/discussion">Discussion groups</a></h4>
 <p>Groups can be associated to a channel as a discussion group, to allow users to discuss about posts.</p>
+<h4><a class="anchor" href="#channels-supergroups-gigagroups-and-basic-groups" id="channels-supergroups-gigagroups-and-basic-groups" name="channels-supergroups-gigagroups-and-basic-groups"><i class="anchor-icon"></i></a><a href="/api/channel">Channels, supergroups, gigagroups and basic groups</a></h4>
+<p>How to handle channels, supergroups, gigagroups, basic groups, and what's the difference between them.</p>
 <h4><a class="anchor" href="#channelstogglejointosend" id="channelstogglejointosend" name="channelstogglejointosend"><i class="anchor-icon"></i></a><a href="/method/channels.toggleJoinToSend">channels.toggleJoinToSend</a></h4>
 <p>Set whether all users <a href="/api/discussion#requiring-users-to-join-the-group">should join a discussion group in order to comment on a post »</a></p>
 <h4><a class="anchor" href="#invites" id="invites" name="invites"><i class="anchor-icon"></i></a><a href="/api/invites">Invites</a></h4>
@@ -326,8 +331,6 @@
 <p>Telegram users and channels can easily post and view stories through the API.</p>
 <h4><a class="anchor" href="#channelsgetchannels" id="channelsgetchannels" name="channelsgetchannels"><i class="anchor-icon"></i></a><a href="/method/channels.getChannels">channels.getChannels</a></h4>
 <p>Get info about <a href="/api/channel">channels/supergroups</a></p>
-<h4><a class="anchor" href="#peer-database" id="peer-database" name="peer-database"><i class="anchor-icon"></i></a><a href="/api/peers">Peer database</a></h4>
-<p>Many constructors in the API need to be stored in a local database upon reception and should only ever be updated reactively (passively) when received via updates or by other means (as specified in the documentation), to avoid overloading the server by continuously requesting changes for the same unchanged information.</p>
 <h4><a class="anchor" href="#admin-banned-default-rights" id="admin-banned-default-rights" name="admin-banned-default-rights"><i class="anchor-icon"></i></a><a href="/api/rights">Admin, banned, default rights</a></h4>
 <p>How to handle admin permissions, granular bans and global permissions in channels, groups and supergroups.</p>
 <h4><a class="anchor" href="#accent-colors" id="accent-colors" name="accent-colors"><i class="anchor-icon"></i></a><a href="/api/colors">Accent colors</a></h4>
