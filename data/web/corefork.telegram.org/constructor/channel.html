@@ -56,14 +56,14 @@
 <li><code>noforwards</code></li>
 <li><code>emoji_status</code></li>
 <li><code>has_link</code></li>
-<li><code>is_slow_mode_enabled</code></li>
+<li><code>slow_mode_enabled</code></li>
 <li><code>scam</code></li>
 <li><code>fake</code></li>
 <li><code>gigagroup</code></li>
 <li><code>forum</code></li>
 <li><code>level</code></li>
 <li><code>restricted</code></li>
-<li><code>restricted_reason</code></li>
+<li><code>restriction_reason</code></li>
 <li><code>join_to_send</code></li>
 <li><code>join_request</code></li>
 <li><code>is_verified</code></li>
@@ -121,7 +121,7 @@
 <tr>
 <td><strong>megagroup</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.8?<a href="/constructor/true">true</a></td>
-<td>Is this a supergroup?</td>
+<td>Is this a supergroup? <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>restricted</strong></td>
@@ -141,12 +141,12 @@
 <tr>
 <td><strong>scam</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.19?<a href="/constructor/true">true</a></td>
-<td>This channel/supergroup is probably a scam</td>
+<td>This channel/supergroup is probably a scam <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>has_link</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.20?<a href="/constructor/true">true</a></td>
-<td>Whether this channel has a linked <a href="/api/discussion">discussion group »</a> (or this supergroup is a channel's discussion group). The actual ID of the linked channel/supergroup is contained in <a href="/constructor/channelFull">channelFull</a>.<code>linked_chat_id</code>.</td>
+<td>Whether this channel has a linked <a href="/api/discussion">discussion group »</a> (or this supergroup is a channel's discussion group). The actual ID of the linked channel/supergroup is contained in <a href="/constructor/channelFull">channelFull</a>.<code>linked_chat_id</code>. <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>has_geo</strong></td>
@@ -156,7 +156,7 @@
 <tr>
 <td><strong>slowmode_enabled</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.22?<a href="/constructor/true">true</a></td>
-<td>Whether slow mode is enabled for groups to prevent flood in chat</td>
+<td>Whether slow mode is enabled for groups to prevent flood in chat. <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>call_active</strong></td>
@@ -171,12 +171,12 @@
 <tr>
 <td><strong>fake</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.25?<a href="/constructor/true">true</a></td>
-<td>If set, this <a href="/api/channel">supergroup/channel</a> was reported by many users as a fake or scam: be careful when interacting with it.</td>
+<td>If set, this <a href="/api/channel">supergroup/channel</a> was reported by many users as a fake or scam: be careful when interacting with it. <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>gigagroup</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.26?<a href="/constructor/true">true</a></td>
-<td>Whether this <a href="/api/channel">supergroup</a> is a gigagroup</td>
+<td>Whether this <a href="/api/channel">supergroup</a> is a gigagroup<br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>noforwards</strong></td>
@@ -186,17 +186,17 @@
 <tr>
 <td><strong>join_to_send</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.28?<a href="/constructor/true">true</a></td>
-<td>Whether a user needs to join the supergroup before they can send messages: can be false only for <a href="/api/discussion">discussion groups »</a>, toggle using <a href="/method/channels.toggleJoinToSend">channels.toggleJoinToSend</a></td>
+<td>Whether a user needs to join the supergroup before they can send messages: can be false only for <a href="/api/discussion">discussion groups »</a>, toggle using <a href="/method/channels.toggleJoinToSend">channels.toggleJoinToSend</a><br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>join_request</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.29?<a href="/constructor/true">true</a></td>
-<td>Whether a user's join request will have to be <a href="/api/invites#join-requests">approved by administrators</a>, toggle using <a href="/method/channels.toggleJoinRequest">channels.toggleJoinToSend</a></td>
+<td>Whether a user's join request will have to be <a href="/api/invites#join-requests">approved by administrators</a>, toggle using <a href="/method/channels.toggleJoinRequest">channels.toggleJoinToSend</a><br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>forum</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.30?<a href="/constructor/true">true</a></td>
-<td>Whether this supergroup is a <a href="/api/forum">forum</a></td>
+<td>Whether this supergroup is a <a href="/api/forum">forum</a> <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>flags2</strong></td>
@@ -251,7 +251,7 @@
 <tr>
 <td><strong>restriction_reason</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.9?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/RestrictionReason">RestrictionReason</a>&gt;</td>
-<td>Contains the reason why access to this channel must be restricted.</td>
+<td>Contains the reason why access to this channel must be restricted. <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 <tr>
 <td><strong>admin_rights</strong></td>
@@ -301,7 +301,7 @@
 <tr>
 <td><strong>level</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.10?<a href="/type/int">int</a></td>
-<td><a href="/api/boost">Boost level</a></td>
+<td><a href="/api/boost">Boost level</a> <br>Changes to this flag should invalidate the local <a href="/constructor/channelFull">channelFull</a> cache for this channel/supergroup ID.</td>
 </tr>
 </tbody>
 </table>
