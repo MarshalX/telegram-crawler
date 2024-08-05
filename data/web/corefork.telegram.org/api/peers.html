@@ -159,8 +159,7 @@ Info about these IDs may be fetched with the zero access hash even by users.  </
 <p>After failing to download a peer photo.</p>
 </li>
 </ul>
-<p>It is not recommended to manually refresh peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.<br>
-Note that in some cases, since it is impossible to send updates about all Telegram users, the peer info database might still be outdated as relative updates might not get sent; however, this is <a href="#quality-of-life-checks">usually not a big problem »</a>.  </p>
+<p><strong>Do not</strong> manually refresh peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.  </p>
 <p>The only exception to the above rule is <a href="/method/contacts.getStatuses">contacts.getStatuses</a>, which should be invoked by clients every <code>70000-100000</code> seconds to update the <a href="/constructor/user">user</a>.<code>status</code> field of contacts.<br>
 The exact contact status polling interval should be randomly chosen between <code>70000</code> and <code>100000</code>, and re-chosen every time <a href="/method/contacts.getStatuses">contacts.getStatuses</a> is invoked.<br>
 If a <a href="/method/contacts.getStatuses">contacts.getStatuses</a> query fails, repeat the method call after <code>5</code> to <code>10</code> seconds.</p>
@@ -246,6 +245,7 @@ See the documentation in the <a href="/constructor/user">user</a> and <a href="/
 <li>If we banned a chat/supergroup participant specifying a <a href="/constructor/chatBannedRights">chatBannedRights</a>.<code>until_date</code>, the full cache of the chat/supergroup should be refresh for the admin at <code>until_date</code>.  </li>
 </ul>
 <p><em>Unlike</em> the invalidation condition list for the <a href="#peer-info-database">non-full peer database</a>, the above list is non-exhaustive, so clients may also choose to re-fetch the full info in some other conditions to make sure the info is always up to date (for example when opening a profile page, or when receiving some RPC errors in other cases), see <a href="#quality-of-life-checks">this section on quality of life checks »</a> for more info.  </p>
+<p>However, in some important cases (like bot information through <code>bot_info_version</code>, etc), the info is guaranteed to be updated through the above invalidation conditions.  </p>
 <h3><a class="anchor" href="#quality-of-life-checks" id="quality-of-life-checks" name="quality-of-life-checks"><i class="anchor-icon"></i></a>Quality of life checks</h3>
 <p>Note the following: peer information is also used for quality-of-life improvements, i.e. to directly prevent the user from doing an operation that is denied by the peer information, instead of allowing the operation and then showing an error.  </p>
 <p>These improvements should be implemented by advanced clients, but they are entirely optional, as the server will always prevent the user from doing illegal operations, by emitting an appropriate <a href="/api/errors">RPC error</a>, and sometimes it is still possible to make an illegal operation, even if a local check <em>is</em> implemented (see below).  </p>
