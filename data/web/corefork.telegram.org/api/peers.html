@@ -120,9 +120,6 @@
 <p>Peer info must be manually refreshed with a method call to the above methods <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, and so on...):  </p>
 <ul>
 <li>
-<p>When receiving an <a href="/constructor/updateUser">updateUser</a>, <a href="/constructor/updateChat">updateChat</a>, <a href="/constructor/updateChannel">updateChannel</a>, and some other updates, as specified <a href="/type/Update">here »</a></p>
-</li>
-<li>
 <p>When fetching info about one of the following internal user IDs, if the info isn't already cached or if the cached info is <code>min</code>: 777000 (service notifications user), 1271266957 (replies bot), 1087968824 (anonymous bot), 136817688 (channel bot), 5434988373 (antispam bot).<br>
 Info about these IDs may be fetched with the zero access hash even by users.  </p>
 </li>
@@ -158,8 +155,14 @@ Info about these IDs may be fetched with the zero access hash even by users.  </
 <li>
 <p>After invoking <a href="/method/photos.deletePhotos">photos.deletePhotos</a>, if the local cache doesn't have any more photos left for the current user after removing the ones passed to the method.  </p>
 </li>
+<li>
+<p>After failing to download a peer photo.</p>
+</li>
 </ul>
 <p><strong>Do not</strong> manually refresh peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.  </p>
+<p>The only exception to the above rule is <a href="/method/contacts.getStatuses">contacts.getStatuses</a>, which should be invoked by clients every <code>70000-100000</code> seconds to update the <a href="/constructor/user">user</a>.<code>status</code> field of contacts.<br>
+The exact contact status polling interval should be randomly chosen between <code>70000</code> and <code>100000</code>, and re-chosen every time <a href="/method/contacts.getStatuses">contacts.getStatuses</a> is invoked.<br>
+If a <a href="/method/contacts.getStatuses">contacts.getStatuses</a> query fails, repeat the method call after <code>5</code> to <code>10</code> seconds.</p>
 <p>Note: some other, non-peer-related constructors (i.e. not <a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> or <a href="/constructor/channel">channel</a>) may also contain access hashes, which should be stored in a different database.  </p>
 <h4><a class="anchor" href="#peer-id" id="peer-id" name="peer-id"><i class="anchor-icon"></i></a>Peer ID</h4>
 <p>The peer <code>id</code> is a unique 64-bit ID used to identify a specific user, chat or channel.  </p>
@@ -209,8 +212,7 @@ As specified in the constructor docs, some of the fields must not be overwritten
 <p>The full info database contains info from the <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a> and <a href="/constructor/channelFull">channelFull</a> constructors.  </p>
 <p>To populate the full info database for a peer, invoke <a href="/method/users.getFullUser">users.getFullUser</a>, <a href="/method/messages.getFullChat">messages.getFullChat</a>, <a href="/method/channels.getFullChannel">channels.getFullChannel</a>, all requiring the previously cached <a href="#access-hash">access_hash »</a>.  </p>
 <p>Invalidate only <a href="/constructor/userFull">userFull</a> and <a href="/constructor/channelFull">channelFull</a> entries 60 seconds after they are stored.</p>
-<p>Refresh the full info database <strong>only</strong> when the client needs some data from a full constructor, <strong>and</strong> there is no entry already in the database, or the entries were invalidated by the TTL, or if any of the conditions listed below are met (i.e. <strong>do not</strong> refresh user info when opening the profile page, or every time the entry is accessed, or when the TTL expires and the data isn't immediately needed for some operation).</p>
-<p>Immediately refresh the related full peer database entry if:</p>
+<p>Refresh the full info database when the client needs some data from a full constructor, <strong>and</strong> there is no entry already in the database, or the required entry was invalidated by the TTL, or if:</p>
 <ul>
 <li>Some event (specified <a href="#peer-info-database">here »</a>) changes the value of a specific subset of fields of an entry in the (non-full!) <a href="#peer-info-database">peer info database »</a>.<br>
 See the documentation in the <a href="/constructor/user">user</a> and <a href="/constructor/channel">channel</a> constructor pages for more info.  </li>
@@ -240,8 +242,9 @@ See the documentation in the <a href="/constructor/user">user</a> and <a href="/
 </li>
 <li>When receiving a <code>CHANNEL_PRIVATE</code> or <code>CHANNEL_PUBLIC_GROUP_NA</code> RPC error.</li>
 <li>When a channel is made private/public (where previously it was public/private. public=has at least one username, private=has no usernames).  </li>
-<li>If we banned a chat/supergroup participant specifying a <a href="/constructor/chatBannedRights">chatBannedRights</a>.<code>until_date</code>, the full cache of the chat/supergroup should be refresh for the admin at <code>until_date</code>.</li>
-</ul></div>
+<li>If we banned a chat/supergroup participant specifying a <a href="/constructor/chatBannedRights">chatBannedRights</a>.<code>until_date</code>, the full cache of the chat/supergroup should be refresh for the admin at <code>until_date</code>.  </li>
+</ul>
+<p><em>Unlike</em> the invalidation condition list for the <a href="#peer-info-database">non-full peer database</a>, the above list is non-exhaustive, so clients may also choose to re-fetch the full info in some other conditions to make sure the info is always up to date (for example when opening a profile page).</p></div>
   
 </div>
           
