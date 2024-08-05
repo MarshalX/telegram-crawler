@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>updateChat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="A new chat is available">
+    <meta property="description" content="Chat (chat and/or chatFull) information was updated.  This update can only be received through getDifference or in updates/updatesCombined constructors, so it will always come bundled with the updated chat, that should be applied as usual », without re-fetching the info manually.  However, full peer information will not come bundled in updates, so the full peer cache (chatFull) must be invalidated for chat_id when receiving this update.">
     <meta property="og:title" content="updateChat">
     <meta property="og:image" content="">
-    <meta property="og:description" content="A new chat is available">
+    <meta property="og:description" content="Chat (chat and/or chatFull) information was updated.  This update can only be received through getDifference or in updates/updatesCombined constructors, so it will always come bundled with the updated chat, that should be applied as usual », without re-fetching the info manually.  However, full peer information will not come bundled in updates, so the full peer cache (chatFull) must be invalidated for chat_id when receiving this update.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -42,9 +42,9 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/updateChat" >updateChat</a></li></ul></div>
   <h1 id="dev_page_title">updateChat</h1>
   
-  <div id="dev_page_content"><p>Chat (<a href="/constructor/chat">chat</a> and/or <a href="/constructor/chatFull">chatFull</a>) information was updated.  </p>
-<p>This update can only be received through getDifference or in <a href="/constructor/updates">updates</a>/<a href="/constructor/updatesCombined">updatesCombined</a> constructors, so it will <strong>always</strong> come bundled with the updated <a href="/constructor/chat">chat</a>, that should be applied <a href="/api/peers">as usual »</a>, <strong>without</strong> re-fetching the info manually.  </p>
-<p>However, full peer information will not come bundled in updates, so the full peer cache (<a href="/constructor/chatFull">chatFull</a>) must be invalidated for <code>chat_id</code> when receiving this update.  </p>
+  <div id="dev_page_content"><p>Chat (<a href="/constructor/chat">chat</a> and/or <a href="/constructor/chatFull">chatFull</a>) information was updated.</p>
+<p>This update can only be received through getDifference or in <a href="/constructor/updates">updates</a>/<a href="/constructor/updatesCombined">updatesCombined</a> constructors, so it will <strong>always</strong> come bundled with the updated <a href="/constructor/chat">chat</a>, that should be applied <a href="/api/peers">as usual »</a>, <strong>without</strong> re-fetching the info manually.</p>
+<p>However, full peer information will not come bundled in updates, so the full peer cache (<a href="/constructor/chatFull">chatFull</a>) must be invalidated for <code>chat_id</code> when receiving this update.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -76,7 +76,21 @@
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
-<p><a href="/type/Update">Update</a></p></div>
+<p><a href="/type/Update">Update</a></p>
+<h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#chat" id="chat" name="chat"><i class="anchor-icon"></i></a><a href="/constructor/chat">chat</a></h4>
+<p>Info about a group.</p>
+<p>When updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
+<p>See <a href="https://github.com/tdlib/td/blob/a24af0992245f838f2b4b418a0a2d5fa9caa27b5/td/telegram/ChatManager.cpp#L5152">here »</a> for an implementation of the logic to use when updating the <a href="/api/peers">local user peer database</a>.</p>
+<h4><a class="anchor" href="#chatfull" id="chatfull" name="chatfull"><i class="anchor-icon"></i></a><a href="/constructor/chatFull">chatFull</a></h4>
+<p>Full info about a <a href="/api/channel#basic-groups">basic group</a>.</p>
+<p>When updating the <a href="/api/peers">local peer database »</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
+<h4><a class="anchor" href="#updates" id="updates" name="updates"><i class="anchor-icon"></i></a><a href="/constructor/updates">Updates</a></h4>
+<p>Full constructor of updates</p>
+<h4><a class="anchor" href="#updatescombined" id="updatescombined" name="updatescombined"><i class="anchor-icon"></i></a><a href="/constructor/updatesCombined">updatesCombined</a></h4>
+<p>Constructor for a group of updates.</p>
+<h4><a class="anchor" href="#peer-database" id="peer-database" name="peer-database"><i class="anchor-icon"></i></a><a href="/api/peers">Peer database</a></h4>
+<p>Many constructors in the API need to be stored in a local database upon reception and should only ever be updated reactively (passively) when received via updates or by other means (as specified in the documentation), to avoid overloading the server by continuously requesting changes for the same unchanged information.</p></div>
   
 </div>
           
