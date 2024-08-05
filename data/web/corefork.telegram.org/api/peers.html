@@ -48,7 +48,7 @@
 <p><a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a>, <a href="/constructor/channel">channel</a> constructors and their full counterparts <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a>, <a href="/constructor/channelFull">channelFull</a> are especially important, because they contain important information about users, bots, chats and channels (from now on, <em>peers</em>), and most importantly the <code>access_hash</code> value, <strong>required</strong> to interact with peers in the API.  </p>
 <p>This page describes exactly how and when should the local databases of the constructors listed above be refreshed, and contains a more detailed description of basic peer-related concepts.  </p>
 <blockquote>
-<p>For simplicity, the documentation often uses the term "cache" instead of "database" when referring to the peer database, however note that the peer database is <strong>not</strong> an ephemeral cache: peer information (or at the very least the id+access hash) must be persisted to a database and <strong>never deleted</strong>, to avoid losing access to the API, which <strong>requires</strong> the locally stored access hash to call methods.  </p>
+<p>For simplicity, the documentation often uses the term "cache" instead of "database" when referring to the peer database, however note that the peer database is <strong>not</strong> an ephemeral cache: peer information (or at the very least the id+access hash) must be persisted to a database and <strong>never deleted</strong>, to avoid losing access to the API, which <strong>requires</strong> the locally stored access hash to call methods without refetching the chat history every time.  </p>
 </blockquote>
 <h3><a class="anchor" href="#peer-info-database" id="peer-info-database" name="peer-info-database"><i class="anchor-icon"></i></a>Peer info database</h3>
 <pre><code><a href='/constructor/userEmpty'>userEmpty</a>#d3bc4b7a id:<a href='/type/long'>long</a> = <a href='/type/User'>User</a>;
@@ -187,7 +187,7 @@ Access hashes may not be reused across different accounts or different sessions 
 This is a core spam prevention feature of Telegram.  </p>
 <p>Clients and client APIs should <strong>not</strong> expose access hashes to users, as they cannot be reused outside of the current session, and the user should not be burdened with storing them, when the client can perfectly do the job by itself.  </p>
 <blockquote>
-<p>For simplicity, the documentation often uses the term "cache" instead of "database" when referring to the peer database, however note that the peer database is <strong>not</strong> an ephemeral cache: peer information (or at the very least the id+access hash) must be persisted to a database and <strong>never deleted</strong>, to avoid losing access to the API, which <strong>requires</strong> the locally stored access hash to call methods.  </p>
+<p>For simplicity, the documentation often uses the term "cache" instead of "database" when referring to the peer database, however note that the peer database is <strong>not</strong> an ephemeral cache: peer information (or at the very least the id+access hash) must be persisted to a database and <strong>never deleted</strong>, to avoid losing access to the API, which <strong>requires</strong> the locally stored access hash to call methods without refetching the chat history every time.  </p>
 </blockquote>
 <h4><a class="anchor" href="#other-info" id="other-info" name="other-info"><i class="anchor-icon"></i></a>Other info</h4>
 <p>Various other fields commonly used by the client, as specified in the constructor pages (<a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> and <a href="/constructor/channel">channel</a>).<br>
@@ -209,21 +209,21 @@ As specified in the constructor docs, some of the fields must not be overwritten
 <p>The full info database contains info from the <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a> and <a href="/constructor/channelFull">channelFull</a> constructors.  </p>
 <p>To populate the full info database for a peer, invoke <a href="/method/users.getFullUser">users.getFullUser</a>, <a href="/method/messages.getFullChat">messages.getFullChat</a>, <a href="/method/channels.getFullChannel">channels.getFullChannel</a>, all requiring the previously cached <a href="#access-hash">access_hash »</a>.  </p>
 <p>Invalidate only <a href="/constructor/userFull">userFull</a> and <a href="/constructor/channelFull">channelFull</a> entries 60 seconds after they are stored.</p>
-<p>Refresh the full info database <strong>only</strong> when the client needs some data from a full constructor, <strong>and</strong> there is no entry already in the database, or the entries were invalidated by the TTL (i.e. <strong>do not</strong> refresh user info when opening the profile page, or every time the entry is accessed, or when the TTL expires and the data isn't immediately needed for some operation).  </p>
-<p>Immediately invalidate the related full peer database entry if:</p>
+<p>Refresh the full info database <strong>only</strong> when the client needs some data from a full constructor, <strong>and</strong> there is no entry already in the database, or the entries were invalidated by the TTL, or if any of the conditions listed below are met (i.e. <strong>do not</strong> refresh user info when opening the profile page, or every time the entry is accessed, or when the TTL expires and the data isn't immediately needed for some operation).</p>
+<p>Immediately refresh the related full peer database entry if:</p>
 <ul>
 <li>Some event (specified <a href="#peer-info-database">here »</a>) changes the value of a specific subset of fields of an entry in the (non-full!) <a href="#peer-info-database">peer info database »</a>.<br>
-The relative full info entry should only be refreshed when some specific fields of the locally cached <a href="/constructor/user">user</a>/<a href="/constructor/channel">channel</a> are changed, see the documentation in the <a href="/constructor/user">user</a> and <a href="/constructor/channel">channel</a> constructor pages for the full list.  </li>
+See the documentation in the <a href="/constructor/user">user</a> and <a href="/constructor/channel">channel</a> constructor pages for more info.  </li>
 <li>When receiving an <a href="/constructor/updateUser">updateUser</a>, <a href="/constructor/updateChat">updateChat</a>, <a href="/constructor/updateChannel">updateChannel</a>, and some other updates, as specified <a href="/type/Update">here »</a></li>
-<li>After invoking <a href="/method/bots.setBotInfo">bots.setBotInfo</a> after changing <code>about</code> or <code>description</code> (but <strong>not</strong> <code>name</code>), for the bot whose info we changed.</li>
+<li>After invoking <a href="/method/bots.setBotInfo">bots.setBotInfo</a> (even on error) after changing <code>about</code> or <code>description</code> (but <strong>not</strong> <code>name</code>), for the bot whose info we changed.</li>
 <li>After invoking <a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a> to <em>remove</em> the wallpaper and receiving an error, for the peer whose wallpapers we tried to change, to fetch the correct and updated wallpaper settings.  </li>
 <li>After invoking <a href="/method/messages.setChatAvailableReactions">messages.setChatAvailableReactions</a> and getting an error different from <code>CHAT_NOT_MODIFIED</code>, for the peer whose reaction settings we tried to change.  </li>
-<li>After receiving a SEND_AS_PEER_INVALID error from any method that interacts with a group/supergroup: refresh info about the destination, to see which channel peers can be used to send messages to the group/supergroup through send_as.</li>
+<li>After receiving a <code>SEND_AS_PEER_INVALID</code> error from any method that interacts with a group/supergroup: refresh info about the destination, to see which channel peers can be used to send messages to the group/supergroup through send_as.</li>
 <li>If <a href="/constructor/chat">chat</a>.<code>photo</code> is not equal to <a href="/constructor/chatFull">chatFull</a>.<code>chat_photo</code></li>
 <li>The <a href="/constructor/channelFull">channelFull</a>.<code>linked_chat_id</code> of channnel/supergroup A is updated to point to channel/supergroup B, but the <a href="/constructor/channelFull">channelFull</a>.<code>linked_chat_id</code> of channel/supergroup B does not point to channel/supergroup A, refresh the <a href="/constructor/channelFull">channelFull</a> of channel/supergroup B.</li>
 <li>Info about a bot that is a participant to the channel/supergroup is fetched by other means, but the bot is not contained in <a href="/constructor/channelFull">channelFull</a>.<code>bot_info</code>.  </li>
 <li>If <a href="/constructor/channelFull">channelFull</a>.<code>participants_count</code> is less than <a href="/constructor/channelFull">channelFull</a>.<code>admins_count</code> after a local update of the admin list by other means.</li>
-<li>If the currently logged in user's <a href="/constructor/inputPrivacyKeyStatusTimestamp">inputPrivacyKeyStatusTimestamp</a> <a href="/api/privacy">privacy setting »</a> was changed, invalidate the entire <a href="/constructor/userFull">userFull</a> cache for all users.  </li>
+<li>If the currently logged in user's <a href="/constructor/inputPrivacyKeyStatusTimestamp">inputPrivacyKeyStatusTimestamp</a> <a href="/api/privacy">privacy setting »</a> was changed, refresh the entire <a href="/constructor/userFull">userFull</a> cache for all users.  </li>
 <li>After receiving an error different from <code>USER_NOT_PARTICIPANT</code> when calling <a href="/method/channels.leaveChannel">channels.leaveChannel</a></li>
 <li>If the profile picture is updated or removed</li>
 <li>After successfully invoking any of the following methods, for the bot in question:<ul>
@@ -233,7 +233,6 @@ The relative full info entry should only be refreshed when some specific fields 
 <li>After invoking any of the following methods (successfully or not):<ul>
 <li><a href="/method/bots.setBotGroupDefaultAdminRights">bots.setBotGroupDefaultAdminRights</a> - For the bot</li>
 <li><a href="/method/bots.setBotBroadcastDefaultAdminRights">bots.setBotBroadcastDefaultAdminRights</a> - For the bot</li>
-<li><a href="/method/bots.setBotInfo">bots.setBotInfo</a> - For the bot</li>
 <li><a href="/method/channels.inviteToChannel">channels.inviteToChannel</a> - For the channel/supergroup</li>
 <li><a href="/method/channels.editAdmin">channels.editAdmin</a> - For the channel/supergroup</li>
 <li><a href="/method/channels.editCreator">channels.editCreator</a> - For the channel/supergroup</li>
@@ -241,7 +240,7 @@ The relative full info entry should only be refreshed when some specific fields 
 </li>
 <li>When receiving a <code>CHANNEL_PRIVATE</code> or <code>CHANNEL_PUBLIC_GROUP_NA</code> RPC error.</li>
 <li>When a channel is made private/public (where previously it was public/private. public=has at least one username, private=has no usernames).  </li>
-<li>If we banned a chat/supergroup participant specifying a <a href="/constructor/chatBannedRights">chatBannedRights</a>.<code>until_date</code>, the full cache for the chat/supergroup should be updated at <code>until_date</code>.</li>
+<li>If we banned a chat/supergroup participant specifying a <a href="/constructor/chatBannedRights">chatBannedRights</a>.<code>until_date</code>, the full cache of the chat/supergroup should be refresh for the admin at <code>until_date</code>.</li>
 </ul></div>
   
 </div>
