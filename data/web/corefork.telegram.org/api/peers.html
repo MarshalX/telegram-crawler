@@ -97,6 +97,7 @@
 <li><a href="#handling-certain-updates">By handling certain updates »</a></li>
 <li><a href="#manual-refreshes">By manual refreshes »</a></li>
 </ul>
+<p>Example implementation: <a href="https://github.com/tdlib/td/">tdlib</a>.</p>
 <h4><a class="anchor" href="#saving-constructors" id="saving-constructors" name="saving-constructors"><i class="anchor-icon"></i></a>Saving constructors</h4>
 <p>The peer info database needs to be updated every time a new constructor of type <a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> and <a href="/constructor/channel">channel</a> (and their <code>forbidden</code> counterparts, used for peers that the user can't access, but can view basic info about) is received.  </p>
 <p>These constructors are received when interacting with the API (i.e. in common chats, through the search function, <a href="/api/invites#public-usernames">username resolution</a>, <a href="/api/links#temporary-profile-links">temporary profile links</a>, and so on...).  </p>
@@ -204,6 +205,7 @@ As specified in the constructor docs, some of the fields must not be overwritten
 <a href='/method/users.getFullUser'>users.getFullUser</a>#b60f5918 id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.UserFull'>users.UserFull</a>;
 <a href='/method/messages.getFullChat'>messages.getFullChat</a>#aeb00b34 chat_id:<a href='/type/long'>long</a> = <a href='/type/messages.ChatFull'>messages.ChatFull</a>;
 <a href='/method/channels.getFullChannel'>channels.getFullChannel</a>#8736a09 channel:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/messages.ChatFull'>messages.ChatFull</a>;</code></pre>
+<p>Example implementation: <a href="https://github.com/tdlib/td/">tdlib</a>.</p>
 <p>The full info database contains info from the <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a> and <a href="/constructor/channelFull">channelFull</a> constructors.  </p>
 <p>To populate the full info database for a peer, invoke <a href="/method/users.getFullUser">users.getFullUser</a>, <a href="/method/messages.getFullChat">messages.getFullChat</a>, <a href="/method/channels.getFullChannel">channels.getFullChannel</a>, all requiring the previously cached <a href="#access-hash">access_hash »</a>.  </p>
 <p>Populate the full info database only when the client needs some data from a full constructor, <strong>and</strong> there is no entry already in the database.  </p>
@@ -215,7 +217,10 @@ The relative full info entry should only be refreshed when some specific fields 
 <li>After invoking <a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a> to <em>remove</em> the wallpaper and receiving an error, for the peer whose wallpapers we tried to change, to fetch the correct and updated wallpaper settings.  </li>
 <li>After invoking <a href="/method/messages.setChatAvailableReactions">messages.setChatAvailableReactions</a> and getting an error different from <code>CHAT_NOT_MODIFIED</code>, for the peer whose reaction settings we tried to change.  </li>
 <li>After receiving a SEND_AS_PEER_INVALID error from any method that interacts with a group/supergroup: refresh info about the destination, to see which channel peers can be used to send messages to the group/supergroup through send_as.</li>
+<li>If <a href="/constructor/chat">chat</a>.<code>photo</code> is not equal to <a href="/constructor/chatFull">chatFull</a>.<code>chat_photo</code></li>
 <li>The <a href="/constructor/channelFull">channelFull</a>.<code>linked_chat_id</code> of channnel/supergroup A is updated to point to channel/supergroup B, but the <a href="/constructor/channelFull">channelFull</a>.<code>linked_chat_id</code> of channel/supergroup B does not point to channel/supergroup A, refresh the <a href="/constructor/channelFull">channelFull</a> of channel/supergroup B.</li>
+<li>Info about a bot that is a participant to the channel/supergroup is fetched by other means, but the bot is not contained in <a href="/constructor/channelFull">channelFull</a>.<code>bot_info</code>.  </li>
+<li>After receiving an error different from <code>USER_NOT_PARTICIPANT</code> when calling <a href="/method/channels.leaveChannel">channels.leaveChannel</a></li>
 </ul>
 <p><strong>Do not</strong> refresh full peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.</p></div>
   
