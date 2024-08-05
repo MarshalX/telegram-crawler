@@ -244,19 +244,18 @@ See the documentation in the <a href="/constructor/user">user</a> and <a href="/
 <li>When a channel is made private/public (where previously it was public/private. public=has at least one username, private=has no usernames).  </li>
 <li>If we banned a chat/supergroup participant specifying a <a href="/constructor/chatBannedRights">chatBannedRights</a>.<code>until_date</code>, the full cache of the chat/supergroup should be refresh for the admin at <code>until_date</code>.  </li>
 </ul>
-<p><em>Unlike</em> the invalidation condition list for the <a href="#peer-info-database">non-full peer database</a>, the above list is non-exhaustive, so clients may also choose to re-fetch the full info in some other conditions to make sure the info is always up to date (for example when opening a profile page, or when receiving some RPC errors in other cases).  </p>
-<p>Also see <a href="#quality-of-life-checks">this section on quality of life checks »</a>.  </p>
+<p><em>Unlike</em> the invalidation condition list for the <a href="#peer-info-database">non-full peer database</a>, the above list is non-exhaustive, so clients may also choose to re-fetch the full info in some other conditions to make sure the info is always up to date (for example when opening a profile page, or when receiving some RPC errors in other cases), see <a href="#quality-of-life-checks">this section on quality of life checks »</a> for more info.  </p>
 <h3><a class="anchor" href="#quality-of-life-checks" id="quality-of-life-checks" name="quality-of-life-checks"><i class="anchor-icon"></i></a>Quality of life checks</h3>
-<p>Note the following: peer information is also used for quality-of-life improvements, i.e. to directly prevent the user from doing an operation that is denied by the peer information.  </p>
+<p>Note the following: peer information is also used for quality-of-life improvements, i.e. to directly prevent the user from doing an operation that is denied by the peer information, instead of allowing the operation and then showing an error.  </p>
 <p>These improvements should be implemented by advanced clients, but they are entirely optional, as the server will always prevent the user from doing illegal operations, by emitting an appropriate <a href="/api/errors">RPC error</a>, and sometimes it is still possible to make an illegal operation, even if a local check <em>is</em> implemented (see below).  </p>
 <p>Instead of (or along with) preventing users from doing illegal operations on the client side, clients should always provide localized versions of errors returned by the server (as listed in the JSON file downloadable from the <a href="/api/errors">RPC error page</a>), to inform the user as to why an attempted operation has failed.  </p>
-<p>In other words, if the client didn't prevent the method call locally because:</p>
+<p>In other words, if the client didn't prevent the failed method call locally because:</p>
 <ul>
 <li>It does not implement a local check for simplicity or</li>
 <li>It <em>does</em> implement a local check, but:<ul>
 <li>Peer info is outdated or</li>
 <li>An update was sent by the server for the peer info, but it wasn't applied in time due to an (unavoidable!) race condition between the server sending the update and the client sending the query.</li>
-<li>Other unspecified reasons (a new check introduced in a future layer or by a new feature, etc...)</li>
+<li>Other unspecified reasons (a new check introduced in a future layer by a new feature, etc...)</li>
 </ul>
 </li>
 </ul>
