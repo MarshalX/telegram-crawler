@@ -133,10 +133,12 @@ Since <code>local_pts + pts_count &lt; pts</code> (<code>137 &lt; 140</code>), t
 <p>If the updates were applied, local <em>Updates state</em> must be updated with <code>seq</code> (unless it's 0) and <code>date</code> from the constructor.</p>
 <p>For all the other <a href="/type/Updates">Updates</a> type constructors there is no need to check <code>seq</code> or change a local state.</p>
 <h3><a class="anchor" href="#recovering-gaps" id="recovering-gaps" name="recovering-gaps"><i class="anchor-icon"></i></a>Recovering gaps</h3>
-<p>To do this, <a href="/method/updates.getDifference">updates.getDifference</a> (common/secret state) or <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> (channel state) with the respective local states must be called.<br>
-Only <a href="/method/updates.getDifference">updates.getDifference</a> should also be called on startup, to fetch updates received while the client was offline (preferably with some flags to reduce server load, see the method's docs).<br>
-Manually obtaining updates is also required in the following situations:</p>
+<p>To do this, <a href="/method/updates.getDifference">updates.getDifference</a> (common/secret state) or <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> (channel state) with the respective local states must be called.  </p>
+<p>Manually obtaining updates through the above methods is required in the following situations:</p>
 <ul>
+<li>On startup, <em>only</em> <a href="/method/updates.getDifference">updates.getDifference</a> should be called, to fetch updates received while the client was offline (preferably with some flags to reduce server load, see the method's docs).<br>
+<a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> does <em>not</em> have to be manually called for all channels on startup.<br>
+Instead, <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> will be automatically triggered (only for channels that need catching up) by a set of <a href="/constructor/updateChannelTooLong">updateChannelTooLong</a> updates that will be returned by the <a href="/method/updates.getDifference">updates.getDifference</a> call.  </li>
 <li>Loss of sync: a gap was found in  <strong>seq</strong> / <strong>pts</strong> / <strong>qts</strong> (as described above). It may be useful to wait up to 0.5 seconds in this situation and abort the sync in case a new update arrives, that fills the gap.</li>
 <li>Session loss on the server: the client receives a <a href="https://core.telegram.org/mtproto/service_messages#new-session-creation-notification">new session created notification</a>. This can be caused by garbage collection on the MTProto server or a server reboot.</li>
 <li>Incorrect update: the client cannot deserialize the received data.</li>
@@ -150,9 +152,15 @@ If the difference is too large to be received in one request, the <code>final</c
 The intermediate status, represented by the <strong>pts</strong>, must be saved on the client and the query must be repeated, using the intermediate status as the current status.  </p>
 <p>For performance reasons and for better user experience, client can set maximum gap size to be filled: <code>pts_total_limit</code> parameter of <a href="/method/updates.getDifference">updates.getDifference</a> and <code>limit</code> parameter for <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> can be used.</p>
 <p>If the gap is too large and there are too many updates to fetch, a <code>*TooLong</code> constructor will be returned. In this case, the client must <a href="#fetching-state">re-fetch the state</a>, re-start fetching updates from that state and follow the instructions that can be found <a href="/constructor/updates.channelDifferenceTooLong">here</a>.</p>
-<p>If the returned channel difference is <code>final</code> and the <code>timeout</code> flag is set, <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> should be re-invoked after <code>timeout</code> seconds.  </p>
 <p>It is recommended to use limit <code>10-100</code> for channels and <code>1000-10000</code> otherwise.</p>
-<h3><a class="anchor" href="#subscribing-to-updates-of-channels-supergroups-we-havent-joined" id="subscribing-to-updates-of-channels-supergroups-we-havent-joined" name="subscribing-to-updates-of-channels-supergroups-we-havent-joined"><i class="anchor-icon"></i></a>Subscribing to updates of channels/supergroups we haven't joined</h3>
+<p>Only if:</p>
+<ul>
+<li>The currently logged in account is a user AND</li>
+<li>The user is currently viewing the messages of one or more supergroups/channels (i.e. via distinct tabs/windows) AND</li>
+<li>The returned difference for a supergroup/channel the user is currently viewing is <code>final</code> and the <code>timeout</code> flag is set</li>
+</ul>
+<p>...<a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> should be re-invoked after <code>timeout</code> seconds, otherwise, do not re-invoke the method (if the result is <code>final</code>).  </p>
+<h3><a class="anchor" href="#subscribing-to-updates-of-channels-supergroups" id="subscribing-to-updates-of-channels-supergroups" name="subscribing-to-updates-of-channels-supergroups"><i class="anchor-icon"></i></a>Subscribing to updates of channels/supergroups</h3>
 <p>Clients may ask the API to passively send them updates for <a href="/api/channel">channels/supergroups</a> they haven't joined, by simply making a <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> query.  </p>
 <p>If the specified channel or supergroup is public, or is private but temporarily available for a limited time thanks to a <a href="/constructor/chatInvitePeek">chatInvitePeek</a>, the API will start passively sending updates (i.e. as standalone <a href="/type/Updates">Updates</a> constructors in the socket, as is already the case for normal channels/supergroups we've already joined) to all logged-in sessions, as long as any of the sessions continues to periodically invoke <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> every <code>timeout</code> seconds (returned by the method, or every 10 seconds if the <code>timeout</code> flag is absent from the return value of the method).  </p>
 <p>To stop passively receiving updates, simply stop invoking <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a>, and the API will automatically stop passively sending updates after a while.  </p>
