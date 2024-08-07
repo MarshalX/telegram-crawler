@@ -133,8 +133,8 @@ Since <code>local_pts + pts_count &lt; pts</code> (<code>137 &lt; 140</code>), t
 <p>If the updates were applied, local <em>Updates state</em> must be updated with <code>seq</code> (unless it's 0) and <code>date</code> from the constructor.</p>
 <p>For all the other <a href="/type/Updates">Updates</a> type constructors there is no need to check <code>seq</code> or change a local state.</p>
 <h3><a class="anchor" href="#recovering-gaps" id="recovering-gaps" name="recovering-gaps"><i class="anchor-icon"></i></a>Recovering gaps</h3>
-<p>To do this, <a href="/method/updates.getDifference">updates.getDifference</a> (common/secret state) or <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> (channel state) with the respective local states must be called.
-These methods should also be called on startup, to fetch new updates (preferably with some flags to reduce server load, see the method's docs).
+<p>To do this, <a href="/method/updates.getDifference">updates.getDifference</a> (common/secret state) or <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> (channel state) with the respective local states must be called.<br>
+Only <a href="/method/updates.getDifference">updates.getDifference</a> should also be called on startup, to fetch new updates (preferably with some flags to reduce server load, see the method's docs).<br>
 Manually obtaining updates is also required in the following situations:</p>
 <ul>
 <li>Loss of sync: a gap was found in  <strong>seq</strong> / <strong>pts</strong> / <strong>qts</strong> (as described above). It may be useful to wait up to 0.5 seconds in this situation and abort the sync in case a new update arrives, that fills the gap.</li>
@@ -145,9 +145,9 @@ Manually obtaining updates is also required in the following situations:</p>
 <li>The server requests the client to fetch the difference using <a href="/constructor/updateChannelTooLong">updateChannelTooLong</a> or <a href="/constructor/updatesTooLong">updatesTooLong</a>.</li>
 </ul>
 <p>When calling <a href="/method/updates.getDifference">updates.getDifference</a> if the <a href="/constructor/updates.differenceSlice">updates.differenceSlice</a> constructor is returned in response, the full difference was too large to be received in one request. The intermediate status, <strong>intermediate_state</strong>, must be saved on the client and the query must be repeated, using the intermediate status as the current status.</p>
-<p>To fetch the updates difference of a channel, <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> is used.
-If the difference is too large to be received in one request, the <code>final</code> flag of the result is <strong>not</strong> set (see <a href="/type/updates.ChannelDifference">docs</a>).
-The intermediate status, represented by the <strong>pts</strong>, must be saved on the client and the query must be repeated, using the intermediate status as the current status.</p>
+<p>To fetch the updates difference of a channel, <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> is used.<br>
+If the difference is too large to be received in one request, the <code>final</code> flag of the result is <strong>not</strong> set (see <a href="/type/updates.ChannelDifference">docs</a>).<br>
+The intermediate status, represented by the <strong>pts</strong>, must be saved on the client and the query must be repeated, using the intermediate status as the current status.  </p>
 <p>For performance reasons and for better user experience, client can set maximum gap size to be filled: <code>pts_total_limit</code> parameter of <a href="/method/updates.getDifference">updates.getDifference</a> and <code>limit</code> parameter for <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> can be used.</p>
 <p>If the gap is too large and there are too many updates to fetch, a <code>*TooLong</code> constructor will be returned. In this case, the client must <a href="#fetching-state">re-fetch the state</a>, re-start fetching updates from that state and follow the instructions that can be found <a href="/constructor/updates.channelDifferenceTooLong">here</a>.</p>
 <p>If the returned channel difference is <code>final</code> and the <code>timeout</code> flag is set, <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> should be re-invoked after <code>timeout</code> seconds.  </p>
