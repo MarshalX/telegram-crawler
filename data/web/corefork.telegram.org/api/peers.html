@@ -48,7 +48,7 @@
 <p><a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a>, <a href="/constructor/channel">channel</a> constructors and their full counterparts <a href="/constructor/userFull">userFull</a>, <a href="/constructor/chatFull">chatFull</a>, <a href="/constructor/channelFull">channelFull</a> are especially important, because they contain important information about users, bots, chats and channels (from now on, <em>peers</em>), and most importantly the <code>access_hash</code> value, <strong>required</strong> to interact with peers in the API.  </p>
 <p>This page describes exactly how and when should the local databases of the constructors listed above be refreshed, and contains a more detailed description of basic peer-related concepts.  </p>
 <blockquote>
-<p>For simplicity, the documentation often uses the term "cache" instead of "database" when referring to the peer database, however note that the peer database is <strong>not</strong> an ephemeral cache: peer information (or at the very least the id+access hash) must be persisted to a database and <strong>never deleted</strong>, to avoid losing access to the API, which <strong>requires</strong> the locally stored access hash to call methods without refetching the chat history every time.  </p>
+<p>For simplicity, the documentation often uses the term "cache" instead of "database" when referring to the peer database, however note that it is recommended to persist received information (or at the very least the id+access hash) to a database, to call methods requiring the access hash and view other peer info without refetching the chat history and peer info after startup.  </p>
 </blockquote>
 <h3><a class="anchor" href="#peer-info-database" id="peer-info-database" name="peer-info-database"><i class="anchor-icon"></i></a>Peer info database</h3>
 <pre><code><a href='/constructor/userEmpty'>userEmpty</a>#d3bc4b7a id:<a href='/type/long'>long</a> = <a href='/type/User'>User</a>;
@@ -103,7 +103,7 @@
 <p>These constructors are received when interacting with the API (i.e. in common chats, through the search function, <a href="/api/invites#public-usernames">username resolution</a>, <a href="/api/links#temporary-profile-links">temporary profile links</a>, and so on...).  </p>
 <p>Unless specified otherwise (see the constructor pages for the special cases), when updating the local peer database, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).  </p>
 <h4><a class="anchor" href="#handling-certain-updates" id="handling-certain-updates" name="handling-certain-updates"><i class="anchor-icon"></i></a>Handling certain updates</h4>
-<p>Some updates should trigger an update of a small subset of the info contained in the peer database:</p>
+<p>The following updates should trigger an update of a small subset of the info contained in the peer database (both non-full and <a href="#full-info-database">full variants</a>):</p>
 <ul>
 <li><a href="/constructor/updateUserStatus">updateUserStatus</a> - Update <a href="/constructor/user">user</a>.<code>status</code></li>
 <li><a href="/constructor/updateUserName">updateUserName</a>- Update <a href="/constructor/user">user</a>.<code>first_name</code>/<code>last_name</code>/<code>username</code>/<code>usernames</code></li>
@@ -189,9 +189,6 @@ Note that <a href="/constructor/chat">chat</a>s (<a href="/api/channel">basic gr
 Access hashes may not be reused across different accounts or different sessions of the same account.<br>
 This is a core spam prevention feature of Telegram.  </p>
 <p>Clients and client APIs should <strong>not</strong> expose access hashes to users, as they cannot be reused outside of the current session, and the user should not be burdened with storing them, when the client can perfectly do the job by itself.  </p>
-<blockquote>
-<p>For simplicity, the documentation often uses the term "cache" instead of "database" when referring to the peer database, however note that the peer database is <strong>not</strong> an ephemeral cache: peer information (or at the very least the id+access hash) must be persisted to a database and <strong>never deleted</strong>, to avoid losing access to the API, which <strong>requires</strong> the locally stored access hash to call methods without refetching the chat history every time.  </p>
-</blockquote>
 <h4><a class="anchor" href="#other-info" id="other-info" name="other-info"><i class="anchor-icon"></i></a>Other info</h4>
 <p>Various other fields commonly used by the client, as specified in the constructor pages (<a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> and <a href="/constructor/channel">channel</a>).<br>
 As specified in the constructor docs, some of the fields must not be overwritten if a <a href="/api/min">min constructor</a> is received, and a change in some other fields must trigger invalidation of the <a href="#full-info-database">full info database »</a>.  </p>
