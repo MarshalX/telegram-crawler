@@ -116,8 +116,8 @@
 <li><a href="/constructor/updateChannelAvailableMessages">updateChannelAvailableMessages</a> - Update <a href="/constructor/channel">channel</a>.<code>hidden_prehistory</code></li>
 </ul>
 <h4><a class="anchor" href="#manual-refreshes" id="manual-refreshes" name="manual-refreshes"><i class="anchor-icon"></i></a>Manual refreshes</h4>
-<p>Information about <em>already cached</em> peers must be refreshed manually in certain conditions using the bulked <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/messages.getChats">messages.getChats</a>, <a href="/method/channels.getChannels">channels.getChannels</a> methods, all requiring the previously cached <code>access_hash</code> (read on for more info).  </p>
-<p>Peer info must be manually refreshed with a method call to the above methods <strong>only in the following conditions</strong> (i.e. <strong>do not</strong> refresh user info when opening the profile page, and so on...):  </p>
+<p>For performance reasons, the server will not always send updates about all peers: for this reason, information about <em>already cached</em> peers may be refreshed manually in certain conditions using the bulked <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/messages.getChats">messages.getChats</a>, <a href="/method/channels.getChannels">channels.getChannels</a> methods, all requiring the previously cached <code>access_hash</code>.  </p>
+<p>The following list is non-exhaustive, and clients may choose to refresh peer information in some other conditions as well (i.e. when opening the profile page, etc).  </p>
 <ul>
 <li>
 <p>When fetching info about one of the following internal user IDs, if the info isn't already cached or if the cached info is <code>min</code>: 777000 (service notifications user), 1271266957 (replies bot), 1087968824 (anonymous bot), 136817688 (channel bot), 5434988373 (antispam bot).<br>
@@ -158,12 +158,12 @@ Info about these IDs may be fetched with the zero access hash even by users.  </
 <li>
 <p>After failing to download a peer photo.</p>
 </li>
-</ul>
-<p><strong>Do not</strong> manually refresh peer information in any other case, to avoid overloading the server by continuously requesting changes for the same unchanged information.  </p>
-<p>The only exception to the above rule is <a href="/method/contacts.getStatuses">contacts.getStatuses</a>, which should be invoked by clients every <code>70000-100000</code> seconds to update the <a href="/constructor/user">user</a>.<code>status</code> field of contacts.<br>
+<li>
+<p><a href="/method/contacts.getStatuses">contacts.getStatuses</a> should be invoked by clients every <code>70000-100000</code> seconds to update the <a href="/constructor/user">user</a>.<code>status</code> field of contacts.<br>
 The exact contact status polling interval should be randomly chosen between <code>70000</code> and <code>100000</code>, and re-chosen every time <a href="/method/contacts.getStatuses">contacts.getStatuses</a> is invoked.<br>
 If a <a href="/method/contacts.getStatuses">contacts.getStatuses</a> query fails, repeat the method call after <code>5</code> to <code>10</code> seconds.</p>
-<p>Note: some other, non-peer-related constructors (i.e. not <a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> or <a href="/constructor/channel">channel</a>) may also contain access hashes, which should be stored in a different database.  </p>
+</li>
+</ul>
 <h4><a class="anchor" href="#peer-id" id="peer-id" name="peer-id"><i class="anchor-icon"></i></a>Peer ID</h4>
 <p>The peer <code>id</code> is a unique 64-bit ID used to identify a specific user, chat or channel.  </p>
 <p>This field should be used as primary key in the channel, chat and user databases.  </p>
@@ -189,6 +189,7 @@ Note that <a href="/constructor/chat">chat</a>s (<a href="/api/channel">basic gr
 Access hashes may not be reused across different accounts or different sessions of the same account.<br>
 This is a core spam prevention feature of Telegram.  </p>
 <p>Clients and client APIs should <strong>not</strong> expose access hashes to users, as they cannot be reused outside of the current session, and the user should not be burdened with storing them, when the client can perfectly do the job by itself.  </p>
+<p>Note: some other, non-peer-related constructors (i.e. not <a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> or <a href="/constructor/channel">channel</a>) may also contain access hashes, which should be stored in a different database.  </p>
 <h4><a class="anchor" href="#other-info" id="other-info" name="other-info"><i class="anchor-icon"></i></a>Other info</h4>
 <p>Various other fields commonly used by the client, as specified in the constructor pages (<a href="/constructor/user">user</a>, <a href="/constructor/chat">chat</a> and <a href="/constructor/channel">channel</a>).<br>
 As specified in the constructor docs, some of the fields must not be overwritten if a <a href="/api/min">min constructor</a> is received, and a change in some other fields must trigger invalidation of the <a href="#full-info-database">full info database »</a>.  </p>
