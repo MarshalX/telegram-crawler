@@ -48,7 +48,14 @@
 <h3><a class="anchor" href="#subscribing-to-updates" id="subscribing-to-updates" name="subscribing-to-updates"><i class="anchor-icon"></i></a>Subscribing to Updates</h3>
 <p>Update events are sent to an authorized user into the last active connection (except for connections needed for downloading / uploading files).</p>
 <p>So to start receiving updates the client needs to init connection and call API method, e.g. to <a href="#fetching-state">fetch current state</a>.</p>
-<p>Make sure to <strong>always ignore updates received from unencrypted connections</strong>.  </p>
+<p>Make sure to <strong>always ignore updates received from unencrypted connections</strong> (i.e. before the handshake is completed).  </p>
+<p>If the connection is encrypted, but the session isn't logged in yet or was logged out, only the following updates may be handled:</p>
+<ul>
+<li><a href="/constructor/updateLoginToken">updateLoginToken</a> - For <a href="/api/qr-login">QR code logins</a></li>
+<li><a href="/constructor/updateDcOptions">updateDcOptions</a> - Changes in the data center connection options that must be applied</li>
+<li><a href="/constructor/updateConfig">updateConfig</a> - The server-side configuration has changed; the client should re-fetch the config using <a href="/method/help.getConfig">help.getConfig</a> and <a href="/method/help.getAppConfig">help.getAppConfig</a>.</li>
+<li><a href="/constructor/updateLangPackTooLong">updateLangPackTooLong</a>, <a href="/constructor/updateLangPack">updateLangPack</a> - Localization pack updates</li>
+</ul>
 <h3><a class="anchor" href="#event-sequences" id="event-sequences" name="event-sequences"><i class="anchor-icon"></i></a>Event sequences</h3>
 <p>All events are received from the socket as a sequence of TL-serialized <a href="/type/Updates">Updates</a> objects, which might be optionally gzip-compressed in the same way as <a href="/api/invoking#decompressing-data">responses to queries</a>.</p>
 <p>Each <a href="/type/Updates">Updates</a> object may contain single or multiple <a href="/type/Update">Update</a> objects, representing different events happening.</p>
