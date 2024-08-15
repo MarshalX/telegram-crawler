@@ -903,7 +903,12 @@
         });
         $field.trigger('datachange');
       });
-      $select.on('datachange', function(e) {
+      $select.on('contentchange.select', function(e) {
+        if (e.target === this) {
+          $field.trigger('contentchange');
+        }
+      });
+      $select.on('datachange.select', function(e) {
         if (e.target === this) {
           $field.trigger('datachange');
         }

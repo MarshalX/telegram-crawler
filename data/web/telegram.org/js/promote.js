@@ -444,6 +444,7 @@ var Ads = {
           return $.trim(str).toLowerCase();
         },
         renderItem: options.renderItem,
+        appendToItems: options.appendToItems,
         renderSelectedItem: options.renderSelectedItem,
         renderNoItems: function(q) {
           return q && options.l_no_items_found ? '<div class="select-list-no-results">' + options.l_no_items_found + '</div>' : '';
@@ -3926,6 +3927,15 @@ var TransferFunds = {
         renderSelectedItem: function(val, item) {
           return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
         },
+        appendToItems: function(query, result_count) {
+          if (Aj.state.accountItemsLoading) {
+            return '<div class="select-list-item select-list-loading dots-animated">' + l('WEB_SELECT_LOADING', 'Loading') + '</div>';
+          }
+          return '';
+        },
+        getData: function(query, items) {
+          return TransferFunds.getAccountsData(items);
+        },
         onEnter: TransferFunds.onAccountSearch,
         onChange: TransferFunds.onAccountChange
       });
@@ -3935,6 +3945,63 @@ var TransferFunds = {
       state.$form.off('submit', preventDefault);
       state.amountField.off('.curPage');
       clearTimeout(Aj.state.transferTo);
+    });
+  },
+  getAccountsData: function(items) {
+    if (Aj.state.accountItemsNextOffset === false) {
+      return items;
+    }
+    Aj.state.accountItemsLoading = true;
+    var owner_id = Aj.state.ownerId;
+    var $fieldEl = Aj.state.$form.field('account');
+    var next_offset = Aj.state.accountItemsNextOffset || 0;
+    Aj.state.accountItemsNextOffset = false;
+    TransferFunds.loadAccountsData({
+      owner_id: owner_id,
+      offset: next_offset
+    }, {items: items}, function() {
+      $fieldEl.trigger('contentchange');
+    }, function() {
+      Aj.state.accountItemsLoading = false;
+      $fieldEl.trigger('dataready').trigger('datachange');
+    });
+    return items;
+  },
+  loadAccountsData: function(params, opts, onUpdate, onReady) {
+    Aj.apiRequest('getAccountsForTransfer', params, function(result) {
+      if (result.error) {
+        if (result.field) {
+          onReady && onReady();
+          var $field = Aj.state.$form.field(result.field);
+          if ($field.size()) {
+            Ads.showFieldError($field, result.error, true);
+            return false;
+          }
+        } else {
+          if (!opts.retry) opts.retry = 1;
+          else opts.retry++;
+          setTimeout(function(){ TransferFunds.loadAccountsData(params, opts, onUpdate, onReady); }, opts.retry * 1000);
+        }
+      } else {
+        if (opts.retry) {
+          opts.retry = 0;
+        }
+        if (result.items) {
+          var items = result.items;
+          for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            item._values = [item.name.toLowerCase()];
+            opts.items.push(item);
+          }
+          onUpdate && onUpdate();
+        }
+        if (result.next_offset) {
+          params.offset = result.next_offset;
+          TransferFunds.loadAccountsData(params, opts, onUpdate, onReady);
+        } else {
+          onReady && onReady();
+        }
+      }
     });
   },
   onToggleAmountSign: function(e) {
