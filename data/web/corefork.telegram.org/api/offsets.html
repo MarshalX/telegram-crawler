@@ -79,7 +79,7 @@
 </ul>
 <h3><a class="anchor" href="#hash-generation" id="hash-generation" name="hash-generation"><i class="anchor-icon"></i></a>Hash generation</h3>
 <p>To further reduce the result subset, there is a mechanism to avoid fetching data if the resulting list hasn't changed from the one stored on client, similar to <a href="https://en.wikipedia.org/wiki/HTTP_ETag">ETag</a>.</p>
-<p>When the client has cached results for API request, it can calculate the <code>hash</code> value for it by taking the result IDs (message IDs or other fields with name <code>id</code>) and using them to compute a 64-bit hash with the following algorithm:</p>
+<p>When the client has cached results for API request, it can calculate the <code>hash</code> value for it by taking the result IDs (message IDs or other fields with name <code>id</code>, or some extra fields in some cases) and using them to compute a 64-bit hash with the following algorithm:</p>
 <pre><code># Here, ^ indicates a bitwise XOR
 
 hash = 0
@@ -88,6 +88,8 @@ for id in ids:
     hash = hash ^ (hash &lt;&lt; 35)
     hash = hash ^ (hash &gt;&gt; 4)
     hash = hash + id</code></pre>
+<p>The <code>&gt;&gt;</code> operator is the unsigned right shift operator.  </p>
+<p>Note: in some cases, the <code>ids</code> array passed to the algorithm must contain strings (i.e. the shortcut name in business shortcuts, and so on...), in which case they must be transformed to longs by taking the first 8 bytes of the MD5 hash of the string (<strong>not</strong> in hex form) and treating it as a big-endian 64-bit long.  </p>
 <p>In some cases, if the result container already has a <code>hash</code> field, that can be used instead.  </p>
 <p>When the client passes a correct value, the API will return one of <code>*NotModified</code> constructors, e.g. <a href="/constructor/messages.messagesNotModified">messages.messagesNotModified</a> instead of the actual results.</p>
 <h3><a class="anchor" href="#example-methods" id="example-methods" name="example-methods"><i class="anchor-icon"></i></a>Example methods</h3>
