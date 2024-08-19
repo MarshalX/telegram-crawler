@@ -46,7 +46,7 @@
 
 <p>Users can interact with your bot via <strong>buttons</strong> or even <strong>inline buttons</strong>, straight from inline <strong>messages</strong> in <strong>any</strong> chat.<br>
 This article describes the full button flow, using the MTProto API.  </p>
-<p>For a simplified description using the HTTP bot API, see <a href="/bots/features#keyboards">here »</a>.  </p>
+<p>For a simplified description using the HTTP bot API, see <a href="/bots/features#keyboards">here »</a>.  </p>
 <h3><a class="anchor" href="#buttons" id="buttons" name="buttons"><i class="anchor-icon"></i></a>Buttons</h3>
 <pre><code><a href='/constructor/keyboardButton'>keyboardButton</a>#a2fa4880 text:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
 <a href='/constructor/keyboardButtonUrl'>keyboardButtonUrl</a>#258aff05 text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
@@ -121,15 +121,15 @@ Each row can have a different number of columns, and user clients should properl
 <p>Buttons available only in inline keyboards:</p>
 <ul>
 <li><a href="/constructor/keyboardButtonUrl">keyboardButtonUrl</a> - Open the URL, showing a "Do you want to open this URL?" prompt (unless the URL is one of the <a href="https://github.com/DrKLO/Telegram/blob/002c01ecd37cd08ed07b3ed84d79318d091dfc85/TMessagesProj/src/main/java/org/telegram/messenger/browser/Browser.java#L351">internal URIs</a>, in which case the URL should be opened right away)</li>
-<li><a href="/constructor/keyboardButtonCallback">keyboardButtonCallback</a> - Send the callback data to the bot, optionally providing the user's 2FA SRP payload for identity verification, see <a href="#callback-queries">here for more info »</a></li>
+<li><a href="/constructor/keyboardButtonCallback">keyboardButtonCallback</a> - Send the callback data to the bot, optionally providing the user's 2FA SRP payload for identity verification, see <a href="#callback-queries">here for more info »</a></li>
 <li><a href="/constructor/keyboardButtonSwitchInline">keyboardButtonSwitchInline</a><ul>
 <li>If <code>keyboardButtonSwitchInline.same_peer</code> is set, insert the bot's username and <code>keyboardButtonSwitchInline.query</code> in the current chat's input field, triggering an <a href="/api/bots/inline">inline query</a>.</li>
 <li>If <code>keyboardButtonSwitchInline.same_peer</code> is not set, prompt the user to select one of their chats, and then insert the bot's username and <code>keyboardButtonSwitchInline.query</code> in the current chat's input field, triggering an <a href="/api/bots/inline">inline query</a>.</li>
 </ul>
 </li>
-<li><a href="/constructor/keyboardButtonGame">keyboardButtonGame</a> - Open the <a href="/constructor/game">game</a> from the attached <a href="/constructor/messageMediaGame">messageMediaGame</a> constructor, for more info <a href="/api/bots/games">see here »</a></li>
-<li><a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> - Proceed to initiating the payment flow, for more info <a href="/api/payments">see here »</a></li>
-<li><a href="/constructor/keyboardButtonUrlAuth">keyboardButtonUrlAuth</a> - Log into a website using the user's Telegram account, as specified <a href="/api/url-authorization">here »</a></li>
+<li><a href="/constructor/keyboardButtonGame">keyboardButtonGame</a> - Open the <a href="/constructor/game">game</a> from the attached <a href="/constructor/messageMediaGame">messageMediaGame</a> constructor, for more info <a href="/api/bots/games">see here »</a></li>
+<li><a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> - Proceed to initiating the payment flow, for more info <a href="/api/payments">see here »</a></li>
+<li><a href="/constructor/keyboardButtonUrlAuth">keyboardButtonUrlAuth</a> - Log into a website using the user's Telegram account, as specified <a href="/api/url-authorization">here »</a></li>
 </ul>
 <h3><a class="anchor" href="#callback-queries" id="callback-queries" name="callback-queries"><i class="anchor-icon"></i></a>Callback queries</h3>
 <p><a href="/constructor/keyboardButtonCallback">keyboardButtonCallback</a> buttons can be used to send the specified <code>data</code> payload back to the bot, when they are clicked.<br>
@@ -152,8 +152,8 @@ The same should happen when clicking on <a href="/constructor/keyboardButtonGame
 <li><code>alert</code> indicates whether the <code>message</code> should be shown as a dismissible prompt, instead of a simple toast notification</li>
 <li><code>has_url</code> Whether an URL is present</li>
 <li><code>url</code> if specified, the client should open the URL, without showing a confirmation prompt. <br>    This is safe and allowed, because here bots can only return: <ul>
-<li><a href="/api/links#bot-links">Deep links to themselves »</a></li>
-<li><a href="/api/links#game-links">Deep links to a valid game they own »</a>, if the bot has manually configured games, and the clicked button was a <a href="/constructor/keyboardButtonGame">keyboardButtonGame</a>.  </li>
+<li><a href="/api/links#bot-links">Deep links to themselves »</a></li>
+<li><a href="/api/links#game-links">Deep links to a valid game they own »</a>, if the bot has manually configured games, and the clicked button was a <a href="/constructor/keyboardButtonGame">keyboardButtonGame</a>.  </li>
 </ul>
 </li>
 <li><code>native_ui</code> whether to open game URLs in a WebView or in native UI.</li>
@@ -178,7 +178,7 @@ This is just a way of verifying the identity of the user, mainly used by the off
 <p>Either way, bots must reply to the query as quickly as possible using <a href="/method/messages.setBotCallbackAnswer">messages.setBotCallbackAnswer</a>:  </p>
 <ul>
 <li><code>query_id</code> is the <code>query_id</code> from <a href="/method/messages.getBotCallbackAnswer">messages.getBotCallbackAnswer</a>, an <a href="/constructor/updateBotCallbackQuery">updateBotCallbackQuery</a>, <a href="/constructor/updateInlineBotCallbackQuery">updateInlineBotCallbackQuery</a> or <a href="/constructor/updateBusinessBotCallbackQuery">updateBusinessBotCallbackQuery</a></li>
-<li><code>message</code>, <code>alert</code>, <code>url</code> can contain messages and URLs to trigger different client behaviour, as <a href="#sending-a-callback-query">specified above »</a></li>
+<li><code>message</code>, <code>alert</code>, <code>url</code> can contain messages and URLs to trigger different client behaviour, as <a href="#sending-a-callback-query">specified above »</a></li>
 <li><code>cache_time</code> indicates the maximum amount of time in seconds that the result of the callback query may be cached by the <strong>client</strong>.  </li>
 </ul>
 <p>If a <code>game_short_name</code> is present in the update, the bot should return the URL of the game with the specified name.<br>

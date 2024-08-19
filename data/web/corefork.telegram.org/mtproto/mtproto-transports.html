@@ -94,7 +94,7 @@ Then, payloads are wrapped in the following envelope:</p>
 <li>Length: payload length, divided by four, and encoded as 3 length bytes (little endian)</li>
 <li>Payload: the MTProto payload</li>
 </ul>
-<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
+<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
 <p>To request a quick ACK from the server for an encrypted MTProto payload, use the following envelope for <em>outgoing</em> messages, instead of the one specified above.</p>
 <p>If the packet length divided by four is smaller than 127:</p>
 <ul>
@@ -129,7 +129,7 @@ Then, payloads are wrapped in the following envelope:</p>
 <li>Length: payload length encoded as 4 length bytes (little endian)</li>
 <li>Payload: the MTProto payload</li>
 </ul>
-<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
+<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
 <p>To request a quick ACK from the server for an encrypted MTProto payload, add <code>0x80000000</code> to the <code>len</code> field before encoding it (equivalent to doing <code>len = len | (1 &lt;&lt; 31)</code>, i.e. set the most-significant bit of the length).  </p>
 <p>The server will send quick ACK tokens as a standalone 4-byte packet without a length header.</p>
 <pre><code>+----+
@@ -154,7 +154,7 @@ Then, payloads are wrapped in the following envelope:</p>
 <li>Payload: the MTProto payload</li>
 <li>Padding: A random padding string of length <code>0-15</code></li>
 </ul>
-<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
+<p><a href="#quick-ack">Quick ACK »</a> may be enabled for this transport.  </p>
 <p>To request a quick ACK from the server for an encrypted MTProto payload, add <code>0x80000000</code> to the <code>len</code> field before encoding it (equivalent to doing <code>len = len | (1 &lt;&lt; 31)</code>, i.e. set the most-significant bit of the length).  </p>
 <p>The server will send quick ACK tokens as a standalone 8 to 16-byte packet (excluding the length of the packet itself, encoded as usual), containing a 4-byte header with all bits set, followed by the ACK token (<code>abcd</code>), followed by 0 to 8 random padding bytes.</p>
 <pre><code>+----+----+----+----...----+
@@ -215,7 +215,7 @@ The encoding simply consists of the DC ID in two-byte signed little-endian form;
 <p>Two keys are extracted from both initialization payloads, using bytes at offsets <code>8-40</code>: the key extracted from the primary payload is used as encryption key, the key extracted from the secondary payload is used as decryption key.</p>
 <p>Two IVs are extracted from both initialization payloads, using bytes at offsets <code>40-56</code>: the IV extracted from the primary payload is used as encryption IV, the IV extracted from the secondary payload is used as decryption IV.</p>
 <p><strong>Only if using MTProxy</strong>, the secret is used to provide connection with the MTProxy server.
-The secret is a 16-byte string, usually distributed in its hexadecimal form along with the MTProxy host and port in <a href="/api/links#mtproxy-links">proxy deep links »</a>.</p>
+The secret is a 16-byte string, usually distributed in its hexadecimal form along with the MTProxy host and port in <a href="/api/links#mtproxy-links">proxy deep links »</a>.</p>
 <p>Often, a 17-byte version of the secret can be found: this simply indicates that the client should use a specific MTProto transport (based on the first byte, usually it's <code>0xdd</code>, to indicate that the padded intermediate protocol should be used <code>0xdddddddd</code>; however, clients should default to the padded intermediate transport whenever an additional byte in the secret is encountered).</p>
 <p>The extracted encryption and decryption keys must be concatenated with the secret (the first byte of which should be ignored if it's the 17-byte version), and the SHA256 hash of such string should be used as encryption/decryption key.</p>
 <p>The obtained encryption and decryption key/IV pairs must then be used with <strong>AES-256-CTR</strong> to encrypt and decrypt all outgoing and incoming payloads.<br>
