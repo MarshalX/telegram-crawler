@@ -45,12 +45,12 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Authorization is associated with a client's encryption key identifier: <strong>auth_key_id</strong>. No additional parameters need to be passed into methods following authorization. </p>
-<p>To log in as a <a href="/bots">bot</a>, follow <a href="/api/bots">these instructions »</a>.</p>
-<p>An alternative <a href="/api/qr-login">QR code-based login flow is also available »</a>.</p>
+<p>To log in as a <a href="/bots">bot</a>, follow <a href="/api/bots">these instructions »</a>.</p>
+<p>An alternative <a href="/api/qr-login">QR code-based login flow is also available »</a>.</p>
 <h3><a class="anchor" href="#sending-a-verification-code" id="sending-a-verification-code" name="sending-a-verification-code"><i class="anchor-icon"></i></a>Sending a verification code</h3>
 <p>Example implementations: <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java">telegram for android</a>, <a href="https://github.com/tdlib/td/tree/master/td/telegram/SendCodeHelper.cpp">tdlib</a>.</p>
 <p>To show a nicely formatted and validated phone number field, the <a href="/constructor/help.countriesList">help.countriesList</a> constructor can be obtained using the <a href="/method/help.getCountriesList">help.getCountriesList</a> method.<br>
-The <a href="/constructor/help.countriesList">help.countriesList</a> config and other configuration values are then used as described <a href="/api/config#country-information-and-login-phone-patterns">here »</a>.  </p>
+The <a href="/constructor/help.countriesList">help.countriesList</a> config and other configuration values are then used as described <a href="/api/config#country-information-and-login-phone-patterns">here »</a>.  </p>
 <p>Then, a text message containing an authorization code is sent to the user's phone using <a href="/method/auth.sendCode">auth.sendCode</a>.<br>
 However, this is not always the case, if future auth tokens are used:  </p>
 <h4><a class="anchor" href="#future-auth-tokens" id="future-auth-tokens" name="future-auth-tokens"><i class="anchor-icon"></i></a>Future auth tokens</h4>
@@ -126,7 +126,7 @@ Currently, only official apps can make use of Firebase SMS authentication: this 
 Third-party apps may log in using any of the other code delivery methods (Telegram codes, Fragment codes, email codes, future auth tokens, <a href="/api/qr-login">QR codes</a>).</p>
 <ul>
 <li><a href="/constructor/auth.sentCodeTypeSetUpEmailRequired">auth.sentCodeTypeSetUpEmailRequired</a>: if the user logins often enough, Telegram will ask the user to verify an email that will be used to send the login code.<br>
-See <a href="#email-verification">here »</a> for more info on the verification process.</li>
+See <a href="#email-verification">here »</a> for more info on the verification process.</li>
 <li><a href="/constructor/auth.sentCodeTypeEmailCode">auth.sentCodeTypeEmailCode</a>: the code was sent to the configured login email.</li>
 <li><a href="/constructor/auth.sentCodeTypeFragmentSms">auth.sentCodeTypeFragmentSms</a>: the code was sent via <a href="https://fragment.com">fragment.com</a>: open the specified <code>url</code> to log into the <a href="https://fragment.com">Fragment</a> platform with your wallet and view the code.  </li>
 <li><a href="/constructor/auth.sentCodeTypeApp">auth.sentCodeTypeApp</a>: the code was sent as a Telegram service notification to all other logged-in sessions.</li>
@@ -153,7 +153,7 @@ The <code>beginning</code> flag, if set, contains the first word of the secret p
 In this case, the phone code will then be the phone number itself, just make sure that the phone number matches the specified pattern (see <a href="/constructor/auth.sentCodeTypeFlashCall">auth.sentCodeTypeFlashCall</a>).</li>
 <li><a href="/constructor/auth.sentCodeTypeMissedCall">auth.sentCodeTypeMissedCall</a>: the code will be sent via a flash phone call, that will be closed immediately.<br>
 The last digits of the phone number that calls are the code that must be entered manually by the user.</li>
-<li><a href="#future-auth-tokens">Future auth tokens »</a></li>
+<li><a href="#future-auth-tokens">Future auth tokens »</a></li>
 </ul>
 <p>If the message takes too long (<code>timeout</code> seconds) to arrive at the phone, the <a href="/method/auth.resendCode">auth.resendCode</a> method may be invoked to resend a code of type <code>next_type</code>.
 If the same happens again, you can use <a href="/method/auth.resendCode">auth.resendCode</a> with the <code>next_type</code> returned by the previous call to <a href="/method/auth.resendCode">auth.resendCode</a>.
@@ -183,7 +183,7 @@ To cancel the verification code use <a href="/method/auth.cancelCode">auth.cance
 In this case, clients should ask the user to verify an email address that will be used to receive the login code as follows:  </p>
 <ul>
 <li>
-<p>If the <code>google_signin_allowed</code> or <code>apple_signin_allowed</code> flags are set, users can directly verify their email with Google/Apple ID as specified <a href="https://developers.google.com/identity/sign-in/android/sign-in">here (Google ID) »</a> and <a href="https://developer.apple.com/documentation/sign_in_with_apple">here (Apple ID) »</a>.<br>
+<p>If the <code>google_signin_allowed</code> or <code>apple_signin_allowed</code> flags are set, users can directly verify their email with Google/Apple ID as specified <a href="https://developers.google.com/identity/sign-in/android/sign-in">here (Google ID) »</a> and <a href="https://developer.apple.com/documentation/sign_in_with_apple">here (Apple ID) »</a>.<br>
 After obtaining the ID token, call <a href="/method/account.verifyEmail">account.verifyEmail</a>, providing the following parameters:</p>
 <ul>
 <li><code>purpose</code> - A <a href="/constructor/emailVerifyPurposeLoginSetup">emailVerifyPurposeLoginSetup</a> constructor</li>
@@ -192,7 +192,7 @@ After obtaining the ID token, call <a href="/method/account.verifyEmail">account
 <li><code>verification</code> - <a href="/constructor/emailVerificationGoogle">emailVerificationGoogle</a> or <a href="/constructor/emailVerificationApple">emailVerificationApple</a></li>
 <li><code>verification.token</code> - The ID token returned by the Google ID API.</li>
 </ul>
-<p>On success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return a <a href="/constructor/account.emailVerifiedLogin">account.emailVerifiedLogin</a> constructor with an <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor that should be handled <a href="#code-types">as usual »</a>.  </p>
+<p>On success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return a <a href="/constructor/account.emailVerifiedLogin">account.emailVerifiedLogin</a> constructor with an <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor that should be handled <a href="#code-types">as usual »</a>.  </p>
 </li>
 <li>
 <p>Otherwise, ask the user to enter an email address and then call <a href="/method/account.sendVerifyEmailCode">account.sendVerifyEmailCode</a>, providing the following parameters:</p>
@@ -210,7 +210,7 @@ After obtaining the ID token, call <a href="/method/account.verifyEmail">account
 <li><code>verification</code> - <a href="/constructor/emailVerificationCode">emailVerificationCode</a></li>
 <li><code>verification.code</code> - The verification code received by the user.</li>
 </ul>
-<p>On success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return a <a href="/constructor/account.emailVerifiedLogin">account.emailVerifiedLogin</a> constructor with an <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor that should be handled <a href="#code-types">as usual »</a>.  </p>
+<p>On success, the <a href="/method/account.verifyEmail">account.verifyEmail</a> method will return a <a href="/constructor/account.emailVerifiedLogin">account.emailVerifiedLogin</a> constructor with an <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor that should be handled <a href="#code-types">as usual »</a>.  </p>
 </li>
 </ul>
 <p>If the user cannot access their email address, an email reset may be requested using <a href="/method/auth.resetLoginEmail">auth.resetLoginEmail</a>.  </p>
@@ -240,14 +240,14 @@ In this case, instructions for <a href="/api/srp">SRP 2FA authentication</a> mus
 If the <code>unconfirmed</code> flag is set, clients should display a notification, asking the user if they recognize the session.  </p>
 <p>If the user clicks on the Yes button, invoke <a href="/method/account.changeAuthorizationSettings">account.changeAuthorizationSettings</a> with the new session's <code>hash</code> and the <code>confirmed</code> flag set, confirming the specified session.  </p>
 <p>If the user clicks on the No button, invoke <a href="/method/account.resetAuthorization">account.resetAuthorization</a> with the new session's <code>hash</code>, logging out the specified session.  </p>
-<p>If no action is taken by the user, the session will be autoconfirmed <code>authorization_autoconfirm_period</code> seconds after login (see the associated <a href="/api/config#authorization-autoconfirm-period">client configuration parameter »</a>).  </p>
+<p>If no action is taken by the user, the session will be autoconfirmed <code>authorization_autoconfirm_period</code> seconds after login (see the associated <a href="/api/config#authorization-autoconfirm-period">client configuration parameter »</a>).  </p>
 <h3><a class="anchor" href="#invalidating-login-codes" id="invalidating-login-codes" name="invalidating-login-codes"><i class="anchor-icon"></i></a>Invalidating login codes</h3>
 <p>Telegram's servers will automatically invalidate login codes if they are sent by the user to another Telegram chat, either by forwarding them or by sending them inside of a message: however, clients should also manually and immediately invalidate login codes if the user attempts to screenshot or forward a message sent by the login notification service user (ID <code>777000</code>) containing login codes.  </p>
 <p>If an incoming message that is:</p>
 <ul>
 <li>Sent by the login notification service user (ID <code>777000</code>)</li>
 <li>AND is a text message (not a media)</li>
-<li>AND contains one or more login codes, defined as a sequence of 5 to 7 decimal digits, optionally interleaved with or followed by any number of <code>-</code> characters (<a href="https://github.com/tdlib/td/blob/07c1d53a6d3cb1fad58d2822e55eef6d57363581/td/telegram/MessagesManager.cpp#L6513">example implementation »</a>)</li>
+<li>AND contains one or more login codes, defined as a sequence of 5 to 7 decimal digits, optionally interleaved with or followed by any number of <code>-</code> characters (<a href="https://github.com/tdlib/td/blob/07c1d53a6d3cb1fad58d2822e55eef6d57363581/td/telegram/MessagesManager.cpp#L6513">example implementation »</a>)</li>
 </ul>
 <p>Is either:</p>
 <ul>

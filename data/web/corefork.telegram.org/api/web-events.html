@@ -94,24 +94,24 @@ While handling is enabled, maximum 3 consecutive valid events of this type can b
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask permission from the user to send them messages.  </p>
 <p>Upon receiving this event, clients should first invoke <a href="/method/bots.canSendMessage">bots.canSendMessage</a>, to check whether they have already granted the bot permission to write them in some way.  </p>
 <ul>
-<li>If the method returns <a href="/constructor/boolTrue">boolTrue</a>, a <a href="/api/bots/webapps#write-access-requested">write_access_requested event »</a> with <code>{"status": "allowed"}</code> should be sent to the Mini App.</li>
+<li>If the method returns <a href="/constructor/boolTrue">boolTrue</a>, a <a href="/api/bots/webapps#write-access-requested">write_access_requested event »</a> with <code>{"status": "allowed"}</code> should be sent to the Mini App.</li>
 <li>Otherwise, if the method returns <a href="/constructor/boolFalse">boolFalse</a>, a prompt should be shown to the user, indicating that the bot is asking permission to send messages to them.<br>
-If the user accepts, invoke <a href="/method/bots.allowSendMessage">bots.allowSendMessage</a>, and if the method call succeeds emit a <a href="/api/bots/webapps#write-access-requested">write_access_requested event »</a> with <code>{"status": "allowed"}</code>.<br>
-Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bots.allowSendMessage</a> call fails, emit a <a href="/api/bots/webapps#write-access-requested">write_access_requested event »</a> with <code>{"status": "cancelled"}</code>.</li>
+If the user accepts, invoke <a href="/method/bots.allowSendMessage">bots.allowSendMessage</a>, and if the method call succeeds emit a <a href="/api/bots/webapps#write-access-requested">write_access_requested event »</a> with <code>{"status": "allowed"}</code>.<br>
+Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bots.allowSendMessage</a> call fails, emit a <a href="/api/bots/webapps#write-access-requested">write_access_requested event »</a> with <code>{"status": "cancelled"}</code>.</li>
 </ul>
 <h4><a class="anchor" href="#web-app-request-phone" id="web-app-request-phone" name="web-app-request-phone"><i class="anchor-icon"></i></a><code>web_app_request_phone</code></h4>
 <p>Event data: <code>null</code></p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the user to share their phone number as a contact.</p>
 <p>Upon receiving this event, clients should show a prompt to the user, indicating that the bot is asking them to share their phone number (optionally also asking the user to unblock the bot, if it's currently blocked).  </p>
-<p>If they accept, the user's phone number should be shared by sending a contact to the bot (unblocking it first, if it's currently blocked by the user); if all RPC queries (to unblock the bot, to send the message) succeed, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "sent"}</code>.  </p>
-<p>If the user refuses or any intermdiate method call fails, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "cancelled"}</code>.  </p>
+<p>If they accept, the user's phone number should be shared by sending a contact to the bot (unblocking it first, if it's currently blocked by the user); if all RPC queries (to unblock the bot, to send the message) succeed, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "sent"}</code>.  </p>
+<p>If the user refuses or any intermdiate method call fails, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "cancelled"}</code>.  </p>
 <h4><a class="anchor" href="#web-app-biometry-get-info" id="web-app-biometry-get-info" name="web-app-biometry-get-info"><i class="anchor-icon"></i></a><code>web_app_biometry_get_info</code></h4>
 <p>Event data: <code>null</code></p>
-<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the client to initialize the biometric authentication manager object for the current bot, emitting a <a href="/api/bots/webapps#biometry-info-received"><code>biometry_info_received</code> event »</a> on completion.  </p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the client to initialize the biometric authentication manager object for the current bot, emitting a <a href="/api/bots/webapps#biometry-info-received"><code>biometry_info_received</code> event »</a> on completion.  </p>
 <p>This request should just initialize the client-side state, i.e. by checking if biometric authentication is even available or not, it should not ask the user anything.  </p>
 <h4><a class="anchor" href="#web-app-biometry-request-access" id="web-app-biometry-request-access" name="web-app-biometry-request-access"><i class="anchor-icon"></i></a><code>web_app_biometry_request_access</code></h4>
 <p>Event data: a JSON object, with an optional <code>reason</code> string field (1-128 chars, used in the prompt), containing the reason why the bot is asking to use biometric authentication.  </p>
-<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the user permission to use biometric authentication, emitting a <a href="/api/bots/webapps#biometry-info-received"><code>biometry_info_received</code> event »</a> on completion.  </p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the user permission to use biometric authentication, emitting a <a href="/api/bots/webapps#biometry-info-received"><code>biometry_info_received</code> event »</a> on completion.  </p>
 <p>This request should not actually prompt biometric authentication, it should just ask the user permission to use it through a popup that should be shown only <strong>once</strong> (for this bot): no popup must be shown if the user has already previously allowed, denied or cancelled a biometry permission popup from this bot.</p>
 <h4><a class="anchor" href="#web-app-biometry-update-token" id="web-app-biometry-update-token" name="web-app-biometry-update-token"><i class="anchor-icon"></i></a><code>web_app_biometry_update_token</code></h4>
 <p>Event data: a JSON object with the following fields:</p>
@@ -119,15 +119,15 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 <li><code>token</code> - The new token (string, 0-1024 chars), or an empty string to remove it.  </li>
 <li><code>reason</code> - Optional string field, containing the reason why the bot is asking to authenticate using biometrics (1-128 chars, used in the prompt).  </li>
 </ul>
-<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to authenticate using biometrics and store the biometric token securely stored on-device, emitting a <a href="/api/bots/webapps#biometry-token-updated"><code>biometry_token_updated</code> event »</a> on completion.  </p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to authenticate using biometrics and store the biometric token securely stored on-device, emitting a <a href="/api/bots/webapps#biometry-token-updated"><code>biometry_token_updated</code> event »</a> on completion.  </p>
 <p>This token (which may be for example the private key of a cryptocurrency wallet, or some other data the app must keep safe) must be safely stored by the Telegram client, associating it to the bot that owns the mini app.  </p>
 <p>For example, the token may be directly stored in the on-device secure storage, accessible only after biometric authentication, or it may be stored to normal, non-secure storage, but <strong>in encrypted form</strong>, encrypted using the key returned from the device's secure storage after biometric authentication (for example on Android, using the CryptoObject returned by <a href="https://developer.android.com/reference/android/hardware/biometrics/BiometricPrompt.AuthenticationResult#getCryptoObject\(\)">the biometric prompt authentication result</a>).  </p>
-<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-token-updated"><code>biometry_token_updated</code> event »</a>.  </p>
+<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-token-updated"><code>biometry_token_updated</code> event »</a>.  </p>
 <h4><a class="anchor" href="#web-app-biometry-request-auth" id="web-app-biometry-request-auth" name="web-app-biometry-request-auth"><i class="anchor-icon"></i></a><code>web_app_biometry_request_auth</code></h4>
 <p>Event data: a JSON object, with an optional <code>reason</code> string field, containing the reason why the bot is asking to authenticate using biometrics (1-128 chars, used in the prompt).  </p>
-<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to authenticate using biometrics and fetch the <a href="#web-app-biometry-update-token">previously stored secure token</a>, emitting a <a href="/api/bots/webapps#biometry-auth-requested"><code>biometry_auth_requested</code> event »</a> on completion, containing either an error, or the decrypted <a href="#web-app-biometry-update-token">biometric token »</a> (or an empty string if no token was configured yet).  </p>
-<p>Should only be used if the <code>token_saved</code> field of the <a href="/api/bots/webapps#biometry-info-received">biometry_info_received object »</a> is equal to <code>true</code>, otherwise set a new token first using <a href="#web-app-biometry-update-token">web_app_biometry_update_token »</a>.  </p>
-<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-auth-requested"><code>biometry_auth_requested</code> event »</a>.  </p>
+<p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to authenticate using biometrics and fetch the <a href="#web-app-biometry-update-token">previously stored secure token</a>, emitting a <a href="/api/bots/webapps#biometry-auth-requested"><code>biometry_auth_requested</code> event »</a> on completion, containing either an error, or the decrypted <a href="#web-app-biometry-update-token">biometric token »</a> (or an empty string if no token was configured yet).  </p>
+<p>Should only be used if the <code>token_saved</code> field of the <a href="/api/bots/webapps#biometry-info-received">biometry_info_received object »</a> is equal to <code>true</code>, otherwise set a new token first using <a href="#web-app-biometry-update-token">web_app_biometry_update_token »</a>.  </p>
+<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-auth-requested"><code>biometry_auth_requested</code> event »</a>.  </p>
 <h4><a class="anchor" href="#web-app-biometry-open-settings" id="web-app-biometry-open-settings" name="web-app-biometry-open-settings"><i class="anchor-icon"></i></a><code>web_app_biometry_open_settings</code></h4>
 <p>Event data: <code>null</code></p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to open the biometric authentication settings page for bots, useful when the app needs to request permission to use biometrics from users who have previously denied it.</p>
@@ -141,7 +141,7 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 </ul>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to make custom method calls to Telegram's servers on behalf of the user.  </p>
 <p>This event should trigger a <a href="/method/bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a> request, passing the <code>method</code> to <code>custom_method</code>, and the <code>params</code> to <code>params</code>.  </p>
-<p>Upon receiving a reply, a <a href="/api/bots/webapps#custom-method-invoked">custom_method_invoked event »</a> should be emitted, with the following fields:</p>
+<p>Upon receiving a reply, a <a href="/api/bots/webapps#custom-method-invoked">custom_method_invoked event »</a> should be emitted, with the following fields:</p>
 <ul>
 <li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_invoke_custom_method</code> object</li>
 <li><code>result</code> - The JSON data contained in the response of the <a href="/method/bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a> method, if the method call succeeded</li>
@@ -153,26 +153,26 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 <li><code>req_id</code> - A string with the ID of the current request</li>
 </ul>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to obtain the contents of the system clipboard.  </p>
-<p>Only for Mini Apps owned by bots added to the <a href="/api/bots/attach">attachment menu</a>, regardles of how the Mini App itself was launched, this event should trigger a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the following payload:  </p>
+<p>Only for Mini Apps owned by bots added to the <a href="/api/bots/attach">attachment menu</a>, regardles of how the Mini App itself was launched, this event should trigger a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the following payload:  </p>
 <ul>
 <li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_read_text_from_clipboard</code> request</li>
 <li><code>data</code> - A string with the clipboard contents</li>
 </ul>
 <p>Note that this method can be called only in response to a user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main or settings button).<br>
-Note that user interactions must have a TTL of 10 seconds: events of this type must be ignored and a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must be sent if the last Mini App user interaction (as described above) happened more than 10 seconds ago.  </p>
-<p>A <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must also be sent if the bot is not installed in the <a href="/api/bots/attach">attachment menu</a>.</p>
+Note that user interactions must have a TTL of 10 seconds: events of this type must be ignored and a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must be sent if the last Mini App user interaction (as described above) happened more than 10 seconds ago.  </p>
+<p>A <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must also be sent if the bot is not installed in the <a href="/api/bots/attach">attachment menu</a>.</p>
 <h4><a class="anchor" href="#web-app-open-scan-qr-popup" id="web-app-open-scan-qr-popup" name="web-app-open-scan-qr-popup"><i class="anchor-icon"></i></a><code>web_app_open_scan_qr_popup</code></h4>
 <p>Event data: a JSON object with the following fields:</p>
 <ul>
 <li><code>text</code> - Optional string, containing the text to be displayed under the 'Scan QR' heading, 0-64 characters.  </li>
 </ul>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to prompt the client to open the native QR code scanner and start continuously scanning for QR codes.  </p>
-<p>A <a href="/api/bots/webapps#qr-text-received"><code>qr_text_received</code> event »</a> should be emitted every time a new QR code is scanned, until the user closes the popup via the UI or the Mini App closes the popup with a <a href="#web-app-close-scan-qr-popup">web_app_close_scan_qr_popup</a> event.</p>
-<p>Closing the popup should emit a <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a>; the same event should be emitted if the scan QR code popup cannot be opened due to permission issues.  </p>
+<p>A <a href="/api/bots/webapps#qr-text-received"><code>qr_text_received</code> event »</a> should be emitted every time a new QR code is scanned, until the user closes the popup via the UI or the Mini App closes the popup with a <a href="#web-app-close-scan-qr-popup">web_app_close_scan_qr_popup</a> event.</p>
+<p>Closing the popup should emit a <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a>; the same event should be emitted if the scan QR code popup cannot be opened due to permission issues.  </p>
 <h4><a class="anchor" href="#web-app-close-scan-qr-popup" id="web-app-close-scan-qr-popup" name="web-app-close-scan-qr-popup"><i class="anchor-icon"></i></a><code>web_app_close_scan_qr_popup</code></h4>
 <p>Event data: <code>null</code></p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to prompt the client to close the native QR code scanner opened using <a href="#web-app-open-scan-qr-popup">web_app_open_scan_qr_popup</a>.  </p>
-<p>The <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a> event should <em>not</em> be emitted if the QR code popup is closed using this event.  </p>
+<p>The <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a> event should <em>not</em> be emitted if the QR code popup is closed using this event.  </p>
 <h4><a class="anchor" href="#web-app-setup-closing-behavior" id="web-app-setup-closing-behavior" name="web-app-setup-closing-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_closing_behavior</code></h4>
 <p>Event data: a JSON object with a boolean <code>need_confirmation</code>.</p>
 <p>If equal to <code>true</code>, the client should require user confirmation with a "Changes that you made may not be saved." popup with "Cancel"/"Close anyway" buttons before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
@@ -193,7 +193,7 @@ Note that user interactions must have a TTL of 10 seconds: events of this type m
 <p>Used to set the mini app header and upper overscroll color.  </p>
 <h4><a class="anchor" href="#web-app-data-send" id="web-app-data-send" name="web-app-data-send"><i class="anchor-icon"></i></a><code>web_app_data_send</code></h4>
 <p>Event data: a JSON object with a string <code>data</code> field.  </p>
-<p>Used <strong>only</strong> by <a href="/api/bots/webapps#keyboard-button-mini-apps">keyboard button mini apps</a> to send back data to the bot as specified <a href="/api/bots/webapps#keyboard-button-mini-apps">here »</a>. The Mini App will be closed.  </p>
+<p>Used <strong>only</strong> by <a href="/api/bots/webapps#keyboard-button-mini-apps">keyboard button mini apps</a> to send back data to the bot as specified <a href="/api/bots/webapps#keyboard-button-mini-apps">here »</a>. The Mini App will be closed.  </p>
 <h4><a class="anchor" href="#web-app-switch-inline-query" id="web-app-switch-inline-query" name="web-app-switch-inline-query"><i class="anchor-icon"></i></a><code>web_app_switch_inline_query</code></h4>
 <p>Event data: a JSON object with the following keys:</p>
 <ul>
@@ -204,7 +204,7 @@ If non-empty, the client should prompt the user to choose a specific chat of the
 The array values specify which types of chats the user will be able to choose from.<br>
 If empty, the current chat is used.  </li>
 </ul>
-<p>Used by <a href="/api/bots/webapps#inline-mode-mini-apps">inline mode mini apps</a> to send back data to the bot as specified <a href="/api/bots/webapps#inline-mode-mini-apps">here »</a>. The Mini App will be closed.  </p>
+<p>Used by <a href="/api/bots/webapps#inline-mode-mini-apps">inline mode mini apps</a> to send back data to the bot as specified <a href="/api/bots/webapps#inline-mode-mini-apps">here »</a>. The Mini App will be closed.  </p>
 <h4><a class="anchor" href="#web-app-trigger-haptic-feedback" id="web-app-trigger-haptic-feedback" name="web-app-trigger-haptic-feedback"><i class="anchor-icon"></i></a><code>web_app_trigger_haptic_feedback</code></h4>
 <p>Event data: a JSON object with the following fields:</p>
 <ul>
@@ -261,7 +261,7 @@ Note that user interactions must have a TTL of 1 second: events of this type mus
 <p>Used to open a <a href="/api/links">t.me deep link</a>. The Mini App must be closed.</p>
 <h4><a class="anchor" href="#web-app-open-invoice" id="web-app-open-invoice" name="web-app-open-invoice"><i class="anchor-icon"></i></a><code>web_app_open_invoice</code></h4>
 <p>Event data: a JSON object with a string <code>slug</code> field, containing an <a href="/api/links#invoice-links">invoice deep link</a>.</p>
-<p>Used to initiate <a href="/api/payments">payment of an invoice »</a>, by opening an invoice popup over the Mini App: the Mini App itself must not be closed.  </p>
+<p>Used to initiate <a href="/api/payments">payment of an invoice »</a>, by opening an invoice popup over the Mini App: the Mini App itself must not be closed.  </p>
 <p>The payment status must be reported back to the mini app using <a href="/api/bots/webapps#invoice-closed">invoice_closed</a>.</p>
 <h4><a class="anchor" href="#web-app-expand" id="web-app-expand" name="web-app-expand"><i class="anchor-icon"></i></a><code>web_app_expand</code></h4>
 <p>No event payload.</p>
@@ -306,7 +306,7 @@ Note that on supported platforms, the OS back button can be used instead of a cu
 <li><code>credentials</code> is a service-specific JSON object with information about the payment credentials provided by the user to the payment system.  </li>
 </ul>
 <p><strong>Neither Telegram, nor bots will have access to your credit card information.</strong><br>
-Credit card details will be handled only by the payment system, see the <a href="/api/payments">payment documentation for more info »</a>.  </p>
+Credit card details will be handled only by the payment system, see the <a href="/api/payments">payment documentation for more info »</a>.  </p>
 <h4><a class="anchor" href="#share-score" id="share-score" name="share-score"><i class="anchor-icon"></i></a><code>share_score</code></h4>
 <p>No event payload.</p>
 <p>Will be called by games when the user explicitly clicks on the <strong>share score</strong> button to share the game, along with their score.<br>
