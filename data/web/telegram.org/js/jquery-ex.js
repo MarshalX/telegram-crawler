@@ -1781,6 +1781,25 @@ function formatNumber(number, decimals, decPoint, thousandsSep) {
   }
   return s.join(dec)
 }
+function formatDuration(duration) {
+  duration = Math.floor(duration);
+  duration = Math.max(0, duration);
+  var duration_str = '';
+  if (duration >= 3600) {
+    var hours = Math.floor(duration / 3600);
+    duration_str += hours + ':';
+    var minutes = Math.floor((duration % 3600) / 60);
+    if (minutes < 10) minutes = '0' + minutes;
+  } else {
+    var minutes = Math.floor(duration / 60);
+  }
+  duration_str += minutes + ':';
+  var seconds = duration % 60;
+  if (seconds < 10) seconds = '0' + seconds;
+  duration_str += seconds;
+  return duration_str;
+}
+
 function stopImmediatePropagation(e) {
   e.stopImmediatePropagation();
 }

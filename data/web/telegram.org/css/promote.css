@@ -323,6 +323,72 @@ a.input:hover {
   z-index: 1;
 }
 
+.circle-progress-wrap {
+  transform: scale3d(0, 0, 1);
+  visibility: hidden;
+  opacity: 0.2;
+  transform-origin: 50%;
+  transition: all ease .2s;
+}
+.circle-progress-bg {
+  fill: rgba(0, 0, 0, .35);
+  r: 20px;
+}
+.circle-progress {
+  transition: stroke-dashoffset ease .3s, stroke-dasharray ease .3s, stroke-width ease .3s, r ease .3s;
+  stroke: #fff;
+  stroke-width: 0;
+  stroke-linecap: round;
+  fill: transparent;
+  transform: rotateZ(-90deg);
+  transform-origin: 50%;
+  stroke-dasharray: 125px;
+  r: 20px;
+}
+.file-loading .circle-progress-wrap {
+  transform: scale3d(1, 1, 1);
+  visibility: visible;
+  opacity: 1;
+}
+.file-loading .circle-progress {
+  animation: rotate-circle linear 2s infinite;
+  stroke-width: 1.5px;
+  stroke-dasharray: 106px;
+  r: 17px;
+}
+.file-loaded .circle-progress {
+  animation: rotate-circle linear 2s infinite;
+  stroke-width: 0;
+  stroke-dashoffset: 0;
+  stroke-dasharray: 125px;
+  r: 20px;
+}
+.circle-progress.infinite {
+  transition: stroke-width ease .3s, r ease .3s;
+}
+.file-loading .circle-progress.infinite,
+.file-loaded .circle-progress.infinite {
+  animation: rotate-circle linear 1.5s infinite, resize-circle linear 360s infinite;
+}
+
+@-webkit-keyframes rotate-circle {
+  from { transform: rotateZ(-90deg); }
+  to   { transform: rotateZ(270deg); }
+}
+@keyframes rotate-circle {
+  from { transform: rotateZ(-90deg); }
+  to   { transform: rotateZ(270deg); }
+}
+
+@-webkit-keyframes resize-circle {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 12500px; }
+}
+@keyframes resize-circle {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 12500px; }
+}
+
 .btn:focus,
 .btn:active:focus,
 button:focus,
@@ -1676,7 +1742,7 @@ input.pr-form-control:focus {
   color: #999;
 }
 .pr-preview-ad-wrap {
-  height: 240px;
+  min-height: 240px;
   background: #6fa786 url('/img/ad_preview_bg.jpg') no-repeat center;
   background-size: cover;
   overflow: hidden;
@@ -1730,6 +1796,9 @@ input.pr-form-control:focus {
 }
 .pr-preview-ad-message-wrap.picture .ad-msg-photo-wrap {
   opacity: 1;
+}
+.pr-preview-ad-message-wrap.has-media .ad-msg-photo-wrap {
+  display: none;
 }
 .pr-preview-ad-message .ad-msg-photo,
 .pr-preview-ad-message .ad-msg-photo img {
@@ -1828,6 +1897,9 @@ input.pr-form-control:focus {
   color: #000;
   margin-top: 5px;
 }
+.pr-preview-ad-message .ad-msg-media {
+  margin-top: 5px;
+}
 .pr-preview-ad-message .ad-msg-date {
   font-size: 12px;
   line-height: 14px;
@@ -1905,6 +1977,17 @@ input.pr-form-control:focus {
   top: 0;
   bottom: 0;
 }
+.pr-preview-ad-message .ad-msg-link-preview-media {
+  margin: 7px 0 -1px;
+}
+.pr-preview-ad-message .ad-msg-link-preview-media .pr-ad-media {
+  border-radius: 4px;
+}
+.pr-preview-ad-message .ad-msg-link-preview-media .pr-ad-media-duration {
+  font-size: 10px;
+  line-height: 12px;
+  padding: 2px 4px 2px;
+}
 .pr-preview-ad-message .ad-msg-link-preview-sitename,
 .pr-preview-ad-message .ad-msg-link-preview-title {
   line-height: 16px;
@@ -1941,6 +2024,9 @@ input.pr-form-control:focus {
   opacity: 1;
   transform: translateX(0px);
   transition: margin 0s ease, transform .15s ease, opacity .15s ease;
+}
+.pr-preview-ad-wrap .pr-preview-ad-message-wrap.has-media .pr-preview-ad-message .ad-msg-link-preview-image {
+  display: none;
 }
 .pr-preview-ad-message .ad-msg-link-preview-btn {
   font-size: 12px;
@@ -4411,6 +4497,129 @@ a.pr-popup-account:hover {
   font-size: 14px;
   line-height: 21px;
   color: #808080;
+}
+
+.pr-ad-media-wrap {
+  padding: 1px 0 8px;
+}
+.pr-ad-media {
+  position: relative;
+  border-radius: 8px;
+  padding-top: 56.25%;
+  overflow: hidden;
+}
+.is-video .pr-ad-media {
+  cursor: pointer;
+}
+.pr-ad-media .pr-ad-media-photo,
+.pr-ad-media .pr-ad-media-video {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.pr-ad-media-photo {
+  background: no-repeat center;
+  background-size: cover;
+}
+.pr-ad-media-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover
+}
+.pr-ad-media-duration {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 11px;
+  line-height: 13px;
+  padding: 3px 5px 2px;
+  margin: 5px;
+  border-radius: 6px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, .35);
+  transition: all ease .2s;
+  pointer-events: none;
+}
+.pr-ad-media-play,
+.pr-ad-media-duration,
+.is-video .pr-ad-media-duration:empty,
+.is-video.is-playing .pr-ad-media-play,
+.is-video.file-loading .pr-ad-media-play,
+.is-video.file-loading .pr-ad-media-duration {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.is-video .pr-ad-media-play,
+.is-video .pr-ad-media-duration {
+  opacity: 1;
+  visibility: visible;
+}
+.pr-ad-media-loader {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+.pr-ad-media-play {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 42px;
+  height: 42px;
+  margin: auto;
+  border-radius: 21px;
+  background-color: rgba(0, 0, 0, .35);
+  transition: all ease .2s;
+  cursor: pointer;
+}
+.pr-ad-media-play:before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  vertical-align: top;
+  margin: 9px;
+  background: url('data:image/svg+xml,%3Csvg%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m8.69%204.21%2011.07%206.65c.63.38.84%201.19.46%201.83-.11.18-.27.34-.46.45l-11.07%206.65c-.64.38-1.45.17-1.83-.46-.13-.21-.19-.44-.19-.68v-13.3c0-.73.59-1.33%201.33-1.33.24%200%20.48.07.69.19z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E') no-repeat center;
+}
+.pr-ad-media-remove {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  margin: 5px;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, .35);
+  cursor: pointer;
+}
+.pr-ad-media-remove:before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: top;
+  margin: 4px;
+  background: url('data:image/svg+xml,%3Csvg%20height%3D%2218%22%20viewBox%3D%220%200%2018%2018%22%20width%3D%2218%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m3.88%206%20.42%208.57c.04.8.7%201.43%201.5%201.43h6.65c.8%200%201.46-.63%201.5-1.43l.43-8.57m-11.6-2.5h12.56m-8.46%209.25v-5.5m2.25%205.5v-5.5m2.25%205.5v-5.5m-4.5-3.75v-1c0-.69.55-1.25%201.25-1.25h2c.69%200%201.25.56%201.25%201.25v1%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-linecap%3D%22round%22%20stroke-width%3D%221.25%22%2F%3E%3C%2Fsvg%3E') no-repeat center;
+}
+
+.pr-form-column .pr-btn.pr-edit-media-button {
+  padding: 10px 22px;
+}
+.pr-edit-media-button:before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  vertical-align: top;
+  margin-right: 5px;
+  background: url('data:image/svg+xml,%3Csvg%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20width%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cmask%20id%3D%22a%22%20fill%3D%22%23fff%22%3E%3Cpath%20d%3D%22m20%200v20h-20v-20zm-4%20.15h-.14c-1.08%200-1.95.87-1.95%201.95v.03h-.9c-1.07%200-1.95.87-1.95%201.95v.14c0%201.08.88%201.95%201.95%201.95h.9v.9c0%201.07.87%201.94%201.95%201.94h.14c1.08%200%201.95-.87%201.95-1.94v-.9h.03c1.07%200%201.94-.87%201.94-1.95v-.14c0-1.08-.87-1.95-1.94-1.95h-.03v-.03c0-1.08-.87-1.95-1.95-1.95z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fmask%3E%3Cg%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%3E%3Crect%20height%3D%227.28%22%20rx%3D%22.79%22%20width%3D%221.58%22%20x%3D%2215.14%22%20y%3D%22.51%22%2F%3E%3Crect%20height%3D%221.58%22%20rx%3D%22.79%22%20width%3D%227.28%22%20x%3D%2212.29%22%20y%3D%223.36%22%2F%3E%3Cpath%20d%3D%22m13.24%202.69c2.1%200%203.8%201.69%203.8%203.79v7.59c0%202.1-1.7%203.8-3.8%203.8h-7.59c-2.1%200-3.8-1.7-3.8-3.8v-7.59c0-2.1%201.7-3.79%203.8-3.79zm-1.21%207.19c-.17-.23-.51-.23-.69-.01l-2.5%202.74c-.12.13-.32.14-.44.02l-1.64-1.51c-.18-.21-.51-.2-.67.02l-1.85%202.74c-.23.28-.23%201.31.65%201.31h9.21c.8%200%20.8-1.02.58-1.31z%22%20mask%3D%22url%28%23a%29%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E') no-repeat center;
 }
 
 .pr-schedule-input {

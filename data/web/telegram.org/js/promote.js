@@ -216,7 +216,7 @@ var Ads = {
     var $msg = $formGroup.find('>.pr-form-control-msg');
     if (!$msg.size() && hint_text) {
       $msg = $('<div class="pr-form-control-msg shide" />');
-      $formGroup.find('>.pr-form-control-wrap,>.datetime-group').after($msg);
+      $formGroup.find('>.pr-form-control-wrap,>.datetime-group,>.pr-btn').after($msg);
     }
     $msg.toggleClass('no-hint', !$hint.text().length);
     if (hint_text) {
@@ -244,6 +244,15 @@ var Ads = {
   onSelectChange: function(field, value, valueFull) {
     var $fieldEl = Aj.state.$form.field(field);
     Ads.hideFieldError($fieldEl);
+    if (Aj.state.selectList) {
+      for (var i = 0; i < Aj.state.selectList.length; i++) {
+        var selectData = Aj.state.selectList[i];
+        if (selectData.field == field &&
+            selectData.update_cpm) {
+          NewAd.adPostCheck(Aj.state.$form);
+        }
+      }
+    }
   },
   updateTime: function(context) {
     $('time[datetime]', context).each(function () {
@@ -424,6 +433,9 @@ var Ads = {
     $('.pr-review-ad-preview .js-preview-text tg-emoji', cont).each(function() {
       TEmoji.init(this);
     });
+    $('.pr-review-ad-preview .js-preview-media', cont).each(function() {
+      NewAd.initAdMedia(this);
+    });
   },
   initSelect: function($form, field, options) {
     var $selectEl = $form.field(field);
@@ -543,6 +555,10 @@ var NewAd = {
       cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
       cont.on('click.curPage', '.js-promote-photo', NewAd.eReplacePromotePhoto);
       cont.on('change.curPage', '.js-promote-photo > .file-upload', NewAd.eUploadPromotePhoto);
+      cont.on('click.curPage', '.js-ad-media', NewAd.ePlayAdMedia);
+      cont.on('click.curPage', '.js-ad-media-remove', NewAd.eRemoveAdMedia);
+      cont.on('click.curPage', '.js-add-media-btn', NewAd.eReplaceAdMedia);
+      cont.on('change.curPage', '.js-add-media-btn > .file-upload', NewAd.eUploadAdMedia);
       cont.on('click.curPage', '.clear-draft-btn', NewAd.eClearDraft);
       cont.on('click.curPage', '.create-new-ad-btn', NewAd.eSubmitForm);
       cont.on('click.curPage', '.js-open-daily-budget', NewAd.eOpenDailyBudget);
@@ -608,6 +624,7 @@ var NewAd = {
       state.websiteNameField = state.$form.field('website_name');
       state.websiteNameField.on('change.curPage', NewAd.onWebsiteNameChange);
       state.websitePhotoField = state.$form.field('website_photo');
+      state.mediaField = state.$form.field('media');
       state.buttonField = state.$form.field('button');
       state.buttonField.on('ddchange.curPage', NewAd.onButtonChange);
       state.adInfoField = state.$form.field('ad_info');
@@ -631,6 +648,7 @@ var NewAd = {
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
       state.similarChannelsPopup = $('.js-similar-channels-popup', cont);
+      NewAd.updateAdMedia(state.mediaField);
       NewAd.updateAdPreview(state.$form, state.previewData);
       NewAd.updateAdTargetOverview();
       setTimeout(function() {
@@ -811,6 +829,7 @@ var NewAd = {
     var buttonField = $form.field('button');
     var websiteNameField = $form.field('website_name');
     var websitePhotoField = $form.field('website_photo');
+    var mediaField = $form.field('media');
     var cpmField = $form.field('cpm');
     var deviceField = $form.field('device');
     var text = textField.value();
@@ -818,6 +837,8 @@ var NewAd = {
     var button = buttonField.data('value');
     var website_name = websiteNameField.value();
     var website_photo = websitePhotoField.value();
+    var media = mediaField.value();
+    var target_type = $form.field('target_type').value();
     var $formGroup = promoteUrlField.fieldEl().parents('.form-group');
     var $cpmFormGroup = cpmField.fieldEl().parents('.form-group');
     var device = deviceField.data('value');
@@ -831,13 +852,22 @@ var NewAd = {
       button: button,
       website_name: website_name,
       website_photo: website_photo,
-      device: device
+      media: media,
+      device: device,
+      target_type: target_type
     };
     if (Aj.state.adId) {
       params.ad_id = Aj.state.adId;
     }
     if ($form.field('picture').prop('checked')) {
       params.picture = 1;
+    }
+    if (Aj.state.selectList) {
+      for (var i = 0; i < Aj.state.selectList.length; i++) {
+        var selectData = Aj.state.selectList[i];
+        var values = $form.field(selectData.field).data('value') || [];
+        params[selectData.field] = values.join(';');
+      }
     }
     $formGroup.addClass('field-loading');
     $cpmFormGroup.addClass('field-loading');
@@ -1281,7 +1311,7 @@ var NewAd = {
       var $formGroup = promoteUrlField.fieldEl().parents('.form-group');
       var $promotePhoto = $('.js-promote-photo', $form);
       $formGroup.addClass('field-loading');
-      var xhr = Upload.uploadFile(files[0], function onSuccess(result) {
+      var xhr = Upload.uploadFile('promote_photo', files[0], function onSuccess(result) {
         $formGroup.removeClass('field-loading');
         $fileInput.remove();
         if (result.website_photo) {
@@ -1301,6 +1331,170 @@ var NewAd = {
       $fileInput.data('xhr', xhr);
     }
   },
+  ePlayAdMedia: function(e) {
+    e && e.stopImmediatePropagation();
+    e && e.preventDefault();
+    var $form = $(this).parents('form');
+    var $field = $form.field('media');
+    var $formGroup = $field.parents('.form-group');
+    var $mediaWrap = $('.js-ad-media-wrap', $formGroup);
+    $('video', $mediaWrap).first().each(function() {
+      if (this.paused) {
+        this.play();
+      } else {
+        this.pause();
+      }
+      $mediaWrap.toggleClass('is-playing', !this.paused);
+    });
+  },
+  eRemoveAdMedia: function(e) {
+    e && e.stopImmediatePropagation();
+    e && e.preventDefault();
+    var $form = $(this).parents('form');
+    var $field = $form.field('media');
+    var $formGroup = $field.parents('.form-group');
+    var $mediaWrap = $('.js-ad-media-wrap', $formGroup);
+    if ($mediaWrap.hasClass('file-loading')) {
+      var xhr = $mediaWrap.data('xhr');
+      if (xhr) {
+        xhr.aborted = true;
+        xhr.abort();
+      }
+    }
+    $field.value('').data('has-media', false);
+    NewAd.updateAdMedia($field);
+    NewAd.adPostCheck($form);
+  },
+  resetAdMediaUpload: function($form) {
+    var $mediaWrap = $('.js-ad-media-wrap', $form);
+    if ($mediaWrap.hasClass('file-loading')) {
+      var xhr = $mediaWrap.data('xhr');
+      if (xhr) {
+        xhr.aborted = true;
+        xhr.abort();
+      }
+      var $field = $form.field('media');
+      $field.value('').data('has-media', false);
+      NewAd.updateAdMedia($field);
+    }
+  },
+  eReplaceAdMedia: function(e) {
+    e && e.stopImmediatePropagation();
+    e && e.preventDefault();
+    $('<input type="file" accept="image/jpeg,image/jpg,image/png,video/mp4" class="file-upload hide">').appendTo(this).click();
+  },
+  eUploadAdMedia: function(e) {
+    var $fileInput = $(this);
+    var $form = $(this).parents('form');
+    var $field = $form.field('media');
+    var files = this.files || [];
+    var photo_size_limit = Aj.state.mediaPhotoSizeLimit || 1048576;
+    var video_size_limit = Aj.state.mediaVideoSizeLimit || 10485760;
+    Ads.hideFieldError($field);
+    if (files.length > 0) {
+      var file = files[0];
+      var is_video = file.type == 'video/mp4';
+      var size_limit = is_video ? video_size_limit : photo_size_limit;
+      if (file.size > size_limit) {
+        var err_msg = l(is_video ? 'ADS_ERROR_VIDEO_IS_TOO_BIG' : 'ADS_ERROR_PHOTO_IS_TOO_BIG', {
+          size_limit: cleanHTML(wrapSize(size_limit)),
+        });
+        Ads.showFieldError($field, err_msg);
+        return false;
+      }
+      var $formGroup = $field.parents('.form-group');
+      var $mediaWrap = $('.js-ad-media-wrap', $formGroup);
+      NewAd.wrapAdMedia($field, file);
+      $mediaWrap.addClass('file-loading');
+      var xhr = Upload.uploadFile('ad_media', files[0], function onSuccess(result) {
+        $mediaWrap.removeClass('file-loading');
+        $fileInput.remove();
+        if (result.media) {
+          $field.value(result.media);
+        }
+        NewAd.adPostCheck($form);
+      }, function onProgress(loaded, total) {
+        var progress = total ? loaded / total : 0;
+        progress = Math.max(0, Math.min(progress, 1));
+        $('.circle-progress', $mediaWrap).attr('stroke-dashoffset', 106 * (1 - progress));
+      }, function onError(error) {
+        $mediaWrap.removeClass('file-loading');
+        $fileInput.remove();
+        if (xhr.aborted) return;
+        showAlert(error);
+      });
+      $mediaWrap.data('xhr', xhr);
+    }
+  },
+  initAdMedia: function($mediaWrap) {
+    var $content = $('.js-ad-media-content', $mediaWrap);
+    var $duration = $('.js-ad-media-duration', $mediaWrap);
+    var $video = $('video', $content);
+    if ($video.size()) {
+      $video.on('loadedmetadata', function(e) {
+        console.log('loadedmetadata', this.duration);
+        if (this.duration) {
+          var duration = Math.round(this.duration);
+          var duration_str = formatDuration(duration);
+          $duration.html(duration_str);
+        }
+      });
+      $video.on('timeupdate', function(e) {
+        console.log('timeupdate', this.duration);
+        if (this.duration) {
+          var duration = Math.round(this.duration);
+          var duration_str = formatDuration(duration - this.currentTime);
+          $duration.html(duration_str);
+        }
+      });
+      $video.each(function(e) {
+        this.load();
+      });
+    }
+  },
+  updateAdMedia: function($field) {
+    var $form = $field.parents('form');
+    var $formGroup = $field.parents('.form-group');
+    var $mediaWrap = $('.js-ad-media-wrap', $formGroup);
+    var $content = $('.js-ad-media-content', $mediaWrap);
+    var $button = $('.js-add-media-btn', $formGroup);
+    var $picture = $('.js-picture-wrap', $form);
+    var has_media = $field.value() || $field.data('has-media');
+    NewAd.initAdMedia($mediaWrap);
+    if (has_media) {
+      $button.html(l('WEB_AD_MEDIA_CHANGE_BUTTON'));
+      $picture.slideHide();
+      $mediaWrap.slideShow();
+    } else {
+      $button.html(l('WEB_AD_MEDIA_UPLOAD_BUTTON'));
+      $picture.slideShow();
+      $mediaWrap.slideHide();
+    }
+    $mediaWrap.removeClass('file-loading');
+    $previewEl = $field.data('$previewEl');
+    if ($previewEl) {
+      $previewEl.toggleClass('has-media', !!has_media);
+    }
+  },
+  wrapAdMedia: function($field, file) {
+    var $formGroup = $field.parents('.form-group');
+    var $mediaWrap = $('.js-ad-media-wrap', $formGroup);
+    var $content = $('.js-ad-media-content', $mediaWrap);
+    $content.html('');
+    if (file) {
+      var is_video = file.type == 'video/mp4';
+      var media_url = URL.createObjectURL(file);
+      if (is_video) {
+        $media = $('<video class="pr-ad-media-video" width="100%" height="100%" preload loop muted></video>').attr('src', media_url);
+      } else {
+        $media = $('<div class="pr-ad-media-photo"></div>').css('backgroundImage', "url('" + media_url + "')");
+      }
+      $mediaWrap.toggleClass('is-video', is_video);
+      $content.append($media);
+    }
+    $field.data('has-media', !!file);
+    NewAd.updateAdMedia($field);
+  },
   updateAdPreview: function($form, previewData) {
     var $previewPopup = Aj.state.$previewPopup;
     var inPopup = $form.parents('.pr-layer-preview-ad').size() > 0;
@@ -1313,6 +1507,7 @@ var NewAd = {
           for (var i = 1; i <= 3; i++) {
             $('.js-preview-wrap', $previewPopup).cssProp('--preview-color' + i, (previewData.accent_colors || [])[i - 1] || '');
           }
+          $('.js-promote-media', $previewPopup).html(previewData.media);
           $('.js-promote-photo', $previewPopup).html(previewData.photo);
           $('.js-promote-photo-tooltip', $previewPopup).html(previewData.from);
           $('.js-preview-text', $previewPopup).html(previewData.text);
@@ -1324,12 +1519,14 @@ var NewAd = {
           $('.js-picture-label', $previewPopup).html(previewData.picture_label);
           $('.js-picture-hint', $previewPopup).html(previewData.picture_hint);
         }
+        NewAd.initAdMedia($('.js-promote-media', $previewPopup));
         $('.js-promote-photo', $previewPopup).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
         $('.js-preview', $previewPopup).toggleClass('active', !!previewData);
       }
     } else {
       Aj.state.previewData = previewData;
       if (previewData) {
+        $('.js-promote-media', Aj.state.$form).html(previewData.media);
         $('.js-promote-photo', Aj.state.$form).html(previewData.photo);
         $('.js-promote-photo-tooltip', Aj.state.$form).html(previewData.from);
         $('.js-picture-label', Aj.state.$form).html(previewData.picture_label);
@@ -1337,6 +1534,7 @@ var NewAd = {
         $('.js-cpm-extra', Aj.state.$form).html(previewData.cpm_extra);
         $('.js-cpm-extra-tooltip', Aj.state.$form).html(previewData.cpm_extra_tooltip);
       }
+      NewAd.initAdMedia($('.js-promote-media', Aj.state.$form));
       $('.js-promote-photo', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
       $('.js-cpm-extra', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-extra-cpm', !!(previewData && previewData.cpm_extra));
       $('.js-preview-link', Aj.state.$form).toggleClass('inactive', !previewData);
@@ -1394,17 +1592,23 @@ var NewAd = {
     var $previewPopup = $('<div class="popup-container hide alert-popup-container pr-popup-container">' + state.previewTpl + '</div>');
     state.$previewPopup = $previewPopup;
     var $form = state.$form;
+    NewAd.resetAdMediaUpload($form);
     var text = $form.field('text').value();
     var promote_url = $form.field('promote_url').value();
     var button = $form.field('button').data('value');
     var website_name = $form.field('website_name').value();
     var website_photo = $form.field('website_photo').value();
+    var media = $form.field('media').value();
     var picture_checked = $form.field('picture').prop('checked');
     var previewPictureChange = function() {
       $('.js-preview', $previewPopup).toggleClass('picture', !!$(this).prop('checked'));
     };
     var website_name_hidden = $('.js-website-name-wrap', $form).isSlideHidden();
     var custom_button_hidden = $('.js-custom-button-wrap', $form).isSlideHidden();
+
+    var $mediaWrap = $('.js-ad-media-wrap', $form);
+    var $previewMediaWrap = $mediaWrap.clone();
+    $('.js-ad-media-wrap', $previewPopup).replaceWith($previewMediaWrap);
 
     var $previewForm = $('.js-ad-form', $previewPopup);
     Ads.formInit($previewForm);
@@ -1422,32 +1626,45 @@ var NewAd = {
     state.previewWebsiteNameField.value(website_name);
     state.previewWebsitePhotoField = $previewForm.field('website_photo');
     state.previewWebsitePhotoField.value(website_photo);
+    state.previewMediaField = $previewForm.field('media');
+    state.previewMediaField.value(media);
     state.previewButtonField = $previewForm.field('button');
     state.previewButtonField.on('ddchange.curPage', NewAd.onButtonChange);
     state.previewButtonField.trigger('selectval', [button]);
     state.previewPictureCheckbox = $previewForm.field('picture');
     state.previewPictureCheckbox.on('change.curPage', previewPictureChange);
     state.previewPictureCheckbox.prop('checked', picture_checked);
-    $('.js-preview', $previewPopup).toggleClass('picture', !!picture_checked);
+    var $previewEl = $('.js-preview', $previewPopup);
+    $previewEl.toggleClass('picture', !!picture_checked);
     $('.js-website-name-wrap', $previewPopup).toggleClass('shide', website_name_hidden);
     $('.js-custom-button-wrap', $previewPopup).toggleClass('shide', custom_button_hidden);
 
+    state.previewMediaField.data('$previewEl', $previewEl);
+    NewAd.updateAdMedia(state.previewMediaField);
     NewAd.updateAdPreview($previewForm, state.previewData);
     NewAd.adPostCheck($previewForm);
 
     var previewSave = function() {
+      NewAd.resetAdMediaUpload($previewForm);
       var text = state.previewTextField.value();
       var promote_url = state.previewPromoteUrlField.value();
       var button = state.previewButtonField.data('value');
       var website_name = state.previewWebsiteNameField.value();
       var website_photo = state.previewWebsitePhotoField.value();
+      var media = state.previewMediaField.value();
       var picture_checked = state.previewPictureCheckbox.prop('checked');
       $form.field('text').value(text).updateAutosize();
       $form.field('promote_url').value(promote_url);
       $form.field('button').trigger('selectval', [button]);
       $form.field('website_name').value(website_name);
       $form.field('website_photo').value(website_photo);
+      $form.field('media').value(media);
       $form.field('picture').prop('checked', picture_checked);
+      var $mediaWrap = $('.js-ad-media-wrap', $previewPopup);
+      var $previewMediaWrap = $mediaWrap.clone();
+      $('.js-ad-media-wrap', $form).replaceWith($previewMediaWrap);
+
+      NewAd.updateAdMedia(state.mediaField);
       NewAd.updateAdPreview($form, state.popupPreviewData);
       NewAd.adPostCheck($form);
       delete state.popupPreviewData;
@@ -1775,6 +1992,7 @@ var NewAd = {
       $form.field('promote_url').value(),
       $form.field('website_name').value(),
       $form.field('website_photo').value(),
+      $form.field('media').value(),
       $form.field('ad_info').value(),
       $form.field('cpm').value(),
       $form.field('views_per_user').value(),
@@ -1826,7 +2044,8 @@ var NewAd = {
         $previewForm.field('button').data('value'),
         $previewForm.field('promote_url').value(),
         $previewForm.field('website_name').value(),
-        $previewForm.field('website_photo').value()
+        $previewForm.field('website_photo').value(),
+        $previewForm.field('media').value()
       ];
       if ($previewForm.field('picture').prop('checked')) {
         values.push('picture');
@@ -1845,6 +2064,7 @@ var NewAd = {
     var promote_url = $form.field('promote_url').value();
     var website_name = $form.field('website_name').value();
     var website_photo = $form.field('website_photo').value();
+    var media       = $form.field('media').value();
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
     var views_per_user = $form.field('views_per_user').value();
@@ -1892,6 +2112,7 @@ var NewAd = {
       promote_url: promote_url,
       website_name: website_name,
       website_photo: website_photo,
+      media: media,
       ad_info: ad_info,
       cpm: cpm,
       views_per_user: views_per_user,
@@ -1978,6 +2199,7 @@ var NewAd = {
     var promote_url = $form.field('promote_url').value();
     var website_name = $form.field('website_name').value();
     var website_photo = $form.field('website_photo').value();
+    var media       = $form.field('media').value();
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
     var views_per_user = $form.field('views_per_user').value();
@@ -2005,6 +2227,7 @@ var NewAd = {
       promote_url: promote_url,
       website_name: website_name,
       website_photo: website_photo,
+      media: media,
       ad_info: ad_info,
       cpm: cpm,
       views_per_user: views_per_user,
@@ -2069,6 +2292,7 @@ var NewAd = {
     $form.field('promote_url').value('');
     $form.field('website_name').value('');
     $form.field('website_photo').value('');
+    $form.field('media').value('');
     $form.field('ad_info').value('');
     $form.field('cpm').value('');
     $form.field('budget').value('');
@@ -2115,9 +2339,10 @@ var NewAd = {
 };
 
 var Upload = {
-  uploadFile: function(file, onSuccess, onProgress, onError) {
+  uploadFile: function(target, file, onSuccess, onProgress, onError) {
     var data = new FormData();
     data.append('owner_id', Aj.state.ownerId);
+    data.append('target', target);
     data.append('file', file, file.name);
     return $.ajax({
       url: '/file/upload',
@@ -3138,6 +3363,10 @@ var EditAd = {
       cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
       cont.on('click.curPage', '.js-promote-photo', NewAd.eReplacePromotePhoto);
       cont.on('change.curPage', '.js-promote-photo > .file-upload', NewAd.eUploadPromotePhoto);
+      cont.on('click.curPage', '.js-ad-media', NewAd.ePlayAdMedia);
+      cont.on('click.curPage', '.js-ad-media-remove', NewAd.eRemoveAdMedia);
+      cont.on('click.curPage', '.js-add-media-btn', NewAd.eReplaceAdMedia);
+      cont.on('change.curPage', '.js-add-media-btn > .file-upload', NewAd.eUploadAdMedia);
       cont.on('click.curPage', '.edit-ad-btn', EditAd.eSubmitForm);
       cont.on('click.curPage', '.js-clone-ad-btn', EditAd.eCloneAd);
       cont.on('click.curPage', '.js-send-to-review-btn', EditAd.eSendToReview);
@@ -3161,6 +3390,7 @@ var EditAd = {
       state.websiteNameField = state.$form.field('website_name');
       state.websiteNameField.on('change.curPage', NewAd.onWebsiteNameChange);
       state.websitePhotoField = state.$form.field('website_photo');
+      state.mediaField = state.$form.field('media');
       state.buttonField = state.$form.field('button');
       state.buttonField.on('ddchange.curPage', NewAd.onButtonChange);
       state.adInfoField = state.$form.field('ad_info');
@@ -3171,6 +3401,7 @@ var EditAd = {
       state.activeRadio.fieldEl().on('change.curPage', NewAd.onActiveChange);
       state.useScheduleCheckbox = state.$form.field('use_schedule');
       state.useScheduleCheckbox.fieldEl().on('change.curPage', NewAd.onUseScheduleChange);
+      NewAd.updateAdMedia(state.mediaField);
       NewAd.updateAdPreview(state.$form, state.previewData);
       Aj.onLoad(function(state) {
         state.initFormData = EditAd.getFormData(state.$form);
@@ -3212,6 +3443,7 @@ var EditAd = {
       $form.field('promote_url').value(),
       $form.field('website_name').value(),
       $form.field('website_photo').value(),
+      $form.field('media').value(),
       $form.field('cpm').value(),
       $form.field('daily_budget').value(),
       $form.field('active').value(),
@@ -3706,6 +3938,7 @@ var EditAd = {
     var promote_url = $form.field('promote_url').value();
     var website_name = $form.field('website_name').value();
     var website_photo = $form.field('website_photo').value();
+    var media       = $form.field('media').value();
     var ad_info     = $form.field('ad_info').value();
     var cpm         = Ads.amountFieldValue($form, 'cpm');
     var daily_budget = Ads.amountFieldValue($form, 'daily_budget');
@@ -3747,6 +3980,7 @@ var EditAd = {
       promote_url: promote_url,
       website_name: website_name,
       website_photo: website_photo,
+      media: media,
       ad_info: ad_info,
       cpm: cpm,
       daily_budget: daily_budget,
