@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app.js?52"></script>
+    <script src="https://tg.dev/js/telegram-web-app-beta.js?54"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -30,6 +30,8 @@
   <button onclick="DemoApp.toggleBackButton(this);">Show Back Button</button>
   <button onclick="DemoApp.toggleSettingsButton(this);">Show Settings Button</button>
   <button onclick="DemoApp.toggleMainButton(this);">Hide Main Button</button>
+  <button onclick="DemoApp.toggleSecondaryButton(this);">Hide Secondary Button</button>
+  <button onclick="DemoApp.toggleButtonsProgress(this);">Show Progress</button>
   <button onclick="DemoApp.toggleSwipeBehavior(this);">Disable Vertical Swypes</button>
   <input type="text" placeholder="Input text in regular input..." />
   <div class="input" contenteditable="true" data-placeholder="Input text in contenteditable field..."></div>
@@ -46,6 +48,12 @@
         <option value="bg_color" selected>bg_color</option>
         <option value="secondary_bg_color">secondary_bg_color</option>
         <option value="custom" id="bg_color_val">custom...</option>
+      </select></div>
+    <div class="sect_row">Bottom Bar: <input type="color" id="bbar_color_input" /> <select id="bbar_color_sel">
+        <option value="bg_color">bg_color</option>
+        <option value="secondary_bg_color">secondary_bg_color</option>
+        <option value="bottom_bar_bg_color" selected>bottom_bar_bg_color</option>
+        <option value="custom" id="bbar_color_val">custom...</option>
       </select></div>
   </section>
   <section>
@@ -166,7 +174,7 @@
   <div class="viewport-stable_border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?29"></script>
+    <script src="/js/webappdemo.js?30"></script>
     <script>DemoApp.apiUrl = "/demo/api";
 
 Telegram.WebApp.onEvent('themeChanged', function() {
@@ -230,6 +238,9 @@ $('body').cssProp('--bg-color', Telegram.WebApp.backgroundColor);
 var prev_header_color_val = $('#header_color_sel').val();
 $('#header_color_input').val(Telegram.WebApp.headerColor);
 $('body').cssProp('--header-color', Telegram.WebApp.headerColor);
+var prev_bbar_color_val = $('#bbar_color_sel').val();
+$('#bbar_color_input').val(Telegram.WebApp.bottomBarColor);
+$('body').cssProp('--bottom-bar-color', Telegram.WebApp.bottomBarColor);
 
 $('#header_color_sel').val('secondary_bg_color');
 $('#header_color_input').on('change', function(e) {
@@ -273,6 +284,27 @@ $('#bg_color_sel').on('change', function(e) {
     $('body').cssProp('--bg-color', Telegram.WebApp.backgroundColor);
     $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
     prev_bg_color_val = $('#bg_color_sel').val();
+  }
+});
+$('#bbar_color_input').on('change', function(e) {
+  var color = e.target.value;
+  $('#bbar_color_val').text(color);
+  $('#bbar_color_sel').val('custom');
+  prev_bbar_color_val = $('#bbar_color_sel').val();
+  Telegram.WebApp.setBottomBarColor(color);
+  $('body').cssProp('--bottom-bar-color', Telegram.WebApp.bottomBarColor);
+});
+$('#bbar_color_sel').on('change', function(e) {
+  var color_key = e.target.value;
+  if (color_key == 'custom') {
+    $('#bbar_color_sel').val(prev_bbar_color_val);
+    $('#bbar_color_input').focus().click();
+  } else {
+    $('#bbar_color_val').text('custom...');
+    Telegram.WebApp.setBottomBarColor(color_key);
+    $('body').cssProp('--bottom-bar-color', Telegram.WebApp.bottomBarColor);
+    $('#bbar_color_input').val(Telegram.WebApp.bottomBarColor);
+    prev_bbar_color_val = $('#bbar_color_sel').val();
   }
 });
 Telegram.WebApp.onEvent('themeChanged', function() {

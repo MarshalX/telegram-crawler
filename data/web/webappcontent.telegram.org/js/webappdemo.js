@@ -2,6 +2,7 @@ var DemoApp = {
   initData: Telegram.WebApp.initData || '',
   initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
   MainButton: Telegram.WebApp.MainButton,
+  SecondaryButton: Telegram.WebApp.SecondaryButton,
   BackButton: Telegram.WebApp.BackButton,
   SettingsButton: Telegram.WebApp.SettingsButton,
 
@@ -9,9 +10,14 @@ var DemoApp = {
     $('body').css('visibility', '');
     Telegram.WebApp.ready();
     Telegram.WebApp.MainButton.setParams({
-      text: 'CLOSE WEBVIEW',
+      text: 'Close Webview',
+      shine_effect: true,
       is_visible: true
     }).onClick(DemoApp.close);
+    Telegram.WebApp.SecondaryButton.setParams({
+      text: 'Do Something',
+      is_visible: true
+    }).onClick(DemoApp.moveSecondaryButton);
     Telegram.WebApp.BackButton.onClick(function() {
       DemoApp.showAlert('Back button pressed');
     });
@@ -380,6 +386,38 @@ var DemoApp = {
     } else {
       DemoApp.MainButton.show();
       el.innerHTML = 'Hide Main Button';
+    }
+  },
+  toggleSecondaryButton: function(el) {
+    if (DemoApp.SecondaryButton.isVisible) {
+      DemoApp.SecondaryButton.hide();
+      el.innerHTML = 'Show Secondary Button';
+    } else {
+      DemoApp.SecondaryButton.show();
+      el.innerHTML = 'Hide Secondary Button';
+    }
+  },
+  toggleButtonsProgress: function(el) {
+    if (DemoApp.MainButton.isProgressVisible) {
+      DemoApp.MainButton.hideProgress();
+      DemoApp.SecondaryButton.hideProgress();
+      el.innerHTML = 'Show Progress';
+    } else {
+      DemoApp.MainButton.showProgress();
+      DemoApp.SecondaryButton.showProgress();
+      el.innerHTML = 'Hide Progress';
+    }
+  },
+  moveSecondaryButton: function(el) {
+    var sButton = DemoApp.SecondaryButton;
+    if (sButton.position == 'left') {
+      sButton.position = 'top';
+    } else if (sButton.position == 'top') {
+      sButton.position = 'right';
+    } else if (sButton.position == 'right') {
+      sButton.position = 'bottom';
+    } else if (sButton.position == 'bottom') {
+      sButton.position = 'left';
     }
   },
   toggleBackButton: function(el) {

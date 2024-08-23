@@ -37,7 +37,8 @@ var Cafe = {
       autosize(this);
     });
     Telegram.WebApp.MainButton.setParams({
-      text_color: '#fff'
+      text_color: '#fff',
+      shine_effect: true
     }).onClick(Cafe.mainBtnClicked);
     Telegram.WebApp.BackButton.onClick(Cafe.backBtnClicked);
     Telegram.WebApp.setHeaderColor('bg_color');
