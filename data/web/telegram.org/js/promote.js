@@ -1421,7 +1421,9 @@ var NewAd = {
         $mediaWrap.removeClass('file-loading');
         $fileInput.remove();
         if (xhr.aborted) return;
-        showAlert(error);
+        Ads.showFieldError($field, error);
+        $field.value('').data('has-media', false);
+        NewAd.updateAdMedia($field);
       });
       $mediaWrap.data('xhr', xhr);
     }
