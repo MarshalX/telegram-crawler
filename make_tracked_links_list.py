@@ -34,6 +34,7 @@ HIDDEN_URLS = {
     'desktop.telegram.org/changelog',
     'td.telegram.org/current',
     'td.telegram.org/current2',
+    'td.telegram.org/current4',
     'td.telegram.org/current5',    # tdx
 
     'osx.telegram.org/updates/versions.xml',    # stable
