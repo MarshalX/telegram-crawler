@@ -11,7 +11,7 @@ var DemoApp = {
     Telegram.WebApp.ready();
     Telegram.WebApp.MainButton.setParams({
       text: 'Close Webview',
-      shine_effect: true,
+      has_shine_effect: true,
       is_visible: true
     }).onClick(DemoApp.close);
     Telegram.WebApp.SecondaryButton.setParams({
