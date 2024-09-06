@@ -53,6 +53,18 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="september-6-2024" href="#september-6-2024"><i class="anchor-icon"></i></a>September 6, 2024</h4>
+<p><strong>Bot API 7.10</strong></p>
+<ul>
+<li>Added updates about purchased paid media, represented by the class <a href="#paidmediapurchased">PaidMediaPurchased</a> and the field <em>purchased_paid_media</em> in the class <a href="#update">Update</a>.</li>
+<li>Added the ability to specify a payload in <a href="#sendpaidmedia">sendPaidMedia</a> that is received back by the bot in <a href="#transactionpartneruser">TransactionPartnerUser</a> and <em>purchased_paid_media</em> updates.</li>
+<li>Added the field <em>prize_star_count</em> to the classes <a href="#giveawaycreated">GiveawayCreated</a>, <a href="#giveaway">Giveaway</a>, <a href="#giveawaywinners">GiveawayWinners</a> and <a href="#chatboostsourcegiveaway">ChatBoostSourceGiveaway</a>.</li>
+<li>Added the field <em>is_star_giveaway</em> to the class <a href="#giveawaycompleted">GiveawayCompleted</a>.</li>
+<li>Added the field <em>SecondaryButton</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the event <em>secondaryButtonClicked</em> for Mini Apps.</li>
+<li>Added the field <em>bottomBarColor</em> and the method <em>setBottomBarColor</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the field <em>bottom_bar_bg_color</em> to the class <a href="/bots/webapps#themeparams">ThemeParams</a>.</li>
+</ul>
 <h4><a class="anchor" name="august-14-2024" href="#august-14-2024"><i class="anchor-icon"></i></a>August 14, 2024</h4>
 <p><strong>Bot API 7.9</strong></p>
 <ul>
@@ -95,16 +107,6 @@ To learn how to create…">
 <li>Changed the default opening mode for <a href="/bots/webapps#direct-link-mini-apps">Direct Link Mini Apps</a>.</li>
 <li>Added support for launching Web Apps via <code>t.me</code> link in the class <a href="#menubuttonwebapp">MenuButtonWebApp</a>.</li>
 <li>Added the field <em>section_separator_color</em> to the class <a href="/bots/webapps#themeparams">ThemeParams</a>.</li>
-</ul>
-<h4><a class="anchor" name="june-18-2024" href="#june-18-2024"><i class="anchor-icon"></i></a>June 18, 2024</h4>
-<p><strong>Bot API 7.5</strong></p>
-<ul>
-<li>Added the classes <a href="#startransactions">StarTransactions</a>, <a href="#startransaction">StarTransaction</a>, <a href="#transactionpartner">TransactionPartner</a> and <a href="#revenuewithdrawalstate">RevenueWithdrawalState</a>, containing information about Telegram Star transactions involving the bot.</li>
-<li>Added the method <a href="#getstartransactions">getStarTransactions</a> that can be used to get the list of all Telegram Star transactions for the bot.</li>
-<li>Added support for <em>callback</em> buttons in <a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a> for messages sent on behalf of a business account.</li>
-<li>Added support for callback queries originating from a message sent on behalf of a business account.</li>
-<li>Added the parameter <em>business_connection_id</em> to the methods <a href="#editmessagetext">editMessageText</a>, <a href="#editmessagemedia">editMessageMedia</a>, <a href="#editmessagecaption">editMessageCaption</a>, <a href="#editmessagelivelocation">editMessageLiveLocation</a>, <a href="#stopmessagelivelocation">stopMessageLiveLocation</a> and <a href="#editmessagereplymarkup">editMessageReplyMarkup</a>, allowing the bot to edit business messages.</li>
-<li>Added the parameter <em>business_connection_id</em> to the method <a href="#stoppoll">stopPoll</a>, allowing the bot to stop polls it sent on behalf of a business account.</li>
 </ul>
 <p><strong><a href="/bots/api-changelog">See earlier changes »</a></strong></p>
 <h3><a class="anchor" name="authorizing-your-bot" href="#authorizing-your-bot"><i class="anchor-icon"></i></a>Authorizing your bot</h3>
@@ -236,6 +238,11 @@ To learn how to create…">
 <td>pre_checkout_query</td>
 <td><a href="#precheckoutquery">PreCheckoutQuery</a></td>
 <td><em>Optional</em>. New incoming pre-checkout query. Contains full information about checkout</td>
+</tr>
+<tr>
+<td>purchased_paid_media</td>
+<td><a href="#paidmediapurchased">PaidMediaPurchased</a></td>
+<td><em>Optional</em>. A user purchased paid media with a non-empty payload sent by the bot in a non-channel chat</td>
 </tr>
 <tr>
 <td>poll</td>
@@ -3074,7 +3081,23 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="giveawaycreated" href="#giveawaycreated"><i class="anchor-icon"></i></a>GiveawayCreated</h4>
-<p>This object represents a service message about the creation of a scheduled giveaway. Currently holds no information.</p>
+<p>This object represents a service message about the creation of a scheduled giveaway.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>prize_star_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of Telegram Stars to be split between giveaway winners; for Telegram Star giveaways only</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="giveaway" href="#giveaway"><i class="anchor-icon"></i></a>Giveaway</h4>
 <p>This object represents a message about a scheduled giveaway.</p>
 <table class="table">
@@ -3122,9 +3145,14 @@ To learn how to create…">
 <td><em>Optional</em>. A list of two-letter <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country codes indicating the countries from which eligible users for the giveaway must come. If empty, then all users can participate in the giveaway. Users with a phone number that was bought on Fragment can always participate in giveaways.</td>
 </tr>
 <tr>
+<td>prize_star_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of Telegram Stars to be split between giveaway winners; for Telegram Star giveaways only</td>
+</tr>
+<tr>
 <td>premium_subscription_month_count</td>
 <td>Integer</td>
-<td><em>Optional</em>. The number of months the Telegram Premium subscription won from the giveaway will be active for</td>
+<td><em>Optional</em>. The number of months the Telegram Premium subscription won from the giveaway will be active for; for Telegram Premium giveaways only</td>
 </tr>
 </tbody>
 </table>
@@ -3170,9 +3198,14 @@ To learn how to create…">
 <td><em>Optional</em>. The number of other chats the user had to join in order to be eligible for the giveaway</td>
 </tr>
 <tr>
+<td>prize_star_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of Telegram Stars that were split between giveaway winners; for Telegram Star giveaways only</td>
+</tr>
+<tr>
 <td>premium_subscription_month_count</td>
 <td>Integer</td>
-<td><em>Optional</em>. The number of months the Telegram Premium subscription won from the giveaway will be active for</td>
+<td><em>Optional</em>. The number of months the Telegram Premium subscription won from the giveaway will be active for; for Telegram Premium giveaways only</td>
 </tr>
 <tr>
 <td>unclaimed_prize_count</td>
@@ -3221,6 +3254,11 @@ To learn how to create…">
 <td>giveaway_message</td>
 <td><a href="#message">Message</a></td>
 <td><em>Optional</em>. Message with the giveaway that was completed, if it wasn&#39;t deleted</td>
+</tr>
+<tr>
+<td>is_star_giveaway</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if the giveaway is a Telegram Star giveaway. Otherwise, currently, the giveaway is a Telegram Premium giveaway.</td>
 </tr>
 </tbody>
 </table>
@@ -5278,7 +5316,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="chatboostsourcegiveaway" href="#chatboostsourcegiveaway"><i class="anchor-icon"></i></a>ChatBoostSourceGiveaway</h4>
-<p>The boost was obtained by the creation of a Telegram Premium giveaway. This boosts the chat 4 times for the duration of the corresponding Telegram Premium subscription.</p>
+<p>The boost was obtained by the creation of a Telegram Premium or a Telegram Star giveaway. This boosts the chat 4 times for the duration of the corresponding Telegram Premium subscription for Telegram Premium giveaways and ??? times for one year for Telegram Star giveaways.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5301,7 +5339,12 @@ To learn how to create…">
 <tr>
 <td>user</td>
 <td><a href="#user">User</a></td>
-<td><em>Optional</em>. User that won the prize in the giveaway if any</td>
+<td><em>Optional</em>. User that won the prize in the giveaway if any; for Telegram Premium giveaways only</td>
+</tr>
+<tr>
+<td>prize_star_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of Telegram Stars to be split between giveaway winners; for Telegram Star giveaways only</td>
 </tr>
 <tr>
 <td>is_unclaimed</td>
@@ -7163,13 +7206,19 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>star_count</td>
 <td>Integer</td>
 <td>Yes</td>
-<td>The number of Telegram Stars that must be paid to buy access to the media</td>
+<td>The number of Telegram Stars that must be paid to buy access to the media; 1-2500</td>
 </tr>
 <tr>
 <td>media</td>
 <td>Array of <a href="#inputpaidmedia">InputPaidMedia</a></td>
 <td>Yes</td>
 <td>A JSON-serialized array describing the media to be sent; up to 10 items</td>
+</tr>
+<tr>
+<td>payload</td>
+<td>String</td>
+<td>Optional</td>
+<td>Bot-defined paid media payload, 0-128 bytes. This will not be displayed to the user, use it for your internal processes.</td>
 </tr>
 <tr>
 <td>caption</td>
@@ -13409,6 +13458,29 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="paidmediapurchased" href="#paidmediapurchased"><i class="anchor-icon"></i></a>PaidMediaPurchased</h4>
+<p>This object contains information about a paid media purchase.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>from</td>
+<td><a href="#user">User</a></td>
+<td>User who purchased the media</td>
+</tr>
+<tr>
+<td>paid_media_payload</td>
+<td>String</td>
+<td>Bot-specified paid media payload</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="revenuewithdrawalstate" href="#revenuewithdrawalstate"><i class="anchor-icon"></i></a>RevenueWithdrawalState</h4>
 <p>This object describes the state of a revenue withdrawal operation. Currently, it can be one of</p>
 <ul>
@@ -13518,6 +13590,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>paid_media</td>
 <td>Array of <a href="#paidmedia">PaidMedia</a></td>
 <td><em>Optional</em>. Information about the paid media bought by the user</td>
+</tr>
+<tr>
+<td>paid_media_payload</td>
+<td>String</td>
+<td><em>Optional</em>. Bot-specified paid media payload</td>
 </tr>
 </tbody>
 </table>
