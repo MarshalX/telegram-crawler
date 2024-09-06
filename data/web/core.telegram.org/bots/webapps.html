@@ -57,6 +57,15 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="september-6-2024" href="#september-6-2024"><i class="anchor-icon"></i></a>September 6, 2024</h4>
+<p><strong>Bot API 7.10</strong></p>
+<ul>
+<li>Added the field <em>SecondaryButton</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the event <em>secondaryButtonClicked</em>.</li>
+<li>Renamed the class <em>MainButton</em> to the class <a href="#bottombutton">BottomButton</a>.</li>
+<li>Added the field <em>bottomBarColor</em> and the method <em>setBottomBarColor</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the field <em>bottom_bar_bg_color</em> to the class <a href="#themeparams">ThemeParams</a>.</li>
+</ul>
 <h4><a class="anchor" name="july-31-2024" href="#july-31-2024"><i class="anchor-icon"></i></a>July 31, 2024</h4>
 <p><strong>Bot API 7.8</strong></p>
 <ul>
@@ -332,6 +341,11 @@
 <td>Current background color in the <code>#RRGGBB</code> format.</td>
 </tr>
 <tr>
+<td>bottomBarColor</td>
+<td>String</td>
+<td>Current bottom bar color in the <code>#RRGGBB</code> format.</td>
+</tr>
+<tr>
 <td>isClosingConfirmationEnabled</td>
 <td>Boolean</td>
 <td><em>True</em>, if the confirmation dialog is enabled while the user is trying to close the Mini App. <em>False</em>, if the confirmation dialog is disabled.</td>
@@ -348,8 +362,13 @@
 </tr>
 <tr>
 <td>MainButton</td>
-<td><a href="#mainbutton">MainButton</a></td>
+<td><a href="#bottombutton">BottomButton</a></td>
 <td>An object for controlling the main button, which is displayed at the bottom of the Mini App in the Telegram interface.</td>
+</tr>
+<tr>
+<td>SecondaryButton</td>
+<td><a href="#bottombutton">BottomButton</a></td>
+<td>An object for controlling the secondary button, which is displayed at the bottom of the Mini App in the Telegram interface.</td>
 </tr>
 <tr>
 <td>SettingsButton</td>
@@ -385,6 +404,11 @@
 <td>setBackgroundColor(color)</td>
 <td>Function</td>
 <td><mark>Bot API 6.1+</mark> A method that sets the app background color in the <code>#RRGGBB</code> format. You can also use keywords <em>bg_color</em> and <em>secondary_bg_color</em>.</td>
+</tr>
+<tr>
+<td>setBottomBarColor(color)</td>
+<td>Function</td>
+<td><mark>Bot API 7.10+</mark> A method that sets the app&#39;s bottom bar color in the <code>#RRGGBB</code> format. You can also use the keywords <em>bg_color</em>, <em>secondary_bg_color</em> and <em>bottom_bar_bg_color</em>.</td>
 </tr>
 <tr>
 <td>enableClosingConfirmation()</td>
@@ -553,6 +577,11 @@
 <td>header_bg_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Header background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-header-bg-color)</code>.</td>
+</tr>
+<tr>
+<td>bottom_bar_bg_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.10+</mark> Bottom background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-bottom-bar-bg-color)</code>.</td>
 </tr>
 <tr>
 <td>accent_text_color</td>
@@ -750,8 +779,8 @@
 </tbody>
 </table>
 <p>All these methods return the BackButton object so they can be chained.</p>
-<h4><a class="anchor" name="mainbutton" href="#mainbutton"><i class="anchor-icon"></i></a>MainButton</h4>
-<p>This object controls the main button, which is displayed at the bottom of the Mini App in the Telegram interface.</p>
+<h4><a class="anchor" name="bottombutton" href="#bottombutton"><i class="anchor-icon"></i></a>BottomButton</h4>
+<p>This object controls the button that is displayed at the bottom of the Mini App in the Telegram interface.</p>
 <table class="table">
 <thead>
 <tr>
@@ -762,19 +791,24 @@
 </thead>
 <tbody>
 <tr>
+<td>type</td>
+<td>String</td>
+<td><em>Readonly.</em> Type of the button. It can be either <em>main</em> for the main button or <em>secondary</em> for the secondary button.</td>
+</tr>
+<tr>
 <td>text</td>
 <td>String</td>
-<td>Current button text. Set to <em>CONTINUE</em> by default.</td>
+<td>Current button text. Set to <em>Continue</em> for the main button and <em>Cancel</em> for the secondary button by default.</td>
 </tr>
 <tr>
 <td>color</td>
 <td>String</td>
-<td>Current button color. Set to <em>themeParams.button_color</em> by default.</td>
+<td>Current button color. Set to <em>themeParams.button_color</em> for the main button and <em>themeParams.bottom_bar_bg_color</em> for the secondary button by default.</td>
 </tr>
 <tr>
 <td>textColor</td>
 <td>String</td>
-<td>Current button text color. Set to <em>themeParams.button_text_color</em> by default.</td>
+<td>Current button text color. Set to <em>themeParams.button_text_color</em> for the main button and <em>themeParams.button_color</em> for the secondary button by default.</td>
 </tr>
 <tr>
 <td>isVisible</td>
@@ -785,6 +819,16 @@
 <td>isActive</td>
 <td>Boolean</td>
 <td>Shows whether the button is active. Set to <em>true</em> by default.</td>
+</tr>
+<tr>
+<td>hasShineEffect</td>
+<td>Boolean</td>
+<td><mark>Bot API 7.10+</mark> Shows whether the button has a shine effect. Set to <em>false</em> by default.</td>
+</tr>
+<tr>
+<td>position</td>
+<td>String</td>
+<td><mark>Bot API 7.10+</mark> Position of the secondary button. Not defined for the main button. It applies only if both the main and secondary buttons are visible. Set to <em>left</em> by default.<br>Supported values:<br>- <em>left</em>, displayed to the left of the main button,<br>- <em>right</em>, displayed to the right of the main button,<br>- <em>top</em>, displayed above the main button,<br>- <em>bottom</em>, displayed below the main button.</td>
 </tr>
 <tr>
 <td>isProgressVisible</td>
@@ -799,12 +843,12 @@
 <tr>
 <td>onClick(callback)</td>
 <td>Function</td>
-<td>A method that sets the button press event handler. An alias for <code>Telegram.WebApp.onEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
+<td>A method that sets the button&#39;s press event handler. An alias for <code>Telegram.WebApp.onEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
 </tr>
 <tr>
 <td>offClick(callback)</td>
 <td>Function</td>
-<td>A method that removes the button press event handler. An alias for <code>Telegram.WebApp.offEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
+<td>A method that removes the button&#39;s press event handler. An alias for <code>Telegram.WebApp.offEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
 </tr>
 <tr>
 <td>show()</td>
@@ -839,11 +883,11 @@
 <tr>
 <td>setParams(params)</td>
 <td>Function</td>
-<td>A method to set the button parameters. The <em>params</em> parameter is an object containing one or several fields that need to be changed:<br><strong>text</strong> - button text;<br><strong>color</strong> - button color;<br><strong>text_color</strong> - button text color;<br><strong>is_active</strong> - enable the button;<br><strong>is_visible</strong> - show the button.</td>
+<td>A method to set the button parameters. The <em>params</em> parameter is an object containing one or several fields that need to be changed:<br><strong>text</strong> - button text;<br><strong>color</strong> - button color;<br><strong>text_color</strong> - button text color;<br><strong>has_shine_effect</strong> - <mark>Bot API 7.10+</mark> enable shine effect;<br><strong>position</strong> - position of the secondary button;<br><strong>is_active</strong> - enable the button;<br><strong>is_visible</strong> - show the button.</td>
 </tr>
 </tbody>
 </table>
-<p>All these methods return the MainButton object so they can be chained.</p>
+<p>All these methods return the BottomButton object so they can be chained.</p>
 <h4><a class="anchor" name="settingsbutton" href="#settingsbutton"><i class="anchor-icon"></i></a>SettingsButton</h4>
 <p>This object controls the <strong>Settings</strong> item in the context menu of the Mini App in the Telegram interface.</p>
 <table class="table">
@@ -1262,7 +1306,11 @@ if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
 </tr>
 <tr>
 <td><code>mainButtonClicked</code></td>
-<td>Occurs when the <a href="#mainbutton">main button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
+<td>Occurs when the <a href="#bottombutton">main button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>secondaryButtonClicked</code></td>
+<td><mark>Bot API 7.10+</mark> Occurs when the <a href="#bottombutton">secondary button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
 </tr>
 <tr>
 <td><code>backButtonClicked</code></td>
