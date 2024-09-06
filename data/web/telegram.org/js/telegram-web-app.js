@@ -326,7 +326,10 @@
     if (eventData.theme_params) {
       setThemeParams(eventData.theme_params);
       window.Telegram.WebApp.MainButton.setParams({});
+      window.Telegram.WebApp.SecondaryButton.setParams({});
+      updateHeaderColor();
       updateBackgroundColor();
+      updateBottomBarColor();
       receiveWebViewEvent('themeChanged');
     }
   }
@@ -441,14 +444,14 @@
     }
     var height, stable_height;
     if (viewportHeight !== false) {
-      height = (viewportHeight - mainButtonHeight) + 'px';
+      height = (viewportHeight - bottomBarHeight) + 'px';
     } else {
-      height = mainButtonHeight ? 'calc(100vh - ' + mainButtonHeight + 'px)' : '100vh';
+      height = bottomBarHeight ? 'calc(100vh - ' + bottomBarHeight + 'px)' : '100vh';
     }
     if (viewportStableHeight !== false) {
-      stable_height = (viewportStableHeight - mainButtonHeight) + 'px';
+      stable_height = (viewportStableHeight - bottomBarHeight) + 'px';
     } else {
-      stable_height = mainButtonHeight ? 'calc(100vh - ' + mainButtonHeight + 'px)' : '100vh';
+      stable_height = bottomBarHeight ? 'calc(100vh - ' + bottomBarHeight + 'px)' : '100vh';
     }
     setCssProperty('viewport-height', height);
     setCssProperty('viewport-stable-height', stable_height);
@@ -564,6 +567,48 @@
     if (appBackgroundColor != color) {
       appBackgroundColor = color;
       WebView.postEvent('web_app_set_background_color', false, {color: color});
+    }
+  }
+
+  var bottomBarColor = 'bottom_bar_bg_color';
+  function getBottomBarColor() {
+    if (bottomBarColor == 'bottom_bar_bg_color') {
+      return themeParams.bottom_bar_bg_color || themeParams.secondary_bg_color || '#ffffff';
+    } else if (bottomBarColor == 'secondary_bg_color') {
+      return themeParams.secondary_bg_color;
+    } else if (bottomBarColor == 'bg_color') {
+      return themeParams.bg_color;
+    }
+    return bottomBarColor;
+  }
+  function setBottomBarColor(color) {
+    if (!versionAtLeast('7.10')) {
+      console.warn('[Telegram.WebApp] Bottom bar color is not supported in version ' + webAppVersion);
+      return;
+    }
+    var bg_color;
+    if (color == 'bg_color' || color == 'secondary_bg_color' || color == 'bottom_bar_bg_color') {
+      bg_color = color;
+    } else {
+      bg_color = parseColorToHex(color);
+      if (!bg_color) {
+        console.error('[Telegram.WebApp] Bottom bar color format is invalid', color);
+        throw Error('WebAppBottomBarColorInvalid');
+      }
+    }
+    bottomBarColor = bg_color;
+    updateBottomBarColor();
+    window.Telegram.WebApp.SecondaryButton.setParams({});
+  }
+  var appBottomBarColor = null;
+  function updateBottomBarColor() {
+    var color = getBottomBarColor();
+    if (appBottomBarColor != color) {
+      appBottomBarColor = color;
+      WebView.postEvent('web_app_set_bottom_bar_color', false, {color: color});
+    }
+    if (initParams.tgWebAppDebug) {
+      updateDebugBottomBar();
     }
   }
 
@@ -712,97 +757,197 @@
     return backButton;
   })();
 
-  var mainButtonHeight = 0;
-  var MainButton = (function() {
+  var debugBottomBar = null, debugBottomBarBtns = {}, bottomBarHeight = 0;
+  if (initParams.tgWebAppDebug) {
+    debugBottomBar = document.createElement('tg-bottom-bar');
+    var debugBottomBarStyle = {
+      display: 'flex',
+      gap: '7px',
+      font: '600 14px/18px sans-serif',
+      width: '100%',
+      background: getBottomBarColor(),
+      position: 'fixed',
+      left: '0',
+      right: '0',
+      bottom: '0',
+      margin: '0',
+      padding: '7px',
+      textAlign: 'center',
+      boxSizing: 'border-box',
+      zIndex: '10000'
+    };
+    for (var k in debugBottomBarStyle) {
+      debugBottomBar.style[k] = debugBottomBarStyle[k];
+    }
+    document.addEventListener('DOMContentLoaded', function onDomLoaded(event) {
+      document.removeEventListener('DOMContentLoaded', onDomLoaded);
+      document.body.appendChild(debugBottomBar);
+    });
+    var animStyle = document.createElement('style');
+    animStyle.innerHTML = 'tg-bottom-button.shine { position: relative; overflow: hidden; } tg-bottom-button.shine:before { content:""; position: absolute; top: 0; width: 100%; height: 100%; background: linear-gradient(120deg, transparent, rgba(255, 255, 255, .2), transparent); animation: tg-bottom-button-shine 5s ease-in-out infinite; } @-webkit-keyframes tg-bottom-button-shine { 0% {left: -100%;} 12%,100% {left: 100%}} @keyframes tg-bottom-button-shine { 0% {left: -100%;} 12%,100% {left: 100%}}';
+    debugBottomBar.appendChild(animStyle);
+  }
+  function updateDebugBottomBar() {
+    var mainBtn = debugBottomBarBtns.main._bottomButton;
+    var secondaryBtn = debugBottomBarBtns.secondary._bottomButton;
+    if (mainBtn.isVisible || secondaryBtn.isVisible) {
+      debugBottomBar.style.display = 'flex';
+      bottomBarHeight = 58;
+      if (mainBtn.isVisible && secondaryBtn.isVisible) {
+        if (secondaryBtn.position == 'top') {
+          debugBottomBar.style.flexDirection = 'column-reverse';
+          bottomBarHeight += 51;
+        } else if (secondaryBtn.position == 'bottom') {
+          debugBottomBar.style.flexDirection = 'column';
+          bottomBarHeight += 51;
+        } else if (secondaryBtn.position == 'left') {
+          debugBottomBar.style.flexDirection = 'row-reverse';
+        } else if (secondaryBtn.position == 'right') {
+          debugBottomBar.style.flexDirection = 'row';
+        }
+      }
+    } else {
+      debugBottomBar.style.display = 'none';
+      bottomBarHeight = 0;
+    }
+    debugBottomBar.style.background = getBottomBarColor();
+    if (document.documentElement) {
+      document.documentElement.style.boxSizing = 'border-box';
+      document.documentElement.style.paddingBottom = bottomBarHeight + 'px';
+    }
+    setViewportHeight();
+  }
+
+
+  var BottomButtonConstructor = function(type) {
+    var isMainButton = (type == 'main');
+    if (isMainButton) {
+      var setupFnName = 'web_app_setup_main_button';
+      var tgEventName = 'main_button_pressed';
+      var webViewEventName = 'mainButtonClicked';
+      var buttonTextDefault = 'Continue';
+      var buttonColorDefault = function(){ return themeParams.button_color || '#2481cc'; };
+      var buttonTextColorDefault = function(){ return themeParams.button_text_color || '#ffffff'; };
+    } else {
+      var setupFnName = 'web_app_setup_secondary_button';
+      var tgEventName = 'secondary_button_pressed';
+      var webViewEventName = 'secondaryButtonClicked';
+      var buttonTextDefault = 'Cancel';
+      var buttonColorDefault = function(){ return getBottomBarColor(); };
+      var buttonTextColorDefault = function(){ return themeParams.button_color || '#2481cc'; };
+    }
+
     var isVisible = false;
     var isActive = true;
+    var hasShineEffect = false;
     var isProgressVisible = false;
-    var buttonText = 'CONTINUE';
+    var buttonType = type;
+    var buttonText = buttonTextDefault;
     var buttonColor = false;
     var buttonTextColor = false;
+    var buttonPosition = 'left';
 
-    var mainButton = {};
-    Object.defineProperty(mainButton, 'text', {
-      set: function(val){ mainButton.setParams({text: val}); },
+    var bottomButton = {};
+    Object.defineProperty(bottomButton, 'type', {
+      get: function(){ return buttonType; },
+      enumerable: true
+    });
+    Object.defineProperty(bottomButton, 'text', {
+      set: function(val){ bottomButton.setParams({text: val}); },
       get: function(){ return buttonText; },
       enumerable: true
     });
-    Object.defineProperty(mainButton, 'color', {
-      set: function(val){ mainButton.setParams({color: val}); },
-      get: function(){ return buttonColor || themeParams.button_color || '#2481cc'; },
+    Object.defineProperty(bottomButton, 'color', {
+      set: function(val){ bottomButton.setParams({color: val}); },
+      get: function(){ return buttonColor || buttonColorDefault(); },
       enumerable: true
     });
-    Object.defineProperty(mainButton, 'textColor', {
-      set: function(val){ mainButton.setParams({text_color: val}); },
-      get: function(){ return buttonTextColor || themeParams.button_text_color || '#ffffff'; },
+    Object.defineProperty(bottomButton, 'textColor', {
+      set: function(val){ bottomButton.setParams({text_color: val}); },
+      get: function(){ return buttonTextColor || buttonTextColorDefault(); },
       enumerable: true
     });
-    Object.defineProperty(mainButton, 'isVisible', {
-      set: function(val){ mainButton.setParams({is_visible: val}); },
+    Object.defineProperty(bottomButton, 'isVisible', {
+      set: function(val){ bottomButton.setParams({is_visible: val}); },
       get: function(){ return isVisible; },
       enumerable: true
     });
-    Object.defineProperty(mainButton, 'isProgressVisible', {
+    Object.defineProperty(bottomButton, 'isProgressVisible', {
       get: function(){ return isProgressVisible; },
       enumerable: true
     });
-    Object.defineProperty(mainButton, 'isActive', {
-      set: function(val){ mainButton.setParams({is_active: val}); },
+    Object.defineProperty(bottomButton, 'isActive', {
+      set: function(val){ bottomButton.setParams({is_active: val}); },
       get: function(){ return isActive; },
       enumerable: true
     });
+    Object.defineProperty(bottomButton, 'hasShineEffect', {
+      set: function(val){ bottomButton.setParams({has_shine_effect: val}); },
+      get: function(){ return hasShineEffect; },
+      enumerable: true
+    });
+    if (!isMainButton) {
+      Object.defineProperty(bottomButton, 'position', {
+        set: function(val){ bottomButton.setParams({position: val}); },
+        get: function(){ return buttonPosition; },
+        enumerable: true
+      });
+    }
 
     var curButtonState = null;
 
-    WebView.onEvent('main_button_pressed', onMainButtonPressed);
+    WebView.onEvent(tgEventName, onBottomButtonPressed);
 
-    var debugBtn = null, debugBtnStyle = {};
+    var debugBtn = null;
     if (initParams.tgWebAppDebug) {
-      debugBtn = document.createElement('tg-main-button');
-      debugBtnStyle = {
-        font: '600 14px/18px sans-serif',
+      debugBtn = document.createElement('tg-bottom-button');
+      var debugBtnStyle = {
         display: 'none',
         width: '100%',
-        height: '48px',
+        height: '44px',
         borderRadius: '0',
         background: 'no-repeat right center',
-        position: 'fixed',
-        left: '0',
-        right: '0',
-        bottom: '0',
-        margin: '0',
-        padding: '15px 20px',
+        padding: '13px 15px',
         textAlign: 'center',
-        boxSizing: 'border-box',
-        zIndex: '10000'
+        boxSizing: 'border-box'
       };
       for (var k in debugBtnStyle) {
         debugBtn.style[k] = debugBtnStyle[k];
       }
-      document.addEventListener('DOMContentLoaded', function onDomLoaded(event) {
-        document.removeEventListener('DOMContentLoaded', onDomLoaded);
-        document.body.appendChild(debugBtn);
-        debugBtn.addEventListener('click', onMainButtonPressed, false);
-      });
+      debugBottomBar.appendChild(debugBtn);
+      debugBtn.addEventListener('click', onBottomButtonPressed, false);
+      debugBtn._bottomButton = bottomButton;
+      debugBottomBarBtns[type] = debugBtn;
     }
 
-    function onMainButtonPressed() {
+    function onBottomButtonPressed() {
       if (isActive) {
-        receiveWebViewEvent('mainButtonClicked');
+        receiveWebViewEvent(webViewEventName);
       }
     }
 
     function buttonParams() {
-      var color = mainButton.color;
-      var text_color = mainButton.textColor;
-      return isVisible ? {
-        is_visible: true,
-        is_active: isActive,
-        is_progress_visible: isProgressVisible,
-        text: buttonText,
-        color: color,
-        text_color: text_color
-      } : {is_visible: false};
+      var color = bottomButton.color;
+      var text_color = bottomButton.textColor;
+      if (isVisible) {
+        var params = {
+          is_visible: true,
+          is_active: isActive,
+          is_progress_visible: isProgressVisible,
+          text: buttonText,
+          color: color,
+          text_color: text_color,
+          has_shine_effect: hasShineEffect && isActive && !isProgressVisible
+        };
+        if (!isMainButton) {
+          params.position = buttonPosition;
+        }
+      } else {
+        var params = {
+          is_visible: false
+        };
+      }
+      return params;
     }
 
     function buttonState(btn_params) {
@@ -819,7 +964,7 @@
         return;
       }
       curButtonState = btn_state;
-      WebView.postEvent('web_app_setup_main_button', false, btn_params);
+      WebView.postEvent(setupFnName, false, btn_params);
       if (initParams.tgWebAppDebug) {
         updateDebugButton(btn_params);
       }
@@ -828,36 +973,31 @@
     function updateDebugButton(btn_params) {
       if (btn_params.is_visible) {
         debugBtn.style.display = 'block';
-        mainButtonHeight = 48;
 
         debugBtn.style.opacity = btn_params.is_active ? '1' : '0.8';
         debugBtn.style.cursor = btn_params.is_active ? 'pointer' : 'auto';
         debugBtn.disabled = !btn_params.is_active;
         debugBtn.innerText = btn_params.text;
-        debugBtn.style.backgroundImage = btn_params.is_progress_visible ? "url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20viewport%3D%220%200%2048%2048%22%20width%3D%2248px%22%20height%3D%2248px%22%3E%3Ccircle%20cx%3D%2250%25%22%20cy%3D%2250%25%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.25%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%20stroke-dashoffset%3D%22106%22%20r%3D%229%22%20stroke-dasharray%3D%2256.52%22%20rotate%3D%22-90%22%3E%3Canimate%20attributeName%3D%22stroke-dashoffset%22%20attributeType%3D%22XML%22%20dur%3D%22360s%22%20from%3D%220%22%20to%3D%2212500%22%20repeatCount%3D%22indefinite%22%3E%3C%2Fanimate%3E%3CanimateTransform%20attributeName%3D%22transform%22%20attributeType%3D%22XML%22%20type%3D%22rotate%22%20dur%3D%221s%22%20from%3D%22-90%2024%2024%22%20to%3D%22630%2024%2024%22%20repeatCount%3D%22indefinite%22%3E%3C%2FanimateTransform%3E%3C%2Fcircle%3E%3C%2Fsvg%3E')" : 'none';
+        debugBtn.className = btn_params.has_shine_effect ? 'shine' : '';
+        debugBtn.style.backgroundImage = btn_params.is_progress_visible ? "url('data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewport="0 0 48 48" width="48px" height="48px"><circle cx="50%" cy="50%" stroke="' + btn_params.text_color + '" stroke-width="2.25" stroke-linecap="round" fill="none" stroke-dashoffset="106" r="9" stroke-dasharray="56.52" rotate="-90"><animate attributeName="stroke-dashoffset" attributeType="XML" dur="360s" from="0" to="12500" repeatCount="indefinite"></animate><animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s" from="-90 24 24" to="630 24 24" repeatCount="indefinite"></animateTransform></circle></svg>') + "')" : 'none';
         debugBtn.style.backgroundColor = btn_params.color;
         debugBtn.style.color = btn_params.text_color;
       } else {
         debugBtn.style.display = 'none';
-        mainButtonHeight = 0;
       }
-      if (document.documentElement) {
-        document.documentElement.style.boxSizing = 'border-box';
-        document.documentElement.style.paddingBottom = mainButtonHeight + 'px';
-      }
-      setViewportHeight();
+      updateDebugBottomBar();
     }
 
     function setParams(params) {
       if (typeof params.text !== 'undefined') {
         var text = strTrim(params.text);
         if (!text.length) {
-          console.error('[Telegram.WebApp] Main button text is required', params.text);
-          throw Error('WebAppMainButtonParamInvalid');
+          console.error('[Telegram.WebApp] Bottom button text is required', params.text);
+          throw Error('WebAppBottomButtonParamInvalid');
         }
         if (text.length > 64) {
-          console.error('[Telegram.WebApp] Main button text is too long', text);
-          throw Error('WebAppMainButtonParamInvalid');
+          console.error('[Telegram.WebApp] Bottom button text is too long', text);
+          throw Error('WebAppBottomButtonParamInvalid');
         }
         buttonText = text;
       }
@@ -868,8 +1008,8 @@
         } else {
           var color = parseColorToHex(params.color);
           if (!color) {
-            console.error('[Telegram.WebApp] Main button color format is invalid', params.color);
-            throw Error('WebAppMainButtonParamInvalid');
+            console.error('[Telegram.WebApp] Bottom button color format is invalid', params.color);
+            throw Error('WebAppBottomButtonParamInvalid');
           }
           buttonColor = color;
         }
@@ -881,67 +1021,80 @@
         } else {
           var text_color = parseColorToHex(params.text_color);
           if (!text_color) {
-            console.error('[Telegram.WebApp] Main button text color format is invalid', params.text_color);
-            throw Error('WebAppMainButtonParamInvalid');
+            console.error('[Telegram.WebApp] Bottom button text color format is invalid', params.text_color);
+            throw Error('WebAppBottomButtonParamInvalid');
           }
           buttonTextColor = text_color;
         }
       }
       if (typeof params.is_visible !== 'undefined') {
         if (params.is_visible &&
-            !mainButton.text.length) {
-          console.error('[Telegram.WebApp] Main button text is required');
-          throw Error('WebAppMainButtonParamInvalid');
+            !bottomButton.text.length) {
+          console.error('[Telegram.WebApp] Bottom button text is required');
+          throw Error('WebAppBottomButtonParamInvalid');
         }
         isVisible = !!params.is_visible;
+      }
+      if (typeof params.has_shine_effect !== 'undefined') {
+        hasShineEffect = !!params.has_shine_effect;
+      }
+      if (!isMainButton && typeof params.position !== 'undefined') {
+        if (params.position != 'left' && params.position != 'right' &&
+            params.position != 'top' && params.position != 'bottom') {
+          console.error('[Telegram.WebApp] Bottom button posiition is invalid', params.position);
+          throw Error('WebAppBottomButtonParamInvalid');
+        }
+        buttonPosition = params.position;
       }
       if (typeof params.is_active !== 'undefined') {
         isActive = !!params.is_active;
       }
       updateButton();
-      return mainButton;
+      return bottomButton;
     }
 
-    mainButton.setText = function(text) {
-      return mainButton.setParams({text: text});
+    bottomButton.setText = function(text) {
+      return bottomButton.setParams({text: text});
     };
-    mainButton.onClick = function(callback) {
-      onWebViewEvent('mainButtonClicked', callback);
-      return mainButton;
+    bottomButton.onClick = function(callback) {
+      onWebViewEvent(webViewEventName, callback);
+      return bottomButton;
     };
-    mainButton.offClick = function(callback) {
-      offWebViewEvent('mainButtonClicked', callback);
-      return mainButton;
+    bottomButton.offClick = function(callback) {
+      offWebViewEvent(webViewEventName, callback);
+      return bottomButton;
     };
-    mainButton.show = function() {
-      return mainButton.setParams({is_visible: true});
+    bottomButton.show = function() {
+      return bottomButton.setParams({is_visible: true});
     };
-    mainButton.hide = function() {
-      return mainButton.setParams({is_visible: false});
+    bottomButton.hide = function() {
+      return bottomButton.setParams({is_visible: false});
     };
-    mainButton.enable = function() {
-      return mainButton.setParams({is_active: true});
+    bottomButton.enable = function() {
+      return bottomButton.setParams({is_active: true});
     };
-    mainButton.disable = function() {
-      return mainButton.setParams({is_active: false});
+    bottomButton.disable = function() {
+      return bottomButton.setParams({is_active: false});
     };
-    mainButton.showProgress = function(leaveActive) {
+    bottomButton.showProgress = function(leaveActive) {
       isActive = !!leaveActive;
       isProgressVisible = true;
       updateButton();
-      return mainButton;
+      return bottomButton;
     };
-    mainButton.hideProgress = function() {
-      if (!mainButton.isActive) {
+    bottomButton.hideProgress = function() {
+      if (!bottomButton.isActive) {
         isActive = true;
       }
       isProgressVisible = false;
       updateButton();
-      return mainButton;
+      return bottomButton;
     }
-    mainButton.setParams = setParams;
-    return mainButton;
-  })();
+    bottomButton.setParams = setParams;
+    return bottomButton;
+  };
+  var MainButton = BottomButtonConstructor('main');
+  var SecondaryButton = BottomButtonConstructor('secondary');
 
   var SettingsButton = (function() {
     var isVisible = false;
@@ -1588,11 +1741,11 @@
     enumerable: true
   });
   Object.defineProperty(WebApp, 'viewportHeight', {
-    get: function(){ return (viewportHeight === false ? window.innerHeight : viewportHeight) - mainButtonHeight; },
+    get: function(){ return (viewportHeight === false ? window.innerHeight : viewportHeight) - bottomBarHeight; },
     enumerable: true
   });
   Object.defineProperty(WebApp, 'viewportStableHeight', {
-    get: function(){ return (viewportStableHeight === false ? window.innerHeight : viewportStableHeight) - mainButtonHeight; },
+    get: function(){ return (viewportStableHeight === false ? window.innerHeight : viewportStableHeight) - bottomBarHeight; },
     enumerable: true
   });
   Object.defineProperty(WebApp, 'isClosingConfirmationEnabled', {
@@ -1615,12 +1768,21 @@
     get: function(){ return getBackgroundColor(); },
     enumerable: true
   });
+  Object.defineProperty(WebApp, 'bottomBarColor', {
+    set: function(val){ setBottomBarColor(val); },
+    get: function(){ return getBottomBarColor(); },
+    enumerable: true
+  });
   Object.defineProperty(WebApp, 'BackButton', {
     value: BackButton,
     enumerable: true
   });
   Object.defineProperty(WebApp, 'MainButton', {
     value: MainButton,
+    enumerable: true
+  });
+  Object.defineProperty(WebApp, 'SecondaryButton', {
+    value: SecondaryButton,
     enumerable: true
   });
   Object.defineProperty(WebApp, 'SettingsButton', {
@@ -1644,6 +1806,9 @@
   };
   WebApp.setBackgroundColor = function(color) {
     WebApp.backgroundColor = color;
+  };
+  WebApp.setBottomBarColor = function(color) {
+    WebApp.bottomBarColor = color;
   };
   WebApp.enableClosingConfirmation = function() {
     WebApp.isClosingConfirmationEnabled = true;
@@ -2044,6 +2209,7 @@
 
   updateHeaderColor();
   updateBackgroundColor();
+  updateBottomBarColor();
   setViewportHeight();
   if (initParams.tgWebAppShowSettings) {
     SettingsButton.show();
