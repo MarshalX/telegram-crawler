@@ -65,8 +65,8 @@
 
 ---functions---
 
-<a href='/method/messages.sendMedia'>messages.sendMedia</a>#72ccc23d flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> update_stickersets_order:flags.15?<a href='/constructor/true'>true</a> invert_media:flags.16?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to:flags.0?<a href='/type/InputReplyTo'>InputReplyTo</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;
-<a href='/method/messages.uploadMedia'>messages.uploadMedia</a>#519bc2b1 peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
+<a href='/method/messages.sendMedia'>messages.sendMedia</a>#7852834e flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> update_stickersets_order:flags.15?<a href='/constructor/true'>true</a> invert_media:flags.16?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to:flags.0?<a href='/type/InputReplyTo'>InputReplyTo</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> quick_reply_shortcut:flags.17?<a href='/type/InputQuickReplyShortcut'>InputQuickReplyShortcut</a> effect:flags.18?<a href='/type/long'>long</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/messages.uploadMedia'>messages.uploadMedia</a>#14967978 flags:<a href='/type/%23'>#</a> business_connection_id:flags.0?<a href='/type/string'>string</a> peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
 <a href='/method/messages.sendEncryptedFile'>messages.sendEncryptedFile</a>#5559481d flags:<a href='/type/%23'>#</a> silent:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputEncryptedChat'>InputEncryptedChat</a> random_id:<a href='/type/long'>long</a> data:<a href='/type/bytes'>bytes</a> file:<a href='/type/InputEncryptedFile'>InputEncryptedFile</a> = <a href='/type/messages.SentEncryptedMessage'>messages.SentEncryptedMessage</a>;
 
 <a href='/method/photos.uploadProfilePhoto'>photos.uploadProfilePhoto</a>#388a3b5 flags:<a href='/type/%23'>#</a> fallback:flags.3?<a href='/constructor/true'>true</a> bot:flags.5?<a href='/type/InputUser'>InputUser</a> file:flags.0?<a href='/type/InputFile'>InputFile</a> video:flags.1?<a href='/type/InputFile'>InputFile</a> video_start_ts:flags.2?<a href='/type/double'>double</a> video_emoji_markup:flags.4?<a href='/type/VideoSize'>VideoSize</a> = <a href='/type/photos.Photo'>photos.Photo</a>;    
@@ -99,6 +99,11 @@
 <li>FILE_PART_EMPTY: The file part sent is empty</li>
 <li>FILE_PART_SIZE_INVALID - 512KB cannot be evenly divided by <strong>part_size</strong></li>
 <li>FILE_PART_SIZE_CHANGED - The part size is different from the size of one of the previous parts in the same file</li>
+<li>FLOOD_PREMIUM_WAIT_X: Indicates that upload speed is limited because the current account does not have a <a href="/api/premium">Premium</a> subscription, and that the query must be automatically repeated by the client after X seconds.<br>
+When receiving this error, clients should display the <a href="/api/premium">Telegram Premium subscription modal</a>, offering the user to purchase a Premium subscription to increase upload speed <a href="/api/config#upload-premium-speedup-upload">upload_premium_speedup_upload »</a> times.<br>
+Note that this modal should only be displayed if the file that is being uploaded is currently visible to the user; if it isn't, the modal should be displayed once the loading/already loaded media becomes visible.<br>
+Also, this modal should only be shown <strong>at most</strong> every <a href="/api/config#upload-premium-speedup-notify-period">upload_premium_speedup_notify_period »</a>, to avoid bombarding the user with this popup for every file whose upload is slowed down.<br>
+This error can only be received when the user has uploaded tens of gigabytes or more.  </li>
 </ul>
 <p>While the parts are being uploaded, an <a href="https://en.wikipedia.org/wiki/MD5">MD5 hash</a> of the file contents can also be computed to be used later as the <strong>md5_checksum</strong> parameter in the <a href="/constructor/inputFile">inputFile</a> constructor (since it is checked only by the server, for encrypted secret chat files it must be generated from the encrypted file).<br>
 After the entire file is successfully saved, the final method may be called and passed the generated <a href="/type/InputFile">inputFile</a> object. In case the <a href="/method/upload.saveBigFilePart">upload.saveBigFilePart</a> method is used, the <a href="/constructor/inputFileBig">inputFileBig</a> constructor must be passed, in other cases use <a href="/constructor/inputFile">inputFile</a>.</p>
@@ -113,6 +118,21 @@ After the entire file is successfully saved, the final method may be called and 
 <li>FILE_PART_X_MISSING: Part X (where X is a number) of the file is missing from storage. Try repeating the method call to resave the part.</li>
 <li>MD5_CHECKSUM_INVALID: The file's MD5 checksum did not match the <strong>md5_checksum</strong> parameter</li>
 </ul>
+<h3><a class="anchor" href="#editing-uploaded-files" id="editing-uploaded-files" name="editing-uploaded-files"><i class="anchor-icon"></i></a>Editing uploaded files</h3>
+<pre><code><a href='/constructor/inputMediaPhoto'>inputMediaPhoto</a>#b3ba0635 flags:<a href='/type/%23'>#</a> spoiler:flags.1?<a href='/constructor/true'>true</a> id:<a href='/type/InputPhoto'>InputPhoto</a> ttl_seconds:flags.0?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
+<a href='/constructor/inputMediaDocument'>inputMediaDocument</a>#33473058 flags:<a href='/type/%23'>#</a> spoiler:flags.2?<a href='/constructor/true'>true</a> id:<a href='/type/InputDocument'>InputDocument</a> ttl_seconds:flags.0?<a href='/type/int'>int</a> query:flags.1?<a href='/type/string'>string</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
+
+<a href='/constructor/inputMediaUploadedPhoto'>inputMediaUploadedPhoto</a>#1e287d04 flags:<a href='/type/%23'>#</a> spoiler:flags.2?<a href='/constructor/true'>true</a> file:<a href='/type/InputFile'>InputFile</a> stickers:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputDocument'>InputDocument</a>&gt; ttl_seconds:flags.1?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
+<a href='/constructor/inputMediaUploadedDocument'>inputMediaUploadedDocument</a>#5b38c6c1 flags:<a href='/type/%23'>#</a> nosound_video:flags.3?<a href='/constructor/true'>true</a> force_file:flags.4?<a href='/constructor/true'>true</a> spoiler:flags.5?<a href='/constructor/true'>true</a> file:<a href='/type/InputFile'>InputFile</a> thumb:flags.2?<a href='/type/InputFile'>InputFile</a> mime_type:<a href='/type/string'>string</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; stickers:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputDocument'>InputDocument</a>&gt; ttl_seconds:flags.1?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
+---functions---
+
+<a href='/method/messages.editMessage'>messages.editMessage</a>#dfd14005 flags:<a href='/type/%23'>#</a> no_webpage:flags.1?<a href='/constructor/true'>true</a> invert_media:flags.16?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> message:flags.11?<a href='/type/string'>string</a> media:flags.14?<a href='/type/InputMedia'>InputMedia</a> reply_markup:flags.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:flags.15?<a href='/type/int'>int</a> quick_reply_shortcut_id:flags.17?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Use <a href="/method/messages.editMessage">messages.editMessage</a> to edit or replace a media file sent using <a href="/method/messages.sendMedia">messages.sendMedia</a> and <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a>.  </p>
+<p>If one wishes to edit only the <code>spoiler</code>, <code>ttl_seconds</code> or <code>query</code> attributes of the media, this may be done without reuploading the entire media file, by simply passing the old media to the <code>id</code> parameter of <a href="/constructor/inputMediaPhoto">inputMediaPhoto</a>, <a href="/constructor/inputMediaDocument">inputMediaDocument</a> and updating the values of the <code>spoiler</code>/<code>ttl_seconds</code>/<code>query</code> attributes as needed.  </p>
+<p>If one wishes to edit any other attribute (for example, the file name specified in <a href="/constructor/documentAttributeFilename">documentAttributeFilename</a>, any other <a href="/type/DocumentAttribute">DocumentAttribute</a> or any flag different from <code>spoiler</code>/<code>ttl_seconds</code>/<code>query</code>) <strong>a full reupload of the file is required</strong>, in order to be able to specify the new attributes in <a href="/constructor/inputMediaUploadedPhoto">inputMediaUploadedPhoto</a>/<a href="/constructor/inputMediaUploadedDocument">inputMediaUploadedDocument</a>.  </p>
+<p>The only exception to this rule is when editing the <a href="/constructor/documentAttributeVideo">documentAttributeVideo</a>.<code>video_start_ts</code> attribute of video <a href="/api/stories">stories</a>, in which case <a href="/constructor/inputMediaDocument">inputMediaDocument</a> may still be used with <a href="/constructor/inputFileStoryDocument">inputFileStoryDocument</a> instead of <a href="/constructor/inputFile">inputFile</a> without reuploading the entire story video, see <a href="/api/stories#editing-stories">here »</a> for more info on the full flow.</p>
 <h4><a class="anchor" href="#streamed-uploads" id="streamed-uploads" name="streamed-uploads"><i class="anchor-icon"></i></a>Streamed uploads</h4>
 <p>The API also supports streamed uploads, in cases where the length of the file is not known before starting the upload.  </p>
 <p>This is useful for example when converting a video, to avoid buffering the entire converted video on the filesystem, each part is uploaded immediately as soon as it is produced by the encoder.  </p>
@@ -136,12 +156,12 @@ After the entire file is successfully saved, the final method may be called and 
 
 ---functions---
 
-<a href='/method/messages.sendMultiMedia'>messages.sendMultiMedia</a>#456e8987 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> update_stickersets_order:flags.15?<a href='/constructor/true'>true</a> invert_media:flags.16?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to:flags.0?<a href='/type/InputReplyTo'>InputReplyTo</a> multi_media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSingleMedia'>InputSingleMedia</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<a href='/method/messages.sendMultiMedia'>messages.sendMultiMedia</a>#37b74355 flags:<a href='/type/%23'>#</a> silent:flags.5?<a href='/constructor/true'>true</a> background:flags.6?<a href='/constructor/true'>true</a> clear_draft:flags.7?<a href='/constructor/true'>true</a> noforwards:flags.14?<a href='/constructor/true'>true</a> update_stickersets_order:flags.15?<a href='/constructor/true'>true</a> invert_media:flags.16?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to:flags.0?<a href='/type/InputReplyTo'>InputReplyTo</a> multi_media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSingleMedia'>InputSingleMedia</a>&gt; schedule_date:flags.10?<a href='/type/int'>int</a> send_as:flags.13?<a href='/type/InputPeer'>InputPeer</a> quick_reply_shortcut:flags.17?<a href='/type/InputQuickReplyShortcut'>InputQuickReplyShortcut</a> effect:flags.18?<a href='/type/long'>long</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Telegram allows grouping photos into <a href="https://telegram.org/blog/albums-saved-messages">albums</a> and generic files (audio, docuemnts) into media groups.  </p>
 <p>To do this, <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> is used, wrapping each <a href="/type/InputMedia">InputMedia</a> constructor (uploaded or pre-existing, maximum 10 per media group) into an <a href="/constructor/inputSingleMedia">inputSingleMedia</a> constructor, optionally providing a custom per-file caption in <code>message</code>.  </p>
 <p>For photo albums, clients should display an album caption only if exactly one photo in the group has a caption, otherwise no album caption should be displayed, and only when viewing in detail a specific photo of the group the caption should be shown.<br>
 Other grouped media can display a caption under each file.  </p>
-<h4><a class="anchor" href="#re-using-pre-uploaded-files" id="re-using-pre-uploaded-files" name="re-using-pre-uploaded-files"><i class="anchor-icon"></i></a>Re-using pre-uploaded files</h4>
+<h4><a class="anchor" href="#uploading-by-hash" id="uploading-by-hash" name="uploading-by-hash"><i class="anchor-icon"></i></a>Uploading by hash</h4>
 <pre><code><a href='/constructor/document'>document</a>#8fd4c4d8 flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/long'>long</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
 
 ---functions---
@@ -191,6 +211,7 @@ Use the <a href="/constructor/inputChatPhoto">inputChatPhoto</a> to reuse previo
 <p>The profile picture should be rendered by placing the sticker at the center of a square canvas, in such a way that it occupies at most 67% of it. The background of the canvas is generated from <code>background_colors</code>, which contains a vector of 1, 2, 3 or 4 RBG-24 colors used to generate a solid (1), gradient (2) or freeform gradient (3, 4) background, similar to how <a href="/api/wallpapers#fill-types">fill wallpapers</a> are generated. The rotation angle for gradient backgrounds is 0.<br>
 If animated or video stickers/custom emojis are used, the <code>video_start_ts</code> flag can contain a floating point UNIX timestamp in seconds, indicating the frame of the profile picture that should be used as static preview.  </p>
 <p><a href="/method/account.getDefaultProfilePhotoEmojis">account.getDefaultProfilePhotoEmojis</a> may be used to fetch a list of suggested <a href="/api/custom-emoji">custom emojis</a> that can be used as profile pictures even by non-premium accounts; <a href="/method/account.getDefaultGroupPhotoEmojis">account.getDefaultGroupPhotoEmojis</a> is the counterpart for group profile pictures.</p>
+<p>The custom emoji selection UI should offer a list of categories to quickly filter results by a (list of) emojis, or by some other criteria, see <a href="/api/emoji-categories">here »</a> for more info.  </p>
 <h3><a class="anchor" href="#downloading-files" id="downloading-files" name="downloading-files"><i class="anchor-icon"></i></a>Downloading files</h3>
 <p>There are methods available to download files which have been successfully uploaded. The schema of the types and methods used is presented below:</p>
 <pre><code><a href='/constructor/upload.file'>upload.file</a>#96a18d5 type:<a href='/type/storage.FileType'>storage.FileType</a> mtime:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/upload.File'>upload.File</a>;
@@ -247,7 +268,7 @@ The data for the input parameter of the <a href="/type/InputFileLocation">InputF
 <p>For photos, <a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a> is used:</p>
 <ul>
 <li><code>id</code>, <code>file_reference</code> and <code>access_hash</code> taken from the <a href="/constructor/photo">photo</a> constructor</li>
-<li><code>thumb_size</code> taken from the <code>type</code> field of the desired <a href="/type/PhotoSize">PhotoSize</a> of the <a href="/constructor/photo">photo</a></li>
+<li><code>thumb_size</code> taken from the <code>type</code> field of the desired <a href="/type/PhotoSize">PhotoSize</a>/<a href="/type/VideoSize">VideoSize</a> of the <a href="/constructor/photo">photo</a></li>
 </ul>
 </li>
 <li>
@@ -262,7 +283,7 @@ The data for the input parameter of the <a href="/type/InputFileLocation">InputF
 <p>For documents, <a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a> is used:</p>
 <ul>
 <li><code>id</code>, <code>file_reference</code> and <code>access_hash</code> taken from the <a href="/constructor/document">document</a> constructor</li>
-<li>If downloading the thumbnail of a document, <code>thumb_size</code> should be taken from the <code>type</code> field of the desired <a href="/type/PhotoSize">PhotoSize</a> of the <a href="/constructor/photo">photo</a>; otherwise, provide an empty string.</li>
+<li>If downloading the thumbnail of a document or a <a href="/api/stickers#premium-animated-sticker-effects">premium sticker effect</a>, <code>thumb_size</code> should be taken from the <code>type</code> field of the desired <a href="/type/PhotoSize">PhotoSize</a>/<a href="/type/VideoSize">VideoSize</a> of the <a href="/constructor/photo">photo</a>; otherwise, provide an empty string.</li>
 </ul>
 </li>
 <li>
@@ -309,7 +330,7 @@ The data for the input parameter of the <a href="/type/InputFileLocation">InputF
 <ul>
 <li><strong>offset</strong> / (1024 * 1024) == (<strong>offset</strong> + <strong>limit</strong> - 1) / (1024 * 1024).</li>
 </ul>
-<p>When downloading multiple files in parallel from the same DC, clients should limit the parallelism to download at most <code>small_queue_max_active_operations_count</code>/<code>large_queue_max_active_operations_count</code> files in parallel when downloading files smaller/bigger than 20MB (<a href="/api/config#client-configuration">client configuration parameters »</a>).  </p>
+<p>When downloading multiple files in parallel from the same DC, clients should limit the parallelism to download at most <code>small_queue_max_active_operations_count</code>/<code>large_queue_max_active_operations_count</code> files in parallel when downloading files smaller/bigger than 20MB (<a href="/api/config#client-configuration">client configuration parameters »</a>).  </p>
 <p>The file download operation may return a <code>FILE_REFERENCE_EXPIRED</code> error (or another error starting with <code>FILE_REFERENCE_</code>): in this case, the <code>file_reference</code> field of the input location must be <a href="/api/file_reference">refreshed</a>.
 The file download operation may return an <a href="/constructor/upload.fileCdnRedirect">upload.fileCdnRedirect</a> constructor: in this case, <a href="/cdn">these</a> instructions must be followed for downloading CDN files.
 The file download operation may also return one of the following <a href="/api/errors#400-bad-request">data input errors</a>:</p>
@@ -318,6 +339,12 @@ The file download operation may also return one of the following <a href="/api/e
 <li>OFFSET_INVALID: The <strong>offset</strong> value is invalid</li>
 <li>LIMIT_INVALID: The <strong>limit</strong> value is invalid</li>
 <li>FILE_MIGRATE_X: The file is in the datacenter No. X</li>
+<li>FLOOD_WAIT_X: Repeat the query after X seconds</li>
+<li>FLOOD_PREMIUM_WAIT_X: Indicates that download speed is limited because the current account does not have a <a href="/api/premium">Premium</a> subscription, and that the query must be automatically repeated by the client after X seconds.<br>
+When receiving this error, clients should display the <a href="/api/premium">Telegram Premium subscription modal</a>, offering the user to purchase a Premium subscription to increase download speed <a href="/api/config#upload-premium-speedup-download">upload_premium_speedup_download »</a> times.<br>
+Note that this modal should only be displayed if the file that is being downloaded is currently visible to the user; if it isn't, the modal should be displayed once the loading/already loaded media becomes visible.<br>
+Also, this modal should only be shown <strong>at most</strong> every <a href="/api/config#upload-premium-speedup-notify-period">upload_premium_speedup_notify_period »</a>, to avoid bombarding the user with this popup for every file whose download is slowed down.<br>
+This error can only be received when the user has uploaded tens of gigabytes or more.  </li>
 </ul>
 <h4><a class="anchor" href="#verifying-downloaded-chunks" id="verifying-downloaded-chunks" name="verifying-downloaded-chunks"><i class="anchor-icon"></i></a>Verifying downloaded chunks</h4>
 <pre><code><a href='/constructor/fileHash'>fileHash</a>#f39b035c offset:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/bytes'>bytes</a> = <a href='/type/FileHash'>FileHash</a>;
@@ -426,7 +453,7 @@ The server also generates a trimmed and scaled down video preview for videos, GI
 <pre><code><a href='/constructor/photoStrippedSize'>photoStrippedSize</a>#e0b0bc2e type:<a href='/type/string'>string</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/PhotoSize'>PhotoSize</a>;</code></pre>
 <p>A <a href="/constructor/photoStrippedSize">photoStrippedSize</a> (with type <code>i</code>) is an extremely low-res thumbnail, embedded directly inside media location objects.<br>
 It should be shown to the user in chat message previews, or while still downloading the most appropriately sized <a href="/constructor/photoSize">photoSize</a> through the media DCs as <a href="#downloading-files">described above</a>.  </p>
-<p>The stripped <code>bytes</code> payload should be inflated to a JPG payload as seen <a href="https://github.com/telegramdesktop/tdesktop/blob/1757dd856b84d23f83d4e562c94dde825f6eb40c/Telegram/SourceFiles/ui/image/image.cpp#L43">here »</a>.</p>
+<p>The stripped <code>bytes</code> payload should be inflated to a JPG payload as seen <a href="https://github.com/telegramdesktop/tdesktop/blob/1757dd856b84d23f83d4e562c94dde825f6eb40c/Telegram/SourceFiles/ui/image/image.cpp#L43">here »</a>.</p>
 <h4><a class="anchor" href="#vector-thumbnails" id="vector-thumbnails" name="vector-thumbnails"><i class="anchor-icon"></i></a>Vector thumbnails</h4>
 <pre><code><a href='/constructor/photoPathSize'>photoPathSize</a>#d8214d41 type:<a href='/type/string'>string</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/PhotoSize'>PhotoSize</a>;</code></pre>
 <p>Messages with <a href="/api/stickers#animated-stickers">animated</a>, <a href="/api/stickers#video-stickers">video</a>, <a href="/api/stickers#static-stickers">static</a> stickers can have a compressed svg (&lt; 300 bytes) to show the outline of the sticker before fetching the actual sticker.
@@ -463,7 +490,7 @@ path += "z"</code></pre>
 &lt;/svg&gt;</code></pre>
 <h4><a class="anchor" href="#video-types" id="video-types" name="video-types"><i class="anchor-icon"></i></a>Video types</h4>
 <pre><code><a href='/constructor/videoSize'>videoSize</a>#de33b094 flags:<a href='/type/%23'>#</a> type:<a href='/type/string'>string</a> w:<a href='/type/int'>int</a> h:<a href='/type/int'>int</a> size:<a href='/type/int'>int</a> video_start_ts:flags.0?<a href='/type/double'>double</a> = <a href='/type/VideoSize'>VideoSize</a>;</code></pre>
-<p>A <a href="/constructor/videoSize">videoSize</a> constructor is typically used for <a href="#animated-profile-pictures">animated profile pictures</a> and video previews.</p>
+<p>A <a href="/constructor/videoSize">videoSize</a> constructor is typically used for <a href="#animated-profile-pictures">animated profile pictures</a>, video previews and <a href="/api/stickers#premium-animated-sticker-effects">premium sticker effects »</a>.</p>
 <table class="table">
 <thead>
 <tr>
@@ -482,6 +509,11 @@ path += "z"</code></pre>
 <td><code>v</code></td>
 <td>Video preview</td>
 <td>MPEG4</td>
+</tr>
+<tr>
+<td><code>f</code></td>
+<td><a href="/api/stickers#premium-animated-sticker-effects">Premium sticker effect »</a></td>
+<td><a href="/api/stickers#animated-stickers">TGS »</a></td>
 </tr>
 </tbody>
 </table>

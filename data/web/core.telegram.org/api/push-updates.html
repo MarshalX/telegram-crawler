@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>Handling PUSH-notifications</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="How to subscribe to and handle PUSH notifications ">
+    <meta property="description" content="How to subscribe to and handle PUSH notifications">
     <meta property="og:title" content="Handling PUSH-notifications">
     <meta property="og:image" content="f171b7d56879c20c22">
-    <meta property="og:description" content="How to subscribe to and handle PUSH notifications ">
+    <meta property="og:description" content="How to subscribe to and handle PUSH notifications">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -148,9 +148,24 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>Messages were deleted, remove multiple notifications for this chat</td>
 </tr>
 <tr>
+<td>READ_REACTION</td>
+<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.messages</strong>: Comma-separated IDs of messages whose reactions were read</td>
+<td>Reactions were read on messages, remove reaction-related notifications for those messages</td>
+</tr>
+<tr>
 <td>READ_HISTORY</td>
 <td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read messages</td>
 <td>Message history was read, remove multiple notifications for this chat</td>
+</tr>
+<tr>
+<td>READ_STORIES</td>
+<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read story</td>
+<td>Notifications from stories were read, remove story-related notifications for this chat</td>
+</tr>
+<tr>
+<td>STORY_DELETED</td>
+<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</td>
+<td>A story was deleted, remove notifications for this story</td>
 </tr>
 <tr>
 <td>GEO_LIVE_PENDING</td>
@@ -258,6 +273,11 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>CHANNEL_MESSAGE_NOTEXT</td>
 <td>{1} posted a message</td>
 <td>1. Channel name</td>
+</tr>
+<tr>
+<td>CHANNEL_MESSAGE_PAID_MEDIA</td>
+<td>{1} posted a paid post for {2} star</td>
+<td>1. Channel name<br>2. <a href="/api/stars">Stars</a></td>
 </tr>
 <tr>
 <td>CHANNEL_MESSAGE_PHOTO</td>
@@ -420,6 +440,11 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>1. Message author<br>2. Chat name</td>
 </tr>
 <tr>
+<td>CHAT_MESSAGE_PAID_MEDIA</td>
+<td>{1} posted a paid post in {2} group for {3} star</td>
+<td>1. Message author<br>2. Chat name<br>3. <a href="/api/stars">Stars</a></td>
+</tr>
+<tr>
 <td>CHAT_MESSAGE_PHOTO</td>
 <td>{1} sent a photo to the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
@@ -528,6 +553,11 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>CHAT_REACT_NOTEXT</td>
 <td>{1}: {3} to your message in {2}</td>
 <td>1. User name<br>2. Group name<br>3. Reaction</td>
+</tr>
+<tr>
+<td>CHAT_REACT_PAID_MEDIA</td>
+<td>{1} reacted {3} in group {2} to your paid post for {4} star</td>
+<td>1. User name<br>2. Group name<br>3. Reaction<br>4. <a href="/api/stars">Stars</a></td>
 </tr>
 <tr>
 <td>CHAT_REACT_PHOTO</td>
@@ -698,6 +728,11 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>MESSAGE_NOTEXT</td>
 <td>{1} sent you a message</td>
 <td>1. Message author</td>
+</tr>
+<tr>
+<td>MESSAGE_PAID_MEDIA</td>
+<td>{1} sent you a paid post for {2} star</td>
+<td>1. Message author<br>2. <a href="/api/stars">Stars</a></td>
 </tr>
 <tr>
 <td>MESSAGE_PHOTO</td>
@@ -910,6 +945,16 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>1. User name<br>2. Group name</td>
 </tr>
 <tr>
+<td>PINNED_PAID_MEDIA</td>
+<td>{1} pinned a paid post for {2} star</td>
+<td>1. User name<br>2. <a href="/api/stars">Stars</a></td>
+</tr>
+<tr>
+<td>PINNED_PAID_MEDIA</td>
+<td>{1} pinned a paid post for {3} star in the group {2}</td>
+<td>1. User name<br>2. Group name<br>3. <a href="/api/stars">Stars</a></td>
+</tr>
+<tr>
 <td>PINNED_PHOTO</td>
 <td>{1} pinned a photo</td>
 <td>1. User name</td>
@@ -1020,6 +1065,11 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>1. User name<br>2. Reaction</td>
 </tr>
 <tr>
+<td>REACT_HIDDEN</td>
+<td>New reaction to your message</td>
+<td> </td>
+</tr>
+<tr>
 <td>REACT_INVOICE</td>
 <td>{1}: {2} to your invoice</td>
 <td>1. User name<br>2. Reaction</td>
@@ -1055,6 +1105,16 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>1. User name<br>2. Reaction<br>3. Sticker emoji</td>
 </tr>
 <tr>
+<td>REACT_STORY</td>
+<td>{1}: {2} to your story</td>
+<td>1. Peer where the story was posted<br>2. Reaction</td>
+</tr>
+<tr>
+<td>REACT_STORY_HIDDEN</td>
+<td>New reaction to your story</td>
+<td> </td>
+</tr>
+<tr>
 <td>REACT_TEXT</td>
 <td>{1}: {2} to your "{3}"</td>
 <td>1. User name<br>2. Reaction<br>3. Message body</td>
@@ -1066,7 +1126,7 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 </tr>
 <tr>
 <td>STORY_HIDDEN_AUTHOR</td>
-<td>A new story was posted (comment: emitted when previews are hidden for this peer)</td>
+<td>A new story was posted</td>
 <td> </td>
 </tr>
 <tr>

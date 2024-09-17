@@ -215,9 +215,9 @@ Use <a href="/method/account.cancelPasswordEmail">account.cancelPasswordEmail</a
 <h3><a class="anchor" href="#password-recovery" id="password-recovery" name="password-recovery"><i class="anchor-icon"></i></a>Password recovery</h3>
 <p>If the user has forgotten their 2FA password, the following recovery options are available:  </p>
 <ul>
-<li>Logged-in sessions only: <a href="#password-reset">password reset »</a></li>
-<li>Logged-in and not logged-in sessions: <a href="#email-recovery">email recovery »</a></li>
-<li>Not logged-in sessions: <a href="#account-deletion">account deletion »</a></li>
+<li>Logged-in sessions only: <a href="#password-reset">password reset »</a></li>
+<li>Logged-in and not logged-in sessions: <a href="#email-recovery">email recovery »</a></li>
+<li>Not logged-in sessions: <a href="#account-deletion">account deletion »</a></li>
 </ul>
 <h4><a class="anchor" href="#password-reset" id="password-reset" name="password-reset"><i class="anchor-icon"></i></a>Password reset</h4>
 <p>Password reset can be requested from logged-in sessions only.  </p>
@@ -234,15 +234,31 @@ Use <a href="/method/account.cancelPasswordEmail">account.cancelPasswordEmail</a
 On success, the call will initially return a <a href="/constructor/account.resetPasswordRequestedWait">account.resetPasswordRequestedWait</a> constructor and start a 7-day server-side timer, during which the user can abort the reset process using a button sent by the Telegram service account or directly in-UI using <a href="/method/account.declinePasswordReset">account.declinePasswordReset</a>.  </p>
 <p>When the time comes, <a href="/method/account.resetPassword">account.resetPassword</a> is invoked once more, returning a <a href="/constructor/account.resetPasswordOk">account.resetPasswordOk</a> to indicate that the password was successfully reset.  </p>
 <p>If the user recently requested a password reset that was canceled, <a href="/constructor/account.resetPasswordFailedWait">account.resetPasswordFailedWait</a> will be returned by the initial <a href="/method/account.resetPassword">account.resetPassword</a> call, and they must wait until the specified date before requesting another reset.  </p>
-<p>Note that if the user already knows their 2FA password and simply wants to disable 2FA, <a href="#setting-a-new-2fa-password">the same process used to enable the password must also be used to disable it »</a>.</p>
+<p>Note that if the user already knows their 2FA password and simply wants to disable 2FA, <a href="#setting-a-new-2fa-password">the same process used to enable the password must also be used to disable it »</a>.</p>
 <h4><a class="anchor" href="#email-recovery" id="email-recovery" name="email-recovery"><i class="anchor-icon"></i></a>Email recovery</h4>
 <p>Email recovery can be requested from logged in sessions, and from non-logged in sessions if the user has successfully provided the login code.<br>
-In both cases, the account must have an associated <a href="#email-verification">recovery email »</a>.  </p>
+In both cases, the account must have an associated <a href="#email-verification">recovery email »</a>.  </p>
 <p>In order to recover a forgotten 2FA password, an email must be sent to the <a href="#email-verification">previously specified address</a> using the <a href="/method/auth.requestPasswordRecovery">auth.requestPasswordRecovery</a> method.<br>
 Use <a href="/method/auth.checkRecoveryPassword">auth.checkRecoveryPassword</a> to make sure that the user provided a valid code.<br>
-Then use <a href="/method/auth.recoverPassword">auth.recoverPassword</a> with the received code to delete the current 2FA password, to set a new one follow <a href="/api/srp">these instructions »</a>.</p>
+Then use <a href="/method/auth.recoverPassword">auth.recoverPassword</a> with the received code to delete the current 2FA password, to set a new one follow <a href="/api/srp">these instructions »</a>.</p>
 <h4><a class="anchor" href="#account-deletion" id="account-deletion" name="account-deletion"><i class="anchor-icon"></i></a>Account deletion</h4>
-<p>If the user has successfully provided the login code, but they forgot their <a href="/api/srp">2FA</a> password and they don't have access to any other logged-in session, the account can be deleted following <a href="/api/account-deletion">these instructions »</a>.  </p>
+<p>If the user has successfully provided the login code, but they forgot their <a href="/api/srp">2FA</a> password and they don't have access to any other logged-in session, the account can be deleted following <a href="/api/account-deletion">these instructions »</a>.  </p>
+<h3><a class="anchor" href="#using-the-2fa-password" id="using-the-2fa-password" name="using-the-2fa-password"><i class="anchor-icon"></i></a>Using the 2FA password</h3>
+<p>Multiple methods in the API such as those used to make <a href="/api/payments">payments</a>, <a href="/method/channels.editCreator">transfer channel ownership</a> and others require the user to authenticate using the 2FA password passed as an <a href="/type/InputCheckPasswordSRP">InputCheckPasswordSRP</a> constructor, generated as specified <a href="#checking-the-password-with-srp">above</a>.  </p>
+<p>All such methods where a password verification is required <em>after login</em> may emit the following RPC errors:  </p>
+<ul>
+<li><code>PASSWORD_MISSING</code> - No 2FA password is configured, but one is <strong>required</strong> in order to invoke the method. <a href="#setting-a-new-2fa-password">Set a 2FA password</a> and then repeat the method call.</li>
+<li><code>PASSWORD_TOO_FRESH_%d</code> - The 2FA password was modified less than 24 hours ago, try again in <code>%d</code> seconds.</li>
+<li><code>SESSION_TOO_FRESH_%d</code> - This session was created less than 24 hours ago, try again in <code>%d</code> seconds.</li>
+<li><code>PASSWORD_HASH_INVALID</code> - The specified password is invalid (or an <a href="/constructor/inputCheckPasswordEmpty">inputCheckPasswordEmpty</a> was provided, but a 2FA password is required).  </li>
+</ul>
+<p>The usual flow for invoking such methods is to first invoke the method passing an <a href="/constructor/inputCheckPasswordEmpty">inputCheckPasswordEmpty</a> (as if no password is configured, even if one is actually configured); then, according to the returned RPC error, proceed to:</p>
+<ul>
+<li><code>PASSWORD_HASH_INVALID</code> - The 2FA password insertion flow, the re-invoke the method with the user-provided password</li>
+<li><code>PASSWORD_MISSING</code> - The 2FA password setup flow, then re-invoke the method with the newly provided password</li>
+<li>All other RPC errors - Show an error message with a description of the error</li>
+</ul>
+<p>This flow is useful to avoid race conditions with other currently logged-in sessions that may change the password.  </p>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#srp-design" id="srp-design" name="srp-design"><i class="anchor-icon"></i></a><a href="http://srp.stanford.edu/design.html">SRP design</a></h4></div>
   

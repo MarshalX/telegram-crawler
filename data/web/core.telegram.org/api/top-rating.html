@@ -52,6 +52,7 @@
 <a href='/constructor/topPeerCategoryPhoneCalls'>topPeerCategoryPhoneCalls</a>#1e76a78c = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
 <a href='/constructor/topPeerCategoryForwardUsers'>topPeerCategoryForwardUsers</a>#a8406ca9 = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
 <a href='/constructor/topPeerCategoryForwardChats'>topPeerCategoryForwardChats</a>#fbeec0f0 = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
+<a href='/constructor/topPeerCategoryBotsApp'>topPeerCategoryBotsApp</a>#fd9e7bec = <a href='/type/TopPeerCategory'>TopPeerCategory</a>;
 
 <a href='/constructor/topPeer'>topPeer</a>#edcdc05b peer:<a href='/type/Peer'>Peer</a> rating:<a href='/type/double'>double</a> = <a href='/type/TopPeer'>TopPeer</a>;
 
@@ -64,19 +65,24 @@
 ---functions---
 
 <a href='/method/contacts.toggleTopPeers'>contacts.toggleTopPeers</a>#8514bdda enabled:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
-<a href='/method/contacts.getTopPeers'>contacts.getTopPeers</a>#973478b6 flags:<a href='/type/%23'>#</a> correspondents:flags.0?<a href='/constructor/true'>true</a> bots_pm:flags.1?<a href='/constructor/true'>true</a> bots_inline:flags.2?<a href='/constructor/true'>true</a> phone_calls:flags.3?<a href='/constructor/true'>true</a> forward_users:flags.4?<a href='/constructor/true'>true</a> forward_chats:flags.5?<a href='/constructor/true'>true</a> groups:flags.10?<a href='/constructor/true'>true</a> channels:flags.15?<a href='/constructor/true'>true</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/contacts.TopPeers'>contacts.TopPeers</a>;
+<a href='/method/contacts.getTopPeers'>contacts.getTopPeers</a>#973478b6 flags:<a href='/type/%23'>#</a> correspondents:flags.0?<a href='/constructor/true'>true</a> bots_pm:flags.1?<a href='/constructor/true'>true</a> bots_inline:flags.2?<a href='/constructor/true'>true</a> phone_calls:flags.3?<a href='/constructor/true'>true</a> forward_users:flags.4?<a href='/constructor/true'>true</a> forward_chats:flags.5?<a href='/constructor/true'>true</a> groups:flags.10?<a href='/constructor/true'>true</a> channels:flags.15?<a href='/constructor/true'>true</a> bots_app:flags.16?<a href='/constructor/true'>true</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/contacts.TopPeers'>contacts.TopPeers</a>;
 <a href='/method/contacts.resetTopPeerRating'>contacts.resetTopPeerRating</a>#1ae373ac category:<a href='/type/TopPeerCategory'>TopPeerCategory</a> peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
-<p>Use <a href="/method/contacts.toggleTopPeers">contacts.toggleTopPeers</a> to enable or disable top peer ratings.  </p>
-<p>The rate delta is computed by taking the time delta between the last time the user used a certain peer and the last time the rating for that peer was received and dividing it by the <a href="/constructor/config">exponential decay from config</a>.</p>
-<p>Example:
-Client-side, every time a user opens chat <code>123456789</code> the following operation must be done on the cached top peer info.</p>
-<ul>
-<li><code>dateOpened</code> indicates when was the peer used</li>
-<li><code>normalizeRate</code> is an arbitrary time in the recent past.
-When ratings are received from the server using <a href="/method/contacts.getTopPeers">contacts.getTopPeers</a> and the schema described above, it is the time when they were received.</li>
-</ul>
-<pre><code>topPeer.rating += e^((dateOpened - normalizeRate) / config.rating_e_decay)</code></pre>
-<p>Use <a href="/method/contacts.resetTopPeerRating">contacts.resetTopPeerRating</a> to reset the top peer rating of a certain peer, in a certain category.</p></div>
+<p>The rate delta is computed by taking the time delta between the last time the user used a certain peer and the last time the rating for that peer was received through <a href="/method/contacts.getTopPeers">contacts.getTopPeers</a> and dividing it by the <a href="/constructor/config">exponential decay from config</a>.</p>
+<p>Specifically, clients should:</p>
+<ol>
+<li>On startup, invoke <a href="/method/contacts.getTopPeers">contacts.getTopPeers</a> for all the required peer rate categories, fetching and storing the ratings for all top peers in a local database.  </li>
+<li>Every time a user opens (for example) chat <code>123456789</code> the following operation must be done on the cached top peer info.<br>
+ <br>
+<code>dateOpened</code> indicates when was the peer used.<br>
+<code>normalizeRate</code> is an arbitrary time in the recent past (when ratings are received from the server using <a href="/method/contacts.getTopPeers">contacts.getTopPeers</a> and the schema described above, it is the time when they were received).<br>
+<code>config.rating_e_decay</code> is the <a href="/constructor/config">exponential decay from config</a>.  </li>
+</ol>
+<pre><code>  topPeer.rating += e^((dateOpened - normalizeRate) / config.rating_e_decay)</code></pre>
+<ol start="3">
+<li>Every time the client needs to display a list of commonly used bots, users, mini apps, call destinations, etc (for example for the <a href="/api/search#global-search">global search tab</a>), sort the peers by the <code>rating</code> for the specified category.  </li>
+</ol>
+<p>Use <a href="/method/contacts.toggleTopPeers">contacts.toggleTopPeers</a> to enable or disable top peer ratings.<br>
+Use <a href="/method/contacts.resetTopPeerRating">contacts.resetTopPeerRating</a> to reset the top peer rating of a certain peer, in a certain category.</p></div>
   
 </div>
           
