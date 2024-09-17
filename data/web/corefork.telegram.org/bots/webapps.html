@@ -57,6 +57,33 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="september-6-2024" href="#september-6-2024"><i class="anchor-icon"></i></a>September 6, 2024</h4>
+<p><strong>Bot API 7.10</strong></p>
+<ul>
+<li>Added the field <em>SecondaryButton</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the event <em>secondaryButtonClicked</em>.</li>
+<li>Renamed the class <em>MainButton</em> to the class <a href="#bottombutton">BottomButton</a>.</li>
+<li>Added the field <em>bottomBarColor</em> and the method <em>setBottomBarColor</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the field <em>bottom_bar_bg_color</em> to the class <a href="#themeparams">ThemeParams</a>.</li>
+</ul>
+<h4><a class="anchor" name="july-31-2024" href="#july-31-2024"><i class="anchor-icon"></i></a>July 31, 2024</h4>
+<p><strong>Bot API 7.8</strong></p>
+<ul>
+<li>Added the option for bots to set a <a href="#launching-the-main-mini-app">Main Mini App</a>, which can be previewed and launched directly from a button in the bot&#39;s profile or a link.</li>
+<li>Added the method <em>shareToStory</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+</ul>
+<h4><a class="anchor" name="july-7-2024" href="#july-7-2024"><i class="anchor-icon"></i></a>July 7, 2024</h4>
+<p><strong>Bot API 7.7</strong></p>
+<ul>
+<li>Added the field <em>isVerticalSwipesEnabled</em> and the methods <em>enableVerticalSwipes</em>, <em>disableVerticalSwipes</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the event <em>scanQrPopupClosed</em>.</li>
+</ul>
+<h4><a class="anchor" name="july-1-2024" href="#july-1-2024"><i class="anchor-icon"></i></a>July 1, 2024</h4>
+<p><strong>Bot API 7.6</strong></p>
+<ul>
+<li>Added the field <em>section_separator_color</em> to the class <a href="#themeparams">ThemeParams</a>.</li>
+<li>Changed the default opening mode for <a href="#direct-link-mini-apps">Direct Link Mini Apps</a>.</li>
+</ul>
 <h4><a class="anchor" name="march-31-2024" href="#march-31-2024"><i class="anchor-icon"></i></a>March 31, 2024</h4>
 <p><strong>Bot API 7.2</strong></p>
 <ul>
@@ -132,7 +159,7 @@
 </ul>
 <hr>
 <h3><a class="anchor" name="implementing-mini-apps" href="#implementing-mini-apps"><i class="anchor-icon"></i></a>Implementing Mini Apps</h3>
-<p>Telegram currently supports six different ways of launching Mini Apps: from a <a href="#keyboard-button-mini-apps">keyboard button</a>, from an <a href="#inline-button-mini-apps">inline button</a>, from the <a href="#launching-mini-apps-from-the-menu-button">bot menu button</a>, via <a href="#inline-mode-mini-apps">inline mode</a>, from a <a href="#direct-link-mini-apps">direct link</a> – and even from the <a href="#launching-mini-apps-from-the-attachment-menu">attachment menu</a>.</p>
+<p>Telegram currently supports seven different ways of launching Mini Apps: the main Mini App from a <a href="#launching-the-main-mini-app">profile button</a>, from a <a href="#keyboard-button-mini-apps">keyboard button</a>, from an <a href="#inline-button-mini-apps">inline button</a>, from the <a href="#launching-mini-apps-from-the-menu-button">bot menu button</a>, via <a href="#inline-mode-mini-apps">inline mode</a>, from a <a href="#direct-link-mini-apps">direct link</a> – and even from the <a href="#launching-mini-apps-from-the-attachment-menu">attachment menu</a>.</p>
 <div>
   <a href="/file/464001388/10b1a/IYpn0wWfggw.1156850/fd9a32baa81dcecbe4" target="_blank"><img src="/file/464001388/10b1a/IYpn0wWfggw.1156850/fd9a32baa81dcecbe4" title="" alt="Types of buttons" class="dev_page_image" /></a>
 </div>
@@ -182,6 +209,29 @@
 <blockquote>
 <p><a href="https://t.me/durgerkingbot">@DurgerKingBot</a> allows launching its Mini App both from an inline button and from the menu button.</p>
 </blockquote>
+<h4><a class="anchor" name="launching-the-main-mini-app" href="#launching-the-main-mini-app"><i class="anchor-icon"></i></a>Launching the main Mini App</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> If your bot is a mini app, you can add a prominent <strong>Launch app</strong> button as well as high-quality demo videos and screenshots to the bot’s profile. To do this, go to <a href="https://t.me/botfather">@BotFather</a> and set up your bot&#39;s <strong>Main Mini App</strong>.</p>
+</blockquote>
+<p>If your bot is a mini app, you can unlock a number of features that streamline and simplify the way in which users view and interact with it. To do this, go to <a href="https://t.me/botfather">@BotFather</a> and set up your bot&#39;s <strong>Main Mini App</strong>.</p>
+<p>After setting a main mini app, you&#39;ll be able to upload detailed <strong>media preview demos</strong> to publicly highlight your app&#39;s key features on its profile. A <strong>Launch app</strong> button will also appear, allowing users to open your app directly from its profile. Bots that enabled a main mini app will be displayed in the <em>Apps</em> tab of the search for users who have launched them.</p>
+<blockquote>
+<p>Media previews support <a href="https://core.telegram.org/bots/features#mini-app-previews">multiple languages</a> – so you can upload <strong>translated versions</strong> of your previews that will be shown to users based on their <strong>app language</strong>.</p>
+</blockquote>
+<p>A bot&#39;s <strong>main Mini App</strong> can also be opened in the current chat by direct link in the format <code>https://t.me/botusername?startapp</code>. If a non-empty <em>startapp</em> parameter is included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>. </p>
+<p><strong>Examples</strong></p>
+<p><code>https://t.me/botusername?startapp</code><br><code>https://t.me/botusername?startapp=command</code><br><code>https://t.me/botusername?startapp=command&amp;mode=compact</code></p>
+<p>In this mode, Mini Apps can use the <em>chat_type</em> and <em>chat_instance</em> parameters to keep track of the current chat context. This introduces support for <strong>concurrent</strong> and <strong>shared</strong> usage by multiple chat members – to create live whiteboards, group orders, multiplayer games and similar apps.</p>
+<p>By default, the main Mini App opens to full-screen height, and users cannot reduce them to half-height. However, you can change this behavior via <a href="https://t.me/botfather">@BotFather</a> or by including the parameter <code>mode=compact</code> in the link to the Mini App, in which case it will open to half-screen height by default.</p>
+<p><strong>Good for:</strong></p>
+<ul>
+<li>Fully-fledged web services and integrations that any user can open in one tap.</li>
+<li>Cooperative, multiplayer or teamwork-oriented services within a chat context.</li>
+<li>The use cases are effectively <strong>unlimited</strong>.</li>
+</ul>
+<blockquote>
+<p>Successful bots which <strong>enable</strong> a main Mini App and <strong>accept payments</strong> in <a href="https://core.telegram.org/bots/payments-stars">Telegram Stars</a> may be featured in the Telegram <a href="https://t.me/BotNews/99">Mini App Store</a>. To increase the chances of being featured, we recommend uploading high-quality media showcasing your app on your bot&#39;s profile and following our <a href="#design-guidelines">design guidelines</a>.</p>
+</blockquote>
 <h4><a class="anchor" name="inline-mode-mini-apps" href="#inline-mode-mini-apps"><i class="anchor-icon"></i></a>Inline Mode Mini Apps</h4>
 <blockquote>
 <p><strong>TL;DR:</strong> Mini Apps launched via <strong>web_app</strong> type <a href="/bots/api#inlinequeryresultsbutton">InlineQueryResultsButton</a> can be used anywhere in inline mode. Users can create content in a web interface and then seamlessly send it to the current chat via inline mode.</p>
@@ -199,8 +249,9 @@
 <p>You can use direct links to <strong>open a Mini App</strong> directly in the current chat. If a non-empty <em>startapp</em> parameter is included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>.</p>
 <p>In this mode, Mini Apps can use the <em>chat_type</em> and <em>chat_instance</em> parameters to keep track of the current chat context. This introduces support for <strong>concurrent</strong> and <strong>shared</strong> usage by multiple chat members – to create live whiteboards, group orders, multiplayer games and similar apps.</p>
 <p>Mini Apps opened from a direct link have <strong>no access</strong> to the chat – they can&#39;t read messages or send new ones on behalf of the user. To send messages, the user must be redirected to <strong>inline mode</strong> and actively pick a result.</p>
+<p>Starting from <mark>Bot API 7.6</mark>, by default, Mini Apps of this type open to full-screen height, and users cannot reduce them to half-height. However, you can change this behavior by including the parameter <code>mode=compact</code> in the link to the Mini App, in which case it will open to half-screen height by default.</p>
 <p><strong>Examples</strong></p>
-<p><code>https://t.me/botusername/appname</code><br><code>https://t.me/botusername/appname?startapp=command</code></p>
+<p><code>https://t.me/botusername/appname</code><br><code>https://t.me/botusername/appname?startapp=command</code><br><code>https://t.me/botusername/appname?startapp=command&amp;mode=compact</code></p>
 <p><strong>Good for:</strong></p>
 <ul>
 <li>Fully-fledged web services and integrations that any user can open in one tap.</li>
@@ -290,9 +341,19 @@
 <td>Current background color in the <code>#RRGGBB</code> format.</td>
 </tr>
 <tr>
+<td>bottomBarColor</td>
+<td>String</td>
+<td>Current bottom bar color in the <code>#RRGGBB</code> format.</td>
+</tr>
+<tr>
 <td>isClosingConfirmationEnabled</td>
 <td>Boolean</td>
 <td><em>True</em>, if the confirmation dialog is enabled while the user is trying to close the Mini App. <em>False</em>, if the confirmation dialog is disabled.</td>
+</tr>
+<tr>
+<td>isVerticalSwipesEnabled <sup><mark>NEW</mark></sup></td>
+<td>Boolean</td>
+<td><em>True</em>, if vertical swipes to close or minimize the Mini App are enabled. <em>False</em>, if vertical swipes to close or minimize the Mini App are disabled. In any case, the user will still be able to minimize and close the Mini App by swiping the Mini App&#39;s header.</td>
 </tr>
 <tr>
 <td>BackButton</td>
@@ -301,8 +362,13 @@
 </tr>
 <tr>
 <td>MainButton</td>
-<td><a href="#mainbutton">MainButton</a></td>
+<td><a href="#bottombutton">BottomButton</a></td>
 <td>An object for controlling the main button, which is displayed at the bottom of the Mini App in the Telegram interface.</td>
+</tr>
+<tr>
+<td>SecondaryButton</td>
+<td><a href="#bottombutton">BottomButton</a></td>
+<td>An object for controlling the secondary button, which is displayed at the bottom of the Mini App in the Telegram interface.</td>
 </tr>
 <tr>
 <td>SettingsButton</td>
@@ -320,7 +386,7 @@
 <td>An object for controlling cloud storage.</td>
 </tr>
 <tr>
-<td>BiometricManager <sup><mark>NEW</mark></sup></td>
+<td>BiometricManager</td>
 <td><a href="#biometricmanager">BiometricManager</a></td>
 <td>An object for controlling biometrics on the device.</td>
 </tr>
@@ -340,6 +406,11 @@
 <td><mark>Bot API 6.1+</mark> A method that sets the app background color in the <code>#RRGGBB</code> format. You can also use keywords <em>bg_color</em> and <em>secondary_bg_color</em>.</td>
 </tr>
 <tr>
+<td>setBottomBarColor(color)</td>
+<td>Function</td>
+<td><mark>Bot API 7.10+</mark> A method that sets the app&#39;s bottom bar color in the <code>#RRGGBB</code> format. You can also use the keywords <em>bg_color</em>, <em>secondary_bg_color</em> and <em>bottom_bar_bg_color</em>.</td>
+</tr>
+<tr>
 <td>enableClosingConfirmation()</td>
 <td>Function</td>
 <td><mark>Bot API 6.2+</mark> A method that enables a confirmation dialog while the user is trying to close the Mini App.</td>
@@ -348,6 +419,16 @@
 <td>disableClosingConfirmation()</td>
 <td>Function</td>
 <td><mark>Bot API 6.2+</mark> A method that disables the confirmation dialog while the user is trying to close the Mini App.</td>
+</tr>
+<tr>
+<td>enableVerticalSwipes() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 7.7+</mark> A method that enables vertical swipes to close or minimize the Mini App. For user convenience, it is recommended to always enable swipes unless they conflict with the Mini App&#39;s own gestures.</td>
+</tr>
+<tr>
+<td>disableVerticalSwipes() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 7.7+</mark> A method that disables vertical swipes to close or minimize the Mini App. This method is useful if your Mini App uses swipe gestures that may conflict with the gestures for minimizing and closing the app.</td>
 </tr>
 <tr>
 <td>onEvent(eventType, eventHandler)</td>
@@ -385,6 +466,11 @@
 <td><mark>Bot API 6.1+</mark> A method that opens an invoice using the link <em>url</em>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>invoiceClosed</em> when the invoice is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the invoice status will be passed as the first argument.</td>
 </tr>
 <tr>
+<td>shareToStory(media_url[, params])</td>
+<td>Function</td>
+<td><mark>Bot API 7.8+</mark> A method that opens the native story editor with the media specified in the <em>media_url</em> parameter as an HTTPS URL. An optional <em>params</em> argument of the type <a href="#storyshareparams">StoryShareParams</a> describes additional sharing settings.</td>
+</tr>
+<tr>
 <td>showPopup(params[, callback])</td>
 <td>Function</td>
 <td><mark>Bot API 6.2+</mark> A method that shows a native popup described by the <em>params</em> argument of the type <a href="#popupparams">PopupParams</a>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>popupClosed</em> when the popup is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the field <em>id</em> of the pressed button will be passed as the first argument.</td>
@@ -402,7 +488,7 @@
 <tr>
 <td>showScanQrPopup(params[, callback])</td>
 <td>Function</td>
-<td><mark>Bot API 6.4+</mark> A method that shows a native popup for scanning a QR code described by the <em>params</em> argument of the type <a href="#scanqrpopupparams">ScanQrPopupParams</a>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>qrTextReceived</em> every time the scanner catches a code with text data. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the text from the QR code will be passed as the first argument. Returning <em>true</em> inside this callback function causes the popup to be closed.</td>
+<td><mark>Bot API 6.4+</mark> A method that shows a native popup for scanning a QR code described by the <em>params</em> argument of the type <a href="#scanqrpopupparams">ScanQrPopupParams</a>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>qrTextReceived</em> every time the scanner catches a code with text data. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the text from the QR code will be passed as the first argument. Returning <em>true</em> inside this callback function causes the popup to be closed. Starting from <mark>Bot API 7.7</mark>, the Mini App will receive the <em>scanQrPopupClosed</em> event if the user closes the native popup for scanning a QR code.</td>
 </tr>
 <tr>
 <td>closeScanQrPopup()</td>
@@ -493,6 +579,11 @@
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Header background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-header-bg-color)</code>.</td>
 </tr>
 <tr>
+<td>bottom_bar_bg_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.10+</mark> Bottom background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-bottom-bar-bg-color)</code>.</td>
+</tr>
+<tr>
 <td>accent_text_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Accent text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-accent-text-color)</code>.</td>
@@ -508,6 +599,11 @@
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Header text color for the section in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-section-header-text-color)</code>.</td>
 </tr>
 <tr>
+<td>section_separator_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.6+</mark> Section separator color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-section-separator-color)</code>.</td>
+</tr>
+<tr>
 <td>subtitle_text_color</td>
 <td>String</td>
 <td><em>Optional</em>. <mark>Bot API 7.0+</mark> Subtitle text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-subtitle-text-color)</code>.</td>
@@ -520,9 +616,74 @@
 </tbody>
 </table>
 <div>
-  <a href="/file/464001695/11185/DAwyUjA7LNA.215601/26f4c8ebf862ae860d" target="_blank"><img src="/file/464001695/11185/DAwyUjA7LNA.215601/26f4c8ebf862ae860d" title="WebViewColors explained"  class="dev_page_image" /></a>
+  <a href="/file/400780400851/2/6GwDkk6T-aY.416569/b591d589108b487d63" target="_blank"><img src="/file/400780400851/2/6GwDkk6T-aY.416569/b591d589108b487d63" title="WebViewColors explained"  class="dev_page_image" /></a>
 </div>
 
+
+<h4><a class="anchor" name="storyshareparams" href="#storyshareparams"><i class="anchor-icon"></i></a>StoryShareParams</h4>
+<p>This object describes additional sharing settings for the native story editor.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. The caption to be added to the media, 0-200 characters for regular users and 0-2048 characters for <a href="https://telegram.org/faq_premium#telegram-premium">premium</a> subscribers.</td>
+</tr>
+<tr>
+<td>widget_link</td>
+<td><a href="#storywidgetlink">StoryWidgetLink</a></td>
+<td><em>Optional</em>. An object that describes a widget link to be included in the story. Note that only <a href="https://telegram.org/faq_premium#telegram-premium">premium</a> subscribers can post stories with links.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="storywidgetlink" href="#storywidgetlink"><i class="anchor-icon"></i></a>StoryWidgetLink</h4>
+<p>This object describes a widget link to be included in the story.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>url</td>
+<td>String</td>
+<td>The URL to be included in the story.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td><em>Optional</em>. The name to be displayed for the widget link, 0-48 characters.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="scanqrpopupparams" href="#scanqrpopupparams"><i class="anchor-icon"></i></a>ScanQrPopupParams</h4>
+<p>This object describes the native popup for scanning QR codes.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed under the &#39;Scan QR&#39; heading, 0-64 characters.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="popupparams" href="#popupparams"><i class="anchor-icon"></i></a>PopupParams</h4>
 <p>This object describes the native popup.</p>
 <table class="table">
@@ -548,24 +709,6 @@
 <td>buttons</td>
 <td>Array of <a href="#popupbutton">PopupButton</a></td>
 <td><em>Optional</em>. List of buttons to be displayed in the popup, 1-3 buttons. Set to <em>[{“type”:“close”}]</em> by default.</td>
-</tr>
-</tbody>
-</table>
-<h4><a class="anchor" name="scanqrpopupparams" href="#scanqrpopupparams"><i class="anchor-icon"></i></a>ScanQrPopupParams</h4>
-<p>This object describes the native popup for scanning QR codes.</p>
-<table class="table">
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>text</td>
-<td>String</td>
-<td><em>Optional</em>. The text to be displayed under the &#39;Scan QR&#39; heading, 0-64 characters.</td>
 </tr>
 </tbody>
 </table>
@@ -636,8 +779,8 @@
 </tbody>
 </table>
 <p>All these methods return the BackButton object so they can be chained.</p>
-<h4><a class="anchor" name="mainbutton" href="#mainbutton"><i class="anchor-icon"></i></a>MainButton</h4>
-<p>This object controls the main button, which is displayed at the bottom of the Mini App in the Telegram interface.</p>
+<h4><a class="anchor" name="bottombutton" href="#bottombutton"><i class="anchor-icon"></i></a>BottomButton</h4>
+<p>This object controls the button that is displayed at the bottom of the Mini App in the Telegram interface.</p>
 <table class="table">
 <thead>
 <tr>
@@ -648,19 +791,24 @@
 </thead>
 <tbody>
 <tr>
+<td>type</td>
+<td>String</td>
+<td><em>Readonly.</em> Type of the button. It can be either <em>main</em> for the main button or <em>secondary</em> for the secondary button.</td>
+</tr>
+<tr>
 <td>text</td>
 <td>String</td>
-<td>Current button text. Set to <em>CONTINUE</em> by default.</td>
+<td>Current button text. Set to <em>Continue</em> for the main button and <em>Cancel</em> for the secondary button by default.</td>
 </tr>
 <tr>
 <td>color</td>
 <td>String</td>
-<td>Current button color. Set to <em>themeParams.button_color</em> by default.</td>
+<td>Current button color. Set to <em>themeParams.button_color</em> for the main button and <em>themeParams.bottom_bar_bg_color</em> for the secondary button by default.</td>
 </tr>
 <tr>
 <td>textColor</td>
 <td>String</td>
-<td>Current button text color. Set to <em>themeParams.button_text_color</em> by default.</td>
+<td>Current button text color. Set to <em>themeParams.button_text_color</em> for the main button and <em>themeParams.button_color</em> for the secondary button by default.</td>
 </tr>
 <tr>
 <td>isVisible</td>
@@ -671,6 +819,16 @@
 <td>isActive</td>
 <td>Boolean</td>
 <td>Shows whether the button is active. Set to <em>true</em> by default.</td>
+</tr>
+<tr>
+<td>hasShineEffect</td>
+<td>Boolean</td>
+<td><mark>Bot API 7.10+</mark> Shows whether the button has a shine effect. Set to <em>false</em> by default.</td>
+</tr>
+<tr>
+<td>position</td>
+<td>String</td>
+<td><mark>Bot API 7.10+</mark> Position of the secondary button. Not defined for the main button. It applies only if both the main and secondary buttons are visible. Set to <em>left</em> by default.<br>Supported values:<br>- <em>left</em>, displayed to the left of the main button,<br>- <em>right</em>, displayed to the right of the main button,<br>- <em>top</em>, displayed above the main button,<br>- <em>bottom</em>, displayed below the main button.</td>
 </tr>
 <tr>
 <td>isProgressVisible</td>
@@ -685,12 +843,12 @@
 <tr>
 <td>onClick(callback)</td>
 <td>Function</td>
-<td>A method that sets the button press event handler. An alias for <code>Telegram.WebApp.onEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
+<td>A method that sets the button&#39;s press event handler. An alias for <code>Telegram.WebApp.onEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
 </tr>
 <tr>
 <td>offClick(callback)</td>
 <td>Function</td>
-<td>A method that removes the button press event handler. An alias for <code>Telegram.WebApp.offEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
+<td>A method that removes the button&#39;s press event handler. An alias for <code>Telegram.WebApp.offEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
 </tr>
 <tr>
 <td>show()</td>
@@ -725,11 +883,11 @@
 <tr>
 <td>setParams(params)</td>
 <td>Function</td>
-<td>A method to set the button parameters. The <em>params</em> parameter is an object containing one or several fields that need to be changed:<br><strong>text</strong> - button text;<br><strong>color</strong> - button color;<br><strong>text_color</strong> - button text color;<br><strong>is_active</strong> - enable the button;<br><strong>is_visible</strong> - show the button.</td>
+<td>A method to set the button parameters. The <em>params</em> parameter is an object containing one or several fields that need to be changed:<br><strong>text</strong> - button text;<br><strong>color</strong> - button color;<br><strong>text_color</strong> - button text color;<br><strong>has_shine_effect</strong> - <mark>Bot API 7.10+</mark> enable shine effect;<br><strong>position</strong> - position of the secondary button;<br><strong>is_active</strong> - enable the button;<br><strong>is_visible</strong> - show the button.</td>
 </tr>
 </tbody>
 </table>
-<p>All these methods return the MainButton object so they can be chained.</p>
+<p>All these methods return the BottomButton object so they can be chained.</p>
 <h4><a class="anchor" name="settingsbutton" href="#settingsbutton"><i class="anchor-icon"></i></a>SettingsButton</h4>
 <p>This object controls the <strong>Settings</strong> item in the context menu of the Mini App in the Telegram interface.</p>
 <table class="table">
@@ -843,7 +1001,7 @@
 </table>
 <p>All these methods return the <a href="#cloudstorage">CloudStorage</a> object, so they can be chained.</p>
 <h4><a class="anchor" name="biometricmanager" href="#biometricmanager"><i class="anchor-icon"></i></a>BiometricManager</h4>
-<p><sup><mark>NEW</mark></sup> This object controls biometrics on the device. Before the first use of this object, it needs to be initialized using the <em>init</em> method.</p>
+<p>This object controls biometrics on the device. Before the first use of this object, it needs to be initialized using the <em>init</em> method.</p>
 <table class="table">
 <thead>
 <tr>
@@ -1148,7 +1306,11 @@ if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
 </tr>
 <tr>
 <td><code>mainButtonClicked</code></td>
-<td>Occurs when the <a href="#mainbutton">main button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
+<td>Occurs when the <a href="#bottombutton">main button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>secondaryButtonClicked</code></td>
+<td><mark>Bot API 7.10+</mark> Occurs when the <a href="#bottombutton">secondary button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
 </tr>
 <tr>
 <td><code>backButtonClicked</code></td>
@@ -1169,6 +1331,10 @@ if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
 <tr>
 <td><code>qrTextReceived</code></td>
 <td><mark>Bot API 6.4+</mark> Occurs when the QR code scanner catches a code with text data.<br><em>eventHandler</em> receives an object with the single field <em>data</em> containing text data from the QR code.</td>
+</tr>
+<tr>
+<td><code>scanQrPopupClosed</code></td>
+<td><mark>Bot API 7.7+</mark> Occurs when the QR code scanner popup is closed by the user.<br><em>eventHandler</em> receives no parameters.</td>
 </tr>
 <tr>
 <td><code>clipboardTextReceived</code></td>
@@ -1235,7 +1401,7 @@ if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
 </ul>
 <p><strong>Telegram Desktop on Windows and Linux</strong></p>
 <ul>
-<li>Download and launch the <a href="https://desktop.telegram.org/changelog#beta-version">Beta Version</a> of Telegram Desktop.</li>
+<li>Download and launch the <a href="https://desktop.telegram.org/changelog#beta-version">Beta Version</a> of Telegram Desktop on <strong>Windows</strong> or <strong>Linux</strong> (not supported on Telegram Desktop for macOS yet).</li>
 <li>Go to <em>Settings &gt; Advanced &gt; Experimental settings &gt; Enable webview inspection</em>.</li>
 <li>Right click in the WebView and choose <em>Inspect</em>.</li>
 </ul>
