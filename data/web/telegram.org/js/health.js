@@ -167,6 +167,15 @@ function formatNumber(number, decimals, decPoint, thousandsSep) {
   return s.join(dec)
 }
 
+function statsFormatAxisPercent(value) {
+  return value + '%';
+}
+
+function statsFormatPercent(value) {
+  var decimals = Math.floor(value * 100) % 100 > 0 ? 2 : 0;
+  return formatNumber(value, decimals, '.', ',') + '%';
+}
+
 function statsFormatAxisAmountTpl(tpl, factor, value, decimals) {
   if (value % factor > 0) {
     decimals = decimals || 0;
