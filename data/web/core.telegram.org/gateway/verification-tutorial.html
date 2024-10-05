@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Authorization via Telegram Gateway: Quick-start Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="The Telegram Gateway API allows any service to send authorization codes through Telegram instead of traditional SMS, offering…">
+    <meta property="og:title" content="Authorization via Telegram Gateway: Quick-start Guide">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="The Telegram Gateway API allows any service to send authorization codes through Telegram instead of traditional SMS, offering…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?241" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"></div>
+  <h1 id="dev_page_title">Authorization via Telegram Gateway: Quick-start Guide</h1>
+  
+  <div id="dev_page_content"><p>The <a href="https://core.telegram.org/gateway">Telegram Gateway API</a> allows any service to send authorization codes through Telegram instead of traditional SMS, offering a more <strong>affordable</strong>, <strong>secure</strong>, and <strong>reliable</strong> alternative. This guide will help you quickly integrate the API into your service. For more information, see:</p>
+<ul>
+<li><a href="https://core.telegram.org/gateway/api">Full Gateway API Reference for Developers</a></li>
+<li><a href="https://core.telegram.org/gateway">Gateway Overview</a></li>
+<li><a href="https://core.telegram.org/gateway#faq">Gateway FAQ</a></li>
+<li><a href="https://telegram.org/tos/gateway">Gateway Terms of Service</a></li>
+</ul>
+<h3><a class="anchor" name="index" href="#index"><i class="anchor-icon"></i></a>Index</h3>
+<ul>
+<li><a href="#before-you-start">Before you Start</a></li>
+<li><a href="#sending-auth-codes">Sending Auth Codes</a></li>
+<li><a href="#checking-the-authorization-status">Checking the Authorization Status</a></li>
+<li><a href="#receiving-reports">Receiving Reports</a></li>
+</ul>
+<h3><a class="anchor" name="before-you-start" href="#before-you-start"><i class="anchor-icon"></i></a>Before you Start</h3>
+<blockquote>
+<p><strong>TLDR</strong>: open <a href="https://core.telegram.org/gateway">this page</a> and log in with your Telegram phone number, then fund your account <a href="https://gateway.telegram.org/account/budget">here</a> and note down your <a href="https://gateway.telegram.org/account/api">API token</a>.</p>
+</blockquote>
+<p>Before getting started, you&#39;ll need to <strong>create an account</strong> on our <a href="https://gateway.telegram.org">dedicated gateway platform</a>. To do this, navigate to the Gateway platform and click ‘<em>Log in to Start</em>’, then confirm your login via Telegram. If this is your first time using the platform, you&#39;ll be prompted to provide some basic information about yourself and your business.</p>
+<blockquote>
+<p>For testing purposes, you’ll be able to send <strong>free verification messages</strong> to the Telegram account tied to the number you used to log in.</p>
+</blockquote>
+<h4><a class="anchor" name="funding-your-account" href="#funding-your-account"><i class="anchor-icon"></i></a>Funding your Account</h4>
+<p>To send messages to other Telegram users via the Gateway API, you’ll need to fund your account. To do so, simply navigate to <a href="https://gateway.telegram.org/account/budget">this page</a> and click <em>‘Add Funds on Fragment’</em>, then follow the instructions on Fragment.</p>
+<p>On the same page you’ll find a detailed transaction history showing your deposits and expenses.</p>
+<h4><a class="anchor" name="obtaining-your-api-token" href="#obtaining-your-api-token"><i class="anchor-icon"></i></a>Obtaining your API Token</h4>
+<p>Before invoking API methods, you must obtain an access token in your Telegram Gateway account settings. To do so, open <a href="https://gateway.telegram.org/account/api">this page</a> and click ‘<em>Copy Token</em>’.</p>
+<p>The token must be passed in every request in one of two ways:</p>
+<ul>
+<li>In the HTTP header: <code>Authorization: Bearer &lt;token&gt;</code></li>
+<li>As the <code>access_token</code> parameter.</li>
+</ul>
+<p>In this guide, we’ll assume you decided to use a <em>bearer token</em>.</p>
+<blockquote>
+<p>To increase security, you can limit which IPs or IP ranges are allowed to use your API token from <a href="https://gateway.telegram.org/account/api">this page</a>.</p>
+</blockquote>
+<h4><a class="anchor" name="querying-the-api" href="#querying-the-api"><i class="anchor-icon"></i></a>Querying the API</h4>
+<p>The API can be queried with GET and POST HTTP methods with your language or framework of choice. Throughout this guide, we’ll use Python as an example and assume you defined the following:</p>
+<pre><code>import requests
+
+# Base API url, your Gateway API token and a phone number
+BASE_URL = &#39;https://gatewayapi.telegram.org/&#39;
+TOKEN = &#39;AAEFAAAAQKI_mDsJppSEQRr3kLOz9SatBxq48BgQLSHLRv&#39;
+PHONE = &#39;+391234567890&#39;
+HEADERS = {
+    &#39;Authorization&#39;: f&#39;Bearer {TOKEN}&#39;,
+    &#39;Content-Type&#39;: &#39;application/json&#39;
+}
+
+# Function to query the API
+def post_request_status(endpoint, json_body):
+    url = f&quot;{BASE_URL}{endpoint}&quot;
+    response = requests.post(url, headers=HEADERS, json=json_body)
+    if response.status_code == 200:
+        response_json = response.json()
+        if response_json.get(&#39;ok&#39;):
+            res = response_json.get(&#39;result&#39;, {})
+            return res
+        else:
+            error_message = response_json.get(&#39;error&#39;, &#39;Unknown error&#39;)
+            print(f&quot;Error: {error_message}&quot;)
+            return None
+    else:
+        print(f&quot;Failed to get request status: HTTP {response.status_code}&quot;)
+        return None</code></pre>
+<h3><a class="anchor" name="sending-auth-codes" href="#sending-auth-codes"><i class="anchor-icon"></i></a>Sending Auth Codes</h3>
+<blockquote>
+<p><strong>TLDR</strong>: Pass a phone number (<a href="https://en.wikipedia.org/wiki/E.164">E.164</a> format) to <a href="https://core.telegram.org/gateway/api#checksendability">this method</a> as a dry run – if you don’t get an error, pass the <code>request_id</code> you just obtained to <a href="https://core.telegram.org/gateway/api#sendverificatiomessage">this method</a> to send an auth code to the user.</p>
+</blockquote>
+<p>To send an authorization code, we’ll first use the <a href="https://core.telegram.org/gateway/api#checksendability">checkSendAbility</a> method to verify that the user we want to target can receive messages on Telegram.</p>
+<pre><code>endpoint = &#39;checkSendAbility&#39;
+json_body = {
+    &#39;phone_number&#39;: PHONE # E.164 format
+}
+result = post_request_status(endpoint, json_body)
+if result:
+    request_id = result.get(&#39;request_id&#39;)
+    print(f&quot;Request ID: {request_id}&quot;)</code></pre>
+<blockquote>
+<p>If the method returns an error and the user cannot be contacted, you will not be charged. If the method instead indicates that the user can be contacted, you will be <strong>automatically charged</strong> in advance for the price of a message regardless of whether you eventually send one. If you do send a message, use the <code>request_id</code> returned by this method to avoid paying the message fee again.</p>
+</blockquote>
+<p>Assuming the outcome was positive and the user can be contacted, we can send them a code generated by Telegram with the <a href="https://core.telegram.org/gateway/api#sendverificatiomessage">sendVerificationMessage</a> method:</p>
+<pre><code>endpoint = &#39;sendVerificationMessage&#39;
+json_body = {
+    &#39;request_id&#39;: request_id,      # Reuse to avoid paying the fee again
+    &#39;phone_number&#39;: PHONE,         # Must be the one tied to request_id
+    &#39;code_length&#39;: 6,              # Ignored if you specify your own &#39;code&#39;
+    &#39;ttl&#39;: 60,                     # 1 minute
+    &#39;payload&#39;: &#39;my_payload_here&#39;,  # Not shown to users
+    &#39;callback_url&#39;: &#39;https://my.webhook.here/auth&#39;
+}
+result = post_request_status(endpoint, json_body)</code></pre>
+<h4><a class="anchor" name="revoking-codes" href="#revoking-codes"><i class="anchor-icon"></i></a>Revoking Codes</h4>
+<p>You can optionally revoke codes even before they expire by passing the relevant <code>request_id</code> to the <a href="https://core.telegram.org/gateway/api#revokeverificatiomessage">revokeVerificationMessage</a> method. Messages which were already read will not be deleted.</p>
+<blockquote>
+<p>Note that revoked codes are not refunded. If you need to send codes free of charge for testing purposes, direct them to your own phone number.</p>
+</blockquote>
+<h3><a class="anchor" name="checking-the-authorization-status" href="#checking-the-authorization-status"><i class="anchor-icon"></i></a>Checking the Authorization Status</h3>
+<p>If you let Telegram generate a code for you (i.e., you did not provide a <code>code</code> param in your request), you can use the <a href="https://core.telegram.org/gateway/api#checkverificationstatus">checkVerificationStatus</a> method to verify the OTP submitted by your user.</p>
+<pre><code>endpoint = &#39;checkVerificationStatus&#39;
+json_body = {
+    &#39;request_id&#39;: request_id, # Relevant request id
+    &#39;code&#39;: CODE,             # The code the user entered in your app
+}
+result = post_request_status(endpoint, json_body)
+
+# Assuming the request was successful
+status = result.get(&#39;verification_status&#39;, {}).get(&#39;status&#39;)
+print(status == &#39;code_valid&#39;) # True if the user entered the correct code</code></pre>
+<blockquote>
+<p>Even if you set the code yourself, you should call this method after the user has entered a code, so that we can display accurate statistics on your Gateway interface.</p>
+</blockquote>
+<h3><a class="anchor" name="receiving-reports" href="#receiving-reports"><i class="anchor-icon"></i></a>Receiving Reports</h3>
+<p>When you include a <code>callback_url</code> parameter in your <a href="https://core.telegram.org/gateway/api#sendverificatiomessage">sendVerificationMessage</a> request, the Gateway API will send a POST request to that URL containing a <a href="https://core.telegram.org/gateway/api#reportdelivery">delivery report</a> for the message. The payload of the POST request will be a JSON object representing the relevant <a href="https://core.telegram.org/gateway/api#requeststatus">RequestStatus</a> object.<br>When processing reports, you <strong>must</strong> verify the integrity of the data you receive as documented <a href="https://core.telegram.org/gateway/api#checking-report-integrity">here</a>.</p>
+<hr>
+<blockquote>
+<p><strong>Note</strong>: The latest API documentation is available <a href="https://core.telegram.org/gateway/api">here</a>, with in-depth explanations for each method and parameter. This guide is intended to get you started quickly and assumes you’re familiar with programming, correctly handling errors, adequately securing and storing phone numbers, responses and credentials.</p>
+</blockquote>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

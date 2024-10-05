@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Telegram Gateway API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="The Gateway API is an HTTP-based interface created for developers looking to deliver automated messages, such as verification…">
+    <meta property="og:title" content="Telegram Gateway API">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="The Gateway API is an HTTP-based interface created for developers looking to deliver automated messages, such as verification…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?241" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"></div>
+  <h1 id="dev_page_title">Telegram Gateway API</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<blockquote>
+<p>The Gateway API is an HTTP-based interface created for developers looking to deliver automated messages, such as verification codes, to users who registered their phone number on Telegram. </p>
+<p>This page outlines the full API documentation for developers. For more information on the API and the features it offers, see our <a href="https://core.telegram.org/gateway">Verification Platform Overview</a> and <a href="https://core.telegram.org/gateway/verification-tutorial">Gateway API Tutorial</a>.</p>
+</blockquote>
+<h3><a class="anchor" name="making-requests" href="#making-requests"><i class="anchor-icon"></i></a>Making requests</h3>
+<p>All queries to the Telegram Gateway API must be served over HTTPS and need to be presented in this form: <code>https://gatewayapi.telegram.org/METHOD_NAME</code>. Like this for example:</p>
+<pre><code>https://gatewayapi.telegram.org/sendVerificationMessage</code></pre>
+<p>We support <strong>GET</strong> and <strong>POST</strong> HTTP methods. We support three ways of passing parameters in Gateway API requests:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Query_string">URL query string</a></li>
+<li>application/x-www-form-urlencoded</li>
+<li>application/json</li>
+</ul>
+<p>The response contains a JSON object, which always has a Boolean field <code>ok</code>. If <code>ok</code> equals <em>true</em>, the request was successful, and the result of the query can be found in the <code>result</code> field. In case of an unsuccessful request, <code>ok</code> equals <em>false</em>, and the error is explained in the <code>error</code> field (e.g. ACCESS_TOKEN_INVALID).</p>
+<ul>
+<li>All methods in the Gateway API are case-insensitive.</li>
+<li>All queries must be made using UTF-8.</li>
+</ul>
+<h3><a class="anchor" name="authorization" href="#authorization"><i class="anchor-icon"></i></a>Authorization</h3>
+<p>Before invoking API methods, you must obtain an access token in the Telegram Gateway account settings.</p>
+<p>The token must be passed in every request in one of two ways:</p>
+<ul>
+<li>in the HTTP header: <code>Authorization: Bearer &lt;token&gt;</code></li>
+<li>as the <code>access_token</code> parameter.</li>
+</ul>
+<h3><a class="anchor" name="available-methods" href="#available-methods"><i class="anchor-icon"></i></a>Available methods</h3>
+<blockquote>
+<p>We support <strong>GET</strong> and <strong>POST</strong> HTTP methods. Use either <a href="https://en.wikipedia.org/wiki/Query_string">URL query string</a> or <em>application/json</em> or <em>application/x-www-form-urlencoded</em> for passing parameters in Telegram Gateway API requests.<br>On successful call, a JSON object containing the result will be returned.</p>
+</blockquote>
+<h4><a class="anchor" name="sendverificationmessage" href="#sendverificationmessage"><i class="anchor-icon"></i></a>sendVerificationMessage</h4>
+<p>Use this method to send a verification message. Charges will apply according to the pricing plan for each successful message delivery. Note that this method is always free of charge when used to send codes to your own phone number. On success, returns a <a href="#requeststatus">RequestStatus</a> object.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>phone_number</td>
+<td>String</td>
+<td>Yes</td>
+<td>The phone number to which you want to send a verification message, in the <a href="https://en.wikipedia.org/wiki/E.164">E.164</a> format.</td>
+</tr>
+<tr>
+<td>request_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>The unique identifier of a previous request from <a href="#checksendability">checkSendAbility</a>. If provided, this request will be free of charge.</td>
+</tr>
+<tr>
+<td>sender_username</td>
+<td>String</td>
+<td>Optional</td>
+<td>Username of the Telegram channel from which the code will be sent. The specified channel, if any, must be <a href="https://telegram.org/verify">verified</a> and owned by the same account who owns the Gateway API token.</td>
+</tr>
+<tr>
+<td>code</td>
+<td>String</td>
+<td>Optional</td>
+<td>The verification code. Use this parameter if you want to set the verification code yourself. Only fully numeric strings between 4 and 8 characters in length are supported. If this parameter is set, <em>code_length</em> is ignored.</td>
+</tr>
+<tr>
+<td>code_length</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>The length of the verification code if Telegram needs to generate it for you. Supported values are from 4 to 8. This is only relevant if you are not using the <em>code</em> parameter to set your own code. Use the <a href="#checkverificationstatus">checkVerificationStatus</a> method with the <em>code</em> parameter to verify the code entered by the user.</td>
+</tr>
+<tr>
+<td>callback_url</td>
+<td>String</td>
+<td>Optional</td>
+<td>A URL where you want to receive <a href="#delivery-reports">delivery reports</a> related to the sent message.</td>
+</tr>
+<tr>
+<td>payload</td>
+<td>String</td>
+<td>Optional</td>
+<td>Custom payload, 0-256 bytes. This will not be displayed to the user, use it for your internal processes.</td>
+</tr>
+<tr>
+<td>ttl</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Time-to-live (in seconds) before the message expires and is deleted. The message will not be deleted if it has already been read. If not specified, the message will not be deleted.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="checksendability" href="#checksendability"><i class="anchor-icon"></i></a>checkSendAbility</h4>
+<p>Use this method to check the ability to send a verification message to the specified phone number. If the ability to send is confirmed, a fee will apply according to the pricing plan. After checking, you can send a verification message using the <a href="#sendverificationmessage">sendVerificationMessage</a> method, providing the <em>request_id</em> from this response.</p>
+<p>Within the scope of a <em>request_id</em>, only one fee can be charged. Calling <a href="#sendverificationmessage">sendVerificationMessage</a> once with the returned <em>request_id</em> will be free of charge, while repeated calls will result in an error. Conversely, calls that don&#39;t include a <em>request_id</em> will spawn new requests and incur the respective fees accordingly. Note that this method is always free of charge when used to send codes to your own phone number.</p>
+<p>In case the message can be sent, returns a <a href="#requeststatus">RequestStatus</a> object. Otherwise, an appropriate error will be returned. </p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>phone_number</td>
+<td>String</td>
+<td>Yes</td>
+<td>The phone number for which you want to check our ability to send a verification message, in the <a href="https://en.wikipedia.org/wiki/E.164">E.164</a> format.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="checkverificationstatus" href="#checkverificationstatus"><i class="anchor-icon"></i></a>checkVerificationStatus</h4>
+<p>Use this method to check the status of a verification message that was sent previously. If the code was generated by Telegram for you, you can also verify the correctness of the code entered by the user using this method. Even if you set the code yourself, it is recommended to call this method after the user has successfully entered the code, passing the correct code in the <em>code</em> parameter, so that we can track the conversion rate of your verifications. On success, returns a <a href="#requeststatus">RequestStatus</a> object.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request_id</td>
+<td>String</td>
+<td>Yes</td>
+<td>The unique identifier of the verification request whose status you want to check.</td>
+</tr>
+<tr>
+<td>code</td>
+<td>String</td>
+<td>Optional</td>
+<td>The code entered by the user. If provided, the method checks if the code is valid for the relevant request.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="revokeverificationmessage" href="#revokeverificationmessage"><i class="anchor-icon"></i></a>revokeVerificationMessage</h4>
+<p>Use this method to revoke a verification message that was sent previously. Returns <em>True</em> if the revocation request was received. However, this does not guarantee that the message will be deleted. For example, it will not be removed if the recipient has already read it.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request_id</td>
+<td>String</td>
+<td>Yes</td>
+<td>The unique identifier of the request whose verification message you want to revoke.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" name="available-types" href="#available-types"><i class="anchor-icon"></i></a>Available types</h3>
+<p>All types used in Telegram Gateway API responses are represented as JSON objects.</p>
+<p>It is safe to use 32-bit signed integers for storing all <strong>Integer</strong> fields unless otherwise noted.</p>
+<blockquote>
+<p><strong>Optional</strong> fields may be not returned when irrelevant.</p>
+</blockquote>
+<h4><a class="anchor" name="requeststatus" href="#requeststatus"><i class="anchor-icon"></i></a>RequestStatus</h4>
+<p>This object represents the status of a verification message request.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request_id</td>
+<td>String</td>
+<td>Unique identifier of the verification request.</td>
+</tr>
+<tr>
+<td>phone_number</td>
+<td>String</td>
+<td>The phone number to which the verification code was sent, in the <a href="https://en.wikipedia.org/wiki/E.164">E.164</a> format.</td>
+</tr>
+<tr>
+<td>request_cost</td>
+<td>Float</td>
+<td>Total request cost incurred by either <a href="#checksendability">checkSendAbility</a> or <a href="#sendverificationmessage">sendVerificationMessage</a>.</td>
+</tr>
+<tr>
+<td>remaining_balance</td>
+<td>Float</td>
+<td><em>Optional.</em> Remaining balance in credits. Returned only in response to a request that incurs a charge.</td>
+</tr>
+<tr>
+<td>delivery_status</td>
+<td><a href="#deliverystatus">DeliveryStatus</a></td>
+<td><em>Optional.</em> The current message delivery status. Returned only if a verification message was sent to the user.</td>
+</tr>
+<tr>
+<td>verification_status</td>
+<td><a href="#verificationstatus">VerificationStatus</a></td>
+<td><em>Optional.</em> The current status of the verification process.</td>
+</tr>
+<tr>
+<td>payload</td>
+<td>String</td>
+<td><em>Optional.</em> Custom payload if it was provided in the request, 0-256 bytes.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="deliverystatus" href="#deliverystatus"><i class="anchor-icon"></i></a>DeliveryStatus</h4>
+<p>This object represents the delivery status of a message.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The current status of the message. One of the following:<br>- <strong>sent</strong> – the message has been sent to the recipient&#39;s device(s),<br>- <strong>read</strong> – the message has been read by the recipient,<br>- <strong>revoked</strong> – the message has been revoked.</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>Integer</td>
+<td>The timestamp when the status was last updated.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="verificationstatus" href="#verificationstatus"><i class="anchor-icon"></i></a>VerificationStatus</h4>
+<p>This object represents the verification status of a code.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>String</td>
+<td>The current status of the verification process. One of the following:<br>- <strong>code_valid</strong> – the code entered by the user is correct,<br>- <strong>code_invalid</strong> – the code entered by the user is incorrect,<br>- <strong>code_max_attempts_exceeded</strong> – the maximum number of attempts to enter the code has been exceeded,<br>- <strong>expired</strong> – the code has expired and can no longer be used for verification.</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>Integer</td>
+<td>The timestamp for this particular status. Represents the time when the status was last updated.</td>
+</tr>
+<tr>
+<td>code_entered</td>
+<td>String</td>
+<td><em>Optional.</em> The code entered by the user.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" name="report-delivery" href="#report-delivery"><i class="anchor-icon"></i></a>Report delivery</h3>
+<p>The Telegram Gateway API can send delivery reports to a user-specified callback URL. When you include a <code>callback_url</code> parameter in your request, the API will send an HTTP POST request to that URL containing the delivery report for the message. The payload of the POST request will be a JSON object representing the <a href="#requeststatus">RequestStatus</a> object.</p>
+<p>Your URL must respond with HTTP status code <code>200</code> to acknowledge receipt of the report. Any other status code will be considered a failure, and the service will retry sending the same report up to 10 times with increasing delays between attempts. If all retries fail, the report will be considered lost.</p>
+<h4><a class="anchor" name="checking-report-integrity" href="#checking-report-integrity"><i class="anchor-icon"></i></a>Checking report integrity</h4>
+<p>All reports submitted to your <code>callback_url</code>, if you provided one, will also contain the following headers:</p>
+<ul>
+<li><code>X-Request-Timestamp</code> – A Unix timestamp indicating when the server submitted the report.</li>
+<li><code>X-Request-Signature</code> – A server-generated signature needed to authenticate the report on your end.</li>
+</ul>
+<p>You can confirm the origin and verify the integrity of the reports you receive by comparing the signature contained in the <code>X-Request-Signature</code> header with the hexadecimal representation of the <a href="https://en.wikipedia.org/wiki/Hash-based_message_authentication_code">HMAC-SHA-256</a> signature of the <strong>data-check-string</strong> with the <a href="https://en.wikipedia.org/wiki/SHA-2">SHA256</a> hash of the API token shown in your Gateway account settings.</p>
+<p>The <strong>data-check-string</strong> is a concatenation of the report timestamp as provided by the  <code>X-Request-Timestamp</code> header, a <a href="https://en.wikipedia.org/wiki/Newline">line feed character</a> (&#39;\n&#39;, 0x0A) used as separator and the raw post body of the HTTP request.</p>
+<p>Example:</p>
+<pre><code>data_check_string = X-Request-Timestamp + &#39;\n&#39; + post_body
+secret_key = SHA256(api_token)
+if (hex(HMAC_SHA256(data_check_string, secret_key)) == X-Request-Signature) {
+  // data is from Telegram
+}</code></pre>
+<blockquote>
+<p>To prevent the use of outdated data, you should additionally check the <code>X-Request-Timestamp</code> header, which contains a Unix timestamp of when the relevant report was submitted by the server.</p>
+</blockquote>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps">Apps</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="/">Platform</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
