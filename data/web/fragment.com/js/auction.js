@@ -599,7 +599,6 @@ var Login = {
 var Wallet = {
   init: function(options) {
     Aj.globalState.tonConnectAuthAddress = options.address || false;
-    Aj.globalState.tonConnectLoggedIn = options.logged_in || false;
     Aj.globalState.tonConnectProof = options.ton_proof || '';
     Aj.globalState.tonConnectVersion = options.version || 1;
     if (Aj.globalState.tonConnectVersion == 2) {
@@ -718,19 +717,14 @@ var Wallet = {
     }
   },
   eTonAuth: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
     if (Aj.globalState.tonConnectVersion == 2) {
       var tonConnectUI = Aj.globalState.tonConnectUI;
       if (!tonConnectUI.connected) {
-        e.stopImmediatePropagation();
-        e.preventDefault();
         tonConnectUI.openModal();
       }
     } else {
-      if (Aj.globalState.tonConnectLoggedIn) {
-        return true;
-      }
-      e.stopImmediatePropagation();
-      e.preventDefault();
       QR.showPopup({
         request: {
           method: 'getTonAuthLink'
@@ -2954,7 +2948,6 @@ var Stars = {
       $('.js-buy-stars-content', Aj.state.$starsBuyPopup).html(result.content);
       $('.js-buy-stars-button', Aj.state.$starsBuyPopup).html(result.button);
       Aj.state.$starsBuyPopup.toggleClass('iam-sender', result.myself);
-      Aj.state.$starsBuyPopup.toggleClass('bot-recipient', result.to_bot);
       Aj.state.starsPrice = result.amount;
       Aj.state.itemTitle = result.item_title;
       Aj.state.$starsBuyForm.field('id').value(result.req_id);
