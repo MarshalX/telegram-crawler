@@ -71,6 +71,9 @@
   --header-tab-color-active: #fff;
   --unavail-color-rgb: 255, 88, 99;
   --unavail-color: rgb(var(--unavail-color-rgb));
+  --warning-color-rgb: 255, 88, 99;
+  --warning-bg-color: rgba(var(--warning-color-rgb), .14);
+  --warning-text-color: rgb(var(--warning-color-rgb));
 }
 
 html.header-tabs {
@@ -1720,6 +1723,11 @@ a.tm-menu-link:focus {
   color: var(--unavail-color);
   background-color: rgba(var(--unavail-color-rgb), .1);
 }
+.table-cell-status-thin.tm-status-banned,
+.tm-section-header-status.tm-status-banned {
+  color: var(--warning-text-color);
+  background-color: rgba(var(--warning-color-rgb), .1);
+}
 .table-cell-status-thin.tm-status-taken,
 .tm-section-header-status.tm-status-taken {
   color: #ff9953;
@@ -1760,6 +1768,15 @@ a.tm-menu-link:focus {
 }
 .tm-blockquote-header .tm-label-new {
   vertical-align: top;
+}
+.tm-section-blockquote.tm-warning {
+  color: var(--warning-text-color);
+  background-color: var(--warning-bg-color);
+  border-left-color: rgb(var(--warning-color-rgb));
+  margin: 30px 0 -10px;
+}
+.tm-section-blockquote.tm-warning .tm-blockquote-header {
+  color: var(--warning-text-color);
 }
 
 .tm-section-tabs-wrap {
@@ -2271,6 +2288,16 @@ a.tm-table-action-link:hover {
 .tm-auction-section .tm-section-header-domain {
   text-overflow: ellipsis;
   overflow: hidden;
+}
+.tm-auction-section.tm-banned-nft .tm-section-header-domain {
+  color: var(--warning-text-color);
+}
+.tm-auction-section.tm-banned-nft .tm-section-buttons .btn-primary {
+  color: var(--warning-text-color);
+  background-color: var(--warning-bg-color);
+}
+.tm-auction-section.tm-banned-nft .tm-section-buttons .btn .icon-ton:before {
+  background-image: var(--image-url-warn-ton-btn-icon);
 }
 
 .tm-list {
@@ -3163,7 +3190,8 @@ a.tm-table-action-link:hover {
   border-radius: 16px;
   background-color: var(--field-bg-color);
 }
-.gift-premium-popup-container.iam-sender .tm-form-checkbox-item {
+.gift-premium-popup-container.iam-sender .tm-form-checkbox-item,
+.gift-premium-popup-container.bot-recipient .tm-form-checkbox-item {
   display: none;
 }
 .preview-sender-shown,
@@ -4387,6 +4415,8 @@ a.tm-table-action-link:hover {
   --image-url-ton-icon: url('data:image/svg+xml,%3Csvg%20height%3D%2219%22%20viewBox%3D%220%200%2015%2019%22%20width%3D%2215%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m1.74%204.5h11.51c.24%200%20.44.2.44.44%200%20.08-.02.15-.05.22l-5.46%209.9c-.24.43-.78.59-1.21.35-.15-.08-.27-.21-.36-.36l-5.26-9.9c-.12-.21-.04-.48.18-.6.07-.03.14-.05.21-.05zm5.76%2010.67v-10.67z%22%20fill%3D%22none%22%20stroke%3D%22%234db2ff%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fsvg%3E');
 
   --image-url-ton-btn-icon: url('data:image/svg+xml,%3Csvg%20height%3D%2219%22%20viewBox%3D%220%200%2015%2019%22%20width%3D%2215%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m1.74%204.5h11.51c.24%200%20.44.2.44.44%200%20.08-.02.15-.05.22l-5.46%209.9c-.24.43-.78.59-1.21.35-.15-.08-.27-.21-.36-.36l-5.26-9.9c-.12-.21-.04-.48.18-.6.07-.03.14-.05.21-.05zm5.76%2010.67v-10.67z%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fsvg%3E');
+
+  --image-url-warn-ton-btn-icon: url('data:image/svg+xml,%3Csvg%20height%3D%2219%22%20viewBox%3D%220%200%2015%2019%22%20width%3D%2215%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m1.74%204.5h11.51c.24%200%20.44.2.44.44%200%20.08-.02.15-.05.22l-5.46%209.9c-.24.43-.78.59-1.21.35-.15-.08-.27-.21-.36-.36l-5.26-9.9c-.12-.21-.04-.48.18-.6.07-.03.14-.05.21-.05zm5.76%2010.67v-10.67z%22%20fill%3D%22none%22%20stroke%3D%22%23ff5863%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fsvg%3E');
 
   --image-url-ton-text-icon: url('data:image/svg+xml,%3Csvg%20height%3D%2220%22%20viewBox%3D%220%200%2016%2020%22%20width%3D%2216%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m2.68%205h10.63c.22%200%20.4.18.4.41%200%20.07-.01.14-.05.2l-5.04%209.08c-.22.4-.72.54-1.11.32-.14-.08-.25-.19-.32-.33l-4.87-9.08c-.1-.2-.03-.45.17-.55.06-.03.12-.05.19-.05zm5.32%209.78v-9.78z%22%20fill%3D%22none%22%20stroke%3D%22%238c9aa9%22%20stroke-width%3D%221.39%22%2F%3E%3C%2Fsvg%3E');
 
