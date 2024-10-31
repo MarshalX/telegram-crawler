@@ -570,6 +570,8 @@ var NewAd = {
       cont.on('click.curPage', '.js-open-schedule', NewAd.eOpenSchedule);
       cont.on('click.curPage', '.js-channels-deselect', NewAd.eDeselectChannels);
       cont.on('click.curPage', '.js-similar-channels-link', NewAd.eOpenSimilarChannels);
+      cont.on('click.curPage', '.js-bots-deselect', NewAd.eDeselectBots);
+      cont.on('click.curPage', '.js-similar-bots-link', NewAd.eOpenSimilarBots);
       $('.js-schedule-overview', state.$form).html(NewAd.scheduleOverview(state.$form));
       for (var i = 0; i < state.selectList.length; i++) {
         var selectData = state.selectList[i];
@@ -581,6 +583,17 @@ var NewAd = {
               return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
             },
             onEnter: NewAd.onChannelSearch,
+            onUpdate: NewAd.onSelectUpdate,
+            onChange: Ads.onSelectChange
+          });
+        } else if (selectData.bot_search) {
+          Ads.initSelect(state.$form, selectData.field, {
+            items: Aj.state[selectData.items_key] || [],
+            pairedField: selectData.paired_field || false,
+            renderSelectedItem: function(val, item) {
+              return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
+            },
+            onEnter: NewAd.onBotSearch,
             onUpdate: NewAd.onSelectUpdate,
             onChange: Ads.onSelectChange
           });
@@ -648,6 +661,7 @@ var NewAd = {
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
       state.similarChannelsPopup = $('.js-similar-channels-popup', cont);
+      state.similarBotsPopup = $('.js-similar-bots-popup', cont);
       NewAd.updateAdMedia(state.mediaField);
       NewAd.updateAdPreview(state.$form, state.previewData);
       NewAd.updateAdTargetOverview();
@@ -1002,6 +1016,48 @@ var NewAd = {
       }
     });
   },
+  onBotSearch: function(field, value) {
+    var $fieldEl = Aj.state.$form.field(field);
+    var $formGroup = $fieldEl.fieldEl().parents('.form-group');
+    var prev_value = $fieldEl.data('prevval');
+    if (prev_value && prev_value == value) {
+      return false;
+    }
+    $fieldEl.data('prevval', value);
+    Ads.hideFieldError($fieldEl);
+    if (!value) {
+      return false;
+    }
+    var bots_limit = Aj.state.botItemsLimit;
+    if ($fieldEl.data('value').length >= bots_limit) {
+      var selOpts = $fieldEl.data('selOpts');
+      if (selOpts.l_bots_limit) {
+        Ads.showFieldError($fieldEl, selOpts.l_bots_limit);
+        return false;
+      }
+    }
+    $formGroup.addClass('field-loading');
+    Aj.apiRequest('searchBot', {
+      query: value,
+      field: field
+    }, function(result) {
+      $formGroup.removeClass('field-loading');
+      if (result.error) {
+        Ads.showFieldError($fieldEl, result.error);
+        return false;
+      }
+      if (result.bot) {
+        var item = {
+          val: result.bot.id,
+          name: result.bot.title,
+          photo: result.bot.photo,
+          username: result.bot.username
+        };
+        $fieldEl.trigger('selectval', [item, true]);
+        $fieldEl.data('prevval', '');
+      }
+    });
+  },
   loadLocationData: function(params, opts, onUpdate, onReady) {
     Aj.apiRequest('searchLocation', params, function(result) {
       if (result.error) {
@@ -1115,6 +1171,10 @@ var NewAd = {
       var channels_cnt = $fieldEl.data('value').length;
       $('.js-similar-channels-link-wrap', Aj.state.$form).slideToggle(channels_cnt > 0 && channels_cnt < 10);
       $('.js-channels-deselect', Aj.state.$form).toggleClass('hide', channels_cnt < 2);
+    } else if (field == 'bots') {
+      var bots_cnt = $fieldEl.data('value').length;
+      $('.js-similar-bots-link-wrap', Aj.state.$form).slideToggle(bots_cnt > 0 && bots_cnt < 10);
+      $('.js-bots-deselect', Aj.state.$form).toggleClass('hide', bots_cnt < 2);
     }
     var selOpts = $fieldEl.data('selOpts');
     var paired_field = selOpts.pairedField;
@@ -1155,9 +1215,9 @@ var NewAd = {
         var $empty = $('.js-similar-channels-empty', this);
         var $loading = $('.js-similar-channels-loading', this);
         var $button = $('.js-add-similar-channels', this);
-        $list.on('scroll', NewAd.onSimiralChannelsScroll);
-        $list.on('change', 'input.checkbox', NewAd.eSimiralChannelChange);
-        $button.on('click', NewAd.eAddSimiralChannels);
+        $list.on('scroll', NewAd.onSimilarScroll);
+        $list.on('change', 'input.checkbox', NewAd.eSimilarChannelChange);
+        $button.on('click', NewAd.eAddSimilarChannels);
         $empty.addClass('hide');
         $button.addClass('hide');
         $loading.removeClass('hide');
@@ -1181,27 +1241,27 @@ var NewAd = {
             $button.toggleClass('hide', !has_items);
             $loading.addClass('hide');
             $list.html(html).data('channel_items', channel_items).toggleClass('hide', !has_items).trigger('scroll');
-            NewAd.updateSimiralChannelButton();
+            NewAd.updateSimilarChannelButton();
           }
         });
       },
       onClose: function() {
         var $list = $('.js-similar-channels-list', this);
         var $button = $('.js-add-similar-channels', this);
-        $list.off('scroll', NewAd.onSimiralChannelsScroll);
-        $list.off('change', 'input.checkbox', NewAd.eSimiralChannelChange);
-        $button.off('click', NewAd.eAddSimiralChannels);
+        $list.off('scroll', NewAd.onSimilarScroll);
+        $list.off('change', 'input.checkbox', NewAd.eSimilarChannelChange);
+        $button.off('click', NewAd.eAddSimilarChannels);
       }
     });
   },
-  onSimiralChannelsScroll: function() {
+  onSimilarScroll: function() {
     $(this).toggleClass('topscroll', this.scrollTop > 0);
     $(this).toggleClass('bottomscroll', this.scrollTop < this.scrollHeight - this.clientHeight);
   },
-  eSimiralChannelChange: function() {
-    NewAd.updateSimiralChannelButton();
+  eSimilarChannelChange: function() {
+    NewAd.updateSimilarChannelButton();
   },
-  updateSimiralChannelButton: function() {
+  updateSimilarChannelButton: function() {
     var $popup = Aj.state.similarChannelsPopup;
     var $list = $('.js-similar-channels-list', $popup);
     var $button = $('.js-add-similar-channels', $popup);
@@ -1214,7 +1274,7 @@ var NewAd = {
     $button.html(l('WEB_ADD_N_SIMILAR_CHANNELS', {n: count}));
     $button.toggleClass('disabled', !count);
   },
-  eAddSimiralChannels: function() {
+  eAddSimilarChannels: function() {
     var $popup = Aj.state.similarChannelsPopup;
     var $list = $('.js-similar-channels-list', $popup);
     var $button = $('.js-add-similar-channels', $popup);
@@ -1229,6 +1289,102 @@ var NewAd = {
           name: channel.title,
           photo: channel.photo,
           username: channel.username
+        };
+        $fieldEl.trigger('selectval', [item, true]);
+      }
+    });
+    closePopup($popup);
+  },
+  eDeselectBots: function(e) {
+    e.preventDefault();
+    Aj.state.$form.field('bots').trigger('reset');
+  },
+  eOpenSimilarBots: function(e) {
+    e.preventDefault();
+    var $link = $(this);
+    var $fieldEl = Aj.state.$form.field('bots');
+    var values   = $fieldEl.data('value') || [];
+    if (!values.length || $link.data('loading')) {
+      return false;
+    }
+    var bots = values.join(';');
+    openPopup(Aj.state.similarBotsPopup, {
+      closeByClickOutside: '.popup-no-close',
+      onOpen: function() {
+        var $list = $('.js-similar-bots-list', this);
+        var $empty = $('.js-similar-bots-empty', this);
+        var $loading = $('.js-similar-bots-loading', this);
+        var $button = $('.js-add-similar-bots', this);
+        $list.on('scroll', NewAd.onSimilarScroll);
+        $list.on('change', 'input.checkbox', NewAd.eSimilarBotChange);
+        $button.on('click', NewAd.eAddSimilarBots);
+        $empty.addClass('hide');
+        $button.addClass('hide');
+        $loading.removeClass('hide');
+        $list.html('').trigger('scroll').data('bots', {}).addClass('hide');
+        Aj.apiRequest('getSimilarBots', {
+          bots: bots
+        }, function(result) {
+          if (result.error) {
+            showAlert(result.error);
+            return false;
+          }
+          if (result.bots) {
+            var html = '', bot_items = {};
+            for (var i = 0; i < result.bots.length; i++) {
+              var item = result.bots[i];
+              html += item.cb_item;
+              bot_items['ch' + item.id] = item;
+            }
+            var has_items = bot_items > 0;
+            $empty.toggleClass('hide', has_items);
+            $button.toggleClass('hide', !has_items);
+            $loading.addClass('hide');
+            $list.html(html).data('bot_items', bot_items).toggleClass('hide', !has_items).trigger('scroll');
+            NewAd.updateSimilarBotButton();
+          }
+        });
+      },
+      onClose: function() {
+        var $list = $('.js-similar-bots-list', this);
+        var $button = $('.js-add-similar-bots', this);
+        $list.off('scroll', NewAd.onSimilarScroll);
+        $list.off('change', 'input.checkbox', NewAd.eSimilarBotChange);
+        $button.off('click', NewAd.eAddSimilarBots);
+      }
+    });
+  },
+  eSimilarBotChange: function() {
+    NewAd.updateSimilarBotButton();
+  },
+  updateSimilarBotButton: function() {
+    var $popup = Aj.state.similarBotsPopup;
+    var $list = $('.js-similar-bots-list', $popup);
+    var $button = $('.js-add-similar-bots', $popup);
+    var count = 0;
+    $('input.checkbox', $list).each(function() {
+      if ($(this).prop('checked')) {
+        count++;
+      }
+    });
+    $button.html(l('WEB_ADD_N_SIMILAR_BOTS', {n: count}));
+    $button.toggleClass('disabled', !count);
+  },
+  eAddSimilarBots: function() {
+    var $popup = Aj.state.similarBotsPopup;
+    var $list = $('.js-similar-bots-list', $popup);
+    var $button = $('.js-add-similar-bots', $popup);
+    var bot_items = $list.data('bot_items');
+    var $fieldEl = Aj.state.$form.field('bots');
+    $('input.checkbox', $list).each(function() {
+      if ($(this).prop('checked')) {
+        var name = $(this).prop('name');
+        var bot = bot_items[name];
+        var item = {
+          val: bot.id,
+          name: bot.title,
+          photo: bot.photo,
+          username: bot.username
         };
         $fieldEl.trigger('selectval', [item, true]);
       }
@@ -1518,6 +1674,10 @@ var NewAd = {
           $('.js-preview-footer', $previewPopup).each(function() {
             Ads.updateTextShadow(this, '.js-preview-text', '.label', 10);
           });
+          $('.js-preview-wrap', $previewPopup).each(function() {
+            var oneline = $('.js-preview-text', this).height() <= 20;
+            $(this).toggleClass('oneline-text', oneline);
+          });
           $('.js-picture-label', $previewPopup).html(previewData.picture_label);
           $('.js-picture-hint', $previewPopup).html(previewData.picture_hint);
         }
@@ -1602,9 +1762,7 @@ var NewAd = {
     var website_photo = $form.field('website_photo').value();
     var media = $form.field('media').value();
     var picture_checked = $form.field('picture').prop('checked');
-    var previewPictureChange = function() {
-      $('.js-preview', $previewPopup).toggleClass('picture', !!$(this).prop('checked'));
-    };
+    var target_type = $form.field('target_type').value();
     var website_name_hidden = $('.js-website-name-wrap', $form).isSlideHidden();
     var custom_button_hidden = $('.js-custom-button-wrap', $form).isSlideHidden();
 
@@ -1634,12 +1792,24 @@ var NewAd = {
     state.previewButtonField.on('ddchange.curPage', NewAd.onButtonChange);
     state.previewButtonField.trigger('selectval', [button]);
     state.previewPictureCheckbox = $previewForm.field('picture');
+    var previewPictureChange = function() {
+      var picture_checked = Aj.state.previewPictureCheckbox.prop('checked');
+      $('.js-preview', $previewPopup).toggleClass('picture', !!picture_checked);
+      $('.js-preview-wrap', $previewPopup).each(function() {
+        var oneline = $('.js-preview-text', this).height() <= 20;
+        $(this).toggleClass('oneline-text', oneline);
+      });
+    };
     state.previewPictureCheckbox.on('change.curPage', previewPictureChange);
     state.previewPictureCheckbox.prop('checked', picture_checked);
     var $previewEl = $('.js-preview', $previewPopup);
-    $previewEl.toggleClass('picture', !!picture_checked);
+    previewPictureChange();
     $('.js-website-name-wrap', $previewPopup).toggleClass('shide', website_name_hidden);
     $('.js-custom-button-wrap', $previewPopup).toggleClass('shide', custom_button_hidden);
+
+    var is_bots_target = (target_type == 'bots');
+    $('.js-bot-preview', $previewPopup).toggle(is_bots_target);
+    $('.js-channel-preview', $previewPopup).toggle(!is_bots_target);
 
     state.previewMediaField.data('$previewEl', $previewEl);
     NewAd.updateAdMedia(state.previewMediaField);
@@ -1687,6 +1857,7 @@ var NewAd = {
       });
       state.previewTextField.updateAutosize();
       state.initPreviewFormData = NewAd.getPreviewFormData();
+      previewPictureChange();
     });
     $previewPopup.one('popup:close', function() {
       Ads.formDestroy($previewForm);
@@ -2981,8 +3152,7 @@ var OwnerAds = {
     }
     var adsList = Aj.state.adsList;
     for (var i = 0; i < adsList.length; i++) {
-      if (ad.owner_id == adsList[i].owner_id &&
-          ad.ad_id == adsList[i].ad_id) {
+      if (ad.ad_id == adsList[i].ad_id) {
         ad.base_url = '/account/ad/' + ad.ad_id;
         ad._values = [
           ad.title.toLowerCase(),
@@ -3516,7 +3686,8 @@ var EditAd = {
         return showAlert(result.error);
       }
       closePopup(Aj.layer);
-      if (result.ad) {
+      if (owner_id == Aj.state.ownerId &&
+          result.ad) {
         OwnerAds.updateAd(result.ad);
       }
     });
@@ -3572,7 +3743,8 @@ var EditAd = {
         return showAlert(result.error);
       }
       closePopup(Aj.layer);
-      if (result.ad) {
+      if (owner_id == Aj.state.ownerId &&
+          result.ad) {
         OwnerAds.updateAd(result.ad);
       }
     });
@@ -3629,7 +3801,8 @@ var EditAd = {
         return showAlert(result.error);
       }
       closePopup(Aj.layer);
-      if (result.ad) {
+      if (owner_id == Aj.state.ownerId &&
+          result.ad) {
         OwnerAds.updateAd(result.ad);
       }
       if (result.header_owner_budget) {
@@ -3695,7 +3868,8 @@ var EditAd = {
         return showAlert(result.error);
       }
       closePopup(Aj.layer);
-      if (result.ad) {
+      if (owner_id == Aj.state.ownerId &&
+          result.ad) {
         OwnerAds.updateAd(result.ad);
       }
     });
@@ -3785,7 +3959,8 @@ var EditAd = {
         return showAlert(result.error);
       }
       closePopup(Aj.layer);
-      if (result.ad) {
+      if (owner_id == Aj.state.ownerId &&
+          result.ad) {
         OwnerAds.updateAd(result.ad);
       }
     });
