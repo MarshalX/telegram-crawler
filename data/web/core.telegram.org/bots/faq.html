@@ -159,13 +159,18 @@ You may also find the Bot API…">
 <p>Yes, file_ids can be treated as persistent.</p>
 <h3><a class="anchor" name="broadcasting-to-users" href="#broadcasting-to-users"><i class="anchor-icon"></i></a>Broadcasting to Users</h3>
 <h4><a class="anchor" name="my-bot-is-hitting-limits-how-do-i-avoid-this" href="#my-bot-is-hitting-limits-how-do-i-avoid-this"><i class="anchor-icon"></i></a>My bot is hitting limits, how do I avoid this?</h4>
-<p>When sending messages inside a particular chat, avoid sending more than one message per second. We may allow short bursts that go over this limit, but eventually you&#39;ll begin receiving 429 errors.</p>
-<p>If you&#39;re sending bulk notifications to multiple users, the API will not allow more than 30 messages per second or so. Consider spreading out notifications over large intervals of 8—12 hours for best results.</p>
-<p>Also note that your bot will not be able to send more than 20 messages per minute to the same group.</p>
+<p>By default, bots are able to message their users <strong>at no cost</strong> – but have limitations on the number of messages they can broadcast in a single interval:</p>
+<ul>
+<li>In a single chat, avoid sending more than one message per second. We may allow short bursts that go over this limit, but eventually you&#39;ll begin receiving 429 errors.</li>
+<li>In a group, bots are not be able to send more than 20 messages per minute.</li>
+<li>For bulk notifications, bots are not able to broadcast more than about 30 messages per second, unless they enable <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">paid broadcasts</a> to increase the limit.</li>
+</ul>
 <h4><a class="anchor" name="how-can-i-message-all-of-my-bot-39s-subscribers-at-once" href="#how-can-i-message-all-of-my-bot-39s-subscribers-at-once"><i class="anchor-icon"></i></a>How can I message all of my bot&#39;s subscribers at once?</h4>
-<p>Unfortunately, at this moment we don&#39;t have methods for sending bulk messages, e.g. notifications. We may add something along these lines in the future.</p>
-<p>In order to avoid hitting our limits when sending out mass notifications, consider spreading them over longer intervals, e.g. 8-12 hours. The API will not allow bulk notifications to more than ~30 users per second, if you go over that, you&#39;ll start getting 429 errors.</p>
-<p>See also: <a href="#my-bot-is-hitting-limits-how-do-i-avoid-this">How to avoid hitting limits?</a></p>
+<p>Enabling <a href="https://core.telegram.org/bots/api#october-26-2024">paid broadcasts</a> in <a href="https://t.me/botfather">@BotFather</a> allows a bot to broadcast up to <strong>1000 messages per second</strong>. Each message broadcasted over the free amount of 30 per second incurs a cost of <strong>0.1 Stars per message</strong>, paid with <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> from the bot&#39;s balance. In order to enable this feature, a bot must have at least <strong>100,000 Stars</strong> on its balance and at least <strong>100,000</strong> monthly active users.</p>
+<blockquote>
+<p>Bots with increased limits are only charged for messages that are broadcasted successfully.</p>
+</blockquote>
+<p>If you do not wish to enable paid broadcasts, consider spreading them over longer intervals (e.g. 8-12 hours) to avoid hitting the limit. The API will not allow bulk notifications to more than ~30 users per second – if you go over that, you&#39;ll start getting 429 errors.</p>
 <hr>
 <blockquote>
 <p>If you&#39;ve got questions that are not answered on this page, ping us at <a href="https://telegram.me/botsupport">@BotSupport</a> in Telegram.<br>We welcome any suggestions for the Bot Platform and API.</p>
