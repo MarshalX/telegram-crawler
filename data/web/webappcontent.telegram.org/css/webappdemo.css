@@ -254,8 +254,17 @@ pre {
 .viewport-stable_border {
   height: var(--tg-viewport-stable-height, 100vh);
 }
+.safe-area_border {
+  position: fixed;
+  left: env(safe-area-inset-left);
+  right: env(safe-area-inset-right);
+  top: env(safe-area-inset-top);
+  bottom: env(safe-area-inset-bottom);
+  pointer-events: none;
+}
 .viewport-border:before,
-.viewport-stable_border:before {
+.viewport-stable_border:before,
+.safe-area_border:before {
   content: attr(text);
   display: inline-block;
   position: absolute;
@@ -271,8 +280,14 @@ pre {
   left: 0;
   right: auto;
 }
+.safe-area_border:before {
+  content: 'safe-area';
+  background: orange;
+  right: 50px;
+}
 .viewport-border:after,
-.viewport-stable_border:after {
+.viewport-stable_border:after,
+.safe-area_border:after {
   content: '';
   display: block;
   position: absolute;
@@ -284,4 +299,7 @@ pre {
 }
 .viewport-stable_border:after {
   border-color: green;
+}
+.safe-area_border:after {
+  border-color: orange;
 }

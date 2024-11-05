@@ -2,13 +2,13 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="format-detection" content="telephone=no" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app-beta.js?56"></script>
+    <script src="https://tg.dev/js/telegram-web-app-beta.js?59"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -19,7 +19,7 @@
     </script>
     <link href="https://tg.dev/css/bootstrap.min.css?3" rel="stylesheet">
     <link href="https://tg.dev/css/bootstrap-extra.css?2" rel="stylesheet">
-    <link href="/css/webappdemo.css?11" rel="stylesheet">
+    <link href="/css/webappdemo.css?12" rel="stylesheet">
   </head>
   <body class="" style="visibility: hidden;">
       <section id="top_sect" class="second">
@@ -33,6 +33,7 @@
   <button onclick="DemoApp.toggleSecondaryButton(this);">Hide Secondary Button</button>
   <button onclick="DemoApp.toggleButtonsProgress(this);">Show Progress</button>
   <button onclick="DemoApp.toggleSwipeBehavior(this);">Disable Vertical Swypes</button>
+  <button id="fullscreen_btn" onclick="DemoApp.toggleFullscreen(this);">Request Fullscreen</button>
   <input type="text" placeholder="Input text in regular input..." />
   <div class="input" contenteditable="true" data-placeholder="Input text in contenteditable field..."></div>
     <div id="peer_wrap" style="display:none">
@@ -88,6 +89,15 @@
       <li><a href="javascript:Telegram.WebApp.openTelegramLink('https://t.me/addstickers/fltmp');">Stickerpack</a></li>
       <li><a href="javascript:Telegram.WebApp.openTelegramLink('https://t.me/addstickers/fltmp', {force_request:true});">Stickerpack</a> (nocache)</li>
     </ul>
+    <ul>
+      <li><a href="javascript:;" onclick="return DemoApp.checkHomeScreenStatus(this);">Check Home Screen Status</a> <span></span></li>
+      <li><a href="javascript:;" onclick="return DemoApp.addToHomeScreen(this);">Add to Home Screen</a></li>
+    </ul>
+    <ul>
+      <li><a href="javascript:DemoApp.setEmojiStatus(this, '5213305508034783384');">Set emoji status</a> <span></span></li>
+      <li><a href="javascript:DemoApp.setEmojiStatus(this, '5213305508034783384', 1730766967);">Set emoji status</a> for 5 min <span></span></li>
+      <li><a href="javascript:DemoApp.setEmojiStatus(this, '123');">Set emoji status</a> (invalid id) <span></span></li>
+    </ul>
     <p>Test permissions:</p>
     <div class="columns">
       <ul>
@@ -101,6 +111,14 @@
         <li><a href="javascript:;" onclick="return DemoApp.requestWriteAccess(this);">Request write access</a> <span></span></li>
         <li><a href="javascript:;" onclick="return DemoApp.requestPhoneNumber(this);">Request phone number</a> <span></span><br><br></li>
         <li><a href="javascript:;" onclick="return DemoApp.requestServerTime(this);">Request server time</a> (invokes custom method) <span></span></li>
+      </ul>
+    </div>
+    <p>Sensors:</p>
+    <div class="columns">
+      <ul>
+        <li><a id="accelerometer_btn" href="javascript:;" onclick="return DemoApp.toggleAccelerometer(this);">Start Accelerometer</a> <span></span></li>
+        <li><a id="device_orientation_btn" href="javascript:;" onclick="return DemoApp.toggleDeviceOrientation(this);">Start DeviceOrientation</a> <span></span></li>
+        <li><a id="gyroscope_btn" href="javascript:;" onclick="return DemoApp.toggleGyroscope(this);">Start Gyroscope</a> <span></span></li>
       </ul>
     </div>
     <p>Test alerts:</p>
@@ -174,11 +192,12 @@
       platform: <span id="platform"></span>
     </div>
   </section>
+  <div class="safe-area_border"></div>
   <div class="viewport-border"></div>
   <div class="viewport-stable_border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?31"></script>
+    <script src="/js/webappdemo.js?32"></script>
     <script>DemoApp.apiUrl = "/demo/api";
 
 Telegram.WebApp.onEvent('themeChanged', function() {
@@ -323,6 +342,24 @@ try {
 } catch(e) {}
 try {
   DemoApp.biometricInit();
+} catch(e) {}
+try {
+  DemoApp.fullscreenInit();
+} catch(e) {}
+try {
+  DemoApp.accelerometerInit();
+} catch(e) {}
+try {
+  DemoApp.deviceOrientationInit();
+} catch(e) {}
+try {
+  DemoApp.gyroscopeInit();
+} catch(e) {}
+try {
+  DemoApp.homeScreenInit();
+} catch(e) {}
+try {
+  DemoApp.emojiStatusInit();
 } catch(e) {}
 
 </script>

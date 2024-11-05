@@ -447,6 +447,155 @@ var DemoApp = {
       el.innerHTML = 'Disable Vertical Swypes';
     }
   },
+  fullscreenInit: function() {
+    Telegram.WebApp.onEvent('fullscreenChanged', function() {
+      DemoApp.updateFullscreenButton();
+    });
+    Telegram.WebApp.onEvent('fullscreenFailed', function(params) {
+      DemoApp.showAlert('fullscreenFailed: ' + params.error);
+    });
+    DemoApp.updateFullscreenButton();
+  },
+  toggleFullscreen: function(el) {
+    if (Telegram.WebApp.isFullscreen) {
+      Telegram.WebApp.exitFullscreen();
+    } else {
+      Telegram.WebApp.requestFullscreen();
+    }
+  },
+  updateFullscreenButton: function() {
+    if (Telegram.WebApp.isFullscreen) {
+      $('#fullscreen_btn').html('Exit Fullscreen');
+    } else {
+      $('#fullscreen_btn').html('Request Fullscreen');
+    }
+  },
+  accelerometerInit: function() {
+    Telegram.WebApp.onEvent('accelerometerStarted', function() {
+      $('#accelerometer_btn').next('span').text('').attr('class', '');
+      DemoApp.updateAccelerometerLink();
+    });
+    Telegram.WebApp.onEvent('accelerometerStopped', function() {
+      $('#accelerometer_btn').next('span').text('').attr('class', '');
+      DemoApp.updateAccelerometerLink();
+    });
+    Telegram.WebApp.onEvent('accelerometerChanged', function(params) {
+      $('#accelerometer_btn').next('span').text('(x: ' + params.x + '; y: ' + params.y + '; z: ' + params.z + ')').attr('class', 'ok');
+    });
+    Telegram.WebApp.onEvent('accelerometerFailed', function(params) {
+      $('#accelerometer_btn').next('span').text('(ERR: ' + params.error + ')').attr('class', 'err');
+    });
+    DemoApp.updateAccelerometerLink();
+  },
+  toggleAccelerometer: function(el) {
+    if (Telegram.WebApp.Accelerometer.isStarted) {
+      Telegram.WebApp.Accelerometer.stop();
+    } else {
+      Telegram.WebApp.Accelerometer.start(100);
+    }
+  },
+  updateAccelerometerLink: function() {
+    if (Telegram.WebApp.Accelerometer.isStarted) {
+      $('#accelerometer_btn').html('Stop Accelerometer');
+    } else {
+      $('#accelerometer_btn').html('Start Accelerometer');
+    }
+  },
+  deviceOrientationInit: function() {
+    Telegram.WebApp.onEvent('deviceOrientationStarted', function() {
+      $('#device_orientation_btn').next('span').text('').attr('class', '');
+      DemoApp.updateDeviceOrientationLink();
+    });
+    Telegram.WebApp.onEvent('deviceOrientationStopped', function() {
+      $('#device_orientation_btn').next('span').text('').attr('class', '');
+      DemoApp.updateDeviceOrientationLink();
+    });
+    Telegram.WebApp.onEvent('deviceOrientationChanged', function() {
+      $('#device_orientation_btn').next('span').text('(alpha: ' + params.alpha + '; beta: ' + params.beta + '; gamma: ' + params.gamma + ')').attr('class', 'ok');
+    });
+    Telegram.WebApp.onEvent('deviceOrientationFailed', function(params) {
+      $('#device_orientation_btn').next('span').text('(ERR: ' + params.error + ')').attr('class', 'err');
+    });
+    DemoApp.updateDeviceOrientationLink();
+  },
+  toggleDeviceOrientation: function(el) {
+    if (Telegram.WebApp.DeviceOrientation.isStarted) {
+      Telegram.WebApp.DeviceOrientation.stop();
+    } else {
+      Telegram.WebApp.DeviceOrientation.start(100);
+    }
+  },
+  updateDeviceOrientationLink: function() {
+    if (Telegram.WebApp.DeviceOrientation.isStarted) {
+      $('#device_orientation_btn').html('Stop DeviceOrientation');
+    } else {
+      $('#device_orientation_btn').html('Start DeviceOrientation');
+    }
+  },
+  gyroscopeInit: function() {
+    Telegram.WebApp.onEvent('gyroscopeStarted', function() {
+      $('#gyroscope_btn').next('span').text('').attr('class', '');
+      DemoApp.updateGyroscopeLink();
+    });
+    Telegram.WebApp.onEvent('gyroscopeStopped', function() {
+      $('#gyroscope_btn').next('span').text('').attr('class', '');
+      DemoApp.updateGyroscopeLink();
+    });
+    Telegram.WebApp.onEvent('gyroscopeChanged', function(params) {
+      $('#gyroscope_btn').next('span').text('(x: ' + params.x + '; y: ' + params.y + '; z: ' + params.z + ')').attr('class', 'ok');
+    });
+    Telegram.WebApp.onEvent('gyroscopeFailed', function(params) {
+      $('#gyroscope_btn').next('span').text('(ERR: ' + params.error + ')').attr('class', 'err');
+    });
+    DemoApp.updateGyroscopeLink();
+  },
+  toggleGyroscope: function(el) {
+    if (Telegram.WebApp.Gyroscope.isStarted) {
+      Telegram.WebApp.Gyroscope.stop();
+    } else {
+      Telegram.WebApp.Gyroscope.start(100);
+    }
+  },
+  updateGyroscopeLink: function() {
+    if (Telegram.WebApp.Gyroscope.isStarted) {
+      $('#gyroscope_btn').html('Stop Gyroscope');
+    } else {
+      $('#gyroscope_btn').html('Start Gyroscope');
+    }
+  },
+  homeScreenInit: function() {
+    Telegram.WebApp.onEvent('homeScreenFailed', function(params) {
+      DemoApp.showAlert('userEmojiStatusFailed: ' + params.error);
+    });
+  },
+  addToHomeScreen: function(el) {
+    Telegram.WebApp.addToHomeScreen(function(result) {
+      if (result) {
+        $(el).next('span').text('(added!)').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(NOT added)').attr('class', 'err');
+      }
+    });
+  },
+  checkHomeScreenStatus: function(el) {
+    Telegram.WebApp.checkHomeScreenStatus(function(is_added, is_supported) {
+      $(el).next('span').text('(is_added: ' + (is_added ? 'true' : 'false') + '; is_supported: ' + (is_supported ? 'true' : 'false') + ')').attr('class', 'ok');
+    });
+  },
+  emojiStatusInit: function() {
+    Telegram.WebApp.onEvent('userEmojiStatusFailed', function(params) {
+      DemoApp.showAlert('userEmojiStatusFailed: ' + params.error);
+    });
+  },
+  setEmojiStatus: function(el, custom_emoji_id, expiration_date) {
+    Telegram.WebApp.setUserEmojiStatus(custom_emoji_id, expiration_date ? {expiration_date: expiration_date} : {}, function(result) {
+      if (result) {
+        $(el).next('span').text('(status set!)').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(status NOT set)').attr('class', 'err');
+      }
+    });
+  },
   showAlert: function(message) {
     Telegram.WebApp.showAlert(message);
   },
