@@ -243,7 +243,7 @@ pre {
   width: auto;
 }
 .viewport-border,
-.viewport-stable_border {
+.viewport-stable-border {
   position: fixed;
   left: 0;
   right: 0;
@@ -251,20 +251,29 @@ pre {
   height: var(--tg-viewport-height, 100vh);
   pointer-events: none;
 }
-.viewport-stable_border {
+.viewport-stable-border {
   height: var(--tg-viewport-stable-height, 100vh);
 }
-.safe-area_border {
+.safe-area-border {
   position: fixed;
-  left: env(safe-area-inset-left);
-  right: env(safe-area-inset-right);
-  top: env(safe-area-inset-top);
-  bottom: env(safe-area-inset-bottom);
+  left: env(safe-area-inset-left, -1000px);
+  right: env(safe-area-inset-right, -1000px);
+  top: env(safe-area-inset-top, -1000px);
+  bottom: env(safe-area-inset-bottom, -1000px);
+  pointer-events: none;
+}
+.tg-safe-area-border {
+  position: fixed;
+  left: var(--tg-safe-area-inset-left, 0);
+  right: var(--tg-safe-area-inset-right, 0);
+  top: var(--tg-safe-area-inset-top, 0);
+  bottom: var(--tg-safe-area-inset-bottom, 0);
   pointer-events: none;
 }
 .viewport-border:before,
-.viewport-stable_border:before,
-.safe-area_border:before {
+.viewport-stable-border:before,
+.safe-area-border:before,
+.tg-safe-area-border:before {
   content: attr(text);
   display: inline-block;
   position: absolute;
@@ -275,19 +284,25 @@ pre {
   padding: 2px 4px;
   vertical-align: top;
 }
-.viewport-stable_border:before {
+.viewport-stable-border:before {
   background: green;
   left: 0;
   right: auto;
 }
-.safe-area_border:before {
+.safe-area-border:before {
   content: 'safe-area';
+  background: darkorange;
+  right: 100px;
+}
+.tg-safe-area-border:before {
+  content: 'tg-safe-area';
   background: orange;
   right: 50px;
 }
 .viewport-border:after,
-.viewport-stable_border:after,
-.safe-area_border:after {
+.viewport-stable-border:after,
+.safe-area-border:after,
+.tg-safe-area-border:after {
   content: '';
   display: block;
   position: absolute;
@@ -297,9 +312,12 @@ pre {
   bottom: 0;
   border: 2px dashed gray;
 }
-.viewport-stable_border:after {
+.viewport-stable-border:after {
   border-color: green;
 }
-.safe-area_border:after {
+.safe-area-border:after {
+  border-color: darkorange;
+}
+.tg-safe-area-border:after {
   border-color: orange;
 }

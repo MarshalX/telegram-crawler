@@ -379,6 +379,45 @@ var DemoApp = {
       }
     });
   },
+  locationInit: function(el) {
+    var locationManager = Telegram.WebApp.LocationManager;
+    if (!DemoApp.locationInited) {
+      DemoApp.locationInited = true;
+      Telegram.WebApp.onEvent('locationManagerUpdated', function() {
+        $('#loc_inited').text(locationManager.isInited ? 'true' : 'false');
+        $('#loc_available').text(locationManager.isLocationAvailable ? 'true' : 'false');
+        $('#loc_access_requested').text(locationManager.isAccessRequested ? 'true' : 'false');
+        $('#loc_access_granted').text(locationManager.isAccessGranted ? 'true' : 'false');
+        $('#loc_settings').toggle(locationManager.isLocationAvailable && locationManager.isAccessRequested && !locationManager.isAccessGranted);
+      });
+    }
+    locationManager.init();
+  },
+  locationGet: function(el) {
+    var locationManager = Telegram.WebApp.LocationManager;
+    if (!locationManager.isInited) {
+      return DemoApp.showAlert('Location not inited yet!');
+    }
+    locationManager.getLocation(function(location_data) {
+      if (location_data) {
+        $(el).next('span').text('(' + JSON.stringify(location_data) + ')').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(Request declined)').attr('class', 'err');
+      }
+    });
+  },
+  locationOpenSettings: function(el) {
+    var locationManager = Telegram.WebApp.LocationManager;
+    if (!locationManager.isInited) {
+      return DemoApp.showAlert('Location not inited yet!');
+    }
+    if (!locationManager.isBiometricAvailable ||
+        !locationManager.isAccessRequested ||
+        locationManager.isAccessGranted) {
+      return false;
+    }
+    locationManager.openSettings();
+  },
   toggleMainButton: function(el) {
     if (DemoApp.MainButton.isVisible) {
       DemoApp.MainButton.hide();
@@ -564,22 +603,16 @@ var DemoApp = {
     }
   },
   homeScreenInit: function() {
-    Telegram.WebApp.onEvent('homeScreenFailed', function(params) {
-      DemoApp.showAlert('userEmojiStatusFailed: ' + params.error);
+    Telegram.WebApp.onEvent('homeScreenAdded', function(params) {
+      $('#add_to_home_btn').next('span').text('(added!)').attr('class', 'ok');
     });
   },
   addToHomeScreen: function(el) {
-    Telegram.WebApp.addToHomeScreen(function(result) {
-      if (result) {
-        $(el).next('span').text('(added!)').attr('class', 'ok');
-      } else {
-        $(el).next('span').text('(NOT added)').attr('class', 'err');
-      }
-    });
+    Telegram.WebApp.addToHomeScreen();
   },
   checkHomeScreenStatus: function(el) {
-    Telegram.WebApp.checkHomeScreenStatus(function(is_added, is_supported) {
-      $(el).next('span').text('(is_added: ' + (is_added ? 'true' : 'false') + '; is_supported: ' + (is_supported ? 'true' : 'false') + ')').attr('class', 'ok');
+    Telegram.WebApp.checkHomeScreenStatus(function(status) {
+      $(el).next('span').text('(status: ' + status + ')').attr('class', 'ok');
     });
   },
   emojiStatusInit: function() {
@@ -595,6 +628,44 @@ var DemoApp = {
         $(el).next('span').text('(status NOT set)').attr('class', 'err');
       }
     });
+  },
+  downloadFile: function(el, url, file_name) {
+    Telegram.WebApp.downloadFile({url: url, file_name: file_name}, function(result) {
+      if (result) {
+        $(el).next('span').text('(downloading...)').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(declined)').attr('class', 'err');
+      }
+    });
+  },
+  activityStartTime: new Date(),
+  activityPrevDuration: false,
+  activityTo: null,
+  activityInit: function() {
+    Telegram.WebApp.onEvent('activated', function(params) {
+      DemoApp.activityStartTime = new Date();
+      DemoApp.activityUpdate();
+    });
+    Telegram.WebApp.onEvent('deactivated', function(params) {
+      DemoApp.activityPrevDuration = new Date() - DemoApp.activityStartTime;
+      DemoApp.activityStartTime = false;
+      clearTimeout(DemoApp.activityTo);
+      DemoApp.activityUpdate();
+    });
+    DemoApp.activityUpdate();
+  },
+  activityUpdate: function() {
+    if (Telegram.WebApp.isActive) {
+      var nowDuration = new Date() - DemoApp.activityStartTime;
+      $('#cur_activity').html('Mini App is active for <b>' + Math.round(nowDuration / 1000) + '</b> sec');
+      DemoApp.activityTo = setTimeout(DemoApp.activityUpdate, 100);
+    } else {
+      $('#cur_activity').html('Mini App is <b>inactive</b>');
+    }
+    if (DemoApp.activityPrevDuration !== false) {
+      var prevDuration = DemoApp.activityPrevDuration;
+      $('#prev_activity').html(', <br>previously was active for <b>' + Math.round(prevDuration / 1000) + '</b> sec');
+    }
   },
   showAlert: function(message) {
     Telegram.WebApp.showAlert(message);
@@ -692,7 +763,7 @@ var DemoAppViewport = {
   },
   setData: function() {
     $('.viewport-border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportHeight, 2));
-    $('.viewport-stable_border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportStableHeight, 2) + ' | is_expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false'));
+    $('.viewport-stable-border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportStableHeight, 2) + ' | is_expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false'));
   }
 };
 

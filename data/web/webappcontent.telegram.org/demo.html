@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app-beta.js?59"></script>
+    <script src="https://tg.dev/js/telegram-web-app-beta.js?65"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -19,7 +19,7 @@
     </script>
     <link href="https://tg.dev/css/bootstrap.min.css?3" rel="stylesheet">
     <link href="https://tg.dev/css/bootstrap-extra.css?2" rel="stylesheet">
-    <link href="/css/webappdemo.css?12" rel="stylesheet">
+    <link href="/css/webappdemo.css?15" rel="stylesheet">
   </head>
   <body class="" style="visibility: hidden;">
       <section id="top_sect" class="second">
@@ -86,16 +86,21 @@
       <li><a href="javascript:Telegram.WebApp.shareToStory('https://telegra.ph/file/61f1dac694c3131a7b4ac.mp4',{text:'Test caption',widget_link:{url:'https://telegra.ph/Almost-done-07-23',name:'Link'}});">Share video to story</a> (with caption and link widget)</li>
     </ul>
     <ul>
+      <li><a href="javascript:DemoApp.downloadFile(this, 'https://telegra.ph/file/5583ac37c90979f052b7b.png', 'Photo.png');">Download picture</a> <span></span></li>
+      <li><a href="javascript:DemoApp.downloadFile(this, 'https://telegra.ph/file/61f1dac694c3131a7b4ac.mp4', 'Video.mp4');">Download video</a> <span></span></li>
+      <li><a href="javascript:DemoApp.downloadFile(this, 'https://pdfobject.com/pdf/sample.pdf', 'Sample.pdf');">Download PDF</a> <span></span></li>
+    </ul>
+    <ul>
       <li><a href="javascript:Telegram.WebApp.openTelegramLink('https://t.me/addstickers/fltmp');">Stickerpack</a></li>
       <li><a href="javascript:Telegram.WebApp.openTelegramLink('https://t.me/addstickers/fltmp', {force_request:true});">Stickerpack</a> (nocache)</li>
     </ul>
     <ul>
       <li><a href="javascript:;" onclick="return DemoApp.checkHomeScreenStatus(this);">Check Home Screen Status</a> <span></span></li>
-      <li><a href="javascript:;" onclick="return DemoApp.addToHomeScreen(this);">Add to Home Screen</a></li>
+      <li><a id="add_to_home_btn" href="javascript:;" onclick="return DemoApp.addToHomeScreen(this);">Add to Home Screen</a></li>
     </ul>
     <ul>
       <li><a href="javascript:DemoApp.setEmojiStatus(this, '5213305508034783384');">Set emoji status</a> <span></span></li>
-      <li><a href="javascript:DemoApp.setEmojiStatus(this, '5213305508034783384', 1730937780);">Set emoji status</a> for 5 min <span></span></li>
+      <li><a href="javascript:DemoApp.setEmojiStatus(this, '5213305508034783384', 1730939759);">Set emoji status</a> for 5 min <span></span></li>
       <li><a href="javascript:DemoApp.setEmojiStatus(this, '123');">Set emoji status</a> (invalid id) <span></span></li>
     </ul>
     <p>Test permissions:</p>
@@ -178,6 +183,15 @@
         <li><a href="javascript:;" onclick="return DemoApp.biometricRequestAuth(this);">Request auth</a> <span></span></li>
       </ul>
     </div>
+    <p>Location:</p>
+    <div class="columns">
+      <ul>
+        <li>isInited: <span class="txt" id="loc_inited">false</span></li>
+        <li>available: <span class="txt" id="loc_available">false</span></li>
+        <li>access_requested: <span class="txt" id="loc_access_requested">false</span> (<a href="javascript:;" onclick="return DemoApp.locationGet(this);">Request location</a>) <span></span></li>
+        <li>access_granted: <span class="txt" id="loc_access_granted">false</span> <span id="loc_settings" style="display:none;">(<a href="javascript:;" onclick="return DemoApp.locationOpenSettings(this);">Open settings</a>)</span></li>
+      </ul>
+    </div>
     <pre><code id="webview_data"></code></pre>
     <div class="hint">
       Data passed to webview.
@@ -191,13 +205,17 @@
       Version: <span id="ver"></span>,
       platform: <span id="platform"></span>
     </div>
+    <div class="hint">
+      <span id="cur_activity"></span><span id="prev_activity"></span>
+    </div>
   </section>
-  <div class="safe-area_border"></div>
+  <div class="safe-area-border"></div>
+  <div class="tg-safe-area-border"></div>
   <div class="viewport-border"></div>
-  <div class="viewport-stable_border"></div>
+  <div class="viewport-stable-border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?32"></script>
+    <script src="/js/webappdemo.js?36"></script>
     <script>DemoApp.apiUrl = "/demo/api";
 
 Telegram.WebApp.onEvent('themeChanged', function() {
@@ -248,7 +266,7 @@ DemoApp.init();
 
 function setViewportData() {
   $('.viewport-border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportHeight, 2));
-  $('.viewport-stable_border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportStableHeight, 2) + ' | is_expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false'));
+  $('.viewport-stable-border').attr('text', window.innerWidth + ' x ' + round(Telegram.WebApp.viewportStableHeight, 2) + ' | is_expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false'));
 }
 Telegram.WebApp.setHeaderColor('secondary_bg_color');
 Telegram.WebApp.onEvent('viewportChanged', setViewportData);
@@ -356,10 +374,16 @@ try {
   DemoApp.gyroscopeInit();
 } catch(e) {}
 try {
+  DemoApp.locationInit();
+} catch(e) {}
+try {
   DemoApp.homeScreenInit();
 } catch(e) {}
 try {
   DemoApp.emojiStatusInit();
+} catch(e) {}
+try {
+  DemoApp.activityInit();
 } catch(e) {}
 
 </script>
