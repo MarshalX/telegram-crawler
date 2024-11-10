@@ -31,7 +31,7 @@ var DemoApp = {
   close: function() {
     Telegram.WebApp.close();
   },
-  sendMessage: function(msg_id, with_webview) {
+  sendMessage: function(msg_id, with_webview, share) {
     if (!DemoApp.initDataUnsafe.query_id) {
       alert('WebViewQueryId not defined');
       return;
@@ -40,12 +40,28 @@ var DemoApp = {
     $('#btn_status').text('Sending...').removeClass('ok err').show();
     DemoApp.apiRequest('sendMessage', {
       msg_id: msg_id || '',
-      with_webview: !DemoApp.initDataUnsafe.receiver && with_webview ? 1 : 0
+      with_webview: !DemoApp.initDataUnsafe.receiver && with_webview ? 1 : 0,
+      share: share ? 1 : 0
     }, function(result) {
       $('button').prop('disabled', false);
       if (result.response) {
         if (result.response.ok) {
-          $('#btn_status').text('Message sent successfully!').addClass('ok').show();
+          if (share) {
+            var fail_handler = function(params) {
+              DemoApp.showAlert('shareMessageFailed: ' + params.error);
+            };
+            Telegram.WebApp.onEvent('shareMessageFailed', fail_handler);
+            Telegram.WebApp.shareMessage(result.response.result.id, function(sent) {
+              Telegram.WebApp.offEvent('shareMessageFailed', fail_handler);
+              if (sent) {
+                $('#btn_status').text('Message sent  successfully!').addClass('ok').show();
+              } else {
+                $('#btn_status').text('Message send failed!').addClass('err').show();
+              }
+            });
+          } else {
+            $('#btn_status').text('Message sent successfully!').addClass('ok').show();
+          }
         } else {
           $('#btn_status').text(result.response.description).addClass('err').show();
           alert(result.response.description);
@@ -411,7 +427,7 @@ var DemoApp = {
     if (!locationManager.isInited) {
       return DemoApp.showAlert('Location not inited yet!');
     }
-    if (!locationManager.isBiometricAvailable ||
+    if (!locationManager.isLocationAvailable ||
         !locationManager.isAccessRequested ||
         locationManager.isAccessGranted) {
       return false;
@@ -616,16 +632,25 @@ var DemoApp = {
     });
   },
   emojiStatusInit: function() {
-    Telegram.WebApp.onEvent('userEmojiStatusFailed', function(params) {
-      DemoApp.showAlert('userEmojiStatusFailed: ' + params.error);
+    Telegram.WebApp.onEvent('emojiStatusFailed', function(params) {
+      DemoApp.showAlert('emojiStatusFailed: ' + params.error);
     });
   },
   setEmojiStatus: function(el, custom_emoji_id, expiration_date) {
-    Telegram.WebApp.setUserEmojiStatus(custom_emoji_id, expiration_date ? {expiration_date: expiration_date} : {}, function(result) {
+    Telegram.WebApp.setEmojiStatus(custom_emoji_id, expiration_date ? {expiration_date: expiration_date} : {}, function(result) {
       if (result) {
         $(el).next('span').text('(status set!)').attr('class', 'ok');
       } else {
         $(el).next('span').text('(status NOT set)').attr('class', 'err');
+      }
+    });
+  },
+  requestEmojiStatusAccess: function(el, custom_emoji_id, expiration_date) {
+    Telegram.WebApp.requestEmojiStatusAccess(function(allowed) {
+      if (allowed) {
+        $(el).next('span').text('(Access granted)').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(User declined this request)').attr('class', 'err');
       }
     });
   },

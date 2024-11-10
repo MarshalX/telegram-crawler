@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app-beta.js?65"></script>
+    <script src="https://tg.dev/js/telegram-web-app-beta.js?73"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -19,12 +19,14 @@
     </script>
     <link href="https://tg.dev/css/bootstrap.min.css?3" rel="stylesheet">
     <link href="https://tg.dev/css/bootstrap-extra.css?2" rel="stylesheet">
-    <link href="/css/webappdemo.css?15" rel="stylesheet">
+    <link href="/css/webappdemo.css?16" rel="stylesheet">
   </head>
   <body class="" style="visibility: hidden;">
       <section id="top_sect" class="second">
       <button id="main_btn" onclick="DemoApp.sendMessage('');">Send «Hello, World!»</button>
   <button id="with_webview_btn" onclick="DemoApp.sendMessage('', true);">Send «Hello, World!» with inline webview button</button>
+  <button id="share_btn" onclick="DemoApp.sendMessage('', false, true);">Share «Hello, World!»</button>
+  <button id="share_ww_btn" onclick="DemoApp.sendMessage('', true, true);">Share «Hello, World!» with inline webview button</button>
   <button id="data_btn" onclick="DemoApp.sendTime(true);">Send current time to bot (x10)</button>
   <button onclick="DemoApp.expand();">Expand Webview</button>
   <button onclick="DemoApp.toggleBackButton(this);">Show Back Button</button>
@@ -100,7 +102,7 @@
     </ul>
     <ul>
       <li><a href="javascript:DemoApp.setEmojiStatus(this, '5213305508034783384');">Set emoji status</a> <span></span></li>
-      <li><a href="javascript:DemoApp.setEmojiStatus(this, '5213305508034783384', 1731245066);">Set emoji status</a> for 5 min <span></span></li>
+      <li><a href="javascript:DemoApp.setEmojiStatus(this, '5213305508034783384', 1731245712);">Set emoji status</a> for 5 min <span></span></li>
       <li><a href="javascript:DemoApp.setEmojiStatus(this, '123');">Set emoji status</a> (invalid id) <span></span></li>
     </ul>
     <p>Test permissions:</p>
@@ -114,7 +116,8 @@
       </ul>
       <ul>
         <li><a href="javascript:;" onclick="return DemoApp.requestWriteAccess(this);">Request write access</a> <span></span></li>
-        <li><a href="javascript:;" onclick="return DemoApp.requestPhoneNumber(this);">Request phone number</a> <span></span><br><br></li>
+        <li><a href="javascript:;" onclick="return DemoApp.requestPhoneNumber(this);">Request phone number</a> <span></span></li>
+        <li><a href="javascript:;" onclick="return DemoApp.requestEmojiStatusAccess(this);">Request emoji status access</a> <span></span></li>
         <li><a href="javascript:;" onclick="return DemoApp.requestServerTime(this);">Request server time</a> (invokes custom method) <span></span></li>
       </ul>
     </div>
@@ -210,12 +213,14 @@
     </div>
   </section>
   <div class="safe-area-border"></div>
-  <div class="tg-safe-area-border"></div>
+  <div class="tg-safe-area-border">
+    <div class="tg-content-safe-area-border"></div>
+  </div>
   <div class="viewport-border"></div>
   <div class="viewport-stable-border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?36"></script>
+    <script src="/js/webappdemo.js?41"></script>
     <script>DemoApp.apiUrl = "/demo/api";
 
 Telegram.WebApp.onEvent('themeChanged', function() {
@@ -224,6 +229,8 @@ Telegram.WebApp.onEvent('themeChanged', function() {
 
 $('#main_btn').toggle(!!DemoApp.initDataUnsafe.query_id);
 $('#with_webview_btn').toggle(!!DemoApp.initDataUnsafe.query_id && !DemoApp.initDataUnsafe.receiver);
+$('#share_btn').toggle(!!DemoApp.initDataUnsafe.query_id);
+$('#share_ww_btn').toggle(!!DemoApp.initDataUnsafe.query_id && !DemoApp.initDataUnsafe.receiver);
 // $('#data_btn').toggle(!DemoApp.initDataUnsafe.query_id || !DemoApp.initDataUnsafe.receiver);
 $('#webview_data').text(JSON.stringify(DemoApp.initDataUnsafe, null, 2));
 $('#theme_data').text(JSON.stringify(Telegram.WebApp.themeParams, null, 2));
