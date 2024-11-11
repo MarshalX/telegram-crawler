@@ -1899,7 +1899,7 @@
       window.open(url, '_blank');
     }
   };
-  WebApp.openTelegramLink = function (url) {
+  WebApp.openTelegramLink = function (url, options) {
     var a = document.createElement('A');
     a.href = url;
     if (a.protocol != 'http:' &&
@@ -1912,8 +1912,13 @@
       throw Error('WebAppTgUrlInvalid');
     }
     var path_full = a.pathname + a.search;
+    options = options || {};
     if (isIframe || versionAtLeast('6.1')) {
-      WebView.postEvent('web_app_open_tg_link', false, {path_full: path_full});
+      var req_params = {path_full: path_full};
+      if (options.force_request) {
+        req_params.force_request = true;
+      }
+      WebView.postEvent('web_app_open_tg_link', false, req_params);
     } else {
       location.href = 'https://t.me' + path_full;
     }

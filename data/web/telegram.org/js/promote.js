@@ -649,9 +649,13 @@ var NewAd = {
       state.intersectTopicsCheckbox = state.$form.field('intersect_topics');
       state.intersectTopicsCheckbox.on('change.curPage', NewAd.onIntersectTopicsChange);
       state.excludePoliticCheckbox = state.$form.field('exclude_politic');
-      state.excludePoliticCheckbox.on('change.curPage', NewAd.onExcludePoliticChange);
+      state.excludePoliticCheckbox.on('change.curPage', NewAd.onExcludeChannelTopicChange);
       state.onlyPoliticCheckbox = state.$form.field('only_politic');
-      state.onlyPoliticCheckbox.on('change.curPage', NewAd.onOnlyPoliticChange);
+      state.onlyPoliticCheckbox.on('change.curPage', NewAd.onOnlyChannelTopicChange);
+      state.excludeCryptoCheckbox = state.$form.field('exclude_crypto');
+      state.excludeCryptoCheckbox.on('change.curPage', NewAd.onExcludeChannelTopicChange);
+      state.onlyCryptoCheckbox = state.$form.field('only_crypto');
+      state.onlyCryptoCheckbox.on('change.curPage', NewAd.onOnlyChannelTopicChange);
       state.activeRadio = state.$form.field('active');
       state.activeRadio.fieldEl().on('change.curPage', NewAd.onActiveChange);
       state.useScheduleCheckbox = state.$form.field('use_schedule');
@@ -737,16 +741,20 @@ var NewAd = {
     NewAd.updateAdTargetOverview();
     NewAd.saveDraftAuto(true);
   },
-  onExcludePoliticChange: function() {
+  onExcludeChannelTopicChange: function() {
     if ($(this).prop('checked')) {
       Aj.state.onlyPoliticCheckbox.prop('checked', false);
+      Aj.state.onlyCryptoCheckbox.prop('checked', false);
     }
     NewAd.updateAdTargetOverview();
     NewAd.saveDraftAuto(true);
   },
-  onOnlyPoliticChange: function() {
+  onOnlyChannelTopicChange: function() {
     if ($(this).prop('checked')) {
-      Aj.state.excludePoliticCheckbox.prop('checked', false);
+      Aj.state.excludePoliticCheckbox.not(this).prop('checked', false);
+      Aj.state.excludeCryptoCheckbox.not(this).prop('checked', false);
+      Aj.state.onlyPoliticCheckbox.not(this).prop('checked', false);
+      Aj.state.onlyCryptoCheckbox.not(this).prop('checked', false);
     }
     NewAd.updateAdTargetOverview();
     NewAd.saveDraftAuto(true);
@@ -2133,6 +2141,8 @@ var NewAd = {
         user_targets = joinTargets(user_targets, false, true);
         if (Aj.state.onlyPoliticCheckbox.prop('checked')) {
           overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS_ONLY_POLITIC', {target: user_targets}) + '</div>';
+        } else if (Aj.state.onlyCryptoCheckbox.prop('checked')) {
+          overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS_ONLY_CRYPTO', {target: user_targets}) + '</div>';
         } else {
           overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_USERS', {target: user_targets}) + '</div>';
         }
@@ -2147,6 +2157,9 @@ var NewAd = {
         }
         if (Aj.state.excludePoliticCheckbox.prop('checked')) {
           overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_POLITIC') + '</div>';
+        }
+        if (Aj.state.excludeCryptoCheckbox.prop('checked')) {
+          overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_CRYPTO') + '</div>';
         }
       }
       $('.js-exclude-outside').addClass('hide');
@@ -2201,6 +2214,12 @@ var NewAd = {
     }
     if ($form.field('only_politic').prop('checked')) {
       values.push('only_politic');
+    }
+    if ($form.field('exclude_crypto').prop('checked')) {
+      values.push('exclude_crypto');
+    }
+    if ($form.field('only_crypto').prop('checked')) {
+      values.push('only_crypto');
     }
     if ($form.field('exclude_outside').prop('checked')) {
       values.push('exclude_outside');
@@ -2313,6 +2332,12 @@ var NewAd = {
     }
     if ($form.field('only_politic').prop('checked')) {
       params.only_politic = 1;
+    }
+    if ($form.field('exclude_crypto').prop('checked')) {
+      params.exclude_crypto = 1;
+    }
+    if ($form.field('only_crypto').prop('checked')) {
+      params.only_crypto = 1;
     }
     if ($form.field('exclude_outside').prop('checked')) {
       params.exclude_outside = 1;
@@ -2429,6 +2454,12 @@ var NewAd = {
     if ($form.field('only_politic').prop('checked')) {
       params.only_politic = 1;
     }
+    if ($form.field('exclude_crypto').prop('checked')) {
+      params.exclude_crypto = 1;
+    }
+    if ($form.field('only_crypto').prop('checked')) {
+      params.only_crypto = 1;
+    }
     if ($form.field('exclude_outside').prop('checked')) {
       params.exclude_outside = 1;
     }
@@ -2489,6 +2520,8 @@ var NewAd = {
     }
     $form.field('exclude_politic').prop('checked', false);
     $form.field('only_politic').prop('checked', false);
+    $form.field('exclude_crypto').prop('checked', false);
+    $form.field('only_crypto').prop('checked', false);
     $form.field('exclude_outside').prop('checked', false);
     $form.field('device').trigger('selectval', ['']);
     Aj.state.titleField.focusAndSelect();
