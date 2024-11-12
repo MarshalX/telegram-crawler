@@ -56,14 +56,17 @@ sponsoredMessage#4d93a990 flags:# recommended:flags.5?true can_report:flags.12?t
 
 ---functions---
 
-channels.getSponsoredMessages#ec210fbf channel:InputChannel = messages.SponsoredMessages;</code></pre>
-<p>Each time the user opens a channel, <code>channels.getSponsoredMessages</code> must be called to receive <a href="https://promote.telegram.org">sponsored messages</a> available for this channel. The result must be cached for <strong>5 minutes</strong>.</p>
+<a href='/method/messages.getSponsoredMessages'>messages.getSponsoredMessages</a>#9bd2f439 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/messages.SponsoredMessages'>messages.SponsoredMessages</a>;</code></pre>
+<p>Each time the user opens a channel or a chat with a bot, <a href="/method/messages.getSponsoredMessages">messages.getSponsoredMessages</a> must be called to receive <a href="https://promote.telegram.org">sponsored messages</a> available for the channel or bot. The result must be cached for <strong>5 minutes</strong>.</p>
 <blockquote>
 <p><a href="https://t.me/durov/172">More about sponsored messages on Telegram</a></p>
 </blockquote>
 <h4><a class="anchor" href="#displaying-sponsored-messages" id="displaying-sponsored-messages" name="displaying-sponsored-messages"><i class="anchor-icon"></i></a>Displaying sponsored messages</h4>
-<p>Sponsored messages must be displayed below all other posts in the channel, after the user scrolls further down, past the last message.  </p>
-<p>Sponsored messages have:</p>
+<p>Sponsored messages must be displayed as follows:</p>
+<ul>
+<li>
+<p>In channels, they must be displayed below all other posts in the channel, after the user scrolls further down, past the last message.<br>
+Sponsored channel messages have:</p>
 <ul>
 <li>A title (contained in <code>title</code>)</li>
 <li>A text (contained in <code>message</code>+<code>entities</code>)</li>
@@ -73,23 +76,37 @@ A confirmation prompt should be shown before opening the URL, unless the host pa
 <p>The message should be marked as "Recommended" instead of "Sponsored" if the <code>recommended</code> flag is set.  </p>
 <p>If the <code>photo</code> flag is set, it should be used to display a profile photo bubble for the sponsored message, like for messages sent in groups.  </p>
 <p>If the <code>sponsor_info</code> or <code>additional_info</code> flags are set, an additional "Sponsor info" menu item must be present in the message context menu (the menu that pops up when clicking on a button), that when clicked, displays the contents of the flags.  </p>
-<p>If set, the sponsored message should use the <a href="/api/colors">message accent color »</a> specified in <code>color</code>.</p>
+</li>
+<li>
+<p>In bots, they must be displayed <a href="https://telegram.org/blog/dynamic-video-quality-and-more#telegram-ads-in-bots">above the chat</a>, akin to an <a href="/api/action-bar">action bar</a>
+Bot ads have:</p>
+<ul>
+<li>A title (contained in <code>title</code>): must be locally prepended with a blue-colored "Ad" prefix, or a "Recommended" prefix if the <code>recommended</code> flag is set. </li>
+<li>A text (contained in <code>message</code>+<code>entities</code>)</li>
+<li>When the ad action bar is clicked, clients should open the URL in <code>url</code>.<br>
+A confirmation prompt should be shown before opening the URL, unless the host part of the URL matches the following regex: <code>(^|\\.)(telegram\.(org|me|dog)|t\.me|te\.?legra\.ph|graph\.org|fragment\.com|telesco\.pe)$</code>, in which case the URL should be opened without confirmation (and if it's a <a href="/api/links">deep link »</a>, it should be opened directly in-app, without passing through the browser).  </li>
+</ul>
+<p>If the <code>photo</code> flag is set, a thumbnail-sized version of it should be displayed in the right section of the action bar.</p>
+</li>
+</ul>
+<p>If set, the sponsored message/action bar should use the <a href="/api/colors">message accent color »</a> specified in <code>color</code>.</p>
 <h4><a class="anchor" href="#counting-sponsored-message-views" id="counting-sponsored-message-views" name="counting-sponsored-message-views"><i class="anchor-icon"></i></a>Counting sponsored message views</h4>
 <pre><code>---functions---
 
-channels.viewSponsoredMessage#beaedb94 channel:InputChannel random_id:bytes = Bool;</code></pre>
-<p>Once the entire text is shown on the screen (excluding the button), <a href="/method/channels.viewSponsoredMessage">channels.viewSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message.</p>
+<a href='/method/messages.viewSponsoredMessage'>messages.viewSponsoredMessage</a>#673ad8f1 peer:<a href='/type/InputPeer'>InputPeer</a> random_id:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Once the entire text of the ad is shown on the screen (excluding the button for channel ads), <a href="/method/messages.viewSponsoredMessage">messages.viewSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message.</p>
 <h4><a class="anchor" href="#clicking-on-sponsored-messages" id="clicking-on-sponsored-messages" name="clicking-on-sponsored-messages"><i class="anchor-icon"></i></a>Clicking on sponsored messages</h4>
 <pre><code>---functions---
 
-channels.clickSponsoredMessage#18afbc93 channel:InputChannel random_id:bytes = Bool;</code></pre>
+<a href='/method/messages.clickSponsoredMessage'>messages.clickSponsoredMessage</a>#f093465 flags:<a href='/type/%23'>#</a> media:flags.0?<a href='/constructor/true'>true</a> fullscreen:flags.1?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> random_id:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p>If the user either:</p>
 <ul>
 <li>Clicks on a link in the sponsored message</li>
+<li>Clicks on the bot ad bar</li>
 <li>Opens a sponsored chat or a sponsored website via the associated button</li>
 <li>Opens the sponsored chat via the sponsored message name, the sponsored message photo, or a mention in the sponsored message</li>
 </ul>
-<p><a href="/method/channels.clickSponsoredMessage">channels.clickSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message.</p>
+<p><a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message.</p>
 <h4><a class="anchor" href="#reporting-sponsored-messages" id="reporting-sponsored-messages" name="reporting-sponsored-messages"><i class="anchor-icon"></i></a>Reporting sponsored messages</h4>
 <pre><code><a href='/constructor/sponsoredMessage'>sponsoredMessage</a>#4d93a990 flags:<a href='/type/%23'>#</a> recommended:flags.5?<a href='/constructor/true'>true</a> can_report:flags.12?<a href='/constructor/true'>true</a> random_id:<a href='/type/bytes'>bytes</a> url:<a href='/type/string'>string</a> title:<a href='/type/string'>string</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; photo:flags.6?<a href='/type/Photo'>Photo</a> media:flags.14?<a href='/type/MessageMedia'>MessageMedia</a> color:flags.13?<a href='/type/PeerColor'>PeerColor</a> button_text:<a href='/type/string'>string</a> sponsor_info:flags.7?<a href='/type/string'>string</a> additional_info:flags.8?<a href='/type/string'>string</a> = <a href='/type/SponsoredMessage'>SponsoredMessage</a>;
 
@@ -101,8 +118,8 @@ channels.clickSponsoredMessage#18afbc93 channel:InputChannel random_id:bytes = B
 
 ---functions---
 
-channels.reportSponsoredMessage#af8ff6b9 channel:InputChannel random_id:bytes option:bytes = channels.SponsoredMessageReportResult;</code></pre>
-<p>To report a sponsored message to Telegram's moderators, invoke <a href="/method/channels.reportSponsoredMessage">channels.reportSponsoredMessage</a>, passing the channel ID, the <code>random_id</code> of the sponsored message and an empty <code>option</code> field.  </p>
+<a href='/method/messages.reportSponsoredMessage'>messages.reportSponsoredMessage</a>#1af3dbb8 peer:<a href='/type/InputPeer'>InputPeer</a> random_id:<a href='/type/bytes'>bytes</a> option:<a href='/type/bytes'>bytes</a> = <a href='/type/channels.SponsoredMessageReportResult'>channels.SponsoredMessageReportResult</a>;</code></pre>
+<p>To report a sponsored message to Telegram's moderators, invoke <a href="/method/messages.reportSponsoredMessage">messages.reportSponsoredMessage</a>, passing the channel/bot ID, the <code>random_id</code> of the sponsored message and an empty <code>option</code> field.  </p>
 <p>Note that only sponsored messages with the <a href="/constructor/sponsoredMessage">sponsoredMessage</a>.<code>can_report</code> flag set may be reported.  </p>
 <p>Then, if the result is:</p>
 <ul>
@@ -118,9 +135,9 @@ The <code>title</code> field of <a href="/constructor/channels.sponsoredMessageR
 </ul>
 <h4><a class="anchor" href="#testing-sponsored-messages" id="testing-sponsored-messages" name="testing-sponsored-messages"><i class="anchor-icon"></i></a>Testing sponsored messages</h4>
 <p>For the channel <a href="https://t.me/SecretAdTestChannel">https://t.me/SecretAdTestChannel</a> the system will <strong>always</strong> return a sponsored message: promoting either a channel, a particular message in a channel, or a bot with a start parameter.</p>
-<h4><a class="anchor" href="#withdrawing-ad-revenue-as-a-channel-owner" id="withdrawing-ad-revenue-as-a-channel-owner" name="withdrawing-ad-revenue-as-a-channel-owner"><i class="anchor-icon"></i></a>Withdrawing ad revenue as a channel owner</h4>
-<p>Telegram has one of the <strong>most generous reward systems</strong> in the history of social media. Telegram channel owners can now receive <strong>50%</strong> of the revenue from ads displayed in their channels.</p>
-<p><a href="/api/revenue">See here »</a> for more info on how to withdraw channel ad revenue, as well as view detailed revenue stats.  </p>
+<h4><a class="anchor" href="#withdrawing-ad-revenue-as-a-channel-bot-owner" id="withdrawing-ad-revenue-as-a-channel-bot-owner" name="withdrawing-ad-revenue-as-a-channel-bot-owner"><i class="anchor-icon"></i></a>Withdrawing ad revenue as a channel/bot owner</h4>
+<p>Telegram has one of the <strong>most generous reward systems</strong> in the history of social media. Telegram channel/bot owners can now receive <strong>50%</strong> of the revenue from ads displayed in their channels.</p>
+<p><a href="/api/revenue">See here »</a> for more info on how to withdraw channel/bot ad revenue, as well as view detailed revenue stats.  </p>
 <hr>
 <h4><a class="anchor" href="#sponsored-messages-in-third-party-apps" id="sponsored-messages-in-third-party-apps" name="sponsored-messages-in-third-party-apps"><i class="anchor-icon"></i></a>Sponsored messages in third-party apps</h4>
 <p>Telegram continues to grow worldwide, in part thanks to third-party apps using the Telegram API. To cover the increasing costs that come with this growth, Telegram added <a href="https://promote.telegram.org">sponsored messages</a> – a paid <a href="https://t.me/durov/172">privacy-friendly way</a> to promote <strong>bots and channels</strong>. </p>
