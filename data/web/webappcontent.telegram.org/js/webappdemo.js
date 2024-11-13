@@ -636,8 +636,8 @@ var DemoApp = {
       DemoApp.showAlert('emojiStatusFailed: ' + params.error);
     });
   },
-  setEmojiStatus: function(el, custom_emoji_id, expiration_date) {
-    Telegram.WebApp.setEmojiStatus(custom_emoji_id, expiration_date ? {expiration_date: expiration_date} : {}, function(result) {
+  setEmojiStatus: function(el, custom_emoji_id, duration) {
+    Telegram.WebApp.setEmojiStatus(custom_emoji_id, duration ? {duration: duration} : {}, function(result) {
       if (result) {
         $(el).next('span').text('(status set!)').attr('class', 'ok');
       } else {
@@ -645,7 +645,7 @@ var DemoApp = {
       }
     });
   },
-  requestEmojiStatusAccess: function(el, custom_emoji_id, expiration_date) {
+  requestEmojiStatusAccess: function(el) {
     Telegram.WebApp.requestEmojiStatusAccess(function(allowed) {
       if (allowed) {
         $(el).next('span').text('(Access granted)').attr('class', 'ok');
