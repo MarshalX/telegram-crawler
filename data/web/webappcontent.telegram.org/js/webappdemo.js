@@ -502,6 +502,15 @@ var DemoApp = {
       el.innerHTML = 'Disable Vertical Swypes';
     }
   },
+  toggleOrientationLock: function(el) {
+    if (Telegram.WebApp.isOrientationLocked) {
+      Telegram.WebApp.unlockOrientation();
+      el.innerHTML = 'Lock Orientation';
+    } else {
+      Telegram.WebApp.lockOrientation();
+      el.innerHTML = 'Unlock Orientation';
+    }
+  },
   fullscreenInit: function() {
     Telegram.WebApp.onEvent('fullscreenChanged', function() {
       DemoApp.updateFullscreenButton();
