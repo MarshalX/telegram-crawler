@@ -554,7 +554,7 @@ var DemoApp = {
     if (Telegram.WebApp.Accelerometer.isStarted) {
       Telegram.WebApp.Accelerometer.stop();
     } else {
-      Telegram.WebApp.Accelerometer.start(100);
+      Telegram.WebApp.Accelerometer.start({refresh_rate: 100});
     }
   },
   updateAccelerometerLink: function() {
@@ -581,18 +581,20 @@ var DemoApp = {
     });
     DemoApp.updateDeviceOrientationLink();
   },
-  toggleDeviceOrientation: function(el) {
+  toggleDeviceOrientation: function(el, need_absolute) {
     if (Telegram.WebApp.DeviceOrientation.isStarted) {
       Telegram.WebApp.DeviceOrientation.stop();
     } else {
-      Telegram.WebApp.DeviceOrientation.start(100);
+      Telegram.WebApp.DeviceOrientation.start({refresh_rate: 100, need_absolute: need_absolute});
     }
   },
   updateDeviceOrientationLink: function() {
     if (Telegram.WebApp.DeviceOrientation.isStarted) {
       $('#device_orientation_btn').html('Stop DeviceOrientation');
+      $('#device_orientation_abs_item').hide();
     } else {
-      $('#device_orientation_btn').html('Start DeviceOrientation');
+      $('#device_orientation_btn').html('Start DeviceOrientation(need_absolute=false)');
+      $('#device_orientation_abs_item').show();
     }
   },
   gyroscopeInit: function() {
@@ -616,7 +618,7 @@ var DemoApp = {
     if (Telegram.WebApp.Gyroscope.isStarted) {
       Telegram.WebApp.Gyroscope.stop();
     } else {
-      Telegram.WebApp.Gyroscope.start(100);
+      Telegram.WebApp.Gyroscope.start({refresh_rate: 100});
     }
   },
   updateGyroscopeLink: function() {
