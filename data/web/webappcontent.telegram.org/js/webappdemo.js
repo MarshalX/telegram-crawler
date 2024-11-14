@@ -103,8 +103,7 @@ var DemoApp = {
     }
   },
   checkInitData: function() {
-    if (DemoApp.initDataUnsafe.query_id &&
-        DemoApp.initData &&
+    if (DemoApp.initData &&
         $('#webview_data_status').hasClass('status_need')) {
       $('#webview_data_status').removeClass('status_need');
       DemoApp.apiRequest('checkInitData', {}, function(result) {
@@ -543,8 +542,8 @@ var DemoApp = {
       $('#accelerometer_btn').next('span').text('').attr('class', '');
       DemoApp.updateAccelerometerLink();
     });
-    Telegram.WebApp.onEvent('accelerometerChanged', function(params) {
-      $('#accelerometer_btn').next('span').text('(x: ' + params.x + '; y: ' + params.y + '; z: ' + params.z + ')').attr('class', 'ok');
+    Telegram.WebApp.onEvent('accelerometerChanged', function() {
+      $('#accelerometer_btn').next('span').text('(x: ' + this.Accelerometer.x + '; y: ' + this.Accelerometer.y + '; z: ' + this.Accelerometer.z + ')').attr('class', 'ok');
     });
     Telegram.WebApp.onEvent('accelerometerFailed', function(params) {
       $('#accelerometer_btn').next('span').text('(ERR: ' + params.error + ')').attr('class', 'err');
@@ -575,7 +574,7 @@ var DemoApp = {
       DemoApp.updateDeviceOrientationLink();
     });
     Telegram.WebApp.onEvent('deviceOrientationChanged', function() {
-      $('#device_orientation_btn').next('span').text('(alpha: ' + params.alpha + '; beta: ' + params.beta + '; gamma: ' + params.gamma + ')').attr('class', 'ok');
+      $('#device_orientation_btn').next('span').text('(alpha: ' + this.DeviceOrientation.alpha + '; beta: ' + this.DeviceOrientation.beta + '; gamma: ' + this.DeviceOrientation.gamma + '; absolute: ' + (this.DeviceOrientation.absolute ? 'true' : 'false') + ')').attr('class', 'ok');
     });
     Telegram.WebApp.onEvent('deviceOrientationFailed', function(params) {
       $('#device_orientation_btn').next('span').text('(ERR: ' + params.error + ')').attr('class', 'err');
@@ -605,8 +604,8 @@ var DemoApp = {
       $('#gyroscope_btn').next('span').text('').attr('class', '');
       DemoApp.updateGyroscopeLink();
     });
-    Telegram.WebApp.onEvent('gyroscopeChanged', function(params) {
-      $('#gyroscope_btn').next('span').text('(x: ' + params.x + '; y: ' + params.y + '; z: ' + params.z + ')').attr('class', 'ok');
+    Telegram.WebApp.onEvent('gyroscopeChanged', function() {
+      $('#gyroscope_btn').next('span').text('(x: ' + this.Gyroscope.x + '; y: ' + this.Gyroscope.y + '; z: ' + this.Gyroscope.z + ')').attr('class', 'ok');
     });
     Telegram.WebApp.onEvent('gyroscopeFailed', function(params) {
       $('#gyroscope_btn').next('span').text('(ERR: ' + params.error + ')').attr('class', 'err');
