@@ -140,12 +140,41 @@ Another way for admins to check who received the gifts is to simply use <a href=
 
 <a href='/constructor/starsGiveawayWinnersOption'>starsGiveawayWinnersOption</a>#54236209 flags:<a href='/type/%23'>#</a> default:flags.0?<a href='/constructor/true'>true</a> users:<a href='/type/int'>int</a> per_user_stars:<a href='/type/long'>long</a> = <a href='/type/StarsGiveawayWinnersOption'>StarsGiveawayWinnersOption</a>;
 
+<a href='/constructor/inputInvoiceStars'>inputInvoiceStars</a>#65f00ce3 purpose:<a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+
+<a href='/constructor/inputStorePaymentStarsGiveaway'>inputStorePaymentStarsGiveaway</a>#751f08fa flags:<a href='/type/%23'>#</a> only_new_subscribers:flags.0?<a href='/constructor/true'>true</a> winners_are_visible:flags.3?<a href='/constructor/true'>true</a> stars:<a href='/type/long'>long</a> boost_peer:<a href='/type/InputPeer'>InputPeer</a> additional_peers:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; countries_iso2:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; prize_description:flags.4?<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> until_date:<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> users:<a href='/type/int'>int</a> = <a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a>;
+
 ---functions---
 
-<a href='/method/payments.getStarsGiveawayOptions'>payments.getStarsGiveawayOptions</a>#bd1efd3e = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StarsGiveawayOption'>StarsGiveawayOption</a>&gt;;</code></pre>
+<a href='/method/payments.getStarsGiveawayOptions'>payments.getStarsGiveawayOptions</a>#bd1efd3e = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StarsGiveawayOption'>StarsGiveawayOption</a>&gt;;
+
+<a href='/method/payments.getPaymentForm'>payments.getPaymentForm</a>#37148dbb flags:<a href='/type/%23'>#</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;</code></pre>
 <p>Star giveaways are similar to <a href="#giveaways-and-giftcodes">normal giveaways</a>, with the only difference that instead of giving away gifts or <a href="/api/premium">Telegram Premium subscriptions</a>, the giveaway will automatically distribute <a href="/api/stars">Telegram Stars</a> among the winners.</p>
-<p>First of all, invoke <a href="/method/payments.getStarsGiveawayOptions">payments.getStarsGiveawayOptions</a> to obtain a list of <a href="/constructor/starsGiveawayOption">starsGiveawayOption</a> constructors, containing a list of giveaway options that may be chosen by the admin, indicating the number of <a href="/api/stars">Telegram Stars</a> that will be gifted in the giveaway, along with their price (<code>amount</code>) in the specified <code>currency</code> (see the <a href="/constructor/starsGiveawayOption">constructor page »</a> for more info on these fields).  </p>
-<p>Once the admin has chosen a specific gift code option, invoke <a href="/method/payments.getPaymentForm">payments.getPaymentForm</a>, passing an <a href="/constructor/inputInvoicePremiumGiftCode">inputInvoicePremiumGiftCode</a>, with the chosen <a href="/constructor/premiumGiftCodeOption">premiumGiftCodeOption</a> in <code>option</code> and a <code>purpose</code> containing either:</p></div>
+<p>First of all, invoke <a href="/method/payments.getStarsGiveawayOptions">payments.getStarsGiveawayOptions</a> to obtain a list of <a href="/constructor/starsGiveawayOption">starsGiveawayOption</a> constructors, containing a list of giveaway options that may be chosen by the admin, indicating the number of winners of the giveaway, the number of <a href="/api/stars">Telegram Stars</a> that will be gifted in the giveaway, along with their price (<code>amount</code>) in the specified <code>currency</code> (see the <a href="/constructor/starsGiveawayOption">constructor page »</a> for more info on these and all the remaining fields).  </p>
+<p>Once the admin has chosen a specific giveaway option, invoke <a href="/method/payments.getPaymentForm">payments.getPaymentForm</a>, passing an <a href="/constructor/inputInvoiceStars">inputInvoiceStars</a>, containing an <a href="/constructor/inputStorePaymentStarsGiveaway">inputStorePaymentStarsGiveaway</a> constructor, with:</p>
+<ul>
+<li>The <code>stars</code>, <code>currency</code> and <code>amount</code> from the chosen <a href="/constructor/starsGiveawayOption">starsGiveawayOption</a> and some extra options, as specified in the <a href="/constructor/inputStorePaymentStarsGiveaway">constructor page »</a>.</li>
+<li>Additional channels/supergroups that the user must join to participate to the giveaway can be specified in <code>additional_peers</code>.  </li>
+<li>The set of users that can participate to the giveaway can be restricted by passing an explicit whitelist of up to <a href="/api/config#giveaway-countries-max">giveaway_countries_max</a> countries, specified as two-letter ISO 3166-1 alpha-2 country codes in <code>countries_iso2</code>.  </li>
+<li>The end date of the giveaway must be specified in <code>until_date</code>, and it must be at most <a href="/api/config#giveaway-period-max">giveaway_period_max</a> seconds in the future; at that date, Telegram will randomly choose <code>option.users</code> subscribers according to the conditions specified above, and send them a Telegram Premium giftcode as a <a href="/constructor/messageActionGiftCode">messageActionGiftCode</a> constructor, that should be used client-side to generate a <a href="/api/links#premium-giftcode-links">giftcode link</a>.  </li>
+<li>The channel/supergroup specified in <code>boost_peer</code> will receive <a href="/api/config#giveaway-boosts-per-premium">giveaway_boosts_per_premium</a> <a href="/api/boost">boosts</a> from each user, that cannot be reassigned to another channel/supergroup for the duration of the gifted subscription.  </li>
+</ul>
+<p>Then, follow the <a href="/api/payments#22-getting-invoice-info-about-the-product">invoice payment flow as described in the payments documentation »</a>.  </p>
+<p>More alternative payment flows are also available:</p>
+<ul>
+<li>The Premium Bot flow, by contacting <a href="/api/config#premium-bot-username">premium_bot_username</a>, and following the inline keyboard payment flow for star giveaways (the final keyboard with the prices will contain buttons with <a href="/api/links#invoice-links">invoice deep links »</a> that should be used to make the payment).</li>
+<li>The store-based subscription flow based on <a href="/method/payments.assignAppStoreTransaction">payments.assignAppStoreTransaction</a>/<a href="/method/payments.assignPlayMarketTransaction">payments.assignPlayMarketTransaction</a>, currently not available to third-party apps.  </li>
+</ul>
+<p>Then:</p>
+<ul>
+<li>
+<p>If the payment was made using the <a href="/method/payments.getPaymentForm">payments.getPaymentForm</a> or <a href="/method/payments.assignAppStoreTransaction">payments.assignAppStoreTransaction</a>/<a href="/method/payments.assignPlayMarketTransaction">payments.assignPlayMarketTransaction</a> payment flows, the giveaway will launch as soon as the payment is complete.</p>
+</li>
+<li>
+<p>Otherwise, if the <a href="/api/config#premium-bot-username">Premium bot</a> flow was used, once the payment for the giveaway is made, invoke <a href="/method/premium.getBoostsStatus">premium.getBoostsStatus</a>, passing to <code>peer</code> the ID of the channel/supergroup that we selected when paying for the giveaway, to obtain a <a href="/constructor/prepaidStarsGiveaway">prepaidStarsGiveaway</a> constructor in <a href="/constructor/premium.boostsStatus">premium.boostsStatus</a>.<code>prepaid_giveaways</code>, containing info about the prepaid star giveaway.  </p>
+</li>
+</ul>
+<p>To actually launch the giveaway for the bot flow, invoke <a href="/method/payments.launchPrepaidGiveaway">payments.launchPrepaidGiveaway</a>, passing <a href="/constructor/prepaidStarsGiveaway">prepaidStarsGiveaway</a>.<code>id</code> to <code>giveaway_id</code>, the ID of the channel/supergroup to <code>peer</code> and giveaway settings in <code>purpose</code> (populated in the <a href="/constructor/inputStorePaymentStarsGiveaway">inputStorePaymentStarsGiveaway</a> created above).</p></div>
   
 </div>
           
