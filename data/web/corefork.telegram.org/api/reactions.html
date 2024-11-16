@@ -98,11 +98,14 @@ Use <a href="/method/messages.readReactions">messages.readReactions</a> to mark 
 
 ---functions---
 
+<a href='/method/messages.setChatAvailableReactions'>messages.setChatAvailableReactions</a>#864b2581 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> available_reactions:<a href='/type/ChatReactions'>ChatReactions</a> reactions_limit:flags.0?<a href='/type/int'>int</a> paid_enabled:flags.1?<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;
+
 <a href='/method/messages.sendPaidReaction'>messages.sendPaidReaction</a>#9dd6a67b flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> count:<a href='/type/int'>int</a> random_id:<a href='/type/long'>long</a> private:flags.0?<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;
 <a href='/method/messages.togglePaidReactionPrivacy'>messages.togglePaidReactionPrivacy</a>#849ad397 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> private:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
 
 <a href='/method/messages.getMessagesReactions'>messages.getMessagesReactions</a>#8bba90e6 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Paid reactions (aka Star reactions) may be sent to channel posts by invoking <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>: this will transfer <code>count</code> Telegram Stars to the channel's balance and increment by <code>count</code> the reaction counter of the Star reaction with type <a href="/constructor/reactionPaid">reactionPaid</a>.  </p>
+<p>To enable paid reactions, channel admins must invoke <a href="/method/messages.setChatAvailableReactions">messages.setChatAvailableReactions</a>, passing <a href="/constructor/boolTrue">boolTrue</a> to <code>paid_enabled</code> and the previously configured reaction set in <code>available_reactions</code> (<code>reactions_limit</code> can be omitted, as omitting the flag will keep the previously configured value).   </p>
 <p>Each post with star reactions has a leaderboard with the top senders, but users can opt out of appearing there if they prefer more privacy.<br>
 If the user explicitly chose to make their paid reaction(s) private, pass <a href="/constructor/boolTrue">boolTrue</a> to <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code>.<br>
 If the user explicitly chose to make their paid reaction(s) private, pass <a href="/constructor/boolTrue">boolFalse</a> to <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code>.<br>
