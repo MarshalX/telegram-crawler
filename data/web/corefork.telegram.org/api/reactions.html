@@ -87,8 +87,19 @@ In groups, <a href="/method/messages.reportReaction">messages.reportReaction</a>
 <p><a href="/method/messages.getUnreadReactions">messages.getUnreadReactions</a> is used to fetch messages with unread reactions.<br>
 Use <a href="/method/messages.readReactions">messages.readReactions</a> to mark all reactions as read in a certain chat.</p>
 <p>For <a href="/api/saved-messages">saved messages</a>, if the <code>reactions_as_tags</code> flag of <a href="/constructor/messageReactions">messageReactions</a> is set, or if there are no reactions, all present and future reactions should be treated as <a href="/api/saved-messages#tags">message tags, see here » for more info</a>.</p>
-<h4><a class="anchor" href="#paid-reactions" id="paid-reactions" name="paid-reactions"><i class="anchor-icon"></i></a>Paid reactions</h4>
+<h3><a class="anchor" href="#paid-reactions" id="paid-reactions" name="paid-reactions"><i class="anchor-icon"></i></a>Paid reactions</h3>
 <pre><code><a href='/constructor/reactionPaid'>reactionPaid</a>#523da4eb = <a href='/type/Reaction'>Reaction</a>;
+
+---functions---
+
+<a href='/method/messages.setChatAvailableReactions'>messages.setChatAvailableReactions</a>#864b2581 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> available_reactions:<a href='/type/ChatReactions'>ChatReactions</a> reactions_limit:flags.0?<a href='/type/int'>int</a> paid_enabled:flags.1?<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/messages.sendPaidReaction'>messages.sendPaidReaction</a>#9dd6a67b flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> count:<a href='/type/int'>int</a> random_id:<a href='/type/long'>long</a> private:flags.0?<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Paid reactions (aka Star reactions) may be sent to channel posts by invoking <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>: this will transfer <code>count</code> Telegram Stars to the channel's balance and increment by <code>count</code> the reaction counter of the Star reaction with type <a href="/constructor/reactionPaid">reactionPaid</a>.  </p>
+<p>To enable paid reactions, channel admins must invoke <a href="/method/messages.setChatAvailableReactions">messages.setChatAvailableReactions</a>, passing <a href="/constructor/boolTrue">boolTrue</a> to <code>paid_enabled</code> and the previously configured reaction set in <code>available_reactions</code> (<code>reactions_limit</code> can be omitted, as omitting the flag will keep the previously configured value).  </p>
+<p>Users can determine whether a channel supports paid reactions by checking the value of the <a href="/constructor/channelFull">channelFull</a>.<code>paid_reactions_available</code> flag.  </p>
+<h4><a class="anchor" href="#paid-reaction-privacy" id="paid-reaction-privacy" name="paid-reaction-privacy"><i class="anchor-icon"></i></a>Paid reaction privacy</h4>
+<pre><code><a href='/constructor/updatePaidReactionPrivacy'>updatePaidReactionPrivacy</a>#51ca7aec private:<a href='/type/Bool'>Bool</a> = <a href='/type/Update'>Update</a>;
 
 <a href='/constructor/updateMessageReactions'>updateMessageReactions</a>#5e1b3cb8 flags:<a href='/type/%23'>#</a> peer:<a href='/type/Peer'>Peer</a> msg_id:<a href='/type/int'>int</a> top_msg_id:flags.0?<a href='/type/int'>int</a> reactions:<a href='/type/MessageReactions'>MessageReactions</a> = <a href='/type/Update'>Update</a>;
 
@@ -98,20 +109,20 @@ Use <a href="/method/messages.readReactions">messages.readReactions</a> to mark 
 
 ---functions---
 
-<a href='/method/messages.setChatAvailableReactions'>messages.setChatAvailableReactions</a>#864b2581 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> available_reactions:<a href='/type/ChatReactions'>ChatReactions</a> reactions_limit:flags.0?<a href='/type/int'>int</a> paid_enabled:flags.1?<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/messages.getPaidReactionPrivacy'>messages.getPaidReactionPrivacy</a>#472455aa = <a href='/type/Updates'>Updates</a>;
 
 <a href='/method/messages.sendPaidReaction'>messages.sendPaidReaction</a>#9dd6a67b flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> count:<a href='/type/int'>int</a> random_id:<a href='/type/long'>long</a> private:flags.0?<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;
+
 <a href='/method/messages.togglePaidReactionPrivacy'>messages.togglePaidReactionPrivacy</a>#849ad397 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> private:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
 
 <a href='/method/messages.getMessagesReactions'>messages.getMessagesReactions</a>#8bba90e6 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
-<p>Paid reactions (aka Star reactions) may be sent to channel posts by invoking <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>: this will transfer <code>count</code> Telegram Stars to the channel's balance and increment by <code>count</code> the reaction counter of the Star reaction with type <a href="/constructor/reactionPaid">reactionPaid</a>.  </p>
-<p>To enable paid reactions, channel admins must invoke <a href="/method/messages.setChatAvailableReactions">messages.setChatAvailableReactions</a>, passing <a href="/constructor/boolTrue">boolTrue</a> to <code>paid_enabled</code> and the previously configured reaction set in <code>available_reactions</code> (<code>reactions_limit</code> can be omitted, as omitting the flag will keep the previously configured value).  </p>
-<p>Users can determine whether a channel supports paid reactions by checking the value of the <a href="/constructor/channelFull">channelFull</a>.<code>paid_reactions_available</code> flag.  </p>
 <p>Each post with star reactions has a leaderboard with the top senders, but users can opt out of appearing there if they prefer more privacy.<br>
 If the user explicitly chose to make their paid reaction(s) private, pass <a href="/constructor/boolTrue">boolTrue</a> to <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code>.<br>
 If the user explicitly chose to make their paid reaction(s) private, pass <a href="/constructor/boolTrue">boolFalse</a> to <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code>.<br>
-If the user did not make any explicit choice about the privacy of their paid reaction(s) (i.e. when reacting by clicking on an existing star reaction on a message), do not populate the <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code> flag.  </p>
+If the user did not make any explicit choice about the privacy of their paid reaction(s) (i.e. when reacting by clicking on an existing star reaction on a message), do not populate the <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code> flag: this will use the default reaction privacy, stored on the server and synced to clients using <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> (see below for more info).  </p>
 <p>To change the privacy of already sent paid reactions, invoke <a href="/method/messages.togglePaidReactionPrivacy">messages.togglePaidReactionPrivacy</a>, passing the ID of the message, the channel and the desired privacy setting.  </p>
+<p>Explicitly specifying a custom reaction privacy, or changing the reaction privacy of already sent reactions will update the default reaction privacy stored on the server: if the new value is different from the old one, an <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> update will be emitted.<br>
+Clients should invoke <a href="/method/messages.getPaidReactionPrivacy">messages.getPaidReactionPrivacy</a> on startup to fetch the current default reaction privacy (because the <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> update is only sent to currently online sessions and cannot be fetched using getDifference on client startup).  </p>
 <p>To fetch the paid reactions leaderboard, invoke <a href="/method/messages.getMessagesReactions">messages.getMessagesReactions</a>: the returned <a href="/constructor/updateMessageReactions">updateMessageReactions</a> constructor will contain a <code>top_reactors</code> vector of <a href="/constructor/messageReactor">messageReactor</a>s, containing the paid reactions leaderboard for that message.  </p>
 <h3><a class="anchor" href="#react-to-a-story" id="react-to-a-story" name="react-to-a-story"><i class="anchor-icon"></i></a>React to a story</h3>
 <p>See <a href="/api/stories#reactions">here »</a> for more info on how to react to a story.</p>
