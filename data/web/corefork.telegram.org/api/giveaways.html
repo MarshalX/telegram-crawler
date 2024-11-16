@@ -45,6 +45,7 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Telegram <a href="/api/channel">channel and supergroup</a> administrators with any set of <a href="/api/rights">rights</a> may launch giveaways to randomly distribute <a href="/api/premium">Telegram Premium</a> subscriptions and other gifts among their followers, in exchange for <a href="/api/boost">boosts</a>.</p>
+<h3><a class="anchor" href="#giveaways-and-giftcodes" id="giveaways-and-giftcodes" name="giveaways-and-giftcodes"><i class="anchor-icon"></i></a>Giveaways and giftcodes</h3>
 <p>This functionality should only be enabled if the <a href="/api/config#giveaway-gifts-purchase-available">giveaway_gifts_purchase_available</a> config value is set to true.  </p>
 <p>Note that the flow described below can also be used to gift a Premium subscriptions to multiple friends, and is different from the <a href="/api/premium#gifting-telegram-premium">old gift flow</a>, which allowed gifting only one subscription with some extra limitations, not present in this flow.  </p>
 <p>Note that <a href="/api/links#premium-multigift-links">premium multigift links</a> lead to a page that uses the new gift flow described below.  </p>
@@ -133,7 +134,18 @@ Clients should display this message, along with a sticker from the <a href="/con
 <p>Any user can invoke <a href="/method/payments.checkGiftCode">payments.checkGiftCode</a> with the link's slug to obtain info about the giveaway, such as the channel/supergroup that gifted the subscription (<code>from_id</code>), and the user that originally received the gift (<code>to_id</code>).<br>
 This can also be useful to channel/supergroup administrators to precisely determine the winners of a giveaway, for example if the giveaway also included some extra gifts apart from Premium subscriptions (<em>like Teslas</em>): the winners can simply send their link as undisputable proof that they won the giveaway, because the user that received the gift can be viewed in the <code>to_id</code> field returned by Telegram when invoking <a href="/method/payments.checkGiftCode">payments.checkGiftCode</a> on the slug.<br>
 Another way for admins to check who received the gifts is to simply use <a href="/method/premium.getBoostsList">premium.getBoostsList</a> while the boosts received by the gifts are still active.  </p>
-<p>To claim the <a href="/api/premium">Telegram Premium</a> subscription, simply invoke <a href="/method/payments.applyGiftCode">payments.applyGiftCode</a>, passing the link's <code>slug</code>.</p></div>
+<p>To claim the <a href="/api/premium">Telegram Premium</a> subscription, simply invoke <a href="/method/payments.applyGiftCode">payments.applyGiftCode</a>, passing the link's <code>slug</code>.  </p>
+<h3><a class="anchor" href="#star-giveaways" id="star-giveaways" name="star-giveaways"><i class="anchor-icon"></i></a>Star giveaways</h3>
+<pre><code><a href='/constructor/starsGiveawayOption'>starsGiveawayOption</a>#94ce852a flags:<a href='/type/%23'>#</a> extended:flags.0?<a href='/constructor/true'>true</a> default:flags.1?<a href='/constructor/true'>true</a> stars:<a href='/type/long'>long</a> yearly_boosts:<a href='/type/int'>int</a> store_product:flags.2?<a href='/type/string'>string</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> winners:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StarsGiveawayWinnersOption'>StarsGiveawayWinnersOption</a>&gt; = <a href='/type/StarsGiveawayOption'>StarsGiveawayOption</a>;
+
+<a href='/constructor/starsGiveawayWinnersOption'>starsGiveawayWinnersOption</a>#54236209 flags:<a href='/type/%23'>#</a> default:flags.0?<a href='/constructor/true'>true</a> users:<a href='/type/int'>int</a> per_user_stars:<a href='/type/long'>long</a> = <a href='/type/StarsGiveawayWinnersOption'>StarsGiveawayWinnersOption</a>;
+
+---functions---
+
+<a href='/method/payments.getStarsGiveawayOptions'>payments.getStarsGiveawayOptions</a>#bd1efd3e = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StarsGiveawayOption'>StarsGiveawayOption</a>&gt;;</code></pre>
+<p>Star giveaways are similar to <a href="#giveaways-and-giftcodes">normal giveaways</a>, with the only difference that instead of giving away gifts or <a href="/api/premium">Telegram Premium subscriptions</a>, the giveaway will automatically distribute <a href="/api/stars">Telegram Stars</a> among the winners.</p>
+<p>First of all, invoke <a href="/method/payments.getStarsGiveawayOptions">payments.getStarsGiveawayOptions</a> to obtain a list of <a href="/constructor/starsGiveawayOption">starsGiveawayOption</a> constructors, containing a list of giveaway options that may be chosen by the admin, indicating the number of <a href="/api/stars">Telegram Stars</a> that will be gifted in the giveaway, along with their price (<code>amount</code>) in the specified <code>currency</code> (see the <a href="/constructor/starsGiveawayOption">constructor page »</a> for more info on these fields).  </p>
+<p>Once the admin has chosen a specific gift code option, invoke <a href="/method/payments.getPaymentForm">payments.getPaymentForm</a>, passing an <a href="/constructor/inputInvoicePremiumGiftCode">inputInvoicePremiumGiftCode</a>, with the chosen <a href="/constructor/premiumGiftCodeOption">premiumGiftCodeOption</a> in <code>option</code> and a <code>purpose</code> containing either:</p></div>
   
 </div>
           
