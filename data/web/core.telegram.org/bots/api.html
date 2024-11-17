@@ -53,6 +53,91 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="november-17-2024" href="#november-17-2024"><i class="anchor-icon"></i></a>November 17, 2024</h4>
+<p><strong>Bot API 8.0</strong></p>
+<blockquote>
+<p>Bot API 8.0 introduces <strong>10 powerful new features</strong> for Mini Apps - including the ability to enter <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#full-screen-mode">full-screen mode</a>, launch from <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#home-screen-shortcuts">home screen shortcuts</a>, offer <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#subscription-plans">subscription plans</a> and more. Check out all the details in our dedicated <a href="https://telegram.org/blog/fullscreen-miniapps-and-more">blog</a> and Mini App <a href="https://core.telegram.org/bots/webapps">documentation</a>.</p>
+</blockquote>
+<p><strong>Star Subscriptions</strong></p>
+<ul>
+<li>Bots now support <strong>paid subscriptions</strong> powered by <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> - <strong>monetizing their efforts</strong> with multiple tiers of content and features.</li>
+<li>Added the parameter <em>subscription_period</em> to the method <a href="#createinvoicelink">createInvoiceLink</a> to support the creation of links that are billed periodically.</li>
+<li>Added the parameter <em>business_connection_id</em> to the method <a href="#createinvoicelink">createInvoiceLink</a> to support the creation of invoice links on behalf of business accounts.</li>
+<li>Added the fields <em>subscription_expiration_date</em>, <em>is_recurring</em> and <em>is_first_recurring</em> to the class <a href="#successfulpayment">SuccessfulPayment</a>.</li>
+<li>Added the method <a href="#edituserstarsubscription">editUserStarSubscription</a>.</li>
+<li>Added the field <em>subscription_period</em> to the class <a href="#transactionpartneruser">TransactionPartnerUser</a>.</li>
+</ul>
+<p><strong>Full-screen Mode</strong></p>
+<ul>
+<li>Mini Apps are now able to <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#full-screen-mode">become full-screen</a> in both portrait and <strong>landscape mode</strong> - allowing them to host <strong>more games</strong>, play <strong>widescreen media</strong> and support <strong>immersive</strong> user experiences.</li>
+<li>Added the methods <em>requestFullscreen</em> and <em>exitFullscreen</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to toggle full-screen mode.</li>
+<li>Added the fields <em>safeAreaInset</em> and <em>contentSafeAreaInset</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>, allowing Mini Apps to ensure that their content properly respects the device&#39;s safe area margins.</li>
+<li>Further added the fields <em>isActive</em> and <em>isFullscreen</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>activated</em>, <em>deactivated</em>, <em>safeAreaChanged</em>, <em>contentSafeAreaChanged</em>, <em>fullscreenChanged</em> and <em>fullscreenFailed</em> for Mini Apps.</li>
+</ul>
+<p><strong>Homescreen Shortcuts</strong></p>
+<ul>
+<li>Mini Apps can now be accessed via <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#home-screen-shortcuts">direct shortcuts</a> added to the <strong>home screen</strong> of mobile devices.</li>
+<li>Added the method <em>addToHomeScreen</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to create a shortcut for users to add to their home screens.</li>
+<li>Added the method <em>checkHomeScreenStatus</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to determine the status and support of the home screen shortcut for the Mini App on the current device.</li>
+<li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>homeScreenAdded</em> and <em>homeScreenChecked</em> for Mini Apps.</li>
+</ul>
+<p><strong>Emoji Status</strong></p>
+<ul>
+<li>Mini Apps can now prompt users to set their <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#emoji-status">emoji status</a> - or request access to later sync it automatically with in-game badges, third-party APIs and more.</li>
+<li>Added the method <a href="#setuseremojistatus">setUserEmojiStatus</a>. The user must allow the bot to manage their emoji status.</li>
+<li>Added the method <em>setEmojiStatus</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to let users manually confirm a custom emoji as their new status via a native dialog.</li>
+<li>Added the method <em>requestEmojiStatusAccess</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> for obtaining permission to later update a user&#39;s emoji status via the Bot API method <a href="https://core.telegram.org/bots#setuseremojistatus">setUserEmojiStatus</a>.</li>
+<li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>emojiStatusSet</em>, <em>emojiStatusFailed</em> and <em>emojiStatusAccessRequested</em> for Mini Apps.</li>
+</ul>
+<p><strong>Media Sharing and File Downloads</strong></p>
+<ul>
+<li>Users can now <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#media-sharing">share media</a> directly from Mini Apps - sending <strong>referral codes</strong>, custom memes, artwork and more to <strong>any chat</strong> or posting them <a href="https://telegram.org/blog/w3-browser-mini-app-store#sharing-from-mini-apps-to-stories">as a story</a>.</li>
+<li>Added the class <a href="#preparedinlinemessage">PreparedInlineMessage</a> and the method <a href="#savepreparedinlinemessage">savePreparedInlineMessage</a>, allowing bots to suggest users to send a specific message from a Mini App via the method <a href="https://core.telegram.org/bots/webapps#initializing-mini-apps">shareMessage</a>.</li>
+<li>Added the method <em>shareMessage</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to share media from Mini Apps to Telegram chats.</li>
+<li>Added the method <em>downloadFile</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>, introducing support for a <strong>native popup</strong> that prompts users to download files from the Mini App.</li>
+<li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>shareMessageSent</em>, <em>shareMessageFailed</em> and <em>fileDownloadRequested</em> for Mini Apps.</li>
+</ul>
+<p><strong>Geolocation Access</strong></p>
+<ul>
+<li>Mini Apps can now request <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#geolocation-options">geolocation access</a> to users, allowing them to build virtually any location-based service, from <strong>games</strong> with dynamic points of interest to <strong>interactive maps</strong> for events.</li>
+<li>Added the field <em>LocationManager</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>locationManagerUpdated</em> and <em>locationRequested</em> for Mini Apps.</li>
+</ul>
+<p><strong>Device Motion Tracking</strong></p>
+<ul>
+<li>Mini Apps can now track detailed <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#device-orientation-data">device motion data</a>, allowing them to implement better productivity tools, immersive <strong>VR experiences</strong> and more.</li>
+<li>Added the fields <em>isOrientationLocked</em>, <em>Accelerometer</em>, <em>DeviceOrientation</em> and <em>Gyroscope</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the methods <em>lockOrientation</em> and <em>unlockOrientation</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to control the screen orientation.</li>
+<li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>accelerometerStarted</em>, <em>accelerometerStopped</em>, <em>accelerometerChanged</em>, <em>accelerometerFailed</em>, <em>deviceOrientationStarted</em>, <em>deviceOrientationStopped</em>, <em>deviceOrientationChanged</em>, <em>deviceOrientationFailed</em>, <em>gyroscopeStarted</em>, <em>gyroscopeStopped</em>, <em>gyroscopeChanged</em>, <em>gyroscopeFailed</em> for Mini Apps.</li>
+</ul>
+<p><strong>Gifts</strong></p>
+<ul>
+<li>Bots can now send <a href="https://telegram.org/blog/gifts-verification-platform#gifts">Paid Gifts</a> to users in exchange for Telegram Stars.</li>
+<li>Added the classes <a href="#gift">Gift</a> and <a href="#gifts">Gifts</a> and the method <a href="#getavailablegifts">getAvailableGifts</a>, allowing bots to get all gifts available for sending.</li>
+<li>Added the method <a href="#sendgift">sendGift</a>, allowing bots to send gifts to users.</li>
+<li>Added the field <em>gift</em> to the class <a href="#transactionpartneruser">TransactionPartnerUser</a>.</li>
+</ul>
+<p><strong>Loading Screen Customization</strong></p>
+<ul>
+<li>Mini Apps can customize their loading screen, adding <strong>their own icon</strong> and <strong>specific colors</strong> for light and dark themes.</li>
+<li>You can access these customization settings in <a href="https://t.me/botfather">@BotFather</a> via <em>/mybots &gt; Select Bot &gt; Bot Settings &gt; Configure Mini App &gt; Enable Mini App</em></li>
+</ul>
+<p><strong>Hardware-specific Optimizations</strong></p>
+<ul>
+<li>Mini Apps running on Android can now receive <a href="/bots/webapps#additional-data-in-user-agent">basic information</a> about a device&#39;s processing hardware, allowing them to <strong>optimize user experience</strong> based on the device&#39;s capabilities.</li>
+<li>This information includes the OS, App and SDK&#39;s respective versions as well as the device&#39;s model and performance class.</li>
+</ul>
+<p><strong> General </strong></p>
+<ul>
+<li>Added the field <em>photo_url</em> to the class <a href="/bots/webapps#webappuser">WebAppUser</a> for all bots, allowing Mini Apps to access a user&#39;s profile photo if their privacy settings allow for it.</li>
+<li>Third parties (e.g., Mini App builders) that receive or process data on behalf of Mini Apps are now able to <a href="/bots/webapps#validating-data-for-third-party-use">validate it</a> without knowing the App&#39;s <a href="/bots/tutorial#obtain-your-bot-token">bot token</a>.</li>
+<li>Debugging <a href="/bots/webapps#debug-mode-for-mini-apps">options</a> have been expanded to include full support for <strong>iOS devices</strong>. You can use these tools to find app-specific issues in your Mini App.</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>Starting December 1, 2024 messages with video that are sent, copied or forwarded to groups and channels with a sufficiently large audience can be automatically scheduled by the server until the respective video is reencoded. Such messages will have 0 as their message identifier and can&#39;t be used before they are actually sent.</p>
+</blockquote>
 <h4><a class="anchor" name="october-31-2024" href="#october-31-2024"><i class="anchor-icon"></i></a>October 31, 2024</h4>
 <p><strong>Bot API 7.11</strong></p>
 <ul>
@@ -90,22 +175,6 @@ To learn how to create…">
 <li>Added the method <a href="#editchatsubscriptioninvitelink">editChatSubscriptionInviteLink</a>, allowing bots to edit the <em>name</em> of subscription invite links.</li>
 <li>Added the field <em>until_date</em> to the class <a href="#chatmembermember">ChatMemberMember</a> for members with an active subscription.</li>
 <li>Added support for paid reactions and the class <a href="#reactiontypepaid">ReactionTypePaid</a>.</li>
-</ul>
-<h4><a class="anchor" name="july-31-2024" href="#july-31-2024"><i class="anchor-icon"></i></a>July 31, 2024</h4>
-<p><strong>Bot API 7.8</strong></p>
-<ul>
-<li>Added the option for bots to set a <a href="/bots/webapps#launching-the-main-mini-app">Main Mini App</a>, which can be previewed and launched directly from a button in the bot&#39;s profile or a link.</li>
-<li>Added the method <em>shareToStory</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
-<li>Added the field <em>has_main_web_app</em> to the class <a href="#user">User</a>, which is returned in the response to <a href="#getme">getMe</a>.</li>
-<li>Added the parameter <em>business_connection_id</em> to the methods <a href="#pinchatmessage">pinChatMessage</a> and <a href="#unpinchatmessage">unpinChatMessage</a>, allowing bots to manage pinned messages on behalf of a business account.</li>
-</ul>
-<h4><a class="anchor" name="july-7-2024" href="#july-7-2024"><i class="anchor-icon"></i></a>July 7, 2024</h4>
-<p><strong>Bot API 7.7</strong></p>
-<ul>
-<li>Added the class <a href="#refundedpayment">RefundedPayment</a>, containing information about a refunded payment.</li>
-<li>Added the field <em>refunded_payment</em> to the class <a href="#message">Message</a>, describing a service message about a refunded payment.</li>
-<li>Added the field <em>isVerticalSwipesEnabled</em> and the methods <em>enableVerticalSwipes</em>, <em>disableVerticalSwipes</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
-<li>Added the <a href="/bots/webapps#events-available-for-mini-apps">event</a> <em>scanQrPopupClosed</em> for Mini Apps.</li>
 </ul>
 <p><strong><a href="/bots/api-changelog">See earlier changes »</a></strong></p>
 <h3><a class="anchor" name="authorizing-your-bot" href="#authorizing-your-bot"><i class="anchor-icon"></i></a>Authorizing your bot</h3>
@@ -5982,7 +6051,7 @@ To learn how to create…">
 <li>Other configurations may work but we can&#39;t guarantee that they will.</li>
 </ul>
 <h4><a class="anchor" name="accent-colors" href="#accent-colors"><i class="anchor-icon"></i></a>Accent colors</h4>
-<p>Colors with identifiers 0 (red), 1 (orange), 2 (purple/violet), 3 (green), 4 (cyan), 5 (blue), 6 (pink) can be customized by app themes. Additionally, the following colors in RGB format are currently in use. </p>
+<p>Colors with identifiers 0 (red), 1 (orange), 2 (purple/violet), 3 (green), 4 (cyan), 5 (blue), 6 (pink) can be customized by app themes. Additionally, the following colors in RGB format are currently in use.</p>
 <p><table class="table table-hover table-bordered">
 <thead>
 <tr><th>Color identifier</th><th>Light colors</th><th>Dark colors</th></tr>
@@ -6005,7 +6074,7 @@ To learn how to create…">
 </tbody>
 </table></p>
 <h4><a class="anchor" name="profile-accent-colors" href="#profile-accent-colors"><i class="anchor-icon"></i></a>Profile accent colors</h4>
-<p>Currently, the following colors in RGB format are in use for profile backgrounds. </p>
+<p>Currently, the following colors in RGB format are in use for profile backgrounds.</p>
 <p><table class="table table-hover table-bordered">
 <thead>
 <tr><th>Color identifier</th><th>Light colors</th><th>Dark colors</th></tr>
@@ -8073,6 +8142,38 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer</td>
 <td>Optional</td>
 <td>Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="setuseremojistatus" href="#setuseremojistatus"><i class="anchor-icon"></i></a>setUserEmojiStatus</h4>
+<p>Changes the emoji status for a given user that previously allowed the bot to manage their emoji status via the Mini App method <a href="/bots/webapps#initializing-mini-apps">requestEmojiStatusAccess</a>. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier of the target user</td>
+</tr>
+<tr>
+<td>emoji_status_custom_emoji_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Custom emoji identifier of the emoji status to set. Pass an empty string to remove the status.</td>
+</tr>
+<tr>
+<td>emoji_status_expiration_date</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Expiration date of the emoji status, if any</td>
 </tr>
 </tbody>
 </table>
@@ -10917,6 +11018,108 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="gift" href="#gift"><i class="anchor-icon"></i></a>Gift</h4>
+<p>This object represents a gift that can be sent by the bot.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>String</td>
+<td>Unique identifier of the gift</td>
+</tr>
+<tr>
+<td>sticker</td>
+<td><a href="#sticker">Sticker</a></td>
+<td>The sticker that represents the gift</td>
+</tr>
+<tr>
+<td>star_count</td>
+<td>Integer</td>
+<td>The number of Telegram Stars that must be paid to send the sticker</td>
+</tr>
+<tr>
+<td>total_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. The total number of the gifts of this type that can be sent; for limited gifts only</td>
+</tr>
+<tr>
+<td>remaining_count</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of remaining gifts of this type that can be sent; for limited gifts only</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="gifts" href="#gifts"><i class="anchor-icon"></i></a>Gifts</h4>
+<p>This object represent a list of gifts.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gifts</td>
+<td>Array of <a href="#gift">Gift</a></td>
+<td>The list of gifts</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="getavailablegifts" href="#getavailablegifts"><i class="anchor-icon"></i></a>getAvailableGifts</h4>
+<p>Returns the list of gifts that can be sent by the bot to users. Requires no parameters. Returns a <a href="#gifts">Gifts</a> object.</p>
+<h4><a class="anchor" name="sendgift" href="#sendgift"><i class="anchor-icon"></i></a>sendGift</h4>
+<p>Sends a gift to the given user. The gift can&#39;t be converted to Telegram Stars by the user. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier of the target user that will receive the gift</td>
+</tr>
+<tr>
+<td>gift_id</td>
+<td>String</td>
+<td>Yes</td>
+<td>Identifier of the gift</td>
+</tr>
+<tr>
+<td>text</td>
+<td>String</td>
+<td>Optional</td>
+<td>Text that will be shown along with the gift; 0-255 characters</td>
+</tr>
+<tr>
+<td>text_parse_mode</td>
+<td>String</td>
+<td>Optional</td>
+<td>Mode for parsing entities in the text. See <a href="#formatting-options">formatting options</a> for more details. Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.</td>
+</tr>
+<tr>
+<td>text_entities</td>
+<td>Array of <a href="#messageentity">MessageEntity</a></td>
+<td>Optional</td>
+<td>A JSON-serialized list of special entities that appear in the gift text. It can be specified instead of <em>text_parse_mode</em>. Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" name="inline-mode" href="#inline-mode"><i class="anchor-icon"></i></a>Inline mode</h3>
 <p>The following methods and objects allow your bot to work in <a href="/bots/inline">inline mode</a>.<br>Please see our <a href="/bots/inline">Introduction to Inline bots</a> for more details.</p>
 <p>To enable this option, send the <code>/setinline</code> command to <a href="https://t.me/botfather">@BotFather</a> and provide the placeholder text that the user will see in the input field after typing your bot&#39;s name.</p>
@@ -12816,6 +13019,79 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="savepreparedinlinemessage" href="#savepreparedinlinemessage"><i class="anchor-icon"></i></a>savePreparedInlineMessage</h4>
+<p>Stores a message that can be sent by a user of a Mini App. Returns a <a href="#preparedinlinemessage">PreparedInlineMessage</a> object.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier of the target user that can use the prepared message</td>
+</tr>
+<tr>
+<td>result</td>
+<td><a href="#inlinequeryresult">InlineQueryResult</a></td>
+<td>Yes</td>
+<td>A JSON-serialized object describing the message to be sent</td>
+</tr>
+<tr>
+<td>allow_user_chats</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the message can be sent to private chats with users</td>
+</tr>
+<tr>
+<td>allow_bot_chats</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the message can be sent to private chats with bots</td>
+</tr>
+<tr>
+<td>allow_group_chats</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the message can be sent to group and supergroup chats</td>
+</tr>
+<tr>
+<td>allow_channel_chats</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the message can be sent to channel chats</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="preparedinlinemessage" href="#preparedinlinemessage"><i class="anchor-icon"></i></a>PreparedInlineMessage</h4>
+<p>Describes an inline message to be sent by a user of a Mini App.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>String</td>
+<td>Unique identifier of the prepared message</td>
+</tr>
+<tr>
+<td>expiration_date</td>
+<td>Integer</td>
+<td>Expiration date of the prepared message, in Unix time. Expired prepared messages can no longer be used</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" name="payments" href="#payments"><i class="anchor-icon"></i></a>Payments</h3>
 <p>Your bot can accept payments from Telegram users. Please see the <a href="/bots/payments">introduction to payments</a> for more details on the process and how to set up payments for your bot.</p>
 <h4><a class="anchor" name="sendinvoice" href="#sendinvoice"><i class="anchor-icon"></i></a>sendInvoice</h4>
@@ -13019,6 +13295,12 @@ pre-formatted fixed-width code block written in the Python programming language
 </thead>
 <tbody>
 <tr>
+<td>business_connection_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the business connection on behalf of which the link will be created</td>
+</tr>
+<tr>
 <td>title</td>
 <td>String</td>
 <td>Yes</td>
@@ -13053,6 +13335,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Array of <a href="#labeledprice">LabeledPrice</a></td>
 <td>Yes</td>
 <td>Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.). Must contain exactly one item for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
+</tr>
+<tr>
+<td>subscription_period</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>The number of seconds the subscription will be active for before the next payment. The currency must be set to “XTR” (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified.</td>
 </tr>
 <tr>
 <td>max_tip_amount</td>
@@ -13262,6 +13550,38 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="edituserstarsubscription" href="#edituserstarsubscription"><i class="anchor-icon"></i></a>editUserStarSubscription</h4>
+<p>Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Identifier of the user whose subscription will be edited</td>
+</tr>
+<tr>
+<td>telegram_payment_charge_id</td>
+<td>String</td>
+<td>Yes</td>
+<td>Telegram payment identifier for the subscription</td>
+</tr>
+<tr>
+<td>is_canceled</td>
+<td>Boolean</td>
+<td>Yes</td>
+<td>Pass <em>True</em> to cancel extension of the user subscription; the subscription must be active up to the end of the current subscription period. Pass <em>False</em> to allow the user to re-enable a subscription that was previously canceled by the bot.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="labeledprice" href="#labeledprice"><i class="anchor-icon"></i></a>LabeledPrice</h4>
 <p>This object represents a portion of the price for goods or services.</p>
 <table class="table">
@@ -13452,6 +13772,21 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>invoice_payload</td>
 <td>String</td>
 <td>Bot-specified invoice payload</td>
+</tr>
+<tr>
+<td>subscription_expiration_date</td>
+<td>Integer</td>
+<td><em>Optional</em>. Expiration date of the subscription, in Unix time; for recurring payments only</td>
+</tr>
+<tr>
+<td>is_recurring</td>
+<td>True</td>
+<td><em>Optional</em>. True, if the payment is a recurring payment for a subscription</td>
+</tr>
+<tr>
+<td>is_first_recurring</td>
+<td>True</td>
+<td><em>Optional</em>. True, if the payment is the first payment for a subscription</td>
 </tr>
 <tr>
 <td>shipping_option_id</td>
@@ -13724,6 +14059,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><em>Optional</em>. Bot-specified invoice payload</td>
 </tr>
 <tr>
+<td>subscription_period</td>
+<td>Integer</td>
+<td><em>Optional</em>. The duration of the paid subscription</td>
+</tr>
+<tr>
 <td>paid_media</td>
 <td>Array of <a href="#paidmedia">PaidMedia</a></td>
 <td><em>Optional</em>. Information about the paid media bought by the user</td>
@@ -13732,6 +14072,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>paid_media_payload</td>
 <td>String</td>
 <td><em>Optional</em>. Bot-specified paid media payload</td>
+</tr>
+<tr>
+<td>gift</td>
+<td>String</td>
+<td><em>Optional</em>. The gift sent to the user by the bot</td>
 </tr>
 </tbody>
 </table>

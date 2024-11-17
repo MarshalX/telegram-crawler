@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app-beta.js?78"></script>
+    <script src="https://tg.dev/js/telegram-web-app-beta.js?79"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -36,7 +36,7 @@
   <button onclick="DemoApp.toggleButtonsProgress(this);">Show Progress</button>
   <button onclick="DemoApp.toggleSwipeBehavior(this);">Disable Vertical Swypes</button>
   <button id="fullscreen_btn" onclick="DemoApp.toggleFullscreen(this);">Request Fullscreen</button>
-  <button onclick="DemoApp.toggleOrientationLock(this);">Lock Orientation</button>
+  <button id="orient_btn" onclick="DemoApp.toggleOrientationLock(this);">Lock Orientation</button>
   <input type="text" placeholder="Input text in regular input..." />
   <div class="input" contenteditable="true" data-placeholder="Input text in contenteditable field..."></div>
     <div id="peer_wrap" style="display:none">
@@ -202,7 +202,8 @@
     <pre><code id="webview_data"></code></pre>
     <div class="hint">
       Data passed to webview.
-      <span id="webview_data_status" class="status_need">Checking hash...</span>
+      <span id="webview_data_status" class="status_need">Checking hash...</span>,
+      <span id="webview_data_sign_status">checking signature...</span>
     </div>
     <pre><code id="theme_data"></code></pre>
     <div class="hint">
@@ -224,7 +225,7 @@
   <div class="viewport-stable-border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?45"></script>
+    <script src="/js/webappdemo.js?46"></script>
     <script>DemoApp.apiUrl = "/demo/api";
 
 Telegram.WebApp.onEvent('themeChanged', function() {
@@ -363,6 +364,11 @@ Telegram.WebApp.onEvent('themeChanged', function() {
   $('#bg_color_input').val(Telegram.WebApp.backgroundColor);
   $('body').cssProp('--bg-color', Telegram.WebApp.backgroundColor);
 });
+if (Telegram.WebApp.isOrientationLocked) {
+  $('#orient_btn').html('Unlock Orientation');
+} else {
+  $('#orient_btn').html('Lock Orientation');
+}
 try {
   DemoApp.testClipboard(document.getElementById('clipboard_test'));
 } catch(e) {}
