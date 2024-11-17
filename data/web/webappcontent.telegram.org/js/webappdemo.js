@@ -107,10 +107,15 @@ var DemoApp = {
         $('#webview_data_status').hasClass('status_need')) {
       $('#webview_data_status').removeClass('status_need');
       DemoApp.apiRequest('checkInitData', {}, function(result) {
-        if (result.ok) {
+        if (result.hash_status) {
           $('#webview_data_status').text('Hash is correct (async)').addClass('ok');
         } else {
-          $('#webview_data_status').text(result.error + ' (async)').addClass('err');
+          $('#webview_data_status').text('Hash invalid (async)').addClass('err');
+        }
+        if (result.sign_status) {
+          $('#webview_data_sign_status').text('Signature is correct (async)').addClass('ok');
+        } else {
+          $('#webview_data_sign_status').text('Signature invalid (async)').addClass('err');
         }
       });
     }
