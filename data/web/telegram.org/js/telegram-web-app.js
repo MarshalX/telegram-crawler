@@ -291,6 +291,9 @@
   var webAppIsActive = true;
   var webAppIsFullscreen = false;
   var webAppIsOrientationLocked = false;
+  var webAppBackgroundColor = 'bg_color';
+  var webAppHeaderColorKey = 'bg_color';
+  var webAppHeaderColor = null;
 
   if (initParams.tgWebAppData && initParams.tgWebAppData.length) {
     webAppInitData = initParams.tgWebAppData;
@@ -317,6 +320,19 @@
   }
   if (stored_theme_params) {
     setThemeParams(stored_theme_params);
+  }
+  var stored_def_colors = Utils.sessionStorageGet('defaultColors');
+  if (initParams.tgWebAppDefaultColors && initParams.tgWebAppDefaultColors.length) {
+    var defColorsRaw = initParams.tgWebAppDefaultColors;
+    try {
+      var def_colors = JSON.parse(defColorsRaw);
+      if (def_colors) {
+        setDefaultColors(def_colors);
+      }
+    } catch (e) {}
+  }
+  if (stored_def_colors) {
+    setDefaultColors(stored_def_colors);
   }
   if (initParams.tgWebAppVersion) {
     webAppVersion = initParams.tgWebAppVersion;
@@ -459,6 +475,27 @@
       }
     }
     Utils.sessionStorageSet('themeParams', themeParams);
+  }
+
+  function setDefaultColors(def_colors) {
+    if (colorScheme == 'dark') {
+      if (def_colors.bg_dark_color) {
+        webAppBackgroundColor = def_colors.bg_dark_color;
+      }
+      if (def_colors.header_dark_color) {
+        webAppHeaderColorKey = null;
+        webAppHeaderColor = def_colors.header_dark_color;
+      }
+    } else {
+      if (def_colors.bg_color) {
+        webAppBackgroundColor = def_colors.bg_color;
+      }
+      if (def_colors.header_color) {
+        webAppHeaderColorKey = null;
+        webAppHeaderColor = def_colors.header_color;
+      }
+    }
+    Utils.sessionStorageSet('defaultColors', def_colors);
   }
 
   var webAppCallbacks = {};
@@ -690,14 +727,13 @@
   }
 
 
-  var headerColorKey = 'bg_color', headerColor = null;
   function getHeaderColor() {
-    if (headerColorKey == 'secondary_bg_color') {
+    if (webAppHeaderColorKey == 'secondary_bg_color') {
       return themeParams.secondary_bg_color;
-    } else if (headerColorKey == 'bg_color') {
+    } else if (webAppHeaderColorKey == 'bg_color') {
       return themeParams.bg_color;
     }
-    return headerColor;
+    return webAppHeaderColor;
   }
   function setHeaderColor(color) {
     if (!versionAtLeast('6.1')) {
@@ -729,32 +765,31 @@
       console.error('[Telegram.WebApp] Header color key should be one of Telegram.WebApp.themeParams.bg_color, Telegram.WebApp.themeParams.secondary_bg_color, \'bg_color\', \'secondary_bg_color\'', color);
       throw Error('WebAppHeaderColorKeyInvalid');
     }
-    headerColorKey = color_key;
-    headerColor = head_color;
+    webAppHeaderColorKey = color_key;
+    webAppHeaderColor = head_color;
     updateHeaderColor();
   }
   var appHeaderColorKey = null, appHeaderColor = null;
   function updateHeaderColor() {
-    if (appHeaderColorKey != headerColorKey ||
-        appHeaderColor != headerColor) {
-      appHeaderColorKey = headerColorKey;
-      appHeaderColor = headerColor;
+    if (appHeaderColorKey != webAppHeaderColorKey ||
+        appHeaderColor != webAppHeaderColor) {
+      appHeaderColorKey = webAppHeaderColorKey;
+      appHeaderColor = webAppHeaderColor;
       if (appHeaderColor) {
-        WebView.postEvent('web_app_set_header_color', false, {color: headerColor});
+        WebView.postEvent('web_app_set_header_color', false, {color: webAppHeaderColor});
       } else {
-        WebView.postEvent('web_app_set_header_color', false, {color_key: headerColorKey});
+        WebView.postEvent('web_app_set_header_color', false, {color_key: webAppHeaderColorKey});
       }
     }
   }
 
-  var backgroundColor = 'bg_color';
   function getBackgroundColor() {
-    if (backgroundColor == 'secondary_bg_color') {
+    if (webAppBackgroundColor == 'secondary_bg_color') {
       return themeParams.secondary_bg_color;
-    } else if (backgroundColor == 'bg_color') {
+    } else if (webAppBackgroundColor == 'bg_color') {
       return themeParams.bg_color;
     }
-    return backgroundColor;
+    return webAppBackgroundColor;
   }
   function setBackgroundColor(color) {
     if (!versionAtLeast('6.1')) {
@@ -771,7 +806,7 @@
         throw Error('WebAppBackgroundColorInvalid');
       }
     }
-    backgroundColor = bg_color;
+    webAppBackgroundColor = bg_color;
     updateBackgroundColor();
   }
   var appBackgroundColor = null;
