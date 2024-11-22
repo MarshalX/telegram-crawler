@@ -70,12 +70,13 @@ Sponsored channel messages have:</p>
 <ul>
 <li>A title (contained in <code>title</code>)</li>
 <li>A text (contained in <code>message</code>+<code>entities</code>)</li>
+<li>An optional media (contained in <code>media</code>, clicking on it should open the URL in <code>url</code> as below; a separate button should be available to expand the video in fullscreen, which should <em>not</em> open the linked <code>url</code> when clicked).</li>
 <li>A button at the button (label in <code>button_text</code>) that when clicked, opens the URL in <code>url</code>.<br>
 A confirmation prompt should be shown before opening the URL, unless the host part of the URL matches the following regex: <code>(^|\\.)(telegram\.(org|me|dog)|t\.me|te\.?legra\.ph|graph\.org|fragment\.com|telesco\.pe)$</code>, in which case the URL should be opened without confirmation (and if it's a <a href="/api/links">deep link »</a>, it should be opened directly in-app, without passing through the browser).  </li>
+<li>The message should be marked as "Recommended" instead of "Sponsored" if the <code>recommended</code> flag is set.  </li>
+<li>If the <code>photo</code> flag is set, it should be used to display a profile photo bubble for the sponsored message, like for messages sent in groups.  </li>
+<li>If the <code>sponsor_info</code> or <code>additional_info</code> flags are set, an additional "Sponsor info" menu item must be present in the message context menu (the menu that pops up when clicking on a button), that when clicked, displays the contents of the flags.  </li>
 </ul>
-<p>The message should be marked as "Recommended" instead of "Sponsored" if the <code>recommended</code> flag is set.  </p>
-<p>If the <code>photo</code> flag is set, it should be used to display a profile photo bubble for the sponsored message, like for messages sent in groups.  </p>
-<p>If the <code>sponsor_info</code> or <code>additional_info</code> flags are set, an additional "Sponsor info" menu item must be present in the message context menu (the menu that pops up when clicking on a button), that when clicked, displays the contents of the flags.  </p>
 </li>
 <li>
 <p>In bots, they must be displayed <a href="https://telegram.org/blog/dynamic-video-quality-and-more#telegram-ads-in-bots">above the chat</a>, akin to an <a href="/api/action-bar">action bar</a>
@@ -99,14 +100,15 @@ A confirmation prompt should be shown before opening the URL, unless the host pa
 <pre><code>---functions---
 
 <a href='/method/messages.clickSponsoredMessage'>messages.clickSponsoredMessage</a>#f093465 flags:<a href='/type/%23'>#</a> media:flags.0?<a href='/constructor/true'>true</a> fullscreen:flags.1?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> random_id:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
-<p>If the user either:</p>
+<p>If the user does one of the following actions, <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message:</p>
 <ul>
 <li>Clicks on a link in the sponsored message</li>
 <li>Clicks on the bot ad bar</li>
 <li>Opens a sponsored chat or a sponsored website via the associated button</li>
 <li>Opens the sponsored chat via the sponsored message name, the sponsored message photo, or a mention in the sponsored message</li>
+<li>Clicks on the media (the <code>media</code> flag must also be set in this case)</li>
+<li>Clicks on the fullscreen button, then clicks on the media (the <code>fullscreen</code> and <code>media</code> flags must be set)</li>
 </ul>
-<p><a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message.</p>
 <h4><a class="anchor" href="#reporting-sponsored-messages" id="reporting-sponsored-messages" name="reporting-sponsored-messages"><i class="anchor-icon"></i></a>Reporting sponsored messages</h4>
 <pre><code><a href='/constructor/sponsoredMessage'>sponsoredMessage</a>#4d93a990 flags:<a href='/type/%23'>#</a> recommended:flags.5?<a href='/constructor/true'>true</a> can_report:flags.12?<a href='/constructor/true'>true</a> random_id:<a href='/type/bytes'>bytes</a> url:<a href='/type/string'>string</a> title:<a href='/type/string'>string</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; photo:flags.6?<a href='/type/Photo'>Photo</a> media:flags.14?<a href='/type/MessageMedia'>MessageMedia</a> color:flags.13?<a href='/type/PeerColor'>PeerColor</a> button_text:<a href='/type/string'>string</a> sponsor_info:flags.7?<a href='/type/string'>string</a> additional_info:flags.8?<a href='/type/string'>string</a> = <a href='/type/SponsoredMessage'>SponsoredMessage</a>;
 
