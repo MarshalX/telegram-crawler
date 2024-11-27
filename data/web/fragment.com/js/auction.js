@@ -705,6 +705,11 @@ var Wallet = {
           transaction: 1
         }, req.params);
         Aj.apiRequest(req.method, params, function(result) {
+          if (result.need_verify) {
+            return Verify.showPopup(result, function() {
+              Wallet.sendTransaction(options);
+            });
+          }
           if (result.error) {
             return showAlert(result.error);
           }
@@ -1582,11 +1587,19 @@ var Account = {
     e.preventDefault();
     var $actions = $(this).closest('.js-actions');
     var username = $actions.attr('data-username');
+    Account.сonvertInit(username);
+  },
+  сonvertInit: function(username) {
     Aj.state.curPopup = null;
     Aj.state.curPopupState = null;
     Aj.apiRequest('initConverting', {
       username: username
     }, function(result) {
+      if (result.need_verify) {
+        return Verify.showPopup(result, function() {
+          Account.сonvertInit(username);
+        });
+      }
       Account.processConverting(result);
     });
   },
@@ -2638,7 +2651,13 @@ var Ads = {
       return false;
     }
     var onSuccess = function(result) {
-        $form.data('disabled', false);
+      $form.data('disabled', false);
+      if (result.need_verify) {
+        return Verify.showPopup(result, function() {
+          $form.data('disabled', true);
+          Aj.apiRequest('initAdsRevenueWithdrawalRequest', params, onSuccess);
+        });
+      }
       if (result.error) {
         return showAlert(result.error);
       }
@@ -3083,6 +3102,12 @@ var Stars = {
     }
     var onSuccess = function(result) {
       $form.data('disabled', false);
+      if (result.need_verify) {
+        return Verify.showPopup(result, function() {
+          $form.data('disabled', true);
+          Aj.apiRequest('initStarsRevenueWithdrawalRequest', params, onSuccess);
+        });
+      }
       if (result.error) {
         return showAlert(result.error);
       }
@@ -3606,6 +3631,94 @@ var Gateway = {
   },
   updateContent: function(html) {
     $('.js-main-content').html(html);
+  }
+};
+
+var Profile = {
+  init: function() {
+    Aj.onLoad(function(state) {
+      var cont = Aj.ajContainer;
+      $(cont).on('click.curPage', '.js-wallet-verify-btn', Profile.eVerifyWallet);
+    });
+  },
+  eVerifyWallet: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    Aj.apiRequest('verifyWallet', {}, function(result) {
+      if (result.need_verify) {
+        return Verify.showPopup(result, function() {
+          Aj.reload();
+        });
+      }
+      if (result.error) {
+        return showAlert(result.error);
+      }
+    });
+  }
+};
+
+var Verify = {
+  init: function(token) {
+    Aj.onLoad(function(state) {
+      var kycInstance = snsWebSdk
+        .init(token, function() {
+          return new Promise(function(resolve, reject) {
+            Verify.getKycToken(function(token) {
+              if (token) {
+                resolve(token);
+              } else {
+                reject(new Error('Failed to get new access token'));
+              }
+            });
+          });
+        })
+        .withConf({lang: 'en', theme: 'dark'})
+        .on('idCheck.onApplicantStatusChanged', (payload) => {
+          console.log('idCheck.onApplicantStatusChanged', payload);
+          if (payload.reviewStatus == 'completed') {
+            $('.js-kyc-buttons').show();
+          } else {
+            $('.js-kyc-buttons').hide();
+          }
+        })
+        .build();
+      state.kycInstance = kycInstance;
+      kycInstance.launch('#sumsub-websdk-container');
+    });
+  },
+  getKycToken: function(callback) {
+    Aj.apiRequest('kycGetToken', {
+    }, function(result) {
+      callback(result.new_token || false);
+    });
+  },
+  showPopup: function(data, callback) {
+    var $confirm = $('<div class="popup-container verify-popup-container hide alert-popup-container"><div class="popup"><div class="popup-body">' + data.popup + '</div><div class="popup-loading-body"><div class="tm-logo tm-logo-progress js-logo js-logo-clickable play"><i class="tm-logo-icon js-logo-icon"></i></div></div></div></div>');
+    $($confirm).on('click', '.js-wallet-check-btn', function(e) {
+      Verify.checkWallet($confirm, callback);
+    });
+    $('.popup-body', $confirm).html(data.popup);
+    $confirm.one('popup:close', function() {
+      $($confirm).off('click', '.js-wallet-check-btn');
+      $confirm.remove();
+    });
+    openPopup($confirm);
+    return $confirm;
+  },
+  checkWallet: function($popup, callback) {
+    $popup.addClass('popup-loading');
+    Aj.apiRequest('checkWallet', {}, function(result) {
+      closePopup($popup);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.message) {
+        var $alert = showAlert(result.message, {close_btn: result.button});
+        $alert.one('popup:close', function() {
+          callback && callback();
+        });
+      }
+    });
   }
 };
 
