@@ -809,6 +809,12 @@ chatPermissions can_send_basic_messages:Bool can_send_audios:Bool can_send_docum
 chatAdministratorRights can_manage_chat:Bool can_change_info:Bool can_post_messages:Bool can_edit_messages:Bool can_delete_messages:Bool can_invite_users:Bool can_restrict_members:Bool can_pin_messages:Bool can_manage_topics:Bool can_promote_members:Bool can_manage_video_chats:Bool can_post_stories:Bool can_edit_stories:Bool can_delete_stories:Bool is_anonymous:Bool = ChatAdministratorRights;
 
 
+//@description Describes a possibly non-integer amount of Telegram Stars
+//@star_count The integer amount of Telegram Stars rounded to 0
+//@nanostar_count The number of 1/1000000000 shares of Telegram Stars; from -999999999 to 999999999
+starAmount star_count:int53 nanostar_count:int32 = StarAmount;
+
+
 //@class StarSubscriptionType @description Describes type of subscription paid in Telegram Stars
 
 //@description Describes a subscription to a channel chat
@@ -840,11 +846,70 @@ starSubscriptionPricing period:int32 star_count:int53 = StarSubscriptionPricing;
 starSubscription id:string chat_id:int53 expiration_date:int32 is_canceled:Bool is_expiring:Bool pricing:starSubscriptionPricing type:StarSubscriptionType = StarSubscription;
 
 //@description Represents a list of Telegram Star subscriptions
-//@star_count The amount of owned Telegram Stars
+//@star_amount The amount of owned Telegram Stars
 //@subscriptions List of subscriptions for Telegram Stars
 //@required_star_count The number of Telegram Stars required to buy to extend subscriptions expiring soon
 //@next_offset The offset for the next request. If empty, then there are no more results
-starSubscriptions star_count:int53 subscriptions:vector<starSubscription> required_star_count:int53 next_offset:string = StarSubscriptions;
+starSubscriptions star_amount:starAmount subscriptions:vector<starSubscription> required_star_count:int53 next_offset:string = StarSubscriptions;
+
+
+//@class AffiliateProgramSortOrder @description Describes the order of the found affiliate programs
+
+//@description The affiliate programs must be sorted by the profitability
+affiliateProgramSortOrderProfitability = AffiliateProgramSortOrder;
+
+//@description The affiliate programs must be sorted by creation date
+affiliateProgramSortOrderCreationDate = AffiliateProgramSortOrder;
+
+//@description The affiliate programs must be sorted by the expected revenue
+affiliateProgramSortOrderRevenue = AffiliateProgramSortOrder;
+
+
+//@description Describes parameters of an affiliate program
+//@commission_per_mille The number of Telegram Stars received by the affiliate for each 1000 Telegram Stars received by the program owner;
+//-getOption("affiliate_program_commission_per_mille_min")-getOption("affiliate_program_commission_per_mille_max")
+//@month_count Number of months the program will be active; 0-36. If 0, then the program is eternal
+affiliateProgramParameters commission_per_mille:int32 month_count:int32 = AffiliateProgramParameters;
+
+//@description Contains information about an active affiliate program
+//@parameters Parameters of the affiliate program
+//@end_date Point in time (Unix timestamp) when the affiliate program will be closed; 0 if the affiliate program isn't scheduled to be closed.
+//-If positive, then the program can't be connected using connectChatAffiliateProgram, but active connections will work until the date
+//@daily_revenue_per_user_amount The amount of daily revenue per user in Telegram Stars of the bot that created the affiliate program
+affiliateProgramInfo parameters:affiliateProgramParameters end_date:int32 daily_revenue_per_user_amount:starAmount = AffiliateProgramInfo;
+
+//@description Contains information about an affiliate that received commission from a Telegram Star transaction
+//@commission_per_mille The number of Telegram Stars received by the affiliate for each 1000 Telegram Stars received by the program owner
+//@affiliate_chat_id Identifier of the chat which received the commission
+//@star_amount The amount of Telegram Stars that were received by the affiliate; can be negative for refunds
+affiliateInfo commission_per_mille:int32 affiliate_chat_id:int53 star_amount:starAmount = AffiliateInfo;
+
+//@description Describes a found affiliate program
+//@bot_user_id User identifier of the bot created the program
+//@parameters Information about the affiliate program
+foundAffiliateProgram bot_user_id:int53 parameters:affiliateProgramInfo = FoundAffiliateProgram;
+
+//@description Represents a list of found affiliate programs
+//@total_count The total number of found affiliate programs
+//@programs The list of affiliate programs
+//@next_offset The offset for the next request. If empty, then there are no more results
+foundAffiliatePrograms total_count:int32 programs:vector<foundAffiliateProgram> next_offset:string = FoundAffiliatePrograms;
+
+//@description Describes an affiliate program that was connected to a chat
+//@url The link that can be used to refer users if the program is still active
+//@bot_user_id User identifier of the bot created the program
+//@parameters The parameters of the affiliate program
+//@connection_date Point in time (Unix timestamp) when the affiliate program was connected
+//@is_disconnected True, if the program was canceled by the bot, or disconnected by the chat owner and isn't available anymore
+//@user_count The number of users that used the affiliate program
+//@revenue_star_count The number of Telegram Stars that were earned by the affiliate program
+chatAffiliateProgram url:string bot_user_id:int53 parameters:affiliateProgramParameters connection_date:int32 is_disconnected:Bool user_count:int64 revenue_star_count:int64 = ChatAffiliateProgram;
+
+//@description Represents a list of affiliate programs that were connected to a chat
+//@total_count The total number of affiliate programs that were connected to the chat
+//@programs The list of connected affiliate programs
+//@next_offset The offset for the next request. If empty, then there are no more results
+chatAffiliatePrograms total_count:int32 programs:vector<chatAffiliateProgram> next_offset:string = ChatAffiliatePrograms;
 
 
 //@description Contains information about a product that can be paid with invoice
@@ -967,103 +1032,137 @@ starTransactionDirectionIncoming = StarTransactionDirection;
 starTransactionDirectionOutgoing = StarTransactionDirection;
 
 
-//@class BotTransactionPurpose @description Describes purpose of a transaction with a bot
+//@class StarTransactionType @description Describes type of transaction with Telegram Stars
 
-//@description Paid media were bought @media The bought media if the transaction wasn't refunded @payload Bot-provided payload; for bots only
-botTransactionPurposePaidMedia media:vector<PaidMedia> payload:string = BotTransactionPurpose;
+//@description The transaction is a deposit of Telegram Stars from the Premium bot; for regular users only
+starTransactionTypePremiumBotDeposit = StarTransactionType;
 
-//@description User bought a product from the bot
-//@product_info Information about the bought product; may be null if not applicable
-//@invoice_payload Invoice payload; for bots only
-botTransactionPurposeInvoicePayment product_info:productInfo invoice_payload:bytes = BotTransactionPurpose;
+//@description The transaction is a deposit of Telegram Stars from App Store; for regular users only
+starTransactionTypeAppStoreDeposit = StarTransactionType;
 
-//@description User bought a subscription in a bot or a business account
-//@period The number of seconds between consecutive Telegram Star debiting
-//@product_info Information about the bought subscription; may be null if not applicable
-//@invoice_payload Invoice payload; for bots only
-botTransactionPurposeSubscription period:int32 product_info:productInfo invoice_payload:bytes = BotTransactionPurpose;
+//@description The transaction is a deposit of Telegram Stars from Google Play; for regular users only
+starTransactionTypeGooglePlayDeposit = StarTransactionType;
 
+//@description The transaction is a deposit of Telegram Stars from Fragment; for regular users and bots only
+starTransactionTypeFragmentDeposit = StarTransactionType;
 
-//@class ChatTransactionPurpose @description Describes purpose of a transaction with a supergroup or a channel
+//@description The transaction is a deposit of Telegram Stars by another user; for regular users only
+//@user_id Identifier of the user that gifted Telegram Stars; 0 if the user was anonymous
+//@sticker The sticker to be shown in the transaction information; may be null if unknown
+starTransactionTypeUserDeposit user_id:int53 sticker:sticker = StarTransactionType;
 
-//@description Paid media were bought
+//@description The transaction is a deposit of Telegram Stars from a giveaway; for regular users only
+//@chat_id Identifier of a supergroup or a channel chat that created the giveaway
+//@giveaway_message_id Identifier of the message with the giveaway; can be 0 or an identifier of a deleted message
+starTransactionTypeGiveawayDeposit chat_id:int53 giveaway_message_id:int53 = StarTransactionType;
+
+//@description The transaction is a withdrawal of earned Telegram Stars to Fragment; for bots and channel chats only @withdrawal_state State of the withdrawal; may be null for refunds from Fragment
+starTransactionTypeFragmentWithdrawal withdrawal_state:RevenueWithdrawalState = StarTransactionType;
+
+//@description The transaction is a withdrawal of earned Telegram Stars to Telegram Ad platform; for bots and channel chats only
+starTransactionTypeTelegramAdsWithdrawal = StarTransactionType;
+
+//@description The transaction is a payment for Telegram API usage; for bots only @request_count The number of billed requests
+starTransactionTypeTelegramApiUsage request_count:int32 = StarTransactionType;
+
+//@description The transaction is a purchase of paid media from a bot or a business account by the current user; for regular users only
+//@user_id Identifier of the bot or the business account user that sent the paid media
+//@media The bought media if the transaction wasn't refunded
+starTransactionTypeBotPaidMediaPurchase user_id:int53 media:vector<PaidMedia> = StarTransactionType;
+
+//@description The transaction is a sale of paid media by the bot or a business account managed by the bot; for bots only
+//@user_id Identifier of the user that bought the media
+//@media The bought media
+//@payload Bot-provided payload
+//@affiliate Information about the affiliate which received commission from the transaction; may be null if none
+starTransactionTypeBotPaidMediaSale user_id:int53 media:vector<PaidMedia> payload:string affiliate:affiliateInfo = StarTransactionType;
+
+//@description The transaction is a purchase of paid media from a channel by the current user; for regular users only
+//@chat_id Identifier of the channel chat that sent the paid media
 //@message_id Identifier of the corresponding message with paid media; can be 0 or an identifier of a deleted message
 //@media The bought media if the transaction wasn't refunded
-chatTransactionPurposePaidMedia message_id:int53 media:vector<PaidMedia> = ChatTransactionPurpose;
+starTransactionTypeChannelPaidMediaPurchase chat_id:int53 message_id:int53 media:vector<PaidMedia> = StarTransactionType;
 
-//@description User joined the channel and subscribed to regular payments in Telegram Stars
-//@period The number of seconds between consecutive Telegram Star debiting
-chatTransactionPurposeJoin period:int32 = ChatTransactionPurpose;
+//@description The transaction is a sale of paid media by the channel chat; for channel chats only
+//@user_id Identifier of the user that bought the media
+//@message_id Identifier of the corresponding message with paid media; can be 0 or an identifier of a deleted message
+//@media The bought media
+starTransactionTypeChannelPaidMediaSale user_id:int53 message_id:int53 media:vector<PaidMedia> = StarTransactionType;
 
-//@description User paid for a reaction
+//@description The transaction is a purchase of a product from a bot or a business account by the current user; for regular users only
+//@user_id Identifier of the bot or the business account user that created the invoice
+//@product_info Information about the bought product
+starTransactionTypeBotInvoicePurchase user_id:int53 product_info:productInfo = StarTransactionType;
+
+//@description The transaction is a sale of a product by the bot; for bots only
+//@user_id Identifier of the user that bought the product
+//@product_info Information about the bought product
+//@invoice_payload Invoice payload
+//@affiliate Information about the affiliate which received commission from the transaction; may be null if none
+starTransactionTypeBotInvoiceSale user_id:int53 product_info:productInfo invoice_payload:bytes affiliate:affiliateInfo = StarTransactionType;
+
+//@description The transaction is a purchase of a subscription from a bot or a business account by the current user; for regular users only
+//@user_id Identifier of the bot or the business account user that created the subscription link
+//@subscription_period The number of seconds between consecutive Telegram Star debitings
+//@product_info Information about the bought subscription
+starTransactionTypeBotSubscriptionPurchase user_id:int53 subscription_period:int32 product_info:productInfo = StarTransactionType;
+
+//@description The transaction is a sale of a subscription by the bot; for bots only
+//@user_id Identifier of the user that bought the subscription
+//@subscription_period The number of seconds between consecutive Telegram Star debitings
+//@product_info Information about the bought subscription
+//@invoice_payload Invoice payload
+//@affiliate Information about the affiliate which received commission from the transaction; may be null if none
+starTransactionTypeBotSubscriptionSale user_id:int53 subscription_period:int32 product_info:productInfo invoice_payload:bytes affiliate:affiliateInfo = StarTransactionType;
+
+//@description The transaction is a purchase of a subscription to a channel chat by the current user; for regular users only
+//@chat_id Identifier of the channel chat that created the subscription
+//@subscription_period The number of seconds between consecutive Telegram Star debitings
+starTransactionTypeChannelSubscriptionPurchase chat_id:int53 subscription_period:int32 = StarTransactionType;
+
+//@description The transaction is a sale of a subscription by the channel chat; for channel chats only
+//@user_id Identifier of the user that bought the subscription
+//@subscription_period The number of seconds between consecutive Telegram Star debitings
+starTransactionTypeChannelSubscriptionSale user_id:int53 subscription_period:int32 = StarTransactionType;
+
+//@description The transaction is a purchase of a gift to another user; for regular users and bots only @user_id Identifier of the user that received the gift @gift The gift
+starTransactionTypeGiftPurchase user_id:int53 gift:gift = StarTransactionType;
+
+//@description The transaction is a sale of a gift received from another user or bot; for regular users only @user_id Identifier of the user that sent the gift @gift The gift
+starTransactionTypeGiftSale user_id:int53 gift:gift = StarTransactionType;
+
+//@description The transaction is a sending of a paid reaction to a message in a channel chat by the current user; for regular users only
+//@chat_id Identifier of the channel chat
 //@message_id Identifier of the reacted message; can be 0 or an identifier of a deleted message
-chatTransactionPurposeReaction message_id:int53 = ChatTransactionPurpose;
+starTransactionTypeChannelPaidReactionSend chat_id:int53 message_id:int53 = StarTransactionType;
 
-//@description User received Telegram Stars from a giveaway @giveaway_message_id Identifier of the message with giveaway; can be 0 or an identifier of a deleted message
-chatTransactionPurposeGiveaway giveaway_message_id:int53 = ChatTransactionPurpose;
+//@description The transaction is a receiving of a paid reaction to a message by the channel chat; for channel chats only
+//@user_id Identifier of the user that added the paid reaction
+//@message_id Identifier of the reacted message; can be 0 or an identifier of a deleted message
+starTransactionTypeChannelPaidReactionReceive user_id:int53 message_id:int53 = StarTransactionType;
 
+//@description The transaction is a receiving of a commission from an affiliate program; for regular users, bots and channel chats only
+//@chat_id Identifier of the chat that created the affiliate program
+//@commission_per_mille The number of Telegram Stars received by the affiliate for each 1000 Telegram Stars received by the program owner
+starTransactionTypeAffiliateProgramCommission chat_id:int53 commission_per_mille:int32 = StarTransactionType;
 
-//@class UserTransactionPurpose @description Describes purpose of a transaction with a user
-
-//@description A user gifted Telegram Stars @sticker A sticker to be shown in the transaction information; may be null if unknown
-userTransactionPurposeGiftedStars sticker:sticker = UserTransactionPurpose;
-
-//@description The user sold a gift received from another user or bot @gift The gift
-userTransactionPurposeGiftSell gift:gift = UserTransactionPurpose;
-
-//@description The user or the bot sent a gift to a user @gift The gift
-userTransactionPurposeGiftSend gift:gift = UserTransactionPurpose;
-
-
-//@class StarTransactionPartner @description Describes source or recipient of a transaction with Telegram Stars
-
-//@description The transaction is a transaction with Telegram through a bot
-starTransactionPartnerTelegram = StarTransactionPartner;
-
-//@description The transaction is a transaction with App Store
-starTransactionPartnerAppStore = StarTransactionPartner;
-
-//@description The transaction is a transaction with Google Play
-starTransactionPartnerGooglePlay = StarTransactionPartner;
-
-//@description The transaction is a transaction with Fragment @withdrawal_state State of the withdrawal; may be null for refunds from Fragment or for Telegram Stars bought on Fragment
-starTransactionPartnerFragment withdrawal_state:RevenueWithdrawalState = StarTransactionPartner;
-
-//@description The transaction is a transaction with Telegram Ad platform
-starTransactionPartnerTelegramAds = StarTransactionPartner;
-
-//@description The transaction is a transaction with Telegram for API usage @request_count The number of billed requests
-starTransactionPartnerTelegramApi request_count:int32 = StarTransactionPartner;
-
-//@description The transaction is a transaction with a bot @user_id Identifier of the bot @purpose Purpose of the transaction
-starTransactionPartnerBot user_id:int53 purpose:BotTransactionPurpose = StarTransactionPartner;
-
-//@description The transaction is a transaction with a business account @user_id Identifier of the business account user @media The bought media if the transaction wasn't refunded
-starTransactionPartnerBusiness user_id:int53 media:vector<PaidMedia> = StarTransactionPartner;
-
-//@description The transaction is a transaction with a supergroup or a channel chat @chat_id Identifier of the chat @purpose Purpose of the transaction
-starTransactionPartnerChat chat_id:int53 purpose:ChatTransactionPurpose = StarTransactionPartner;
-
-//@description The transaction is a transaction with another user @user_id Identifier of the user; 0 if the user was anonymous @purpose Purpose of the transaction
-starTransactionPartnerUser user_id:int53 purpose:UserTransactionPurpose = StarTransactionPartner;
-
-//@description The transaction is a transaction with unknown partner
-starTransactionPartnerUnsupported = StarTransactionPartner;
+//@description The transaction is a transaction of an unsupported type
+starTransactionTypeUnsupported = StarTransactionType;
 
 
 //@description Represents a transaction changing the amount of owned Telegram Stars
 //@id Unique identifier of the transaction
-//@star_count The amount of added owned Telegram Stars; negative for outgoing transactions
+//@star_amount The amount of added owned Telegram Stars; negative for outgoing transactions
 //@is_refund True, if the transaction is a refund of a previous transaction
 //@date Point in time (Unix timestamp) when the transaction was completed
-//@partner Source of the incoming transaction, or its recipient for outgoing transactions
-starTransaction id:string star_count:int53 is_refund:Bool date:int32 partner:StarTransactionPartner = StarTransaction;
+//@type Type of the transaction
+starTransaction id:string star_amount:starAmount is_refund:Bool date:int32 type:StarTransactionType = StarTransaction;
 
 //@description Represents a list of Telegram Star transactions
-//@star_count The amount of owned Telegram Stars
+//@star_amount The amount of owned Telegram Stars
 //@transactions List of transactions with Telegram Stars
 //@next_offset The offset for the next request. If empty, then there are no more results
-starTransactions star_count:int53 transactions:vector<starTransaction> next_offset:string = StarTransactions;
+starTransactions star_amount:starAmount transactions:vector<starTransaction> next_offset:string = StarTransactions;
 
 
 //@class GiveawayParticipantStatus @description Contains information about status of a user in a giveaway
@@ -1194,6 +1293,7 @@ user id:int53 first_name:string last_name:string usernames:usernames phone_numbe
 //@privacy_policy_url The HTTP link to the privacy policy of the bot. If empty, then /privacy command must be used if supported by the bot. If the command isn't supported, then https://telegram.org/privacy-tpa must be opened
 //@default_group_administrator_rights Default administrator rights for adding the bot to basic group and supergroup chats; may be null
 //@default_channel_administrator_rights Default administrator rights for adding the bot to channels; may be null
+//@affiliate_program Information about the affiliate program of the bot; may be null if none
 //@web_app_background_light_color Default light background color for bot Web Apps; -1 if not specified
 //@web_app_background_dark_color Default dark background color for bot Web Apps; -1 if not specified
 //@web_app_header_light_color Default light header color for bot Web Apps; -1 if not specified
@@ -1205,7 +1305,7 @@ user id:int53 first_name:string last_name:string usernames:usernames phone_numbe
 //@edit_description_link The internal link, which can be used to edit bot description; may be null
 //@edit_description_media_link The internal link, which can be used to edit the photo or animation shown in the chat with the bot if the chat is empty; may be null
 //@edit_settings_link The internal link, which can be used to edit bot settings; may be null
-botInfo short_description:string description:string photo:photo animation:animation menu_button:botMenuButton commands:vector<botCommand> privacy_policy_url:string default_group_administrator_rights:chatAdministratorRights default_channel_administrator_rights:chatAdministratorRights web_app_background_light_color:int32 web_app_background_dark_color:int32 web_app_header_light_color:int32 web_app_header_dark_color:int32 can_get_revenue_statistics:Bool can_manage_emoji_status:Bool has_media_previews:Bool edit_commands_link:InternalLinkType edit_description_link:InternalLinkType edit_description_media_link:InternalLinkType edit_settings_link:InternalLinkType = BotInfo;
+botInfo short_description:string description:string photo:photo animation:animation menu_button:botMenuButton commands:vector<botCommand> privacy_policy_url:string default_group_administrator_rights:chatAdministratorRights default_channel_administrator_rights:chatAdministratorRights affiliate_program:affiliateProgramInfo web_app_background_light_color:int32 web_app_background_dark_color:int32 web_app_header_light_color:int32 web_app_header_dark_color:int32 can_get_revenue_statistics:Bool can_manage_emoji_status:Bool has_media_previews:Bool edit_commands_link:InternalLinkType edit_description_link:InternalLinkType edit_description_media_link:InternalLinkType edit_settings_link:InternalLinkType = BotInfo;
 
 //@description Contains full information about a user
 //@personal_photo User profile photo set by the current user for the contact; may be null. If null and user.profile_photo is null, then the photo is empty; otherwise, it is unknown.
@@ -5161,7 +5261,7 @@ targetChatTypes allow_user_chats:Bool allow_bot_chats:Bool allow_group_chats:Boo
 
 //@class TargetChat @description Describes the target chat to be opened
 
-//@description The currently opened chat needs to be kept
+//@description The currently opened chat and forum topic must be kept
 targetChatCurrent = TargetChat;
 
 //@description The chat needs to be chosen by the user among chats of the specified types @types Allowed types for the chat
@@ -6809,6 +6909,11 @@ internalLinkTypeBuyStars star_count:int53 purpose:string = InternalLinkType;
 //@description The link is a link to the change phone number section of the application
 internalLinkTypeChangePhoneNumber = InternalLinkType;
 
+//@description The link is an affiliate program link. Call searchChatAffiliateProgram with the given username and referrer to process the link
+//@username Username to be passed to searchChatAffiliateProgram
+//@referrer Referrer to be passed to searchChatAffiliateProgram
+internalLinkTypeChatAffiliateProgram username:string referrer:string = InternalLinkType;
+
 //@description The link is a link to boost a Telegram chat. Call getChatBoostLinkInfo with the given URL to process the link.
 //-If the chat is found, then call getChatBoostStatus and getAvailableChatBoostSlots to get the current boost status and check whether the chat can be boosted.
 //-If the user wants to boost the chat and the chat can be boosted, then call boostChat
@@ -7053,6 +7158,18 @@ fileTypeSecretThumbnail = FileType;
 
 //@description The file is a file from Secure storage used for storing Telegram Passport files
 fileTypeSecure = FileType;
+
+//@description The file is a self-destructing photo in a private chat
+fileTypeSelfDestructingPhoto = FileType;
+
+//@description The file is a self-destructing video in a private chat
+fileTypeSelfDestructingVideo = FileType;
+
+//@description The file is a self-destructing video note in a private chat
+fileTypeSelfDestructingVideoNote = FileType;
+
+//@description The file is a self-destructing voice note in a private chat
+fileTypeSelfDestructingVoiceNote = FileType;
 
 //@description The file is a sticker
 fileTypeSticker = FileType;
@@ -7552,12 +7669,12 @@ chatRevenueTransactions total_count:int32 transactions:vector<chatRevenueTransac
 
 
 //@description Contains information about Telegram Stars earned by a bot or a chat
-//@total_count Total number of Telegram Stars earned
-//@current_count The number of Telegram Stars that aren't withdrawn yet
-//@available_count The number of Telegram Stars that are available for withdrawal
+//@total_amount Total amount of Telegram Stars earned
+//@current_amount The amount of Telegram Stars that aren't withdrawn yet
+//@available_amount The amount of Telegram Stars that are available for withdrawal
 //@withdrawal_enabled True, if Telegram Stars can be withdrawn now or later
 //@next_withdrawal_in Time left before the next withdrawal can be started, in seconds; 0 if withdrawal can be started now
-starRevenueStatus total_count:int53 current_count:int53 available_count:int53 withdrawal_enabled:Bool next_withdrawal_in:int32 = StarRevenueStatus;
+starRevenueStatus total_amount:starAmount current_amount:starAmount available_amount:starAmount withdrawal_enabled:Bool next_withdrawal_in:int32 = StarRevenueStatus;
 
 //@description A detailed statistics about Telegram Stars earned by a bot or a chat
 //@revenue_by_day_graph A graph containing amount of revenue in a given day
@@ -8091,8 +8208,8 @@ updateSavedMessagesTags saved_messages_topic_id:int53 tags:savedMessagesTags = U
 //@messages The list of messages with active live locations
 updateActiveLiveLocationMessages messages:vector<message> = Update;
 
-//@description The number of Telegram Stars owned by the current user has changed @star_count The new number of Telegram Stars owned
-updateOwnedStarCount star_count:int53 = Update;
+//@description The number of Telegram Stars owned by the current user has changed @star_amount The new amount of owned Telegram Stars
+updateOwnedStarCount star_amount:starAmount = Update;
 
 //@description The revenue earned from sponsored messages in a chat has changed. If chat revenue screen is opened, then getChatRevenueTransactions may be called to fetch new transactions
 //@chat_id Identifier of the chat
@@ -9536,7 +9653,7 @@ answerInlineQuery inline_query_id:int64 is_personal:Bool button:inlineQueryResul
 //@chat_types Types of the chats to which the message can be sent
 savePreparedInlineMessage user_id:int53 result:InputInlineQueryResult chat_types:targetChatTypes = PreparedInlineMessageId;
 
-//@description Saves an inline message to be sent by the given user; for bots only
+//@description Saves an inline message to be sent by the given user
 //@bot_user_id Identifier of the bot that created the message
 //@prepared_message_id Identifier of the prepared message
 getPreparedInlineMessage bot_user_id:int53 prepared_message_id:string = PreparedInlineMessage;
@@ -10539,7 +10656,7 @@ setVideoChatDefaultParticipant chat_id:int53 default_participant_id:MessageSende
 //@chat_id Identifier of a chat in which the video chat will be created
 //@title Group call title; if empty, chat title will be used
 //@start_date Point in time (Unix timestamp) when the group call is expected to be started by an administrator; 0 to start the video chat immediately. The date must be at least 10 seconds and at most 8 days in the future
-//@is_rtmp_stream Pass true to create an RTMP stream instead of an ordinary video chat; requires owner privileges
+//@is_rtmp_stream Pass true to create an RTMP stream instead of an ordinary video chat
 createVideoChat chat_id:int53 title:string start_date:int32 is_rtmp_stream:Bool = GroupCallId;
 
 //@description Returns RTMP URL for streaming to the chat; requires can_manage_video_chats administrator right @chat_id Chat identifier
@@ -10769,9 +10886,12 @@ getAllStickerEmojis sticker_type:StickerType query:string chat_id:int53 return_o
 
 //@description Searches for stickers from public sticker sets that correspond to any of the given emoji
 //@sticker_type Type of the stickers to return
-//@emojis Space-separated list of emojis to search for; must be non-empty
+//@emojis Space-separated list of emojis to search for
+//@query Query to search for; may be empty to search for emoji only
+//@input_language_codes List of possible IETF language tags of the user's input language; may be empty if unknown
+//@offset The offset from which to return the stickers; must be non-negative
 //@limit The maximum number of stickers to be returned; 0-100
-searchStickers sticker_type:StickerType emojis:string limit:int32 = Stickers;
+searchStickers sticker_type:StickerType emojis:string query:string input_language_codes:vector<string> offset:int32 limit:int32 = Stickers;
 
 //@description Returns greeting stickers from regular sticker sets that can be used for the start page of other users
 getGreetingStickers = Stickers;
@@ -10900,6 +11020,9 @@ removeSavedAnimation animation:InputFile = Ok;
 
 //@description Returns up to 20 recently used inline bots in the order of their last usage
 getRecentInlineBots = Users;
+
+//@description Returns the list of owned by the current user bots
+getOwnedBots = Users;
 
 
 //@description Searches for recently used hashtags by their prefix @prefix Hashtag prefix to search for @limit The maximum number of hashtags to be returned
@@ -11897,6 +12020,46 @@ editUserStarSubscription user_id:int53 telegram_payment_charge_id:string is_canc
 
 //@description Reuses an active Telegram Star subscription to a channel chat and joins the chat again @subscription_id Identifier of the subscription
 reuseStarSubscription subscription_id:string = Ok;
+
+
+//@description Changes affiliate program for a bot
+//@chat_id Identifier of the chat with an owned bot for which affiliate program is changed
+//@parameters Parameters of the affiliate program; pass null to close the currently active program. If there is an active program, then commission and program duration can only be increased.
+//-If the active program is scheduled to be closed, then it can't be changed anymore
+setChatAffiliateProgram chat_id:int53 parameters:affiliateProgramParameters = Ok;
+
+//@description Searches a chat with an affiliate program. Returns the chat if found and the program is active
+//@username Username of the chat
+//@referrer The referrer from an internalLinkTypeChatAffiliateProgram link
+searchChatAffiliateProgram username:string referrer:string = Chat;
+
+//@description Searches affiliate programs that can be applied to the given chat
+//@chat_id Identifier of the chat for which affiliate programs are searched for. Can be an identifier of the Saved Messages chat, of a chat with an owned bot, or of a channel chat with can_post_messages administrator right
+//@sort_order Sort order for the results
+//@offset Offset of the first affiliate program to return as received from the previous request; use empty string to get the first chunk of results
+//@limit The maximum number of affiliate programs to return
+searchAffiliatePrograms chat_id:int53 sort_order:AffiliateProgramSortOrder offset:string limit:int32 = FoundAffiliatePrograms;
+
+//@description Connects an affiliate program to the given chat. Returns information about the connected affiliate program
+//@chat_id Identifier of the chat to which the affiliate program will be connected. Can be an identifier of the Saved Messages chat, of a chat with an owned bot, or of a channel chat with can_post_messages administrator right
+//@bot_user_id Identifier of the bot, which affiliate program is connected
+connectChatAffiliateProgram chat_id:int53 bot_user_id:int53 = ChatAffiliateProgram;
+
+//@description Disconnects an affiliate program from the given chat and immediately deactivates its referral link. Returns updated information about the disconnected affiliate program
+//@chat_id Identifier of the chat for which the affiliate program is connected
+//@url The referral link of the affiliate program
+disconnectChatAffiliateProgram chat_id:int53 url:string = ChatAffiliateProgram;
+
+//@description Returns an affiliate program that were connected to the given chat by identifier of the bot that created the program
+//@chat_id Identifier of the chat for which the affiliate program was connected. Can be an identifier of the Saved Messages chat, of a chat with an owned bot, or of a channel chat with can_post_messages administrator right
+//@bot_user_id Identifier of the bot that created the program
+getChatAffiliateProgram chat_id:int53 bot_user_id:int53 = ChatAffiliateProgram;
+
+//@description Returns affiliate programs that were connected to the given chat
+//@chat_id Identifier of the chat for which the affiliate programs were connected. Can be an identifier of the Saved Messages chat, of a chat with an owned bot, or of a channel chat with can_post_messages administrator right
+//@offset Offset of the first affiliate program to return as received from the previous request; use empty string to get the first chunk of results
+//@limit The maximum number of affiliate programs to return
+getChatAffiliatePrograms chat_id:int53 offset:string limit:int32 = ChatAffiliatePrograms;
 
 
 //@description Returns information about features, available to Business users @source Source of the request; pass null if the method is called from settings or some non-standard source

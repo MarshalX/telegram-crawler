@@ -53,6 +53,13 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="december-4-2024" href="#december-4-2024"><i class="anchor-icon"></i></a>December 4, 2024</h4>
+<p><strong>Bot API 8.1</strong></p>
+<ul>
+<li>Added the field <em>nanostar_amount</em> to the class <a href="#startransaction">StarTransaction</a>.</li>
+<li>Added the class <a href="#transactionpartneraffiliateprogram">TransactionPartnerAffiliateProgram</a> for transactions pertaining to incoming affiliate commissions.</li>
+<li>Added the class <a href="#affiliateinfo">AffiliateInfo</a> and the field <em>affiliate</em> to the class <a href="#transactionpartneruser">TransactionPartnerUser</a>, allowing bots to identify the relevant affiliate in transactions with an affiliate commission.</li>
+</ul>
 <h4><a class="anchor" name="november-17-2024" href="#november-17-2024"><i class="anchor-icon"></i></a>November 17, 2024</h4>
 <p><strong>Bot API 8.0</strong></p>
 <blockquote>
@@ -13340,7 +13347,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>subscription_period</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>The number of seconds the subscription will be active for before the next payment. The currency must be set to “XTR” (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user.</td>
+<td>The number of seconds the subscription will be active for before the next payment. The currency must be set to “XTR” (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user. Subscription price must no exceed 2500 Telegram Stars.</td>
 </tr>
 <tr>
 <td>max_tip_amount</td>
@@ -14023,10 +14030,49 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="affiliateinfo" href="#affiliateinfo"><i class="anchor-icon"></i></a>AffiliateInfo</h4>
+<p>Contains information about the affiliate that received a commission via this transaction.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>affiliate_user</td>
+<td><a href="#user">User</a></td>
+<td><em>Optional</em>. The bot or the user that received an affiliate commission if it was received by a bot or a user</td>
+</tr>
+<tr>
+<td>affiliate_chat</td>
+<td><a href="#chat">Chat</a></td>
+<td><em>Optional</em>. The chat that received an affiliate commission if it was received by a chat</td>
+</tr>
+<tr>
+<td>commission_per_mille</td>
+<td>Integer</td>
+<td>The number of Telegram Stars received by the affiliate for each 1000 Telegram Stars received by the bot from referred users</td>
+</tr>
+<tr>
+<td>amount</td>
+<td>Integer</td>
+<td>Integer amount of Telegram Stars received by the affiliate from the transaction, rounded to 0; can be negative for refunds</td>
+</tr>
+<tr>
+<td>nanostar_amount</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of 1/1000000000 shares of Telegram Stars received by the affiliate; from -999999999 to 999999999; can be negative for refunds</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="transactionpartner" href="#transactionpartner"><i class="anchor-icon"></i></a>TransactionPartner</h4>
 <p>This object describes the source of a transaction, or its recipient for outgoing transactions. Currently, it can be one of</p>
 <ul>
 <li><a href="#transactionpartneruser">TransactionPartnerUser</a></li>
+<li><a href="#transactionpartneraffiliateprogram">TransactionPartnerAffiliateProgram</a></li>
 <li><a href="#transactionpartnerfragment">TransactionPartnerFragment</a></li>
 <li><a href="#transactionpartnertelegramads">TransactionPartnerTelegramAds</a></li>
 <li><a href="#transactionpartnertelegramapi">TransactionPartnerTelegramApi</a></li>
@@ -14054,6 +14100,11 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Information about the user</td>
 </tr>
 <tr>
+<td>affiliate</td>
+<td><a href="#affiliateinfo">AffiliateInfo</a></td>
+<td><em>Optional</em>. Information about the affiliate that received a commission via this transaction</td>
+</tr>
+<tr>
 <td>invoice_payload</td>
 <td>String</td>
 <td><em>Optional</em>. Bot-specified invoice payload</td>
@@ -14077,6 +14128,34 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>gift</td>
 <td><a href="#gift">Gift</a></td>
 <td><em>Optional</em>. The gift sent to the user by the bot</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="transactionpartneraffiliateprogram" href="#transactionpartneraffiliateprogram"><i class="anchor-icon"></i></a>TransactionPartnerAffiliateProgram</h4>
+<p>Describes the affiliate program that issued the affiliate commission received via this transaction.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the transaction partner, always “affiliate_program”</td>
+</tr>
+<tr>
+<td>sponsor_user</td>
+<td><a href="#user">User</a></td>
+<td><em>Optional</em>. Information about the bot that sponsored the affiliate program</td>
+</tr>
+<tr>
+<td>commission_per_mille</td>
+<td>Integer</td>
+<td>The number of Telegram Stars received by the bot for each 1000 Telegram Stars received by the affiliate program sponsor from referred users</td>
 </tr>
 </tbody>
 </table>
@@ -14181,7 +14260,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>amount</td>
 <td>Integer</td>
-<td>Number of Telegram Stars transferred by the transaction</td>
+<td>Integer amount of Telegram Stars transferred by the transaction</td>
+</tr>
+<tr>
+<td>nanostar_amount</td>
+<td>Integer</td>
+<td><em>Optional</em>. The number of 1/1000000000 shares of Telegram Stars transferred by the transaction; from 0 to 999999999</td>
 </tr>
 <tr>
 <td>date</td>
