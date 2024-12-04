@@ -665,6 +665,9 @@ var Wallet = {
                   location.reload();
                 } else {
                   Wallet.disconnect();
+                  if (result.error) {
+                    showAlert(result.error);
+                  }
                 }
                 console.log('verified', result.verified);
               });
@@ -3676,6 +3679,7 @@ var Verify = {
         .on('idCheck.onApplicantStatusChanged', (payload) => {
           console.log('idCheck.onApplicantStatusChanged', payload);
           if (payload.reviewStatus == 'completed') {
+            Verify.updateKycStatus(payload);
             $('.js-kyc-buttons').show();
           } else {
             $('.js-kyc-buttons').hide();
@@ -3692,14 +3696,23 @@ var Verify = {
       callback(result.new_token || false);
     });
   },
+  updateKycStatus: function(payload) {
+    Aj.apiRequest('kycUpdateStatus', {
+      payload: JSON.stringify(payload)
+    });
+  },
   showPopup: function(data, callback) {
     var $confirm = $('<div class="popup-container verify-popup-container hide alert-popup-container"><div class="popup"><div class="popup-body">' + data.popup + '</div><div class="popup-loading-body"><div class="tm-logo tm-logo-progress js-logo js-logo-clickable play"><i class="tm-logo-icon js-logo-icon"></i></div></div></div></div>');
     $($confirm).on('click', '.js-wallet-check-btn', function(e) {
       Verify.checkWallet($confirm, callback);
     });
+    $($confirm).on('click', '.js-wallet-link-btn', function(e) {
+      Verify.linkWallet($confirm, callback);
+    });
     $('.popup-body', $confirm).html(data.popup);
     $confirm.one('popup:close', function() {
       $($confirm).off('click', '.js-wallet-check-btn');
+      $($confirm).off('click', '.js-wallet-link-btn');
       $confirm.remove();
     });
     openPopup($confirm);
@@ -3708,6 +3721,21 @@ var Verify = {
   checkWallet: function($popup, callback) {
     $popup.addClass('popup-loading');
     Aj.apiRequest('checkWallet', {}, function(result) {
+      closePopup($popup);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.message) {
+        var $alert = showAlert(result.message, {close_btn: result.button});
+        $alert.one('popup:close', function() {
+          callback && callback();
+        });
+      }
+    });
+  },
+  linkWallet: function($popup, callback) {
+    $popup.addClass('popup-loading');
+    Aj.apiRequest('linkWallet', {}, function(result) {
       closePopup($popup);
       if (result.error) {
         return showAlert(result.error);
