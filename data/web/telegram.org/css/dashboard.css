@@ -4,14 +4,16 @@
   font-display: swap;
   font-style: normal;
   font-weight: 400;
-  src: url(/fonts/ProductSansRegular.ttf);
+  src: url(/fonts/ProductSansRegular.woff2) format('woff2'),
+       url(/fonts/ProductSansRegular.ttf) format('truetype');
 }
 @font-face {
   font-family: ProductSans;
   font-display: swap;
   font-style: bold;
   font-weight: 600;
-  src: url(/fonts/ProductSansBold.ttf);
+  src: url(/fonts/ProductSansBold.woff2) format('woff2'),
+       url(/fonts/ProductSansBold.ttf) format('truetype');
 }
 
 .tl_dashboard_container,
@@ -121,9 +123,22 @@
 .tl_dashboard_table_wrap {
   order: 2;
 }
+.tl_dashboard_graph_wrap .tchart--tip-scroller {
+  max-height: 210px;
+  overflow: hidden;
+}
+.tl_dashboard_graph_wrap .tchart--tip-scroller-wrapper:before,
+.tl_dashboard_graph_wrap .tchart--tip-scroller-wrapper:after {
+  display: none;
+}
+.tl_dashboard_graph_wrap .chart_wrap_longlabel .tchart--switchers__side-legend .tchart--switcher span,
+.tl_dashboard_graph_wrap .chart_wrap_longlabel .tchart--switchers__side-legend .tchart--switcher__active span,
+.tl_dashboard_graph_wrap .chart_wrap_longlabel .tchart--tip-row span {
+  max-width: 210px;
+}
 .tl_dashboard_content_text {
-  font-size: 17px;
-  line-height: 25px;
+  font-size: 16px;
+  line-height: 24px;
   margin: 0 18px 14px;
   order: 1;
 }
@@ -187,7 +202,8 @@ h2 + .tl_dashboard_content_box .tl_dashboard_content_text {
 }
 .tl_dashboard_footer {
   margin-top: 60px;
-  background: #f0f6fa;
+  --bg-color: #f0f6fa;
+  background: var(--bg-color);
   padding: 60px 0 150px;
   text-align: center;
   box-shadow: 0 1px #e8e8e8;
@@ -217,26 +233,34 @@ h2 + .tl_dashboard_content_box .tl_dashboard_content_text {
 .tl_dashboard_phone_video {
   display: inline-block;
   position: relative;
+  overflow: hidden;
+  max-width: 100%;
   width: 354px;
-  margin: 16px;
 }
-.tl_dashboard_phone_video video {
-  width: 328px;
-  height: 712px;
-  margin: 12px 13px;
-  vertical-align: top;
-  object-fit: cover;
-  border-radius: 47px;
+.tl_dashboard_phone_video:before {
+  padding-top: 208%;
+  display: block;
+  content: '';
 }
+.tl_dashboard_phone_video video,
 .tl_dashboard_phone_video svg {
   position: absolute;
+  vertical-align: top;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
+}
+.tl_dashboard_phone_video video {
+  width: 92.66%;
+  height: auto;
+  margin: 3.39% 3.67%;
+  object-fit: cover;
+}
+.tl_dashboard_phone_video svg {
   width: 100%;
   height: auto;
-  vertical-align: top;
+  color: var(--bg-color);
   z-index: 1;
 }
 @media (min-width: 992px) {
