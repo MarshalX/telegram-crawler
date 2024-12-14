@@ -80,8 +80,8 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
 <p>When first invoking <a href="/method/help.getAppConfig">help.getAppConfig</a>, pass <code>0</code> to hash; in future calls, use the <code>hash</code> contained in the previously returned <a href="/constructor/help.appConfig">help.appConfig</a>; if the configuration hasn't changed, a <a href="/constructor/help.appConfigNotModified">help.appConfigNotModified</a> will be returned instead of <a href="/constructor/help.appConfig">help.appConfig</a>.</p>
 <p>The configuration should be manually refreshed immediately upon receival of an <a href="/constructor/updateConfig">updateConfig</a> update.  </p>
 <p>Example value of <a href="/constructor/help.appConfig">help.appConfig</a>.<code>config</code>:  </p>
+<!-- start config -->
 <pre><code class="language-json">{
-    "test": 1,
     "emojies_animated_zoom": 0.625,
     "emojies_send_dice": [
         "\ud83c\udfb2",
@@ -247,6 +247,10 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "reactions_user_max_premium": 3,
     "reactions_in_chat_max": 100,
     "default_emoji_statuses_stickerset_id": "773947703670341676",
+    "chatlist_invites_limit_default": 3,
+    "chatlist_invites_limit_premium": 100,
+    "chatlists_joined_limit_default": 2,
+    "chatlists_joined_limit_premium": 20,
     "premium_promo_order": [
         "stories",
         "more_upload",
@@ -303,10 +307,6 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "hidden_members_group_size_min": 100,
     "premium_gift_attach_menu_icon": true,
     "premium_gift_text_field_icon": false,
-    "chatlist_invites_limit_default": 3,
-    "chatlist_invites_limit_premium": 100,
-    "chatlists_joined_limit_default": 2,
-    "chatlists_joined_limit_premium": 20,
     "chatlist_update_period": 300,
     "small_queue_max_active_operations_count": 5,
     "large_queue_max_active_operations_count": 2,
@@ -337,7 +337,6 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "boosts_channel_level_max": 100,
     "boosts_per_sent_gift": 3,
     "quote_length_max": 1024,
-    "channel_color_level_min": 5,
     "transcribe_audio_trial_weekly_number": 0,
     "transcribe_audio_trial_duration_max": 300,
     "recommended_channels_limit_default": 10,
@@ -388,8 +387,16 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "stargifts_message_length_max": 255,
     "stargifts_blocked": false,
     "stargifts_convert_period_max": 7776000,
-    "video_ignore_alt_documents": false
+    "video_ignore_alt_documents": false,
+    "starref_start_param_prefixes": [
+        "_tgr_"
+    ],
+    "starref_program_allowed": true,
+    "starref_connect_allowed": true,
+    "starref_min_commission_permille": 1,
+    "starref_max_commission_permille": 900
 }</code></pre>
+<!-- end config -->
 <p>The fields included in the resulting JSON object are:  </p>
 <h4><a class="anchor" href="#weather-search-username" id="weather-search-username" name="weather-search-username"><i class="anchor-icon"></i></a><code>weather_search_username</code></h4>
 <p>Contains the username of the bot used to query the current weather, to use in <a href="/api/stories#weather">weather media areas as specified here »</a>. (string)</p>
@@ -696,7 +703,7 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <h4><a class="anchor" href="#stars-usd-sell-rate-x1000" id="stars-usd-sell-rate-x1000" name="stars-usd-sell-rate-x1000"><i class="anchor-icon"></i></a><code>stars_usd_sell_rate_x1000</code></h4>
 <p>Specifies the number of US dollars required to buy one thousand <a href="/api/stars">Telegram Stars</a>. (float)</p>
 <h4><a class="anchor" href="#stars-usd-withdraw-rate-x1000" id="stars-usd-withdraw-rate-x1000" name="stars-usd-withdraw-rate-x1000"><i class="anchor-icon"></i></a><code>stars_usd_withdraw_rate_x1000</code></h4>
-<p>Specifies the number of US dollars that will be received by <a href="/api">withdrawing »</a> one thousand <a href="/api/stars">Telegram Stars</a>. (float)</p>
+<p>Specifies the number of US dollars that will be received by <a href="/api/stars#withdrawing-stars">withdrawing »</a> one thousand <a href="/api/stars">Telegram Stars</a>. (float)</p>
 <h4><a class="anchor" href="#stars-paid-reaction-amount-max" id="stars-paid-reaction-amount-max" name="stars-paid-reaction-amount-max"><i class="anchor-icon"></i></a><code>stars_paid_reaction_amount_max</code></h4>
 <p>Maximum number of <a href="/api/reactions#paid-reactions">paid reactions</a> that may be sent on a post. (integer)</p>
 <h4><a class="anchor" href="#stargifts-message-length-max" id="stargifts-message-length-max" name="stargifts-message-length-max"><i class="anchor-icon"></i></a><code>stargifts_message_length_max</code></h4>
@@ -707,6 +714,17 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <p>A <a href="/api/gifts">Gift »</a> can be converted back into <a href="/api/stars">Telegram Stars</a> only if it was received less than <code>stargifts_convert_period_max</code> seconds ago. (integer)</p>
 <h4><a class="anchor" href="#video-ignore-alt-documents" id="video-ignore-alt-documents" name="video-ignore-alt-documents"><i class="anchor-icon"></i></a><code>video_ignore_alt_documents</code></h4>
 <p>If set and equal to true, indicates that the <a href="/constructor/messageMediaDocument">messageMediaDocument</a>.<code>alt_documents</code> field must be ignored. (boolean)</p>
+<h4><a class="anchor" href="#starref-start-param-prefixes" id="starref-start-param-prefixes" name="starref-start-param-prefixes"><i class="anchor-icon"></i></a><code>starref_start_param_prefixes</code></h4>
+<p> </p>
+<h4><a class="anchor" href="#starref-program-allowed" id="starref-program-allowed" name="starref-program-allowed"><i class="anchor-icon"></i></a><code>starref_program_allowed</code></h4>
+<p> </p>
+<h4><a class="anchor" href="#starref-connect-allowed" id="starref-connect-allowed" name="starref-connect-allowed"><i class="anchor-icon"></i></a><code>starref_connect_allowed</code></h4>
+<p> </p>
+<h4><a class="anchor" href="#starref-min-commission-permille" id="starref-min-commission-permille" name="starref-min-commission-permille"><i class="anchor-icon"></i></a><code>starref_min_commission_permille</code></h4>
+<p> </p>
+<h4><a class="anchor" href="#starref-max-commission-permille" id="starref-max-commission-permille" name="starref-max-commission-permille"><i class="anchor-icon"></i></a><code>starref_max_commission_permille</code></h4>
+<p> </p>
+<!-- Last config -->
 <h3><a class="anchor" href="#suggestions" id="suggestions" name="suggestions"><i class="anchor-icon"></i></a>Suggestions</h3>
 <p>The API can return a set of useful suggestions for users of graphical clients.  </p>
 <h4><a class="anchor" href="#basic-suggestions" id="basic-suggestions" name="basic-suggestions"><i class="anchor-icon"></i></a>Basic suggestions</h4>
