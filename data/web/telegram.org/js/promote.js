@@ -1244,7 +1244,7 @@ var NewAd = {
               html += item.cb_item;
               channel_items['ch' + item.id] = item;
             }
-            var has_items = channel_items > 0;
+            var has_items = result.channels.length > 0;
             $empty.toggleClass('hide', has_items);
             $button.toggleClass('hide', !has_items);
             $loading.addClass('hide');
