@@ -53,16 +53,20 @@
 
 <a href='/constructor/webViewResultUrl'>webViewResultUrl</a>#4d22ff98 flags:<a href='/type/%23'>#</a> fullsize:flags.1?<a href='/constructor/true'>true</a> fullscreen:flags.2?<a href='/constructor/true'>true</a> query_id:flags.0?<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
 
+<a href='/constructor/botAppSettings'>botAppSettings</a>#c99b1950 flags:<a href='/type/%23'>#</a> placeholder_path:flags.0?<a href='/type/bytes'>bytes</a> background_color:flags.1?<a href='/type/int'>int</a> background_dark_color:flags.2?<a href='/type/int'>int</a> header_color:flags.3?<a href='/type/int'>int</a> header_dark_color:flags.4?<a href='/type/int'>int</a> = <a href='/type/BotAppSettings'>BotAppSettings</a>;
+<a href='/constructor/botInfo'>botInfo</a>#36607333 flags:<a href='/type/%23'>#</a> has_preview_medias:flags.6?<a href='/constructor/true'>true</a> user_id:flags.0?<a href='/type/long'>long</a> description:flags.1?<a href='/type/string'>string</a> description_photo:flags.4?<a href='/type/Photo'>Photo</a> description_document:flags.5?<a href='/type/Document'>Document</a> commands:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotCommand'>BotCommand</a>&gt; menu_button:flags.3?<a href='/type/BotMenuButton'>BotMenuButton</a> privacy_policy_url:flags.7?<a href='/type/string'>string</a> app_settings:flags.8?<a href='/type/BotAppSettings'>BotAppSettings</a> = <a href='/type/BotInfo'>BotInfo</a>;
+
 ---functions---
 
 <a href='/method/messages.requestMainWebView'>messages.requestMainWebView</a>#c9e01e7b flags:<a href='/type/%23'>#</a> compact:flags.7?<a href='/constructor/true'>true</a> fullscreen:flags.8?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> bot:<a href='/type/InputUser'>InputUser</a> start_param:flags.1?<a href='/type/string'>string</a> theme_params:flags.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;</code></pre>
 <p>Main Mini Apps are configured through <a href="https://t.me/botfather">@botfather</a>.  </p>
 <p>Once enabled, the <a href="/constructor/user">user</a>.<code>bot_has_main_app</code> flag will be set, and an "Open App" button should be shown on the bot's profile page.  </p>
 <p>Clicking on this button should open the Main Mini App, by invoking <a href="/method/messages.requestMainWebView">messages.requestMainWebView</a>: no URL needs to be passed to the method, because the Main Mini App URL is configured through <a href="https://t.me/botfather">@botfather</a>.  </p>
+<p>Apps may also specify a custom background, header color and placeholder SVG logo to be used during loading screens, specified in the <a href="/constructor/botAppSettings">botAppSettings</a> constructor, contained in the <a href="/constructor/botInfo">botInfo</a> constructor returned in <a href="/constructor/userFull">userFull</a>.  </p>
 <p>After invoking <a href="/method/messages.requestMainWebView">messages.requestMainWebView</a> and obtaining a <a href="/constructor/webViewResultUrl">webViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
 <p>The bot's profile page should also show a list of photos and videos, previewing the features offered by the Main Mini App, see <a href="#main-mini-app-previews">Main Mini App previews</a> for more info on how to configure and render them.  </p>
 <p>Main Mini Apps are also featured in the in-app <a href="/api/search#apps-tab">Mini App Store »</a>.  </p>
-<p>The Main Mini App should also be directly opened when <a href="/api/links#main-mini-app-links">clicking on a Main Mini App deep link »</a>; the <code>compact</code> flag of the method must be set if the <code>mode</code> parameter in the link is set and equal to <code>compact</code>; any eventual <code>start_param</code> present in the link must also be passed to the method.  </p>
+<p>The Main Mini App should also be directly opened when <a href="/api/links#main-mini-app-links">clicking on a Main Mini App deep link »</a>; the <code>compact</code>/<code>fullscreen</code> flag of the method must be set if the <code>mode</code> parameter in the link is set and equal to <code>compact</code>/<code>fullscreen</code>; any eventual <code>start_param</code> present in the link must also be passed to the method.  </p>
 <h4><a class="anchor" href="#main-mini-app-previews" id="main-mini-app-previews" name="main-mini-app-previews"><i class="anchor-icon"></i></a>Main Mini App previews</h4>
 <pre><code><a href='/constructor/botInfo'>botInfo</a>#36607333 flags:<a href='/type/%23'>#</a> has_preview_medias:flags.6?<a href='/constructor/true'>true</a> user_id:flags.0?<a href='/type/long'>long</a> description:flags.1?<a href='/type/string'>string</a> description_photo:flags.4?<a href='/type/Photo'>Photo</a> description_document:flags.5?<a href='/type/Document'>Document</a> commands:flags.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotCommand'>BotCommand</a>&gt; menu_button:flags.3?<a href='/type/BotMenuButton'>BotMenuButton</a> privacy_policy_url:flags.7?<a href='/type/string'>string</a> app_settings:flags.8?<a href='/type/BotAppSettings'>BotAppSettings</a> = <a href='/type/BotInfo'>BotInfo</a>;
 
@@ -156,7 +160,7 @@ The default, fallback language has an empty <code>lang_code</code>.  </p>
 <h3><a class="anchor" href="#attachment-menu-mini-apps" id="attachment-menu-mini-apps" name="attachment-menu-mini-apps"><i class="anchor-icon"></i></a>Attachment menu Mini Apps</h3>
 <p>Attachment menu Mini Apps work similarly to <a href="#inline-button-mini-apps">inline button Mini Apps »</a>: they send messages on behalf of the user to the chat where the bot's <a href="/api/bots/attach">attachment menu »</a> was opened.  </p>
 <p>Attachment menu Mini Apps can be opened from an <a href="/api/bots/attach">attachment menu entry »</a>: in this case, no special flag should be set when invoking <a href="/method/messages.requestWebView">messages.requestWebView</a>.  </p>
-<p>Attachment menu Mini Apps can also be opened from a <a href="/api/links#bot-attachment-or-side-menu-links">bot attachment menu deep link</a>, in which case the <code>start_parameter</code> should be provided to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code>, if present, and the <code>compact</code> flag must be set if the <code>mode</code> parameter is set and equal to <code>compact</code>.</p>
+<p>Attachment menu Mini Apps can also be opened from a <a href="/api/links#bot-attachment-or-side-menu-links">bot attachment menu deep link</a>, in which case the <code>start_parameter</code> should be provided to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code>, if present, and the <code>compact</code>/<code>fullscreen</code> flag must be set if the <code>mode</code> parameter is set and equal to <code>compact</code>/<code>fullscreen</code>.</p>
 <p>The full flow is identical to the flow for <a href="#inline-button-mini-apps">inline button Mini Apps »</a>, apart from the different flags passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>, as described above.</p>
 <h3><a class="anchor" href="#inline-mode-mini-apps" id="inline-mode-mini-apps" name="inline-mode-mini-apps"><i class="anchor-icon"></i></a>Inline mode Mini Apps</h3>
 <pre><code><a href='/constructor/messages.botResults'>messages.botResults</a>#e021f2f6 flags:<a href='/type/%23'>#</a> gallery:flags.0?<a href='/constructor/true'>true</a> query_id:<a href='/type/long'>long</a> next_offset:flags.1?<a href='/type/string'>string</a> switch_pm:flags.2?<a href='/type/InlineBotSwitchPM'>InlineBotSwitchPM</a> switch_webview:flags.3?<a href='/type/InlineBotWebView'>InlineBotWebView</a> results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotInlineResult'>BotInlineResult</a>&gt; cache_time:<a href='/type/int'>int</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.BotResults'>messages.BotResults</a>;
@@ -287,23 +291,8 @@ Note that eventual errors will not be sent as a <code>failed</code> event if the
 <p>Emitted when requested by the Mini App using a <a href="/api/web-events#web-app-request-theme"><code>web_app_request_theme</code> event »</a>, or when the app theme changes.  </p>
 <h5><a class="anchor" href="#theme-parameters" id="theme-parameters" name="theme-parameters"><i class="anchor-icon"></i></a>Theme parameters</h5>
 <p>Bot Mini Apps can be themed according to the following theme parameters, passed as a JSON object to the <code>theme_params</code> parameter of the <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>, <a href="/method/messages.requestWebView">messages.requestWebView</a> and <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a> methods.  </p>
-<p>This JSON object has the following keys, containing color theme information (hex string, RGB, no alpha) to pass to the Mini App:</p>
-<ul>
-<li><code>bg_color</code> - Background color</li>
-<li><code>secondary_bg_color</code> - Secondary background color</li>
-<li><code>text_color</code> - Text color</li>
-<li><code>hint_color</code> - Hint text color</li>
-<li><code>link_color</code> - Link color</li>
-<li><code>button_color</code> - Button color</li>
-<li><code>button_text_color</code> - Button text color</li>
-<li><code>header_bg_color</code> - Header background color</li>
-<li><code>accent_text_color</code> - Accent text color</li>
-<li><code>section_bg_color</code> - Section background color</li>
-<li><code>section_header_text_color</code> - Section header text color</li>
-<li><code>section_separator_color</code> - Section separator color</li>
-<li><code>subtitle_text_color</code> - Sub title text color</li>
-<li><code>destructive_text_color</code> - Text color for destructive action buttons in prompts</li>
-</ul>
+<p>This JSON object has the following keys, containing color theme information (hex string, RGB, no alpha) to pass to the Mini App.  </p>
+<p>See <a href="/bots/webapps#themeparams">here »</a> for more info on the contents of the object.  </p>
 <h4><a class="anchor" href="#popup-closed" id="popup-closed" name="popup-closed"><i class="anchor-icon"></i></a><code>popup_closed</code></h4>
 <p>Params: a JSON object with an optional <code>button_id</code> string field.</p>
 <p>Emitted when the user presses a button or cancels a popup brought up by a previous <a href="/api/web-events#web-app-open-popup"><code>web_app_open_popup</code> event »</a>.  </p>
