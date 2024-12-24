@@ -61,6 +61,22 @@ The GamingCommunication and bot mini apps libraries by default will use <code>'*
 <pre><code>window.parent.postMessage(JSON.stringify({eventType: eventType, eventData: eventData}), targetOrigin);</code></pre>
 <h3><a class="anchor" href="#event-types" id="event-types" name="event-types"><i class="anchor-icon"></i></a>Event types</h3>
 <p><code>eventType</code> is a simple string indicating the event type, and <code>eventData</code> is a payload with an object that will be parsed by the Telegram app.</p>
+<h4><a class="anchor" href="#payment-form-submit" id="payment-form-submit" name="payment-form-submit"><i class="anchor-icon"></i></a><code>payment_form_submit</code></h4>
+<p>Event payload: JSON object with <code>credentials</code> and <code>title</code> fields.</p>
+<ul>
+<li><code>title</code> is the censored credit card title.  </li>
+<li><code>credentials</code> is a service-specific JSON object with information about the payment credentials provided by the user to the payment system.  </li>
+</ul>
+<p><strong>Neither Telegram, nor bots will have access to your credit card information.</strong><br>
+Credit card details will be handled only by the payment system, see the <a href="/api/payments">payment documentation for more info »</a>.  </p>
+<h4><a class="anchor" href="#share-score" id="share-score" name="share-score"><i class="anchor-icon"></i></a><code>share_score</code></h4>
+<p>No event payload.</p>
+<p>Will be called by games when the user explicitly clicks on the <strong>share score</strong> button to share the game, along with their score.<br>
+Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message with the <code>with_my_score</code> flag.  </p>
+<h4><a class="anchor" href="#share-game" id="share-game" name="share-game"><i class="anchor-icon"></i></a><code>share_game</code></h4>
+<p>No event payload.</p>
+<p>Will be called by games when the user explicitly clicks on the <strong>share game</strong> button to share the game, without sharing their score.<br>
+Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message without the <code>with_my_score</code> flag, or by sharing the game's <a href="/api/links#game-links">deep link</a>.</p>
 <h4><a class="anchor" href="#web-app-close" id="web-app-close" name="web-app-close"><i class="anchor-icon"></i></a><code>web_app_close</code></h4>
 <p>No event payload, OR a JSON object with the following fields (which should be properly validated by the client).</p>
 <ul>
@@ -299,22 +315,6 @@ Note that on supported platforms, the OS back button can be used instead of a cu
 <h4><a class="anchor" href="#web-app-setup-settings-button" id="web-app-setup-settings-button" name="web-app-setup-settings-button"><i class="anchor-icon"></i></a><code>web_app_setup_settings_button</code></h4>
 <p>Event data: a JSON object with an <code>is_visible</code> boolean field.</p>
 <p>Determines whether to show or hide the settings button: when the user presses it a <a href="/api/bots/webapps#settings-button-pressed"><code>settings_button_pressed</code> event should be emitted by the client</a>.  </p>
-<h4><a class="anchor" href="#payment-form-submit" id="payment-form-submit" name="payment-form-submit"><i class="anchor-icon"></i></a><code>payment_form_submit</code></h4>
-<p>Event payload: JSON object with <code>credentials</code> and <code>title</code> fields.</p>
-<ul>
-<li><code>title</code> is the censored credit card title.  </li>
-<li><code>credentials</code> is a service-specific JSON object with information about the payment credentials provided by the user to the payment system.  </li>
-</ul>
-<p><strong>Neither Telegram, nor bots will have access to your credit card information.</strong><br>
-Credit card details will be handled only by the payment system, see the <a href="/api/payments">payment documentation for more info »</a>.  </p>
-<h4><a class="anchor" href="#share-score" id="share-score" name="share-score"><i class="anchor-icon"></i></a><code>share_score</code></h4>
-<p>No event payload.</p>
-<p>Will be called by games when the user explicitly clicks on the <strong>share score</strong> button to share the game, along with their score.<br>
-Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message with the <code>with_my_score</code> flag.  </p>
-<h4><a class="anchor" href="#share-game" id="share-game" name="share-game"><i class="anchor-icon"></i></a><code>share_game</code></h4>
-<p>No event payload.</p>
-<p>Will be called by games when the user explicitly clicks on the <strong>share game</strong> button to share the game, without sharing their score.<br>
-Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message without the <code>with_my_score</code> flag, or by sharing the game's <a href="/api/links#game-links">deep link</a>.</p>
 <h4><a class="anchor" href="#resize-frame" id="resize-frame" name="resize-frame"><i class="anchor-icon"></i></a><code>resize_frame</code></h4>
 <p>Event payload: JSON object with <code>height</code> field.</p>
 <p>Called by supported pages inside of <a href="https://instantview.telegram.org">IV</a> iframe embeds, indicates the new size of the embed frame.</p>
@@ -363,18 +363,22 @@ Typically done by using <a href="/method/messages.forwardMessages">messages.forw
 <h4><a class="anchor" href="#web-app-open-location-settings" id="web-app-open-location-settings" name="web-app-open-location-settings"><i class="anchor-icon"></i></a><code>web_app_open_location_settings</code></h4>
 <p> </p>
 <h4><a class="anchor" href="#web-app-request-file-download" id="web-app-request-file-download" name="web-app-request-file-download"><i class="anchor-icon"></i></a><code>web_app_request_file_download</code></h4>
-<p> </p>
+<p>Event data: a JSON object with <code>url</code> and <code>filename</code> string fields.</p>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to request the download of a file.  </p>
+<p>Handle this event using the following steps:</p>
+<ol>
+<li>Invoke <a href="/method/bots.checkDownloadFileParams">bots.checkDownloadFileParams</a>, passing the <code>url</code>, <code>filename</code> and the ID of the bot.<br>
+Ignore further <code>web_app_request_file_download</code> events until step 3 is reached (new <code>web_app_request_file_download</code> <em>can</em> be accepted while the previous file is being downloaded).<br>
+1.1) If the method doesn't return <a href="/constructor/boolTrue">boolTrue</a>, emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>cancelled</code> and abort the process.</li>
+<li>If <a href="/constructor/boolTrue">boolTrue</a> is returned, show a prompt to the user, notifying them that <code>$nameOfTheBot</code> is asking to download a file with name <code>filename</code>.<br>
+2.1) If the user refuses to download the file, emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>cancelled</code> and abort the process.  </li>
+<li>If the user agrees, start downloading the file from <code>url</code> as <code>filename</code> and emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>downloading</code>.  </li>
+<li>When the download is finished, show a toast to the user, indicating that the file was downloaded successfully.</li>
+</ol>
 <h4><a class="anchor" href="#web-app-send-prepared-message" id="web-app-send-prepared-message" name="web-app-send-prepared-message"><i class="anchor-icon"></i></a><code>web_app_send_prepared_message</code></h4>
-<p> </p>
+<p>Event data: a JSON object with an <code>id</code> string field.</p>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to invite the user to send a <a href="/api/bots/inline#21-using-a-prepared-inline-message">prepared inline message »</a>.</p>
 <h4><a class="anchor" href="#web-app-toggle-orientation-lock" id="web-app-toggle-orientation-lock" name="web-app-toggle-orientation-lock"><i class="anchor-icon"></i></a><code>web_app_toggle_orientation_lock</code></h4>
-<p> </p>
-<h4><a class="anchor" href="#loaded" id="loaded" name="loaded"><i class="anchor-icon"></i></a><code>loaded</code></h4>
-<p> </p>
-<h4><a class="anchor" href="#height" id="height" name="height"><i class="anchor-icon"></i></a><code>height</code></h4>
-<p> </p>
-<h4><a class="anchor" href="#credentials" id="credentials" name="credentials"><i class="anchor-icon"></i></a><code>credentials</code></h4>
-<p> </p>
-<h4><a class="anchor" href="#title" id="title" name="title"><i class="anchor-icon"></i></a><code>title</code></h4>
 <p> </p>
 <!-- Last entry --></div>
   
