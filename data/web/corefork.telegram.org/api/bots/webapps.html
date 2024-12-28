@@ -405,6 +405,9 @@ If <code>failed</code>, a <a href="#biometry-info-received">biometry_info_receiv
 <h4><a class="anchor" href="#accelerometer-stopped" id="accelerometer-stopped" name="accelerometer-stopped"><i class="anchor-icon"></i></a><code>accelerometer_stopped</code></h4>
 <p>Params: <code>null</code></p>
 <p>Sent by the client in response to a <a href="/api/web-events#web-app-stop-accelerometer">web_app_stop_accelerometer event »</a> if accelerometer tracking is stopped successfully.</p>
+<h4><a class="anchor" href="#accelerometer-changed" id="accelerometer-changed" name="accelerometer-changed"><i class="anchor-icon"></i></a><code>accelerometer_changed</code></h4>
+<p>Params: JSON object with <code>x</code>, <code>y</code> and <code>z</code> fields of type <code>float</code>, containing the current acceleration in the X, Y and Z-axis, measured in m/s².  </p>
+<p>Sent periodically by the client at most every <code>refresh_rate</code> milliseconds after <a href="/api/web-events#web-app-start-accelerometer">web_app_start_accelerometer »</a> is invoked and until <a href="/api/web-events#web-app-stop-accelerometer">web_app_stop_accelerometer</a> is invoked.  </p>
 <h4><a class="anchor" href="#gyroscope-started" id="gyroscope-started" name="gyroscope-started"><i class="anchor-icon"></i></a><code>gyroscope_started</code></h4>
 <p>Params: <code>null</code></p>
 <p>Sent by the client in response to a <a href="/api/web-events#web-app-start-gyroscope">web_app_start_gyroscope event »</a> if gyroscope tracking is started successfully.</p>
@@ -421,9 +424,12 @@ If <code>failed</code>, a <a href="#biometry-info-received">biometry_info_receiv
 <h4><a class="anchor" href="#gyroscope-stopped" id="gyroscope-stopped" name="gyroscope-stopped"><i class="anchor-icon"></i></a><code>gyroscope_stopped</code></h4>
 <p>Params: <code>null</code></p>
 <p>Sent by the client in response to a <a href="/api/web-events#web-app-stop-gyroscope">web_app_stop_gyroscope event »</a> if gyroscope tracking is stopped successfully.</p>
+<h4><a class="anchor" href="#gyroscope-changed" id="gyroscope-changed" name="gyroscope-changed"><i class="anchor-icon"></i></a><code>gyroscope_changed</code></h4>
+<p>Params: JSON object with <code>x</code>, <code>y</code> and <code>z</code> fields of type <code>float</code>, containing the current rotation rate around the X, Y and Z-axis, measured in rad/s.  </p>
+<p>Sent periodically by the client at most every <code>refresh_rate</code> milliseconds after <a href="/api/web-events#web-app-start-gyroscope">web_app_start_gyroscope »</a> is invoked and until <a href="/api/web-events#web-app-stop-gyroscope">web_app_stop_gyroscope</a> is invoked.  </p>
 <h4><a class="anchor" href="#device-orientation-started" id="device-orientation-started" name="device-orientation-started"><i class="anchor-icon"></i></a><code>device_orientation_started</code></h4>
 <p>Params: <code>null</code></p>
-<p>Sent by the client in response to a <a href="/api/web-events#web-app-start-device_orientation">web_app_start_device_orientation event »</a> if device orientation tracking is started successfully.</p>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-start-device-orientation">web_app_start_device_orientation event »</a> if device orientation tracking is started successfully.</p>
 <p>Until <a href="/api/web-events#web-app-stop-device-orientation">web_app_stop_device_orientation</a> is emitted by the mini app, the client will also emit <a href="#device-orientation-changed">device_orientation events</a> at most every <code>refresh_rate</code> milliseconds with device orientation readings.  </p>
 <h4><a class="anchor" href="#device-orientation-failed" id="device-orientation-failed" name="device-orientation-failed"><i class="anchor-icon"></i></a><code>device_orientation_failed</code></h4>
 <p>Params: JSON object with the following fields:</p>
@@ -437,6 +443,15 @@ If <code>failed</code>, a <a href="#biometry-info-received">biometry_info_receiv
 <h4><a class="anchor" href="#device-orientation-stopped" id="device-orientation-stopped" name="device-orientation-stopped"><i class="anchor-icon"></i></a><code>device_orientation_stopped</code></h4>
 <p>Params: <code>null</code></p>
 <p>Sent by the client in response to a <a href="/api/web-events#web-app-stop-device-orientation">web_app_stop_device_orientation event »</a> if device orientation tracking is stopped successfully.</p>
+<h4><a class="anchor" href="#device-orientation-changed" id="device-orientation-changed" name="device-orientation-changed"><i class="anchor-icon"></i></a><code>device_orientation_changed</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>alpha</code> - The rotation around the Z-axis, measured in radians.</li>
+<li><code>beta</code> - The rotation around the X-axis, measured in radians.</li>
+<li><code>gamma</code> - The rotation around the Y-axis, measured in radians.</li>
+<li><code>absolute</code> - A boolean that indicates whether or not the device is providing orientation data in absolute values (may be false even if absolute data was requested if and only if the device/platform doesn't support absolute orientation tracking).  </li>
+</ul>
+<p>Sent periodically by the client at most every <code>refresh_rate</code> milliseconds after <a href="/api/web-events#web-app-start-device-orientation">web_app_start_device_orientation »</a> is invoked and until <a href="/api/web-events#web-app-stop-device-orientation">web_app_stop_device_orientation</a> is invoked.  </p>
 <h4><a class="anchor" href="#home-screen-added" id="home-screen-added" name="home-screen-added"><i class="anchor-icon"></i></a><code>home_screen_added</code></h4>
 <p>Params: <code>null</code></p>
 <p>Sent by the client in response to a <a href="/api/web-events#web-app-add-to-home-screen">web_app_add_to_home_screen event »</a> if the shortcut was (already) added successfully.  </p>
@@ -490,8 +505,6 @@ If <code>failed</code>, a <a href="#biometry-info-received">biometry_info_receiv
 </li>
 </ul>
 <p>Sent by the client in response to a <a href="/api/web-events#web-app-request-emoji-status-access">web_app_request_emoji_status_access event »</a>.  </p>
-<h4><a class="anchor" href="#location-requested" id="location-requested" name="location-requested"><i class="anchor-icon"></i></a><code>location_requested</code></h4>
-<p> </p>
 <h4><a class="anchor" href="#file-download-requested" id="file-download-requested" name="file-download-requested"><i class="anchor-icon"></i></a><code>file_download_requested</code></h4>
 <p>Params: a JSON object with the following fields:</p>
 <ul>
@@ -511,13 +524,9 @@ If <code>failed</code>, a <a href="#biometry-info-received">biometry_info_receiv
 <p> </p>
 <h4><a class="anchor" href="#content-safe-area-changed" id="content-safe-area-changed" name="content-safe-area-changed"><i class="anchor-icon"></i></a><code>content_safe_area_changed</code></h4>
 <p> </p>
+<h4><a class="anchor" href="#location-requested" id="location-requested" name="location-requested"><i class="anchor-icon"></i></a><code>location_requested</code></h4>
+<p> </p>
 <h4><a class="anchor" href="#location-checked" id="location-checked" name="location-checked"><i class="anchor-icon"></i></a><code>location_checked</code></h4>
-<p> </p>
-<h4><a class="anchor" href="#accelerometer-changed" id="accelerometer-changed" name="accelerometer-changed"><i class="anchor-icon"></i></a><code>accelerometer_changed</code></h4>
-<p> </p>
-<h4><a class="anchor" href="#device-orientation-changed" id="device-orientation-changed" name="device-orientation-changed"><i class="anchor-icon"></i></a><code>device_orientation_changed</code></h4>
-<p> </p>
-<h4><a class="anchor" href="#gyroscope-changed" id="gyroscope-changed" name="gyroscope-changed"><i class="anchor-icon"></i></a><code>gyroscope_changed</code></h4>
 <p> </p>
 <!-- Last entry --></div>
   
