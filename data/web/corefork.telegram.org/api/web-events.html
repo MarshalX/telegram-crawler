@@ -423,9 +423,16 @@ Absolute orientation data may also not be supported on some platforms, in which 
 <li><code>duration</code> - Optional integer, indicating the TTL of the status; if 0, the status doesn't expire (integer, defaults to 0)</li>
 </ul>
 <p>Used by <a href="/api/bots/webapps">mini apps</a> to manually set (or remove) the <a href="/api/emoji-status">status emoji</a> of a user.  </p>
+<p>Ignore incoming events of this type if another event of the same type is still being handled, or if the last click of the user within the app occurred more than 10 seconds ago.  </p>
 <p>Emits an <a href="/api/bots/webapps#emoji-status-set">emoji_status_set event</a> on success and <a href="/api/bots/webapps#emoji-status-failed">emoji_status_failed event</a> on failure.  </p>
 <h4><a class="anchor" href="#web-app-request-emoji-status-access" id="web-app-request-emoji-status-access" name="web-app-request-emoji-status-access"><i class="anchor-icon"></i></a><code>web_app_request_emoji_status_access</code></h4>
-<p> </p>
+<p>Event payload: <code>null</code></p>
+<p>Ignore incoming events of this type if another event of the same type is still being handled, or if the last click of the user within the app occurred more than 10 seconds ago.  </p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to ask permission to update the <a href="/api/emoji-status">emoji status</a> of a user using the <a href="/method/bots.updateUserEmojiStatus">bots.updateUserEmojiStatus</a> method.  </p>
+<p>If the user already previously agreed (i.e. the <a href="/constructor/userFull">userFull</a>.<code>bot_can_manage_emoji_status</code> flag of the bot is set for the user), emit an <a href="/api/bots/webapps#emoji-status-access-requested">emoji_status_access_requested event</a> event with <code>status="allowed"</code> and terminate the flow.  </p>
+<p>If the user refuses, emit an <a href="/api/bots/webapps#emoji-status-access-requested">emoji_status_access_requested event</a> event with <code>status="cancelled"</code> and terminate the flow.  </p>
+<p>If the user agrees, the client must invoke the <a href="/method/bots.toggleUserEmojiStatusPermission">bots.toggleUserEmojiStatusPermission</a> method, passing <code>enabled=true</code> and the ID of the bot: if the method returns <a href="/constructor/boolTrue">boolTrue</a>, emit an <a href="/api/bots/webapps#emoji-status-access-requested">emoji_status_access_requested event</a> event with <code>status="allowed"</code>; otherwise emit the same event with <code>status="cancelled"</code>.  </p>
+<p>On success, the bot will be able to use <a href="/method/bots.updateUserEmojiStatus">bots.updateUserEmojiStatus</a> to change the emoji status of the user.  </p>
 <h4><a class="anchor" href="#web-app-request-safe-area" id="web-app-request-safe-area" name="web-app-request-safe-area"><i class="anchor-icon"></i></a><code>web_app_request_safe_area</code></h4>
 <p> </p>
 <h4><a class="anchor" href="#web-app-request-content-safe-area" id="web-app-request-content-safe-area" name="web-app-request-content-safe-area"><i class="anchor-icon"></i></a><code>web_app_request_content_safe_area</code></h4>
