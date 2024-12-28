@@ -303,6 +303,7 @@ The mini app must also be expanded when the user swipes up on the webview.  </p>
 <li><code>color</code> - Button color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_color</code> theme parameter</a>)</li>
 <li><code>text_color</code> - Button text color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_text_color</code> theme parameter</a>)</li>
 <li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean, false by default)</li>
+<li><code>has_shine_effect</code> - Whether the button should have a shine effect (boolean, false by default)</li>
 </ul>
 <p>Configures the main button, located immediately below the webview: when the user presses it a <a href="/api/bots/webapps#main-button-pressed"><code>main_button_pressed</code> event should be emitted by the client</a>.  </p>
 <p>Some clients implement a horizontal media type tab bar located at the bottom of the screen, opened when the user clicks on the attachment menu button: this tab bar contains a horizontal list of buttons used to attach media of a certain type and to open installed <a href="/api/bots/attach">attachment menu mini apps</a>.<br>
@@ -318,20 +319,52 @@ Note that on supported platforms, the OS back button can be used instead of a cu
 <h4><a class="anchor" href="#resize-frame" id="resize-frame" name="resize-frame"><i class="anchor-icon"></i></a><code>resize_frame</code></h4>
 <p>Event payload: JSON object with <code>height</code> field.</p>
 <p>Called by supported pages inside of <a href="https://instantview.telegram.org">IV</a> iframe embeds, indicates the new size of the embed frame.</p>
-<h4><a class="anchor" href="#web-app-allow-scroll" id="web-app-allow-scroll" name="web-app-allow-scroll"><i class="anchor-icon"></i></a><code>web_app_allow_scroll</code></h4>
-<p> </p>
 <h4><a class="anchor" href="#web-app-setup-swipe-behavior" id="web-app-setup-swipe-behavior" name="web-app-setup-swipe-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_swipe_behavior</code></h4>
-<p> </p>
+<p>Event payload: JSON object with boolean <code>allow_vertical_swipe</code> field.  </p>
+<p>Called <a href="/api/bots/webapps">bot web apps</a> to tell the client to enable or disable the vertical swipe gesture usually used on mobile to minimize the web app.  </p>
 <h4><a class="anchor" href="#web-app-set-bottom-bar-color" id="web-app-set-bottom-bar-color" name="web-app-set-bottom-bar-color"><i class="anchor-icon"></i></a><code>web_app_set_bottom_bar_color</code></h4>
-<p> </p>
+<p>Event data: a JSON object with a string <code>color</code> with a hex RGB color.  </p>
+<p>Used to set the mini app bottom bar color.  </p>
 <h4><a class="anchor" href="#web-app-setup-secondary-button" id="web-app-setup-secondary-button" name="web-app-setup-secondary-button"><i class="anchor-icon"></i></a><code>web_app_setup_secondary_button</code></h4>
-<p> </p>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>is_visible</code> - Whether the button is visible (boolean, false by default)</li>
+<li><code>is_active</code> - Whether the button is active (boolean, true by default)</li>
+<li><code>text</code> - Button text (string, if <code>trim(text)</code> is empty the button must be hidden)</li>
+<li><code>color</code> - Button color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_color</code> theme parameter</a>)</li>
+<li><code>text_color</code> - Button text color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_text_color</code> theme parameter</a>)</li>
+<li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean, false by default)</li>
+<li><code>has_shine_effect</code> - Whether the button should have a shine effect (boolean, false by default)</li>
+<li><code>position</code> - One of <code>left</code>, <code>right</code>, <code>top</code>, <code>bottom</code> (string, defaults to <code>left</code>)</li>
+</ul>
+<p>Configures the secondary button, located immediately below the webview, either on the left, right, top or bottom of the main button (if it is visible, otherwise it is located where the main button is usually located).  </p>
+<p>When the user presses it a <a href="/api/bots/webapps#secondary-button-pressed"><code>secondary_button_pressed</code> event should be emitted by the client</a>.  </p>
+<p>Some clients implement a horizontal media type tab bar located at the bottom of the screen, opened when the user clicks on the attachment menu button: this tab bar contains a horizontal list of buttons used to attach media of a certain type and to open installed <a href="/api/bots/attach">attachment menu mini apps</a>.<br>
+In clients that implements a tab bar, iff the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_secondary_button</code> with <code>is_visible=true</code>, the secondary button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.  </p>
+<p>Otherwise, the secondary button can be displayed right away with no user interaction when receiving a <code>web_app_setup_secondary_button</code> event with <code>is_visible=true</code>.  </p>
 <h4><a class="anchor" href="#web-app-share-to-story" id="web-app-share-to-story" name="web-app-share-to-story"><i class="anchor-icon"></i></a><code>web_app_share_to_story</code></h4>
-<p> </p>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>media_url</code> - A string containing an HTTPS URL of the media to share as a story</li>
+<li><code>text</code> - An optional string caption for the media</li>
+<li><code>widget_link</code> - An optional object describing a <a href="/api/stories#urls">URL media area »</a> to be included in the story, with the following fields:<ul>
+<li><code>url</code> - A string with the URL of the widget</li>
+<li><code>text</code> - An optional string with a label for the widget</li>
+</ul>
+</li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to share a <a href="/api/stories">story on the user's profile »</a>, specifying an optional caption and <a href="/api/stories#urls">URL widget »</a>.  </p>
+<p>This event should open the app's story editor with the specified media, caption and widget, letting the user tweak the story before posting it.  </p>
 <h4><a class="anchor" href="#web-app-request-fullscreen" id="web-app-request-fullscreen" name="web-app-request-fullscreen"><i class="anchor-icon"></i></a><code>web_app_request_fullscreen</code></h4>
-<p> </p>
+<p>Event payload: <code>null</code></p>
+<p>Emitted by <a href="/api/bots/webapps">mini web apps</a> to request expansion of the web app to fullscreen mode.  </p>
+<p>On success, emits a <a href="/api/bots/webapps#fullscreen-changed">fullscreen_changed event</a> with <code>is_fullscreen=true</code>.<br>
+On failure, emits a <a href="/api/bots/webapps#fullscreen-failed">fullscreen_failed event</a> with <code>error</code> equal to <code>UNSUPPORTED</code> (Fullscreen mode is not supported on this device or platform) or <code>ALREADY_FULLSCREEN</code> (The Mini App is already in fullscreen mode).  </p>
 <h4><a class="anchor" href="#web-app-exit-fullscreen" id="web-app-exit-fullscreen" name="web-app-exit-fullscreen"><i class="anchor-icon"></i></a><code>web_app_exit_fullscreen</code></h4>
-<p> </p>
+<p>Event payload: <code>null</code></p>
+<p>Emitted by <a href="/api/bots/webapps">mini web apps</a> to request exiting fullscreen mode.  </p>
+<p>This method should unconditionally emit a <a href="/api/bots/webapps#fullscreen-changed">fullscreen_changed event</a> with <code>is_fullscreen=false</code> (even if we've already exited fullscreen mode).<br>
+On platforms where fullscreen mode is not supported, must emit a <a href="/api/bots/webapps#fullscreen-failed">fullscreen_failed event</a> with <code>error</code> equal to <code>UNSUPPORTED</code> instead of <code>fullscreen_changed</code>.  </p>
 <h4><a class="anchor" href="#web-app-start-accelerometer" id="web-app-start-accelerometer" name="web-app-start-accelerometer"><i class="anchor-icon"></i></a><code>web_app_start_accelerometer</code></h4>
 <p> </p>
 <h4><a class="anchor" href="#web-app-stop-accelerometer" id="web-app-stop-accelerometer" name="web-app-stop-accelerometer"><i class="anchor-icon"></i></a><code>web_app_stop_accelerometer</code></h4>
