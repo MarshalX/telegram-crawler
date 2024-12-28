@@ -407,11 +407,23 @@ Absolute orientation data may also not be supported on some platforms, in which 
 <p>Used by <a href="/api/bots/webapps">mini apps</a> to stop device orientation tracking, stopping the emission of <a href="/api/bots/webapps#device-orientation-changed">device_orientation_changed events</a>.  </p>
 <p>Emits a <a href="/api/bots/webapps#device-orientation-stopped">device_orientation_stopped event</a> on success, or a <a href="/api/bots/webapps#device-orientation-failed">device_orientation_failed event</a> with <code>error=UNSUPPORTED</code> on platforms with no device orientation tracking.  </p>
 <h4><a class="anchor" href="#web-app-add-to-home-screen" id="web-app-add-to-home-screen" name="web-app-add-to-home-screen"><i class="anchor-icon"></i></a><code>web_app_add_to_home_screen</code></h4>
-<p> </p>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to ask the user to add a shortcut to the mini app (using the bot's logo) on the homescreen.  </p>
+<p>Ignore incoming events of this type if another event of the same type is still being handled, or if the last click of the user within the app occurred more than 10 seconds ago.  </p>
+<p>Emits a <a href="/api/bots/webapps#home-screen-added">home_screen_added event</a> if the shortcut was (already) added successfully, and a <a href="/api/bots/webapps#home-screen-failed">home_screen_failed event</a> with <code>error="UNSUPPORTED"</code> on unsupported platforms.  </p>
+<p>It is acceptable to not emit the <code>home_screen_added</code> and <code>home_screen_failed</code> events if the current platform doesn't have a way to determine the installation status of the shortcut.</p>
 <h4><a class="anchor" href="#web-app-check-home-screen" id="web-app-check-home-screen" name="web-app-check-home-screen"><i class="anchor-icon"></i></a><code>web_app_check_home_screen</code></h4>
-<p> </p>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to check if a shortcut to the mini app was added to the homescreen.  </p>
+<p>Must emit a <a href="/api/bots/webapps#home-screen-checked">home_screen_checked event »</a> event with the status (including on unsupported platforms, see the <a href="/api/bots/webapps#home-screen-checked">event documentation »</a> for this case).  </p>
 <h4><a class="anchor" href="#web-app-set-emoji-status" id="web-app-set-emoji-status" name="web-app-set-emoji-status"><i class="anchor-icon"></i></a><code>web_app_set_emoji_status</code></h4>
-<p> </p>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>custom_emoji_id</code> - Optional integer in string form, containing the ID of the <a href="/api/custom-emoji">custom emoji</a> to set as emoji status; if 0, removes the current emoji status (string, defaults to 0)</li>
+<li><code>duration</code> - Optional integer, indicating the TTL of the status; if 0, the status doesn't expire (integer, defaults to 0)</li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to manually set (or remove) the <a href="/api/emoji-status">status emoji</a> of a user.  </p>
+<p>Emits an <a href="/api/bots/webapps#emoji-status-set">emoji_status_set event</a> on success and <a href="/api/bots/webapps#emoji-status-failed">emoji_status_failed event</a> on failure.  </p>
 <h4><a class="anchor" href="#web-app-request-emoji-status-access" id="web-app-request-emoji-status-access" name="web-app-request-emoji-status-access"><i class="anchor-icon"></i></a><code>web_app_request_emoji_status_access</code></h4>
 <p> </p>
 <h4><a class="anchor" href="#web-app-request-safe-area" id="web-app-request-safe-area" name="web-app-request-safe-area"><i class="anchor-icon"></i></a><code>web_app_request_safe_area</code></h4>
