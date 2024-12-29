@@ -439,12 +439,18 @@ Absolute orientation data may also not be supported on some platforms, in which 
 <h4><a class="anchor" href="#web-app-request-content-safe-area" id="web-app-request-content-safe-area" name="web-app-request-content-safe-area"><i class="anchor-icon"></i></a><code>web_app_request_content_safe_area</code></h4>
 <p>Event payload: <code>null</code></p>
 <p>Used by <a href="/api/bots/webapps">mini apps</a> to request the emission of a <a href="/api/bots/webapps#content-safe-area-changed">content_safe_area_changed event »</a>, containing the current content-defined safe area inset padding values.  </p>
-<h4><a class="anchor" href="#web-app-request-location" id="web-app-request-location" name="web-app-request-location"><i class="anchor-icon"></i></a><code>web_app_request_location</code></h4>
-<p> </p>
 <h4><a class="anchor" href="#web-app-check-location" id="web-app-check-location" name="web-app-check-location"><i class="anchor-icon"></i></a><code>web_app_check_location</code></h4>
-<p> </p>
+<p>Event payload: <code>null</code></p>
+<p>Must be used by <a href="/api/bots/webapps">mini apps</a> to initialize the geolocation object in the client and obtain basic information about geolocation capabilities and status, as a <a href="/api/bots/webapps#location-checked">location_checked event »</a>.  </p>
+<p>This event should not actually ask anything from the user, just return the current settings (not the current geolocation).  </p>
+<h4><a class="anchor" href="#web-app-request-location" id="web-app-request-location" name="web-app-request-location"><i class="anchor-icon"></i></a><code>web_app_request_location</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to request the emission of a <a href="/api/bots/webapps#location-requested">location_requested event »</a>, containing current geolocation data of the user (or nothing if the user denied access to their current geolocation).  </p>
+<p>This event should ask the user permission to share their location with the current mini app only if the user hasn't already denied or allowed location access to the mini app, in which case no prompt must be shown.  </p>
 <h4><a class="anchor" href="#web-app-open-location-settings" id="web-app-open-location-settings" name="web-app-open-location-settings"><i class="anchor-icon"></i></a><code>web_app_open_location_settings</code></h4>
-<p> </p>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to request opening the geolocation settings page for bots, useful when the app needs to request permission to use the current geolocation from users who have previously denied it.</p>
+<p>Note that this event should only be handled in response to user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button within the last 10 seconds) and only if an event of the same type isn't already being handled. </p>
 <h4><a class="anchor" href="#web-app-request-file-download" id="web-app-request-file-download" name="web-app-request-file-download"><i class="anchor-icon"></i></a><code>web_app_request_file_download</code></h4>
 <p>Event data: a JSON object with <code>url</code> and <code>filename</code> string fields.</p>
 <p>Used by <a href="/api/bots/webapps">bot web apps</a> to request the download of a file.  </p>

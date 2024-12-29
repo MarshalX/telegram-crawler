@@ -542,9 +542,28 @@ If <code>failed</code>, a <a href="#biometry-info-received">biometry_info_receiv
 <p>Emitted by clients when any of the content-defined safe area inset padding values change, or when explicitly requested by the mini app using <a href="/api/web-events#web-app-request-content-safe-area">web_app_request_content_safe_area</a>.  </p>
 <p>See <a href="/bots/webapps#contentsafeareainset">here »</a> for more info.</p>
 <h4><a class="anchor" href="#location-requested" id="location-requested" name="location-requested"><i class="anchor-icon"></i></a><code>location_requested</code></h4>
-<p> </p>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>available</code> - Boolean, indicates whether location data is available or not; if false, the following fields must not be set.  </li>
+<li><code>latitude</code> - Float, contains latitude in degrees.</li>
+<li><code>longitude</code> - Float, contains longitude in degrees.</li>
+<li><code>altitude</code> - Float or null, contains the altitude above the sea level in metres, must be null if not supported by the device or platform.</li>
+<li><code>course</code> - Float or null, contains the direction the device is moving in degrees, must be null if not supported by the device or platform.</li>
+<li><code>speed</code> - Float or null, contains the speed of the device in m/s, must be null if not supported by the device or platform.</li>
+<li><code>horizontal_accuracy</code> - Float or null, contains the accuracy of the latitude and longitude values in meters, must be null if not supported by the device or platform.</li>
+<li><code>vertical_accuracy</code> - Float or null, contains the accuracy of the altitude value in meters, must be null if not supported by the device or platform.</li>
+<li><code>course_accuracy</code> - Float or null, contains the accuracy of the course value in degrees, must be null if not supported by the device or platform.</li>
+<li><code>speed_accuracy</code> - Float or null, contains the accuracy of the speed value in m/s, must be null if not supported by the device or platform.</li>
+</ul>
+<p>Emitted in response to a <a href="/api/web-events#web-app-request-location">web_app_request_location event</a>.  </p>
 <h4><a class="anchor" href="#location-checked" id="location-checked" name="location-checked"><i class="anchor-icon"></i></a><code>location_checked</code></h4>
-<p> </p>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>available</code> - Boolean, indicates whether location data is available on the current platform or device.</li>
+<li><code>access_requested</code> - Optional boolean, must be set if <code>available</code> is true, indicates whether the mini app has already requested access to location data.</li>
+<li><code>access_granted</code> - Optional boolean, if set and <code>true</code> indicates that the user granted the mini app access to location data.</li>
+</ul>
+<p>Emitted in response to a <a href="/api/web-events#web-app-check-location">web_app_check_location event</a>.  </p>
 <!-- Last entry --></div>
   
 </div>
