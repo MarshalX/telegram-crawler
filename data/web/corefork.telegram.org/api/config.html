@@ -394,13 +394,14 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "starref_connect_allowed": true,
     "starref_min_commission_permille": 1,
     "starref_max_commission_permille": 900,
-    "bot_verification_description_length_limit": 70,
     "video_ignore_alt_documents": false,
     "keep_alive_service": true,
     "background_connection": true,
     "can_edit_factcheck": false,
     "factcheck_length_limit": 1024,
-    "premium_invoice_slug": "abc"
+    "premium_invoice_slug": "abc",
+    "inapp_update_check_delay": 86400,
+    "premium_manage_subscription_url": "https:\/\/t.me\/premiumbot?start=status"
 }</code></pre>
 <!-- end config -->
 <p>The fields included in the resulting JSON object are:  </p>
@@ -440,9 +441,9 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
 <h4><a class="anchor" href="#autoarchive-setting-available" id="autoarchive-setting-available" name="autoarchive-setting-available"><i class="anchor-icon"></i></a><code>autoarchive_setting_available</code></h4>
 <p>Whether clients <em>can</em> invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a> with <a href="/constructor/globalPrivacySettings"><code>globalPrivacySettings.archive_and_mute_new_noncontact_peers = boolTrue</code></a>, to automatically archive and mute new incoming chats from non-contacts. (boolean)</p>
 <h4><a class="anchor" href="#pending-suggestions" id="pending-suggestions" name="pending-suggestions"><i class="anchor-icon"></i></a><code>pending_suggestions</code></h4>
-<p>Contains a list of suggestions that should be actively shown as a tooltip to the user. (Array of strings, possible values shown <a href="#suggestions">in the suggestions section »</a>).  </p>
+<p>Contains a list of suggestions that should be actively shown as a tooltip to the user. (Array of strings, possible values shown <a href="#suggestions">in the suggestions section »</a>).</p>
 <h4><a class="anchor" href="#dismissed-suggestions" id="dismissed-suggestions" name="dismissed-suggestions"><i class="anchor-icon"></i></a><code>dismissed_suggestions</code></h4>
-<p>Contains a list of <a href="#inverted-suggestions">inverted suggestions</a> that were <a href="/api/config#dismissing-suggestions">dismissed</a> by the user. (Array of strings, possible values shown <a href="#inverted-suggestions">in the inverted suggestions section »</a>).  </p>
+<p>Contains a list of <a href="#inverted-suggestions">inverted suggestions</a> that were <a href="/api/config#dismissing-suggestions">dismissed</a> by the user. (Array of strings, possible values shown <a href="#inverted-suggestions">in the inverted suggestions section »</a>).</p>
 <h4><a class="anchor" href="#topics-pinned-limit" id="topics-pinned-limit" name="topics-pinned-limit"><i class="anchor-icon"></i></a><code>topics_pinned_limit</code></h4>
 <p>Maximum number of <a href="/api/forum#forum-topics">topics</a> that can be pinned in a single <a href="/api/forum">forum</a>. (integer)</p>
 <h4><a class="anchor" href="#telegram-antispam-user-id" id="telegram-antispam-user-id" name="telegram-antispam-user-id"><i class="anchor-icon"></i></a><code>telegram_antispam_user_id</code></h4>
@@ -461,7 +462,7 @@ When fetching the admin list of a supergroup using <a href="/method/channels.get
 <h4><a class="anchor" href="#whitelisted-domains" id="whitelisted-domains" name="whitelisted-domains"><i class="anchor-icon"></i></a><code>whitelisted_domains</code></h4>
 <p>A list of Telegram domains that can always be opened without additional user confirmation, when clicking on in-app links where the URL is not fully displayed (i.e. <a href="/constructor/messageEntityTextUrl">messageEntityTextUrl</a> entities). (array of strings)</p>
 <p>Note that when opening <a href="/api/links#direct-mini-app-links">direct Mini App links</a> for the first time, confirmation should still be requested from the user, even if the domain of the containing deep link is whitelisted (i.e. <code>t.me/&lt;bot_username&gt;/&lt;short_name&gt;?startapp=&lt;start_parameter&gt;</code>, where <code>t.me</code> is whitelisted).  </p>
-<p>Confirmation should <strong>always</strong> be asked, even if we already opened the <a href="/api/links#direct-mini-app-links">direct Mini App</a> before, if the link is not visible (i.e. <a href="/constructor/messageEntityTextUrl">messageEntityTextUrl</a> text links, inline buttons etc.).  </p>
+<p>Confirmation should <strong>always</strong> be asked, even if we already opened the <a href="/api/links#direct-mini-app-links">direct Mini App</a> before, if the link is not visible (i.e. <a href="/constructor/messageEntityTextUrl">messageEntityTextUrl</a> text links, inline buttons etc.).</p>
 <h4><a class="anchor" href="#round-video-encoding" id="round-video-encoding" name="round-video-encoding"><i class="anchor-icon"></i></a><code>round_video_encoding</code></h4>
 <p>Contains a set of recommended codec parameters for round videos.  (object, as described in the example)</p>
 <h4><a class="anchor" href="#chat-read-mark-size-threshold" id="chat-read-mark-size-threshold" name="chat-read-mark-size-threshold"><i class="anchor-icon"></i></a><code>chat_read_mark_size_threshold</code></h4>
@@ -482,7 +483,7 @@ When fetching the admin list of a supergroup using <a href="/method/channels.get
 <p>Maximum number of reactions that can be added to a single message by a Premium user. (integer)</p>
 <h4><a class="anchor" href="#default-emoji-statuses-stickerset-id" id="default-emoji-statuses-stickerset-id" name="default-emoji-statuses-stickerset-id"><i class="anchor-icon"></i></a><code>default_emoji_statuses_stickerset_id</code></h4>
 <p>Default emoji status stickerset ID. (integer)<br>
-Note that the stickerset can be fetched using <a href="/constructor/inputStickerSetEmojiDefaultStatuses">inputStickerSetEmojiDefaultStatuses</a>. </p>
+Note that the stickerset can be fetched using <a href="/constructor/inputStickerSetEmojiDefaultStatuses">inputStickerSetEmojiDefaultStatuses</a>.</p>
 <h4><a class="anchor" href="#ringtone-duration-max" id="ringtone-duration-max" name="ringtone-duration-max"><i class="anchor-icon"></i></a><code>ringtone_duration_max</code></h4>
 <p>The maximum duration in seconds of <a href="/api/ringtones">uploadable notification sounds »</a> (integer)</p>
 <h4><a class="anchor" href="#ringtone-size-max" id="ringtone-size-max" name="ringtone-size-max"><i class="anchor-icon"></i></a><code>ringtone_size_max</code></h4>
@@ -612,7 +613,7 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <p>ID of the official Telegram user that will post stories about new Telegram features: stories posted by this user should be shown on the <a href="/api/stories#watching-stories">active or active and hidden stories bar</a> just like for contacts, even if the user was removed from the contact list. (integer, defaults to <code>777000</code>)</p>
 <h4><a class="anchor" href="#stories-entities" id="stories-entities" name="stories-entities"><i class="anchor-icon"></i></a><code>stories_entities</code></h4>
 <p>Whether <a href="/api/entities">styled text entities</a> and links in story text captions can be used by all users (<code>enabled</code>), only [Premium](/api/premium users) (<code>premium</code>), or no one (<code>disabled</code>). (string)</p>
-<p>This field is used both when posting stories, to indicate to the user whether they can use entities, and when viewing stories, to hide entities (client-side) on stories posted by users whose <a href="/api/premium">Premium</a> subscription has expired (if <code>stories_entities == "premium"</code> and <a href="/constructor/user">user</a>.<code>premium</code> is not set, or if <code>stories_entities == "disabled"</code>).  </p>
+<p>This field is used both when posting stories, to indicate to the user whether they can use entities, and when viewing stories, to hide entities (client-side) on stories posted by users whose <a href="/api/premium">Premium</a> subscription has expired (if <code>stories_entities == "premium"</code> and <a href="/constructor/user">user</a>.<code>premium</code> is not set, or if <code>stories_entities == "disabled"</code>).</p>
 <h4><a class="anchor" href="#stories-area-url-max" id="stories-area-url-max" name="stories-area-url-max"><i class="anchor-icon"></i></a><code>stories_area_url_max</code></h4>
 <p>Maximum number of <a href="/api/stories#media-areas">URL media areas »</a> that can be added to a posted story. (integer)</p>
 <h4><a class="anchor" href="#giveaway-gifts-purchase-available" id="giveaway-gifts-purchase-available" name="giveaway-gifts-purchase-available"><i class="anchor-icon"></i></a><code>giveaway_gifts_purchase_available</code></h4>
@@ -628,7 +629,7 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <h4><a class="anchor" href="#boosts-channel-level-max" id="boosts-channel-level-max" name="boosts-channel-level-max"><i class="anchor-icon"></i></a><code>boosts_channel_level_max</code></h4>
 <p>Maximum <a href="/api/boost">boost level</a> for channels. (integer)</p>
 <h4><a class="anchor" href="#boosts-per-sent-gift" id="boosts-per-sent-gift" name="boosts-per-sent-gift"><i class="anchor-icon"></i></a><code>boosts_per_sent_gift</code></h4>
-<p>The number of additional <a href="/api/boost">boost slots</a> that the current user will receive when <a href="/api/premium#gifting-telegram-premium">gifting a Telegram Premium subscription</a>.  </p>
+<p>The number of additional <a href="/api/boost">boost slots</a> that the current user will receive when <a href="/api/premium#gifting-telegram-premium">gifting a Telegram Premium subscription</a>.</p>
 <h4><a class="anchor" href="#transcribe-audio-trial-weekly-number" id="transcribe-audio-trial-weekly-number" name="transcribe-audio-trial-weekly-number"><i class="anchor-icon"></i></a><code>transcribe_audio_trial_weekly_number</code></h4>
 <p>The maximum number of <a href="/api/transcribe">speech recognition »</a> calls per week for non-<a href="/api/premium">Premium</a> users. (integer)</p>
 <h4><a class="anchor" href="#transcribe-audio-trial-duration-max" id="transcribe-audio-trial-duration-max" name="transcribe-audio-trial-duration-max"><i class="anchor-icon"></i></a><code>transcribe_audio_trial_duration_max</code></h4>
@@ -731,8 +732,10 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <p>Minimum allowed permille affiliate commission for <a href="/api/bots/referrals">referral programs »</a>. (integer)</p>
 <h4><a class="anchor" href="#starref-max-commission-permille" id="starref-max-commission-permille" name="starref-max-commission-permille"><i class="anchor-icon"></i></a><code>starref_max_commission_permille</code></h4>
 <p>Maximum allowed permille affiliate commission for <a href="/api/bots/referrals">referral programs »</a>. (integer)</p>
-<h4><a class="anchor" href="#bot-verification-description-length-limit" id="bot-verification-description-length-limit" name="bot-verification-description-length-limit"><i class="anchor-icon"></i></a><code>bot_verification_description_length_limit</code></h4>
-<p> </p>
+<h4><a class="anchor" href="#inapp-update-check-delay" id="inapp-update-check-delay" name="inapp-update-check-delay"><i class="anchor-icon"></i></a><code>inapp_update_check_delay</code></h4>
+<p>Integer, <a href="/method/help.getAppUpdate">help.getAppUpdate</a> should be invoked every <code>inapp_update_check_delay</code> update seconds (if set) to check for app updates.</p>
+<h4><a class="anchor" href="#premium-manage-subscription-url" id="premium-manage-subscription-url" name="premium-manage-subscription-url"><i class="anchor-icon"></i></a><code>premium_manage_subscription_url</code></h4>
+<p>URL/deep link that can be opened to manage the premium subscription. (string)</p>
 <!-- end config description -->
 <h3><a class="anchor" href="#suggestions" id="suggestions" name="suggestions"><i class="anchor-icon"></i></a>Suggestions</h3>
 <p>The API can return a set of useful suggestions for users of graphical clients.  </p>
