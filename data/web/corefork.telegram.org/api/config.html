@@ -404,6 +404,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
 }</code></pre>
 <!-- end config -->
 <p>The fields included in the resulting JSON object are:  </p>
+<!-- start config description -->
 <h4><a class="anchor" href="#weather-search-username" id="weather-search-username" name="weather-search-username"><i class="anchor-icon"></i></a><code>weather_search_username</code></h4>
 <p>Contains the username of the bot used to query the current weather, to use in <a href="/api/stories#weather">weather media areas as specified here »</a>. (string)</p>
 <h4><a class="anchor" href="#story-weather-preload" id="story-weather-preload" name="story-weather-preload"><i class="anchor-icon"></i></a><code>story_weather_preload</code></h4>
@@ -732,7 +733,7 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <p>Maximum allowed permille affiliate commission for <a href="/api/bots/referrals">referral programs »</a>. (integer)</p>
 <h4><a class="anchor" href="#bot-verification-description-length-limit" id="bot-verification-description-length-limit" name="bot-verification-description-length-limit"><i class="anchor-icon"></i></a><code>bot_verification_description_length_limit</code></h4>
 <p> </p>
-<!-- Last entry -->
+<!-- end config description -->
 <h3><a class="anchor" href="#suggestions" id="suggestions" name="suggestions"><i class="anchor-icon"></i></a>Suggestions</h3>
 <p>The API can return a set of useful suggestions for users of graphical clients.  </p>
 <h4><a class="anchor" href="#basic-suggestions" id="basic-suggestions" name="basic-suggestions"><i class="anchor-icon"></i></a>Basic suggestions</h4>
@@ -750,24 +751,34 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <a href='/method/help.getAppConfig'>help.getAppConfig</a>#61e3f854 hash:<a href='/type/int'>int</a> = <a href='/type/help.AppConfig'>help.AppConfig</a>;</code></pre>
 <p>The <a href="/method/help.getAppConfig">help.getAppConfig</a> method returns a JSON object containing rapidly evolving, client-specific configuration parameters.<br>
 A full list of these parameters can be seen in the <a href="#client-configuration">Client Configuration section »</a>, but we're mostly interested in the <code>pending_suggestions</code> and <code>autoarchive_setting_available</code> fields of the returned JSON object:  </p>
-<ul>
-<li><code>autoarchive_setting_available</code> - Whether clients <em>can</em> invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a> with <a href="/constructor/globalPrivacySettings"><code>globalPrivacySettings.archive_and_mute_new_noncontact_peers = boolTrue</code></a>, to automatically archive and mute new incoming chats from non-contacts. (boolean)</li>
-<li><code>pending_suggestions</code> - Contains a list of suggestions that should be actively shown as a tooltip to the user. Array of strings, possible values shown below:<ul>
-<li><code>"AUTOARCHIVE_POPULAR"</code> - Users <em>should</em> invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a> with <a href="/constructor/globalPrivacySettings"><code>globalPrivacySettings.archive_and_mute_new_noncontact_peers = boolTrue</code></a>, to automatically archive and mute new incoming chats from non-contacts.</li>
-<li><code>"VALIDATE_PASSWORD"</code> - Users should make sure they still remember their <a href="/api/srp">2-step verification password</a>.</li>
-<li><code>"VALIDATE_PHONE_NUMBER"</code> - Users should check whether their <a href="/api/auth">authorization phone number</a> is correct and change the phone number if it is inaccessible.</li>
-<li><code>"NEWCOMER_TICKS"</code> - Show the user a hint about the meaning of one and two ticks on sent messages.</li>
-<li><code>"SETUP_PASSWORD"</code> - Show the user a hint, asking them to check whether they still remember their <a href="/api/srp">2FA password</a></li>
-<li><code>"PREMIUM_ANNUAL"</code> - Suggests the user to subscribe to Telegram Premium (with annual payments)</li>
-<li><code>"PREMIUM_UPGRADE"</code> - Suggests the user to upgrade their existing Premium subscription from monthly payments to annual payments</li>
-<li><code>"PREMIUM_RESTORE"</code> - Suggests the user to restore a recently expired Premium subscription</li>
-<li><code>"PREMIUM_CHRISTMAS"</code> - Suggests the user to <a href="/api/premium#gifting-telegram-premium">gift Telegram Premium</a> subscriptions to friends for Christmas.</li>
-<li><code>"PREMIUM_GRACE"</code> -  Suggests the user to extend their expiring Telegram Premium subscription</li>
-<li><code>"BIRTHDAY_SETUP"</code> - Suggests the user to set a <a href="/api/profile#birthday">birthday »</a>.</li>
-<li><code>"STARS_SUBSCRIPTION_LOW_BALANCE"</code> - When we get close to the end of the subscription period of one or more active subscriptions, and the current <a href="/api/stars">Telegram Star balance</a> is not high enough to autorenew at least one of them, this suggestion will be activated: when the user clicks on the suggestion, the client should fetch and display the list of expiring subscriptions by invoking <a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a>, passing <a href="/constructor/inputPeerSelf">inputPeerSelf</a> to <code>peer</code> and setting the <code>missing_balance</code> flag: the returned subscriptions may be renewed by <a href="/api/stars">filling up the current Telegram Star balance</a> with at least <a href="/constructor/payments.starsStatus">payments.starsStatus</a>.<code>subscriptions_missing_balance</code> stars.</li>
-</ul>
-</li>
-</ul>
+<p>The <code>autoarchive_setting_available</code> flag indicates whether clients <em>can</em> invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a> with <a href="/constructor/globalPrivacySettings"><code>globalPrivacySettings.archive_and_mute_new_noncontact_peers = boolTrue</code></a>, to automatically archive and mute new incoming chats from non-contacts. (boolean)</p>
+<p>The <code>pending_suggestions</code> field contains a list of suggestions that should be actively shown as a tooltip to the user as an array of strings, possible values shown below:</p>
+<!-- start suggestions -->
+<h5><a class="anchor" href="#autoarchive-popular" id="autoarchive-popular" name="autoarchive-popular"><i class="anchor-icon"></i></a><code>AUTOARCHIVE_POPULAR</code></h5>
+<p>Users <em>should</em> invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a> with <a href="/constructor/globalPrivacySettings"><code>globalPrivacySettings.archive_and_mute_new_noncontact_peers = boolTrue</code></a>, to automatically archive and mute new incoming chats from non-contacts.</p>
+<h5><a class="anchor" href="#validate-password" id="validate-password" name="validate-password"><i class="anchor-icon"></i></a><code>VALIDATE_PASSWORD</code></h5>
+<p>Users should make sure they still remember their <a href="/api/srp">2-step verification password</a>.</p>
+<h5><a class="anchor" href="#validate-phone-number" id="validate-phone-number" name="validate-phone-number"><i class="anchor-icon"></i></a><code>VALIDATE_PHONE_NUMBER</code></h5>
+<p>Users should check whether their <a href="/api/auth">authorization phone number</a> is correct and change the phone number if it is inaccessible.</p>
+<h5><a class="anchor" href="#newcomer-ticks" id="newcomer-ticks" name="newcomer-ticks"><i class="anchor-icon"></i></a><code>NEWCOMER_TICKS</code></h5>
+<p>Show the user a hint about the meaning of one and two ticks on sent messages.</p>
+<h5><a class="anchor" href="#setup-password" id="setup-password" name="setup-password"><i class="anchor-icon"></i></a><code>SETUP_PASSWORD</code></h5>
+<p>Show the user a hint, asking them to check whether they still remember their <a href="/api/srp">2FA password</a></p>
+<h5><a class="anchor" href="#premium-annual" id="premium-annual" name="premium-annual"><i class="anchor-icon"></i></a><code>PREMIUM_ANNUAL</code></h5>
+<p>Suggests the user to subscribe to Telegram Premium (with annual payments)</p>
+<h5><a class="anchor" href="#premium-upgrade" id="premium-upgrade" name="premium-upgrade"><i class="anchor-icon"></i></a><code>PREMIUM_UPGRADE</code></h5>
+<p>Suggests the user to upgrade their existing Premium subscription from monthly payments to annual payments</p>
+<h5><a class="anchor" href="#premium-restore" id="premium-restore" name="premium-restore"><i class="anchor-icon"></i></a><code>PREMIUM_RESTORE</code></h5>
+<p>Suggests the user to restore a recently expired Premium subscription</p>
+<h5><a class="anchor" href="#premium-christmas" id="premium-christmas" name="premium-christmas"><i class="anchor-icon"></i></a><code>PREMIUM_CHRISTMAS</code></h5>
+<p>Suggests the user to <a href="/api/premium#gifting-telegram-premium">gift Telegram Premium</a> subscriptions to friends for Christmas.</p>
+<h5><a class="anchor" href="#premium-grace" id="premium-grace" name="premium-grace"><i class="anchor-icon"></i></a><code>PREMIUM_GRACE</code></h5>
+<p>Suggests the user to extend their expiring Telegram Premium subscription</p>
+<h5><a class="anchor" href="#birthday-setup" id="birthday-setup" name="birthday-setup"><i class="anchor-icon"></i></a><code>BIRTHDAY_SETUP</code></h5>
+<p>Suggests the user to set a <a href="/api/profile#birthday">birthday »</a>.</p>
+<h5><a class="anchor" href="#stars-subscription-low-balance" id="stars-subscription-low-balance" name="stars-subscription-low-balance"><i class="anchor-icon"></i></a><code>STARS_SUBSCRIPTION_LOW_BALANCE</code></h5>
+<p>When we get close to the end of the subscription period of one or more active subscriptions, and the current <a href="/api/stars">Telegram Star balance</a> is not high enough to autorenew at least one of them, this suggestion will be activated: when the user clicks on the suggestion, the client should fetch and display the list of expiring subscriptions by invoking <a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a>, passing <a href="/constructor/inputPeerSelf">inputPeerSelf</a> to <code>peer</code> and setting the <code>missing_balance</code> flag: the returned subscriptions may be renewed by <a href="/api/stars">filling up the current Telegram Star balance</a> with at least <a href="/constructor/payments.starsStatus">payments.starsStatus</a>.<code>subscriptions_missing_balance</code> stars.</p>
+<!-- end suggestions -->
 <h4><a class="anchor" href="#inverted-suggestions" id="inverted-suggestions" name="inverted-suggestions"><i class="anchor-icon"></i></a>Inverted suggestions</h4>
 <p>These suggestions are <em>enabled by default</em>, and are never returned in the <code>pending_suggestions</code> field of the <a href="#client-configuration">client configuration object</a>.  </p>
 <p>They can be dismissed by invoking <a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> as usual, but unlike <a href="#basic-suggestions">basic suggestions</a>, once dismissed they will appear in the <code>dismissed_suggestions</code> field of the <a href="#client-configuration">client configuration object</a>.  </p>
@@ -785,9 +796,10 @@ This suggestion can be dismissed by invoking <a href="/method/help.dismissSugges
 <a href='/method/channels.getFullChannel'>channels.getFullChannel</a>#8736a09 channel:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/messages.ChatFull'>messages.ChatFull</a>;</code></pre>
 <p>Some <a href="/api/channel">channel/supergroup</a>-related suggestions can also be contained in the <code>pending_suggestions</code> field of the <a href="/constructor/channelFull">channelFull</a> constructor, returned by <a href="/method/channels.getFullChannel">channels.getFullChannel</a>.<br>
 Here's a list of possible suggestions:  </p>
-<ul>
-<li><code>CONVERT_GIGAGROUP</code> - The <a href="/api/channel">supergroup</a> has many participants: the admin should call <a href="/method/channels.convertToGigagroup">channels.convertToGigagroup</a> to convert it to a gigagroup.</li>
-</ul>
+<!-- start dialog suggestions -->
+<h5><a class="anchor" href="#convert-gigagroup" id="convert-gigagroup" name="convert-gigagroup"><i class="anchor-icon"></i></a><code>CONVERT_GIGAGROUP</code></h5>
+<p>The <a href="/api/channel">supergroup</a> has many participants: the admin should call <a href="/method/channels.convertToGigagroup">channels.convertToGigagroup</a> to convert it to a gigagroup.</p>
+<!-- end dialog suggestions -->
 <h4><a class="anchor" href="#dismissing-suggestions" id="dismissing-suggestions" name="dismissing-suggestions"><i class="anchor-icon"></i></a>Dismissing suggestions</h4>
 <pre><code><a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
 <a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
