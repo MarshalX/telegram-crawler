@@ -46,10 +46,40 @@
 
 <p>Below you will find information on schema changes. For more details on the use of layers, see <a href="/api/invoking#layers">Invoking API methods</a>.</p>
 <h3><a class="anchor" href="#layer-195" id="layer-195" name="layer-195"><i class="anchor-icon"></i></a><a href="/schema?layer=195">Layer 195</a></h3>
+<p>Start reading the changelog at <a href="#layer-186">layer 186</a> to view all changes since the last refresh of the documentation.</p>
 <p>This layer introduces the following new features:</p>
 <ul>
-<li><a href="/api/bots/referrals">Affiliate programs for bots »</a></li>
-<li><a href="/api/stickers#searching-stickers">AI-powered sticker search »</a></li>
+<li>
+<p><a href="/api/bots/referrals">Affiliate programs for bots »</a>This includes the following new <a href="/api/config#client-configuration">client configuration keys »</a></p>
+<ul>
+<li><a href="/api/config#starref-start-param-prefixes">starref_start_param_prefixes »</a></li>
+<li><a href="/api/config#starref-program-allowed">starref_program_allowed »</a></li>
+<li><a href="/api/config#starref-connect-allowed">starref_connect_allowed »</a></li>
+<li><a href="/api/config#starref-min-commission-permille">starref_min_commission_permille »</a></li>
+<li><a href="/api/config#starref-max-commission-permille">starref_max_commission_permille »</a></li>
+</ul>
+<p>And the following new deep links:</p>
+<ul>
+<li><a href="/api/links#referral-links">Referral links »</a></li>
+</ul>
+</li>
+<li>
+<p><a href="/api/stickers#searching-stickers">AI-powered sticker search »</a></p>
+</li>
+<li>
+<p>The <a href="/api/errors">RPC error database was updated »</a></p>
+</li>
+</ul>
+<p>The following documentation was added for pre-existing features:</p>
+<ul>
+<li>Documentation was added for the following pre-existing <a href="/api/config#client-configuration">client configuration keys »</a>:<ul>
+<li><a href="/api/config#inapp-update-check-delay">inapp_update_check_delay »</a></li>
+<li><a href="/api/config#premium-manage-subscription-url">premium_manage_subscription_url »</a></li>
+</ul>
+</li>
+<li>Added documentation about <a href="/api/premium#stories">Telegram Premium story feature identifiers »</a></li>
+<li>Added documentation about <a href="/api/premium#double-limits">Telegram Premium limit feature identifiers »</a></li>
+<li>Updated the list of <a href="/constructor/webPage">webPage types »</a></li>
 </ul>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
@@ -134,12 +164,89 @@
 <p>This layer introduces the following new features, mainly related to <a href="https://telegram.org/blog/fullscreen-miniapps-and-more">Mini Apps 2.0</a>:</p>
 <ul>
 <li><a href="/api/bots/inline#21-using-a-prepared-inline-message">Prepared inline messages from mini apps »</a></li>
-<li><a href="/api/emoji-status#setting-an-emoji-status-from-a-bot">Setting a user's emoji status from a bot</a></li>
+<li><a href="/api/emoji-status#setting-an-emoji-status-from-a-bot">Setting a user's emoji status from a bot/mini app</a></li>
 <li><a href="/api/web-events#web-app-request-file-download">Mini app file downloads »</a></li>
-<li><a href="/api/subscriptions#bot-subscriptions">Bot subscriptions »</a></li>
-<li>Fullscreen <a href="/api/bots/webapps">mini apps</a></li>
+<li><a href="/api/web-events#web-app-share-to-story">Share stories from a mini app »</a></li>
+<li><a href="/api/subscriptions#bot-subscriptions">Bot subscriptions »</a><ul>
+<li><a href="/method/payments.exportInvoice">payments.exportInvoice</a> can now be invoked over a <a href="/api/business#connected-bots">business connection</a> to generate subscription invoice links</li>
+</ul>
+</li>
+<li>Fullscreen <a href="/api/bots/webapps">mini apps</a><ul>
+<li>Added <code>fullscreen</code> parameters to <a href="/constructor/webViewResultUrl">webViewResultUrl</a> to allow opening apps in fullscreen mode by default (editable via botfather, can also be enabled by setting the <code>fullscreen</code> flag in the requestWebView methods)</li>
+<li>The <code>mode</code> parameter of <a href="/api/links#main-mini-app-links">main mini app links</a> and <a href="/api/links#direct-mini-app-links">direct mini app links</a> now supports <code>fullscreen</code> mode, which forces setting the <code>fullscreen</code> flag in the requestWebView methods</li>
+<li>Added a <a href="/api/web-events#web-app-request-fullscreen">web_app_request_fullscreen »</a> method to request fullscreen mode in mini apps</li>
+</ul>
+</li>
 <li><a href="/api/gifts">Gifts</a> from bots, gift privacy settings and birthday-themed gifts</li>
 <li><a href="/constructor/botAppSettings">Customization for the mini app loading screen »</a></li>
+<li><a href="/api/web-events#web-app-start-accelerometer">Accelerometer tracking for mini apps »</a></li>
+<li><a href="/api/web-events#web-app-start-gyroscope">Gyroscope tracking for mini apps »</a></li>
+<li><a href="/api/web-events#web-app-start-device-orientation">Device orientation tracking for mini apps »</a></li>
+<li><a href="/api/web-events#web-app-toggle-orientation-lock">Orientation lock for mini apps »</a></li>
+<li><a href="/api/web-events#web-app-request-location">Geolocation support for mini apps »</a></li>
+<li><a href="/api/bots/webapps#visibility-changed">Visibility tracking for mini apps »</a></li>
+<li><a href="/api/web-events#web-app-add-to-home-screen">Add mini apps to the homescreen »</a></li>
+<li>Methods usable by mini apps to obtain the current <a href="/api/web-events#web-app-request-content-safe-area">content-defined »</a> and <a href="/api/web-events#web-app-request-safe-area">system-defined »</a> safe areas</li>
+<li><a href="/api/web-events#web-app-setup-swipe-behavior">Allow customizing the vertical swipe behavior in mini apps</a></li>
+<li><a href="/api/web-events#web-app-setup-secondary-button">A secondary button for mini apps</a></li>
+<li>Even more theming options for mini apps with a custom <a href="/api/web-events#web-app-set-bottom-bar-color">bottom bar color</a></li>
+</ul>
+<p>The following new <a href="/api/web-events">web events »</a> were added:</p>
+<ul>
+<li><a href="/api/web-events#web-app-setup-swipe-behavior">web_app_setup_swipe_behavior »</a></li>
+<li><a href="/api/web-events#web-app-set-bottom-bar-color">web_app_set_bottom_bar_color »</a></li>
+<li><a href="/api/web-events#web-app-setup-secondary-button">web_app_setup_secondary_button »</a></li>
+<li><a href="/api/web-events#web-app-share-to-story">web_app_share_to_story »</a></li>
+<li><a href="/api/web-events#web-app-request-fullscreen">web_app_request_fullscreen »</a></li>
+<li><a href="/api/web-events#web-app-exit-fullscreen">web_app_exit_fullscreen »</a></li>
+<li><a href="/api/web-events#web-app-start-gyroscope">web_app_start_gyroscope »</a></li>
+<li><a href="/api/web-events#web-app-stop-gyroscope">web_app_stop_gyroscope »</a></li>
+<li><a href="/api/web-events#web-app-start-device-orientation">web_app_start_device_orientation »</a></li>
+<li><a href="/api/web-events#web-app-stop-device-orientation">web_app_stop_device_orientation »</a></li>
+<li><a href="/api/web-events#web-app-add-to-home-screen">web_app_add_to_home_screen »</a></li>
+<li><a href="/api/web-events#web-app-check-home-screen">web_app_check_home_screen »</a></li>
+<li><a href="/api/web-events#web-app-set-emoji-status">web_app_set_emoji_status »</a></li>
+<li><a href="/api/web-events#web-app-request-emoji-status-access">web_app_request_emoji_status_access »</a></li>
+<li><a href="/api/web-events#web-app-request-safe-area">web_app_request_safe_area »</a></li>
+<li><a href="/api/web-events#web-app-request-content-safe-area">web_app_request_content_safe_area »</a></li>
+<li><a href="/api/web-events#web-app-check-location">web_app_check_location »</a></li>
+<li><a href="/api/web-events#web-app-request-location">web_app_request_location »</a></li>
+<li><a href="/api/web-events#web-app-open-location-settings">web_app_open_location_settings »</a></li>
+<li><a href="/api/web-events#web-app-request-file-download">web_app_request_file_download »</a></li>
+<li><a href="/api/web-events#web-app-send-prepared-message">web_app_send_prepared_message »</a></li>
+<li><a href="/api/web-events#web-app-toggle-orientation-lock">web_app_toggle_orientation_lock »</a></li>
+</ul>
+<p>The following new <a href="/api/bots/webapps">mini app events »</a> were added:</p>
+<ul>
+<li><a href="/api/bots/webapps#visibility-changed">visibility_changed »</a></li>
+<li><a href="/api/bots/webapps#secondary-button-pressed">secondary_button_pressed »</a></li>
+<li><a href="/api/bots/webapps#fullscreen-changed">fullscreen_changed »</a></li>
+<li><a href="/api/bots/webapps#fullscreen-failed">fullscreen_failed »</a></li>
+<li><a href="/api/bots/webapps#accelerometer-started">accelerometer_started »</a></li>
+<li><a href="/api/bots/webapps#accelerometer-failed">accelerometer_failed »</a></li>
+<li><a href="/api/bots/webapps#accelerometer-stopped">accelerometer_stopped »</a></li>
+<li><a href="/api/bots/webapps#accelerometer-changed">accelerometer_changed »</a></li>
+<li><a href="/api/bots/webapps#gyroscope-started">gyroscope_started »</a></li>
+<li><a href="/api/bots/webapps#gyroscope-failed">gyroscope_failed »</a></li>
+<li><a href="/api/bots/webapps#gyroscope-stopped">gyroscope_stopped »</a></li>
+<li><a href="/api/bots/webapps#gyroscope-changed">gyroscope_changed »</a></li>
+<li><a href="/api/bots/webapps#device-orientation-started">device_orientation_started »</a></li>
+<li><a href="/api/bots/webapps#device-orientation-failed">device_orientation_failed »</a></li>
+<li><a href="/api/bots/webapps#device-orientation-stopped">device_orientation_stopped »</a></li>
+<li><a href="/api/bots/webapps#device-orientation-changed">device_orientation_changed »</a></li>
+<li><a href="/api/bots/webapps#home-screen-added">home_screen_added »</a></li>
+<li><a href="/api/bots/webapps#home-screen-failed">home_screen_failed »</a></li>
+<li><a href="/api/bots/webapps#home-screen-checked">home_screen_checked »</a></li>
+<li><a href="/api/bots/webapps#emoji-status-failed">emoji_status_failed »</a></li>
+<li><a href="/api/bots/webapps#emoji-status-set">emoji_status_set »</a></li>
+<li><a href="/api/bots/webapps#emoji-status-access-requested">emoji_status_access_requested »</a></li>
+<li><a href="/api/bots/webapps#file-download-requested">file_download_requested »</a></li>
+<li><a href="/api/bots/webapps#prepared-message-failed">prepared_message_failed »</a></li>
+<li><a href="/api/bots/webapps#prepared-message-sent">prepared_message_sent »</a></li>
+<li><a href="/api/bots/webapps#safe-area-changed">safe_area_changed »</a></li>
+<li><a href="/api/bots/webapps#content-safe-area-changed">content_safe_area_changed »</a></li>
+<li><a href="/api/bots/webapps#location-requested">location_requested »</a></li>
+<li><a href="/api/bots/webapps#location-checked">location_checked »</a></li>
 </ul>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
@@ -287,6 +394,13 @@
 <li><a href="/constructor/keyboardButtonCopy">Clipboard button »</a></li>
 <li><a href="/api/sponsored-messages">Sponsored message improvements »</a></li>
 <li><a href="/method/messages.report">Improvements to the reporting flow »</a></li>
+</ul>
+<p>The following new config keys were added:</p>
+<ul>
+<li><a href="/api/config#stargifts-message-length-max">stargifts_message_length_max »</a></li>
+<li><a href="/api/config#stargifts-blocked">stargifts_blocked »</a></li>
+<li><a href="/api/config#stargifts-convert-period-max">stargifts_convert_period_max »</a></li>
+<li><a href="/api/config#video-ignore-alt-documents">video_ignore_alt_documents »</a></li>
 </ul>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
@@ -445,6 +559,21 @@ Enabling this mode will allow admins to post messages to the channel as any of t
 The new <a href="/constructor/channel">channel</a>.<code>signature_profiles</code> flag is a <a href="/constructor/channel">valid min field</a>.</li>
 <li><a href="/api/sponsored-messages">Media in sponsored messages</a></li>
 <li>Privacy policies for bots through the <a href="/constructor/botInfo">botInfo</a>.<code>privacy_policy_url</code> parameter.</li>
+</ul>
+<p>The following new suggestions were added:</p>
+<ul>
+<li><a href="/api/config#stars-subscription-low-balance">STARS_SUBSCRIPTION_LOW_BALANCE »</a></li>
+</ul>
+<p>The following new config keys were added:</p>
+<ul>
+<li><a href="/api/config#stars-subscription-amount-max">stars_subscription_amount_max »</a></li>
+<li><a href="/api/config#stars-usd-sell-rate-x1000">stars_usd_sell_rate_x1000 »</a></li>
+<li><a href="/api/config#stars-usd-withdraw-rate-x1000">stars_usd_withdraw_rate_x1000 »</a></li>
+<li><a href="/api/config#stars-paid-reaction-amount-max">stars_paid_reaction_amount_max »</a></li>
+</ul>
+<p>The following new deep links were added:</p>
+<ul>
+<li><a href="/api/links#stars-topup-link">Stars topup link »</a></li>
 </ul>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>

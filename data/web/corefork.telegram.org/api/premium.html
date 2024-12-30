@@ -76,23 +76,96 @@ You can also directly use <a href="/method/help.getPremiumPromo">help.getPremium
 Clicking on this button in the settings, clicking on the <a href="#badge">badge</a> of a Premium user or hitting one of the Premium limits listed below should open a Telegram Premium modal.  </p>
 <p>Call <a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> and <a href="/method/help.getAppConfig">help.getAppConfig</a> to fetch info on how to build the premium modal.  </p>
 <p><a href="/method/help.getAppConfig">help.getAppConfig</a> will return a list of Premium feature identifiers in the <a href="/api/config#premium-promo-order"><code>premium_promo_order</code> appConfig field</a>: the modal should contain a row for each returned feature, ordered as specified in the returned array.  </p>
+<p>These feature identifiers must be used when <a href="#subscribing-to-telegram-premium">subscribing to Telegram Premium</a> if the related limit was hit.  </p>
 <p>Possible feature identifiers:</p>
 <!-- start features -->
 <h5><a class="anchor" href="#stories" id="stories" name="stories"><i class="anchor-icon"></i></a><code>stories</code></h5>
-<p>Premium users have various <a href="/api/stories">Story</a>-related improvements:</p>
-<ul>
-<li>Stories posted by Premium users are shown first to users when fetching the list of active stories with <a href="/method/stories.getAllStories">stories.getAllStories »</a>.  </li>
-<li>Premium users can activate <a href="/api/stories#stealth-mode">stealth mode »</a></li>
-<li>Premium users can <a href="/api/stories#fetching-the-interaction-list">fetch the full viewer list of stories, even after they expire »</a></li>
-<li>Premium users can set <a href="/api/stories">custom expiration options when posting stories »</a></li>
-<li>Premium users can post stories with longer captions, as specified by the <a href="/api/config#story-caption-length-limit-default"><code>story_caption_length_limit_*</code> »</a> config keys.</li>
-<li>Premium users can add more <a href="/api/stories#media-areas">story reaction media areas »</a> to a story, as specified by the <a href="/api/config#stories-suggested-reactions-limit-default"><code>stories_suggested_reactions_limit_*</code> »</a> config keys.</li>
-<li>Premium users can <a href="/api/entities">styled text entities</a> and links in story captions, as specified by the <a href="/api/config#stories-entities">stories_entities »</a> config key.</li>
-<li>Premium users can download non-protected stories.</li>
-</ul>
+<p><a href="/api/premium">Telegram Premium</a> adds some <a href="/api/stories">story-related</a> features.</p>
+<p>Story-related Premium features also have certain subidentifiers, which are used if the user chooses to <a href="/api/premium#subscribing-to-telegram-premium">subscribe to Telegram Premium</a> after hitting one of the following story-related limitations.  </p>
+<p>If the user instead signs up simply after reading the promo page for story-related features, pass just <code>stories</code> as feature identifier.  </p>
+<p>Here's the full list of story-related features and their sub-identifiers (contained in the title header):</p>
+<!-- start story features -->
+<h6><code>stories__priority_order</code></h6>
+<p>Stories posted by Premium users are shown first to users when fetching the list of active stories with <a href="/method/stories.getAllStories">stories.getAllStories »</a>.</p>
+<h6><code>stories__stealth_mode</code></h6>
+<p>Premium users can activate <a href="/api/stories#stealth-mode">stealth mode »</a>.</p>
+<h6><code>stories__permanent_views_history</code></h6>
+<p>Premium users can <a href="/api/stories#fetching-the-interaction-list">fetch the full viewer list of stories, even after they expire »</a></p>
+<h6><code>stories__expiration_durations</code></h6>
+<p>Premium users can set <a href="/api/stories">custom expiration options when posting stories »</a></p>
+<h6><code>stories__save_stories_to_gallery</code></h6>
+<p>Premium users can save other users' unprotected stories.</p>
+<h6><code>stories__links_and_formatting</code></h6>
+<p>Premium users can <a href="/api/entities">styled text entities</a> and links in story captions and use <a href="/api/stories#urls">URL media areas</a>, as specified by the <a href="/api/config#stories-entities">stories_entities »</a> config key.</p>
+<h6><code>stories__quality</code></h6>
+<p>Premium users can view stories in a higher quality.</p>
+<!-- end story features -->
+<p>There are a few more Premium story features that are listed in the <a href="#double-limits">limits »</a> section.  </p>
 <p>See the <a href="/api/stories">stories documentation »</a> for more information on stories.</p>
 <h5><a class="anchor" href="#double-limits" id="double-limits" name="double-limits"><i class="anchor-icon"></i></a><code>double_limits</code></h5>
-<p>Clicking on this entry should open a secondary popup with a list of the <a href="#premium-limits">improved Premium limits »</a>.</p>
+<p>Clicking on this entry should open a secondary popup with a list of the improved Premium limits, as follows.</p>
+<p>Limit-related Premium features also have certain subidentifiers, which are used if the user chooses to <a href="/api/premium#subscribing-to-telegram-premium">subscribe to Telegram Premium</a> after hitting one of the following limitations.  </p>
+<p>If the user instead signs up simply after reading the promo page for limits, pass just <code>double_limits</code> as feature identifier.  </p>
+<p>Here's the full list of improved limits and their sub-identifiers (contained in the title header):</p>
+<!-- start limits -->
+<h6><code>double_limits__channels</code></h6>
+<p>Config keys: <a href="/api/config#channels-limit-premium">channels_limit_premium »</a>/<a href="/api/config#channels-limit-default">channels_limit_default »</a></p>
+<p>The maximum number of <a href="/api/channel">channels and supergroups</a> a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may join (integer)</p>
+<h6><code>double_limits__saved_gifs</code></h6>
+<p>Config keys: <a href="/api/config#saved-gifs-limit-premium">saved_gifs_limit_premium »</a>/<a href="/api/config#saved-gifs-limit-default">saved_gifs_limit_default »</a></p>
+<p>The maximum number of GIFs a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may save (integer)</p>
+<h6><code>double_limits__stickers_faved</code></h6>
+<p>Config keys: <a href="/api/config#stickers-faved-limit-premium">stickers_faved_limit_premium »</a>/<a href="/api/config#stickers-faved-limit-default">stickers_faved_limit_default »</a></p>
+<p>The maximum number of stickers a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may <a href="/api/stickers#favorite-stickersets">add to Favorites »</a> (integer)</p>
+<h6><code>double_limits__dialog_filters</code></h6>
+<p>Config keys: <a href="/api/config#dialog-filters-limit-premium">dialog_filters_limit_premium »</a>/<a href="/api/config#dialog-filters-limit-default">dialog_filters_limit_default »</a></p>
+<p>The maximum number of <a href="/api/folders">folders</a> a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may create (integer)</p>
+<h6><code>double_limits__dialog_filters_chats</code></h6>
+<p>Config keys: <a href="/api/config#dialog-filters-chats-limit-premium">dialog_filters_chats_limit_premium »</a>/<a href="/api/config#dialog-filters-chats-limit-default">dialog_filters_chats_limit_default »</a></p>
+<p>The maximum number of chats a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may add to a <a href="/api/folders">folder</a> (integer)</p>
+<h6><code>double_limits__dialogs_pinned</code></h6>
+<p>Config keys: <a href="/api/config#dialogs-pinned-limit-premium">dialogs_pinned_limit_premium »</a>/<a href="/api/config#dialogs-pinned-limit-default">dialogs_pinned_limit_default »</a></p>
+<p>The maximum number of chats a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may pin (integer)</p>
+<h6><code>double_limits__dialogs_folder_pinned</code></h6>
+<p>Config keys: <a href="/api/config#dialogs-folder-pinned-limit-premium">dialogs_folder_pinned_limit_premium »</a>/<a href="/api/config#dialogs-folder-pinned-limit-default">dialogs_folder_pinned_limit_default »</a></p>
+<p>The maximum number of chats a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may pin in a folder (integer)</p>
+<h6><code>double_limits__channels_public</code></h6>
+<p>Config keys: <a href="/api/config#channels-public-limit-premium">channels_public_limit_premium »</a>/<a href="/api/config#channels-public-limit-default">channels_public_limit_default »</a></p>
+<p>The maximum number of public <a href="/api/channel">channels or supergroups</a> a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may create (integer)</p>
+<h6><code>double_limits__caption_length</code></h6>
+<p>Config keys: <a href="/api/config#caption-length-limit-premium">caption_length_limit_premium »</a>/<a href="/api/config#caption-length-limit-default">caption_length_limit_default »</a></p>
+<p>The maximum UTF-8 length of media captions sendable by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users (integer)</p>
+<h6><code>double_limits__about_length</code></h6>
+<p>Config keys: <a href="/api/config#about-length-limit-premium">about_length_limit_premium »</a>/<a href="/api/config#about-length-limit-default">about_length_limit_default »</a></p>
+<p>The maximum UTF-8 length of bios of <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users (integer)</p>
+<h6><code>double_limits__chatlist_invites</code></h6>
+<p>Config keys: <a href="/api/config#chatlist-invites-limit-premium">chatlist_invites_limit_premium »</a>/<a href="/api/config#chatlist-invites-limit-default">chatlist_invites_limit_default »</a></p>
+<p>Maximum number of per-folder <a href="/api/links#chat-folder-links">chat folder deep links »</a> that can be created by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
+<h6><code>double_limits__chatlists_joined</code></h6>
+<p>Config keys: <a href="/api/config#chatlists-joined-limit-premium">chatlists_joined_limit_premium »</a>/<a href="/api/config#chatlists-joined-limit-default">chatlists_joined_limit_default »</a></p>
+<p>Maximum number of <a href="/api/links#chat-folder-links">shareable folders</a> <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users may have. (integer)</p>
+<h6><code>double_limits__story_expiring</code></h6>
+<p>Config keys: <a href="/api/config#story-expiring-limit-premium">story_expiring_limit_premium »</a>/<a href="/api/config#story-expiring-limit-default">story_expiring_limit_default »</a></p>
+<p>The maximum number of active <a href="/api/stories">stories</a> for <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users (integer).</p>
+<h6><code>double_limits__story_caption_length</code></h6>
+<p>Config keys: <a href="/api/config#story-caption-length-limit-premium">story_caption_length_limit_premium »</a>/<a href="/api/config#story-caption-length-limit-default">story_caption_length_limit_default »</a></p>
+<p>The maximum UTF-8 length of story captions for <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
+<h6><code>double_limits__stories_sent_weekly</code></h6>
+<p>Config keys: <a href="/api/config#stories-sent-weekly-limit-premium">stories_sent_weekly_limit_premium »</a>/<a href="/api/config#stories-sent-weekly-limit-default">stories_sent_weekly_limit_default »</a></p>
+<p>Maximum number of stories that can be sent in a week by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
+<h6><code>double_limits__stories_sent_monthly</code></h6>
+<p>Config keys: <a href="/api/config#stories-sent-monthly-limit-premium">stories_sent_monthly_limit_premium »</a>/<a href="/api/config#stories-sent-monthly-limit-default">stories_sent_monthly_limit_default »</a></p>
+<p>Maximum number of stories that can be sent in a month by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
+<h6><code>double_limits__stories_suggested_reactions</code></h6>
+<p>Config keys: <a href="/api/config#stories-suggested-reactions-limit-premium">stories_suggested_reactions_limit_premium »</a>/<a href="/api/config#stories-suggested-reactions-limit-default">stories_suggested_reactions_limit_default »</a></p>
+<p>Maximum number of <a href="/api/stories#media-areas">story reaction media areas »</a> that can be added to a story by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
+<h6><code>double_limits__recommended_channels</code></h6>
+<p>Config keys: <a href="/api/config#recommended-channels-limit-premium">recommended_channels_limit_premium »</a>/<a href="/api/config#recommended-channels-limit-default">recommended_channels_limit_default »</a></p>
+<p>The maximum number of similar channels that can be recommended by <a href="/method/channels.getChannelRecommendations">channels.getChannelRecommendations»</a> to <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
+<h6><code>double_limits__saved_dialogs_pinned</code></h6>
+<p>Config keys: <a href="/api/config#saved-dialogs-pinned-limit-premium">saved_dialogs_pinned_limit_premium »</a>/<a href="/api/config#saved-dialogs-pinned-limit-default">saved_dialogs_pinned_limit_default »</a></p>
+<p>Maximum number of pinned dialogs in <a href="/api/saved-messages">saved messages</a> for <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users.  (integer)</p>
+<!-- end limits -->
 <h5><a class="anchor" href="#business" id="business" name="business"><i class="anchor-icon"></i></a><code>business</code></h5>
 <p>Premium users currently have access to <a href="/api/business">Telegram Business features »</a>.</p>
 <h5><a class="anchor" href="#last-seen" id="last-seen" name="last-seen"><i class="anchor-icon"></i></a><code>last_seen</code></h5>
@@ -140,104 +213,6 @@ Clicking on this button in the settings, clicking on the <a href="#badge">badge<
 <h5><a class="anchor" href="#forum-topic-icon" id="forum-topic-icon" name="forum-topic-icon"><i class="anchor-icon"></i></a><code>forum_topic_icon</code></h5>
 <p>Premium users can set a <a href="/api/custom-emoji">custom emoji</a> as a <a href="/api/forum">forum topic icon</a></p>
 <!-- end features -->
-<h4><a class="anchor" href="#premium-limits" id="premium-limits" name="premium-limits"><i class="anchor-icon"></i></a>Premium limits</h4>
-<p>What follows is a list of <a href="/api/config#client-configuration">appConfig integer config parameters »</a>, containing info about limits that differ on Premium and non-Premium accounts.  </p>
-<!-- start limits -->
-<h5><a class="anchor" href="#channels" id="channels" name="channels"><i class="anchor-icon"></i></a><code>channels</code></h5>
-<p>Limit identifier: <code>channels</code></p>
-<p>Config keys: <a href="/api/config#channels-limit-default">channels_limit_default »</a>/<a href="/api/config#channels-limit-premium">channels_limit_premium »</a></p>
-<p>The maximum number of <a href="/api/channel">channels and supergroups</a> a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may join (integer)</p>
-<h5><a class="anchor" href="#saved-gifs" id="saved-gifs" name="saved-gifs"><i class="anchor-icon"></i></a><code>saved_gifs</code></h5>
-<p>Limit identifier: <code>saved_gifs</code></p>
-<p>Config keys: <a href="/api/config#saved-gifs-limit-default">saved_gifs_limit_default »</a>/<a href="/api/config#saved-gifs-limit-premium">saved_gifs_limit_premium »</a></p>
-<p>The maximum number of GIFs a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may save (integer)</p>
-<h5><a class="anchor" href="#stickers-faved" id="stickers-faved" name="stickers-faved"><i class="anchor-icon"></i></a><code>stickers_faved</code></h5>
-<p>Limit identifier: <code>stickers_faved</code></p>
-<p>Config keys: <a href="/api/config#stickers-faved-limit-default">stickers_faved_limit_default »</a>/<a href="/api/config#stickers-faved-limit-premium">stickers_faved_limit_premium »</a></p>
-<p>The maximum number of stickers a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may <a href="/api/stickers#favorite-stickersets">add to Favorites »</a> (integer)</p>
-<h5><a class="anchor" href="#dialog-filters" id="dialog-filters" name="dialog-filters"><i class="anchor-icon"></i></a><code>dialog_filters</code></h5>
-<p>Limit identifier: <code>dialog_filters</code></p>
-<p>Config keys: <a href="/api/config#dialog-filters-limit-default">dialog_filters_limit_default »</a>/<a href="/api/config#dialog-filters-limit-premium">dialog_filters_limit_premium »</a></p>
-<p>The maximum number of <a href="/api/folders">folders</a> a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may create (integer)</p>
-<h5><a class="anchor" href="#dialog-filters-chats" id="dialog-filters-chats" name="dialog-filters-chats"><i class="anchor-icon"></i></a><code>dialog_filters_chats</code></h5>
-<p>Limit identifier: <code>dialog_filters_chats</code></p>
-<p>Config keys: <a href="/api/config#dialog-filters-chats-limit-default">dialog_filters_chats_limit_default »</a>/<a href="/api/config#dialog-filters-chats-limit-premium">dialog_filters_chats_limit_premium »</a></p>
-<p>The maximum number of chats a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may add to a <a href="/api/folders">folder</a> (integer)</p>
-<h5><a class="anchor" href="#dialogs-pinned" id="dialogs-pinned" name="dialogs-pinned"><i class="anchor-icon"></i></a><code>dialogs_pinned</code></h5>
-<p>Limit identifier: <code>dialogs_pinned</code></p>
-<p>Config keys: <a href="/api/config#dialogs-pinned-limit-default">dialogs_pinned_limit_default »</a>/<a href="/api/config#dialogs-pinned-limit-premium">dialogs_pinned_limit_premium »</a></p>
-<p>The maximum number of chats a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may pin (integer)</p>
-<h5><a class="anchor" href="#dialogs-folder-pinned" id="dialogs-folder-pinned" name="dialogs-folder-pinned"><i class="anchor-icon"></i></a><code>dialogs_folder_pinned</code></h5>
-<p>Limit identifier: <code>dialogs_folder_pinned</code></p>
-<p>Config keys: <a href="/api/config#dialogs-folder-pinned-limit-default">dialogs_folder_pinned_limit_default »</a>/<a href="/api/config#dialogs-folder-pinned-limit-premium">dialogs_folder_pinned_limit_premium »</a></p>
-<p>The maximum number of chats a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may pin in a folder (integer)</p>
-<h5><a class="anchor" href="#channels-public" id="channels-public" name="channels-public"><i class="anchor-icon"></i></a><code>channels_public</code></h5>
-<p>Limit identifier: <code>channels_public</code></p>
-<p>Config keys: <a href="/api/config#channels-public-limit-default">channels_public_limit_default »</a>/<a href="/api/config#channels-public-limit-premium">channels_public_limit_premium »</a></p>
-<p>The maximum number of public <a href="/api/channel">channels or supergroups</a> a <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> user may create (integer)</p>
-<h5><a class="anchor" href="#caption-length" id="caption-length" name="caption-length"><i class="anchor-icon"></i></a><code>caption_length</code></h5>
-<p>Limit identifier: <code>caption_length</code></p>
-<p>Config keys: <a href="/api/config#caption-length-limit-default">caption_length_limit_default »</a>/<a href="/api/config#caption-length-limit-premium">caption_length_limit_premium »</a></p>
-<p>The maximum UTF-8 length of media captions sendable by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users (integer)</p>
-<h5><a class="anchor" href="#about-length" id="about-length" name="about-length"><i class="anchor-icon"></i></a><code>about_length</code></h5>
-<p>Limit identifier: <code>about_length</code></p>
-<p>Config keys: <a href="/api/config#about-length-limit-default">about_length_limit_default »</a>/<a href="/api/config#about-length-limit-premium">about_length_limit_premium »</a></p>
-<p>The maximum UTF-8 length of bios of <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users (integer)</p>
-<h5><a class="anchor" href="#chatlist-invites" id="chatlist-invites" name="chatlist-invites"><i class="anchor-icon"></i></a><code>chatlist_invites</code></h5>
-<p>Limit identifier: <code>chatlist_invites</code></p>
-<p>Config keys: <a href="/api/config#chatlist-invites-limit-default">chatlist_invites_limit_default »</a>/<a href="/api/config#chatlist-invites-limit-premium">chatlist_invites_limit_premium »</a></p>
-<p>Maximum number of per-folder <a href="/api/links#chat-folder-links">chat folder deep links »</a> that can be created by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
-<h5><a class="anchor" href="#chatlists-joined" id="chatlists-joined" name="chatlists-joined"><i class="anchor-icon"></i></a><code>chatlists_joined</code></h5>
-<p>Limit identifier: <code>chatlists_joined</code></p>
-<p>Config keys: <a href="/api/config#chatlists-joined-limit-default">chatlists_joined_limit_default »</a>/<a href="/api/config#chatlists-joined-limit-premium">chatlists_joined_limit_premium »</a></p>
-<p>Maximum number of <a href="/api/links#chat-folder-links">shareable folders</a> <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users may have. (integer)</p>
-<h5><a class="anchor" href="#story-expiring" id="story-expiring" name="story-expiring"><i class="anchor-icon"></i></a><code>story_expiring</code></h5>
-<p>Limit identifier: <code>story_expiring</code></p>
-<p>Config keys: <a href="/api/config#story-expiring-limit-default">story_expiring_limit_default »</a>/<a href="/api/config#story-expiring-limit-premium">story_expiring_limit_premium »</a></p>
-<p>The maximum number of active <a href="/api/stories">stories</a> for <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users (integer).</p>
-<h5><a class="anchor" href="#story-caption-length" id="story-caption-length" name="story-caption-length"><i class="anchor-icon"></i></a><code>story_caption_length</code></h5>
-<p>Limit identifier: <code>story_caption_length</code></p>
-<p>Config keys: <a href="/api/config#story-caption-length-limit-default">story_caption_length_limit_default »</a>/<a href="/api/config#story-caption-length-limit-premium">story_caption_length_limit_premium »</a></p>
-<p>The maximum UTF-8 length of story captions for <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
-<h5><a class="anchor" href="#stories-sent-weekly" id="stories-sent-weekly" name="stories-sent-weekly"><i class="anchor-icon"></i></a><code>stories_sent_weekly</code></h5>
-<p>Limit identifier: <code>stories_sent_weekly</code></p>
-<p>Config keys: <a href="/api/config#stories-sent-weekly-limit-default">stories_sent_weekly_limit_default »</a>/<a href="/api/config#stories-sent-weekly-limit-premium">stories_sent_weekly_limit_premium »</a></p>
-<p>Maximum number of stories that can be sent in a week by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
-<h5><a class="anchor" href="#stories-sent-monthly" id="stories-sent-monthly" name="stories-sent-monthly"><i class="anchor-icon"></i></a><code>stories_sent_monthly</code></h5>
-<p>Limit identifier: <code>stories_sent_monthly</code></p>
-<p>Config keys: <a href="/api/config#stories-sent-monthly-limit-default">stories_sent_monthly_limit_default »</a>/<a href="/api/config#stories-sent-monthly-limit-premium">stories_sent_monthly_limit_premium »</a></p>
-<p>Maximum number of stories that can be sent in a month by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
-<h5><a class="anchor" href="#stories-suggested-reactions" id="stories-suggested-reactions" name="stories-suggested-reactions"><i class="anchor-icon"></i></a><code>stories_suggested_reactions</code></h5>
-<p>Limit identifier: <code>stories_suggested_reactions</code></p>
-<p>Config keys: <a href="/api/config#stories-suggested-reactions-limit-default">stories_suggested_reactions_limit_default »</a>/<a href="/api/config#stories-suggested-reactions-limit-premium">stories_suggested_reactions_limit_premium »</a></p>
-<p>Maximum number of <a href="/api/stories#media-areas">story reaction media areas »</a> that can be added to a story by <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
-<h5><a class="anchor" href="#recommended-channels" id="recommended-channels" name="recommended-channels"><i class="anchor-icon"></i></a><code>recommended_channels</code></h5>
-<p>Limit identifier: <code>recommended_channels</code></p>
-<p>Config keys: <a href="/api/config#recommended-channels-limit-default">recommended_channels_limit_default »</a>/<a href="/api/config#recommended-channels-limit-premium">recommended_channels_limit_premium »</a></p>
-<p>The maximum number of similar channels that can be recommended by <a href="/method/channels.getChannelRecommendations">channels.getChannelRecommendations»</a> to <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users. (integer)</p>
-<h5><a class="anchor" href="#saved-dialogs-pinned" id="saved-dialogs-pinned" name="saved-dialogs-pinned"><i class="anchor-icon"></i></a><code>saved_dialogs_pinned</code></h5>
-<p>Limit identifier: <code>saved_dialogs_pinned</code></p>
-<p>Config keys: <a href="/api/config#saved-dialogs-pinned-limit-default">saved_dialogs_pinned_limit_default »</a>/<a href="/api/config#saved-dialogs-pinned-limit-premium">saved_dialogs_pinned_limit_premium »</a></p>
-<p>Maximum number of pinned dialogs in <a href="/api/saved-messages">saved messages</a> for <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users.  (integer)</p>
-<!-- end limits -->
-<h3><a class="anchor" href="#story-features" id="story-features" name="story-features"><i class="anchor-icon"></i></a>Story features</h3>
-<p><a href="/api/premium">Telegram Premium</a> increases some <a href="/api/stories">story-related</a> limits: story-related Premium features have certain identifiers, which are used if the user chooses to <a href="/api/premium#subscribing-to-telegram-premium">subscribe to Telegram Premium</a> after hitting a limit, here's the full list of feature identifiers:</p>
-<!-- start story features -->
-<h4><a class="anchor" href="#priority-order" id="priority-order" name="priority-order"><i class="anchor-icon"></i></a><code>priority_order</code></h4>
-<p>Stories of Premium users are displayed before stories of non-Premium contacts, supergroups, and channels.</p>
-<h4><a class="anchor" href="#stealth-mode" id="stealth-mode" name="stealth-mode"><i class="anchor-icon"></i></a><code>stealth_mode</code></h4>
-<p><a href="#stealth-mode">Stealth mode</a> is available to premium users.</p>
-<h4><a class="anchor" href="#permanent-views-history" id="permanent-views-history" name="permanent-views-history"><i class="anchor-icon"></i></a><code>permanent_views_history</code></h4>
-<p>Premium users can check who opened the current user's stories after they expire.</p>
-<h4><a class="anchor" href="#expiration-durations" id="expiration-durations" name="expiration-durations"><i class="anchor-icon"></i></a><code>expiration_durations</code></h4>
-<p>Premium users can set custom expiration durations for stories.</p>
-<h4><a class="anchor" href="#save-stories-to-gallery" id="save-stories-to-gallery" name="save-stories-to-gallery"><i class="anchor-icon"></i></a><code>save_stories_to_gallery</code></h4>
-<p>Premium users can save other users' unprotected stories.</p>
-<h4><a class="anchor" href="#links-and-formatting" id="links-and-formatting" name="links-and-formatting"><i class="anchor-icon"></i></a><code>links_and_formatting</code></h4>
-<p>Premium users can use links and formatting in story caption, and use <a href="/api/stories#urls">URL media areas</a>.</p>
-<h4><a class="anchor" href="#quality" id="quality" name="quality"><i class="anchor-icon"></i></a><code>quality</code></h4>
-<p>Premium users can choose a better quality for viewed stories.</p>
-<!-- end story features -->
 <h4><a class="anchor" href="#badge" id="badge" name="badge"><i class="anchor-icon"></i></a>Badge</h4>
 <p>Users with a Telegram Premium subscription (<a href="/constructor/user">user</a>.<code>premium</code> is set) should have a Telegram Premium badge next to their name.  </p>
 <h4><a class="anchor" href="#animated-profile-pictures" id="animated-profile-pictures" name="animated-profile-pictures"><i class="anchor-icon"></i></a>Animated profile pictures</h4>
@@ -252,8 +227,8 @@ Clicking on this button in the settings, clicking on the <a href="#badge">badge<
 <li><code>start_param</code>: One of the following values:<ul>
 <li>If the user clicks on the subscribe button when viewing the promo page for a specific Premium feature, provide the <a href="#telegram-premium-features">feature identifier</a> (or an empty string if opened from the main promo page).</li>
 <li>If the user clicks on the subscribe button when viewing the promo page for a specific <a href="/api/business#business-features-promo-page">Telegram Business</a> feature, provide the business <a href="/api/business#business-features-promo-page">feature identifier</a> (or <code>business</code> if opened from the main business promo page).</li>
-<li>If the user clicks on the subscribe button after hitting a limit that Telegram Premium raises, provide <code>double_limits__{limit}</code>, where limit is one of the <a href="#premium-limits">limit identifiers</a></li>
-<li>If the user clicks on the subscribe button after hitting a <a href="/api/stories">story-related</a> limit that Telegram Premium raises, provide <code>stories__{feature}</code>, where feature is one of the <a href="#story-features">story feature identifiers</a></li>
+<li>If the user clicks on the subscribe button after hitting a limit that Telegram Premium raises, provide one of the <a href="#double-limits">limit identifiers</a></li>
+<li>If the user clicks on the subscribe button after hitting a <a href="/api/stories">story-related</a> limit that Telegram Premium raises, provide one of the <a href="#stories">story feature identifiers</a></li>
 <li>If the user clicks on the subscribe button from the Telegram Premium button in the settings, provide <code>settings</code></li>
 <li>If the user clicks on the subscribe button from the Telegram Premium star in a profile page, provide <code>profile</code></li>
 <li>If the user opened a <a href="/api/links#premium-referrer-links">premium referrer link</a>, provide <code>deeplink</code> if the <code>referrer</code> is empty, and <code>deeplink_$referrer</code> if non-empty.
