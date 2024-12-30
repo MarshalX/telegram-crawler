@@ -79,7 +79,9 @@
 While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specific configuration with information about server-side limitations and other MTProto-related information, <a href="/method/help.getAppConfig">help.getAppConfig</a> returns configuration parameters useful for graphical Telegram clients.</p>
 <p>When first invoking <a href="/method/help.getAppConfig">help.getAppConfig</a>, pass <code>0</code> to hash; in future calls, use the <code>hash</code> contained in the previously returned <a href="/constructor/help.appConfig">help.appConfig</a>; if the configuration hasn't changed, a <a href="/constructor/help.appConfigNotModified">help.appConfigNotModified</a> will be returned instead of <a href="/constructor/help.appConfig">help.appConfig</a>.</p>
 <p>The configuration should be manually refreshed immediately upon receival of an <a href="/constructor/updateConfig">updateConfig</a> update.  </p>
-<p>Example value of <a href="/constructor/help.appConfig">help.appConfig</a>.<code>config</code>:  </p>
+<p>If any of the configuration keys are not available at runtime, a default value must be used.<br>
+Specifically, the defaults must be used if <a href="/method/help.getAppConfig">help.getAppConfig</a> was invoked successfully, but the desired key is not available in <a href="/constructor/help.appConfig">help.appConfig</a>.<code>config</code>, or if the invocation of <a href="/method/help.getAppConfig">help.getAppConfig</a> returned an RPC error.  </p>
+<p>Here's the full list of defaults that must be used:  </p>
 <!-- start config -->
 <pre><code class="language-json">{
     "about_length_limit_default": 70,
@@ -142,7 +144,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "dialog_filters_enabled": true,
     "dialog_filters_limit_default": 10,
     "dialog_filters_limit_premium": 30,
-    "dialog_filters_tooltip": true,
+    "dialog_filters_tooltip": false,
     "dialogs_folder_pinned_limit_default": 100,
     "dialogs_folder_pinned_limit_premium": 200,
     "dialogs_pinned_limit_default": 5,
@@ -184,53 +186,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
             "frame_start": 110
         }
     },
-    "emojies_sounds": {
-        "\ud83c\udf83": {
-            "id": "4956223179606458539",
-            "access_hash": "-2107001400913062971",
-            "file_reference_base64": ""
-        },
-        "\u26b0": {
-            "id": "4956223179606458540",
-            "access_hash": "-1498869544183595185",
-            "file_reference_base64": ""
-        },
-        "\ud83e\udddf\u200d\u2642": {
-            "id": "4960929110848176331",
-            "access_hash": "3986395821757915468",
-            "file_reference_base64": ""
-        },
-        "\ud83e\udddf": {
-            "id": "4960929110848176332",
-            "access_hash": "-8929417974289765626",
-            "file_reference_base64": ""
-        },
-        "\ud83e\udddf\u200d\u2640": {
-            "id": "4960929110848176333",
-            "access_hash": "9161696144162881753",
-            "file_reference_base64": ""
-        },
-        "\ud83c\udf51": {
-            "id": "4963180910661861548",
-            "access_hash": "-7431729439735063448",
-            "file_reference_base64": ""
-        },
-        "\ud83c\udf8a": {
-            "id": "5094064004578410732",
-            "access_hash": "8518192996098758509",
-            "file_reference_base64": ""
-        },
-        "\ud83c\udf84": {
-            "id": "5094064004578410733",
-            "access_hash": "-4142643820629256996",
-            "file_reference_base64": ""
-        },
-        "\ud83e\uddbe": {
-            "id": "5094064004578410734",
-            "access_hash": "-8934384022571962340",
-            "file_reference_base64": ""
-        }
-    },
+    "emojies_sounds": [],
     "factcheck_length_limit": 1024,
     "fragment_prefixes": [
         "888"
@@ -337,7 +293,7 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
     "stars_gifts_enabled": true,
     "stars_paid_post_amount_max": 2500,
     "stars_paid_reaction_amount_max": 2500,
-    "stars_purchase_blocked": false,
+    "stars_purchase_blocked": true,
     "stars_revenue_withdrawal_min": 1000,
     "stars_subscription_amount_max": 2500,
     "stars_usd_sell_rate_x1000": 1410,
@@ -422,6 +378,19 @@ While <a href="/method/help.getConfig">help.getConfig</a> returns MTProto-specif
 <p>For <a href="/api/dice">animated dice</a> emojis other than the basic <img class="emoji" src="//telegram.org/img/emoji/40/F09F8EB2.png" width="20" height="20" alt="🎲" />, indicates the winning dice value and the final frame of the animated sticker, at which to show the fireworks <img class="emoji" src="//telegram.org/img/emoji/40/F09F8E86.png" width="20" height="20" alt="🎆" /> (object with emoji keys and object values, containing <code>value</code> and <code>frame_start</code> float values)</p>
 <h4><a class="anchor" href="#emojies-sounds" id="emojies-sounds" name="emojies-sounds"><i class="anchor-icon"></i></a><code>emojies_sounds</code></h4>
 <p>A map of soundbites to be played when the user clicks on the specified <a href="/api/animated-emojis">animated emoji</a>; the <a href="/api/file_reference">file reference field</a> should be base64-decoded before <a href="/api/files">downloading the file</a> (map of <a href="/api/files">file IDs</a> (<a href="/constructor/inputDocument">inputDocument</a>.id), with emoji string keys)</p>
+<p>Example:</p>
+<pre><code class="language-json">{
+    "\ud83c\udf83": {
+        "id": "4956223179606458539",
+        "access_hash": "-2107001400913062971",
+        "file_reference_base64": ""
+    },
+    "\u26b0": {
+        "id": "4956223179606458540",
+        "access_hash": "-1498869544183595185",
+        "file_reference_base64": ""
+    }
+}</code></pre>
 <h4><a class="anchor" href="#gif-search-branding" id="gif-search-branding" name="gif-search-branding"><i class="anchor-icon"></i></a><code>gif_search_branding</code></h4>
 <p>Specifies the name of the service providing GIF search through <a href="#mtproto-configuration">gif_search_username</a> (string)</p>
 <h4><a class="anchor" href="#gif-search-emojies" id="gif-search-emojies" name="gif-search-emojies"><i class="anchor-icon"></i></a><code>gif_search_emojies</code></h4>
@@ -493,9 +462,9 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <h4><a class="anchor" href="#message-animated-emoji-max" id="message-animated-emoji-max" name="message-animated-emoji-max"><i class="anchor-icon"></i></a><code>message_animated_emoji_max</code></h4>
 <p>The maximum number of <a href="/api/custom-emoji">custom emojis</a> that may be present in a message. (integer)</p>
 <h4><a class="anchor" href="#stickers-premium-by-emoji-num" id="stickers-premium-by-emoji-num" name="stickers-premium-by-emoji-num"><i class="anchor-icon"></i></a><code>stickers_premium_by_emoji_num</code></h4>
-<p>Defines how many <a href="/api/premium">Premium stickers</a> to show in the sticker suggestion popup when entering an emoji into the text field, see the <a href="/api/stickers#sticker-suggestions">sticker docs for more info</a> (integer, defaults to 0)</p>
+<p>Defines how many <a href="/api/premium">Premium stickers</a> to show in the sticker suggestion popup when entering an emoji into the text field, see the <a href="/api/stickers#sticker-suggestions">sticker docs for more info</a> (integer)</p>
 <h4><a class="anchor" href="#stickers-normal-by-emoji-per-premium-num" id="stickers-normal-by-emoji-per-premium-num" name="stickers-normal-by-emoji-per-premium-num"><i class="anchor-icon"></i></a><code>stickers_normal_by_emoji_per_premium_num</code></h4>
-<p>For <a href="/api/premium">Premium users</a>, used to define the suggested sticker list, see the <a href="/api/stickers#sticker-suggestions">sticker docs for more info</a> (integer, defaults to 2)</p>
+<p>For <a href="/api/premium">Premium users</a>, used to define the suggested sticker list, see the <a href="/api/stickers#sticker-suggestions">sticker docs for more info</a> (integer)</p>
 <h4><a class="anchor" href="#premium-purchase-blocked" id="premium-purchase-blocked" name="premium-purchase-blocked"><i class="anchor-icon"></i></a><code>premium_purchase_blocked</code></h4>
 <p>The user can't purchase <a href="/api/premium">Telegram Premium</a>. The app must also hide all Premium features, including stars for other users, et cetera. (boolean)</p>
 <h4><a class="anchor" href="#channels-limit-default" id="channels-limit-default" name="channels-limit-default"><i class="anchor-icon"></i></a><code>channels_limit_default</code></h4>
@@ -610,7 +579,7 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <h4><a class="anchor" href="#stories-venue-search-username" id="stories-venue-search-username" name="stories-venue-search-username"><i class="anchor-icon"></i></a><code>stories_venue_search_username</code></h4>
 <p>Username of the inline bot to use to generate venue location tags for stories, see <a href="/api/stories#location-tags">here »</a> for more info. (string)</p>
 <h4><a class="anchor" href="#stories-changelog-user-id" id="stories-changelog-user-id" name="stories-changelog-user-id"><i class="anchor-icon"></i></a><code>stories_changelog_user_id</code></h4>
-<p>ID of the official Telegram user that will post stories about new Telegram features: stories posted by this user should be shown on the <a href="/api/stories#watching-stories">active or active and hidden stories bar</a> just like for contacts, even if the user was removed from the contact list. (integer, defaults to <code>777000</code>)</p>
+<p>ID of the official Telegram user that will post stories about new Telegram features: stories posted by this user should be shown on the <a href="/api/stories#watching-stories">active or active and hidden stories bar</a> just like for contacts, even if the user was removed from the contact list. (integer)</p>
 <h4><a class="anchor" href="#stories-entities" id="stories-entities" name="stories-entities"><i class="anchor-icon"></i></a><code>stories_entities</code></h4>
 <p>Whether <a href="/api/entities">styled text entities</a> and links in story text captions can be used by all users (<code>enabled</code>), only [Premium](/api/premium users) (<code>premium</code>), or no one (<code>disabled</code>). (string)</p>
 <p>This field is used both when posting stories, to indicate to the user whether they can use entities, and when viewing stories, to hide entities (client-side) on stories posted by users whose <a href="/api/premium">Premium</a> subscription has expired (if <code>stories_entities == "premium"</code> and <a href="/constructor/user">user</a>.<code>premium</code> is not set, or if <code>stories_entities == "disabled"</code>).</p>
