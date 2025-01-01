@@ -906,7 +906,6 @@ var Auction = {
     var type = Aj.state.type;
     var username = Aj.state.username;
     var item_title = Aj.state.itemTitle;
-    var sent_message = Aj.state.itemSentMessage;
     var amount   = $(this).attr('data-bid-amount');
     Wallet.sendTransaction({
       request: {
@@ -928,7 +927,7 @@ var Auction = {
       terms_label: l('WEB_POPUP_QR_PLACE_BID_TERMS'),
       onConfirm: function(by_server) {
         if (by_server) {
-          showAlert(sent_message);
+          showAlert(l('WEB_BUY_NOW_SENT'));
         }
       }
     });
