@@ -1392,6 +1392,14 @@ function checkFrameSize() {
     });
   }
 
+  function destroyEmoji(emojiEl) {
+    emojiEl = geById(emojiEl);
+    if (!emojiEl || !emojiEl.__inited || !RLottie.isSupported) return;
+    gec('.tg-emoji-tgs', function() {
+      RLottie.destroy(this);
+    }, emojiEl);
+  }
+
   function checkVideo(el, error_callback) {
     var timeout, eventAdded;
     if (!eventAdded) {
@@ -2496,7 +2504,8 @@ function checkFrameSize() {
   };
 
   var TEmoji = window.TEmoji = {
-    init: proccessEmoji
+    init: proccessEmoji,
+    destroy: destroyEmoji
   }
 
   window.TWidgetPost = {
