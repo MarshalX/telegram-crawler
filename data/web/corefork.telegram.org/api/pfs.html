@@ -42,7 +42,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/pfs" >Perfect Forward Secrecy</a></li></ul></div>
   <h1 id="dev_page_title">Perfect Forward Secrecy</h1>
   
-  <div id="dev_page_content"><h5><a class="anchor" name="related-articles" href="#related-articles"><i class="anchor-icon"></i></a>Related articles</h5>
+  <div id="dev_page_content"><h5><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related articles</h5>
 <p><div class="dev_page_nav_wrap"></p>
 <ul>
 <li><a href="/api/end-to-end/pfs">Perfect Forward Secrecy in Secret Chats</a></li>
@@ -62,11 +62,12 @@
 <li><a href="/method/help.getConfig">help.getConfig</a></li>
 <li><a href="/method/help.getNearestDc">help.getNearestDc</a></li>
 </ul>
-<p>In order to bind a temporary authorization key to the permanent key the client creates a <a href="/method/auth.bindTempAuthKey#binding-message-contents">special binding message</a> and executes the <a href="/method/auth.bindTempAuthKey">auth.bindTempAuthKey</a> method using <strong>temp_auth_key</strong>. Once <strong>auth.bindTempAuthKey</strong> has been executed successfully, the client may continue using the API as usual; the client must also <a href="/api/invoking#saving-client-info">rewrite client info</a> using <a href="/method/initConnection">initConnection</a> after each binding. Each permanent key may only be bound to <strong>one</strong> temporary key at a time, binding a new temporary key overwrites the previous one.</p>
+<p>In order to bind a temporary authorization key to the permanent key the client creates a <a href="/method/auth.bindTempAuthKey#binding-message-contents">special binding message</a> and executes the <a href="/method/auth.bindTempAuthKey">auth.bindTempAuthKey</a> method using <strong>temp_auth_key</strong>. Once <strong>auth.bindTempAuthKey</strong> has been executed successfully, the client may continue using the API as usual; the client must also <a href="/api/invoking#saving-client-info">rewrite client info</a> using <a href="/method/initConnection">initConnection</a> after each binding. Each permanent key may only be bound to <strong>one</strong> temporary key at a time, binding a new temporary key overwrites the previous one.  </p>
+<p>An <a href="/method/auth.bindTempAuthKey">auth.bindTempAuthKey</a> request may also return an <code>ENCRYPTED_MESSAGE_INVALID</code> error, which must be handled by dropping both the temporary and permanent auth keys used in the request and restarting the auth process.<br>
+This also means that if this error is received when binding the main logged in auth key, the user was logged out.  </p>
 <p>Once the temporary key expires, the client needs to generate a new temporary key using <strong>p_q_inner_data_temp</strong>. Then it needs to re-bind that new temporary key to the initial permanent key. A new key can also be generated in advance, so that the client has a new key ready by the time the old one has expired.</p>
 <p>For additional security, the client can store the temporary authorization key in RAM only and never save it in persistent storage.</p>
-<p>A temporary authorization key may expire at any moment before <strong>expires_at</strong>, since such keys are also stored only in the RAM on the server-side. Be prepared to handle resulting MTProto errors correctly (non-existent auth_key_id results in a 404 error).</p>
-</div>
+<p>A temporary authorization key may expire at any moment before <strong>expires_at</strong>, since such keys are also stored only in the RAM on the server-side. Be prepared to handle resulting MTProto errors correctly (non-existent auth_key_id results in a 404 error).</p></div>
   
 </div>
           
