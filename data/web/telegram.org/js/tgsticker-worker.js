@@ -33,17 +33,14 @@ RLottieItem.prototype.init = function(jsString) {
 };
 
 RLottieItem.prototype.render = function(frameNo, clamped) {
-  if (this.dead) return;
+  if(this.dead) return;
 
-  var realFrameNo = frameNo;
-  if (frameNo < 0) {
-    realFrameNo = 0;
-  } else if (frameNo >= this.frameCount) {
-    realFrameNo = this.frameCount - 1;
+  if(this.frameCount < frameNo || frameNo < 0) {
+    return;
   }
 
   try {
-    RLottieWorker.Api.render(this.handle, realFrameNo);
+    RLottieWorker.Api.render(this.handle, frameNo);
 
     var bufferPointer = RLottieWorker.Api.buffer(this.handle);
 
