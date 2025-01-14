@@ -68,8 +68,8 @@ The minimum and maximum values for this parameter are contained in the <a href="
 <li>The <code>duration_months</code> can be optionally populated, indicating the duration of the affiliate program; if not set, there is no expiration date.  </li>
 </ul>
 <p>Both the duration and the commission may only be raised after creation of the program: to lower them, the program must first be terminated and a new one created.  </p>
-<p>To end an affiliate program, pass <code>0</code> to <code>commission_permille</code>: around 24 hours after invoking the method, the program will be terminated, invalidating all <a href="#becoming-an-affiliate">created affiliate links</a>.<br>
-A new affiliate program can only be created 24 hours after terminating the current one.<br>
+<p>To end an affiliate program, pass <code>0</code> to <code>commission_permille</code>: around 24 hours after invoking the method (specifically, exactly at the time specified in <a href="/constructor/userFull">userFull</a>.<code>starref_program</code>.<code>end_date</code>), the program will be terminated, invalidating all <a href="#becoming-an-affiliate">created affiliate links</a>.<br>
+A new affiliate program can only be created after termination of the current one (after <a href="/constructor/userFull">userFull</a>.<code>starref_program</code>.<code>end_date</code>); invoking the method before the end_date will emit a <code>STARREF_AWAITING_END</code> RPC error.<br>
 Note that after termination, affiliates will still retain all commissions they earned before the program was terminated. Additionally, future purchases by users who were referred by affiliates that joined while the program was active will continue generating commissions for those affiliates until their originally specified commission period has elapsed.  </p>
 <p>If a bot has an active affiliate program, the <a href="/constructor/userFull">userFull</a>.<code>starref_program</code> flag will be set, containing info about the referral program.<br>
 Mini apps, channel owners and simple users can join the referral program as specified <a href="#becoming-an-affiliate">here »</a>.  </p>
@@ -114,7 +114,9 @@ Use <a href="/method/payments.editConnectedStarRefBot">payments.editConnectedSta
 <pre><code>---functions---
 
 <a href='/method/contacts.resolveUsername'>contacts.resolveUsername</a>#725afbbc flags:<a href='/type/%23'>#</a> username:<a href='/type/string'>string</a> referer:flags.0?<a href='/type/string'>string</a> = <a href='/type/contacts.ResolvedPeer'>contacts.ResolvedPeer</a>;</code></pre>
-<p>When clicking on a <a href="/api/links#referral-links">referral link »</a>, created by an affiliated user, channel or mini app as <a href="#becoming-an-affiliate">specified here »</a>, the <code>referrer</code> parameter must be passed to the <code>referer</code> parameter of <a href="/method/contacts.resolveUsername">contacts.resolveUsername</a>.</p></div>
+<p>When clicking on a <a href="/api/links#referral-links">referral link »</a>, created by an affiliated user, channel or mini app as <a href="#becoming-an-affiliate">specified here »</a>, the <code>referrer</code> parameter must be passed to the <code>referer</code> parameter of <a href="/method/contacts.resolveUsername">contacts.resolveUsername</a>.  </p>
+<p>When opening <a href="/api/links#referral-links">referral links »</a>, <a href="/method/contacts.resolveUsername">contacts.resolveUsername</a> must be <strong>always</strong> invoked, even if the client already has a cached <a href="/type/Peer">Peer</a> for the associated <code>username</code>.  </p>
+<p>If a <code>STARREF_EXPIRED</code> RPC error is returned by the method, an error indicating that the passed referral link is invalid must be shown to the user.</p></div>
   
 </div>
           
