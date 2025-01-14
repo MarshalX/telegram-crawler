@@ -384,14 +384,12 @@ function initScrollVideos(desktop) {
 
   var index = 1;
   var tgStickersCnt = document.querySelectorAll('.js-tgsticker_image').length;
-  var preloadVideos = tgStickersCnt > 1 ? 0 : (tgStickersCnt ? 1 : 2);
-  var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  var preloadVideos = tgStickersCnt ? 0 : 2;
   for (var i = 0; i < pageVideos.length; i++) {
     var videoEl = pageVideos[i];
     videoEl.setAttribute('vindex', index++);
-    var preloadValue = i >= preloadVideos ? (isSafari ? 'none' : 'metadata') : 'auto';
-    videoEl.setAttribute('preload', preloadValue);
-    videoEl.preload = preloadValue;
+    videoEl.setAttribute('preload', i >= preloadVideos ? 'metadata' : 'auto');
+    videoEl.preload = i >= preloadVideos ? 'metadata' : 'auto';
     if (desktop) {
       videoEl.removeAttribute('controls');
       videoEl.autoplay = false;
@@ -401,15 +399,6 @@ function initScrollVideos(desktop) {
       videoEl.playsinline = true;
       videoEl.setAttribute('autoplay', 'autoplay');
       videoEl.setAttribute('playsinline', 'playsinline');
-      videoEl.controls = false;
-      videoEl.removeAttribute('controls');
-    }
-    var posterUrl = videoEl.poster;
-    if (posterUrl && isSafari) {
-      videoEl.parentNode.style.background = "url('" + escapeHTML(posterUrl) +  "') center no-repeat";
-      videoEl.parentNode.style.backgroundSize = "cover";
-      videoEl.parentNode.style.lineHeight = "0";
-      videoPreloadPosterDimensions(videoEl, posterUrl);
     }
   }
   if (!desktop) {
@@ -452,16 +441,6 @@ function checkScrollVideos() {
       }
     }
   }
-}
-
-function videoPreloadPosterDimensions(videoEl, posterUrl) {
-  var img = new Image();
-  img.onload = function () {
-    if (img.width > 0 && img.height > 0) {
-      videoEl.style.aspectRatio = img.width / img.height;
-    }
-  };
-  img.src = posterUrl;
 }
 
 function isVisibleEnough(boxOffset, boxSize, viewOffset, viewSize, boxThreshold, viewThreshold) {
@@ -654,16 +633,6 @@ function mainDemoVideoDoHover(videoLinkEl, isHover) {
   }
 }
 
-function mainInitLogo(logo_url) {
-  var img = new Image();
-  img.onload = function() {
-    var logo = document.querySelector('div.tl_main_logo');
-    logo.style.backgroundImage = 'url(\'' + logo_url + '\')';
-    logo.classList.add('play');
-  };
-  img.src = logo_url;
-}
-
 function mainInitTgStickers(options) {
   options = options || {};
   if (!RLottie.isSupported) {
@@ -703,13 +672,4 @@ function getCookie(name) {
     }
   }
   return null;
-}
-
-function mainScrollTo(element) {
-  if (typeof element === 'string') {
-    element = document.querySelector(element)
-  }
-  if (element) {
-    window.scroll(0, getFullOffsetY(element));
-  }
 }
