@@ -100,14 +100,16 @@ A confirmation prompt should be shown before opening the URL, unless the host pa
 <pre><code>---functions---
 
 <a href='/method/messages.clickSponsoredMessage'>messages.clickSponsoredMessage</a>#f093465 flags:<a href='/type/%23'>#</a> media:flags.0?<a href='/constructor/true'>true</a> fullscreen:flags.1?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> random_id:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
-<p>If the user does one of the following actions, <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a> must be called with the <code>random_id</code> of the sponsored message:</p>
+<p>Depending on the action made by the user, the following logic must be followed.  </p>
 <ul>
-<li>Clicks on a link in the sponsored message</li>
-<li>Clicks on the bot ad bar</li>
-<li>Opens a sponsored chat or a sponsored website via the associated button</li>
-<li>Opens the sponsored chat via the sponsored message name, the sponsored message photo, or a mention in the sponsored message</li>
-<li>Clicks on the media (the <code>media</code> flag must also be set in this case)</li>
-<li>Clicks on the fullscreen button, then clicks on the media (the <code>fullscreen</code> and <code>media</code> flags must be set)</li>
+<li>Click on a link in the sponsored message: invoke <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a>, open link.  </li>
+<li>Click on the bot ad bar: invoke <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a>, open link.  </li>
+<li>Open a sponsored chat or a sponsored website via the associated button: invoke <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a>, open chat.  </li>
+<li>Open the sponsored chat via the sponsored message name, the sponsored message photo, or a mention in the sponsored message: invoke <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a>, open chat.  </li>
+<li>Clicks on media (only <strong>photos and videos without sound</strong>): invoke <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a> with the <code>media</code> flag set, open link.  </li>
+<li>Clicks on media (only <strong>videos with sound</strong>): invoke <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a> with the <code>media</code> flag set, open video in fullscreen (do <strong>not</strong> open the link yet).</li>
+<li>Clicks on media (only <strong>videos with sound in fullscreen</strong>): invoke <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a> with the <code>media</code> and <code>fullscreen</code> flags set, open link.  </li>
+<li>Clicks on the button while a sponsored video is in fullscreen: invoke <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a> with the <code>fullscreen</code> flag set, open link.  </li>
 </ul>
 <h4><a class="anchor" href="#reporting-sponsored-messages" id="reporting-sponsored-messages" name="reporting-sponsored-messages"><i class="anchor-icon"></i></a>Reporting sponsored messages</h4>
 <pre><code><a href='/constructor/sponsoredMessage'>sponsoredMessage</a>#4d93a990 flags:<a href='/type/%23'>#</a> recommended:flags.5?<a href='/constructor/true'>true</a> can_report:flags.12?<a href='/constructor/true'>true</a> random_id:<a href='/type/bytes'>bytes</a> url:<a href='/type/string'>string</a> title:<a href='/type/string'>string</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; photo:flags.6?<a href='/type/Photo'>Photo</a> media:flags.14?<a href='/type/MessageMedia'>MessageMedia</a> color:flags.13?<a href='/type/PeerColor'>PeerColor</a> button_text:<a href='/type/string'>string</a> sponsor_info:flags.7?<a href='/type/string'>string</a> additional_info:flags.8?<a href='/type/string'>string</a> = <a href='/type/SponsoredMessage'>SponsoredMessage</a>;
