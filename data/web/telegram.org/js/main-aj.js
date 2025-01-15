@@ -6,7 +6,7 @@ function ajInit(options) {
   var nav_url   = location.href;
   var short_url = layerUrlToShort(nav_url);
   if (options.layer && !short_url) {
-    nav_url = layerUrlToNav(nav_url, options.layerUnderUrl);
+    nav_url = layerUrlToNav(nav_url);
   }
   if (!history.state) {
     history.replaceState({i: 0, u: nav_url}, null, short_url);
@@ -17,8 +17,8 @@ function ajInit(options) {
   }
 
   var $progress = $('#aj_progress'),
-      progressBoxShadow = 'inset 0 2px 0 var(--accent-color, #39ade7)',
-      progressNoBoxShadow = 'inset 0 0 0 var(--accent-color, #39ade7)',
+      progressBoxShadow = 'inset 0 2px 0 #39ade7',
+      progressNoBoxShadow = 'inset 0 0 0 #39ade7',
       progressTransition = 'width .3s linear, box-shadow .2s ease',
       progressTo,
       progressVal = 0;
@@ -62,14 +62,11 @@ function ajInit(options) {
     layerLocation: layerLocation,
     setLocation: setLocation,
     setLayerLocation: setLayerLocation,
-    reload: reload,
     apiRequest: apiRequest,
-    uploadRequest: uploadRequest,
     needAuth: needAuth,
     ajContainer: ajContainer,
     state: options.state || {},
     layerState: {},
-    globalState: {},
     layer: false
   };
 
@@ -125,53 +122,8 @@ function ajInit(options) {
           // was aborted
         } else if (xhr.status == 401) {
           location.href = '/auth';
-        } else if (xhr.readyState > 0) {
+        } else {
           location.reload();
-        }
-      }
-    });
-  }
-
-  function uploadRequest(method, file, params, onSuccess, onProgress) {
-    var data = new FormData();
-    data.append('file', file, file.name);
-    data.append('method', method);
-    for (var key in params) {
-      data.append(key, params[key]);
-    }
-    return $.ajax(Aj.apiUrl, {
-      type: 'POST',
-      data: data,
-      cache: false,
-      dataType: 'json',
-      processData: false,
-      contentType: false,
-      xhrFields: {
-        withCredentials: true
-      },
-      xhr: function() {
-        var xhr = new XMLHttpRequest();
-        xhr.upload.addEventListener('progress', function(event) {
-          if (event.lengthComputable) {
-            onProgress && onProgress(event.loaded, event.total);
-          }
-        });
-        return xhr;
-      },
-      beforeSend: function(xhr) {
-        onProgress && onProgress(0, 1);
-      },
-      success: function(result) {
-        if (result._dlog) {
-          $('#dlog').append(result._dlog);
-        }
-        onSuccess && onSuccess(result);
-      },
-      error: function(xhr) {
-        if (xhr.status == 401) {
-          location.href = '/auth';
-        } else if (xhr.readyState > 0) {
-          onSuccess && onSuccess({error: 'Network error'});
         }
       }
     });
@@ -294,6 +246,7 @@ function ajInit(options) {
   }
 
   function pageLoaded() {
+    curBeforeUnload = false;
     if (curOnLoad.length) {
       for (var i = 0; i < curOnLoad.length; i++) {
         console.log('onLoad', i);
@@ -304,13 +257,13 @@ function ajInit(options) {
       $(ajContainer).off('.curPage');
       $(document).off('.curPage');
     });
-    $(ajContainer).trigger('page:load');
     if (Aj.layer) {
       layerLoaded();
     }
   }
 
   function layerLoaded() {
+    curBeforeLayerUnload = false;
     if (curOnLayerLoad.length) {
       for (var i = 0; i < curOnLayerLoad.length; i++) {
         console.log('onLayerLoad', i);
@@ -356,7 +309,6 @@ function ajInit(options) {
         return unloaded;
       }
     });
-    $(ajContainer).trigger('layer:load');
   }
 
   function onResult(url, http_code, result, push_state) {
@@ -410,14 +362,13 @@ function ajInit(options) {
       if (result.s) {
         $.extend(Aj.state, result.s);
       }
-      document.documentElement.className = result.rc || '';
       if (result._dlog) {
         $('#dlog').html(result._dlog);
       }
       if (push_state || !Aj._useScrollHack) {
         $(window).scrollTop(0);
       }
-      unfreezeBody();
+      $('body').css({height: '', overflow: ''});
       if (url_hash) {
         scrollToHash();
       }
@@ -464,7 +415,7 @@ function ajInit(options) {
       if (result.j) {
         window.execScript ? window.execScript(result.j) : eval(result.j);
       }
-      layerLoaded();
+      Aj.layerLoaded();
       return;
     }
     return changeLocation(url, push_state);
@@ -473,7 +424,6 @@ function ajInit(options) {
   function loadPage(link, push_state, state_go) {
     var url = link.href;
     var cur_url = curLocation.href;
-    var cur_ref = curLocation.origin + curLocation.pathname + curLocation.search;
     if (link.origin != curLocation.origin) {
       return false;
     }
@@ -481,9 +431,6 @@ function ajInit(options) {
         link.search == curLocation.search &&
         link.hash != curLocation.hash) {
       return false;
-    }
-    if (url == cur_url) {
-      push_state = false;
     }
     var load_fn, interrupted = false;
     load_fn = function() {
@@ -502,7 +449,7 @@ function ajInit(options) {
       $.ajax(url, {
         dataType: 'json',
         xhrFields: {withCredentials: true},
-        headers: {'X-Aj-Referer': cur_ref},
+        headers: {'X-Aj-Referer': cur_url},
         success: function(result, t, xhr) {
           onResult(url, xhr.status, result, push_state);
         },
@@ -518,13 +465,9 @@ function ajInit(options) {
     return true;
   }
 
-  function _location(href, replace) {
+  function _location(href) {
     if (typeof href !== 'undefined') {
-      var url = loc(href);
-      var push_state = !replace;
-      if (!loadPage(url, push_state)) {
-        changeLocation(url, push_state);
-      }
+      loadPage(loc(href), true);
     } else {
       return loc(curLocation.href);
     }
@@ -539,16 +482,11 @@ function ajInit(options) {
     }
   }
 
-  function setLocation(href, replace = false) {
+  function setLocation(href) {
     var url = loc(href).href;
     var short_url = layerUrlToShort(url) || url;
-    if (replace) {
-      history.replaceState({i: curHistoryState.i, u: url}, null, short_url);
-      console.log('history replace', 'oldState =', curHistoryState, 'newState =', history.state);
-    } else {
-      history.pushState({i: curHistoryState.i + 1, u: url}, null, short_url);
-      console.log('history push', 'oldState =', curHistoryState, 'newState =', history.state);
-    }
+    history.pushState({i: curHistoryState.i + 1, u: url}, null, short_url);
+    console.log('history push', 'oldState =', curHistoryState, 'newState =', history.state);
     curHistoryState = history.state;
     curLocation = loc(curHistoryState.u);
     layerCloseLocation = layerCloseLoc(curHistoryState.u);
@@ -563,10 +501,6 @@ function ajInit(options) {
     console.log('history push', 'oldState =', curHistoryState, 'newState =', history.state);
     curHistoryState = history.state;
     curLocation = loc(curHistoryState.u);
-  }
-
-  function reload() {
-    _location(_location(), true);
   }
 
   function historyJump(delta) {
@@ -629,17 +563,12 @@ function ajInit(options) {
     if (!message && curBeforeUnload) {
       message = curBeforeUnload();
     }
-    var load_func = function() {
-      curBeforeLayerUnload = false;
-      curBeforeUnload = false;
-      load_fn();
-    };
     if (message) {
       var message_html = $('<div>').text(message).html();
-      showConfirm(message_html, load_func, l('WEB_LEAVE_PAGE', 'Leave'));
+      showConfirm(message_html, load_fn, l('WEB_LEAVE_PAGE', 'Leave'));
       return false;
     } else {
-      load_func();
+      load_fn();
       return true;
     }
   }
@@ -662,25 +591,12 @@ function ajInit(options) {
       return;
     }
     if (Aj._useScrollHack) {
-      freezeBody();
+      $('body').css({height: '100000px', overflow: 'hidden'}); // for correct scroll restoration
     }
     var link = loc(curHistoryState.u);
-    var loaded = loadPage(link, false, state_go);
-    if (!loaded && Aj._useScrollHack) {
-      unfreezeBody();
-    }
+    loadPage(link, false, state_go);
   });
   window.onbeforeunload = beforeUnloadHandler;
-}
-
-function freezeBody() {
-  $('body').css({height: '1000000px', overflow: 'hidden'}); // for correct scroll restoration
-  $(Aj.ajContainer).css({position: 'fixed', width: '100%', top: -$(window).scrollTop() + 'px', left: -$(window).scrollLeft() + 'px'});
-}
-
-function unfreezeBody() {
-  $(Aj.ajContainer).css({position: '', width: '', top: '', left: ''});
-  $('body').css({height: '', overflow: ''});
 }
 
 function updateNavBar() {
@@ -730,31 +646,19 @@ function openPopup(popup, options) {
   if (!popup_id) {
     if (!Popups._pid) Popups._pid = 0;
     popup_id = ++Popups._pid;
-    $popup.data('puid', popup_id).addClass('aj_popup');
+    $popup.data('puid', popup_id);
   }
   $popup.data('options', options);
-  var closeOutside = $popup.attr('data-close-outside');
-  if (closeOutside && !options.closeByClickOutside) {
-    options.closeByClickOutside = '.' + closeOutside;
-  }
   var i = Popups.indexOf(popup_id);
   if (i >= 0) {
     Popups.splice(i, 1);
   }
   Popups.push(popup_id);
   $('body').css('overflow', 'hidden');
-  if (!options.noAppend) {
-    $popup.appendTo(window.Aj && Aj.ajContainer || 'body').redraw();
-  }
+  $popup.appendTo(window.Aj && Aj.ajContainer || 'body');
   $popup.removeClass('hide');
   if (document.activeElement) {
     document.activeElement.blur();
-  }
-  if (options.onOpen) {
-    $popup.one('popup:open', options.onOpen);
-  }
-  if (options.onClose) {
-    $popup.one('popup:close', options.onClose);
   }
   if (options.closeByClickOutside) {
     $popup.on('click', function(e) {
@@ -771,7 +675,7 @@ function openPopup(popup, options) {
 }
 
 function getPopupById(popup_id) {
-  var $popups = $('.aj_popup');
+  var $popups = $('.popup-container');
   var found = false;
   for (var i = 0; i < $popups.length; i++) {
     $popup = $popups.eq(i);
@@ -795,7 +699,7 @@ function closePopup(popup) {
       return false;
     }
   }
-  var options = $popup.data('options') || {};
+  var options = $popup.data('options');
   if (options.onBeforeClose) {
     var result = options.onBeforeClose($popup);
     if (result === false) {
@@ -879,10 +783,8 @@ function showConfirm(html, onConfirm, confirm_btn, onCancel, cancel_btn) {
 }
 
 function showMedia(src, is_video, options) {
-  var media_html = (is_video ? '<video class="media media-video ohide" autoplay' + (options.is_gif ? ' loop playsinline' : ' controls') + '></video>' : '<div class="media media-photo ohide"></div>') + (options.add_media_html || '');
-  var title_html = options.title ? '<div class="media-title-wrap"><div class="media-title">' + options.title + '</div></div>' : '';
-  var pagination_html = options.pagination ? '<div class="media-counter-wrap"><div class="media-prev-btn"></div><div class="media-counter">' + (options.pagination.num + 1) + ' / ' + options.pagination.total + '</div><div class="media-next-btn"></div></div>' : '';
-  var $popup = $('<div class="popup-container hide media-popup-container">' + title_html + pagination_html + '<div class="media-popup-wrap popup-no-close file-loading"><div class="media-popup-cover ohide">' + media_html + '<svg class="circle-progress-wrap ohide" viewport="0 0 66 66" width="66px" height="66px"><circle class="circle-progress-bg" cx="50%" cy="50%"></circle><circle class="circle-progress infinite" cx="50%" cy="50%" stroke-dashoffset="106"></circle></svg></div></div></div>');
+  var media_html = is_video ? '<video class="media media-video ohide" autoplay' + (options.is_gif ? ' loop playsinline' : ' controls') + '></video>' : '<div class="media media-photo ohide"></div>';
+  var $popup = $('<div class="popup-container hide media-popup-container"><div class="media-popup-wrap popup-no-close file-loading"><div class="media-popup-cover ohide">' + media_html + '<svg class="circle-progress-wrap ohide" viewport="0 0 66 66" width="66px" height="66px"><circle class="circle-progress-bg" cx="50%" cy="50%"></circle><circle class="circle-progress infinite" cx="50%" cy="50%" stroke-dashoffset="106"></circle></svg></div></div></div>');
   var media = {
     $wrap:    $('.media-popup-wrap', $popup),
     $cover:   $('.media-popup-cover', $popup),
@@ -974,49 +876,6 @@ function showMedia(src, is_video, options) {
         $popup.scrollLeft(-sx);
         $popup.scrollTop(-sy);
       }
-    },
-    onKeysPress: function(e) {
-      if (e.keyCode == Keys.LEFT) {
-        media.onPrevMedia(e);
-      } else if (e.keyCode == Keys.RIGHT) {
-        media.onNextMedia(e);
-      } else if (e.keyCode == Keys.UP) {
-        media.onPrevMediaGroup(e);
-      } else if (e.keyCode == Keys.DOWN) {
-        media.onNextMediaGroup(e);
-      }
-    },
-    onPrevMedia: function(e) {
-      if (options.pagination && options.pagination.prev) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        closePopup($popup);
-        options.pagination.prev();
-      }
-    },
-    onNextMedia: function(e) {
-      if (options.pagination && options.pagination.next) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        closePopup($popup);
-        options.pagination.next();
-      }
-    },
-    onPrevMediaGroup: function(e) {
-      if (options.pagination && options.pagination.prevGroup) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        closePopup($popup);
-        options.pagination.prevGroup();
-      }
-    },
-    onNextMediaGroup: function(e) {
-      if (options.pagination && options.pagination.nextGroup) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        closePopup($popup);
-        options.pagination.nextGroup();
-      }
     }
   };
   if (is_video) {
@@ -1026,21 +885,11 @@ function showMedia(src, is_video, options) {
     media.mediaEl.onload = media.onLoad;
     media.$wrap.on('click', media.onZoomInOut);
   }
-  if (options.pagination) {
-    $('.media-prev-btn', $popup).on('click', media.onPrevMedia);
-    $('.media-next-btn', $popup).on('click', media.onNextMedia);
-    $(document).on('keydown', media.onKeysPress);
-  }
   $(window).on('resize', media.onResize);
   media.checkMediaSize();
   $popup.one('popup:close', function() {
     if (!is_video) {
       media.$media.off('click', media.onZoomInOut);
-    }
-    if (options.pagination) {
-      $('.media-prev-btn', $popup).off('click', media.onPrevMedia);
-      $('.media-next-btn', $popup).off('click', media.onNextMedia);
-      $(document).off('keydown', media.onKeysPress);
     }
     $(window).off('resize', media.onResize);
     clearTimeout(media.timeout);
@@ -1101,10 +950,6 @@ function l(lang_key, params, def_value) {
       i = 1;
     }
     var numeric_option = numeric_options[i] || '#';
-    if (params.__format_number && window.formatNumber) {
-      var decimals = params.__format_number === true ? 0 : params.__format_number;
-      number = formatNumber(number, decimals, '.', ',');
-    }
     return numeric_option.replace(/#/g, number);
   });
   value = value.replace(/\{([A-Za-z_\-\d]{1,32}):(.{1,256}?)\}/g, function(lang_value, token, options) {
@@ -1118,10 +963,6 @@ function l(lang_key, params, def_value) {
       i = 0;
     }
     var numeric_option = numeric_options[i] || '#';
-    if (params.__format_number && window.formatNumber) {
-      var decimals = params.__format_number === true ? 0 : params.__format_number;
-      number = formatNumber(number, decimals, '.', ',');
-    }
     return numeric_option.replace(/#/g, number);
   });
   for (var param in params) {
