@@ -93,7 +93,19 @@ function l(lang_key, params, def_value) {
   }
   params = params || {};
   var value = l._keys[lang_key] || def_value || lang_key;
-  value = value.replace(/\{([A-Za-z_\-\d]{1,32}):(.{1,256}?)\}/, function(lang_value, token, options) {
+  value = value.replace(/\{\{([A-Za-z_\-\d]{1,32}):(.+?)\}\}/g, function(lang_value, token, options) {
+    var number = +params[token] || 0;
+    var numeric_options = options.split('|');
+    var i;
+    if (number == 1) i = 0;
+    else i = 1;
+    if (typeof numeric_options[i] === 'undefined') {
+      i = 1;
+    }
+    var numeric_option = numeric_options[i] || '#';
+    return numeric_option.replace(/#/g, number);
+  });
+  value = value.replace(/\{([A-Za-z_\-\d]{1,32}):(.{1,256}?)\}/g, function(lang_value, token, options) {
     var number = +params[token] || 0;
     var numeric_options = options.split('|');
     var i;
@@ -104,10 +116,10 @@ function l(lang_key, params, def_value) {
       i = 0;
     }
     var numeric_option = numeric_options[i] || '#';
-    return numeric_option.replace('#', number);
+    return numeric_option.replace(/#/g, number);
   });
   for (var param in params) {
-    value = value.replace('{' + param + '}', params[param]);
+    value = value.split('{' + param + '}').join(params[param]);
   }
   return value;
 }
@@ -178,16 +190,22 @@ var PostMessage = {
         console.warn('Callback #' + data._cb + ' not found');
       }
     }
+    else {
+      triggerEvent(window, 'tg:postmessage', {detail: data});
+    }
   }
 };
 
 var TPopups = {
   _list: [],
-  _lastId: 0,
+  _lastId: 1000000,
   _inited: false,
   init: function() {
     if (!TPopups._inited) {
       TPopups._inited = true;
+      if (window.Popups) {
+        TPopups._list = window.Popups; // legacy
+      }
       addEvent(document, 'keydown', function(e) {
         if (e.keyCode == Keys.ESC && TPopups._list.length > 0) {
           e.stopImmediatePropagation();
@@ -293,7 +311,7 @@ var TPopups = {
   },
   show: function(html, buttons, options) {
     options = options || {};
-    var popup_el = newEl('div', 'tgme_popup_container js-popup_container tgme_popup_alert hide', '<div class="tgme_popup js-popup_box"><div class="tgme_popup_body"><div class="tgme_popup_text js-popup_text"></div><div class="tgme_popup_buttons js-popup_buttons"></div></div></div></div>');
+    var popup_el = newEl('div', 'tgme_popup_container js-popup_container tgme_popup_alert hide', '<div class="tgme_popup js-popup_box"><div class="tgme_popup_body"><div class="tgme_popup_text js-popup_text"></div><div class="tgme_popup_buttons js-popup_buttons"></div></div></div>');
     var text_el = ge1('.js-popup_text', popup_el);
     var buttons_el = ge1('.js-popup_buttons', popup_el);
     setHtml(text_el, html);
@@ -346,9 +364,12 @@ function showAlert(html, onClose) {
   }]);
 }
 
-function showConfirm(html, onConfirm, confirm_btn) {
+function showConfirm(html, onConfirm, confirm_btn, onCancel, cancel_btn) {
   var popup_el = TPopups.show(html, [{
-    label: l('WEB_CANCEL', 'Cancel'),
+    label: cancel_btn || l('WEB_CANCEL', 'Cancel'),
+    onPress: function() {
+      onCancel && onCancel(popup_el);
+    },
     close: true
   }, {
     label: confirm_btn || l('WEB_OK', 'OK'),
@@ -385,6 +406,13 @@ function removeEvent(el, event, handler) {
     }
   });
 }
+function addEventOnce(el, event, handler) {
+  var once_handler = function(e) {
+    removeEvent(el, event, once_handler);
+    handler(e);
+  };
+  addEvent(el, event, once_handler);
+}
 function triggerEvent(el, event_type, init_dict) {
   gec(el, function() {
     var event = new CustomEvent(event_type, init_dict);
@@ -416,6 +444,8 @@ function ge(el, context) {
     list = (ge1(context) || document).querySelectorAll(el);
   } else if (el instanceof Node || el instanceof Window) {
     list = [el];
+  } else if (el instanceof NodeList) {
+    list = el;
   } else if (Array.isArray(el)) {
     list = el;
   } else if (el) {
@@ -692,6 +722,37 @@ function xhrRequest(href, postdata, onCallback, retry_delay) {
   return xhr;
 }
 
+function xhrJsonRequest(href, onCallback) {
+  var xhr = getXHR();
+  xhr.open('get', href);
+  if (xhr.overrideMimeType) {
+    xhr.overrideMimeType('text/plain; charset=x-user-defined');
+  } else {
+    xhr.setRequestHeader('Accept-Charset', 'x-user-defined');
+  }
+  xhr.onerror = function() {
+    onCallback({error: 'XHR_ERROR'});
+  }
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4) {
+      var result;
+      if (typeof xhr.responseBody == 'undefined' &&
+          xhr.responseText && xhr.status == 200) {
+        try {
+          result = JSON.parse(xhr.responseText);
+        } catch(e) {
+          result = {error: 'JSON_PARSE_FAILED'};
+        }
+      } else {
+        result = {error: 'HTTP_ERROR_' + xhr.status};
+      }
+      onCallback(result);
+    }
+  };
+  xhr.send(null);
+  return xhr;
+}
+
 function xhrUploadRequest(href, params, onCallback, onProgress) {
   var xhr = getXHR(), data = new FormData(), ls_header;
   xhr.open('POST', href, true);
@@ -865,19 +926,29 @@ var frameLastHeight = null,
 function checkFrameSize() {
   var height, width, style;
   if (document.body) {
-    if (window.getComputedStyle) {
-      style = window.getComputedStyle(document.body);
-      height = style.height;
-      if (height.substr(-2) == 'px') {
-        height = height.slice(0, -2);
-      }
-      width = style.width;
-      if (width.substr(-2) == 'px') {
-        width = width.slice(0, -2);
+    if (TWidget.options.include_absolute_elems) {
+      if (document.body.querySelectorAll) {
+        document.body.querySelectorAll('*').forEach(function(el) {
+            var rect = el.getBoundingClientRect();
+            if (!width || width < rect.right) width = rect.right;
+            if (!height || height < rect.bottom) height = rect.bottom;
+        });
       }
     } else {
-      height = document.body.offsetHeight;
-      width = document.body.offsetWidth;
+      if (window.getComputedStyle) {
+        style = window.getComputedStyle(document.body);
+        height = style.height;
+        if (height.substr(-2) == 'px') {
+          height = height.slice(0, -2);
+        }
+        width = style.width;
+        if (width.substr(-2) == 'px') {
+          width = width.slice(0, -2);
+        }
+      } else {
+        height = document.body.offsetHeight;
+        width = document.body.offsetWidth;
+      }
     }
     var data = {event: 'resize'}, resized = false;
     if (TWidget.options.auto_height) {
@@ -1220,6 +1291,115 @@ function checkFrameSize() {
     });
   }
 
+  function proccessWebmImage(imageEl, failed_callback, success_callback) {
+    imageEl = geById(imageEl);
+    if (!imageEl || imageEl.__inited) return;
+    imageEl.__inited = true;
+    failed_callback = failed_callback || function(){};
+    success_callback = success_callback || function(){};
+    var videoEl = ge1('video', imageEl);
+    var imgEl = ge1('img', videoEl);
+    if (!videoEl) return;
+    var fallback = function() {
+      videoEl.parentNode.removeChild(videoEl);
+      imageEl.style.backgroundImage = 'none';
+      if (imgEl && imgEl.src) {
+        var img = new Image();
+        img.onload = function() {
+          imageEl.style.backgroundImage = "url('" + img.src + "')";
+        }
+        img.src = imgEl.src;
+      }
+      failed_callback();
+    };
+    if (browser.safari) {
+      fallback();
+      return;
+    }
+    enableInlineVideo(videoEl);
+    checkVideo(videoEl, fallback);
+    function videoStarted() {
+      removeEvent(videoEl, 'timeupdate', videoStarted);
+      imageEl.style.backgroundImage = 'none';
+      addClass(imgEl, 'webm_sticker_done');
+      success_callback();
+    }
+    addEvent(videoEl, 'timeupdate', videoStarted);
+  }
+
+  function proccessEmoji(emojiEl, failed_callback, success_callback) {
+    emojiEl = geById(emojiEl);
+    if (!emojiEl || emojiEl.__inited) return;
+    emojiEl.__inited = true;
+    failed_callback = failed_callback || function(){};
+    success_callback = success_callback || function(){};
+
+    var emoji_id = emojiEl.getAttribute('emoji-id');
+    if (!emoji_id) {
+      failed_callback();
+      return;
+    }
+    xhrJsonRequest('/i/emoji/' + emoji_id + '.json', function(emoji) {
+      if (emoji.error) {
+        failed_callback();
+        return;
+      }
+      var emoji_html = '', thumb_url = '', thumb_mime = '';
+      if (emoji.path) {
+        var size = emoji.size || (emoji.type == 'tgs' ? 512 : 100);
+        var thumb_svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + size + ' ' + size + '"><defs><linearGradient id="g" x1="-300%" x2="-200%" y1="0" y2="0"><stop offset="-10%" stop-opacity=".1"/><stop offset="30%" stop-opacity=".07"/><stop offset="70%" stop-opacity=".07"/><stop offset="110%" stop-opacity=".1"/><animate attributeName="x1" from="-300%" to="1200%" dur="3s" repeatCount="indefinite"/><animate attributeName="x2" from="-200%" to="1300%" dur="3s" repeatCount="indefinite"/></linearGradient></defs><path fill="url(#g)" d="' + emoji.path + '"/></svg>';
+        thumb_url = 'data:image/svg+xml,' + encodeURIComponent(thumb_svg);
+      }
+      if (emoji.type == 'tgs') {
+        if (!thumb_url) {
+          thumb_url = emoji.thumb;
+          thumb_mime = 'image/webp';
+        } else {
+          thumb_mime = 'image/svg+xml';
+        }
+        emoji_html = '<picture class="tg-emoji tg-emoji-tgs"><source type="application/x-tgsticker" srcset="' + emoji.emoji + '"><source type="' + thumb_mime + '" srcset="' + thumb_url + '"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></picture>';
+      } else if (emoji.type == 'webm') {
+        var wrap_attr = thumb_url ? ' style="background-image:url(\'' + thumb_url + '\');"' : '';
+        emoji_html = '<div class="tg-emoji tg-emoji-webm"' + wrap_attr + '><video src="' + emoji.emoji + '" width="100%" height="100%" preload muted autoplay loop playsinline disablepictureinpicture><img src="' + emoji.thumb + '"></video></div>';
+      } else if (emoji.type == 'webp') {
+        var wrap_attr = thumb_url ? ' style="background-image:url(\'' + thumb_url + '\');" data-webp="' + emoji.emoji + '"' : ' style="background-image:url(\'' + emoji.emoji + '\');"';
+        emoji_html = '<i class="tg-emoji tg-emoji-webp"' + wrap_attr + '></i>';
+      }
+      if (emoji_html) {
+        var emojiWrapEl = newEl('span', 'tg-emoji-wrap', emoji_html);
+        emojiEl.insertBefore(emojiWrapEl, emojiEl.firstChild);
+        if (emoji.type == 'tgs') {
+          gec('.tg-emoji-tgs', function() {
+            if (!RLottie.isSupported) {
+              failed_callback();
+            } else {
+              addEventOnce(this, 'tg:init', success_callback);
+              RLottie.init(this);
+            }
+          }, emojiWrapEl);
+        } else if (emoji.type == 'webm') {
+          gec('.tg-emoji-webm', function() {
+            TVideoSticker.init(this, failed_callback, success_callback);
+          }, emojiWrapEl);
+        } else if (emoji.type == 'webp') {
+          gec('.tg-emoji-webp', function() {
+            TSticker.init(this, failed_callback, success_callback);
+          }, emojiWrapEl);
+        }
+      } else {
+        failed_callback();
+      }
+    });
+  }
+
+  function destroyEmoji(emojiEl) {
+    emojiEl = geById(emojiEl);
+    if (!emojiEl || !emojiEl.__inited || !RLottie.isSupported) return;
+    gec('.tg-emoji-tgs', function() {
+      RLottie.destroy(this);
+    }, emojiEl);
+  }
+
   function checkVideo(el, error_callback) {
     var timeout, eventAdded;
     if (!eventAdded) {
@@ -1254,6 +1434,13 @@ function checkFrameSize() {
       options = options || {};
       if (!postEl || postEl.__inited) return;
       postEl.__inited = true;
+      if (window.RLottie) {
+        if (options.tgs_workers_limit) {
+          RLottie.WORKERS_LIMIT = options.tgs_workers_limit;
+        } else if (options.frame) {
+          RLottie.WORKERS_LIMIT = 1;
+        }
+      }
       gec('time[datetime]', function() {
         var datetime = this.getAttribute('datetime');
         if (datetime) {
@@ -1266,9 +1453,29 @@ function checkFrameSize() {
           }
         }
       }, postEl);
+      gec('.js-message_text', function() {
+        TPost.initSpoilers(this, !gpeByClass(this, 'service_message'));
+        gec('tg-emoji', function() {
+          var emojiEl = this;
+          TEmoji.init(this, function() {
+            var wrapEl = gpeByClass(emojiEl, 'js-message_media') || postEl;
+            addClass(wrapEl, 'media_not_supported');
+            removeClass(postEl, 'no_bubble');
+          });
+        }, this);
+      }, postEl);
+      gec('.js-message_reply_text', function() {
+        TPost.initSpoilers(this);
+        gec('tg-emoji', function() {
+          TEmoji.init(this);
+        }, this);
+      }, postEl);
       gec('.js-message_footer.compact', function() {
         var timeEl = ge1('time[datetime]', this)
           , textEl = this.previousElementSibling;
+        if (textEl && hasClass(textEl, 'js-message_media')) {
+          textEl = textEl.lastElementChild;
+        }
         if (textEl && !textEl.__inited && hasClass(textEl, 'js-message_text')) {
           var text_rect = textEl.getBoundingClientRect();
           var tnode = textEl.firstChild;
@@ -1319,13 +1526,35 @@ function checkFrameSize() {
         TSticker.init(this);
       }, postEl);
       gec('.js-tgsticker_image', function() {
-        if (options.tgs_workers_limit) {
-          RLottie.WORKERS_LIMIT = options.tgs_workers_limit;
-        } else if (options.frame) {
-          RLottie.WORKERS_LIMIT = 1;
+        var stickerEl = this;
+        var effectEl = ge1('.js-tgsticker_effect', postEl);
+        if (effectEl) {
+          addEventOnce(this, 'tg:play', function() {
+            RLottie.playOnce(effectEl);
+          });
+          addEvent(this, 'click', function(e) {
+            e.stopPropagation();
+            RLottie.playOnce(effectEl);
+          });
         }
         RLottie.init(this, {
-          playOnce: this.hasAttribute('data-play-once')
+          playUntilEnd: this.hasAttribute('data-is-dice')
+        });
+      }, postEl);
+      gec('.js-tgsticker_effect', function() {
+        RLottie.init(this, {noAutoPlay: true});
+        var effectEl = this;
+        addEvent(this, 'tg:play', function() {
+          effectEl.style.visibility = 'visible';
+        });
+        addEvent(this, 'tg:pause', function() {
+          effectEl.style.visibility = 'hidden';
+        });
+      }, postEl);
+      gec('.js-videosticker', function() {
+        TVideoSticker.init(this, function() {
+          addClass(postEl, 'media_not_supported');
+          removeClass(postEl, 'no_bubble');
         });
       }, postEl);
     },
@@ -1339,6 +1568,63 @@ function checkFrameSize() {
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.send(null);
       }
+    },
+    initSpoilers: function(text_el, active) {
+      var spoilers = ge('tg-spoiler', text_el);
+      if (spoilers.length) {
+        TPost.wrapSpoilers(spoilers);
+        TPost.wrapTextNodes(text_el);
+        addClass(text_el, 'decorated-text');
+      }
+      TPost.hideSpoilers(text_el, active);
+    },
+    wrapSpoilers: function(spoilers) {
+      gec(spoilers, function() {
+        var inner_el = newEl('span', 'tg-spoiler-text');
+        while (this.firstChild) {
+          inner_el.appendChild(this.firstChild);
+        }
+        this.appendChild(inner_el);
+      });
+    },
+    wrapTextNodes: function(el) {
+      gec(el.childNodes, function() {
+        if (this.nodeType == this.TEXT_NODE) {
+          var text = newEl('span', 'd-text');
+          this.parentNode.insertBefore(text, this);
+          text.appendChild(this);
+        } else if (!this.classList.contains('tg-spoiler') && this.childNodes) {
+          TPost.wrapTextNodes(this);
+        }
+      });
+    },
+    hideSpoilers: function(text_el, active) {
+      var spoilers = ge('tg-spoiler', text_el);
+      if (spoilers.length) {
+        if (active) {
+          addClass(text_el, 'spoilers_active');
+          addEvent(spoilers, 'click', TPost.eSpoilerShow);
+        }
+        addClass(text_el, 'spoilers_hidden');
+      }
+    },
+    eSpoilerShow: function(e) {
+      var text_el = gpeByClass(this, 'spoilers_hidden');
+      if (!text_el) return false;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      addClass(text_el, 'spoilers_animate');
+      removeClass(text_el, 'spoilers_hidden');
+      var delay = 0;
+      gec('tg-spoiler', function() {
+        removeEvent(this, 'click', TPost.eSpoilerShow);
+        delay += this.innerText.length * 40;
+      }, text_el);
+      if (delay < 4000) delay = 4000;
+      if (delay > 45000) delay = 45000;
+      setTimeout(function() {
+        TPost.hideSpoilers(text_el, true);
+      }, delay);
     }
   };
 
@@ -1412,6 +1698,9 @@ function checkFrameSize() {
         if (videoBluredEl) {
           enableInlineVideo(videoBluredEl);
         }
+      }
+      if (videoBluredEl) {
+        videoBluredEl.muted = true;
       }
       function fixControls() {
         if (videoEl.controls) videoEl.controls = false;
@@ -2210,6 +2499,15 @@ function checkFrameSize() {
     init: proccessWebpImage
   };
 
+  var TVideoSticker = window.TVideoSticker = {
+    init: proccessWebmImage
+  };
+
+  var TEmoji = window.TEmoji = {
+    init: proccessEmoji,
+    destroy: destroyEmoji
+  }
+
   window.TWidgetPost = {
     init: function(options) {
       if (!doesSupportEmoji()) {
@@ -2241,6 +2539,10 @@ function checkFrameSize() {
         addClass(document.body, 'no_transitions');
         toggleClass(document.body, 'dark', !!new_options.dark);
         toggleClass(document.body, 'nodark', !new_options.dark);
+        var root = document.documentElement;
+        if (root && root.style) {
+          root.style.colorScheme = !new_options.dark ? 'light' : 'dark';
+        }
       }
       if (transition_off) {
         setTimeout(function() {
@@ -2316,7 +2618,7 @@ function checkFrameSize() {
   };
 
   var TWidgetLogin = {
-    init: function(id, bot_id, params, init_auth, lang) {
+    init: function(id, bot_id, params, init_auth) {
       initWidgetFrame({
         auto_height: true,
         auto_width: true
@@ -2324,7 +2626,7 @@ function checkFrameSize() {
       TWidgetLogin.widgetEl = document.getElementById(id);
       TWidgetLogin.botId = bot_id;
       TWidgetLogin.params = params;
-      TWidgetLogin.lang = lang;
+      TWidgetLogin.lang = (params || {}).lang;
       var params_encoded = '', params_arr = [];
       for (var k in params) {
         params_arr.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
