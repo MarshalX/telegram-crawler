@@ -1,5 +1,5 @@
 function prepareGraphJson(json) {
-  var callableParams = ['xTickFormatter', 'xTooltipFormatter', 'xRangeFormatter', 'yTooltipFormatter', 'x_on_zoom', 'sideLegend'];
+  var callableParams = ['xTickFormatter', 'xTooltipFormatter', 'xRangeFormatter', 'yTickFormatter', 'yTooltipFormatter', 'x_on_zoom', 'sideLegend'];
   callableParams.forEach(function (k) {
     if (typeof json[k] === 'string') {
       json[k] = eval('(' + json[k] + ')');
@@ -35,7 +35,7 @@ function fetchGraph(id, tokenData, retry) {
   }
   var loadingEl = domEl.querySelector('.chart_wrap_loading');
   retry = retry || 0;
-  return fetch('/asyncgraph', {
+  return fetch('/asyncgraph' + (tokenData.test ? '?_test=1' : ''), {
     method: 'post',
     headers: {
       "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
@@ -91,8 +91,8 @@ function statsFormatXCategories(x, categories) {
   return categories[x] === undefined ? '' : categories[x];
 }
 
-function statsFormatKMBT(x) {
-  return window.Graph.units.TUtils.statsFormatKMBT(x);
+function statsFormatKMBT(x, kmbt, precision) {
+  return window.Graph.units.TUtils.statsFormatKMBT(x, kmbt, precision);
 }
 
 function statsFormatDayHourFull(hour) {
@@ -108,16 +108,118 @@ var statShortWeekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function statsFormat(period) {
   switch (period) {
+    case 'minute':
     case '5min':
       return statsFormat5min;
 
     case 'hour':
       return statsFormatHour;
 
+    case 'week':
+      return statsFormatWeek;
+
+    case 'month':
+      return statsFormatMonth;
+
     case 'day':
     default:
       return null;
   }
+}
+
+function statsTooltipFormat(period) {
+  switch (period) {
+    case 'week':
+      return statsFormatWeekFull;
+    case 'month':
+      return statsFormatMonthFull;
+  }
+  return statsFormat(period);
+}
+
+function formatNumber(number, decimals, decPoint, thousandsSep) {
+  number = (number + '').replace(/[^0-9+\-Ee.]/g, '')
+  var n = !isFinite(+number) ? 0 : +number
+  var prec = !isFinite(+decimals) ? 0 : Math.abs(decimals)
+  var sep = (typeof thousandsSep === 'undefined') ? ',' : thousandsSep
+  var dec = (typeof decPoint === 'undefined') ? '.' : decPoint
+  var s = ''
+  var toFixedFix = function (n, prec) {
+    if (('' + n).indexOf('e') === -1) {
+      return +(Math.round(n + 'e+' + prec) + 'e-' + prec)
+    } else {
+      var arr = ('' + n).split('e')
+      var sig = ''
+      if (+arr[1] + prec > 0) {
+        sig = '+'
+      }
+      return (+(Math.round(+arr[0] + 'e' + sig + (+arr[1] + prec)) + 'e-' + prec)).toFixed(prec)
+    }
+  }
+  s = (prec ? toFixedFix(n, prec).toString() : '' + Math.round(n)).split('.')
+  if (s[0].length > 3) {
+    s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep)
+  }
+  if ((s[1] || '').length < prec) {
+    s[1] = s[1] || ''
+    s[1] += new Array(prec - s[1].length + 1).join('0')
+  }
+  return s.join(dec)
+}
+
+function statsFormatAxisPercent(value) {
+  return value + '%';
+}
+
+function statsFormatPercent(value) {
+  var decimals = Math.floor(value * 100) % 100 > 0 ? 2 : 0;
+  return formatNumber(value, decimals, '.', ',') + '%';
+}
+
+function statsFormatAxisAmountTpl(tpl, factor, value, decimals) {
+  if (value % factor > 0) {
+    decimals = decimals || 0;
+    var max_decimals = Math.log10(factor);
+    while (value % Math.pow(10, max_decimals - decimals)) {
+      decimals++;
+      if (decimals >= 3) break;
+    }
+    value = formatNumber(value / factor, decimals, '.', ',');
+  } else {
+    value = statsFormatKMBT(value / factor);
+  }
+  return tpl.replace('{value}', value);
+}
+
+function statsFormatAxisAmountFn(tpl, factor, decimals) {
+  return function(value) {
+    return statsFormatAxisAmountTpl(tpl, factor, value, decimals || 0);
+  };
+}
+
+function statsFormatAxisAmount(value) {
+  return statsFormatAxisAmountTpl('€ {value}', 1000000, value, 2);
+}
+
+function statsFormatAmountTpl(tpl, factor, value, decimals) {
+  decimals = decimals || 0;
+  var max_decimals = Math.log10(factor);
+  while (value % Math.pow(10, max_decimals - decimals) &&
+         value < Math.pow(10, max_decimals + 4 - decimals)) {
+    decimals++;
+  }
+  value = formatNumber(value / factor, decimals, '.', ',');
+  return tpl.replace('{value}', value);
+}
+
+function statsFormatAmountFn(tpl, factor, decimals) {
+  return function(value) {
+    return statsFormatAmountTpl(tpl, factor, value, decimals || 0);
+  };
+}
+
+function statsFormatAmount(value) {
+  return statsFormatAmountTpl('€ {value}', 1000000, value, 2);
 }
 
 function statsFormat5min(time) {
@@ -127,6 +229,49 @@ function statsFormat5min(time) {
 function statsFormatHour(time) {
   var date = new Date(time);
   return statShortMonths[date.getUTCMonth()] + ', ' + date.getUTCDate() + ' ' + date.toUTCString().match(/(\d+:\d+):/)[1];
+}
+
+function statsFormatPeriod(time, days) {
+  var dt = new Date(time),
+      de = new Date(time + (days - 1) * 86400000);
+  var dtm = dt.getUTCMonth(), dem = de.getUTCMonth(),
+      dtd = dt.getUTCDate(), ded = de.getUTCDate();
+
+  if (dtm == dem) {
+    return dtd + '-' + ded + ' ' + statShortMonths[dtm];
+  } else {
+    return dtd + ' ' + statShortMonths[dtm] + ' - ' + ded + ' ' + statShortMonths[dem];
+  }
+}
+
+function statsFormatPeriodFull(time, days) {
+  var dt = new Date(time),
+      de = new Date(time + (days - 1) * 86400000);
+  var dty = dt.getUTCFullYear(), dey = de.getUTCFullYear(),
+      dtm = dt.getUTCMonth(), dem = de.getUTCMonth(),
+      dtd = dt.getUTCDate(), ded = de.getUTCDate();
+
+  if (dty != dey) {
+    return dtd + ' ' + statShortMonths[dtm] + ' ' + dty + ' – ' + ded + ' ' + statShortMonths[dem] + ' ' + dey;
+  } else {
+    return dtd + ' ' + statShortMonths[dtm] + ' – ' + ded + ' ' + statShortMonths[dem] + ' ' + dey;
+  }
+}
+
+function statsFormatWeek(time) {
+  return statsFormatPeriod(time, 7);
+}
+
+function statsFormatWeekFull(time) {
+  return statsFormatPeriodFull(time, 7);
+}
+
+function statsFormatMonth(time) {
+  return statsFormatPeriod(time, 30);
+}
+
+function statsFormatMonthFull(time) {
+  return statsFormatPeriodFull(time, 30);
 }
 
 function statsFormatTooltipValue(val) {
