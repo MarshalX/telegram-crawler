@@ -254,7 +254,7 @@ function updateOriginalFrame() {
 function updateOriginalLabels() {
   var time_label = $original_loaded_label.attr('data-time') || '';
   var date_label = $original_loaded_label.attr('data-date') || '';
-  var label = formatTplDate(App.state.loaded_date, time_label, date_label);
+  var label = formatDate(App.state.loaded_date, time_label, date_label);
   $original_loaded_label.text(label);
 
   $original_section.removeClass('original-loading');
@@ -580,7 +580,7 @@ function duplicate() {
   }
 };
 
-function formatTplDate(timestamp, time_format, date_format) {
+function formatDate(timestamp, time_format, date_format) {
   if (!timestamp) return '';
   var cur = new Date();
   var date = new Date(timestamp * 1000);
@@ -601,86 +601,6 @@ function formatTplDate(timestamp, time_format, date_format) {
     .replace('{month}', month)
     .replace('{year}', year)
     .replace(/\s+$/, '');
-}
-
-function ivFormatDate(date) {
-  var date = new Date(date * 1000);
-  var cur_date = new Date();
-  var j = date.getDate();
-  var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getMonth()];
-  var Y = date.getFullYear();
-  if (cur_date.getFullYear() != Y) {
-    return M + ' ' + j + ', ' + Y;
-  }
-  var hours = date.getHours();
-  var g = (hours % 12) || 12;
-  var i = date.getMinutes();
-  if (i < 10) i = '0' + i;
-  return M + ' ' + j + ' at ' + g + ':' + i + ' ' + (hours < 12 ? 'AM' : 'PM');
-}
-
-function svgStat(stat) {
-  var values_count = 3;
-  var colors = ['#5cb85c', '#f0ad4e', '#d9534f'];
-  var col_width = 10;
-
-  if (!stat.length) {
-    return '';
-  }
-  stat_window = 7;
-  if (stat_window > 0) {
-    var new_stat = [];
-    for (var i = 0, k = 0; i < stat.length; i += values_count, k++) {
-      for (var j = values_count - 1; j >= 0; j--) {
-        var w_sum = 0, w_size = 0;
-        for (var w = Math.min(k, stat_window - 1); w >= 0; w--) {
-          w_sum += stat[(k - w) * values_count + j];
-          w_size++;
-        }
-        new_stat[k * values_count + j] = w_size ? w_sum / w_size : 0;
-      }
-    }
-    stat = new_stat;
-  }
-  var paths  = [];
-  var rpaths = [];
-  for (var j = values_count - 1; j >= 0; j--) {
-    paths[j] = '';
-    rpaths[j] = '';
-  }
-  var x = 0, first = true;
-  for (var i = 0; i < stat.length; i += values_count) {
-    var values = stat.slice(i, i + values_count);
-    var sum    = 0;
-    for (var j = values_count - 1; j >= 0; j--) {
-      sum += values[j];
-    }
-    var y = sum > 0 ? 0 : 100;
-    for (var j = values_count - 1; j >= 0; j--) {
-      if (first) {
-        paths[j] += 'M' + x + ' ' + (j ? y : 100) + ' ';
-      }
-      rpaths[j] = 'L' + x + ' ' + (j ? y : 100) + ' ' + rpaths[j];
-      if (j > 0) {
-        y += sum > 0 ? Math.round(values[j] / sum * 100) : 0;
-      }
-      paths[j] += 'L' + x + ' ' + y + ' ';
-    }
-    first = false;
-    x += col_width;
-  }
-  x -= col_width;
-  for (var j = values_count - 1; j >= 0; j--) {
-    paths[j] += rpaths[j];
-  }
-  var width = (stat.length / 3 - 1) * col_width;
-  var height = 100;
-  var html = '';
-  for (var k = 0; k < paths.length; k++) {
-    html += '<path d="' + paths[k] + '" fill="' + colors[k] + '" />';
-  }
-  html = '<svg class="stat" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' + html + '</svg>';
-  return html;
 }
 
 function initWorkspace(url, url_data) {
@@ -1305,125 +1225,6 @@ function updateDeadlines() {
     return this;
   });
   setTimeout(updateDeadlines, 100);
-}
-
-function versionString(ver) {
-  if (!ver) return '–';
-  var major = parseInt(ver);
-  var minor = Math.round(ver * 100) % 100;
-  return major + '.' + minor;
-}
-function initTemplatesList(options, search_opts) {
-  var $searchField = $('.templates-filter-input');
-  var $results = $('.templates-list');
-  var templatesListSortBy = 'domain';
-  var templatesListSortAsc = true;
-
-  $('.cell-sort').on('click', function(e) {
-    var sortEl = $(this);
-    var sortBy  = sortEl.attr('data-sort-by');
-    var sortAsc = sortEl.hasClass('sort-asc');
-    if (sortBy == templatesListSortBy) {
-      templatesListSortAsc = !sortAsc;
-    } else {
-      templatesListSortBy = sortBy;
-      templatesListSortAsc = false;
-    }
-    updateTemplatesList();
-    $searchField.trigger('datachange');
-  });
-  var updateTemplatesList = function() {
-    if (App.templatesList) {
-      var sortBy  = templatesListSortBy;
-      var sortAsc = templatesListSortAsc;
-      $('.cell-sort').each(function() {
-        var sortEl = $(this);
-        var curSortBy  = sortEl.attr('data-sort-by');
-        sortEl.toggleClass('sort-active', sortBy == curSortBy);
-        sortEl.toggleClass('sort-asc', sortAsc && sortBy == curSortBy);
-      });
-      App.templatesList.sort(function(ad1, ad2) {
-        var v1 = sortAsc ? ad1 : ad2;
-        var v2 = sortAsc ? ad2 : ad1;
-        if (typeof v1[sortBy + '_asc'] !== 'undefined') {
-          return (v1[sortBy] - v2[sortBy]) || (v1[sortBy + '_asc'] - v2[sortBy + '_asc']) || (v1.date - v2.date);
-        }
-        if (v1[sortBy] && v1[sortBy].localeCompare) {
-          return v1[sortBy].localeCompare(v2[sortBy]) || (v1.date - v2.date);
-        }
-        return (v1[sortBy] - v2[sortBy]) || (v1.date - v2.date);
-      });
-    }
-  };
-  var loadTemplatesList = function(opts) {
-    opts = opts || {};
-    apiRequest('getProductionTemplatesList', {
-      offset_id: opts.offset
-    }, function(result) {
-      if (result.error) {
-        if (!opts.retry) opts.retry = 1;
-        else opts.retry++;
-        setTimeout(function(){ loadTemplatesList(opts); }, opts.retry * 1000);
-      } else {
-        if (opts.retry) {
-          opts.retry = 0;
-        }
-        processTemplatesList(result, opts);
-      }
-    });
-  };
-  var getTemplatesList = function() {
-    var _data = App.templatesList;
-    if (_data === false) {
-      return false;
-    } else if (_data) {
-      return _data;
-    }
-    App.templatesList = false;
-    App.templatesListIsLoading = true;
-    if (options.init_items) {
-      setTimeout(function() {
-        processTemplatesList(options.init_items);
-      }, 10);
-    } else {
-      loadTemplatesList({offset: 0});
-    }
-    return false;
-  };
-  var processTemplatesList = function(result, opts) {
-    opts = opts || {};
-    if (result.items) {
-      if (!App.templatesList) {
-        App.templatesList = [];
-      }
-      for (var i = 0; i < result.items.length; i++) {
-        var item = result.items[i];
-        item._values = [
-          item.domain.toLowerCase(),
-        ];
-        if (options.prepareItem) {
-          options.prepareItem(item);
-        }
-        App.templatesList.push(item);
-      }
-      updateTemplatesList();
-      $searchField.trigger('contentchange');
-    }
-    if (result.next_offset) {
-      opts.offset = result.next_offset;
-      loadTemplatesList(opts);
-    } else {
-      App.templatesListIsLoading = false;
-      $searchField.trigger('dataready');
-    }
-  }
-  $searchField.initSearch($.extend({
-    $results: $results,
-    emptyQueryEnabled: true,
-    updateOnInit: true,
-    resultsNotScrollable: true,
-    getData: getTemplatesList
-  }, search_opts));
 }
 
 $('body').removeClass('no-transition');
