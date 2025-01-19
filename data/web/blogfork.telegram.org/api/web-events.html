@@ -61,6 +61,23 @@ The GamingCommunication and bot mini apps libraries by default will use <code>'*
 <pre><code>window.parent.postMessage(JSON.stringify({eventType: eventType, eventData: eventData}), targetOrigin);</code></pre>
 <h3><a class="anchor" href="#event-types" id="event-types" name="event-types"><i class="anchor-icon"></i></a>Event types</h3>
 <p><code>eventType</code> is a simple string indicating the event type, and <code>eventData</code> is a payload with an object that will be parsed by the Telegram app.</p>
+<!-- start events -->
+<h4><a class="anchor" href="#payment-form-submit" id="payment-form-submit" name="payment-form-submit"><i class="anchor-icon"></i></a><code>payment_form_submit</code></h4>
+<p>Event payload: JSON object with <code>credentials</code> and <code>title</code> fields.</p>
+<ul>
+<li><code>title</code> is the censored credit card title.  </li>
+<li><code>credentials</code> is a service-specific JSON object with information about the payment credentials provided by the user to the payment system.  </li>
+</ul>
+<p><strong>Neither Telegram, nor bots will have access to your credit card information.</strong><br>
+Credit card details will be handled only by the payment system, see the <a href="/api/payments">payment documentation for more info »</a>.</p>
+<h4><a class="anchor" href="#share-score" id="share-score" name="share-score"><i class="anchor-icon"></i></a><code>share_score</code></h4>
+<p>No event payload.</p>
+<p>Will be called by games when the user explicitly clicks on the <strong>share score</strong> button to share the game, along with their score.<br>
+Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message with the <code>with_my_score</code> flag.</p>
+<h4><a class="anchor" href="#share-game" id="share-game" name="share-game"><i class="anchor-icon"></i></a><code>share_game</code></h4>
+<p>No event payload.</p>
+<p>Will be called by games when the user explicitly clicks on the <strong>share game</strong> button to share the game, without sharing their score.<br>
+Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message without the <code>with_my_score</code> flag, or by sharing the game's <a href="/api/links#game-links">deep link</a>.</p>
 <h4><a class="anchor" href="#web-app-close" id="web-app-close" name="web-app-close"><i class="anchor-icon"></i></a><code>web_app_close</code></h4>
 <p>No event payload, OR a JSON object with the following fields (which should be properly validated by the client).</p>
 <ul>
@@ -88,7 +105,7 @@ If the mini app provides three buttons, always display each button on a separate
 <li>If the user cancels the interaction without pressing any of the specified buttons, call <code>window.Telegram.WebView.receiveEvent("popup_closed", {})</code></li>
 </ul>
 <p>Disable handling of this event if a popup is already being displayed, re-enable handling only after the <code>popup_closed</code> response event is emitted.<br>
-While handling is enabled, maximum 3 consecutive valid events of this type can be handled in a timespan of 3 seconds, ignore excess events.  </p>
+While handling is enabled, maximum 3 consecutive valid events of this type can be handled in a timespan of 3 seconds, ignore excess events.</p>
 <h4><a class="anchor" href="#web-app-request-write-access" id="web-app-request-write-access" name="web-app-request-write-access"><i class="anchor-icon"></i></a><code>web_app_request_write_access</code></h4>
 <p>Event data: <code>null</code></p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask permission from the user to send them messages.  </p>
@@ -104,11 +121,11 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the user to share their phone number as a contact.</p>
 <p>Upon receiving this event, clients should show a prompt to the user, indicating that the bot is asking them to share their phone number (optionally also asking the user to unblock the bot, if it's currently blocked).  </p>
 <p>If they accept, the user's phone number should be shared by sending a contact to the bot (unblocking it first, if it's currently blocked by the user); if all RPC queries (to unblock the bot, to send the message) succeed, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "sent"}</code>.  </p>
-<p>If the user refuses or any intermdiate method call fails, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "cancelled"}</code>.  </p>
+<p>If the user refuses or any intermdiate method call fails, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "cancelled"}</code>.</p>
 <h4><a class="anchor" href="#web-app-biometry-get-info" id="web-app-biometry-get-info" name="web-app-biometry-get-info"><i class="anchor-icon"></i></a><code>web_app_biometry_get_info</code></h4>
 <p>Event data: <code>null</code></p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the client to initialize the biometric authentication manager object for the current bot, emitting a <a href="/api/bots/webapps#biometry-info-received"><code>biometry_info_received</code> event »</a> on completion.  </p>
-<p>This request should just initialize the client-side state, i.e. by checking if biometric authentication is even available or not, it should not ask the user anything.  </p>
+<p>This request should just initialize the client-side state, i.e. by checking if biometric authentication is even available or not, it should not ask the user anything.</p>
 <h4><a class="anchor" href="#web-app-biometry-request-access" id="web-app-biometry-request-access" name="web-app-biometry-request-access"><i class="anchor-icon"></i></a><code>web_app_biometry_request_access</code></h4>
 <p>Event data: a JSON object, with an optional <code>reason</code> string field (1-128 chars, used in the prompt), containing the reason why the bot is asking to use biometric authentication.  </p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the user permission to use biometric authentication, emitting a <a href="/api/bots/webapps#biometry-info-received"><code>biometry_info_received</code> event »</a> on completion.  </p>
@@ -122,16 +139,16 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to authenticate using biometrics and store the biometric token securely stored on-device, emitting a <a href="/api/bots/webapps#biometry-token-updated"><code>biometry_token_updated</code> event »</a> on completion.  </p>
 <p>This token (which may be for example the private key of a cryptocurrency wallet, or some other data the app must keep safe) must be safely stored by the Telegram client, associating it to the bot that owns the mini app.  </p>
 <p>For example, the token may be directly stored in the on-device secure storage, accessible only after biometric authentication, or it may be stored to normal, non-secure storage, but <strong>in encrypted form</strong>, encrypted using the key returned from the device's secure storage after biometric authentication (for example on Android, using the CryptoObject returned by <a href="https://developer.android.com/reference/android/hardware/biometrics/BiometricPrompt.AuthenticationResult#getCryptoObject\(\)">the biometric prompt authentication result</a>).  </p>
-<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-token-updated"><code>biometry_token_updated</code> event »</a>.  </p>
+<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-token-updated"><code>biometry_token_updated</code> event »</a>.</p>
 <h4><a class="anchor" href="#web-app-biometry-request-auth" id="web-app-biometry-request-auth" name="web-app-biometry-request-auth"><i class="anchor-icon"></i></a><code>web_app_biometry_request_auth</code></h4>
 <p>Event data: a JSON object, with an optional <code>reason</code> string field, containing the reason why the bot is asking to authenticate using biometrics (1-128 chars, used in the prompt).  </p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to authenticate using biometrics and fetch the <a href="#web-app-biometry-update-token">previously stored secure token</a>, emitting a <a href="/api/bots/webapps#biometry-auth-requested"><code>biometry_auth_requested</code> event »</a> on completion, containing either an error, or the decrypted <a href="#web-app-biometry-update-token">biometric token »</a> (or an empty string if no token was configured yet).  </p>
 <p>Should only be used if the <code>token_saved</code> field of the <a href="/api/bots/webapps#biometry-info-received">biometry_info_received object »</a> is equal to <code>true</code>, otherwise set a new token first using <a href="#web-app-biometry-update-token">web_app_biometry_update_token »</a>.  </p>
-<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-auth-requested"><code>biometry_auth_requested</code> event »</a>.  </p>
+<p>If the user has <a href="#web-app-biometry-request-access">previously disallowed</a> the bot from using biometric authentication, this request should immediately fail, emitting an appropriate <a href="/api/bots/webapps#biometry-auth-requested"><code>biometry_auth_requested</code> event »</a>.</p>
 <h4><a class="anchor" href="#web-app-biometry-open-settings" id="web-app-biometry-open-settings" name="web-app-biometry-open-settings"><i class="anchor-icon"></i></a><code>web_app_biometry_open_settings</code></h4>
 <p>Event data: <code>null</code></p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to open the biometric authentication settings page for bots, useful when the app needs to request permission to use biometrics from users who have previously denied it.</p>
-<p>Note that this event should only be handled in response to user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button), and it must be handled at most once a second.  </p>
+<p>Note that this event should only be handled in response to user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button), and it must be handled at most once a second.</p>
 <h4><a class="anchor" href="#web-app-invoke-custom-method" id="web-app-invoke-custom-method" name="web-app-invoke-custom-method"><i class="anchor-icon"></i></a><code>web_app_invoke_custom_method</code></h4>
 <p>Event data: a JSON object with the following fields:</p>
 <ul>
@@ -168,17 +185,17 @@ Note that user interactions must have a TTL of 10 seconds: events of this type m
 </ul>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to prompt the client to open the native QR code scanner and start continuously scanning for QR codes.  </p>
 <p>A <a href="/api/bots/webapps#qr-text-received"><code>qr_text_received</code> event »</a> should be emitted every time a new QR code is scanned, until the user closes the popup via the UI or the Mini App closes the popup with a <a href="#web-app-close-scan-qr-popup">web_app_close_scan_qr_popup</a> event.</p>
-<p>Closing the popup should emit a <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a>; the same event should be emitted if the scan QR code popup cannot be opened due to permission issues.  </p>
+<p>Closing the popup should emit a <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a>; the same event should be emitted if the scan QR code popup cannot be opened due to permission issues.</p>
 <h4><a class="anchor" href="#web-app-close-scan-qr-popup" id="web-app-close-scan-qr-popup" name="web-app-close-scan-qr-popup"><i class="anchor-icon"></i></a><code>web_app_close_scan_qr_popup</code></h4>
 <p>Event data: <code>null</code></p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to prompt the client to close the native QR code scanner opened using <a href="#web-app-open-scan-qr-popup">web_app_open_scan_qr_popup</a>.  </p>
-<p>The <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a> event should <em>not</em> be emitted if the QR code popup is closed using this event.  </p>
+<p>The <a href="/api/bots/webapps#scan-qr-popup-closed"><code>scan_qr_popup_closed</code> event »</a> event should <em>not</em> be emitted if the QR code popup is closed using this event.</p>
 <h4><a class="anchor" href="#web-app-setup-closing-behavior" id="web-app-setup-closing-behavior" name="web-app-setup-closing-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_closing_behavior</code></h4>
 <p>Event data: a JSON object with a boolean <code>need_confirmation</code>.</p>
-<p>If equal to <code>true</code>, the client should require user confirmation with a "Changes that you made may not be saved." popup with "Cancel"/"Close anyway" buttons before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.  </p>
+<p>If equal to <code>true</code>, the client should require user confirmation with a "Changes that you made may not be saved." popup with "Cancel"/"Close anyway" buttons before closing the webview, to avoid accidentally aborting a sensitive operation; otherwise no confirmation should be requested.</p>
 <h4><a class="anchor" href="#web-app-set-background-color" id="web-app-set-background-color" name="web-app-set-background-color"><i class="anchor-icon"></i></a><code>web_app_set_background_color</code></h4>
 <p>Event data: a JSON object with a string <code>color</code> with a hex RGB color.  </p>
-<p>Used to set the mini app background and lower overscroll color.  </p>
+<p>Used to set the mini app background and lower overscroll color.</p>
 <h4><a class="anchor" href="#web-app-set-header-color" id="web-app-set-header-color" name="web-app-set-header-color"><i class="anchor-icon"></i></a><code>web_app_set_header_color</code></h4>
 <p>Event data: a JSON object with the following fields:</p>
 <ul>
@@ -190,10 +207,10 @@ Note that user interactions must have a TTL of 10 seconds: events of this type m
 <li><code>color</code> - A color in hex RGB format (<code>#ffffff</code>).</li>
 </ul>
 <p>The two fields are mutually exclusive, if none of the two fields are provided the default header color is used.</p>
-<p>Used to set the mini app header and upper overscroll color.  </p>
+<p>Used to set the mini app header and upper overscroll color.</p>
 <h4><a class="anchor" href="#web-app-data-send" id="web-app-data-send" name="web-app-data-send"><i class="anchor-icon"></i></a><code>web_app_data_send</code></h4>
 <p>Event data: a JSON object with a string <code>data</code> field.  </p>
-<p>Used <strong>only</strong> by <a href="/api/bots/webapps#keyboard-button-mini-apps">keyboard button mini apps</a> to send back data to the bot as specified <a href="/api/bots/webapps#keyboard-button-mini-apps">here »</a>. The Mini App will be closed.  </p>
+<p>Used <strong>only</strong> by <a href="/api/bots/webapps#keyboard-button-mini-apps">keyboard button mini apps</a> to send back data to the bot as specified <a href="/api/bots/webapps#keyboard-button-mini-apps">here »</a>. The Mini App will be closed.</p>
 <h4><a class="anchor" href="#web-app-switch-inline-query" id="web-app-switch-inline-query" name="web-app-switch-inline-query"><i class="anchor-icon"></i></a><code>web_app_switch_inline_query</code></h4>
 <p>Event data: a JSON object with the following keys:</p>
 <ul>
@@ -204,7 +221,7 @@ If non-empty, the client should prompt the user to choose a specific chat of the
 The array values specify which types of chats the user will be able to choose from.<br>
 If empty, the current chat is used.  </li>
 </ul>
-<p>Used by <a href="/api/bots/webapps#inline-mode-mini-apps">inline mode mini apps</a> to send back data to the bot as specified <a href="/api/bots/webapps#inline-mode-mini-apps">here »</a>. The Mini App will be closed.  </p>
+<p>Used by <a href="/api/bots/webapps#inline-mode-mini-apps">inline mode mini apps</a> to send back data to the bot as specified <a href="/api/bots/webapps#inline-mode-mini-apps">here »</a>. The Mini App will be closed.</p>
 <h4><a class="anchor" href="#web-app-trigger-haptic-feedback" id="web-app-trigger-haptic-feedback" name="web-app-trigger-haptic-feedback"><i class="anchor-icon"></i></a><code>web_app_trigger_haptic_feedback</code></h4>
 <p>Event data: a JSON object with the following fields:</p>
 <ul>
@@ -257,8 +274,12 @@ If empty, the current chat is used.  </li>
 After opening the URL, further events of this type should be ignored until the user interacts again with the Mini App interface (as above).<br>
 Note that user interactions must have a TTL of 1 second: events of this type must be ignored if the last Mini App user interaction happened more than 1 second ago.</p>
 <h4><a class="anchor" href="#web-app-open-tg-link" id="web-app-open-tg-link" name="web-app-open-tg-link"><i class="anchor-icon"></i></a><code>web_app_open_tg_link</code></h4>
-<p>Event data: a JSON object with a string <code>path_full</code> field, containing the path+query component of a <a href="/api/links">t.me deep link</a> (<code>url = 'https://t.me' + path_full</code>).  </p>
-<p>Used to open a <a href="/api/links">t.me deep link</a>. The Mini App must be closed.</p>
+<p>Event data: a JSON object with the following fields:</p>
+<ul>
+<li><code>path_full</code> - string field, containing the path+query component of a <a href="/api/links">t.me deep link</a> (<code>url = 'https://t.me' + path_full</code>)</li>
+<li><code>force_request</code> - optional boolean field, if set and true the client must ignore any locally cached information for the deep link (mainly used to refresh the cache information for <a href="/api/links#stickerset-links">stickerset links »</a>)</li>
+</ul>
+<p>Used to open a <a href="/api/links">t.me deep link</a>. The Mini App must not be closed.</p>
 <h4><a class="anchor" href="#web-app-open-invoice" id="web-app-open-invoice" name="web-app-open-invoice"><i class="anchor-icon"></i></a><code>web_app_open_invoice</code></h4>
 <p>Event data: a JSON object with a string <code>slug</code> field, containing an <a href="/api/links#invoice-links">invoice deep link</a>.</p>
 <p>Used to initiate <a href="/api/payments">payment of an invoice »</a>, by opening an invoice popup over the Mini App: the Mini App itself must not be closed.  </p>
@@ -287,43 +308,174 @@ The mini app must also be expanded when the user swipes up on the webview.  </p>
 <li><code>color</code> - Button color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_color</code> theme parameter</a>)</li>
 <li><code>text_color</code> - Button text color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_text_color</code> theme parameter</a>)</li>
 <li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean, false by default)</li>
+<li><code>has_shine_effect</code> - Whether the button should have a shine effect (boolean, false by default)</li>
 </ul>
 <p>Configures the main button, located immediately below the webview: when the user presses it a <a href="/api/bots/webapps#main-button-pressed"><code>main_button_pressed</code> event should be emitted by the client</a>.  </p>
 <p>Some clients implement a horizontal media type tab bar located at the bottom of the screen, opened when the user clicks on the attachment menu button: this tab bar contains a horizontal list of buttons used to attach media of a certain type and to open installed <a href="/api/bots/attach">attachment menu mini apps</a>.<br>
 In clients that implements a tab bar, iff the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_main_button</code> with <code>is_visible=true</code>, the main button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.  </p>
-<p>Otherwise, the main button can be displayed right away with no user interaction when receiving a <code>web_app_setup_main_button</code> event with <code>is_visible=true</code>.  </p>
+<p>Otherwise, the main button can be displayed right away with no user interaction when receiving a <code>web_app_setup_main_button</code> event with <code>is_visible=true</code>.</p>
 <h4><a class="anchor" href="#web-app-setup-back-button" id="web-app-setup-back-button" name="web-app-setup-back-button"><i class="anchor-icon"></i></a><code>web_app_setup_back_button</code></h4>
 <p>Event data: a JSON object with an <code>is_visible</code> boolean field.</p>
 <p>Determines whether to show or hide the back button: when the user presses it a <a href="/api/bots/webapps#back-button-pressed"><code>back_button_pressed</code> event should be emitted by the client</a>.<br>
 Note that on supported platforms, the OS back button can be used instead of a custom back button: in this case, if <code>is_visible</code> is true pressing the OS back button should emit a <a href="/api/bots/webapps#back-button-pressed"><code>back_button_pressed</code> event</a>, otherwise the webview should be closed.</p>
 <h4><a class="anchor" href="#web-app-setup-settings-button" id="web-app-setup-settings-button" name="web-app-setup-settings-button"><i class="anchor-icon"></i></a><code>web_app_setup_settings_button</code></h4>
 <p>Event data: a JSON object with an <code>is_visible</code> boolean field.</p>
-<p>Determines whether to show or hide the settings button: when the user presses it a <a href="/api/bots/webapps#settings-button-pressed"><code>settings_button_pressed</code> event should be emitted by the client</a>.  </p>
-<h4><a class="anchor" href="#payment-form-submit" id="payment-form-submit" name="payment-form-submit"><i class="anchor-icon"></i></a><code>payment_form_submit</code></h4>
-<p>Event payload: JSON object with <code>credentials</code> and <code>title</code> fields.</p>
-<ul>
-<li><code>title</code> is the censored credit card title.  </li>
-<li><code>credentials</code> is a service-specific JSON object with information about the payment credentials provided by the user to the payment system.  </li>
-</ul>
-<p><strong>Neither Telegram, nor bots will have access to your credit card information.</strong><br>
-Credit card details will be handled only by the payment system, see the <a href="/api/payments">payment documentation for more info »</a>.  </p>
-<h4><a class="anchor" href="#share-score" id="share-score" name="share-score"><i class="anchor-icon"></i></a><code>share_score</code></h4>
-<p>No event payload.</p>
-<p>Will be called by games when the user explicitly clicks on the <strong>share score</strong> button to share the game, along with their score.<br>
-Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message with the <code>with_my_score</code> flag.  </p>
-<h4><a class="anchor" href="#share-game" id="share-game" name="share-game"><i class="anchor-icon"></i></a><code>share_game</code></h4>
-<p>No event payload.</p>
-<p>Will be called by games when the user explicitly clicks on the <strong>share game</strong> button to share the game, without sharing their score.<br>
-Typically done by using <a href="/method/messages.forwardMessages">messages.forwardMessages</a> on the game message without the <code>with_my_score</code> flag, or by sharing the game's <a href="/api/links#game-links">deep link</a>.</p>
-<h4><a class="anchor" href="#game-over" id="game-over" name="game-over"><i class="anchor-icon"></i></a><code>game_over</code></h4>
-<p>No event payload.</p>
-<p>Can be called by games when the user loses a game.</p>
-<h4><a class="anchor" href="#game-loaded" id="game-loaded" name="game-loaded"><i class="anchor-icon"></i></a><code>game_loaded</code></h4>
-<p>No event payload.</p>
-<p>Can be called by games once the game fully loads.</p>
+<p>Determines whether to show or hide the settings button: when the user presses it a <a href="/api/bots/webapps#settings-button-pressed"><code>settings_button_pressed</code> event should be emitted by the client</a>.</p>
 <h4><a class="anchor" href="#resize-frame" id="resize-frame" name="resize-frame"><i class="anchor-icon"></i></a><code>resize_frame</code></h4>
 <p>Event payload: JSON object with <code>height</code> field.</p>
-<p>Called by supported pages inside of <a href="https://instantview.telegram.org">IV</a> iframe embeds, indicates the new size of the embed frame.</p></div>
+<p>Called by supported pages inside of <a href="https://instantview.telegram.org">IV</a> iframe embeds, indicates the new size of the embed frame.</p>
+<h4><a class="anchor" href="#web-app-setup-swipe-behavior" id="web-app-setup-swipe-behavior" name="web-app-setup-swipe-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_swipe_behavior</code></h4>
+<p>Event payload: JSON object with boolean <code>allow_vertical_swipe</code> field.  </p>
+<p>Called <a href="/api/bots/webapps">bot web apps</a> to tell the client to enable or disable the vertical swipe gesture usually used on mobile to minimize the web app.</p>
+<h4><a class="anchor" href="#web-app-set-bottom-bar-color" id="web-app-set-bottom-bar-color" name="web-app-set-bottom-bar-color"><i class="anchor-icon"></i></a><code>web_app_set_bottom_bar_color</code></h4>
+<p>Event data: a JSON object with a string <code>color</code> with a hex RGB color.  </p>
+<p>Used to set the mini app bottom bar color.</p>
+<h4><a class="anchor" href="#web-app-setup-secondary-button" id="web-app-setup-secondary-button" name="web-app-setup-secondary-button"><i class="anchor-icon"></i></a><code>web_app_setup_secondary_button</code></h4>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>is_visible</code> - Whether the button is visible (boolean, false by default)</li>
+<li><code>is_active</code> - Whether the button is active (boolean, true by default)</li>
+<li><code>text</code> - Button text (string, if <code>trim(text)</code> is empty the button must be hidden)</li>
+<li><code>color</code> - Button color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_color</code> theme parameter</a>)</li>
+<li><code>text_color</code> - Button text color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_text_color</code> theme parameter</a>)</li>
+<li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean, false by default)</li>
+<li><code>has_shine_effect</code> - Whether the button should have a shine effect (boolean, false by default)</li>
+<li><code>position</code> - One of <code>left</code>, <code>right</code>, <code>top</code>, <code>bottom</code> (string, defaults to <code>left</code>)</li>
+</ul>
+<p>Configures the secondary button, located immediately below the webview, either on the left, right, top or bottom of the main button (if it is visible, otherwise it is located where the main button is usually located).  </p>
+<p>When the user presses it a <a href="/api/bots/webapps#secondary-button-pressed"><code>secondary_button_pressed</code> event should be emitted by the client</a>.  </p>
+<p>Some clients implement a horizontal media type tab bar located at the bottom of the screen, opened when the user clicks on the attachment menu button: this tab bar contains a horizontal list of buttons used to attach media of a certain type and to open installed <a href="/api/bots/attach">attachment menu mini apps</a>.<br>
+In clients that implements a tab bar, iff the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_secondary_button</code> with <code>is_visible=true</code>, the secondary button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.  </p>
+<p>Otherwise, the secondary button can be displayed right away with no user interaction when receiving a <code>web_app_setup_secondary_button</code> event with <code>is_visible=true</code>.</p>
+<h4><a class="anchor" href="#web-app-share-to-story" id="web-app-share-to-story" name="web-app-share-to-story"><i class="anchor-icon"></i></a><code>web_app_share_to_story</code></h4>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>media_url</code> - A string containing an HTTPS URL of the media to share as a story</li>
+<li><code>text</code> - An optional string caption for the media</li>
+<li><code>widget_link</code> - An optional object describing a <a href="/api/stories#urls">URL media area »</a> to be included in the story, with the following fields:<ul>
+<li><code>url</code> - A string with the URL of the widget</li>
+<li><code>text</code> - An optional string with a label for the widget</li>
+</ul>
+</li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to share a <a href="/api/stories">story on the user's profile »</a>, specifying an optional caption and <a href="/api/stories#urls">URL widget »</a>.  </p>
+<p>This event should open the app's story editor with the specified media, caption and widget, letting the user tweak the story before posting it.</p>
+<h4><a class="anchor" href="#web-app-request-fullscreen" id="web-app-request-fullscreen" name="web-app-request-fullscreen"><i class="anchor-icon"></i></a><code>web_app_request_fullscreen</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Emitted by <a href="/api/bots/webapps">mini web apps</a> to request expansion of the web app to fullscreen mode.  </p>
+<p>On success, emits a <a href="/api/bots/webapps#fullscreen-changed">fullscreen_changed event</a> with <code>is_fullscreen=true</code>.<br>
+On failure, emits a <a href="/api/bots/webapps#fullscreen-failed">fullscreen_failed event</a> with <code>error</code> equal to <code>UNSUPPORTED</code> (Fullscreen mode is not supported on this device or platform) or <code>ALREADY_FULLSCREEN</code> (The Mini App is already in fullscreen mode).</p>
+<h4><a class="anchor" href="#web-app-exit-fullscreen" id="web-app-exit-fullscreen" name="web-app-exit-fullscreen"><i class="anchor-icon"></i></a><code>web_app_exit_fullscreen</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Emitted by <a href="/api/bots/webapps">mini web apps</a> to request exiting fullscreen mode.  </p>
+<p>This method should unconditionally emit a <a href="/api/bots/webapps#fullscreen-changed">fullscreen_changed event</a> with <code>is_fullscreen=false</code> (even if we've already exited fullscreen mode).<br>
+On platforms where fullscreen mode is not supported, must emit a <a href="/api/bots/webapps#fullscreen-failed">fullscreen_failed event</a> with <code>error</code> equal to <code>UNSUPPORTED</code> instead of <code>fullscreen_changed</code>.</p>
+<h4><a class="anchor" href="#web-app-start-accelerometer" id="web-app-start-accelerometer" name="web-app-start-accelerometer"><i class="anchor-icon"></i></a><code>web_app_start_accelerometer</code></h4>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>refresh_rate</code> - An optional integer indicating the refresh rate in milliseconds, ranging from 20 to 1000 (defaults to 1000).  </li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to start accelerometer tracking.  </p>
+<p>The specified refresh rate may be ignored on platforms where it is not supported, or if it doesn't fall within the supported range: this should not cause an error, tracking should be started with the closest supported refresh rate.  </p>
+<p>Emits an <a href="/api/bots/webapps#accelerometer-started">accelerometer_started event</a> on success, or an <a href="/api/bots/webapps#accelerometer-failed">accelerometer_failed event</a> with <code>error=UNSUPPORTED</code> on platforms with no accelerometer tracking.  </p>
+<p>Until <a href="#web-app-stop-accelerometer">web_app_stop_accelerometer</a> is emitted by the mini app, the client will emit <a href="/api/bots/webapps#accelerometer-changed">accelerometer_changed events</a> at most every <code>refresh_rate</code> milliseconds with accelerometer readings.</p>
+<h4><a class="anchor" href="#web-app-stop-accelerometer" id="web-app-stop-accelerometer" name="web-app-stop-accelerometer"><i class="anchor-icon"></i></a><code>web_app_stop_accelerometer</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to stop accelerometer tracking, stopping the emission of <a href="/api/bots/webapps#accelerometer-changed">accelerometer_changed events</a>.  </p>
+<p>Emits an <a href="/api/bots/webapps#accelerometer-stopped">accelerometer_stopped event</a> on success, or an <a href="/api/bots/webapps#accelerometer-failed">accelerometer_failed event</a> with <code>error=UNSUPPORTED</code> on platforms with no accelerometer tracking.</p>
+<h4><a class="anchor" href="#web-app-start-gyroscope" id="web-app-start-gyroscope" name="web-app-start-gyroscope"><i class="anchor-icon"></i></a><code>web_app_start_gyroscope</code></h4>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>refresh_rate</code> - An optional integer indicating the refresh rate in milliseconds, ranging from 20 to 1000 (defaults to 1000).  </li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to start gyroscope tracking.  </p>
+<p>The specified refresh rate may be ignored on platforms where it is not supported, or if it doesn't fall within the supported range: this should not cause an error, tracking should be started with the closest supported refresh rate.  </p>
+<p>Emits a <a href="/api/bots/webapps#gyroscope-started">gyroscope_started event</a> on success, or a <a href="/api/bots/webapps#gyroscope-failed">gyroscope_failed event</a> with <code>error=UNSUPPORTED</code> on platforms with no gyroscope tracking.  </p>
+<p>Until <a href="#web-app-stop-gyroscope">web_app_stop_gyroscope</a> is emitted by the mini app, the client will emit <a href="/api/bots/webapps#gyroscope-changed">gyroscope_changed events</a> at most every <code>refresh_rate</code> milliseconds with gyroscope readings.</p>
+<h4><a class="anchor" href="#web-app-stop-gyroscope" id="web-app-stop-gyroscope" name="web-app-stop-gyroscope"><i class="anchor-icon"></i></a><code>web_app_stop_gyroscope</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to stop gyroscope tracking, stopping the emission of <a href="/api/bots/webapps#gyroscope-changed">gyroscope_changed events</a>.  </p>
+<p>Emits a <a href="/api/bots/webapps#gyroscope-stopped">gyroscope_stopped event</a> on success, or a <a href="/api/bots/webapps#gyroscope-failed">gyroscope_failed event</a> with <code>error=UNSUPPORTED</code> on platforms with no gyroscope tracking.</p>
+<h4><a class="anchor" href="#web-app-start-device-orientation" id="web-app-start-device-orientation" name="web-app-start-device-orientation"><i class="anchor-icon"></i></a><code>web_app_start_device_orientation</code></h4>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>refresh_rate</code> - An optional integer indicating the refresh rate in milliseconds, ranging from 20 to 1000 (defaults to 1000).  </li>
+<li><code>need_absolute</code> - An optional boolean, indicating whether the app is requesting to receive absolute orientation data, allowing it to determine the device's attitude relative to magnetic north (useful to implement features like a compass, defaults to <code>false</code>)</li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to start device orientation tracking.  </p>
+<p>The specified refresh rate may be ignored on platforms where it is not supported, or if it doesn't fall within the supported range: this should not cause an error, tracking should be started with the closest supported refresh rate.<br>
+Absolute orientation data may also not be supported on some platforms, in which case relative orientation events will be sent, instead.  </p>
+<p>Emits a <a href="/api/bots/webapps#device-orientation-started">device_orientation_started event</a> on success, or a <a href="/api/bots/webapps#device-orientation-failed">device_orientation_failed event</a> with <code>error=UNSUPPORTED</code> on platforms with no device orientation tracking.  </p>
+<p>Until <a href="#web-app-stop-device-orientation">web_app_stop_device_orientation</a> is emitted by the mini app, the client will emit <a href="/api/bots/webapps#device-orientation-changed">device_orientation_changed events</a> at most every <code>refresh_rate</code> milliseconds with device orientation readings.</p>
+<h4><a class="anchor" href="#web-app-stop-device-orientation" id="web-app-stop-device-orientation" name="web-app-stop-device-orientation"><i class="anchor-icon"></i></a><code>web_app_stop_device_orientation</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to stop device orientation tracking, stopping the emission of <a href="/api/bots/webapps#device-orientation-changed">device_orientation_changed events</a>.  </p>
+<p>Emits a <a href="/api/bots/webapps#device-orientation-stopped">device_orientation_stopped event</a> on success, or a <a href="/api/bots/webapps#device-orientation-failed">device_orientation_failed event</a> with <code>error=UNSUPPORTED</code> on platforms with no device orientation tracking.</p>
+<h4><a class="anchor" href="#web-app-add-to-home-screen" id="web-app-add-to-home-screen" name="web-app-add-to-home-screen"><i class="anchor-icon"></i></a><code>web_app_add_to_home_screen</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to ask the user to add a shortcut to the mini app (using the bot's logo) on the homescreen.  </p>
+<p>Ignore incoming events of this type if another event of the same type is still being handled, or if the last click of the user within the app occurred more than 10 seconds ago.  </p>
+<p>Emits a <a href="/api/bots/webapps#home-screen-added">home_screen_added event</a> if the shortcut was (already) added successfully, and a <a href="/api/bots/webapps#home-screen-failed">home_screen_failed event</a> with <code>error="UNSUPPORTED"</code> on unsupported platforms.  </p>
+<p>It is acceptable to not emit the <code>home_screen_added</code> and <code>home_screen_failed</code> events if the current platform doesn't have a way to determine the installation status of the shortcut.</p>
+<h4><a class="anchor" href="#web-app-check-home-screen" id="web-app-check-home-screen" name="web-app-check-home-screen"><i class="anchor-icon"></i></a><code>web_app_check_home_screen</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to check if a shortcut to the mini app was added to the homescreen.  </p>
+<p>Must emit a <a href="/api/bots/webapps#home-screen-checked">home_screen_checked event »</a> event with the status (including on unsupported platforms, see the <a href="/api/bots/webapps#home-screen-checked">event documentation »</a> for this case).</p>
+<h4><a class="anchor" href="#web-app-set-emoji-status" id="web-app-set-emoji-status" name="web-app-set-emoji-status"><i class="anchor-icon"></i></a><code>web_app_set_emoji_status</code></h4>
+<p>Event payload: JSON object with the following fields:</p>
+<ul>
+<li><code>custom_emoji_id</code> - Long integer in string form, containing the ID of the <a href="/api/custom-emoji">custom emoji</a> to set as emoji status (string)</li>
+<li><code>duration</code> - Optional integer, indicating the TTL of the status; if 0, the status doesn't expire (integer, defaults to 0)</li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to manually set (or remove) the <a href="/api/emoji-status">status emoji</a> of a user.  </p>
+<p>Ignore incoming events of this type if another event of the same type is still being handled, or if the last click of the user within the app occurred more than 10 seconds ago.  </p>
+<p>Emits an <a href="/api/bots/webapps#emoji-status-set">emoji_status_set event</a> on success and <a href="/api/bots/webapps#emoji-status-failed">emoji_status_failed event</a> on failure.</p>
+<h4><a class="anchor" href="#web-app-request-emoji-status-access" id="web-app-request-emoji-status-access" name="web-app-request-emoji-status-access"><i class="anchor-icon"></i></a><code>web_app_request_emoji_status_access</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Ignore incoming events of this type if another event of the same type is still being handled, or if the last click of the user within the app occurred more than 10 seconds ago.  </p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to ask permission to update the <a href="/api/emoji-status">emoji status</a> of a user using the <a href="/method/bots.updateUserEmojiStatus">bots.updateUserEmojiStatus</a> method.  </p>
+<p>If the user already previously agreed (i.e. the <a href="/constructor/userFull">userFull</a>.<code>bot_can_manage_emoji_status</code> flag of the bot is set for the user), emit an <a href="/api/bots/webapps#emoji-status-access-requested">emoji_status_access_requested event</a> event with <code>status="allowed"</code> and terminate the flow.  </p>
+<p>If the user refuses, emit an <a href="/api/bots/webapps#emoji-status-access-requested">emoji_status_access_requested event</a> event with <code>status="cancelled"</code> and terminate the flow.  </p>
+<p>If the user agrees, the client must invoke the <a href="/method/bots.toggleUserEmojiStatusPermission">bots.toggleUserEmojiStatusPermission</a> method, passing <code>enabled=true</code> and the ID of the bot: if the method returns <a href="/constructor/boolTrue">boolTrue</a>, emit an <a href="/api/bots/webapps#emoji-status-access-requested">emoji_status_access_requested event</a> event with <code>status="allowed"</code>; otherwise emit the same event with <code>status="cancelled"</code>.  </p>
+<p>On success, the bot will be able to use <a href="/method/bots.updateUserEmojiStatus">bots.updateUserEmojiStatus</a> to change the emoji status of the user.</p>
+<h4><a class="anchor" href="#web-app-request-safe-area" id="web-app-request-safe-area" name="web-app-request-safe-area"><i class="anchor-icon"></i></a><code>web_app_request_safe_area</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to request the emission of a <a href="/api/bots/webapps#safe-area-changed">safe_area_changed event »</a>, containing the current system-defined safe area inset padding values.</p>
+<h4><a class="anchor" href="#web-app-request-content-safe-area" id="web-app-request-content-safe-area" name="web-app-request-content-safe-area"><i class="anchor-icon"></i></a><code>web_app_request_content_safe_area</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to request the emission of a <a href="/api/bots/webapps#content-safe-area-changed">content_safe_area_changed event »</a>, containing the current content-defined safe area inset padding values.</p>
+<h4><a class="anchor" href="#web-app-check-location" id="web-app-check-location" name="web-app-check-location"><i class="anchor-icon"></i></a><code>web_app_check_location</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Must be used by <a href="/api/bots/webapps">mini apps</a> to initialize the geolocation object in the client and obtain basic information about geolocation capabilities and status, as a <a href="/api/bots/webapps#location-checked">location_checked event »</a>.  </p>
+<p>This event should not actually ask anything from the user, just return the current settings (not the current geolocation).</p>
+<h4><a class="anchor" href="#web-app-request-location" id="web-app-request-location" name="web-app-request-location"><i class="anchor-icon"></i></a><code>web_app_request_location</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to request the emission of a <a href="/api/bots/webapps#location-requested">location_requested event »</a>, containing current geolocation data of the user (or nothing if the user denied access to their current geolocation).  </p>
+<p>This event should ask the user permission to share their location with the current mini app only if the user hasn't already denied or allowed location access to the mini app, in which case no prompt must be shown.</p>
+<h4><a class="anchor" href="#web-app-open-location-settings" id="web-app-open-location-settings" name="web-app-open-location-settings"><i class="anchor-icon"></i></a><code>web_app_open_location_settings</code></h4>
+<p>Event payload: <code>null</code></p>
+<p>Used by <a href="/api/bots/webapps">mini apps</a> to request opening the geolocation settings page for bots, useful when the app needs to request permission to use the current geolocation from users who have previously denied it.</p>
+<p>Note that this event should only be handled in response to user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button within the last 10 seconds) and only if an event of the same type isn't already being handled.</p>
+<h4><a class="anchor" href="#web-app-request-file-download" id="web-app-request-file-download" name="web-app-request-file-download"><i class="anchor-icon"></i></a><code>web_app_request_file_download</code></h4>
+<p>Event data: a JSON object with <code>url</code> and <code>filename</code> string fields.</p>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to request the download of a file.  </p>
+<p>Handle this event using the following steps:</p>
+<ol>
+<li>Invoke <a href="/method/bots.checkDownloadFileParams">bots.checkDownloadFileParams</a>, passing the <code>url</code>, <code>filename</code> and the ID of the bot.<br>
+Ignore further <code>web_app_request_file_download</code> events until step 3 is reached (new <code>web_app_request_file_download</code> <em>can</em> be accepted while the previous file is being downloaded).<br>
+1.1) If the method doesn't return <a href="/constructor/boolTrue">boolTrue</a>, emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>cancelled</code> and abort the process.</li>
+<li>If <a href="/constructor/boolTrue">boolTrue</a> is returned, show a prompt to the user, notifying them that <code>$nameOfTheBot</code> is asking to download a file with name <code>filename</code>.<br>
+2.1) If the user refuses to download the file, emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>cancelled</code> and abort the process.  </li>
+<li>If the user agrees, start downloading the file from <code>url</code> as <code>filename</code> and emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>downloading</code>.  </li>
+<li>When the download is finished, show a toast to the user, indicating that the file was downloaded successfully.</li>
+</ol>
+<h4><a class="anchor" href="#web-app-send-prepared-message" id="web-app-send-prepared-message" name="web-app-send-prepared-message"><i class="anchor-icon"></i></a><code>web_app_send_prepared_message</code></h4>
+<p>Event data: a JSON object with an <code>id</code> string field.</p>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to invite the user to send a <a href="/api/bots/inline#21-using-a-prepared-inline-message">prepared inline message »</a>.</p>
+<h4><a class="anchor" href="#web-app-toggle-orientation-lock" id="web-app-toggle-orientation-lock" name="web-app-toggle-orientation-lock"><i class="anchor-icon"></i></a><code>web_app_toggle_orientation_lock</code></h4>
+<p>Event data: a JSON object with a <code>locked</code> boolean field (defaults to <code>false</code>).</p>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to enable or disable the orientation lock.</p>
+<!-- end events --></div>
   
 </div>
           

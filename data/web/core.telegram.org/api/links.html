@@ -895,6 +895,7 @@ tg://bg?slug=&lt;slug&gt;&amp;intensity=&lt;intensity&gt;&amp;bg_color=&lt;hex_c
 <pre><code>t.me/&lt;bot_username&gt;?start=&lt;parameter&gt;</code></pre>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;start=&lt;parameter&gt;</code></pre>
+<p>Note that <a href="#referral-links">referral links have a similar syntax, with a mandatory prefix in <code>parameter</code></a>.</p>
 <p>Parameters:</p>
 <table class="table">
 <thead>
@@ -1284,7 +1285,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startapp=&lt;start_parameter&gt;&am
 <tr>
 <td><code>mode</code></td>
 <td style="text-align: center;">Optional</td>
-<td>If equal to <code>compact</code>, the <a href="/method/messages.requestMainWebView">messages.requestMainWebView</a>.<code>compact</code> flag must be set.</td>
+<td>If equal to <code>compact</code>, the <a href="/method/messages.requestMainWebView">messages.requestMainWebView</a>.<code>compact</code> flag must be set. <br>If equal to <code>fullscreen</code>, the <a href="/method/messages.requestMainWebView">messages.requestMainWebView</a>.<code>fullscreen</code> flag must be set.</td>
 </tr>
 </tbody>
 </table>
@@ -1325,7 +1326,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startapp=&lt;start_parameter&gt;&am
 <tr>
 <td><code>mode</code></td>
 <td style="text-align: center;">Optional</td>
-<td>If equal to <code>compact</code>, the <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.<code>compact</code> flag must be set.</td>
+<td>If equal to <code>compact</code>, the <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.<code>compact</code> flag must be set. <br>If equal to <code>fullscreen</code>, the <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.<code>fullscreen</code> flag must be set.</td>
 </tr>
 </tbody>
 </table>
@@ -1448,6 +1449,65 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startattach=&lt;start_parameter&gt;
 <td><code>choose</code></td>
 <td style="text-align: center;">Optional</td>
 <td>A combination of <code>users</code>, <code>bots</code>, <code>groups</code>, <code>channels</code> separated by <code>+</code>: indicates the dialog types to show in the dialog selection popup: must be intersected with the dialog types contained in the <a href="/constructor/attachMenuBot">attachMenuBot</a>.<code>peer_types</code> field before use.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#stars-topup-link" id="stars-topup-link" name="stars-topup-link"><i class="anchor-icon"></i></a>Stars topup link</h3>
+<p>Used to ensure that the user has at least N <a href="/api/stars">Telegram Stars</a> on their balance.<br>
+If not, this link must bring the user to the <a href="/api/stars#buying-or-gifting-stars">Telegram Star topup page</a>.  </p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://stars_topup?balance=&lt;star_count&gt;&amp;purpose=&lt;purpose&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>star_count</code></td>
+<td style="text-align: center;">Required</td>
+<td>Indicates the number of required stars to execute an action (integer, must be clamped between 1 and 1000000000000). <br>If the current balance is higher than or equal to this value, instead of bringing up the topup form, a simple toast should be displayed, indicating that the user already has enough stars to complete the operation: this toast should also contain a "Buy anyway" button that must bring up the star topup form unconditionally.</td>
+</tr>
+<tr>
+<td><code>purpose</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Contains a string indicating the reason why the topup is required, that must be shown on the topup page (if activated), possible values: <!-- start topup --><br><br>- <code>subs</code> - Buy <strong>Stars</strong> to keep your channel subscriptions.<br>- <code>subadvance12</code> - Buy <strong>Stars</strong> to keep your subscriptions active for the next 12 months.<br><!-- end topup --></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#referral-links" id="referral-links" name="referral-links"><i class="anchor-icon"></i></a>Referral links</h3>
+<p>Used for <a href="/api/bots/referrals">Affiliate programs</a>: when imported, all Telegram Star purchases made for digital products and subscriptions in the associated <a href="/api/bots/webapps">mini app</a> will also transfer a certain amount of Stars to the <em>creator</em> of the link.  </p>
+<p>See <a href="/api/bots/referrals">here »</a> for more info on the full flow.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;bot_username&gt;?ref=&lt;referrer&gt;
+t.me/&lt;bot_username&gt;?start={prefix}&lt;referrer&gt;</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;bot_username&gt;&amp;ref=&lt;referrer&gt;
+tg://resolve?domain=&lt;bot_username&gt;&amp;start={prefix}&lt;referrer&gt;</code></pre>
+<p><code>{prefix}</code> is any of the prefixes specified in the <a href="/api/config#starref-start-param-prefixes">starref_start_param_prefixes client configuration parameter »</a>: it is mandatory for the second variants of referral links, to distinguish them from <a href="#bot-links">bot links</a>. </p>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bot_username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the bot that owns the <a href="/api/bots/webapps">mini app</a></td>
+</tr>
+<tr>
+<td><code>referrer</code></td>
+<td style="text-align: center;">Required</td>
+<td>Referrer ID, to be passed to <a href="/method/contacts.resolveUsername">contacts.resolveUsername</a></td>
 </tr>
 </tbody>
 </table>
