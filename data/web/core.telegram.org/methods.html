@@ -509,7 +509,7 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#working-with-main-mini-bot-apps--and-the-mini-app-store" id="working-with-main-mini-bot-apps--and-the-mini-app-store" name="working-with-main-mini-bot-apps--and-the-mini-app-store"><i class="anchor-icon"></i></a>Working with <a href="/api/bots/webapps#main-mini-apps">Main Mini Bot Apps »</a> and the <a href="/api/search#apps-tab">Mini App Store</a></h3>
+<h3><a class="anchor" href="#working-with-main-mini-bot-apps-and-the-mini-app-store" id="working-with-main-mini-bot-apps-and-the-mini-app-store" name="working-with-main-mini-bot-apps-and-the-mini-app-store"><i class="anchor-icon"></i></a>Working with <a href="/api/bots/webapps#main-mini-apps">Main Mini Bot Apps »</a> and the <a href="/api/search#apps-tab">Mini App Store</a></h3>
 <table class="table">
 <thead>
 <tr>
@@ -600,6 +600,10 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a></td>
 <td>Send a custom request from a <a href="/api/bots/webapps">mini bot app</a>, triggered by a <a href="/api/web-events#web-app-invoke-custom-method">web_app_invoke_custom_method event »</a>.<br><br>The response should be sent using a <a href="/api/bots/webapps#custom-method-invoked">custom_method_invoked</a> event, <a href="/api/web-events#web-app-invoke-custom-method">see here »</a> for more info on the flow.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.checkDownloadFileParams">bots.checkDownloadFileParams</a></td>
+<td>Check if a <a href="/api/bots/webapps">mini app</a> can request the download of a specific file: called when handling <a href="/api/web-events#web-app-request-file-download">web_app_request_file_download events »</a></td>
 </tr>
 </tbody>
 </table>
@@ -777,6 +781,60 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-telegram-gifts" id="working-with-telegram-gifts" name="working-with-telegram-gifts"><i class="anchor-icon"></i></a>Working with <a href="/api/gifts">Telegram Gifts</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/payments.getStarGifts">payments.getStarGifts</a></td>
+<td>Get a list of available <a href="/api/gifts">gifts, see here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.getUserStarGifts">payments.getUserStarGifts</a></td>
+<td>Get the <a href="/api/gifts">gifts »</a> pinned on a specific user's profile.<br><br>May also be used to fetch all gifts received by the current user.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.saveStarGift">payments.saveStarGift</a></td>
+<td>Display or remove a <a href="/api/gifts">received gift »</a> from our profile.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.convertStarGift">payments.convertStarGift</a></td>
+<td>Convert a <a href="/api/gifts">received gift »</a> into Telegram Stars: this will permanently destroy the gift, converting it into <a href="/constructor/starGift">starGift</a>.<code>convert_stars</code> <a href="/api/stars">Telegram Stars</a>, added to the user's balance.<br><br>Note that <a href="/constructor/starGift">starGift</a>.<code>convert_stars</code> will be less than the buying price (<a href="/constructor/starGift">starGift</a>.<code>stars</code>) of the gift if it was originally bought using Telegram Stars bought a long time ago.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-telegram-star-subscriptions-" id="working-with-telegram-star-subscriptions-" name="working-with-telegram-star-subscriptions-"><i class="anchor-icon"></i></a>Working with <a href="/api/subscriptions">Telegram Star subscriptions »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a></td>
+<td>Obtain a list of active, expired or cancelled <a href="/api/invites#paid-invite-links">Telegram Star subscriptions »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.changeStarsSubscription">payments.changeStarsSubscription</a></td>
+<td>Activate or deactivate a <a href="/api/invites#paid-invite-links">Telegram Star subscription »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.fulfillStarsSubscription">payments.fulfillStarsSubscription</a></td>
+<td>Re-join a private channel associated to an active <a href="/api/invites#paid-invite-links">Telegram Star subscription »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.botCancelStarsSubscription">payments.botCancelStarsSubscription</a></td>
+<td>Cancel a <a href="/api/subscriptions#bot-subscriptions">bot subscription</a></td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-telegram-stars" id="working-with-telegram-stars" name="working-with-telegram-stars"><i class="anchor-icon"></i></a>Working with <a href="/api/stars">Telegram Stars</a></h3>
 <table class="table">
 <thead>
@@ -812,7 +870,7 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 <tr>
 <td><a href="/method/payments.getStarsRevenueWithdrawalUrl">payments.getStarsRevenueWithdrawalUrl</a></td>
-<td>Withdraw funds from a channel or bot's <a href="/api/stars#withdrawing-revenue">star balance »</a>.</td>
+<td>Withdraw funds from a channel or bot's <a href="/api/stars#withdrawing-stars">star balance »</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/payments.getStarsRevenueAdsAccountUrl">payments.getStarsRevenueAdsAccountUrl</a></td>
@@ -911,6 +969,41 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/account.getDefaultBackgroundEmojis">account.getDefaultBackgroundEmojis</a></td>
 <td>Get a set of suggested <a href="/api/custom-emoji">custom emoji stickers</a> that can be used in an <a href="/api/colors">accent color pattern</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-affiliate-programs" id="working-with-affiliate-programs" name="working-with-affiliate-programs"><i class="anchor-icon"></i></a>Working with <a href="/api/bots/referrals">affiliate programs</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/payments.getConnectedStarRefBots">payments.getConnectedStarRefBots</a></td>
+<td>Fetch all affiliations we have created for a certain peer</td>
+</tr>
+<tr>
+<td><a href="/method/payments.getConnectedStarRefBot">payments.getConnectedStarRefBot</a></td>
+<td>Fetch info about a specific <a href="/api/bots/referrals">bot affiliation »</a></td>
+</tr>
+<tr>
+<td><a href="/method/payments.getSuggestedStarRefBots">payments.getSuggestedStarRefBots</a></td>
+<td>Obtain a list of suggested <a href="/api/bots/webapps">mini apps</a> with available <a href="/api/bots/referrals">affiliate programs</a><br><br><code>order_by_revenue</code> and <code>order_by_date</code> are mutually exclusive: if neither is set, results are sorted by profitability.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.connectStarRefBot">payments.connectStarRefBot</a></td>
+<td>Join a bot's <a href="/api/bots/referrals#becoming-an-affiliate">affiliate program, becoming an affiliate »</a></td>
+</tr>
+<tr>
+<td><a href="/method/payments.editConnectedStarRefBot">payments.editConnectedStarRefBot</a></td>
+<td>Leave a bot's <a href="/api/bots/referrals#becoming-an-affiliate">affiliate program »</a></td>
+</tr>
+<tr>
+<td><a href="/method/bots.updateStarRefProgram">bots.updateStarRefProgram</a></td>
+<td>Create, edit or delete the <a href="/api/bots/referrals">affiliate program</a> of a bot we own</td>
 </tr>
 </tbody>
 </table>
@@ -1464,6 +1557,14 @@ Look for updates of telegram&#39;s terms of service…">
 <td><a href="/method/account.clearRecentEmojiStatuses">account.clearRecentEmojiStatuses</a></td>
 <td>Clears list of recently used <a href="/api/emoji-status">emoji statuses</a></td>
 </tr>
+<tr>
+<td><a href="/method/bots.updateUserEmojiStatus">bots.updateUserEmojiStatus</a></td>
+<td>Change the emoji status of a user (invoked by bots, see <a href="/api/emoji-status#setting-an-emoji-status-from-a-bot">here »</a> for more info on the full flow)</td>
+</tr>
+<tr>
+<td><a href="/method/bots.toggleUserEmojiStatusPermission">bots.toggleUserEmojiStatusPermission</a></td>
+<td>Allow or prevent a bot from <a href="/api/emoji-status#setting-an-emoji-status-from-a-bot">changing our emoji status »</a></td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-fact-checks" id="working-with-fact-checks" name="working-with-fact-checks"><i class="anchor-icon"></i></a>Working with <a href="/api/factcheck">fact-checks</a></h3>
@@ -1791,6 +1892,10 @@ Look for updates of telegram&#39;s terms of service…">
 <td><a href="/method/payments.launchPrepaidGiveaway">payments.launchPrepaidGiveaway</a></td>
 <td>Launch a <a href="/api/giveaways">prepaid giveaway »</a>.</td>
 </tr>
+<tr>
+<td><a href="/method/payments.getStarsGiveawayOptions">payments.getStarsGiveawayOptions</a></td>
+<td>Fetch a list of <a href="/api/giveaways#star-giveaways">star giveaway options »</a>.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-instant-view-pages" id="working-with-instant-view-pages" name="working-with-instant-view-pages"><i class="anchor-icon"></i></a>Working with <a href="https://instantview.telegram.org">instant view pages</a></h3>
@@ -1884,6 +1989,18 @@ Look for updates of telegram&#39;s terms of service…">
 <td><a href="/method/messages.clearRecentReactions">messages.clearRecentReactions</a></td>
 <td>Clear recently used <a href="/api/reactions">message reactions</a></td>
 </tr>
+<tr>
+<td><a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a></td>
+<td>Sends one or more <a href="/api/reactions#paid-reactions">paid Telegram Star reactions »</a>, transferring <a href="/api/stars">Telegram Stars »</a> to a channel's balance.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.togglePaidReactionPrivacy">messages.togglePaidReactionPrivacy</a></td>
+<td>Changes the privacy of already sent <a href="/api/reactions#paid-reactions">paid reactions</a> on a specific message.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getPaidReactionPrivacy">messages.getPaidReactionPrivacy</a></td>
+<td>Fetches an <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> update with the current <a href="/api/reactions#paid-reactions">default paid reaction privacy, see here »</a> for more info.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-message-translation" id="working-with-message-translation" name="working-with-message-translation"><i class="anchor-icon"></i></a>Working with <a href="/api/translation">message translation</a></h3>
@@ -1917,6 +2034,25 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a></td>
 <td>Fetch updated information about <a href="/api/paid-media">paid media, see here »</a> for the full flow.<br><br>This method will return an array of <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> updates, only for messages containing <strong>already bought</strong> paid media.  <br>No information will be returned for messages containing not yet bought paid media.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-prepared-inline-messages" id="working-with-prepared-inline-messages" name="working-with-prepared-inline-messages"><i class="anchor-icon"></i></a>Working with <a href="/api/bots/inline#21-using-a-prepared-inline-message">prepared inline messages</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.savePreparedInlineMessage">messages.savePreparedInlineMessage</a></td>
+<td>Save a <a href="/api/bots/inline#21-using-a-prepared-inline-message">prepared inline message</a>, to be shared by the user of the mini app using a <a href="/api/web-events#web-app-send-prepared-message">web_app_send_prepared_message event</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.getPreparedInlineMessage">messages.getPreparedInlineMessage</a></td>
+<td>Obtain a <a href="/api/bots/inline#21-using-a-prepared-inline-message">prepared inline message</a> generated by a <a href="/api/bots/webapps">mini app</a>: invoked when handling <a href="/api/web-events#web-app-send-prepared-message">web_app_send_prepared_message events</a></td>
 </tr>
 </tbody>
 </table>
@@ -2215,6 +2351,10 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/messages.searchStickerSets">messages.searchStickerSets</a></td>
 <td>Search for stickersets</td>
+</tr>
+<tr>
+<td><a href="/method/messages.searchStickers">messages.searchStickers</a></td>
+<td>Search for stickers using AI-powered keyword search</td>
 </tr>
 <tr>
 <td><a href="/method/messages.searchEmojiStickerSets">messages.searchEmojiStickerSets</a></td>
@@ -2586,6 +2726,10 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/bots.getBotInfo">bots.getBotInfo</a></td>
 <td>Get localized name, about text and description of a bot (or of the current account, if called by a bot).</td>
+</tr>
+<tr>
+<td><a href="/method/bots.getAdminedBots">bots.getAdminedBots</a></td>
+<td>Get a list of bots owned by the current user</td>
 </tr>
 </tbody>
 </table>
@@ -3350,28 +3494,28 @@ Look for updates of telegram&#39;s terms of service…">
 </thead>
 <tbody>
 <tr>
-<td><a href="/method/channels.getSponsoredMessages">channels.getSponsoredMessages</a></td>
-<td>Get a list of sponsored messages</td>
-</tr>
-<tr>
-<td><a href="/method/channels.viewSponsoredMessage">channels.viewSponsoredMessage</a></td>
-<td>Mark a specific sponsored message as read</td>
-</tr>
-<tr>
-<td><a href="/method/channels.clickSponsoredMessage">channels.clickSponsoredMessage</a></td>
-<td>Informs the server that the user has either:<br><br>- Clicked on a link in the sponsored message<br>- Has opened a sponsored chat or a sponsored website via the associated button<br>- Has opened the sponsored chat via the sponsored message name, the sponsored message photo, or a mention in the sponsored message</td>
-</tr>
-<tr>
-<td><a href="/method/channels.reportSponsoredMessage">channels.reportSponsoredMessage</a></td>
-<td>Report a <a href="/api/sponsored-messages">sponsored message »</a>, see <a href="/api/sponsored-messages#reporting-sponsored-messages">here »</a> for more info on the full flow.</td>
-</tr>
-<tr>
 <td><a href="/method/channels.restrictSponsoredMessages">channels.restrictSponsoredMessages</a></td>
 <td>Disable ads on the specified channel, for all users.<br><br>Available only after reaching at least the <a href="/api/boost">boost level »</a> specified in the <a href="/api/config#channel-restrict-sponsored-level-min"><code>channel_restrict_sponsored_level_min</code> »</a> config parameter.</td>
 </tr>
 <tr>
 <td><a href="/method/account.toggleSponsoredMessages">account.toggleSponsoredMessages</a></td>
 <td>Disable or re-enable Telegram ads for the current <a href="/api/premium">Premium</a> account.<br><br>Useful for business owners that may want to launch and view their own Telegram ads via the <a href="https://ads.telegram.org">Telegram ad platform »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.viewSponsoredMessage">messages.viewSponsoredMessage</a></td>
+<td>Mark a specific <a href="/api/sponsored-messages">sponsored message »</a> as read</td>
+</tr>
+<tr>
+<td><a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a></td>
+<td>Informs the server that the user has interacted with a sponsored message in <a href="/api/sponsored-messages#clicking-on-sponsored-messages">one of the ways listed here »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.reportSponsoredMessage">messages.reportSponsoredMessage</a></td>
+<td>Report a <a href="/api/sponsored-messages">sponsored message »</a>, see <a href="/api/sponsored-messages#reporting-sponsored-messages">here »</a> for more info on the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getSponsoredMessages">messages.getSponsoredMessages</a></td>
+<td>Get a list of <a href="/api/sponsored-messages">sponsored messages for a peer, see here »</a> for more info.</td>
 </tr>
 </tbody>
 </table>
@@ -3405,7 +3549,7 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#working-with-the-attachment-menu--of-mini-bot-apps-" id="working-with-the-attachment-menu--of-mini-bot-apps-" name="working-with-the-attachment-menu--of-mini-bot-apps-"><i class="anchor-icon"></i></a>Working with the <a href="/bots/webapps#launching-mini-apps-from-the-attachment-menu">attachment menu »</a> of <a href="/bots/webapps">mini bot apps »</a></h3>
+<h3><a class="anchor" href="#working-with-the-attachment-menu-of-mini-bot-apps-" id="working-with-the-attachment-menu-of-mini-bot-apps-" name="working-with-the-attachment-menu-of-mini-bot-apps-"><i class="anchor-icon"></i></a>Working with the <a href="/bots/webapps#launching-mini-apps-from-the-attachment-menu">attachment menu »</a> of <a href="/bots/webapps">mini bot apps »</a></h3>
 <table class="table">
 <thead>
 <tr>
@@ -3509,7 +3653,7 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#working-with-the-takeout-api-see-here--for-more-info" id="working-with-the-takeout-api-see-here--for-more-info" name="working-with-the-takeout-api-see-here--for-more-info"><i class="anchor-icon"></i></a>Working with the <a href="/api/takeout">takeout API, see here » for more info</a>.</h3>
+<h3><a class="anchor" href="#working-with-the-takeout-api-see-here-for-more-info" id="working-with-the-takeout-api-see-here-for-more-info" name="working-with-the-takeout-api-see-here-for-more-info"><i class="anchor-icon"></i></a>Working with the <a href="/api/takeout">takeout API, see here » for more info</a>.</h3>
 <table class="table">
 <thead>
 <tr>
