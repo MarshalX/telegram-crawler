@@ -3638,6 +3638,114 @@ var Gateway = {
   }
 };
 
+var Nft = {
+  initWithdraw: function() {
+    Aj.onLoad(function(state) {
+      var cont = Aj.ajContainer;
+      $('.js-lottie', cont).each(function() {
+        RLottie.init(this);
+      });
+      $(cont).on('click.curPage', '.js-withdraw-btn', Nft.eWithdrawNft);
+      state.$withdrawForm = $('.js-withdraw-form', cont);
+      Main.initForm(state.$withdrawForm);
+      state.$withdrawBtn = $('.js-withdraw-btn', cont);
+      state.updLastReq = +Date.now();
+      state.canUpdate = true;
+      if (state.needUpdate) {
+        state.updStateTo = setTimeout(Nft.updateWithdrawState, Main.UPDATE_PERIOD);
+      }
+    });
+    Aj.onUnload(function(state) {
+      $('.js-lottie', cont).each(function() {
+        RLottie.destroy(this);
+      });
+      clearTimeout(state.updStateTo);
+      state.canUpdate = false;
+      Main.destroyForm(state.$withdrawForm);
+    });
+  },
+  updateWithdrawState: function(force) {
+    var now = +Date.now();
+    if (document.hasFocus() || force ||
+        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
+      Aj.state.updLastReq = now;
+      Aj.apiRequest('updateNftWithdrawalState', {
+        transaction: Aj.state.transaction,
+        mode: Aj.state.mode
+      }, function(result) {
+        if (result.mode) {
+          Aj.state.mode = result.mode;
+        }
+        if (result.html) {
+          Nft.updateContent(result.html);
+        }
+        Aj.state.needUpdate = result.need_update;
+        if (Aj.state.canUpdate && Aj.state.needUpdate) {
+          Aj.state.updStateTo = setTimeout(Nft.updateWithdrawState, Main.UPDATE_PERIOD);
+        }
+      });
+    } else {
+      if (Aj.state.canUpdate && Aj.state.needUpdate) {
+        Aj.state.updStateTo = setTimeout(Nft.updateWithdrawState, Main.CHECK_PERIOD);
+      }
+    }
+  },
+  updateContent: function(html) {
+    $('.js-main-content .js-lottie').each(function() {
+      RLottie.destroy(this);
+    });
+    $('.js-main-content').html(html).find('.js-lottie').each(function() {
+      RLottie.init(this);
+    });
+  },
+  eWithdrawNft: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    var $form       = Aj.state.$withdrawForm;
+    var transaction = $form.field('transaction').value();
+    var wallet_address = $form.field('wallet_address').value();
+    var params = {
+      transaction: transaction,
+      wallet_address: wallet_address
+    };
+    if ($form.data('disabled')) {
+      return false;
+    }
+    var onSuccess = function(result) {
+      $form.data('disabled', false);
+      if (result.need_verify) {
+        return Verify.showPopup(result, function() {
+          $form.data('disabled', true);
+          Aj.apiRequest('initNftWithdrawalRequest', params, onSuccess);
+        });
+      }
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.confirm_message && result.confirm_hash) {
+        showConfirm(result.confirm_message, function() {
+          params.confirm_hash = result.confirm_hash;
+          $form.data('disabled', true);
+          Aj.apiRequest('initNftWithdrawalRequest', params, onSuccess);
+        }, result.confirm_button);
+      } else {
+        if (result.mode) {
+          Aj.state.mode = result.mode;
+        }
+        if (result.html) {
+          Nft.updateContent(result.html);
+        }
+        Aj.state.needUpdate = result.need_update;
+        if (Aj.state.canUpdate && Aj.state.needUpdate) {
+          Aj.state.updStateTo = setTimeout(Nft.updateWithdrawState, Main.UPDATE_PERIOD);
+        }
+      }
+    };
+    $form.data('disabled', true);
+    Aj.apiRequest('initNftWithdrawalRequest', params, onSuccess);
+  }
+};
+
 var Profile = {
   init: function() {
     Aj.onLoad(function(state) {
