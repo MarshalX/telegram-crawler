@@ -77,7 +77,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">td_json_client.h File Reference</div>  </div>
@@ -85,33 +84,13 @@ $(function() {
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Description</h2>
 <div class="textblock"><p>C interface for interaction with TDLib via JSON-serialized objects. Can be used to easily integrate TDLib with any programming language which supports calling C functions and is able to work with JSON.</p>
-<p>The JSON serialization of TDLib API objects is straightforward: all API objects are represented as JSON objects with the same keys as the API object field names. The object type name is stored in the special field "@type" which is optional in places where type is uniquely determined by the context. Fields of Bool type are stored as Boolean, fields of int32, int53, and double types are stored as Number, fields of int64 and string types are stored as String, fields of bytes type are base64 encoded and then stored as String, fields of array type are stored as Array.</p>
-<p>The main TDLib interface is asynchronous. To match requests with a corresponding response, the field "@extra" can be added to the request object. The corresponding response will have an "@extra" field with exactly the same value. Each returned object will have an "@client_id" field, containing the identifier of the client for which a response or an update was received.</p>
-<p>A TDLib client instance can be created through td_create_client_id. Requests can be sent using td_send and the received client identifier. New updates and responses to requests can be received through td_receive from any thread after the first request has been sent to the client instance. This function must not be called simultaneously from two different threads. Also, note that all updates and responses to requests must be applied in the order they were received for consistency. Some TDLib requests can be executed synchronously from any thread using td_execute. TDLib client instances are destroyed automatically after they are closed. All TDLib client instances must be closed before application termination to ensure data consistency.</p>
-<p>General pattern of usage: </p><div class="fragment"><div class="line"><span class="keywordtype">int</span> client_id = <a class="code" href="td__json__client_8h.html#a7feda953a66eee36bc207eb71a55c490">td_create_client_id</a>();</div><div class="line"><span class="comment">// share the client_id with other threads, which will be able to send requests via td_send</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> <span class="keywordtype">double</span> WAIT_TIMEOUT = 10.0; <span class="comment">// seconds</span></div><div class="line"><span class="keywordflow">while</span> (<span class="keyword">true</span>) {</div><div class="line">  <span class="keyword">const</span> <span class="keywordtype">char</span> *result = <a class="code" href="td__json__client_8h.html#a62715bea8e41a554d1bac763c187b662">td_receive</a>(WAIT_TIMEOUT);</div><div class="line">  <span class="keywordflow">if</span> (result) {</div><div class="line">    <span class="comment">// parse the result as a JSON object and process it as an incoming update or the answer to a previously sent request</span></div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><p>Alternatively, you can use old TDLib JSON interface, which will be removed in TDLib 2.0.0.</p>
-<p>Objects and functions serialization to JSON is the same for both JSON interfaces.</p>
-<p>The main TDLib interface is asynchronous. To match requests with a corresponding response a field "@extra" can be added to the request object. The corresponding response will have an "@extra" field with exactly the same value.</p>
-<p>A TDLib client instance can be created through td_json_client_create. Requests then can be sent using td_json_client_send from any thread. New updates and request responses can be received through td_json_client_receive from any thread. This function must not be called simultaneously from two different threads. Also, note that all updates and request responses must be applied in the order they were received to ensure consistency. Given this information, it's advisable to call this function from a dedicated thread. Some service TDLib requests can be executed synchronously from any thread by using td_json_client_execute. The TDLib client instance can be destroyed via td_json_client_destroy.</p>
+<p>The JSON serialization of TDLib API objects is straightforward: all API objects are represented as JSON objects with the same keys as the API object field names. The object type name is stored in the special field "@type" which is optional in places where type is uniquely determined by the context. Fields of Bool type are stored as Boolean, fields of int32, int53, and double types are stored as Number, fields of int64 and string types are stored as String, fields of bytes type are base64 encoded and then stored as String, fields of array type are stored as Array. The main TDLib interface is asynchronous. To match requests with a corresponding response a field "@extra" can be added to the request object. The corresponding response will have an "@extra" field with exactly the same value.</p>
+<p>A TDLib client instance can be created through td_json_client_create. Requests then can be sent using td_json_client_send from any thread. New updates and request responses can be received through td_json_client_receive from any thread. This function must not be called simultaneously from two different threads. Also note that all updates and request responses must be applied in the order they were received to ensure consistency. Given this information, it's advisable to call this function from a dedicated thread. Some service TDLib requests can be executed synchronously from any thread by using td_json_client_execute. The TDLib client instance can be destroyed via td_json_client_destroy.</p>
 <p>General pattern of usage: </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> *client = <a class="code" href="td__json__client_8h.html#a45cd6979ada11b7690d9dcb1ddc841a0">td_json_client_create</a>();</div><div class="line"><span class="comment">// somehow share the client with other threads, which will be able to send requests via td_json_client_send</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> <span class="keywordtype">double</span> WAIT_TIMEOUT = 10.0; <span class="comment">// seconds</span></div><div class="line"><span class="keywordtype">int</span> is_closed = 0;  <span class="comment">// should be set to 1, when updateAuthorizationState with authorizationStateClosed is received</span></div><div class="line"><span class="keywordflow">while</span> (!is_closed) {</div><div class="line">  <span class="keyword">const</span> <span class="keywordtype">char</span> *result = <a class="code" href="td__json__client_8h.html#a9e0cb36bfa2bc2249905aebd7d07a4ac">td_json_client_receive</a>(client, WAIT_TIMEOUT);</div><div class="line">  <span class="keywordflow">if</span> (result) {</div><div class="line">    <span class="comment">// parse the result as JSON object and process it as an incoming update or an answer to a previously sent request</span></div><div class="line">  }</div><div class="line">}</div><div class="line"><a class="code" href="td__json__client_8h.html#a75c765a44f3bdf6a724d90c2e7f75ecf">td_json_client_destroy</a>(client);</div></div><!-- fragment --> </div>
 <p><a href="td__json__client_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a967769864d76b43cf3ad779b801971d5"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#a967769864d76b43cf3ad779b801971d5">td_log_message_callback_ptr</a>) (int verbosity_level, const char *message)</td></tr>
-<tr class="separator:a967769864d76b43cf3ad779b801971d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a7feda953a66eee36bc207eb71a55c490"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#a7feda953a66eee36bc207eb71a55c490">td_create_client_id</a> ()</td></tr>
-<tr class="separator:a7feda953a66eee36bc207eb71a55c490"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8a6b2061559c80887af75381abdbddf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#aa8a6b2061559c80887af75381abdbddf">td_send</a> (int client_id, const char *request)</td></tr>
-<tr class="separator:aa8a6b2061559c80887af75381abdbddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62715bea8e41a554d1bac763c187b662"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#a62715bea8e41a554d1bac763c187b662">td_receive</a> (double timeout)</td></tr>
-<tr class="separator:a62715bea8e41a554d1bac763c187b662"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff3d28f8896cf0b74f7825e3198f5b3e"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#aff3d28f8896cf0b74f7825e3198f5b3e">td_execute</a> (const char *request)</td></tr>
-<tr class="separator:aff3d28f8896cf0b74f7825e3198f5b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c7d765c53703b3c082bbd6f77eb2de6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#a1c7d765c53703b3c082bbd6f77eb2de6">td_set_log_message_callback</a> (int max_verbosity_level, <a class="el" href="td__json__client_8h.html#a967769864d76b43cf3ad779b801971d5">td_log_message_callback_ptr</a> callback)</td></tr>
-<tr class="separator:a1c7d765c53703b3c082bbd6f77eb2de6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45cd6979ada11b7690d9dcb1ddc841a0"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#a45cd6979ada11b7690d9dcb1ddc841a0">td_json_client_create</a> ()</td></tr>
 <tr class="separator:a45cd6979ada11b7690d9dcb1ddc841a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fea1f986bf950d19eee3032c24cce83"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#a1fea1f986bf950d19eee3032c24cce83">td_json_client_send</a> (void *client, const char *request)</td></tr>
@@ -122,170 +101,16 @@ Functions</h2></td></tr>
 <tr class="separator:a6d6c76380793072d4a9ce3c71ba0f1cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75c765a44f3bdf6a724d90c2e7f75ecf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#a75c765a44f3bdf6a724d90c2e7f75ecf">td_json_client_destroy</a> (void *client)</td></tr>
 <tr class="separator:a75c765a44f3bdf6a724d90c2e7f75ecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7feda953a66eee36bc207eb71a55c490"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#a7feda953a66eee36bc207eb71a55c490">td_create_client_id</a> ()</td></tr>
+<tr class="separator:a7feda953a66eee36bc207eb71a55c490"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8a6b2061559c80887af75381abdbddf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#aa8a6b2061559c80887af75381abdbddf">td_send</a> (int client_id, const char *request)</td></tr>
+<tr class="separator:aa8a6b2061559c80887af75381abdbddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62715bea8e41a554d1bac763c187b662"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#a62715bea8e41a554d1bac763c187b662">td_receive</a> (double timeout)</td></tr>
+<tr class="separator:a62715bea8e41a554d1bac763c187b662"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff3d28f8896cf0b74f7825e3198f5b3e"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="td__json__client_8h.html#aff3d28f8896cf0b74f7825e3198f5b3e">td_execute</a> (const char *request)</td></tr>
+<tr class="separator:aff3d28f8896cf0b74f7825e3198f5b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a id="a967769864d76b43cf3ad779b801971d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a967769864d76b43cf3ad779b801971d5">&#9670;&nbsp;</a></span>td_log_message_callback_ptr</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef void(* td_log_message_callback_ptr) (int verbosity_level, const char *message)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>A type of callback function that will be called when a message is added to the internal TDLib log.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">verbosity_level</td><td>Log verbosity level with which the message was added from -1 up to 1024. If 0, then TDLib will crash as soon as the callback returns. None of the TDLib methods can be called from the callback. </td></tr>
-    <tr><td class="paramname">message</td><td>Null-terminated UTF-8-encoded string with the message added to the log. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a7feda953a66eee36bc207eb71a55c490"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7feda953a66eee36bc207eb71a55c490">&#9670;&nbsp;</a></span>td_create_client_id()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int td_create_client_id </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Returns an opaque identifier of a new TDLib instance. The TDLib instance will not send updates until the first request is sent to it. </p><dl class="section return"><dt>Returns</dt><dd>Opaque identifier of a new TDLib instance. </dd></dl>
-
-</div>
-</div>
-<a id="aa8a6b2061559c80887af75381abdbddf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8a6b2061559c80887af75381abdbddf">&#9670;&nbsp;</a></span>td_send()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void td_send </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>client_id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>request</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Sends request to the TDLib client. May be called from any thread. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">client_id</td><td>TDLib client identifier. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">request</td><td>JSON-serialized null-terminated request to TDLib. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a62715bea8e41a554d1bac763c187b662"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62715bea8e41a554d1bac763c187b662">&#9670;&nbsp;</a></span>td_receive()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char* td_receive </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>timeout</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Receives incoming updates and request responses. Must not be called simultaneously from two different threads. The returned pointer can be used until the next call to td_receive or td_execute, after which it will be deallocated by TDLib. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">timeout</td><td>The maximum number of seconds allowed for this function to wait for new data. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>JSON-serialized null-terminated incoming update or request response. May be NULL if the timeout expires. </dd></dl>
-
-</div>
-</div>
-<a id="aff3d28f8896cf0b74f7825e3198f5b3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aff3d28f8896cf0b74f7825e3198f5b3e">&#9670;&nbsp;</a></span>td_execute()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char* td_execute </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>request</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Synchronously executes a TDLib request. A request can be executed synchronously, only if it is documented with "Can be called synchronously". The returned pointer can be used until the next call to td_receive or td_execute, after which it will be deallocated by TDLib. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">request</td><td>JSON-serialized null-terminated request to TDLib. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>JSON-serialized null-terminated request response. </dd></dl>
-
-</div>
-</div>
-<a id="a1c7d765c53703b3c082bbd6f77eb2de6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c7d765c53703b3c082bbd6f77eb2de6">&#9670;&nbsp;</a></span>td_set_log_message_callback()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void td_set_log_message_callback </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>max_verbosity_level</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="td__json__client_8h.html#a967769864d76b43cf3ad779b801971d5">td_log_message_callback_ptr</a>&#160;</td>
-          <td class="paramname"><em>callback</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Sets the callback that will be called when a message is added to the internal TDLib log. None of the TDLib methods can be called from the callback. By default the callback is not set.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">max_verbosity_level</td><td>The maximum verbosity level of messages for which the callback will be called. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">callback</td><td>Callback that will be called when a message is added to the internal TDLib log. Pass nullptr to remove the callback. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a45cd6979ada11b7690d9dcb1ddc841a0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a45cd6979ada11b7690d9dcb1ddc841a0">&#9670;&nbsp;</a></span>td_json_client_create()</h2>
 
@@ -402,7 +227,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Synchronously executes TDLib request. May be called from any thread. Only a few requests can be executed synchronously. Returned pointer will be deallocated by TDLib during next call to td_json_client_receive or td_json_client_execute in the same thread, so it can't be used after that. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">client</td><td>The client. Currently, ignored for all requests, so NULL can be passed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">client</td><td>The client. Currently ignored for all requests, so NULL can be passed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">request</td><td>JSON-serialized null-terminated request to TDLib. </td></tr>
   </table>
   </dd>
@@ -432,6 +257,109 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a7feda953a66eee36bc207eb71a55c490"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7feda953a66eee36bc207eb71a55c490">&#9670;&nbsp;</a></span>td_create_client_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int td_create_client_id </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns an opaque identifier of a new TDLib instance. The TDLib instance will not send updates until the first request is sent to it. </p><dl class="section return"><dt>Returns</dt><dd>Opaque identifier of a new TDLib instance. </dd></dl>
+
+</div>
+</div>
+<a id="aa8a6b2061559c80887af75381abdbddf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8a6b2061559c80887af75381abdbddf">&#9670;&nbsp;</a></span>td_send()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void td_send </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>client_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>request</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sends request to the TDLib client. May be called from any thread. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">client_id</td><td>TDLib client identifier. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">request</td><td>JSON-serialized null-terminated request to TDLib. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a62715bea8e41a554d1bac763c187b662"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62715bea8e41a554d1bac763c187b662">&#9670;&nbsp;</a></span>td_receive()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* td_receive </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>timeout</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Receives incoming updates and request responses. Must not be called simultaneously from two different threads. The returned pointer can be used until the next call to td_receive or td_execute, after which it will be deallocated by TDLib. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">timeout</td><td>The maximum number of seconds allowed for this function to wait for new data. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>JSON-serialized null-terminated incoming update or request response. May be NULL if the timeout expires. </dd></dl>
+
+</div>
+</div>
+<a id="aff3d28f8896cf0b74f7825e3198f5b3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff3d28f8896cf0b74f7825e3198f5b3e">&#9670;&nbsp;</a></span>td_execute()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* td_execute </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>request</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Synchronously executes a TDLib request. A request can be executed synchronously, only if it is documented with "Can be called synchronously". The returned pointer can be used until the next call to td_receive or td_execute, after which it will be deallocated by TDLib. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">request</td><td>JSON-serialized null-terminated request to TDLib. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>JSON-serialized null-terminated request response. </dd></dl>
 
 </div>
 </div>
