@@ -21,7 +21,6 @@ var Main = {
       $(cont).on('click.curPage', '.ton-auth-link', Wallet.eTonAuth);
       $(cont).on('click.curPage', '.ton-logout-link', Wallet.eLogOut);
       $(cont).on('click.curPage', '.js-copy-code', Main.copyCode);
-      $(cont).on('click.curPage', '.js-lottie[playbyclick]', Main.playLottieByClick);
       $(cont).on('click.curPage', '.js-main-search-dd-item', Main.eMainSearchDDSelected);
       state.$headerMenu = $('.js-header-menu');
       state.$unavailPopup = $('.js-unavailable-popup');
@@ -551,18 +550,15 @@ var Main = {
     });
   },
   initLottie: function(cont) {
-    $('.js-lottie', cont || Aj.ajContainer).each(function() {
+    $('.js-lottie', cont).each(function() {
       RLottie.init(this, {
         noAutoPlay: !this.hasAttribute('autoplay'),
         playOnce: this.hasAttribute('playonce')
       });
     });
   },
-  playLottieByClick: function() {
-    RLottie.playOnce(this);
-  },
   destroyLottie: function(cont) {
-    $('.js-lottie', cont || Aj.ajContainer).each(function() {
+    $('.js-lottie', cont).each(function() {
       RLottie.destroy(this);
     });
   }
@@ -1109,13 +1105,13 @@ var Assets = {
       state.$sellUsernamePopup = $('.js-sell-username-popup');
       state.$sellUsernameForm = $('.js-sell-username-form');
       Main.initForm(state.$sellUsernameForm);
-      Main.initLottie();
+      Main.initLottie(Aj.ajContainer);
     });
     Aj.onUnload(function(state) {
       $('.table-selectable-in-row').off('mouseover mouseout', Assets.eTableRowSelHovered);
       Main.destroyForm(state.$putToAuctionForm);
       Main.destroyForm(state.$sellUsernameForm);
-      Main.destroyLottie();
+      Main.destroyLottie(Aj.ajContainer);
       clearTimeout(Aj.state.waitingTo);
     });
   },
@@ -1819,10 +1815,10 @@ var PremiumHistory = {
   init: function() {
     Aj.onLoad(function(state) {
       $(document).on('click.curPage', '.js-load-more-rows', PremiumHistory.eLoadMoreRows);
-      Main.initLottie();
+      Main.initLottie(Aj.ajContainer);
     });
     Aj.onUnload(function(state) {
-      Main.destroyLottie();
+      Main.destroyLottie(Aj.ajContainer);
     });
   },
   eLoadMoreRows: function(e) {
@@ -3687,11 +3683,11 @@ var Nft = {
         RLottie.init(this, {playUntilEnd: true});
       });
       RLottie.init();
-      Main.initLottie();
+      Main.initLottie(cont);
     });
     Aj.onUnload(function(state) {
       var cont = Aj.ajContainer;
-      Main.destroyLottie();
+      Main.destroyLottie(cont);
       clearTimeout(state.updStateTo);
       state.canUpdate = false;
       state.$nftTransferSearchForm.off('submit', Nft.eTransferSearchSubmit);
@@ -3899,7 +3895,7 @@ var Nft = {
       var cont = Aj.ajContainer;
       $(cont).on('click.curPage', '.js-withdraw-btn', Nft.eWithdrawNft);
       state.$withdrawForm = $('.js-withdraw-form', cont);
-      Main.initLottie();
+      Main.initLottie(cont);
       Main.initForm(state.$withdrawForm);
       state.$withdrawBtn = $('.js-withdraw-btn', cont);
       state.updLastReq = +Date.now();
@@ -3909,7 +3905,8 @@ var Nft = {
       }
     });
     Aj.onUnload(function(state) {
-      Main.destroyLottie();
+      var cont = Aj.ajContainer;
+      Main.destroyLottie(cont);
       clearTimeout(state.updStateTo);
       state.canUpdate = false;
       Main.destroyForm(state.$withdrawForm);
