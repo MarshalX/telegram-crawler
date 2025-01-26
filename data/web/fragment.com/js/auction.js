@@ -21,6 +21,7 @@ var Main = {
       $(cont).on('click.curPage', '.ton-auth-link', Wallet.eTonAuth);
       $(cont).on('click.curPage', '.ton-logout-link', Wallet.eLogOut);
       $(cont).on('click.curPage', '.js-copy-code', Main.copyCode);
+      $(cont).on('click.curPage', '.js-lottie[playbyclick]', Main.playLottieByClick);
       $(cont).on('click.curPage', '.js-main-search-dd-item', Main.eMainSearchDDSelected);
       state.$headerMenu = $('.js-header-menu');
       state.$unavailPopup = $('.js-unavailable-popup');
@@ -548,6 +549,22 @@ var Main = {
       }
       Aj.state.$mainSearchField.removeClass('loading');
     });
+  },
+  initLottie: function(cont) {
+    $('.js-lottie', cont || Aj.ajContainer).each(function() {
+      RLottie.init(this, {
+        noAutoPlay: !this.hasAttribute('autoplay'),
+        playOnce: this.hasAttribute('playonce')
+      });
+    });
+  },
+  playLottieByClick: function() {
+    RLottie.playOnce(this);
+  },
+  destroyLottie: function(cont) {
+    $('.js-lottie', cont || Aj.ajContainer).each(function() {
+      RLottie.destroy(this);
+    });
   }
 };
 
@@ -1073,7 +1090,7 @@ var Assets = {
       $(document).on('click.curPage', '.js-assign-btn', Assets.eAssignToTelegram);
       $(document).on('submit.curPage', '.js-assign-form', Assets.eAssignSubmit);
       $(document).on('submit.curPage', '.js-bot-username-form', Assets.eBotUsernameSubmit);
-      $(document).on('click.curPage', '.js-get-code-btn', Assets.eGetCode);
+      $(document).on('click.curPage', '.js-follow-link', Assets.eFollowLink);
       $(document).on('click.curPage', '.js-put-to-auction-btn', Assets.ePutToAuction);
       $(document).on('submit.curPage', '.js-put-to-auction-form', Assets.ePutToAuctionSubmit);
       $(document).on('click.curPage', '.js-cancel-auction-btn', Assets.eCancelAuction);
@@ -1092,18 +1109,20 @@ var Assets = {
       state.$sellUsernamePopup = $('.js-sell-username-popup');
       state.$sellUsernameForm = $('.js-sell-username-form');
       Main.initForm(state.$sellUsernameForm);
+      Main.initLottie();
     });
     Aj.onUnload(function(state) {
       $('.table-selectable-in-row').off('mouseover mouseout', Assets.eTableRowSelHovered);
       Main.destroyForm(state.$putToAuctionForm);
       Main.destroyForm(state.$sellUsernameForm);
+      Main.destroyLottie();
       clearTimeout(Aj.state.waitingTo);
     });
   },
   eTableRowSelHovered: function(e) {
     $(this).closest('.tm-row-selectable').toggleClass('noselect', e.type == 'mouseover');
   },
-  eGetCode: function(e) {
+  eFollowLink: function(e) {
     e.stopImmediatePropagation();
     e.preventDefault();
     var href = $(this).attr('data-href');
@@ -1800,6 +1819,10 @@ var PremiumHistory = {
   init: function() {
     Aj.onLoad(function(state) {
       $(document).on('click.curPage', '.js-load-more-rows', PremiumHistory.eLoadMoreRows);
+      Main.initLottie();
+    });
+    Aj.onUnload(function(state) {
+      Main.destroyLottie();
     });
   },
   eLoadMoreRows: function(e) {
@@ -3639,14 +3662,244 @@ var Gateway = {
 };
 
 var Nft = {
+  initTransfer: function() {
+    Aj.onLoad(function(state) {
+      var cont = Aj.ajContainer;
+      $(cont).on('click.curPage', '.js-myself-link', Nft.eMoveToMyself);
+      $(cont).on('click.curPage', '.js-nft-transfer-btn', Nft.eTransferNft);
+      state.$nftTransferPopup = $('.js-nft-transfer-popup');
+      $(cont).on('submit.curPage', '.js-nft-transfer-form', Nft.eNftTransferSubmit);
+      state.$nftTransferForm = $('.js-nft-transfer-form');
+      Main.initForm(state.$nftTransferForm);
+      state.$nftTransferSearchField = $('.js-nft-transfer-search-field');
+      state.$nftTransferSearchForm = $('.js-nft-transfer-search-form');
+      state.$nftTransferSearchForm.on('submit', Nft.eTransferSearchSubmit);
+      state.$nftTransferSearchForm.field('query').on('input', Nft.eSearchInput);
+      state.$nftTransferSearchForm.field('query').on('change', Nft.eSearchChange);
+      $('.js-form-clear', state.$nftTransferSearchForm).on('click', Nft.eSearchClear);
+      state.$nftTransferForm.on('change', 'input.checkbox', Nft.eCheckboxChanged);
+      state.$nftTransferBtn = $('.js-nft-transfer-btn');
+      state.updLastReq = +Date.now();
+      if (state.needUpdate) {
+        state.updStateTo = setTimeout(Nft.updateState, Main.UPDATE_PERIOD);
+      }
+      $('.js-preview-sticker').each(function() {
+        RLottie.init(this, {playUntilEnd: true});
+      });
+      RLottie.init();
+      Main.initLottie();
+    });
+    Aj.onUnload(function(state) {
+      var cont = Aj.ajContainer;
+      Main.destroyLottie();
+      clearTimeout(state.updStateTo);
+      state.canUpdate = false;
+      state.$nftTransferSearchForm.off('submit', Nft.eTransferSearchSubmit);
+      state.$nftTransferSearchForm.field('query').off('input', Nft.eSearchInput);
+      state.$nftTransferSearchForm.field('query').off('change', Nft.eSearchChange);
+      $('.js-form-clear', state.$nftTransferSearchForm).off('click', Nft.eSearchClear);
+      state.$nftTransferForm.off('change', 'input.checkbox', Nft.eCheckboxChanged);
+      $('.js-preview-sticker').each(function() {
+        RLottie.destroy(this);
+      });
+      Main.destroyForm(state.$nftTransferForm);
+    });
+  },
+  updateState: function(force) {
+    var now = +Date.now();
+    if (document.hasFocus() || force ||
+        Aj.state.updLastReq && (now - Aj.state.updLastReq) > Main.FORCE_UPDATE_PERIOD) {
+      Aj.state.updLastReq = now;
+      Aj.apiRequest('updateNftTransferState', {
+        mode: Aj.state.mode,
+        slug: Aj.state.slug
+      }, function(result) {
+        if (result.mode) {
+          Aj.state.mode = result.mode;
+        }
+        if (result.html) {
+          Nft.updateContent(result.html);
+        } else {
+          if (result.history_html) {
+            Nft.updateHistory(result.history_html);
+          }
+        }
+        if (Aj.state.needUpdate && result.need_update) {
+          Aj.state.updStateTo = setTimeout(Nft.updateState, Main.UPDATE_PERIOD);
+        }
+      });
+    } else {
+      if (Aj.state.needUpdate) {
+        Aj.state.updStateTo = setTimeout(Nft.updateState, Main.CHECK_PERIOD);
+      }
+    }
+  },
+  eSearchInput: function(e) {
+    var $field = Aj.state.$nftTransferSearchField;
+    $('.js-search-field-error').html('');
+    $field.removeClass('error');
+  },
+  eSearchChange: function(e) {
+    Nft.searchSubmit();
+  },
+  eSearchClear: function(e) {
+    var $form = Aj.state.$nftTransferSearchForm;
+    var $field = Aj.state.$nftTransferSearchField;
+    var $btn   = Aj.state.$nftTransferBtn;
+    $form.field('recipient').value('');
+    $form.field('query').value('').prop('disabled', false).focus();
+    $form.removeClass('myself');
+    $btn.prop('disabled', true);
+    $field.removeClass('found');
+    $('.js-search-field-error').html('');
+    $field.removeClass('error');
+    Nft.updateTransferUrl();
+  },
+  eMoveToMyself: function(e) {
+    e.preventDefault();
+    Nft.updateResult(Aj.state.myselfResult);
+  },
+  eCheckboxChanged: function() {
+    var $form = Aj.state.$nftTransferForm;
+    var show_sender = $form.field('show_sender').prop('checked');
+    Aj.state.$nftTransferPopup.toggleClass('show-sender', show_sender);
+  },
+  eTransferSearchSubmit: function(e) {
+    e.preventDefault();
+    Nft.transferSearchSubmit();
+  },
+  transferSearchSubmit: function() {
+    var $form  = Aj.state.$nftTransferSearchForm;
+    var recipient = $form.field('recipient').value();
+    var query  = $form.field('query').value();
+    if (!query.length) {
+      $form.field('query').focus();
+      return;
+    }
+    Aj.state.$nftTransferSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
+    Aj.showProgress();
+    Aj.apiRequest('searchNftTransferRecipient', {
+      query: recipient || query
+    }, function(result) {
+      Aj.hideProgress();
+      Nft.updateResult(result);
+      Aj.state.$nftTransferSearchField.removeClass('loading');
+    });
+  },
+  updateResult: function(result) {
+    var $form  = Aj.state.$nftTransferSearchForm;
+    var $field = Aj.state.$nftTransferSearchField;
+    var $btn   = Aj.state.$nftTransferBtn;
+    if (result.error) {
+      $('.js-search-field-error').html(result.error);
+      $field.addClass('error').removeClass('found');
+      $form.field('query').prop('disabled', false);
+    } else {
+      $('.js-search-field-error').html('');
+      $field.removeClass('error');
+      if (result.found) {
+        if (result.found.photo) {
+          $('.js-nft-transfer-search-photo', $field).html(result.found.photo);
+        }
+        if (result.found.name) {
+          var $form = Aj.state.$nftTransferSearchForm;
+          $form.field('query').value(uncleanHTML(result.found.name));
+        }
+        $form.toggleClass('myself', result.found.myself);
+        $form.field('recipient').value(result.found.recipient);
+        $field.addClass('found');
+        $form.field('query').prop('disabled', true);
+        $btn.prop('disabled', false);
+      } else {
+        $form.removeClass('myself');
+        $form.field('recipient').value('');
+        $field.removeClass('found');
+        $form.field('query').prop('disabled', false);
+        $btn.prop('disabled', true);
+      }
+    }
+    Nft.updateTransferUrl();
+  },
+  updateTransferUrl: function() {
+    var new_url = '';
+    var $form     = Aj.state.$nftTransferSearchForm;
+    var recipient = $form.field('recipient').value();
+    if (recipient) {
+      new_url += '&recipient=' + encodeURIComponent(recipient);
+    }
+    if (new_url) {
+      new_url = '?' + new_url.substr(1);
+    }
+    var loc = Aj.location(), path = loc.pathname + loc.search;
+    Aj.setLocation(loc.pathname + new_url, path != loc.pathname);
+  },
+  eTransferNft: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    var $form     = Aj.state.$nftTransferSearchForm;
+    var recipient = $form.field('recipient').value();
+    var slug      = Aj.state.slug;
+    Aj.apiRequest('initNftTransferRequest', {
+      recipient: recipient,
+      slug: slug
+    }, function(result) {
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      $('.js-nft-transfer-content', Aj.state.$nftTransferPopup).html(result.content);
+      $('.js-nft-transfer-button', Aj.state.$nftTransferPopup).html(result.button);
+      Aj.state.$nftTransferPopup.toggleClass('iam-sender', result.myself);
+      Aj.state.itemTitle = result.item_title;
+      Aj.state.$nftTransferForm.field('id').value(result.req_id);
+      RLottie.WORKERS_LIMIT = 1;
+      openPopup(Aj.state.$nftTransferPopup, {
+        onOpen: function() {
+          $('.js-preview-sticker').each(function() {
+            RLottie.init(this, {playUntilEnd: true});
+          });
+        },
+        onClose: function() {
+          $('.js-preview-sticker').each(function() {
+            RLottie.destroy(this);
+          });
+        }
+      });
+    });
+  },
+  eNftTransferSubmit: function(e) {
+    e.preventDefault();
+    var $form = $(this);
+    var item_title = Aj.state.itemTitle;
+    var req_id = $form.field('id').value();
+    var show_sender = $form.field('show_sender').prop('checked');
+    closePopup(Aj.state.$nftTransferPopup);
+    Wallet.sendTransaction({
+      request: {
+        method: 'getNftTransferLink',
+        params: {
+          id: req_id,
+          show_sender: show_sender ? 1 : 0
+        }
+      },
+      title: l('WEB_POPUP_QR_NFT_TRANSFER_HEADER', {
+        nft_name: item_title
+      }),
+      description: l('WEB_POPUP_QR_NFT_TRANSFER_TEXT'),
+      qr_label: item_title,
+      tk_label: l('WEB_POPUP_QR_NFT_TRANSFER_TK_BUTTON'),
+      terms_label: l('WEB_POPUP_QR_PROCEED_TERMS'),
+      onConfirm: function(by_server) {
+        Nft.updateState(true);
+      }
+    });
+    Aj.state.needUpdate = true;
+  },
   initWithdraw: function() {
     Aj.onLoad(function(state) {
       var cont = Aj.ajContainer;
-      $('.js-lottie', cont).each(function() {
-        RLottie.init(this);
-      });
       $(cont).on('click.curPage', '.js-withdraw-btn', Nft.eWithdrawNft);
       state.$withdrawForm = $('.js-withdraw-form', cont);
+      Main.initLottie();
       Main.initForm(state.$withdrawForm);
       state.$withdrawBtn = $('.js-withdraw-btn', cont);
       state.updLastReq = +Date.now();
@@ -3656,9 +3909,7 @@ var Nft = {
       }
     });
     Aj.onUnload(function(state) {
-      $('.js-lottie', cont).each(function() {
-        RLottie.destroy(this);
-      });
+      Main.destroyLottie();
       clearTimeout(state.updStateTo);
       state.canUpdate = false;
       Main.destroyForm(state.$withdrawForm);
