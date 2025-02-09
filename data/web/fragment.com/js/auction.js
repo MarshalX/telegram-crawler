@@ -530,14 +530,16 @@ var Main = {
     var $form  = Aj.state.$mainSearchForm;
     var cache  = Aj.state.mainSearchCache;
     var type  = $form.field('type').value();
+    var collection = $form.field('collection').value();
     var query  = $form.field('query').value();
     var filter = $form.field('filter').value();
     var sort   = $form.field('sort').value();
-    var cache_key = 'q='+query+'&f='+filter+'&s='+sort;
+    var cache_key = (collection ? 'c='+collection+'&' : '')+'q='+query+'&f='+filter+'&s='+sort;
     Aj.state.$mainSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
     Aj.showProgress();
     Aj.apiRequest('searchAuctions', {
       type: type,
+      collection: collection,
       query: query,
       filter: filter,
       sort: sort
@@ -1235,9 +1237,11 @@ var Assets = {
     var $actions = $(this).closest('.js-actions');
     var username = $actions.attr('data-username');
     var item_title = $actions.attr('data-item-title');
+    var item_thumb = $actions.attr('data-item-thumb');
     var def_bid  = $actions.attr('data-def-bid');
     var doPutToAuction = function() {
       $('.js-username', Aj.state.$putToAuctionPopup).html(item_title);
+      $('.js-item-thumb', Aj.state.$putToAuctionPopup).attr('src', '').redraw().attr('src', item_thumb);
       openPopup(Aj.state.$putToAuctionPopup, {
         onOpen: function() {
           Aj.state.$putToAuctionForm.reset();
@@ -1337,9 +1341,11 @@ var Assets = {
     var $actions = $(this).closest('.js-actions');
     var username = $actions.attr('data-username');
     var item_title = $actions.attr('data-item-title');
+    var item_thumb = $actions.attr('data-item-thumb');
     var def_bid  = $actions.attr('data-def-bid');
     var doSellUsername = function() {
       $('.js-username', Aj.state.$sellUsernamePopup).html(item_title);
+      $('.js-item-thumb', Aj.state.$sellUsernamePopup).attr('src', '').redraw().attr('src', item_thumb);
       openPopup(Aj.state.$sellUsernamePopup, {
         onOpen: function() {
           Aj.state.$sellUsernameForm.reset();
@@ -1589,6 +1595,7 @@ var Account = {
       var cont = Aj.ajContainer;
       $(cont).on('click.curPage', '.js-convert-btn', Account.eConvertInit);
       $(cont).on('click.curPage', '.js-revert-btn', Account.eConvertRevert);
+      $(cont).on('click.curPage', '.js-move-request-btn', Account.eMoveRequestInit);
       $(cont).on('submit.curPage', '.js-convert-bid-form', Account.eConvertBidSubmit);
       $(cont).on('submit.curPage', '.js-new-convert-bid-form', Account.eConvertBidSubmit);
       state.$convertBidPopup = $('.js-convert-bid-popup');
@@ -1598,11 +1605,13 @@ var Account = {
       Main.initForm(state.$convertBidForm);
       Main.initForm(state.$newConvertBidForm);
       state.$convertConfirmPopup = $('.js-convert-confirm-popup');
+      state.$moveConfirmPopup = $('.js-move-confirm-popup');
     });
     Aj.onUnload(function(state) {
       Main.destroyForm(state.$convertBidForm);
       Main.destroyForm(state.$newConvertBidForm);
       clearTimeout(state.convertTimeout);
+      clearTimeout(state.nftMoveTimeout);
     });
   },
   eConvertInit: function(e) {
@@ -1789,6 +1798,77 @@ var Account = {
       $form.data('loading', false);
       Account.processConverting(result);
     });
+  },
+  eMoveRequestInit: function(e) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    var $actions = $(this).closest('.js-actions');
+    var username = $actions.attr('data-username');
+    Account.moveRequestInit(username);
+  },
+  moveRequestInit: function(username) {
+    Aj.state.curPopup = null;
+    Aj.state.curPopupState = null;
+    Aj.apiRequest('initNftMoveRequest', {
+      username: username
+    }, function(result) {
+      if (result.need_verify) {
+        return Verify.showPopup(result, function() {
+          Account.moveRequestInit(username);
+        });
+      }
+      Account.processNftMoving(result);
+    });
+  },
+  processNftMoving: function(result) {
+    var $popup = Aj.state.curPopup;
+    if (result.error) {
+      if (!result.keep && $popup) {
+        closePopup($popup);
+      }
+      return showAlert(result.error);
+    }
+    if (result.state == 'tg_confirm') {
+      Aj.state.curPopup = Aj.state.$moveConfirmPopup;
+      if (Aj.state.curPopupState != result.state) {
+        if ($popup) {
+          closePopup($popup);
+        }
+        Aj.state.curPopupState = result.state;
+        openPopup(Aj.state.curPopup, {
+          onOpen: function() {
+            Account.nftMoveStateCheck(result.req_id);
+          },
+          onClose: function() {
+            Aj.state.curPopupState = null;
+            clearTimeout(Aj.state.nftMoveTimeout);
+          }
+        });
+      } else {
+        Account.nftMoveStateCheck(result.req_id);
+      }
+    }
+    else if (result.state == 'tg_declined') {
+      if ($popup) {
+        closePopup($popup);
+      }
+      Aj.state.curPopupState = result.state;
+      showAlert(result.message);
+    }
+  },
+  nftMoveStateCheck: function(req_id, force) {
+    var $popup = Aj.state.curPopup;
+    if (!force && (!$popup || $popup.hasClass('hide'))) {
+      return false;
+    }
+    clearTimeout(Aj.state.nftMoveTimeout);
+    Aj.state.nftMoveTimeout = setTimeout(function() {
+      Aj.apiRequest('checkNftMoving', {
+        id: req_id
+      }, function(result) {
+        Account.processNftMoving(result);
+      });
+    }, force ? 1 : 700);
   }
 };
 
