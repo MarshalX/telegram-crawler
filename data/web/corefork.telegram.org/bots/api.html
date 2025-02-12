@@ -53,6 +53,18 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="february-12-2025" href="#february-12-2025"><i class="anchor-icon"></i></a>February 12, 2025</h4>
+<p><strong>Bot API 8.3</strong></p>
+<ul>
+<li>Added the parameter <em>chat_id</em> to the method <a href="#sendgift">sendGift</a>, allowing bots to send gifts to channel chats.</li>
+<li>Added the field <em>can_send_gift</em> to the class <a href="#chatfullinfo">ChatFullInfo</a>.</li>
+<li>Added the class <a href="#transactionpartnerchat">TransactionPartnerChat</a> describing transactions with chats.</li>
+<li>Added the fields <em>cover</em> and <em>start_timestamp</em> to the class <a href="#video">Video</a>, containing a message-specific cover and a start timestamp for the video.</li>
+<li>Added the parameters <em>cover</em> and <em>start_timestamp</em> to the method <a href="#sendvideo">sendVideo</a>, allowing bots to specify a cover and a start timestamp for the videos they send.</li>
+<li>Added the fields <em>cover</em> and <em>start_timestamp</em> to the classes <a href="#inputmediavideo">InputMediaVideo</a> and <a href="#inputpaidmediavideo">InputPaidMediaVideo</a>, allowing bots to edit video cover and start timestamp and specify them for videos in albums and paid media.</li>
+<li>Added the parameter <em>video_start_timestamp</em> to the methods <a href="#forwardmessage">forwardMessage</a> and  <a href="#copymessage">copyMessage</a>, allowing bots to change the start timestamp for forwarded and copied videos.</li>
+<li>Allowed to add reactions to most types of service messages.</li>
+</ul>
 <h4><a class="anchor" name="january-1-2025" href="#january-1-2025"><i class="anchor-icon"></i></a>January 1, 2025</h4>
 <p><strong>Bot API 8.2</strong></p>
 <ul>
@@ -148,19 +160,6 @@ To learn how to create…">
 <li>Added the field <em>photo_url</em> to the class <a href="/bots/webapps#webappuser">WebAppUser</a> for all bots, allowing Mini Apps to access a user&#39;s profile photo if their privacy settings allow for it.</li>
 <li>Third parties (e.g., Mini App builders) that receive or process data on behalf of Mini Apps are now able to <a href="/bots/webapps#validating-data-for-third-party-use">validate it</a> without knowing the App&#39;s <a href="/bots/tutorial#obtain-your-bot-token">bot token</a>.</li>
 <li>Debugging <a href="/bots/webapps#debug-mode-for-mini-apps">options</a> have been expanded to include full support for <strong>iOS devices</strong>. You can use these tools to find app-specific issues in your Mini App.</li>
-</ul>
-<hr>
-<blockquote>
-<p><strong><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> WARNING! <img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /></strong><br>Starting December 1, 2024 messages with video that are sent, copied or forwarded to groups and channels with a sufficiently large audience can be automatically scheduled by the server until the respective video is reencoded. Such messages will have 0 as their message identifier and can&#39;t be used before they are actually sent.</p>
-</blockquote>
-<h4><a class="anchor" name="october-31-2024" href="#october-31-2024"><i class="anchor-icon"></i></a>October 31, 2024</h4>
-<p><strong>Bot API 7.11</strong></p>
-<ul>
-<li>Added the class <a href="#copytextbutton">CopyTextButton</a> and the field <em>copy_text</em> in the class <a href="#inlinekeyboardbutton">InlineKeyboardButton</a> allowing bots to send and receive inline buttons that copy arbitrary text.</li>
-<li>Added the parameter <em>allow_paid_broadcast</em> to the methods <a href="#sendmessage">sendMessage</a>, <a href="#sendphoto">sendPhoto</a>, <a href="#sendvideo">sendVideo</a>, <a href="#sendanimation">sendAnimation</a>, <a href="#sendaudio">sendAudio</a>, <a href="#senddocument">sendDocument</a>, <a href="#sendpaidmedia">sendPaidMedia</a>, <a href="#sendsticker">sendSticker</a>, <a href="#sendvideonote">sendVideoNote</a>, <a href="#sendvoice">sendVoice</a>, <a href="#sendlocation">sendLocation</a>, <a href="#sendvenue">sendVenue</a>, <a href="#sendcontact">sendContact</a>, <a href="#sendpoll">sendPoll</a>, <a href="#senddice">sendDice</a>, <a href="#sendinvoice">sendInvoice</a>, <a href="#sendgame">sendGame</a>, <a href="#sendmediagroup">sendMediaGroup</a> and <a href="#copymessage">copyMessage</a>.</li>
-<li>Added the class <a href="#transactionpartnertelegramapi">TransactionPartnerTelegramApi</a> for transactions related to paid broadcasted messages.</li>
-<li>Introduced the ability to add media to existing text messages using the method <a href="#editmessagemedia">editMessageMedia</a>.</li>
-<li>Added support for hashtag and cashtag <a href="#messageentity">entities</a> with a specified chat username that opens a search for the relevant tag within the specified chat.</li>
 </ul>
 <hr>
 <blockquote>
@@ -2033,6 +2032,16 @@ To learn how to create…">
 <td>thumbnail</td>
 <td><a href="#photosize">PhotoSize</a></td>
 <td><em>Optional</em>. Video thumbnail</td>
+</tr>
+<tr>
+<td>cover</td>
+<td>Array of <a href="#photosize">PhotoSize</a></td>
+<td><em>Optional</em>. Available sizes of the cover of the video in the message</td>
+</tr>
+<tr>
+<td>start_timestamp</td>
+<td>Integer</td>
+<td><em>Optional</em>. Timestamp in seconds from which the video will play in the message</td>
 </tr>
 <tr>
 <td>file_name</td>
@@ -5715,8 +5724,18 @@ To learn how to create…">
 </tr>
 <tr>
 <td>thumbnail</td>
-<td><a href="#inputfile">InputFile</a> or String</td>
+<td>String</td>
 <td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>cover</td>
+<td>String</td>
+<td><em>Optional</em>. Cover for the video in the message. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>start_timestamp</td>
+<td>Integer</td>
+<td><em>Optional</em>. Start timestamp for the video in the message</td>
 </tr>
 <tr>
 <td>caption</td>
@@ -5788,7 +5807,7 @@ To learn how to create…">
 </tr>
 <tr>
 <td>thumbnail</td>
-<td><a href="#inputfile">InputFile</a> or String</td>
+<td>String</td>
 <td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
@@ -5856,7 +5875,7 @@ To learn how to create…">
 </tr>
 <tr>
 <td>thumbnail</td>
-<td><a href="#inputfile">InputFile</a> or String</td>
+<td>String</td>
 <td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
@@ -5914,7 +5933,7 @@ To learn how to create…">
 </tr>
 <tr>
 <td>thumbnail</td>
-<td><a href="#inputfile">InputFile</a> or String</td>
+<td>String</td>
 <td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
 </tr>
 <tr>
@@ -5993,8 +6012,18 @@ To learn how to create…">
 </tr>
 <tr>
 <td>thumbnail</td>
-<td><a href="#inputfile">InputFile</a> or String</td>
+<td>String</td>
 <td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>cover</td>
+<td>String</td>
+<td><em>Optional</em>. Cover for the video in the message. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>start_timestamp</td>
+<td>Integer</td>
+<td><em>Optional</em>. Start timestamp for the video in the message</td>
 </tr>
 <tr>
 <td>width</td>
@@ -6325,6 +6354,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Unique identifier for the chat where the original message was sent (or channel username in the format <code>@channelusername</code>)</td>
 </tr>
 <tr>
+<td>video_start_timestamp</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>New start timestamp for the forwarded video in the message</td>
+</tr>
+<tr>
 <td>disable_notification</td>
 <td>Boolean</td>
 <td>Optional</td>
@@ -6429,6 +6464,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer</td>
 <td>Yes</td>
 <td>Message identifier in the chat specified in <em>from_chat_id</em></td>
+</tr>
+<tr>
+<td>video_start_timestamp</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>New start timestamp for the copied video in the message</td>
 </tr>
 <tr>
 <td>caption</td>
@@ -6926,6 +6967,18 @@ pre-formatted fixed-width code block written in the Python programming language
 <td><a href="#inputfile">InputFile</a> or String</td>
 <td>Optional</td>
 <td>Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>cover</td>
+<td><a href="#inputfile">InputFile</a> or String</td>
+<td>Optional</td>
+<td>Cover for the video in the message. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>start_timestamp</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Start timestamp for the video in the message</td>
 </tr>
 <tr>
 <td>caption</td>
@@ -8066,7 +8119,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="setmessagereaction" href="#setmessagereaction"><i class="anchor-icon"></i></a>setMessageReaction</h4>
-<p>Use this method to change the chosen reactions on a message. Service messages can&#39;t be reacted to. Automatically forwarded messages from a channel to its discussion group have the same available reactions as messages in the channel. Bots can&#39;t use paid reactions. Returns <em>True</em> on success.</p>
+<p>Use this method to change the chosen reactions on a message. Service messages of some types can&#39;t be reacted to. Automatically forwarded messages from a channel to its discussion group have the same available reactions as messages in the channel. Bots can&#39;t use paid reactions. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -11070,9 +11123,9 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="getavailablegifts" href="#getavailablegifts"><i class="anchor-icon"></i></a>getAvailableGifts</h4>
-<p>Returns the list of gifts that can be sent by the bot to users. Requires no parameters. Returns a <a href="#gifts">Gifts</a> object.</p>
+<p>Returns the list of gifts that can be sent by the bot to users and channel chats. Requires no parameters. Returns a <a href="#gifts">Gifts</a> object.</p>
 <h4><a class="anchor" name="sendgift" href="#sendgift"><i class="anchor-icon"></i></a>sendGift</h4>
-<p>Sends a gift to the given user. The gift can&#39;t be converted to Telegram Stars by the user. Returns <em>True</em> on success.</p>
+<p>Sends a gift to the given user or channel chat. The gift can&#39;t be converted to Telegram Stars by the receiver. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -11086,8 +11139,14 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>user_id</td>
 <td>Integer</td>
-<td>Yes</td>
-<td>Unique identifier of the target user that will receive the gift</td>
+<td>Optional</td>
+<td>Required if <em>chat_id</em> is not specified. Unique identifier of the target user who will receive the gift.</td>
+</tr>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Optional</td>
+<td>Required if <em>user_id</em> is not specified. Unique identifier for the chat or username of the channel (in the format <code>@channelusername</code>) that will receive the gift.</td>
 </tr>
 <tr>
 <td>gift_id</td>
@@ -14153,6 +14212,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <p>This object describes the source of a transaction, or its recipient for outgoing transactions. Currently, it can be one of</p>
 <ul>
 <li><a href="#transactionpartneruser">TransactionPartnerUser</a></li>
+<li><a href="#transactionpartnerchat">TransactionPartnerChat</a></li>
 <li><a href="#transactionpartneraffiliateprogram">TransactionPartnerAffiliateProgram</a></li>
 <li><a href="#transactionpartnerfragment">TransactionPartnerFragment</a></li>
 <li><a href="#transactionpartnertelegramads">TransactionPartnerTelegramAds</a></li>
@@ -14209,6 +14269,34 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>gift</td>
 <td><a href="#gift">Gift</a></td>
 <td><em>Optional</em>. The gift sent to the user by the bot</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="transactionpartnerchat" href="#transactionpartnerchat"><i class="anchor-icon"></i></a>TransactionPartnerChat</h4>
+<p>Describes a transaction with a chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the transaction partner, always “chat”</td>
+</tr>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Information about the chat</td>
+</tr>
+<tr>
+<td>gift</td>
+<td><a href="#gift">Gift</a></td>
+<td><em>Optional</em>. The gift sent to the chat by the bot</td>
 </tr>
 </tbody>
 </table>
