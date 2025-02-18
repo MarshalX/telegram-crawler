@@ -23,11 +23,14 @@ var Main = {
       $(cont).on('click.curPage', '.js-copy-code', Main.copyCode);
       $(cont).on('click.curPage', '.js-lottie[playbyclick]', Main.playLottieByClick);
       $(cont).on('click.curPage', '.js-main-search-dd-item', Main.eMainSearchDDSelected);
+      $(cont).on('click.curPage', '.js-choose-collection-item', Main.eChooseCollectionSelected);
+      $(cont).on('click.curPage', '.js-choose-collection-btn', Main.eChooseCollectionOpen);
       state.$headerMenu = $('.js-header-menu');
       state.$unavailPopup = $('.js-unavailable-popup');
       state.$howitworksPopup = $('.js-howitworks-popup');
       state.$howofferworksPopup = $('.js-howofferworks-popup');
       state.$botsaboutPopup = $('.js-botsabout-popup');
+      state.$chooseCollectionPopup = $('.js-choose-collection-popup');
       state.$mainSearchField = $('.js-main-search-field');
       state.$mainSearchForm = $('.js-main-search-form');
       state.$mainSearchForm.on('submit', Main.eMainSearchSubmit);
@@ -35,11 +38,14 @@ var Main = {
       state.mainSearchCache = {};
       $('.js-form-clear', state.$mainSearchForm).on('click', Main.eMainSearchClear);
       $('.js-x-scrollable').on('scroll', Main.eXScrollableUpdate);
+      $('.js-y-scrollable').on('scroll', Main.eYScrollableUpdate);
       $(window).on('resize', Main.eXScrollablesUpdate);
+      $(window).on('resize', Main.eYScrollablesUpdate);
       Main.updateTime();
       Main.initViewport();
       Main.initLogo();
       Main.eXScrollablesUpdate();
+      Main.eYScrollablesUpdate();
     });
     Aj.onUnload(function(state) {
       clearTimeout(Aj.state.searchTimeout);
@@ -51,7 +57,9 @@ var Main = {
       state.$mainSearchForm.field('query').off('input', Main.eMainSearchInput);
       $('.js-form-clear', state.$mainSearchForm).off('click', Main.eMainSearchClear);
       $('.js-x-scrollable').off('scroll', Main.eXScrollableUpdate);
+      $('.js-y-scrollable').off('scroll', Main.eYScrollableUpdate);
       $(window).off('resize', Main.eXScrollablesUpdate);
+      $(window).off('resize', Main.eYScrollablesUpdate);
     });
   },
   initForm: function(form) {
@@ -252,6 +260,16 @@ var Main = {
       Main.eXScrollableUpdate.apply(this);
     });
   },
+  eYScrollableUpdate: function() {
+    $(this).toggleClass('topscroll', this.scrollTop > 0);
+    $(this).toggleClass('bottomscroll', this.scrollTop < this.scrollHeight - this.clientHeight);
+    console.log(0, this.scrollTop, this.scrollHeight - this.clientHeight, this.scrollHeight, this.clientHeight);
+  },
+  eYScrollablesUpdate: function() {
+    $('.js-y-scrollable').each(function() {
+      Main.eYScrollableUpdate.apply(this);
+    });
+  },
   openSimplePopup: function($popup) {
     var onEnterPress = function(e) {
       if (e.keyCode == Keys.RETURN) {
@@ -308,6 +326,11 @@ var Main = {
     e.preventDefault();
     e.stopImmediatePropagation();
     Main.openSimplePopup(Aj.state.$botsaboutPopup);
+  },
+  eChooseCollectionOpen: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    Main.openSimplePopup(Aj.state.$chooseCollectionPopup);
   },
   amountFieldValue: function($form, field) {
     var $fieldEl = field ? $form.field(field) : $form;
@@ -490,6 +513,13 @@ var Main = {
     $form.field(field).value(value);
     Main.searchSubmit();
   },
+  eChooseCollectionSelected: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var value = $(this).attr('data-value');
+    var loc = Aj.location();
+    Aj.location('/gifts/' + value + loc.search);
+  },
   eMainSearchClear: function(e) {
     var $form = Aj.state.$mainSearchForm;
     $form.field('query').value('');
@@ -511,10 +541,11 @@ var Main = {
   getSearchCachedResult: function() {
     var $form  = Aj.state.$mainSearchForm;
     var cache  = Aj.state.mainSearchCache;
+    var collection = $form.field('collection').value();
     var query  = $form.field('query').value();
     var filter = $form.field('filter').value();
     var sort   = $form.field('sort').value();
-    var cache_key = 'q='+query+'&f='+filter+'&s='+sort;
+    var cache_key = (collection ? 'c='+collection+'&' : '')+'q='+query+'&f='+filter+'&s='+sort;
     if (cache[cache_key]) {
       var expire_time = cache[cache_key].expire*1000;
       var now_time = +(new Date);
