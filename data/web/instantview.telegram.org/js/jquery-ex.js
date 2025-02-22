@@ -888,6 +888,15 @@
         }
         $field.trigger('datachange');
       });
+      $select.on('selectvals.select', function(e, vals, clear) {
+        for (var i = 0; i < vals.length; i++) {
+          addSelected(vals[i]);
+        }
+        if (clear) {
+          $field.value('');
+        }
+        $field.trigger('datachange');
+      });
       $select.on('deselectval.select', function(e, val) {
         delSelected(val);
         $field.trigger('datachange');

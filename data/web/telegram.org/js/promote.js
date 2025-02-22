@@ -1177,8 +1177,12 @@ var NewAd = {
       $('.js-intersect-topics-wrap', Aj.state.$form).slideToggle(user_topics_cnt > 1);
     } else if (field == 'channels') {
       var channels_cnt = $fieldEl.data('value').length;
-      $('.js-similar-channels-link-wrap', Aj.state.$form).slideToggle(channels_cnt > 0 && channels_cnt < 10);
-      $('.js-channels-deselect', Aj.state.$form).toggleClass('hide', channels_cnt < 2);
+      $('.js-similar-channels-link-wrap[data-field="channels"]', Aj.state.$form).slideToggle(channels_cnt > 0 && channels_cnt < 10);
+      $('.js-channels-deselect[data-field="channels"]', Aj.state.$form).toggleClass('hide', channels_cnt < 2);
+    } else if (field == 'exclude_channels') {
+      var channels_cnt = $fieldEl.data('value').length;
+      $('.js-similar-channels-link-wrap[data-field="exclude_channels"]', Aj.state.$form).slideToggle(channels_cnt > 0 && channels_cnt < 10);
+      $('.js-channels-deselect[data-field="exclude_channels"]', Aj.state.$form).toggleClass('hide', channels_cnt < 2);
     } else if (field == 'bots') {
       var bots_cnt = $fieldEl.data('value').length;
       $('.js-similar-bots-link-wrap', Aj.state.$form).slideToggle(bots_cnt > 0 && bots_cnt < 10);
@@ -1205,12 +1209,14 @@ var NewAd = {
   },
   eDeselectChannels: function(e) {
     e.preventDefault();
-    Aj.state.$form.field('channels').trigger('reset');
+    var field = $(this).attr('data-field') || 'channels';
+    Aj.state.$form.field(field).trigger('reset');
   },
   eOpenSimilarChannels: function(e) {
     e.preventDefault();
     var $link = $(this);
-    var $fieldEl = Aj.state.$form.field('channels');
+    var field = $link.parents('.js-similar-channels-link-wrap').attr('data-field') || 'channels';
+    var $fieldEl = Aj.state.$form.field(field);
     var values   = $fieldEl.data('value') || [];
     if (!values.length || $link.data('loading')) {
       return false;
@@ -1225,13 +1231,15 @@ var NewAd = {
         var $button = $('.js-add-similar-channels', this);
         $list.on('scroll', NewAd.onSimilarScroll);
         $list.on('change', 'input.checkbox', NewAd.eSimilarChannelChange);
+        $button.data('field', field);
         $button.on('click', NewAd.eAddSimilarChannels);
         $empty.addClass('hide');
         $button.addClass('hide');
         $loading.removeClass('hide');
         $list.html('').trigger('scroll').data('channels', {}).addClass('hide');
         Aj.apiRequest('getSimilarChannels', {
-          channels: channels
+          channels: channels,
+          for: field
         }, function(result) {
           if (result.error) {
             showAlert(result.error);
@@ -1284,10 +1292,12 @@ var NewAd = {
   },
   eAddSimilarChannels: function() {
     var $popup = Aj.state.similarChannelsPopup;
+    var field = $(this).data('field') || 'channels';
     var $list = $('.js-similar-channels-list', $popup);
     var $button = $('.js-add-similar-channels', $popup);
     var channel_items = $list.data('channel_items');
-    var $fieldEl = Aj.state.$form.field('channels');
+    var $fieldEl = Aj.state.$form.field(field);
+    var add_items = [];
     $('input.checkbox', $list).each(function() {
       if ($(this).prop('checked')) {
         var name = $(this).prop('name');
@@ -1298,9 +1308,12 @@ var NewAd = {
           photo: channel.photo,
           username: channel.username
         };
-        $fieldEl.trigger('selectval', [item, true]);
+        add_items.push(item);
       }
     });
+    if (add_items.length > 0) {
+      $fieldEl.trigger('selectvals', [add_items, true]);
+    }
     closePopup($popup);
   },
   eDeselectBots: function(e) {
@@ -1342,9 +1355,9 @@ var NewAd = {
             for (var i = 0; i < result.bots.length; i++) {
               var item = result.bots[i];
               html += item.cb_item;
-              bot_items['ch' + item.id] = item;
+              bot_items['bot' + item.id] = item;
             }
-            var has_items = bot_items > 0;
+            var has_items = result.bots.length > 0;
             $empty.toggleClass('hide', has_items);
             $button.toggleClass('hide', !has_items);
             $loading.addClass('hide');
@@ -1384,6 +1397,7 @@ var NewAd = {
     var $button = $('.js-add-similar-bots', $popup);
     var bot_items = $list.data('bot_items');
     var $fieldEl = Aj.state.$form.field('bots');
+    var add_items = [];
     $('input.checkbox', $list).each(function() {
       if ($(this).prop('checked')) {
         var name = $(this).prop('name');
@@ -1394,9 +1408,12 @@ var NewAd = {
           photo: bot.photo,
           username: bot.username
         };
-        $fieldEl.trigger('selectval', [item, true]);
+        add_items.push(item);
       }
     });
+    if (add_items.length > 0) {
+      $fieldEl.trigger('selectvals', [add_items, true]);
+    }
     closePopup($popup);
   },
   ePreviewAd: function(e) {
