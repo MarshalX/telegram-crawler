@@ -24,16 +24,13 @@ var Main = {
       $(cont).on('click.curPage', '.js-lottie[playbyclick]', Main.playLottieByClick);
       $(cont).on('click.curPage', '.js-main-search-dd-item', Main.eMainSearchDDSelected);
       $(cont).on('click.curPage', '.js-choose-collection-item', Main.eChooseCollectionSelected);
-      $(cont).on('click.curPage', '.js-main-filters-header', Main.eMainFiltersToggle);
       $(cont).on('click.curPage', '.js-choose-collection-btn', Main.eChooseCollectionOpen);
-      $(cont).on('click.curPage', '.js-choose-filters-btn', Main.eChooseFiltersOpen);
       state.$headerMenu = $('.js-header-menu');
       state.$unavailPopup = $('.js-unavailable-popup');
       state.$howitworksPopup = $('.js-howitworks-popup');
       state.$howofferworksPopup = $('.js-howofferworks-popup');
       state.$botsaboutPopup = $('.js-botsabout-popup');
       state.$chooseCollectionPopup = $('.js-choose-collection-popup');
-      state.$chooseFiltersPopup = $('.js-choose-filters-popup');
       state.$mainSearchField = $('.js-main-search-field');
       state.$mainSearchForm = $('.js-main-search-form');
       state.$mainSearchForm.on('submit', Main.eMainSearchSubmit);
@@ -125,7 +122,7 @@ var Main = {
             if (!days && !hours && (mode == 'text' || !minutes)) {
               arr.push(l('{n:# seconds|# second|# seconds}', {n: seconds}));
             }
-            arr = arr.slice(0, mode == 'short-text' ? 2 : (mode == 'ago-text' || mode == 'tiny-text' ? 1 : 3));
+            arr = arr.slice(0, mode == 'short-text' ? 2 : (mode == 'ago-text' ? 1 : 3));
             var text = arr.join(' ');
             if (text != $time.text()) {
               $time.text(text);
@@ -335,11 +332,6 @@ var Main = {
     e.stopImmediatePropagation();
     Main.openSimplePopup(Aj.state.$chooseCollectionPopup);
   },
-  eChooseFiltersOpen: function(e) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    Main.openSimplePopup(Aj.state.$chooseFiltersPopup);
-  },
   amountFieldValue: function($form, field) {
     var $fieldEl = field ? $form.field(field) : $form;
     var minValue = $fieldEl.attr('data-min') || null;
@@ -524,22 +516,9 @@ var Main = {
   eChooseCollectionSelected: function(e) {
     e.preventDefault();
     e.stopImmediatePropagation();
-    var loc = Aj.location();
     var value = $(this).attr('data-value');
-    if (value) {
-      Aj.location('/gifts/' + value + loc.search);
-    } else {
-      Aj.location('/gifts' + loc.search);
-    }
-  },
-  eMainFiltersToggle: function(e) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    var $boxEl = $(this).parents('.js-main-filters-box');
-    var $contentEl = $('.js-main-filters-box-content', $boxEl);
-    var isOpened = $boxEl.hasClass('opened');
-    $contentEl.prepareSlideY();
-    $boxEl.toggleClass('opened', !isOpened).toggleClass('closed', isOpened);
+    var loc = Aj.location();
+    Aj.location('/gifts/' + value + loc.search);
   },
   eMainSearchClear: function(e) {
     var $form = Aj.state.$mainSearchForm;
