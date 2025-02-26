@@ -48,6 +48,20 @@
 <p>The Gateway API is an HTTP-based interface created for developers looking to deliver automated messages, such as verification codes, to users who registered their phone number on Telegram. </p>
 <p>This page outlines the full API documentation for developers. For more information on the API and the features it offers, see our <a href="https://core.telegram.org/gateway">Verification Platform Overview</a> and <a href="https://core.telegram.org/gateway/verification-tutorial">Gateway API Tutorial</a>.</p>
 </blockquote>
+<h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="february-26-2025" href="#february-26-2025"><i class="anchor-icon"></i></a>February 26, 2025</h4>
+<ul>
+<li>Updated the possible values for <em>ttl</em> in <a href="#sendverificationmessage">sendVerificationMessage</a>. The supported range is now 30 to 3600 seconds.</li>
+<li>Clarified the behavior of <em>ttl</em>:<ul>
+<li>If a message is <strong>not</strong> delivered within the specified <em>ttl</em>, the request <strong>fee will be refunded</strong> automatically.</li>
+<li>If a message is successfully delivered within the <em>ttl</em>, it will not be refunded.</li>
+<li>If you were already using <em>ttl</em> before this update, you do not need to change anything to receive refunds.</li>
+</ul>
+</li>
+<li>Updated <a href="#revokeverificationmessage">revokeVerificationMessage</a> to specify that a message will not be removed if it has already been delivered or read.</li>
+<li>Added the optional field <em>is_refunded</em> to <a href="#requeststatus">RequestStatus</a>, which indicates whether the request fee was refunded.</li>
+<li>Added new possible statuses <strong>delivered</strong> and <strong>expired</strong> to the field <em>status</em> in <a href="#deliverystatus">DeliveryStatus</a>.</li>
+</ul>
 <h3><a class="anchor" name="making-requests" href="#making-requests"><i class="anchor-icon"></i></a>Making requests</h3>
 <p>All queries to the Telegram Gateway API must be served over HTTPS and need to be presented in this form: <code>https://gatewayapi.telegram.org/METHOD_NAME</code>. Like this for example:</p>
 <pre><code>https://gatewayapi.telegram.org/sendVerificationMessage</code></pre>
@@ -134,7 +148,7 @@
 <td>ttl</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>Time-to-live (in seconds) before the message expires and is deleted. The message will not be deleted if it has already been read. If not specified, the message will not be deleted. Supported values are from 60 to 86400.</td>
+<td>Time-to-live (in seconds) before the message expires. If the message is not delivered or read within this time, the request fee will be refunded. Supported values are from 30 to 3600.</td>
 </tr>
 </tbody>
 </table>
@@ -193,7 +207,7 @@
 </tbody>
 </table>
 <h4><a class="anchor" name="revokeverificationmessage" href="#revokeverificationmessage"><i class="anchor-icon"></i></a>revokeVerificationMessage</h4>
-<p>Use this method to revoke a verification message that was sent previously. Returns <em>True</em> if the revocation request was received. However, this does not guarantee that the message will be deleted. For example, it will not be removed if the recipient has already read it.</p>
+<p>Use this method to revoke a verification message that was sent previously. Returns <em>True</em> if the revocation request was received. However, this does not guarantee that the message will be deleted. For example, if the message has already been delivered or read, it will not be removed.</p>
 <table class="table">
 <thead>
 <tr>
@@ -245,6 +259,11 @@
 <td>Total request cost incurred by either <a href="#checksendability">checkSendAbility</a> or <a href="#sendverificationmessage">sendVerificationMessage</a>.</td>
 </tr>
 <tr>
+<td>is_refunded</td>
+<td>Boolean</td>
+<td><em>Optional.</em> If <em>True</em>, the request fee was refunded.</td>
+</tr>
+<tr>
 <td>remaining_balance</td>
 <td>Float</td>
 <td><em>Optional.</em> Remaining balance in credits. Returned only in response to a request that incurs a charge.</td>
@@ -280,7 +299,7 @@
 <tr>
 <td>status</td>
 <td>String</td>
-<td>The current status of the message. One of the following:<br>- <strong>sent</strong> – the message has been sent to the recipient&#39;s device(s),<br>- <strong>delivered</strong> – the message has been delivered to the recipient&#39;s device(s),<br>- <strong>read</strong> – the message has been read by the recipient,<br>- <strong>revoked</strong> – the message has been revoked.</td>
+<td>The current status of the message. One of the following:<br>- <strong>sent</strong> – the message has been sent to the recipient&#39;s device(s),<br>- <strong>delivered</strong> – the message has been delivered to the recipient&#39;s device(s),<br>- <strong>read</strong> – the message has been read by the recipient,<br>- <strong>expired</strong> – the message has expired without being delivered or read,<br>- <strong>revoked</strong> – the message has been revoked.</td>
 </tr>
 <tr>
 <td>updated_at</td>
