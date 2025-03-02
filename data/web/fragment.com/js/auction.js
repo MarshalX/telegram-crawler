@@ -27,6 +27,9 @@ var Main = {
       $(cont).on('click.curPage', '.js-main-filters-header', Main.eMainFiltersToggle);
       $(cont).on('click.curPage', '.js-choose-collection-btn', Main.eChooseCollectionOpen);
       $(cont).on('click.curPage', '.js-choose-filters-btn', Main.eChooseFiltersOpen);
+      $(cont).on('click.curPage', '.js-attribute-item .js-attribute-checkbox', Main.eChooseAttributeCheckbox);
+      $(cont).on('click.curPage', '.js-attribute-item', Main.eChooseAttributeValue);
+      $(cont).on('click.curPage', '.js-attribute-all', Main.eChooseAttributeAll);
       state.$headerMenu = $('.js-header-menu');
       state.$unavailPopup = $('.js-unavailable-popup');
       state.$howitworksPopup = $('.js-howitworks-popup');
@@ -525,11 +528,21 @@ var Main = {
     e.preventDefault();
     e.stopImmediatePropagation();
     var loc = Aj.location();
+    var url = new URL(loc.href);
+    var attr_fields = [];
+    url.searchParams.forEach(function(_, field) {
+      if (field.startsWith('attr[')) {
+        attr_fields.push(field);
+      }
+    });
+    attr_fields.forEach(function(field) {
+      url.searchParams.delete(field);
+    });
     var value = $(this).attr('data-value');
     if (value) {
-      Aj.location('/gifts/' + value + loc.search);
+      Aj.location('/gifts/' + value + url.search);
     } else {
-      Aj.location('/gifts' + loc.search);
+      Aj.location('/gifts' + url.search);
     }
   },
   eMainFiltersToggle: function(e) {
@@ -540,6 +553,96 @@ var Main = {
     var isOpened = $boxEl.hasClass('opened');
     $contentEl.prepareSlideY();
     $boxEl.toggleClass('opened', !isOpened).toggleClass('closed', isOpened);
+  },
+  eChooseAttributeCheckbox: function(e) {
+    e.stopImmediatePropagation();
+    var $attr   = $(this).parents('.js-attribute');
+    var $items  = $('.js-attribute-item', $attr);
+    var $all_cb = $('.js-attribute-all input.checkbox', $attr);
+    if ($all_cb.prop('checked')) {
+      e.preventDefault();
+      $items.each(function() {
+        $('input.checkbox', this).prop('checked', false);
+      });
+      $('input.checkbox', this).prop('checked', true);
+    }
+    Main.updateAttributeValue($attr);
+    Main.searchSubmit();
+  },
+  eChooseAttributeValue: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var item    = this;
+    var $attr   = $(this).parents('.js-attribute');
+    var $items  = $('.js-attribute-item', $attr);
+    var $cur_cb = $('input.checkbox', this);
+    var $all_cb = $('.js-attribute-all input.checkbox', $attr);
+    if ($all_cb.prop('checked') ||
+        !$cur_cb.prop('checked')) {
+      $items.each(function() {
+        $('input.checkbox', this).prop('checked', item === this);
+      });
+    } else {
+      var has_other = false;
+      $items.each(function() {
+        if (item !== this && $('input.checkbox', this).prop('checked')) {
+          has_other = true;
+        }
+      });
+      if (!has_other) {
+        $cur_cb.prop('checked', !$cur_cb.prop('checked'));
+      }
+    }
+    Main.updateAttributeValue($attr);
+    Main.searchSubmit();
+  },
+  eChooseAttributeAll: function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var $attr = $(this).parents('.js-attribute');
+    $('.js-attribute-item', $attr).each(function() {
+      $('input.checkbox', this).prop('checked', true);
+    });
+    Main.updateAttributeValue($attr);
+    Main.searchSubmit();
+  },
+  updateAttributeValue: function($attr) {
+    var $all_cb = $('.js-attribute-all input.checkbox', $attr);
+    var $items  = $('.js-attribute-item', $attr);
+    var $cntEl  = $('.js-filter-cnt', $attr);
+    var field   = $attr.attr('data-field');
+    var sel_count = 0;
+    var tot_count = 0;
+    var value_full = [];
+    $items.each(function() {
+      var $cb = $('input.checkbox', this);
+      var value = $(this).attr('data-value');
+      tot_count++;
+      if ($cb.prop('checked')) {
+        value_full.push(value);
+        sel_count++;
+      }
+    });
+    if (!sel_count) {
+      sel_count = tot_count;
+      $items.each(function() {
+        $('input.checkbox', this).prop('checked', true);
+      });
+    }
+    $all_cb.prop('checked', sel_count == tot_count);
+    if (tot_count > 0) {
+      if (sel_count == tot_count) {
+        value_full = [];
+        $cntEl.text(tot_count);
+      } else {
+        $cntEl.text(sel_count + '/' + tot_count);
+      }
+    } else {
+      $cntEl.text('');
+    }
+    var value_str = value_full.length > 0 ? JSON.stringify(value_full) : '';
+    var $form  = Aj.state.$mainSearchForm;
+    $form.field(field).value(value_str);
   },
   eMainSearchClear: function(e) {
     var $form = Aj.state.$mainSearchForm;
@@ -559,14 +662,23 @@ var Main = {
     }
     $('.js-main-recent-bids').toggleClass('hide', !result.show_recent_bids);
   },
+  getSearchCacheKey: function(params) {
+    var cache_arr = [];
+    for (var k in params) {
+      cache_arr.push(k + '=' + params[k]);
+    }
+    return cache_arr.join('&');
+  },
   getSearchCachedResult: function() {
     var $form  = Aj.state.$mainSearchForm;
     var cache  = Aj.state.mainSearchCache;
-    var collection = $form.field('collection').value();
-    var query  = $form.field('query').value();
-    var filter = $form.field('filter').value();
-    var sort   = $form.field('sort').value();
-    var cache_key = (collection ? 'c='+collection+'&' : '')+'q='+query+'&f='+filter+'&s='+sort;
+    var params = $form.fields();
+    for (var k in params) {
+      if (!k.length) {
+        delete params[k];
+      }
+    }
+    var cache_key = Main.getSearchCacheKey(params);
     if (cache[cache_key]) {
       var expire_time = cache[cache_key].expire*1000;
       var now_time = +(new Date);
@@ -581,21 +693,16 @@ var Main = {
   searchSubmit: function() {
     var $form  = Aj.state.$mainSearchForm;
     var cache  = Aj.state.mainSearchCache;
-    var type  = $form.field('type').value();
-    var collection = $form.field('collection').value();
-    var query  = $form.field('query').value();
-    var filter = $form.field('filter').value();
-    var sort   = $form.field('sort').value();
-    var cache_key = (collection ? 'c='+collection+'&' : '')+'q='+query+'&f='+filter+'&s='+sort;
+    var params = $form.fields();
+    for (var k in params) {
+      if (!k.length) {
+        delete params[k];
+      }
+    }
+    var cache_key = Main.getSearchCacheKey(params);
     Aj.state.$mainSearchField.addClass('loading').removeClass('play').redraw().addClass('play');
     Aj.showProgress();
-    Aj.apiRequest('searchAuctions', {
-      type: type,
-      collection: collection,
-      query: query,
-      filter: filter,
-      sort: sort
-    }, function(result) {
+    Aj.apiRequest('searchAuctions', params, function(result) {
       Aj.hideProgress();
       if (result.ok) {
         cache[cache_key] = result;
