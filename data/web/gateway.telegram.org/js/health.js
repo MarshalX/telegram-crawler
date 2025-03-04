@@ -288,7 +288,19 @@ function statsFormatEmpty() {
 
 function statsOnZoom(zoomToken) {
   return function (x) {
-    return zoomGraphX(x, zoomToken);
+    console.log('On Zoom', x, zoomToken);
+    var copyText = x
+    if (!(x % 1000) && 
+        x > 1376438400000 && // launch date
+        x < +(new Date()) + 365 * 86400 * 1000) {
+      copyText /= 1000;
+    }
+    copyToClipboard(copyText);
+    if (zoomToken) {
+      return zoomGraphX(x, zoomToken);
+    } else {
+      return Promise.reject();
+    }
   }
 }
 
@@ -348,3 +360,33 @@ window.addEventListener('load', function () {
     hlWrapper.classList.add('transitions-ready');
   }
 });
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      // console.log('Copied to clipboard successfully!');
+    }).catch(err => {
+      // console.error('Failed to copy:', err);
+      fallbackCopyToClipboard(text); // Use fallback if clipboard API fails
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard(text);
+  }
+}
+
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.position = "fixed";  // Prevent scrolling to the bottom
+  textArea.style.opacity = 0;  // Make it invisible
+  document.body.appendChild(textArea);
+  textArea.select();
+  try {
+    document.execCommand("copy");
+    // console.log('Copied to clipboard using fallback!');
+  } catch (err) {
+    // console.error('Fallback copy failed:', err);
+  }
+  document.body.removeChild(textArea);
+}
