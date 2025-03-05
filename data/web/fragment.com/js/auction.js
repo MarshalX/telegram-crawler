@@ -47,7 +47,6 @@ var Main = {
       $('.js-y-scrollable').on('scroll', Main.eYScrollableUpdate);
       $(window).on('resize', Main.eXScrollablesUpdate);
       $(window).on('resize', Main.eYScrollablesUpdate);
-      Main.initMainSearchFormAutoScroll();
       Main.updateTime();
       Main.initViewport();
       Main.initLogo();
@@ -67,29 +66,6 @@ var Main = {
       $('.js-y-scrollable').off('scroll', Main.eYScrollableUpdate);
       $(window).off('resize', Main.eXScrollablesUpdate);
       $(window).off('resize', Main.eYScrollablesUpdate);
-      Main.deinitMainSearchFormAutoScroll();
-    });
-  },
-  initMainSearchFormAutoScroll: function() {
-    if (Aj.state.$mainSearchForm.size()) {
-      Aj.state.mainSearchAutoscrollInited = true;
-      $(window).on('scroll resize', Main.onMainSearchFormScroll);
-      Main.onMainSearchFormScroll();
-    }
-  },
-  deinitMainSearchFormAutoScroll: function() {
-    if (Aj.state.mainSearchAutoscrollInited) {
-      Aj.state.mainSearchAutoscrollInited = false;
-      $(window).off('scroll resize', Main.onMainSearchFormScroll);
-    }
-  },
-  onMainSearchFormScroll: function() {
-    $('.js-load-more', Aj.ajContainer).each(function() {
-      var $loadMore = $(this);
-      var top = $loadMore.offset().top - $(window).scrollTop();
-      if (top < $(window).height() * 2) {
-        Main.searchLoadMore($loadMore);
-      }
     });
   },
   initForm: function(form) {
@@ -684,16 +660,6 @@ var Main = {
       var loc = Aj.location(), path = loc.pathname + loc.search;
       Aj.setLocation(result.url, path != '/');
     }
-    else if (result.part) {
-      var $body = $('.js-search-results .js-autoscroll-body', Aj.ajContainer);
-      var $foot = $('.js-search-results .js-autoscroll-foot', Aj.ajContainer);
-      if (result.body) {
-        $('.js-autoscroll-trash', $body).remove();
-        $body.append(result.body);
-      }
-      $foot.html(result.foot);
-      Main.updateTime();
-    }
     $('.js-main-recent-bids').toggleClass('hide', !result.show_recent_bids);
   },
   getSearchCacheKey: function(params) {
@@ -723,32 +689,6 @@ var Main = {
       }
     }
     return false;
-  },
-  searchLoadMore: function($loadMore) {
-    var offset_id = $loadMore.attr('data-next-offset');
-    if (!offset_id) {
-      $loadMore.remove();
-    }
-    if ($loadMore.data('loading')) {
-      return;
-    }
-    var $form  = Aj.state.$mainSearchForm;
-    var cache  = Aj.state.mainSearchCache;
-    var params = $form.fields();
-    for (var k in params) {
-      if (!k.length) {
-        delete params[k];
-      }
-    }
-    params.offset_id = offset_id;
-    $loadMore.data('loading', true);
-    Aj.apiRequest('searchAuctions', params, function(result) {
-      $loadMore.data('loading', false);
-      if (result.ok) {
-        Main.updateResults(result);
-        Main.onMainSearchFormScroll();
-      }
-    });
   },
   searchSubmit: function() {
     var $form  = Aj.state.$mainSearchForm;
