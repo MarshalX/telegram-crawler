@@ -2055,7 +2055,7 @@ var NewAd = {
   },
   updateAdTargetOverview: function() {
     var len = {}, lang_params = {}, need_outside_cb = false;
-    var target_type = Aj.state.$form.field('target_type').value();
+    var target_type = Aj.state.$form.field('target_type').value() || 'channels';
     var joinTargets = function(list, or, repeat) {
       var lk = or ? 'WEB_AD_TARGET_OR' : 'WEB_AD_TARGET_AND';
       if (repeat && list.length > 2) {
