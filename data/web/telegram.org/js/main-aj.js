@@ -746,6 +746,9 @@ function openPopup(popup, options) {
   if (!options.noAppend) {
     $popup.appendTo(window.Aj && Aj.ajContainer || 'body').redraw();
   }
+  $popup.one('transitionend transitioncancel', function() {
+    $popup.trigger('popup:opencomplete');
+  });
   $popup.removeClass('hide');
   if (document.activeElement) {
     document.activeElement.blur();
@@ -753,8 +756,14 @@ function openPopup(popup, options) {
   if (options.onOpen) {
     $popup.one('popup:open', options.onOpen);
   }
+  if (options.onOpenComplete) {
+    $popup.one('popup:opencomplete', options.onOpenComplete);
+  }
   if (options.onClose) {
     $popup.one('popup:close', options.onClose);
+  }
+  if (options.onCloseComplete) {
+    $popup.one('popup:closecomplete', options.onCloseComplete);
   }
   if (options.closeByClickOutside) {
     $popup.on('click', function(e) {
@@ -813,6 +822,9 @@ function closePopup(popup) {
     $popup.off('click');
   }
   $('.popup-cancel-btn', $popup).off('click');
+  $popup.one('transitionend transitioncancel', function() {
+    $popup.trigger('popup:closecomplete');
+  });
   $popup.addClass('hide');
   $popup.trigger('popup:close');
 }
