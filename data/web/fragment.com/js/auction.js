@@ -1100,8 +1100,6 @@ var Auction = {
     openPopup(Aj.state.$bidPopup, {
       onOpen: function() {
         Aj.state.$bidForm.reset();
-      },
-      onOpenComplete: function() {
         Aj.state.$bidForm.field('bid_value').value(amount).trigger('input').focusAndSelect();
       }
     });
@@ -1198,8 +1196,6 @@ var Auction = {
           Aj.state.$makeOfferForm.reset();
           var $amountField = Aj.state.$makeOfferForm.field('amount_value');
           $amountField.on('keyup change input', eUpdateOfferFee);
-        },
-        onOpenComplete: function() {
           $amountField.trigger('input').focusAndSelect();
         },
         onClose: function() {
@@ -1470,8 +1466,6 @@ var Assets = {
           Aj.state.$putToAuctionForm.reset();
           Aj.state.$putToAuctionForm.field('username').value(username);
           Aj.state.$putToAuctionForm.data('item_title', item_title);
-        },
-        onOpenComplete: function() {
           Aj.state.$putToAuctionForm.field('min_bid_value').value(def_bid).trigger('input').focusAndSelect();
         }
       });
@@ -1576,8 +1570,6 @@ var Assets = {
           Aj.state.$sellUsernameForm.reset();
           Aj.state.$sellUsernameForm.field('username').value(username);
           Aj.state.$sellUsernameForm.data('item_title', item_title);
-        },
-        onOpenComplete: function() {
           Aj.state.$sellUsernameForm.field('sell_value').value(def_bid).trigger('input').focusAndSelect();
         }
       });
