@@ -48,7 +48,6 @@ var Main = {
       $(window).on('resize', Main.eXScrollablesUpdate);
       $(window).on('resize', Main.eYScrollablesUpdate);
       Main.initMainSearchFormAutoScroll();
-      Main.initMainFilters(cont);
       Main.updateTime();
       Main.initViewport();
       Main.initLogo();
@@ -367,7 +366,6 @@ var Main = {
     e.preventDefault();
     e.stopImmediatePropagation();
     Main.openSimplePopup(Aj.state.$chooseFiltersPopup);
-    Main.initMainFilters(Aj.state.$chooseFiltersPopup);
   },
   amountFieldValue: function($form, field) {
     var $fieldEl = field ? $form.field(field) : $form;
@@ -570,12 +568,6 @@ var Main = {
     } else {
       Aj.location('/gifts' + url.search);
     }
-  },
-  initMainFilters: function(cont) {
-    $('.js-main-filters-box-content', cont).each(function() {
-      $('.js-choose-collection-item.selected', this).scrollIntoView({position: 'top', padding: 38});
-      $('.js-attribute-item:has(input.checkbox:checked)', this).scrollIntoView({position: 'top', padding: 38});
-    });
   },
   eMainFiltersToggle: function(e) {
     e.preventDefault();
@@ -1108,8 +1100,6 @@ var Auction = {
     openPopup(Aj.state.$bidPopup, {
       onOpen: function() {
         Aj.state.$bidForm.reset();
-      },
-      onOpenComplete: function() {
         Aj.state.$bidForm.field('bid_value').value(amount).trigger('input').focusAndSelect();
       }
     });
@@ -1206,8 +1196,6 @@ var Auction = {
           Aj.state.$makeOfferForm.reset();
           var $amountField = Aj.state.$makeOfferForm.field('amount_value');
           $amountField.on('keyup change input', eUpdateOfferFee);
-        },
-        onOpenComplete: function() {
           $amountField.trigger('input').focusAndSelect();
         },
         onClose: function() {
@@ -1478,8 +1466,6 @@ var Assets = {
           Aj.state.$putToAuctionForm.reset();
           Aj.state.$putToAuctionForm.field('username').value(username);
           Aj.state.$putToAuctionForm.data('item_title', item_title);
-        },
-        onOpenComplete: function() {
           Aj.state.$putToAuctionForm.field('min_bid_value').value(def_bid).trigger('input').focusAndSelect();
         }
       });
@@ -1584,8 +1570,6 @@ var Assets = {
           Aj.state.$sellUsernameForm.reset();
           Aj.state.$sellUsernameForm.field('username').value(username);
           Aj.state.$sellUsernameForm.data('item_title', item_title);
-        },
-        onOpenComplete: function() {
           Aj.state.$sellUsernameForm.field('sell_value').value(def_bid).trigger('input').focusAndSelect();
         }
       });
