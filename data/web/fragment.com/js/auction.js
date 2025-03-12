@@ -48,7 +48,6 @@ var Main = {
       $(window).on('resize', Main.eXScrollablesUpdate);
       $(window).on('resize', Main.eYScrollablesUpdate);
       Main.initMainSearchFormAutoScroll();
-      Main.initMainFilters(cont);
       Main.updateTime();
       Main.initViewport();
       Main.initLogo();
@@ -367,7 +366,6 @@ var Main = {
     e.preventDefault();
     e.stopImmediatePropagation();
     Main.openSimplePopup(Aj.state.$chooseFiltersPopup);
-    Main.initMainFilters(Aj.state.$chooseFiltersPopup);
   },
   amountFieldValue: function($form, field) {
     var $fieldEl = field ? $form.field(field) : $form;
@@ -570,12 +568,6 @@ var Main = {
     } else {
       Aj.location('/gifts' + url.search);
     }
-  },
-  initMainFilters: function(cont) {
-    $('.js-main-filters-box-content', cont).each(function() {
-      $('.js-choose-collection-item.selected', this).scrollIntoView({position: 'top', padding: 38});
-      $('.js-attribute-item:has(input.checkbox:checked)', this).scrollIntoView({position: 'top', padding: 38});
-    });
   },
   eMainFiltersToggle: function(e) {
     e.preventDefault();
