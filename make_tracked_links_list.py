@@ -62,8 +62,8 @@ HIDDEN_URLS = {
     # 'fragment.com/about',
     # 'fragment.com/privacy',
     # 'fragment.com/terms',
-    'fragment.com/css/auction.css',
-    'fragment.com/js/auction.js',
+    # 'fragment.com/css/auction.css',   # a lot of CDN issues which TG can't fix
+    # 'fragment.com/js/auction.js',  # a lot of CDN issues which TG can't fix
 }
 ADDITIONAL_URLS = {
     'raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/SourceFiles/mtproto/scheme/mtproto.tl',
@@ -140,6 +140,7 @@ CRAWL_RULES = {
             r'img/StickerExample.psd$',
             r'/privacy$',  # geolocation depended
             r'/tos$',  # geolocation depended
+            r'/moderation$',  # dynamic graphs
         },
     },
     'webz.telegram.org': {
@@ -165,7 +166,7 @@ OUTPUT_FILENAME = os.environ.get('OUTPUT_FILENAME', 'tracked_links.txt')
 OUTPUT_RESOURCES_FILENAME = os.environ.get('OUTPUT_RESOURCES_FILENAME', 'tracked_res_links.txt')
 OUTPUT_TRANSLATIONS_FILENAME = os.environ.get('OUTPUT_TRANSLATIONS_FILENAME', 'tracked_tr_links.txt')
 
-STEL_DEV_LAYER = 190
+STEL_DEV_LAYER = 290
 
 # unsecure but so simple
 CONNECTOR = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
