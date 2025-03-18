@@ -579,6 +579,7 @@ var NewAd = {
           Ads.initSelect(state.$form, selectData.field, {
             items: Aj.state[selectData.items_key] || [],
             pairedField: selectData.paired_field || false,
+            l_limit: selectData.limit_lang_key ? l(selectData.limit_lang_key) : '',
             renderSelectedItem: function(val, item) {
               return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
             },
@@ -590,6 +591,7 @@ var NewAd = {
           Ads.initSelect(state.$form, selectData.field, {
             items: Aj.state[selectData.items_key] || [],
             pairedField: selectData.paired_field || false,
+            l_limit: selectData.limit_lang_key ? l(selectData.limit_lang_key) : '',
             renderSelectedItem: function(val, item) {
               return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
             },
@@ -616,6 +618,17 @@ var NewAd = {
             onBlur: NewAd.onLocationSelectBlur,
             onUpdate: NewAd.onSelectUpdate,
             onChange: NewAd.onLocationSelectChange
+          });
+        } else if (selectData.query_search) {
+          Ads.initSelect(state.$form, selectData.field, {
+            items: Aj.state[selectData.items_key] || [],
+            l_limit: selectData.limit_lang_key ? l(selectData.limit_lang_key) : '',
+            renderSelectedItem: function(val, item) {
+              return '<div class="selected-item" data-val="' + cleanHTML(val.toString()) + '"><span class="close"></span><div class="label">' + item.name + '</div></div>';
+            },
+            onEnter: NewAd.onTargetQuerySearch,
+            onUpdate: NewAd.onSelectUpdate,
+            onChange: Ads.onSelectChange
           });
         } else {
           Ads.initSelect(state.$form, selectData.field, {
@@ -729,6 +742,11 @@ var NewAd = {
     $('.pr-target-options', Aj.ajContainer).each(function() {
       $(this).toggleClass('visible', $(this).attr('data-value') == cur_type);
     });
+    var $pictureWrap = $('.js-picture-wrap');
+    var $textWrap = $('.js-ad-text-wrap', Aj.state.$form);
+    $pictureWrap.slideToggle(!(cur_type == 'search'));
+    $textWrap.slideToggle(!(cur_type == 'search'));
+
     $('.js-schedule-overview', Aj.state.$form).html(NewAd.scheduleOverview(Aj.state.$form));
     NewAd.updateAdTargetOverview();
     NewAd.saveDraftAuto(true);
@@ -994,8 +1012,8 @@ var NewAd = {
     var channels_limit = Aj.state.channelItemsLimit;
     if ($fieldEl.data('value').length >= channels_limit) {
       var selOpts = $fieldEl.data('selOpts');
-      if (selOpts.l_channels_limit) {
-        Ads.showFieldError($fieldEl, selOpts.l_channels_limit);
+      if (selOpts.l_limit) {
+        Ads.showFieldError($fieldEl, selOpts.l_limit);
         return false;
       }
     }
@@ -1039,8 +1057,8 @@ var NewAd = {
     var bots_limit = Aj.state.botItemsLimit;
     if ($fieldEl.data('value').length >= bots_limit) {
       var selOpts = $fieldEl.data('selOpts');
-      if (selOpts.l_bots_limit) {
-        Ads.showFieldError($fieldEl, selOpts.l_bots_limit);
+      if (selOpts.l_limit) {
+        Ads.showFieldError($fieldEl, selOpts.l_limit);
         return false;
       }
     }
@@ -1060,6 +1078,46 @@ var NewAd = {
           name: result.bot.title,
           photo: result.bot.photo,
           username: result.bot.username
+        };
+        $fieldEl.trigger('selectval', [item, true]);
+        $fieldEl.data('prevval', '');
+      }
+    });
+  },
+  onTargetQuerySearch: function(field, value) {
+    var $fieldEl = Aj.state.$form.field(field);
+    var $formGroup = $fieldEl.fieldEl().parents('.form-group');
+    var prev_value = $fieldEl.data('prevval');
+    if (prev_value && prev_value == value) {
+      return false;
+    }
+    $fieldEl.data('prevval', value);
+    Ads.hideFieldError($fieldEl);
+    if (!value) {
+      return false;
+    }
+    var queries_limit = Aj.state.searchQueryItemsLimit;
+    if ($fieldEl.data('value').length >= queries_limit) {
+      var selOpts = $fieldEl.data('selOpts');
+      if (selOpts.l_limit) {
+        Ads.showFieldError($fieldEl, selOpts.l_limit);
+        return false;
+      }
+    }
+    $formGroup.addClass('field-loading');
+    Aj.apiRequest('searchTargetQuery', {
+      query: value,
+      field: field
+    }, function(result) {
+      $formGroup.removeClass('field-loading');
+      if (result.error) {
+        Ads.showFieldError($fieldEl, result.error);
+        return false;
+      }
+      if (result.query) {
+        var item = {
+          val: result.query.id,
+          name: result.query.title
         };
         $fieldEl.trigger('selectval', [item, true]);
         $fieldEl.data('prevval', '');
@@ -1833,8 +1891,10 @@ var NewAd = {
     $('.js-custom-button-wrap', $previewPopup).toggleClass('shide', custom_button_hidden);
 
     var is_bots_target = (target_type == 'bots');
+    var is_search_target = (target_type == 'search');
     $('.js-bot-preview', $previewPopup).toggle(is_bots_target);
-    $('.js-channel-preview', $previewPopup).toggle(!is_bots_target);
+    $('.js-search-preview', $previewPopup).toggle(is_search_target);
+    $('.js-channel-preview', $previewPopup).toggle(!is_bots_target && !is_search_target);
 
     state.previewMediaField.data('$previewEl', $previewEl);
     NewAd.updateAdMedia(state.previewMediaField);
@@ -2291,10 +2351,6 @@ var NewAd = {
 
     if (!title.length) {
       $form.field('title').focus();
-      return false;
-    }
-    if (!text.length) {
-      $form.field('text').focus();
       return false;
     }
     if (!promote_url.length) {
@@ -4181,10 +4237,6 @@ var EditAd = {
 
     if (!title.length) {
       $form.field('title').focus();
-      return false;
-    }
-    if (!text.length) {
-      $form.field('text').focus();
       return false;
     }
     if (!promote_url.length) {
