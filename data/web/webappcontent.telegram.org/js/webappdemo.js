@@ -314,6 +314,116 @@ var DemoApp = {
       }
     });
   },
+  deviceStorageGet: function(el, event) {
+    event.preventDefault();
+    var form = el.form;
+    var key = form.key.value;
+    var value = form.value.value;
+    Telegram.WebApp.DeviceStorage.getItem(key, function(err, value) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else {
+        if (value === null) {
+          DemoApp.showAlert('Not found');
+          form.value.value = '';
+        } else {
+          form.value.value = value;
+        }
+      }
+    });
+  },
+  deviceStorageSave: function(el, event) {
+    event.preventDefault();
+    var form = el.form;
+    var key = form.key.value;
+    var value = form.value.value;
+    Telegram.WebApp.DeviceStorage.setItem(key, value, function(err, result) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else if (result) {
+        DemoApp.showAlert('Saved!');
+      }
+    });
+  },
+  deviceStorageDelete: function(el, event) {
+    event.preventDefault();
+    var form = el.form;
+    var key = form.key.value;
+    var value = form.value.value;
+    Telegram.WebApp.DeviceStorage.removeItem(key, function(err, result) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else if (result) {
+        DemoApp.showAlert('Deleted!');
+      }
+    });
+  },
+  deviceStorageClear: function(el, event) {
+    event.preventDefault();
+    var form = el.form;
+    Telegram.WebApp.DeviceStorage.clear(function(err, result) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else if (result) {
+        DemoApp.showAlert('Cleared!');
+      }
+    });
+  },
+  secureStorageGet: function(el, event) {
+    event.preventDefault();
+    var form = el.form;
+    var key = form.key.value;
+    var value = form.value.value;
+    Telegram.WebApp.SecureStorage.getItem(key, function(err, value) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else {
+        if (value === null) {
+          DemoApp.showAlert('Not found');
+          form.value.value = '';
+        } else {
+          form.value.value = value;
+        }
+      }
+    });
+  },
+  secureStorageSave: function(el, event) {
+    event.preventDefault();
+    var form = el.form;
+    var key = form.key.value;
+    var value = form.value.value;
+    Telegram.WebApp.SecureStorage.setItem(key, value, function(err, result) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else if (result) {
+        DemoApp.showAlert('Saved!');
+      }
+    });
+  },
+  secureStorageDelete: function(el, event) {
+    event.preventDefault();
+    var form = el.form;
+    var key = form.key.value;
+    var value = form.value.value;
+    Telegram.WebApp.SecureStorage.removeItem(key, function(err, result) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else if (result) {
+        DemoApp.showAlert('Deleted!');
+      }
+    });
+  },
+  secureStorageClear: function(el, event) {
+    event.preventDefault();
+    var form = el.form;
+    Telegram.WebApp.SecureStorage.clear(function(err, result) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else if (result) {
+        DemoApp.showAlert('Cleared!');
+      }
+    });
+  },
   biometricInit: function(el) {
     var biometricManager = Telegram.WebApp.BiometricManager;
     if (!DemoApp.biometricInited) {
