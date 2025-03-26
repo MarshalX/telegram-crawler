@@ -373,8 +373,24 @@ var DemoApp = {
     event.preventDefault();
     var form = el.form;
     var key = form.key.value;
-    var value = form.value.value;
-    Telegram.WebApp.SecureStorage.getItem(key, function(err, value) {
+    Telegram.WebApp.SecureStorage.getItem(key, function(err, value, can_restore) {
+      if (err) {
+        DemoApp.showAlert('Error: ' + err);
+      } else {
+        if (value === null) {
+          DemoApp.showAlert('Not found' + (can_restore ? ', can restore' : ''));
+          form.value.value = '';
+        } else {
+          form.value.value = value;
+        }
+      }
+    });
+  },
+  secureStorageRestore: function(el, event) {
+    event.preventDefault();
+    var form = el.form;
+    var key = form.key.value;
+    Telegram.WebApp.SecureStorage.restoreItem(key, function(err, value) {
       if (err) {
         DemoApp.showAlert('Error: ' + err);
       } else {
