@@ -430,6 +430,7 @@ var Ads = {
     }
   },
   updateAdMessagePreviews: function(cont) {
+    NewAd.updateAdPreviewText(cont);
     $('.pr-review-ad-preview .js-preview-text tg-emoji', cont).each(function() {
       TEmoji.init(this);
     });
@@ -491,6 +492,9 @@ var Ads = {
         onUpdate: function(value, valueFull) {
           Ads.updateField($selectInput);
           options.onUpdate && options.onUpdate(field, value, valueFull);
+        },
+        onValueFocus: function(value, valueFull) {
+          options.onValueFocus && options.onValueFocus(field, value, valueFull);
         }
       });
       Ads.updateField($selectInput);
@@ -528,6 +532,7 @@ var Ads = {
     if (typeof tz_offset === 'undefined') {
       tz_offset = -60 * (new Date()).getTimezoneOffset();
     }
+    tz_offset = parseInt(tz_offset);
     var is_pos = tz_offset >= 0;
     if (!is_pos) tz_offset *= -1;
     var h = Math.floor(tz_offset / 3600);
@@ -552,7 +557,6 @@ var NewAd = {
       state.$form = $('.js-ad-form', cont);
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
-      cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
       cont.on('click.curPage', '.js-promote-photo', NewAd.eReplacePromotePhoto);
       cont.on('change.curPage', '.js-promote-photo > .file-upload', NewAd.eUploadPromotePhoto);
       cont.on('click.curPage', '.js-ad-media', NewAd.ePlayAdMedia);
@@ -568,10 +572,11 @@ var NewAd = {
       cont.on('click.curPage', '.js-activate-date-remove', NewAd.eRemoveStartDate);
       cont.on('click.curPage', '.js-deactivate-date-remove', NewAd.eRemoveEndDate);
       cont.on('click.curPage', '.js-open-schedule', NewAd.eOpenSchedule);
-      cont.on('click.curPage', '.js-channels-deselect', NewAd.eDeselectChannels);
-      cont.on('click.curPage', '.js-similar-channels-link', NewAd.eOpenSimilarChannels);
-      cont.on('click.curPage', '.js-bots-deselect', NewAd.eDeselectBots);
-      cont.on('click.curPage', '.js-similar-bots-link', NewAd.eOpenSimilarBots);
+      cont.on('click.curPage', '.js-deselect-all', NewAd.eDeselectAll);
+      cont.on('click.curPage', '.js-field-similar_channels', NewAd.eOpenSimilarChannels);
+      cont.on('click.curPage', '.js-field-similar_bots', NewAd.eOpenSimilarBots);
+      cont.on('click.curPage', '.js-prev-sample-results', NewAd.ePrevSampleResults);
+      cont.on('click.curPage', '.js-next-sample-results', NewAd.eNextSampleResults);
       $('.js-schedule-overview', state.$form).html(NewAd.scheduleOverview(state.$form));
       for (var i = 0; i < state.selectList.length; i++) {
         var selectData = state.selectList[i];
@@ -579,7 +584,7 @@ var NewAd = {
           Ads.initSelect(state.$form, selectData.field, {
             items: Aj.state[selectData.items_key] || [],
             pairedField: selectData.paired_field || false,
-            l_limit: selectData.limit_lang_key ? l(selectData.limit_lang_key) : '',
+            l_limit: (selectData.limit_error || ''),
             renderSelectedItem: function(val, item) {
               return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
             },
@@ -591,7 +596,7 @@ var NewAd = {
           Ads.initSelect(state.$form, selectData.field, {
             items: Aj.state[selectData.items_key] || [],
             pairedField: selectData.paired_field || false,
-            l_limit: selectData.limit_lang_key ? l(selectData.limit_lang_key) : '',
+            l_limit: (selectData.limit_error || ''),
             renderSelectedItem: function(val, item) {
               return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
             },
@@ -622,19 +627,20 @@ var NewAd = {
         } else if (selectData.query_search) {
           Ads.initSelect(state.$form, selectData.field, {
             items: Aj.state[selectData.items_key] || [],
-            l_limit: selectData.limit_lang_key ? l(selectData.limit_lang_key) : '',
+            l_limit: (selectData.limit_error || ''),
             renderSelectedItem: function(val, item) {
               return '<div class="selected-item" data-val="' + cleanHTML(val.toString()) + '"><span class="close"></span><div class="label">' + item.name + '</div></div>';
             },
+            onValueFocus: NewAd.onTargetQueryFocus,
             onEnter: NewAd.onTargetQuerySearch,
-            onUpdate: NewAd.onSelectUpdate,
+            onUpdate: NewAd.onTargetQueryUpdate,
             onChange: Ads.onSelectChange
           });
         } else {
           Ads.initSelect(state.$form, selectData.field, {
             items: Aj.state[selectData.items_key] || [],
             pairedField: selectData.paired_field || false,
-            l_no_items_found: selectData.no_items_lang_key ? l(selectData.no_items_lang_key) : '',
+            l_no_items_found: (selectData.no_items_error || ''),
             onUpdate: NewAd.onSelectUpdate,
             onChange: Ads.onSelectChange
           });
@@ -740,19 +746,31 @@ var NewAd = {
   onTargetTypeChange: function() {
     var cur_type = this.value;
     $('.pr-target-options', Aj.ajContainer).each(function() {
-      $(this).toggleClass('visible', $(this).attr('data-value') == cur_type);
+      var visible = $(this).attr('data-value') == cur_type;
+      $(this).toggleClass('visible', visible);
+      if (visible) {
+        NewAd.updateAdPreviewText(this);
+      }
     });
-    var $pictureWrap = $('.js-picture-wrap');
-    var $textWrap = $('.js-ad-text-wrap', Aj.state.$form);
+    var $form = Aj.state.$form;
+    var $pictureWrap = $('.js-field-picture-wrap');
+    var $textWrap = $('.js-field-text-wrap', $form);
+    var $mediaWrap = $('.js-field-media-wrap', $form);
+    var $buttonWrap = $('.js-field-button-wrap', $form);
     $pictureWrap.slideToggle(!(cur_type == 'search'));
     $textWrap.slideToggle(!(cur_type == 'search'));
+    $mediaWrap.slideToggle(!(cur_type == 'search' || cur_type == 'bots'));
+    $buttonWrap.slideToggle(!!Aj.state.customButton && !(cur_type == 'search' || cur_type == 'bots'));
 
-    $('.js-schedule-overview', Aj.state.$form).html(NewAd.scheduleOverview(Aj.state.$form));
+    $('.js-schedule-overview', $form).html(NewAd.scheduleOverview($form));
     NewAd.updateAdTargetOverview();
-    NewAd.saveDraftAuto(true);
+    NewAd.adPostCheck($form);
   },
   onPictureChange: function() {
     var $form = $(this.form);
+    var picture_checked = $(this).prop('checked');
+    $('.js-preview', $form).toggleClass('picture', !!picture_checked);
+    NewAd.updateAdPreviewText($form);
     NewAd.adPostCheck($form);
   },
   onIntersectTopicsChange: function() {
@@ -1019,6 +1037,7 @@ var NewAd = {
     }
     $formGroup.addClass('field-loading');
     Aj.apiRequest('searchChannel', {
+      owner_id: Aj.state.ownerId,
       query: value,
       field: field
     }, function(result) {
@@ -1028,15 +1047,7 @@ var NewAd = {
         return false;
       }
       if (result.channel) {
-        var item = {
-          val: result.channel.id,
-          name: result.channel.title,
-          photo: result.channel.photo,
-          username: result.channel.username
-        };
-        if (result.channel.ask_outside) {
-          item.ask_outside = result.channel.ask_outside;
-        }
+        var item = result.channel;
         $fieldEl.trigger('selectval', [item, true]);
         $fieldEl.data('prevval', '');
       }
@@ -1084,6 +1095,14 @@ var NewAd = {
       }
     });
   },
+  onTargetQueryFocus: function(field, value, valueFull) {
+    NewAd.showAdSampleResults(valueFull);
+  },
+  onTargetQueryUpdate: function(field, value, valueFull) {
+    NewAd.onSelectUpdate(field, value, valueFull);
+    NewAd.openAdSampleResults();
+    $('.js-sample-results-wrap', Aj.state.$form).toggleClass('multiple', value.length > 1);
+  },
   onTargetQuerySearch: function(field, value) {
     var $fieldEl = Aj.state.$form.field(field);
     var $formGroup = $fieldEl.fieldEl().parents('.form-group');
@@ -1117,8 +1136,10 @@ var NewAd = {
       if (result.query) {
         var item = {
           val: result.query.id,
-          name: result.query.title
+          name: result.query.title,
+          sample_results: result.query.sample_results
         };
+        NewAd.updateAdSampleResults(item);
         $fieldEl.trigger('selectval', [item, true]);
         $fieldEl.data('prevval', '');
       }
@@ -1232,19 +1253,19 @@ var NewAd = {
     var $fieldEl = Aj.state.$form.field(field);
     if (field == 'user_topics') {
       var user_topics_cnt = $fieldEl.data('value').length;
-      $('.js-intersect-topics-wrap', Aj.state.$form).slideToggle(user_topics_cnt > 1);
+      $('.js-field-intersect_topics-wrap', Aj.state.$form).slideToggle(user_topics_cnt > 1);
     } else if (field == 'channels') {
       var channels_cnt = $fieldEl.data('value').length;
-      $('.js-similar-channels-link-wrap[data-field="channels"]', Aj.state.$form).slideToggle(channels_cnt > 0 && channels_cnt < 10);
-      $('.js-channels-deselect[data-field="channels"]', Aj.state.$form).toggleClass('hide', channels_cnt < 2);
+      $('.js-field-similar_channels-wrap[data-field="channels"]', Aj.state.$form).slideToggle(channels_cnt > 0 && channels_cnt < 10);
+      $('.js-deselect-all[data-field="channels"]', Aj.state.$form).toggleClass('hide', channels_cnt < 2);
     } else if (field == 'exclude_channels') {
       var channels_cnt = $fieldEl.data('value').length;
-      $('.js-similar-channels-link-wrap[data-field="exclude_channels"]', Aj.state.$form).slideToggle(channels_cnt > 0 && channels_cnt < 10);
-      $('.js-channels-deselect[data-field="exclude_channels"]', Aj.state.$form).toggleClass('hide', channels_cnt < 2);
+      $('.js-field-similar_channels-wrap[data-field="exclude_channels"]', Aj.state.$form).slideToggle(channels_cnt > 0 && channels_cnt < 10);
+      $('.js-deselect-all[data-field="exclude_channels"]', Aj.state.$form).toggleClass('hide', channels_cnt < 2);
     } else if (field == 'bots') {
       var bots_cnt = $fieldEl.data('value').length;
-      $('.js-similar-bots-link-wrap', Aj.state.$form).slideToggle(bots_cnt > 0 && bots_cnt < 10);
-      $('.js-bots-deselect', Aj.state.$form).toggleClass('hide', bots_cnt < 2);
+      $('.js-field-similar_bots-wrap', Aj.state.$form).slideToggle(bots_cnt > 0 && bots_cnt < 10);
+      $('.js-deselect-all[data-field="bots"]', Aj.state.$form).toggleClass('hide', bots_cnt < 2);
     }
     var selOpts = $fieldEl.data('selOpts');
     var paired_field = selOpts.pairedField;
@@ -1265,15 +1286,15 @@ var NewAd = {
     }
     NewAd.updateAdTargetOverview();
   },
-  eDeselectChannels: function(e) {
+  eDeselectAll: function(e) {
     e.preventDefault();
-    var field = $(this).attr('data-field') || 'channels';
+    var field = $(this).attr('data-field');
     Aj.state.$form.field(field).trigger('reset');
   },
   eOpenSimilarChannels: function(e) {
     e.preventDefault();
     var $link = $(this);
-    var field = $link.parents('.js-similar-channels-link-wrap').attr('data-field') || 'channels';
+    var field = $link.parents('.js-field-similar_channels-wrap').attr('data-field') || 'channels';
     var $fieldEl = Aj.state.$form.field(field);
     var values   = $fieldEl.data('value') || [];
     if (!values.length || $link.data('loading')) {
@@ -1374,10 +1395,6 @@ var NewAd = {
     }
     closePopup($popup);
   },
-  eDeselectBots: function(e) {
-    e.preventDefault();
-    Aj.state.$form.field('bots').trigger('reset');
-  },
   eOpenSimilarBots: function(e) {
     e.preventDefault();
     var $link = $(this);
@@ -1474,20 +1491,16 @@ var NewAd = {
     }
     closePopup($popup);
   },
-  ePreviewAd: function(e) {
-    e.preventDefault();
-    NewAd.previewPopup();
-  },
   eOpenDailyBudget: function(e) {
     e.preventDefault();
     var $form = $(this).parents('form');
-    $('.js-daily-budget-wrap', $form).slideShow();
+    $('.js-field-daily_budget-wrap', $form).slideShow();
     $('.js-open-daily-budget', $form).addClass('inactive');
   },
   eRemoveDailyBudget: function(e) {
     e.preventDefault();
     var $form = $(this).parents('form');
-    $('.js-daily-budget-wrap', $form).slideHide();
+    $('.js-field-daily_budget-wrap', $form).slideHide();
     $('.js-open-daily-budget', $form).removeClass('inactive');
     $form.field('daily_budget').value('');
   },
@@ -1699,16 +1712,17 @@ var NewAd = {
     var $mediaWrap = $('.js-ad-media-wrap', $formGroup);
     var $content = $('.js-ad-media-content', $mediaWrap);
     var $button = $('.js-add-media-btn', $formGroup);
-    var $picture = $('.js-picture-wrap', $form);
+    var $pictureWrap = $('.js-field-picture-wrap', $form);
     var has_media = $field.value() || $field.data('has-media');
+    var cur_type = $form.field('target_type').value();
     NewAd.initAdMedia($mediaWrap);
     if (has_media) {
       $button.html(l('WEB_AD_MEDIA_CHANGE_BUTTON'));
-      $picture.slideHide();
+      $pictureWrap.slideHide();
       $mediaWrap.slideShow();
     } else {
       $button.html(l('WEB_AD_MEDIA_UPLOAD_BUTTON'));
-      $picture.slideShow();
+      $pictureWrap.slideToggle(!(cur_type == 'search'));
       $mediaWrap.slideHide();
     }
     $mediaWrap.removeClass('file-loading');
@@ -1736,58 +1750,52 @@ var NewAd = {
     $field.data('has-media', !!file);
     NewAd.updateAdMedia($field);
   },
+  updateAdPreviewText: function($cont) {
+    $('.js-preview-wrap', $cont).each(function() {
+      var oneline = $('.js-preview-text', this).height() <= 20;
+      $(this).toggleClass('oneline-text', oneline);
+    });
+  },
   updateAdPreview: function($form, previewData) {
-    var $previewPopup = Aj.state.$previewPopup;
-    var inPopup = $form.parents('.pr-layer-preview-ad').size() > 0;
-    if (inPopup) {
-      Aj.state.popupPreviewData = previewData;
-      if ($previewPopup) {
-        if (previewData) {
-          $('.js-preview-from', $previewPopup).html(previewData.from);
-          $('.js-preview-wrap', $previewPopup).attr('href', uncleanHTML(previewData.button_url));
-          for (var i = 1; i <= 3; i++) {
-            $('.js-preview-wrap', $previewPopup).cssProp('--preview-color' + i, (previewData.accent_colors || [])[i - 1] || '');
-          }
-          $('.js-promote-media', $previewPopup).html(previewData.media);
-          $('.js-promote-photo', $previewPopup).html(previewData.photo);
-          $('.js-promote-photo-tooltip', $previewPopup).html(previewData.from);
-          $('.js-preview-text', $previewPopup).html(previewData.text);
-          $('.js-preview-text tg-emoji', $previewPopup).each(function(){ TEmoji.init(this); });
-          $('.js-preview-button', $previewPopup).html(previewData.button);
-          $('.js-preview-footer', $previewPopup).each(function() {
-            Ads.updateTextShadow(this, '.js-preview-text', '.label', 10);
-          });
-          $('.js-preview-wrap', $previewPopup).each(function() {
-            var oneline = $('.js-preview-text', this).height() <= 20;
-            $(this).toggleClass('oneline-text', oneline);
-          });
-          $('.js-picture-label', $previewPopup).html(previewData.picture_label);
-          $('.js-picture-hint', $previewPopup).html(previewData.picture_hint);
-        }
-        NewAd.initAdMedia($('.js-promote-media', $previewPopup));
-        $('.js-promote-photo', $previewPopup).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
-        $('.js-preview', $previewPopup).toggleClass('active', !!previewData);
+    var $form = Aj.state.$form;
+    Aj.state.previewData = previewData;
+    if (previewData) {
+      $('.js-preview-from', $form).html(previewData.from);
+      $('.js-preview-from-desc', $form).html(previewData.from_desc);
+      $('.js-preview-wrap', $form).attr('href', uncleanHTML(previewData.button_url));
+      for (var i = 1; i <= 3; i++) {
+        $('.js-preview-wrap', $form).cssProp('--preview-color' + i, (previewData.accent_colors || [])[i - 1] || '');
       }
-    } else {
-      Aj.state.previewData = previewData;
-      if (previewData) {
-        $('.js-promote-media', Aj.state.$form).html(previewData.media);
-        $('.js-promote-photo', Aj.state.$form).html(previewData.photo);
-        $('.js-promote-photo-tooltip', Aj.state.$form).html(previewData.from);
-        $('.js-picture-label', Aj.state.$form).html(previewData.picture_label);
-        $('.js-picture-hint', Aj.state.$form).html(previewData.picture_hint);
-        $('.js-cpm-extra', Aj.state.$form).html(previewData.cpm_extra);
-        $('.js-cpm-extra-tooltip', Aj.state.$form).html(previewData.cpm_extra_tooltip);
-      }
-      NewAd.initAdMedia($('.js-promote-media', Aj.state.$form));
-      $('.js-promote-photo', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
-      $('.js-cpm-extra', Aj.state.$form).parents('.pr-form-control-wrap').toggleClass('has-extra-cpm', !!(previewData && previewData.cpm_extra));
-      $('.js-preview-link', Aj.state.$form).toggleClass('inactive', !previewData);
+      $('.js-promote-media', $form).html(previewData.media);
+      $('.js-promote-photo', $form).html(previewData.photo);
+      $('.js-promote-photo-tooltip', $form).html(previewData.from);
+      $('.js-preview-text', $form).html(previewData.text);
+      $('.js-preview-text tg-emoji', $form).each(function(){ TEmoji.init(this); });
+      $('.js-preview-button', $form).html(previewData.button);
+      $('.js-preview-footer', $form).each(function() {
+        Ads.updateTextShadow(this, '.js-preview-text', '.label', 10);
+      });
+      $('.js-field-picture-label', $form).html(previewData.picture_label);
+      $('.js-preview', $form).toggleClass('picture', !!previewData.picture);
+      $('.js-picture-hint', $form).html(previewData.picture_hint);
+      $('.js-cpm-extra', $form).html(previewData.cpm_extra);
+      $('.js-cpm-extra-tooltip', $form).html(previewData.cpm_extra_tooltip);
+      NewAd.updateAdPreviewText($form);
     }
+    $('.js-preview', $form).each(function() {
+      var target_type = $(this).attr('data-target-type');
+      var avail = previewData && previewData.avail_targets && previewData.avail_targets[target_type] || false;
+      $(this).toggleClass('active', avail);
+    });
+    NewAd.initAdMedia($('.js-promote-media', $form));
+    $('.js-promote-photo', $form).parents('.pr-form-control-wrap').toggleClass('has-photo', !!previewData);
+    $('.js-cpm-extra', $form).parents('.pr-form-control-wrap').toggleClass('has-extra-cpm', !!(previewData && previewData.cpm_extra));
+    $('.js-preview-link', $form).toggleClass('inactive', !previewData);
   },
   updateAdForm: function($form, isWebsite, customButton) {
     var $previewPopup = Aj.state.$previewPopup;
     var inPopup = $form.parents('.pr-layer-preview-ad').size() > 0;
+    var cur_type = $form.field('target_type').value();
     var $cont = false;
     var $websiteNameField = false;
     var $websitePhotoField = false;
@@ -1805,166 +1813,16 @@ var NewAd = {
     if ($cont) {
       $('.js-promote-photo', $cont).toggleClass('can-replace', !!isWebsite);
       if (isWebsite) {
-        $('.js-website-name-wrap', $cont).slideShow();
+        $('.js-field-website_name-wrap', $cont).slideShow();
       } else {
-        $('.js-website-name-wrap', $cont).slideHide();
+        $('.js-field-website_name-wrap', $cont).slideHide();
         $websiteNameField.value('');
         $websitePhotoField.value('');
       }
-      $('.js-custom-button-wrap', $cont).slideToggle(!!customButton);
+      var $buttonWrap = $('.js-field-button-wrap', $cont);
+      Aj.state.customButton = customButton;
+      $buttonWrap.slideToggle(!!Aj.state.customButton && !(cur_type == 'search' || cur_type == 'bots'));
     }
-  },
-  checkBeforePreviewPopupUnload: function(load_fn) {
-    var message = null;
-    var curPreviewFormData = NewAd.getPreviewFormData();
-    if (Aj.state.initPreviewFormData != curPreviewFormData) {
-      message = l('WEB_LEAVE_FORM_CONFIRM_TEXT');
-    }
-    if (message) {
-      var message_html = $('<div>').text(message).html();
-      showConfirm(message_html, load_fn, l('WEB_LEAVE_PAGE', 'Leave'));
-      return false;
-    } else {
-      load_fn();
-      return true;
-    }
-  },
-  previewPopup: function() {
-    var state = Aj.state;
-    if (!state.previewData) {
-      return false;
-    }
-    var $previewPopup = $('<div class="popup-container hide alert-popup-container pr-popup-container">' + state.previewTpl + '</div>');
-    state.$previewPopup = $previewPopup;
-    var $form = state.$form;
-    NewAd.resetAdMediaUpload($form);
-    var text = $form.field('text').value();
-    var promote_url = $form.field('promote_url').value();
-    var button = $form.field('button').data('value');
-    var website_name = $form.field('website_name').value();
-    var website_photo = $form.field('website_photo').value();
-    var media = $form.field('media').value();
-    var picture_checked = $form.field('picture').prop('checked');
-    var target_type = $form.field('target_type').value();
-    var website_name_hidden = $('.js-website-name-wrap', $form).isSlideHidden();
-    var custom_button_hidden = $('.js-custom-button-wrap', $form).isSlideHidden();
-
-    var $mediaWrap = $('.js-ad-media-wrap', $form);
-    var $previewMediaWrap = $mediaWrap.clone();
-    $('.js-ad-media-wrap', $previewPopup).replaceWith($previewMediaWrap);
-
-    var $previewForm = $('.js-ad-form', $previewPopup);
-    Ads.formInit($previewForm);
-    $previewForm.on('submit', preventDefault);
-
-    state.previewTextField = $previewForm.field('text');
-    state.previewTextField.on('change.curPage', NewAd.onTextChange);
-    state.previewTextField.value(text);
-    state.previewTextField.on('input.curPage', NewAd.onTextInput);
-    state.previewPromoteUrlField = $previewForm.field('promote_url');
-    state.previewPromoteUrlField.on('change.curPage', NewAd.onPromoteUrlChange);
-    state.previewPromoteUrlField.value(promote_url);
-    state.previewWebsiteNameField = $previewForm.field('website_name');
-    state.previewWebsiteNameField.on('change.curPage', NewAd.onWebsiteNameChange);
-    state.previewWebsiteNameField.value(website_name);
-    state.previewWebsitePhotoField = $previewForm.field('website_photo');
-    state.previewWebsitePhotoField.value(website_photo);
-    state.previewMediaField = $previewForm.field('media');
-    state.previewMediaField.value(media);
-    state.previewButtonField = $previewForm.field('button');
-    state.previewButtonField.on('ddchange.curPage', NewAd.onButtonChange);
-    state.previewButtonField.trigger('selectval', [button]);
-    state.previewPictureCheckbox = $previewForm.field('picture');
-    var previewPictureChange = function() {
-      var picture_checked = Aj.state.previewPictureCheckbox.prop('checked');
-      $('.js-preview', $previewPopup).toggleClass('picture', !!picture_checked);
-      $('.js-preview-wrap', $previewPopup).each(function() {
-        var oneline = $('.js-preview-text', this).height() <= 20;
-        $(this).toggleClass('oneline-text', oneline);
-      });
-    };
-    state.previewPictureCheckbox.on('change.curPage', previewPictureChange);
-    state.previewPictureCheckbox.prop('checked', picture_checked);
-    var $previewEl = $('.js-preview', $previewPopup);
-    previewPictureChange();
-    $('.js-website-name-wrap', $previewPopup).toggleClass('shide', website_name_hidden);
-    $('.js-custom-button-wrap', $previewPopup).toggleClass('shide', custom_button_hidden);
-
-    var is_bots_target = (target_type == 'bots');
-    var is_search_target = (target_type == 'search');
-    $('.js-bot-preview', $previewPopup).toggle(is_bots_target);
-    $('.js-search-preview', $previewPopup).toggle(is_search_target);
-    $('.js-channel-preview', $previewPopup).toggle(!is_bots_target && !is_search_target);
-
-    state.previewMediaField.data('$previewEl', $previewEl);
-    NewAd.updateAdMedia(state.previewMediaField);
-    NewAd.updateAdPreview($previewForm, state.previewData);
-    NewAd.adPostCheck($previewForm);
-
-    var previewSave = function() {
-      NewAd.resetAdMediaUpload($previewForm);
-      var text = state.previewTextField.value();
-      var promote_url = state.previewPromoteUrlField.value();
-      var button = state.previewButtonField.data('value');
-      var website_name = state.previewWebsiteNameField.value();
-      var website_photo = state.previewWebsitePhotoField.value();
-      var media = state.previewMediaField.value();
-      var picture_checked = state.previewPictureCheckbox.prop('checked');
-      $form.field('text').value(text).updateAutosize();
-      $form.field('promote_url').value(promote_url);
-      $form.field('button').trigger('selectval', [button]);
-      $form.field('website_name').value(website_name);
-      $form.field('website_photo').value(website_photo);
-      $form.field('media').value(media);
-      $form.field('picture').prop('checked', picture_checked);
-      var $mediaWrap = $('.js-ad-media-wrap', $previewPopup);
-      var $previewMediaWrap = $mediaWrap.clone();
-      $('.js-ad-media-wrap', $form).replaceWith($previewMediaWrap);
-
-      NewAd.updateAdMedia(state.mediaField);
-      NewAd.updateAdPreview($form, state.popupPreviewData);
-      NewAd.adPostCheck($form);
-      delete state.popupPreviewData;
-      delete state.$previewPopup;
-      state.initPreviewFormData = NewAd.getPreviewFormData();
-      closePopup($previewPopup);
-    }
-    var $submitBtn = $('.submit-form-btn', $previewPopup);
-    $submitBtn.on('click', previewSave);
-    var previewCancel = function() {
-      closePopup($previewPopup);
-    }
-    var $cancelBtn = $('.cancel-form-btn', $previewPopup);
-    $cancelBtn.on('click', previewCancel);
-    $previewPopup.one('popup:open', function() {
-      $('.pr-preview-ad-message .ad-msg-date', $previewPopup).each(function() {
-        Ads.updateTextShadow(this, '.js-preview-text', '.label', 10);
-      });
-      state.previewTextField.updateAutosize();
-      state.initPreviewFormData = NewAd.getPreviewFormData();
-      previewPictureChange();
-    });
-    $previewPopup.one('popup:close', function() {
-      Ads.formDestroy($previewForm);
-      $previewForm.off('submit', preventDefault);
-      delete state.$previewPopup;
-      $submitBtn.off('click', previewSave);
-      $cancelBtn.off('click', previewCancel);
-      $previewPopup.remove();
-      state.initPreviewFormData = NewAd.getPreviewFormData();
-    });
-    openPopup($previewPopup, {
-      closeByClickOutside: '.popup-no-close',
-      onBeforeClose: function($popup) {
-        var unloaded = NewAd.checkBeforePreviewPopupUnload(function() {
-          var options = $popup.data('options');
-          options.onBeforeClose = null;
-          closePopup($popup);
-        });
-        return unloaded;
-      }
-    });
-    return $previewPopup;
   },
   scheduleOverview: function($form) {
     var schedule = $form.field('schedule').value();
@@ -2113,8 +1971,69 @@ var NewAd = {
     }
     return false;
   },
+  ePrevSampleResults: function(e) {
+    NewAd.openAdSampleResults(-1);
+  },
+  eNextSampleResults: function(e) {
+    NewAd.openAdSampleResults(1);
+  },
+  openAdSampleResults: function(delta) {
+    var curValue = $('.js-sample-query', Aj.state.$form).attr('data-value');
+    var $field = Aj.state.$form.field('search_queries');
+    var value = $field.data('value') || [];
+    var valueFull = $field.data('valueFull') || {};
+    var curIndex = null;
+    if (value.length) {
+      var list = [];
+      for (var j = 0; j < value.length; j++) {
+        var val = value[j], valFull = valueFull[val] || {};
+        if (curValue == val) {
+          curIndex = j;
+          break;
+        }
+      }
+    }
+    if (curIndex === null) {
+      curIndex = 0;
+    } else if (delta > 0) {
+      curIndex++;
+      if (curIndex >= value.length) {
+        curIndex = 0;
+      }
+    } else if (delta < 0) {
+      curIndex--;
+      if (curIndex < 0) {
+        curIndex = value.length - 1;
+      }
+    }
+    NewAd.showAdSampleResults(valueFull[value[curIndex]]);
+  },
+  showAdSampleResults: function(valueFull) {
+    if (!valueFull) {
+      valueFull = {
+        sample_results: Aj.state.sampleResultsPlaceholder
+      };
+    };
+    if (valueFull.sample_results) {
+      NewAd.updateAdSampleResults(valueFull);
+    } else {
+      Aj.apiRequest('searchTargetQuery', {
+        query: valueFull.name
+      }, function(result) {
+        if (result.query) {
+          valueFull.sample_results = result.query.sample_results;
+          NewAd.updateAdSampleResults(valueFull);
+        }
+      });
+    }
+  },
+  updateAdSampleResults: function(item) {
+    $('.js-sample-query', Aj.state.$form).attr('data-value', item.val || '');
+    $('.js-sample-query', Aj.state.$form).html(item.name || '');
+    $('.js-sample-results', Aj.state.$form).html(item.sample_results || '');
+  },
   updateAdTargetOverview: function() {
-    var len = {}, lang_params = {}, need_outside_cb = false;
+    var len = {}, lang_params = {};
     var target_type = Aj.state.$form.field('target_type').value() || 'channels';
     var joinTargets = function(list, or, repeat) {
       var lk = or ? 'WEB_AD_TARGET_OR' : 'WEB_AD_TARGET_AND';
@@ -2140,11 +2059,8 @@ var NewAd = {
         for (var j = 0; j < value.length; j++) {
           var val = value[j], valFull = valueFull[val] || {};
           list.push(valFull.username ? '<a class="value" href="https://t.me/' + valFull.username + '" rel="noopener" target="_blank" dir="auto">' + valFull.name + '</a>' : '<span class="value" dir="auto">' + valFull.name + '</span>');
-          if (valFull.ask_outside) {
-            need_outside_cb = true;
-          }
         }
-        var list_or = (field == 'langs' || field == 'topics' || field == 'countries' || field == 'locations' || field == 'user_langs' || field == 'user_topics' && !Aj.state.intersectTopicsCheckbox.prop('checked') || field == 'user_channels' || field == 'audiences')
+        var list_or = (field == 'langs' || field == 'topics' || field == 'countries' || field == 'locations' || field == 'user_langs' || field == 'user_topics' && !Aj.state.intersectTopicsCheckbox.prop('checked') || field == 'user_channels' || field == 'audiences' || field == 'search_queries' || field == 'search_countries')
         lang_params[field] = joinTargets(list, list_or);
       } else {
         lang_params[field] = '';
@@ -2187,7 +2103,6 @@ var NewAd = {
           overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_CHANNELS', lang_params) + '</div>';
         }
       }
-      $('.js-exclude-outside').toggleClass('hide', !need_outside_cb);
     } else if (target_type == 'users') {
       if (!len.locations && !len.countries && !(NewAd.isAudienceTargetOnly(len) &&
          Aj.state.audienceTargetOnlyAvailable)) {
@@ -2239,7 +2154,20 @@ var NewAd = {
           overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_EXCLUDE_CRYPTO') + '</div>';
         }
       }
-      $('.js-exclude-outside').addClass('hide');
+    } else if (target_type == 'bots') {
+      if (!len.bots) {
+        overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
+      } else {
+        overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_BOTS', lang_params) + '</div>';
+      }
+    } else if (target_type == 'search') {
+      if (!len.search_queries) {
+        overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
+      } else if (len.search_countries > 0) {
+        overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_COUNTRY_SEARCH_QUERIES', lang_params) + '</div>';
+      } else {
+        overview += '<div class="pr-form-info-block plus">' + l('WEB_AD_TARGET_SEARCH_QUERIES', lang_params) + '</div>';
+      }
     } else {
       overview += '<div class="pr-form-info-block minus">' + l('WEB_AD_TARGET_NOTHING') + '</div>';
     }
@@ -2297,9 +2225,6 @@ var NewAd = {
     }
     if ($form.field('only_crypto').prop('checked')) {
       values.push('only_crypto');
-    }
-    if ($form.field('exclude_outside').prop('checked')) {
-      values.push('exclude_outside');
     }
     return values.join('|');
   },
@@ -2411,9 +2336,6 @@ var NewAd = {
     }
     if ($form.field('only_crypto').prop('checked')) {
       params.only_crypto = 1;
-    }
-    if ($form.field('exclude_outside').prop('checked')) {
-      params.exclude_outside = 1;
     }
     if (activate_date) {
       params.activate_date = activate_date;
@@ -2533,9 +2455,6 @@ var NewAd = {
     if ($form.field('only_crypto').prop('checked')) {
       params.only_crypto = 1;
     }
-    if ($form.field('exclude_outside').prop('checked')) {
-      params.exclude_outside = 1;
-    }
     if (activate_date) {
       params.activate_date = activate_date;
     }
@@ -2595,7 +2514,6 @@ var NewAd = {
     $form.field('only_politic').prop('checked', false);
     $form.field('exclude_crypto').prop('checked', false);
     $form.field('only_crypto').prop('checked', false);
-    $form.field('exclude_outside').prop('checked', false);
     $form.field('device').trigger('selectval', ['']);
     Aj.state.titleField.focusAndSelect();
     NewAd.updateAdPreview(Aj.state.$form, false);
@@ -3639,7 +3557,6 @@ var EditAd = {
       state.$form = $('.js-ad-form', cont);
       Ads.formInit(state.$form);
       state.$form.on('submit', preventDefault);
-      cont.on('click.curPage', '.js-preview-link', NewAd.ePreviewAd);
       cont.on('click.curPage', '.js-promote-photo', NewAd.eReplacePromotePhoto);
       cont.on('change.curPage', '.js-promote-photo > .file-upload', NewAd.eUploadPromotePhoto);
       cont.on('click.curPage', '.js-ad-media', NewAd.ePlayAdMedia);
@@ -3918,7 +3835,7 @@ var EditAd = {
         $('.js-owner_budget').html(result.owner_budget);
       }
       if (result.ad_budget_val) {
-        $('.js-ad_budget_val').value(result.ad_budget_val);
+        $('.js-field-budget-val').value(result.ad_budget_val);
       }
     });
     return false;

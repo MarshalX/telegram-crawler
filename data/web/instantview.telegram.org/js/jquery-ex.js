@@ -947,6 +947,9 @@
       $selected.on('click.select', '.selected-item', function(e) {
         $('.selected-item.focused', $selected).removeClass('focused');
         $(this).addClass('focused');
+        var val = $(this).attr('data-val');
+        options.onValueFocus && options.onValueFocus(val, selectedMap[val]);
+        $field.trigger('valuefocus', [val, selectedMap[val]]);
         e.stopImmediatePropagation();
       });
       $selected.on('click.select', '.selected-item .close', function(e) {
