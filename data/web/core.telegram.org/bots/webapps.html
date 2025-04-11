@@ -57,6 +57,12 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="april-11-2025" href="#april-11-2025"><i class="anchor-icon"></i></a>April 11, 2025</h4>
+<p><strong>Bot API 9.0</strong></p>
+<ul>
+<li>Added the field <a href="#devicestorage">DeviceStorage</a>, allowing Mini Apps to use persistent local storage on the user&#39;s device.</li>
+<li>Added the field <a href="#securestorage">SecureStorage</a>, allowing Mini Apps to use a secure local storage on the user&#39;s device for sensitive data.</li>
+</ul>
 <h4><a class="anchor" name="november-17-2024" href="#november-17-2024"><i class="anchor-icon"></i></a>November 17, 2024</h4>
 <p><strong>Bot API 8.0</strong></p>
 <blockquote>
@@ -344,8 +350,8 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="initializing-mini-apps" href="#initializing-mini-apps"><i class="anchor-icon"></i></a>Initializing Mini Apps</h3>
-<p>To connect your Mini App to the Telegram client, place the script <a href="https://telegram.org/js/telegram-web-app.js?56">telegram-web-app.js</a> in the <code>&lt;head&gt;</code> tag before any other scripts, using this code:</p>
-<pre><code>&lt;script src=&quot;https://telegram.org/js/telegram-web-app.js?56&quot;&gt;&lt;/script&gt;</code></pre>
+<p>To connect your Mini App to the Telegram client, place the script <a href="https://telegram.org/js/telegram-web-app.js?57">telegram-web-app.js</a> in the <code>&lt;head&gt;</code> tag before any other scripts, using this code:</p>
+<pre><code>&lt;script src=&quot;https://telegram.org/js/telegram-web-app.js?57&quot;&gt;&lt;/script&gt;</code></pre>
 <p>Once the script is connected, a <code>window.Telegram.WebApp</code> object will become available with the following fields:</p>
 <table class="table">
 <thead>
@@ -505,6 +511,16 @@
 <td>LocationManager <sup><mark>NEW</mark></sup></td>
 <td><a href="#locationmanager">LocationManager</a></td>
 <td>An object for controlling location on the device.</td>
+</tr>
+<tr>
+<td>DeviceStorage <sup><mark>NEW</mark></sup></td>
+<td><a href="#devicestorage">DeviceStorage</a></td>
+<td>An object for storing and retrieving data from the device&#39;s local storage.</td>
+</tr>
+<tr>
+<td>SecureStorage <sup><mark>NEW</mark></sup></td>
+<td><a href="#securestorage">SecureStorage</a></td>
+<td>An object for storing and retrieving data from the device&#39;s secure storage.</td>
 </tr>
 <tr>
 <td>isVersionAtLeast(version)</td>
@@ -1709,6 +1725,80 @@
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="devicestorage" href="#devicestorage"><i class="anchor-icon"></i></a>DeviceStorage</h4>
+<p>This object provides access to persistent local storage on the user’s device. It is conceptually similar to the browser&#39;s <code>localStorage</code> API, but integrated within the Telegram client. All data is stored locally and is available only to the bot that created it. Each bot can store up to <strong>5 MB per user</strong> using this storage.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>setItem(key, value[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that stores a value in the device&#39;s local storage using the specified key. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was stored.</td>
+</tr>
+<tr>
+<td>getItem(key, callback)</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that receives a value from the device&#39;s local storage using the specified key. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the value will be passed as the second argument.</td>
+</tr>
+<tr>
+<td>removeItem(key[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that removes a value from the device&#39;s local storage using the specified key. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was removed.</td>
+</tr>
+<tr>
+<td>clear([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that clears all keys previously stored by the bot in the device&#39;s local storage. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether all values were removed.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#devicestorage">DeviceStorage</a> object, so they can be chained.</p>
+<h4><a class="anchor" name="securestorage" href="#securestorage"><i class="anchor-icon"></i></a>SecureStorage</h4>
+<p>This object provides access to a secure storage on the user’s device for sensitive data. On <strong>iOS</strong>, it uses the system <strong>Keychain</strong>; on <strong>Android</strong>, it uses the <strong>Keystore</strong>. This ensures that all stored values are encrypted at rest and inaccessible to unauthorized applications.</p>
+<p>Secure storage is suitable for storing tokens, secrets, authentication state, and other sensitive user-specific information. Each bot can store up to <strong>10 items per user</strong>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>setItem(key, value[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that stores a value in the device&#39;s secure storage using the specified key. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was stored.</td>
+</tr>
+<tr>
+<td>getItem(key, callback)</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that receives a value from the device&#39;s secure storage using the specified key. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the value will be passed as the second argument. If the key was not found, the second argument will be <em>null</em>, and the third argument will be a boolean indicating whether the key can be restored from the current device.</td>
+</tr>
+<tr>
+<td>restoreItem(key[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> Attempts to restore a key that previously existed on the current device. When called, the user will be asked for permission to restore the value. If the user declines or an error occurs, the first argument in the <em>callback</em> will contain the error. If restored successfully, the first argument will be <em>null</em> and the second argument will contain the restored value.</td>
+</tr>
+<tr>
+<td>removeItem(key[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that removes a value from the device&#39;s secure storage using the specified key. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was removed.</td>
+</tr>
+<tr>
+<td>clear([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that clears all keys previously stored by the bot in the device&#39;s secure storage. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether all values were removed.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#securestorage">SecureStorage</a> object, so they can be chained.</p>
 <h4><a class="anchor" name="webappinitdata" href="#webappinitdata"><i class="anchor-icon"></i></a>WebAppInitData</h4>
 <p>This object contains data that is transferred to the Mini App when it is opened. It is empty if the Mini App was launched from a <a href="#keyboard-button-mini-apps">keyboard button</a> or from <a href="#inline-mode-mini-apps">inline mode</a>.</p>
 <table class="table">
