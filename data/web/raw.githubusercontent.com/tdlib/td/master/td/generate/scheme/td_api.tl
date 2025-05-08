@@ -1089,10 +1089,11 @@ upgradedGiftSymbol name:string sticker:sticker rarity_per_mille:int32 = Upgraded
 upgradedGiftBackdropColors center_color:int32 edge_color:int32 symbol_color:int32 text_color:int32 = UpgradedGiftBackdropColors;
 
 //@description Describes a backdrop of an upgraded gift
+//@id Unique identifier of the backdrop
 //@name Name of the backdrop
 //@colors Colors of the backdrop
 //@rarity_per_mille The number of upgraded gifts that receive this backdrop for each 1000 gifts upgraded
-upgradedGiftBackdrop name:string colors:upgradedGiftBackdropColors rarity_per_mille:int32 = UpgradedGiftBackdrop;
+upgradedGiftBackdrop id:int32 name:string colors:upgradedGiftBackdropColors rarity_per_mille:int32 = UpgradedGiftBackdrop;
 
 //@description Describes the original details about the gift
 //@sender_id Identifier of the user or the chat that sent the gift; may be null if the gift was private
@@ -1114,13 +1115,10 @@ upgradedGiftOriginalDetails sender_id:MessageSender receiver_id:MessageSender te
 //@last_send_date Point in time (Unix timestamp) when the gift was send for the last time; for sold out gifts only
 gift id:int64 sticker:sticker star_count:int53 default_sell_star_count:int53 upgrade_star_count:int53 is_for_birthday:Bool remaining_count:int32 total_count:int32 first_send_date:int32 last_send_date:int32 = Gift;
 
-//@description Contains a list of gifts that can be sent to another user or channel chat @gifts The list of gifts
-gifts gifts:vector<gift> = Gifts;
-
 //@description Describes an upgraded gift that can be transferred to another owner or transferred to the TON blockchain as an NFT
 //@id Unique identifier of the gift
 //@title The title of the upgraded gift
-//@name Unique name of the upgraded gift that can be used with internalLinkTypeUpgradedGift
+//@name Unique name of the upgraded gift that can be used with internalLinkTypeUpgradedGift or sendResoldGift
 //@number Unique number of the upgraded gift among gifts upgraded from the same gift
 //@total_upgraded_count Total number of gifts that were upgraded from the same gift
 //@max_upgraded_count The maximum number of gifts that can be upgraded from the same gift
@@ -1132,7 +1130,8 @@ gifts gifts:vector<gift> = Gifts;
 //@symbol Symbol of the upgraded gift
 //@backdrop Backdrop of the upgraded gift
 //@original_details Information about the originally sent gift; may be null if unknown
-upgradedGift id:int64 title:string name:string number:int32 total_upgraded_count:int32 max_upgraded_count:int32 owner_id:MessageSender owner_address:string owner_name:string gift_address:string model:upgradedGiftModel symbol:upgradedGiftSymbol backdrop:upgradedGiftBackdrop original_details:upgradedGiftOriginalDetails = UpgradedGift;
+//@resale_star_count Number of Telegram Stars that must be paid to buy the gift and send it to someone else; 0 if resale isn't possible
+upgradedGift id:int64 title:string name:string number:int32 total_upgraded_count:int32 max_upgraded_count:int32 owner_id:MessageSender owner_address:string owner_name:string gift_address:string model:upgradedGiftModel symbol:upgradedGiftSymbol backdrop:upgradedGiftBackdrop original_details:upgradedGiftOriginalDetails resale_star_count:int53 = UpgradedGift;
 
 //@description Contains result of gift upgrading
 //@gift The upgraded gift
@@ -1140,8 +1139,69 @@ upgradedGift id:int64 title:string name:string number:int32 total_upgraded_count
 //@is_saved True, if the gift is displayed on the user's or the channel's profile page
 //@can_be_transferred True, if the gift can be transferred to another owner
 //@transfer_star_count Number of Telegram Stars that must be paid to transfer the upgraded gift
+//@next_transfer_date Point in time (Unix timestamp) when the gift can be transferred to another owner; 0 if the gift can be transferred immediately or transfer isn't possible
+//@next_resale_date Point in time (Unix timestamp) when the gift can be resold to another user; 0 if the gift can't be resold; only for the receiver of the gift
 //@export_date Point in time (Unix timestamp) when the gift can be transferred to the TON blockchain as an NFT
-upgradeGiftResult gift:upgradedGift received_gift_id:string is_saved:Bool can_be_transferred:Bool transfer_star_count:int53 export_date:int32 = UpgradeGiftResult;
+upgradeGiftResult gift:upgradedGift received_gift_id:string is_saved:Bool can_be_transferred:Bool transfer_star_count:int53 next_transfer_date:int32 next_resale_date:int32 export_date:int32 = UpgradeGiftResult;
+
+//@description Describes a gift that is available for purchase
+//@gift The gift
+//@resale_count Number of gifts that are available for resale
+//@min_resale_star_count The minimum price for the gifts available for resale; 0 if there are no such gifts
+//@title The title of the upgraded gift; empty if the gift isn't available for resale
+availableGift gift:gift resale_count:int32 min_resale_star_count:int53 title:string = AvailableGift;
+
+//@description Contains a list of gifts that can be sent to another user or channel chat @gifts The list of gifts
+availableGifts gifts:vector<availableGift> = AvailableGifts;
+
+
+//@class UpgradedGiftAttributeId @description Contains identifier of an upgraded gift attribute to search for
+
+//@description Identifier of a gift model @sticker_id Identifier of the sticker representing the model
+upgradedGiftAttributeIdModel sticker_id:int64 = UpgradedGiftAttributeId;
+
+//@description Identifier of a gift symbol @sticker_id Identifier of the sticker representing the symbol
+upgradedGiftAttributeIdSymbol sticker_id:int64 = UpgradedGiftAttributeId;
+
+//@description Identifier of a gift backdrop @backdrop_id Identifier of the backdrop
+upgradedGiftAttributeIdBackdrop backdrop_id:int32 = UpgradedGiftAttributeId;
+
+
+//@description Describes a model of an upgraded gift with the number of gifts found @model The model @total_count Total number of gifts with the model
+upgradedGiftModelCount model:upgradedGiftModel total_count:int32 = UpgradedGiftModelCount;
+
+//@description Describes a symbol shown on the pattern of an upgraded gift @symbol The symbol @total_count Total number of gifts with the symbol
+upgradedGiftSymbolCount symbol:upgradedGiftSymbol total_count:int32 = UpgradedGiftSymbolCount;
+
+//@description Describes a backdrop of an upgraded gift @backdrop The backdrop @total_count Total number of gifts with the symbol
+upgradedGiftBackdropCount backdrop:upgradedGiftBackdrop total_count:int32 = UpgradedGiftBackdropCount;
+
+
+//@class GiftForResaleOrder @description Describes order in which upgraded gifts for resale will be sorted
+
+//@description The gifts will be sorted by their price from the lowest to the highest
+giftForResaleOrderPrice = GiftForResaleOrder;
+
+//@description The gifts will be sorted by the last date when their price was changed from the newest to the oldest
+giftForResaleOrderPriceChangeDate = GiftForResaleOrder;
+
+//@description The gifts will be sorted by their number from the smallest to the largest
+giftForResaleOrderNumber = GiftForResaleOrder;
+
+
+//@description Describes a gift available for resale
+//@gift The gift
+//@received_gift_id Unique identifier of the received gift for the current user; only for the gifts owned by the current user
+giftForResale gift:upgradedGift received_gift_id:string = GiftForResale;
+
+//@description Describes gifts available for resale
+//@total_count Total number of gifts found
+//@gifts The gifts
+//@models Available models; for searchGiftsForResale requests without offset and attributes only
+//@symbols Available symbols; for searchGiftsForResale requests without offset and attributes only
+//@backdrops Available backdrops; for searchGiftsForResale requests without offset and attributes only
+//@next_offset The offset for the next request. If empty, then there are no more results
+giftsForResale total_count:int32 gifts:vector<giftForResale> models:vector<upgradedGiftModelCount> symbols:vector<upgradedGiftSymbolCount> backdrops:vector<upgradedGiftBackdropCount> next_offset:string = GiftsForResale;
 
 
 //@class SentGift @description Represents content of a gift received by a user or a channel chat
@@ -1168,8 +1228,10 @@ sentGiftUpgraded gift:upgradedGift = SentGift;
 //@sell_star_count Number of Telegram Stars that can be claimed by the receiver instead of the regular gift; 0 if the gift can't be sold by the current user
 //@prepaid_upgrade_star_count Number of Telegram Stars that were paid by the sender for the ability to upgrade the gift
 //@transfer_star_count Number of Telegram Stars that must be paid to transfer the upgraded gift; only for the receiver of the gift
+//@next_transfer_date Point in time (Unix timestamp) when the gift can be transferred to another owner; 0 if the gift can be transferred immediately or transfer isn't possible; only for the receiver of the gift
+//@next_resale_date Point in time (Unix timestamp) when the gift can be resold to another user; 0 if the gift can't be resold; only for the receiver of the gift
 //@export_date Point in time (Unix timestamp) when the upgraded gift can be transferred to the TON blockchain as an NFT; 0 if NFT export isn't possible; only for the receiver of the gift
-receivedGift received_gift_id:string sender_id:MessageSender text:formattedText is_private:Bool is_saved:Bool is_pinned:Bool can_be_upgraded:Bool can_be_transferred:Bool was_refunded:Bool date:int32 gift:SentGift sell_star_count:int53 prepaid_upgrade_star_count:int53 transfer_star_count:int53 export_date:int32 = ReceivedGift;
+receivedGift received_gift_id:string sender_id:MessageSender text:formattedText is_private:Bool is_saved:Bool is_pinned:Bool can_be_upgraded:Bool can_be_transferred:Bool was_refunded:Bool date:int32 gift:SentGift sell_star_count:int53 prepaid_upgrade_star_count:int53 transfer_star_count:int53 next_transfer_date:int32 next_resale_date:int32 export_date:int32 = ReceivedGift;
 
 //@description Represents a list of gifts received by a user or a chat
 //@total_count The total number of received gifts
@@ -1299,6 +1361,15 @@ starTransactionTypeGiftSale user_id:int53 gift:gift = StarTransactionType;
 
 //@description The transaction is an upgrade of a gift; for regular users only @user_id Identifier of the user that initially sent the gift @gift The upgraded gift
 starTransactionTypeGiftUpgrade user_id:int53 gift:upgradedGift = StarTransactionType;
+
+//@description The transaction is a purchase of an upgraded gift for some user or channel; for regular users only @user_id Identifier of the user that sold the gift @gift The gift
+starTransactionTypeUpgradedGiftPurchase user_id:int53 gift:upgradedGift = StarTransactionType;
+
+//@description The transaction is a sale of an upgraded gift; for regular users only
+//@user_id Identifier of the user that bought the gift
+//@gift The gift
+//@affiliate Information about commission received by Telegram from the transaction
+starTransactionTypeUpgradedGiftSale user_id:int53 gift:upgradedGift affiliate:affiliateInfo = StarTransactionType;
 
 //@description The transaction is a sending of a paid reaction to a message in a channel chat by the current user; for regular users only
 //@chat_id Identifier of the channel chat
@@ -1773,6 +1844,7 @@ basicGroupFullInfo photo:chatPhoto description:string creator_user_id:int53 memb
 //-getUserPrivacySettingRules, getVideoChatAvailableParticipants, searchPublicChats, or in chatFolderInviteLinkInfo.missing_chat_ids, or in userFullInfo.personal_chat_id,
 //-or for chats with messages or stories from publicForwards and foundStories
 //@boost_level Approximate boost level for the chat
+//@has_automatic_translation True, if automatic translation of messages is enabled in the channel
 //@has_linked_chat True, if the channel has a discussion group, or the supergroup is the designated discussion group for a channel
 //@has_location True, if the supergroup is connected to a location, i.e. the supergroup is a location-based supergroup
 //@sign_messages True, if messages sent to the channel contains name of the sender. This field is only applicable to channels
@@ -1789,7 +1861,7 @@ basicGroupFullInfo photo:chatPhoto description:string creator_user_id:int53 memb
 //@paid_message_star_count Number of Telegram Stars that must be paid by non-administrator users of the supergroup chat for each sent message
 //@has_active_stories True, if the supergroup or channel has non-expired stories available to the current user
 //@has_unread_active_stories True, if the supergroup or channel has unread non-expired stories available to the current user
-supergroup id:int53 usernames:usernames date:int32 status:ChatMemberStatus member_count:int32 boost_level:int32 has_linked_chat:Bool has_location:Bool sign_messages:Bool show_message_sender:Bool join_to_send_messages:Bool join_by_request:Bool is_slow_mode_enabled:Bool is_channel:Bool is_broadcast_group:Bool is_forum:Bool verification_status:verificationStatus has_sensitive_content:Bool restriction_reason:string paid_message_star_count:int53 has_active_stories:Bool has_unread_active_stories:Bool = Supergroup;
+supergroup id:int53 usernames:usernames date:int32 status:ChatMemberStatus member_count:int32 boost_level:int32 has_automatic_translation:Bool has_linked_chat:Bool has_location:Bool sign_messages:Bool show_message_sender:Bool join_to_send_messages:Bool join_by_request:Bool is_slow_mode_enabled:Bool is_channel:Bool is_broadcast_group:Bool is_forum:Bool verification_status:verificationStatus has_sensitive_content:Bool restriction_reason:string paid_message_star_count:int53 has_active_stories:Bool has_unread_active_stories:Bool = Supergroup;
 
 //@description Contains full information about a supergroup or channel
 //@photo Chat photo; may be null if empty or unknown. If non-null, then it is the same photo as in chat.photo
@@ -4183,18 +4255,21 @@ messageGift gift:gift sender_id:MessageSender received_gift_id:string text:forma
 //@gift The gift
 //@sender_id Sender of the gift; may be null for anonymous gifts
 //@received_gift_id Unique identifier of the received gift for the current user; only for the receiver of the gift
-//@is_upgrade True, if the gift was obtained by upgrading of a previously received gift; otherwise, this is a transferred gift
+//@is_upgrade True, if the gift was obtained by upgrading of a previously received gift; otherwise, this is a transferred or resold gift
 //@is_saved True, if the gift is displayed on the user's or the channel's profile page; only for the receiver of the gift
 //@can_be_transferred True, if the gift can be transferred to another owner; only for the receiver of the gift
 //@was_transferred True, if the gift was transferred to another owner; only for the receiver of the gift
+//@last_resale_star_count Number of Telegram Stars that were paid by the sender for the gift; 0 if the gift was upgraded or transferred
 //@transfer_star_count Number of Telegram Stars that must be paid to transfer the upgraded gift; only for the receiver of the gift
+//@next_transfer_date Point in time (Unix timestamp) when the gift can be transferred to another owner; 0 if the gift can be transferred immediately or transfer isn't possible; only for the receiver of the gift
+//@next_resale_date Point in time (Unix timestamp) when the gift can be resold to another user; 0 if the gift can't be resold; only for the receiver of the gift
 //@export_date Point in time (Unix timestamp) when the gift can be transferred to the TON blockchain as an NFT; 0 if NFT export isn't possible; only for the receiver of the gift
-messageUpgradedGift gift:upgradedGift sender_id:MessageSender received_gift_id:string is_upgrade:Bool is_saved:Bool can_be_transferred:Bool was_transferred:Bool transfer_star_count:int53 export_date:int32 = MessageContent;
+messageUpgradedGift gift:upgradedGift sender_id:MessageSender received_gift_id:string is_upgrade:Bool is_saved:Bool can_be_transferred:Bool was_transferred:Bool last_resale_star_count:int53 transfer_star_count:int53 next_transfer_date:int32 next_resale_date:int32 export_date:int32 = MessageContent;
 
 //@description A gift which purchase, upgrade or transfer were refunded
 //@gift The gift
 //@sender_id Sender of the gift
-//@is_upgrade True, if the gift was obtained by upgrading of a previously received gift
+//@is_upgrade True, if the gift was obtained by upgrading of a previously received gift; otherwise, this is a transferred or resold gift
 messageRefundedUpgradedGift gift:gift sender_id:MessageSender is_upgrade:Bool = MessageContent;
 
 //@description Paid messages were refunded @message_count The number of refunded messages @star_count The number of refunded Telegram Stars
@@ -5118,9 +5193,10 @@ botMediaPreviewInfo previews:vector<botMediaPreview> language_codes:vector<strin
 //@chat_theme_background_count Number of chat theme backgrounds that can be set as chat background
 //@can_set_custom_background True, if custom background can be set in the chat for all users
 //@can_set_custom_emoji_sticker_set True, if custom emoji sticker set can be set for the chat
+//@can_enable_automatic_translation True, if automatic translation of messages can be enabled in the chat
 //@can_recognize_speech True, if speech recognition can be used for video note and voice note messages by all users
 //@can_disable_sponsored_messages True, if sponsored messages can be disabled in the chat
-chatBoostLevelFeatures level:int32 story_per_day_count:int32 custom_emoji_reaction_count:int32 title_color_count:int32 profile_accent_color_count:int32 can_set_profile_background_custom_emoji:Bool accent_color_count:int32 can_set_background_custom_emoji:Bool can_set_emoji_status:Bool chat_theme_background_count:int32 can_set_custom_background:Bool can_set_custom_emoji_sticker_set:Bool can_recognize_speech:Bool can_disable_sponsored_messages:Bool = ChatBoostLevelFeatures;
+chatBoostLevelFeatures level:int32 story_per_day_count:int32 custom_emoji_reaction_count:int32 title_color_count:int32 profile_accent_color_count:int32 can_set_profile_background_custom_emoji:Bool accent_color_count:int32 can_set_background_custom_emoji:Bool can_set_emoji_status:Bool chat_theme_background_count:int32 can_set_custom_background:Bool can_set_custom_emoji_sticker_set:Bool can_enable_automatic_translation:Bool can_recognize_speech:Bool can_disable_sponsored_messages:Bool = ChatBoostLevelFeatures;
 
 //@description Contains a list of features available on the first chat boost levels
 //@features The list of features
@@ -5130,9 +5206,10 @@ chatBoostLevelFeatures level:int32 story_per_day_count:int32 custom_emoji_reacti
 //@min_chat_theme_background_boost_level The minimum boost level required to set a chat theme background as chat background
 //@min_custom_background_boost_level The minimum boost level required to set custom chat background
 //@min_custom_emoji_sticker_set_boost_level The minimum boost level required to set custom emoji sticker set for the chat; for supergroup chats only
+//@min_automatic_translation_boost_level The minimum boost level allowing to enable automatic translation of messages for non-Premium users; for channel chats only
 //@min_speech_recognition_boost_level The minimum boost level allowing to recognize speech in video note and voice note messages for non-Premium users; for supergroup chats only
 //@min_sponsored_message_disable_boost_level The minimum boost level allowing to disable sponsored messages in the chat; for channel chats only
-chatBoostFeatures features:vector<chatBoostLevelFeatures> min_profile_background_custom_emoji_boost_level:int32 min_background_custom_emoji_boost_level:int32 min_emoji_status_boost_level:int32 min_chat_theme_background_boost_level:int32 min_custom_background_boost_level:int32 min_custom_emoji_sticker_set_boost_level:int32 min_speech_recognition_boost_level:int32 min_sponsored_message_disable_boost_level:int32 = ChatBoostFeatures;
+chatBoostFeatures features:vector<chatBoostLevelFeatures> min_profile_background_custom_emoji_boost_level:int32 min_background_custom_emoji_boost_level:int32 min_emoji_status_boost_level:int32 min_chat_theme_background_boost_level:int32 min_custom_background_boost_level:int32 min_custom_emoji_sticker_set_boost_level:int32 min_automatic_translation_boost_level:int32 min_speech_recognition_boost_level:int32 min_sponsored_message_disable_boost_level:int32 = ChatBoostFeatures;
 
 
 //@class ChatBoostSource @description Describes source of a chat boost
@@ -6058,6 +6135,9 @@ chatEventSignMessagesToggled sign_messages:Bool = ChatEventAction;
 //@description The show_message_sender setting of a channel was toggled @show_message_sender New value of show_message_sender
 chatEventShowMessageSenderToggled show_message_sender:Bool = ChatEventAction;
 
+//@description The has_automatic_translation setting of a channel was toggled @has_automatic_translation New value of has_automatic_translation
+chatEventAutomaticTranslationToggled has_automatic_translation:Bool = ChatEventAction;
+
 //@description A chat invite link was edited @old_invite_link Previous information about the invite link @new_invite_link New information about the invite link
 chatEventInviteLinkEdited old_invite_link:chatInviteLink new_invite_link:chatInviteLink = ChatEventAction;
 
@@ -6650,8 +6730,8 @@ hashtags hashtags:vector<string> = Hashtags;
 
 //@class CanPostStoryResult @description Represents result of checking whether the current user can post a story on behalf of the specific chat
 
-//@description A story can be sent
-canPostStoryResultOk = CanPostStoryResult;
+//@description A story can be sent @story_count Number of stories that can be posted by the user
+canPostStoryResultOk story_count:int32 = CanPostStoryResult;
 
 //@description The user must subscribe to Telegram Premium to be able to post stories
 canPostStoryResultPremiumNeeded = CanPostStoryResult;
@@ -6804,7 +6884,7 @@ pushMessageContentGiveaway winner_count:int32 prize:GiveawayPrize is_pinned:Bool
 pushMessageContentGift star_count:int53 = PushMessageContent;
 
 //@description A message with an upgraded gift
-//@is_upgrade True, if the gift was obtained by upgrading of a previously received gift; otherwise, this is a transferred gift
+//@is_upgrade True, if the gift was obtained by upgrading of a previously received gift; otherwise, this is a transferred or resold gift
 pushMessageContentUpgradedGift is_upgrade:Bool = PushMessageContent;
 
 //@description A screenshot of a message in the chat has been taken
@@ -7433,6 +7513,9 @@ internalLinkTypeMessage url:string = InternalLinkType;
 //@contains_link True, if the first line of the text contains a link. If true, the input field needs to be focused and the text after the link must be selected
 internalLinkTypeMessageDraft text:formattedText contains_link:Bool = InternalLinkType;
 
+//@description The link is a link to the screen with information about Telegram Star balance and transactions of the current user
+internalLinkTypeMyStars = InternalLinkType;
+
 //@description The link contains a request of Telegram passport data. Call getPassportAuthorizationForm with the given parameters to process the link if the link was received from outside of the application; otherwise, ignore it
 //@bot_user_id User identifier of the service's bot; the corresponding user may be unknown yet
 //@scope Telegram Passport element types requested by the service
@@ -7888,6 +7971,13 @@ suggestedActionExtendPremium manage_premium_subscription_url:string = SuggestedA
 //@description Suggests the user to extend their expiring Telegram Star subscriptions. Call getStarSubscriptions with only_expiring == true
 //-to get the number of expiring subscriptions and the number of required to buy Telegram Stars
 suggestedActionExtendStarSubscriptions = SuggestedAction;
+
+//@description A custom suggestion to be shown at the top of the chat list
+//@name Unique name of the suggestion
+//@title Title of the suggestion
+//@param_description Description of the suggestion
+//@url The link to open when the suggestion is clicked
+suggestedActionCustom name:string title:formattedText description:formattedText url:string = SuggestedAction;
 
 
 //@description Contains a counter @count Count
@@ -12050,6 +12140,12 @@ toggleSupergroupIsAllHistoryAvailable supergroup_id:int53 is_all_history_availab
 //@can_have_sponsored_messages The new value of can_have_sponsored_messages
 toggleSupergroupCanHaveSponsoredMessages supergroup_id:int53 can_have_sponsored_messages:Bool = Ok;
 
+//@description Toggles whether messages are automatically translated in the channel chat; requires can_change_info administrator right in the channel.
+//-The chat must have at least chatBoostFeatures.min_automatic_translation_boost_level boost level to enable automatic translation
+//@supergroup_id The identifier of the channel
+//@has_automatic_translation The new value of has_automatic_translation
+toggleSupergroupHasAutomaticTranslation supergroup_id:int53 has_automatic_translation:Bool = Ok;
+
 //@description Toggles whether non-administrators can receive only administrators and bots using getSupergroupMembers or searchChatMembers. Can be called only if supergroupFullInfo.can_hide_members == true
 //@supergroup_id Identifier of the supergroup
 //@has_hidden_members New value of has_hidden_members
@@ -12139,7 +12235,7 @@ deleteSavedCredentials = Ok;
 setGiftSettings settings:giftSettings = Ok;
 
 //@description Returns gifts that can be sent to other users and channel chats
-getAvailableGifts = Gifts;
+getAvailableGifts = AvailableGifts;
 
 //@description Sends a gift to another user or channel chat. May return an error with a message "STARGIFT_USAGE_LIMITED" if the gift was sold out
 //@gift_id Identifier of the gift to send
@@ -12187,6 +12283,13 @@ upgradeGift business_connection_id:string received_gift_id:string keep_original_
 //@star_count The amount of Telegram Stars required to pay for the transfer
 transferGift business_connection_id:string received_gift_id:string new_owner_id:MessageSender star_count:int53 = Ok;
 
+//@description Sends an upgraded gift that is available for resale to another user or channel chat; gifts already owned by the current user
+//-must be transferred using transferGift and can't be passed to the method
+//@gift_name Name of the upgraded gift to send
+//@owner_id Identifier of the user or the channel chat that will receive the gift
+//@star_count The amount of Telegram Stars required to pay for the gift
+sendResoldGift gift_name:string owner_id:MessageSender star_count:int53 = Ok;
+
 //@description Returns gifts received by the given user or chat
 //@business_connection_id Unique identifier of business connection on behalf of which to send the request; for bots only
 //@owner_id Identifier of the gift receiver
@@ -12211,6 +12314,20 @@ getUpgradedGift name:string = UpgradedGift;
 //@password The 2-step verification password of the current user
 getUpgradedGiftWithdrawalUrl received_gift_id:string password:string = HttpUrl;
 
+//@description Changes resale price of a unique gift owned by the current user
+//@received_gift_id Identifier of the unique gift
+//@resale_star_count The new price for the unique gift; 0 or getOption("gift_resale_star_count_min")-getOption("gift_resale_star_count_max"). Pass 0 to disallow gift resale.
+//-The current user will receive getOption("gift_resale_earnings_per_mille") Telegram Stars for each 1000 Telegram Stars paid for the gift
+setGiftResalePrice received_gift_id:string resale_star_count:int53 = Ok;
+
+//@description Returns upgraded gifts that can be bought from other owners
+//@gift_id Identifier of the regular gift that was upgraded to a unique gift
+//@order Order in which the results will be sorted
+//@attributes Attributes used to filter received gifts. If multiple attributes of the same type are specified, then all of them are allowed.
+//-If none attributes of specific type are specified, then all values for this attribute type are allowed
+//@offset Offset of the first entry to return as received from the previous request with the same order and attributes; use empty string to get the first chunk of results
+//@limit The maximum number of gifts to return
+searchGiftsForResale gift_id:int64 order:GiftForResaleOrder attributes:vector<UpgradedGiftAttributeId> offset:string limit:int32 = GiftsForResale;
 
 //@description Creates a link for the given invoice; for bots only
 //@business_connection_id Unique identifier of business connection on behalf of which to send the request
