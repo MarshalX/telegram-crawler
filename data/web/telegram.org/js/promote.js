@@ -578,74 +578,7 @@ var NewAd = {
       cont.on('click.curPage', '.js-prev-sample-results', NewAd.ePrevSampleResults);
       cont.on('click.curPage', '.js-next-sample-results', NewAd.eNextSampleResults);
       $('.js-schedule-overview', state.$form).html(NewAd.scheduleOverview(state.$form));
-      for (var i = 0; i < state.selectList.length; i++) {
-        var selectData = state.selectList[i];
-        if (selectData.channel_search) {
-          Ads.initSelect(state.$form, selectData.field, {
-            items: Aj.state[selectData.items_key] || [],
-            pairedField: selectData.paired_field || false,
-            l_limit: (selectData.limit_error || ''),
-            renderSelectedItem: function(val, item) {
-              return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
-            },
-            onEnter: NewAd.onChannelSearch,
-            onUpdate: NewAd.onSelectUpdate,
-            onChange: Ads.onSelectChange
-          });
-        } else if (selectData.bot_search) {
-          Ads.initSelect(state.$form, selectData.field, {
-            items: Aj.state[selectData.items_key] || [],
-            pairedField: selectData.paired_field || false,
-            l_limit: (selectData.limit_error || ''),
-            renderSelectedItem: function(val, item) {
-              return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
-            },
-            onEnter: NewAd.onBotSearch,
-            onUpdate: NewAd.onSelectUpdate,
-            onChange: Ads.onSelectChange
-          });
-        } else if (selectData.location_search) {
-          var $cFieldEl = state.$form.field(selectData.c_field).fieldEl();
-          $cFieldEl.data('l_field', selectData.field);
-          $cFieldEl.on('valueupdate', NewAd.updateLocationFields);
-          Ads.initSelect(state.$form, selectData.field, {
-            items: Aj.state[selectData.items_key] || [],
-            renderItem: function(item) {
-              return '<div class="select-list-item">' + (item.name + (item.region ? ', ' + item.region : '')) + '</div>';
-            },
-            getData: function(query, items, opts) {
-              return NewAd.getLocationData(items, opts.field, opts.c_field, query);
-            },
-            getDataOpts: {
-              field: selectData.field,
-              c_field: selectData.c_field,
-            },
-            onBlur: NewAd.onLocationSelectBlur,
-            onUpdate: NewAd.onSelectUpdate,
-            onChange: NewAd.onLocationSelectChange
-          });
-        } else if (selectData.query_search) {
-          Ads.initSelect(state.$form, selectData.field, {
-            items: Aj.state[selectData.items_key] || [],
-            l_limit: (selectData.limit_error || ''),
-            renderSelectedItem: function(val, item) {
-              return '<div class="selected-item" data-val="' + cleanHTML(val.toString()) + '"><span class="close"></span><div class="label">' + item.name + '</div></div>';
-            },
-            onValueFocus: NewAd.onTargetQueryFocus,
-            onEnter: NewAd.onTargetQuerySearch,
-            onUpdate: NewAd.onTargetQueryUpdate,
-            onChange: Ads.onSelectChange
-          });
-        } else {
-          Ads.initSelect(state.$form, selectData.field, {
-            items: Aj.state[selectData.items_key] || [],
-            pairedField: selectData.paired_field || false,
-            l_no_items_found: (selectData.no_items_error || ''),
-            onUpdate: NewAd.onSelectUpdate,
-            onChange: Ads.onSelectChange
-          });
-        }
-      }
+      NewAd.initSelectList(state);
       state.titleField = state.$form.field('title');
       state.titleField.on('change.curPage', NewAd.onTitleChange);
       state.textField = state.$form.field('text');
@@ -736,6 +669,78 @@ var NewAd = {
       }
       clearTimeout(state.saveDraftTo);
     });
+  },
+  initSelectList: function(state) {
+    if (!state.selectList) return;
+    for (var i = 0; i < state.selectList.length; i++) {
+      var selectData = state.selectList[i];
+      if (selectData.channel_search) {
+        Ads.initSelect(state.$form, selectData.field, {
+          items: Aj.state[selectData.items_key] || [],
+          pairedField: selectData.paired_field || false,
+          l_limit: (selectData.limit_error || ''),
+          renderSelectedItem: function(val, item) {
+            return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
+          },
+          onEnter: NewAd.onChannelSearch,
+          onUpdate: NewAd.onSelectUpdate,
+          onChange: Ads.onSelectChange
+        });
+      } else if (selectData.bot_search) {
+        Ads.initSelect(state.$form, selectData.field, {
+          items: Aj.state[selectData.items_key] || [],
+          pairedField: selectData.paired_field || false,
+          l_limit: (selectData.limit_error || ''),
+          renderSelectedItem: function(val, item) {
+            return '<div class="selected-item' + (item.photo ? ' has-photo' : '') + '" data-val="' + cleanHTML(val.toString()) + '">' + (item.photo ? '<div class="selected-item-photo">' + item.photo + '</div>' : '') + '<span class="close"></span><div class="label">' + item.name + '</div></div>';
+          },
+          onEnter: NewAd.onBotSearch,
+          onUpdate: NewAd.onSelectUpdate,
+          onChange: Ads.onSelectChange
+        });
+      } else if (selectData.location_search) {
+        var $cFieldEl = state.$form.field(selectData.c_field).fieldEl();
+        $cFieldEl.data('l_field', selectData.field);
+        $cFieldEl.on('valueupdate', NewAd.updateLocationFields);
+        Ads.initSelect(state.$form, selectData.field, {
+          items: Aj.state[selectData.items_key] || [],
+          renderItem: function(item) {
+            return '<div class="select-list-item">' + (item.name + (item.region ? ', ' + item.region : '')) + '</div>';
+          },
+          getData: function(query, items, opts) {
+            return NewAd.getLocationData(items, opts.field, opts.c_field, query);
+          },
+          getDataOpts: {
+            field: selectData.field,
+            c_field: selectData.c_field,
+          },
+          onBlur: NewAd.onLocationSelectBlur,
+          onUpdate: NewAd.onSelectUpdate,
+          onChange: NewAd.onLocationSelectChange
+        });
+      } else if (selectData.query_search) {
+        Ads.initSelect(state.$form, selectData.field, {
+          items: Aj.state[selectData.items_key] || [],
+          l_limit: (selectData.limit_error || ''),
+          renderSelectedItem: function(val, item) {
+            return '<div class="selected-item" data-val="' + cleanHTML(val.toString()) + '"><span class="close"></span><div class="label">' + item.name + '</div></div>';
+          },
+          onValueFocus: NewAd.onTargetQueryFocus,
+          onEnter: NewAd.onTargetQuerySearch,
+          onUpdate: NewAd.onTargetQueryUpdate,
+          onChange: Ads.onSelectChange
+        });
+      } else {
+        Ads.initSelect(state.$form, selectData.field, {
+          items: Aj.state[selectData.items_key] || [],
+          pairedField: selectData.paired_field || false,
+          noMultiSelect: selectData.single_value || false,
+          l_no_items_found: (selectData.no_items_error || ''),
+          onUpdate: NewAd.onSelectUpdate,
+          onChange: Ads.onSelectChange
+        });
+      }
+    }
   },
   onTitleChange: function() {
     Ads.hideFieldError($(this));
@@ -924,7 +929,7 @@ var NewAd = {
       for (var i = 0; i < Aj.state.selectList.length; i++) {
         var selectData = Aj.state.selectList[i];
         var values = $form.field(selectData.field).data('value') || [];
-        params[selectData.field] = values.join(';');
+        params[selectData.field] = selectData.single_value ? values : values.join(';');
       }
     }
     $formGroup.addClass('field-loading');
@@ -1269,22 +1274,22 @@ var NewAd = {
     }
     var selOpts = $fieldEl.data('selOpts');
     var paired_field = selOpts.pairedField;
-    if (!paired_field) {
+    if (paired_field) {
+      var $pairedField = Aj.state.$form.field(paired_field);
+      if ($pairedField.data('inited')) {
+        var paired_value = $pairedField.data('value');
+        var paired_valueFull = $pairedField.data('valueFull');
+        valueFull && $.each(valueFull, function(val, item) {
+          if (paired_valueFull[val]) {
+            $pairedField.trigger('deselectval', [val]);
+            $pairedField.data('prevval', '');
+          }
+        });
+      }
+    }
+    if (!Aj.state.adId) {
       NewAd.updateAdTargetOverview();
-      return;
     }
-    var $pairedField = Aj.state.$form.field(paired_field);
-    if ($pairedField.data('inited')) {
-      var paired_value = $pairedField.data('value');
-      var paired_valueFull = $pairedField.data('valueFull');
-      valueFull && $.each(valueFull, function(val, item) {
-        if (paired_valueFull[val]) {
-          $pairedField.trigger('deselectval', [val]);
-          $pairedField.data('prevval', '');
-        }
-      });
-    }
-    NewAd.updateAdTargetOverview();
   },
   eDeselectAll: function(e) {
     e.preventDefault();
@@ -1812,13 +1817,14 @@ var NewAd = {
     }
     if ($cont) {
       $('.js-promote-photo', $cont).toggleClass('can-replace', !!isWebsite);
-      if (isWebsite) {
-        $('.js-field-website_name-wrap', $cont).slideShow();
-      } else {
-        $('.js-field-website_name-wrap', $cont).slideHide();
+      if (!isWebsite) {
         $websiteNameField.value('');
         $websitePhotoField.value('');
       }
+      var $websiteNameWrap = $('.js-field-website_name-wrap', $cont);
+      $websiteNameWrap.slideToggle(!!isWebsite);
+      var $convEventWrap = $('.js-field-conversion_event-wrap', $cont);
+      $convEventWrap.slideToggle(!!isWebsite);
       var $buttonWrap = $('.js-field-button-wrap', $cont);
       Aj.state.customButton = customButton;
       $buttonWrap.slideToggle(!!Aj.state.customButton && !(cur_type == 'search' || cur_type == 'bots'));
@@ -2051,8 +2057,19 @@ var NewAd = {
       var selectData = Aj.state.selectList[i];
       var field = selectData.field;
       var $field = Aj.state.$form.field(field);
-      var value = $field.data('value') || [];
-      var valueFull = $field.data('valueFull') || {};
+      if (selectData.single_value) {
+        var val1 = $field.data('value') || '';
+        var val1Full = $field.data('valueFull') || {};
+        var value = [];
+        var valueFull = {};
+        if (val1) {
+          value.push(val1);
+          valueFull[val1] = val1Full;
+        }
+      } else {
+        var value = $field.data('value') || [];
+        var valueFull = $field.data('valueFull') || {};
+      }
       len[field] = value.length;
       if (value.length) {
         var list = [];
@@ -2208,7 +2225,7 @@ var NewAd = {
       for (var i = 0; i < Aj.state.selectList.length; i++) {
         var selectData = Aj.state.selectList[i];
         var vals = $form.field(selectData.field).data('value') || [];
-        values.push(vals.join(';'));
+        values.push(selectData.single_value ? vals : vals.join(';'));
       }
     }
     if ($form.field('intersect_topics').prop('checked')) {
@@ -2319,7 +2336,7 @@ var NewAd = {
       for (var i = 0; i < Aj.state.selectList.length; i++) {
         var selectData = Aj.state.selectList[i];
         var values = $form.field(selectData.field).data('value') || [];
-        params[selectData.field] = values.join(';');
+        params[selectData.field] = selectData.single_value ? values : values.join(';');
       }
     }
     if ($form.field('intersect_topics').prop('checked')) {
@@ -2437,7 +2454,7 @@ var NewAd = {
       for (var i = 0; i < Aj.state.selectList.length; i++) {
         var selectData = Aj.state.selectList[i];
         var values = $form.field(selectData.field).data('value') || [];
-        params[selectData.field] = values.join(';');
+        params[selectData.field] = selectData.single_value ? values : values.join(';');
       }
     }
     if ($form.field('intersect_topics').prop('checked')) {
@@ -2980,8 +2997,8 @@ var OwnerAds = {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
       state.$searchField = $('.pr-search-input');
-      state.$adsListTable = $('.pr-table');
-      state.$searchResults = $('.pr-table tbody');
+      state.$adsListTable = $('.js-ads-table');
+      state.$searchResults = $('.js-ads-table-body');
       Ads.fieldInit(state.$searchField);
       cont.on('click.curPage', '.pr-cell-sort', OwnerAds.eSortList);
       cont.on('click.curPage', '.pr-table-settings', OwnerAds.eSettingsOpen);
@@ -3017,15 +3034,17 @@ var OwnerAds = {
             var promote_url_text = l('WEB_ADS_NO_TME_LINK');
             var promote_link = '<span class="pr-no-tme-link">' + promote_url_text + '</span>';
           }
-          var joins = item.joins !== false ? formatNumber(item.joins) : '–';
           var opens = item.opens !== false ? formatNumber(item.opens) : '–';
           var clicks = item.clicks !== false ? formatNumber(item.clicks) : '–';
+          var actions = item.actions !== false ? formatNumber(item.actions) : '–';
+          var action = item.action !== false ? '<br>' + item.action : '';
           var ctr = item.ctr !== false ? item.ctr + '%' : '–';
+          var cvr = item.cvr !== false ? item.cvr + '%' : '–';
           var cpc = item.cpc !== false ? Ads.wrapAmount(item.cpc) : '–';
-          var cps = item.cps !== false ? Ads.wrapAmount(item.cps) : '–';
+          var cpa = item.cpa !== false ? Ads.wrapAmount(item.cpa) : '–';
           var daily_spent  = item.daily_spent !== false ? '<small><br>' + Ads.wrapAmount(item.daily_spent)+'</small>' : '';
           var daily_budget = item.daily_budget !== false ? '<small><br><a href="' + item.base_url + '/edit_daily_budget" data-layer>' + Ads.wrapAmount(item.daily_budget)+'</a></small>' : '';
-          return '<td><div class="pr-cell pr-cell-title ' + title_class + '"><a href="' + item.base_url + '"class="pr-link">' + item.title + '</a><small style="display:var(--coldp-url,inline)"><br>' + promote_link + '</small></div></td><td style="display:var(--coldp-views,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + formatNumber(item.views) + '</a></div></td><td style="display:var(--coldp-opens,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + opens + '</a></div></td><td style="display:var(--coldp-clicks,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + clicks + '</a></div></td><td style="display:var(--coldp-joins,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + joins + '</a></div></td><td style="display:var(--coldp-ctr,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + ctr + '</a></div></td><td style="display:var(--coldp-cpm,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + Ads.wrapAmount(item.cpm) + '</a></div></td><td style="display:var(--coldp-cpc,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + cpc + '</a></div></td><td style="display:var(--coldp-cps,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + cps + '</a></div></td><td style="display:var(--coldp-spent,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + Ads.wrapAmount(item.spent) + daily_spent + '</a></div></td><td style="display:var(--coldp-budget,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + Ads.wrapAmount(item.budget) + '</a>' + daily_budget + '</div></td><td style="display:var(--coldp-target,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + item.target + '</a></div></td><td style="display:var(--coldp-status,table-cell)"><div class="pr-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td style="display:var(--coldp-date,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + Ads.formatTableDate(item.date) + '</a></div></td><td><div class="pr-actions-cell">' + Aj.state.adsDropdownTpl.replace(/\{ad_id\}/g, item.ad_id).replace(/\{promote_url\}/g, promote_url).replace(/\{promote_url_text\}/g, promote_url_text).replace(/\{ad_text\}/g, item.text) + '</div></td>';
+          return '<td><div class="pr-cell pr-cell-title ' + title_class + '"><a href="' + item.base_url + '"class="pr-link">' + item.title + '</a><small style="display:var(--coldp-url,inline)"><br>' + promote_link + '</small></div></td><td style="display:var(--coldp-views,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + formatNumber(item.views) + '</a></div></td><td style="display:var(--coldp-opens,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + opens + '</a></div></td><td style="display:var(--coldp-clicks,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + clicks + '</a></div></td><td style="display:var(--coldp-actions,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + actions + '</a><small style="display:var(--coldp-action,inline)">' + action + '</small></div></td><td style="display:var(--coldp-ctr,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + ctr + '</a></div></td><td style="display:var(--coldp-cvr,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + cvr + '</a></div></td><td style="display:var(--coldp-cpm,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_cpm" data-layer>' + Ads.wrapAmount(item.cpm) + '</a></div></td><td style="display:var(--coldp-cpc,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + cpc + '</a></div></td><td style="display:var(--coldp-cpa,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + cpa + '</a></div></td><td style="display:var(--coldp-spent,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/stats" class="pr-link">' + Ads.wrapAmount(item.spent) + daily_spent + '</a></div></td><td style="display:var(--coldp-budget,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '/edit_budget" data-layer>' + Ads.wrapAmount(item.budget) + '</a>' + daily_budget + '</div></td><td style="display:var(--coldp-target,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + item.target + '</a></div></td><td style="display:var(--coldp-status,table-cell)"><div class="pr-cell"><a' + status_attrs + '>' + item.status + '</a></div></td><td style="display:var(--coldp-date,table-cell)"><div class="pr-cell"><a href="' + item.base_url + '" class="pr-link">' + Ads.formatTableDate(item.date) + '</a></div></td><td><div class="pr-actions-cell">' + Aj.state.adsDropdownTpl.replace(/\{ad_id\}/g, item.ad_id).replace(/\{promote_url\}/g, promote_url).replace(/\{promote_url_text\}/g, promote_url_text).replace(/\{ad_text\}/g, item.text) + '</div></td>';
         },
         renderLoading: function() {
           return '<tr><td colspan="100" class="pr-cell-empty"><div class="pr-cell">' + l('WEB_OWNER_ADS_LOADING') + '</div></td></tr>';
@@ -3576,6 +3595,7 @@ var EditAd = {
       cont.on('click.curPage', '.js-deactivate-date-remove', NewAd.eRemoveEndDate);
       cont.on('click.curPage', '.js-open-schedule', NewAd.eOpenSchedule);
       $('.js-schedule-overview', state.$form).html(NewAd.scheduleOverview(state.$form));
+      NewAd.initSelectList(state);
       state.titleField = state.$form.field('title');
       state.titleField.on('change.curPage', NewAd.onTitleChange);
       state.textField = state.$form.field('text');
@@ -3653,6 +3673,16 @@ var EditAd = {
       $form.field('schedule_tz').value(),
       $form.field('views_per_user').value()
     ];
+    if ($form.field('picture').prop('checked')) {
+      values.push('picture');
+    }
+    if (Aj.state.selectList) {
+      for (var i = 0; i < Aj.state.selectList.length; i++) {
+        var selectData = Aj.state.selectList[i];
+        var vals = $form.field(selectData.field).data('value') || [];
+        values.push(selectData.single_value ? vals : vals.join(';'));
+      }
+    }
     return values.join('|');
   },
   eSelectPlaceholder: function() {
@@ -4187,6 +4217,13 @@ var EditAd = {
     if ($form.field('picture').prop('checked')) {
       params.picture = 1;
     }
+    if (Aj.state.selectList) {
+      for (var i = 0; i < Aj.state.selectList.length; i++) {
+        var selectData = Aj.state.selectList[i];
+        var values = $form.field(selectData.field).data('value') || [];
+        params[selectData.field] = selectData.single_value ? values : values.join(';');
+      }
+    }
     if (activate_date) {
       params.activate_date = activate_date;
     }
@@ -4579,7 +4616,7 @@ var Audiences = {
     var cont = Aj.ajContainer;
     Aj.onLoad(function(state) {
       state.$searchField = $('.pr-search-input');
-      state.$searchResults = $('.pr-table tbody');
+      state.$searchResults = $('.js-audiences-table-body');
       Ads.fieldInit(state.$searchField);
       cont.on('click.curPage', '.pr-cell-sort', Audiences.eSortList);
       cont.on('click.curPage', '.js-create-audience-ad-btn', Audiences.createAudienceAd);
@@ -4999,6 +5036,358 @@ var Audiences = {
     };
     $button.prop('disabled', true);
     Aj.apiRequest('deleteAudience', params, onSuccess);
+    return false;
+  }
+};
+
+var Events = {
+  init: function() {
+    var cont = Aj.ajContainer;
+    Aj.onLoad(function(state) {
+      state.$searchField = $('.pr-search-input');
+      state.$searchResults = $('.js-events-table-body');
+      Ads.fieldInit(state.$searchField);
+      cont.on('click.curPage', '.pr-cell-sort', Events.eSortList);
+      cont.on('click.curPage', '.js-create-pixel-btn', Events.createPixel);
+      cont.on('click.curPage', '.delete-event-btn', Events.deleteEvent);
+      state.$searchResults.on('mouseover mouseout click', '.js-hint-tooltip', Ads.eHintEvent);
+      $(document).on('touchstart click', Ads.eHideAllHints);
+
+      state.listInited = false;
+      state.needUpdateState = false;
+      state.$searchField.initSearch({
+        $results: state.$searchResults,
+        emptyQueryEnabled: true,
+        updateOnInit: true,
+        resultsNotScrollable: true,
+        itemTagName: 'tr',
+        enterEnabled: function() {
+          return false;
+        },
+        renderItem: function(item, query) {
+          var mtime = item.mtime !== false ? '<small><br>' + Ads.formatTableDate(item.mtime) + '</small>' : '';
+          return '<td><div class="pr-cell pr-cell-title">' + item.title + '<small><br>' + item.tag_id + '</small></div></td><td><div class="pr-cell">' + item.type + '</div></td><td><div class="pr-cell">' + item.status + mtime + '</div></td><td><div class="pr-cell">' + item.used + '</div></td><td><div class="pr-actions-cell">' + (item.can_edit ? Aj.state.eventDropdownTpl : Aj.state.eventReadonlyDropdownTpl).replace(/{event_id}/g, item.event_id) + '</div></td>';
+        },
+        getData: function() {
+          if (!state.listInited) {
+            state.listInited = true;
+            var items = Aj.state.eventsList;
+            for (var i = 0; i < items.length; i++) {
+              var item = items[i];
+              item.base_url = '/account/event/' + item.event_id;
+              item._values = [item.title.toLowerCase()];
+              if (item.need_update) {
+                state.needUpdateState = true;
+              }
+            }
+            Events.updateEventsState();
+          }
+          return Aj.state.eventsList;
+        }
+      });
+    });
+    Aj.onUnload(function(state) {
+      state.$searchResults.off('mouseover mouseout click', '.js-hint-tooltip', Ads.eHintEvent);
+      $(document).off('touchstart click', Ads.eHideAllHints);
+      clearTimeout(Aj.state.updateStateTo);
+      Ads.fieldDestroy(state.$searchField);
+      state.$searchField.destroySearch();
+    });
+  },
+  eSortList: function(e) {
+    var $sortEl = $(this);
+    var sortBy  = $sortEl.attr('data-sort-by');
+    var sortAsc = $sortEl.hasClass('sort-asc');
+    if (sortBy == Aj.state.eventsListSortBy) {
+      Aj.state.eventsListSortAsc = !sortAsc;
+    } else {
+      Aj.state.eventsListSortBy = sortBy;
+      Aj.state.eventsListSortAsc = false;
+    }
+    Events.updateEventsList();
+    Aj.state.$searchField.trigger('datachange');
+  },
+  updateEventsList: function() {
+    if (Aj.state.eventsList) {
+      var sortBy  = Aj.state.eventsListSortBy;
+      var sortAsc = Aj.state.eventsListSortAsc;
+      $('.pr-cell-sort').each(function() {
+        var $sortEl = $(this);
+        var curSortBy  = $sortEl.attr('data-sort-by');
+        $sortEl.toggleClass('sort-active', sortBy == curSortBy);
+        $sortEl.toggleClass('sort-asc', sortAsc && sortBy == curSortBy);
+      });
+      Aj.state.eventsList.sort(function(ad1, ad2) {
+        var v1 = sortAsc ? ad1 : ad2;
+        var v2 = sortAsc ? ad2 : ad1;
+        return (v1[sortBy] - v2[sortBy]) || (v1.date - v2.date);
+      });
+    }
+  },
+  updateEventsState: function() {
+    if (!Aj.state || !Aj.state.eventsList || !Aj.state.needUpdateState) {
+      return;
+    }
+    Aj.state.needUpdateState = false;
+    Aj.state.updateStateTo = setTimeout(function() {
+      Aj.apiRequest('updateEventsState', {
+        owner_id: Aj.state.ownerId
+      }, function(result) {
+        if (result.error) {
+          return showAlert(result.error);
+        }
+        if (result.events) {
+          for (var i = 0; i < result.events.length; i++) {
+            Events.updateEvent(result.events[i], true);
+          }
+          Events.updateEventsList();
+          Aj.state.$searchField.trigger('contentchange');
+          Events.updateEventsState();
+        }
+      });
+    }, 400);
+  },
+  updateEvent: function(event, no_update) {
+    if (!Aj.state || !Aj.state.eventsList) {
+      return;
+    }
+    var eventsList = Aj.state.eventsList;
+    for (var i = 0; i < eventsList.length; i++) {
+      if (event.owner_id == eventsList[i].owner_id &&
+          event.event_id == eventsList[i].event_id) {
+        event.base_url = '/account/event/' + event.event_id;
+        event._values = [event.title.toLowerCase()];
+        eventsList[i] = event;
+        if (event.need_update) {
+          Aj.state.needUpdateState = true;
+        }
+        if (!no_update) {
+          Events.updateEventsList();
+          Aj.state.$searchField.trigger('contentchange');
+          Events.updateEventsState();
+        }
+        return;
+      }
+    }
+  },
+  initCreatePopup: function() {
+    var cont = Aj.layer;
+    Aj.onLayerLoad(function(layerState) {
+      layerState.$form = $('.pr-popup-edit-form', cont);
+      Ads.formInit(layerState.$form);
+      layerState.titleField = layerState.$form.field('title');
+      layerState.titleField.on('change.curPage', NewAd.onTitleChange);
+      Aj.layer.one('popup:open', function() {
+        layerState.titleField.focusAndSelect(true);
+      });
+      layerState.$form.on('submit', Events.eSubmitCreatePopupForm);
+      cont.on('click.curLayer', '.submit-form-btn', Events.eSubmitCreatePopupForm);
+    });
+    Aj.onLayerUnload(function(layerState) {
+      Ads.formDestroy(layerState.$form);
+      layerState.$form.off('submit', Events.eSubmitCreatePopupForm);
+      layerState.titleField.off('.curPage');
+    });
+  },
+  eSubmitCreatePopupForm: function(e) {
+    e.preventDefault();
+    var $form    = Aj.layerState.$form;
+    var owner_id = $form.field('owner_id').value();
+    var title    = $form.field('title').value();
+    var type     = $form.field('type').data('value');
+    if ($form.data('disabled')) {
+      return false;
+    }
+    if (!title.length) {
+      $form.field('title').focus();
+      return false;
+    }
+    var params = {
+      owner_id: owner_id,
+      title:    title,
+      type:     type
+    };
+    $form.data('disabled', true);
+    Aj.apiRequest('createEvent', params, function(result) {
+      $form.data('disabled', false);
+      if (result.error) {
+        if (result.field) {
+          var $field = $form.field(result.field);
+          if ($field.size()) {
+            Ads.showFieldError($field, result.error, true);
+            return false;
+          }
+        }
+        return showAlert(result.error);
+      }
+      closePopup(Aj.layer);
+      if (result.event && Aj.state.eventsList) {
+        Aj.state.eventsList.push(result.event);
+        Events.updateEvent(result.event);
+      }
+      if (result.event_opt && Aj.state.convEventItems) {
+        Aj.state.convEventItems.push(result.event_opt);
+        for (var i = 0; i < Aj.state.selectList.length; i++) {
+          var selectData = Aj.state.selectList[i];
+          if (selectData.items_key == 'convEventItems') {
+            var $fieldEl = Aj.state.$form.field(selectData.field);
+            $fieldEl.trigger('datachange');
+            if (selectData.add_new_event) {
+              $fieldEl.trigger('selectval', [result.event_opt, true]);
+            }
+          }
+        }
+      }
+      if (result.to_layer) {
+        Aj.layerLocation(result.to_layer);
+      }
+    });
+    return false;
+  },
+  initEditTitlePopup: function() {
+    var cont = Aj.layer;
+    Aj.onLayerLoad(function(layerState) {
+      layerState.$form = $('.pr-popup-edit-form', cont);
+      Ads.formInit(layerState.$form);
+      layerState.titleField = layerState.$form.field('title');
+      layerState.titleField.on('change.curPage', NewAd.onTitleChange);
+      Aj.layer.one('popup:open', function() {
+        layerState.titleField.focusAndSelect(true);
+      });
+      layerState.$form.on('submit', Events.eSubmitEditTitlePopupForm);
+      cont.on('click.curLayer', '.submit-form-btn', Events.eSubmitEditTitlePopupForm);
+    });
+    Aj.onLayerUnload(function(layerState) {
+      Ads.formDestroy(layerState.$form);
+      layerState.$form.off('submit', Events.eSubmitEditTitlePopupForm);
+      layerState.titleField.off('.curPage');
+    });
+  },
+  eSubmitEditTitlePopupForm: function(e) {
+    e.preventDefault();
+    var $form    = Aj.layerState.$form;
+    var owner_id = $form.field('owner_id').value();
+    var event_id = $form.field('event_id').value();
+    var title    = $form.field('title').value();
+    if ($form.data('disabled')) {
+      return false;
+    }
+    if (!title.length) {
+      $form.field('title').focus();
+      return false;
+    }
+    var params = {
+      owner_id: owner_id,
+      event_id: event_id,
+      title:    title
+    };
+    $form.data('disabled', true);
+    Aj.apiRequest('editEventTitle', params, function(result) {
+      $form.data('disabled', false);
+      if (result.error) {
+        if (result.field) {
+          var $field = $form.field(result.field);
+          if ($field.size()) {
+            Ads.showFieldError($field, result.error, true);
+            return false;
+          }
+        }
+        return showAlert(result.error);
+      }
+      closePopup(Aj.layer);
+      if (result.event) {
+        Events.updateEvent(result.event);
+      }
+    });
+    return false;
+  },
+  initSetupPopup: function() {
+    var cont = Aj.layer;
+    Aj.onLayerLoad(function(layerState) {
+      cont.on('click.curLayer', '.js-copy-field-btn', Events.eCopyField);
+    });
+  },
+  eCopyField: function(e) {
+    e.preventDefault();
+    var field = $(this).attr('data-field');
+    var value = $(this).parents('.form-group').find('.form-control').val();
+    copyToClipboard(value);
+    showToast(l('WEB_CODE_SAMPLE_COPIED', 'Copied.'));
+  },
+  deletePopup: function (confirm_text, onConfirm) {
+    var $confirm = $('<div class="popup-container hide alert-popup-container"><section class="pr-layer-popup pr-layer-delete-ad popup-no-close"><h3 class="pr-layer-header">' + l('WEB_DELETE_EVENT_CONFIRM_HEADER') + '</h3><p class="pr-layer-text"></p><div class="popup-buttons"><div class="popup-button popup-cancel-btn">' + l('WEB_POPUP_CANCEL_BTN') + '</div><div class="popup-button popup-primary-btn">' + l('WEB_DELETE_EVENT_CONFIRM_BUTTON') + '</div></div></section></div>');
+    var confirm = function() {
+      onConfirm && onConfirm($confirm);
+      closePopup($confirm);
+    }
+    $('.pr-layer-text', $confirm).html(confirm_text);
+    var $primaryBtn = $('.popup-primary-btn', $confirm);
+    $primaryBtn.on('click', confirm);
+    $confirm.one('popup:close', function() {
+      $primaryBtn.off('click', confirm);
+      $confirm.remove();
+    });
+    openPopup($confirm, {
+      closeByClickOutside: '.popup-no-close',
+    });
+    return $confirm;
+  },
+  createPixel: function(e) {
+    e.preventDefault();
+    var $button = $(this);
+    if ($button.prop('disabled')) {
+      return false;
+    }
+    var params = {
+      owner_id: Aj.state.ownerId
+    };
+    $button.prop('disabled', true);
+    Aj.apiRequest('createPixel', params, function(result) {
+      $button.prop('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.redirect_to) {
+        Aj.location(result.redirect_to);
+      } else if (result.to_layer) {
+        Aj.layerLocation(result.to_layer);
+      }
+    });
+    return false;
+  },
+  deleteEvent: function(e) {
+    e.preventDefault();
+    var $button = $(this);
+    if ($button.prop('disabled')) {
+      return false;
+    }
+    var $item = $button.parents('li');
+    var event_id = Aj.state.eventId;
+    if ($item.size()) {
+      $item.parents('.open').find('.dropdown-toggle').dropdown('toggle');
+      event_id = $(this).parents('[data-event-id]').attr('data-event-id');
+    }
+    var params = {
+      owner_id: Aj.state.ownerId,
+      event_id: event_id
+    };
+    var onSuccess = function(result) {
+      $button.prop('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.confirm_text && result.confirm_hash) {
+        Events.deletePopup(result.confirm_text, function() {
+          params.confirm_hash = result.confirm_hash;
+          $button.prop('disabled', true);
+          Aj.apiRequest('deleteEvent', params, onSuccess);
+        });
+      } else if (result.redirect_to) {
+        Aj.location(result.redirect_to);
+      }
+    };
+    $button.prop('disabled', true);
+    Aj.apiRequest('deleteEvent', params, onSuccess);
     return false;
   }
 };
