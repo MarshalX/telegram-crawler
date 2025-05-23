@@ -68,9 +68,16 @@
       <div class="form-group">
         <input type="hidden" class="form-control" id="support_lang" name="setln" value="">
       </div>
-      
+        <div class="form-group">
+    <div class="turnstile-wrapper">
+      <div class="cf-challenge"
+           data-sitekey="0x4AAAAAABeXKow67DnvUBPD"
+           data-callback="onTurnstileSuccess"
+           data-theme="auto"></div>
+    </div>
+  </div>
       <div class="support_submit">
-        <button type="submit" class="btn btn-primary btn-lg js-captcha-controlled-btn">Submit</button>
+        <button type="submit" class="btn btn-primary btn-lg js-captcha-controlled-btn"disabled>Submit</button>
       </div>
     </form>
   </div>
@@ -136,8 +143,38 @@
   </div>
 </div>
     <script src="/js/main.js?47"></script>
-    
-    <script>backToTopInit("Go up");
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?1"></script>
+<script src="/js/jquery.min.js?1"></script>
+<script src="/js/jquery-ui.min.js?1"></script>
+<script src="/js/main-aj.js?71"></script>
+<script src="/js/jquery-ex.js?22"></script>
+
+    <script>  function onTurnstileSuccess(token, attemptCount) {
+    var currentAttempt = attemptCount || 1;
+  
+    $.ajax('/support/captcha', {
+      type: 'POST',
+      data: {token: token},
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true
+      },
+      success: function(result, s, xhr) {
+        if (result.error) {
+          return showAlert(result.error);
+        }
+        if (result.pending) {
+          if (currentAttempt >= 20) {
+            return false;
+          }
+          setTimeout(function() { onTurnstileSuccess(token, currentAttempt + 1); }, 200);
+          return false;
+        }
+        $('.js-captcha-controlled-btn').prop('disabled', false);
+      }
+    });
+  }
+backToTopInit("Go up");
 removePreloadInit();
 </script>
   </body>
