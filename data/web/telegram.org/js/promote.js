@@ -614,6 +614,8 @@ var NewAd = {
       state.useScheduleCheckbox.on('change.curPage', NewAd.onUseScheduleChange);
       state.deviceField = state.$form.field('device');
       state.deviceField.on('ddchange.curPage', NewAd.onDeviceChange);
+      state.placementRadio = state.$form.field('placement');
+      state.placementRadio.fieldEl().on('change.curPage', NewAd.onPlacementChange);
       state.confirmedCheckbox = state.$form.field('confirmed');
       state.confirmedCheckbox.on('change.curPage', NewAd.onConfirmedChange);
       state.similarChannelsPopup = $('.js-similar-channels-popup', cont);
@@ -658,6 +660,7 @@ var NewAd = {
       state.excludePoliticCheckbox.off('.curPage');
       state.onlyPoliticCheckbox.off('.curPage');
       state.activeRadio.fieldEl().off('.curPage');
+      state.placementRadio.fieldEl().off('.curPage');
       state.useScheduleCheckbox.off('.curPage');
       state.deviceField.off('.curPage');
       for (var i = 0; i < state.selectList.length; i++) {
@@ -758,18 +761,60 @@ var NewAd = {
       }
     });
     var $form = Aj.state.$form;
-    var $pictureWrap = $('.js-field-picture-wrap');
-    var $textWrap = $('.js-field-text-wrap', $form);
-    var $mediaWrap = $('.js-field-media-wrap', $form);
-    var $buttonWrap = $('.js-field-button-wrap', $form);
-    $pictureWrap.slideToggle(!(cur_type == 'search'));
-    $textWrap.slideToggle(!(cur_type == 'search'));
-    $mediaWrap.slideToggle(!(cur_type == 'search' || cur_type == 'bots'));
-    $buttonWrap.slideToggle(!!Aj.state.customButton && !(cur_type == 'search' || cur_type == 'bots'));
+    NewAd.updateFieldsVisibility();
 
     $('.js-schedule-overview', $form).html(NewAd.scheduleOverview($form));
     NewAd.updateAdTargetOverview();
     NewAd.adPostCheck($form);
+  },
+  onPlacementChange: function() {
+    var cur_placement = this.value;
+    var $cont = $(this).parents('.pr-target-options');
+    $('.js-preview', $cont).each(function() {
+      var visible = $(this).attr('data-placement') == cur_placement;
+      $(this).toggleClass('hide', !visible);
+    });
+    var $form = Aj.state.$form;
+    NewAd.updateFieldsVisibility();
+    NewAd.adPostCheck($form);
+  },
+  updateFieldsVisibility: function() {
+    var $form = Aj.state.$form;
+    var target_type = $form.field('target_type').value();
+    var fv = {};
+    if (target_type == 'channels' ||
+        target_type == 'users') {
+      fv.text = true;
+      fv.media = true;
+      fv.button = true;
+      fv.picture = true;
+      if (target_type == 'users') {
+        var placement = $form.field('placement').value();
+        if (placement == 'video_banner') {
+          fv.media = false;
+          fv.button = false;
+        }
+      }
+      var $mediaField = Aj.state.mediaField;
+      var has_media = $mediaField.value() || $mediaField.data('has-media');
+      if (fv.media && has_media) {
+        fv.picture = false;
+      }
+    } else if (target_type == 'bots') {
+      fv.text = true;
+      fv.picture = true;
+    }
+    var media_on = !!$form.field('media').value();
+    var picture_checked = $form.field('picture').prop('checked');
+    var $textWrap = $('.js-field-text-wrap', $form);
+    var $mediaWrap = $('.js-field-media-wrap', $form);
+    var $buttonWrap = $('.js-field-button-wrap', $form);
+    var $pictureWrap = $('.js-field-picture-wrap');
+    $textWrap.slideToggle(!!fv.text);
+    $mediaWrap.slideToggle(!!fv.media);
+    $pictureWrap.slideToggle(!!fv.picture);
+    $buttonWrap.slideToggle(!!Aj.state.customButton && !!fv.button);
+    $('.js-preview', $form).toggleClass('picture', !!fv.picture && picture_checked).toggleClass('media', !!fv.media && media_on);
   },
   onPictureChange: function() {
     var $form = $(this.form);
@@ -902,6 +947,7 @@ var NewAd = {
     var website_photo = websitePhotoField.value();
     var media = mediaField.value();
     var target_type = $form.field('target_type').value();
+    var placement = $form.field('placement').value();
     var $formGroup = promoteUrlField.fieldEl().parents('.form-group');
     var $cpmFormGroup = cpmField.fieldEl().parents('.form-group');
     var device = deviceField.data('value');
@@ -917,7 +963,8 @@ var NewAd = {
       website_photo: website_photo,
       media: media,
       device: device,
-      target_type: target_type
+      target_type: target_type,
+      placement: placement
     };
     if (Aj.state.adId) {
       params.ad_id = Aj.state.adId;
@@ -1717,19 +1764,16 @@ var NewAd = {
     var $mediaWrap = $('.js-ad-media-wrap', $formGroup);
     var $content = $('.js-ad-media-content', $mediaWrap);
     var $button = $('.js-add-media-btn', $formGroup);
-    var $pictureWrap = $('.js-field-picture-wrap', $form);
     var has_media = $field.value() || $field.data('has-media');
-    var cur_type = $form.field('target_type').value();
     NewAd.initAdMedia($mediaWrap);
     if (has_media) {
       $button.html(l('WEB_AD_MEDIA_CHANGE_BUTTON'));
-      $pictureWrap.slideHide();
       $mediaWrap.slideShow();
     } else {
       $button.html(l('WEB_AD_MEDIA_UPLOAD_BUTTON'));
-      $pictureWrap.slideToggle(!(cur_type == 'search'));
       $mediaWrap.slideHide();
     }
+    NewAd.updateFieldsVisibility();
     $mediaWrap.removeClass('file-loading');
     $previewEl = $field.data('$previewEl');
     if ($previewEl) {
@@ -1781,7 +1825,7 @@ var NewAd = {
         Ads.updateTextShadow(this, '.js-preview-text', '.label', 10);
       });
       $('.js-field-picture-label', $form).html(previewData.picture_label);
-      $('.js-preview', $form).toggleClass('picture', !!previewData.picture);
+      $('.js-preview', $form).toggleClass('picture', !!previewData.picture).toggleClass('media', !!previewData.media_on);
       $('.js-picture-hint', $form).html(previewData.picture_hint);
       $('.js-cpm-extra', $form).html(previewData.cpm_extra);
       $('.js-cpm-extra-tooltip', $form).html(previewData.cpm_extra_tooltip);
@@ -1825,9 +1869,8 @@ var NewAd = {
       $websiteNameWrap.slideToggle(!!isWebsite);
       var $convEventWrap = $('.js-field-conversion_event-wrap', $cont);
       $convEventWrap.slideToggle(!!isWebsite);
-      var $buttonWrap = $('.js-field-button-wrap', $cont);
       Aj.state.customButton = customButton;
-      $buttonWrap.slideToggle(!!Aj.state.customButton && !(cur_type == 'search' || cur_type == 'bots'));
+      NewAd.updateFieldsVisibility();
     }
   },
   scheduleOverview: function($form) {
@@ -2216,6 +2259,7 @@ var NewAd = {
       $form.field('schedule_tz_custom').value(),
       $form.field('schedule_tz').value(),
       $form.field('target_type').value(),
+      $form.field('placement').value(),
       $form.field('device').data('value')
     ];
     if ($form.field('picture').prop('checked')) {
@@ -2289,6 +2333,7 @@ var NewAd = {
     var schedule_tz_custom = $form.field('schedule_tz_custom').value();
     var schedule_tz = $form.field('schedule_tz').value();
     var target_type = $form.field('target_type').value();
+    var placement   = $form.field('placement').value();
     var device      = $form.field('device').data('value');
 
     if (!title.length) {
@@ -2327,6 +2372,7 @@ var NewAd = {
       daily_budget: daily_budget,
       active: active,
       target_type: target_type,
+      placement: placement,
       device: device
     };
     if ($form.field('picture').prop('checked')) {
@@ -2423,6 +2469,7 @@ var NewAd = {
     var schedule_tz_custom = $form.field('schedule_tz_custom').value();
     var schedule_tz = $form.field('schedule_tz').value();
     var target_type = $form.field('target_type').value();
+    var placement   = $form.field('placement').value();
     var device      = $form.field('device').data('value');
 
     var curFormData = NewAd.getFormData($form);
@@ -2445,6 +2492,7 @@ var NewAd = {
       daily_budget: daily_budget,
       active: active,
       target_type: target_type,
+      placement: placement,
       device: device
     };
     if ($form.field('picture').prop('checked')) {
@@ -2511,6 +2559,7 @@ var NewAd = {
     $form.field('budget').value('');
     $form.field('daily_budget').value('');
     $form.field('active').value('1');
+    $form.field('placement').value('channel_post');
     $form.field('ad_activate_date').trigger('selectval', ['']);
     $form.field('ad_activate_time').trigger('selectval', ['']);
     $form.field('ad_deactivate_date').trigger('selectval', ['']);
