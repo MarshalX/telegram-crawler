@@ -73,6 +73,8 @@ function ajInit(options) {
     layer: false
   };
 
+  delete options.state; 
+  
   if (options.layer) {
     Aj.layer = $('#layer-popup-container');
     Aj.layerState = options.layerState || {};

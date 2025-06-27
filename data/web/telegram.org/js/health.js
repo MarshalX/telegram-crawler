@@ -5,6 +5,14 @@ function prepareGraphJson(json) {
       json[k] = eval('(' + json[k] + ')');
     }
   });
+  var customFormatters;
+  if (customFormatters = json.yCustomTooltipFormatters) {
+    for (var k in customFormatters) {
+      if (typeof customFormatters[k] === 'string') {
+        customFormatters[k] = eval('(' + customFormatters[k] + ')');
+      }
+    };
+  }
   console.log('new json', json);
   return json;
 }
@@ -201,20 +209,25 @@ function statsFormatAxisAmount(value) {
   return statsFormatAxisAmountTpl('€ {value}', 1000000, value, 2);
 }
 
-function statsFormatAmountTpl(tpl, factor, value, decimals) {
+function statsFormatAmountTpl(tpl, factor, value, decimals, rate) {
   decimals = decimals || 0;
   var max_decimals = Math.log10(factor);
   while (value % Math.pow(10, max_decimals - decimals) &&
          value < Math.pow(10, max_decimals + 4 - decimals)) {
     decimals++;
   }
+  var def_val = '';
+  if (rate && rate != 1) {
+    def_val = statsFormatAmount(value);
+    value /= rate;
+  }
   value = formatNumber(value / factor, decimals, '.', ',');
-  return tpl.replace('{value}', value);
+  return tpl.replace('{value}', value) + (def_val ? ' = ' + def_val : '');
 }
 
-function statsFormatAmountFn(tpl, factor, decimals) {
+function statsFormatAmountFn(tpl, factor, decimals, rate) {
   return function(value) {
-    return statsFormatAmountTpl(tpl, factor, value, decimals || 0);
+    return statsFormatAmountTpl(tpl, factor, value, decimals || 0, rate || 0);
   };
 }
 
