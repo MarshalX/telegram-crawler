@@ -3267,6 +3267,9 @@
   WebApp.invokeCustomMethod = function (method, params, callback) {
     invokeCustomMethod(method, params, callback);
   };
+  WebApp.hideKeyboard = function () {
+    WebView.postEvent('web_app_hide_keyboard');
+  };
   WebApp.ready = function () {
     WebView.postEvent('web_app_ready');
   };
