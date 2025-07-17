@@ -434,6 +434,9 @@ var Ads = {
     $('.pr-review-ad-preview .js-preview-text tg-emoji', cont).each(function() {
       TEmoji.init(this);
     });
+    $('.pr-target-intro-sticker tg-emoji', cont).each(function() {
+      TEmoji.init(this);
+    });
     $('.pr-review-ad-preview .js-preview-media', cont).each(function() {
       NewAd.initAdMedia(this);
     });

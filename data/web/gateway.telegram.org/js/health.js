@@ -312,7 +312,7 @@ function statsOnZoom(zoomToken) {
     if (zoomToken) {
       return zoomGraphX(x, zoomToken);
     } else {
-      return Promise.reject();
+      return Promise.reject('default');
     }
   }
 }
