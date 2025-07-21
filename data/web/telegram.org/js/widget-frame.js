@@ -1348,6 +1348,7 @@ function checkFrameSize() {
           imageEl.style.backgroundImage = "url('" + img.src + "')";
         }
         img.src = imgEl.src;
+        return;
       }
       failed_callback();
     };
