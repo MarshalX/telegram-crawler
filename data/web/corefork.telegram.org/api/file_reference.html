@@ -42,18 +42,114 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/file_reference" >File references</a></li></ul></div>
   <h1 id="dev_page_title">File references</h1>
   
-  <div id="dev_page_content"><p>File references are strings of bytes, that can be encountered in the <code>file_reference</code> fields of <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.</p>
-<p>They must be cached by the client, along with the <strong>origin context</strong> where the document/photo object was found, in order to be refetched when the file reference expires.</p>
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>File references are strings of bytes, that can be encountered in the <code>file_reference</code> fields of <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.</p>
+<p>They must be cached by the client, along with the <strong>origin</strong> where the document/photo object was found, in order to be refetched when the file reference expires.</p>
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
-<h4><a class="anchor" href="#another-example" id="another-example" name="another-example"><i class="anchor-icon"></i></a>Another example:</h4>
+<h3><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h3>
+<p>Implementation and maintenance of the file reference database may be fully automated by using the following <strong>file reference origin definition file</strong>.  </p>
+<p><a href="/file/400780400444/3/jKO0ymBF6rY.20581.json/3363b6d0eab5f40cc7">Latest file reference origin definition file for the current layer »</a></p>
+<p>First, some definitions:</p>
+<ul>
+<li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
+<li>A <strong>file reference origin</strong> contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </li>
+</ul>
+<p>The definition file contains <strong>all possible origins</strong>, for <strong>all possible file reference paths</strong>.  </p>
+<p>It is automatically generated and validated by the <a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">file reference origin generator</a> using a set of manually-specified rules (specifying the actual origins) and the latest API schema, to make sure that:</p>
+<ul>
+<li>
+<p>All possible and valid places where a <code>file_reference</code> appears have at least one valid associated origin: this is checked by recursively checking all possible deserialized object graphs, starting from:</p>
+<ul>
+<li>All constructors of type <code>Update</code></li>
+<li>All constructors which are directly returned by at least one method.</li>
+<li>All constructors which are directly returned by at least one method inside of a vector.</li>
+</ul>
+<p>This covers all possible TL payloads received from the API, which can only return method call responses, or <a href="/type/Update">Update</a> constructors contained inside <a href="/type/Updates">Updates</a>.  </p>
+<p>For example, when checking the graph of the <a href="/constructor/updateNewMessage">updateNewMessage</a> constructor, the following file reference paths are found:</p>
+<pre><code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference
+updateNewMessage.message -&gt; message.reply_to -&gt; messageReplyHeader.reply_media -&gt; messageMediaDocument.document -&gt; document.file_reference
+updateNewMessage.message -&gt; message.media -&gt; messageMediaInvoice.extended_media -&gt; messageExtendedMedia.media -&gt; messageMediaDocument.document -&gt; document.file_reference
+... and many others</code></pre>
+<p>... and for all paths, the system makes sure that at least one origin covers the path.  </p>
+</li>
+<li>
+<p>All origins must be used in at least one path.</p>
+</li>
+<li>
+<p>All paths covered by origins which make use of flag fields (which may be absent, leading to an orphan, context-less file reference) must be covered by at least one non-flagged origin (or the flagged origin must be non-flagged in the specified path).  </p>
+<p>For example, the file reference path <code>updateStory.story -&gt; storyItem.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code> <em>would</em> rely on the origin <code>getStory{peer: storyItem.from_id, story_id: storyItem.id}</code> with <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.  </p>
+<p>However, the <code>from_id</code> field of <a href="/constructor/storyItem">storyItem</a> is actually a flag and in this specific path it is <strong>not</strong> set (it's only set when a <a href="/constructor/storyItem">storyItem</a> is returned by <a href="/method/stories.getAllStories">stories.getAllStories</a>).</p>
+<p>The validator noticed that, which forced the manual addition of the valid fallback origin <code>getStory{peer: updateStory.peer, story_id: updateStory.story -&gt; storyItem.id}</code>, which is present in the final origin definition file.  </p>
+</li>
+</ul>
+<p>The definition file uses the following TL schema:</p>
+<pre><code>// Root
+fileReferenceOrigins ctxs:Vector&lt;origin&gt; = FileReferenceOrigins;
+
+origin constructor:string action:ActionOp = origin;
+
+// For string =&gt; TypedOp dictionaries
+typedOpArg key:string value:TypedOp = TypedOpArg;
+typedOpArgs args:Vector&lt;TypedOpArg&gt; = TypedOpArgs;
+
+// Actions
+callOp method:string args:TypedOpArgs = ActionOp;
+copyMethodCallOp method:string = ActionOp;
+getMessageOp args:TypedOpArgs = ActionOp;
+noOp why:string = ActionOp;
+
+// Field extraction path
+pathPart flags:# constructor:string param:string is_flag:flags.0?true fallback_if_flag_empty:flags.1?TypedOp flag_passthrough:flags.2?true unpack_vector:flags.3?true = PathPart;
+
+path parts:Vector&lt;PathPart&gt; = Path;
+
+// Typed constructors, the type is specified to simplify codegen,
+// but isn't strictly necessary as it can be inferred from the TypedOpOp.
+// It is fully pre-validated during the generation of the definition file.
+typedOp type:string op:TypedOpOp = TypedOp;
+
+// The actual operation that extracts the concrete value.
+extractFromHereOp path:Path = TypedOpOp;
+
+getInputChannelByIdOp from:Path = TypedOpOp;
+getInputUserByIdOp from:Path = TypedOpOp;
+
+getInputPeerOp from:Path = TypedOpOp;
+getInputUserOp from:Path = TypedOpOp;
+getInputChannelOp from:Path = TypedOpOp;
+
+// Literals &amp; constructors (methods not allowed or needed here)
+constructorOp constructor:string args:TypedOpArgs = TypedOpOp;
+
+vectorOp value:Vector&lt;TypedOp&gt; = TypedOpOp;
+
+intLiteralOp value:int = TypedOpOp;
+longLiteralOp value:long = TypedOpOp;
+stringLiteralOp value:string = TypedOpOp;
+boolLiteralOp value:bool = TypedOpOp;
+floatLiteralOp value:float = TypedOpOp;
+themeFormatLiteralOp = TypedOpOp;</code></pre>
+<p>Here's a detailed description of the constructors.</p>
+<h4><a class="anchor" href="#root" id="root" name="root"><i class="anchor-icon"></i></a>Root</h4>
+<pre><code>fileReferenceOrigins ctxs:Vector&lt;origin&gt; = FileReferenceOrigins;
+
+origin constructor:string action:ActionOp = origin;
+</code></pre>
+<p>The definition file is composed of a single <code>fileReferenceOrigins</code> constructor, which contains a list of <code>origin</code> constructors.  </p>
+<p>Each <code>origin</code> represents a file reference origin:</p>
+<ul>
+<li><code>constructor</code> - Indicates the constructor</li>
+</ul>
+<h3><a class="anchor" href="#another-example" id="another-example" name="another-example"><i class="anchor-icon"></i></a>Another example:</h3>
 <p>Assume you receive a <a href="/constructor/message">message</a> from your friend: that message contains a <a href="/constructor/messageMediaPhoto">messageMediaPhoto</a> with a <a href="/constructor/photo">photo</a>.</p>
 <p>Your client has to cache not only the <code>file_reference</code> field of the photo, but also the context in which the file reference was seen (in this case, a message coming from a specific user).</p>
-<p>The context info is in this case, <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L74">an origin context of type message</a>, containing the message ID and the peer ID of the chat/channel/user where the message was seen.</p>
+<p>The context info is in this case, <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L74">an origin of type message</a>, containing the message ID and the peer ID of the chat/channel/user where the message was seen.</p>
 <p>The context info has to be associated with the file reference: when downloading a file using <a href="/method/upload.getFile">upload.getFile</a> or resending it using <a href="/method/messages.sendMedia">messages.sendMedia</a>, a <code>FILE_REFERENCE_EXPIRED</code> error may be returned.<br>
 <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> returns a variation of the same error, as a <code>FILE_REFERENCE_%d_EXPIRED</code> error (where <code>%d</code> is the index of the media with the expired file reference in the passed media array).<br>
 If this happens, the context info must be used to refetch the object that contained the file reference: in this example, the peer info and the message ID have to be used with <a href="/method/channels.getMessages">channels.getMessages</a> or <a href="/method/messages.getMessages">messages.getMessages</a> to <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L481">refetch the message</a>, recache the file reference and use it in a new file download request.</p>
-<p>More than one origin context can be associated to one file reference, for greater resilience (in the case of a message that was deleted in one chat but was also forwarded in another chat, the file reference can be refetched from the second chat, instead).</p>
-<p>Origin contexts for objects returned by method calls with certain parameters can be considered, too (for example, in the case of favorited sticker sets returned by <a href="/method/messages.getFavedStickers">messages.getFavedStickers</a>).</p></div>
+<p>More than one origin can be associated to one file reference, for greater resilience (in the case of a message that was deleted in one chat but was also forwarded in another chat, the file reference can be refetched from the second chat, instead).</p>
+<p>Origins for objects returned by method calls with certain parameters can be considered, too (for example, in the case of favorited sticker sets returned by <a href="/method/messages.getFavedStickers">messages.getFavedStickers</a>).</p></div>
   
 </div>
           
@@ -117,8 +213,11 @@ If this happens, the context info must be used to refetch the object that contai
 </div>
     </div>
     <script src="/js/main.js?47"></script>
-    
-    <script>backToTopInit("Go up");
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
 removePreloadInit();
 </script>
   </body>
