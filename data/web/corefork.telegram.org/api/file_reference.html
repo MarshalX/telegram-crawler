@@ -147,7 +147,7 @@ origin flags:# predicate:string is_constructor:flags.0?true action:flags.1?Actio
 <p>Each <code>origin</code> represents a constructor or method file reference origin:</p>
 <ul>
 <li><code>predicate</code> - Indicates the name of the constructor or of the method where extraction of the origin fields must start.</li>
-<li><code>is_constructor</code> - If set, <code>predicate</code> points to a constructor, otherwise it poitns to a method.</li>
+<li><code>is_constructor</code> - If set, <code>predicate</code> points to a constructor, otherwise it points to a method.</li>
 <li><code>needs_parent</code> - If set, contains the name of a constructor which needs to appear as a parent in the deserialized object or a method whose response we're deserializing, as it will be used by one or more of the paths in the action.</li>
 <li><code>parent_is_constructor</code> - If set, <code>needs_parent</code> points to a constructor; otherwise it points to a method.</li>
 <li><code>action</code> - <em>Optional</em>: contains the method that needs to be invoked to refresh the reference, when needed.  </li>
@@ -192,7 +192,7 @@ typedOp type:string op:TypedOpOp = TypedOp;</code></pre>
 <p><code>callOp.args</code> will always contain at least all of the required parameters, and possibly some flagged parameters as well.  </p>
 <h5><a class="anchor" href="#getmessageop" id="getmessageop" name="getmessageop"><i class="anchor-icon"></i></a><code>getMessageOp</code></h5>
 <p><code>getMessageOp</code> is a specialized action which invokes either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <code>peer</code>, passing the <code>id</code> as the only element to the vector <code>id</code> parameter.<br>
-If the <code>from_scheduled</code> flag is present and set, <a href="/method/messages.getScheduledMessages">messages.getScheduledMessages</a> should be executed instead.  </p>
+If the <code>from_scheduled</code> flag is present and set, and the flag to which the path points is also set, <a href="/method/messages.getScheduledMessages">messages.getScheduledMessages</a> should be executed instead.  </p>
 <h4><a class="anchor" href="#action-parameters" id="action-parameters" name="action-parameters"><i class="anchor-icon"></i></a>Action parameters</h4>
 <pre><code>copyOp path:Path = TypedOpOp;
 copyFromParentOp path:Path = TypedOpOp;
@@ -220,8 +220,8 @@ themeFormatLiteralOp = TypedOpOp;</code></pre>
 <p>Action parameters are represented by <code>TypedOpOp</code> constructors.  </p>
 <h5><a class="anchor" href="#copyop" id="copyop" name="copyop"><i class="anchor-icon"></i></a><code>copyOp</code></h5>
 <p>The most commonly used type, copies the value(s) at the specified <a href="#paths">path »</a>.</p>
-<h5><a class="anchor" href="#copyop" id="copyop" name="copyop"><i class="anchor-icon"></i></a><code>copyOp</code></h5>
-<p>Copies the value(s) at the specified <a href="#paths">path »</a>.</p>
+<h5><a class="anchor" href="#copyfromparentop" id="copyfromparentop" name="copyfromparentop"><i class="anchor-icon"></i></a><code>copyFromParentOp</code></h5>
+<p>Copies the value(s) at the specified <a href="#paths">path »</a>, starting from the constructor/method specified in <code>origin.needs_parent</code>.</p>
 <h5><a class="anchor" href="#getinputchannelbyidop" id="getinputchannelbyidop" name="getinputchannelbyidop"><i class="anchor-icon"></i></a><code>getInputChannelByIdOp</code></h5>
 <p>Returns an <a href="/type/InputChannel">InputChannel</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the channel ID of type <a href="/constructor/int">long</a> specified in <code>path</code>.  </p>
 <h5><a class="anchor" href="#getinputuserbyidop" id="getinputuserbyidop" name="getinputuserbyidop"><i class="anchor-icon"></i></a><code>getInputUserByIdOp</code></h5>
@@ -262,11 +262,6 @@ pathParent parts:Vector&lt;PathPart&gt; = Path;</code></pre>
 <li>The constructor/method of the parent contained in <code>origin.needs_parent</code>, for <code>pathParent</code></li>
 </ul>
 <p>A path is composed of multiple <code>pathPart</code>s.  </p>
-<p>Note: when the following instructions tell to "abort extraction", what actually should happen is:</p>
-<ul>
-<li>If the current path up until this point contained at least one unpacked vector element, skip to the next array element in the path.</li>
-<li>Otherwise, abort extraction altogether and skip adding the origin to the database.</li>
-</ul>
 <p>Each <code>pathPart</code> contains the following fields, which describe how to extract the field.  </p>
 <ul>
 <li><code>constructor</code> - Indicates the required constructor/method predicate. 
