@@ -56,7 +56,7 @@
 <li>A <strong>file reference origin</strong> contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </li>
 </ul>
 <p>The definition file contains <strong>all possible origins</strong>, for <strong>all possible file reference paths</strong>.  </p>
-<p>It is automatically generated and validated by the <a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">file reference origin generator</a> using a set of manually-specified rules (specifying the actual origins) and the latest API schema, to make sure that:</p>
+<p>It is automatically generated and validated by the <a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">file reference origin generator</a> using a set of manually-specified rules (specifying the actual origins) and the latest API schema, to make sure the following rules are followed:</p>
 <ul>
 <li>
 <p>All possible and valid places where a <code>file_reference</code> appears have at least one valid associated origin: this is checked by recursively checking all possible deserialized object graphs, starting from:</p>
@@ -93,7 +93,7 @@ updateNewMessage.message -&gt; message.media -&gt; messageMediaInvoice.extended_
 <pre><code>// Root
 fileReferenceOrigins ctxs:Vector&lt;Origin&gt; = FileReferenceOrigins;
 
-origin flags:# originName:string predicate:string is_constructor:flags.0?true action:flags.1?ActionOp noop:flags.2?string = origin;
+origin flags:# predicate:string is_constructor:flags.0?true action:flags.1?ActionOp noop:flags.2?string needs_parent:flags.3?string parent_is_constructor:flags.4?true = origin;
 
 // For string =&gt; TypedOp dictionaries
 typedOpArg key:string value:TypedOp = TypedOpArg;
@@ -103,9 +103,10 @@ callOp method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
 getMessageOp flags:# peer:TypedOp id:TypedOp from_scheduled:flags.0?TypedOp = ActionOp;
 
 // Field extraction path
-pathPart flags:# constructor:string param:string flag_abort_if_empty:flags.0?true flag_fallback_if_empty:flags.1?TypedOp flag_passthrough:flags.2?true unpack_vector:flags.3?true = PathPart;
+pathPart flags:# constructor:string param:string flag_abort_if_empty:flags.0?true flag_fallback_if_empty:flags.1?TypedOp flag_passthrough:flags.2?true = PathPart;
 
 path parts:Vector&lt;PathPart&gt; = Path;
+pathParent parts:Vector&lt;PathPart&gt; = Path;
 
 // Typed constructors, the type is specified to simplify codegen,
 // but isn't strictly necessary as it can be inferred from the TypedOpOp.
@@ -113,6 +114,7 @@ path parts:Vector&lt;PathPart&gt; = Path;
 typedOp type:string op:TypedOpOp = TypedOp;
 
 copyOp path:Path = TypedOpOp;
+copyFromParentOp path:Path = TypedOpOp;
 
 getInputChannelByIdOp path:Path = TypedOpOp;
 getInputUserByIdOp path:Path = TypedOpOp;
@@ -140,13 +142,14 @@ While this operation could be done within the file reference origin definition f
 <h4><a class="anchor" href="#root" id="root" name="root"><i class="anchor-icon"></i></a>Root</h4>
 <pre><code>fileReferenceOrigins ctxs:Vector&lt;Origin&gt; = FileReferenceOrigins;
 
-origin flags:# originName:string predicate:string is_constructor:flags.0?true action:flags.1?ActionOp noop:flags.2?string = origin;</code></pre>
+origin flags:# predicate:string is_constructor:flags.0?true action:flags.1?ActionOp noop:flags.2?string needs_parent:flags.3?string parent_is_constructor:flags.4?true = origin;</code></pre>
 <p>The definition file is composed of a single <code>fileReferenceOrigins</code> constructor, which contains a list of <code>origin</code> constructors.  </p>
 <p>Each <code>origin</code> represents a constructor or method file reference origin:</p>
 <ul>
-<li><code>originName</code> - Contains a unique name for the origin</li>
 <li><code>predicate</code> - Indicates the name of the constructor or of the method where extraction of the origin fields must start.</li>
 <li><code>is_constructor</code> - If set, <code>predicate</code> points to a constructor, otherwise it poitns to a method.</li>
+<li><code>needs_parent</code> - If set, contains the name of a constructor which needs to appear as a parent in the deserialized object or a method whose response we're deserializing, as it will be used by one or more of the paths in the action.</li>
+<li><code>parent_is_constructor</code> - If set, <code>needs_parent</code> points to a constructor; otherwise it points to a method.</li>
 <li><code>action</code> - <em>Optional</em>: contains the method that needs to be invoked to refresh the reference, when needed.  </li>
 <li><code>noop</code> - <em>Optional</em>: contains a human-readable description as to why should this origin be ignored.  </li>
 </ul>
@@ -154,9 +157,11 @@ origin flags:# originName:string predicate:string is_constructor:flags.0?true ac
 <p>If the <code>noop</code> flag is set, this origin should be ignored completely (including during codegen): noop origins are used internally to make sure all file reference paths are still covered in some way during validation, including paths for ephemeral media like inline results, or for media without any associated origin (for example, media uploaded using <a href="/method/messages.uploadMedia">messages.uploadMedia</a> but not yet sent anywhere obviously does not have any associated origin).  </p>
 <p>If the <code>action</code> flag is set and the <code>is_constructor</code> flag is set, when deserializing a constructor with predicate equal to <code>predicate</code>, contained in an incoming <a href="/type/Update">Update</a> or in at any depth in a method call response, do the following:</p>
 <ul>
-<li><strong>Before</strong> beginning deserialization of the constructor, push a new origin of type <code>originName</code> to the origin stack.</li>
+<li><strong>Before</strong> beginning deserialization of the constructor, push a new origin to the origin stack.<br>
+Skip pushing the origin if <code>needs_parent</code> is set but we don't have a constructor or method of the appropriate type in our parents.</li>
 <li>During deserialization, add all encountered <code>file_reference</code>s to all origins <strong>of all types</strong> currently on the stack.</li>
-<li><strong>After</strong> deserialization of the constructor, pop the pushed origin, make sure <code>ActionOp</code> can be evaluated (all required flag fields are set, all paths can be correctly extracted; the check can be done during evaluation, aborting the evaluation on error), and if yes, evaluate and commit the origin to the database.  </li>
+<li><strong>After</strong> deserialization of the constructor, pop the pushed origin, make sure <code>ActionOp</code> can be evaluated (all required flag fields are set, all paths can be correctly extracted; the check can be done during evaluation, aborting the evaluation on error), and if yes, evaluate and commit the origin to the database.<br>
+Skip this step if <code>needs_parent</code> is set but we don't have a constructor or method of the appropriate type  in our parents.</li>
 </ul>
 <p>If the <code>action</code> flag is set and the <code>is_constructor</code> flag is <strong>not</strong> set, when deserializing the response of the method with name equal to <code>predicate</code>, do the following:</p>
 <ul>
@@ -164,6 +169,7 @@ origin flags:# originName:string predicate:string is_constructor:flags.0?true ac
 <li>During deserialization, add all encountered <code>file_reference</code>s to all origins <strong>of all types</strong> currently on the stack.</li>
 <li><strong>After</strong> deserialization of the method response, pop the pushed origin, make sure <code>ActionOp</code> can be evaluated (all required flag fields are set, all paths can be correctly extracted; the check can be done during evaluation, aborting the evaluation on error), and if yes, evaluate and commit the origin to the database.  </li>
 </ul>
+<p>Note that method origins cannot make use of <code>needs_parent</code>.   </p>
 <h4><a class="anchor" href="#actions" id="actions" name="actions"><i class="anchor-icon"></i></a>Actions</h4>
 <pre><code>// Actions
 callOp method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
@@ -189,6 +195,7 @@ typedOp type:string op:TypedOpOp = TypedOp;</code></pre>
 If the <code>from_scheduled</code> flag is present and set, <a href="/method/messages.getScheduledMessages">messages.getScheduledMessages</a> should be executed instead.  </p>
 <h4><a class="anchor" href="#action-parameters" id="action-parameters" name="action-parameters"><i class="anchor-icon"></i></a>Action parameters</h4>
 <pre><code>copyOp path:Path = TypedOpOp;
+copyFromParentOp path:Path = TypedOpOp;
 
 getInputChannelByIdOp path:Path = TypedOpOp;
 getInputUserByIdOp path:Path = TypedOpOp;
@@ -213,6 +220,8 @@ themeFormatLiteralOp = TypedOpOp;</code></pre>
 <p>Action parameters are represented by <code>TypedOpOp</code> constructors.  </p>
 <h5><a class="anchor" href="#copyop" id="copyop" name="copyop"><i class="anchor-icon"></i></a><code>copyOp</code></h5>
 <p>The most commonly used type, copies the value(s) at the specified <a href="#paths">path »</a>.</p>
+<h5><a class="anchor" href="#copyop" id="copyop" name="copyop"><i class="anchor-icon"></i></a><code>copyOp</code></h5>
+<p>Copies the value(s) at the specified <a href="#paths">path »</a>.</p>
 <h5><a class="anchor" href="#getinputchannelbyidop" id="getinputchannelbyidop" name="getinputchannelbyidop"><i class="anchor-icon"></i></a><code>getInputChannelByIdOp</code></h5>
 <p>Returns an <a href="/type/InputChannel">InputChannel</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the channel ID of type <a href="/constructor/int">long</a> specified in <code>path</code>.  </p>
 <h5><a class="anchor" href="#getinputuserbyidop" id="getinputuserbyidop" name="getinputuserbyidop"><i class="anchor-icon"></i></a><code>getInputUserByIdOp</code></h5>
@@ -223,7 +232,7 @@ themeFormatLiteralOp = TypedOpOp;</code></pre>
 <p>Transforms and returns the <a href="/type/User">User</a> constructor to which <code>path</code> points into an <a href="/type/InputUser">InputUser</a> constructor.  </p>
 <h5><a class="anchor" href="#getinputchannelop" id="getinputchannelop" name="getinputchannelop"><i class="anchor-icon"></i></a><code>getInputChannelOp</code></h5>
 <p>Transforms and returns the <a href="/type/Channel">Channel</a> constructor to which <code>path</code> points into an <a href="/type/InputChannel">InputChannel</a> constructor.  </p>
-<h4><a class="anchor" href="#getstickersetfromdocumentattributesop" id="getstickersetfromdocumentattributesop" name="getstickersetfromdocumentattributesop"><i class="anchor-icon"></i></a><code>getStickerSetFromDocumentAttributesOp</code></h4>
+<h5><a class="anchor" href="#getstickersetfromdocumentattributesop" id="getstickersetfromdocumentattributesop" name="getstickersetfromdocumentattributesop"><i class="anchor-icon"></i></a><code>getStickerSetFromDocumentAttributesOp</code></h5>
 <p>Takes the <code>Vector&lt;DocumentAttribute&gt;</code> to which <code>path</code> points, looks for a <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a>, and returns the <a href="/type/InputStickerSet">InputStickerSet</a> contained in <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a>.<code>stickerset</code>; aborts if there is no attribute of type <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a> in the passed vector.</p>
 <h5><a class="anchor" href="#constructorop" id="constructorop" name="constructorop"><i class="anchor-icon"></i></a><code>constructorOp</code></h5>
 <p>Constructs the constructor of type (predicate) <code>constructor</code> using the arguments specified in <code>args</code>.  </p>
@@ -242,11 +251,17 @@ themeFormatLiteralOp = TypedOpOp;</code></pre>
 <h5><a class="anchor" href="#themeformatliteralop" id="themeformatliteralop" name="themeformatliteralop"><i class="anchor-icon"></i></a><code>themeFormatLiteralOp</code></h5>
 <p>Constructs a <a href="/type/string">string</a>, indicating the <a href="/api/themes">theming engines</a> supported by the client (used when working with theme-related media, can be an empty string if the client doesn't support themes).</p>
 <h4><a class="anchor" href="#paths" id="paths" name="paths"><i class="anchor-icon"></i></a>Paths</h4>
-<pre><code>pathPart flags:# constructor:string param:string flag_abort_if_empty:flags.0?true flag_fallback_if_empty:flags.1?TypedOp flag_passthrough:flags.2?true unpack_vector:flags.3?true = PathPart;
+<pre><code>pathPart flags:# constructor:string param:string flag_abort_if_empty:flags.0?true flag_fallback_if_empty:flags.1?TypedOp flag_passthrough:flags.2?true = PathPart;
 
-path parts:Vector&lt;PathPart&gt; = Path;</code></pre>
+path parts:Vector&lt;PathPart&gt; = Path;
+pathParent parts:Vector&lt;PathPart&gt; = Path;</code></pre>
 <p>Paths are used by <a href="#action-parameters">action parameters</a> to extract a parameter from one or more constructors, i.e. <code>updateStory.story -&gt; storyItem.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </p>
-<p>A <code>path</code> is composed of multiple <code>pathPart</code>s.  </p>
+<p>The first part of the path always points to:</p>
+<ul>
+<li>The constructor/method of the <code>origin</code> (<code>origin.predicate</code>), for <code>path</code></li>
+<li>The constructor/method of the parent contained in <code>origin.needs_parent</code>, for <code>pathParent</code></li>
+</ul>
+<p>A path is composed of multiple <code>pathPart</code>s.  </p>
 <p>Note: when the following instructions tell to "abort extraction", what actually should happen is:</p>
 <ul>
 <li>If the current path up until this point contained at least one unpacked vector element, skip to the next array element in the path.</li>
@@ -261,12 +276,8 @@ By definition, if a method name is passed, it will always be equal to the method
 <li><code>flag_abort_if_empty</code> - If set and the flag at <code>param</code> is not set, abort extraction.  </li>
 <li><code>flag_fallback_if_empty</code> - If set, contains a fallback value to use if the current flagged parameter is not set.  </li>
 <li><code>flag_passthrough</code> - If set indicates that this <code>param</code> a flag, and its value should be copied/returned verbatim; can only be used on the last element of a path and within the arguments of a constructorOp/callOp/getMessageOp only if the argument that uses this path is a flag of the same type.  </li>
-<li><code>unpack_vector</code> - If set, the current <code>param</code> is a vector, and it should <strong>not</strong> be returned verbatim: instead, path extraction must continue for all elements of the array.<br>
-Note that this means that during evaluation of a single origin, multiple origins might end up being added to the database, depending on the number of unpacked vectors.  </li>
 </ul>
 <p>Only one of the <code>flag_abort_if_empty</code>, <code>flag_fallback_if_empty</code>, <code>flag_passthrough</code> flags can be set; at least one will always be set if the current parameter is a flag parameter.  </p>
-<p><code>unpack_vector</code> can be combined with <code>flag_abort_if_empty</code> (in this case, only if it's the last element of the path) and <code>flag_fallback_if_empty</code> (anywhere, though not currently used).  </p>
-<p>A path can be easily compiled to a set of field accesses (inside <code>for</code> loops if unpacked params are present) to simplify extraction of the origin parameter.  </p>
 <h3><a class="anchor" href="#another-example" id="another-example" name="another-example"><i class="anchor-icon"></i></a>Another example:</h3>
 <p>Assume you receive a <a href="/constructor/message">message</a> from your friend: that message contains a <a href="/constructor/messageMediaPhoto">messageMediaPhoto</a> with a <a href="/constructor/photo">photo</a>.</p>
 <p>Your client has to cache not only the <code>file_reference</code> field of the photo, but also the context in which the file reference was seen (in this case, a message coming from a specific user).</p>
