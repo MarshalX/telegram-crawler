@@ -49,7 +49,7 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h3><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h3>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the following <strong>file reference origin definition file</strong>.  </p>
-<p><a href="/file/400780400374/4/AXL4cQUr57s.20581.json/a9494741e2447ecb3c">Latest file reference origin definition file for the current layer »</a></p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.dat">Latest file reference origin definition file for the current layer »</a></p>
 <p>First, some definitions:</p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
@@ -93,19 +93,17 @@ updateNewMessage.message -&gt; message.media -&gt; messageMediaInvoice.extended_
 <pre><code>// Root
 fileReferenceOrigins ctxs:Vector&lt;Origin&gt; = FileReferenceOrigins;
 
-originConstructor flags:# originName:string constructor:string action:flags.0?ActionOp noop:flags.1?string = origin;
-originMethod flags:# originName:string method:string action:flags.0?ActionOp copy:flags.1?true noop:flags.2?string = origin;
+origin flags:# originName:string predicate:string is_constructor:flags.0?true action:flags.1?ActionOp noop:flags.2?string = origin;
 
 // For string =&gt; TypedOp dictionaries
 typedOpArg key:string value:TypedOp = TypedOpArg;
-typedOpArgs args:Vector&lt;TypedOpArg&gt; = TypedOpArgs;
 
 // Actions
-callOp method:string args:TypedOpArgs = ActionOp;
-getMessageOp args:TypedOpArgs = ActionOp;
+callOp method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
+getMessageOp flags:# peer:TypedOp id:TypedOp from_scheduled:flags.0?TypedOp = ActionOp;
 
 // Field extraction path
-pathPart flags:# constructor:string param:string is_flag:flags.0?true fallback_if_flag_empty:flags.1?TypedOp flag_passthrough:flags.2?true unpack_vector:flags.3?true = PathPart;
+pathPart flags:# constructor:string param:string flag_abort_if_empty:flags.0?true flag_fallback_if_empty:flags.1?TypedOp flag_passthrough:flags.2?true unpack_vector:flags.3?true = PathPart;
 
 path parts:Vector&lt;PathPart&gt; = Path;
 
@@ -123,8 +121,10 @@ getInputPeerOp path:Path = TypedOpOp;
 getInputUserOp path:Path = TypedOpOp;
 getInputChannelOp path:Path = TypedOpOp;
 
+getStickerSetFromDocumentAttributesOp path:Path = TypedOpOp;
+
 // Literals &amp; constructors (methods not allowed or needed here)
-constructorOp constructor:string args:TypedOpArgs = TypedOpOp;
+constructorOp constructor:string args:Vector&lt;TypedOpArg&gt; = TypedOpOp;
 
 vectorOp values:Vector&lt;TypedOp&gt; = TypedOpOp;
 
@@ -140,54 +140,37 @@ While this operation could be done within the file reference origin definition f
 <h4><a class="anchor" href="#root" id="root" name="root"><i class="anchor-icon"></i></a>Root</h4>
 <pre><code>fileReferenceOrigins ctxs:Vector&lt;Origin&gt; = FileReferenceOrigins;
 
-originConstructor flags:# originName:string constructor:string action:flags.0?ActionOp noop:flags.1?string = origin;
-originMethod flags:# originName:string method:string action:flags.0?ActionOp copy:flags.1?true noop:flags.2?string = origin;</code></pre>
-<p>The definition file is composed of a single <code>fileReferenceOrigins</code> constructor, which contains a list of <code>Origin</code> constructors.  </p>
-<h5><a class="anchor" href="#originconstructor" id="originconstructor" name="originconstructor"><i class="anchor-icon"></i></a><code>originConstructor</code></h5>
-<p>Each <code>originConstructor</code> represents a constructor file reference origin:</p>
+origin flags:# originName:string predicate:string is_constructor:flags.0?true action:flags.1?ActionOp noop:flags.2?string = origin;</code></pre>
+<p>The definition file is composed of a single <code>fileReferenceOrigins</code> constructor, which contains a list of <code>origin</code> constructors.  </p>
+<p>Each <code>origin</code> represents a constructor or method file reference origin:</p>
 <ul>
-<li><code>originName</code> - Contains a unique name for the origin (unique across both <code>originConstructor</code> and <code>originMethod</code>)</li>
-<li><code>constructor</code> - Indicates the constructor where extraction of the origin fields must start.</li>
+<li><code>originName</code> - Contains a unique name for the origin</li>
+<li><code>predicate</code> - Indicates the name of the constructor or of the method where extraction of the origin fields must start.</li>
+<li><code>is_constructor</code> - If set, <code>predicate</code> points to a constructor, otherwise it poitns to a method.</li>
 <li><code>action</code> - <em>Optional</em>: contains the method that needs to be invoked to refresh the reference, when needed.  </li>
 <li><code>noop</code> - <em>Optional</em>: contains a human-readable description as to why should this origin be ignored.  </li>
 </ul>
 <p><em>Exactly one</em> of the mutually exclusive <code>action</code>, <code>noop</code> flags must be set.  </p>
 <p>If the <code>noop</code> flag is set, this origin should be ignored completely (including during codegen): noop origins are used internally to make sure all file reference paths are still covered in some way during validation, including paths for ephemeral media like inline results, or for media without any associated origin (for example, media uploaded using <a href="/method/messages.uploadMedia">messages.uploadMedia</a> but not yet sent anywhere obviously does not have any associated origin).  </p>
-<p>If the <code>action</code> flag is set, when deserializing a constructor with predicate equal to <code>constructor</code>, contained in an incoming <a href="/type/Update">Update</a> or in a method call response, do the following:</p>
+<p>If the <code>action</code> flag is set and the <code>is_constructor</code> flag is set, when deserializing a constructor with predicate equal to <code>predicate</code>, contained in an incoming <a href="/type/Update">Update</a> or in at any depth in a method call response, do the following:</p>
 <ul>
 <li><strong>Before</strong> beginning deserialization of the constructor, push a new origin of type <code>originName</code> to the origin stack.</li>
 <li>During deserialization, add all encountered <code>file_reference</code>s to all origins <strong>of all types</strong> currently on the stack.</li>
 <li><strong>After</strong> deserialization of the constructor, pop the pushed origin, make sure <code>ActionOp</code> can be evaluated (all required flag fields are set, all paths can be correctly extracted; the check can be done during evaluation, aborting the evaluation on error), and if yes, evaluate and commit the origin to the database.  </li>
 </ul>
-<h5><a class="anchor" href="#originmethod" id="originmethod" name="originmethod"><i class="anchor-icon"></i></a><code>originMethod</code></h5>
-<p>Each <code>originMethod</code> represents a constructor file reference origin:</p>
-<ul>
-<li><code>originName</code> - Contains a unique name for the origin (unique across both <code>originConstructor</code> and <code>originMethod</code>)</li>
-<li><code>method</code> - Indicates the method where extraction of the origin fields must start.</li>
-<li><code>action</code> - <em>Optional</em>: contains the method that needs to be invoked to refresh the reference, when needed.  </li>
-<li><code>copy</code> - <em>Optional</em>: indicates that the origin requires a simple re-invocation of the current method with all arguments copied verbatim.</li>
-<li><code>noop</code> - <em>Optional</em>: contains a human-readable description as to why should this origin be ignored.  </li>
-</ul>
-<p><em>Exactly one</em> of the mutually exclusive <code>action</code>, <code>copy</code>, <code>noop</code> flags must be set.  </p>
-<p>If the <code>noop</code> flag is set, this origin should be ignored completely (including during codegen, <a href="#originconstructor">see the explanation of the noop flag above</a>).  </p>
-<p>If either of the <code>action</code> or <code>copy</code> flags are set, when invoking the method specified in <code>method</code>, do the following:</p>
+<p>If the <code>action</code> flag is set and the <code>is_constructor</code> flag is <strong>not</strong> set, when deserializing the response of the method with name equal to <code>predicate</code>, do the following:</p>
 <ul>
 <li><strong>Before</strong> beginning deserialization of the method response, push a new origin of type <code>originName</code> to the origin stack.</li>
 <li>During deserialization, add all encountered <code>file_reference</code>s to all origins <strong>of all types</strong> currently on the stack.</li>
-<li><strong>After</strong> deserialization of the method response, pop the pushed origin and:<ul>
-<li>If <code>action</code> is set, make sure <code>ActionOp</code> can be evaluated (all required flag fields are set, all paths can be correctly extracted; the check can be done during evaluation, aborting the evaluation on error), and if yes, evaluate and commit the origin to the database.  </li>
-<li>If <code>copy</code> is set, commit a new origin to the database: the action of this origin must be an exact copy of the current method call.  </li>
-</ul>
-</li>
+<li><strong>After</strong> deserialization of the method response, pop the pushed origin, make sure <code>ActionOp</code> can be evaluated (all required flag fields are set, all paths can be correctly extracted; the check can be done during evaluation, aborting the evaluation on error), and if yes, evaluate and commit the origin to the database.  </li>
 </ul>
 <h4><a class="anchor" href="#actions" id="actions" name="actions"><i class="anchor-icon"></i></a>Actions</h4>
 <pre><code>// Actions
-callOp method:string args:TypedOpArgs = ActionOp;
+callOp method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
 getMessageOp flags:# peer:TypedOp id:TypedOp from_scheduled:flags.0?TypedOp = ActionOp;
 
 // For string =&gt; TypedOp dictionaries
 typedOpArg key:string value:TypedOp = TypedOpArg;
-typedOpArgs args:Vector&lt;TypedOpArg&gt; = TypedOpArgs;
 
 // Action parameters
 
@@ -214,8 +197,10 @@ getInputPeerOp path:Path = TypedOpOp;
 getInputUserOp path:Path = TypedOpOp;
 getInputChannelOp path:Path = TypedOpOp;
 
+getStickerSetFromDocumentAttributesOp path:Path = TypedOpOp;
+
 // Literals &amp; constructors (methods not allowed or needed here)
-constructorOp constructor:string args:TypedOpArgs = TypedOpOp;
+constructorOp constructor:string args:Vector&lt;TypedOpArg&gt; = TypedOpOp;
 
 vectorOp values:Vector&lt;TypedOp&gt; = TypedOpOp;
 
@@ -238,6 +223,8 @@ themeFormatLiteralOp = TypedOpOp;</code></pre>
 <p>Transforms and returns the <a href="/type/User">User</a> constructor to which <code>path</code> points into an <a href="/type/InputUser">InputUser</a> constructor.  </p>
 <h5><a class="anchor" href="#getinputchannelop" id="getinputchannelop" name="getinputchannelop"><i class="anchor-icon"></i></a><code>getInputChannelOp</code></h5>
 <p>Transforms and returns the <a href="/type/Channel">Channel</a> constructor to which <code>path</code> points into an <a href="/type/InputChannel">InputChannel</a> constructor.  </p>
+<h4><a class="anchor" href="#getstickersetfromdocumentattributesop" id="getstickersetfromdocumentattributesop" name="getstickersetfromdocumentattributesop"><i class="anchor-icon"></i></a><code>getStickerSetFromDocumentAttributesOp</code></h4>
+<p>Takes the <code>Vector&lt;DocumentAttribute&gt;</code> to which <code>path</code> points, looks for a <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a>, and returns the <a href="/type/InputStickerSet">InputStickerSet</a> contained in <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a>.<code>stickerset</code>; aborts if there is no attribute of type <a href="/constructor/documentAttributeSticker">documentAttributeSticker</a> in the passed vector.</p>
 <h5><a class="anchor" href="#constructorop" id="constructorop" name="constructorop"><i class="anchor-icon"></i></a><code>constructorOp</code></h5>
 <p>Constructs the constructor of type (predicate) <code>constructor</code> using the arguments specified in <code>args</code>.  </p>
 <h5><a class="anchor" href="#vectorop" id="vectorop" name="vectorop"><i class="anchor-icon"></i></a><code>vectorOp</code></h5>
@@ -273,7 +260,7 @@ By definition, if a method name is passed, it will always be equal to the method
 <li><code>param</code> - Indicates the required parameter; if it's an empty string, it indicates the return value of a method.  </li>
 <li><code>flag_abort_if_empty</code> - If set and the flag at <code>param</code> is not set, abort extraction.  </li>
 <li><code>flag_fallback_if_empty</code> - If set, contains a fallback value to use if the current flagged parameter is not set.  </li>
-<li><code>flag_passthrough</code> - Can only be used on the last element of a path, if set indicates that this <code>param</code> a flag of type <code>true</code>, and its value should be copied/returned.  </li>
+<li><code>flag_passthrough</code> - If set indicates that this <code>param</code> a flag, and its value should be copied/returned verbatim; can only be used on the last element of a path and within the arguments of a constructorOp/callOp/getMessageOp only if the argument that uses this path is a flag of the same type.  </li>
 <li><code>unpack_vector</code> - If set, the current <code>param</code> is a vector, and it should <strong>not</strong> be returned verbatim: instead, path extraction must continue for all elements of the array.<br>
 Note that this means that during evaluation of a single origin, multiple origins might end up being added to the database, depending on the number of unpacked vectors.  </li>
 </ul>
