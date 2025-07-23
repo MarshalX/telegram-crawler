@@ -506,7 +506,13 @@ function ajInit(options) {
         xhrFields: {withCredentials: true},
         headers: {'X-Aj-Referer': cur_ref},
         success: function(result, t, xhr) {
-          onResult(url, xhr.status, result, push_state);
+          if (Aj.viewTransition && document.startViewTransition) {
+            document.startViewTransition(() => {
+              onResult(url, xhr.status, result, push_state);
+            });
+          } else {
+            onResult(url, xhr.status, result, push_state);
+          }
         },
         error: function(xhr) {
           onResult(url, xhr.status, false, push_state);
