@@ -103,7 +103,12 @@ callOp method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
 getMessageOp flags:# peer:TypedOp id:TypedOp from_scheduled:flags.0?TypedOp = ActionOp;
 
 // Field extraction path
-pathPart flags:# constructor:string param:string flag_abort_if_empty:flags.0?true flag_fallback_if_empty:flags.1?TypedOp flag_passthrough:flags.2?true = PathPart;
+paramNotFlag = ParamFlag;
+paramIsFlagAbortIfEmpty = ParamFlag;
+paramIsFlagFallback fallback:TypedOp = ParamFlag;
+paramIsFlagPassthrough = ParamFlag;
+
+pathPart flags:# constructor:string param:string flag:ParamFlag = PathPart;
 
 path parts:Vector&lt;PathPart&gt; = Path;
 pathParent parts:Vector&lt;PathPart&gt; = Path;
@@ -251,7 +256,12 @@ themeFormatLiteralOp = TypedOpOp;</code></pre>
 <h5><a class="anchor" href="#themeformatliteralop" id="themeformatliteralop" name="themeformatliteralop"><i class="anchor-icon"></i></a><code>themeFormatLiteralOp</code></h5>
 <p>Constructs a <a href="/type/string">string</a>, indicating the <a href="/api/themes">theming engines</a> supported by the client (used when working with theme-related media, can be an empty string if the client doesn't support themes).</p>
 <h4><a class="anchor" href="#paths" id="paths" name="paths"><i class="anchor-icon"></i></a>Paths</h4>
-<pre><code>pathPart flags:# constructor:string param:string flag_abort_if_empty:flags.0?true flag_fallback_if_empty:flags.1?TypedOp flag_passthrough:flags.2?true = PathPart;
+<pre><code>paramNotFlag = ParamFlag;
+paramIsFlagAbortIfEmpty = ParamFlag;
+paramIsFlagFallback fallback:TypedOp = ParamFlag;
+paramIsFlagPassthrough = ParamFlag;
+
+pathPart flags:# constructor:string param:string flag:ParamFlag = PathPart;
 
 path parts:Vector&lt;PathPart&gt; = Path;
 pathParent parts:Vector&lt;PathPart&gt; = Path;</code></pre>
@@ -268,11 +278,14 @@ pathParent parts:Vector&lt;PathPart&gt; = Path;</code></pre>
 If a different constructor type is encountered (i.e. <a href="/constructor/documentEmpty">documentEmpty</a> instead of <a href="/constructor/document">document</a>), abort extraction.<br>
 By definition, if a method name is passed, it will always be equal to the method of the associated origin.</li>
 <li><code>param</code> - Indicates the required parameter; if it's an empty string, it indicates the return value of a method.  </li>
-<li><code>flag_abort_if_empty</code> - If set and the flag at <code>param</code> is not set, abort extraction.  </li>
-<li><code>flag_fallback_if_empty</code> - If set, contains a fallback value to use if the current flagged parameter is not set.  </li>
-<li><code>flag_passthrough</code> - If set indicates that this <code>param</code> a flag, and its value should be copied/returned verbatim; can only be used on the last element of a path and within the arguments of a constructorOp/callOp/getMessageOp only if the argument that uses this path is a flag of the same type.  </li>
+<li><code>flag</code> - Contains exactly one of the following constructors:<ul>
+<li><code>paramNotFlag</code> - The current parameter is not a flag</li>
+<li><code>paramIsFlagAbortIfEmpty</code> - The current parameter is a flag, and if it's not set, abort extraction.  </li>
+<li><code>paramIsFlagFallback</code> -  The current parameter is a flag, and if it's not set, use the specified <code>TypedOp</code> as fallback value.  </li>
+<li><code>paramIsFlagPassthrough</code> - The current parameter is a flag, and its value should be copied/returned verbatim; can only be used on the last element of a path and within the arguments of a constructorOp/callOp/getMessageOp only if the argument that uses this path is a flag of the same type.  </li>
 </ul>
-<p>Only one of the <code>flag_abort_if_empty</code>, <code>flag_fallback_if_empty</code>, <code>flag_passthrough</code> flags can be set; at least one will always be set if the current parameter is a flag parameter.  </p>
+</li>
+</ul>
 <h3><a class="anchor" href="#another-example" id="another-example" name="another-example"><i class="anchor-icon"></i></a>Another example:</h3>
 <p>Assume you receive a <a href="/constructor/message">message</a> from your friend: that message contains a <a href="/constructor/messageMediaPhoto">messageMediaPhoto</a> with a <a href="/constructor/photo">photo</a>.</p>
 <p>Your client has to cache not only the <code>file_reference</code> field of the photo, but also the context in which the file reference was seen (in this case, a message coming from a specific user).</p>
