@@ -191,7 +191,7 @@
 <tr>
 <td><strong>contact_require_premium</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.10?<a href="/constructor/true">true</a></td>
-<td>If set, we can only write to this user if they have already sent some messages to us, if we are subscribed to <a href="/api/premium">Telegram Premium</a>, or if they're a mutual contact (<a href="/constructor/user">user</a>.<code>mutual_contact</code>).  <br>All the secondary conditions listed above must be checked separately to verify whether we can still write to the user, even if this flag is set (i.e. a mutual contact will have this flag set even if we can still write to them, and so on...); to avoid doing these extra checks if we haven't yet cached all the required information (for example while displaying the chat list in the sharing UI) the <a href="/method/users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a> method may be invoked instead, passing the list of users currently visible in the UI, returning a list of booleans that directly specify whether we can or cannot write to each user; alternatively, the <a href="/constructor/userFull">userFull</a>.<code>contact_require_premium</code> flag contains the same (fully checked, i.e. it's not just a copy of this flag) info returned by <a href="/method/users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a>. <br>To set this flag for ourselves invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a>, setting the <code>settings.new_noncontact_peers_require_premium</code> flag.</td>
+<td>See <a href="/api/privacy#require-premium-for-new-non-contact-users">here for more info on this flag »</a>.</td>
 </tr>
 <tr>
 <td><strong>bot_business</strong></td>
@@ -325,16 +325,6 @@
 <p>Telegram allows users to specify granular privacy settings, choosing which users can or can't interact with them in certain ways.</p>
 <h4><a class="anchor" href="#stories" id="stories" name="stories"><i class="anchor-icon"></i></a><a href="/api/stories">Stories</a></h4>
 <p>Telegram users and channels can easily post and view stories through the API.</p>
-<h4><a class="anchor" href="#telegram-premium" id="telegram-premium" name="telegram-premium"><i class="anchor-icon"></i></a><a href="/api/premium">Telegram Premium</a></h4>
-<p>Telegram Premium is an optional subscription service that unlocks additional exclusive client-side and API-side features, while helping support the development of the app.</p>
-<h4><a class="anchor" href="#user" id="user" name="user"><i class="anchor-icon"></i></a><a href="/constructor/user">user</a></h4>
-<p>Indicates info about a certain user.</p>
-<p>Unless specified otherwise, when updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
-<p>See <a href="https://github.com/tdlib/td/blob/cb164927417f22811c74cd8678ed4a5ab7cb80ba/td/telegram/UserManager.cpp#L2267">here »</a> for an implementation of the logic to use when updating the <a href="/api/peers">local user peer database</a>.</p>
-<h4><a class="anchor" href="#usersgetispremiumrequiredtocontact" id="usersgetispremiumrequiredtocontact" name="usersgetispremiumrequiredtocontact"><i class="anchor-icon"></i></a><a href="/method/users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a></h4>
-<p>Check whether we can write to the specified user (this method can only be called by non-<a href="/api/premium">Premium</a> users), see <a href="/api/privacy#require-premium-for-new-non-contact-users">here »</a> for more info on the full flow.</p>
-<h4><a class="anchor" href="#accountsetglobalprivacysettings" id="accountsetglobalprivacysettings" name="accountsetglobalprivacysettings"><i class="anchor-icon"></i></a><a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a></h4>
-<p>Set global privacy settings</p>
 <h4><a class="anchor" href="#business" id="business" name="business"><i class="anchor-icon"></i></a><a href="/api/business">Business</a></h4>
 <p>Users can turn their Telegram account into a business account, gaining access to business features such as opening hours, location, quick replies, automated messages, custom start pages, chatbot support, and more.</p>
 <h4><a class="anchor" href="#mini-apps-on-telegram" id="mini-apps-on-telegram" name="mini-apps-on-telegram"><i class="anchor-icon"></i></a><a href="/api/bots/webapps">Mini Apps on Telegram</a></h4>
