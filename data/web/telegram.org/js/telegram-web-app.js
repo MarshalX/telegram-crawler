@@ -414,7 +414,7 @@
         el.target != '_blank' &&
         (el.protocol == 'http:' || el.protocol == 'https:') &&
         el.hostname == 't.me') {
-      WebApp.openTgLink(el.href);
+      WebApp.openTelegramLink(el.href);
       e.preventDefault();
     }
   }
