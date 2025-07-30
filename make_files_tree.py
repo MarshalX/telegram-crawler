@@ -97,8 +97,6 @@ async def download_file(url: str, path: str, session: aiohttp.ClientSession):
 
 
 async def get_download_link_of_latest_appcenter_release(parameterized_url: str, session: aiohttp.ClientSession):
-    api_base = 'https://install.appcenter.ms/api/v0.1'
-    base_url = f'{api_base}/{parameterized_url}'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/118.0',
     }
@@ -106,24 +104,50 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
     async def make_req(url):
         async with session.get(url, headers=headers) as response:
             if response.status != 200:
-                return
+                logger.error(f'Error {response.status} while fetching {url}')
+                return None
 
-            return await response.json(encoding='UTF-8')
+            content_type = response.headers.get('Content-Type', '').lower()
+            try:
+                if 'xml' in content_type:
+                    return await response.text()
+                elif 'json' in content_type:
+                    return await response.json(encoding='UTF-8')
+                else:
+                    try:
+                        return await response.json(encoding='UTF-8')
+                    except:
+                        return await response.text()
+            except Exception as e:
+                print(f"Error processing response: {e}")
+                return None
 
-    res_json = await make_req(f'{base_url}/public_releases')
-    if res_json and res_json[0]:
-        latest_id = res_json[0]['id']
-        version = res_json[0]['version']
-    else:
-        raise RuntimeError('AppCenter is down as always')
+    res = await make_req(parameterized_url)
+    logger.debug(f'Response: {res}')
 
-    logger.info(f'The latest appcenter release is {version} ({parameterized_url})')
+    if isinstance(res, str) and '<rss' in res:
+        from xml.etree import ElementTree
+        root = ElementTree.fromstring(res)
+        item = root.find('.//item')
+        if item:
+            enclosure = item.find('enclosure')
+            if enclosure is not None:
+                return enclosure.get('url')
+    elif isinstance(res, (dict, list)):
+        if isinstance(res, dict):
+            print(f'Response is a dict: {res}')
+            return res.get('file_url')
+        elif isinstance(res, list) and res and isinstance(res[0], dict):
+            latest_id = res[0].get('id')
+            version = res[0].get('version')
+            if latest_id:
+                logger.info(f'The latest release is {version} ({parameterized_url})')
+                res_json = await make_req(f'{parameterized_url}/releases/{latest_id}')
+                if isinstance(res_json, dict):
+                    logger.debug(f'Release download URL: {res_json.get("download_url")}')
+                    return res_json.get('download_url')
 
-    res_json = await make_req(f'{base_url}/releases/{latest_id}')
-    if res_json:
-        return res_json['download_url']
-
-    raise RuntimeError('AppCenter is down as always')
+    raise RuntimeError('Response could not be processed')
 
 
 async def track_additional_files(
@@ -150,7 +174,7 @@ async def track_additional_files(
 
 
 async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.ClientSession):
-    parameterized_url = 'apps/keepcoder/Telergam-Beta-Updated/distribution_groups/public'
+    parameterized_url = 'https://mac-updates.telegram.org/beta/versions.xml'
     download_url = await get_download_link_of_latest_appcenter_release(parameterized_url, session)
 
     if not download_url:
@@ -363,7 +387,7 @@ async def download_telegram_android_stable_dl_and_extract_resources(session: aio
 
 
 async def download_telegram_android_beta_and_extract_resources(session: aiohttp.ClientSession):
-    parameterized_url = 'apps/drklo-2kb-ghpo/telegram-beta-2/distribution_groups/all-users-of-telegram-beta-2'
+    parameterized_url = 'https://telegram.org/dl/android/apk-public-beta.json'
     download_url = await get_download_link_of_latest_appcenter_release(parameterized_url, session)
 
     await _download_telegram_android_and_extract_resources(session, download_url, 'android-beta')
