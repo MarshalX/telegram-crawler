@@ -117,8 +117,10 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
                 else:
                     try:
                         return await response.json(encoding='UTF-8')
-                    except:
-                        return await response.text()
+                    except Exception as e:
+                        text = await response.text()
+                        logger.error(f"Error fetching JSON from {url} (status={response.status}): {e}\nResponse (truncated): {text[:200]}")
+                        return text
             except Exception as e:
                 logger.error(f"Error processing response: {e}")
                 return None
