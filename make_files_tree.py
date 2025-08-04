@@ -13,6 +13,7 @@ from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
 from time import time
 from typing import List
+from xml.etree import ElementTree
 
 import aiofiles
 import aiohttp
@@ -119,14 +120,13 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
                     except:
                         return await response.text()
             except Exception as e:
-                print(f"Error processing response: {e}")
+                logger.error(f"Error processing response: {e}")
                 return None
 
     res = await make_req(parameterized_url)
     logger.debug(f'Response: {res}')
 
     if isinstance(res, str) and '<rss' in res:
-        from xml.etree import ElementTree
         root = ElementTree.fromstring(res)
         item = root.find('.//item')
         if item:
@@ -135,7 +135,7 @@ async def get_download_link_of_latest_appcenter_release(parameterized_url: str, 
                 return enclosure.get('url')
     elif isinstance(res, (dict, list)):
         if isinstance(res, dict):
-            print(f'Response is a dict: {res}')
+            logger.debug(f'Response is a dict: {res}')
             return res.get('file_url')
         elif isinstance(res, list) and res and isinstance(res[0], dict):
             latest_id = res[0].get('id')
