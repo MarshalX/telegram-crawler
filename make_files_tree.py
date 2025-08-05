@@ -87,7 +87,7 @@ def get_hash(data: bytes) -> str:
 
 
 async def download_file(url: str, path: str, session: aiohttp.ClientSession):
-    async with session.get(url) as response:
+    async with session.get(f'{url}&noCache={int(time() * 1000)}{random.randint(0, 1000)}') as response:
         if response.status != 200:
             return
 
