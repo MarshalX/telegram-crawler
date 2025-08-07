@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Auth key generation example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="A full auth key generation example">
+    <meta property="og:title" content="Auth key generation example">
+    <meta property="og:image" content="71a15765997de28d38">
+    <meta property="og:description" content="A full auth key generation example">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?246" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/samples-auth_key" >Auth key generation example</a></li></ul></div>
+  <h1 id="dev_page_title">Auth key generation example</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>In the examples below, the <a href="/mtproto#transport">transport</a> headers are omitted:</p>
+<blockquote>
+<p>For example, for the <a href="/mtproto/mtproto-transports#abridged">abridged version of the transport »</a>, the client sends <code>0xef</code> as the first byte (<strong>important:</strong> only prior to the very first data packet), then the packet length is encoded with a single byte (<code>0x01-0x7e</code> = data length divided by 4; or <code>0x7f</code> followed by 3 bytes (little endian) divided by 4) followed by the data itself. In this case, server responses have the same structure (although the server does not send <code>0xef</code>as the first byte).</p>
+</blockquote>
+<p>Detailed documentation on creating authorization keys is available <a href="/mtproto/auth_key">here »</a>.</p>
+<h4><a class="anchor" href="#dh-exchange-initiation" id="dh-exchange-initiation" name="dh-exchange-initiation"><i class="anchor-icon"></i></a>DH exchange initiation</h4>
+<h5><a class="anchor" href="#1-client-sends-query-to-server" id="1-client-sends-query-to-server" name="1-client-sends-query-to-server"><i class="anchor-icon"></i></a>1) Client sends query to server</h5>
+<!-- start req_pq_multi -->
+<p>Sent payload (excluding transport headers/trailers):</p>
+<pre><code>0000 | 00 00 00 00 00 00 00 00 90 F9 04 00 87 A4 94 68
+0010 | 14 00 00 00 F1 8E 7E BE A6 50 2C EF 92 6C CC 4C
+0020 | 7D 77 E7 3C 88 11 B2 93</code></pre>
+<p>Payload (de)serialization:</p>
+<pre><code>req_pq_multi#be7e8ef1 nonce:int128 = ResPQ;</code></pre>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Offset, Length in bytes</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auth_key_id</td>
+<td>0, 8</td>
+<td><code>0000000000000000</code></td>
+<td>0 since the message is in plain text</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>8, 8</td>
+<td><code>90F9040087A49468</code></td>
+<td>Message ID generated as specified <a href="/mtproto/description#message-identifier-msg-id">here »</a> (unixtime() &lt;&lt; 32) + (N*4)</td>
+</tr>
+<tr>
+<td>message_length</td>
+<td>16, 4</td>
+<td><code>14000000</code> (20 in decimal)</td>
+<td>Message body length</td>
+</tr>
+<tr>
+<td>%(req_pq_multi)</td>
+<td>20, 4</td>
+<td><code>f18e7ebe</code></td>
+<td><em>req_pq_multi</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>24, 16</td>
+<td><code>A6502CEF926CCC4C7D77E73C8811B293</code></td>
+<td>Random number</td>
+</tr>
+</tbody>
+</table>
+<!-- end req_pq_multi -->
+<h5><a class="anchor" href="#2-server-sends-response-of-the-form" id="2-server-sends-response-of-the-form" name="2-server-sends-response-of-the-form"><i class="anchor-icon"></i></a>2) Server sends response of the form</h5>
+<!-- start resPQ -->
+<p>Received payload (excluding transport headers/trailers):</p>
+<pre><code>0000 | 00 00 00 00 00 00 00 00 01 5C D3 35 87 A4 94 68
+0010 | 50 00 00 00 63 24 16 05 A6 50 2C EF 92 6C CC 4C
+0020 | 7D 77 E7 3C 88 11 B2 93 33 EE 3C D6 FA 11 A4 9B
+0030 | 2A 97 E7 46 03 0A A8 06 08 1B CF FC 64 D9 03 81
+0040 | EF 00 00 00 15 C4 B5 1C 03 00 00 00 85 FD 64 DE
+0050 | 85 1D 9D D0 A5 B7 F7 09 35 5F C3 0B 21 6B E8 6C
+0060 | 02 2B B4 C3</code></pre>
+<p>Payload (de)serialization:</p>
+<pre><code>resPQ#05162463 nonce:int128 server_nonce:int128 pq:string server_public_key_fingerprints:Vector&lt;strlong&gt; = ResPQ;</code></pre>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Offset, Length in bytes</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auth_key_id</td>
+<td>0, 8</td>
+<td><code>0000000000000000</code></td>
+<td>0 since the message is in plain text</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>8, 8</td>
+<td><code>015CD33587A49468</code></td>
+<td>Message ID generated as specified <a href="/mtproto/description#message-identifier-msg-id">here »</a> (unixtime() &lt;&lt; 32) + (N*4)</td>
+</tr>
+<tr>
+<td>message_length</td>
+<td>16, 4</td>
+<td><code>50000000</code> (80 in decimal)</td>
+<td>Message body length</td>
+</tr>
+<tr>
+<td>%(resPQ)</td>
+<td>20, 4</td>
+<td><code>63241605</code></td>
+<td><em>resPQ</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>24, 16</td>
+<td><code>A6502CEF926CCC4C7D77E73C8811B293</code></td>
+<td>Value generated by client in Step 1</td>
+</tr>
+<tr>
+<td>server_nonce</td>
+<td>40, 16</td>
+<td><code>33EE3CD6FA11A49B2A97E746030AA806</code></td>
+<td>Server-generated random number</td>
+</tr>
+<tr>
+<td>pq</td>
+<td>56, 12</td>
+<td><code>081BCFFC64D90381EF000000</code><br>TL byte deserialization <br>=&gt; bigendian conversion to decimal<br>=&gt; 2004097869270974959</td>
+<td>Single-byte prefix denoting length, an 8-byte string, and three bytes of padding</td>
+</tr>
+<tr>
+<td>%(Vector strlong)</td>
+<td>68, 4</td>
+<td><code>15c4b51c</code></td>
+<td><em>Vector t</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>count</td>
+<td>72, 4</td>
+<td><code>03000000</code></td>
+<td>Number of elements in server_public_key_fingerprints</td>
+</tr>
+<tr>
+<td>server_public_key_fingerprints[0]</td>
+<td>76, 8</td>
+<td><code>85FD64DE851D9DD0</code></td>
+<td>64 lower-order bits of <code>SHA1(server_public_key)</code></td>
+</tr>
+<tr>
+<td>server_public_key_fingerprints[1]</td>
+<td>84, 8</td>
+<td><code>A5B7F709355FC30B</code></td>
+<td>64 lower-order bits of <code>SHA1(server_public_key)</code></td>
+</tr>
+<tr>
+<td>server_public_key_fingerprints[2]</td>
+<td>92, 8</td>
+<td><code>216BE86C022BB4C3</code></td>
+<td>64 lower-order bits of <code>SHA1(server_public_key)</code></td>
+</tr>
+</tbody>
+</table>
+<!-- end resPQ -->
+<p>In our case, the client only has the following public keys, with the following fingerprints:</p>
+<!-- start fingerprints -->
+<ul>
+<li><code>85FD64DE851D9DD0</code></li>
+</ul>
+<p>Let's choose the only matching key, the one with fingerprint equal to <code>85FD64DE851D9DD0</code>.</p>
+<!-- end fingerprints -->
+<h4><a class="anchor" href="#proof-of-work" id="proof-of-work" name="proof-of-work"><i class="anchor-icon"></i></a>Proof of work</h4>
+<h5><a class="anchor" href="#3-client-decomposes-pq-into-prime-factors-such-that-p-lt-q" id="3-client-decomposes-pq-into-prime-factors-such-that-p-lt-q" name="3-client-decomposes-pq-into-prime-factors-such-that-p-lt-q"><i class="anchor-icon"></i></a>3) Client decomposes pq into prime factors such that p &lt; q.</h5>
+<!-- start pq -->
+<pre><code>pq = 2004097869270974959</code></pre>
+<p>Decompose into 2 prime cofactors <code>p &lt; q</code>: <code>2004097869270974959 = 1081382737 * 1853273407</code></p>
+<pre><code>p = 1081382737
+q = 1853273407</code></pre>
+<!-- end pq -->
+<h4><a class="anchor" href="#presenting-proof-of-work-server-authentication" id="presenting-proof-of-work-server-authentication" name="presenting-proof-of-work-server-authentication"><i class="anchor-icon"></i></a>Presenting proof of work; Server authentication</h4>
+<h5><a class="anchor" href="#4-encrypted-data-payload-generation" id="4-encrypted-data-payload-generation" name="4-encrypted-data-payload-generation"><i class="anchor-icon"></i></a>4) <code>encrypted_data</code> payload generation</h5>
+<p>First of all, generate an <code>encrypted_data</code> payload as follows:</p>
+<!-- start p_q_inner_data_dc -->
+<p>Generated payload (excluding transport headers/trailers):</p>
+<pre><code>0000 | 95 5F F5 A9 08 1B CF FC 64 D9 03 81 EF 00 00 00
+0010 | 04 40 74 97 51 00 00 00 04 6E 76 B5 3F 00 00 00
+0020 | A6 50 2C EF 92 6C CC 4C 7D 77 E7 3C 88 11 B2 93
+0030 | 33 EE 3C D6 FA 11 A4 9B 2A 97 E7 46 03 0A A8 06
+0040 | 35 73 04 83 89 11 CA 27 B2 75 93 7D F6 6E 1B 8D
+0050 | 68 D5 EB 2B 81 E3 EB BA EC 8D 01 5E 3A 5C 4F F9
+0060 | 02 00 00 00</code></pre>
+<p>Payload (de)serialization:</p>
+<pre><code>p_q_inner_data_dc#a9f55f95 pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 dc:int = P_Q_inner_data;</code></pre>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Offset, Length in bytes</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%(p_q_inner_data_dc)</td>
+<td>0, 4</td>
+<td><code>955ff5a9</code></td>
+<td><em>p_q_inner_data_dc</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>pq</td>
+<td>4, 12</td>
+<td><code>081BCFFC64D90381EF000000</code><br>TL byte deserialization <br>=&gt; bigendian conversion to decimal<br>=&gt; 2004097869270974959</td>
+<td>Single-byte prefix denoting length, 8-byte string, and three bytes of padding</td>
+</tr>
+<tr>
+<td>p</td>
+<td>16, 8</td>
+<td><code>0440749751000000</code><br>TL byte deserialization <br>=&gt; bigendian conversion to decimal<br>=&gt; 1081382737</td>
+<td>First prime cofactor: single-byte prefix denoting length, 4-byte string, and three bytes of padding</td>
+</tr>
+<tr>
+<td>q</td>
+<td>24, 8</td>
+<td><code>046E76B53F000000</code><br>TL byte deserialization <br>=&gt; bigendian conversion to decimal<br>=&gt; 1853273407</td>
+<td>Second prime cofactor: single-byte prefix denoting length, 4-byte string, and three bytes of padding</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>32, 16</td>
+<td><code>A6502CEF926CCC4C7D77E73C8811B293</code></td>
+<td>Value generated by client in Step 1</td>
+</tr>
+<tr>
+<td>server_nonce</td>
+<td>48, 16</td>
+<td><code>33EE3CD6FA11A49B2A97E746030AA806</code></td>
+<td>Value received from server in Step 2</td>
+</tr>
+<tr>
+<td>new_nonce</td>
+<td>64, 32</td>
+<td><code>357304838911CA27B275937DF66E1B8D</code> <code>68D5EB2B81E3EBBAEC8D015E3A5C4FF9</code></td>
+<td>Client-generated random number</td>
+</tr>
+<tr>
+<td>dc</td>
+<td>96, 4</td>
+<td><code>02000000</code> (2 in decimal)</td>
+<td>DC ID: <code>10000</code> (decimal) has to be added to the DC ID to connect to the test servers; it has to be made negative if the DC we're connecting to is a media (not CDN) DC.</td>
+</tr>
+</tbody>
+</table>
+<!-- end p_q_inner_data_dc -->
+<p>The serialization of <em>P_Q_inner_data</em> produces <strong>data</strong>, which is used to generate <strong>encrypted_data</strong> as specified in <a href="/mtproto/auth_key">step 4.1</a>.<br>
+These are the inputs to the algorithm specified in <a href="/mtproto/auth_key">step 4.1</a>:</p>
+<!-- start p_q_inner_data_input -->
+<pre><code>data = 955FF5A9081BCFFC64D90381EF0000000440749751000000046E76B53F000000A6502CEF926CCC4C7D77E73C8811B29333EE3CD6FA11A49B2A97E746030AA806357304838911CA27B275937DF66E1B8D68D5EB2B81E3EBBAEC8D015E3A5C4FF902000000
+random_padding_bytes = C4F288AF2DB0D79EF3CC1FF99FF965367FA0A440E04A37D9C6CD663211A088983B73015BC60270EAC5BBDB46A2664ECB08F27A5FC7B459B3465B8C33ECF26B8EEB2C127E7414DA7A21A6ED103E261E3186AE579991FF3A805DCC2353</code></pre>
+<!-- end p_q_inner_data_input -->
+<p>And this is the output:</p>
+<!-- start p_q_inner_data_output -->
+<pre><code>encrypted_data = 34933128456013A6DEBDAB1692F23D2E086C940A8A9CCF3D85F35D47A5788C41FB1894A286F81BA3554A7B48B9D2DCF078B51BDF0AE0949D5F0CEF42B4B9DAEA6490FEB0618E7A8819294D265176644FFE8C69E3DB889D8184CB9FA6794DA38CEC285A50E2749C075105604D2C9F2B4B488DCB4A4CB8089D9088A76003D63CFD6641B7C3A30CBBF8103B640F748394F1B9197400FFA5C2809FE9E9665D3D75AAEA83BBEE7FCFB95B4F3032E9B1703EAA8C8D93839E054F32B619A29463662EC954AF8A003CA827B727D78D45D24382FD13A1B7B43BC664FBFAB7B54DE7095624E77239A73F7BCEBA84F057412CB13BFAA03F8ACBA77F394274D4B744061685B2</code></pre>
+<!-- end p_q_inner_data_output -->
+<p>The length of the final string is 256 bytes.</p>
+<h5><a class="anchor" href="#5-send-req-dh-params-query-with-generated-encrypted-data" id="5-send-req-dh-params-query-with-generated-encrypted-data" name="5-send-req-dh-params-query-with-generated-encrypted-data"><i class="anchor-icon"></i></a>5) Send req_DH_params query with generated <code>encrypted_data</code></h5>
+<!-- start req_DH_params -->
+<p>Sent payload (excluding transport headers/trailers):</p>
+<pre><code>0000 | 00 00 00 00 00 00 00 00 94 F9 04 00 87 A4 94 68
+0010 | 40 01 00 00 BE E4 12 D7 A6 50 2C EF 92 6C CC 4C
+0020 | 7D 77 E7 3C 88 11 B2 93 33 EE 3C D6 FA 11 A4 9B
+0030 | 2A 97 E7 46 03 0A A8 06 04 40 74 97 51 00 00 00
+0040 | 04 6E 76 B5 3F 00 00 00 85 FD 64 DE 85 1D 9D D0
+0050 | FE 00 01 00 34 93 31 28 45 60 13 A6 DE BD AB 16
+0060 | 92 F2 3D 2E 08 6C 94 0A 8A 9C CF 3D 85 F3 5D 47
+0070 | A5 78 8C 41 FB 18 94 A2 86 F8 1B A3 55 4A 7B 48
+0080 | B9 D2 DC F0 78 B5 1B DF 0A E0 94 9D 5F 0C EF 42
+0090 | B4 B9 DA EA 64 90 FE B0 61 8E 7A 88 19 29 4D 26
+00A0 | 51 76 64 4F FE 8C 69 E3 DB 88 9D 81 84 CB 9F A6
+00B0 | 79 4D A3 8C EC 28 5A 50 E2 74 9C 07 51 05 60 4D
+00C0 | 2C 9F 2B 4B 48 8D CB 4A 4C B8 08 9D 90 88 A7 60
+00D0 | 03 D6 3C FD 66 41 B7 C3 A3 0C BB F8 10 3B 64 0F
+00E0 | 74 83 94 F1 B9 19 74 00 FF A5 C2 80 9F E9 E9 66
+00F0 | 5D 3D 75 AA EA 83 BB EE 7F CF B9 5B 4F 30 32 E9
+0100 | B1 70 3E AA 8C 8D 93 83 9E 05 4F 32 B6 19 A2 94
+0110 | 63 66 2E C9 54 AF 8A 00 3C A8 27 B7 27 D7 8D 45
+0120 | D2 43 82 FD 13 A1 B7 B4 3B C6 64 FB FA B7 B5 4D
+0130 | E7 09 56 24 E7 72 39 A7 3F 7B CE BA 84 F0 57 41
+0140 | 2C B1 3B FA A0 3F 8A CB A7 7F 39 42 74 D4 B7 44
+0150 | 06 16 85 B2</code></pre>
+<p>Payload (de)serialization:</p>
+<pre><code>req_DH_params#d712e4be nonce:int128 server_nonce:int128 p:string q:string public_key_fingerprint:long encrypted_data:string = Server_DH_Params;</code></pre>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Offset, Length in bytes</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auth_key_id</td>
+<td>0, 8</td>
+<td><code>0000000000000000</code></td>
+<td>0 since the message is in plain text</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>8, 8</td>
+<td><code>94F9040087A49468</code></td>
+<td>Message ID generated as specified <a href="/mtproto/description#message-identifier-msg-id">here »</a> (unixtime() &lt;&lt; 32) + (N*4)</td>
+</tr>
+<tr>
+<td>message_length</td>
+<td>16, 4</td>
+<td><code>40010000</code> (320 in decimal)</td>
+<td>Message body length</td>
+</tr>
+<tr>
+<td>%(req_DH_params)</td>
+<td>20, 4</td>
+<td><code>bee412d7</code></td>
+<td><em>req_DH_params</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>24, 16</td>
+<td><code>A6502CEF926CCC4C7D77E73C8811B293</code></td>
+<td>Value generated by client in Step 1</td>
+</tr>
+<tr>
+<td>server_nonce</td>
+<td>40, 16</td>
+<td><code>33EE3CD6FA11A49B2A97E746030AA806</code></td>
+<td>Value received from server in Step 2</td>
+</tr>
+<tr>
+<td>p</td>
+<td>56, 8</td>
+<td><code>0440749751000000</code><br>TL byte deserialization <br>=&gt; bigendian conversion to decimal<br>=&gt; 1081382737</td>
+<td>First prime cofactor: single-byte prefix denoting length, 4-byte string, and three bytes of padding</td>
+</tr>
+<tr>
+<td>q</td>
+<td>64, 8</td>
+<td><code>046E76B53F000000</code><br>TL byte deserialization <br>=&gt; bigendian conversion to decimal<br>=&gt; 1853273407</td>
+<td>Second prime cofactor: single-byte prefix denoting length, 4-byte string, and three bytes of padding</td>
+</tr>
+<tr>
+<td>public_key_fingerprint</td>
+<td>72, 8</td>
+<td><code>85FD64DE851D9DD0</code></td>
+<td><code>fingerprint</code> of public key used</td>
+</tr>
+<tr>
+<td>encrypted_data</td>
+<td>80, 260</td>
+<td><code>FE00010034933128456013A6DEBDAB16</code> <code>92F23D2E086C940A8A9CCF3D85F35D47</code> <code>A5788C41FB1894A286F81BA3554A7B48</code> <code>B9D2DCF078B51BDF0AE0949D5F0CEF42</code> <code>B4B9DAEA6490FEB0618E7A8819294D26</code> <code>5176644FFE8C69E3DB889D8184CB9FA6</code> <code>794DA38CEC285A50E2749C075105604D</code> <code>2C9F2B4B488DCB4A4CB8089D9088A760</code> <code>03D63CFD6641B7C3A30CBBF8103B640F</code> <code>748394F1B9197400FFA5C2809FE9E966</code> <code>5D3D75AAEA83BBEE7FCFB95B4F3032E9</code> <code>B1703EAA8C8D93839E054F32B619A294</code> <code>63662EC954AF8A003CA827B727D78D45</code> <code>D24382FD13A1B7B43BC664FBFAB7B54D</code> <code>E7095624E77239A73F7BCEBA84F05741</code> <code>2CB13BFAA03F8ACBA77F394274D4B744</code><br> <code>061685B2</code></td>
+<td>Value generated above</td>
+</tr>
+</tbody>
+</table>
+<!-- end req_DH_params -->
+<h5><a class="anchor" href="#6-server-responds-with" id="6-server-responds-with" name="6-server-responds-with"><i class="anchor-icon"></i></a>6) Server responds with:</h5>
+<!-- start server_DH_params_ok -->
+<p>Received payload (excluding transport headers/trailers):</p>
+<pre><code>0000 | 00 00 00 00 00 00 00 00 01 B8 3C 67 87 A4 94 68
+0010 | 78 02 00 00 5C 07 E8 D0 A6 50 2C EF 92 6C CC 4C
+0020 | 7D 77 E7 3C 88 11 B2 93 33 EE 3C D6 FA 11 A4 9B
+0030 | 2A 97 E7 46 03 0A A8 06 FE 50 02 00 68 DA 5F EF
+0040 | 2F B1 99 E4 8C C4 C1 90 AA D1 74 D4 B0 D7 32 0C
+0050 | C2 54 C9 9C F9 DF D6 D0 BB 3B 2B 02 CA 1F 28 DD
+0060 | 7E 85 33 FB E2 E8 CC 20 CF BD 28 98 65 4D 49 23
+0070 | BE BE 4B 8B 2D 84 D6 B6 F9 3A F5 A0 E9 98 44 BF
+0080 | 66 74 5D 61 8C 31 EE 8A CD A9 A8 A4 F4 FE BE 24
+0090 | 1F 37 FF DD 82 83 48 90 56 7B FF F6 7F 58 E8 CB
+00A0 | 20 4C 00 5A 84 F3 B8 F3 1A 9A F4 8A 1A C5 A5 47
+00B0 | 8A 3B 42 40 2A 71 EC EA 13 3D E9 01 43 40 02 EF
+00C0 | 04 00 1D 84 AF 60 6C 0C DD F6 61 AD 14 46 FA 9B
+00D0 | A8 0B C1 7B 17 5D 2E 8A 6A 8C 0D 09 83 5D A2 00
+00E0 | 35 66 38 9D 28 C5 C5 16 F1 E4 25 6C 2D 32 FE A5
+00F0 | 72 56 DC A5 92 E2 FE 14 93 36 F0 7A F9 FD 49 8A
+0100 | FB 88 17 99 BE 83 CA 43 23 64 D4 97 20 2D 99 5E
+0110 | 8E 13 7A 65 48 B3 BF 6F 5D 88 C7 DD 20 4B 9C 1A
+0120 | A5 90 3B F2 3C 30 05 A0 B6 D1 4D 1C CE F8 23 E5
+0130 | 73 02 13 A2 EE E6 34 1B 73 63 47 C5 E6 BA 52 DA
+0140 | F3 76 90 C3 29 4F 3F 1E C3 B2 8F 68 98 94 8D 69
+0150 | 4F 3E EF F8 99 13 AB AB FB 47 AE 83 B7 94 8F 4D
+0160 | FD 86 34 86 2C FB 29 D5 69 DB 40 DC C6 21 1C B3
+0170 | CF 8E C9 87 37 9D 20 7B 5E EF 65 9A EB 33 D1 B7
+0180 | 54 33 C6 59 9B EF 54 61 6E 90 56 40 DE 17 81 F8
+0190 | 7F 75 0D 01 E2 B0 8D 6A FF 23 DF 26 AE 17 2F 07
+01A0 | 38 61 62 5E 6B 2A 9A 44 10 F0 B3 E3 85 D3 25 19
+01B0 | CE 49 5D 2E FA 6A B0 97 73 6D 05 A8 CE B3 0D 79
+01C0 | 0E 38 37 D1 FE 64 E9 A3 C5 4F C2 75 32 B4 7A 6A
+01D0 | B4 6F 6C EE 4F 8C DD A1 7C 5D 75 3D 10 14 32 A6
+01E0 | E2 7B 64 84 47 15 9E 6F 69 99 3E B7 B1 8E 17 8D
+01F0 | DF C1 54 75 BB C4 08 66 87 60 C1 DD 2E 84 6E 8B
+0200 | 03 52 62 F3 74 A9 59 D8 78 A0 7D 71 D2 44 37 70
+0210 | 91 F6 0A FF C9 4C D0 41 CD C1 42 44 4D 8C E7 79
+0220 | E5 DF D5 FC D6 4F B5 80 92 05 36 2F 13 6E 4B 5D
+0230 | B6 E2 3B C5 CD B1 2F D4 87 76 93 2C 59 0F 1E C2
+0240 | 9F 80 D0 F7 A8 71 25 0B 24 42 F5 69 4A 39 6B FB
+0250 | 2A 89 1B 11 B7 08 E3 8E D6 9F 1E 96 D0 4A 79 36
+0260 | 18 69 49 A7 6F 4C 5A 0C BA B4 E5 74 BD 57 25 D1
+0270 | 64 FE B4 15 65 1B D4 5F 3B 93 47 EC 86 4A 4A 30
+0280 | AA BE FE 23 D7 0C B1 D6 61 CD 04 CB</code></pre>
+<p>Payload (de)serialization:</p>
+<pre><code>server_DH_params_ok#d0e8075c nonce:int128 server_nonce:int128 encrypted_answer:string = Server_DH_Params;</code></pre>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Offset, Length in bytes</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auth_key_id</td>
+<td>0, 8</td>
+<td><code>0000000000000000</code></td>
+<td>0 since the message is in plain text</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>8, 8</td>
+<td><code>01B83C6787A49468</code></td>
+<td>Message ID generated as specified <a href="/mtproto/description#message-identifier-msg-id">here »</a> (unixtime() &lt;&lt; 32) + (N*4)</td>
+</tr>
+<tr>
+<td>message_length</td>
+<td>16, 4</td>
+<td><code>78020000</code> (632 in decimal)</td>
+<td>Message body length</td>
+</tr>
+<tr>
+<td>%(server_DH_params_ok)</td>
+<td>20, 4</td>
+<td><code>5c07e8d0</code></td>
+<td><em>server_DH_params_ok</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>24, 16</td>
+<td><code>A6502CEF926CCC4C7D77E73C8811B293</code></td>
+<td>Value generated by client in Step 1</td>
+</tr>
+<tr>
+<td>server_nonce</td>
+<td>40, 16</td>
+<td><code>33EE3CD6FA11A49B2A97E746030AA806</code></td>
+<td>Value received from server in Step 2</td>
+</tr>
+<tr>
+<td>encrypted_answer</td>
+<td>56, 596</td>
+<td><code>FE50020068DA5FEF2FB199E48CC4C190</code> <code>AAD174D4B0D7320CC254C99CF9DFD6D0</code> <code>BB3B2B02CA1F28DD7E8533FBE2E8CC20</code> <code>CFBD2898654D4923BEBE4B8B2D84D6B6</code> <code>F93AF5A0E99844BF66745D618C31EE8A</code> <code>CDA9A8A4F4FEBE241F37FFDD82834890</code> <code>567BFFF67F58E8CB204C005A84F3B8F3</code> <code>1A9AF48A1AC5A5478A3B42402A71ECEA</code> <code>133DE901434002EF04001D84AF606C0C</code> <code>DDF661AD1446FA9BA80BC17B175D2E8A</code> <code>6A8C0D09835DA2003566389D28C5C516</code> <code>F1E4256C2D32FEA57256DCA592E2FE14</code> <code>9336F07AF9FD498AFB881799BE83CA43</code> <code>2364D497202D995E8E137A6548B3BF6F</code> <code>5D88C7DD204B9C1AA5903BF23C3005A0</code> <code>B6D14D1CCEF823E5730213A2EEE6341B</code> <code>736347C5E6BA52DAF37690C3294F3F1E</code> <code>C3B28F6898948D694F3EEFF89913ABAB</code> <code>FB47AE83B7948F4DFD8634862CFB29D5</code> <code>69DB40DCC6211CB3CF8EC987379D207B</code> <code>5EEF659AEB33D1B75433C6599BEF5461</code> <code>6E905640DE1781F87F750D01E2B08D6A</code> <code>FF23DF26AE172F073861625E6B2A9A44</code> <code>10F0B3E385D32519CE495D2EFA6AB097</code> <code>736D05A8CEB30D790E3837D1FE64E9A3</code> <code>C54FC27532B47A6AB46F6CEE4F8CDDA1</code> <code>7C5D753D101432A6E27B648447159E6F</code> <code>69993EB7B18E178DDFC15475BBC40866</code> <code>8760C1DD2E846E8B035262F374A959D8</code> <code>78A07D71D244377091F60AFFC94CD041</code> <code>CDC142444D8CE779E5DFD5FCD64FB580</code> <code>9205362F136E4B5DB6E23BC5CDB12FD4</code> <code>8776932C590F1EC29F80D0F7A871250B</code> <code>2442F5694A396BFB2A891B11B708E38E</code> <code>D69F1E96D04A7936186949A76F4C5A0C</code> <code>BAB4E574BD5725D164FEB415651BD45F</code> <code>3B9347EC864A4A30AABEFE23D70CB1D6</code><br> <code>61CD04CB</code></td>
+<td>See below</td>
+</tr>
+</tbody>
+</table>
+<!-- end server_DH_params_ok -->
+<p>Decrypt <code>encrypted_answer</code> using the reverse of the process specified in <a href="/mtproto/auth_key#6-server-responds-with">step 6</a>:</p>
+<!-- start server_DH_inner_data_input -->
+<pre><code>encrypted_answer = 68DA5FEF2FB199E48CC4C190AAD174D4B0D7320CC254C99CF9DFD6D0BB3B2B02CA1F28DD7E8533FBE2E8CC20CFBD2898654D4923BEBE4B8B2D84D6B6F93AF5A0E99844BF66745D618C31EE8ACDA9A8A4F4FEBE241F37FFDD82834890567BFFF67F58E8CB204C005A84F3B8F31A9AF48A1AC5A5478A3B42402A71ECEA133DE901434002EF04001D84AF606C0CDDF661AD1446FA9BA80BC17B175D2E8A6A8C0D09835DA2003566389D28C5C516F1E4256C2D32FEA57256DCA592E2FE149336F07AF9FD498AFB881799BE83CA432364D497202D995E8E137A6548B3BF6F5D88C7DD204B9C1AA5903BF23C3005A0B6D14D1CCEF823E5730213A2EEE6341B736347C5E6BA52DAF37690C3294F3F1EC3B28F6898948D694F3EEFF89913ABABFB47AE83B7948F4DFD8634862CFB29D569DB40DCC6211CB3CF8EC987379D207B5EEF659AEB33D1B75433C6599BEF54616E905640DE1781F87F750D01E2B08D6AFF23DF26AE172F073861625E6B2A9A4410F0B3E385D32519CE495D2EFA6AB097736D05A8CEB30D790E3837D1FE64E9A3C54FC27532B47A6AB46F6CEE4F8CDDA17C5D753D101432A6E27B648447159E6F69993EB7B18E178DDFC15475BBC408668760C1DD2E846E8B035262F374A959D878A07D71D244377091F60AFFC94CD041CDC142444D8CE779E5DFD5FCD64FB5809205362F136E4B5DB6E23BC5CDB12FD48776932C590F1EC29F80D0F7A871250B2442F5694A396BFB2A891B11B708E38ED69F1E96D04A7936186949A76F4C5A0CBAB4E574BD5725D164FEB415651BD45F3B9347EC864A4A30AABEFE23D70CB1D661CD04CB
+tmp_aes_key = 708C4A43A80B58909979EC56D858DBF0C35B2DEF387913C1AEB5908D57438EC7
+tmp_aes_iv = F6DA52B14EAA61AD944CD5CB469EFE4A0826421A9D6B5BD6269C648535730483</code></pre>
+<!-- end server_DH_inner_data_input -->
+<p>Yielding:</p>
+<!-- start server_DH_inner_data_output -->
+<pre><code>answer_with_hash = 8B1064F0EF1C334E3A4A5AB562BA5B1D928902D8BA0D89B5A6502CEF926CCC4C7D77E73C8811B29333EE3CD6FA11A49B2A97E746030AA80603000000FE000100C71CAEB9C6B1C9048E6C522F70F13F73980D40238E3E21C14934D037563D930F48198A0AA7C14058229493D22530F4DBFA336F6E0AC925139543AED44CCE7C3720FD51F69458705AC68CD4FE6B6B13ABDC9746512969328454F18FAF8C595F642477FE96BB2A941D5BCD1D4AC8CC49880708FA9B378E3C4F3A9060BEE67CF9A4A4A695811051907E162753B56B0F6B410DBA74D8A84B2A14B3144E0EF1284754FD17ED950D5965B4B9DD46582DB1178D169C6BC465B0D6FF9CA3928FEF5B9AE4E418FC15E83EBEA0F87FA9FF5EED70050DED2849F47BF959D956850CE929851F0D8115F635B105EE2E4E15D04B2454BF6F4FADF034B10403119CD8E3B92FCC5BFE00010090E0A42F11AFBBFFA379EFC53C12AAC1FE876414B54343C03819FFE4F1565459C400F5D2C9651F1312AEA212F04EF609F4A5129832CB315AB74A78B0001E43CE7AFBACAABDDEBC0ED96223C9C2B9DCE7F939B4D7049CDADE23DA849644A6206A73EE81F6EA227CAF0866603EBBA1627E3250EC96E73DD4AA3D5D09B11DD83C3A9E7062BEED39D210F249A93142769A1519A4D7AED0B95E5F2B2443BC4448AB5B90826AF067740D90ABA3D82F032DCB6CA81C266DF6C748F46C0E9D16FF04A49F2A318EADD0F87FACC7A35462878CAA3412D4EC81E438CF5AE253B99F0CAA2A00981A92F564C80DAF9E85FC93667E1192775384920B92C5D019C43EA1DE6E315187A4946810E41F8A46CC9B83
+answer = BA0D89B5A6502CEF926CCC4C7D77E73C8811B29333EE3CD6FA11A49B2A97E746030AA80603000000FE000100C71CAEB9C6B1C9048E6C522F70F13F73980D40238E3E21C14934D037563D930F48198A0AA7C14058229493D22530F4DBFA336F6E0AC925139543AED44CCE7C3720FD51F69458705AC68CD4FE6B6B13ABDC9746512969328454F18FAF8C595F642477FE96BB2A941D5BCD1D4AC8CC49880708FA9B378E3C4F3A9060BEE67CF9A4A4A695811051907E162753B56B0F6B410DBA74D8A84B2A14B3144E0EF1284754FD17ED950D5965B4B9DD46582DB1178D169C6BC465B0D6FF9CA3928FEF5B9AE4E418FC15E83EBEA0F87FA9FF5EED70050DED2849F47BF959D956850CE929851F0D8115F635B105EE2E4E15D04B2454BF6F4FADF034B10403119CD8E3B92FCC5BFE00010090E0A42F11AFBBFFA379EFC53C12AAC1FE876414B54343C03819FFE4F1565459C400F5D2C9651F1312AEA212F04EF609F4A5129832CB315AB74A78B0001E43CE7AFBACAABDDEBC0ED96223C9C2B9DCE7F939B4D7049CDADE23DA849644A6206A73EE81F6EA227CAF0866603EBBA1627E3250EC96E73DD4AA3D5D09B11DD83C3A9E7062BEED39D210F249A93142769A1519A4D7AED0B95E5F2B2443BC4448AB5B90826AF067740D90ABA3D82F032DCB6CA81C266DF6C748F46C0E9D16FF04A49F2A318EADD0F87FACC7A35462878CAA3412D4EC81E438CF5AE253B99F0CAA2A00981A92F564C80DAF9E85FC93667E1192775384920B92C5D019C43EA1DE6E315187A4946810E41F8A46CC9B83</code></pre>
+<!-- end server_DH_inner_data_output -->
+<!-- start server_DH_inner_data -->
+<p>Generated payload (excluding transport headers/trailers):</p>
+<pre><code>0000 | BA 0D 89 B5 A6 50 2C EF 92 6C CC 4C 7D 77 E7 3C
+0010 | 88 11 B2 93 33 EE 3C D6 FA 11 A4 9B 2A 97 E7 46
+0020 | 03 0A A8 06 03 00 00 00 FE 00 01 00 C7 1C AE B9
+0030 | C6 B1 C9 04 8E 6C 52 2F 70 F1 3F 73 98 0D 40 23
+0040 | 8E 3E 21 C1 49 34 D0 37 56 3D 93 0F 48 19 8A 0A
+0050 | A7 C1 40 58 22 94 93 D2 25 30 F4 DB FA 33 6F 6E
+0060 | 0A C9 25 13 95 43 AE D4 4C CE 7C 37 20 FD 51 F6
+0070 | 94 58 70 5A C6 8C D4 FE 6B 6B 13 AB DC 97 46 51
+0080 | 29 69 32 84 54 F1 8F AF 8C 59 5F 64 24 77 FE 96
+0090 | BB 2A 94 1D 5B CD 1D 4A C8 CC 49 88 07 08 FA 9B
+00A0 | 37 8E 3C 4F 3A 90 60 BE E6 7C F9 A4 A4 A6 95 81
+00B0 | 10 51 90 7E 16 27 53 B5 6B 0F 6B 41 0D BA 74 D8
+00C0 | A8 4B 2A 14 B3 14 4E 0E F1 28 47 54 FD 17 ED 95
+00D0 | 0D 59 65 B4 B9 DD 46 58 2D B1 17 8D 16 9C 6B C4
+00E0 | 65 B0 D6 FF 9C A3 92 8F EF 5B 9A E4 E4 18 FC 15
+00F0 | E8 3E BE A0 F8 7F A9 FF 5E ED 70 05 0D ED 28 49
+0100 | F4 7B F9 59 D9 56 85 0C E9 29 85 1F 0D 81 15 F6
+0110 | 35 B1 05 EE 2E 4E 15 D0 4B 24 54 BF 6F 4F AD F0
+0120 | 34 B1 04 03 11 9C D8 E3 B9 2F CC 5B FE 00 01 00
+0130 | 90 E0 A4 2F 11 AF BB FF A3 79 EF C5 3C 12 AA C1
+0140 | FE 87 64 14 B5 43 43 C0 38 19 FF E4 F1 56 54 59
+0150 | C4 00 F5 D2 C9 65 1F 13 12 AE A2 12 F0 4E F6 09
+0160 | F4 A5 12 98 32 CB 31 5A B7 4A 78 B0 00 1E 43 CE
+0170 | 7A FB AC AA BD DE BC 0E D9 62 23 C9 C2 B9 DC E7
+0180 | F9 39 B4 D7 04 9C DA DE 23 DA 84 96 44 A6 20 6A
+0190 | 73 EE 81 F6 EA 22 7C AF 08 66 60 3E BB A1 62 7E
+01A0 | 32 50 EC 96 E7 3D D4 AA 3D 5D 09 B1 1D D8 3C 3A
+01B0 | 9E 70 62 BE ED 39 D2 10 F2 49 A9 31 42 76 9A 15
+01C0 | 19 A4 D7 AE D0 B9 5E 5F 2B 24 43 BC 44 48 AB 5B
+01D0 | 90 82 6A F0 67 74 0D 90 AB A3 D8 2F 03 2D CB 6C
+01E0 | A8 1C 26 6D F6 C7 48 F4 6C 0E 9D 16 FF 04 A4 9F
+01F0 | 2A 31 8E AD D0 F8 7F AC C7 A3 54 62 87 8C AA 34
+0200 | 12 D4 EC 81 E4 38 CF 5A E2 53 B9 9F 0C AA 2A 00
+0210 | 98 1A 92 F5 64 C8 0D AF 9E 85 FC 93 66 7E 11 92
+0220 | 77 53 84 92 0B 92 C5 D0 19 C4 3E A1 DE 6E 31 51
+0230 | 87 A4 94 68</code></pre>
+<p>Payload (de)serialization:</p>
+<pre><code>server_DH_inner_data#b5890dba nonce:int128 server_nonce:int128 g:int dh_prime:string g_a:string server_time:int = Server_DH_inner_data;</code></pre>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Offset, Length in bytes</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%(server_DH_inner_data)</td>
+<td>0, 4</td>
+<td><code>ba0d89b5</code></td>
+<td><em>server_DH_inner_data</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>4, 16</td>
+<td><code>A6502CEF926CCC4C7D77E73C8811B293</code></td>
+<td>Value generated by client in Step 1</td>
+</tr>
+<tr>
+<td>server_nonce</td>
+<td>20, 16</td>
+<td><code>33EE3CD6FA11A49B2A97E746030AA806</code></td>
+<td>Value received from server in Step 2</td>
+</tr>
+<tr>
+<td>g</td>
+<td>36, 4</td>
+<td><code>03000000</code> (3 in decimal)</td>
+<td>Value received from server in Step 2</td>
+</tr>
+<tr>
+<td>dh_prime</td>
+<td>40, 260</td>
+<td><code>FE000100C71CAEB9C6B1C9048E6C522F</code> <code>70F13F73980D40238E3E21C14934D037</code> <code>563D930F48198A0AA7C14058229493D2</code> <code>2530F4DBFA336F6E0AC925139543AED4</code> <code>4CCE7C3720FD51F69458705AC68CD4FE</code> <code>6B6B13ABDC9746512969328454F18FAF</code> <code>8C595F642477FE96BB2A941D5BCD1D4A</code> <code>C8CC49880708FA9B378E3C4F3A9060BE</code> <code>E67CF9A4A4A695811051907E162753B5</code> <code>6B0F6B410DBA74D8A84B2A14B3144E0E</code> <code>F1284754FD17ED950D5965B4B9DD4658</code> <code>2DB1178D169C6BC465B0D6FF9CA3928F</code> <code>EF5B9AE4E418FC15E83EBEA0F87FA9FF</code> <code>5EED70050DED2849F47BF959D956850C</code> <code>E929851F0D8115F635B105EE2E4E15D0</code> <code>4B2454BF6F4FADF034B10403119CD8E3</code><br> <code>B92FCC5B</code></td>
+<td>2048-bit prime, in big-endian byte order, to be checked as specified in the auth key docs</td>
+</tr>
+<tr>
+<td>g_a</td>
+<td>300, 260</td>
+<td><code>FE00010090E0A42F11AFBBFFA379EFC5</code> <code>3C12AAC1FE876414B54343C03819FFE4</code> <code>F1565459C400F5D2C9651F1312AEA212</code> <code>F04EF609F4A5129832CB315AB74A78B0</code> <code>001E43CE7AFBACAABDDEBC0ED96223C9</code> <code>C2B9DCE7F939B4D7049CDADE23DA8496</code> <code>44A6206A73EE81F6EA227CAF0866603E</code> <code>BBA1627E3250EC96E73DD4AA3D5D09B1</code> <code>1DD83C3A9E7062BEED39D210F249A931</code> <code>42769A1519A4D7AED0B95E5F2B2443BC</code> <code>4448AB5B90826AF067740D90ABA3D82F</code> <code>032DCB6CA81C266DF6C748F46C0E9D16</code> <code>FF04A49F2A318EADD0F87FACC7A35462</code> <code>878CAA3412D4EC81E438CF5AE253B99F</code> <code>0CAA2A00981A92F564C80DAF9E85FC93</code> <code>667E1192775384920B92C5D019C43EA1</code><br> <code>DE6E3151</code></td>
+<td><code>g_a</code> diffie-hellman parameter</td>
+</tr>
+<tr>
+<td>server_time</td>
+<td>560, 4</td>
+<td><code>87A49468</code> (1754571911 in decimal)</td>
+<td>Server time</td>
+</tr>
+</tbody>
+</table>
+<!-- end server_DH_inner_data -->
+<h5><a class="anchor" href="#7-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message" id="7-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message" name="7-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message"><i class="anchor-icon"></i></a>7) Client computes random 2048-bit number <em>b</em> (using a sufficient amount of entropy) and sends the server a message</h5>
+<p>First, generate a secure random 2048-bit number b:</p>
+<!-- start b -->
+<pre><code>b = 7AFF8D46F6CF4F64F78791EF0E2FD26C733612EBE90F94DD4CB55AEF289F0D30E3D44E23A8CEC2B6E2A567E410006D3EBDE7D2651B71D5EA397248145E9178448227F2ECFCB68105815742D3D699ABCFC6B5456C545715F4BAE6C677D08BBA2D35555A6AAFBF75F058D40522567FCF646DB7A2720CFBF130C814014062C5FB4C6F5F187507E5324FD84AB1545C596EDEA05D28450487B084F79F37A64319AAE23D5B33E494818CB2B98D531A3E7114E06254B52CDB9C27573E3F22856B8018CC996704F2282F6BB67C034E9F3857FD634AC003FCCD41EFB7571C4BE57B934A8ED2A97320A89BD6A60A7908AE12EBDC64668968ADA9B4653D42E643CD2A6B4915</code></pre>
+<!-- end b -->
+<p>Then compute <code>g_b = pow(g, b) mod dh_prime</code></p>
+<!-- start g_b -->
+<pre><code>g_b = 2736274CE0ECC2E3DDE7C3A343818FC18FABF1CAAC66847D8AE93E9C418ED7F32B348BBAC72A36CF62C08F5A4FB47B20BC1FE37A401D865015EC8B88041C84D721A60C65A4C99655F1C146A5C1A357F1DC1C9BD9F9859D5D81046BE3E6188DFA4E4B68282E8067DE15F2F3EE2E04F02FAAED8DA9B4179A677A598C508A02B07B197F498D0C4A75506C6252DDFF1251D68AC6BDF2FCB3F2F2C3ADCC1A989272E8DDF51315B11025CF280BD50299343244D91BA835EA83D68F9B73E252CA903772434AC2EAE7320646340AF4D6F77231972E5C5093E7DE2283C94A1BF9E223D665E3E6476C44724B0A972F78243EC8C82A610CAB3C36160DF4E8353F90854918F2</code></pre>
+<!-- end g_b -->
+<h6>7.1) generation of encrypted_data</h6>
+<!-- start client_DH_inner_data -->
+<p>Generated payload (excluding transport headers/trailers):</p>
+<pre><code>0000 | 54 B6 43 66 A6 50 2C EF 92 6C CC 4C 7D 77 E7 3C
+0010 | 88 11 B2 93 33 EE 3C D6 FA 11 A4 9B 2A 97 E7 46
+0020 | 03 0A A8 06 00 00 00 00 00 00 00 00 FE 00 01 00
+0030 | 27 36 27 4C E0 EC C2 E3 DD E7 C3 A3 43 81 8F C1
+0040 | 8F AB F1 CA AC 66 84 7D 8A E9 3E 9C 41 8E D7 F3
+0050 | 2B 34 8B BA C7 2A 36 CF 62 C0 8F 5A 4F B4 7B 20
+0060 | BC 1F E3 7A 40 1D 86 50 15 EC 8B 88 04 1C 84 D7
+0070 | 21 A6 0C 65 A4 C9 96 55 F1 C1 46 A5 C1 A3 57 F1
+0080 | DC 1C 9B D9 F9 85 9D 5D 81 04 6B E3 E6 18 8D FA
+0090 | 4E 4B 68 28 2E 80 67 DE 15 F2 F3 EE 2E 04 F0 2F
+00A0 | AA ED 8D A9 B4 17 9A 67 7A 59 8C 50 8A 02 B0 7B
+00B0 | 19 7F 49 8D 0C 4A 75 50 6C 62 52 DD FF 12 51 D6
+00C0 | 8A C6 BD F2 FC B3 F2 F2 C3 AD CC 1A 98 92 72 E8
+00D0 | DD F5 13 15 B1 10 25 CF 28 0B D5 02 99 34 32 44
+00E0 | D9 1B A8 35 EA 83 D6 8F 9B 73 E2 52 CA 90 37 72
+00F0 | 43 4A C2 EA E7 32 06 46 34 0A F4 D6 F7 72 31 97
+0100 | 2E 5C 50 93 E7 DE 22 83 C9 4A 1B F9 E2 23 D6 65
+0110 | E3 E6 47 6C 44 72 4B 0A 97 2F 78 24 3E C8 C8 2A
+0120 | 61 0C AB 3C 36 16 0D F4 E8 35 3F 90 85 49 18 F2</code></pre>
+<p>Payload (de)serialization:</p>
+<pre><code>client_DH_inner_data#6643b654 nonce:int128 server_nonce:int128 retry_id:long g_b:string = Client_DH_Inner_Data;</code></pre>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Offset, Length in bytes</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%(client_DH_inner_data)</td>
+<td>0, 4</td>
+<td><code>54b64366</code></td>
+<td><em>client_DH_inner_data</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>4, 16</td>
+<td><code>A6502CEF926CCC4C7D77E73C8811B293</code></td>
+<td>Value generated by client in Step 1</td>
+</tr>
+<tr>
+<td>server_nonce</td>
+<td>20, 16</td>
+<td><code>33EE3CD6FA11A49B2A97E746030AA806</code></td>
+<td>Value received from server in Step 2</td>
+</tr>
+<tr>
+<td>g_b</td>
+<td>36, 260</td>
+<td><code>FE0001002736274CE0ECC2E3DDE7C3A3</code> <code>43818FC18FABF1CAAC66847D8AE93E9C</code> <code>418ED7F32B348BBAC72A36CF62C08F5A</code> <code>4FB47B20BC1FE37A401D865015EC8B88</code> <code>041C84D721A60C65A4C99655F1C146A5</code> <code>C1A357F1DC1C9BD9F9859D5D81046BE3</code> <code>E6188DFA4E4B68282E8067DE15F2F3EE</code> <code>2E04F02FAAED8DA9B4179A677A598C50</code> <code>8A02B07B197F498D0C4A75506C6252DD</code> <code>FF1251D68AC6BDF2FCB3F2F2C3ADCC1A</code> <code>989272E8DDF51315B11025CF280BD502</code> <code>99343244D91BA835EA83D68F9B73E252</code> <code>CA903772434AC2EAE7320646340AF4D6</code> <code>F77231972E5C5093E7DE2283C94A1BF9</code> <code>E223D665E3E6476C44724B0A972F7824</code> <code>3EC8C82A610CAB3C36160DF4E8353F90</code><br> <code>854918F2</code></td>
+<td>Single-byte prefix denoting length, a 256-byte (2048-bit) string, and zero bytes of padding</td>
+</tr>
+<tr>
+<td>retry_id</td>
+<td>296, 8</td>
+<td><code>0000000000000000</code></td>
+<td>Equal to zero at the time of the first attempt; otherwise, it is equal to <code>auth_key_aux_hash</code> from the previous failed attempt (see Item 7).</td>
+</tr>
+</tbody>
+</table>
+<!-- end client_DH_inner_data -->
+<p>The serialization of <em>Client_DH_Inner_Data</em> produces a string <strong>data</strong>. This is used to generate <strong>encrypted_data</strong> as specified in <a href="#7-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message">step 6</a>, using the following inputs:</p>
+<!-- start client_DH_inner_data_input -->
+<pre><code>data = 54B64366A6502CEF926CCC4C7D77E73C8811B29333EE3CD6FA11A49B2A97E746030AA8060000000000000000FE0001002736274CE0ECC2E3DDE7C3A343818FC18FABF1CAAC66847D8AE93E9C418ED7F32B348BBAC72A36CF62C08F5A4FB47B20BC1FE37A401D865015EC8B88041C84D721A60C65A4C99655F1C146A5C1A357F1DC1C9BD9F9859D5D81046BE3E6188DFA4E4B68282E8067DE15F2F3EE2E04F02FAAED8DA9B4179A677A598C508A02B07B197F498D0C4A75506C6252DDFF1251D68AC6BDF2FCB3F2F2C3ADCC1A989272E8DDF51315B11025CF280BD50299343244D91BA835EA83D68F9B73E252CA903772434AC2EAE7320646340AF4D6F77231972E5C5093E7DE2283C94A1BF9E223D665E3E6476C44724B0A972F78243EC8C82A610CAB3C36160DF4E8353F90854918F2
+padding = A57776544310FEB28DC168D4
+tmp_aes_key = 708C4A43A80B58909979EC56D858DBF0C35B2DEF387913C1AEB5908D57438EC7
+tmp_aes_iv = F6DA52B14EAA61AD944CD5CB469EFE4A0826421A9D6B5BD6269C648535730483</code></pre>
+<!-- end client_DH_inner_data_input -->
+<p>Process:</p>
+<pre><code>data_with_hash := SHA1(data) + data + padding (0-15 random bytes such that total length is divisible by 16)
+encrypted_data := AES256_ige_encrypt (data_with_hash, tmp_aes_key, tmp_aes_iv);</code></pre>
+<p>Output:</p>
+<!-- start client_DH_inner_data_output -->
+<pre><code>encrypted_data = FEE5BFE2F7C8E92C61BFFAD77D2F08034F0AE3C6BDD195A59E4BB25FAA059C6D90466B187DC3CC1BF5489585E13A59024FEBBF7BB4F92F7BACD2832CDF10A2EE926B593A5D3FB810C6BAA4DD987D3B4B2A488A1B972BCB6D928A43259D88B2A8F9862D697A252B52216AEAB777790A1E7E1191E908C5AC90E476CDC866353DA0D0113707DD6A1BD90044EED1583ADAC1A585EE36837DD029D3F6F39F958DEBEB05C8B3F6B11A5AAE4416EFA7A5A21187A25190399CEB090735F069147736C05FF906C1D37935A5A2A161B7C065BFC17CFBF4AD53E8B6F1856079BA1B3BE051E0C4C6BC2A51EA688DD5A21826D44E071CB98A10FE2570EB19430F2A3B753DCEE7F87F7767FDE85A04225EFF0DF448F2F13A42F00B76C56E05E5B3C33576AE7EEC76522B0D943D6C5AF7CD6DC8E6D3B297B2F25E9D6CFDBDDF303CF20927076A5F7DC39B62732D861DA49686867CF00B00</code></pre>
+<!-- end client_DH_inner_data_output -->
+<p>The length of the final string is 336 bytes.</p>
+<h6>7.2) set_client_DH_params query</h6>
+<!-- start set_client_DH_params -->
+<p>Sent payload (excluding transport headers/trailers):</p>
+<pre><code>0000 | 00 00 00 00 00 00 00 00 94 37 08 00 87 A4 94 68
+0010 | 78 01 00 00 1F 5F 04 F5 A6 50 2C EF 92 6C CC 4C
+0020 | 7D 77 E7 3C 88 11 B2 93 33 EE 3C D6 FA 11 A4 9B
+0030 | 2A 97 E7 46 03 0A A8 06 FE 50 01 00 FE E5 BF E2
+0040 | F7 C8 E9 2C 61 BF FA D7 7D 2F 08 03 4F 0A E3 C6
+0050 | BD D1 95 A5 9E 4B B2 5F AA 05 9C 6D 90 46 6B 18
+0060 | 7D C3 CC 1B F5 48 95 85 E1 3A 59 02 4F EB BF 7B
+0070 | B4 F9 2F 7B AC D2 83 2C DF 10 A2 EE 92 6B 59 3A
+0080 | 5D 3F B8 10 C6 BA A4 DD 98 7D 3B 4B 2A 48 8A 1B
+0090 | 97 2B CB 6D 92 8A 43 25 9D 88 B2 A8 F9 86 2D 69
+00A0 | 7A 25 2B 52 21 6A EA B7 77 79 0A 1E 7E 11 91 E9
+00B0 | 08 C5 AC 90 E4 76 CD C8 66 35 3D A0 D0 11 37 07
+00C0 | DD 6A 1B D9 00 44 EE D1 58 3A DA C1 A5 85 EE 36
+00D0 | 83 7D D0 29 D3 F6 F3 9F 95 8D EB EB 05 C8 B3 F6
+00E0 | B1 1A 5A AE 44 16 EF A7 A5 A2 11 87 A2 51 90 39
+00F0 | 9C EB 09 07 35 F0 69 14 77 36 C0 5F F9 06 C1 D3
+0100 | 79 35 A5 A2 A1 61 B7 C0 65 BF C1 7C FB F4 AD 53
+0110 | E8 B6 F1 85 60 79 BA 1B 3B E0 51 E0 C4 C6 BC 2A
+0120 | 51 EA 68 8D D5 A2 18 26 D4 4E 07 1C B9 8A 10 FE
+0130 | 25 70 EB 19 43 0F 2A 3B 75 3D CE E7 F8 7F 77 67
+0140 | FD E8 5A 04 22 5E FF 0D F4 48 F2 F1 3A 42 F0 0B
+0150 | 76 C5 6E 05 E5 B3 C3 35 76 AE 7E EC 76 52 2B 0D
+0160 | 94 3D 6C 5A F7 CD 6D C8 E6 D3 B2 97 B2 F2 5E 9D
+0170 | 6C FD BD DF 30 3C F2 09 27 07 6A 5F 7D C3 9B 62
+0180 | 73 2D 86 1D A4 96 86 86 7C F0 0B 00</code></pre>
+<p>Payload (de)serialization:</p>
+<pre><code>set_client_DH_params#f5045f1f nonce:int128 server_nonce:int128 encrypted_data:string = Set_client_DH_params_answer;</code></pre>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Offset, Length in bytes</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auth_key_id</td>
+<td>0, 8</td>
+<td><code>0000000000000000</code></td>
+<td>0 since the message is in plain text</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>8, 8</td>
+<td><code>9437080087A49468</code></td>
+<td>Message ID generated as specified <a href="/mtproto/description#message-identifier-msg-id">here »</a> (unixtime() &lt;&lt; 32) + (N*4)</td>
+</tr>
+<tr>
+<td>message_length</td>
+<td>16, 4</td>
+<td><code>78010000</code> (376 in decimal)</td>
+<td>Message body length</td>
+</tr>
+<tr>
+<td>%(set_client_DH_params)</td>
+<td>20, 4</td>
+<td><code>1f5f04f5</code></td>
+<td><em>set_client_DH_params</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>24, 16</td>
+<td><code>A6502CEF926CCC4C7D77E73C8811B293</code></td>
+<td>Value generated by client in Step 1</td>
+</tr>
+<tr>
+<td>server_nonce</td>
+<td>40, 16</td>
+<td><code>33EE3CD6FA11A49B2A97E746030AA806</code></td>
+<td>Value received from server in Step 2</td>
+</tr>
+<tr>
+<td>encrypted_data</td>
+<td>56, 340</td>
+<td><code>FE500100FEE5BFE2F7C8E92C61BFFAD7</code> <code>7D2F08034F0AE3C6BDD195A59E4BB25F</code> <code>AA059C6D90466B187DC3CC1BF5489585</code> <code>E13A59024FEBBF7BB4F92F7BACD2832C</code> <code>DF10A2EE926B593A5D3FB810C6BAA4DD</code> <code>987D3B4B2A488A1B972BCB6D928A4325</code> <code>9D88B2A8F9862D697A252B52216AEAB7</code> <code>77790A1E7E1191E908C5AC90E476CDC8</code> <code>66353DA0D0113707DD6A1BD90044EED1</code> <code>583ADAC1A585EE36837DD029D3F6F39F</code> <code>958DEBEB05C8B3F6B11A5AAE4416EFA7</code> <code>A5A21187A25190399CEB090735F06914</code> <code>7736C05FF906C1D37935A5A2A161B7C0</code> <code>65BFC17CFBF4AD53E8B6F1856079BA1B</code> <code>3BE051E0C4C6BC2A51EA688DD5A21826</code> <code>D44E071CB98A10FE2570EB19430F2A3B</code> <code>753DCEE7F87F7767FDE85A04225EFF0D</code> <code>F448F2F13A42F00B76C56E05E5B3C335</code> <code>76AE7EEC76522B0D943D6C5AF7CD6DC8</code> <code>E6D3B297B2F25E9D6CFDBDDF303CF209</code> <code>27076A5F7DC39B62732D861DA4968686</code><br> <code>7CF00B00</code></td>
+<td>Encrypted client_DH_inner_data generated previously, serialized as a TL byte string</td>
+</tr>
+</tbody>
+</table>
+<!-- end set_client_DH_params -->
+<h5><a class="anchor" href="#8-auth-key-generation" id="8-auth-key-generation" name="8-auth-key-generation"><i class="anchor-icon"></i></a>8) Auth key generation</h5>
+<p>The client computes the auth_key using formula <code>g_a^b mod dh_prime</code>:</p>
+<!-- start auth_key -->
+<pre><code>auth_key = 02B83B849AACD6D8C0C0D2745CD01D17D0B725DD76EEF7F2FC23D97DC76CBEE2032A2341F58F5BFB3CE804FA4389EAD3CBE3DA3BA875CFBFB6208F0FA2F2492CAF7AA963EB87A5A0FDCBE80E38D222CE3209C1D10BF3108D0E5370E74D55BA5227CCA08276FF7F5B9FCE2B6154418B55F53518735378F4E8BDC6C4FBC576EE4D44D04718DD2143A121A3D6F977AFC8916552E0DF83DBA5EB2E9754EA3891BE6C946DAFA43E80CAB6B2ECDB0038C240D161D552D2166E038E60316257C885E6EF5DE6B8FB6744714B058BD2E73594B38FE8822A114743B4F79504E0F774C37F31F9C6E2D3F41A2AF834EF401FCA93EBBE634E7992FA25727E6DA9E7148CCB447A</code></pre>
+<!-- end auth_key -->
+<h5><a class="anchor" href="#9-final-server-reply" id="9-final-server-reply" name="9-final-server-reply"><i class="anchor-icon"></i></a>9) Final server reply</h5>
+<p>The server verifies and confirms that auth_key_hash is unique: since it's unique, it replies with the following:</p>
+<!-- start dh_gen_ok -->
+<p>Received payload (excluding transport headers/trailers):</p>
+<pre><code>0000 | 00 00 00 00 00 00 00 00 01 14 E5 5F 88 A4 94 68
+0010 | 34 00 00 00 34 F7 CB 3B A6 50 2C EF 92 6C CC 4C
+0020 | 7D 77 E7 3C 88 11 B2 93 33 EE 3C D6 FA 11 A4 9B
+0030 | 2A 97 E7 46 03 0A A8 06 43 51 CD 03 A5 2E 9B 83
+0040 | 6A 2F 1A 2D 30 45 DD B0</code></pre>
+<p>Payload (de)serialization:</p>
+<pre><code>dh_gen_ok#3bcbf734 nonce:int128 server_nonce:int128 new_nonce_hash1:int128 = Set_client_DH_params_answer;</code></pre>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Offset, Length in bytes</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auth_key_id</td>
+<td>0, 8</td>
+<td><code>0000000000000000</code></td>
+<td>0 since the message is in plain text</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>8, 8</td>
+<td><code>0114E55F88A49468</code></td>
+<td>Message ID generated as specified <a href="/mtproto/description#message-identifier-msg-id">here »</a> (unixtime() &lt;&lt; 32) + (N*4)</td>
+</tr>
+<tr>
+<td>message_length</td>
+<td>16, 4</td>
+<td><code>34000000</code> (52 in decimal)</td>
+<td>Message body length</td>
+</tr>
+<tr>
+<td>%(dh_gen_ok)</td>
+<td>20, 4</td>
+<td><code>34f7cb3b</code></td>
+<td><em>dh_gen_ok</em> constructor number from TL schema</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>24, 16</td>
+<td><code>A6502CEF926CCC4C7D77E73C8811B293</code></td>
+<td>Value generated by client in Step 1</td>
+</tr>
+<tr>
+<td>server_nonce</td>
+<td>40, 16</td>
+<td><code>33EE3CD6FA11A49B2A97E746030AA806</code></td>
+<td>Value received from server in Step 2</td>
+</tr>
+<tr>
+<td>new_nonce_hash1</td>
+<td>56, 16</td>
+<td><code>4351CD03A52E9B836A2F1A2D3045DDB0</code></td>
+<td>The 128 lower-order bits of SHA1 of the byte string derived from the <code>new_nonce</code> string by adding a single byte with the value of 1, 2, or 3, and followed by another 8 bytes with <code>auth_key_aux_hash</code>. Different values are required to prevent an intruder from changing server response dh_gen_ok into dh_gen_retry.</td>
+</tr>
+</tbody>
+</table>
+<!-- end dh_gen_ok --></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
