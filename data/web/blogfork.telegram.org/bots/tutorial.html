@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>From BotFather to &#39;Hello World&#39;</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Building your first bot">
+    <meta property="og:title" content="From BotFather to &#39;Hello World&#39;">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Building your first bot">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/bots" >Telegram Bots</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/bots/tutorial" >From BotFather to &#39;Hello World&#39;</a></li></ul></div>
+  <h1 id="dev_page_title">From BotFather to &#39;Hello World&#39;</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>This guide will walk you through everything you need to know to build your first <strong>Telegram Bot</strong>.<br>If you already know your way around some of the basic steps, you can jump directly to the part you&#39;re missing. Equivalent examples are available in <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/TutorialBot.cs">C#</a>, <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/TutorialBot.py">Python</a>, <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/TutorialBot.go">Go</a> and <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/tree/main/Nodejs">TypeScript</a> .</p>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#getting-ready"><strong>Basic Tutorial</strong></a></li>
+</ul>
+<div id="dev_page_content">
+
+<ul style="padding-left: 30px;">
+<li style="margin-top: -5px"><a href="#getting-ready">Environment</a></li>
+<li><a href="#first-run">First Run</a></li>
+<li><a href="#echo-bot">Echo Bot</a></li>
+
+</ul>
+</div>
+
+<ul>
+<li><a href="#executing-commands"><strong>Advanced Tutorial</strong></a></li>
+</ul>
+<div id="dev_page_content">
+<ul style="padding-left: 30px;">
+<li style="margin-top: -5px"><a href="#executing-commands">Commands</a></li>
+<li><a href="#navigation">Navigation</a></li>
+<li><a href="#database">Database</a></li>
+<li><a href="#hosting">Hosting</a></li>
+
+</ul>
+</div>
+
+
+
+<ul>
+<li><a href="#further-reading">Further Reading</a></li>
+</ul>
+<hr>
+<h3><a class="anchor" name="introduction" href="#introduction"><i class="anchor-icon"></i></a>Introduction</h3>
+<p>At its core, you can think of the Telegram <a href="api">Bot API</a> as software that provides <a href="https://en.wikipedia.org/wiki/JSON">JSON-encoded</a> responses to your queries.</p>
+<p>A bot, on the other hand, is essentially a routine, software or script that queries the API by means of an <a href="https://core.telegram.org/bots/api#making-requests">HTTPS request</a> and waits for a response. There are several types of <a href="api#available-methods">requests</a> you can make, as well as many different <a href="api#available-types">objects</a> that you can use and receive as responses.</p>
+<p>Since <strong>your browser</strong> is capable of sending HTTPS requests, you can use it to quickly try out the API. After <a href="#obtain-your-bot-token">obtaining your token</a>, try pasting this string into your browser:</p>
+<pre><code>https://api.telegram.org/bot&lt;YOUR_BOT_TOKEN&gt;/getMe</code></pre>
+<p>In theory, you could interact with the API with <strong>basic requests</strong> like this, either via your browser or other tailor-made tools like <a href="https://curl.se/">cURL</a>. While this can work for simple requests like the example above, it&#39;s not practical for larger applications and doesn&#39;t scale well.<br>For that reason, this guide will show you how to use <a href="samples">libraries and frameworks</a>, along with some <strong>basic programming skills</strong>, to build a more robust and scalable project.</p>
+<p>If you know how to code, you&#39;ll fly right through each step in no time – and if you&#39;re just starting out, this guide will show you everything you need to learn.</p>
+<blockquote>
+<p>We will use <a href="https://en.wikipedia.org/wiki/Java_%28programming_language%29">Java</a> throughout this guide as it&#39;s one of the most popular programming languages, however, you can follow along with any language as all the steps are fundamentally the same.<br>Since Java is fully cross-platform, each code example will work with any operating system.<br>If you pick another language, equivalent examples are available in <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/TutorialBot.cs">C#</a>, <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/TutorialBot.py">Python</a>, <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/TutorialBot.go">Go</a> and <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/tree/main/Nodejs">TypeScript</a> .</p>
+</blockquote>
+<h3><a class="anchor" name="getting-ready" href="#getting-ready"><i class="anchor-icon"></i></a>Getting Ready</h3>
+<p>First, we will briefly cover how to <strong>create your first project</strong>, obtain your <strong>API token</strong> and download all necessary <strong>dependencies and libraries</strong>.</p>
+<p>For the purposes of this guide, a copy of the bot you will be creating is also live at <a href="https://t.me/tutorialbot">@TutorialBot</a> – feel free to check it out along the way to see how your own implementation should look after each step.</p>
+<h4><a class="anchor" name="obtain-your-bot-token" href="#obtain-your-bot-token"><i class="anchor-icon"></i></a>Obtain Your Bot Token</h4>
+<p>In this context, a <strong>token</strong> is a string that authenticates your bot (not your account) on the bot API. Each bot has a unique token which can also be revoked at any time via <a href="https://t.me/botfather">@BotFather</a>.</p>
+<p>Obtaining a token is as simple as contacting <a href="https://t.me/botfather">@BotFather</a>, issuing the <code>/newbot</code> command and following the steps until you&#39;re given a new token. You can find a step-by-step guide <a href="features#creating-a-new-bot">here</a>.</p>
+<p>Your token will look something like this:</p>
+<pre><code>4839574812:AAFD39kkdpWt3ywyRZergyOLMaJhac60qc</code></pre>
+<blockquote>
+<p>Make sure to save your token in a secure place, treat it like a password and <strong>don&#39;t share it with anyone</strong>.</p>
+</blockquote>
+<h4><a class="anchor" name="download-an-ide" href="#download-an-ide"><i class="anchor-icon"></i></a>Download an IDE</h4>
+<p>To program in Java you&#39;ll need an <a href="https://en.wikipedia.org/wiki/Integrated_development_environment">IDE</a> – a special text editor that will let you write, compile and run your code.<br>In this tutorial, we&#39;ll use IntelliJ – there are several free, open source alternatives like <a href="https://www.eclipse.org/ide/">Eclipse</a> or <a href="https://netbeans.apache.org/download/index.html">NetBeans</a> which work in the exact same way.</p>
+<p>You will also need a <a href="https://en.wikipedia.org/wiki/Java_Development_Kit">JDK</a>, a software kit that allows your Java code to run.<br>Most IDEs don&#39;t include a JDK, so you should download a version compatible with your operating system separately. You can find a free, open source version <a href="https://adoptium.net/temurin/releases/">here</a>.</p>
+<blockquote>
+<p>If you use another language, the steps are identical. You will just have to download a different IDE and software development kit.</p>
+</blockquote>
+<h4><a class="anchor" name="pick-a-framework-or-library" href="#pick-a-framework-or-library"><i class="anchor-icon"></i></a>Pick a Framework or Library</h4>
+<p>You can think of a framework as software that handles all the low-level logic for you, including the API calls, and lets you focus on your bot-specific logic.</p>
+<p>In this tutorial, we&#39;ll use <a href="https://github.com/rubenlagus/TelegramBots">TelegramBots</a>, but you can follow along with any equivalent implementation, since all the underlying methods are either similar or exactly the same.</p>
+<blockquote>
+<p>You can find many frameworks, along with code examples, in <a href="samples">our dedicated list</a>.</p>
+</blockquote>
+<h4><a class="anchor" name="create-your-project" href="#create-your-project"><i class="anchor-icon"></i></a>Create Your Project</h4>
+<p>In IntelliJ, go to <code>File &gt; New &gt; Project</code>.</p>
+<p>Fill in the fields accordingly:</p>
+<ul>
+<li><strong>Name</strong> - The name of your project. For example, <em>BotTutorial</em>.</li>
+<li><strong>Location</strong> - Where to store your project. You can use the default value.</li>
+<li><strong>Language</strong> - Java</li>
+<li><strong>Build System</strong> - The framework that will handle your dependencies. Pick <em>Maven</em>.</li>
+<li><strong>JDK</strong> - Pick whichever version you downloaded. We&#39;ll be using version <em>17</em>.</li>
+<li><strong>Add Sample Code</strong> - Leave this <strong>selected</strong>, it will generate some needed files for you.</li>
+<li><strong>Advanced Settings &gt; GroupId</strong> - We suggest <em>tutorial</em>.</li>
+<li><strong>Advanced Settings &gt; ArtifactId</strong> - You can use the default value.</li>
+</ul>
+<p>After hitting <em>Create</em>, if you did everything correctly, your <strong>Project</strong> view in the top left should show a <strong>project structure</strong> along these lines:</p>
+<pre><code>BotTutorial
+├─ .idea
+├─ src
+│  └─ main
+│     └─ java
+│        └─ tutorial
+│           └─ Main
+└─ pom.xml</code></pre>
+<blockquote>
+<p>Other IDEs will follow a similar pattern. Your dependency management system will have a different name (or no name at all if it&#39;s built-in) depending on the language you chose.</p>
+</blockquote>
+<p>If this looks scary, don&#39;t worry. We will only be using the <code>Main</code> file and the <code>pom.xml</code> file.<br>In fact, to check that everything is working so far, double click on <em>Main</em> and click on the small green arrow on the left of <em>public class Main</em>, then select the first option.<br>If you followed the steps correctly, <em>Hello world!</em> should appear in the console below.</p>
+<h4><a class="anchor" name="add-framework-dependency" href="#add-framework-dependency"><i class="anchor-icon"></i></a>Add Framework Dependency</h4>
+<p>We will now instruct the IDE to download and configure everything needed to work with the API.<br>This is very easy and happens automatically behind the scenes.</p>
+<p>First, locate your <code>pom.xml</code> file on the left side of the screen.<br>Open it by double-clicking and simply add:</p>
+<pre><code>&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.telegram&lt;/groupId&gt;
+        &lt;artifactId&gt;telegrambots&lt;/artifactId&gt;
+        &lt;version&gt;6.0.1&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+<p>right after the <code>&lt;/properties&gt;</code> tag.</p>
+<p>When you&#39;re done, your <code>pom.xml</code> should look something like <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/pom.xml">this</a>.</p>
+<h3><a class="anchor" name="start-coding" href="#start-coding"><i class="anchor-icon"></i></a>Start Coding</h3>
+<p>We are ready to start coding. If you&#39;re a beginner, consider that being familiar with your language of choice will greatly help. With this tutorial, you&#39;ll be able to teach your bot basic behaviors, though more advanced features will require some coding experience.</p>
+<h4><a class="anchor" name="creating-a-bot-class" href="#creating-a-bot-class"><i class="anchor-icon"></i></a>Creating a Bot Class</h4>
+<p>If you&#39;re familiar with <a href="https://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented programming</a>, you&#39;ll know what a class is.<br>If you&#39;ve never heard of it before, consider a class as a file where you write some logic.</p>
+<p>To <strong>create the class</strong> that will contain the bot logic, right click on <em>tutorial</em> from the project tree on the left and select <em>New &gt; Java Class</em>. Name it <em>Bot</em> and hit enter.</p>
+<p>Now we have to connect this class to the bot framework. In other words, we must make sure it extends <code>TelegramLongPollingBot</code>. To do that, just add <em>extends TelegramLongPollingBot</em> right after <em>Bot</em>.<br>A red line will appear – it simply means we&#39;re missing some important methods.</p>
+<p>To fix this, hover over the red line, click on <em>implement methods</em>, then hit OK.<br>Depending on the IDE, this option may be called <em>implement missing methods</em> or something similar.</p>
+<p>You should end up with this – if something went wrong, feel free to copy it from here and paste it in your class:</p>
+<pre><code>package tutorial;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Update;
+
+public class Bot extends TelegramLongPollingBot {
+
+  @Override
+  public String getBotUsername() {
+      return null;
+  }
+
+  @Override
+  public String getBotToken() {
+      return null;
+  }
+
+  @Override
+  public void onUpdateReceived(Update update) {}
+
+}</code></pre>
+<blockquote>
+<p>If you get a red line under TelegramLongPollingBot, it means you didn&#39;t set up your pom.xml correctly. If this is the case, restart from <a href="#add-framework-dependency">here</a>.</p>
+</blockquote>
+<h4><a class="anchor" name="available-methods" href="#available-methods"><i class="anchor-icon"></i></a>Available Methods</h4>
+<p>Let&#39;s look into these 3 methods one by one.</p>
+<ul>
+<li><strong>getBotUsername</strong> - This method must be edited to always return your bot&#39;s username. You should replace the <em>null</em> return value with it.</li>
+<li><strong>getBotToken</strong> - This method will be used by the framework to retrieve your bot token. You should replace the <em>null</em> return value with the token.</li>
+<li><strong>onUpdateReceived</strong> - This is the most important method. It will be called automatically whenever a new Update is available. Let&#39;s add a <code>System.out.println(update);</code> call in there to quickly show what we are getting.</li>
+</ul>
+<p>After you&#39;ve replaced all the strings, you should end up with this:</p>
+<pre><code>@Override
+public String getBotUsername() {
+    return &quot;TutorialBot&quot;;
+}
+
+@Override
+public String getBotToken() {
+    return &quot;4839574812:AAFD39kkdpWt3ywyRZergyOLMaJhac60qc&quot;;
+}
+
+@Override
+public void onUpdateReceived(Update update) {
+    System.out.println(update);
+}</code></pre>
+<p>At this point, the bot is configured and ready to go – time to register it on the API and start processing updates.</p>
+<blockquote>
+<p>In the future, you should consider storing your token in a dedicated settings file or in <a href="https://en.wikipedia.org/wiki/Environment_variable">environment variables</a>. Keeping it in the code is fine for the scope of this tutorial, however, it&#39;s not very versatile and is generally considered bad practice. </p>
+</blockquote>
+<h4><a class="anchor" name="registering-the-bot" href="#registering-the-bot"><i class="anchor-icon"></i></a>Registering the Bot</h4>
+<p>To <strong>register the bot</strong> on the API, simply add a couple of lines <strong>in the main method</strong> that will launch the application. If you named your class <code>Bot</code>, this is what your main method should look like:</p>
+<pre><code>public static void main(String[] args) throws TelegramApiException {
+  TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+  botsApi.registerBot(new Bot());
+}</code></pre>
+<blockquote>
+<p>You can place this method in any class. Since we have an auto-generated <code>main</code> method in the Main class, we&#39;ll be using that one for this tutorial.</p>
+</blockquote>
+<h3><a class="anchor" name="first-run" href="#first-run"><i class="anchor-icon"></i></a>First Run</h3>
+<p>It&#39;s time to <strong>run your bot</strong> for the first time.<br>Hit the green arrow to the left of <code>public static void main</code> and select the first option.</p>
+<p><em>And then there was nothing</em>. Yes, a bit anticlimactic.<br>This is because your bot <strong>has nothing to print</strong> – there are <strong>no new updates</strong> because nobody messaged it yet.</p>
+<p>If you try messaging the bot on Telegram, you&#39;ll then see <strong>new updates</strong> pop up in the console. At this point, you have your very own Telegram Bot – quite the achievement. Now, on to making it a bit more intelligent.</p>
+<blockquote>
+<p>If nothing pops up, make sure you messaged the right bot and that the token you pasted in the code is correct.</p>
+</blockquote>
+<h3><a class="anchor" name="receiving-messages" href="#receiving-messages"><i class="anchor-icon"></i></a>Receiving Messages</h3>
+<p>Every time someone sends a <strong>private message</strong> to your bot, your <code>onUpdateReceived</code> method will be called automatically and you&#39;ll be able to handle the <code>update</code> parameter, which contains the <strong>message</strong>, along with a great deal of other info which you can see detailed <a href="api#update">here</a>.</p>
+<p>Let&#39;s focus on two values for now:</p>
+<ul>
+<li><strong>The user</strong> - Who sent the message. Access it via <code>update.getMessage().getFrom()</code>.</li>
+<li><strong>The message</strong> - What was sent. Access it via <code>update.getMessage()</code>.</li>
+</ul>
+<p>Knowing this, we can make it a bit more clear in the <strong>console output</strong>.</p>
+<pre><code>@Override
+public void onUpdateReceived(Update update) {
+    var msg = update.getMessage();
+    var user = msg.getFrom();
+
+    System.out.println(user.getFirstName() + &quot; wrote &quot; + msg.getText());
+}</code></pre>
+<p>This is just a basic example – you can now play around with all the methods to see everything you can pull out of these objects. You can try <code>getUsername</code>, <code>getLanguageCode</code>, and dozens more.</p>
+<p>Knowing how to receive, process and print <strong>incoming messages</strong>, now it&#39;s time to learn how to <strong>answer them</strong>.</p>
+<blockquote>
+<p>Remember to stop and re-launch your bot after each change to the code.</p>
+</blockquote>
+<h3><a class="anchor" name="sending-messages" href="#sending-messages"><i class="anchor-icon"></i></a>Sending Messages</h3>
+<p>To send a private text message, you generally need <strong>three things</strong>:</p>
+<ul>
+<li>The user <strong>must</strong> have contacted your bot first. (Unless the user sent a join request to a group where your bot is an admin, but that&#39;s a more advanced scenario).</li>
+<li>You <strong>must</strong> have previously saved the <strong>User ID</strong> (<code>user.getId()</code>)</li>
+<li>A <code>String</code> object containing the message text, 1-4096 characters.</li>
+</ul>
+<p>With that out of the way, let&#39;s create a <strong>new method</strong> to send the first message:</p>
+<pre><code>public void sendText(Long who, String what){
+   SendMessage sm = SendMessage.builder()
+                    .chatId(who.toString()) //Who are we sending a message to
+                    .text(what).build();    //Message content
+   try {
+        execute(sm);                        //Actually sending the message
+   } catch (TelegramApiException e) {
+        throw new RuntimeException(e);      //Any error will be printed here
+   }
+}</code></pre>
+<p>And proceed to run this in the <code>main</code> method, right after registering the bot.<br>For this example, we&#39;ll assume your User ID is <code>1234</code>.</p>
+<pre><code>public static void main(String[] args) throws TelegramApiException {
+   TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+   Bot bot = new Bot();                  //We moved this line out of the register method, to access it later
+   botsApi.registerBot(bot);            
+   bot.sendText(1234L, &quot;Hello World!&quot;);  //The L just turns the Integer into a Long
+}</code></pre>
+<p>If you did everything correctly, your bot should text you <em>Hello World!</em> every time you launch your code. Sending messages to groups or channels – assuming you have the relevant permissions – is as simple as replacing <code>1234</code> with the ID of the respective chat.</p>
+<blockquote>
+<p>Try experimenting with other types of messages, like SendPhoto, SendSticker, SendDice…<br>A full list is available starting <a href="https://core.telegram.org/bots/api#sendmessage">here</a>.</p>
+</blockquote>
+<h3><a class="anchor" name="echo-bot" href="#echo-bot"><i class="anchor-icon"></i></a>Echo Bot</h3>
+<p>Let&#39;s practice everything we tried so far by coding an <strong>Echo Bot</strong>.<br>Its functionality will be rather simple: every text message it receives will be sent right back to the user.</p>
+<h4><a class="anchor" name="copying-text" href="#copying-text"><i class="anchor-icon"></i></a>Copying Text</h4>
+<p>The most intuitive way of coding this is saving the User ID and calling <code>sendText</code> right after each update.</p>
+<p>In other words:</p>
+<pre><code>@Override
+public void onUpdateReceived(Update update) {
+    var msg = update.getMessage();
+    var user = msg.getFrom();
+    var id = user.getId();
+
+    sendText(id, msg.getText());
+}</code></pre>
+<p>This works for text but can be extended to stickers, media and files.</p>
+<h4><a class="anchor" name="copying-everything" href="#copying-everything"><i class="anchor-icon"></i></a>Copying Everything</h4>
+<p>There are more specific functions that can be used to copy messages and send them back.<br>Let&#39;s build a method to do just that:</p>
+<pre><code>public void copyMessage(Long who, Integer msgId){
+   CopyMessage cm = CopyMessage.builder()
+              .fromChatId(who.toString())  //We copy from the user
+           .chatId(who.toString())      //And send it back to him
+           .messageId(msgId)            //Specifying what message
+           .build();
+    try {
+        execute(cm);
+    } catch (TelegramApiException e) {
+        throw new RuntimeException(e);
+    }
+}</code></pre>
+<p>After replacing the method call in<code>onUpdateReceived</code>, running the code will result in a fully functional <strong>Echo Bot</strong>.</p>
+<blockquote>
+<p>This tutorial assumes that updates always contain messages for the sake of simplicity. This may not always be true – be sure to implement all the proper checks in your code to handle every type of update with the appropriate methods.</p>
+</blockquote>
+<h3><a class="anchor" name="executing-commands" href="#executing-commands"><i class="anchor-icon"></i></a>Executing Commands</h3>
+<p>To learn what a command is and how it works, we recommend reading this <a href="features#commands">dedicated summary</a>.<br>In this guide, we&#39;ll focus on the technical side of things.</p>
+<h4><a class="anchor" name="creating-your-command" href="#creating-your-command"><i class="anchor-icon"></i></a>Creating Your Command</h4>
+<p>Begin by opening <a href="https://t.me/botfather">@BotFather</a>.<br>Type <code>/mybots</code> &gt; <em>Your_Bot_Name</em> &gt; Edit Bot &gt; Edit Commands.</p>
+<p>Now send a new command, followed by a brief description.<br>For the purpose of this tutorial, we&#39;ll implement two simple commands:</p>
+<pre><code>scream - Speak, I&#39;ll scream right back 
+whisper - Shhhhhhh</code></pre>
+<h4><a class="anchor" name="command-logic" href="#command-logic"><i class="anchor-icon"></i></a>Command Logic</h4>
+<p>We want the <strong>Echo Bot</strong> to reply in uppercase when it&#39;s in <strong>scream mode</strong> and normally otherwise.</p>
+<p>First, let&#39;s <strong>create a variable</strong> to store the current mode.</p>
+<pre><code>public class Bot extends TelegramLongPollingBot {
+
+   private boolean screaming = false;
+
+   [...]
+}</code></pre>
+<p>Then, let&#39;s change some logic to <strong>account for this mode</strong>.</p>
+<pre><code>public void onUpdateReceived(Update update) {
+    [...]                                   //Same variables as the previous versions
+   if(screaming)                            //If we are screaming
+       scream(id, update.getMessage());     //Call a custom method
+   else
+       copyMessage(id, msg.getMessageId()); //Else proceed normally
+}
+
+private void scream(Long id, Message msg) {
+   if(msg.hasText())
+       sendText(id, msg.getText().toUpperCase());
+   else
+       copyMessage(id, msg.getMessageId());  //We can&#39;t really scream a sticker
+}</code></pre>
+<p>Finally, let&#39;s add a couple more lines to the <code>onUpdateReceived</code> method to process each command before replying.</p>
+<pre><code>if(msg.isCommand()){ 
+   if(msg.getText().equals(&quot;/scream&quot;))         //If the command was /scream, we switch gears
+      screaming = true;
+   else if (msg.getText().equals(&quot;/whisper&quot;))  //Otherwise, we return to normal
+      screaming = false;
+
+   return;                                     //We don&#39;t want to echo commands, so we exit
+}</code></pre>
+<p>As you can see, it checks if the message <strong>is a command</strong>. If it is, the bot enters <strong>scream mode</strong>.<br>In the update method, we check <strong>which mode we are in</strong> and either copy the message or convert it to upper case before <strong>sending it back</strong>.</p>
+<p>And that&#39;s it. Now the bot can <strong>execute commands</strong> and change its behavior accordingly.</p>
+<p>Naturally, this simplified logic will change the bot&#39;s behavior for <strong>everyone</strong> – not just the person who sent the command. This can be fun for this tutorial but <strong>won&#39;t work in a production environment</strong> – consider using a Map, dictionary or equivalent data structure to assign settings for individual users.</p>
+<blockquote>
+<p>Remember to always implement a few basic <a href="features#global-commands">global commands</a>.<br>You can practice by implementing a simple feedback to the <code>/start</code> command, which we intentionally left out.</p>
+</blockquote>
+<h3><a class="anchor" name="buttons-and-keyboards" href="#buttons-and-keyboards"><i class="anchor-icon"></i></a>Buttons and Keyboards</h3>
+<p>To streamline and simplify user interaction with your bot, you can replace many text-based exchanges with handy buttons. These buttons can perform a wide variety of actions and can be customized for each user.</p>
+<h4><a class="anchor" name="button-types" href="#button-types"><i class="anchor-icon"></i></a>Button Types</h4>
+<p>There are two main types of buttons:</p>
+<ul>
+<li><strong>Reply Buttons</strong> - used to provide a list of predefined text <a href="features#keyboards">reply options</a>.</li>
+<li><strong>Inline Buttons</strong> - used to offer quick navigation, shortcuts, URLs, games and <a href="features#inline-keyboards">so much more</a>.</li>
+</ul>
+<p>Using these buttons is as easy as attaching a <code>ReplyKeyboardMarkup</code> or an <code>InlineKeyboardMarkup</code> to your <code>SendMessage</code> object.</p>
+<p>This guide will focus on <strong>inline buttons</strong> since they only require a few extra lines of code.</p>
+<h4><a class="anchor" name="creating-buttons" href="#creating-buttons"><i class="anchor-icon"></i></a>Creating Buttons</h4>
+<p>First of all, let&#39;s create some buttons.</p>
+<pre><code> var next = InlineKeyboardButton.builder()
+            .text(&quot;Next&quot;).callbackData(&quot;next&quot;)           
+            .build();
+
+ var back = InlineKeyboardButton.builder()
+            .text(&quot;Back&quot;).callbackData(&quot;back&quot;)
+            .build();
+
+ var url = InlineKeyboardButton.builder()
+            .text(&quot;Tutorial&quot;)
+            .url(&quot;https://core.telegram.org/bots/api&quot;)
+            .build();</code></pre>
+<p>Let&#39;s go back through the fields we specified:</p>
+<ul>
+<li><strong>Text</strong> - This is what the user will see, the text that appears on the button</li>
+<li><strong>Callback Data</strong> - This will be sent back to the code instance as part of a new <code>Update</code>, so we can quickly identify what button was clicked.</li>
+<li><strong>Url</strong> - A button that specifies a URL doesn&#39;t specify callbackdata since its behavior is predefined – it will open the given link when tapped.</li>
+</ul>
+<h4><a class="anchor" name="creating-keyboards" href="#creating-keyboards"><i class="anchor-icon"></i></a>Creating Keyboards</h4>
+<p>The <strong>buttons</strong> we created can be assembled into two <strong>keyboards</strong>, which will then be used to navigate back and forth between two <strong>sample menus</strong>.</p>
+<p>First, <strong>add two fields</strong> to store the necessary keyboards.</p>
+<pre><code>private boolean screaming = false;
+
+private InlineKeyboardMarkup keyboardM1;
+private InlineKeyboardMarkup keyboardM2;</code></pre>
+<p>Then, <strong>build</strong> and <strong>assign</strong> them.</p>
+<pre><code>keyboardM1 = InlineKeyboardMarkup.builder()
+          .keyboardRow(List.of(next)).build();  
+
+//Buttons are wrapped in lists since each keyboard is a set of button rows
+keyboardM2 = InlineKeyboardMarkup.builder()
+          .keyboardRow(List.of(back))
+          .keyboardRow(List.of(url))
+          .build();</code></pre>
+<blockquote>
+<p>You can place this code wherever you prefer, the important thing is making sure that keyboard variables are accessible from the method call that will send the new menu. If you&#39;re confused by this concept and don&#39;t know where to put them, just paste them above the command processing flow.</p>
+</blockquote>
+<h4><a class="anchor" name="sending-keyboards" href="#sending-keyboards"><i class="anchor-icon"></i></a>Sending Keyboards</h4>
+<p>Sending a keyboard only requires specifying a reply markup for the message.</p>
+<pre><code>public void sendMenu(Long who, String txt, InlineKeyboardMarkup kb){
+    SendMessage sm = SendMessage.builder().chatId(who.toString())
+            .parseMode(&quot;HTML&quot;).text(txt)
+            .replyMarkup(kb).build();
+
+    try {
+        execute(sm);
+    } catch (TelegramApiException e) {
+        throw new RuntimeException(e);
+    }
+}</code></pre>
+<blockquote>
+<p>You may have noticed that we also added a new parameter, <code>HTML</code>.<br>This is called a <a href="api#formatting-options">formatting option</a> and will allow us to use HTML tags and add formatting to the text later on.</p>
+</blockquote>
+<h4><a class="anchor" name="menu-trigger" href="#menu-trigger"><i class="anchor-icon"></i></a>Menu Trigger</h4>
+<p>We could send a new menu for each new user, but for simplicity let&#39;s add a new command that will spawn a menu. We can achieve this by adding a new <strong>else clause</strong> to the previous command flow.</p>
+<pre><code> var txt = msg.getText();
+ if(msg.isCommand()) {
+        if (txt.equals(&quot;/scream&quot;))
+            screaming = true;
+        else if (txt.equals(&quot;/whisper&quot;))
+            screaming = false;
+        else if (txt.equals(&quot;/menu&quot;))
+            sendMenu(id, &quot;&lt;b&gt;Menu 1&lt;/b&gt;&quot;, keyboardM1);
+        return;
+ }</code></pre>
+<p>Try sending <code>/menu</code> to your bot now. If you did everything correctly, you should see a brand new menu pop up.</p>
+<blockquote>
+<p>In a production environment, commands should be handled with an appropriate design pattern that isolates them into different executor classes – modular and separated from the main logic.</p>
+</blockquote>
+<h3><a class="anchor" name="navigation" href="#navigation"><i class="anchor-icon"></i></a>Navigation</h3>
+<p>When building complex bots, navigation is essential. Your users must be able to move seamlessly from one menu to the next. </p>
+<p>In this example, we want the <code>Next</code> button to lead the user to the second menu.<br>The <code>Back</code> button will send us back.<br>To do that, we will start processing incoming <code>CallbackQueries</code>, which are the results we get after the user taps on a button.</p>
+<p>A <code>CallbackQuery</code> is essentially composed of three main parameters:</p>
+<ul>
+<li><strong>queryId</strong> - Needed to close the query. You <strong>must always</strong> close new queries after processing them – if you don&#39;t, a loading symbol will keep showing on the user&#39;s side on top of each button.</li>
+<li><strong>data</strong> - This identifies which button was pressed.</li>
+<li><strong>from</strong> - The user who pressed the button.</li>
+</ul>
+<p>Processing in this context just means <strong>executing the action</strong> uniquely identified by the button, then <strong>closing the query</strong>.</p>
+<p>A very basic button handler could look something like:</p>
+<pre><code>private void buttonTap(Long id, String queryId, String data, int msgId) {
+
+    EditMessageText newTxt = EditMessageText.builder()
+            .chatId(id.toString())
+            .messageId(msgId).text(&quot;&quot;).build();
+
+    EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder()
+            .chatId(id.toString()).messageId(msgId).build();                           
+
+    if(data.equals(&quot;next&quot;)) {
+        newTxt.setText(&quot;MENU 2&quot;);
+        newKb.setReplyMarkup(keyboardM2);
+    } else if(data.equals(&quot;back&quot;)) {
+        newTxt.setText(&quot;MENU 1&quot;);
+        newKb.setReplyMarkup(keyboardM1);
+    }
+
+    AnswerCallbackQuery close = AnswerCallbackQuery.builder()
+            .callbackQueryId(queryId).build();
+
+    execute(close);
+    execute(newTxt);
+    execute(newKb);
+}</code></pre>
+<p>With this handler, whenever a button is tapped, your bot will automatically navigate between inline menus.<br>Expanding on this concept allows for endless combinations of navigable submenus, settings and dynamic pages.</p>
+<h3><a class="anchor" name="database" href="#database"><i class="anchor-icon"></i></a>Database</h3>
+<p>Telegram <strong>does not</strong> host an update database for you – once you process and consume an update, it will no longer be available. This means that features like user lists, message lists, current user inline menu, settings, etc. <strong>have to be implemented and maintained</strong> by bot developers.</p>
+<p>If your bot needs one of these features and you want to get started on <strong>data persistence</strong>, we recommend that you look into <a href="https://en.wikipedia.org/wiki/Serialization">serialization</a> practices and libraries for your language of choice, as well as available databases.</p>
+<p>Implementing a database is out of scope for this guide, however, several guides are available online for simple embedded <strong>open source</strong> software solutions like <a href="https://www.sqlite.org/index.html">SQLite</a>, <a href="https://hsqldb.org/">HyperSQL</a>, <a href="https://db.apache.org/derby/">Derby</a> and many more.</p>
+<blockquote>
+<p>Your language of choice will also influence which databases are available and supported – the list above assumes you followed this Java tutorial.</p>
+</blockquote>
+<h3><a class="anchor" name="hosting" href="#hosting"><i class="anchor-icon"></i></a>Hosting</h3>
+<p>So far, your bot has been running on your <strong>local machine</strong> – your PC. While this may be good for <strong>developing</strong>, <strong>testing</strong> and <strong>debugging</strong>, it is not ideal for a production environment.<br>You&#39;ll want your bot to be available and responsive at all times, but your computer might not always be online.</p>
+<p>This can be done in four steps:</p>
+<ul>
+<li><p><strong>Package your code</strong><br>Making your bot <strong>easy to move</strong> and <strong>runnable</strong> outside of an IDE is essential to <strong>host it elsewhere</strong>.<br>If you followed this tutorial, this <a href="https://www.jetbrains.com/help/idea/compiling-applications.html#run_packaged_jar">standard guide</a> will work for you. If you didn&#39;t, look into <strong>export or packaging guides</strong> for your IDE and language of choice – procedures may vary but the end result is the same.</p>
+</li>
+<li><p><strong>Purchase a VPS or equivalent service</strong><br>A server is essentially a machine that is always online and running, without you having to worry about anything. To host your bot, you can opt for a <a href="https://en.wikipedia.org/wiki/Virtual_private_server">VPS</a> which serves this purpose and can be rented from several different providers.<br>Another option would be to purchase a network-capable <a href="https://en.wikipedia.org/wiki/Microcontroller">microcontroller</a>, which come in all different specs and sizes depending on your needs.</p>
+</li>
+</ul>
+<blockquote>
+<p>You should ensure that all user data remains <strong>heavily encrypted at all times</strong> in your database to guarantee the privacy of your users. The same concept applies to your local instance, however, this becomes especially important once you transfer your database to a remote server.</p>
+</blockquote>
+<ul>
+<li><strong>Upload your executable/package</strong></li>
+</ul>
+<p>Once you have a working <a href="https://en.wikipedia.org/wiki/Secure_Shell">ssh</a> connection between your machine and your new server, you should upload your executable and all associated files.<br>We will assume the runnable jar <code>TutorialBot.jar</code> and its database <code>dbase.db</code> are currently in the <code>/TBot</code> folder.</p>
+<pre><code>$ scp -r /TBot/ username@server_ip:/bots/TBotRemote/</code></pre>
+<ul>
+<li><strong>Run your application</strong></li>
+</ul>
+<p>Depending on which language you chose, you might have to configure your server environment differently. If you chose Java, you just need to install a compatible JDK.</p>
+<pre><code>$ apt install openjdk-17-jre
+$ java -version</code></pre>
+<p>If you did everything correctly, you should see a Java version as the output, along with a few other values. This means you&#39;re ready to run your application.</p>
+<p>Now, to run the executable:</p>
+<pre><code>$ cd /bots/TBotRemote/
+$ java -jar TutorialBot.jar</code></pre>
+<p>Your bot is now online and users can interact with it at any time.</p>
+<blockquote>
+<p>To streamline and modularize this process, you could employ a specialized <a href="https://www.docker.com/resources/what-container/">docker container</a> or equivalent service.<br>If you followed along in one of the equivalent examples (<a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/TutorialBot.cs">C#</a>, <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/TutorialBot.py">Python</a>, <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/blob/main/TutorialBot.go">Go</a> and <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/tree/main/Nodejs">TypeScript</a>) you can find a detailed set of instructions to export and run your code <a href="https://gitlab.com/Athamaxy/telegram-bot-tutorial/-/tree/main/">here</a>.</p>
+</blockquote>
+<h3><a class="anchor" name="further-reading" href="#further-reading"><i class="anchor-icon"></i></a>Further Reading</h3>
+<p>If you got this far, you might be interested in these additional guides and docs:</p>
+<ul>
+<li><a href="/bots">General Bot Platform Overview</a></li>
+<li><a href="/bots/features">Detailed List of Bot Features</a></li>
+<li><a href="/bots/api">Full API Reference</a></li>
+</ul>
+<p>If you encounter any issues while following this guide, you can contact us on Telegram at <a href="https://t.me/botsupport">@BotSupport</a>.</p>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

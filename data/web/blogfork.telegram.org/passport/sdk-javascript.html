@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Javascript SDK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="The Javascript SDK helps you easily integrate Telegram Passport requests into your website. Check out our GitHub repository…">
+    <meta property="og:title" content="Javascript SDK">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="The Javascript SDK helps you easily integrate Telegram Passport requests into your website. Check out our GitHub repository…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/passport" >Telegram Passport</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/passport/sdk-javascript" >Javascript SDK</a></li></ul></div>
+  <h1 id="dev_page_title">Javascript SDK</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>The Javascript SDK helps you easily integrate Telegram Passport requests into your website. Check out our <a href="https://github.com/TelegramMessenger/TGPassportPHPSample">GitHub repository</a> to see samples using this SDK.</p>
+<h3><a class="anchor" href="#installation" id="installation" name="installation"><i class="anchor-icon"></i></a>Installation</h3>
+<p><a href="https://github.com/TelegramMessenger/TGPassportJsSDK">Download</a> and include the Javascript SDK in the head section of your page:</p>
+<pre><code>&lt;script src="telegram-passport.js"&gt;&lt;/script&gt;</code></pre>
+<h3><a class="anchor" href="#usage" id="usage" name="usage"><i class="anchor-icon"></i></a>Usage</h3>
+<p>Simply call <a href="#createauthbutton">Telegram.Passport.createAuthButton</a> to create the default Telegram Passport button:</p>
+<pre><code>&lt;div id="telegram_passport_auth"&gt;&lt;/div&gt;
+&lt;script&gt;
+  Telegram.Passport.createAuthButton('telegram_passport_auth', {
+    bot_id:       123456, // place id of your bot here
+    scope:        {data: [{type: 'id_document', selfie: true}, 'address_document', 'phone_number', 'email'], v: 1},
+    public_key:   '-----BEGIN PUBLIC KEY----- ...', // place public key of your bot here
+    nonce:        'ab2df83746a87d2f3bd6...', // place nonce here
+    callback_url: 'https://example.com/callback/' // place callback url here
+  });
+&lt;/script&gt;</code></pre>
+<blockquote>
+<p>Note that if you use a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy">Content-Security-Policy</a> (CSP) header with the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src">frame-src</a>/<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/child-src">child-src</a> directive you should allow <code>tg:</code> source to prevent errors in some browsers (e.g. Firefox)</p>
+</blockquote>
+<h4><a class="anchor" href="#createauthbutton" id="createauthbutton" name="createauthbutton"><i class="anchor-icon"></i></a>createAuthButton</h4>
+<table class="table">
+<tbody>
+<tr>
+<td><strong>Parameters</strong></td>
+<td><strong>Type</strong></td>
+<td><strong>Required</strong></td>
+</tr>
+<tr>
+<td>element</td>
+<td>String or DOMNode</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>auth_params</td>
+<td><a href="#authparameters">AuthParameters</a> or Function</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>options</td>
+<td><a href="#authbuttonoptions">AuthButtonOptions</a></td>
+<td>Optional</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#authparameters" id="authparameters" name="authparameters"><i class="anchor-icon"></i></a>AuthParameters</h4>
+<table class="table">
+<tbody>
+<tr>
+<td><strong>Field</strong></td>
+<td><strong>Type</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td>bot_id</td>
+<td>Integer</td>
+<td>Unique identifier for the bot</td>
+</tr>
+<tr>
+<td>scope</td>
+<td><a href="/passport#passportscope">PassportScope</a></td>
+<td>A JSON-serialized object describing the data you want to request</td>
+</tr>
+<tr>
+<td>public_key</td>
+<td>String</td>
+<td>Public key of your bot</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>String</td>
+<td>Bot-specified nonce</td>
+</tr>
+<tr>
+<td>callback_url</td>
+<td>String</td>
+<td><em>Optional.</em> URL to which the user will be redirected.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#authbuttonoptions" id="authbuttonoptions" name="authbuttonoptions"><i class="anchor-icon"></i></a>AuthButtonOptions</h4>
+<table class="table">
+<tbody>
+<tr>
+<td><strong>Field</strong></td>
+<td><strong>Type</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional.</em> Text on the button. Defaults to "Log In With Telegram".</td>
+</tr>
+<tr>
+<td>radius</td>
+<td>Integer</td>
+<td><em>Optional.</em> Radius of the button and tooltip in px. Defaults to 23.</td>
+</tr>
+<tr>
+<td>tooltip_text</td>
+<td>String</td>
+<td><em>Optional.</em> Text on the tooltip. Defaults to "Please <u>install Telegram</u> to use this option.".</td>
+</tr>
+<tr>
+<td>tooltip_position</td>
+<td>String</td>
+<td><em>Optional.</em> Tooltip position. One of "top", "bottom", "left", "right". Defaults to "bottom".</td>
+</tr>
+<tr>
+<td>tooltip_force</td>
+<td>Boolean</td>
+<td><em>Optional.</em> Always show a tooltip. Defaults to <em>false</em>.</td>
+</tr>
+</tbody>
+</table>
+<p>You can also create your custom button. Do not forget about the tooltip. You should add an <code>onclick</code> listener to the button which calls the <code>Telegram.Passport.auth(auth_params, tooltip_toggle);</code> method:</p>
+<pre><code>&lt;button id="telegram_passport_auth"&gt;Log In With Telegram&lt;/button&gt;
+&lt;script&gt;
+  var auth_button = document.getElementById('telegram_passport_auth');
+  var auth_params = {
+    bot_id:        XXXXXX, // place id of your bot here
+    scope:         {data: [{type: 'id_document', selfie: true}, 'address_document', 'phone_number', 'email'], v: 1},
+    public_key:    '-----BEGIN PUBLIC KEY----- ...', // place public key of your bot here
+    nonce:         'ab2df83746a87d2f3bd6...', // place nonce here
+    callback_url:  'https://example.com/callback/' // place callback url here
+  };
+  auth_button.addEventListener('click', function() {
+    Telegram.Passport.auth(auth_params, function(show) {
+      if (show) {
+        // some code to show tooltip
+      } else {
+        // some code to hide tooltip
+      }
+    });
+  }, false);
+&lt;/script&gt;</code></pre>
+<h3><a class="anchor" href="#receiving-information" id="receiving-information" name="receiving-information"><i class="anchor-icon"></i></a>Receiving information</h3>
+<p>When the user confirms your request by pressing the "Authorize" button, it will be redirected to the URL specified in the <em>callback_url</em> with the parameter <code>tg_passport=success</code> and the Bot API will send the bot an <a href="/bots/api#update">Update</a> with the field <em>passport_data</em> which contains encrypted <a href="/bots/api#passportdata">Telegram Passport data</a>.</p>
+<p>If the user cancels your request, it will be redirected to the URL specified in the <em>callback_url</em> with the parameter <code>tg_passport=cancel</code>.</p>
+<p>If an error occurs during the request, the user will be redirected to the URL specified in the <em>callback_url</em> with the parameter <code>tg_passport=error</code>. The parameter <code>error</code> will contain one of the following values: <strong>BOT_INVALID</strong>, <strong>PUBLIC_KEY_REQUIRED</strong>, <strong>PUBLIC_KEY_INVALID</strong>, <strong>SCOPE_EMPTY</strong>, <strong>NONCE_EMPTY</strong>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

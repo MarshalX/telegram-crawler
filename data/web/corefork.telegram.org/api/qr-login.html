@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Login via QR code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="QR code login flow">
+    <meta property="og:title" content="Login via QR code">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="QR code login flow">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/qr-login" >Login via QR code</a></li></ul></div>
+  <h1 id="dev_page_title">Login via QR code</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p><a href="https://en.wikipedia.org/wiki/QR_code">QR code</a> login flow.</p>
+<p>Related TL schema:</p>
+<pre><code><a href='/constructor/auth.loginToken'>auth.loginToken</a>#629f1980 expires:<a href='/type/int'>int</a> token:<a href='/type/bytes'>bytes</a> = <a href='/type/auth.LoginToken'>auth.LoginToken</a>;
+<a href='/constructor/auth.loginTokenMigrateTo'>auth.loginTokenMigrateTo</a>#68e9916 dc_id:<a href='/type/int'>int</a> token:<a href='/type/bytes'>bytes</a> = <a href='/type/auth.LoginToken'>auth.LoginToken</a>;
+<a href='/constructor/auth.loginTokenSuccess'>auth.loginTokenSuccess</a>#390d5c5e authorization:<a href='/type/auth.Authorization'>auth.Authorization</a> = <a href='/type/auth.LoginToken'>auth.LoginToken</a>;
+
+<a href='/constructor/updateLoginToken'>updateLoginToken</a>#564fe691 = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/authorization'>authorization</a>#ad01d61d flags:<a href='/type/%23'>#</a> current:flags.0?<a href='/constructor/true'>true</a> official_app:flags.1?<a href='/constructor/true'>true</a> password_pending:flags.2?<a href='/constructor/true'>true</a> encrypted_requests_disabled:flags.3?<a href='/constructor/true'>true</a> call_requests_disabled:flags.4?<a href='/constructor/true'>true</a> unconfirmed:flags.5?<a href='/constructor/true'>true</a> hash:<a href='/type/long'>long</a> device_model:<a href='/type/string'>string</a> platform:<a href='/type/string'>string</a> system_version:<a href='/type/string'>string</a> api_id:<a href='/type/int'>int</a> app_name:<a href='/type/string'>string</a> app_version:<a href='/type/string'>string</a> date_created:<a href='/type/int'>int</a> date_active:<a href='/type/int'>int</a> ip:<a href='/type/string'>string</a> country:<a href='/type/string'>string</a> region:<a href='/type/string'>string</a> = <a href='/type/Authorization'>Authorization</a>;
+
+---functions---
+
+<a href='/method/auth.exportLoginToken'>auth.exportLoginToken</a>#b7e085fe api_id:<a href='/type/int'>int</a> api_hash:<a href='/type/string'>string</a> except_ids:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/auth.LoginToken'>auth.LoginToken</a>;
+<a href='/method/auth.acceptLoginToken'>auth.acceptLoginToken</a>#e894ad4d token:<a href='/type/bytes'>bytes</a> = <a href='/type/Authorization'>Authorization</a>;
+<a href='/method/auth.importLoginToken'>auth.importLoginToken</a>#95ac5ce4 token:<a href='/type/bytes'>bytes</a> = <a href='/type/auth.LoginToken'>auth.LoginToken</a>;</code></pre>
+<h3><a class="anchor" href="#exporting-a-login-token" id="exporting-a-login-token" name="exporting-a-login-token"><i class="anchor-icon"></i></a>Exporting a login token</h3>
+<p>First of all, <a href="/method/auth.exportLoginToken">auth.exportLoginToken</a> must be called by the app that wants to log in to an existing Telegram account.<br>
+The method will return an <a href="/constructor/auth.loginToken">auth.loginToken</a> constructor, containing a binary login <code>token</code> and an expiration date (usually 30 seconds).  </p>
+<p>The login <code>token</code> must be encoded using <a href="https://tools.ietf.org/html/rfc4648#section-5">base64url</a>, embedded in a <code>tg://login?token=base64encodedtoken</code> URL and shown in the form of a <a href="https://en.wikipedia.org/wiki/QR_code">QR code</a> to the user.<br>
+After the expiration of the current QR code, the <a href="/method/auth.exportLoginToken">auth.exportLoginToken</a> method must be recalled and a new QR code must be generated automatically.</p>
+<h3><a class="anchor" href="#accepting-a-login-token" id="accepting-a-login-token" name="accepting-a-login-token"><i class="anchor-icon"></i></a>Accepting a login token</h3>
+<p>In order to log in, the QR code must be scanned and accepted by an already logged-in Telegram app using <a href="/method/auth.acceptLoginToken">auth.acceptLoginToken</a>.<br>
+The token must be extracted from the <code>tg://login</code> URI and <a href="https://tools.ietf.org/html/rfc4648#section-5">base64url-decoded</a> before using it in the method.</p>
+<p>Possible <a href="/api/errors">errors</a> returned by the method are:  </p>
+<ul>
+<li>400 - <code>AUTH_TOKEN_INVALID</code>, <code>AUTH_TOKEN_INVALID1</code>, an invalid authorization token was provided</li>
+<li>400 - <code>AUTH_TOKEN_EXPIRED</code>, the provided authorization token has expired and the updated QR-code must be re-scanned</li>
+<li>400 - <code>AUTH_TOKEN_ALREADY_ACCEPTED</code>, the authorization token was already used</li>
+</ul>
+<p>The method will return an <a href="/constructor/authorization">authorization</a> object, containing info about the app and session that we just authorized.</p>
+<h3><a class="anchor" href="#confirming-importing-the-login-token" id="confirming-importing-the-login-token" name="confirming-importing-the-login-token"><i class="anchor-icon"></i></a>Confirming (importing) the login token</h3>
+<p>After the logged-in app calls <a href="/method/auth.acceptLoginToken">auth.acceptLoginToken</a> and accepts the login token, the app that is trying to login will receive an <a href="/constructor/updateLoginToken">updateLoginToken</a> update, which should trigger a <strong>second</strong> call to the <a href="/method/auth.exportLoginToken">auth.exportLoginToken</a> method.  </p>
+<p>This second call should then return an <a href="/constructor/auth.loginTokenSuccess">auth.loginTokenSuccess</a> constructor, indicating <strong>successful login</strong>, essentially allowing further authorized interaction with the API.</p>
+<p>If, however, there is a DC mismatch between the two apps, <a href="/constructor/auth.loginTokenMigrateTo">auth.loginTokenMigrateTo</a> is returned instead, to which the app that is trying to login should respond by calling <a href="/method/auth.importLoginToken">auth.importLoginToken</a> with the specified <code>token</code>, to the specified DC.  </p>
+<p>This call should then finally return a <a href="/constructor/auth.loginTokenSuccess">auth.loginTokenSuccess</a> constructor.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

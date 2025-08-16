@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Styled text with message entities</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="How to create styled text with message entities">
+    <meta property="og:title" content="Styled text with message entities">
+    <meta property="og:image" content="d2441cad7ecfa0d622">
+    <meta property="og:description" content="How to create styled text with message entities">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/entities" >Styled text with message entities</a></li></ul></div>
+  <h1 id="dev_page_title">Styled text with message entities</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram supports styled text using <a href="/type/MessageEntity">message entities</a>.</p>
+<p>A client that wants to send styled messages would simply have to integrate a <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>/<a href="https://en.wikipedia.org/wiki/HTML">HTML</a> parser, and generate an array of message entities by iterating through the parsed tags.  </p>
+<p>Nested entities are supported.</p>
+<h3><a class="anchor" href="#entity-length" id="entity-length" name="entity-length"><i class="anchor-icon"></i></a>Entity length</h3>
+<p>Special care must be taken to consider the length of strings when generating message entities as the number of <a href="https://en.wikipedia.org/wiki/UTF-16">UTF-16</a> code units, even if the message itself must be encoded using UTF-8.  </p>
+<p>Example implementations: <a href="https://github.com/tdlib/td/tree/master/td/telegram/MessageEntity.cpp">tdlib</a>, <a href="https://github.com/danog/telegram-entities/blob/master/src/Entities.php">MadelineProto</a>.</p>
+<h4><a class="anchor" href="#unicode-codepoints-and-encoding" id="unicode-codepoints-and-encoding" name="unicode-codepoints-and-encoding"><i class="anchor-icon"></i></a>Unicode codepoints and encoding</h4>
+<p>A <a href="https://en.wikipedia.org/wiki/Unicode">Unicode</a> <a href="https://en.wikipedia.org/wiki/Code_point">code point</a> is a number ranging from <code>0x0</code> to <code>0x10FFFF</code>, usually represented using <code>U+0000</code> to <code>U+10FFFF</code> syntax.<br>
+Unicode defines a codespace of 1,112,064 assignable code points within the <code>U+0000</code> to <code>U+10FFFF</code> range.<br>
+Each of the assignable codepoints, once assigned by the Unicode consortium, maps to a specific character, emoji or control symbol.  </p>
+<p>The Unicode codespace is further subdivided into 17 planes:</p>
+<ul>
+<li>Plane 1: <code>U+0000</code> to <code>U+FFFF</code>: Basic Multilingual Plane (BMP)</li>
+<li>Planes 2-17: <code>U+00000</code> to <code>U+10FFFF</code>: Multiple supplementary planes as specified <a href="https://en.wikipedia.org/wiki/Plane_(Unicode)">by the Unicode standard</a></li>
+</ul>
+<p>Since storing a 21-bit number for each letter would result in a waste of space, the Unicode consortium defines multiple encodings that allow storing a code point into a smaller <em>code unit</em>:  </p>
+<h4><a class="anchor" href="#utf-8" id="utf-8" name="utf-8"><i class="anchor-icon"></i></a>UTF-8</h4>
+<p><a href="https://en.wikipedia.org/wiki/UTF-8">UTF-8 »</a> is a Unicode encoding that allows storing a 21-bit Unicode code point into <em>code units</em> as small as 8 bits.<br>
+UTF-8 is used by the MTProto and Bot API when transmitting and receiving fields of type <a href="/type/string">string</a>.  </p>
+<h4><a class="anchor" href="#utf-16" id="utf-16" name="utf-16"><i class="anchor-icon"></i></a>UTF-16</h4>
+<p><a href="https://en.wikipedia.org/wiki/UTF-16">UTF-16 »</a> is a Unicode encoding that allows storing a 21-bit Unicode code point into one or two 16-bit <em>code units</em>.  </p>
+<p>UTF-16 is used when computing the length and offsets of entities in the MTProto and bot APIs, by counting the number of UTF-16 code units (<strong>not</strong> code points).</p>
+<h4><a class="anchor" href="#computing-entity-length" id="computing-entity-length" name="computing-entity-length"><i class="anchor-icon"></i></a>Computing entity length</h4>
+<ul>
+<li>Code points in the BMP (<code>U+0000</code> to <code>U+FFFF</code>) count as 1, because they are encoded into a single UTF-16 code unit</li>
+<li>Code points in all other planes count as 2, because they are encoded into two UTF-16 code units (also called surrogate pairs)</li>
+</ul>
+<p>A simple, but not very efficient way of computing the entity length is converting the text to UTF-16, and then taking the byte length divided by 2 (=number of UTF-16 code units).</p>
+<p>However, since UTF-8 encodes codepoints in non-BMP planes as a 32-bit code unit starting with <code>0b11110</code>, a more efficient way to compute the entity length without converting the message to UTF-16 is the following:  </p>
+<ul>
+<li>If the byte marks the beginning of a 32-bit UTF-8 code unit (all bytes starting with <code>0b11110</code>) increment the count by 2, otherwise</li>
+<li>If the byte marks the beginning of a UTF-8 code unit (all bytes not starting with <code>0b10</code>) increment the count by 1.</li>
+</ul>
+<p>Example:  </p>
+<pre><code>length := 0
+for byte in text {
+    if (byte &amp; 0xc0) != 0x80 {
+        length += (byte &gt;= 0xf0 ? 2 : 1)
+    }
+}</code></pre>
+<p><strong>Note</strong>: the <em>length</em> of an entity <strong>must not</strong> include the length of trailing newlines or whitespaces, <code>rtrim</code> entities before computing their length: however, the next <em>offset</em> <strong>must</strong> include the length of newlines or whitespaces that precede it.  </p>
+<p>Example implementations: <a href="https://github.com/tdlib/td/tree/master/td/telegram/MessageEntity.cpp">tdlib</a>, <a href="https://github.com/danog/telegram-entities/blob/master/src/Entities.php">MadelineProto</a>.</p>
+<h3><a class="anchor" href="#allowed-entities" id="allowed-entities" name="allowed-entities"><i class="anchor-icon"></i></a>Allowed entities</h3>
+<p>For example the following HTML/Markdown aliases for message entities can be used:</p>
+<ul>
+<li><a href="https://core.telegram.org/constructor/messageEntityBold"><strong>messageEntityBold</strong></a> =&gt; <code>&lt;b&gt;bold&lt;/b&gt;</code>, <code>&lt;strong&gt;bold&lt;/strong&gt;</code>, <code>**bold**</code></li>
+<li><a href="https://core.telegram.org/constructor/messageEntityItalic"><em>messageEntityItalic</em></a> =&gt; <code>&lt;i&gt;italic&lt;/i&gt;</code>, <code>&lt;em&gt;italic&lt;/em&gt;</code> <code>*italic*</code></li>
+<li><a href="https://core.telegram.org/constructor/messageEntityCode"><code>messageEntityCode</code> »</a> =&gt; <code>&lt;code&gt;code&lt;/code&gt;</code>, <code>`code`</code></li>
+<li><a href="https://core.telegram.org/constructor/messageEntityStrike"><del>messageEntityStrike</del></a> =&gt; <code>&lt;s&gt;strike&lt;/s&gt;</code>, <code>&lt;strike&gt;strike&lt;/strike&gt;</code>, <code>&lt;del&gt;strike&lt;/del&gt;</code>, <code>~~strike~~</code></li>
+<li><a href="https://core.telegram.org/constructor/messageEntityUnderline"><u>messageEntityUnderline</u></a> =&gt; <code>&lt;u&gt;underline&lt;/u&gt;</code></li>
+<li><a href="https://core.telegram.org/constructor/messageEntityPre"><code>messageEntityPre</code> »</a> =&gt; <code>&lt;pre language="c++"&gt;code&lt;/pre&gt;</code>, </li>
+</ul>
+<pre>
+```c++
+code
+```
+</pre>
+<p>The following entities can also be used to <a href="/api/mentions">mention</a> users:</p>
+<ul>
+<li><a href="/constructor/inputMessageEntityMentionName">inputMessageEntityMentionName</a> =&gt; <a href="https://t.me/botfather">Mention a user</a></li>
+<li><a href="/constructor/inputMessageEntityMentionName">messageEntityMention</a> =&gt; <a href="https://t.me/botfather">@botfather</a> (this mention is generated automatically server-side for @usernames in messages)</li>
+</ul>
+<p>Also, <a href="/constructor/messageEntityCustomEmoji">messageEntityCustomEmoji</a> entities are used for <a href="/api/custom-emoji">custom emojis »</a>.</p>
+<p>A number of other entities are also available, see the <a href="/type/MessageEntity">type page for the full list »</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
