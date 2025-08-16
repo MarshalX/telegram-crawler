@@ -9,6 +9,7 @@ from typing import Set
 from urllib.parse import unquote
 
 import aiohttp
+import uvloop
 from aiohttp import ClientConnectorError, ServerDisconnectedError
 
 
@@ -166,7 +167,15 @@ OUTPUT_TRANSLATIONS_FILENAME = os.environ.get('OUTPUT_TRANSLATIONS_FILENAME', 't
 
 STEL_DEV_LAYER = 290
 
-TIMEOUT = aiohttp.ClientTimeout(total=10)
+TIMEOUT_CONFIGS = [
+    # Fast timeout for most requests
+    {'total': 30, 'connect': 30, 'sock_connect': 30, 'sock_read': 30},
+    # Medium timeout for slower responses  
+    {'total': 60, 'connect': 60, 'sock_connect': 30, 'sock_read': 60},
+    # High timeout for problematic URLs
+    {'total': 120, 'connect': 90, 'sock_connect': 30, 'sock_read': 90}
+]
+
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -191,6 +200,9 @@ VISITED_LINKS = set()
 LINKS_TO_TRACK = set()
 LINKS_TO_TRANSLATIONS = set()
 LINKS_TO_TRACKABLE_RESOURCES = set()
+
+URL_RETRY_COUNT = {}
+RETRY_LOCK = asyncio.Lock()
 
 VISITED_LINKS_LOCK = asyncio.Lock()
 
@@ -364,12 +376,31 @@ async def crawl_worker(session: aiohttp.ClientSession):
             break
 
         try:
-            await _crawl(url, session)
+            async with RETRY_LOCK:
+                retry_count = URL_RETRY_COUNT.get(url, 0)
+            
+            timeout_index = min(retry_count, len(TIMEOUT_CONFIGS) - 1)
+            timeout_config = TIMEOUT_CONFIGS[timeout_index]
+
+            await _crawl(url, session, timeout_config)
+
+            async with RETRY_LOCK:
+                if url in URL_RETRY_COUNT:
+                    del URL_RETRY_COUNT[url]
+
             WORKERS_TASK_QUEUE.task_done()
         except (ServerSideError, ServerDisconnectedError, asyncio.TimeoutError, ClientConnectorError) as e:
             exc_name = e.__class__.__name__
             exc_msg = str(e) if str(e) else 'No message'
-            logger.warning(f'Crawl error {exc_name}: {exc_msg}. Retrying {url}')
+
+            async with RETRY_LOCK:
+                retry_count = URL_RETRY_COUNT.get(url, 0)
+                URL_RETRY_COUNT[url] = retry_count + 1
+
+            next_timeout_index = min(retry_count + 1, len(TIMEOUT_CONFIGS) - 1)
+            next_timeout_config = TIMEOUT_CONFIGS[next_timeout_index]
+
+            logger.warning(f'Crawl error {exc_name}: {exc_msg}. Retrying {url} with {next_timeout_config["total"]}s total timeout')
 
             await WORKERS_TASK_QUEUE.put(url)
             async with VISITED_LINKS_LOCK:
@@ -379,15 +410,24 @@ async def crawl_worker(session: aiohttp.ClientSession):
             WORKERS_TASK_QUEUE.task_done()
 
 
-async def _crawl(url: str, session: aiohttp.ClientSession):
+async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict = None):
     async with VISITED_LINKS_LOCK:
         if url in VISITED_LINKS:
             return
         VISITED_LINKS.add(url)
 
     try:
-        logger.debug('[%s] Process %s', len(VISITED_LINKS), url)
-        async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT) as response:
+        if timeout_config is None:
+            timeout_config = TIMEOUT_CONFIGS[0]  # Use default (fast) timeout
+
+        timeout = aiohttp.ClientTimeout(
+            total=timeout_config['total'],
+            connect=timeout_config['connect'], 
+            sock_connect=timeout_config['sock_connect'],
+            sock_read=timeout_config['sock_read']
+        )
+        logger.debug('[%s] Process %s (total timeout: %ds)', len(VISITED_LINKS), url, timeout_config['total'])
+        async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=timeout) as response:
             content_type = response.headers.get('content-type')
 
             if 499 < response.status < 600:
@@ -456,8 +496,15 @@ async def start(url_list: Set[str]):
     for url in url_list:
         await WORKERS_TASK_QUEUE.put(url)
 
-    # unsecure but so simple
-    tcp_connector = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
+    # Optimized TCP connector for web crawling
+    tcp_connector = aiohttp.TCPConnector(
+        ssl=False,                    # Disable SSL verification for crawling
+        limit=300,                    # Total connection pool size (10x workers)
+        limit_per_host=20,            # Max connections per host (avoid overwhelming servers)
+        ttl_dns_cache=None,           # Cache DNS for forever
+        keepalive_timeout=30,         # Keep connections alive for 30 seconds
+        enable_cleanup_closed=True,   # Clean up closed connections automatically
+    )
     async with aiohttp.ClientSession(connector=tcp_connector, headers=HEADERS) as session:
         workers = [crawl_worker(session) for _ in range(WORKERS_COUNT)]
         await asyncio.gather(*workers)
@@ -471,7 +518,7 @@ if __name__ == '__main__':
 
     logger.info('Start crawling links...')
     start_time = time()
-    asyncio.run(start(HIDDEN_URLS))
+    uvloop.run(start(HIDDEN_URLS))
     logger.info(f'Stop crawling links. {time() - start_time} sec.')
 
     try:
