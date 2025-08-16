@@ -209,6 +209,7 @@ URL_RETRY_COUNT = {}
 RETRY_LOCK = asyncio.Lock()
 
 VISITED_LINKS_LOCK = asyncio.Lock()
+TRACKING_SETS_LOCK = asyncio.Lock()
 
 WORKERS_COUNT = 30
 WORKERS_TASK_QUEUE = asyncio.Queue()
@@ -407,6 +408,7 @@ async def crawl_worker(session: aiohttp.ClientSession):
             logger.warning(f'Crawl error {exc_name}: {exc_msg}. Retrying {url} with {next_timeout_config["total"]}s total timeout')
 
             await WORKERS_TASK_QUEUE.put(url)
+
             async with VISITED_LINKS_LOCK:
                 if url in VISITED_LINKS:
                     VISITED_LINKS.remove(url)
@@ -451,12 +453,13 @@ async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict 
                 raw_content = await response.read()
                 content = await response.text(encoding='UTF-8')
 
-                if is_translation_url(url):
-                    LINKS_TO_TRANSLATIONS.add(url)
-                    logger.debug('Add %s to LINKS_TO_TRANSLATIONS', url)
-                else:
-                    LINKS_TO_TRACK.add(url)
-                    logger.debug('Add %s to LINKS_TO_TRACK', url)
+                async with TRACKING_SETS_LOCK:
+                    if is_translation_url(url):
+                        LINKS_TO_TRANSLATIONS.add(url)
+                        logger.debug('Add %s to LINKS_TO_TRANSLATIONS', url)
+                    else:
+                        LINKS_TO_TRACK.add(url)
+                        logger.debug('Add %s to LINKS_TO_TRACK', url)
 
                 absolute_links = cleanup_links(find_absolute_links(content))
 
@@ -472,8 +475,9 @@ async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict 
                         if sub_url not in VISITED_LINKS:
                             await WORKERS_TASK_QUEUE.put(sub_url)
             elif is_trackable_content_type(content_type):
-                LINKS_TO_TRACKABLE_RESOURCES.add(url)
-                logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES', url)
+                async with TRACKING_SETS_LOCK:
+                    LINKS_TO_TRACKABLE_RESOURCES.add(url)
+                    logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES', url)
             else:
                 # for example, zip with update of macOS client
                 logger.warning(f'Unhandled type: {content_type} from {url}')
@@ -483,17 +487,19 @@ async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict 
             # so this is a problem when we have random behavior with a link will be added
             # this if resolve this issue.
             # if available both links, we prefer without a trailing slash
-            for links_set in (LINKS_TO_TRACK, LINKS_TO_TRANSLATIONS, LINKS_TO_TRACKABLE_RESOURCES):
-                without_trailing_slash = url[:-1:] if url.endswith('/') else url
-                if without_trailing_slash in links_set and f'{without_trailing_slash}/' in links_set:
-                    links_set.remove(f'{without_trailing_slash}/')
-                    logger.debug('Remove %s/', without_trailing_slash)
+            async with TRACKING_SETS_LOCK:
+                for links_set in (LINKS_TO_TRACK, LINKS_TO_TRANSLATIONS, LINKS_TO_TRACKABLE_RESOURCES):
+                    without_trailing_slash = url[:-1:] if url.endswith('/') else url
+                    if without_trailing_slash in links_set and f'{without_trailing_slash}/' in links_set:
+                        links_set.remove(f'{without_trailing_slash}/')
+                        logger.debug('Remove %s/', without_trailing_slash)
     except UnicodeDecodeError:
         logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
 
         if raw_content.startswith(b'GIF'):
-            LINKS_TO_TRACKABLE_RESOURCES.add(url)
-            logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES (raw content)', url)
+            async with TRACKING_SETS_LOCK:
+                LINKS_TO_TRACKABLE_RESOURCES.add(url)
+                logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES (raw content)', url)
 
 
 async def start(url_list: Set[str]):
