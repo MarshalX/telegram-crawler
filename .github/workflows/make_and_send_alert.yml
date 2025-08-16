@@ -8,17 +8,17 @@ on:
 jobs:
   make_and_send_alert:
     name: Send alert
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
 
       - name: Clone.
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: Setup Python.
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.13
 
       - name: Install dependencies.
         run: |
@@ -26,8 +26,8 @@ jobs:
           git checkout main
           pip install -r requirements.txt
 
-      - name: Send alert to Telegram channel.
-        if: ${{ github.event.head_commit.author.name == 'GitHub Action' }}
+      - name: Send alert to channels.
+        if: ${{ github.event.head_commit.author.name == 'github-actions[bot]' }}
         env:
           COMMIT_SHA: ${{ github.sha }}
           GITHUB_PAT: ${{ secrets.PAT_FOR_ALERTS }}
