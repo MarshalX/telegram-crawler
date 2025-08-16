@@ -5,7 +5,7 @@ import re
 from functools import cache
 from html import unescape
 from time import time
-from typing import Set
+from typing import Set, List, Union
 from urllib.parse import unquote
 
 import aiohttp
@@ -84,10 +84,10 @@ CRAWL_RULES = {
     'translations.telegram.org': {
         'allow': {
             r'^[^/]*$',  # root
-            r'org/[^/]*/$',  # 1 lvl sub
+            r'org/[^/]*$',  # 1 lvl sub
             r'/css/[a-z-_.]+$',  # css files
-            r'/en/[a-z_]+/$',  # 1 lvl after /en/
-            r'/en/[a-z_]+/[a-z_]+/$',  # 2 lvl after /en/. for example, /en/ios/unsorted/
+            r'/en/[a-z_]+$',  # 1 lvl after /en/
+            r'/en/(?!recent)[a-z_]+/[a-z_]+$',  # 2 lvl after /en/. for example, /en/ios/unsorted except /en/recent
         },
         'deny': {
             '',  # all
@@ -143,6 +143,9 @@ CRAWL_RULES = {
             r'/privacy$',  # geolocation depended
             r'/tos$',  # geolocation depended
             r'/moderation$',  # dynamic graphs
+            r'/dsa-report$',  # EU only
+            r'/tos/eu-dsa/transparency-2025$',  # EU only
+            r'/tos/eu/transparency-tco$',  # EU only
         },
     },
     'webz.telegram.org': {
@@ -247,7 +250,7 @@ def should_exclude(url: str) -> bool:
 def find_absolute_links(html: str) -> Set[str]:
     absolute_links = set(re.findall(ABSOLUTE_LINK_REGEX, html))
 
-    return {link for link in absolute_links if not should_exclude(link)}
+    return {link for link in cleanup_links(absolute_links) if not should_exclude(link)}
 
 
 def find_relative_links(html: str, cur_link: str) -> Set[str]:
@@ -265,7 +268,7 @@ def find_relative_links(html: str, cur_link: str) -> Set[str]:
         regex = f'{attr}="{RELATIVE_LINK_REGEX}'
         links = re.findall(regex, html)
 
-        for link in links:
+        for link in cleanup_links(links):
             url = f'{direct_cur_link}/{link}'
             if not should_exclude(url):
                 relative_links.add(url)
@@ -281,13 +284,20 @@ def find_relative_scripts(code: str, cur_link: str) -> Set[str]:
     direct_cur_link = re.findall(DIRECT_LINK_REGEX, cur_link)[0]
 
     relative_links = set()
-    for link in re.findall(RELATIVE_JS_SCRIPTS_REGEX, code):
+    links = re.findall(RELATIVE_JS_SCRIPTS_REGEX, code)
+
+    def join_paths(part1: str, part2: str) -> str:
+        part1 = part1.rstrip('/')
+        part2 = part2.lstrip('/')
+        return f'{part1}/{part2}'
+
+    for link in cleanup_links(links):
         # dirty magic for specific cases
         if '/' in link:    # path to file from the root
-            url = f'{direct_cur_link}/{link}'
+            url = join_paths(direct_cur_link, link)
         else:   # it is a relative link from the current folder. not from the root
             current_folder_link, *_ = cur_link.rsplit('/', 1)
-            url = f'{current_folder_link}/{link}'
+            url = join_paths(current_folder_link, link)
 
         if not should_exclude(url):
             relative_links.add(url)
@@ -295,7 +305,7 @@ def find_relative_scripts(code: str, cur_link: str) -> Set[str]:
     return relative_links
 
 
-def cleanup_links(links: Set[str]) -> Set[str]:
+def cleanup_links(links: Union[List[str], Set[str]]) -> Set[str]:
     cleaned_links = set()
     for tmp_link in links:
         # normalize link
@@ -322,6 +332,9 @@ def cleanup_links(links: Set[str]) -> Set[str]:
         # fix wildcard
         if link.startswith('.'):
             link = link[1:]
+
+        if link.endswith('/'):
+            link = link[:-1]
 
         cleaned_links.add(link)
 
@@ -461,13 +474,13 @@ async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict 
                         LINKS_TO_TRACK.add(url)
                         logger.debug('Add %s to LINKS_TO_TRACK', url)
 
-                absolute_links = cleanup_links(find_absolute_links(content))
+                absolute_links = find_absolute_links(content)
 
                 relative_links_finder = find_relative_links
                 if 'javascript' in content_type:
                     relative_links_finder = find_relative_scripts
 
-                relative_links = cleanup_links(relative_links_finder(content, url))
+                relative_links = relative_links_finder(content, url)
 
                 sub_links = absolute_links | relative_links
                 for sub_url in sub_links:
@@ -490,8 +503,9 @@ async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict 
             async with TRACKING_SETS_LOCK:
                 for links_set in (LINKS_TO_TRACK, LINKS_TO_TRANSLATIONS, LINKS_TO_TRACKABLE_RESOURCES):
                     without_trailing_slash = url[:-1:] if url.endswith('/') else url
-                    if without_trailing_slash in links_set and f'{without_trailing_slash}/' in links_set:
-                        links_set.remove(f'{without_trailing_slash}/')
+                    with_trailing_slash = f'{without_trailing_slash}/'
+                    if without_trailing_slash in links_set and with_trailing_slash in links_set:
+                        links_set.remove(with_trailing_slash)
                         logger.debug('Remove %s/', without_trailing_slash)
     except UnicodeDecodeError:
         logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')

@@ -41,7 +41,7 @@ OUTPUT_RESOURCES_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_RES
 OUTPUT_TRANSLATIONS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_RESOURCES_FOLDER', 'web_tr/'))
 OUTPUT_MINI_APPS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_MINI_APPS_FOLDER', 'mini_app/'))
 
-TRANSLATIONS_EN_CATEGORY_URL_REGEX = r'/en/[a-z_]+/[a-z_]+/$'
+TRANSLATIONS_EN_CATEGORY_URL_REGEX = r'/en/[a-z_]+/[a-z_]+$'
 
 PAGE_GENERATION_TIME_REGEX = r'<!-- page generated in .+ -->'
 PAGE_API_HASH_REGEX = r'\?hash=[a-z0-9]+'
