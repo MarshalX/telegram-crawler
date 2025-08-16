@@ -505,7 +505,7 @@ async def start(url_list: Set[str]):
         keepalive_timeout=30,         # Keep connections alive for 30 seconds
         enable_cleanup_closed=True,   # Clean up closed connections automatically
     )
-    async with aiohttp.ClientSession(connector=tcp_connector, headers=HEADERS) as session:
+    async with aiohttp.ClientSession(connector=tcp_connector, headers=HEADERS, trust_env=True) as session:
         workers = [crawl_worker(session) for _ in range(WORKERS_COUNT)]
         await asyncio.gather(*workers)
 

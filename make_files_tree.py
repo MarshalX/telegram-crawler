@@ -868,7 +868,7 @@ async def start(mode: str):
         enable_cleanup_closed=True,   # Clean up closed connections automatically
     )
 
-    async with aiohttp.ClientSession(connector=tcp_connector) as session:
+    async with aiohttp.ClientSession(connector=tcp_connector, trust_env=True) as session:
         mode == 'all' and await asyncio.gather(
             crawl_web(session),
             crawl_web_res(session),
