@@ -26,6 +26,8 @@ import ccl_bplist
 PROTOCOL = 'https://'
 ILLEGAL_PATH_CHARS = punctuation.replace('.', '') + whitespace
 
+CRAWL_STATUS_CODE_EXCLUSIONS = {'webappinternal.telegram.org/botfather'}
+
 DYNAMIC_PART_MOCK = 'telegram-crawler'
 
 INPUT_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_links.txt')
@@ -727,7 +729,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
             logger.warning(msg)
             raise RetryError(msg)
 
-        if response.status not in {200, 304}:
+        if response.status not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
             if response.status != 302:
                 content = await response.text()
                 logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')

@@ -57,6 +57,7 @@ HIDDEN_URLS = {
     'comments.app/test_webview',    # old
     'webappcontent.telegram.org/demo',  # new
     'webappcontent.telegram.org/cafe',  # demo 2
+    'webappinternal.telegram.org/botfather',
     # 'a-webappcontent.stel.com/demo',
     # 'a-webappcontent.stel.com/cafe',
 
@@ -155,6 +156,7 @@ CRAWL_RULES = {
         },
     },
 }
+CRAWL_STATUS_CODE_EXCLUSIONS = {'webappinternal.telegram.org/botfather'}
 
 DIRECT_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{0,249}' + BASE_URL_REGEX + r')'
 ABSOLUTE_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{0,248}' + BASE_URL_REGEX + r'\b[-a-zA-Z0-9@:%_\+.~#?&//=]*)'
@@ -438,7 +440,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict 
                 logger.warning(f'Error 5XX. Retrying {url}')
                 raise ServerSideError()
 
-            if response.status not in {200, 304}:
+            if response.status not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
                 if response.status != 302:
                     content = await response.text(encoding='UTF-8')
                     logger.warning(f'Skip {url} because status code == {response.status}. Content: {content}')
