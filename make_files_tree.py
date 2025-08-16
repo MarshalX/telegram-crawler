@@ -8,11 +8,12 @@ import platform
 import random
 import re
 import shutil
+import uuid
 import zipfile
 from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
 from time import time
-from typing import List
+from typing import List, Optional
 from xml.etree import ElementTree
 
 import aiofiles
@@ -91,7 +92,8 @@ def get_hash(data: bytes) -> str:
 
 
 async def download_file(url: str, path: str, session: aiohttp.ClientSession):
-    async with session.get(f'{url}&noCache={int(time() * 1000)}{random.randint(0, 1000)}') as response:
+    params = {'tgcrawlNoCache': uuid.uuid4().hex}
+    async with session.get(url, params=params) as response:
         if response.status != 200:
             return
 
@@ -99,61 +101,6 @@ async def download_file(url: str, path: str, session: aiohttp.ClientSession):
 
     async with aiofiles.open(path, mode='wb') as f:
         await f.write(content)
-
-
-async def get_download_link_of_latest_appcenter_release(parameterized_url: str, session: aiohttp.ClientSession):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/118.0',
-    }
-
-    async def make_req(url):
-        async with session.get(url, headers=headers) as response:
-            if response.status != 200:
-                logger.error(f'Error {response.status} while fetching {url}')
-                return None
-
-            content_type = response.headers.get('Content-Type', '').lower()
-            try:
-                if 'xml' in content_type:
-                    return await response.text()
-                elif 'json' in content_type:
-                    return await response.json(encoding='UTF-8')
-                else:
-                    try:
-                        return await response.json(encoding='UTF-8')
-                    except Exception as e:
-                        text = await response.text()
-                        logger.error(f"Error fetching JSON from {url} (status={response.status}): {e}\nResponse (truncated): {text[:200]}")
-                        return text
-            except Exception as e:
-                logger.error(f"Error processing response: {e}")
-                return None
-
-    res = await make_req(parameterized_url)
-    logger.debug(f'Response: {res}')
-
-    if isinstance(res, str) and '<rss' in res:
-        root = ElementTree.fromstring(res)
-        item = root.find('.//item')
-        if item:
-            enclosure = item.find('enclosure')
-            if enclosure is not None:
-                return enclosure.get('url')
-    elif isinstance(res, (dict, list)):
-        if isinstance(res, dict):
-            logger.debug(f'Response is a dict: {res}')
-            return res.get('file_url')
-        elif isinstance(res, list) and res and isinstance(res[0], dict):
-            latest_id = res[0].get('id')
-            version = res[0].get('version')
-            if latest_id:
-                logger.info(f'The latest release is {version} ({parameterized_url})')
-                res_json = await make_req(f'{parameterized_url}/releases/{latest_id}')
-                if isinstance(res_json, dict):
-                    logger.debug(f'Release download URL: {res_json.get("download_url")}')
-                    return res_json.get('download_url')
-
-    raise RuntimeError('Response could not be processed')
 
 
 async def track_additional_files(
@@ -179,9 +126,35 @@ async def track_additional_files(
             await w_file.write(content)
 
 
+async def get_download_link_of_latest_macos_release(remote_updates_manifest_url: str, session: aiohttp.ClientSession) -> Optional[str]:
+    async with session.get(remote_updates_manifest_url) as response:
+        if response.status != 200:
+            logger.error(f'Error {response.status} while fetching {remote_updates_manifest_url}')
+            return None
+
+        try:
+            response = await response.text()  # we do expect XML here
+        except Exception as e:
+            logger.error(f'Error processing response: {e}')
+            return None
+
+    if not isinstance(response, str) and not response.lstrip().startswith('<rss'):
+        logger.error('Response is not a valid XML string')
+        return None
+
+    root = ElementTree.fromstring(response)
+    item = root.find('.//item')
+    if item is not None:
+        enclosure = item.find('enclosure')
+        if enclosure is not None:
+            return enclosure.get('url')
+
+    return None
+
+
 async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.ClientSession):
-    parameterized_url = 'https://mac-updates.telegram.org/beta/versions.xml'
-    download_url = await get_download_link_of_latest_appcenter_release(parameterized_url, session)
+    remote_updates_manifest_url = 'https://mac-updates.telegram.org/beta/versions.xml'
+    download_url = await get_download_link_of_latest_macos_release(remote_updates_manifest_url, session)
 
     if not download_url:
         return
@@ -393,8 +366,7 @@ async def download_telegram_android_stable_dl_and_extract_resources(session: aio
 
 
 async def download_telegram_android_beta_and_extract_resources(session: aiohttp.ClientSession):
-    parameterized_url = 'https://telegram.org/dl/android/apk-public-beta.json'
-    download_url = await get_download_link_of_latest_appcenter_release(parameterized_url, session)
+    download_url = 'https://telegram.org/dl/android/apk-public-beta'
 
     await _download_telegram_android_and_extract_resources(session, download_url, 'android-beta')
 
