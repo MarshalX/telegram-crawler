@@ -17,6 +17,7 @@ from xml.etree import ElementTree
 
 import aiofiles
 import aiohttp
+import uvloop
 from aiohttp import ClientConnectorError, ServerDisconnectedError
 
 import ccl_bplist
@@ -58,9 +59,12 @@ SPARKLE_SE_TEMPLATE = f';se={DYNAMIC_PART_MOCK};'
 
 STEL_DEV_LAYER = 190
 
-# unsecure but so simple
-CONNECTOR = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
-TIMEOUT = aiohttp.ClientTimeout(total=10)
+TIMEOUT = aiohttp.ClientTimeout(  # mediumly sized from link collector
+    total=60,
+    connect=60,
+    sock_connect=30,
+    sock_read=60,
+)
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -737,8 +741,8 @@ async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
     while True:
         try:
             await _crawl(url, session, output_dir)
-        except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
-            logger.warning(f'Client or timeout error. Retrying {url}')
+        except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError) as e:
+            logger.warning(f'Client or timeout error ({e}). Retrying {url}')
         else:
             break
 
@@ -880,7 +884,17 @@ async def crawl_web_tr(session: aiohttp.ClientSession):
 
 
 async def start(mode: str):
-    async with aiohttp.ClientSession(connector=CONNECTOR) as session:
+    # Optimized TCP connector for web crawling
+    tcp_connector = aiohttp.TCPConnector(
+        ssl=False,                    # Disable SSL verification for crawling
+        limit=300,                    # Total connection pool size (10x workers)
+        limit_per_host=20,            # Max connections per host (avoid overwhelming servers)
+        ttl_dns_cache=None,           # Cache DNS for forever
+        keepalive_timeout=30,         # Keep connections alive for 30 seconds
+        enable_cleanup_closed=True,   # Clean up closed connections automatically
+    )
+
+    async with aiohttp.ClientSession(connector=tcp_connector, trust_env=True) as session:
         mode == 'all' and await asyncio.gather(
             crawl_web(session),
             crawl_web_res(session),
@@ -920,5 +934,5 @@ if __name__ == '__main__':
 
     start_time = time()
     logger.info(f'Start crawling content of tracked urls...')
-    asyncio.get_event_loop().run_until_complete(start(run_mode))
+    uvloop.run(start(run_mode))
     logger.info(f'Stop crawling content in mode {run_mode}. {time() - start_time} sec.')
