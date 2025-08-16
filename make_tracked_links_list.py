@@ -367,7 +367,9 @@ async def crawl_worker(session: aiohttp.ClientSession):
             await _crawl(url, session)
             WORKERS_TASK_QUEUE.task_done()
         except (ServerSideError, ServerDisconnectedError, asyncio.TimeoutError, ClientConnectorError) as e:
-            logger.warning(f'Client or timeout error ({e}). Retrying {url}')
+            exc_name = e.__class__.__name__
+            exc_msg = str(e) if str(e) else 'No message'
+            logger.warning(f'Crawl error {exc_name}: {exc_msg}. Retrying {url}')
 
             await WORKERS_TASK_QUEUE.put(url)
             async with VISITED_LINKS_LOCK:
