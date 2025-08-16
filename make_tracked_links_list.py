@@ -2,8 +2,6 @@ import asyncio
 import logging
 import os
 import re
-from asyncio import Queue
-from asyncio.exceptions import TimeoutError
 from functools import cache
 from html import unescape
 from time import time
@@ -168,8 +166,6 @@ OUTPUT_TRANSLATIONS_FILENAME = os.environ.get('OUTPUT_TRANSLATIONS_FILENAME', 't
 
 STEL_DEV_LAYER = 290
 
-# unsecure but so simple
-CONNECTOR = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
 TIMEOUT = aiohttp.ClientTimeout(total=10)
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0',
@@ -196,8 +192,11 @@ LINKS_TO_TRACK = set()
 LINKS_TO_TRANSLATIONS = set()
 LINKS_TO_TRACKABLE_RESOURCES = set()
 
+VISITED_LINKS_LOCK = asyncio.Lock()
+
 WORKERS_COUNT = 30
-WORKERS_TASK_QUEUE = Queue()
+WORKERS_TASK_QUEUE = asyncio.Queue()
+WORKERS_NEW_TASK_TIMEOUT = 5.0  # seconds
 
 
 @cache
@@ -357,23 +356,32 @@ class ServerSideError(Exception):
 
 
 async def crawl_worker(session: aiohttp.ClientSession):
-    while not WORKERS_TASK_QUEUE.empty():
-        url = WORKERS_TASK_QUEUE.get_nowait()
+    while True:
+        try:
+            url = await asyncio.wait_for(WORKERS_TASK_QUEUE.get(), timeout=WORKERS_NEW_TASK_TIMEOUT)
+        except asyncio.TimeoutError:
+            logger.debug(f'Worker exiting - no tasks for {WORKERS_NEW_TASK_TIMEOUT} seconds')
+            break
 
         try:
             await _crawl(url, session)
-        except (ServerSideError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
-            logger.warning(f'Client or timeout error. Retrying {url}')
+            WORKERS_TASK_QUEUE.task_done()
+        except (ServerSideError, ServerDisconnectedError, asyncio.TimeoutError, ClientConnectorError) as e:
+            logger.warning(f'Client or timeout error ({e}). Retrying {url}')
 
-            WORKERS_TASK_QUEUE.put_nowait(url)
-            if url in VISITED_LINKS:
-                VISITED_LINKS.remove(url)
+            await WORKERS_TASK_QUEUE.put(url)
+            async with VISITED_LINKS_LOCK:
+                if url in VISITED_LINKS:
+                    VISITED_LINKS.remove(url)
+
+            WORKERS_TASK_QUEUE.task_done()
 
 
 async def _crawl(url: str, session: aiohttp.ClientSession):
-    if url in VISITED_LINKS:
-        return
-    VISITED_LINKS.add(url)
+    async with VISITED_LINKS_LOCK:
+        if url in VISITED_LINKS:
+            return
+        VISITED_LINKS.add(url)
 
     try:
         logger.debug('[%s] Process %s', len(VISITED_LINKS), url)
@@ -381,7 +389,8 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
             content_type = response.headers.get('content-type')
 
             if 499 < response.status < 600:
-                VISITED_LINKS.remove(url)
+                async with VISITED_LINKS_LOCK:
+                    VISITED_LINKS.remove(url)
                 logger.warning(f'Error 5XX. Retrying {url}')
                 raise ServerSideError()
 
@@ -413,8 +422,9 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
 
                 sub_links = absolute_links | relative_links
                 for sub_url in sub_links:
-                    if sub_url not in VISITED_LINKS:
-                        WORKERS_TASK_QUEUE.put_nowait(sub_url)
+                    async with VISITED_LINKS_LOCK:
+                        if sub_url not in VISITED_LINKS:
+                            await WORKERS_TASK_QUEUE.put(sub_url)
             elif is_trackable_content_type(content_type):
                 LINKS_TO_TRACKABLE_RESOURCES.add(url)
                 logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES', url)
@@ -442,10 +452,15 @@ async def _crawl(url: str, session: aiohttp.ClientSession):
 
 async def start(url_list: Set[str]):
     for url in url_list:
-        WORKERS_TASK_QUEUE.put_nowait(url)
+        await WORKERS_TASK_QUEUE.put(url)
 
-    async with aiohttp.ClientSession(connector=CONNECTOR, headers=HEADERS) as session:
-        await asyncio.gather(*[crawl_worker(session) for _ in range(WORKERS_COUNT)])
+    # unsecure but so simple
+    tcp_connector = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
+    async with aiohttp.ClientSession(connector=tcp_connector, headers=HEADERS) as session:
+        workers = [crawl_worker(session) for _ in range(WORKERS_COUNT)]
+        await asyncio.gather(*workers)
+
+    await WORKERS_TASK_QUEUE.join()
 
 
 if __name__ == '__main__':
@@ -454,7 +469,7 @@ if __name__ == '__main__':
 
     logger.info('Start crawling links...')
     start_time = time()
-    asyncio.get_event_loop().run_until_complete(start(HIDDEN_URLS))
+    asyncio.run(start(HIDDEN_URLS))
     logger.info(f'Stop crawling links. {time() - start_time} sec.')
 
     try:

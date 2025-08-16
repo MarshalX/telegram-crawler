@@ -12,20 +12,20 @@ on:
 jobs:
   make_tracked_links_file:
     name: Make tracked links file
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:
 
       - name: Clone.
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT }}
 
       - name: Setup Python.
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: 3.13
 
       - name: Install dependencies.
         run: |
@@ -47,8 +47,8 @@ jobs:
           mv tracked_res_links_ci.txt tracked_res_links.txt
           mv tracked_tr_links_ci.txt tracked_tr_links.txt
 
-          git config --global user.email "github-action@users.noreply.github.com"
-          git config --global user.name "GitHub Action"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add .
           git commit -m "Update tracked links"

@@ -57,8 +57,6 @@ SPARKLE_SE_TEMPLATE = f';se={DYNAMIC_PART_MOCK};'
 
 STEL_DEV_LAYER = 190
 
-# unsecure but so simple
-CONNECTOR = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
 TIMEOUT = aiohttp.ClientTimeout(total=10)
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0',
@@ -711,8 +709,8 @@ async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
     while True:
         try:
             await _crawl(url, session, output_dir)
-        except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError):
-            logger.warning(f'Client or timeout error. Retrying {url}')
+        except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError) as e:
+            logger.warning(f'Client or timeout error ({e}). Retrying {url}')
         else:
             break
 
@@ -854,7 +852,9 @@ async def crawl_web_tr(session: aiohttp.ClientSession):
 
 
 async def start(mode: str):
-    async with aiohttp.ClientSession(connector=CONNECTOR) as session:
+    # unsecure but so simple
+    tcp_connector = aiohttp.TCPConnector(ssl=False, force_close=True, limit=300)
+    async with aiohttp.ClientSession(connector=tcp_connector) as session:
         mode == 'all' and await asyncio.gather(
             crawl_web(session),
             crawl_web_res(session),
@@ -894,5 +894,5 @@ if __name__ == '__main__':
 
     start_time = time()
     logger.info(f'Start crawling content of tracked urls...')
-    asyncio.get_event_loop().run_until_complete(start(run_mode))
+    asyncio.run(start(run_mode))
     logger.info(f'Stop crawling content in mode {run_mode}. {time() - start_time} sec.')
