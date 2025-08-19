@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Working with Different Data Centers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="How to connect to the closest DC access point for faster interaction with the API, and things to watch out for when developing a client.">
+    <meta property="og:title" content="Working with Different Data Centers">
+    <meta property="og:image" content="5bb32ac46255f88a6c">
+    <meta property="og:description" content="How to connect to the closest DC access point for faster interaction with the API, and things to watch out for when developing a client.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/datacenter" >Working with Different Data Centers</a></li></ul></div>
+  <h1 id="dev_page_title">Working with Different Data Centers</h1>
+  
+  <div id="dev_page_content"><p>The servers are divided into several data centers (hereinafter “DCs”) in different parts of the world.
+A complete list of proxy access points for these DCs may be obtained using <a href="/method/help.getConfig">help.getConfig</a>:</p>
+<pre><code><a href='/constructor/dcOption'>dcOption</a>#18b7a10d flags:<a href='/type/%23'>#</a> ipv6:flags.0?<a href='/constructor/true'>true</a> media_only:flags.1?<a href='/constructor/true'>true</a> tcpo_only:flags.2?<a href='/constructor/true'>true</a> cdn:flags.3?<a href='/constructor/true'>true</a> static:flags.4?<a href='/constructor/true'>true</a> this_port_only:flags.5?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> ip_address:<a href='/type/string'>string</a> port:<a href='/type/int'>int</a> secret:flags.10?<a href='/type/bytes'>bytes</a> = <a href='/type/DcOption'>DcOption</a>;
+<a href='/constructor/config'>config</a>#cc1a241e flags:<a href='/type/%23'>#</a> default_p2p_contacts:flags.3?<a href='/constructor/true'>true</a> preload_featured_stickers:flags.4?<a href='/constructor/true'>true</a> revoke_pm_inbox:flags.6?<a href='/constructor/true'>true</a> blocked_mode:flags.8?<a href='/constructor/true'>true</a> force_try_ipv6:flags.14?<a href='/constructor/true'>true</a> date:<a href='/type/int'>int</a> expires:<a href='/type/int'>int</a> test_mode:<a href='/type/Bool'>Bool</a> this_dc:<a href='/type/int'>int</a> dc_options:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DcOption'>DcOption</a>&gt; dc_txt_domain_name:<a href='/type/string'>string</a> chat_size_max:<a href='/type/int'>int</a> megagroup_size_max:<a href='/type/int'>int</a> forwarded_count_max:<a href='/type/int'>int</a> online_update_period_ms:<a href='/type/int'>int</a> offline_blur_timeout_ms:<a href='/type/int'>int</a> offline_idle_timeout_ms:<a href='/type/int'>int</a> online_cloud_timeout_ms:<a href='/type/int'>int</a> notify_cloud_delay_ms:<a href='/type/int'>int</a> notify_default_delay_ms:<a href='/type/int'>int</a> push_chat_period_ms:<a href='/type/int'>int</a> push_chat_limit:<a href='/type/int'>int</a> edit_time_limit:<a href='/type/int'>int</a> revoke_time_limit:<a href='/type/int'>int</a> revoke_pm_time_limit:<a href='/type/int'>int</a> rating_e_decay:<a href='/type/int'>int</a> stickers_recent_limit:<a href='/type/int'>int</a> channels_read_media_period:<a href='/type/int'>int</a> tmp_sessions:flags.0?<a href='/type/int'>int</a> call_receive_timeout_ms:<a href='/type/int'>int</a> call_ring_timeout_ms:<a href='/type/int'>int</a> call_connect_timeout_ms:<a href='/type/int'>int</a> call_packet_timeout_ms:<a href='/type/int'>int</a> me_url_prefix:<a href='/type/string'>string</a> autoupdate_url_prefix:flags.7?<a href='/type/string'>string</a> gif_search_username:flags.9?<a href='/type/string'>string</a> venue_search_username:flags.10?<a href='/type/string'>string</a> img_search_username:flags.11?<a href='/type/string'>string</a> static_maps_provider:flags.12?<a href='/type/string'>string</a> caption_length_max:<a href='/type/int'>int</a> message_length_max:<a href='/type/int'>int</a> webfile_dc_id:<a href='/type/int'>int</a> suggested_lang_code:flags.2?<a href='/type/string'>string</a> lang_pack_version:flags.2?<a href='/type/int'>int</a> base_lang_pack_version:flags.2?<a href='/type/int'>int</a> reactions_default:flags.15?<a href='/type/Reaction'>Reaction</a> autologin_token:flags.16?<a href='/type/string'>string</a> = <a href='/type/Config'>Config</a>;
+---functions---
+<a href='/method/help.getConfig'>help.getConfig</a>#c4f9186b = <a href='/type/Config'>Config</a>;</code></pre>
+<p>In this context, <strong>this_dc</strong> is the number of the current DC, <strong>dc_options</strong> is a list of all DCs available at the moment, each of which has an <strong>id</strong>, <strong>ip</strong>, and <strong>port</strong> for establishing a connection. Please note that <strong>ip</strong> and <strong>port</strong> may change frequently, based on proxy server load and the user's current location.<br>
+Typically, each DC has at least one IPv4 and one IPv6 endpoint available.  </p>
+<p>To optimize client communication with the API, each client must use the connection to the closest access point for its main queries (sending messages, getting contacts, etc.). Therefore, knowing how to select a DC is required before communicating with the API.</p>
+<h3><a class="anchor" href="#registrationauthorization" id="registrationauthorization" name="registrationauthorization"><i class="anchor-icon"></i></a>Registration/Authorization</h3>
+<p>The <a href="/method/auth.sendCode">auth.sendCode</a> method is the basic entry point when registering a new user or authorizing an existing user. 95% of all redirection cases to a different DC will occur when invoking this method.</p>
+<p>The client does not yet know which DC it will be associated with; therefore, it establishes an encrypted connection to a random address and sends its query to that address.
+Having received a <strong>phone_number</strong> from a client, we can find out whether or not it is registered in the system. If it is, then, if necessary, instead of sending a text message, we request that it establish a connection with a different DC first (PHONE_MIGRATE_X error).
+If we do not yet have a user with this number, we examine its IP-address. We can use it to identify the closest DC. Again, if necessary, we redirect the user to a different DC (NETWORK_MIGRATE_X error).</p>
+<h4><a class="anchor" href="#testing-redirects" id="testing-redirects" name="testing-redirects"><i class="anchor-icon"></i></a>Testing Redirects</h4>
+<p>There are reserved phone number prefixes to test the correctness of the application's handling of redirects between DCs. Read more in <a href="https://core.telegram.org/api/auth#test-phone-numbers">User Authorization</a> article.</p>
+<h3><a class="anchor" href="#file-access" id="file-access" name="file-access"><i class="anchor-icon"></i></a>File Access</h3>
+<p>A file saved by a user with <a href="/method/upload.saveFilePart">upload.saveFilePart</a> will be available for direct download only from the DC where the query was executed. That is why each file has a <strong>dc_id</strong> parameter:</p>
+<pre><code><a href='/constructor/document'>document</a>#8fd4c4d8 flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> size:<a href='/type/long'>long</a> thumbs:flags.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_thumbs:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/Document'>Document</a>;
+<a href='/constructor/photo'>photo</a>#fb197a65 flags:<a href='/type/%23'>#</a> has_stickers:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> file_reference:<a href='/type/bytes'>bytes</a> date:<a href='/type/int'>int</a> sizes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhotoSize'>PhotoSize</a>&gt; video_sizes:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/VideoSize'>VideoSize</a>&gt; dc_id:<a href='/type/int'>int</a> = <a href='/type/Photo'>Photo</a>;
+
+<a href='/constructor/encryptedFile'>encryptedFile</a>#a8008cd8 id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> size:<a href='/type/long'>long</a> dc_id:<a href='/type/int'>int</a> key_fingerprint:<a href='/type/int'>int</a> = <a href='/type/EncryptedFile'>EncryptedFile</a>;
+
+<a href='/constructor/userProfilePhoto'>userProfilePhoto</a>#82d1f706 flags:<a href='/type/%23'>#</a> has_video:flags.0?<a href='/constructor/true'>true</a> personal:flags.2?<a href='/constructor/true'>true</a> photo_id:<a href='/type/long'>long</a> stripped_thumb:flags.1?<a href='/type/bytes'>bytes</a> dc_id:<a href='/type/int'>int</a> = <a href='/type/UserProfilePhoto'>UserProfilePhoto</a>;
+<a href='/constructor/chatPhoto'>chatPhoto</a>#1c6e1c11 flags:<a href='/type/%23'>#</a> has_video:flags.0?<a href='/constructor/true'>true</a> photo_id:<a href='/type/long'>long</a> stripped_thumb:flags.1?<a href='/type/bytes'>bytes</a> dc_id:<a href='/type/int'>int</a> = <a href='/type/ChatPhoto'>ChatPhoto</a>;</code></pre>
+<p>To download the file, an encrypted connection to DC <strong>dc_id</strong> must be established and used to execute the <a href="/method/upload.getFile">upload.getFile</a> query.
+If an attempt is made to download the file over a wrong connection, the FILE_MIGRATE_X error will be returned.</p>
+<p>Please note that encryption keys are not copied between DCs; therefore, the process of establishing an encrypted connection is started from the very beginning for each new DC. An issued auth_key can be associated with the current authorized user by using an <a href="#authorization-transfer">authorization transfer</a>.</p>
+<h3><a class="anchor" href="#user-migration" id="user-migration" name="user-migration"><i class="anchor-icon"></i></a>User Migration</h3>
+<p>During the process of working with the API, user information is accumulated in the DC with which the user is associated. This is the reason a user cannot be associated with a different DC by means of the client. However, in the future, during prolonged communication from an unusual location, we may decide that the user's data must be moved to a different DC. After some time, the data will be copied and the association will be updated. Once this happens, when executing any query transmitted to the old DC, the API will return the USER_MIGRATE_X error. The client will then have to establish a connection with the new DC and repeat the query.</p>
+<h3><a class="anchor" href="#authorization-transfer" id="authorization-transfer" name="authorization-transfer"><i class="anchor-icon"></i></a>Authorization Transfer</h3>
+<p>The following methods can be used to eliminate the need for users to enter the code from a text message every time:</p>
+<pre><code><a href='/constructor/auth.exportedAuthorization'>auth.exportedAuthorization</a>#b434e2b8 id:<a href='/type/long'>long</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/auth.ExportedAuthorization'>auth.ExportedAuthorization</a>;
+<a href='/constructor/auth.authorization'>auth.authorization</a>#2ea2c0d4 flags:<a href='/type/%23'>#</a> setup_password_required:flags.1?<a href='/constructor/true'>true</a> otherwise_relogin_days:flags.1?<a href='/type/int'>int</a> tmp_sessions:flags.0?<a href='/type/int'>int</a> future_auth_token:flags.2?<a href='/type/bytes'>bytes</a> user:<a href='/type/User'>User</a> = <a href='/type/auth.Authorization'>auth.Authorization</a>;
+---functions---
+<a href='/method/auth.importAuthorization'>auth.importAuthorization</a>#a57a7dad id:<a href='/type/long'>long</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/auth.Authorization'>auth.Authorization</a>;
+<a href='/method/auth.exportAuthorization'>auth.exportAuthorization</a>#e5bfffcd dc_id:<a href='/type/int'>int</a> = <a href='/type/auth.ExportedAuthorization'>auth.ExportedAuthorization</a>;</code></pre>
+<p><a href="/method/auth.exportAuthorization">auth.exportAuthorization</a> must be executed in the current DC (the DC with which a connection has already been established), passing in <strong>dc_id</strong> as the value for the new DC. The method should return the user identifier and a long string of random data. An import operation can be performed at the new DC by sending it what was received. Queries requiring authorization can then be successfully executed in the new DC.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
