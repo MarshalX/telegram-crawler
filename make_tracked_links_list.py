@@ -525,7 +525,6 @@ async def start(url_list: Set[str]):
         ssl=False,                    # Disable SSL verification for crawling
         limit=300,                    # Total connection pool size (10x workers)
         limit_per_host=20,            # Max connections per host (avoid overwhelming servers)
-        ttl_dns_cache=None,           # Cache DNS for forever
         keepalive_timeout=30,         # Keep connections alive for 30 seconds
         enable_cleanup_closed=True,   # Clean up closed connections automatically
     )
