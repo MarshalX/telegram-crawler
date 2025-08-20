@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Telegram passport</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Client-side passport flow">
+    <meta property="og:title" content="Telegram passport">
+    <meta property="og:image" content="127528a6974e1bc1ac">
+    <meta property="og:description" content="Client-side passport flow">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/passport" >Telegram passport</a></li></ul></div>
+  <h1 id="dev_page_title">Telegram passport</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p><strong>Telegram Passport</strong> is a unified authorization method for services that require personal identification. Users can upload their documents once, then instantly share their data with services that require real-world ID (finance, ICOs, etc.). Telegram doesn't have access to the users' personal information thanks to end-to-end encryption.</p>
+<p>This page describes the request flow that client apps must used to send the requested data to the service.</p>
+<h3><a class="anchor" href="#overview" id="overview" name="overview"><i class="anchor-icon"></i></a>Overview</h3>
+<p>From the perspective of a service that requires real-world ID, the process looks like this:</p>
+<ul>
+<li>A user presses “Log in with Telegram” on your website or in your app.</li>
+<li>You request the data you need.</li>
+<li>The user accepts your privacy policy and agrees to share their data.</li>
+<li>The user's Telegram app downloads and decrypts the data you requested from the end-to-end encrypted storage on Telegram.</li>
+<li>If some of the data you requested is missing, the user can add it to their Telegram Passport at this point.</li>
+<li>The user's app encrypts the data with your public key and sends it to you.</li>
+<li>You decrypt the data, check it for errors and re-request any missing or invalid information.</li>
+<li>You sign the user up for your service. Tada!</li>
+</ul>
+<p>See <a href="#as-a-bot">As a bot</a> to see how to request passport data using a bot, through the MTProto API.
+Look at the <a href="/passport">Passport Manual</a> to see how to request passport data using a bot, through the simplified bot API.</p>
+<p>From the perspective of a user, the process looks something like this:</p>
+<ul>
+<li>Your app <a href="#receiving-requests">receives an event/intent</a> from one of the <a href="/passport#sdk">SDKs</a>, or from a custom source.</li>
+<li>The user accepts your privacy policy and agrees to share their data.</li>
+<li>The user's Telegram app <a href="/passport/encryption#fetching-and-deleting-stored-passport-data">downloads the data you requested</a> from the end-to-end encrypted storage on Telegram.</li>
+<li>If some of the data you requested is missing, the user can <a href="/passport/encryption#encryption">add it to their Telegram Passport</a> at this point.</li>
+<li>The user's app encrypts the data with your public key and sends it to the service.</li>
+<li>You sign the user up for your service. Tada!</li>
+</ul>
+<p>See <a href="#as-a-user">As a user</a> to see how user client apps should send passport data to a service, through the MTProto API.</p>
+<h3><a class="anchor" href="#as-a-bot" id="as-a-bot" name="as-a-bot"><i class="anchor-icon"></i></a>As a bot</h3>
+<p>A simplified version of this process can be used using the bot API, for more info see the <a href="/passport">Passport Manual</a>.</p>
+<p>Using the MTProto API, the process is pretty much the same, up until the actual API calls.</p>
+<blockquote>
+<p>Note that all binary fields are in raw binary format, unlike in the bot API where they are base64-encoded</p>
+</blockquote>
+<h4><a class="anchor" href="#setting-up-telegram-passport" id="setting-up-telegram-passport" name="setting-up-telegram-passport"><i class="anchor-icon"></i></a>Setting Up Telegram Passport</h4>
+<p><a href="/passport#setting-up-telegram-passport">As per the bot API</a>.</p>
+<h4><a class="anchor" href="#requesting-information" id="requesting-information" name="requesting-information"><i class="anchor-icon"></i></a>Requesting Information</h4>
+<p><a href="/passport#requesting-information">As per the bot API</a>.</p>
+<h4><a class="anchor" href="#receiving-information" id="receiving-information" name="receiving-information"><i class="anchor-icon"></i></a>Receiving information</h4>
+<p>Schema:</p>
+<pre><code><a href='/constructor/secureData'>secureData</a>#8aeabec3 data:<a href='/type/bytes'>bytes</a> data_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureData'>SecureData</a>;
+
+<a href='/constructor/securePlainPhone'>securePlainPhone</a>#7d6099dd phone:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
+<a href='/constructor/securePlainEmail'>securePlainEmail</a>#21ec5a5f email:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
+
+<a href='/constructor/secureFile'>secureFile</a>#7d09c27e id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> size:<a href='/type/long'>long</a> dc_id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> file_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureFile'>SecureFile</a>;
+
+<a href='/constructor/secureValueTypePersonalDetails'>secureValueTypePersonalDetails</a>#9d2a81e3 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypePassport'>secureValueTypePassport</a>#3dac6a00 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeDriverLicense'>secureValueTypeDriverLicense</a>#6e425c4 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeIdentityCard'>secureValueTypeIdentityCard</a>#a0d0744b = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeInternalPassport'>secureValueTypeInternalPassport</a>#99a48f23 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeAddress'>secureValueTypeAddress</a>#cbe31e26 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeUtilityBill'>secureValueTypeUtilityBill</a>#fc36954e = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeBankStatement'>secureValueTypeBankStatement</a>#89137c0d = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeRentalAgreement'>secureValueTypeRentalAgreement</a>#8b883488 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypePassportRegistration'>secureValueTypePassportRegistration</a>#99e3806a = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeTemporaryRegistration'>secureValueTypeTemporaryRegistration</a>#ea02ec33 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypePhone'>secureValueTypePhone</a>#b320aadb = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeEmail'>secureValueTypeEmail</a>#8e3ca7ee = <a href='/type/SecureValueType'>SecureValueType</a>;
+
+<a href='/constructor/secureValue'>secureValue</a>#187fa0ca flags:<a href='/type/%23'>#</a> type:<a href='/type/SecureValueType'>SecureValueType</a> data:flags.0?<a href='/type/SecureData'>SecureData</a> front_side:flags.1?<a href='/type/SecureFile'>SecureFile</a> reverse_side:flags.2?<a href='/type/SecureFile'>SecureFile</a> selfie:flags.3?<a href='/type/SecureFile'>SecureFile</a> translation:flags.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureFile'>SecureFile</a>&gt; files:flags.4?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureFile'>SecureFile</a>&gt; plain_data:flags.5?<a href='/type/SecurePlainData'>SecurePlainData</a> hash:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureValue'>SecureValue</a>;
+
+<a href='/constructor/secureCredentialsEncrypted'>secureCredentialsEncrypted</a>#33f0ea47 data:<a href='/type/bytes'>bytes</a> hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureCredentialsEncrypted'>SecureCredentialsEncrypted</a>;
+
+<a href='/constructor/messageActionSecureValuesSentMe'>messageActionSecureValuesSentMe</a>#1b287353 values:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValue'>SecureValue</a>&gt; credentials:<a href='/type/SecureCredentialsEncrypted'>SecureCredentialsEncrypted</a> = <a href='/type/MessageAction'>MessageAction</a>; 
+<a href='/constructor/messageService'>messageService</a>#7a800e0a flags:<a href='/type/%23'>#</a> out:flags.1?<a href='/constructor/true'>true</a> mentioned:flags.4?<a href='/constructor/true'>true</a> media_unread:flags.5?<a href='/constructor/true'>true</a> reactions_are_possible:flags.9?<a href='/constructor/true'>true</a> silent:flags.13?<a href='/constructor/true'>true</a> post:flags.14?<a href='/constructor/true'>true</a> legacy:flags.19?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> from_id:flags.8?<a href='/type/Peer'>Peer</a> peer_id:<a href='/type/Peer'>Peer</a> saved_peer_id:flags.28?<a href='/type/Peer'>Peer</a> reply_to:flags.3?<a href='/type/MessageReplyHeader'>MessageReplyHeader</a> date:<a href='/type/int'>int</a> action:<a href='/type/MessageAction'>MessageAction</a> reactions:flags.20?<a href='/type/MessageReactions'>MessageReactions</a> ttl_period:flags.25?<a href='/type/int'>int</a> = <a href='/type/Message'>Message</a>;
+
+<a href='/constructor/updateNewMessage'>updateNewMessage</a>#1f2b0afd message:<a href='/type/Message'>Message</a> pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;</code></pre>
+<p>When the user confirms your request by pressing the "Authorize" button, the MTProto API sends an <a href="/constructor/updateNewMessage">updateNewMessage</a> from the user, with a <a href="/constructor/messageService">messageService</a> constructor, containing a <a href="/constructor/messageActionSecureValuesSentMe">messageActionSecureValuesSentMe</a> constructor that contains the encrypted Telegram Passport data.</p>
+<h4><a class="anchor" href="#decrypting-data" id="decrypting-data" name="decrypting-data"><i class="anchor-icon"></i></a>Decrypting data</h4>
+<pre><code><a href='/constructor/secureCredentialsEncrypted'>secureCredentialsEncrypted</a>#33f0ea47 data:<a href='/type/bytes'>bytes</a> hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureCredentialsEncrypted'>SecureCredentialsEncrypted</a>;
+
+<a href='/constructor/messageActionSecureValuesSentMe'>messageActionSecureValuesSentMe</a>#1b287353 values:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValue'>SecureValue</a>&gt; credentials:<a href='/type/SecureCredentialsEncrypted'>SecureCredentialsEncrypted</a> = <a href='/type/MessageAction'>MessageAction</a>; </code></pre>
+<p>To decrypt the received data, first, decrypt the credentials contained in <a href="/constructor/secureCredentialsEncrypted">secureCredentialsEncrypted</a>.</p>
+<ol>
+<li>
+<p>Decrypt the credentials secret ( <em>secret</em> field in <a href="/constructor/secureCredentialsEncrypted">secureCredentialsEncrypted</a>) using your <strong>private</strong> key (set OAEP padding option, e.g. <code>OPENSSL_PKCS1_OAEP_PADDING</code> in PHP)</p>
+</li>
+<li>
+<p>Use this secret and the credentials hash ( <em>hash</em> field in <a href="/constructor/secureCredentialsEncrypted">secureCredentialsEncrypted</a>) to calculate <em>credentials_key</em> and <em>credentials_iv</em> as described below:</p>
+<pre><code> credentials_secret_hash = SHA512( credentials_secret + credentials_hash )
+ credentials_key = slice( credentials_secret_hash, 0, 32 )
+ credentials_iv = slice( credentials_secret_hash, 32, 16 )</code></pre>
+</li>
+<li>
+<p>Decrypt the credentials data ( <em>data</em> field in <a href="/constructor/secureCredentialsEncrypted">secureCredentialsEncrypted</a>) by AES256-CBC using these <em>credentials_key</em> and <em>credentials_iv</em>. <strong>IMPORTANT:</strong> At this step, make sure that the credentials hash is equal to <code>SHA256( credentials_data )</code></p>
+</li>
+<li>
+<p>Credentials data is padded with 32 to 255 random padding bytes to make its length divisible by 16 bytes. The first byte contains the length of this padding (including this byte). Remove the padding to get the data.</p>
+</li>
+</ol>
+<blockquote>
+<p>Note that all hashes are raw binary data, not hexits</p>
+</blockquote>
+<h4><a class="anchor" href="#credentials" id="credentials" name="credentials"><i class="anchor-icon"></i></a>Credentials</h4>
+<p>The credentials are a JSON-serialized object, structured exactly as in the <a href="/passport#credentials">bot API »</a>.
+Since decryption credentials are E2E encrypted, apps have to store the decryption credentials as JSON and not TL payloads.</p>
+<p>The credentials are used as described in the <a href="/passport#credentials">Passport Manual</a> to decrypt the files attached to the <a href="/constructor/secureValue">secureValue</a>.
+In this case, the container for the E2E encrypted data is in TL, while the encrypted data itself is in JSON.</p>
+<h5><a class="anchor" href="#securevalue" id="securevalue" name="securevalue"><i class="anchor-icon"></i></a><a href="/constructor/secureValue">secureValue</a></h5>
+<pre><code><a href='/constructor/secureValue'>secureValue</a>#187fa0ca flags:<a href='/type/%23'>#</a> type:<a href='/type/SecureValueType'>SecureValueType</a> data:flags.0?<a href='/type/SecureData'>SecureData</a> front_side:flags.1?<a href='/type/SecureFile'>SecureFile</a> reverse_side:flags.2?<a href='/type/SecureFile'>SecureFile</a> selfie:flags.3?<a href='/type/SecureFile'>SecureFile</a> translation:flags.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureFile'>SecureFile</a>&gt; files:flags.4?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureFile'>SecureFile</a>&gt; plain_data:flags.5?<a href='/type/SecurePlainData'>SecurePlainData</a> hash:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureValue'>SecureValue</a>;
+
+<a href='/constructor/messageActionSecureValuesSentMe'>messageActionSecureValuesSentMe</a>#1b287353 values:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValue'>SecureValue</a>&gt; credentials:<a href='/type/SecureCredentialsEncrypted'>SecureCredentialsEncrypted</a> = <a href='/type/MessageAction'>MessageAction</a>; </code></pre>
+<p>The schema for the <a href="/constructor/inputSecureValue">secureValue</a> constructor defines the constructor that can be found in each field.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>type</strong></td>
+<td><a href="/type/SecureValueType">SecureValueType</a></td>
+<td>Secure <a href="/passport">passport</a> value type</td>
+</tr>
+<tr>
+<td><strong>data</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/SecureData">SecureData</a></td>
+<td>Encrypted <a href="/passport">Telegram Passport</a> element data</td>
+</tr>
+<tr>
+<td><strong>front_side</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/SecureFile">SecureFile</a></td>
+<td>Encrypted <a href="/passport">passport</a> file with the front side of the document</td>
+</tr>
+<tr>
+<td><strong>reverse_side</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/SecureFile">SecureFile</a></td>
+<td>Encrypted <a href="/passport">passport</a> file with the reverse side of the document</td>
+</tr>
+<tr>
+<td><strong>selfie</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/type/SecureFile">SecureFile</a></td>
+<td>Encrypted <a href="/passport">passport</a> file with a selfie of the user holding the document</td>
+</tr>
+<tr>
+<td><strong>translation</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.6?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/SecureFile">SecureFile</a>&gt;</td>
+<td>Array of encrypted <a href="/passport">passport</a> files with translated versions of the provided documents</td>
+</tr>
+<tr>
+<td><strong>files</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/SecureFile">SecureFile</a>&gt;</td>
+<td>Array of encrypted <a href="/passport">passport</a> files with photos the of the documents</td>
+</tr>
+<tr>
+<td><strong>plain_data</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/type/SecurePlainData">SecurePlainData</a></td>
+<td>Plaintext verified <a href="/passport">passport</a> data</td>
+</tr>
+<tr>
+<td><strong>hash</strong></td>
+<td><a href="/type/bytes">bytes</a></td>
+<td>Data hash</td>
+</tr>
+</tbody>
+</table>
+<p>Here's a list of possible <a href="/type/SecureValueType">SecureValueTypes</a>, and the parameters that can be set/requested when using each type.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Type</th>
+<th>Allowed fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/constructor/secureValueTypeEmail">secureValueTypeEmail</a></td>
+<td><code>plain_data</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeEmail">secureValueTypePhone</a></td>
+<td><code>plain_data</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypePersonalDetails">secureValueTypePersonalDetails</a></td>
+<td><code>data</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypePassport">secureValueTypePassport</a></td>
+<td><code>data</code>, <code>front_side</code>, <code>selfie</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeDriverLicense">secureValueTypeDriverLicense</a></td>
+<td><code>data</code>, <code>front_side</code>, <code>reverse_side</code>, <code>selfie</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeIdentityCard">secureValueTypeIdentityCard</a></td>
+<td><code>data</code>, <code>front_side</code>, <code>reverse_side</code>, <code>selfie</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeInternalPassport">secureValueTypeInternalPassport</a></td>
+<td><code>data</code>, <code>front_side</code>, <code>selfie</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeAddress">secureValueTypeAddress</a></td>
+<td><code>data</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeUtilityBill">secureValueTypeUtilityBill</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeBankStatement">secureValueTypeBankStatement</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeRentalAgreement">secureValueTypeRentalAgreement</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypePassportRegistration">secureValueTypePassportRegistration</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeTemporaryRegistration">secureValueTypeTemporaryRegistration</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+</tbody>
+</table>
+<h5><a class="anchor" href="#securedata" id="securedata" name="securedata"><i class="anchor-icon"></i></a><a href="/type/SecureData">SecureData</a></h5>
+<pre><code><a href='/constructor/secureData'>secureData</a>#8aeabec3 data:<a href='/type/bytes'>bytes</a> data_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureData'>SecureData</a>;</code></pre>
+<p>Data is an encrypted and padded JSON-serialized object of one of the specified JSON types, depending on the chosen <a href="/type/SecureValueType">type</a>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Chosen type</th>
+<th>JSON object</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/constructor/secureValueTypePersonalDetails">secureValueTypePersonalDetails</a></td>
+<td><a href="/passport#personaldetails">PersonalDetails</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypePassport">secureValueTypePassport</a></td>
+<td><a href="/passport#iddocumentdata">IdDocumentData</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeDriverLicense">secureValueTypeDriverLicense</a></td>
+<td><a href="/passport#iddocumentdata">IdDocumentData</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeIdentityCard">secureValueTypeIdentityCard</a></td>
+<td><a href="/passport#iddocumentdata">IdDocumentData</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeInternalPassport">secureValueTypeInternalPassport</a></td>
+<td><a href="/passport#iddocumentdata">IdDocumentData</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeAddress">secureValueTypeAddress</a></td>
+<td><a href="/passport#residentialaddress">ResidentialAddress</a></td>
+</tr>
+</tbody>
+</table>
+<p><a href="/passport#datacredentials">DataCredentials</a> extracted <a href="#credentials">from the credentials</a> can then be used to decrypt encrypted data from the <em>data</em> field in <a href="/constructor/secureData">secureData</a>.
+For more info on how to decrypt the <em>data</em> field, see the <a href="/passport#datacredentials">passport manual</a>.</p>
+<h5><a class="anchor" href="#securefile" id="securefile" name="securefile"><i class="anchor-icon"></i></a><a href="/type/SecureFile">SecureFile</a></h5>
+<pre><code><a href='/constructor/secureFile'>secureFile</a>#7d09c27e id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> size:<a href='/type/long'>long</a> dc_id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> file_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureFile'>SecureFile</a>;    
+
+<a href='/constructor/inputSecureFileLocation'>inputSecureFileLocation</a>#cbc7ee28 id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputFileLocation'>InputFileLocation</a>;
+
+---functions---
+
+<a href='/method/upload.getFile'>upload.getFile</a>#be5335be flags:<a href='/type/%23'>#</a> precise:flags.0?<a href='/constructor/true'>true</a> cdn_supported:flags.1?<a href='/constructor/true'>true</a> location:<a href='/type/InputFileLocation'>InputFileLocation</a> offset:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> = <a href='/type/upload.File'>upload.File</a>;</code></pre>
+<p>Files (JPG format when decrypted, max. 10 MB) are downloaded chunk by chunk as described in <a href="/api/files">files »</a>, except that instead of generating an <a href="/constructor/inputFile">inputFileLocation</a>, an <a href="/constructor/inputFileLocation">inputFileLocation</a> should be generated, instead.</p>
+<ul>
+<li>The <code>id</code> field is the <code>id</code> of the <a href="/constructor/secureFile">secureFile</a></li>
+<li>The <code>access_hash</code> field is the <code>access_hash</code> of the <a href="/constructor/secureFile">secureFile</a></li>
+</ul>
+<p><a href="/passport#filecredentials">FileCredentials</a> extracted <a href="#credentials">from the credentials</a> can then be used to decrypt downloaded encrypted data.
+For more info on how to decrypt passport files, see the <a href="/passport#filecredentials">passport manual</a>.</p>
+<h5><a class="anchor" href="#secureplaindata" id="secureplaindata" name="secureplaindata"><i class="anchor-icon"></i></a><a href="/type/SecurePlainData">SecurePlainData</a></h5>
+<pre><code><a href='/constructor/securePlainPhone'>securePlainPhone</a>#7d6099dd phone:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
+<a href='/constructor/securePlainEmail'>securePlainEmail</a>#21ec5a5f email:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;</code></pre>
+<p>The email/phone is passed in plaintext using the respective <a href="/type/SecurePlainData">SecurePlainData</a> constructor.
+Emails and phone numbers sent using telegram passport are <em>already verified</em> as described in the <a href="/passport/encryption#secureplaindata">passport manual</a>.</p>
+<h4><a class="anchor" href="#fixing-errors" id="fixing-errors" name="fixing-errors"><i class="anchor-icon"></i></a>Fixing errors</h4>
+<pre><code><a href='/constructor/secureValueErrorData'>secureValueErrorData</a>#e8a40bd9 type:<a href='/type/SecureValueType'>SecureValueType</a> data_hash:<a href='/type/bytes'>bytes</a> field:<a href='/type/string'>string</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorFrontSide'>secureValueErrorFrontSide</a>#be3dfa type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorReverseSide'>secureValueErrorReverseSide</a>#868a2aa5 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorSelfie'>secureValueErrorSelfie</a>#e537ced6 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorFile'>secureValueErrorFile</a>#7a700873 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorFiles'>secureValueErrorFiles</a>#666220e9 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueError'>secureValueError</a>#869d758f type:<a href='/type/SecureValueType'>SecureValueType</a> hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorTranslationFile'>secureValueErrorTranslationFile</a>#a1144770 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorTranslationFiles'>secureValueErrorTranslationFiles</a>#34636dd8 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+
+<a href='/constructor/inputUser'>inputUser</a>#f21158c6 user_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputUser'>InputUser</a>;
+
+
+---functions---
+
+<a href='/method/users.setSecureValueErrors'>users.setSecureValueErrors</a>#90c894b5 id:<a href='/type/InputUser'>InputUser</a> errors:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValueError'>SecureValueError</a>&gt; = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>If the data you received contains errors, the bot can use the <a href="/method/users.setSecureValueErrors">users.setSecureValueErrors</a> method to inform the user and <a href="#requesting-information">request information</a> again. The user will not be able to resend the data, until all errors are fixed.</p>
+<p>Descriptions of the method parameters can be found in the method's <a href="/method/users.setSecureValueErrors">documentation page »</a>.</p>
+<h3><a class="anchor" href="#as-a-user" id="as-a-user" name="as-a-user"><i class="anchor-icon"></i></a>As a user</h3>
+<h4><a class="anchor" href="#receiving-requests" id="receiving-requests" name="receiving-requests"><i class="anchor-icon"></i></a>Receiving requests</h4>
+<p>The process starts when your app receives an event from one of the <a href="/passport#sdk">SDKs</a>, or from a custom source.</p>
+<h4><a class="anchor" href="#uri-format" id="uri-format" name="uri-format"><i class="anchor-icon"></i></a>URI format</h4>
+<p>The SDKs trigger a passport authorization request by opening the following <a href="/api/links">deep links »</a>:</p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://passport?bot_id=&lt;bot_user_id&gt;&amp;scope=&lt;scope&gt;&amp;public_key=&lt;public_key&gt;&amp;nonce=&lt;nonce&gt;
+tg://resolve?domain=telegrampassport&amp;bot_id=&lt;bot_user_id&gt;&amp;scope=&lt;scope&gt;&amp;public_key=&lt;public_key&gt;&amp;nonce=&lt;nonce&gt;</code></pre>
+<p>With the following query string parameters:</p>
+<table class="table">
+<tbody>
+<tr>
+<td><strong>Parameters</strong></td>
+<td><strong>Type</strong></td>
+<td><strong>Required</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td>domain</td>
+<td>String</td>
+<td>Required only for <code>resolve</code> versions of the passport URI</td>
+<td>Always <code>telegrampassport</code> for Passport authorization requests.</td>
+</tr>
+<tr>
+<td>bot_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier for the bot. You can get it from bot token. For example, for the bot token <code>1234567:4TT8bAc8GHUspu3ERYn-KGcvsvGB9u_n4ddy</code>, the bot id is <code>1234567</code>.</td>
+</tr>
+<tr>
+<td>scope</td>
+<td><a href="#uripassportscope">UriPassportScope</a></td>
+<td>Yes</td>
+<td>A more compact JSON-serialized object describing the data you want to request</td>
+</tr>
+<tr>
+<td>public_key</td>
+<td>String</td>
+<td>Yes</td>
+<td>Public key of the bot</td>
+</tr>
+<tr>
+<td>nonce</td>
+<td>String</td>
+<td>Yes</td>
+<td>Bot-specified nonce. <strong>Important:</strong> For security purposes it should be a cryptographically secure unique identifier of the request. In particular, it should be long enough and it should be generated using a cryptographically secure pseudorandom number generator. You should never accept credentials with the same nonce twice.</td>
+</tr>
+<tr>
+<td>callback_url</td>
+<td>String</td>
+<td>Optional</td>
+<td>Supported by some Telegram clients, specifies a callback URL to open once the process is finished or canceled.</td>
+</tr>
+<tr>
+<td>payload</td>
+<td>String</td>
+<td>Optional</td>
+<td><strong>Deprecated</strong> parameter from Telegram Passport 1.0 that had the same function of the <code>nonce</code> parameter.<br>Services that still use a legacy version of the SDK may provide this parameter instead of the <code>nonce</code>.<br>In some cases, both the <code>nonce</code> and the <code>payload</code> parameters may be found in a URI, for backwards compatibility: in this case, the <code>nonce</code> parameter should always be used instead of <code>payload</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Example URI, generated by the <a href="/passport/example">Telegram Passport Example page</a>:</p>
+<pre><code>tg://resolve?domain=telegrampassport&amp;bot_id=543260180&amp;scope=%7B%22v%22%3A1%2C%22d%22%3A%5B%7B%22_%22%3A%22pd%22%2C%22n%22%3A1%7D%2C%22ad%22%2C%22pn%22%2C%22em%22%2C%7B%22_%22%3A%5B%7B%22_%22%3A%22pp%22%2C%22s%22%3A1%2C%22t%22%3A1%7D%2C%22ip%22%2C%22dl%22%2C%22ic%22%5D%7D%2C%7B%22_%22%3A%5B%22ub%22%2C%22bs%22%2C%22ra%22%2C%22pr%22%2C%22tr%22%5D%7D%5D%7D&amp;public_key=-----BEGIN%20PUBLIC%20KEY-----%0AMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv6m1zBF8lZOCqcxf8hnj%0AkvHwuWdU8s4rBWaxKXH%2FvDDUklcCS5uhSnmjhxWca9suubaG3lW4HxlCilkeJPVf%0Ajimg5Q8ZqWrR3OoOihEpcG9iJZTOEpsEk7VtEiabgacBG3Quv9JslTrDe95Fn801%0At9d21HXwgMrHeHpWDOn31Dr%2BwoEH%2BkwySUWa6L%2FZbnGwSNP7eeDTE7Amz1RMDk3t%0A8EWGq58u0IQatPcEH09aUQlKzk6MIiALkZ9ILBKCBk6d2WCokKnsdBctovNbxwSx%0AhP1qst1r%2BYc8iPBZozsDC0ZsC5jXCkcODI3OC0tkNtYzN2XKalW5R0DjDRUDmGhT%0AzQIDAQAB%0A-----END%20PUBLIC%20KEY-----%0A&amp;nonce=b8e892dc2e0afe63424d101b964f1256_32858210_708614a4585b84872e&amp;callback_url=https%3A%2F%2Fcore.telegram.org%2Fpassport%2Fexample%3Fpassport_ssid%3Db8e892dc2e0afe63424d101b964f1256_32858210_db259b427f200751ce&amp;payload=b8e892dc2e0afe63424d101b964f1256_32858210_708614a4585b84872e</code></pre>
+<h4><a class="anchor" href="#uripassportscope" id="uripassportscope" name="uripassportscope"><i class="anchor-icon"></i></a>UriPassportScope</h4>
+<p>This object represents the data to be requested.</p>
+<table class="table">
+<tbody>
+<tr>
+<td><strong>Field</strong></td>
+<td><strong>Type</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td>d</td>
+<td>Array of <a href="#uripassportscopeelement">UriPassportScopeElement</a></td>
+<td>List of requested elements, each type may be used only once in the entire array of UriPassportScopeElement objects</td>
+</tr>
+<tr>
+<td>v</td>
+<td>Integer</td>
+<td>Scope version, must be <em>1</em></td>
+</tr>
+</tbody>
+</table>
+<h5><a class="anchor" href="#uripassportscopeelement" id="uripassportscopeelement" name="uripassportscopeelement"><i class="anchor-icon"></i></a>UriPassportScopeElement</h5>
+<p>This object represents a requested element, should be one of:</p>
+<ul>
+<li><a href="#uripassportscopeelementoneofseveral">UriPassportScopeElementOneOfSeveral</a> - use to request any one of the documents included in the scope.</li>
+<li><a href="#uripassportscopeelementone">UriPassportScopeElementOne</a> – use to request one particular document.</li>
+</ul>
+<p>Passport document type identifiers are aliased with the following reduced type identifiers:</p>
+<table class="table">
+<thead>
+<tr>
+<th><strong>Full</strong></th>
+<th><strong>Alias</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>personal_details</code></td>
+<td><code>pd</code></td>
+</tr>
+<tr>
+<td><code>passport</code></td>
+<td><code>pp</code></td>
+</tr>
+<tr>
+<td><code>driver_license</code></td>
+<td><code>dl</code></td>
+</tr>
+<tr>
+<td><code>identity_card</code></td>
+<td><code>ic</code></td>
+</tr>
+<tr>
+<td><code>internal_passport</code></td>
+<td><code>ip</code></td>
+</tr>
+<tr>
+<td><code>id_document</code></td>
+<td><code>idd</code></td>
+</tr>
+<tr>
+<td><code>address</code></td>
+<td><code>ad</code></td>
+</tr>
+<tr>
+<td><code>utility_bill</code></td>
+<td><code>ub</code></td>
+</tr>
+<tr>
+<td><code>bank_statement</code></td>
+<td><code>bs</code></td>
+</tr>
+<tr>
+<td><code>rental_agreement</code></td>
+<td><code>ra</code></td>
+</tr>
+<tr>
+<td><code>passport_registration</code></td>
+<td><code>pr</code></td>
+</tr>
+<tr>
+<td><code>temporary_registration</code></td>
+<td><code>tr</code></td>
+</tr>
+<tr>
+<td><code>address_document</code></td>
+<td><code>add</code></td>
+</tr>
+<tr>
+<td><code>phone_number</code></td>
+<td><code>pn</code></td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td><code>em</code></td>
+</tr>
+</tbody>
+</table>
+<p>You can use the special type "idd" as an alias for one of "pp", "dl", "ic" and the special type "add" as an alias for one of "ub", "bs", "ra". </p>
+<h4><a class="anchor" href="#uripassportscopeelementoneofseveral" id="uripassportscopeelementoneofseveral" name="uripassportscopeelementoneofseveral"><i class="anchor-icon"></i></a>UriPassportScopeElementOneOfSeveral</h4>
+<p>This object represents several elements one of which must be provided.</p>
+<table class="table">
+<tbody>
+<tr>
+<td><strong>Field</strong></td>
+<td><strong>Type</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td>_</td>
+<td>Array of <a href="#uripassportscopeelementone">UriPassportScopeElementOne</a></td>
+<td>List of elements one of which must be provided; must contain either several of “pp”, “dl”, “ic”, “ip” <strong>or</strong> several of “ub”, “bs”, “ra”, “pr”, “tr”</td>
+</tr>
+<tr>
+<td>s</td>
+<td>Boolean</td>
+<td><em>Optional.</em> Use this parameter if you want to request a selfie with the document from this list that the user chooses to upload.</td>
+</tr>
+<tr>
+<td>t</td>
+<td>Boolean</td>
+<td><em>Optional.</em> Use this parameter if you want to request a translation of the document from this list that the user chooses to upload. <strong>Note:</strong> We suggest to only request translations <em>after</em> you have received a valid document that requires one.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#uripassportscopeelementone" id="uripassportscopeelementone" name="uripassportscopeelementone"><i class="anchor-icon"></i></a>UriPassportScopeElementOne</h4>
+<p>This object represents one particular element that must be provided. If no options are needed, <em>String</em> can be used instead of this object to specify the type of the element.</p>
+<table class="table">
+<tbody>
+<tr>
+<td><strong>Field</strong></td>
+<td><strong>Type</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td>_</td>
+<td>String</td>
+<td>Element type. One of "pd", "pp", "dl", "ic", "ip", "ad", "ub", "bs", "ra", "pr", "tr", "pn", "em"</td>
+</tr>
+<tr>
+<td>s</td>
+<td>Boolean</td>
+<td><em>Optional.</em> Use this parameter if you want to request a selfie with the document as well. Available for "pp", "dl", "ic" and "ip"</td>
+</tr>
+<tr>
+<td>t</td>
+<td>Boolean</td>
+<td><em>Optional.</em> Use this parameter if you want to request a translation of the document as well. Available for "pp", "dl", "ic", "ip", "ub", "bs", "ra", "pr" and "tr". <strong>Note:</strong> We suggest to only request translations <em>after</em> you have received a valid document that requires one.</td>
+</tr>
+<tr>
+<td>n</td>
+<td>Boolean</td>
+<td><em>Optional.</em> Use this parameter to request the first, last and middle name of the user in the language of the user's country of residence. Available for "pd"</td>
+</tr>
+</tbody>
+</table>
+<p>You can also use the special type "idd" as an alias for one of "pp", "dl", "ic" and the special type "add" as an alias for one of "ub", "bs", "ra". </p>
+<h4><a class="anchor" href="#setting-up-telegram-passport" id="setting-up-telegram-passport" name="setting-up-telegram-passport"><i class="anchor-icon"></i></a>Setting up Telegram Passport</h4>
+<p>The next step for the client app is to request the user's 2FA passport, and configure Telegram Passport/fetch and decrypt remotely saved Telegram Passport parameters as described in the <a href="/passport/encryption">Encryption article »</a>.</p>
+<h4><a class="anchor" href="#fetching-the-passport-form" id="fetching-the-passport-form" name="fetching-the-passport-form"><i class="anchor-icon"></i></a>Fetching the passport form</h4>
+<pre><code><a href='/constructor/account.authorizationForm'>account.authorizationForm</a>#ad2e1cd8 flags:<a href='/type/%23'>#</a> required_types:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureRequiredType'>SecureRequiredType</a>&gt; values:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValue'>SecureValue</a>&gt; errors:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValueError'>SecureValueError</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; privacy_policy_url:flags.0?<a href='/type/string'>string</a> = <a href='/type/account.AuthorizationForm'>account.AuthorizationForm</a>;
+
+---functions---
+
+<a href='/method/account.getAuthorizationForm'>account.getAuthorizationForm</a>#a929597a bot_id:<a href='/type/long'>long</a> scope:<a href='/type/string'>string</a> public_key:<a href='/type/string'>string</a> = <a href='/type/account.AuthorizationForm'>account.AuthorizationForm</a>;</code></pre>
+<p>Then, the client app passes the bot ID, scope and public key from the <a href="#receiving-requests">passport authorization request</a> to the Telegram servers using the <a href="/method/account.getAuthorizationForm">account.getAuthorizationForm</a> method.</p>
+<p>The response will be an <a href="/constructor/account.authorizationForm">account.authorizationForm</a> constructor, with info about the required document types, the URL of the service's privacy policy, as well as info about the bot to which the form should be sent.
+If the form was already submitted at least once, the constructor will also contain a list of already submitted data, along with eventual errors. </p>
+<p>The user should accept the privacy policy and proceed to fill in the required data, and the client should encrypt and upload it as described in the <a href="/passport/encryption">Encryption article »</a>.</p>
+<h4><a class="anchor" href="#submitting-the-passport-form" id="submitting-the-passport-form" name="submitting-the-passport-form"><i class="anchor-icon"></i></a>Submitting the passport form</h4>
+<pre><code><a href='/constructor/secureCredentialsEncrypted'>secureCredentialsEncrypted</a>#33f0ea47 data:<a href='/type/bytes'>bytes</a> hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureCredentialsEncrypted'>SecureCredentialsEncrypted</a>;
+
+<a href='/constructor/secureValueHash'>secureValueHash</a>#ed1ecdb0 type:<a href='/type/SecureValueType'>SecureValueType</a> hash:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureValueHash'>SecureValueHash</a>;
+
+---functions---
+
+<a href='/method/account.acceptAuthorization'>account.acceptAuthorization</a>#f3ed4c73 bot_id:<a href='/type/long'>long</a> scope:<a href='/type/string'>string</a> public_key:<a href='/type/string'>string</a> value_hashes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValueHash'>SecureValueHash</a>&gt; credentials:<a href='/type/SecureCredentialsEncrypted'>SecureCredentialsEncrypted</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Once the user finishes uploading the required documents and clicks on the submit button, the client calls <a href="/method/account.acceptAuthorization">account.acceptAuthorization</a>, submitting the documents to the bot associated to the service.</p>
+<ul>
+<li>As before, <code>bot_id</code>, <code>scope</code> and <code>public_key</code> are taken from the authorization request URI.</li>
+<li><code>value_hashes</code> is used by the server to choose which document of which type to send to the bot: the <code>type</code> field should be set to the document type, and the <code>hash</code> field should be set to the <code>data_hash</code>/<code>file_hash</code> generated when <a href="/passport/encryption#encryption">uploading encrypting the data »</a>.</li>
+<li><code>credentials</code> contains the encrypted credentials required by the service to decrypt the sent E2E encrypted secure values: it is generated as described in <a href="/passport/encryption#passport-credentials">Passport Credentials »</a>.</li>
+</ul>
+<p>Finally, the client opens the callback URL (if present).</p>
+<h4><a class="anchor" href="#handling-invalid-forms" id="handling-invalid-forms" name="handling-invalid-forms"><i class="anchor-icon"></i></a>Handling invalid forms</h4>
+<pre><code><a href='/constructor/secureValueErrorData'>secureValueErrorData</a>#e8a40bd9 type:<a href='/type/SecureValueType'>SecureValueType</a> data_hash:<a href='/type/bytes'>bytes</a> field:<a href='/type/string'>string</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorFrontSide'>secureValueErrorFrontSide</a>#be3dfa type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorReverseSide'>secureValueErrorReverseSide</a>#868a2aa5 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorSelfie'>secureValueErrorSelfie</a>#e537ced6 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorFile'>secureValueErrorFile</a>#7a700873 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorFiles'>secureValueErrorFiles</a>#666220e9 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueError'>secureValueError</a>#869d758f type:<a href='/type/SecureValueType'>SecureValueType</a> hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorTranslationFile'>secureValueErrorTranslationFile</a>#a1144770 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/bytes'>bytes</a> text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+<a href='/constructor/secureValueErrorTranslationFiles'>secureValueErrorTranslationFiles</a>#34636dd8 type:<a href='/type/SecureValueType'>SecureValueType</a> file_hash:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; text:<a href='/type/string'>string</a> = <a href='/type/SecureValueError'>SecureValueError</a>;
+
+<a href='/constructor/account.authorizationForm'>account.authorizationForm</a>#ad2e1cd8 flags:<a href='/type/%23'>#</a> required_types:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureRequiredType'>SecureRequiredType</a>&gt; values:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValue'>SecureValue</a>&gt; errors:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValueError'>SecureValueError</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; privacy_policy_url:flags.0?<a href='/type/string'>string</a> = <a href='/type/account.AuthorizationForm'>account.AuthorizationForm</a>;
+
+---functions---
+
+<a href='/method/account.getAuthorizationForm'>account.getAuthorizationForm</a>#a929597a bot_id:<a href='/type/long'>long</a> scope:<a href='/type/string'>string</a> public_key:<a href='/type/string'>string</a> = <a href='/type/account.AuthorizationForm'>account.AuthorizationForm</a>;</code></pre>
+<p>If any of the values of the submitted form are rejected by the service, the bot <a href="/api/passport#fixing-errors">calls the appropriate method to set information about errors</a>.</p>
+<p>The user can find out about these errors directly from the service, or, if they decide to <a href="#receiving-requests">restart the process</a> and resend the corrected data, directly from the authorization form (<code>errors</code> field).</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

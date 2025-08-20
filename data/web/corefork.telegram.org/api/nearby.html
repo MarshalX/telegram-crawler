@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Nearby users&amp;chats</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="How to work with geolocation-based features like geochats and the nearby users feature.">
+    <meta property="og:title" content="Nearby users&amp;chats">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="How to work with geolocation-based features like geochats and the nearby users feature.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/nearby" >Nearby users&amp;chats</a></li></ul></div>
+  <h1 id="dev_page_title">Nearby users&amp;chats</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>How to work with geolocation-based features like geochats and the nearby users feature.</p>
+<h3><a class="anchor" href="#fetching-nearby-users-and-geogroups" id="fetching-nearby-users-and-geogroups" name="fetching-nearby-users-and-geogroups"><i class="anchor-icon"></i></a>Fetching nearby users and geogroups</h3>
+<pre><code><a href='/constructor/inputGeoPoint'>inputGeoPoint</a>#48222faf flags:<a href='/type/%23'>#</a> lat:<a href='/type/double'>double</a> long:<a href='/type/double'>double</a> accuracy_radius:flags.0?<a href='/type/int'>int</a> = <a href='/type/InputGeoPoint'>InputGeoPoint</a>;
+
+---functions---
+
+<a href='/method/contacts.getLocated'>contacts.getLocated</a>#d348bc44 flags:<a href='/type/%23'>#</a> background:flags.1?<a href='/constructor/true'>true</a> geo_point:<a href='/type/InputGeoPoint'>InputGeoPoint</a> self_expires:flags.0?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Use <a href="/method/contacts.getLocated">contacts.getLocated</a> to fetch a list of nearby users and groups.  </p>
+<p>Do <strong>not</strong> set any of the <code>background</code>, <code>self_expires</code> flags: only populate <code>geo_point</code> with the current geolocation of the user: a list of users and geochats located nearby will be returned (<strong>without</strong> publishing the current location of the user).  </p>
+<p>This functionality is useful for example to <a href="/api/contacts#adding-telegram-users-as-contacts">exchange contacts</a> with a nearby Telegram user, or <a href="/method/channels.joinChannel">join</a> a location-based group chat, see <a href="https://telegram.org/blog/contacts-local-groups">here »</a> for more usecases.  </p>
+<p>See <a href="#creating-a-geogroup">here »</a> for more info on how to create a geogroup, and <a href="#advertising-our-current-location">here »</a> for more info on how to advertise our current location to other users.  </p>
+<h3><a class="anchor" href="#creating-a-geogroup" id="creating-a-geogroup" name="creating-a-geogroup"><i class="anchor-icon"></i></a>Creating a geogroup</h3>
+<pre><code><a href='/constructor/inputGeoPoint'>inputGeoPoint</a>#48222faf flags:<a href='/type/%23'>#</a> lat:<a href='/type/double'>double</a> long:<a href='/type/double'>double</a> accuracy_radius:flags.0?<a href='/type/int'>int</a> = <a href='/type/InputGeoPoint'>InputGeoPoint</a>;
+
+---functions---
+
+<a href='/method/channels.createChannel'>channels.createChannel</a>#91006707 flags:<a href='/type/%23'>#</a> broadcast:flags.0?<a href='/constructor/true'>true</a> megagroup:flags.1?<a href='/constructor/true'>true</a> for_import:flags.3?<a href='/constructor/true'>true</a> forum:flags.5?<a href='/constructor/true'>true</a> title:<a href='/type/string'>string</a> about:<a href='/type/string'>string</a> geo_point:flags.2?<a href='/type/InputGeoPoint'>InputGeoPoint</a> address:flags.2?<a href='/type/string'>string</a> ttl_period:flags.4?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/channels.editLocation'>channels.editLocation</a>#58e63f6d channel:<a href='/type/InputChannel'>InputChannel</a> geo_point:<a href='/type/InputGeoPoint'>InputGeoPoint</a> address:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Pass a <code>geo_point</code> to <a href="/method/channels.createChannel">channels.createChannel</a> when creating a <a href="/api/channel">supergroup</a> in order to create a geogroup associated to a geolocation, that will be returned to <a href="#fetching-nearby-users-and-geogroups">nearby users »</a>.  </p>
+<p>A textual description of the location (1-64 UTF-8 chars) should also be passed in <code>address</code>.  </p>
+<p>Use <a href="/method/channels.editLocation">channels.editLocation</a> to change the group's location.</p>
+<h3><a class="anchor" href="#advertising-our-current-location" id="advertising-our-current-location" name="advertising-our-current-location"><i class="anchor-icon"></i></a>Advertising our current location</h3>
+<pre><code><a href='/constructor/inputGeoPoint'>inputGeoPoint</a>#48222faf flags:<a href='/type/%23'>#</a> lat:<a href='/type/double'>double</a> long:<a href='/type/double'>double</a> accuracy_radius:flags.0?<a href='/type/int'>int</a> = <a href='/type/InputGeoPoint'>InputGeoPoint</a>;
+
+---functions---
+
+<a href='/method/contacts.getLocated'>contacts.getLocated</a>#d348bc44 flags:<a href='/type/%23'>#</a> background:flags.1?<a href='/constructor/true'>true</a> geo_point:<a href='/type/InputGeoPoint'>InputGeoPoint</a> self_expires:flags.0?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Our current location may be <a href="#fetching-nearby-users-and-geogroups">advertised to other users</a> using <a href="/method/contacts.getLocated">contacts.getLocated</a>: in this case the <code>self_expires</code> flag <strong>must always be set</strong>.  </p>
+<p>Note that if the current user is already advertising their location using the <a href="/api/business#location">Telegram Business location feature »</a> (even without a <code>geo_point</code>, just with a textual <code>address</code>), the method will return a <code>BUSINESS_ADDRESS_ACTIVE</code> error, indicating that the location may only be changed (or removed) using <a href="/method/account.updateBusinessLocation">account.updateBusinessLocation »</a>, instead of <a href="/method/contacts.getLocated">contacts.getLocated</a>.  </p>
+<p>This flag is used to specify the expiration TTL of the passed geolocation (i.e. the geolocation will expire after <code>self_expires</code> seconds); pass <code>0x7fffffff</code> to disable expiry, 0 to make the current geolocation private.  </p>
+<p>The method will also return a list of nearby users and chats, but only if the passed expiration TTL is not equal to zero.<br>
+Users may still fetch nearby users and chats without making their geolocation public by simply not setting the flag, see <a href="#fetching-nearby-users-and-geogroups">here »</a> for more info.  </p>
+<p>While the geolocation of the current user is public, clients should update it in the background every half-an-hour or so (or in any case before the expiration date specified with <code>self_expires</code>), while setting this flag: if the new location is more than 1 KM away from the previous one, or if the previous location is unknown, the <code>background</code> flag should be set.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

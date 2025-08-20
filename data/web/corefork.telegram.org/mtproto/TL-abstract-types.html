@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Binary serialization and abstract TL types</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="TL Language defines abstract data types in the spirit of a general theory of types (more accurately, Martin-Löf&#39;s theories…">
+    <meta property="og:title" content="Binary serialization and abstract TL types">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="TL Language defines abstract data types in the spirit of a general theory of types (more accurately, Martin-Löf&#39;s theories…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL-abstract-types" >Binary serialization and abstract TL types</a></li></ul></div>
+  <h1 id="dev_page_title">Binary serialization and abstract TL types</h1>
+  
+  <div id="dev_page_content"><p><a href="TL">TL Language</a> defines <em>abstract</em> data types in the spirit of a general theory of types (more accurately, Martin-Löf's theories of dependent intuitionistic types) without specifying the values of these types should be represented in memory, when saved to disk, or transmitted over a network. In contrast, the article on <a href="serialize">binary serialization</a> discusses the problem of effective serialization of values of abstract types. To this end, the concept of a <em>concrete</em> or <em>serialized</em> type has been defined as the sets of serializations of all possible values of the corresponding abstract type. In this case, the serializations take values in the set A<em> of words in the alphabet </em>A*, which consists of 2^32 characters -- 32-bit integers.</p>
+<p>In order to use a TL schema (e.g. “program”) in the TL language to describe the serialization of values of abstract types, we should explain how the concrete type <em>[T]</em> (subset <em>[T]</em> of A^<em>) is associated with the abstract type </em>T<em> (defined in TL), and how the values of the abstract type </em>T<em> correspond to the values of the concrete type </em>[T]<em> (i.e. the elements of </em>[T]*).</p>
+<p>Serialization is the process of constructing an element of <em>[T]</em> based on a value of the abstract type <em>T</em>. The reverse process is deserialization. </p>
+<p>Values of the abstract type <em>T</em> may be represented in a different way. Typically, some sort of trees or graphs are used in memory or, if desired, a set of nodes may be used, each of which contains a certain tag (“node type”) and several pointers to other nodes and/or values of built-in primitive types such as <code>int</code>. However, for general discussions it is useful to write the values of abstract type <em>T</em> as a string, more specifically, an S-expression. Recall that an S-expression is either an atom (the value of a primitive type, for example, an integer or a string constant in quotation marks; or an identifier that corresponds to a built-in or defined function) or a space-delimited list of S-expressions ending in parentheses. In our case, we use S-expressions, the first element of which is a combinator identifier, while the remaining elements (the number of which depends on the combinator's arity) are S-expressions representing elements of the chosen combinator's fields (or parameters). Moreover, the type of the arguments' S-expressions and the type of the S-expressions of the result (e.g. the associated expression) must match.</p>
+<p>For example, for the schema</p>
+<pre><code>pair x:int y:int = Pair;
+pnil = PairList;
+pcons hd:Pair tl:PairList = PairList;</code></pre>
+<p>the following are examples of the abstract type <code>PairList</code>, written as S-expressions: </p>
+<pre><code>(pnil)
+(pcons (pair 2 3) (pcons (pair 9 4) (pnil)))</code></pre>
+<p>We usually write <em>E : T</em> (read "<em>E</em> of type <em>T</em>”) when we want to say that <em>E</em> is a value of type <em>T</em>. We assume there is a built-in type <em>Type</em> whose values are types. Thus, writing <em>T : Type</em> means that <em>T</em> is a type.</p>
+<p>For example, we can write:</p>
+<pre><code>PairList : Type;
+(pcons (pair 2 3) (pcons (pair 9 4) (pnil))) : PairList;</code></pre>
+<p>Converting an abstract value to a serialized value, generally speaking, is straightforward (and, if desired, can be defined by induction):</p>
+<ul>
+<li>
+<p>It is the serialization of values <em>n</em> of the primitive type <code>int</code> (as a single-symbol word in the alphabet <em>A</em>)</p>
+</li>
+<li>
+<p>The serialization of a string constant (a value of the primitive type string) is a sequence of the 32-bit numbers defined in <a href="serialize">Binary serialization</a>.</p>
+</li>
+<li>
+<p>The serialization of the S-expression <code>(C E1 ... Er) : T</code>, where <code>C</code> is a combinator with arity <em>r</em> with argument types <em>T1</em>, ..., <em>Tr</em> and result type <em>T</em> (e.g. <em>C : T1-&gt;T2-&gt;...-&gt;Tr-&gt;T</em>) is the concatenation of the <em>combinator number</em> <em>C</em> (a 32-bit number that unambiguously identifies the combinator, usually equal to the CRC-32 of the string of its TL description) and the serializations of the values <em>E1</em> of type <em>T1</em>, <em>E2</em> of type <em>T2</em>, ..., <em>Er</em> of type <em>Tr</em>.</p>
+</li>
+</ul>
+<p>If we use <em>[T]</em> to denote the concrete type corresponding to the abstract <em>T</em>, and <em>[E]</em> to denote an element of <em>[T]</em> corresponding to the value <em>E</em> of type <em>T</em>, then the last rule may be written as:</p>
+<ul>
+<li><em>[T]</em> is the combination, for each constructor of type <em>C</em> <em>T1-&gt;T2-&gt;...-&gt;Tr-&gt;T</em> (i.e. that returns a value of type <em>T</em>), of direct products <em>{C} x [T1] x [T2] x ... x [Tr]</em>, where <em>{C}</em> is a single-element set consisting of the combinator number <em>C</em>. Because <em>{C}&lt;&gt;{C'}</em> when <em>C&lt;&gt;C'</em>, this defines a mutually single-valued mapping of the values of the abstract type <em>T</em> (written using S-expressions) to the set <em>[T]</em>.</li>
+</ul>
+<p>Values of the built-in clothed types <code>Int</code> and <code>String</code> and serialized as if they were defined using <code>int x:int = Int;</code> and <code>string s:string = String;</code>, i.e. the serialization of integer constant or a string is preceded by number of the <code>int</code> or <code>string</code> combinator (constructor). In S-expressions, this may be written as <code>(int 5)</code> or <code>(string "Test")</code>.</p>
+<p>However, what has been described above does not account for certain subtleties, such as the existence of naked types, or the difference between functions (active combinators whose application may be reduced, e.g. calculated) and constructors (passive combinators for which there are not and cannot be reduction rules). Furthermore, we have not explained how to handle polymorphic types and <a href="TL-optargs">optional combinator parameters</a>. We will attempt to explain this now.</p>
+<h3><a class="anchor" href="#constants-surface-values-and-functional-values" id="constants-surface-values-and-functional-values" name="constants-surface-values-and-functional-values"><i class="anchor-icon"></i></a>Constants, surface values, and functional values</h3>
+<p>By dividing combinators into constructors and functions, we can introduce the following classes of expressions (values) of the abstract type <em>T</em>:</p>
+<ul>
+<li>
+<p><em>Constant expressions</em>: for the types <code>int</code> and <code>string</code>, these are all integer/string constants; for <em>T</em>, these are all expressions like <em>(C E1 ... Er) : T</em>, where the combinator <em>C : T1-&gt;T2-&gt;...-&gt;Tr-&gt;T</em> is a constructor, and <em>Ei : Ti</em> is constant expressions of types <em>Ti</em>. In other words, a constant expression is an S-expression consisting of only constructors and constant of primitive types.</p>
+</li>
+<li>
+<p><em>Surface expressions</em> are expressions that outwardly contain a functional combinator whose arguments, however, are constant expressions of the appropriate types. In other words, the functional combinator is resolved only at the outer level. (This is not entirely true; see the full explanation below).</p>
+</li>
+<li>
+<p><em>Functional expressions</em>: These are expressions that may contain any combinators or constants at all levels.</p>
+</li>
+</ul>
+<p>In practice, we most frequently need constant values (for storage and passing any data structures, in particular, responses to RPC queries) and surface expressions (for example, as RPC queries: then the functional combinator of the outer level is the name of the RPC function that we want to call, while its parameters are the arguments, which are constant values, for invoking the function). In some cases, arbitrary functional expressions are helpful (for example, it we want to remotely transmit the result of one RPC query to a different RPC query).</p>
+<p>We will use <em>c(T)</em> to denote a subtype of the abstract type <em>T</em>, whose values are constant expressions of type <em>T</em>. Clearly, <em>c(T)</em> possesses approximately the same constructors as <em>T</em> itself (with the types of all arguments <em>Ti</em> replaced by <em>c(Ti)</em>, but it does not have functional combinators.</p>
+<p>Analogously, we will use <em>f(T)</em> to denote a subtype of <em>T</em>, whose values are surface expressions of type <em>T</em>. Clearly, the combinators of <em>f(T)</em> are essentially functional combinators of type <em>T</em>, but <em>c()</em> applies to the types of these combinators' arguments: The combinator <em>A : T1-&gt;...-&gt;Tr-&gt;T</em> turns into <em>A' : c(T1)-&gt;...-&gt;c(Tr)-&gt;f(T)</em>. (See the clarification of this rule below.)</p>
+<p>Thus, we have defined two “functionals” <em>c : Type -&gt; Type</em> and <em>f : Type -&gt; Type</em>, such that <em>forall T : Type, c(T) :- T</em> and <em>forall T : Type, f(T) :- T</em>  (writing <em>T :- T'</em> means that <em>T</em> is contained in <em>T'</em>, or that <em>T</em> is a subtype of <em>T'</em>).</p>
+<p>We will assume that <em>c</em> and <em>f</em> are idempotent.</p>
+<h3><a class="anchor" href="#naked-types" id="naked-types" name="naked-types"><i class="anchor-icon"></i></a>Naked types</h3>
+<p>From the perspective of abstract type theory, naked types (in contrast to built-in primitive types like <code>int</code> and <code>string</code> are unnecessary. However, they are extremely useful in practice.</p>
+<p>Therefore, TL introduces the (partially defined) idempotent unary operator <code>%</code>, which turns a standard functional (e.g. an expression of type <em>...-&gt;Type</em> or simply <em>Type</em>) into a different standard functional of the same type. If <em>T</em> is a type, then from an abstract theoretical point of view, <code>%T</code> is equivalent to <em>c(T)</em>. In other words, the values of <code>%T</code> are the constant values of <em>T</em>. If <em>T</em> is a <em>k</em>-arity standard expression, then <em>T : S1 -&gt; ... -&gt; Sk -&gt; Type</em>, where each <em>Si=Type</em> or <em>#</em>, then by definition <code>%T</code> is a <em>k</em>-arity standard expression with the same arity, which is defined by the equation <em>(%T) a1 ... ak = % (T a1 ... ak)</em>.  </p>
+<p>When a <em>constant</em> value of type <code>%T</code> is serialized, it is first serialized as a value of type <em>T</em> (assuming that <em>T</em> is not already a naked type itself). Then the first character of the serialization is discarded (e.g. the name of the enclosing combinator). Therefore, <code>%T</code> is a only a valid type expression if there is not more than one constructor for <code>%T</code>. The expression <code>%T</code>, where <em>T : S1 -&gt; ... -&gt; Sk -&gt; Type</em>, is valid, if for <em>any</em> choice of parameters <em>a1 : S1, ... , ak : Sk</em>, the type <em>T a1 ... ak</em> does not have more than one constructor. Using <code>%</code> in other instances is incorrect.</p>
+<p>If for every value of the parameters <em>a1 : S1, ..., ak : Sk</em>, there is exactly one constructor <em>C</em> for <em>T a1 ... ak</em>, then TL allows writing <code>C a1 ... ak</code> instead of <code>%T a1 ... ak</code> or <code>%(T a1 .. ak)</code>. In other words, in certain situations the identifier <code>C</code> is a synonym for <code>%T</code>. This is only allowed in the context of a type (when specifying the type of a combinator's field or result).</p>
+<p>Moreover, it is assumed that <code>%Int = int</code> and <code>%String = string</code>.</p>
+<h3><a class="anchor" href="#-modifier" id="-modifier" name="-modifier"><i class="anchor-icon"></i></a><code>!</code> modifier</h3>
+<p>In TL, the idempotent operator <code>!</code> can modify any type, actually making surface values be allowed when its constant values are serialized. However, if <em>T</em> is a standard function like <em>S1-&gt;..-&gt;Sr-&gt;Type</em>, then <em>!T</em> is defined using the equation <code>(!T) a1 ... ar = !(T a1 ... ar)</code>, for any <em>a1:S1</em>, ..., <em>ar:Sr</em>.</p>
+<p>The <code>!</code> operator is only allowed in a definition of the types of fields of functional combinators. It is usually used as a type prefix, for example:</p>
+<pre><code>set_timeout {X:Type} timeout:int f:!X = X;</code></pre>
+<p>In this case, the <code>set_timeout</code> “wrapper” is defined. It takes two explicit parameters: the integer <code>timeout</code> and a surface expression of type <code>X</code>. <em>X : Type</em> is itself an implicit parameter (it is not explicitly stated, rather it is inferred from the values of the other parameters and their types). A similar kind of wrapper may be helpful for modifying the action of RPC queries (which are surface expressions of various types). For example, suppose we have the function</p>
+<pre><code>factorial n:int = int;</code></pre>
+<p>then we can wrap the RPC query <code>(factorial 100)</code> as follows: <code>(set_timeout 200 (factorial 100))</code>. This expression is still a surface value of type <code>int</code>, which means it can be passed as an RPC query.</p>
+<p>A consecutive pair of two computations is another example:</p>
+<pre><code>pair {X Y : Type} x:X y:Y = Pair X Y;  // constructor
+seq_pair {X Y : Type} x:!X y:!Y = Pair X Y; // functional wrapper for sequential computation
+par_pair {X Y : Type} x:!X y:!Y = Pair X Y; // functional wrapper for parallel computation</code></pre>
+<p>Now the RPC query <code>(seq_pair (factorial 2) (factorial 3)) : Pair int int</code> first calculates factorial 2, then factorial 3, and returns the pair <code>(pair 2 6)</code>. In this case, the sequence of operations isn't important, because they do not have side effects. It would have been just as well to use <code>(par_pair (factorial 2) (factorial 3))</code>. However, this is not always the case.</p>
+<p>We can also define an analogy to a “comma” operation:</p>
+<pre><code>comma {X Y : Type} x:!X y:!Y = Y;</code></pre>
+<p>For example, this operation could first calculate <code>x</code>, then forget the result, calculate <code>y</code>, and return <code>y</code>. </p>
+<p>Note that the semantics of the <code>seq_pair</code>, <code>par_pair</code> and <code>comma</code> wrappers are indeed defined where they are implemented (like the semantics of all other functional combinators), not by their TL declaration.</p>
+<p>In principle, polymorphic wrappers like <code>set_timeout</code> can also be applied, for example, to “annotate” a RPC response's constant values. For example, the server might return a response to a query together with the time it was calculated. However, a value of type <em>!X</em> must be constant, because that is what is expected as the enclosing expression's value. In other words, <code>set_timeout 239 E</code> is a constant/surface value of type <em>X</em> if and only if <em>E</em> is such itself.</p>
+<h3><a class="anchor" href="#-modifier" id="-modifier" name="-modifier"><i class="anchor-icon"></i></a><code>$</code> modifier</h3>
+<p>The idempotent modifier <code>$</code> permits the use of arbitrary functional values of an appropriate type in contexts where only constants or surface values are usually allowed. It recursively transforms all combinators for all of the types involved, canceling the action of <code>%</code> and affixing <code>$</code> to the parameter types and result of all combinators (<code>$</code> is also added to the front of the transformed combinators). Moreover, built-in types are also transformed (in the final stage): <code>$int = Int</code> and <code>$string = String</code>.</p>
+<p>This may be useful to create an RPC query that performs a “deep computation” of the expression passed to it:</p>
+<pre><code>compute {X:Type} expr:$X = X;</code></pre>
+<p>For example, now we can transmit the following as an RPC query:</p>
+<pre><code>(compute ($factorial ($factorial (int 3)))) : int</code></pre>
+<p>(Note that the three has become clothed; the combinator $factorial has type $int -&gt; $int).</p>
+<p>This is very powerful tool. It does not have to be implemented in very simple versions of TL. <code>$</code> is not encountered in currently used TL schemas.</p>
+<h3><a class="anchor" href="#more-on-modifiers" id="more-on-modifiers" name="more-on-modifiers"><i class="anchor-icon"></i></a>More on modifiers</h3>
+<p>In fact, at least in terms of its application to serialization, the TL language by default implies the <em>c()</em> modifier around all combinators' parameter types and results, while <code>!</code> and <code>$</code> cancel it (more accurately, <code>!</code> only cancels, and in some sense <code>$</code> reverses the meaning). This is why there is no explicit <code>c()</code> modifier in TL and why it is assumed that all functions only accept constant values and return constant results, unless otherwise specified.</p>
+<p>You may think that some functional combinators may have a type such as <code>partial_factorial n:int = $int;</code> and that the RPC query <code>(partial_factorial 3)</code> might then unexpectedly return <code>($product (int 3) ($product (int 2) ($product (int 1) (int 1)))) : $int</code> ...</p>
+<p>It is probably more correct to think about the <code>!</code> modifier as follows. All types initially include only constant values (and only constructors). The <code>!</code> modifier makes a new type (it's twin) out of each type. This new type has no inherent constructors. Functional combinators differ from constructors in that <code>!</code> is implicitly added in front of their result's type. After this, the (local or remote) process of calculating the expression can be represented using the polymorphic function <code>eval : !X -&gt; X</code>.</p>
+<h3><a class="anchor" href="#optional-combinator-parameters-and-their-values" id="optional-combinator-parameters-and-their-values" name="optional-combinator-parameters-and-their-values"><i class="anchor-icon"></i></a>Optional combinator parameters and their values</h3>
+<p>See <a href="TL-optargs">Optional combinator parameters and their values</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
