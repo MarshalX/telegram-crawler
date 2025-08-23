@@ -183,23 +183,6 @@ TIMEOUT_CONFIGS = [
     {'total': 120, 'connect': 90, 'sock_connect': 30, 'sock_read': 90}
 ]
 
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.5',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'DNT': '1',
-    'Connection': 'keep-alive',
-    'Cookie': f'stel_ln=en; stel_dev_layer={STEL_DEV_LAYER}',
-    'Upgrade-Insecure-Requests': '1',
-    'Sec-Fetch-Dest': 'document',
-    'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'none',
-    'Sec-Fetch-User': '?1',
-    'Cache-Control': 'max-age=0',
-    'TE': 'trailers',
-}
-
 logging.basicConfig(format='%(asctime)s  %(levelname)s - %(message)s', level=logging.INFO)
 logging.getLogger('httpx').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -217,7 +200,7 @@ TRACKING_SETS_LOCK = asyncio.Lock()
 
 WORKERS_COUNT = 50
 WORKERS_TASK_QUEUE = asyncio.Queue()
-WORKERS_NEW_TASK_TIMEOUT = 5.0  # seconds
+WORKERS_NEW_TASK_TIMEOUT = 1.0  # seconds
 
 TEXT_DECODER = codecs.getincrementaldecoder('UTF-8')(errors='strict')
 
@@ -393,7 +376,7 @@ async def crawl_worker(client: httpx.AsyncClient):
         try:
             url = await asyncio.wait_for(WORKERS_TASK_QUEUE.get(), timeout=WORKERS_NEW_TASK_TIMEOUT)
         except asyncio.TimeoutError:
-            logger.warning(f'Worker exiting - no tasks for {WORKERS_NEW_TASK_TIMEOUT} seconds')
+            logger.debug(f'Worker exiting - no tasks for {WORKERS_NEW_TASK_TIMEOUT} seconds')
             break
 
         try:
@@ -462,7 +445,8 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict = Non
             content = response.text
             clean_content = content.replace('\n', ' ').replace('\r', ' ')
             truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
-            logger.warning(f'Skip [{response.status_code}] {url}: {truncated_content}')
+            truncated_url = (url[:100] + '...') if len(url) > 100 else url
+            logger.warning(f'Skip [{response.status_code}] {truncated_url}: {truncated_content}')
         return
 
     content_type = response.headers.get('content-type')
