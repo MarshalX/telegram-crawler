@@ -195,6 +195,10 @@ LINKS_TO_TRACKABLE_RESOURCES = set()
 URL_RETRY_COUNT = {}
 RETRY_LOCK = asyncio.Lock()
 
+# Track URLs that have been tried with trailing slash for 404 retry logic
+SLASH_RETRY_ATTEMPTED = set()
+SLASH_RETRY_LOCK = asyncio.Lock()
+
 VISITED_LINKS_LOCK = asyncio.Lock()
 TRACKING_SETS_LOCK = asyncio.Lock()
 
@@ -441,12 +445,31 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict = Non
         raise ServerSideError()
 
     if response.status_code not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
+        # Handle 404 errors with retry logic: try URL with trailing slash
+        if response.status_code == 404:
+            async with SLASH_RETRY_LOCK:
+                if url not in SLASH_RETRY_ATTEMPTED:
+                    url_with_slash = url if url.endswith('/') else f'{url}/'
+                    if url_with_slash != url:
+                        SLASH_RETRY_ATTEMPTED.add(url)
+                        logger.warning(f'404 trailing slash retry: trying {url_with_slash} for {url}')
+
+                        await WORKERS_TASK_QUEUE.put(url_with_slash)
+                        return
+
+                    logger.warning(f'Skip [404] {url}: already ends with slash')
+                    return
+                else:
+                    logger.warning(f'Skip [404] {url}: already tried with trailing slash')
+                    return
+
         if response.status_code != 302:
             content = response.text
             clean_content = content.replace('\n', ' ').replace('\r', ' ')
             truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
             truncated_url = (url[:100] + '...') if len(url) > 100 else url
             logger.warning(f'Skip [{response.status_code}] {truncated_url}: {truncated_content}')
+
         return
 
     content_type = response.headers.get('content-type')
@@ -505,7 +528,7 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict = Non
             with_trailing_slash = f'{without_trailing_slash}/'
             if without_trailing_slash in links_set and with_trailing_slash in links_set:
                 links_set.remove(with_trailing_slash)
-                logger.debug('Remove %s/', without_trailing_slash)
+                logger.debug('Remove %s', with_trailing_slash)
 
 
 async def start(url_list: Set[str]):
