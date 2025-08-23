@@ -1,17 +1,16 @@
 import asyncio
+import codecs
 import logging
 import os
 import re
-import socket
 from functools import cache
 from html import unescape
 from time import time
 from typing import Set, List, Union
 from urllib.parse import unquote
 
-import aiohttp
+import httpx
 import uvloop
-from aiohttp import ClientConnectorError, ServerDisconnectedError
 
 
 PROTOCOL = 'https://'
@@ -202,6 +201,7 @@ HEADERS = {
 }
 
 logging.basicConfig(format='%(asctime)s  %(levelname)s - %(message)s', level=logging.INFO)
+logging.getLogger('httpx').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 VISITED_LINKS = set()
@@ -215,9 +215,11 @@ RETRY_LOCK = asyncio.Lock()
 VISITED_LINKS_LOCK = asyncio.Lock()
 TRACKING_SETS_LOCK = asyncio.Lock()
 
-WORKERS_COUNT = 30
+WORKERS_COUNT = 50
 WORKERS_TASK_QUEUE = asyncio.Queue()
 WORKERS_NEW_TASK_TIMEOUT = 5.0  # seconds
+
+TEXT_DECODER = codecs.getincrementaldecoder('UTF-8')(errors='strict')
 
 
 @cache
@@ -386,7 +388,7 @@ class ServerSideError(Exception):
     pass
 
 
-async def crawl_worker(session: aiohttp.ClientSession):
+async def crawl_worker(client: httpx.AsyncClient):
     while True:
         try:
             url = await asyncio.wait_for(WORKERS_TASK_QUEUE.get(), timeout=WORKERS_NEW_TASK_TIMEOUT)
@@ -401,14 +403,14 @@ async def crawl_worker(session: aiohttp.ClientSession):
             timeout_index = min(retry_count, len(TIMEOUT_CONFIGS) - 1)
             timeout_config = TIMEOUT_CONFIGS[timeout_index]
 
-            await _crawl(url, session, timeout_config)
+            await _crawl(url, client, timeout_config)
 
             async with RETRY_LOCK:
                 if url in URL_RETRY_COUNT:
                     del URL_RETRY_COUNT[url]
 
             WORKERS_TASK_QUEUE.task_done()
-        except (ServerSideError, ServerDisconnectedError, asyncio.TimeoutError, ClientConnectorError) as e:
+        except (ServerSideError, httpx.ProtocolError, httpx.TimeoutException, httpx.NetworkError) as e:
             exc_name = e.__class__.__name__
             exc_msg = str(e) if str(e) else 'No message'
 
@@ -430,108 +432,105 @@ async def crawl_worker(session: aiohttp.ClientSession):
             WORKERS_TASK_QUEUE.task_done()
 
 
-async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict = None):
+async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict = None):
     async with VISITED_LINKS_LOCK:
         if url in VISITED_LINKS:
             return
         VISITED_LINKS.add(url)
 
-    try:
-        if timeout_config is None:
-            timeout_config = TIMEOUT_CONFIGS[0]  # Use default (fast) timeout
+    if timeout_config is None:
+        timeout_config = TIMEOUT_CONFIGS[0]  # Use default (fast) timeout
 
-        timeout = aiohttp.ClientTimeout(
-            total=timeout_config['total'],
-            connect=timeout_config['connect'], 
-            sock_connect=timeout_config['sock_connect'],
-            sock_read=timeout_config['sock_read']
-        )
-        logger.debug('[%s] Process %s (total timeout: %ds)', len(VISITED_LINKS), url, timeout_config['total'])
-        async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=timeout) as response:
-            content_type = response.headers.get('content-type')
+    timeout = httpx.Timeout(
+        timeout= timeout_config['total'],
+        connect=timeout_config['connect'],
+        read=timeout_config['sock_read'],
+        write=None,
+        pool=None
+    )
+    logger.debug('[%s] Process %s (total timeout: %ds)', len(VISITED_LINKS), url, timeout_config['total'])
+    response = await client.get(f'{PROTOCOL}{url}', timeout=timeout)
 
-            if 499 < response.status < 600:
-                async with VISITED_LINKS_LOCK:
-                    VISITED_LINKS.remove(url)
-                logger.warning(f'Error 5XX. Retrying {url}')
-                raise ServerSideError()
+    if 499 < response.status_code < 600:
+        async with VISITED_LINKS_LOCK:
+            VISITED_LINKS.remove(url)
+        logger.warning(f'Error 5XX. Retrying {url}')
+        raise ServerSideError()
 
-            if response.status not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
-                if response.status != 302:
-                    content = await response.text(encoding='UTF-8')
-                    clean_content = content.replace('\n', ' ').replace('\r', ' ')
-                    truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
-                    logger.warning(f'Skip [{response.status}] {url}: {truncated_content}')
-                return
+    if response.status_code not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
+        if response.status_code != 302:
+            content = response.text
+            clean_content = content.replace('\n', ' ').replace('\r', ' ')
+            truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
+            logger.warning(f'Skip [{response.status_code}] {url}: {truncated_content}')
+        return
 
-            if is_textable_content_type(content_type):
-                # aiohttp will cache raw content. we don't worry about it
-                raw_content = await response.read()
-                content = await response.text(encoding='UTF-8')
+    content_type = response.headers.get('content-type')
+    if is_textable_content_type(content_type):
+        raw_content = response.content
 
-                async with TRACKING_SETS_LOCK:
-                    if is_translation_url(url):
-                        LINKS_TO_TRANSLATIONS.add(url)
-                        logger.debug('Add %s to LINKS_TO_TRANSLATIONS', url)
-                    else:
-                        LINKS_TO_TRACK.add(url)
-                        logger.debug('Add %s to LINKS_TO_TRACK', url)
-
-                absolute_links = find_absolute_links(content)
-
-                relative_links_finder = find_relative_links
-                if 'javascript' in content_type:
-                    relative_links_finder = find_relative_scripts
-
-                relative_links = relative_links_finder(content, url)
-
-                sub_links = absolute_links | relative_links
-                for sub_url in sub_links:
-                    async with VISITED_LINKS_LOCK:
-                        if sub_url not in VISITED_LINKS:
-                            await WORKERS_TASK_QUEUE.put(sub_url)
-            elif is_trackable_content_type(content_type):
+        try:
+            content = TEXT_DECODER.decode(raw_content)
+        except UnicodeDecodeError:
+            if raw_content.startswith(b'GIF'):
                 async with TRACKING_SETS_LOCK:
                     LINKS_TO_TRACKABLE_RESOURCES.add(url)
-                    logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES', url)
+                    logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES (raw GIF content)', url)
+                return
             else:
-                # for example, zip with update of macOS client
-                logger.warning(f'Unhandled type: {content_type} from {url}')
+                logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
+                return
 
-            # telegram url can work with and without a trailing slash (no redirect).
-            # note: not on every subdomain ;d
-            # so this is a problem when we have random behavior with a link will be added
-            # this if resolve this issue.
-            # if available both links, we prefer without a trailing slash
-            async with TRACKING_SETS_LOCK:
-                for links_set in (LINKS_TO_TRACK, LINKS_TO_TRANSLATIONS, LINKS_TO_TRACKABLE_RESOURCES):
-                    without_trailing_slash = url[:-1:] if url.endswith('/') else url
-                    with_trailing_slash = f'{without_trailing_slash}/'
-                    if without_trailing_slash in links_set and with_trailing_slash in links_set:
-                        links_set.remove(with_trailing_slash)
-                        logger.debug('Remove %s/', without_trailing_slash)
-    except UnicodeDecodeError:
-        if raw_content.startswith(b'GIF'):
-            async with TRACKING_SETS_LOCK:
-                LINKS_TO_TRACKABLE_RESOURCES.add(url)
-                logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES (raw GIF content)', url)
-        else:
-            logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
+        async with TRACKING_SETS_LOCK:
+            if is_translation_url(url):
+                LINKS_TO_TRANSLATIONS.add(url)
+                logger.debug('Add %s to LINKS_TO_TRANSLATIONS', url)
+            else:
+                LINKS_TO_TRACK.add(url)
+                logger.debug('Add %s to LINKS_TO_TRACK', url)
+
+        absolute_links = find_absolute_links(content)
+
+        relative_links_finder = find_relative_links
+        if 'javascript' in content_type:
+            relative_links_finder = find_relative_scripts
+
+        relative_links = relative_links_finder(content, url)
+
+        sub_links = absolute_links | relative_links
+        for sub_url in sub_links:
+            async with VISITED_LINKS_LOCK:
+                if sub_url not in VISITED_LINKS:
+                    await WORKERS_TASK_QUEUE.put(sub_url)
+    elif is_trackable_content_type(content_type):
+        async with TRACKING_SETS_LOCK:
+            LINKS_TO_TRACKABLE_RESOURCES.add(url)
+            logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES', url)
+    else:
+        # for example, zip with update of macOS client
+        logger.warning(f'Unhandled type: {content_type} from {url}')
+
+    # telegram url can work with and without a trailing slash (no redirect).
+    # note: not on every subdomain ;d
+    # so this is a problem when we have random behavior with a link will be added
+    # this if resolve this issue.
+    # if available both links, we prefer without a trailing slash
+    async with TRACKING_SETS_LOCK:
+        for links_set in (LINKS_TO_TRACK, LINKS_TO_TRANSLATIONS, LINKS_TO_TRACKABLE_RESOURCES):
+            without_trailing_slash = url[:-1:] if url.endswith('/') else url
+            with_trailing_slash = f'{without_trailing_slash}/'
+            if without_trailing_slash in links_set and with_trailing_slash in links_set:
+                links_set.remove(with_trailing_slash)
+                logger.debug('Remove %s/', without_trailing_slash)
 
 
 async def start(url_list: Set[str]):
     for url in url_list:
         await WORKERS_TASK_QUEUE.put(url)
 
-    # Optimized TCP connector for web crawling
-    tcp_connector = aiohttp.TCPConnector(
-        ssl=False,             # Disable SSL verification for crawling
-        use_dns_cache=False,          # Disable DNS caching
-        force_close=True,             # Force close connections after use
-        family=socket.AF_INET,        # Use IPv4 only to avoid potential IPv6 issues
-    )
-    async with aiohttp.ClientSession(connector=tcp_connector, headers=HEADERS, trust_env=True) as session:
-        workers = [crawl_worker(session) for _ in range(WORKERS_COUNT)]
+    transport = httpx.AsyncHTTPTransport(verify=False, retries=3)
+    async with httpx.AsyncClient(transport=transport) as client:
+        workers = [crawl_worker(client) for _ in range(WORKERS_COUNT)]
         await asyncio.gather(*workers)
 
     await WORKERS_TASK_QUEUE.join()
