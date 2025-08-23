@@ -195,7 +195,7 @@ LINKS_TO_TRACKABLE_RESOURCES = set()
 URL_RETRY_COUNT = {}
 RETRY_LOCK = asyncio.Lock()
 
-# Track URLs that have been tried with trailing slash for 404 retry logic
+# Track base URLs that have had their trailing slash state flipped for retry logic
 SLASH_RETRY_ATTEMPTED = set()
 SLASH_RETRY_LOCK = asyncio.Lock()
 
@@ -314,6 +314,10 @@ def cleanup_links(links: Union[List[str], Set[str]]) -> Set[str]:
         if '?' in link:
             link = ''.join(link.split('?')[:-1])
 
+        # remove get params from link
+        if '&' in link:
+            link = ''.join(link.split('&')[:-1])
+
         # skip mailto:
         link_parts = link.split('.')
         if '@' in link_parts[0]:
@@ -420,6 +424,8 @@ async def crawl_worker(client: httpx.AsyncClient):
 
 
 async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict = None):
+    truncated_url = (url[:100] + '...') if len(url) > 100 else url
+
     async with VISITED_LINKS_LOCK:
         if url in VISITED_LINKS:
             return
@@ -435,40 +441,39 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict = Non
         write=None,
         pool=None
     )
-    logger.debug('[%s] Process %s (total timeout: %ds)', len(VISITED_LINKS), url, timeout_config['total'])
+    logger.debug('[%s] Process %s (total timeout: %ds)', len(VISITED_LINKS), truncated_url, timeout_config['total'])
     response = await client.get(f'{PROTOCOL}{url}', timeout=timeout)
+    code = response.status_code
 
-    if 499 < response.status_code < 600:
+    if 499 < code < 600:
         async with VISITED_LINKS_LOCK:
             VISITED_LINKS.remove(url)
         logger.warning(f'Error 5XX. Retrying {url}')
         raise ServerSideError()
 
-    if response.status_code not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
-        # Handle 404 errors with retry logic: try URL with trailing slash
-        if response.status_code == 404:
+    if code not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
+        # Handle redirect and not found errors with retry logic: flip trailing slash state
+        if code in {301, 302, 404}:
             async with SLASH_RETRY_LOCK:
-                if url not in SLASH_RETRY_ATTEMPTED:
-                    url_with_slash = url if url.endswith('/') else f'{url}/'
-                    if url_with_slash != url:
-                        SLASH_RETRY_ATTEMPTED.add(url)
-                        logger.warning(f'404 trailing slash retry: trying {url_with_slash} for {url}')
+                base_url = url.rstrip('/')
+                if base_url not in SLASH_RETRY_ATTEMPTED:
+                    if url.endswith('/'):
+                        flipped_url = base_url
+                        logger.warning(f'{code} slash removal retry for {truncated_url}')
+                    else:
+                        flipped_url = f'{url}/'
+                        logger.warning(f'{code} slash addition retry for {truncated_url}')
 
-                        await WORKERS_TASK_QUEUE.put(url_with_slash)
-                        return
-
-                    logger.warning(f'Skip [404] {url}: already ends with slash')
+                    SLASH_RETRY_ATTEMPTED.add(base_url)
+                    await WORKERS_TASK_QUEUE.put(flipped_url)
                     return
                 else:
-                    logger.warning(f'Skip [404] {url}: already tried with trailing slash')
+                    logger.warning(f'Skip [{code}] {truncated_url}: already tried flipping slash state for {base_url}')
                     return
 
-        if response.status_code != 302:
-            content = response.text
-            clean_content = content.replace('\n', ' ').replace('\r', ' ')
-            truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
-            truncated_url = (url[:100] + '...') if len(url) > 100 else url
-            logger.warning(f'Skip [{response.status_code}] {truncated_url}: {truncated_content}')
+        clean_content = response.text.replace('\n', ' ').replace('\r', ' ')
+        truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
+        logger.warning(f'Skip [{code}] {truncated_url}: {truncated_content}')
 
         return
 
@@ -517,19 +522,6 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict = Non
         # for example, zip with update of macOS client
         logger.warning(f'Unhandled type: {content_type} from {url}')
 
-    # telegram url can work with and without a trailing slash (no redirect).
-    # note: not on every subdomain ;d
-    # so this is a problem when we have random behavior with a link will be added
-    # this if resolve this issue.
-    # if available both links, we prefer without a trailing slash
-    async with TRACKING_SETS_LOCK:
-        for links_set in (LINKS_TO_TRACK, LINKS_TO_TRANSLATIONS, LINKS_TO_TRACKABLE_RESOURCES):
-            without_trailing_slash = url[:-1:] if url.endswith('/') else url
-            with_trailing_slash = f'{without_trailing_slash}/'
-            if without_trailing_slash in links_set and with_trailing_slash in links_set:
-                links_set.remove(with_trailing_slash)
-                logger.debug('Remove %s', with_trailing_slash)
-
 
 async def start(url_list: Set[str]):
     for url in url_list:
@@ -543,6 +535,10 @@ async def start(url_list: Set[str]):
     await WORKERS_TASK_QUEUE.join()
 
 
+def unified_links(links_set: Set[str]) -> Set[str]:
+    return {link.rstrip('/') for link in links_set}
+
+
 if __name__ == '__main__':
     HIDDEN_URLS.add(BASE_URL)
     LINKS_TO_TRACK = LINKS_TO_TRACK | ADDITIONAL_URLS
@@ -551,6 +547,10 @@ if __name__ == '__main__':
     start_time = time()
     uvloop.run(start(HIDDEN_URLS))
     logger.info(f'Stop crawling links. {time() - start_time} sec.')
+
+    LINKS_TO_TRACK = unified_links(LINKS_TO_TRACK)
+    LINKS_TO_TRACKABLE_RESOURCES = unified_links(LINKS_TO_TRACKABLE_RESOURCES)
+    LINKS_TO_TRANSLATIONS = unified_links(LINKS_TO_TRANSLATIONS)
 
     try:
         OLD_URL_LIST = set()
@@ -567,10 +567,10 @@ if __name__ == '__main__':
         pass
 
     with open(OUTPUT_FILENAME, 'w') as f:
-        f.write('\n'.join(sorted(LINKS_TO_TRACK)))
+        f.write('\n'.join(sorted(unified_links(LINKS_TO_TRACK))))
 
     with open(OUTPUT_RESOURCES_FILENAME, 'w') as f:
-        f.write('\n'.join(sorted(LINKS_TO_TRACKABLE_RESOURCES)))
+        f.write('\n'.join(sorted(unified_links(LINKS_TO_TRACKABLE_RESOURCES))))
 
     with open(OUTPUT_TRANSLATIONS_FILENAME, 'w') as f:
-        f.write('\n'.join(sorted(LINKS_TO_TRANSLATIONS)))
+        f.write('\n'.join(sorted(unified_links(LINKS_TO_TRANSLATIONS))))

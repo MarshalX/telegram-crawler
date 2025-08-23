@@ -709,7 +709,9 @@ def is_hashable_only_content_type(content_type) -> bool:
 
 
 class RetryError(Exception):
-    ...
+    def __init__(self, message: str, new_url: Optional[str] = None):
+        super().__init__(message)
+        self.new_url = new_url
 
 
 async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
@@ -717,23 +719,46 @@ async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         try:
             await _crawl(url, session, output_dir)
         except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError) as e:
+            if isinstance(e, RetryError) and e.new_url is not None:
+                url = e.new_url
             logger.warning(f'Client or timeout error ({e}). Retrying {url}')
         else:
             break
 
 
+SLASH_RETRY_ATTEMPTED = set()
+
+
 async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
-    logger.debug(f'Process {url}')
+    truncated_url = (url[:100] + '...') if len(url) > 100 else url
+
+    logger.debug(f'Process {truncated_url}')
     async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT, headers=HEADERS) as response:
-        if 499 < response.status < 600:
-            msg = f'Error 5XX. Retrying {url}'
+        code = response.status
+        if 499 < code < 600:
+            msg = f'Error 5XX. Retrying {truncated_url}'
             logger.warning(msg)
             raise RetryError(msg)
 
-        if response.status not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
-            if response.status != 302:
-                content = await response.text()
-                logger.warning(f'Skip {url} because status code == {response.status}. Content: {content}')
+        if code not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
+            if code in {301, 302, 404}:
+                base_url = url.rstrip('/')
+                if base_url not in SLASH_RETRY_ATTEMPTED:
+                    if url.endswith('/'):
+                        flipped_url = base_url
+                        logger.warning(f'{code} slash removal retry for {truncated_url}')
+                    else:
+                        flipped_url = f'{url}/'
+                        logger.warning(f'{code} slash addition retry for {truncated_url}')
+
+                    SLASH_RETRY_ATTEMPTED.add(base_url)
+                    raise RetryError(f'{code} slash retry for {truncated_url}', new_url=flipped_url)
+
+            content = await response.text()
+            clean_content = content.replace('\n', ' ').replace('\r', ' ')
+            truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
+            logger.warning(f'Skip [{code}] {truncated_url}: {truncated_content}')
+
             return
 
         # bypass external slashes and so on
