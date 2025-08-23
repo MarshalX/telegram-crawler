@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>TL-dependent</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Main article: TL Language.
+In certain cases, types may depend not only on other types (polymorphism), but also on the parameters…">
+    <meta property="og:title" content="TL-dependent">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Main article: TL Language.
+In certain cases, types may depend not only on other types (polymorphism), but also on the parameters…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL-dependent" >TL-dependent</a></li></ul></div>
+  <h1 id="dev_page_title">TL-dependent</h1>
+  
+  <div id="dev_page_content"><p>Main article: <a href="/mtproto/TL">TL Language</a>.</p>
+<p>In certain cases, types may depend not only on other types (polymorphism), but also on the parameters of another type (dependent types). The TL language provides very limited support for this functionality: dependence is only allowed on a natural parameter whose type is designated using <code>#</code> (alias <code>nat</code>, but this is private -- TL doesn't currently support this synonym). Values of type # are serialized as 32-bit signed numbers from 0 to 2^31-1.</p>
+<h2><a class="anchor" href="#example-integer-tuples-vectors" id="example-integer-tuples-vectors" name="example-integer-tuples-vectors"><i class="anchor-icon"></i></a>Example: integer tuples (vectors)</h2>
+<p>Suppose we want to use induction to define the types “one integer”, “two integers”, and “three integers”. We could try to define them as follows:</p>
+<pre><code>empty = Empty;
+single x:int = Single;
+pair x:int y:int = Pair;
+triple x:int y:int z:int = Triple;
+quadruple x:int y:int z:int t:int = Quadruple;
+...</code></pre>
+<p>or as:</p>
+<pre><code>empty = Empty;
+single x:int empty = Single;
+pair x:int y:single = Pair;
+triple x:int yz:pair = Triple;
+quadruple x:int yzt:triple = Quadruple;</code></pre>
+<p>or as:</p>
+<pre><code>tnil = Tuple0;
+tcons0 hd:int tl:Tuple0 = Tuple1;
+tcons1 hd:int tl:Tuple1 = Tuple2;
+tcons2 hd:int tl:Tuple2 = Tuple3;
+...
+tcons_n hd:int tl:Tuple_n = Tuple_(n+1)</code></pre>
+<p>The first two variations lead to the same serialization. For example, <code>(2 3 9):%triple</code> and <code>(2 (3 9)):%triple</code> serialize as three 32-bit numbers: <code>2 3 9</code>. The last variation better emphasizes the inductive version of the definition, but it uses boxed types. This is good from a theoretical perspective, but it leads to “superfluous” constructor names in serialization.</p>
+<p>Therefore, we will write <code>%Type-Ident</code> to indicate the bare type that corresponds to the boxed type <code>Type-Ident</code> with a single constructor. If this constructor is named <code>constructor</code>, then according to the definition %<code>Type-Ident</code> = %<code>constructor</code>. Now we can write our definition like this:</p>
+<pre><code>tnil = Tuple0;
+tcons_n hd:int tl:%Tuple_n = Tuple_(n+1)</code></pre>
+<p>If we now abstract <em>n</em> out of the name of the type name and make it like a parameter for a polymorphic (dependent, to be more exact) type, then something like the following can be written in a suitable functional language:</p>
+<pre><code>NewType Tuple (n : #) :=
+| tnil = Tuple 0
+| tcons n:# hd:int tl:%(Tuple n) = Tuple (S n)
+EndType;</code></pre>
+<p>In the TL language, it looks like this:</p>
+<pre><code>tnil = Tuple 0;
+tcons {n:#} hd:int tl:%(Tuple n) = Tuple (S n);</code></pre>
+<p>The function <code>S : # -&gt; #</code> and the constant <code>O : #</code> (it is <code>0</code>) are the function for the next natural number (<code>S n = n + 1</code>) and the constant null. Therefore, the type <code>#</code> (alias <code>nat</code>) behaves as if it were defined in TL using the constructors</p>
+<pre><code>O = nat;
+S nat = nat;</code></pre>
+<p>or, using syntax more typical of other functional languages,</p>
+<pre><code>NewType nat :=
+| O
+| S nat
+EndType;</code></pre>
+<p>Types of all defined combinators:</p>
+<pre><code>O : #
+S : # -&gt; #
+Tuple : # -&gt; Type
+tnil : Tuple 0
+tcons : forall n : #, int -&gt; Tuple n -&gt; Tuple (S n)</code></pre>
+<p>or</p>
+<pre><code>Tuple : forall n : #, Type;
+tcons : forall n : #, forall hd : int, forall tl : Tuple n, Tuple (S n)</code></pre>
+<p>Note that in this case the constructor <code>tnil</code> does not depend on the parameter <em>n</em>, while <code>tcons</code> does.</p>
+<p>In an analogous manner, it is possible to define a complete binary tree of height <em>h</em> with strings in the leaf nodes:</p>
+<pre><code>tleaf value:string = BinTree 0;
+tnode {h:#} left:(BinTree h) right:(BinTree h) = BinTree (S h);</code></pre>
+<p>Or a random tree whose leaf nodes are all a distance of <em>h</em> from the root and whose nodes are all labeled with integers:</p>
+<pre><code>hleaf value:int = Tree 0;
+hnode {n:#} left:(Tree n) next:(Tree (S n)) = Tree (S n)
+hnil {n:#} = Tree (S n)</code></pre>
+<p>Another version:</p>
+<pre><code>hleaf' value:int = Tree' 0;
+hnode' {n:#} children:(list (Tree' n)) = Tree' (S n)</code></pre>
+<h2><a class="anchor" href="#polymorphic-dependent-types" id="polymorphic-dependent-types" name="polymorphic-dependent-types"><i class="anchor-icon"></i></a>Polymorphic dependent types</h2>
+<p>Let us try to define a type <code>Tuple X n</code> whose values are <em>n</em>-tuples of type <code>X</code> values. In this way, <code>Tuple</code> will be simultaneously polymorphic and dependent:</p>
+<pre><code>Tuple : Type -&gt; # -&gt; Type;</code></pre>
+<p>In the familiar syntax of functional languages:</p>
+<pre><code>NewType Tuple {X : Type} {n : #} :=
+| vnil : Tuple X 0
+| vcons {n:#} hd:X tl:%(Tuple X n) : Tuple X (S n)
+EndType</code></pre>
+<p>or, in TL syntax,</p>
+<pre><code>vnil {X:Type} = Tuple X 0;
+vcons {X:Type} {n:#} tl:(%Tuple X n) = Tuple X S n</code></pre>
+<p>In the end we obtain terms for the following types:</p>
+<pre><code>vnil : forall X : Type, Tuple X 0
+vcons : forall X : Type, forall n : #, X -&gt; Tuple X n -&gt; Tuple X (S n)</code></pre>
+<p>or</p>
+<pre><code>vnil : forall X : Type, Tuple X 0
+vcons : forall X : Type, forall n : #, forall hd : X, forall tl : Tuple X n, Tuple X (S n)</code></pre>
+<h2><a class="anchor" href="#dependent-sums" id="dependent-sums" name="dependent-sums"><i class="anchor-icon"></i></a>Dependent sums</h2>
+<p>The <code>Tuple</code> we just defined differs from the built-in <code>Vector</code> type. Specifically, the <code>Vector</code> type formally depends on a single argument (a type), but our <code>Tuple</code> depends on two (a type and a number):</p>
+<pre><code>Tuple : Type -&gt; # -&gt; Type;
+Vector : Type -&gt; Type;</code></pre>
+<p>The built-in <code>Vector</code> could be defined in terms of our <code>Tuple</code> using “summing across all <em>n</em> : #":</p>
+<pre><code>vector {X:Type} n:# v:(%Tuple X n) = Vector X;</code></pre>
+<p>Nevertheless, our <code>Tuple</code> has its advantages. For example, we can define data types such as:</p>
+<pre><code>matrix_10x10 a:(%Tuple (%Tuple double 10) 10) = Matrix_10x10;</code></pre>
+<p>In any event, remember that during calculation of the <code>matrix_10x10</code> combinator's number, all parentheses must be removed and the CRC32 of the string <code>matrix_10x10 a:%Tuple %Tuple double 10 10 = Matrix_10x10</code> must be computed.</p>
+<p>Moreover, we can define arbitrarily-sized matrices:</p>
+<pre><code>matrix {X:Type} m:# n:# a:(%Tuple (%Tuple X m) n) = Matrix X;</code></pre>
+<p>In this case using vector would result in storing the length of a row (<em>m</em>) in each row, e.g. <em>n</em> times.</p>
+<p>Note that the serializations of values of type <code>%Tuple X n</code> and <code>vector X</code> (also known as <code>%vector X</code> and <code>%Vector X</code>) nearly match when <em>n &gt; 0</em>: in both cases we obtain a single 32-bit number (equal to <em>n-1</em> or <em>n</em> depending on the version) followed by the serializations of <em>n</em> objects of type <em>X</em>. (This is slightly untrue: values of type <code>%Tuple X n</code> can only be serialized if <em>n</em> is a constant or value known from one of the preceding fields of the enclosing entry; but then this <em>n</em> won't be serialized explicitly anywhere).</p>
+<h2><a class="anchor" href="#special-syntax-for-repetitions" id="special-syntax-for-repetitions" name="special-syntax-for-repetitions"><i class="anchor-icon"></i></a>Special syntax for repetitions</h2>
+<p>In view of the importance of the construction presented above, it is built into the TL language in the following manner. A substructure in the form of [ <em>array-field-name</em> ":" ] [ <em>nat-ident</em> "<em>" ] "[" </em>field-descr<em> ... "]” may be used in the declaration of any combinator, where </em>nat-ident* is the name of any previously encountered field of type # (if it is not explicitly indicated, the most recent is used). In abstract, this substructure is equivalent to:</p>
+<pre><code>aux_type *field-descr* ... = AuxType;
+*current_constructor* ... [ *array-field-name* ":" ] (%Tuple aux_type *nat-ident*)</code></pre>
+<p>For example, 10x10 matrices, vectors, and arbitrary matrices may be defined in the following way:</p>
+<pre><code>matrix {X:Type} m:# n:# a:n*[ m*[ X ] ] = Matrix X;
+matrix_10x10 a:10*[ 10*[ double ]] = Matrix_10x10;
+vector {X:Type} # [ X ] = Vector X;</code></pre>
+<p>We have already encountered the last version as a “definition” of the “built-in type” <code>Vector</code>.</p>
+<p>Of course, several fields, as complex as desired, may be within the repeating part. Furthermore, besides using <em>n</em> as a repeat counter, one may use expressions of the form <em>(n+const)</em> and <em>(const+n)</em>, where <em>const</em> is a small nonnegative constant, which are shorthand for <em>S (S ( ... (S n) ... ))</em>:</p>
+<pre><code>repeat_np1 n:# a:(S n)*[ key:string value:string ] = Dictionary;</code></pre>
+<p>To calculate the CRC32 these expressions are converted to expressions of the form <code>(const+X)</code> without internal spaces. Additionally, the <code>*</code> in this case is not set off by spaces on the left and right.</p>
+<h2><a class="anchor" href="#serialization-of-dependent-types" id="serialization-of-dependent-types" name="serialization-of-dependent-types"><i class="anchor-icon"></i></a>Serialization of dependent types</h2>
+<p>Serialization of dependent types and polymorphic types is not a fundamental challenge: we have combinators with non-zero arity with Type values. For example, the type <code>Tuple double 10 : Type</code> serializes to <code>'Tuple' '%double' 10</code>. Note that at present in practice there is virtually no need to serialize types, whether dependent or not.</p>
+<h2><a class="anchor" href="#optional-combinator-parameters-in-tl" id="optional-combinator-parameters-in-tl" name="optional-combinator-parameters-in-tl"><i class="anchor-icon"></i></a>Optional combinator parameters in TL</h2>
+<p>Optional combinator parameters in TL must possess the following properties:</p>
+<ul>
+<li>
+<p>Optional parameters must be precisely the combinator's first several arguments;</p>
+</li>
+<li>
+<p>The value of any optional parameter must be entirely determined by the combinator's result type.</p>
+</li>
+</ul>
+<p>For example, in <code>cons {X:Type} hd:X tl:(list X) = list X</code> the parameter <code>X</code> may be made optional, because it is located at the very beginning of the argument list and is unambiguously determined by the <code>list X</code> result type. Similarly, in <code>tcons {X:Type} {n:#} hd:X tl:(%Tuple X n) = Tuple X (S n)</code> the values of X and n are completely determined based on the <code>Tuple X (S n)</code> result type, therefore they made be made optional parameters.</p>
+<p>It usually makes sense to move all of a constructor's arguments satisfying the second condition to the beginning of the list, arrange them in the order they appear in the result type's parameters, and make them optional. Given such an approach, the full version of a constructor is rarely needed -- only when we want to transmit the value of the polymorphic or dependent type as a value of type Object. In all other cases, the type of the expected value from the context is already known, which means that all optional parameters can be recovered during decomposition.</p>
+<p>See also <a href="/mtproto/TL-optargs">Optional combinator parameters and their values</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
