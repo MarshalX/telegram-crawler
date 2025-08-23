@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import re
+import socket
 from functools import cache
 from html import unescape
 from time import time
@@ -390,7 +391,7 @@ async def crawl_worker(session: aiohttp.ClientSession):
         try:
             url = await asyncio.wait_for(WORKERS_TASK_QUEUE.get(), timeout=WORKERS_NEW_TASK_TIMEOUT)
         except asyncio.TimeoutError:
-            logger.debug(f'Worker exiting - no tasks for {WORKERS_NEW_TASK_TIMEOUT} seconds')
+            logger.warning(f'Worker exiting - no tasks for {WORKERS_NEW_TASK_TIMEOUT} seconds')
             break
 
         try:
@@ -458,7 +459,9 @@ async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict 
             if response.status not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
                 if response.status != 302:
                     content = await response.text(encoding='UTF-8')
-                    logger.warning(f'Skip {url} because status code == {response.status}. Content: {content}')
+                    clean_content = content.replace('\n', ' ').replace('\r', ' ')
+                    truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
+                    logger.warning(f'Skip [{response.status}] {url}: {truncated_content}')
                 return
 
             if is_textable_content_type(content_type):
@@ -508,12 +511,12 @@ async def _crawl(url: str, session: aiohttp.ClientSession, timeout_config: dict 
                         links_set.remove(with_trailing_slash)
                         logger.debug('Remove %s/', without_trailing_slash)
     except UnicodeDecodeError:
-        logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
-
         if raw_content.startswith(b'GIF'):
             async with TRACKING_SETS_LOCK:
                 LINKS_TO_TRACKABLE_RESOURCES.add(url)
-                logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES (raw content)', url)
+                logger.debug('Add %s to LINKS_TO_TRACKABLE_RESOURCES (raw GIF content)', url)
+        else:
+            logger.warning(f'Codec can\'t decode bytes. So it was a tgs file or response with broken content type {url}')
 
 
 async def start(url_list: Set[str]):
@@ -522,11 +525,10 @@ async def start(url_list: Set[str]):
 
     # Optimized TCP connector for web crawling
     tcp_connector = aiohttp.TCPConnector(
-        ssl=False,                    # Disable SSL verification for crawling
-        limit=300,                    # Total connection pool size (10x workers)
-        limit_per_host=20,            # Max connections per host (avoid overwhelming servers)
-        keepalive_timeout=30,         # Keep connections alive for 30 seconds
-        enable_cleanup_closed=True,   # Clean up closed connections automatically
+        ssl=False,             # Disable SSL verification for crawling
+        use_dns_cache=False,          # Disable DNS caching
+        force_close=True,             # Force close connections after use
+        family=socket.AF_INET,        # Use IPv4 only to avoid potential IPv6 issues
     )
     async with aiohttp.ClientSession(connector=tcp_connector, headers=HEADERS, trust_env=True) as session:
         workers = [crawl_worker(session) for _ in range(WORKERS_COUNT)]

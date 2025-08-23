@@ -8,6 +8,7 @@ import platform
 import random
 import re
 import shutil
+import socket
 import uuid
 import zipfile
 from asyncio.exceptions import TimeoutError
@@ -722,7 +723,7 @@ async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
 
 
 async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
-    logger.info(f'Process {url}')
+    logger.debug(f'Process {url}')
     async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT, headers=HEADERS) as response:
         if 499 < response.status < 600:
             msg = f'Error 5XX. Retrying {url}'
@@ -732,7 +733,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         if response.status not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
             if response.status != 302:
                 content = await response.text()
-                logger.debug(f'Skip {url} because status code == {response.status}. Content: {content}')
+                logger.warning(f'Skip {url} because status code == {response.status}. Content: {content}')
             return
 
         # bypass external slashes and so on
@@ -803,7 +804,7 @@ async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
         # - corefork.telegram.org/constructor/Updates
         # - corefork.telegram.org/constructor/updates
         async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
-            logger.info(f'Write to {filename}')
+            logger.debug(f'Write to {filename}')
             await f.write(content)
 
 
@@ -860,11 +861,10 @@ async def crawl_web_tr(session: aiohttp.ClientSession):
 async def start(mode: str):
     # Optimized TCP connector for web crawling
     tcp_connector = aiohttp.TCPConnector(
-        ssl=False,                    # Disable SSL verification for crawling
-        limit=300,                    # Total connection pool size (10x workers)
-        limit_per_host=20,            # Max connections per host (avoid overwhelming servers)
-        keepalive_timeout=30,         # Keep connections alive for 30 seconds
-        enable_cleanup_closed=True,   # Clean up closed connections automatically
+        ssl=False,             # Disable SSL verification for crawling
+        use_dns_cache=False,          # Disable DNS caching
+        force_close=True,             # Force close connections after use
+        family=socket.AF_INET,        # Use IPv4 only to avoid potential IPv6 issues
     )
 
     async with aiohttp.ClientSession(connector=tcp_connector, trust_env=True) as session:
