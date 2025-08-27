@@ -1,1 +1,155 @@
-bot_id required
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Authorization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-itunes-app" content="app-id=686449807">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    <link href="/css/bootstrap-extra.css?2" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body>
+    <div id="fb-root"></div>
+    <div class="tl_page_wrap">
+      <div class="tl_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container">
+            <ul class="nav navbar-nav">
+  <li><a href="//telegram.org/">Home</a></li>
+  <li><a href="//telegram.org/faq">FAQ</a></li>
+  <li><a href="//telegram.org/apps">Apps</a></li>
+  <li class="hidden-xs"><a href="//core.telegram.org/api">API</a></li>
+  <li class="hidden-xs"><a href="//core.telegram.org/mtproto">Protocol</a></li>
+</ul>
+          </div>
+        </div>
+      </div>
+      <div class="container tl_page_container">
+        <div class="tl_page">
+          <div class="my_page_wrap">
+  <div class="container clearfix">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="tl_main_card tl_main_card_decentralized"></div>
+      </div>
+      <div class="col-md-8">
+
+        <div id="my_login_form_wrap">
+
+          <h1>Delete Account or Manage Apps</h1>
+          <p class="my_login_form_details help-block">Log in here to <strong>manage your apps</strong> using Telegram API or <strong>delete your account</strong>. Enter your number and we will send you a confirmation code via Telegram (not SMS).</p>
+
+          <div id="my_login_alert"></div>
+
+          <form id="my_send_form" onsubmit="return sendPassword(event);">
+            <div class="form-group">
+              <label for="my_login_phone">Your Phone Number</label>
+              <input type="text" class="form-control input-large" id="my_login_phone" placeholder="+12223334455" autocomplete="off"/>
+              <p class="help-block">Please enter your number in <a href="https://telegram.org/faq#login-and-sms" target="_blank">international format</a></p>
+            </div>
+            <div class="support_submit">
+              <button type="submit" class="btn btn-primary btn-lg">Next</button>
+            </div>
+          </form>
+
+          <form method="POST" action="/auth/login" class="hide" id="my_login_form" onsubmit="return checkPassword(event);">
+            <input type="hidden" id="my_login_phone_input" name="phone">
+            <input type="hidden" id="my_random_hash" name="random_hash">
+            <div class="form-group">
+              <label>Your Phone Number</label>
+              <span class="form-control input input-large uneditable-input"><strong id="my_login_phone_field"></strong> (<a href="/auth">Incorrect?</a>)</span>
+            </div>
+            <div class="form-group">
+              <label for="my_password">Confirmation code</label>
+              <input type="text" id="my_password" class="form-control input-large" name="password" placeholder="Confirmation code">
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="remember" value="1"> Remember Me
+              </label>
+            </div>
+
+            <div class="support_submit">
+              <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+          
+        </div>
+      </div>
+    </div>
+    <script src="/js/jquery.min.js?1"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/main.js?4"></script>
+    <script>function showLoginError(error_text) {
+  $('#my_login_alert').html('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">×</a>' + error_text + ' </div>').show();
+}
+
+function sendPassword (event) {
+  event.preventDefault();
+
+  $('#my_login_alert').hide();
+
+  var phone = $('#my_login_phone').val();
+
+  $.ajax({
+    type: 'POST',
+    url: '/auth/send_password',
+    data: {phone: phone},
+    success: function (result) {
+      $('#my_login_phone_input').val(phone);
+      $('#my_login_phone_field').text(phone);
+      $('#my_random_hash').val(result.random_hash);
+
+      $('#my_send_form').addClass('hide');
+      $('#my_login_form').removeClass('hide');
+      $('#my_password').focus();
+    },
+    error: function (xhr, error_text) {
+      showLoginError(xhr.responseText);
+    },
+    dataType: 'json'
+  });
+
+  return false;
+}
+
+function checkPassword (event) {
+  event.preventDefault();
+
+  $('#my_login_alert').hide();
+
+  $.ajax({
+    type: 'POST',
+    url: '/auth/login',
+    data: $('#my_login_form').serialize(),
+    success: function () {
+      location.href = "\/";
+    },
+    error: function (xhr, error_text) {
+      showLoginError(xhr.responseText);
+    },
+    dataType: 'json'
+  });
+
+  return false;
+}
+</script>
+  </body>
+</html>
+
