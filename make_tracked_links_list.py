@@ -76,6 +76,12 @@ ADDITIONAL_URLS = {
 }
 BASE_URL_REGEX = r'telegram.org'
 
+CRAWL_GLOBAL_RULES = {
+    'allow': set(),
+    'deny': {
+        r'.org/auth$',
+    },
+}
 # disable crawling sub links for specific domains and url patterns
 CRAWL_RULES = {
     # every rule is regex
@@ -214,10 +220,10 @@ def should_exclude(url: str) -> bool:
     direct_link = re.findall(DIRECT_LINK_REGEX, url)[0]
     domain_rules = CRAWL_RULES.get(direct_link)
     if not domain_rules:
-        return False
+        domain_rules = CRAWL_GLOBAL_RULES
 
-    allow_rules = domain_rules.get('allow', set())
-    deny_rules = domain_rules.get('deny', set())
+    allow_rules = domain_rules.get('allow', set()) | CRAWL_GLOBAL_RULES.get('allow', set())
+    deny_rules = domain_rules.get('deny', set()) | CRAWL_GLOBAL_RULES.get('deny', set())
 
     exclude = False
 
