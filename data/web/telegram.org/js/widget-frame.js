@@ -1330,7 +1330,7 @@ function checkFrameSize() {
     });
   }
 
-  function proccessWebmImage(imageEl, failed_callback, success_callback) {
+  function proccessWebmImage(imageEl, failed_callback, success_callback, options = {}) {
     imageEl = geById(imageEl);
     if (!imageEl || imageEl.__inited) return;
     imageEl.__inited = true;
@@ -1340,7 +1340,7 @@ function checkFrameSize() {
     var imgEl = ge1('img', videoEl);
     if (!videoEl) return;
     var fallback = function() {
-      videoEl.parentNode.removeChild(videoEl);
+      videoEl.parentNode?.removeChild(videoEl);
       imageEl.style.backgroundImage = 'none';
       if (imgEl && imgEl.src) {
         var img = new Image();
@@ -1352,7 +1352,7 @@ function checkFrameSize() {
       }
       failed_callback();
     };
-    if (browser.safari) {
+    if (browser.safari && !options.allowSafari) {
       fallback();
       return;
     }

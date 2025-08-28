@@ -42,8 +42,9 @@ function fetchGraph(id, tokenData, retry) {
     return;
   }
   var loadingEl = domEl.querySelector('.chart_wrap_loading');
+  var basePath = window.basePath || '';
   retry = retry || 0;
-  return fetch('/asyncgraph' + (tokenData.test ? '?_test=1' : ''), {
+  return fetch(basePath + '/asyncgraph' + (tokenData.test ? '?_test=1' : ''), {
     method: 'post',
     headers: {
       "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
@@ -83,7 +84,7 @@ function renderGraph(id, json, initial) {
   window.charts[id] = chart;
   setTimeout(function () {
     if (loadingEl) {
-      loadingEl.parentNode.removeChild(loadingEl)
+      loadingEl.parentNode && loadingEl.parentNode.removeChild(loadingEl)
     }
   }, 1000);
   if (json.csvExport) {

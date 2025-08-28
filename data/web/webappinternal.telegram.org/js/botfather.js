@@ -183,6 +183,8 @@ var CreateBot = {
     $('input[name=username]').on('change', (ev) => {
       usernameDebounce(CreateBot.checkUsername, 0);
     });
+    $('.js-upload-button').click(CreateBot.uploadUserpic);
+    
     $('input[name=username]').on('input', (ev) => {
       var $hint = $('.hint-text[data-for=username]');
       $hint.attr('class', 'hint-text hint-text-loading');
@@ -190,7 +192,6 @@ var CreateBot = {
       usernameDebounce(CreateBot.checkUsername, 400);
     })
 
-    $('.js-upload-button').click(CreateBot.uploadUserpic);
   },
   checkUsername() {
     var $hint = $('.hint-text[data-for=username]');
