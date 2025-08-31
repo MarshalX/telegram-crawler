@@ -58,6 +58,7 @@ HIDDEN_URLS = {
     'webappcontent.telegram.org/demo',  # new
     'webappcontent.telegram.org/cafe',  # demo 2
     'webappinternal.telegram.org/botfather',
+    'webappinternal.telegram.org/stickers',
     # 'a-webappcontent.stel.com/demo',
     # 'a-webappcontent.stel.com/cafe',
 
@@ -165,7 +166,10 @@ CRAWL_RULES = {
         },
     },
 }
-CRAWL_STATUS_CODE_EXCLUSIONS = {'webappinternal.telegram.org/botfather'}
+CRAWL_STATUS_CODE_EXCLUSIONS = {
+    'webappinternal.telegram.org/botfather',
+    'webappinternal.telegram.org/stickers',
+}
 
 DIRECT_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{0,249}' + BASE_URL_REGEX + r')'
 ABSOLUTE_LINK_REGEX = r'([-a-zA-Z0-9@:%._\+~#]{0,248}' + BASE_URL_REGEX + r'\b[-a-zA-Z0-9@:%_\+.~#?&//=]*)'

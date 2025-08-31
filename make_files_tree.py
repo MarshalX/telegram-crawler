@@ -27,7 +27,10 @@ import ccl_bplist
 PROTOCOL = 'https://'
 ILLEGAL_PATH_CHARS = punctuation.replace('.', '') + whitespace
 
-CRAWL_STATUS_CODE_EXCLUSIONS = {'webappinternal.telegram.org/botfather'}
+CRAWL_STATUS_CODE_EXCLUSIONS = {
+    'webappinternal.telegram.org/botfather',
+    'webappinternal.telegram.org/stickers',
+}
 
 DYNAMIC_PART_MOCK = 'telegram-crawler'
 
