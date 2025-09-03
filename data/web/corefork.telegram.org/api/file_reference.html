@@ -48,24 +48,29 @@
 <p>They must be cached by the client, along with the <strong>origin</strong> where the document/photo object was found, in order to be refetched when the file reference expires.</p>
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
-<p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file_reference_generator">file reference database schema generator tool »</a>, and the <strong>file reference database schema file</strong> it generates.  </p>
-<p><a href="/file/400780400170/1/FIOD3Cnub_w.43095.json/f680ea9e1acba1c654">Latest file reference database schema file for the current layer »</a></p>
+<p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file_reference_generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
+<p><a href="/file/400780400451/5/8oO_QVqztD4.43095.json/e58b4eade2220b3f58">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
 <li>A <strong>file reference origin</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </li>
 </ul>
-<p>The database schema file contains <strong>all possible origins</strong>, for <strong>all possible file reference paths</strong>.  </p>
-<p>It is automatically generated and validated by the <a href="/api/file_reference_generator">file reference database schema generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database schema file</strong> for a given API schema: see <a href="/api/file_reference_generator">here »</a> for more info.  </p>
+<p>The database map file contains <strong>all possible origins</strong>, for <strong>all possible file reference paths</strong>.  </p>
+<p>It is automatically generated and validated by the <a href="/api/file_reference_generator">file reference database schema generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file_reference_generator">here »</a> for more info.  </p>
 <h3><a class="anchor" href="#implementation" id="implementation" name="implementation"><i class="anchor-icon"></i></a>Implementation</h3>
-<p>Here's how to use file reference database <strong>schema file</strong> to generate all the logic needed for a file reference database within an MTProto client.</p>
+<p>Here's how to use file reference database <strong>map file</strong> to generate all the logic needed for a file reference database within an MTProto client.</p>
 <p>The file reference database can be represented by the following type:</p>
 <pre><code>HashMap&lt;FileId, List&lt;FileSource&gt;&gt;</code></pre>
-<p>It maps a <code>FileId</code> to one or more objects of type <code>FileSource</code>: the exact structure and possible types of <code>FileId</code> and <code>FileSource</code> are specified within the <strong>schema file</strong>.  </p>
-<p>New entries are added when deserializing objects of a specific type received from the API, mapping a received file ID to one or more <code>FileSource</code>s; the exact procedure and affected objects are fully specified within the <strong>schema file</strong>.  </p>
+<p>It maps a <code>FileId</code> to one or more objects of type <code>FileSource</code>: the exact structure and possible types of <code>FileId</code> and <code>FileSource</code> are specified within the <strong>map file</strong>.  </p>
+<p>New entries are added when deserializing objects of a specific type received from the API, mapping a received file ID to one or more <code>FileSource</code>s; the exact procedure and affected objects are fully specified within the <strong>map file</strong>.  </p>
 <p>Later, when a file is used (for example when sending or downloading a media file), and a <code>FILE_REFERENCE_EXPIRED</code> RPC error is received for a specific <code>FileId</code>, the client must fetch the <code>List&lt;FileSource&gt;</code> associated to the used <code>FileId</code>, and execute a specific method call for each <code>FileSource</code>, until a new <code>file_reference</code> is fetched for the <code>FileId</code>.  </p>
-<p>Note that the database doesn't have to store the actual <code>file_reference</code>, only the file id =&gt; file source mapping: the file reference itself can be stored for example in the message DB, or the document DB, or in any other way that can be associated to a <code>FileId</code> upon extraction or storage as specified in the <strong>schema file</strong>.  </p>
-<p>The schema file itself uses the following TL schema:</p>
+<p>Note that the database doesn't have to store the actual <code>file_reference</code>, only the file id =&gt; file source mapping: the file reference itself can be stored for example in the message DB, or the document DB, or in any other way that can be associated to a <code>FileId</code> upon extraction or storage as specified in the <strong>map file</strong>.  </p>
+<p>The map file itself follows a custom TL schema, and is available in JSON or serialized TL format.  </p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">Serialized TL version of map file »</a></p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">JSON map file »</a></p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.tl">TL schema of map file »</a></p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.tl">JSON version TL schema of map file »</a></p>
+<p>This is the TL schema of the map file:</p>
 <!-- start schema -->
 <pre><code>// Root
 fileReferenceOrigins#ed01a4f1 db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; origins:Vector&lt;Origin&gt; skipped:Vector&lt;SkippedOrigin&gt; actions:Vector&lt;Action&gt; = FileReferenceOrigins;
@@ -149,7 +154,7 @@ origin#b62177bf flags:# predicate:string is_constructor:flags.0?true stored_cons
 skippedOrigin#7c62809e flags:# predicate:string is_constructor:flags.0?true why:string = SkippedOrigin;
 
 action#9539f410 stored_constructor:string action:ActionOp = Action;</code></pre>
-<p>The schema file is composed of a single <code>fileReferenceOrigins</code> constructor, which contains:</p>
+<p>The map file is composed of a single <code>fileReferenceOrigins</code> constructor, which contains:</p>
 <ul>
 <li>
 <p>The <code>db_schema</code> and <code>db_schema_json</code> fields with the TL <strong>database</strong> schema of <code>FileId</code>s and <code>FileSource</code>s.<br>
@@ -202,7 +207,7 @@ locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
 <pre><code>origin#b62177bf flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = origin;</code></pre>
 <p>An <code>origin</code> contains instructions on how to extract and store file reference origins from an incoming method response or update.  </p>
 <p><strong>Note</strong>: The following sections assume that all <a href="/type/Updates">Updates</a> constructors have already been converted to a vector of <a href="/type/Update">Update</a> constructors, <strong>including short variants</strong> like <a href="/constructor/updateShortMessage">updateShortMessage</a>, <a href="/constructor/updateShortSentMessage">updateShortSentMessage</a>, <a href="/constructor/updateShortChatMessage">updateShortChatMessage</a>, which must be pre-converted to <a href="/type/Update">Update</a> constructors by the client using information extracted from the method call.<br>
-While this operation could be done within the schema file, it would needlessly increase the number of paths: given that most clients already convert short constructors to Update constructors, the schema file only considers paths starting from the Update constructors.  </p>
+While this operation could be done within the map file, it would needlessly increase the number of paths: given that most clients already convert short constructors to Update constructors, the map file only considers paths starting from the Update constructors.  </p>
 <p>Parameters:</p>
 <ul>
 <li><code>predicate</code> - Indicates the name of the constructor or of the method where extraction of the origin fields must start.</li>
@@ -360,13 +365,13 @@ doubleLiteralOp#3651e3bf value:double = TypedOpOp;
 themeFormatLiteralOp#8e4f9208 = TypedOpOp;</code></pre>
 <p>Action parameters are represented by <code>TypedOpOp</code> constructors.  </p>
 <h5><a class="anchor" href="#copyop" id="copyop" name="copyop"><i class="anchor-icon"></i></a><code>copyOp</code></h5>
-<p>The most commonly used type, copies the value(s) at the specified <a href="#paths">path »</a>.</p>
+<p>The most commonly used type, copies the value(s) from the stored <code>$FileSource.$from</code>.</p>
 <h5><a class="anchor" href="#getinputchannelbyidop" id="getinputchannelbyidop" name="getinputchannelbyidop"><i class="anchor-icon"></i></a><code>getInputChannelByIdOp</code></h5>
-<p>Returns an <a href="/type/InputChannel">InputChannel</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the channel ID of type <a href="/type/long">long</a> specified in <code>from</code>.  </p>
+<p>Returns an <a href="/type/InputChannel">InputChannel</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the channel ID of type <a href="/type/long">long</a> specified in the stored <code>$FileSource.$from</code>.  </p>
 <h5><a class="anchor" href="#getinputuserbyidop" id="getinputuserbyidop" name="getinputuserbyidop"><i class="anchor-icon"></i></a><code>getInputUserByIdOp</code></h5>
-<p>Returns an <a href="/type/InputUser">InputUser</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the channel ID of type <a href="/type/long">long</a> specified in <code>from</code>.  </p>
+<p>Returns an <a href="/type/InputUser">InputUser</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the channel ID of type <a href="/type/long">long</a> specified in the stored <code>$FileSource.$from</code>.    </p>
 <h5><a class="anchor" href="#getinputpeerbyidop" id="getinputpeerbyidop" name="getinputpeerbyidop"><i class="anchor-icon"></i></a><code>getInputPeerByIdOp</code></h5>
-<p>Returns an <a href="/type/InputPeer">InputPeer</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the <a href="/api/bots/ids">bot API peer ID »</a> of type <a href="/type/long">long</a> specified in <code>from</code>.  </p>
+<p>Returns an <a href="/type/InputPeer">InputPeer</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the <a href="/api/bots/ids">bot API peer ID »</a> of type <a href="/type/long">long</a> specified in the stored <code>$FileSource.$from</code>.  </p>
 <h5><a class="anchor" href="#constructorop" id="constructorop" name="constructorop"><i class="anchor-icon"></i></a><code>constructorOp</code></h5>
 <p>Constructs the constructor of type (predicate) <code>constructor</code> using the arguments specified in <code>args</code>.  </p>
 <h5><a class="anchor" href="#vectorop" id="vectorop" name="vectorop"><i class="anchor-icon"></i></a><code>vectorOp</code></h5>
@@ -383,15 +388,17 @@ themeFormatLiteralOp#8e4f9208 = TypedOpOp;</code></pre>
 <p>Constructs a literal <a href="/type/double">double</a> with the value passed in <code>value</code>.</p>
 <h5><a class="anchor" href="#themeformatliteralop" id="themeformatliteralop" name="themeformatliteralop"><i class="anchor-icon"></i></a><code>themeFormatLiteralOp</code></h5>
 <p>Constructs a <a href="/type/string">string</a>, indicating the <a href="/api/themes">theming engines</a> supported by the client (used when working with theme-related media, can be an empty string if the client doesn't support themes).</p>
-<h3><a class="anchor" href="#another-example" id="another-example" name="another-example"><i class="anchor-icon"></i></a>Another example:</h3>
-<p>Assume you receive a <a href="/constructor/message">message</a> from your friend: that message contains a <a href="/constructor/messageMediaPhoto">messageMediaPhoto</a> with a <a href="/constructor/photo">photo</a>.</p>
-<p>Your client has to cache not only the <code>file_reference</code> field of the photo, but also the context in which the file reference was seen (in this case, a message coming from a specific user).</p>
-<p>The context info is in this case, <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L74">an origin of type message</a>, containing the message ID and the peer ID of the chat/channel/user where the message was seen.</p>
-<p>The context info has to be associated with the file reference: when downloading a file using <a href="/method/upload.getFile">upload.getFile</a> or resending it using <a href="/method/messages.sendMedia">messages.sendMedia</a>, a <code>FILE_REFERENCE_EXPIRED</code> error may be returned.<br>
-<a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> returns a variation of the same error, as a <code>FILE_REFERENCE_%d_EXPIRED</code> error (where <code>%d</code> is the index of the media with the expired file reference in the passed media array).<br>
-If this happens, the context info must be used to refetch the object that contained the file reference: in this example, the peer info and the message ID have to be used with <a href="/method/channels.getMessages">channels.getMessages</a> or <a href="/method/messages.getMessages">messages.getMessages</a> to <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L481">refetch the message</a>, recache the file reference and use it in a new file download request.</p>
-<p>More than one origin can be associated to one file reference, for greater resilience (in the case of a message that was deleted in one chat but was also forwarded in another chat, the file reference can be refetched from the second chat, instead).</p>
-<p>Origins for objects returned by method calls with certain parameters can be considered, too (for example, in the case of favorited sticker sets returned by <a href="/method/messages.getFavedStickers">messages.getFavedStickers</a>).</p></div>
+<!-- 
+### Another example:
+Assume you receive a [message](/constructor/message) from your friend: that message contains a [messageMediaPhoto](/constructor/messageMediaPhoto) with a [photo](/constructor/photo).
+Your client has to cache not only the `file_reference` field of the photo, but also the context in which the file reference was seen (in this case, a message coming from a specific user).
+The context info is in this case, [an origin of type message](https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L74), containing the message ID and the peer ID of the chat/channel/user where the message was seen.
+The context info has to be associated with the file reference: when downloading a file using [upload.getFile](/method/upload.getFile) or resending it using [messages.sendMedia](/method/messages.sendMedia), a `FILE_REFERENCE_EXPIRED` error may be returned.  
+[messages.sendMultiMedia](/method/messages.sendMultiMedia) returns a variation of the same error, as a `FILE_REFERENCE_%d_EXPIRED` error (where `%d` is the index of the media with the expired file reference in the passed media array).  
+If this happens, the context info must be used to refetch the object that contained the file reference: in this example, the peer info and the message ID have to be used with [channels.getMessages](/method/channels.getMessages) or [messages.getMessages](/method/messages.getMessages) to [refetch the message](https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L481), recache the file reference and use it in a new file download request.
+More than one origin can be associated to one file reference, for greater resilience (in the case of a message that was deleted in one chat but was also forwarded in another chat, the file reference can be refetched from the second chat, instead).
+Origins for objects returned by method calls with certain parameters can be considered, too (for example, in the case of favorited sticker sets returned by [messages.getFavedStickers](/method/messages.getFavedStickers)).
+--></div>
   
 </div>
           
