@@ -76,9 +76,37 @@ updateNewMessage.message -&gt; message.media -&gt; messageMediaInvoice.extended_
 <p>For example, the file reference path <code>updateStory.story -&gt; storyItem.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code> <em>would</em> rely on the origin <code>getStory{peer: storyItem.from_id, story_id: storyItem.id}</code> with <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.  </p>
 <p>However, the <code>from_id</code> field of <a href="/constructor/storyItem">storyItem</a> is actually a flag and in this specific path it is <strong>not</strong> set (it's only set when a <a href="/constructor/storyItem">storyItem</a> is returned by <a href="/method/stories.getAllStories">stories.getAllStories</a>).</p>
 <p>The validator (<a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">the code that generated the definition file, you DO NOT have to implement a validator yourself</a>) noticed that, which forced the manual addition of the valid fallback origin <code>getStory{peer: updateStory.peer, story_id: updateStory.story -&gt; storyItem.id}</code>, which is present in the final origin definition file.  </p>
-<p>Note that the definition file is already pre-validated, no additional validation is needed to implement it, the above is just an example of a case that is successfully covered by the <a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">validator implemented here »</a>.</p>
+<p>Note that the definition file is already pre-validated, no additional validation is needed to implement it, the above is just an example of a case that is successfully covered by the <a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">validator implemented here »</a>.  </p>
 </li>
-</ul></div>
+</ul>
+<h3><a class="anchor" href="#running" id="running" name="running"><i class="anchor-icon"></i></a>Running</h3>
+<p>To run the generator on a newer layer, clone the repo, install deps, and run the generator:</p>
+<pre><code>git clone https://github.com/danog/MadelineProto.git --recursive
+cd MadelineProto
+composer update
+php tools/gen_filerefmap.php &lt;inputSchema&gt; &lt;output&gt; &lt;outputJson&gt;</code></pre>
+<p>Arguments:</p>
+<ul>
+<li><code>inputSchema</code> - The new API schema in JSON or TL format</li>
+<li><code>output</code> - The generated file reference database map file in serialized TL format</li>
+<li><code>outputJson</code> - The generated file reference database map file in JSON format </li>
+</ul>
+<p>The schema used for the map file is contained in <code>src/TL_file_ref_map_schema.tl</code>.  </p>
+<p>When new, not yet covered paths are found, an exception will be thrown: to cover the new paths, modify <code>tools/FileRefExtractor/FileRefGenerator.php</code>, adding a new <code>CallOp</code>, for example:</p>
+<pre><code>$locations['storyItem'][] = new CallOp(
+    'stories.getStoriesByID',
+    [
+        'id' =&gt; new ArrayOp(new CopyOp(new Path([['storyItem', 'id']]))),
+        'peer' =&gt; new GetInputPeerOp(new Path([['peerStories', 'peer']], true)),
+    ],
+    'fileSourceStory'
+);</code></pre>
+<p><code>$locations</code> is a <code>HashMap&lt;Key, Vector&lt;Op&gt;&gt;</code>, where:</p>
+<ul>
+<li><code>Key</code> is the constructor where context capturing begins (must be equal to the first element of non-parent Paths)</li>
+<li><code>Op</code> is an object of type  <code>ActionOp</code> (<code>CallOp</code>, <code>CopyMethodCallOp</code>, <code>GetMessageOp</code>, <code>Noop</code>).  </li>
+</ul>
+<p>Follow existing locations to add new locations as needed.</p></div>
   
 </div>
           
