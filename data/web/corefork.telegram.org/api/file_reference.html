@@ -49,7 +49,7 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file_reference_generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400785/4/OH_qngLmfVk.43553.json/cf7bf63976f7873655">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400623/2/EX3caOZ6Nz8.43553.json/7ede8ac72e3881b75d">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
@@ -230,7 +230,12 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <ul>
 <li><a href="/constructor/message">message</a> - <pre><code>fileSourceMessage{from_scheduled: <a href="/constructor/message">message</a>.from_scheduled?passthrough, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/message">message</a>.peer_id), id: <a href="/constructor/message">message</a>.id}</code></pre></li>
 <li><a href="/constructor/messageService">messageService</a> - <pre><code>fileSourceMessage{peer: extractPeerIdFromPeerAndStore(<a href="/constructor/messageService">messageService</a>.peer_id), id: <a href="/constructor/messageService">messageService</a>.id, from_scheduled: false}</code></pre></li>
-<li><a href="/constructor/storyItem">storyItem</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyItem">storyItem</a>.from_id?abort_if_empty)}</code></pre></li>
+<li>(1) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getPinnedStories">stories.getPinnedStories</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getPinnedStories">stories.getPinnedStories</a>.peer)}</code></pre></li>
+<li>(2) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a>.peer)}</code></pre></li>
+<li>(3) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.peer)}</code></pre></li>
+<li>(4) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getAlbumStories">stories.getAlbumStories</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getAlbumStories">stories.getAlbumStories</a>.peer)}</code></pre></li>
+<li>(5) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/constructor/peerStories">peerStories</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/peerStories">peerStories</a>.peer)}</code></pre></li>
+<li>(6) <a href="/constructor/storyItem">storyItem</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyItem">storyItem</a>.from_id?abort_if_empty)}</code></pre></li>
 <li><a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a>.peer_id)}</code></pre></li>
 <li><a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a>.peer_id)}</code></pre></li>
 <li><a href="/constructor/foundStory">foundStory</a> - <pre><code>fileSourceStory{id: <a href="/constructor/foundStory">foundStory</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/foundStory">foundStory</a>.peer)}</code></pre></li>
@@ -253,7 +258,10 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li><a href="/constructor/chatFull">chatFull</a> - <pre><code>fileSourceChatFull{chat_id: <a href="/constructor/chatFull">chatFull</a>.id}</code></pre></li>
 <li><a href="/constructor/channelFull">channelFull</a> - <pre><code>fileSourceChannelFull{channel: <a href="/constructor/channelFull">channelFull</a>.id}</code></pre></li>
 <li><a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> - <pre><code>fileSourcePremiumPromo{}</code></pre></li>
-<li><a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>(needs <a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a>) fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a>.peer), id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough, ton: false}</code></pre></li>
+<li>(1) <a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>(needs <a href="/method/payments.getStarsStatus">payments.getStarsStatus</a>) fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsStatus">payments.getStarsStatus</a>.peer), ton: <a href="/method/payments.getStarsStatus">payments.getStarsStatus</a>.ton?passthrough, id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough}</code></pre></li>
+<li>(2) <a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>(needs <a href="/method/payments.getStarsTransactions">payments.getStarsTransactions</a>) fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsTransactions">payments.getStarsTransactions</a>.peer), ton: <a href="/method/payments.getStarsTransactions">payments.getStarsTransactions</a>.ton?passthrough, id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough}</code></pre></li>
+<li>(3) <a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>(needs <a href="/method/payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a>) fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a>.peer), ton: <a href="/method/payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a>.ton?passthrough, id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough}</code></pre></li>
+<li>(4) <a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>(needs <a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a>) fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a>.peer), id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough, ton: false}</code></pre></li>
 <li><a href="/constructor/attachMenuBot">attachMenuBot</a> - <pre><code>fileSourceAttachMenuBot{bot: <a href="/constructor/attachMenuBot">attachMenuBot</a>.bot_id}</code></pre></li>
 <li><a href="/constructor/theme">theme</a> - <pre><code>fileSourceTheme{id: <a href="/constructor/theme">theme</a>.id, access_hash: <a href="/constructor/theme">theme</a>.access_hash}</code></pre></li>
 <li><a href="/constructor/wallPaper">wallPaper</a> - <pre><code>fileSourceWallPaper{id: <a href="/constructor/wallPaper">wallPaper</a>.id, access_hash: <a href="/constructor/wallPaper">wallPaper</a>.access_hash}</code></pre></li>
@@ -327,6 +335,7 @@ These constructors indicate that the origin should be ignored completely (includ
 <li><code>skippedOrigin.is_constructor</code> - If set, <code>predicate</code> points to a constructor, otherwise it points to a method.</li>
 <li><code>skippedOrigin.why</code> - A human-readable reason as to why this origin should be ignored.</li>
 </ul>
+<p>Each skipped predicate can have one associated reason.  </p>
 </li>
 </ul>
 <h4><a class="anchor" href="#locations" id="locations" name="locations"><i class="anchor-icon"></i></a>Locations</h4>
@@ -341,6 +350,7 @@ locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
 <li><code>predicate</code> - The name of the API constructor.</li>
 <li><code>stored_constructor</code> - The name of the <code>FileId</code> object to be used for database read/writes.  </li>
 </ul>
+<p>Each unique predicate can only have one <code>stored_constructor</code>.  </p>
 <p>For example, current API layers have the following locations:</p>
 <ul>
 <li><a href="/constructor/photo">photo</a> =&gt; <code>fileIdPhoto</code> (incoming)</li>
@@ -368,6 +378,7 @@ While this operation could be done within the map file, it would needlessly incr
 <li><code>stored_params</code> - Contains info on how to populate the <code>FileSource</code> constructor specified in <code>stored_constructor</code></li>
 <li><code>skipped_flags</code> - In some cases, some <strong>flag</strong> fields of <code>stored_constructor</code> aren't referenced by <code>action</code>: this field contains the full list of flags which are never referenced by the current origin and must be unset.  </li>
 </ul>
+<p>Each unique predicate can have one or more <code>stored_constructor</code>s with different params.  </p>
 <p>If the <code>is_constructor</code> flag is set, when deserializing a constructor with predicate equal to <code>predicate</code>, contained in an incoming <a href="/type/Update">Update</a> or in at any depth in a method call response, do the following:</p>
 <ul>
 <li><strong>Before</strong> beginning deserialization of the constructor, push a new <code>FileSource</code> of type <code>stored_constructor</code> to the file source stack.<br>
@@ -488,6 +499,7 @@ typedOp#705b10ec type:string op:TypedOpOp = TypedOp;</code></pre>
 <li><code>stored_constructor</code> - The name of an object of type <code>FileSource</code>, specified in the <code>db_schema</code>.</li>
 <li><code>action</code> - The action to execute when refreshing a file source of type <code>stored_constructor</code>.  </li>
 </ul>
+<p>There can only be one action per constructor.</p>
 <p>The arguments of the action are composed of a set of <code>typedOp</code> constructors.  </p>
 <p><a href="#action-parameters"><code>typedOp</code> »</a> is a wrapper for a <code>TypedOpOp</code> constructor which also contains the TL <code>type</code> of the associated <code>TypedOpOp</code>; this isn't strictly necessary for evaluation, but it can be useful during automatic code generation from the definition file.  </p>
 <h5><a class="anchor" href="#callop" id="callop" name="callop"><i class="anchor-icon"></i></a><code>callOp</code></h5>
