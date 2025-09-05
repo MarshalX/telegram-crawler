@@ -49,7 +49,7 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file_reference_generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400477/4/dOe7v0AIPjk.43553.json/26d87ad250093a0098">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400997/2/gXlJx7r_nPE.43553.json/2ac30e90b1b20fe719">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
@@ -96,7 +96,7 @@ paramIsFlagAbortIfEmpty#f8fe9fee = ParamFlag;
 paramIsFlagFallback#202b77a1 fallback:TypedOp = ParamFlag;
 paramIsFlagPassthrough#1dc6e17d = ParamFlag;
 
-pathPart#7b8b07d4 flags:# constructor:string param:string flag:ParamFlag = PathPart;
+pathPart#8dc6ff46 constructor:string param:string flag:ParamFlag = PathPart;
 
 path#0c3586a2 parts:Vector&lt;PathPart&gt; = Path;
 pathParent#58f13684 parts:Vector&lt;PathPart&gt; = Path;
@@ -118,7 +118,7 @@ extractUserIdFromInputUserAndStore#7720aa2e from:Path to:string = FieldExtractor
 
 // Actions
 callOp#c2ff3383 method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
-getMessageOp#84b69f70 flags:# peer:TypedOp id:TypedOp from_scheduled:flags.0?TypedOp = ActionOp;
+getMessageOp#b51d9468 peer:TypedOp id:TypedOp from_scheduled:TypedOp = ActionOp;
 
 // For string =&gt; TypedOp dictionaries
 typedOpArg#3a2930c2 key:string value:TypedOp = TypedOpArg;
@@ -204,7 +204,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>fileSourceWebPage - <pre><code>messages.getWebPage(url: copyOp(url), hash: 0)</code></pre></li>
 <li>fileSourceBotApp - <pre><code>messages.getBotApp(app: <a href="/constructor/inputBotAppID">inputBotAppID</a>{id: copyOp(id), access_hash: copyOp(access_hash)}, hash: 0)</code></pre></li>
 <li>fileSourceUserFull - <pre><code>users.getFullUser(id: getInputUserByIdOp(id))</code></pre></li>
-<li>fileSourceAdminLog - <pre><code>channels.getAdminLog(channel: getInputChannelByIdOp(channel), max_id: copyOp(max_id), min_id: copyOp(max_id), limit: 1, q:)</code></pre></li>
+<li>fileSourceAdminLog - <pre><code>channels.getAdminLog(channel: getInputChannelByIdOp(channel), max_id: copyOp(max_id), min_id: copyOp(max_id), limit: 1, q: "")</code></pre></li>
 <li>fileSourceStoryAlbum - <pre><code>stories.getAlbums(peer: getInputPeerByIdOp(peer), hash: 0)</code></pre></li>
 <li>fileSourceBotPreviewMedia - <pre><code>bots.getPreviewMedias(bot: getInputUserByIdOp(bot))</code></pre></li>
 <li>fileSourceBotPreviewInfo - <pre><code>bots.getPreviewInfo(bot: getInputUserByIdOp(bot), lang_code: copyOp(lang_code))</code></pre></li>
