@@ -312,6 +312,106 @@ fileSourceAvailableEffects#eb8578f0 = FileSource;
 fileSourceAvailableReactions#0e432388 = FileSource;
 fileSourceUserProfilePhoto#e39ee274 user_id:long max_id:long = FileSource;
 fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = FileSource;<br></code></pre></div>
+<h4><a class="anchor" href="#changes-in-the-file-reference-database-map-file-" id="changes-in-the-file-reference-database-map-file-" name="changes-in-the-file-reference-database-map-file-"><i class="anchor-icon"></i></a>Changes in the <a href="/api/file_reference">file reference database map file »</a></h4>
+<h5><a class="anchor" href="#new-locations" id="new-locations" name="new-locations"><i class="anchor-icon"></i></a>New Locations</h5>
+<ul>
+<li>Added <a href="/constructor/inputPhoto">inputPhoto</a> - fileIdPhoto</li>
+<li>Added <a href="/constructor/inputDocument">inputDocument</a> - fileIdDocument</li>
+<li>Added <a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a> - fileIdDocument</li>
+<li>Added <a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a> - fileIdPhoto</li>
+<li>Added <a href="/constructor/document">document</a> - fileIdDocument</li>
+<li>Added <a href="/constructor/photo">photo</a> - fileIdPhoto</li>
+</ul>
+<h5><a class="anchor" href="#new-origins" id="new-origins" name="new-origins"><i class="anchor-icon"></i></a>New Origins</h5>
+<ul>
+<li>Added <a href="/constructor/message">message</a> - <pre><code>fileSourceMessage{from_scheduled: <a href="/constructor/message">message</a>.from_scheduled?passthrough, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/message">message</a>.peer_id), id: <a href="/constructor/message">message</a>.id}</code></pre></li>
+<li>Added <a href="/constructor/messageService">messageService</a> - <pre><code>fileSourceMessage{peer: extractPeerIdFromPeerAndStore(<a href="/constructor/messageService">messageService</a>.peer_id), id: <a href="/constructor/messageService">messageService</a>.id, from_scheduled: false}</code></pre></li>
+<li>Added <a href="/constructor/storyItem">storyItem</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyItem">storyItem</a>.from_id?abort_if_empty)}</code></pre></li>
+<li>Added <a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a>.peer_id)}</code></pre></li>
+<li>Added <a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a>.peer_id)}</code></pre></li>
+<li>Added <a href="/constructor/foundStory">foundStory</a> - <pre><code>fileSourceStory{id: <a href="/constructor/foundStory">foundStory</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/foundStory">foundStory</a>.peer)}</code></pre></li>
+<li>Added <a href="/constructor/publicForwardStory">publicForwardStory</a> - <pre><code>fileSourceStory{id: <a href="/constructor/publicForwardStory">publicForwardStory</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/publicForwardStory">publicForwardStory</a>.peer)}</code></pre></li>
+<li>Added <a href="/constructor/webPageAttributeStory">webPageAttributeStory</a> - <pre><code>fileSourceStory{id: <a href="/constructor/webPageAttributeStory">webPageAttributeStory</a>.story?abort_if_empty.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/webPageAttributeStory">webPageAttributeStory</a>.peer)}</code></pre></li>
+<li>Added <a href="/constructor/messageMediaStory">messageMediaStory</a> - <pre><code>fileSourceStory{id: <a href="/constructor/messageMediaStory">messageMediaStory</a>.story?abort_if_empty.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/messageMediaStory">messageMediaStory</a>.peer)}</code></pre></li>
+<li>Added <a href="/constructor/webPage">webPage</a> - <pre><code>fileSourceWebPage{url: <a href="/constructor/webPage">webPage</a>.url}</code></pre></li>
+<li>Added <a href="/constructor/botApp">botApp</a> - <pre><code>fileSourceBotApp{id: <a href="/constructor/botApp">botApp</a>.id, access_hash: <a href="/constructor/botApp">botApp</a>.access_hash}</code></pre></li>
+<li>Added <a href="/constructor/botInfo">botInfo</a> - <pre><code>fileSourceUserFull{id: <a href="/constructor/botInfo">botInfo</a>.user_id?abort_if_empty}</code></pre></li>
+<li>Added <a href="/constructor/channelAdminLogEvent">channelAdminLogEvent</a> - <pre><code>fileSourceAdminLog{channel: extractChannelIdFromInputChannelAndStore(<a href="/method/channels.getAdminLog">channels.getAdminLog</a>.channel), max_id: <a href="/constructor/channelAdminLogEvent">channelAdminLogEvent</a>.id} needs <a href="/method/channels.getAdminLog">channels.getAdminLog</a></code></pre></li>
+<li>Added <a href="/method/stories.createAlbum">stories.createAlbum</a> - <pre><code>fileSourceStoryAlbum{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.createAlbum">stories.createAlbum</a>.peer)}</code></pre></li>
+<li>Added <a href="/method/stories.getAlbums">stories.getAlbums</a> - <pre><code>fileSourceStoryAlbum{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getAlbums">stories.getAlbums</a>.peer)}</code></pre></li>
+<li>Added <a href="/method/stories.updateAlbum">stories.updateAlbum</a> - <pre><code>fileSourceStoryAlbum{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.updateAlbum">stories.updateAlbum</a>.peer)}</code></pre></li>
+<li>Added <a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a> - <pre><code>fileSourceBotPreviewMedia{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a>.bot)}</code></pre></li>
+<li>Added <a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a>.bot), lang_code: <a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a>.lang_code}</code></pre></li>
+<li>Added <a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>.bot), lang_code: <a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>.lang_code}</code></pre></li>
+<li>Added <a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a>.bot), lang_code: <a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a>.lang_code}</code></pre></li>
+<li>Added <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> - <pre><code>fileSourcePaidMedia{id: <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a>.msg_id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a>.peer)}</code></pre></li>
+<li>Added <a href="/constructor/userFull">userFull</a> - <pre><code>fileSourceUserFull{id: <a href="/constructor/userFull">userFull</a>.id}</code></pre></li>
+<li>Added <a href="/constructor/chatFull">chatFull</a> - <pre><code>fileSourceChatFull{chat_id: <a href="/constructor/chatFull">chatFull</a>.id}</code></pre></li>
+<li>Added <a href="/constructor/channelFull">channelFull</a> - <pre><code>fileSourceChannelFull{channel: <a href="/constructor/channelFull">channelFull</a>.id}</code></pre></li>
+<li>Added <a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> - <pre><code>fileSourcePremiumPromo{}</code></pre></li>
+<li>Added <a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a>.peer), id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough, ton: false} needs <a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a></code></pre></li>
+<li>Added <a href="/constructor/attachMenuBot">attachMenuBot</a> - <pre><code>fileSourceAttachMenuBot{bot: <a href="/constructor/attachMenuBot">attachMenuBot</a>.bot_id}</code></pre></li>
+<li>Added <a href="/constructor/theme">theme</a> - <pre><code>fileSourceTheme{id: <a href="/constructor/theme">theme</a>.id, access_hash: <a href="/constructor/theme">theme</a>.access_hash}</code></pre></li>
+<li>Added <a href="/constructor/wallPaper">wallPaper</a> - <pre><code>fileSourceWallPaper{id: <a href="/constructor/wallPaper">wallPaper</a>.id, access_hash: <a href="/constructor/wallPaper">wallPaper</a>.access_hash}</code></pre></li>
+<li>Added <a href="/constructor/stickerSetMultiCovered">stickerSetMultiCovered</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromStickerSetAndStore(<a href="/constructor/stickerSetMultiCovered">stickerSetMultiCovered</a>.set)}</code></pre></li>
+<li>Added <a href="/constructor/stickerSetFullCovered">stickerSetFullCovered</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromStickerSetAndStore(<a href="/constructor/stickerSetFullCovered">stickerSetFullCovered</a>.set)}</code></pre></li>
+<li>Added <a href="/constructor/messages.stickerSet">messages.stickerSet</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromStickerSetAndStore(<a href="/constructor/messages.stickerSet">messages.stickerSet</a>.set)}</code></pre></li>
+<li>Added <a href="/constructor/messages.savedGifs">messages.savedGifs</a> - <pre><code>fileSourceSavedGifs{}</code></pre></li>
+<li>Added <a href="/constructor/account.savedRingtones">account.savedRingtones</a> - <pre><code>fileSourceSavedRingtones{}</code></pre></li>
+<li>Added <a href="/constructor/account.savedRingtoneConverted">account.savedRingtoneConverted</a> - <pre><code>fileSourceSavedRingtones{}</code></pre></li>
+<li>Added <a href="/method/account.uploadRingtone">account.uploadRingtone</a> - <pre><code>fileSourceSavedRingtones{}</code></pre></li>
+<li>Added <a href="/constructor/messages.availableEffects">messages.availableEffects</a> - <pre><code>fileSourceAvailableEffects{}</code></pre></li>
+<li>Added <a href="/constructor/messages.availableReactions">messages.availableReactions</a> - <pre><code>fileSourceAvailableReactions{}</code></pre></li>
+<li>Added <a href="/constructor/photo">photo</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.getUserPhotos">photos.getUserPhotos</a>.user_id), max_id: <a href="/constructor/photo">photo</a>.id} needs <a href="/method/photos.getUserPhotos">photos.getUserPhotos</a></code></pre></li>
+<li>Added <a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a>.bot?fallback(<a href="/constructor/inputUserSelf">inputUserSelf</a>{})), max_id: <a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a>..<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
+<li>Added <a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a>.bot?fallback(<a href="/constructor/inputUserSelf">inputUserSelf</a>{})), max_id: <a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a>..<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
+<li>Added <a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a>.user_id), max_id: <a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a>..<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
+<li>Added <a href="/constructor/document">document</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromDocumentAttributesAndStore(<a href="/constructor/document">document</a>.attributes)}</code></pre></li>
+<li>Added <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a> - <pre><code>fileSourceDocumentByHash{sha256: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.sha256, size: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.size, mime_type: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.mime_type}</code></pre></li>
+</ul>
+<h5><a class="anchor" href="#new-skipped" id="new-skipped" name="new-skipped"><i class="anchor-icon"></i></a>New Skipped</h5>
+<ul>
+<li>Added <a href="/method/messages.getSponsoredMessages">messages.getSponsoredMessages</a> - Do not store file references from sponsored messages</li>
+<li>Added <a href="/constructor/recentMeUrlChatInvite">recentMeUrlChatInvite</a> - Do not store references based on chat invite links</li>
+<li>Added <a href="/method/messages.checkChatInvite">messages.checkChatInvite</a> - Do not store references based on chat invite links</li>
+<li>Added <a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a> - Inline bot results are ephemeral</li>
+<li>Added <a href="/method/messages.getPreparedInlineMessage">messages.getPreparedInlineMessage</a> - Inline bot results are ephemeral</li>
+<li>Added <a href="/method/messages.uploadMedia">messages.uploadMedia</a> - A freshly uploaded media file will obtain a context only once it is sent to a chat</li>
+<li>Added <a href="/method/messages.uploadImportedMedia">messages.uploadImportedMedia</a> - A freshly uploaded media file will obtain a context only once it is sent to a chat</li>
+<li>Added <a href="/constructor/updateServiceNotification">updateServiceNotification</a> - Cannot refetch service notifications</li>
+<li>Added <a href="/method/messages.getWebPagePreview">messages.getWebPagePreview</a> - No locations are added for the method call, as it doesn't use persistent IDs as input; the location is instead extracted from the persistent IDs in the returned WebPage object</li>
+<li>Added <a href="/constructor/payments.resaleStarGifts">payments.resaleStarGifts</a> - Contexts for star gifts are not yet implemented</li>
+<li>Added <a href="/constructor/payments.starGiftUpgradePreview">payments.starGiftUpgradePreview</a> - Contexts for star gifts are not yet implemented</li>
+<li>Added <a href="/constructor/starGift">starGift</a> - Contexts for star gifts are not yet implemented</li>
+<li>Added <a href="/constructor/starGiftUnique">starGiftUnique</a> - Contexts for star gifts are not yet implemented</li>
+</ul>
+<h5><a class="anchor" href="#new-actions" id="new-actions" name="new-actions"><i class="anchor-icon"></i></a>New Actions</h5>
+<ul>
+<li>Added fileSourceMessage - <pre><code>getMessageOp(peer: getInputPeerByIdOp(peer), id: copyOp(id), from_scheduled: copyOp(from_scheduled))</code></pre></li>
+<li>Added fileSourceStory - <pre><code>stories.getStoriesByID(id: [copyOp(id)], peer: getInputPeerByIdOp(peer))</code></pre></li>
+<li>Added fileSourceWebPage - <pre><code>messages.getWebPage(url: copyOp(url), hash: 0)</code></pre></li>
+<li>Added fileSourceBotApp - <pre><code>messages.getBotApp(app: <a href="/constructor/inputBotAppID">inputBotAppID</a>{id: copyOp(id), access_hash: copyOp(access_hash)}, hash: 0)</code></pre></li>
+<li>Added fileSourceUserFull - <pre><code>users.getFullUser(id: getInputUserByIdOp(id))</code></pre></li>
+<li>Added fileSourceAdminLog - <pre><code>channels.getAdminLog(channel: getInputChannelByIdOp(channel), max_id: copyOp(max_id), min_id: copyOp(max_id), limit: 1, q:)</code></pre></li>
+<li>Added fileSourceStoryAlbum - <pre><code>stories.getAlbums(peer: getInputPeerByIdOp(peer), hash: 0)</code></pre></li>
+<li>Added fileSourceBotPreviewMedia - <pre><code>bots.getPreviewMedias(bot: getInputUserByIdOp(bot))</code></pre></li>
+<li>Added fileSourceBotPreviewInfo - <pre><code>bots.getPreviewInfo(bot: getInputUserByIdOp(bot), lang_code: copyOp(lang_code))</code></pre></li>
+<li>Added fileSourcePaidMedia - <pre><code>messages.getExtendedMedia(id: [copyOp(id)], peer: getInputPeerByIdOp(peer))</code></pre></li>
+<li>Added fileSourceChatFull - <pre><code>messages.getFullChat(chat_id: copyOp(chat_id))</code></pre></li>
+<li>Added fileSourceChannelFull - <pre><code>channels.getFullChannel(channel: getInputChannelByIdOp(channel))</code></pre></li>
+<li>Added fileSourcePremiumPromo - <pre><code>help.getPremiumPromo()</code></pre></li>
+<li>Added fileSourceStarsTransaction - <pre><code>payments.getStarsTransactionsByID(peer: getInputPeerByIdOp(peer), ton: copyOp(ton), id: [<a href="/constructor/inputStarsTransaction">inputStarsTransaction</a>{id: copyOp(id), refund: copyOp(refund)}])</code></pre></li>
+<li>Added fileSourceAttachMenuBot - <pre><code>messages.getAttachMenuBot(bot: getInputUserByIdOp(bot))</code></pre></li>
+<li>Added fileSourceTheme - <pre><code>account.getTheme(theme: <a href="/constructor/inputTheme">inputTheme</a>{id: copyOp(id), access_hash: copyOp(access_hash)}, format: $themeFormat)</code></pre></li>
+<li>Added fileSourceWallPaper - <pre><code>account.getWallPaper(wallpaper: <a href="/constructor/inputWallPaper">inputWallPaper</a>{id: copyOp(id), access_hash: copyOp(access_hash)})</code></pre></li>
+<li>Added fileSourceStickerSet - <pre><code>messages.getStickerSet(stickerset: copyOp(stickerset), hash: 0)</code></pre></li>
+<li>Added fileSourceSavedGifs - <pre><code>messages.getSavedGifs(hash: 0)</code></pre></li>
+<li>Added fileSourceSavedRingtones - <pre><code>account.getSavedRingtones(hash: 0)</code></pre></li>
+<li>Added fileSourceAvailableEffects - <pre><code>messages.getAvailableEffects(hash: 0)</code></pre></li>
+<li>Added fileSourceAvailableReactions - <pre><code>messages.getAvailableReactions(hash: 0)</code></pre></li>
+<li>Added fileSourceUserProfilePhoto - <pre><code>photos.getUserPhotos(user_id: getInputUserByIdOp(user_id), offset: -1, max_id: copyOp(max_id), limit: 1)</code></pre></li>
+<li>Added fileSourceDocumentByHash - <pre><code>messages.getDocumentByHash(sha256: copyOp(sha256), size: copyOp(size), mime_type: copyOp(mime_type))</code></pre></li>
+</ul>
 <h3><a class="anchor" href="#layer-212" id="layer-212" name="layer-212"><i class="anchor-icon"></i></a><a href="/schema?layer=212">Layer 212</a></h3>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>

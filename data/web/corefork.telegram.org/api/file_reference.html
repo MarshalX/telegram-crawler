@@ -49,7 +49,7 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file_reference_generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400344/4/hkGtBmJEwLg.43553.json/8a8acc5fa07002f9eb">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400907/4/E5UsIXvqmok.43553.json/b45ccdfd1daa04a012">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
@@ -318,7 +318,8 @@ By definition, if a method name is passed, it will always be equal to the method
 <li><code>flag</code> - Contains exactly one of the following constructors:<ul>
 <li><code>paramNotFlag</code> - The current parameter is not a flag</li>
 <li><code>paramIsFlagAbortIfEmpty</code> - The current parameter is a flag, and if it's not set, abort extraction.  </li>
-<li><code>paramIsFlagFallback</code> -  The current parameter is a flag, and if it's not set, use the specified <code>TypedOp</code> as fallback value.  </li>
+<li><code>paramIsFlagFallback</code> -  The current parameter is a flag, and if it's not set, use the specified <code>TypedOp</code> as fallback value.<br>
+Note that OPs of type <code>copyOp</code>, <code>getInputChannelByIdOp</code>, <code>getInputUserByIdOp</code> and <code>getInputPeerByIdOp</code> are not allowed in this context.</li>
 <li><code>paramIsFlagPassthrough</code> - The current parameter is a flag, and its value should be copied/returned verbatim; can only be used on the last element of a path and within the arguments of a constructorOp/callOp/getMessageOp only if the argument that uses this path is a flag of the same type.  </li>
 </ul>
 </li>
@@ -350,7 +351,7 @@ typedOp#705b10ec type:string op:TypedOpOp = TypedOp;</code></pre>
 <p><code>callOp.args</code> will always contain at least all of the required parameters, and possibly some flagged parameters as well.  </p>
 <h5><a class="anchor" href="#getmessageop" id="getmessageop" name="getmessageop"><i class="anchor-icon"></i></a><code>getMessageOp</code></h5>
 <p><code>getMessageOp</code> is a specialized action which invokes either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <code>peer</code> (which is always a subtype of <a href="/type/InputPeer">InputPeer</a>), passing the <code>id</code> as the only element to the vector <code>id</code> parameter.<br>
-If the <code>from_scheduled</code> flag is present and set, and the flag to which the path points is also set, <a href="/method/messages.getScheduledMessages">messages.getScheduledMessages</a> should be executed instead.  </p>
+If the flag to which the <code>from_scheduled</code> points is set, <a href="/method/messages.getScheduledMessages">messages.getScheduledMessages</a> should be executed instead.  </p>
 <h4><a class="anchor" href="#action-parameters" id="action-parameters" name="action-parameters"><i class="anchor-icon"></i></a>Action parameters</h4>
 <pre><code>copyOp#f48f418f from:string = TypedOpOp;
 
