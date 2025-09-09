@@ -424,7 +424,7 @@ i.icon {
 }
 .tm-dropdown > .dropdown-menu.dropdown-menu-top {
   bottom: 100%;
-  top: unset;
+  top: unset !important;
 }
 .tm-dropdown > .dropdown-menu.dropdown-menu-right {
   left: 0;
@@ -2498,8 +2498,10 @@ picture.tm-row-pic canvas {
   overflow: auto;
   background: #2D3A47;
   border-radius: 0 0 10px 10px;
+  min-width: calc(100% - 32px);
   margin: 0 16px;
   padding-top: 8px;
+  padding-bottom: 12px;
   opacity: 1;
   transition-duration: 0.15s;
   transition-timing-function: ease-in;
@@ -2565,6 +2567,9 @@ picture.tm-row-pic canvas {
 }
 
 .tm-row-results-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   min-height: 240px;
   justify-content: center;
   text-align: center;
@@ -2599,11 +2604,8 @@ picture.tm-row-pic canvas {
   padding: 10px 12px;
   margin: 12px;
   margin-bottom: -1lh;
-  /*border-radius: 8px;*/
-  /*border: 1.5px rgba(255, 255, 255, 0.33) solid;*/
-  /*background: rgba(255, 255, 255, 0.18);*/
   color: rgba(255, 255, 255, 0.68);
-  /*font-weight: 600;*/
+  text-align: center;
 }
 
 .tm-dropdown:has(.tm-row.hidden) {
@@ -2733,13 +2735,17 @@ picture.tm-row-pic canvas {
   aspect-ratio: 1 / 1;
 }
 
-.tm-sticker-picker-item img {
+.tm-sticker-picker-item-img {
   width: 100%;
   height: 100%;
+  transform: scale(1.0);
   transition: transform 0.4s cubic-bezier(0.23, 1.0, 0.32, 1.0);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.tm-sticker-picker-item.active img {
+.tm-sticker-picker-item.active .tm-sticker-picker-item-img {
   transform: scale(0.85);
 }
 
@@ -2774,11 +2780,7 @@ picture.tm-row-pic canvas {
   opacity: 1;
 }
 
-.tm-sticker-picker-results-empty {
-  /*display: none;  */
-}
-
-.tm-sticker-picker:has(.tm-sticker-picker-pack:not(.hidden)) .tm-sticker-picker-results-empty {
+.tm-sticker-picker:has(.tm-sticker-picker-item) .tm-sticker-picker-results-empty {
   display: none;
 }
 
@@ -2807,6 +2809,125 @@ html.dark .tchart--tip {
   .tm-mode-grid .tm-dropdown > .dropdown-menu {
     top: 30px;
   }
+}
+
+/* Emoji iconset */
+i.emoji-md,
+i.emoji-lg {
+  font-style: normal;
+  box-sizing: content-box;
+  font-size: 20px;
+  line-height: 24px;
+  width: 24px;
+  height: 24px;
+  vertical-align: top;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  background: no-repeat;
+  text-indent: -10em;
+  padding: 0 1px 1px 0;
+  margin: 0 -1px -1px 0;
+}
+i.emoji-lg {
+  font-size: 25px;
+  line-height: 30px;
+  width: 30px;
+  height: 30px;
+}
+i.emoji-md > b,
+i.emoji-lg > b {
+  font-weight: normal;
+  letter-spacing: 12em;
+  pointer-events: none;
+}
+i.emoji-md.g0 {
+  background-image: url('/img/emoji/48/emoji0.png?9');
+  background-size: 250px 1200px;
+}
+i.emoji-md.lg.g0,
+i.emoji-lg.g0 {
+  background-image: url('/img/emoji/60/emoji0.png?9');
+}
+i.emoji-lg.g0 {
+  background-size: 310px 1488px;
+}
+i.emoji-md.g1 {
+  background-image: url('/img/emoji/48/emoji1.png?9');
+  background-size: 250px 550px;
+}
+i.emoji-md.lg.g1,
+i.emoji-lg.g1 {
+  background-image: url('/img/emoji/60/emoji1.png?9');
+}
+i.emoji-lg.g1 {
+  background-size: 310px 682px;
+}
+i.emoji-md.g2 {
+  background-image: url('/img/emoji/48/emoji2.png?9');
+  background-size: 250px 325px;
+}
+i.emoji-md.lg.g2,
+i.emoji-lg.g2 {
+  background-image: url('/img/emoji/60/emoji2.png?9');
+}
+i.emoji-lg.g2 {
+  background-size: 310px 403px;
+}
+i.emoji-md.g3 {
+  background-image: url('/img/emoji/48/emoji3.png?9');
+  background-size: 250px 300px;
+}
+i.emoji-md.lg.g3,
+i.emoji-lg.g3 {
+  background-image: url('/img/emoji/60/emoji3.png?9');
+}
+i.emoji-lg.g3 {
+  background-size: 310px 372px;
+}
+i.emoji-md.g4 {
+  background-image: url('/img/emoji/48/emoji4.png?9');
+  background-size: 250px 350px;
+}
+i.emoji-md.lg.g4,
+i.emoji-lg.g4 {
+  background-image: url('/img/emoji/60/emoji4.png?9');
+}
+i.emoji-lg.g4 {
+  background-size: 310px 434px;
+}
+i.emoji-md.g5 {
+  background-image: url('/img/emoji/48/emoji5.png?9');
+  background-size: 250px 575px;
+}
+i.emoji-md.lg.g5,
+i.emoji-lg.g5 {
+  background-image: url('/img/emoji/60/emoji5.png?9');
+}
+i.emoji-lg.g5 {
+  background-size: 310px 713px;
+}
+i.emoji-md.g6 {
+  background-image: url('/img/emoji/48/emoji6.png?9');
+  background-size: 250px 775px;
+}
+i.emoji-md.lg.g6,
+i.emoji-lg.g6 {
+  background-image: url('/img/emoji/60/emoji6.png?9');
+}
+i.emoji-lg.g6 {
+  background-size: 310px 961px;
+}
+i.emoji-md.g7 {
+  background-image: url('/img/emoji/48/emoji7.png?9');
+  background-size: 250px 650px;
+}
+i.emoji-md.lg.g7,
+i.emoji-lg.g7 {
+  background-image: url('/img/emoji/60/emoji7.png?9');
+}
+i.emoji-lg.g7 {
+  background-size: 310px 806px;
 }
 
 @starting-style {

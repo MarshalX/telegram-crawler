@@ -314,7 +314,6 @@ var Main = {
     Aj.viewTransition = true;
     window.basePath = '/stickers'
 
-    $('form').on('submit', e => e.preventDefault());
     setBackButton(Aj.state.backButton);
     Aj.state.files = Aj.state.files || {};
 
@@ -409,6 +408,8 @@ var Main = {
 
     window._localCache = {};
 
+    $(document).on('submit', 'form', e => e.preventDefault());
+
     $(document).on('click', '.tm-bot-anchor', () => {
       WebApp.HapticFeedback.impactOccurred('soft');
     });
@@ -442,6 +443,10 @@ var Main = {
 
     $(document).on('sortstop', () => {
       window._sortInProgress = false;
+    });
+
+    $(document).on('click', '.js-form-clear', function () {
+      $('input', this.closest('.tm-field')).val('').trigger('input');
     });
   },
   scrollToEl(elem, offset = 0, smooth = false) {
@@ -849,7 +854,16 @@ var EditPack = {
       Aj.state.$activeInput = $(this);
     }).on('blur', function () {
       Aj.state.$emojiPanel.addClass('hidden');
+      var curValue = Aj.state.$activeInput.val();
+      var search = curValue.match(/(\w*?)$/);
+      curValue = curValue.replace(search[1] || '', '');
+      Aj.state.$activeInput.val(curValue);
+
       $('.js-toggle-panel.active').removeClass('active');
+      EditPack.updatePanelSearch('');
+    }).on('input', function () {
+      var search = this.value.match(/\w/g)?.join('');
+      EditPack.updatePanelSearch(search);
     });
 
     $(document).on('click.curPage', '.js-toggle-panel', function () {
@@ -865,7 +879,13 @@ var EditPack = {
     EditPack.initEmojiList();
     Aj.state.$emojiPanel = $(EditPack.initEmojiPanel()).on('click', '.emoji-btn', function (event) {
       event.preventDefault();
-      document.execCommand('insertText', false, $(this).text());
+      var emoji = $(this).text();
+      var curValue = Aj.state.$activeInput.val();
+      var search = curValue.match(/(\w*?)$/);
+      curValue = curValue.replace(search[1] || '', '');
+      curValue += emoji;
+      curValue += search[1] || '';
+      Aj.state.$activeInput.val(curValue);
       Aj.state.$activeInput.focus();
     }).on('pointerdown', function (e) {
       e.preventDefault();
@@ -875,6 +895,36 @@ var EditPack = {
 
     $('.js-open-sticker-picker').on('click', StickerPicker.open);
     $(document).on('sticker-picker-input.curPage', EditPack.eStickerPickerInput);
+
+    StickerPicker.loadKeywords();
+  },
+  updatePanelSearch(query) {
+    var emojis = {};
+    Object.entries(Aj.state.emojiKeywords || {}).forEach(entry => {
+      if (!query) return;
+      if (fuzzyMatch(query, entry[0])) {
+        entry[1].split("\u0001").forEach(em => {
+          emojis[em] = true;
+        })
+      }
+    });
+
+    var index = 0;
+    var groups = $('.emoji-group-wrap').toArray();
+    var processChunk = function () {
+      el = groups[index++];
+      var match_some = false;
+      $('.emoji-btn', el).each(function () {
+        var match = !query || emojis[this.dataset.emoji];
+        this.classList.toggle('hidden', !match);
+        match_some = match_some || match;
+      });
+      el.classList.toggle('hidden', !match_some);
+      if (index < groups.length) {
+        requestAnimationFrame(processChunk);
+      };
+    };
+    processChunk();
   },
   eDeleteSticker() {
     var activeSticker = document.activeElement.closest('.js-sticker-row');
@@ -922,7 +972,7 @@ var EditPack = {
       html += '<h4 class="emoji-group-header">' + group.t + '</h4>';
       html += '<div class="emoji-group">';
       for (var i = 0; i < emojis.length; i++) {
-        html += '<div class="emoji-btn">' + EditPack.emojiHtml(emojis[i], true) + '</div>';
+        html += '<div class="emoji-btn" data-emoji="' + emojis[i] + '">' + EditPack.emojiHtml(emojis[i], true) + '</div>';
       }
       for (i = 0; i < 30; i++) {
         html += '<div class="emoji-btn-hidden"></div>';
@@ -1332,7 +1382,15 @@ var StickerPicker = {
 
     $('.tm-search-input').on('input', StickerPicker.eSearchInput);
 
+    $('.tm-sticker-picker').on('scroll', StickerPicker.eScroll);
+    StickerPicker.eScroll.bind($('.tm-sticker-picker')[0])();
+
     StickerPicker.loadKeywords();
+  },
+  eScroll() {
+    if (this.scrollTop + 20 > (this.scrollHeight - this.offsetHeight)) {
+      $('.tm-sticker-picker-pack.hidden', this).slice(0, 2).toggleClass('hidden');
+    }
   },
   deinit() {
     Aj.state.pickerDestroy && Aj.state.pickerDestroy();
@@ -1342,7 +1400,7 @@ var StickerPicker = {
       return;
     }
     Aj.state.stickerPickerInited = true;
-    $(document).on('click', '.js-sticker-picker-item', StickerPicker.eClickItem);
+    $(document).on('click.curPage', '.js-sticker-picker-item', StickerPicker.eClickItem);
   },
   loadKeywords() {
     var cacheKey = 'emojiKeywords';
@@ -1358,15 +1416,15 @@ var StickerPicker = {
     });
   },
   open() {
-    var openHtml = (html) => {
-      var $popup = $(html).on('popup:close', StickerPicker.deinit);
+    var openEl = (html) => {
+      var $popup = html.clone().on('popup:close', StickerPicker.deinit);
       openPopup($popup);
       StickerPicker.init();
     }
     var cacheKey = Aj.state.isEmojis ? 'stickerPickerHtmlEmoji' : 'stickerPickerHtml';
     var cached = window._localCache[cacheKey];
     if (cached) {
-      openHtml(cached);
+      openEl(cached);
     } else {
       if (Aj.state._stickerPickerLoading) {
         return;
@@ -1379,13 +1437,21 @@ var StickerPicker = {
           Aj.state._stickerPickerLoading = false;
           Main.showErrorToast(res.error);
         }
-        window._localCache[cacheKey] = res.html;
-        openHtml(res.html);
+        window._localCache[cacheKey] = $(res.html);
+        openEl(window._localCache[cacheKey]);
       });
     }
   },
   eSearchInput() {
     var val = this.value.trim();
+    var cacheKey = Aj.state.isEmojis ? 'stickerPickerHtmlEmoji' : 'stickerPickerHtml';
+    var cached = window._localCache[cacheKey].children('.js-sticker-picker-items');
+
+    if (!val) {
+      var $newEl = cached.clone();
+      $('.tm-sticker-picker .js-sticker-picker-items').replaceWith($newEl);
+      return;
+    }
 
     var emojis = [];
     Object.entries(Aj.state.emojiKeywords || {}).forEach(entry => {
@@ -1393,23 +1459,44 @@ var StickerPicker = {
         emojis.push(...entry[1].split("\u0001"));
       }
     });
-    console.log(emojis);
+
+    var $items = cached;
+    var $newEl = $('<div class="js-sticker-picker-items"><div class="tm-section tm-sticker-picker-pack"><div class="tm-sticker-picker-grid"></div></div></div>');
+    var $grid = $('.tm-sticker-picker-grid', $newEl);
 
     var match_some_packs = false;
-    $('.tm-sticker-picker .tm-sticker-picker-pack').each(function () {
-      var doc = $('.tm-section-header', this).text();
-      var match_pack = fuzzyMatch(val, doc);
+    var matched = 0;
+    $items.find('.tm-sticker-picker-pack').each(function () {
+      if (matched >= 80 && val) {
+        return;
+      }
+      $packEl = $(this).clone();
+      var $header = $('.tm-section-header', this);
+      var title = $header.text();
+      var match_pack = fuzzyMatch(val, title);
       var match_some = false;
-      $('.js-sticker-picker-item', this).each(function () {
-        var stickerEmojis = $(this).data('emoji');
+      $('.js-sticker-picker-item', $packEl).each(function () {
+        if (matched >= 80 && val) {
+          return;
+        }
+        var stickerEmojis = this.dataset.emoji;
         var match = match_pack || emojis.some(emoji => stickerEmojis.includes(emoji));
-        $(this).toggleClass('hidden', !match);
+        if (match) {
+          $sticker = $(this).clone();
+          $grid.append($sticker);
+          var stickerRaw = $(this).data('raw');
+          var isSelected = Aj.state.stickerPickerSelected[stickerRaw];
+          if (isSelected) {
+            $sticker.addClass('active')
+          }
+          // $('img', $sticker).attr('loading', 'eager');
+          matched++;          
+        }
         match_some = match_some || match;
       });
-      match_pack = match_pack || match_some;
-      $(this).toggleClass('hidden', !match_pack);
-      match_some_packs = match_some_packs || match_pack;
+      match_some_packs = match_some_packs || match_pack || match_some;
     });
+    $('.tm-sticker-picker .js-sticker-picker-items').replaceWith($newEl);
   },
   eMainClick() {
     var detail = Object.values(Aj.state.stickerPickerSelected);
@@ -1421,10 +1508,11 @@ var StickerPicker = {
   eClickItem() {
     var stickerRaw = $(this).data('raw');
     var docId = $(this).data('doc');
+    var thumb = $(this).data('thumb');
     var newState = !Aj.state.stickerPickerSelected[stickerRaw];
     if (newState) {
       Aj.state.stickerPickerSelected[stickerRaw] = {
-        thumb: $('img', this).attr('src'),
+        thumb: thumb,
         stickerRaw: stickerRaw,
         docId: docId,
         emoji: $(this).data('emoji'),
@@ -1617,23 +1705,19 @@ function processImage(file, callback, target='game_pic') {
         canvas.height = 512;
       }
 
-      const srcAspect = img.width / img.height;
-      let dstAspect = canvas.width / canvas.height;
-
-      let sx, sy, sw, sh;
-      if (srcAspect > dstAspect) {
-        sh = img.height;
-        sw = sh * dstAspect;
-        sx = (img.width - sw) / 2;
-        sy = 0;
-      } else {
-        sw = img.width;
-        sh = sw / dstAspect;
-        sx = 0;
-        sy = (img.height - sh) / 2;
+      if (img.width == canvas.width && img.height == canvas.height) {
+        callback(file);
+        return;
       }
 
-      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+      var hRatio = canvas.width / img.width;
+      var vRatio = canvas.height / img.height;
+      var ratio  = Math.min ( hRatio, vRatio );
+
+     var dx = ( canvas.width - img.width*ratio ) / 2;
+     var dy = ( canvas.height - img.height*ratio ) / 2;  
+     ctx.clearRect(0,0,canvas.width, canvas.height);
+     ctx.drawImage(img, 0,0, img.width, img.height, dx, dy, img.width*ratio, img.height*ratio);  
 
       canvas.toBlob(function(blob) {
         file = new File([blob], file.name + '.webp', { type: 'image/webp' });
