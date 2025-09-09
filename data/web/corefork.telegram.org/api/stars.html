@@ -185,7 +185,18 @@ Bot owners can then <a href="#withdrawing-stars">withdraw Stars as Toncoin »</
 <p>To use Stars for ads, go to your bot's or channels' Balance or Monetization section and tap '<em>Buy Ads</em>'.<br>
 Clicking on the button should invoke <a href="/method/payments.getStarsRevenueAdsAccountUrl">payments.getStarsRevenueAdsAccountUrl</a> (passing the bot/channel in <code>peer</code>).<br>
 The returned <code>url</code> will lead to a page where the user will be able to place ads for the channel/bot passed in <code>peer</code>.  </p>
-<p><a href="#balance-and-transaction-history">Transactions</a> for ad payments will be of type <a href="/constructor/starsTransactionPeerAds">starsTransactionPeerAds</a>.</p></div>
+<p><a href="#balance-and-transaction-history">Transactions</a> for ad payments will be of type <a href="/constructor/starsTransactionPeerAds">starsTransactionPeerAds</a>.  </p>
+<h3><a class="anchor" href="#transferring-stars-from-a-business-account-to-the-business-bot" id="transferring-stars-from-a-business-account-to-the-business-bot" name="transferring-stars-from-a-business-account-to-the-business-bot"><i class="anchor-icon"></i></a>Transferring stars from a business account to the business bot</h3>
+<pre><code><a href='/constructor/inputInvoiceBusinessBotTransferStars'>inputInvoiceBusinessBotTransferStars</a>#f4997e42 bot:<a href='/type/InputUser'>InputUser</a> stars:<a href='/type/long'>long</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+
+<a href='/constructor/payments.starsStatus'>payments.starsStatus</a>#6c9ce8ed flags:<a href='/type/%23'>#</a> balance:<a href='/type/StarsAmount'>StarsAmount</a> subscriptions:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StarsSubscription'>StarsSubscription</a>&gt; subscriptions_next_offset:flags.2?<a href='/type/string'>string</a> subscriptions_missing_balance:flags.4?<a href='/type/long'>long</a> history:flags.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StarsTransaction'>StarsTransaction</a>&gt; next_offset:flags.0?<a href='/type/string'>string</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.StarsStatus'>payments.StarsStatus</a>;
+
+---functions---
+
+<a href='/method/payments.getStarsStatus'>payments.getStarsStatus</a>#4ea9b3bf flags:<a href='/type/%23'>#</a> ton:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/payments.StarsStatus'>payments.StarsStatus</a>;</code></pre>
+<p><a href="/constructor/inputInvoiceBusinessBotTransferStars">inputInvoiceBusinessBotTransferStars</a> may be used to transfer stars from the balance of a user account <a href="#connected-bots">connected to a business bot</a>, to the balance of the business bot.  </p>
+<p>The number of available stars on the user's balance may be fetched by invoking <a href="/method/payments.getStarsStatus">payments.getStarsStatus</a> with peer=<a href="/constructor/inputPeerSelf">inputPeerSelf</a> over the business connection.  </p>
+<p>To transfer the stars, invoke <a href="/method/payments.getPaymentForm">payments.getPaymentForm</a> with <a href="/constructor/inputInvoiceBusinessBotTransferStars">inputInvoiceBusinessBotTransferStars</a> (with <code>bot</code>=<a href="/constructor/inputPeerSelf">inputPeerSelf</a>), and follow the usual <a href="/api/payments#22-getting-invoice-info-about-the-product">payment flow »</a>, <strong>with all method calls executed over the business connection</strong>.</p></div>
   
 </div>
           
