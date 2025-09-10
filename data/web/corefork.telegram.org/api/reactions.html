@@ -109,6 +109,8 @@ Use <a href="/method/messages.readReactions">messages.readReactions</a> to mark 
 
 <a href='/constructor/messageReactor'>messageReactor</a>#4ba3a95a flags:<a href='/type/%23'>#</a> top:flags.0?<a href='/constructor/true'>true</a> my:flags.1?<a href='/constructor/true'>true</a> anonymous:flags.2?<a href='/constructor/true'>true</a> peer_id:flags.3?<a href='/type/Peer'>Peer</a> count:<a href='/type/int'>int</a> = <a href='/type/MessageReactor'>MessageReactor</a>;
 
+<a href='/constructor/channels.sendAsPeers'>channels.sendAsPeers</a>#f496b0c6 peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SendAsPeer'>SendAsPeer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/channels.SendAsPeers'>channels.SendAsPeers</a>;
+
 ---functions---
 
 <a href='/method/messages.getPaidReactionPrivacy'>messages.getPaidReactionPrivacy</a>#472455aa = <a href='/type/Updates'>Updates</a>;
@@ -117,11 +119,11 @@ Use <a href="/method/messages.readReactions">messages.readReactions</a> to mark 
 
 <a href='/method/messages.togglePaidReactionPrivacy'>messages.togglePaidReactionPrivacy</a>#435885b5 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> private:<a href='/type/PaidReactionPrivacy'>PaidReactionPrivacy</a> = <a href='/type/Bool'>Bool</a>;
 
-<a href='/method/messages.getMessagesReactions'>messages.getMessagesReactions</a>#8bba90e6 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
-<p>Each post with star reactions has a leaderboard with the top senders, but users can opt out of appearing there if they prefer more privacy.<br>
-If the user explicitly chose to make their paid reaction(s) private, pass <a href="/constructor/boolTrue">boolTrue</a> to <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code>.<br>
-If the user explicitly chose to make their paid reaction(s) private, pass <a href="/constructor/boolTrue">boolFalse</a> to <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code>.<br>
-If the user did not make any explicit choice about the privacy of their paid reaction(s) (i.e. when reacting by clicking on an existing star reaction on a message), do not populate the <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code> flag: this will use the default reaction privacy, stored on the server and synced to clients using <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> (see below for more info).  </p>
+<a href='/method/messages.getMessagesReactions'>messages.getMessagesReactions</a>#8bba90e6 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/channels.getSendAs'>channels.getSendAs</a>#e785a43f flags:<a href='/type/%23'>#</a> for_paid_reactions:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/channels.SendAsPeers'>channels.SendAsPeers</a>;</code></pre>
+<p>Each post with star reactions has a leaderboard with the top senders, but users can opt out of appearing there if they prefer more privacy, by specifying the appropriate <a href="/type/PaidReactionPrivacy">PaidReactionPrivacy</a> object; not populating it will use the default reaction privacy, stored on the server and synced to clients using <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> (see below for more info).  </p>
+<p>A reaction can also be sent on behalf of a channel we own; invoke <a href="/method/channels.getSendAs">channels.getSendAs</a> with the <code>for_paid_reactions</code> flag to obtain the list of channels that can be used to send reactions.  </p>
 <p>To change the privacy of already sent paid reactions, invoke <a href="/method/messages.togglePaidReactionPrivacy">messages.togglePaidReactionPrivacy</a>, passing the ID of the message, the channel and the desired privacy setting.  </p>
 <p>Explicitly specifying a custom reaction privacy, or changing the reaction privacy of already sent reactions will update the default reaction privacy stored on the server: if the new value is different from the old one, an <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> update will be emitted.<br>
 Clients should invoke <a href="/method/messages.getPaidReactionPrivacy">messages.getPaidReactionPrivacy</a> on startup to fetch the current default reaction privacy (because the <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> update is only sent to currently online sessions and cannot be fetched using getDifference on client startup).  </p>

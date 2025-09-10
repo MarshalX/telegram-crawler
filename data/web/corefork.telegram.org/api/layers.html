@@ -926,6 +926,12 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <a href="/method/phone.declineConferenceCallInvite">phone.declineConferenceCallInvite</a>#3c479971 msg_id:<a href="/type/int">int</a> = <a href="/type/Updates">Updates</a>;
 <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a>#ee9f88a6 call:<a href="/type/InputGroupCall">InputGroupCall</a> sub_chain_id:<a href="/type/int">int</a> offset:<a href="/type/int">int</a> limit:<a href="/type/int">int</a> = <a href="/type/Updates">Updates</a>;<br></code></pre></div>
 <h3><a class="anchor" href="#layer-200" id="layer-200" name="layer-200"><i class="anchor-icon"></i></a><a href="/schema?layer=200">Layer 200</a></h3>
+<p>This layer introduces:</p>
+<ul>
+<li><a href="/api/paid-messages">Paid messages »</a></li>
+<li><a href="/api/gifts#pinning-a-received-gift">Pinning a specific received gift to the profile »</a></li>
+<li><a href="/api/reactions#paid-reaction-privacy">Sending paid reactions as a channel »</a></li>
+</ul>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
@@ -934,7 +940,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added <a href="/method/account.getPaidMessagesRevenue">account.getPaidMessagesRevenue</a> - Get the number of stars we have received from the specified user thanks to <a href="/api/paid-messages">paid messages »</a>; the received amount will be equal to the sent amount multiplied by <a href="/api/config#stars-paid-message-commission-permille">stars_paid_message_commission_permille</a> divided by 1000.</li>
 <li>Added <a href="/method/channels.updatePaidMessagesPrice">channels.updatePaidMessagesPrice</a> - Enable or disable <a href="/api/paid-messages">paid messages »</a> in this <a href="/api/channel">supergroup</a> or <a href="/api/forum#monoforums">monoforum</a>.</li>
 <li>Added <a href="/method/users.getRequirementsToContact">users.getRequirementsToContact</a> - Check whether we can write to the specified users, used to implement bulk checks for <a href="/api/privacy#require-premium-for-new-non-contact-users">Premium-only messages »</a> and <a href="/api/paid-messages">paid messages »</a>.</li>
-<li>Added <a href="/method/payments.toggleStarGiftsPinnedToTop">payments.toggleStarGiftsPinnedToTop</a> - </li>
+<li>Added <a href="/method/payments.toggleStarGiftsPinnedToTop">payments.toggleStarGiftsPinnedToTop</a> - Pins a received gift on top of the profile of the user or owned channels by using <a href="/method/payments.toggleStarGiftsPinnedToTop">payments.toggleStarGiftsPinnedToTop</a>.</li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
@@ -953,9 +959,9 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/paidReactionPrivacyDefault">paidReactionPrivacyDefault</a> - </li>
-<li>Added <a href="/constructor/paidReactionPrivacyAnonymous">paidReactionPrivacyAnonymous</a> - </li>
-<li>Added <a href="/constructor/paidReactionPrivacyPeer">paidReactionPrivacyPeer</a> - </li>
+<li>Added <a href="/constructor/paidReactionPrivacyDefault">paidReactionPrivacyDefault</a> - Uses the default reaction privacy, set using <a href="/method/messages.togglePaidReactionPrivacy">messages.togglePaidReactionPrivacy</a>.</li>
+<li>Added <a href="/constructor/paidReactionPrivacyAnonymous">paidReactionPrivacyAnonymous</a> - Send paid reactions anonymously.</li>
+<li>Added <a href="/constructor/paidReactionPrivacyPeer">paidReactionPrivacyPeer</a> - Send paid reactions as the specified peer, fetched using <a href="/method/channels.getSendAs">channels.getSendAs</a>.</li>
 <li>Added <a href="/constructor/inputPrivacyKeyNoPaidMessages">inputPrivacyKeyNoPaidMessages</a> - Who can send you messages without paying, if <a href="/api/paid-messages">paid messages »</a> are enabled.</li>
 <li>Added <a href="/constructor/privacyKeyNoPaidMessages">privacyKeyNoPaidMessages</a> - Who can send you messages without paying, if <a href="/api/paid-messages">paid messages »</a> are enabled.</li>
 <li>Added <a href="/constructor/account.paidMessagesRevenue">account.paidMessagesRevenue</a> - Total number of non-refunded <a href="/api/stars">Telegram Stars</a> a user has spent on sending us messages either directly or through a channel, see <a href="/api/paid-messages">here »</a> for more info on paid messages.</li>
