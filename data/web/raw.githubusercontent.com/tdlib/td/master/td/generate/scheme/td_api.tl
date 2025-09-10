@@ -1204,6 +1204,9 @@ upgradedGiftOriginTransfer = UpgradedGiftOrigin;
 //@description The gift was bought from another user @price Price paid by the sender for the gift
 upgradedGiftOriginResale price:GiftResalePrice = UpgradedGiftOrigin;
 
+//@description The sender or receiver of the message has paid for upgraid of the gift, which has been completed
+upgradedGiftOriginPrepaidUpgrade = UpgradedGiftOrigin;
+
 
 //@description Describes a model of an upgraded gift
 //@name Name of the model
@@ -1255,6 +1258,7 @@ gift id:int64 publisher_chat_id:int53 sticker:sticker star_count:int53 default_s
 
 //@description Describes an upgraded gift that can be transferred to another owner or transferred to the TON blockchain as an NFT
 //@id Unique identifier of the gift
+//@regular_gift_id Unique identifier of the regular gift from which the gift was upgraded; may be 0 for short period of time for old gifts from database
 //@publisher_chat_id Identifier of the chat that published the gift; 0 if none
 //@title The title of the upgraded gift
 //@name Unique name of the upgraded gift that can be used with internalLinkTypeUpgradedGift or sendResoldGift
@@ -1271,7 +1275,26 @@ gift id:int64 publisher_chat_id:int53 sticker:sticker star_count:int53 default_s
 //@backdrop Backdrop of the upgraded gift
 //@original_details Information about the originally sent gift; may be null if unknown
 //@resale_parameters Resale parameters of the gift; may be null if resale isn't possible
-upgradedGift id:int64 publisher_chat_id:int53 title:string name:string number:int32 total_upgraded_count:int32 max_upgraded_count:int32 is_premium:Bool owner_id:MessageSender owner_address:string owner_name:string gift_address:string model:upgradedGiftModel symbol:upgradedGiftSymbol backdrop:upgradedGiftBackdrop original_details:upgradedGiftOriginalDetails resale_parameters:giftResaleParameters = UpgradedGift;
+//@value_currency ISO 4217 currency code of the currency in which value of the gift is represented; may be empty if unavailable
+//@value_amount Estimated value of the gift; in the smallest units of the currency; 0 if unavailable
+upgradedGift id:int64 regular_gift_id:int64 publisher_chat_id:int53 title:string name:string number:int32 total_upgraded_count:int32 max_upgraded_count:int32 is_premium:Bool owner_id:MessageSender owner_address:string owner_name:string gift_address:string model:upgradedGiftModel symbol:upgradedGiftSymbol backdrop:upgradedGiftBackdrop original_details:upgradedGiftOriginalDetails resale_parameters:giftResaleParameters value_currency:string value_amount:int53 = UpgradedGift;
+
+//@description Contains information about value of an upgraded gift
+//@currency ISO 4217 currency code of the currency in which the prices are represented
+//@value Estimated value of the gift; in the smallest units of the currency
+//@is_value_average True, if the value is calculated as average value of similar sold gifts. Otherwise, it is based on the sale price of the gift
+//@initial_sale_date Point in time (Unix timestamp) when the corresponding regular gift was originally purchased
+//@initial_sale_star_count Amount of Telegram Stars that were paid for the gift
+//@initial_sale_price Initial price of the gift; in the smallest units of the currency
+//@last_sale_date Point in time (Unix timestamp) when the upgraded gift was purchased last time; 0 if never
+//@last_sale_price Last purchase price of the gift; in the smallest units of the currency; 0 if the gift has never been resold
+//@is_last_sale_on_fragment True, if the last sale was completed on Fragment
+//@minimum_price The current minimum price of gifts upgraded from the same gift; in the smallest units of the currency; 0 if there are no such gifts
+//@average_sale_price The average sale price in the last month of gifts upgraded from the same gift; in the smallest units of the currency; 0 if there were no such sales
+//@telegram_listed_gift_count Number of gifts upgraded from the same gift being resold on Telegram
+//@fragment_listed_gift_count Number of gifts upgraded from the same gift being resold on Fragment
+//@fragment_url The HTTPS link to the Fragment for the gift; may be empty if there are no such gifts being sold on Fragment
+upgradedGiftValueInfo currency:string value:int53 is_value_average:Bool initial_sale_date:int32 initial_sale_star_count:int53 initial_sale_price:int53 last_sale_date:int32 last_sale_price:int53 is_last_sale_on_fragment:Bool minimum_price:int53 average_sale_price:int53 telegram_listed_gift_count:int32 fragment_listed_gift_count:int32 fragment_url:string = UpgradedGiftValueInfo;
 
 //@description Contains result of gift upgrading
 //@gift The upgraded gift
@@ -1279,9 +1302,9 @@ upgradedGift id:int64 publisher_chat_id:int53 title:string name:string number:in
 //@is_saved True, if the gift is displayed on the user's or the channel's profile page
 //@can_be_transferred True, if the gift can be transferred to another owner
 //@transfer_star_count Number of Telegram Stars that must be paid to transfer the upgraded gift
-//@next_transfer_date Point in time (Unix timestamp) when the gift can be transferred to another owner; 0 if the gift can be transferred immediately or transfer isn't possible
-//@next_resale_date Point in time (Unix timestamp) when the gift can be resold to another user; 0 if the gift can't be resold; only for the receiver of the gift
-//@export_date Point in time (Unix timestamp) when the gift can be transferred to the TON blockchain as an NFT
+//@next_transfer_date Point in time (Unix timestamp) when the gift can be transferred to another owner; can be in the past; 0 if the gift can be transferred immediately or transfer isn't possible
+//@next_resale_date Point in time (Unix timestamp) when the gift can be resold to another user; can be in the past; 0 if the gift can't be resold; only for the receiver of the gift
+//@export_date Point in time (Unix timestamp) when the gift can be transferred to the TON blockchain as an NFT; can be in the past
 upgradeGiftResult gift:upgradedGift received_gift_id:string is_saved:Bool can_be_transferred:Bool transfer_star_count:int53 next_transfer_date:int32 next_resale_date:int32 export_date:int32 = UpgradeGiftResult;
 
 //@description Describes a gift that is available for purchase
@@ -1378,10 +1401,11 @@ sentGiftUpgraded gift:upgradedGift = SentGift;
 //@sell_star_count Number of Telegram Stars that can be claimed by the receiver instead of the regular gift; 0 if the gift can't be sold by the current user
 //@prepaid_upgrade_star_count Number of Telegram Stars that were paid by the sender for the ability to upgrade the gift
 //@transfer_star_count Number of Telegram Stars that must be paid to transfer the upgraded gift; only for the receiver of the gift
-//@next_transfer_date Point in time (Unix timestamp) when the gift can be transferred to another owner; 0 if the gift can be transferred immediately or transfer isn't possible; only for the receiver of the gift
-//@next_resale_date Point in time (Unix timestamp) when the gift can be resold to another user; 0 if the gift can't be resold; only for the receiver of the gift
-//@export_date Point in time (Unix timestamp) when the upgraded gift can be transferred to the TON blockchain as an NFT; 0 if NFT export isn't possible; only for the receiver of the gift
-receivedGift received_gift_id:string sender_id:MessageSender text:formattedText is_private:Bool is_saved:Bool is_pinned:Bool can_be_upgraded:Bool can_be_transferred:Bool was_refunded:Bool date:int32 gift:SentGift collection_ids:vector<int32> sell_star_count:int53 prepaid_upgrade_star_count:int53 transfer_star_count:int53 next_transfer_date:int32 next_resale_date:int32 export_date:int32 = ReceivedGift;
+//@next_transfer_date Point in time (Unix timestamp) when the gift can be transferred to another owner; can be in the past; 0 if the gift can be transferred immediately or transfer isn't possible; only for the receiver of the gift
+//@next_resale_date Point in time (Unix timestamp) when the gift can be resold to another user; can be in the past; 0 if the gift can't be resold; only for the receiver of the gift
+//@export_date Point in time (Unix timestamp) when the upgraded gift can be transferred to the TON blockchain as an NFT; can be in the past; 0 if NFT export isn't possible; only for the receiver of the gift
+//@prepaid_upgrade_hash If non-empty, then the user can pay for an upgrade of the gift using buyGiftUpgrade
+receivedGift received_gift_id:string sender_id:MessageSender text:formattedText is_private:Bool is_saved:Bool is_pinned:Bool can_be_upgraded:Bool can_be_transferred:Bool was_refunded:Bool date:int32 gift:SentGift collection_ids:vector<int32> sell_star_count:int53 prepaid_upgrade_star_count:int53 transfer_star_count:int53 next_transfer_date:int32 next_resale_date:int32 export_date:int32 prepaid_upgrade_hash:string = ReceivedGift;
 
 //@description Represents a list of gifts received by a user or a chat
 //@total_count The total number of received gifts
@@ -1511,6 +1535,9 @@ starTransactionTypeGiftSale user_id:int53 gift:gift = StarTransactionType;
 
 //@description The transaction is an upgrade of a gift; for regular users only @user_id Identifier of the user that initially sent the gift @gift The upgraded gift
 starTransactionTypeGiftUpgrade user_id:int53 gift:upgradedGift = StarTransactionType;
+
+//@description The transaction is a purchase of an upgrade of a gift owned by another user or channel; for regular users only @owner_id Owner of the upgraded gift @gift The gift
+starTransactionTypeGiftUpgradePurchase owner_id:MessageSender gift:gift = StarTransactionType;
 
 //@description The transaction is a purchase of an upgraded gift for some user or channel; for regular users only @user_id Identifier of the user that sold the gift @gift The gift
 starTransactionTypeUpgradedGiftPurchase user_id:int53 gift:upgradedGift = StarTransactionType;
@@ -4559,7 +4586,7 @@ messageGiveawayPrizeStars star_count:int53 transaction_id:string boosted_chat_id
 
 //@description A regular gift was received or sent by the current user, or the current user was notified about a channel gift
 //@gift The gift
-//@sender_id Sender of the gift
+//@sender_id Sender of the gift; may be null for outgoing messages about prepaid upgrade of gifts from unknown users
 //@receiver_id Receiver of the gift
 //@received_gift_id Unique identifier of the received gift for the current user; only for the receiver of the gift
 //@text Message added to the gift
@@ -4567,12 +4594,14 @@ messageGiveawayPrizeStars star_count:int53 transaction_id:string boosted_chat_id
 //@prepaid_upgrade_star_count Number of Telegram Stars that were paid by the sender for the ability to upgrade the gift
 //@is_private True, if the sender and gift text are shown only to the gift receiver; otherwise, everyone will be able to see them
 //@is_saved True, if the gift is displayed on the user's or the channel's profile page; only for the receiver of the gift
+//@is_prepaid_upgrade True, if the message is about prepaid upgrade of the gift by another user
 //@can_be_upgraded True, if the gift can be upgraded to a unique gift; only for the receiver of the gift
 //@was_converted True, if the gift was converted to Telegram Stars; only for the receiver of the gift
 //@was_upgraded True, if the gift was upgraded to a unique gift
 //@was_refunded True, if the gift was refunded and isn't available anymore
 //@upgraded_received_gift_id Identifier of the corresponding upgraded gift; may be empty if unknown. Use getReceivedGift to get information about the gift
-messageGift gift:gift sender_id:MessageSender receiver_id:MessageSender received_gift_id:string text:formattedText sell_star_count:int53 prepaid_upgrade_star_count:int53 is_private:Bool is_saved:Bool can_be_upgraded:Bool was_converted:Bool was_upgraded:Bool was_refunded:Bool upgraded_received_gift_id:string = MessageContent;
+//@prepaid_upgrade_hash If non-empty, then the user can pay for an upgrade of the gift using buyGiftUpgrade
+messageGift gift:gift sender_id:MessageSender receiver_id:MessageSender received_gift_id:string text:formattedText sell_star_count:int53 prepaid_upgrade_star_count:int53 is_private:Bool is_saved:Bool is_prepaid_upgrade:Bool can_be_upgraded:Bool was_converted:Bool was_upgraded:Bool was_refunded:Bool upgraded_received_gift_id:string prepaid_upgrade_hash:string = MessageContent;
 
 //@description An upgraded gift was received or sent by the current user, or the current user was notified about a channel gift
 //@gift The gift
@@ -4584,9 +4613,9 @@ messageGift gift:gift sender_id:MessageSender receiver_id:MessageSender received
 //@can_be_transferred True, if the gift can be transferred to another owner; only for the receiver of the gift
 //@was_transferred True, if the gift has already been transferred to another owner; only for the receiver of the gift
 //@transfer_star_count Number of Telegram Stars that must be paid to transfer the upgraded gift; only for the receiver of the gift
-//@next_transfer_date Point in time (Unix timestamp) when the gift can be transferred to another owner; 0 if the gift can be transferred immediately or transfer isn't possible; only for the receiver of the gift
-//@next_resale_date Point in time (Unix timestamp) when the gift can be resold to another user; 0 if the gift can't be resold; only for the receiver of the gift
-//@export_date Point in time (Unix timestamp) when the gift can be transferred to the TON blockchain as an NFT; 0 if NFT export isn't possible; only for the receiver of the gift
+//@next_transfer_date Point in time (Unix timestamp) when the gift can be transferred to another owner; can be in the past; 0 if the gift can be transferred immediately or transfer isn't possible; only for the receiver of the gift
+//@next_resale_date Point in time (Unix timestamp) when the gift can be resold to another user; can be in the past; 0 if the gift can't be resold; only for the receiver of the gift
+//@export_date Point in time (Unix timestamp) when the gift can be transferred to the TON blockchain as an NFT; can be in the past; 0 if NFT export isn't possible; only for the receiver of the gift
 messageUpgradedGift gift:upgradedGift sender_id:MessageSender receiver_id:MessageSender origin:UpgradedGiftOrigin received_gift_id:string is_saved:Bool can_be_transferred:Bool was_transferred:Bool transfer_star_count:int53 next_transfer_date:int32 next_resale_date:int32 export_date:int32 = MessageContent;
 
 //@description A gift which purchase, upgrade or transfer were refunded
@@ -12935,7 +12964,7 @@ getAvailableGifts = AvailableGifts;
 
 //@description Sends a gift to another user or channel chat. May return an error with a message "STARGIFT_USAGE_LIMITED" if the gift was sold out
 //@gift_id Identifier of the gift to send
-//@owner_id Identifier of the user or the channel chat that will receive the gift
+//@owner_id Identifier of the user or the channel chat that will receive the gift; limited gifts can't be sent to channel chats
 //@text Text to show along with the gift; 0-getOption("gift_text_length_max") characters. Only Bold, Italic, Underline, Strikethrough, Spoiler, and CustomEmoji entities are allowed.
 //-Must be empty if the receiver enabled paid messages
 //@is_private Pass true to show gift text and sender only to the gift receiver; otherwise, everyone will be able to see them
@@ -12972,7 +13001,13 @@ getGiftUpgradePreview gift_id:int64 = GiftUpgradePreview;
 //@star_count The amount of Telegram Stars required to pay for the upgrade. It the gift has prepaid_upgrade_star_count > 0, then pass 0, otherwise, pass gift.upgrade_star_count
 upgradeGift business_connection_id:string received_gift_id:string keep_original_details:Bool star_count:int53 = UpgradeGiftResult;
 
-//@description Sends an upgraded gift to another user or a channel chat
+//@description Pays for upgrade of a regular gift that is owned by another user or channel chat
+//@owner_id Identifier of the user or the channel chat that owns the gift
+//@prepaid_upgrade_hash Prepaid upgrade hash as received along with the gift
+//@star_count The amount of Telegram Stars the user agreed to pay for the upgrade; must be equal to gift.upgrade_star_count
+buyGiftUpgrade owner_id:MessageSender prepaid_upgrade_hash:string star_count:int53 = Ok;
+
+//@description Sends an upgraded gift to another user or channel chat
 //@business_connection_id Unique identifier of business connection on behalf of which to send the request; for bots only
 //@received_gift_id Identifier of the gift
 //@new_owner_id Identifier of the user or the channel chat that will receive the gift
@@ -12993,18 +13028,22 @@ sendResoldGift gift_name:string owner_id:MessageSender price:GiftResalePrice = G
 //@exclude_unsaved Pass true to exclude gifts that aren't saved to the chat's profile page. Always true for gifts received by other users and channel chats without can_post_messages administrator right
 //@exclude_saved Pass true to exclude gifts that are saved to the chat's profile page. Always false for gifts received by other users and channel chats without can_post_messages administrator right
 //@exclude_unlimited Pass true to exclude gifts that can be purchased unlimited number of times
-//@exclude_limited Pass true to exclude gifts that can be purchased limited number of times
+//@exclude_upgradable Pass true to exclude gifts that can be purchased limited number of times and can be upgraded
+//@exclude_non_upgradable Pass true to exclude gifts that can be purchased limited number of times and can't be upgraded
 //@exclude_upgraded Pass true to exclude upgraded gifts
 //@sort_by_price Pass true to sort results by gift price instead of send date
 //@offset Offset of the first entry to return as received from the previous request; use empty string to get the first chunk of results
 //@limit The maximum number of gifts to be returned; must be positive and can't be greater than 100. For optimal performance, the number of returned objects is chosen by TDLib and can be smaller than the specified limit
-getReceivedGifts business_connection_id:string owner_id:MessageSender collection_id:int32 exclude_unsaved:Bool exclude_saved:Bool exclude_unlimited:Bool exclude_limited:Bool exclude_upgraded:Bool sort_by_price:Bool offset:string limit:int32 = ReceivedGifts;
+getReceivedGifts business_connection_id:string owner_id:MessageSender collection_id:int32 exclude_unsaved:Bool exclude_saved:Bool exclude_unlimited:Bool exclude_upgradable:Bool exclude_non_upgradable:Bool exclude_upgraded:Bool sort_by_price:Bool offset:string limit:int32 = ReceivedGifts;
 
 //@description Returns information about a received gift @received_gift_id Identifier of the gift
 getReceivedGift received_gift_id:string = ReceivedGift;
 
 //@description Returns information about an upgraded gift by its name @name Unique name of the upgraded gift
 getUpgradedGift name:string = UpgradedGift;
+
+//@description Returns information about value of an upgraded gift by its name @name Unique name of the upgraded gift
+getUpgradedGiftValueInfo name:string = UpgradedGiftValueInfo;
 
 //@description Returns a URL for upgraded gift withdrawal in the TON blockchain as an NFT; requires owner privileges for gifts owned by a chat
 //@received_gift_id Identifier of the gift
