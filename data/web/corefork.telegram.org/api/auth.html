@@ -81,6 +81,7 @@ If any of the future auth tokens matches the account we're trying to login into 
 
 <a href='/constructor/auth.sentCode'>auth.sentCode</a>#5e002502 flags:<a href='/type/%23'>#</a> type:<a href='/type/auth.SentCodeType'>auth.SentCodeType</a> phone_code_hash:<a href='/type/string'>string</a> next_type:flags.1?<a href='/type/auth.CodeType'>auth.CodeType</a> timeout:flags.2?<a href='/type/int'>int</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
 <a href='/constructor/auth.sentCodeSuccess'>auth.sentCodeSuccess</a>#2390fe44 authorization:<a href='/type/auth.Authorization'>auth.Authorization</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
+<a href='/constructor/auth.sentCodePaymentRequired'>auth.sentCodePaymentRequired</a>#d7a2fcf9 store_product:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> support_email_address:<a href='/type/string'>string</a> support_email_subject:<a href='/type/string'>string</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
 
 ---functions---
 
@@ -158,6 +159,8 @@ The last digits of the phone number that calls are the code that must be entered
 <p>If the message takes too long (<code>timeout</code> seconds) to arrive at the phone, the <a href="/method/auth.resendCode">auth.resendCode</a> method may be invoked to resend a code of type <code>next_type</code>.
 If the same happens again, you can use <a href="/method/auth.resendCode">auth.resendCode</a> with the <code>next_type</code> returned by the previous call to <a href="/method/auth.resendCode">auth.resendCode</a>.
 To cancel the verification code use <a href="/method/auth.cancelCode">auth.cancelCode</a>.</p>
+<p>Official apps may receive an <a href="/method/auth.sentCodePaymentRequired">auth.sentCodePaymentRequired</a> instead: this constructor indicates that due to the high cost of SMS verification codes for the user's country/provider, the user must purchase a Telegram Premium subscription in order to proceed with the login/signup.  </p>
+<p>After a successful purchase of the specified store item, an <a href="/constructor/updateSentPhoneCode">updateSentPhoneCode</a> update will be emitted, containing info about the sent code.  </p>
 <h3><a class="anchor" href="#email-verification" id="email-verification" name="email-verification"><i class="anchor-icon"></i></a>Email verification</h3>
 <pre><code><a href='/constructor/auth.sentCodeTypeSetUpEmailRequired'>auth.sentCodeTypeSetUpEmailRequired</a>#a5491dea flags:<a href='/type/%23'>#</a> apple_signin_allowed:flags.0?<a href='/constructor/true'>true</a> google_signin_allowed:flags.1?<a href='/constructor/true'>true</a> = <a href='/type/auth.SentCodeType'>auth.SentCodeType</a>;
 
