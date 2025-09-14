@@ -61,6 +61,29 @@ sponsoredMessage#7dbf8673 flags:# recommended:flags.5?true can_report:flags.12?t
 <blockquote>
 <p><a href="https://t.me/durov/172">More about sponsored messages on Telegram</a></p>
 </blockquote>
+<h4><a class="anchor" href="#getting-sponsored-search-results" id="getting-sponsored-search-results" name="getting-sponsored-search-results"><i class="anchor-icon"></i></a>Getting sponsored search results</h4>
+<pre><code><a href='/constructor/contacts.found'>contacts.found</a>#b3134d9d my_results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.Found'>contacts.Found</a>;
+
+<a href='/constructor/contacts.sponsoredPeersEmpty'>contacts.sponsoredPeersEmpty</a>#ea32b4b1 = <a href='/type/contacts.SponsoredPeers'>contacts.SponsoredPeers</a>;
+<a href='/constructor/contacts.sponsoredPeers'>contacts.sponsoredPeers</a>#eb032884 peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SponsoredPeer'>SponsoredPeer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.SponsoredPeers'>contacts.SponsoredPeers</a>;
+
+<a href='/constructor/sponsoredPeer'>sponsoredPeer</a>#c69708d3 flags:<a href='/type/%23'>#</a> random_id:<a href='/type/bytes'>bytes</a> peer:<a href='/type/Peer'>Peer</a> sponsor_info:flags.0?<a href='/type/string'>string</a> additional_info:flags.1?<a href='/type/string'>string</a> = <a href='/type/SponsoredPeer'>SponsoredPeer</a>;
+
+---functions---
+
+<a href='/method/contacts.search'>contacts.search</a>#11f812d8 q:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/contacts.Found'>contacts.Found</a>;
+
+<a href='/method/contacts.getSponsoredPeers'>contacts.getSponsoredPeers</a>#b6c8c393 q:<a href='/type/string'>string</a> = <a href='/type/contacts.SponsoredPeers'>contacts.SponsoredPeers</a>;</code></pre>
+<p>Clients must also support sponsored peers, to be shown when searching for peers using the <strong>global search function</strong>, together with <a href="/method/contacts.search">contacts.search</a>.  </p>
+<p><a href="/method/contacts.getSponsoredPeers">contacts.getSponsoredPeers</a> should be invoked, returning a list of sponsored peers to be displayed after the results in <a href="/constructor/contacts.found">contacts.found</a>.<code>my_results</code> and before the results in <a href="/constructor/contacts.found">contacts.found</a>.<code>results</code>.  </p>
+<p>Sponsored peers should be treated similarly to sponsored messages: </p>
+<ul>
+<li>If the <a href="/constructor/sponsoredPeer">sponsoredPeer</a>.<code>sponsor_info</code> or <a href="/constructor/sponsoredPeer">sponsoredPeer</a>.<code>additional_info</code> flags are set, an additional "Sponsor info" label must be present, that when clicked, displays the contents of the flags.  </li>
+<li>When they scroll into view, <a href="/method/messages.viewSponsoredMessage">messages.viewSponsoredMessage</a> should be <a href="#counting-sponsored-message-views">invoked as specified here »</a>, passing the <a href="/constructor/sponsoredPeer">sponsoredPeer</a>'s <code>random_id</code> to the <code>random_id</code> parameter.</li>
+<li>Clicks should be reported by invoking <a href="/method/messages.clickSponsoredMessage">messages.clickSponsoredMessage</a>, without setting any flag, passing the <a href="/constructor/sponsoredPeer">sponsoredPeer</a>'s <code>random_id</code> to the <code>random_id</code> parameter.</li>
+<li>Sponsored search results can be reported using <a href="/method/messages.reportSponsoredMessage">messages.reportSponsoredMessage</a>, following the <a href="#reporting-sponsored-messages">usual flow »</a>, passing the <a href="/constructor/sponsoredPeer">sponsoredPeer</a>'s <code>random_id</code> to the <code>random_id</code> parameter.  </li>
+</ul>
+<p>As specified above, a <a href="/constructor/sponsoredPeer">sponsoredPeer</a>'s <code>random_id</code> <strong>can</strong> be passed to methods related to sponsored messages.  </p>
 <h4><a class="anchor" href="#displaying-sponsored-messages" id="displaying-sponsored-messages" name="displaying-sponsored-messages"><i class="anchor-icon"></i></a>Displaying sponsored messages</h4>
 <p>Sponsored messages must be displayed as follows:</p>
 <ul>
