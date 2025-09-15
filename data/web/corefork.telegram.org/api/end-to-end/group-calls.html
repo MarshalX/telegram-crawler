@@ -45,7 +45,7 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>This article describes the end-to-end encryption used for Telegram <strong>group voice and video calls</strong>, incorporating a blockchain for state management and enhanced security.</p>
-<h5><a class="anchor" name="related-articles" href="#related-articles"><i class="anchor-icon"></i></a>Related Articles</h5>
+<h5><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related Articles</h5>
 <p><div class="dev_page_nav_wrap"></p>
 <ul>
 <li><a href="/api/end-to-end">End-to-End Encryption in Secret Chats</a></li>
@@ -54,21 +54,21 @@
 </ul>
 <p></div></p>
 <hr>
-<h3><a class="anchor" name="overview" href="#overview"><i class="anchor-icon"></i></a>Overview</h3>
+<h3><a class="anchor" href="#overview" id="overview" name="overview"><i class="anchor-icon"></i></a>Overview</h3>
 <p>Telegram end-to-end encrypted group calls generally rely on 3 components to manage communication securely among multiple participants:</p>
 <ol>
-<li><strong>Blockchain:</strong> A decentralized ledger shared among all participants. It acts as the source of truth for the call&#39;s state, including participant lists, permissions, and shared encryption keys. Its hash is needed to generate verification codes.</li>
+<li><strong>Blockchain:</strong> A decentralized ledger shared among all participants. It acts as the source of truth for the call's state, including participant lists, permissions, and shared encryption keys. Its hash is needed to generate verification codes.</li>
 <li><strong>Encryption Protocol:</strong> A protocol optimized for real-time communication, encrypting audio and video data at the frame level. It includes mechanisms for packet signing to verify authorship and secure distribution of shared keys.</li>
 <li><strong>Emoji Verification Protocol:</strong> A two-phase commit-reveal scheme used to generate verification emojis based on the blockchain state combined with participant-generated randomness. This <strong>prevents manipulation by any single participant</strong>, including block creators, ensuring trustworthy visual key verification.</li>
 </ol>
 <p>This document details the technical implementation of these components.</p>
-<h3><a class="anchor" name="high-level-workflow" href="#high-level-workflow"><i class="anchor-icon"></i></a>High-Level Workflow</h3>
+<h3><a class="anchor" href="#high-level-workflow" id="high-level-workflow" name="high-level-workflow"><i class="anchor-icon"></i></a>High-Level Workflow</h3>
 <p>Below follows a high-level workflow for working with group calls. As mentioned, the blockchain underpins the core operations of joining, leaving, and maintaining a consistent state within a group call.</p>
-<h4><a class="anchor" name="joining-a-call" href="#joining-a-call"><i class="anchor-icon"></i></a>Joining a Call</h4>
+<h4><a class="anchor" href="#joining-a-call" id="joining-a-call" name="joining-a-call"><i class="anchor-icon"></i></a>Joining a Call</h4>
 <ol>
 <li><strong>Fetch State:</strong> A user wishing to join requests the latest blockchain block (representing the current call state) from the server.</li>
 <li><strong>Create Join Block:</strong> The user constructs a new block proposal. This block:<ul>
-<li>References the previous block&#39;s hash.</li>
+<li>References the previous block's hash.</li>
 <li>Includes a <code>ChangeSetGroupState</code> change adding the user to the participant list.</li>
 <li>Includes a <code>ChangeSetSharedKey</code> change establishing a new shared key, encrypted for all participants (including the joining user). The joining user <em>must</em> be listed as a participant in the group state change <em>within the same block</em> to be able to create the shared key.</li>
 </ul>
@@ -81,7 +81,7 @@
 </li>
 <li><strong>Client Update:</strong> Eventually, all participants receive the new block from the server and start using the new shared key.</li>
 </ol>
-<h4><a class="anchor" name="removing-a-participant" href="#removing-a-participant"><i class="anchor-icon"></i></a>Removing a Participant</h4>
+<h4><a class="anchor" href="#removing-a-participant" id="removing-a-participant" name="removing-a-participant"><i class="anchor-icon"></i></a>Removing a Participant</h4>
 <ol>
 <li><strong>Initiation:</strong> Any active participant with the necessary permissions (<code>remove_users</code> flag) can initiate the removal of another (e.g., inactive) participant.</li>
 <li><strong>Create Removal Block:</strong> The initiating participant creates a block proposal containing:<ul>
@@ -94,56 +94,56 @@
 <blockquote>
 <p><strong>Note:</strong> Self-removal is not supported via this mechanism, as a participant cannot create a block that removes themselves while simultaneously generating a new key for the others.</p>
 </blockquote>
-<h4><a class="anchor" name="security-considerations" href="#security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
+<h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li>Clients <strong>must</strong> only apply blocks received from the server, even those they proposed themselves. The server enforces block ordering and prevents forks.</li>
 <li>All participants must verify that they see the same verification emojis, which are derived from the blockchain state using the commit-reveal protocol detailed later.</li>
 <li>If the server were to deliver different valid blocks to different participants (a fork), their blockchain hashes, and consequently their verification emojis, would permanently diverge. The reliance on the server prevents this under normal operation.</li>
 </ul>
 <hr>
-<h3><a class="anchor" name="blockchain-state-management" href="#blockchain-state-management"><i class="anchor-icon"></i></a>Blockchain State Management</h3>
-<p>A dedicated blockchain provides a distributed, verifiable, and synchronized history of the group call&#39;s state.</p>
-<h4><a class="anchor" name="block-structure" href="#block-structure"><i class="anchor-icon"></i></a>Block Structure</h4>
+<h3><a class="anchor" href="#blockchain-state-management" id="blockchain-state-management" name="blockchain-state-management"><i class="anchor-icon"></i></a>Blockchain State Management</h3>
+<p>A dedicated blockchain provides a distributed, verifiable, and synchronized history of the group call's state.</p>
+<h4><a class="anchor" href="#block-structure" id="block-structure" name="block-structure"><i class="anchor-icon"></i></a>Block Structure</h4>
 <p>Blocks form the chain, linking sequentially to maintain history. The structure is defined as follows (based on <code>e2e_api.tl</code>):</p>
-<pre><code class="lang-tlang">e2e.chain.block flags:# signature:int512 prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;</code></pre>
+<pre><code class="language-tlang">e2e.chain.block flags:# signature:int512 prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;</code></pre>
 <p>Namely:</p>
 <ul>
-<li><code>signature</code>: A cryptographic signature verifying the block&#39;s authenticity.</li>
+<li><code>signature</code>: A cryptographic signature verifying the block's authenticity.</li>
 <li><code>prev_block_hash</code>: The SHA256 hash of the preceding block, forming the chain link.</li>
 <li><code>changes</code>: A list of state modifications applied by this block.</li>
 <li><code>height</code>: The sequential number of the block in the chain.</li>
 <li><code>state_proof</code>: Cryptographic proof (including group state hash, shared key info hash) representing the blockchain state <em>after</em> this block is applied.</li>
 <li><code>signature_public_key</code>: The public key of the participant who created and signed the block.</li>
 </ul>
-<h4><a class="anchor" name="blockchain-state" href="#blockchain-state"><i class="anchor-icon"></i></a>Blockchain State</h4>
-<pre><code class="lang-tlang">e2e.chain.stateProof flags:# kv_hash:int256 group_state:flags.0?e2e.chain.GroupState shared_key:flags.1?e2e.chain.SharedKey = e2e.chain.StateProof;</code></pre>
+<h4><a class="anchor" href="#blockchain-state" id="blockchain-state" name="blockchain-state"><i class="anchor-icon"></i></a>Blockchain State</h4>
+<pre><code class="language-tlang">e2e.chain.stateProof flags:# kv_hash:int256 group_state:flags.0?e2e.chain.GroupState shared_key:flags.1?e2e.chain.SharedKey = e2e.chain.StateProof;</code></pre>
 <p>Blockchain states consist of:</p>
 <ol>
 <li><strong>Group State</strong>: List of group participants and their permissions.</li>
 <li><strong>Shared Key</strong>: Shared group key encrypted for each group participant.</li>
 <li><strong>Key Value Storage</strong>: This is out of scope of the current document.</li>
 </ol>
-<h4><a class="anchor" name="signature-and-hash-generation" href="#signature-and-hash-generation"><i class="anchor-icon"></i></a>Signature and Hash Generation</h4>
+<h4><a class="anchor" href="#signature-and-hash-generation" id="signature-and-hash-generation" name="signature-and-hash-generation"><i class="anchor-icon"></i></a>Signature and Hash Generation</h4>
 <ul>
 <li><strong>Signature:</strong> Calculated over the TL-serialized block with the <code>signature</code> field itself zeroed out. The specific serialization format follows standard TL rules.</li>
 <li><strong>Block Hash:</strong> The SHA256 hash of the complete TL-serialized block.</li>
 </ul>
-<h4><a class="anchor" name="change-types-for-group-calls" href="#change-types-for-group-calls"><i class="anchor-icon"></i></a>Change Types for Group Calls</h4>
+<h4><a class="anchor" href="#change-types-for-group-calls" id="change-types-for-group-calls" name="change-types-for-group-calls"><i class="anchor-icon"></i></a>Change Types for Group Calls</h4>
 <p>Blocks contain changes that modify the blockchain state. The types used in group calls are:</p>
 <ol>
-<li><strong>ChangeSetGroupState</strong>: Modifies the list of participants and their permissions. This action <em>clears</em> the current shared key, requiring a subsequent <code>ChangeSetSharedKey</code> in a later block if encryption is needed.<pre><code class="lang-tlang">e2e.chain.groupParticipant user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
+<li><strong>ChangeSetGroupState</strong>: Modifies the list of participants and their permissions. This action <em>clears</em> the current shared key, requiring a subsequent <code>ChangeSetSharedKey</code> in a later block if encryption is needed.<pre><code class="language-tlang">e2e.chain.groupParticipant user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
 e2e.chain.groupState participants:vector&lt;e2e.chain.GroupParticipant&gt; = e2e.chain.GroupState;
 e2e.chain.changeSetGroupState group_state:e2e.chain.GroupState = e2e.chain.Change;</code></pre>
 </li>
-<li><strong>ChangeSetSharedKey</strong>: Establishes a new shared encryption key, encrypted individually for each listed participant.<pre><code class="lang-tlang">e2e.chain.sharedKey ek:int256 encrypted_shared_key:string dest_user_id:vector&lt;long&gt; dest_header:vector&lt;bytes&gt; = e2e.chain.SharedKey;
+<li><strong>ChangeSetSharedKey</strong>: Establishes a new shared encryption key, encrypted individually for each listed participant.<pre><code class="language-tlang">e2e.chain.sharedKey ek:int256 encrypted_shared_key:string dest_user_id:vector&lt;long&gt; dest_header:vector&lt;bytes&gt; = e2e.chain.SharedKey;
 e2e.chain.changeSetSharedKey shared_key:e2e.chain.SharedKey = e2e.chain.Change;</code></pre>
 </li>
-<li><strong>ChangeNoop</strong>: A no-operation change, potentially used for hash randomization. Must be present in the initial “zero block”.<pre><code class="lang-tlang">e2e.chain.changeNoop random:int256 = e2e.chain.Change;</code></pre>
+<li><strong>ChangeNoop</strong>: A no-operation change, potentially used for hash randomization. Must be present in the initial "zero block".<pre><code class="language-tlang">e2e.chain.changeNoop random:int256 = e2e.chain.Change;</code></pre>
 </li>
 </ol>
-<h4><a class="anchor" name="participants-and-permissions" href="#participants-and-permissions"><i class="anchor-icon"></i></a>Participants and Permissions</h4>
+<h4><a class="anchor" href="#participants-and-permissions" id="participants-and-permissions" name="participants-and-permissions"><i class="anchor-icon"></i></a>Participants and Permissions</h4>
 <p>Participants are defined by their <code>user_id</code>, <code>public_key</code>, and associated permissions within the <code>GroupState</code>:</p>
-<pre><code class="lang-tlang">e2e.chain.groupParticipant user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;</code></pre>
+<pre><code class="language-tlang">e2e.chain.groupParticipant user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;</code></pre>
 <ul>
 <li><code>add_users</code>: Permission to add new participants.</li>
 <li><code>remove_users</code>: Permission to remove existing participants.</li>
@@ -151,28 +151,28 @@ e2e.chain.changeSetSharedKey shared_key:e2e.chain.SharedKey = e2e.chain.Change;<
 <blockquote>
 <p><strong>Note:</strong> For improved user experience, any person can currently join a call with server permission, without requiring explicit confirmation from existing participants. While the blockchain supports an explicit confirmation mode, we currently use <code>external_permissions</code> in the blockchain state to allow self-addition to groups.</p>
 </blockquote>
-<h4><a class="anchor" name="block-application-process" href="#block-application-process"><i class="anchor-icon"></i></a>Block Application Process</h4>
+<h4><a class="anchor" href="#block-application-process" id="block-application-process" name="block-application-process"><i class="anchor-icon"></i></a>Block Application Process</h4>
 <p>Blocks must be applied atomically (all changes succeed or none do) and sequentially. The validation process is as follows:</p>
 <ol>
-<li><strong>Height Check:</strong> The block&#39;s <code>height</code> must be exactly <code>current_height + 1</code>. If not, the block is invalid. It is currently impossible to apply a block with height larger than <code>2^31-1</code>.</li>
-<li><strong>Previous Hash Check:</strong> The block&#39;s <code>prev_block_hash</code> must match the hash of the last applied block. If not, the block is invalid.</li>
-<li><strong>Permission Check (Initial):</strong> Determine the permissions of the block creator (identified by <code>signature_public_key</code>). Permissions are sourced from the <em>previous</em> block&#39;s state or <code>external_permissions</code> if the creator wasn&#39;t already a participant.</li>
-<li><strong>Signature Verification:</strong> Verify the block&#39;s <code>signature</code> using the creator&#39;s public key. If invalid, the block is rejected.</li>
+<li><strong>Height Check:</strong> The block's <code>height</code> must be exactly <code>current_height + 1</code>. If not, the block is invalid. It is currently impossible to apply a block with height larger than <code>2^31-1</code>.</li>
+<li><strong>Previous Hash Check:</strong> The block's <code>prev_block_hash</code> must match the hash of the last applied block. If not, the block is invalid.</li>
+<li><strong>Permission Check (Initial):</strong> Determine the permissions of the block creator (identified by <code>signature_public_key</code>). Permissions are sourced from the <em>previous</em> block's state or <code>external_permissions</code> if the creator wasn't already a participant.</li>
+<li><strong>Signature Verification:</strong> Verify the block's <code>signature</code> using the creator's public key. If invalid, the block is rejected.</li>
 <li><strong>Apply Changes Sequentially:</strong> Iterate through the <code>changes</code> vector:<ul>
 <li>Verify the creator has sufficient permissions for the specific change, using their <em>current</em> permissions (which might have been updated by a previous change <em>within the same block</em>). If permissions are insufficient, the entire block is invalid.</li>
 <li>Apply the change to the state (updating the group state or shared key info). If the change itself is malformed or invalid (e.g., invalid participant data), the entire block is invalid.</li>
 </ul>
 </li>
-<li><strong>State Proof Validation:</strong> After applying all changes, verify that the resulting state hashes (for group state, shared key state) match the information provided in the block&#39;s <code>state_proof</code>. If not, the block is invalid.</li>
+<li><strong>State Proof Validation:</strong> After applying all changes, verify that the resulting state hashes (for group state, shared key state) match the information provided in the block's <code>state_proof</code>. If not, the block is invalid.</li>
 </ol>
-<p>The blockchain starts with a conceptual “genesis” block at <code>height: -1</code> with a hash of <code>UInt256(0)</code> and effective <code>self_join_permissions</code> allowing the very first participant action.</p>
+<p>The blockchain starts with a conceptual "genesis" block at <code>height: -1</code> with a hash of <code>UInt256(0)</code> and effective <code>self_join_permissions</code> allowing the very first participant action.</p>
 <blockquote>
-<p><strong>Note:</strong> For optimization purposes, the <code>signature_public_key</code> can be omitted if it matches the first participant&#39;s key in the group state. Similarly, state proof components (<code>group_state</code>, <code>shared_key</code>) can sometimes be omitted if corresponding <code>Set*</code> changes are present in the block.</p>
+<p><strong>Note:</strong> For optimization purposes, the <code>signature_public_key</code> can be omitted if it matches the first participant's key in the group state. Similarly, state proof components (<code>group_state</code>, <code>shared_key</code>) can sometimes be omitted if corresponding <code>Set*</code> changes are present in the block.</p>
 </blockquote>
-<h4><a class="anchor" name="applying-specific-changes" href="#applying-specific-changes"><i class="anchor-icon"></i></a>Applying Specific Changes</h4>
+<h4><a class="anchor" href="#applying-specific-changes" id="applying-specific-changes" name="applying-specific-changes"><i class="anchor-icon"></i></a>Applying Specific Changes</h4>
 <ul>
 <li><strong>Participant Management (<code>ChangeSetGroupState</code>):</strong><ul>
-<li>Requires the <code>add_users</code> permission to add participants. Added users receive permissions that are a non-strict subset of the creator&#39;s permissions (with an exception allowing granting permissions to others).</li>
+<li>Requires the <code>add_users</code> permission to add participants. Added users receive permissions that are a non-strict subset of the creator's permissions (with an exception allowing granting permissions to others).</li>
 <li>Requires the <code>remove_users</code> permission to remove participants.</li>
 <li>Participant <code>user_id</code> and <code>public_key</code> must be unique.</li>
 <li>This change <em>always clears</em> the existing shared key state. A new key must be set in a subsequent block if needed.</li>
@@ -187,18 +187,18 @@ e2e.chain.changeSetSharedKey shared_key:e2e.chain.SharedKey = e2e.chain.Change;<
 </li>
 </ul>
 <blockquote>
-<p><strong>Note:</strong> Participants cannot remove themselves via <code>ChangeSetGroupState</code>, as this would require generating a new shared key for the remaining members, which they couldn&#39;t do after removal. Active participants should remove inactive ones.</p>
+<p><strong>Note:</strong> Participants cannot remove themselves via <code>ChangeSetGroupState</code>, as this would require generating a new shared key for the remaining members, which they couldn't do after removal. Active participants should remove inactive ones.</p>
 </blockquote>
-<h5><a class="anchor" name="implementation-notes" href="#implementation-notes"><i class="anchor-icon"></i></a>Implementation Notes</h5>
+<h5><a class="anchor" href="#implementation-notes" id="implementation-notes" name="implementation-notes"><i class="anchor-icon"></i></a>Implementation Notes</h5>
 <ul>
 <li><strong>Serialization:</strong> Blocks and their contents are serialized using the standard Telegram TL serialization methods before signing or hashing.</li>
 <li><strong>Concurrency:</strong> If multiple valid blocks for the same <code>height</code> are created concurrently, only the first one to be successfully applied will be appended. Subsequent blocks for that height will be rejected by participants due to the height mismatch, preventing forks and ensuring a linear history.</li>
 <li><strong>Validation:</strong> Clients <strong>must</strong> only apply blocks received from the server (even blocks they created themselves). The server performs validation and ordering to prevent forks and ensure consistency. Clients should retry sending created blocks/broadcasts until acknowledged (success or error) by the server.</li>
 </ul>
 <hr>
-<h3><a class="anchor" name="encryption-protocol" href="#encryption-protocol"><i class="anchor-icon"></i></a>Encryption Protocol</h3>
+<h3><a class="anchor" href="#encryption-protocol" id="encryption-protocol" name="encryption-protocol"><i class="anchor-icon"></i></a>Encryption Protocol</h3>
 <p>The following protocol encrypts call data (audio/video frames) and manages shared keys securely.</p>
-<h4><a class="anchor" name="core-primitives" href="#core-primitives"><i class="anchor-icon"></i></a>Core Primitives</h4>
+<h4><a class="anchor" href="#core-primitives" id="core-primitives" name="core-primitives"><i class="anchor-icon"></i></a>Core Primitives</h4>
 <p>The encryption relies on the following primitive functions, similar to MTProto 2.0. Note that <strong>KDF</strong> refers to <strong>HMAC-SHA512</strong> throughout this document.</p>
 <ul>
 <li><strong>encrypt_data(payload, secret, extra_data)</strong></li>
@@ -208,7 +208,6 @@ e2e.chain.changeSetSharedKey shared_key:e2e.chain.SharedKey = e2e.chain.Change;<
     <img src="/file/400780400121/3/4i8vpkfDb-Q.209706.png/5b7f9e14d6c811fd9c" alt="Encrypt Data" class="dev_page_image" style="max-width: 600px;">
   </a>
 </div>
-
 <blockquote>
 <p>Encrypts <code>payload</code> using a <code>secret</code>. <code>extra_data</code> will be used as part of MAC. <code>large_msg_id</code> will be used later to sign the packet.</p>
 </blockquote>
@@ -216,7 +215,7 @@ e2e.chain.changeSetSharedKey shared_key:e2e.chain.SharedKey = e2e.chain.Change;<
 padding = random_bytes(padding_size)
 padding[0] = padding_size
 padded_data = padding || payload
-large_secret = KDF(secret, &quot;tde2e_encrypt_data&quot;)
+large_secret = KDF(secret, "tde2e_encrypt_data")
 encrypt_secret = large_secret[0:32]
 hmac_secret = large_secret[32:64]
 large_msg_id = HMAC-SHA256(hmac_secret, padded_data || extra_data || len(extra_data))
@@ -232,12 +231,11 @@ Result: (msg_id || encrypted), large_msg_id</code></pre>
     <img src="/file/400780400206/1/iqlwkozJe4g.139107.png/e98f3020c133d4b503" alt="Encrypt Header" class="dev_page_image" style="max-width: 600px;">
   </a>
 </div>
-
 <blockquote>
 <p>Encrypts a 32-byte <code>header</code> using context from <code>encrypted_msg</code> and a <code>secret</code>.</p>
 </blockquote>
 <pre><code>msg_id = encrypted_msg[0:16]
-encrypt_secret = KDF(secret, &quot;tde2e_encrypt_header&quot;)[0:32]
+encrypt_secret = KDF(secret, "tde2e_encrypt_header")[0:32]
 (aes_key, aes_iv) = HMAC-SHA512(encrypt_secret, msg_id)[0:48]
 encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 <p><strong>Security:</strong></p>
@@ -245,7 +243,7 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 <li>Decryption routines <strong>must</strong> re-calculate and verify the <code>msg_id</code> before processing the decrypted payload.</li>
 <li>Replay protection is managed at the packet level using <code>seqno</code>.</li>
 </ul>
-<h4><a class="anchor" name="packet-encryption" href="#packet-encryption"><i class="anchor-icon"></i></a>Packet Encryption</h4>
+<h4><a class="anchor" href="#packet-encryption" id="packet-encryption" name="packet-encryption"><i class="anchor-icon"></i></a>Packet Encryption</h4>
 <p>Audio and video data packets are encrypted using the following process:</p>
 <ul>
 <li><strong>encrypt_packet(payload, extra_data, active_epochs, user_id, channel_id, seqno, private_key)</strong></li>
@@ -255,18 +253,19 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
     <img src="/file/400780400411/2/SNTNBubSRE4.286743.png/191c0cd208afb9921f" alt="Encrypt Packet" class="dev_page_image" style="max-width: 600px;">
   </a>
 </div>
-
 <blockquote>
 <p>Encrypts <code>payload</code> for transmission, associating it with active blockchain epochs. Epochs are essentially blocks whose shared keys are currently used for encryption.</p>
 </blockquote>
 <ol>
-<li><p><strong>Generate Header A (Epoch List):</strong></p>
+<li>
+<p><strong>Generate Header A (Epoch List):</strong></p>
 <ul>
 <li><code>epoch_id[i] = active_epochs[i].block_hash</code> (32 bytes per epoch_id)</li>
 <li><code>header_a = active_epochs.size (4 bytes) || epoch_id[0] || epoch_id[1] || ...</code></li>
 </ul>
 </li>
-<li><p><strong>Encrypt Payload with One-Time Key:</strong></p>
+<li>
+<p><strong>Encrypt Payload with One-Time Key:</strong></p>
 <ul>
 <li><code>one_time_key = random(32)</code></li>
 <li><code>packet_payload = channel_id (4 bytes) || seqno (4 bytes) || payload</code></li>
@@ -274,12 +273,14 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 <li><code>encrypted_payload, large_msg_id = encrypt_data(packet_payload, one_time_key, extra_data)</code></li>
 </ul>
 </li>
-<li><p><strong>Generate signature</strong></p>
+<li>
+<p><strong>Generate signature</strong></p>
 <ul>
 <li><code>signature = sign(magic2 || large_msg_id, private_key)</code></li>
 </ul>
 </li>
-<li><p><strong>Generate Header B (Encrypted One-Time Keys):</strong></p>
+<li>
+<p><strong>Generate Header B (Encrypted One-Time Keys):</strong></p>
 <ul>
 <li>For each <code>i</code> in <code>active_epochs</code>:<ul>
 <li><code>encrypted_key[i] = encrypt_header(one_time_key, encrypted_payload, active_epochs[i].shared_key)</code></li>
@@ -288,32 +289,37 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 <li><code>header_b = encrypted_key[0] || encrypted_key[1] || ...</code></li>
 </ul>
 </li>
-<li><p><strong>Final Packet:</strong> <code>(header_a || header_b || encrypted_payload || signature)</code></p>
+<li>
+<p><strong>Final Packet:</strong> <code>(header_a || header_b || encrypted_payload || signature)</code></p>
 </li>
 </ol>
-<p><code>magic1</code> is magic for <code>e2e.callPacket = e2e.CallPacket;</code><br><code>magic2</code> is magic for <code>e2e.callPacketLargeMsgId = e2e.CallPacketLargeMsgId;</code></p>
-<h4><a class="anchor" name="security-considerations" href="#security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
+<p><code>magic1</code> is magic for <code>e2e.callPacket = e2e.CallPacket;</code>
+<code>magic2</code> is magic for <code>e2e.callPacketLargeMsgId = e2e.CallPacketLargeMsgId;</code></p>
+<h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li><strong>Replay Protection:</strong> The <code>seqno</code> must be unique and monotonically increasing for each <code>(public key, channel_id)</code> pair. In case of overflow, the client must leave the call. Receivers must track recently received <code>seqno</code> values and discard packets with old or duplicate numbers.</li>
-<li><strong>Signature Verification:</strong> During decryption, the receiver must use the <code>user_id</code> (provided out-of-band) to look up the sender&#39;s <code>public_key</code> in the relevant blockchain state (epoch specified in <code>header_a</code>). This public key is used to verify the <code>signature</code> within the decrypted <code>signed_payload</code>.</li>
+<li><strong>Signature Verification:</strong> During decryption, the receiver must use the <code>user_id</code> (provided out-of-band) to look up the sender's <code>public_key</code> in the relevant blockchain state (epoch specified in <code>header_a</code>). This public key is used to verify the <code>signature</code> within the decrypted <code>signed_payload</code>.</li>
 <li><strong>Unique private keys:</strong> Clients <strong>must</strong> use unique private keys each time they add themselves to the blockchain. Otherwise, replay attacks could be possible.</li>
 </ul>
-<h4><a class="anchor" name="shared-key-encryption" href="#shared-key-encryption"><i class="anchor-icon"></i></a>Shared Key Encryption</h4>
+<h4><a class="anchor" href="#shared-key-encryption" id="shared-key-encryption" name="shared-key-encryption"><i class="anchor-icon"></i></a>Shared Key Encryption</h4>
 <p>When a <code>ChangeSetSharedKey</code> operation occurs in the blockchain, the new shared key material is distributed securely as follows:</p>
 <ol>
-<li><p><strong>Generate New Material:</strong></p>
+<li>
+<p><strong>Generate New Material:</strong></p>
 <ul>
 <li><code>raw_group_shared_key = random(32 bytes)</code> (The actual shared key for data encryption).</li>
 <li><code>one_time_secret = random(32 bytes)</code> (A temporary secret for encrypting the <em>group_shared_key</em>).</li>
 <li><code>e_private_key, e_public_key = generate_private_key()</code> (Key pair used to encrypt the <em>one_time_secret</em>)</li>
 </ul>
 </li>
-<li><p><strong>Encrypt the Group Shared Key:</strong></p>
+<li>
+<p><strong>Encrypt the Group Shared Key:</strong></p>
 <ul>
 <li><code>encrypted_group_shared_key = encrypt_data(group_shared_key, one_time_secret)</code></li>
 </ul>
 </li>
-<li><p><strong>Encrypt <code>one_time_secret</code> for Each Participant:</strong></p>
+<li>
+<p><strong>Encrypt <code>one_time_secret</code> for Each Participant:</strong></p>
 <ul>
 <li>For each <code>participant</code> in the current group state:<ul>
 <li><code>shared_secret = compute_shared_secret(e_private_key, participant.public_key)</code></li>
@@ -322,40 +328,45 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 </li>
 </ul>
 </li>
-<li><p><strong>Store in Blockchain:</strong> The <code>e_public_key</code>, <code>encrypted_group_shared_key</code>, and the list of <code>encrypted_header</code> (one per participant) are recorded in the blockchain state.</p>
+<li>
+<p><strong>Store in Blockchain:</strong> The <code>e_public_key</code>, <code>encrypted_group_shared_key</code>, and the list of <code>encrypted_header</code> (one per participant) are recorded in the blockchain state.</p>
 </li>
-<li><p><strong>Generate the real shared key used for packets encryption:</strong></p>
+<li>
+<p><strong>Generate the real shared key used for packets encryption:</strong></p>
 <ul>
 <li><code>block_hash</code> is the hash of the block where this shared key is set.</li>
 <li><code>group_shared_key</code> = <code>HMAC-SHA512(raw_group_shared_key, block_hash)[0:32]</code> </li>
 </ul>
 </li>
 </ol>
-<h4><a class="anchor" name="security-considerations" href="#security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
+<h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li>Decryption is not guaranteed for all participants (e.g., if a participant has an outdated app or corrupted state).</li>
 <li>However, all participants who <em>can</em> successfully decrypt the key material (by reversing the <code>encrypt_header</code> and <code>encrypt_data</code> steps using their private key and the ephemeral public key) will arrive at the identical <code>group_shared_key</code>.</li>
 <li>Participants unable to decrypt the key <strong>must</strong> exit the call immediately, and specifically must not participate in the emoji generation process.</li>
 </ul>
 <hr>
-<h3><a class="anchor" name="key-verification-and-emoji-generation" href="#key-verification-and-emoji-generation"><i class="anchor-icon"></i></a>Key Verification and Emoji Generation</h3>
+<h3><a class="anchor" href="#key-verification-and-emoji-generation" id="key-verification-and-emoji-generation" name="key-verification-and-emoji-generation"><i class="anchor-icon"></i></a>Key Verification and Emoji Generation</h3>
 <p>To ensure participants are communicating securely without a Man-in-the-Middle (MitM) attack, and to prevent manipulation of verification codes, a commit-reveal protocol is used to generate emojis based on the blockchain state and shared randomness.</p>
-<h4><a class="anchor" name="commit-reveal-protocol-workflow" href="#commit-reveal-protocol-workflow"><i class="anchor-icon"></i></a>Commit-Reveal Protocol Workflow</h4>
+<h4><a class="anchor" href="#commit-reveal-protocol-workflow" id="commit-reveal-protocol-workflow" name="commit-reveal-protocol-workflow"><i class="anchor-icon"></i></a>Commit-Reveal Protocol Workflow</h4>
 <ol>
-<li><p><strong>Initial Setup (Per Participant):</strong></p>
+<li>
+<p><strong>Initial Setup (Per Participant):</strong></p>
 <ul>
 <li>Generate a cryptographically secure random 32-byte <strong>nonce</strong>.</li>
 <li>Compute <code>nonce_hash = SHA256(nonce)</code>.</li>
 </ul>
 </li>
-<li><p><strong>Commit Phase:</strong></p>
+<li>
+<p><strong>Commit Phase:</strong></p>
 <ul>
 <li>Each participant broadcasts their <code>nonce_hash</code> with a signature.</li>
 <li>Use the <code>e2e.chain.groupBroadcastNonceCommit</code> structure.</li>
 <li>The system (coordinated via the server) waits until commits have been received from <em>all</em> expected participants (based on the blockchain state at the specified height).</li>
 </ul>
 </li>
-<li><p><strong>Reveal Phase:</strong></p>
+<li>
+<p><strong>Reveal Phase:</strong></p>
 <ul>
 <li>Once all commits are collected, each participant broadcasts their original <code>nonce</code>, again with a signature.</li>
 <li>Use the <code>e2e.chain.groupBroadcastNonceReveal</code> structure.</li>
@@ -363,7 +374,8 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 <li>The system waits until all valid nonces have been revealed.</li>
 </ul>
 </li>
-<li><p><strong>Final Hash Generation:</strong></p>
+<li>
+<p><strong>Final Hash Generation:</strong></p>
 <ul>
 <li>Concatenate all successfully revealed nonces sorted in lexicographic order. Let this be <code>concatenated_sorted_nonces</code>.</li>
 <li>Obtain the <code>blockchain_hash</code> (the hash of the latest block for which verification is being performed).</li>
@@ -372,21 +384,21 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 </ul>
 </li>
 </ol>
-<h4><a class="anchor" name="tl-schema-for-broadcasts" href="#tl-schema-for-broadcasts"><i class="anchor-icon"></i></a>TL Schema for Broadcasts</h4>
-<pre><code class="lang-tlang">// Phase 1: Commit
+<h4><a class="anchor" href="#tl-schema-for-broadcasts" id="tl-schema-for-broadcasts" name="tl-schema-for-broadcasts"><i class="anchor-icon"></i></a>TL Schema for Broadcasts</h4>
+<pre><code class="language-tlang">// Phase 1: Commit
 e2e.chain.groupBroadcastNonceCommit signature:int512 public_key:int256 chain_height:int32 chain_hash:int256 nonce_hash:int256 = e2e.chain.GroupBroadcast;
 
 // Phase 2: Reveal
 e2e.chain.groupBroadcastNonceReveal signature:int512 public_key:int256 chain_height:int32 chain_hash:int256 nonce:int256 = e2e.chain.GroupBroadcast;</code></pre>
 <p>The <code>signature</code> in both cases covers the TL-serialized object with the signature field itself zeroed out.</p>
-<h4><a class="anchor" name="security-considerations" href="#security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
+<h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li>The final <code>emoji_hash</code> is unpredictable to any single participant <em>before</em> the reveal phase, as it depends on random nonces from all others.</li>
 <li>Participants should only process broadcast messages (commits/reveals) received from the server. Emojis should only be displayed once the process completes successfully for all participants (within reasonable network latency).</li>
-<li>The two-phase protocol prevents any participant (even one controlling block creation) from selectively revealing their nonce or trying multiple nonces to influence the final emoji outcome based on others&#39; revealed values.</li>
+<li>The two-phase protocol prevents any participant (even one controlling block creation) from selectively revealing their nonce or trying multiple nonces to influence the final emoji outcome based on others' revealed values.</li>
 </ul>
 <hr>
-<h3><a class="anchor" name="full-tl-schema" href="#full-tl-schema"><i class="anchor-icon"></i></a>Full TL Schema</h3>
+<h3><a class="anchor" href="#full-tl-schema" id="full-tl-schema" name="full-tl-schema"><i class="anchor-icon"></i></a>Full TL Schema</h3>
 <pre><code>e2e.chain.groupBroadcastNonceCommit#d1512ae7 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce_hash:int256 = e2e.chain.GroupBroadcast;
 e2e.chain.groupBroadcastNonceReveal#83f4f9d8 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce:int256 = e2e.chain.GroupBroadcast;
 
@@ -404,8 +416,7 @@ e2e.chain.stateProof flags:# kv_hash:int256 group_state:flags.0?e2e.chain.GroupS
 e2e.chain.block#639a3db6 signature:int512 flags:# prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;
 
 e2e.callPacket = e2e.CallPacket;
-e2e.callPacketLargeMsgId = e2e.CallPacketLargeMsgId;</code></pre>
-</div>
+e2e.callPacketLargeMsgId = e2e.CallPacketLargeMsgId;</code></pre></div>
   
 </div>
           
