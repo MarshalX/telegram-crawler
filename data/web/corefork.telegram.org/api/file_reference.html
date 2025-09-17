@@ -49,7 +49,7 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file_reference_generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400427/7/ySlHK8a18IM.43553.json/69954ca29ce993ffe3">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400851/3/xEuJEVoCcRM.46969.json/95d7ae3f6b43d4fbbc">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
@@ -67,7 +67,7 @@
 <p>Note that the database doesn't have to store the actual <code>file_reference</code>, only the file id =&gt; file source mapping: the file reference itself can be stored for example in the message DB, or the document DB, or in any other way that can be associated to a <code>FileId</code> upon extraction or storage as specified in the <strong>map file</strong>.  </p>
 <p>The map file itself follows a custom TL schema, and is available in JSON or serialized TL format.  </p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">Serialized TL version of map file »</a></p>
-<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">JSON map file »</a></p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">JSON map file »</a> - The constructor predicate is serialized under the <code>_</code> key, <code>bytes</code> fields are serialized as <code>{"_": "bytes", "bytes": "&lt;base64 encoded value&gt;"}</code></p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.tl">TL schema of map file »</a></p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.json">JSON version of TL schema of map file »</a></p>
 <p>This is the TL schema of the map file:</p>
@@ -143,6 +143,7 @@ vectorOp#f8fb8f72 values:Vector&lt;TypedOp&gt; = TypedOpOp;
 intLiteralOp#cbfabe7c value:int = TypedOpOp;
 longLiteralOp#d08b8d3a value:long = TypedOpOp;
 stringLiteralOp#2b56ea8e value:string = TypedOpOp;
+bytesLiteralOp#fdb395a4 value:bytes = TypedOpOp;
 boolLiteralOp#37e07911 value:Bool = TypedOpOp;
 doubleLiteralOp#3651e3bf value:double = TypedOpOp;
 themeFormatLiteralOp#8e4f9208 = TypedOpOp;
@@ -182,6 +183,7 @@ fileSourceSavedRingtones#2b25ef1b = FileSource;
 fileSourceAvailableEffects#eb8578f0 = FileSource;
 fileSourceAvailableReactions#0e432388 = FileSource;
 fileSourceUserProfilePhoto#e39ee274 user_id:long max_id:long = FileSource;
+fileSourceSavedMusic#dd1a7664 user_id:long id:long access_hash:long = FileSource;
 fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = FileSource;
 </code></pre>
 <!-- end db schema -->
@@ -222,6 +224,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>fileSourceAvailableEffects - <pre><code><a href="/method/messages.getAvailableEffects">messages.getAvailableEffects</a>(hash: 0)</code></pre></li>
 <li>fileSourceAvailableReactions - <pre><code><a href="/method/messages.getAvailableReactions">messages.getAvailableReactions</a>(hash: 0)</code></pre></li>
 <li>fileSourceUserProfilePhoto - <pre><code><a href="/method/photos.getUserPhotos">photos.getUserPhotos</a>(user_id: getInputUserByIdOp(user_id), offset: -1, max_id: copyOp(max_id), limit: 1)</code></pre></li>
+<li>fileSourceSavedMusic - <pre><code><a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>(id: getInputUserByIdOp(user_id), documents: [<a href="/constructor/inputDocument">inputDocument</a>{id: copyOp(id), access_hash: copyOp(access_hash), file_reference: base64_decode("")}])</code></pre></li>
 <li>fileSourceDocumentByHash - <pre><code><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>(sha256: copyOp(sha256), size: copyOp(size), mime_type: copyOp(mime_type))</code></pre></li>
 </ul>
 <!-- end actions -->
@@ -278,7 +281,9 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li><a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a>.bot?fallback(<a href="/constructor/inputUserSelf">inputUserSelf</a>{})), max_id: <a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a>.(return value).<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
 <li><a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a>.bot?fallback(<a href="/constructor/inputUserSelf">inputUserSelf</a>{})), max_id: <a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a>.(return value).<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
 <li><a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a>.user_id), max_id: <a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a>.(return value).<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
-<li><a href="/constructor/document">document</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromDocumentAttributesAndStore(<a href="/constructor/document">document</a>.attributes)}</code></pre></li>
+<li>(1) <a href="/constructor/document">document</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromDocumentAttributesAndStore(<a href="/constructor/document">document</a>.attributes)}</code></pre></li>
+<li>(2) <a href="/constructor/document">document</a> - <pre><code>(needs <a href="/method/users.getSavedMusic">users.getSavedMusic</a>) fileSourceSavedMusic{user_id: extractUserIdFromInputUserAndStore(<a href="/method/users.getSavedMusic">users.getSavedMusic</a>.id), id: <a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/document">document</a>.access_hash}</code></pre></li>
+<li>(3) <a href="/constructor/document">document</a> - <pre><code>(needs <a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>) fileSourceSavedMusic{user_id: extractUserIdFromInputUserAndStore(<a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>.id), id: <a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/document">document</a>.access_hash}</code></pre></li>
 <li><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a> - <pre><code>fileSourceDocumentByHash{sha256: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.sha256, size: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.size, mime_type: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.mime_type}</code></pre></li>
 </ul>
 <!-- end origins -->
@@ -286,6 +291,8 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <!-- start skipped -->
 <ul>
 <li><a href="/method/messages.getSponsoredMessages">messages.getSponsoredMessages</a> - Do not store file references from sponsored messages</li>
+<li><a href="/method/help.getAppUpdate">help.getAppUpdate</a> - Don't handle file references from ephemeral app update info</li>
+<li><a href="/method/help.getRecentMeUrls">help.getRecentMeUrls</a> - Don't handle file references from recent t.me URLs</li>
 <li><a href="/constructor/recentMeUrlChatInvite">recentMeUrlChatInvite</a> - Do not store references based on chat invite links</li>
 <li><a href="/method/messages.checkChatInvite">messages.checkChatInvite</a> - Do not store references based on chat invite links</li>
 <li><a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a> - Inline bot results are ephemeral</li>
@@ -298,6 +305,10 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li><a href="/constructor/payments.starGiftUpgradePreview">payments.starGiftUpgradePreview</a> - Contexts for star gifts are not yet implemented</li>
 <li><a href="/constructor/starGift">starGift</a> - Contexts for star gifts are not yet implemented</li>
 <li><a href="/constructor/starGiftUnique">starGiftUnique</a> - Contexts for star gifts are not yet implemented</li>
+<li><a href="/constructor/starGiftCollection">starGiftCollection</a> - Contexts for star gifts are not yet implemented</li>
+<li><a href="/constructor/payments.starGiftCollections">payments.starGiftCollections</a> - Contexts for star gifts are not yet implemented</li>
+<li><a href="/method/messages.getCustomEmojiDocuments">messages.getCustomEmojiDocuments</a> - Do not store file references in this context</li>
+<li><a href="/method/account.uploadTheme">account.uploadTheme</a> - A freshly uploaded theme file will obtain a context only once it is created via account.createTheme</li>
 </ul>
 <!-- end skipped -->
 <p>Here's a detailed description of the constructors.</p>
@@ -523,6 +534,7 @@ vectorOp#f8fb8f72 values:Vector&lt;TypedOp&gt; = TypedOpOp;
 intLiteralOp#cbfabe7c value:int = TypedOpOp;
 longLiteralOp#d08b8d3a value:long = TypedOpOp;
 stringLiteralOp#2b56ea8e value:string = TypedOpOp;
+bytesLiteralOp#fdb395a4 value:bytes = TypedOpOp;
 boolLiteralOp#37e07911 value:Bool = TypedOpOp;
 doubleLiteralOp#3651e3bf value:double = TypedOpOp;
 themeFormatLiteralOp#8e4f9208 = TypedOpOp;</code></pre>
@@ -545,6 +557,8 @@ themeFormatLiteralOp#8e4f9208 = TypedOpOp;</code></pre>
 <p>Constructs a literal <a href="/type/long">long</a> with the value passed in <code>value</code>.</p>
 <h5><a class="anchor" href="#stringliteralop" id="stringliteralop" name="stringliteralop"><i class="anchor-icon"></i></a><code>stringLiteralOp</code></h5>
 <p>Constructs a literal <a href="/type/string">string</a> with the value passed in <code>value</code>.</p>
+<h5><a class="anchor" href="#bytesliteralop" id="bytesliteralop" name="bytesliteralop"><i class="anchor-icon"></i></a><code>bytesLiteralOp</code></h5>
+<p>Constructs a literal <a href="/type/bytes">bytes</a> with the value passed in <code>value</code>.</p>
 <h5><a class="anchor" href="#boolliteralop" id="boolliteralop" name="boolliteralop"><i class="anchor-icon"></i></a><code>boolLiteralOp</code></h5>
 <p>Constructs a literal <a href="/type/Bool">Bool</a> with the value passed in <code>value</code>.</p>
 <h5><a class="anchor" href="#doubleliteralop" id="doubleliteralop" name="doubleliteralop"><i class="anchor-icon"></i></a><code>doubleLiteralOp</code></h5>

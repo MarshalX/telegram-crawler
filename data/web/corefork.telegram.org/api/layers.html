@@ -133,6 +133,7 @@
 <li>Added intLiteralOp</li>
 <li>Added longLiteralOp</li>
 <li>Added stringLiteralOp</li>
+<li>Added bytesLiteralOp</li>
 <li>Added boolLiteralOp</li>
 <li>Added doubleLiteralOp</li>
 <li>Added themeFormatLiteralOp</li>
@@ -177,6 +178,7 @@ vectorOp#f8fb8f72 values:Vector&lt;TypedOp&gt; = TypedOpOp;<br>
 intLiteralOp#cbfabe7c value:int = TypedOpOp;<br>
 longLiteralOp#d08b8d3a value:long = TypedOpOp;<br>
 stringLiteralOp#2b56ea8e value:string = TypedOpOp;<br>
+bytesLiteralOp#fdb395a4 value:bytes = TypedOpOp;
 boolLiteralOp#37e07911 value:Bool = TypedOpOp;<br>
 doubleLiteralOp#3651e3bf value:double = TypedOpOp;<br>
 themeFormatLiteralOp#8e4f9208 = TypedOpOp;<br></code></pre></div>
@@ -212,6 +214,7 @@ themeFormatLiteralOp#8e4f9208 = TypedOpOp;<br></code></pre></div>
 <li>Added fileSourceAvailableEffects</li>
 <li>Added fileSourceAvailableReactions</li>
 <li>Added fileSourceUserProfilePhoto</li>
+<li>Added fileSourceSavedMusic</li>
 <li>Added fileSourceDocumentByHash</li>
 </ul>
 <h4><a class="anchor" href="#file-reference-database-schema-" id="file-reference-database-schema-" name="file-reference-database-schema-"><i class="anchor-icon"></i></a><a href="/api/file_reference">File reference database schema »</a></h4>
@@ -244,6 +247,7 @@ fileSourceSavedRingtones#2b25ef1b = FileSource;
 fileSourceAvailableEffects#eb8578f0 = FileSource;
 fileSourceAvailableReactions#0e432388 = FileSource;
 fileSourceUserProfilePhoto#e39ee274 user_id:long max_id:long = FileSource;
+fileSourceSavedMusic#dd1a7664 user_id:long id:long access_hash:long = FileSource;
 fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = FileSource;<br></code></pre></div>
 <h4><a class="anchor" href="#changes-in-the-file-reference-database-map-file-" id="changes-in-the-file-reference-database-map-file-" name="changes-in-the-file-reference-database-map-file-"><i class="anchor-icon"></i></a><a href="/api/file_reference">Changes in the file reference database map file »</a></h4>
 <h5><a class="anchor" href="#new-locations" id="new-locations" name="new-locations"><i class="anchor-icon"></i></a>New Locations</h5>
@@ -307,12 +311,16 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added <a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a>.bot?fallback(<a href="/constructor/inputUserSelf">inputUserSelf</a>{})), max_id: <a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a>.(return value).<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
 <li>Added <a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a>.bot?fallback(<a href="/constructor/inputUserSelf">inputUserSelf</a>{})), max_id: <a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a>.(return value).<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
 <li>Added <a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a>.user_id), max_id: <a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a>.(return value).<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
-<li>Added <a href="/constructor/document">document</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromDocumentAttributesAndStore(<a href="/constructor/document">document</a>.attributes)}</code></pre></li>
+<li>Added (1) <a href="/constructor/document">document</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromDocumentAttributesAndStore(<a href="/constructor/document">document</a>.attributes)}</code></pre></li>
+<li>Added (2) <a href="/constructor/document">document</a> - <pre><code>(needs <a href="/method/users.getSavedMusic">users.getSavedMusic</a>) fileSourceSavedMusic{user_id: extractUserIdFromInputUserAndStore(<a href="/method/users.getSavedMusic">users.getSavedMusic</a>.id), id: <a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/document">document</a>.access_hash}</code></pre></li>
+<li>Added (3) <a href="/constructor/document">document</a> - <pre><code>(needs <a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>) fileSourceSavedMusic{user_id: extractUserIdFromInputUserAndStore(<a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>.id), id: <a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/document">document</a>.access_hash}</code></pre></li>
 <li>Added <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a> - <pre><code>fileSourceDocumentByHash{sha256: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.sha256, size: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.size, mime_type: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.mime_type}</code></pre></li>
 </ul>
 <h5><a class="anchor" href="#new-skipped" id="new-skipped" name="new-skipped"><i class="anchor-icon"></i></a>New Skipped</h5>
 <ul>
 <li>Added <a href="/method/messages.getSponsoredMessages">messages.getSponsoredMessages</a> - Do not store file references from sponsored messages</li>
+<li>Added <a href="/method/help.getAppUpdate">help.getAppUpdate</a> - Don't handle file references from ephemeral app update info</li>
+<li>Added <a href="/method/help.getRecentMeUrls">help.getRecentMeUrls</a> - Don't handle file references from recent t.me URLs</li>
 <li>Added <a href="/constructor/recentMeUrlChatInvite">recentMeUrlChatInvite</a> - Do not store references based on chat invite links</li>
 <li>Added <a href="/method/messages.checkChatInvite">messages.checkChatInvite</a> - Do not store references based on chat invite links</li>
 <li>Added <a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a> - Inline bot results are ephemeral</li>
@@ -325,6 +333,10 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added <a href="/constructor/payments.starGiftUpgradePreview">payments.starGiftUpgradePreview</a> - Contexts for star gifts are not yet implemented</li>
 <li>Added <a href="/constructor/starGift">starGift</a> - Contexts for star gifts are not yet implemented</li>
 <li>Added <a href="/constructor/starGiftUnique">starGiftUnique</a> - Contexts for star gifts are not yet implemented</li>
+<li>Added <a href="/constructor/starGiftCollection">starGiftCollection</a> - Contexts for star gifts are not yet implemented</li>
+<li>Added <a href="/constructor/payments.starGiftCollections">payments.starGiftCollections</a> - Contexts for star gifts are not yet implemented</li>
+<li>Added <a href="/method/messages.getCustomEmojiDocuments">messages.getCustomEmojiDocuments</a> - Do not store file references in this context</li>
+<li>Added <a href="/method/account.uploadTheme">account.uploadTheme</a> - A freshly uploaded theme file will obtain a context only once it is created via account.createTheme</li>
 </ul>
 <h5><a class="anchor" href="#new-actions" id="new-actions" name="new-actions"><i class="anchor-icon"></i></a>New Actions</h5>
 <ul>
@@ -351,6 +363,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added fileSourceAvailableEffects - <pre><code><a href="/method/messages.getAvailableEffects">messages.getAvailableEffects</a>(hash: 0)</code></pre></li>
 <li>Added fileSourceAvailableReactions - <pre><code><a href="/method/messages.getAvailableReactions">messages.getAvailableReactions</a>(hash: 0)</code></pre></li>
 <li>Added fileSourceUserProfilePhoto - <pre><code><a href="/method/photos.getUserPhotos">photos.getUserPhotos</a>(user_id: getInputUserByIdOp(user_id), offset: -1, max_id: copyOp(max_id), limit: 1)</code></pre></li>
+<li>Added fileSourceSavedMusic - <pre><code><a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>(id: getInputUserByIdOp(user_id), documents: [<a href="/constructor/inputDocument">inputDocument</a>{id: copyOp(id), access_hash: copyOp(access_hash), file_reference: base64_decode("")}])</code></pre></li>
 <li>Added fileSourceDocumentByHash - <pre><code><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>(sha256: copyOp(sha256), size: copyOp(size), mime_type: copyOp(mime_type))</code></pre></li>
 </ul>
 <h3><a class="anchor" href="#layer-213" id="layer-213" name="layer-213"><i class="anchor-icon"></i></a><a href="/schema?layer=213">Layer 213</a></h3>
@@ -363,24 +376,24 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/account.setMainProfileTab">account.setMainProfileTab</a> - </li>
+<li>Added <a href="/method/account.setMainProfileTab">account.setMainProfileTab</a> - Changes the main profile tab of the current user, see <a href="/api/profile#tabs">here »</a> for more info.</li>
 <li>Added <a href="/method/account.saveMusic">account.saveMusic</a> - </li>
 <li>Added <a href="/method/account.getSavedMusicIds">account.getSavedMusicIds</a> - </li>
 <li>Added <a href="/method/users.getSavedMusic">users.getSavedMusic</a> - </li>
 <li>Added <a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a> - </li>
-<li>Added <a href="/method/channels.setMainProfileTab">channels.setMainProfileTab</a> - </li>
+<li>Added <a href="/method/channels.setMainProfileTab">channels.setMainProfileTab</a> - Changes the main profile tab of a channel, see <a href="/api/profile#tabs">here »</a> for more info.</li>
 <li>Added <a href="/method/payments.checkCanSendGift">payments.checkCanSendGift</a> - </li>
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/profileTabPosts">profileTabPosts</a> - </li>
-<li>Added <a href="/constructor/profileTabGifts">profileTabGifts</a> - </li>
-<li>Added <a href="/constructor/profileTabMedia">profileTabMedia</a> - </li>
-<li>Added <a href="/constructor/profileTabFiles">profileTabFiles</a> - </li>
-<li>Added <a href="/constructor/profileTabMusic">profileTabMusic</a> - </li>
-<li>Added <a href="/constructor/profileTabVoice">profileTabVoice</a> - </li>
-<li>Added <a href="/constructor/profileTabLinks">profileTabLinks</a> - </li>
-<li>Added <a href="/constructor/profileTabGifs">profileTabGifs</a> - </li>
+<li>Added <a href="/constructor/profileTabPosts">profileTabPosts</a> - Represents the <a href="/api/stories">stories</a> tab of a profile page.</li>
+<li>Added <a href="/constructor/profileTabGifts">profileTabGifts</a> - Represents the <a href="/api/gifts">gifts</a> tab of a profile page.</li>
+<li>Added <a href="/constructor/profileTabMedia">profileTabMedia</a> - Represents the media tab of a profile page.</li>
+<li>Added <a href="/constructor/profileTabFiles">profileTabFiles</a> - Represents the shared files tab of a profile.</li>
+<li>Added <a href="/constructor/profileTabMusic">profileTabMusic</a> - Represents the <a href="/api/profile#music">music</a> tab of a profile page.</li>
+<li>Added <a href="/constructor/profileTabVoice">profileTabVoice</a> - Represents the voice messages tab of a profile page.</li>
+<li>Added <a href="/constructor/profileTabLinks">profileTabLinks</a> - Represents the shared links tab of a profile page.</li>
+<li>Added <a href="/constructor/profileTabGifs">profileTabGifs</a> - Represents the gifs tab of a profile page.</li>
 <li>Added <a href="/constructor/users.savedMusicNotModified">users.savedMusicNotModified</a> - </li>
 <li>Added <a href="/constructor/users.savedMusic">users.savedMusic</a> - </li>
 <li>Added <a href="/constructor/account.savedMusicIdsNotModified">account.savedMusicIdsNotModified</a> - </li>
@@ -566,6 +579,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <a href="/method/payments.reorderStarGiftCollections">payments.reorderStarGiftCollections</a>#c32af4cc peer:<a href="/type/InputPeer">InputPeer</a> order:<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/int">int</a>&gt; = <a href="/type/Bool">Bool</a>;
 <a href="/method/payments.deleteStarGiftCollection">payments.deleteStarGiftCollection</a>#ad5648e8 peer:<a href="/type/InputPeer">InputPeer</a> collection_id:<a href="/type/int">int</a> = <a href="/type/Bool">Bool</a>;
 <a href="/method/payments.getStarGiftCollections">payments.getStarGiftCollections</a>#981b91dd peer:<a href="/type/InputPeer">InputPeer</a> hash:<a href="/type/long">long</a> = <a href="/type/payments.StarGiftCollections">payments.StarGiftCollections</a>;<br></code></pre></div>
+<h3><a class="anchor" href="#layer-209" id="layer-209" name="layer-209"><i class="anchor-icon"></i></a><a href="/schema?layer=209">Layer 209</a></h3>
 <h3><a class="anchor" href="#layer-208" id="layer-208" name="layer-208"><i class="anchor-icon"></i></a><a href="/schema?layer=208">Layer 208</a></h3>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
