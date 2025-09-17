@@ -166,7 +166,7 @@ extractChannelIdFromInputChannelAndStore#b662660e from:Path to:string = FieldExt
 extractUserIdFromUserAndStore#4778ec63 from:Path to:string = FieldExtractor;
 extractUserIdFromInputUserAndStore#7720aa2e from:Path to:string = FieldExtractor;<br>
 callOp#c2ff3383 method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;<br>
-getMessageOp#b51d9468 peer:TypedOp id:TypedOp from_scheduled:TypedOp = ActionOp;<br>
+getMessageOp#237849e8 peer:TypedOp id:TypedOp from_scheduled:TypedOp quick_reply_shortcut_id:TypedOp = ActionOp;<br>
 typedOpArg#3a2930c2 key:string value:TypedOp = TypedOpArg;
 typedOp#705b10ec type:string op:TypedOpOp = TypedOp;<br>
 copyOp#f48f418f from:string = TypedOpOp;<br>
@@ -224,7 +224,7 @@ themeFormatLiteralOp#8e4f9208 = TypedOpOp;<br></code></pre></div>
 vector#1cb5c415 = Vector t;<br>
 fileIdPhoto#47a0bd49 id:long = FileId;
 fileIdDocument#461b1d89 id:long = FileId;
-fileSourceMessage#8e8d1cee flags:# from_scheduled:flags.0?true peer:long id:int = FileSource;
+fileSourceMessage#7e015bb0 flags:# from_scheduled:flags.0?true quick_reply_shortcut_id:flags.1?int peer:long id:int = FileSource;
 fileSourceStarsTransaction#c1bac8c7 flags:# peer:long id:string refund:flags.0?true ton:flags.1?true = FileSource;
 fileSourceStory#c820e3eb id:int peer:long = FileSource;
 fileSourceWebPage#9e5b749c url:string = FileSource;
@@ -261,8 +261,8 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 </ul>
 <h5><a class="anchor" href="#new-origins" id="new-origins" name="new-origins"><i class="anchor-icon"></i></a>New Origins</h5>
 <ul>
-<li>Added <a href="/constructor/message">message</a> - <pre><code>fileSourceMessage{from_scheduled: <a href="/constructor/message">message</a>.from_scheduled?passthrough, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/message">message</a>.peer_id), id: <a href="/constructor/message">message</a>.id}</code></pre></li>
-<li>Added <a href="/constructor/messageService">messageService</a> - <pre><code>fileSourceMessage{peer: extractPeerIdFromPeerAndStore(<a href="/constructor/messageService">messageService</a>.peer_id), id: <a href="/constructor/messageService">messageService</a>.id, from_scheduled: false}</code></pre></li>
+<li>Added <a href="/constructor/message">message</a> - <pre><code>fileSourceMessage{from_scheduled: <a href="/constructor/message">message</a>.from_scheduled?passthrough, quick_reply_shortcut_id: <a href="/constructor/message">message</a>.quick_reply_shortcut_id?passthrough, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/message">message</a>.peer_id), id: <a href="/constructor/message">message</a>.id}</code></pre></li>
+<li>Added <a href="/constructor/messageService">messageService</a> - <pre><code>fileSourceMessage{peer: extractPeerIdFromPeerAndStore(<a href="/constructor/messageService">messageService</a>.peer_id), id: <a href="/constructor/messageService">messageService</a>.id, from_scheduled: false, quick_reply_shortcut_id: false}</code></pre></li>
 <li>Added (1) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getPinnedStories">stories.getPinnedStories</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getPinnedStories">stories.getPinnedStories</a>.peer)}</code></pre></li>
 <li>Added (2) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a>.peer)}</code></pre></li>
 <li>Added (3) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.peer)}</code></pre></li>
@@ -340,7 +340,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 </ul>
 <h5><a class="anchor" href="#new-actions" id="new-actions" name="new-actions"><i class="anchor-icon"></i></a>New Actions</h5>
 <ul>
-<li>Added fileSourceMessage - <pre><code><a href="/api/file_reference#getmessageop">getMessageOp</a>(peer: getInputPeerByIdOp(peer), id: copyOp(id), from_scheduled: copyOp(from_scheduled))</code></pre></li>
+<li>Added fileSourceMessage - <pre><code><a href="/api/file_reference#getmessageop">getMessageOp</a>(peer: getInputPeerByIdOp(peer), id: copyOp(id), from_scheduled: copyOp(from_scheduled)quick_reply_shortcut_id: copyOp(quick_reply_shortcut_id))</code></pre></li>
 <li>Added fileSourceStory - <pre><code><a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>(id: [copyOp(id)], peer: getInputPeerByIdOp(peer))</code></pre></li>
 <li>Added fileSourceWebPage - <pre><code><a href="/method/messages.getWebPage">messages.getWebPage</a>(url: copyOp(url), hash: 0)</code></pre></li>
 <li>Added fileSourceBotApp - <pre><code><a href="/method/messages.getBotApp">messages.getBotApp</a>(app: <a href="/constructor/inputBotAppID">inputBotAppID</a>{id: copyOp(id), access_hash: copyOp(access_hash)}, hash: 0)</code></pre></li>
