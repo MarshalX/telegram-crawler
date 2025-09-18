@@ -49,7 +49,7 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file_reference_generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400837/4/csNlISnbD3M.47400.json/842e7f3490f0cbd74a">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400729/5/KbuAebfRfko.48241.json/c3d30cd9ff646c8934">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
@@ -171,6 +171,7 @@ fileSourceStoryAlbum#5e01f223 peer:long = FileSource;
 fileSourceBotPreviewMedia#0aa91441 bot:long = FileSource;
 fileSourceBotPreviewInfo#f9d2d6fc bot:long lang_code:string = FileSource;
 fileSourcePaidMedia#b18d9042 id:int peer:long = FileSource;
+fileSourceSavedMusic#dd1a7664 user_id:long id:long access_hash:long = FileSource;
 fileSourceChatFull#9de75fde chat_id:long = FileSource;
 fileSourceChannelFull#6fe19339 channel:long = FileSource;
 fileSourcePremiumPromo#c907a44f = FileSource;
@@ -183,7 +184,6 @@ fileSourceSavedRingtones#2b25ef1b = FileSource;
 fileSourceAvailableEffects#eb8578f0 = FileSource;
 fileSourceAvailableReactions#0e432388 = FileSource;
 fileSourceUserProfilePhoto#e39ee274 user_id:long max_id:long = FileSource;
-fileSourceSavedMusic#dd1a7664 user_id:long id:long access_hash:long = FileSource;
 fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = FileSource;
 </code></pre>
 <!-- end db schema -->
@@ -211,6 +211,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>fileSourceBotPreviewMedia - <pre><code><a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a>(bot: getInputUserByIdOp(bot))</code></pre></li>
 <li>fileSourceBotPreviewInfo - <pre><code><a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a>(bot: getInputUserByIdOp(bot), lang_code: copyOp(lang_code))</code></pre></li>
 <li>fileSourcePaidMedia - <pre><code><a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a>(id: [copyOp(id)], peer: getInputPeerByIdOp(peer))</code></pre></li>
+<li>fileSourceSavedMusic - <pre><code><a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>(id: getInputUserByIdOp(user_id), documents: [<a href="/constructor/inputDocument">inputDocument</a>{id: copyOp(id), access_hash: copyOp(access_hash), file_reference: base64_decode("")}])</code></pre></li>
 <li>fileSourceChatFull - <pre><code><a href="/method/messages.getFullChat">messages.getFullChat</a>(chat_id: copyOp(chat_id))</code></pre></li>
 <li>fileSourceChannelFull - <pre><code><a href="/method/channels.getFullChannel">channels.getFullChannel</a>(channel: getInputChannelByIdOp(channel))</code></pre></li>
 <li>fileSourcePremiumPromo - <pre><code><a href="/method/help.getPremiumPromo">help.getPremiumPromo</a>()</code></pre></li>
@@ -224,7 +225,6 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>fileSourceAvailableEffects - <pre><code><a href="/method/messages.getAvailableEffects">messages.getAvailableEffects</a>(hash: 0)</code></pre></li>
 <li>fileSourceAvailableReactions - <pre><code><a href="/method/messages.getAvailableReactions">messages.getAvailableReactions</a>(hash: 0)</code></pre></li>
 <li>fileSourceUserProfilePhoto - <pre><code><a href="/method/photos.getUserPhotos">photos.getUserPhotos</a>(user_id: getInputUserByIdOp(user_id), offset: -1, max_id: copyOp(max_id), limit: 1)</code></pre></li>
-<li>fileSourceSavedMusic - <pre><code><a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>(id: getInputUserByIdOp(user_id), documents: [<a href="/constructor/inputDocument">inputDocument</a>{id: copyOp(id), access_hash: copyOp(access_hash), file_reference: base64_decode("")}])</code></pre></li>
 <li>fileSourceDocumentByHash - <pre><code><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>(sha256: copyOp(sha256), size: copyOp(size), mime_type: copyOp(mime_type))</code></pre></li>
 </ul>
 <!-- end actions -->
@@ -257,7 +257,8 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li><a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>.bot), lang_code: <a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>.lang_code}</code></pre></li>
 <li><a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a>.bot), lang_code: <a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a>.lang_code}</code></pre></li>
 <li><a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> - <pre><code>fileSourcePaidMedia{id: <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a>.msg_id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a>.peer)}</code></pre></li>
-<li><a href="/constructor/userFull">userFull</a> - <pre><code>fileSourceUserFull{id: <a href="/constructor/userFull">userFull</a>.id}</code></pre></li>
+<li>(1) <a href="/constructor/userFull">userFull</a> - <pre><code>fileSourceUserFull{id: <a href="/constructor/userFull">userFull</a>.id}</code></pre></li>
+<li>(2) <a href="/constructor/userFull">userFull</a> - <pre><code>fileSourceSavedMusic{user_id: <a href="/constructor/userFull">userFull</a>.id, id: <a href="/constructor/userFull">userFull</a>.saved_music?abort_if_empty.<a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/userFull">userFull</a>.saved_music?abort_if_empty.<a href="/constructor/document">document</a>.access_hash}</code></pre></li>
 <li><a href="/constructor/chatFull">chatFull</a> - <pre><code>fileSourceChatFull{chat_id: <a href="/constructor/chatFull">chatFull</a>.id}</code></pre></li>
 <li><a href="/constructor/channelFull">channelFull</a> - <pre><code>fileSourceChannelFull{channel: <a href="/constructor/channelFull">channelFull</a>.id}</code></pre></li>
 <li><a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> - <pre><code>fileSourcePremiumPromo{}</code></pre></li>

@@ -202,6 +202,7 @@ themeFormatLiteralOp#8e4f9208 = TypedOpOp;<br></code></pre></div>
 <li>Added fileSourceBotPreviewMedia</li>
 <li>Added fileSourceBotPreviewInfo</li>
 <li>Added fileSourcePaidMedia</li>
+<li>Added fileSourceSavedMusic</li>
 <li>Added fileSourceChatFull</li>
 <li>Added fileSourceChannelFull</li>
 <li>Added fileSourcePremiumPromo</li>
@@ -214,7 +215,6 @@ themeFormatLiteralOp#8e4f9208 = TypedOpOp;<br></code></pre></div>
 <li>Added fileSourceAvailableEffects</li>
 <li>Added fileSourceAvailableReactions</li>
 <li>Added fileSourceUserProfilePhoto</li>
-<li>Added fileSourceSavedMusic</li>
 <li>Added fileSourceDocumentByHash</li>
 </ul>
 <h4><a class="anchor" href="#file-reference-database-schema-" id="file-reference-database-schema-" name="file-reference-database-schema-"><i class="anchor-icon"></i></a><a href="/api/file_reference">File reference database schema »</a></h4>
@@ -235,6 +235,7 @@ fileSourceStoryAlbum#5e01f223 peer:long = FileSource;
 fileSourceBotPreviewMedia#0aa91441 bot:long = FileSource;
 fileSourceBotPreviewInfo#f9d2d6fc bot:long lang_code:string = FileSource;
 fileSourcePaidMedia#b18d9042 id:int peer:long = FileSource;
+fileSourceSavedMusic#dd1a7664 user_id:long id:long access_hash:long = FileSource;
 fileSourceChatFull#9de75fde chat_id:long = FileSource;
 fileSourceChannelFull#6fe19339 channel:long = FileSource;
 fileSourcePremiumPromo#c907a44f = FileSource;
@@ -247,7 +248,6 @@ fileSourceSavedRingtones#2b25ef1b = FileSource;
 fileSourceAvailableEffects#eb8578f0 = FileSource;
 fileSourceAvailableReactions#0e432388 = FileSource;
 fileSourceUserProfilePhoto#e39ee274 user_id:long max_id:long = FileSource;
-fileSourceSavedMusic#dd1a7664 user_id:long id:long access_hash:long = FileSource;
 fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = FileSource;<br></code></pre></div>
 <h4><a class="anchor" href="#changes-in-the-file-reference-database-map-file-" id="changes-in-the-file-reference-database-map-file-" name="changes-in-the-file-reference-database-map-file-"><i class="anchor-icon"></i></a><a href="/api/file_reference">Changes in the file reference database map file »</a></h4>
 <h5><a class="anchor" href="#new-locations" id="new-locations" name="new-locations"><i class="anchor-icon"></i></a>New Locations</h5>
@@ -287,7 +287,8 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added <a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>.bot), lang_code: <a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>.lang_code}</code></pre></li>
 <li>Added <a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a>.bot), lang_code: <a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a>.lang_code}</code></pre></li>
 <li>Added <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> - <pre><code>fileSourcePaidMedia{id: <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a>.msg_id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a>.peer)}</code></pre></li>
-<li>Added <a href="/constructor/userFull">userFull</a> - <pre><code>fileSourceUserFull{id: <a href="/constructor/userFull">userFull</a>.id}</code></pre></li>
+<li>Added (1) <a href="/constructor/userFull">userFull</a> - <pre><code>fileSourceUserFull{id: <a href="/constructor/userFull">userFull</a>.id}</code></pre></li>
+<li>Added (2) <a href="/constructor/userFull">userFull</a> - <pre><code>fileSourceSavedMusic{user_id: <a href="/constructor/userFull">userFull</a>.id, id: <a href="/constructor/userFull">userFull</a>.saved_music?abort_if_empty.<a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/userFull">userFull</a>.saved_music?abort_if_empty.<a href="/constructor/document">document</a>.access_hash}</code></pre></li>
 <li>Added <a href="/constructor/chatFull">chatFull</a> - <pre><code>fileSourceChatFull{chat_id: <a href="/constructor/chatFull">chatFull</a>.id}</code></pre></li>
 <li>Added <a href="/constructor/channelFull">channelFull</a> - <pre><code>fileSourceChannelFull{channel: <a href="/constructor/channelFull">channelFull</a>.id}</code></pre></li>
 <li>Added <a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> - <pre><code>fileSourcePremiumPromo{}</code></pre></li>
@@ -350,6 +351,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added fileSourceBotPreviewMedia - <pre><code><a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a>(bot: getInputUserByIdOp(bot))</code></pre></li>
 <li>Added fileSourceBotPreviewInfo - <pre><code><a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a>(bot: getInputUserByIdOp(bot), lang_code: copyOp(lang_code))</code></pre></li>
 <li>Added fileSourcePaidMedia - <pre><code><a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a>(id: [copyOp(id)], peer: getInputPeerByIdOp(peer))</code></pre></li>
+<li>Added fileSourceSavedMusic - <pre><code><a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>(id: getInputUserByIdOp(user_id), documents: [<a href="/constructor/inputDocument">inputDocument</a>{id: copyOp(id), access_hash: copyOp(access_hash), file_reference: base64_decode("")}])</code></pre></li>
 <li>Added fileSourceChatFull - <pre><code><a href="/method/messages.getFullChat">messages.getFullChat</a>(chat_id: copyOp(chat_id))</code></pre></li>
 <li>Added fileSourceChannelFull - <pre><code><a href="/method/channels.getFullChannel">channels.getFullChannel</a>(channel: getInputChannelByIdOp(channel))</code></pre></li>
 <li>Added fileSourcePremiumPromo - <pre><code><a href="/method/help.getPremiumPromo">help.getPremiumPromo</a>()</code></pre></li>
@@ -363,7 +365,6 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added fileSourceAvailableEffects - <pre><code><a href="/method/messages.getAvailableEffects">messages.getAvailableEffects</a>(hash: 0)</code></pre></li>
 <li>Added fileSourceAvailableReactions - <pre><code><a href="/method/messages.getAvailableReactions">messages.getAvailableReactions</a>(hash: 0)</code></pre></li>
 <li>Added fileSourceUserProfilePhoto - <pre><code><a href="/method/photos.getUserPhotos">photos.getUserPhotos</a>(user_id: getInputUserByIdOp(user_id), offset: -1, max_id: copyOp(max_id), limit: 1)</code></pre></li>
-<li>Added fileSourceSavedMusic - <pre><code><a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>(id: getInputUserByIdOp(user_id), documents: [<a href="/constructor/inputDocument">inputDocument</a>{id: copyOp(id), access_hash: copyOp(access_hash), file_reference: base64_decode("")}])</code></pre></li>
 <li>Added fileSourceDocumentByHash - <pre><code><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>(sha256: copyOp(sha256), size: copyOp(size), mime_type: copyOp(mime_type))</code></pre></li>
 </ul>
 <h3><a class="anchor" href="#layer-213" id="layer-213" name="layer-213"><i class="anchor-icon"></i></a><a href="/schema?layer=213">Layer 213</a></h3>
@@ -371,8 +372,8 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <ul>
 <li><a href="/api/profile#changing-the-default-profile-tab">Changing the default profile tab »</a></li>
 <li><a href="/api/profile#music">Saving music to the profile »</a></li>
-<li><a href="/constructor/starGift">Added a <code>locked_until_date</code> flag to starGift, for locked gifts that cannot be sent until the specified date</a>.  </li>
-<li><a href="/method/payments.checkCanSendGift">Added the payments.checkCanSendGift method, to check if a non-locked gift can't be sent yet for other reasons</a>.  </li>
+<li><a href="/constructor/starGift">Added a <code>locked_until_date</code> flag to starGift, for locked gifts that cannot be sent until the specified date</a>.</li>
+<li><a href="/method/payments.checkCanSendGift">Added the payments.checkCanSendGift method, to check if a non-locked gift can't be sent yet for other reasons</a>.</li>
 <li><a href="/constructor/inputStorePaymentStarsTopup">Added an optional <code>spend_purpose_peer</code> flag to inputStorePaymentStarsTopup, that should be populated with the peer where the topup process was initiated due to low funds (i.e. a bot for bot payments, a channel for paid media/reactions, etc) »</a></li>
 </ul>
 <p><a href="/api/profile">Documentation for the profile page was also reorganized, to include the full list of tabs to show, along with instructions on how to populate them »</a>.</p>
@@ -380,12 +381,12 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
 <li>Added <a href="/method/account.setMainProfileTab">account.setMainProfileTab</a> - Changes the main profile tab of the current user, see <a href="/api/profile#tabs">here »</a> for more info.</li>
-<li>Added <a href="/method/account.saveMusic">account.saveMusic</a> - </li>
-<li>Added <a href="/method/account.getSavedMusicIds">account.getSavedMusicIds</a> - </li>
-<li>Added <a href="/method/users.getSavedMusic">users.getSavedMusic</a> - </li>
-<li>Added <a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a> - </li>
+<li>Added <a href="/method/account.saveMusic">account.saveMusic</a> - Adds or removes a song from the current user's profile <a href="/api/profile#music">see here »</a> for more info on the music tab of the profile page.</li>
+<li>Added <a href="/method/account.getSavedMusicIds">account.getSavedMusicIds</a> - Fetch the full list of only the IDs of <a href="/api/profile#music">songs currently added to the profile, see here »</a> for more info.</li>
+<li>Added <a href="/method/users.getSavedMusic">users.getSavedMusic</a> - Get songs <a href="/api/profile#music">pinned to the user's profile, see here »</a> for more info.</li>
+<li>Added <a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a> - Check if the passed songs are still pinned to the user's profile, or refresh the file references of songs pinned on a user's profile <a href="/api/profile#music">see here »</a> for more info.</li>
 <li>Added <a href="/method/channels.setMainProfileTab">channels.setMainProfileTab</a> - Changes the main profile tab of a channel, see <a href="/api/profile#tabs">here »</a> for more info.</li>
-<li>Added <a href="/method/payments.checkCanSendGift">payments.checkCanSendGift</a> - </li>
+<li>Added <a href="/method/payments.checkCanSendGift">payments.checkCanSendGift</a> - Check if the specified <a href="/api/gifts">gift »</a> can be sent.</li>
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
@@ -397,12 +398,12 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added <a href="/constructor/profileTabVoice">profileTabVoice</a> - Represents the voice messages tab of a profile page.</li>
 <li>Added <a href="/constructor/profileTabLinks">profileTabLinks</a> - Represents the shared links tab of a profile page.</li>
 <li>Added <a href="/constructor/profileTabGifs">profileTabGifs</a> - Represents the gifs tab of a profile page.</li>
-<li>Added <a href="/constructor/users.savedMusicNotModified">users.savedMusicNotModified</a> - </li>
-<li>Added <a href="/constructor/users.savedMusic">users.savedMusic</a> - </li>
-<li>Added <a href="/constructor/account.savedMusicIdsNotModified">account.savedMusicIdsNotModified</a> - </li>
-<li>Added <a href="/constructor/account.savedMusicIds">account.savedMusicIds</a> - </li>
-<li>Added <a href="/constructor/payments.checkCanSendGiftResultOk">payments.checkCanSendGiftResultOk</a> - </li>
-<li>Added <a href="/constructor/payments.checkCanSendGiftResultFail">payments.checkCanSendGiftResultFail</a> - </li>
+<li>Added <a href="/constructor/users.savedMusicNotModified">users.savedMusicNotModified</a> - This subset of the songs currently pinned on a user's profile hasn't changed, see <a href="/api/profile#music">here »</a> for more info.</li>
+<li>Added <a href="/constructor/users.savedMusic">users.savedMusic</a> - List of songs currently pinned on a user's profile, see <a href="/api/profile#music">here »</a> for more info.</li>
+<li>Added <a href="/constructor/account.savedMusicIdsNotModified">account.savedMusicIdsNotModified</a> - The list of IDs of songs (<a href="/constructor/document">document</a>.<code>id</code>s) currently pinned on our profile hasn't changed.</li>
+<li>Added <a href="/constructor/account.savedMusicIds">account.savedMusicIds</a> - List of IDs of songs (<a href="/constructor/document">document</a>.<code>id</code>s) currently pinned on our profile, see <a href="/api/profile#music">here »</a> for more info.</li>
+<li>Added <a href="/constructor/payments.checkCanSendGiftResultOk">payments.checkCanSendGiftResultOk</a> - The specified gift can be sent.</li>
+<li>Added <a href="/constructor/payments.checkCanSendGiftResultFail">payments.checkCanSendGiftResultFail</a> - The specified gift cannot be sent yet for the specified reason.</li>
 </ul>
 <h5><a class="anchor" href="#changed-constructors" id="changed-constructors" name="changed-constructors"><i class="anchor-icon"></i></a>Changed Constructors</h5>
 <ul>
