@@ -245,18 +245,20 @@ Since <code>BIRTHDAY_CONTACTS_TODAY</code> is an <em>inverted</em> suggestion, d
 
 <a href='/method/account.saveMusic'>account.saveMusic</a>#b26732a9 flags:<a href='/type/%23'>#</a> unsave:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputDocument'>InputDocument</a> after_id:flags.1?<a href='/type/InputDocument'>InputDocument</a> = <a href='/type/Bool'>Bool</a>;
 
+<a href='/method/users.getSavedMusic'>users.getSavedMusic</a>#788d7fe3 id:<a href='/type/InputUser'>InputUser</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/users.SavedMusic'>users.SavedMusic</a>;
+
 <a href='/method/account.getSavedMusicIds'>account.getSavedMusicIds</a>#e09d5faf hash:<a href='/type/long'>long</a> = <a href='/type/account.SavedMusicIds'>account.SavedMusicIds</a>;
 
-<a href='/method/users.getSavedMusic'>users.getSavedMusic</a>#788d7fe3 id:<a href='/type/InputUser'>InputUser</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/users.SavedMusic'>users.SavedMusic</a>;
 <a href='/method/users.getSavedMusicByID'>users.getSavedMusicByID</a>#7573a4e9 id:<a href='/type/InputUser'>InputUser</a> documents:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputDocument'>InputDocument</a>&gt; = <a href='/type/users.SavedMusic'>users.SavedMusic</a>;</code></pre>
 <p>This tab displays music added to the profile using the methods described below.  </p>
 <p>Usable only by users.  </p>
 <p>To add a music file to our profile, invoke <a href="/method/account.saveMusic">account.saveMusic</a> on a music file available in a private chat, group or channel; invoke the method with the <code>unsave</code> flag to remove the song from the profile.  </p>
 <p>The first song added to the profile will be available in <a href="/constructor/userFull">userFull</a>.<code>saved_music</code>.  </p>
-<p>Songs added to the profile can be fetched using <a href="/method/users.getSavedMusic">users.getSavedMusic</a> (both by us and by other users).<br>
-<a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a> can be used to check </p>
-<p>When adding songs, the <code>after_id</code> flag can also be populated to specify </p>
-<p>To fetch the music we added to our profile, use <a href="/method/account.getSavedMusicIds">account.getSavedMusicIds</a>.  </p>
+<p>Songs added to the profile can be fetched using <a href="/method/users.getSavedMusic">users.getSavedMusic</a> (both by us and by other users).  </p>
+<p>When adding songs with <a href="/method/account.saveMusic">account.saveMusic</a>, the <code>after_id</code> flag can also be populated to specify that the song in <code>id</code> should be added after the song passed in <code>after_id</code> (which must be already in the saved songs list): this can also be done if <code>id</code> is already in the saved songs list, to reorder entries.<br>
+Adding an already added song will never re-add it, only move it to the top of the song list (or after the song passed in <code>after_id</code>).  </p>
+<p>To fetch the full <strong>unordered</strong> list of IDs of the songs we added to our profile, use <a href="/method/account.getSavedMusicIds">account.getSavedMusicIds</a>: this method doesn't require pagination, as it returns only the document IDs, without the full document objects: it can be used to quickly check whether new songs were added to our profile (and not for song order changes), if the <code>hash</code> field (generated <a href="/api/offsets#hash-generation">the usual way</a> from the returned IDs)is populated.  </p>
+<p><a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a> takes a list of audio <a href="/constructor/inputDocument">inputDocument</a>s, and returns the associated <a href="/constructor/document">document</a>s only if they are currently pinned on the specified user's profile: while it <em>can</em> be used to check if some songs are still pinned on the profile of a user, its main intended use is to refetch expired <a href="/api/file_references">file references</a> of songs previously seen on a user's profile, as, only in the context of this method, the passed <a href="/constructor/inputDocument">inputDocument</a> can have an empty <code>file_reference</code> field, and the refreshed reference will be returned by the method if the audio is still pinned on the user's profile (this case is already automatically covered by the <a href="/api/file_reference">file reference map file</a>).  </p>
 <h4><a class="anchor" href="#media" id="media" name="media"><i class="anchor-icon"></i></a>Media</h4>
 <pre><code><a href='/constructor/profileTabMedia'>profileTabMedia</a>#72c64955 = <a href='/type/ProfileTab'>ProfileTab</a>;</code></pre>
 <p>This tab displays the videos and photos shared in the chat, fetched using <a href="/method/messages.search">messages.search</a> and the <a href="/constructor/inputMessagesFilterPhotoVideo">inputMessagesFilterPhotoVideo</a> filter, see <a href="/api/search">here »</a> for more info.  </p>
