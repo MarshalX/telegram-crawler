@@ -3339,6 +3339,7 @@ var ReviewAds = {
     var $ad      = $(this).parents('.js-review-item');
     var owner_id = $ad.attr('data-owner-id');
     var ad_id    = $ad.attr('data-ad-id');
+    var ad_hash  = $ad.attr('data-ad-hash');
     var $buttons = $ad.find('.pr-btn');
 
     var method, params = {};
@@ -3357,6 +3358,7 @@ var ReviewAds = {
       method = 'approveAd';
       params.owner_id = owner_id;
       params.ad_id = ad_id;
+      params.ad_hash = ad_hash;
     }
 
     if ($buttons.prop('disabled')) {
@@ -3385,6 +3387,15 @@ var ReviewAds = {
         }
         $ad.find('.js-reports-badge').hide();
       }
+      if (result.ads_html) {
+        var $loadMore = $('.js-load-next');
+        var $loadMoreCont = $loadMore.closest('.pr-review-list');
+        if ($loadMoreCont.size()) {
+          $loadMore.remove();
+          $loadMoreCont.append(result.ads_html);
+          Ads.updateAdMessagePreviews($loadMoreCont);
+        }
+      }
     });
     return false;
   },
@@ -3393,6 +3404,7 @@ var ReviewAds = {
     var $ad       = $(this).parents('.js-review-item');
     var owner_id  = $ad.attr('data-owner-id');
     var ad_id     = $ad.attr('data-ad-id');
+    var ad_hash   = $ad.attr('data-ad-hash');
     var $buttons  = $ad.find('.pr-btn');
     var reason_id = $(this).attr('data-reason-id');
 
@@ -3414,6 +3426,7 @@ var ReviewAds = {
       method = 'declineAd';
       params.owner_id = owner_id;
       params.ad_id = ad_id;
+      params.ad_hash = ad_hash;
     }
 
     if ($buttons.prop('disabled')) {
@@ -3441,6 +3454,15 @@ var ReviewAds = {
           ReviewAds.updateSimilarAds($ad, result.similar_html, result.similar_hash);
         }
         $ad.find('.js-reports-badge').hide();
+      }
+      if (result.ads_html) {
+        var $loadMore = $('.js-load-next');
+        var $loadMoreCont = $loadMore.closest('.pr-review-list');
+        if ($loadMoreCont.size()) {
+          $loadMore.remove();
+          $loadMoreCont.append(result.ads_html);
+          Ads.updateAdMessagePreviews($loadMoreCont);
+        }
       }
     });
     return false;
@@ -3567,16 +3589,18 @@ var ReviewTargets = {
   },
   eApproveAd: function(e) {
     e.preventDefault();
-    var $target  = $(this).parents('.js-review-item');
-    var target   = $target.attr('data-target');
-    var $buttons = $target.find('.pr-btn');
+    var $target     = $(this).parents('.js-review-item');
+    var target      = $target.attr('data-target');
+    var target_hash = $target.attr('data-target-hash');
+    var $buttons    = $target.find('.pr-btn');
 
     if ($buttons.prop('disabled')) {
       return false;
     }
     $buttons.prop('disabled', true);
     Aj.apiRequest('approveTarget', {
-      target: target
+      target: target,
+      target_hash: target_hash
     }, function(result) {
       $buttons.prop('disabled', false);
       if (result.error) {
@@ -3588,15 +3612,25 @@ var ReviewTargets = {
       if (result.buttons_html) {
         $target.find('.js-review-buttons').html(result.buttons_html);
       }
+      if (result.targets_html) {
+        var $loadMore = $('.js-load-next');
+        var $loadMoreCont = $loadMore.closest('.pr-review-list');
+        if ($loadMoreCont.size()) {
+          $loadMore.remove();
+          $loadMoreCont.append(result.targets_html);
+          Ads.updateAdMessagePreviews($loadMoreCont);
+        }
+      }
     });
     return false;
   },
   eDeclineAd: function(e) {
     e.preventDefault();
-    var $target   = $(this).parents('.js-review-item');
-    var target    = $target.attr('data-target');
-    var $buttons  = $target.find('.pr-btn');
-    var reason_id = $(this).attr('data-reason-id');
+    var $target     = $(this).parents('.js-review-item');
+    var target      = $target.attr('data-target');
+    var target_hash = $target.attr('data-target-hash');
+    var $buttons    = $target.find('.pr-btn');
+    var reason_id   = $(this).attr('data-reason-id');
 
     if ($buttons.prop('disabled')) {
       return false;
@@ -3604,6 +3638,7 @@ var ReviewTargets = {
     $buttons.prop('disabled', true);
     Aj.apiRequest('declineTarget', {
       target: target,
+      target_hash: target_hash,
       reason_id: reason_id
     }, function(result) {
       $buttons.prop('disabled', false);
@@ -3615,6 +3650,15 @@ var ReviewTargets = {
       }
       if (result.buttons_html) {
         $target.find('.js-review-buttons').html(result.buttons_html);
+      }
+      if (result.targets_html) {
+        var $loadMore = $('.js-load-next');
+        var $loadMoreCont = $loadMore.closest('.pr-review-list');
+        if ($loadMoreCont.size()) {
+          $loadMore.remove();
+          $loadMoreCont.append(result.targets_html);
+          Ads.updateAdMessagePreviews($loadMoreCont);
+        }
       }
     });
     return false;
