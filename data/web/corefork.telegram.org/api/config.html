@@ -230,7 +230,6 @@ Specifically, the relative value from the default object must be used if <a href
     "<a href="#message-animated-emoji-max">message_animated_emoji_max</a>": 100,
     "<a href="#need-age-video-verification">need_age_video_verification</a>": false,
     "<a href="#new-noncontact-peers-require-premium-without-ownpremium">new_noncontact_peers_require_premium_without_ownpremium</a>": false,
-    "<a href="#pending-suggestions">pending_suggestions</a>": [],
     "<a href="#pm-read-date-expire-period">pm_read_date_expire_period</a>": 604800,
     "<a href="#poll-answers-max">poll_answers_max</a>": 12,
     "<a href="#premium-bot-username">premium_bot_username</a>": "PremiumBot",
@@ -370,7 +369,7 @@ Specifically, the relative value from the default object must be used if <a href
     "<a href="#ton-suggested-post-amount-min">ton_suggested_post_amount_min</a>": 1,
     "<a href="#ton-suggested-post-commission-permille">ton_suggested_post_commission_permille</a>": 850,
     "<a href="#ton-topup-url">ton_topup_url</a>": "https://fragment.com/ads/topup",
-    "<a href="#ton-usd-rate">ton_usd_rate</a>": 3.0763141994387304,
+    "<a href="#ton-usd-rate">ton_usd_rate</a>": 2.778129100930269,
     "<a href="#topics-pinned-limit">topics_pinned_limit</a>": 5,
     "<a href="#transcribe-audio-trial-duration-max">transcribe_audio_trial_duration_max</a>": 300,
     "<a href="#transcribe-audio-trial-weekly-number">transcribe_audio_trial_weekly_number</a>": 0,
@@ -455,8 +454,6 @@ Specifically, the relative value from the default object must be used if <a href
 <p>Whether clients should actively show a tooltip, inviting the user to configure <a href="/api/folders">dialog filters AKA folders</a>; typically this happens when the chat list is long enough to start getting cluttered. (boolean)</p>
 <h4><a class="anchor" href="#autoarchive-setting-available" id="autoarchive-setting-available" name="autoarchive-setting-available"><i class="anchor-icon"></i></a><code>autoarchive_setting_available</code></h4>
 <p>Whether clients <em>can</em> invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a> with <a href="/constructor/globalPrivacySettings"><code>globalPrivacySettings.archive_and_mute_new_noncontact_peers = boolTrue</code></a>, to automatically archive and mute new incoming chats from non-contacts. (boolean)</p>
-<h4><a class="anchor" href="#pending-suggestions" id="pending-suggestions" name="pending-suggestions"><i class="anchor-icon"></i></a><code>pending_suggestions</code></h4>
-<p>Contains a list of suggestions that should be actively shown as a tooltip to the user. (Array of strings, possible values shown <a href="#suggestions">in the suggestions section »</a>).</p>
 <h4><a class="anchor" href="#topics-pinned-limit" id="topics-pinned-limit" name="topics-pinned-limit"><i class="anchor-icon"></i></a><code>topics_pinned_limit</code></h4>
 <p>Maximum number of <a href="/api/forum#forum-topics">topics</a> that can be pinned in a single <a href="/api/forum">forum</a>. (integer)</p>
 <h4><a class="anchor" href="#telegram-antispam-user-id" id="telegram-antispam-user-id" name="telegram-antispam-user-id"><i class="anchor-icon"></i></a><code>telegram_antispam_user_id</code></h4>
@@ -843,12 +840,58 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <p> </p>
 <!-- end config description -->
 <h3><a class="anchor" href="#suggestions" id="suggestions" name="suggestions"><i class="anchor-icon"></i></a>Suggestions</h3>
-<p>The API can return a set of useful suggestions for users of graphical clients.  </p>
+<pre><code><a href='/constructor/help.promoData'>help.promoData</a>#8a4d87a flags:<a href='/type/%23'>#</a> proxy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> expires:<a href='/type/int'>int</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Peer'>Peer</a> psa_type:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> psa_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> pending_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; dismissed_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; custom_pending_suggestion:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/PendingSuggestion'>PendingSuggestion</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/constructor/help.promoDataEmpty'>help.promoDataEmpty</a>#98f6ac75 expires:<a href='/type/int'>int</a> = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+---functions---
+
+<a href='/method/help.getPromoData'>help.getPromoData</a>#c0977421 = <a href='/type/help.PromoData'>help.PromoData</a>;</code></pre>
+<p>The API can return a set of useful suggestions and PSA/MTProxy info for users of graphical clients using the <a href="/method/help.getPromoData">help.getPromoData</a> method.  </p>
+<p>This method should be invoked:</p>
+<ul>
+<li>On client startup</li>
+<li>After <a href="/type/help.PromoData">help.PromoData</a>.<code>expires</code> seconds, until the client is shut down.</li>
+<li>Every time a new MTProxy connection is established.  </li>
+</ul>
+<h4><a class="anchor" href="#psa-info" id="psa-info" name="psa-info"><i class="anchor-icon"></i></a>PSA info</h4>
+<pre><code><a href='/constructor/help.promoData'>help.promoData</a>#8a4d87a flags:<a href='/type/%23'>#</a> proxy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> expires:<a href='/type/int'>int</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Peer'>Peer</a> psa_type:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> psa_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> pending_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; dismissed_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; custom_pending_suggestion:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/PendingSuggestion'>PendingSuggestion</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/constructor/help.promoDataEmpty'>help.promoDataEmpty</a>#98f6ac75 expires:<a href='/type/int'>int</a> = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+---functions---
+
+<a href='/method/help.getPromoData'>help.getPromoData</a>#c0977421 = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/method/help.hidePromoData'>help.hidePromoData</a>#1e251c95 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The <code>peer</code>, <code>psa_type</code> (type of the announcement) and <code>psa_message</code> (text of the announcement) flags of a <a href="/constructor/help.promoData">help.promoData</a> returned by <a href="/method/help.getPromoData">help.getPromoData</a> will all be set for Public Service Announcement peers that should be pinned on top of the chat list.  </p>
+<p>In this case, the <code>proxy</code> flag will never be set.  </p>
+<p>Invoke <a href="/method/help.hidePromoData">help.hidePromoData</a> to hide the PSA peer from <a href="/constructor/help.promoData">help.promoData</a>.  </p>
+<h4><a class="anchor" href="#mtproxy-sponsor" id="mtproxy-sponsor" name="mtproxy-sponsor"><i class="anchor-icon"></i></a>MTProxy sponsor</h4>
+<pre><code><a href='/constructor/help.promoData'>help.promoData</a>#8a4d87a flags:<a href='/type/%23'>#</a> proxy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> expires:<a href='/type/int'>int</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Peer'>Peer</a> psa_type:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> psa_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> pending_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; dismissed_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; custom_pending_suggestion:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/PendingSuggestion'>PendingSuggestion</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/constructor/help.promoDataEmpty'>help.promoDataEmpty</a>#98f6ac75 expires:<a href='/type/int'>int</a> = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+---functions---
+
+<a href='/method/help.getPromoData'>help.getPromoData</a>#c0977421 = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/method/help.hidePromoData'>help.hidePromoData</a>#1e251c95 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The <code>peer</code>, <code>proxy</code> flags of a <a href="/constructor/help.promoData">help.promoData</a> returned by <a href="/method/help.getPromoData">help.getPromoData</a> will all be set when connecting using an MTProxy that has configured an associated peer (i.e. the channel that sponsored the MTProxy) that should be pinned on top of the chat list.  </p>
+<p>Invoke <a href="/method/help.hidePromoData">help.hidePromoData</a> to hide the MTProxy peer from <a href="/constructor/help.promoData">help.promoData</a>.  </p>
 <h4><a class="anchor" href="#basic-suggestions" id="basic-suggestions" name="basic-suggestions"><i class="anchor-icon"></i></a>Basic suggestions</h4>
-<p>The <a href="/method/help.getAppConfig">help.getAppConfig</a> method returns a JSON object containing rapidly evolving, client-specific configuration parameters.<br>
-A full list of these parameters can be seen in the <a href="#client-configuration">Client Configuration section »</a>, but we're mostly interested in the <code>pending_suggestions</code> and <code>autoarchive_setting_available</code> fields of the returned JSON object:  </p>
-<p>The <code>autoarchive_setting_available</code> flag indicates whether clients <em>can</em> invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a> with <a href="/constructor/globalPrivacySettings"><code>globalPrivacySettings.archive_and_mute_new_noncontact_peers = boolTrue</code></a>, to automatically archive and mute new incoming chats from non-contacts. (boolean)</p>
-<p>The <code>pending_suggestions</code> field contains a list of suggestions that should be actively shown as a tooltip to the user as an array of strings, possible values shown below:</p>
+<pre><code><a href='/constructor/help.promoData'>help.promoData</a>#8a4d87a flags:<a href='/type/%23'>#</a> proxy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> expires:<a href='/type/int'>int</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Peer'>Peer</a> psa_type:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> psa_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> pending_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; dismissed_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; custom_pending_suggestion:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/PendingSuggestion'>PendingSuggestion</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/constructor/help.promoDataEmpty'>help.promoDataEmpty</a>#98f6ac75 expires:<a href='/type/int'>int</a> = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+---functions---
+
+<a href='/method/help.getPromoData'>help.getPromoData</a>#c0977421 = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/method/help.dismissSuggestion'>help.dismissSuggestion</a>#f50dbaa1 peer:<a href='/type/InputPeer'>InputPeer</a> suggestion:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The <code>pending_suggestions</code> field contained in a <a href="/constructor/help.promoData">help.promoData</a> returned by <a href="/method/help.getPromoData">help.getPromoData</a> contains a list of suggestions that should be actively shown as a tooltip to the user.</p>
+<p><a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> may be invoked to dismiss a suggestion (with <code>peer=</code><a href="/constructor/inputPeerEmpty">inputPeerEmpty</a>), which will remove it from the <code>pending_suggestions</code> field.  </p>
+<p>List of suggestion values:</p>
 <!-- start suggestions -->
 <h5><a class="anchor" href="#autoarchive-popular" id="autoarchive-popular" name="autoarchive-popular"><i class="anchor-icon"></i></a><code>AUTOARCHIVE_POPULAR</code></h5>
 <p>Users <em>should</em> invoke <a href="/method/account.setGlobalPrivacySettings">account.setGlobalPrivacySettings</a> with <a href="/constructor/globalPrivacySettings"><code>globalPrivacySettings.archive_and_mute_new_noncontact_peers = boolTrue</code></a>, to automatically archive and mute new incoming chats from non-contacts.</p>
@@ -877,13 +920,37 @@ A full list of these parameters can be seen in the <a href="#client-configuratio
 <h5><a class="anchor" href="#userpic-setup" id="userpic-setup" name="userpic-setup"><i class="anchor-icon"></i></a><code>USERPIC_SETUP</code></h5>
 <p>Suggests the user to set a <a href="/api/files#uploading-profile-or-chat-pictures">profile picture »</a>.</p>
 <!-- end suggestions -->
+<h4><a class="anchor" href="#custom-suggestions" id="custom-suggestions" name="custom-suggestions"><i class="anchor-icon"></i></a>Custom suggestions</h4>
+<pre><code><a href='/constructor/help.promoData'>help.promoData</a>#8a4d87a flags:<a href='/type/%23'>#</a> proxy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> expires:<a href='/type/int'>int</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Peer'>Peer</a> psa_type:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> psa_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> pending_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; dismissed_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; custom_pending_suggestion:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/PendingSuggestion'>PendingSuggestion</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/constructor/pendingSuggestion'>pendingSuggestion</a>#e7e82e12 suggestion:<a href='/type/string'>string</a> title:<a href='/type/TextWithEntities'>TextWithEntities</a> description:<a href='/type/TextWithEntities'>TextWithEntities</a> url:<a href='/type/string'>string</a> = <a href='/type/PendingSuggestion'>PendingSuggestion</a>;
+
+---functions---
+
+<a href='/method/help.getPromoData'>help.getPromoData</a>#c0977421 = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/method/help.dismissSuggestion'>help.dismissSuggestion</a>#f50dbaa1 peer:<a href='/type/InputPeer'>InputPeer</a> suggestion:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The <code>custom_pending_suggestion</code> field contained in a <a href="/constructor/help.promoData">help.promoData</a> returned by <a href="/method/help.getPromoData">help.getPromoData</a> contains a list of <em>custom</em> suggestions that should be actively shown as a tooltip to the user.</p>
+<p>Custom suggestions have a pre-populated <code>title</code>, <code>description</code>, a <code>url</code> that should be opened when the suggestion is clicked, and a <code>suggestion</code> field that contains an identifier that should be used when invoking <a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> to dismiss a suggestion (with <code>peer=</code><a href="/constructor/inputPeerEmpty">inputPeerEmpty</a>), which will remove it from the <code>custom_pending_suggestion</code> field.  </p>
+<p>This is different from <a href="#basic-suggestions">basic suggestions »</a>, which effectively only have the <code>suggestion</code> identifier, and the client should populate the description, title and action accordingly.  </p>
 <h4><a class="anchor" href="#inverted-suggestions" id="inverted-suggestions" name="inverted-suggestions"><i class="anchor-icon"></i></a>Inverted suggestions</h4>
-<p>These suggestions are <em>enabled by default</em>, and are never returned in the <code>pending_suggestions</code> field of the <a href="#client-configuration">client configuration object</a>.  </p>
-<p>They can be dismissed by invoking <a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> as usual, but unlike <a href="#basic-suggestions">basic suggestions</a>, once dismissed they will appear in the <code>dismissed_suggestions</code> field of the <a href="#client-configuration">client configuration object</a>.  </p>
-<ul>
-<li><code>"BIRTHDAY_CONTACTS_TODAY"</code> - If not dismissed, indicates that the client should display the tooltip that recommends to gift a Telegram Premium subscription to contacts on their <a href="/api/profile#birthday">birthday »</a>.<br>
-This suggestion can be dismissed by invoking <a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> when the user hides the tooltip, but it is also automatically dismissed by the server if the user gifts one or more Telegram Premium subscriptions to friends with birthdays falling within the next/previous 24 hours.  </li>
-</ul>
+<pre><code><a href='/constructor/help.promoData'>help.promoData</a>#8a4d87a flags:<a href='/type/%23'>#</a> proxy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> expires:<a href='/type/int'>int</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Peer'>Peer</a> psa_type:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> psa_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> pending_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; dismissed_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; custom_pending_suggestion:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/PendingSuggestion'>PendingSuggestion</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/constructor/help.promoDataEmpty'>help.promoDataEmpty</a>#98f6ac75 expires:<a href='/type/int'>int</a> = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+---functions---
+
+<a href='/method/help.getPromoData'>help.getPromoData</a>#c0977421 = <a href='/type/help.PromoData'>help.PromoData</a>;
+
+<a href='/method/help.dismissSuggestion'>help.dismissSuggestion</a>#f50dbaa1 peer:<a href='/type/InputPeer'>InputPeer</a> suggestion:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>These suggestions are <em>enabled by default</em>, and are never returned in the <code>pending_suggestions</code> field returned by <a href="/method/help.getPromoData">help.getPromoData</a>.  </p>
+<p>They can be dismissed by invoking <a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> as usual, but unlike <a href="#basic-suggestions">basic suggestions</a> (with <code>peer=</code><a href="/constructor/inputPeerEmpty">inputPeerEmpty</a>), once dismissed they will appear in the <code>dismissed_suggestions</code> field of the <a href="#client-configuration">client configuration object</a>.  </p>
+<p>List of inverted suggestions:</p>
+<!-- start dismissed suggestions -->
+<h5><a class="anchor" href="#birthday-contacts-today" id="birthday-contacts-today" name="birthday-contacts-today"><i class="anchor-icon"></i></a><code>BIRTHDAY_CONTACTS_TODAY</code></h5>
+<p>If not dismissed, indicates that the client should display the tooltip that recommends to gift a Telegram Premium subscription to contacts on their <a href="/api/profile#birthday">birthday »</a>.  </p>
+<p>This suggestion can be dismissed by invoking <a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> when the user hides the tooltip, but it is also automatically dismissed by the server if the user gifts one or more Telegram Premium subscriptions to friends with birthdays falling within the next/previous 24 hours.</p>
+<!-- end dismissed suggestions -->
 <h4><a class="anchor" href="#channel-suggestions" id="channel-suggestions" name="channel-suggestions"><i class="anchor-icon"></i></a>Channel suggestions</h4>
 <pre><code><a href='/constructor/messages.chatFull'>messages.chatFull</a>#e5d7d19c full_chat:<a href='/type/ChatFull'>ChatFull</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.ChatFull'>messages.ChatFull</a>;
 
@@ -906,7 +973,7 @@ Here's a list of possible suggestions:  </p>
 
 <a href='/method/help.dismissSuggestion'>help.dismissSuggestion</a>#f50dbaa1 peer:<a href='/type/InputPeer'>InputPeer</a> suggestion:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
 <p><a href="/method/help.dismissSuggestion">help.dismissSuggestion</a> can be used to dismiss a suggestion.<br>
-Pass <a href="/constructor/inputPeerEmpty">inputPeerEmpty</a> to <code>peer</code> for <a href="#basic-suggestions">basic suggestions</a> and the <a href="/api/channel">channel/supergroup</a>'s peer for <a href="#channel-suggestions">channel suggestions</a>.</p>
+Pass <a href="/constructor/inputPeerEmpty">inputPeerEmpty</a> to <code>peer</code> for <a href="#basic-suggestions">basic suggestions</a> and <a href="#custom-suggestions">custom suggestions</a> and the <a href="/api/channel">channel/supergroup</a>'s peer for <a href="#channel-suggestions">channel suggestions</a>.</p>
 <h3><a class="anchor" href="#app-specific-configuration" id="app-specific-configuration" name="app-specific-configuration"><i class="anchor-icon"></i></a>App-specific configuration</h3>
 <pre><code><a href='/constructor/help.appUpdate'>help.appUpdate</a>#ccbbce30 flags:<a href='/type/%23'>#</a> can_not_skip:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> version:<a href='/type/string'>string</a> text:<a href='/type/string'>string</a> entities:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; document:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Document'>Document</a> url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> sticker:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Document'>Document</a> = <a href='/type/help.AppUpdate'>help.AppUpdate</a>;
 <a href='/constructor/help.noAppUpdate'>help.noAppUpdate</a>#c45a6536 = <a href='/type/help.AppUpdate'>help.AppUpdate</a>;
