@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Todo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Premium users can now create collaborative checklists in any chat to track tasks and coordinate teams — or manage shopping…">
+    <meta property="og:title" content="Todo">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Premium users can now create collaborative checklists in any chat to track tasks and coordinate teams — or manage shopping…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/todo" >Todo</a></li></ul></div>
+  <h1 id="dev_page_title">Todo</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Premium users can now create collaborative checklists in any chat to track tasks and coordinate teams — or manage shopping and to-do lists.  </p>
+<pre><code><a href='/constructor/todoItem'>todoItem</a>#cba9a52f id:<a href='/type/int'>int</a> title:<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/TodoItem'>TodoItem</a>;
+<a href='/constructor/todoList'>todoList</a>#49b92a26 flags:<a href='/type/%23'>#</a> others_can_append:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> others_can_complete:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> title:<a href='/type/TextWithEntities'>TextWithEntities</a> list:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/TodoItem'>TodoItem</a>&gt; = <a href='/type/TodoList'>TodoList</a>;
+
+<a href='/constructor/inputMediaTodo'>inputMediaTodo</a>#9fc55fde todo:<a href='/type/TodoList'>TodoList</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
+<a href='/constructor/messageMediaToDo'>messageMediaToDo</a>#8a53b014 flags:<a href='/type/%23'>#</a> todo:<a href='/type/TodoList'>TodoList</a> completions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/TodoCompletion'>TodoCompletion</a>&gt; = <a href='/type/MessageMedia'>MessageMedia</a>;
+
+<a href='/constructor/messageActionTodoCompletions'>messageActionTodoCompletions</a>#cc7c5c89 completed:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; incompleted:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/MessageAction'>MessageAction</a>;
+<a href='/constructor/messageActionTodoAppendTasks'>messageActionTodoAppendTasks</a>#c7edbc83 list:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/TodoItem'>TodoItem</a>&gt; = <a href='/type/MessageAction'>MessageAction</a>;
+
+---functions---
+
+<a href='/method/messages.appendTodoList'>messages.appendTodoList</a>#21a61057 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> list:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/TodoItem'>TodoItem</a>&gt; = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/messages.toggleTodoCompleted'>messages.toggleTodoCompleted</a>#d3e03124 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> completed:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; incompleted:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Use <a href="/method/messages.sendMedia">messages.sendMedia</a> with <a href="/constructor/inputMediaTodo">inputMediaTodo</a> to post a to-do list.  </p>
+<p>Use <a href="/method/messages.appendTodoList">messages.appendTodoList</a> to append items to the to-do list after creation: this will emit <a href="/constructor/messageService">service messages</a> of type <a href="/constructor/messageActionTodoAppendTasks">messageActionTodoAppendTasks</a>.  </p>
+<p>Use <a href="/method/messages.toggleTodoCompleted">messages.toggleTodoCompleted</a> to toggle some items as completed or not completed using their IDs: this will emit <a href="/constructor/messageService">service messages</a> of type <a href="/constructor/messageActionTodoCompletions">messageActionTodoCompletions</a>.  </p>
+<p>During creation, <a href="/method/todoList">todoList</a>.<code>others_can_append</code> can be set to allow users different from yourself to invoke <a href="/method/messages.appendTodoList">messages.appendTodoList</a> to append items to the list.<br>
+<a href="/method/todoList">todoList</a>.<code>others_can_complete</code> can be set to allow users different from yourself to mark items as (not) completed with <a href="/method/messages.toggleTodoCompleted">messages.toggleTodoCompleted</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
