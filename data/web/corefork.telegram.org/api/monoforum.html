@@ -140,6 +140,7 @@ Use <a href="/method/messages.unpinAllMessages">messages.unpinAllMessages</a> to
 To search for messages within a miniforum topic, additionally set the <code>saved_peer_id</code> to the id of the topic.  </p>
 <p><a href="/method/messages.getPinnedSavedDialogs">messages.getPinnedSavedDialogs</a>, <a href="/method/messages.toggleSavedDialogPin">messages.toggleSavedDialogPin</a>, <a href="/method/messages.reorderPinnedSavedDialogs">messages.reorderPinnedSavedDialogs</a> can only be used for <a href="/api/saved-messages">saved messages</a>, <strong>not</strong> monoforums.</p>
 <p>Admins will receive <a href="/constructor/updateReadMonoForumInbox">updateReadMonoForumInbox</a>/<a href="/constructor/updateReadMonoForumOutbox">updateReadMonoForumOutbox</a> updates instead of <a href="/constructor/updateReadChannelInbox">updateReadChannelInbox</a>/<a href="/constructor/updateReadChannelOutbox">updateReadChannelOutbox</a>.  </p>
+<p>Admins will also receive an additional <code>saved_peer_id</code> flag in <a href="/constructor/updateDraftMessage">updateDraftMessage</a>, <a href="/constructor/updateChannelReadMessagesContents">updateChannelReadMessagesContents</a>, <a href="/constructor/updateDialogUnreadMark">updateDialogUnreadMark</a>, <a href="/constructor/updateMessageReactions">updateMessageReactions</a> updates received from monoforums, containing the topic ID.  </p>
 </li>
 <li>
 <p>Non-administrators can only view and send messages to their own topic.  </p>
@@ -148,7 +149,7 @@ To search for messages within a miniforum topic, additionally set the <code>save
 <p>From the user side monoforums are, as the name implies, monotopic forums, so they should be treated similarly to supergroups when working with the API.  </p>
 <p>For graphical clients, the user-side UI should be similar to the one used for one-to-one chats.  </p>
 <p>To interact with messages in a monoforum as a (non-admined) user, use all the methods usually used for supergroups, <strong>not</strong> the <code>messages.*Saved*</code> variants, without any of the modified <code>saved_*</code> arguments listed above, which can only be used by monoforum admins.  </p>
-<p>The same goes for updates: non-admin users will never receive</p>
+<p>The same goes for <em>some</em> updates: non-admin users will never receive an additional <code>saved_peer_id</code> flag in <a href="/constructor/updateDraftMessage">updateDraftMessage</a>, <a href="/constructor/updateChannelReadMessagesContents">updateChannelReadMessagesContents</a>, <a href="/constructor/updateDialogUnreadMark">updateDialogUnreadMark</a>, but they <strong>will</strong> receive it for <a href="/constructor/updateMessageReactions">updateMessageReactions</a></p>
 </li>
 </ul></div>
   
