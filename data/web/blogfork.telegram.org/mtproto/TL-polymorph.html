@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>﻿Polymorphism in TL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="It should be noted that in the TL schema of the overwhelming majority of API calls the use of polymorphic types is restricted…">
+    <meta property="og:title" content="﻿Polymorphism in TL">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="It should be noted that in the TL schema of the overwhelming majority of API calls the use of polymorphic types is restricted…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL" >TL Language</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL-polymorph" >﻿Polymorphism in TL</a></li></ul></div>
+  <h1 id="dev_page_title">﻿Polymorphism in TL</h1>
+  
+  <div id="dev_page_content"><p>It should be noted that in the TL schema of the overwhelming majority of API calls the use of polymorphic types is restricted to the Vector type. Nevertheless, having a view of the big picture is still helpful.</p>
+<h3><a class="anchor" href="#ordinary-inductive-types" id="ordinary-inductive-types" name="ordinary-inductive-types"><i class="anchor-icon"></i></a>Ordinary inductive types</h3>
+<p>For example, let us consider the IntList, which is defined as follows:</p>
+<pre><code>int_cons hd:int tl:IntList = IntList;
+int_nil = IntList;</code></pre>
+<p>The “int_cons” and “int_nil” constructors as well as the “IntList” type itself are expressions of the following types (writing A : X means that A is an expression of type X):</p>
+<pre><code>IntList : Type;
+int_cons : int -&gt; IntList -&gt; IntList;
+int_nil : IntList;</code></pre>
+<p>The keyword <em>Type</em> is used to denote the type of all types. Note that Type is not Object (Object is the type of all terms). 
+Here is alternative syntax that could be used in some other functional programming language (but not in TL):</p>
+<pre><code>NewType IntList :=
+| int_cons hd:int tl:IntList
+| int_nil
+EndType</code></pre>
+<h3><a class="anchor" href="#polymorphic-type" id="polymorphic-type" name="polymorphic-type"><i class="anchor-icon"></i></a>Polymorphic type</h3>
+<p>TL supports the following version (curly brackets indicate optional fields, see below):</p>
+<pre><code>cons {X:Type} hd:X tl:(List X) = List X;
+nil {X:Type} = List X</code></pre>
+<p>Here is an alternative formulation in other functional languages with dependent types:</p>
+<pre><code>NewType List {X:Type} :=
+| cons {X:Type} hd:X tl:(List X)
+| nil {X:Type}
+EndType</code></pre>
+<p>In any event, these variations are equivalent to one another from the point of view of the formal theory of types and lead to the definition of the following terms:</p>
+<pre><code>List : Type -&gt; Type;
+cons : forall (X:Type), X -&gt; List X -&gt; List X;
+nil : forall (X:Type), X -&gt; List X;</code></pre>
+<p>In each case, remember that writing “A -&gt; B” is shorthand for “forall (x : A), B” for any variable x not entering into A and B. For example, the “cons” type could be written as follows:</p>
+<pre><code>cons : forall (X:Type), forall (hd : X), forall (tl : List X), List X</code></pre>
+<p>or more compactly:</p>
+<pre><code>cons : forall (X : Type) (hd : X) (tl : List X), List X</code></pre>
+<p>See <a href="https://en.wikipedia.org/wiki/Calculus_of_constructions">Calculus of constructions</a>. Examples of functional languages with dependent types, which support similar constructions are <a href="https://en.wikipedia.org/wiki/Coq">Coq</a> and <a href="https://en.wikipedia.org/wiki/Agda_%28programming_language%29">Agda</a>.</p>
+<p>In this case, the entry after a universal quantifier proves to be more content-related than that after an arrow, because the name of a variable bound by the quantifier is used to transmit the name of the corresponding field in the constructor, even if this variable is not used anywhere as it pertains to the expression under the quantifier. Structurally, all of these entries of the “cons” type are equivalent.</p>
+<h3><a class="anchor" href="#serialization-of-types-values-of-type-type" id="serialization-of-types-values-of-type-type" name="serialization-of-types-values-of-type-type"><i class="anchor-icon"></i></a>Serialization of types (values of type Type)</h3>
+<p>As we can see, to serialize a value of type List X, which has been obtained by applying the combinator “cons X:Type hd:X tl:(List X) = List X”, we need to:</p>
+<ol>
+<li>serialize the name of the “cons” combinator into a 32-bit number;</li>
+<li>serialize X (as a type, i.e. as a value of type Type) if X is a required parameter;</li>
+<li>serialize the head of the list (hd) as a value of type X;</li>
+<li>serialize the tail of the list as a value of the polymorphic type List X. </li>
+</ol>
+<p>In the first step, the natural question is which string exactly will be used to calculate the CRC32. It is proposed to take "<code>cons X:Type hd:X tl:List X = List X</code>” without the terminating semicolon and without any parentheses (closed type expressions are unambiguously reconstructed based on their construction's prefix).</p>
+<p>In the last step, we recursively resolve the very same problem of serializing a value of type List X; we will consider it resolved based on the assumption of induction in the construction of the value being serialized. We will similarly consider the third step understandable (induction in the construction of the value being serialized). </p>
+<p>We still need to describe how to transmit (serialize) types, e.g. values of type <strong>Type</strong>. <em>Types in TL schemas currently appear only as constructors' optional parameters and are therefore never serialized explicitly. Rather, their values are inferred from the previously known type of the value being serialized</em>. </p>
+<p>For completeness we will describe how it would be possible to serialize types (values of type Type). However, keep in mind that for now this information is not useful. See <a href="/mtproto/TL-types">Type serialization</a>.</p>
+<h3><a class="anchor" href="#optional-arguments-in-polymorphic-constructors" id="optional-arguments-in-polymorphic-constructors" name="optional-arguments-in-polymorphic-constructors"><i class="anchor-icon"></i></a>Optional arguments in polymorphic constructors</h3>
+<p>It was stated above that any subset of (the first few) parameters of any constructor can be identified as optional (by enclosing their declarations in curly brackets), but this is not actually entirely accurate.  First, these optional parameters can only be of type <code>Type</code> or <code>#</code> (natural numbers). Second, optional parameters must share the return value's type, otherwise their value cannot be determined.</p>
+<p>Note that @'''constr-id''' means the constructor's “full form” (in which all optional parameters become required), while '''constr-id'' denotes its abbreviated form (without the optional arguments). If there are no optional arguments, then these two forms are the same. Constructors' full forms are never used at present.</p>
+<h3><a class="anchor" href="#bare-polymorphic-types" id="bare-polymorphic-types" name="bare-polymorphic-types"><i class="anchor-icon"></i></a>Bare polymorphic types</h3>
+<p>There is a small problem: if we want to serialize the value of the bare type '%pair string int' or '%pair string Y' (which in TL is usually denoted simply as “pair”, though the form “%Pair” is preferable), we cannot simultaneously use both the full constructor @pair and the partial pair, because the constructor's name will not be serialized. Therefore, we must differentiate the bare types %@pair (type X, type Y, value x:X, and value y:Y are serialized) and %pair (only x:X and y:Y are serialized; types X and Y are known from the context). In practice, we nearly almost always need the bare type %pair, and this is precisely what “pair” means in the type's context in TL. Therefore, </p>
+<pre><code>record name:string map:(List (pair int string)) = Record;</code></pre>
+<p>will be serialized approximately like we want it to be (the serialization of list elements will consist of the serialization of int and the serialization of string, without any additional headers, types, or combinator names).
+Incidentally, when calculating the “record” combinator's name <em>'record'</em> in the example given above, the CRC32 of <code>record name:string map:List pair int string = Record</code> will be computed.</p>
+<p>Also note that a more precise description of this type would be</p>
+<pre><code>record name:string map:(List %(Pair int string)) = Record</code></pre></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
