@@ -65,22 +65,33 @@ While in the API direct channel message groups are…">
 <p>To send a direct message to the channel, users simply have to send a message to the associated monoforum: unlike for normal supergroups/forums there's no need to join it.  </p>
 <p>Monoforums have the following special characteristics:</p>
 <ul>
-<li>The <a href="/constructor/channel">channel</a>.<code>id</code> of a monoforum will have a range different from those of normal supergroups and channels (this is especially relevant when generating and categorizing the associated <a href="/api/bots/ids#monoforum-ids">bot API ID, see here »</a> for the correct procedure to use for monoforum IDs).  </li>
-<li>The <a href="/constructor/channel">channel</a>.<code>monoforum</code> flag will be set for a monoforum.</li>
-<li>The <a href="/constructor/channel">channel</a>.<code>linked_monoforum_id</code> of a monoforum will be set to the ID of the associated channel.  </li>
-</ul>
-<p>All messages sent to the monoforum are split into "topics", reusing the same UI used for <a href="/api/forum#tabbed-or-list-based-forum-ui">tabbed forums</a> (note: monoforums should use the tabbed forum UI regardless of the value of <a href="/constructor/channel">channel</a>.<code>forum_tabs</code>).  </p>
-<p>Monoforum topics do <strong>not</strong> share their implementation with forum topics (i.e. they are <strong>not</strong> based on message threads): instead, topics are identified by the <code>saved_peer_id</code> field of <a href="/constructor/message">message</a>s and <a href="/constructor/messageService">messageService</a>s, which will be equal to the ID of the user.  </p>
-<p>Each topic is associated to exactly one user.  </p>
-<ul>
 <li>
-<p>Administrators of the channel can view and reply to all messages sent by all topics of the monoforum.<br>
-To send messages to a specic monoforum topic/user, when invoking <a href="/method/messages.sendMessage">messages.sendMessage</a> and the other methods, channel administrators must pass an <a href="/constructor/inputReplyToMonoForum">inputReplyToMonoForum</a> to <code>reply_to</code>, with <code>monoforum_peer_id</code> equal to the topic ID (aka <code>saved_peer_id</code>): the resulting outgoing message will have a <code>saved_peer_id</code> equal to the passed <code>monoforum_peer_id</code> (equal and set for both for the administrator, and for the receiving user).  </p>
+<p>The <a href="/constructor/channel">channel</a>.<code>id</code> of a monoforum will have a range different from those of normal supergroups and channels (this is especially relevant when generating and categorizing the associated <a href="/api/bots/ids#monoforum-ids">bot API ID, see here »</a> for the correct procedure to use for monoforum IDs).  </p>
+</li>
+<li>
+<p>The <a href="/constructor/channel">channel</a>.<code>monoforum</code> flag will be set for a monoforum.</p>
+</li>
+<li>
+<p>The <a href="/constructor/channel">channel</a>.<code>linked_monoforum_id</code> of a monoforum will be set to the ID of the associated channel.  </p>
+</li>
+<li>
+<p>All messages sent to the monoforum are split into "topics", reusing the same UI used for <a href="/api/forum#tabbed-or-list-based-forum-ui">tabbed forums</a> (note: monoforums should use the tabbed forum UI regardless of the value of <a href="/constructor/channel">channel</a>.<code>forum_tabs</code>).  </p>
+<p>Each topic is associated to exactly one user, and contains only the direct message history between the user and the channel itself.  </p>
+<p>Topics are identified by the <code>saved_peer_id</code> field of <a href="/constructor/message">message</a>s and <a href="/constructor/messageService">messageService</a>s, which will be equal to the ID of the user.  </p>
+<p>Of course, this means monoforum topics do <strong>not</strong> share their implementation with forum topics: this also means that, unlike normal forums, monoforums fully support <a href="/api/threads">message threads</a>.  </p>
+<p>Note that the <a href="/constructor/message">message</a>.<code>saved_peer_id</code> field is also used to implement a distinct feature, <a href="/api/saved-messages#saved-message-dialogs">saved message dialogs »</a>: in this case, the <code>peer_id</code> will be equal to the ID of the currently logged in user, instead of the ID of a monoforum. </p>
+</li>
+<li>
+<p>Administrators of the channel can view and reply to all messages sent by all topics of the monoforum.  </p>
+<p>To send messages to a specific monoforum topic/user, when invoking <a href="/method/messages.sendMessage">messages.sendMessage</a> and the other methods, channel administrators must pass an <a href="/constructor/inputReplyToMonoForum">inputReplyToMonoForum</a> to <code>reply_to</code>, with <code>monoforum_peer_id</code> equal to the topic ID (aka <code>saved_peer_id</code>): the resulting outgoing message will have a <code>saved_peer_id</code> equal to the passed <code>monoforum_peer_id</code> (equal and set for both for the administrator, and for the receiving user).  </p>
+<p>The message will be sent on behalf of the channel associated to the monoforum (i.e. <code>send_as</code> will be forcefully set by the server to the <a href="/constructor/channel">(monoforum's) channel</a>.<code>linked_monoforum_id</code>): custom <code>send_as</code> values are not allowed and are simply ignored.  </p>
 <p>To reply to a message within a monoforum topic, pass <a href="/constructor/inputReplyToMessage">inputReplyToMessage</a> with the <code>reply_to_msg_id</code> and other flags populated as usual, and <code>monoforum_peer_id</code> equal to the topic ID (aka <code>saved_peer_id</code>); unlike for normal forums, do <strong>not</strong> populate <code>top_msg_id</code>.  </p>
 </li>
 <li>
 <p>Non-administrators can only view and send messages to their own topic.  </p>
-<p>Outoing and incoming messages will still be identified by the <code>saved_peer_id</code>, but there's no need to set <a href="/constructor/inputReplyToMonoForum">inputReplyToMonoForum</a> or <a href="/constructor/inputReplyToMessage">inputReplyToMessage</a>.<code>monoforum_peer_id</code> when sending messages to the monoforum.</p>
+<p>To send a direct message to the channel, users simply have to send a message to the associated monoforum: unlike for normal supergroups/forums there's no need to join the monoforum.  </p>
+<p>Outoing and incoming monoforum messages will still be identified by the <code>saved_peer_id</code>, but there's no need to set <a href="/constructor/inputReplyToMonoForum">inputReplyToMonoForum</a> or <a href="/constructor/inputReplyToMessage">inputReplyToMessage</a>.<code>monoforum_peer_id</code> when sending messages to the monoforum.  </p>
+<p>Since from the user side monoforums are, as the name implies, monotopic forums, they should simply use the normal supergroup UI instead of the tabbed forum UI.</p>
 </li>
 </ul></div>
   
