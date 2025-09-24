@@ -179,8 +179,20 @@ To search for messages within a miniforum topic, additionally set the <code>save
 <p>In this context, the sender can only (optionally) populate the following flags of <a href="/constructor/suggestedPost">suggestedPost</a>:</p>
 <ul>
 <li><code>price</code> - To offer payment for the suggested post (posts can also be suggested for free, without setting this flag)</li>
-<li><code>schedule_date</code> - To specify when should the message be posted (optional, can be omitted if the message can be posted at any time).</li>
-</ul></div>
+<li><code>schedule_date</code> - To specify when should the message be posted (optional, can be omitted if the message can be posted at any time); in this case, upon approval, the post will be automatically <a href="/api/scheduled-messages">scheduled »</a>.  </li>
+</ul>
+<p>The channel administrator can then choose to:</p>
+<ul>
+<li>Accept the suggested post by invoking <a href="/method/messages.toggleSuggestedPostApproval">messages.toggleSuggestedPostApproval</a>, setting <strong>only</strong> <code>peer</code>, <code>msg_id</code> and optionally <code>schedule_date</code>, to modify the scheduling date.<br>
+This will emit a <a href="/constructor/messageActionSuggestedPostApproval">messageActionSuggestedPostApproval</a> service message with the <code>schedule_date</code> and <code>price</code> flags populated accordingly.<br>
+If the user's balance is too low for the suggested price, the message will not be scheduled/posted until </li>
+<li>Request a modification to the price, to the contents of the message or the scheduling date, by replying to the message with the same message, tweaked as needed; it's mandatory to also pass the same or a modified <a href="/constructor/suggestedPost">suggestedPost</a> constructor to <code>suggested_post</code>.<br>
+In this case, it will be up to the receiver to accept, request a modification or reject the suggested post, using the same flow previously used by the channel administrator (in case of a further modification, it will be the channel's turn again, and so on).<br>
+Note that the channel may also suggest a post to the user unprompted (i.e. without replying to a post suggested by the user).  </li>
+<li>Reject the suggested post by invoking <a href="/method/messages.toggleSuggestedPostApproval">messages.toggleSuggestedPostApproval</a>, setting <strong>only</strong> <code>peer</code>, <code>msg_id</code>, <code>reject</code> and optionally <code>reject_comment</code>, to specify a reason for the rejection.<br>
+This will emit a <a href="/constructor/messageActionSuggestedPostApproval">messageActionSuggestedPostApproval</a> service message with the <code>rejected</code> and <code>reject_comment</code> flags populated accordingly.  </li>
+</ul>
+<p>Note that channel administrators can recommend posts in the same way, the only difference is that</p></div>
   
 </div>
           
