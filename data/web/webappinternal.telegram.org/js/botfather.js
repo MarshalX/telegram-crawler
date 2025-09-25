@@ -237,15 +237,12 @@ var CreateBot = {
       return;
     }
 
-    var btfrm_enabled = $('input[name=type]:checked').val() == 'btfrm';
-
     WebApp.MainButton.showProgress();
     Aj.apiRequest('createBot', {
         title: title,
         about: $('textarea[name="about"]').val(),
         username: $('input[name="username"]').val(),
         userpic: Aj.state.files?.['bot_userpic']?.photo_id || '',
-        btfrm: btfrm_enabled || '',
     }, res => {
         WebApp.MainButton.hideProgress();
         if (res.ok) {
