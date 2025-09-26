@@ -64,8 +64,15 @@
 <p>In this context, the sender can only (optionally) populate the following flags of <a href="/constructor/suggestedPost">suggestedPost</a>:</p>
 <ul>
 <li><code>price</code> - To offer payment for the suggested post (posts can also be suggested for free, without setting this flag).<br>
-If set and specified in <a href="/api/stars">Stars</a>, the price must range between <a href="/api/config#stars-suggested-post-amount-min">stars_suggested_post_amount_min</a> and <a href="/api/config#stars-suggested-post-amount-max">stars_suggested_post_amount_max</a>.<br>
-If set and specified in toncoins, the price must range between <a href="/api/config#ton-suggested-post-amount-min">ton_suggested_post_amount_min</a> and <a href="/api/config#ton-suggested-post-amount-max">ton_suggested_post_amount_max</a> (in nanotons).  </li>
+If set and specified in <a href="/api/stars">Stars</a><ul>
+<li>The price must range between <a href="/api/config#stars-suggested-post-amount-min">stars_suggested_post_amount_min</a> and <a href="/api/config#stars-suggested-post-amount-max">stars_suggested_post_amount_max</a>,</li>
+<li>Upon successful completion, the channel will get <code>price*stars_suggested_post_commission_permille/1000</code> stars, <a href="/api/config#stars-suggested-post-commission-permille">see stars_suggested_post_commission_permille »</a>.
+.<br>
+If set and specified in nanotons (toncoin):</li>
+<li>The price must range between <a href="/api/config#ton-suggested-post-amount-min">ton_suggested_post_amount_min</a> and <a href="/api/config#ton-suggested-post-amount-max">ton_suggested_post_amount_max</a>.  </li>
+<li>Upon successful completion, the channel will get <code>price*ton_suggested_post_commission_permille/1000</code> nanotons, <a href="/api/config#ton-suggested-post-commission-permille">see ton_suggested_post_commission_permille »</a>.</li>
+</ul>
+</li>
 <li><code>schedule_date</code> - To specify when should the message be posted (optional, can be omitted if the message can be posted at any time); in this case, upon approval, the post will be automatically <a href="/api/scheduled-messages">scheduled »</a>.  </li>
 </ul>
 <p>The channel administrator (or the user, for posts suggested by the channel; in any case, for paid suggested posts, it's always the user that pays the channel, never the other way around) can then choose to:</p>
