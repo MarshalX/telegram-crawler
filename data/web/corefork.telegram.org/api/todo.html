@@ -62,9 +62,11 @@
 
 <a href='/method/messages.toggleTodoCompleted'>messages.toggleTodoCompleted</a>#d3e03124 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> completed:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; incompleted:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Use <a href="/method/messages.sendMedia">messages.sendMedia</a> with <a href="/constructor/inputMediaTodo">inputMediaTodo</a> to post a to-do list.  </p>
+<p>The title of a todo list has a maximum length equal to <a href="/api/config#todo-title-length-max">todo_title_length_max »</a>.  </p>
 <p>During creation, <a href="/constructor/todoList">todoList</a>.<code>others_can_append</code> can be set to allow users different from yourself to invoke <a href="/method/messages.appendTodoList">messages.appendTodoList</a> to append items to the list.<br>
 <a href="/constructor/todoList">todoList</a>.<code>others_can_complete</code> can be set to allow users different from yourself to mark items as (not) completed with <a href="/method/messages.toggleTodoCompleted">messages.toggleTodoCompleted</a>.</p>
-<p>The passed <a href="/constructor/todoItem">todoItem</a>s are composed of a title and a positive (non-zero) ID, unique within the context of the current list.  </p>
+<p>The passed <a href="/constructor/todoItem">todoItem</a>s are composed of a title (maximum length equal to <a href="/api/config#todo-item-length-max">todo_item_length_max »</a>) and a positive (non-zero) ID, unique within the context of the current list.  </p>
+<p>A todo list can have at most <a href="/api/config#todo-items-max">todo_items_max »</a> items.  </p>
 <p>Use <a href="/method/messages.appendTodoList">messages.appendTodoList</a> to append items to the to-do list after creation: this will emit <a href="/constructor/messageService">service messages</a> of type <a href="/constructor/messageActionTodoAppendTasks">messageActionTodoAppendTasks</a>.<br>
 The newly appended <a href="/constructor/todoItem">todoItem</a>s must have an ID that isn't already contained within the item list, otherwise a <code>TODO_ITEM_DUPLICATE</code> RPC error will be emitted.  </p>
 <p>Use <a href="/method/messages.toggleTodoCompleted">messages.toggleTodoCompleted</a> to toggle some items as completed or not completed using their IDs: this will emit <a href="/constructor/messageService">service messages</a> of type <a href="/constructor/messageActionTodoCompletions">messageActionTodoCompletions</a>.  </p>
