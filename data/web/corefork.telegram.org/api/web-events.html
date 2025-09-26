@@ -476,21 +476,61 @@ Ignore further <code>web_app_request_file_download</code> events until step 3 is
 <p>Event data: a JSON object with a <code>locked</code> boolean field (defaults to <code>false</code>).</p>
 <p>Used by <a href="/api/bots/webapps">bot web apps</a> to enable or disable the orientation lock.</p>
 <h4><a class="anchor" href="#web-app-device-storage-save-key" id="web-app-device-storage-save-key" name="web-app-device-storage-save-key"><i class="anchor-icon"></i></a><code>web_app_device_storage_save_key</code></h4>
-<p> </p>
+<p>Event data: a JSON object with the following keys:</p>
+<ul>
+<li><code>req_id</code> - A string with the ID of the current request</li>
+<li><code>key</code> - A string with the key to save</li>
+<li><code>value</code> - A string with the value to save, or <code>null</code> to remove the key.  </li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to save or remove a key from a persistent local storage on the user's device, associated to the currently logged in user and mini app.  </p>
+<p>All data is stored locally and is available only to the bot that created it. Each bot can store up to 5 MB per user using this storage.  </p>
+<p>Emits a <a href="/api/bots/webapps#device-storage-key-saved">device_storage_key_saved event »</a> on success and a <a href="/api/bots/webapps#device-storage-failed">device_storage_failed event »</a> on failure.</p>
 <h4><a class="anchor" href="#web-app-device-storage-get-key" id="web-app-device-storage-get-key" name="web-app-device-storage-get-key"><i class="anchor-icon"></i></a><code>web_app_device_storage_get_key</code></h4>
-<p> </p>
+<p>Event data: a JSON object with the following keys:</p>
+<ul>
+<li><code>req_id</code> - A string with the ID of the current request</li>
+<li><code>key</code> - A string with the key to fetch</li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to fetch a key from a persistent local storage on the user's device, associated to the currently logged in user and mini app.  </p>
+<p>Emits a <a href="/api/bots/webapps#device-storage-key-received">device_storage_key_received event »</a> on success and a <a href="/api/bots/webapps#device-storage-failed">device_storage_failed event »</a> on failure.</p>
 <h4><a class="anchor" href="#web-app-device-storage-clear" id="web-app-device-storage-clear" name="web-app-device-storage-clear"><i class="anchor-icon"></i></a><code>web_app_device_storage_clear</code></h4>
-<p> </p>
+<p>Event data: a JSON object with the following keys:</p>
+<ul>
+<li><code>req_id</code> - A string with the ID of the current request</li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to clear the persistent local storage on the user's device, associated to the currently logged in user and mini app.  </p>
+<p>Emits a <a href="/api/bots/webapps#device-storage-cleared">device_storage_cleared event »</a> on success and a <a href="/api/bots/webapps#device-storage-failed">device_storage_failed event »</a> on failure.</p>
 <h4><a class="anchor" href="#web-app-secure-storage-save-key" id="web-app-secure-storage-save-key" name="web-app-secure-storage-save-key"><i class="anchor-icon"></i></a><code>web_app_secure_storage_save_key</code></h4>
-<p> </p>
+<p>Event data: a JSON object with the following keys:</p>
+<ul>
+<li><code>req_id</code> - A string with the ID of the current request</li>
+<li><code>key</code> - A string with the key to save</li>
+<li><code>value</code> - A string with the value to save, or <code>null</code> to remove the key.  </li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to save or remove a key from a secure storage on the user's device, associated to the currently logged in user and mini app.  </p>
+<p>On <strong>iOS</strong>, it uses the system <strong>Keychain</strong>; on <strong>Android</strong>, it uses the <strong>Keystore</strong>. This ensures that all stored values are encrypted at rest and inaccessible to unauthorized applications.  </p>
+<p>Secure storage is suitable for storing tokens, secrets, authentication state, and other sensitive user-specific information. Each bot can store up to <strong>10 items per user</strong>.   </p>
+<p>Emits a <a href="/api/bots/webapps#secure-storage-key-saved">secure_storage_key_saved event »</a> on success and a <a href="/api/bots/webapps#secure-storage-failed">secure_storage_failed event »</a> on failure.</p>
 <h4><a class="anchor" href="#web-app-secure-storage-get-key" id="web-app-secure-storage-get-key" name="web-app-secure-storage-get-key"><i class="anchor-icon"></i></a><code>web_app_secure_storage_get_key</code></h4>
-<p> </p>
+<p>Event data: a JSON object with the following keys:</p>
+<ul>
+<li><code>req_id</code> - A string with the ID of the current request</li>
+<li><code>key</code> - A string with the key to get.  </li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to fetch a key from a secure storage on the user's device, associated to the currently logged in user and mini app.  </p>
+<p>Emits a <a href="/api/bots/webapps#secure-storage-key-received">secure_storage_key_received event »</a> on success and a <a href="/api/bots/webapps#secure-storage-failed">secure_storage_failed event »</a> on failure.</p>
 <h4><a class="anchor" href="#web-app-secure-storage-clear" id="web-app-secure-storage-clear" name="web-app-secure-storage-clear"><i class="anchor-icon"></i></a><code>web_app_secure_storage_clear</code></h4>
-<p> </p>
+<p>Event data: a JSON object with the following keys:</p>
+<ul>
+<li><code>req_id</code> - A string with the ID of the current request</li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">bot web apps</a> to clear the secure storage on the user's device, associated to the currently logged in user and mini app.  </p>
+<p>Emits a <a href="/api/bots/webapps#secure-storage-cleared">secure_storage_cleared event »</a> on success and a <a href="/api/bots/webapps#secure-storage-failed">secure_storage_failed event »</a> on failure.</p>
 <h4><a class="anchor" href="#web-app-secure-storage-restore-key" id="web-app-secure-storage-restore-key" name="web-app-secure-storage-restore-key"><i class="anchor-icon"></i></a><code>web_app_secure_storage_restore_key</code></h4>
 <p> </p>
 <h4><a class="anchor" href="#web-app-hide-keyboard" id="web-app-hide-keyboard" name="web-app-hide-keyboard"><i class="anchor-icon"></i></a><code>web_app_hide_keyboard</code></h4>
-<p> </p>
+<p>Event payload: <code>null</code></p>
+<p>Hides the on-screen keyboard, if it is currently visible. Does nothing if the keyboard is not active.</p>
 <h4><a class="anchor" href="#web-app-verify-age" id="web-app-verify-age" name="web-app-verify-age"><i class="anchor-icon"></i></a><code>web_app_verify_age</code></h4>
 <p> </p>
 <!-- end events --></div>
