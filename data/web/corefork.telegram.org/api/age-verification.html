@@ -55,12 +55,15 @@
 <p>Access to users, chats, channels and individual messages may be restricted for a variety of platforms and reasons through the <code>restriction_reason</code> field.  </p>
 <p>To check if any of the restriction reasons applies to us, iterate over the <a href="/constructor/restrictionReason">restrictionReason</a> objects in the <code>restriction_reason</code> field, keeping <strong>only</strong> reasons where:</p>
 <ul>
-<li><code>platform</code> is equal to <code>all</code></li>
-<li><code>platform</code> is equal to the current platform (hardcoded within the client based on the current platform, i.e. <code>ios</code>, <code>android</code>, <code>wp</code>, etc)</li>
-<li><code>platform</code> is equal to any of the platform specified in the <a href="/api/config#restriction-add-platforms">restriction_add_platforms dynamic configuration parameter »</a></li>
-<li><code>reason</code> is <strong>not</strong> contained in the list of reasons specified in the <a href="/api/config#ignore-restriction-reasons">ignore_restriction_reasons dynamic configuration parameter »</a>.  </li>
+<li><a href="/constructor/restrictionReason">restrictionReason</a>.<code>platform</code> is equal to <code>all</code></li>
+<li>For all platforms specified in <a href="/constructor/restrictionReason">restrictionReason</a>.<code>platform</code> (which contains a concatenated list of one or more multiple platforms, separated by <code>-</code>):<ul>
+<li>At least one matches the current platform (hardcoded within the client based on the current platform, i.e. <code>ios</code>, <code>android</code>, <code>wp</code>, etc) </li>
+<li>At least one matches any of the platforms specified in the <a href="/api/config#restriction-add-platforms">restriction_add_platforms dynamic configuration parameter »</a></li>
 </ul>
-<p>If at least one of the <code>reason</code>s available after filtering is <strong>not</strong> equal to <code>sensitive</code>, access to the content must be completely restricted.  </p>
+</li>
+<li><a href="/constructor/restrictionReason">restrictionReason</a>.<code>reason</code> is <strong>not</strong> contained in the list of reasons specified in the <a href="/api/config#ignore-restriction-reasons">ignore_restriction_reasons dynamic configuration parameter »</a>.  </li>
+</ul>
+<p>If at least one of the <code>reason</code>s available after filtering is <strong>not</strong> equal to <code>sensitive</code>, access to the content must be completely restricted, showing the error specified in <a href="/constructor/restrictionReason">restrictionReason</a>.<code>text</code>.  </p>
 <p>If the only <code>reason</code> is equal to <code>sensitive</code>, and the <a href="/api/config#need-age-video-verification">need_age_video_verification »</a> client configuration key is not set or equal to <code>false</code>, age verification is disabled or was already passed by the user and the content may be accessed, but must be hidden with a <code>18+</code> spoiler.  </p>
 <p>If the only <code>reason</code> is equal to <code>sensitive</code>, and the <a href="/api/config#need-age-video-verification">need_age_video_verification »</a> client configuration key is equal to <code>true</code>, the content may only be accessed after age verification, and even then, it must be hidden with a <code>18+</code> spoiler.  </p>
 <p>The following <a href="/api/config">client configuration parameters »</a> are used to implement age verification:</p>
