@@ -144,7 +144,37 @@
 </tr>
 </tbody>
 </table>
-<p>Note that <a href="#message-links">message links</a> have the same syntax, with extra parameters.  </p>
+<p>Note that <a href="#message-links">message links</a> and <a href="#monoforum-links">monoforum links</a> have the same or similar syntax, with extra parameters.  </p>
+<h3><a class="anchor" href="#monoforum-links" id="monoforum-links" name="monoforum-links"><i class="anchor-icon"></i></a>Monoforum links</h3>
+<p>Used to open the direct messages chat (aka <a href="/api/monoforum">monoforum »</a>) associated to a channel, see <a href="/api/monoforum">here for more info on monoforums »</a>.  </p>
+<p><strong>Note</strong>: when sharing messages sent to a monoforum, use <a href="#message-links">normal message links »</a> with the ID of the monoforum, not the ID of the associated channel; the same rule applies for all other chat-related links involving a monoforum.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;username&gt;?direct</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;username&gt;&amp;direct</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the channel, that has an associated monoforum.</td>
+</tr>
+<tr>
+<td><code>direct</code></td>
+<td style="text-align: center;">Required</td>
+<td>Distinguishes monoforum links from other link types.</td>
+</tr>
+</tbody>
+</table>
+<p>Note that <a href="#public-username-links">public username links</a> have a similar syntax, but don't have the <code>direct</code> flag.  </p>
 <h3><a class="anchor" href="#temporary-profile-links" id="temporary-profile-links" name="temporary-profile-links"><i class="anchor-icon"></i></a>Temporary profile links</h3>
 <p>Used to link to user profiles, generated using <a href="/method/contacts.exportContactToken">contacts.exportContactToken</a>.<br>
 These links can be generated even for profiles that don't have a username, and they have an expiration date, specified by the <code>expires</code> field of the <a href="/constructor/exportedContactToken">exportedContactToken</a> constructor returned by <a href="/method/contacts.exportContactToken">contacts.exportContactToken</a>.  </p>
@@ -419,12 +449,8 @@ tg://resolve?domain=&lt;username&gt;&amp;voicechat=&lt;invite_hash&gt;</code></p
 </tbody>
 </table>
 <h3><a class="anchor" href="#conference-links" id="conference-links" name="conference-links"><i class="anchor-icon"></i></a>Conference links</h3>
-<h3><a class="anchor" href="#monoforum-links" id="monoforum-links" name="monoforum-links"><i class="anchor-icon"></i></a>Monoforum links</h3>
 <h3><a class="anchor" href="#my-stars-links" id="my-stars-links" name="my-stars-links"><i class="anchor-icon"></i></a>My stars links</h3>
 <h3><a class="anchor" href="#my-toncoins-links" id="my-toncoins-links" name="my-toncoins-links"><i class="anchor-icon"></i></a>My toncoins links</h3>
-<h3><a class="anchor" href="#star-gift-collection-links" id="star-gift-collection-links" name="star-gift-collection-links"><i class="anchor-icon"></i></a>Star gift collection links</h3>
-<h3><a class="anchor" href="#story-album-links" id="story-album-links" name="story-album-links"><i class="anchor-icon"></i></a>Story album links</h3>
-<h3><a class="anchor" href="#collectible-gift-links" id="collectible-gift-links" name="collectible-gift-links"><i class="anchor-icon"></i></a>Collectible gift links</h3>
 <h3><a class="anchor" href="#stickerset-links" id="stickerset-links" name="stickerset-links"><i class="anchor-icon"></i></a>Stickerset links</h3>
 <p>Used to import stickersets or <a href="/api/custom-emoji">custom emoji</a> stickersets as described <a href="/api/stickers#installing-stickersets">here »</a>.</p>
 <p><code>t.me</code> syntax:</p>
@@ -498,6 +524,34 @@ tg://addemoji?set=&lt;slug&gt;</code></pre>
 <td><code>story_id</code></td>
 <td style="text-align: center;">Required</td>
 <td>ID of the <a href="/api/stories#watching-stories">Telegram Story to be fetched and viewed as described here »</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#story-album-links" id="story-album-links" name="story-album-links"><i class="anchor-icon"></i></a>Story album links</h3>
+<p>Identifies a <a href="/api/stories#story-albums">story album »</a> on a peer's profile: use <a href="/method/stories.getAlbumStories">stories.getAlbumStories</a> to fetch stories within the specified album.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;username&gt;?album=&lt;album_id&gt;</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;username&gt;&amp;album=&lt;album_id&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the peer that owns the collection.</td>
+</tr>
+<tr>
+<td><code>album_id</code></td>
+<td style="text-align: center;">Required</td>
+<td>Integer ID of the <a href="/api/stories#story-albums">story album »</a>, from <a href="/constructor/storyAlbum">storyAlbum</a>.<code>album_id</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -1509,6 +1563,34 @@ If not, this link must bring the user to the <a href="/api/stars#buying-or-gifti
 <td><code>slug</code></td>
 <td style="text-align: center;">Required</td>
 <td>Identifier of the collectible gift, to pass to <a href="/method/payments.getUniqueStarGift">payments.getUniqueStarGift</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#gift-collection-links" id="gift-collection-links" name="gift-collection-links"><i class="anchor-icon"></i></a>Gift collection links</h3>
+<p>Identifies a <a href="/api/gifts#gift-collections">star gift collection »</a> on a peer's profile: use <a href="/method/payments.getSavedStarGifts">payments.getSavedStarGifts</a> with the <code>collection_id</code> flag set to fetch gifts within a collection.  </p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;username&gt;?collection=&lt;collection_id&gt;</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;username&gt;&amp;collection=&lt;collection_id&gt;</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the peer that owns the collection.</td>
+</tr>
+<tr>
+<td><code>collection_id</code></td>
+<td style="text-align: center;">Required</td>
+<td>Integer ID of the <a href="/api/gifts#gift-collections">star gift collection »</a>, from <a href="/constructor/starGiftCollection">starGiftCollection</a>.<code>collection_id</code>.</td>
 </tr>
 </tbody>
 </table>
