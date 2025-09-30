@@ -47,7 +47,7 @@
 <p>Below you will find information on schema changes. For more details on the use of layers, see <a href="/api/invoking#layers">Invoking API methods</a>.</p>
 <h3><a class="anchor" href="#layer-214" id="layer-214" name="layer-214"><i class="anchor-icon"></i></a><a href="/schema?layer=214">Layer 214</a></h3>
 <p>To view all changes since the last documentation refresh, start reading at <a href="#layer-196">layer 196</a>.</p>
-<p>This documentation refresh brings the following changes:</p>
+<p>This documentation refresh <em>also</em> brings the following changes:</p>
 <ul>
 <li>
 <p><a href="/api/file-references">A brand new new file reference database map file »</a>: can be used to automatically codegen a fully functional file reference database, see <a href="/api/file-references">here »</a> for more info.</p>
@@ -105,6 +105,15 @@
 <li>Specifically, the bot API dialog ID new ranges from <code>-4000000000000</code> to <code>1099511627775</code> (previously the range was <code>-2002147483648</code> to <code>1099511627775</code>).</li>
 <li>The transformed range for bot API monoforum dialog IDs is <code>-2002147483649</code> to <code>-4000000000000</code> inclusively.  </li>
 </ul>
+</li>
+<li>
+<p>Push notifications can now have a custom <code>report_delivery_until_date</code> parameter for <a href="https://telegram.org/blog/star-messages-gateway-2-0-and-more#save-even-more-on-user-verification">Telegram Gateway verification messages</a>: if set, the message is a telegram gateway verification code, and <a href="/method/messages.reportMessagesDelivery">messages.reportMessagesDelivery</a> should be invoked with the <code>push</code> flag set.  </p>
+</li>
+<li>
+<p>Added a correction to the <a href="/api/reactions#paid-reactions">paid reactions documentation »</a>: the <code>random_id</code> argument of <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a> <strong>must</strong> be composed of a 64-bit integer where the first 32 bits are random, and the remaining 32 bits <strong>are equal to the current unixtime</strong>, i.e. <code>uint64_t random_id = (time() &lt;&lt; 32) | ((uint64_t)random_uint32_t())</code>: this differs from the <code>random_id</code> format of all other methods in the API, which just take 64 random bits.  </p>
+</li>
+<li>
+<p>A whole bunch of new features and articles, <a href="#layer-196">start reading at layer 196</a> to view them all.  </p>
 </li>
 </ul>
 <p>And here are the changes in this layer:  </p>
