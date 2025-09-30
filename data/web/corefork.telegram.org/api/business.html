@@ -159,20 +159,21 @@ Quick replies are shortcuts for sending preset messages that may contain several
 <p>To fetch basic info about all existing quick reply shortcuts, use <a href="/method/messages.getQuickReplies">messages.getQuickReplies</a>.  </p>
 <p>The method will return the ID and name of each shortcut, along with the number of messages in the shortcut and the ID of (only) the last message of each shortcut (along with the message itself in <code>messages</code>).  </p>
 <p>Note that the <code>hash</code> is used for caching, and is generated <strong>not</strong> by using the message IDs, but rather the following set of integers, passed to the <a href="/api/offsets#hash-generation">usual hashing algorithm</a>.  </p>
-<pre><code>hash_ints = [];
+<pre><code>vector&lt;uint64&gt; hash_ints = [];
 foreach (quick_replies as quick_reply) {
-  hash_ints[] = quick_reply.shortcut_id;
-  hash_ints[] = hexdec(substr(md5(quick_reply.shortcut), 0, 16));
-  hash_ints[] = quick_reply.top_message;
-  hash_ints[] = top_message.edit_date || 0;
+  hash_ints.append((uint64) quick_reply.shortcut_id);
+  hash_ints.append((uint64) hexdec(substr(md5(quick_reply.shortcut), 0, 16)));
+  hash_ints.append((uint64) quick_reply.top_message);
+  hash_ints.append((uint64) (top_message.edit_date || 0));
 }</code></pre>
 <p>The method will return <a href="/constructor/messages.quickRepliesNotModified">messages.quickRepliesNotModified</a> if the passed hash is equal to the server-side hash, meaning that the order, names and last messages of the quick replies haven't changed.  </p>
 <p>Editing some intermediate message in a quick reply will not change the hash, which is why <a href="/method/messages.getQuickReplyMessages">messages.getQuickReplyMessages</a> should be used to fetch (a subset or all) messages in a quick reply shortcut, and its hash is generated as follows:</p>
-<pre><code>hash_ints = [];
+<pre><code>vector&lt;uint64&gt; hash_ints = [];
 foreach (messages as message) {
-  hash_ints[] = message.id;
-  hash_ints[] = message.edit_date || 0;
+  hash_ints.append((uint64) message.id);
+  hash_ints.append((uint64) message.edit_date || 0);
 }</code></pre>
+<p>The generated list of integers must then be passed to the <a href="/api/offsets#hash-generation">usual hashing algorithm</a>.  </p>
 <h4><a class="anchor" href="#adding-a-message-to-a-quick-reply-shortcut" id="adding-a-message-to-a-quick-reply-shortcut" name="adding-a-message-to-a-quick-reply-shortcut"><i class="anchor-icon"></i></a>Adding a message to a quick reply shortcut</h4>
 <pre><code><a href='/constructor/inputQuickReplyShortcut'>inputQuickReplyShortcut</a>#24596d41 shortcut:<a href='/type/string'>string</a> = <a href='/type/InputQuickReplyShortcut'>InputQuickReplyShortcut</a>;
 <a href='/constructor/inputQuickReplyShortcutId'>inputQuickReplyShortcutId</a>#1190cf1 shortcut_id:<a href='/type/int'>int</a> = <a href='/type/InputQuickReplyShortcut'>InputQuickReplyShortcut</a>;
