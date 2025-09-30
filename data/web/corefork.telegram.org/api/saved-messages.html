@@ -166,6 +166,46 @@ If the <code>reactions_as_tags</code> flag is not set on a saved message with at
 <p>The user may also assign a name (max 12 UTF-8 chars) to a tag reaction using <a href="/method/messages.updateSavedReactionTag">messages.updateSavedReactionTag</a>; to remove the name, call the same method without setting the <code>title</code> flag.  </p>
 <p><a href="/method/messages.getSavedReactionTags">messages.getSavedReactionTags</a> can be used to fetch and locally cache the full list of reaction tag names assigned by the user; a <code>peer</code> may be optionally specified, to fetch only reaction tags used on messages of a specific <a href="#saved-message-dialogs">saved message dialog</a>.<br>
 Updating the name of a reaction tag will emit an <a href="/constructor/updateSavedReactionTags">updateSavedReactionTags</a> update to all logged-in sessions except for the current one; this update should trigger a call to <a href="/method/messages.getSavedReactionTags">messages.getSavedReactionTags</a> <em>without</em> setting the <code>peer</code> flag to refresh the locally cached list.  </p>
+<p>The client that updated the reaction tag won't get a <a href="/constructor/updateSavedReactionTags">updateSavedReactionTags</a>: in this case, the client can choose to manually invoke <a href="/method/messages.getSavedReactionTags">messages.getSavedReactionTags</a> every time it updates the reaction tags, or, to avoid making the extra call, it can choose to manually update the cached list, in this case the <code>hash</code> should be regenerated using the following algorithm:</p>
+<pre><code>string remove_emoji_selectors(string emoji) {
+  string str;
+  for (i = 0; i &lt; len(emoji); i++) {
+    if (i + 3 &lt;= len(emoji) &amp;&amp; emoji[i] == '\xEF' &amp;&amp; emoji[i + 1] == '\xB8' &amp;&amp; emoji[i + 2] == '\x8F') {
+      // skip \uFE0F
+      i += 2;
+    } else {
+      str += emoji[i];
+    }
+  }
+  return str;
+}
+
+uint64 get_md5_string_hash(string str) {
+  // Binary md5 hash, not hex
+  string hash = md5(str);
+
+  uint64 result = 0;
+  for (int i = 0; i &lt;= 7; i++) {
+    result += ((uint64)hash[i]) &lt;&lt; (56 - 8 * i);
+  }
+  return result;
+}
+
+vector&lt;uint64&gt; numbers = [];
+
+// tags is an array of savedReactionTag constructors
+foreach (tags as tag) {
+  if tag.reaction instanceof reactionEmoji {
+    numbers.append(get_md5_string_hash(remove_emoji_selectors(tag.reaction.emoticon)))
+  } else if reaction instanceof reactionCustomEmoji {
+    numbers.append(tag.reaction.document_id)
+  }
+  if (len(tag.title) &gt; 0) {
+    numbers.append(get_md5_string_hash(tag.title));
+  }
+  numbers.append(tag.count);
+}</code></pre>
+<p>The generated list of 64-bit integers must then be passed to the <a href="/api/offsets#hash-generation">usual hashing algorithm</a>.  </p>
 <p>If non-empty, the list of saved reaction tags returned by <a href="/method/messages.getSavedReactionTags">messages.getSavedReactionTags</a> should be shown in the UI just below the search input bar, in descending order by <code>count</code>; if searching within a specific <a href="#saved-message-dialogs">saved message dialog</a>, use <code>peer</code> to only return tags used in a specific saved message dialog.  </p>
 <p>The tag reaction selection UI, on the other hand, should first display the reactions returned by <a href="/method/messages.getSavedReactionTags">messages.getSavedReactionTags</a> (global tag list, i.e. without <code>peer</code> regardless of the current saved message dialog) in descending order by <code>count</code>, then the reactions returned by <a href="/method/messages.getDefaultTagReactions">messages.getDefaultTagReactions</a> that weren't already returned by <a href="/method/messages.getSavedReactionTags">messages.getSavedReactionTags</a>, then any installed <a href="/api/custom-emoji">custom emoji packs</a>.</p></div>
   

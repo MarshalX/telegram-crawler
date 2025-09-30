@@ -208,7 +208,7 @@ The set <a href="/type/ChatReactions">ChatReactions</a> constructor can then be 
 </ul>
 <p>Setting the <code>add_to_recent</code> flag of <a href="/method/messages.sendReaction">messages.sendReaction</a> will update the recent reaction list, triggering an <a href="/constructor/updateRecentReactions">updateRecentReactions</a> update on other logged-in sessions.  </p>
 <p>When receiving <a href="/constructor/updateRecentReactions">updateRecentReactions</a>, clients should invoke <a href="/method/messages.getRecentReactions">messages.getRecentReactions</a> to refresh the locally cached list.  </p>
-<p>The client that invoked <a href="/method/messages.sendReaction">messages.sendReaction</a> will not get a <a href="/constructor/updateRecentReactions">updateRecentReactions</a>: in this case, the client can choose to manually invoke <a href="/method/messages.getRecentReactions">messages.getRecentReactions</a> every time a reaction is sent with <code>add_to_recent</code>, or, to avoid making the extra call, update the local list manually, regenerating the <code>hash</code> using the following algorithm:</p>
+<p>The client that invoked <a href="/method/messages.sendReaction">messages.sendReaction</a> will not get a <a href="/constructor/updateRecentReactions">updateRecentReactions</a>: in this case, the client can choose to manually invoke <a href="/method/messages.getRecentReactions">messages.getRecentReactions</a> every time a reaction is sent with <code>add_to_recent</code>, or, to avoid making the extra call, it can update the local list manually, regenerating the <code>hash</code> using the following algorithm:</p>
 <pre><code>reactions.prepend(new_reaction)
 
 string remove_emoji_selectors(string emoji) {
@@ -234,6 +234,7 @@ vector&lt;uint64&gt; hash_ints = [];
 foreach (reactions as reaction) {
   if reaction instanceof reactionEmoji {
     string emoji = remove_emoji_selectors(reaction.emoticon);
+    // Binary md5 hash, not hex
     string hash = md5(emoji);
 
     hash_ints.append(0);
