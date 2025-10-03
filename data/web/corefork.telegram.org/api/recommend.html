@@ -48,21 +48,25 @@
 <h3><a class="anchor" href="#similar-channels" id="similar-channels" name="similar-channels"><i class="anchor-icon"></i></a>Similar channels</h3>
 <p>Scheme:</p>
 <pre><code><a href='/constructor/messages.chats'>messages.chats</a>#64ff9fd5 chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
+<a href='/constructor/messages.chatsSlice'>messages.chatsSlice</a>#9cd81144 count:<a href='/type/int'>int</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
 
 ---functions---
 
-<a href='/method/channels.getChannelRecommendations'>channels.getChannelRecommendations</a>#25a71742 flags:<a href='/type/%23'>#</a> channel:flags.0?<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
+<a href='/method/channels.getChannelRecommendations'>channels.getChannelRecommendations</a>#25a71742 flags:<a href='/type/%23'>#</a> channel:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
 <p>Clients should invoke <a href="/method/channels.getChannelRecommendations">channels.getChannelRecommendations</a> after joining a <a href="/api/channel">channel</a> (passing the channel's peer in <code>channel</code>), automatically displaying a popup with a list of similarly themed channels.  </p>
 <p>The same method should also be invoked when opening a special "Similar channels" tab in the channel's profile (similar to the Media/Links/Gifs/etc tabs).  </p>
 <p>The method should also be called <em>without</em> setting the <code>channel</code> flag in the "Similar channels" section of the "Channels" tab of global search, to return a <em>global</em> list of recommended channels, similar to the ones the current user has already joined, see <a href="/api/search#global-search">here »</a> for more info.  </p>
 <p>The maximum number of similar channels that can be recommended by <a href="/method/channels.getChannelRecommendations">channels.getChannelRecommendations»</a> to <a href="/api/premium">Premium</a>/non-<a href="/api/premium">Premium</a> users is contained in the <a href="/api/config#recommended-channels-limit-premium">recommended_channels_limit_premium</a>/<a href="/api/config#recommended-channels-limit-default">recommended_channels_limit_default</a> app configuration keys.</p>
+<p>Non-<a href="/type/Premium">Premium</a> users may get a reduced result set in the form of a <a href="/constructor/messages.chatsSlice">messages.chatsSlice</a> where <code>count</code> &gt; the number of results in <code>chats</code>: upgrading to a <a href="/api/premium">Premium</a> account will return the full result set as a <a href="/constructor/messages.chatsSlice">messages.chatsSlice</a>.  </p>
 <h3><a class="anchor" href="#similar-bots" id="similar-bots" name="similar-bots"><i class="anchor-icon"></i></a>Similar bots</h3>
 <pre><code><a href='/constructor/users.users'>users.users</a>#62d706b8 users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/users.Users'>users.Users</a>;
+<a href='/constructor/users.usersSlice'>users.usersSlice</a>#315a4974 count:<a href='/type/int'>int</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/users.Users'>users.Users</a>;
 
 ---functions---
 
 <a href='/method/bots.getBotRecommendations'>bots.getBotRecommendations</a>#a1b70815 bot:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.Users'>users.Users</a>;</code></pre>
-<p>The same method should also be invoked when opening a special "Similar bots" tab in the bot's profile (similar to the Media/Links/Gifs/etc tabs).</p></div>
+<p>The same method should also be invoked when opening a special "Similar bots" tab in the bot's profile (similar to the Media/Links/Gifs/etc tabs).  </p>
+<p>Non-<a href="/type/Premium">Premium</a> users may get a reduced result set in the form of a <a href="/constructor/users.usersSlice">users.usersSlice</a> where <code>count</code> &gt; the number of results in <code>users</code>: upgrading to a <a href="/api/premium">Premium</a> account will return the full result set as a <a href="/constructor/users.users">users.users</a>.</p></div>
   
 </div>
           

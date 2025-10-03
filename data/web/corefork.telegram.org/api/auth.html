@@ -318,7 +318,11 @@ If the <code>unconfirmed</code> flag is set, clients should display a notificati
 <p>Note that a JSON version of the full list of methods that can be invoked over an unauthed connection is also available in the <a href="/api/errors#error-database">RPC db »</a>.  </p>
 <h3><a class="anchor" href="#frozen-accounts" id="frozen-accounts" name="frozen-accounts"><i class="anchor-icon"></i></a>Frozen accounts</h3>
 <p>Accounts can be frozen for serious violations of Telegram's <a href="https://telegram.org/tos">ToS</a>.  </p>
-<p>Frozen accounts are in read-only mode, and invoking many methods will emit a <code>FROZEN_METHOD_INVALID</code> (420) error.  </p>
+<p>Frozen accounts are in read-only mode, and invoking many methods will emit one of the following errors:</p>
+<ul>
+<li><code>FROZEN_METHOD_INVALID</code> (420): the specified method cannot be used at all by frozen accounts.  </li>
+<li><code>FROZEN_PARTICIPANT_MISSING</code> (400): even if the specified method can be used by frozen accounts, the specified peer cannot be accessed by frozen accounts.</li>
+</ul>
 <p>Frozen accounts are deleted after a specific amount of time, unless an appeal is submitted and accepted.  </p>
 <p>When receiving a <code>FROZEN_METHOD_INVALID</code>, clients should invoke <a href="/method/help.getAppConfig">help.getAppConfig</a> to obtain the following newly populated fields:</p>
 <ul>
