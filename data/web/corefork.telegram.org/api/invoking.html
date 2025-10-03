@@ -52,7 +52,7 @@
 <pre><code>invokeWithLayer#da9b0d0d {X:Type} layer:int query:!X = X;</code></pre>
 <p>The helper method <strong><a href="/method/invokeWithLayer">invokeWithLayer</a></strong> can be used only together with <a href="/method/initConnection">initConnection</a>: the present layer will be saved with all other parameters of the client and any future requests will be using this saved value. <a href="#saving-client-info">See more below</a>.</p>
 <p><strong>Note</strong>: in some cases, updates from big channels may contain constructors from older layers, different from the connection's current layer.  </p>
-<p>Clients should treat this as a <code>500</code> server error, and handle it by closing and reopening the TCP socket, and invoking <a href="/api/updates">getDifference</a>.  </p>
+<p>Clients should treat this as a <code>500</code> server error, and handle it by closing and reopening the TCP socket, re-reinitializing the session with <a href="/constructor/initConnection">initConnection</a> and invoking <a href="/api/updates">getDifference</a>.</p>
 <h4><a class="anchor" href="#list-of-available-layers" id="list-of-available-layers" name="list-of-available-layers"><i class="anchor-icon"></i></a><a href="/api/layers">List of Available Layers</a></h4>
 <h3><a class="anchor" href="#saving-client-info" id="saving-client-info" name="saving-client-info"><i class="anchor-icon"></i></a>Saving Client Info</h3>
 <p>It is possible to save information about the current client on the server in conjunction with an authorization key. This may help eliminate client-side problems with certain releases on certain devices or with certain localizations, as well as eliminate the need for sending layer information in each request.</p>
