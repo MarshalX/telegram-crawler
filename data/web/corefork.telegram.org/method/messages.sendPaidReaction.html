@@ -97,18 +97,17 @@
 <tr>
 <td><strong>random_id</strong></td>
 <td style="text-align: center;"><a href="/type/long">long</a></td>
-<td>Unique client message ID required to prevent message resending. <br><strong>Note</strong>: this argument <strong>must</strong> be composed of a 64-bit integer where the lower 32 bits are random, and the higher 32 bits <strong>are equal to the current unixtime</strong>, i.e. <code>uint64_t random_id = (time() &lt;&lt; 32) | ((uint64_t)random_uint32_t())</code>: this differs from the <code>random_id</code> format of all other methods in the API, which just take 64 random bits.</td>
+<td>Unique client message ID required to prevent message resending</td>
 </tr>
 <tr>
 <td><strong>private</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/PaidReactionPrivacy">PaidReactionPrivacy</a></td>
-<td>Each post with star reactions has a leaderboard with the top senders, but users can opt out of appearing there if they prefer more privacy. Not populating this field will use the default reaction privacy, stored on the server and synced to clients using <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> (see <a href="/api/reactions#paid-reaction-privacy">here</a> for more info).</td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/Bool">Bool</a></td>
+<td>Each post with star reactions has a leaderboard with the top senders, but users can opt out of appearing there if they prefer more privacy.  <br>If the user explicitly chose to make their paid reaction(s) private, pass <a href="/constructor/boolTrue">boolTrue</a> to <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code>.  <br>If the user explicitly chose to make their paid reaction(s) private, pass <a href="/constructor/boolTrue">boolFalse</a> to <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code>.  <br>If the user did not make any explicit choice about the privacy of their paid reaction(s) (i.e. when reacting by clicking on an existing star reaction on a message), do not populate the <a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a>.<code>private</code> flag.</td>
 </tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#result" id="result" name="result"><i class="anchor-icon"></i></a>Result</h3>
 <p><a href="/type/Updates">Updates</a></p>
-<h3><a class="anchor" href="#only-users-can-use-this-method" id="only-users-can-use-this-method" name="only-users-can-use-this-method"><i class="anchor-icon"></i></a>Only users can use this method</h3>
 <h3><a class="anchor" href="#possible-errors" id="possible-errors" name="possible-errors"><i class="anchor-icon"></i></a>Possible errors</h3>
 <table class="table">
 <thead>
@@ -121,57 +120,18 @@
 <tbody>
 <tr>
 <td>400</td>
-<td>BALANCE_TOO_LOW</td>
-<td>The transaction cannot be completed because the current <a href="/api/stars">Telegram Stars balance</a> is too low.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>CHANNEL_INVALID</td>
-<td>The provided channel is invalid.</td>
-</tr>
-<tr>
-<td>403</td>
-<td>CHAT_WRITE_FORBIDDEN</td>
-<td>You can't write in this chat.</td>
-</tr>
-<tr>
-<td>400</td>
 <td>MESSAGE_ID_INVALID</td>
 <td>The provided message id is invalid.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>PEER_ID_INVALID</td>
-<td>The provided peer id is invalid.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>RANDOM_ID_EMPTY</td>
-<td>Random ID empty.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>RANDOM_ID_EXPIRED</td>
-<td>The specified <code>random_id</code> was expired (most likely it didn't follow the required <code>uint64_t random_id = (time() &lt;&lt; 32) | ((uint64_t)random_uint32_t())</code> format, or the specified time is too far in the past).</td>
-</tr>
-<tr>
-<td>400</td>
-<td>REACTIONS_COUNT_INVALID</td>
-<td>The specified number of reactions is invalid.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>SEND_AS_PEER_INVALID</td>
-<td>You can't send messages as the specified peer.</td>
 </tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
 <p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
-<h4><a class="anchor" href="#updatepaidreactionprivacy" id="updatepaidreactionprivacy" name="updatepaidreactionprivacy"><i class="anchor-icon"></i></a><a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a></h4>
-<p>Contains the current <a href="/api/reactions#paid-reactions">default paid reaction privacy, see here »</a> for more info.</p>
-<p>Clients should invoke <a href="/method/messages.getPaidReactionPrivacy">messages.getPaidReactionPrivacy</a> on startup to fetch the current default reaction privacy because this update is only sent to currently online sessions and cannot be fetched using getDifference on client startup.</p>
+<h4><a class="anchor" href="#booltrue" id="booltrue" name="booltrue"><i class="anchor-icon"></i></a><a href="/constructor/boolTrue">boolTrue</a></h4>
+<p>The constructor can be interpreted as a <strong>boolean</strong><code>true</code> value.</p>
+<h4><a class="anchor" href="#messagessendpaidreaction" id="messagessendpaidreaction" name="messagessendpaidreaction"><i class="anchor-icon"></i></a><a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a></h4>
+<p>Sends one or more <a href="/api/reactions#paid-reactions">paid Telegram Star reactions »</a>, transferring <a href="/api/stars">Telegram Stars »</a> to a channel's balance.</p>
 <h4><a class="anchor" href="#message-reactions" id="message-reactions" name="message-reactions"><i class="anchor-icon"></i></a><a href="/api/reactions">Message reactions</a></h4>
 <p>Telegram allows users to react on any message using specific emojis, triggering cute lottie animations.</p></div>
   

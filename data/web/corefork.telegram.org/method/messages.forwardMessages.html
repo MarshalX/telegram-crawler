@@ -140,11 +140,6 @@
 <td>Destination <a href="/api/forum#forum-topics">forum topic</a></td>
 </tr>
 <tr>
-<td><strong>reply_to</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.22?<a href="/type/InputReplyTo">InputReplyTo</a></td>
-<td>Can only contain an <a href="/constructor/inputReplyToMonoForum">inputReplyToMonoForum</a>, to forward messages to a <a href="/api/monoforum">monoforum topic</a> (mutually exclusive with <code>top_msg_id</code>).</td>
-</tr>
-<tr>
 <td><strong>schedule_date</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.10?<a href="/type/int">int</a></td>
 <td>Scheduled message date for scheduled messages</td>
@@ -159,26 +154,10 @@
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.17?<a href="/type/InputQuickReplyShortcut">InputQuickReplyShortcut</a></td>
 <td>Add the messages to the specified <a href="/api/business#quick-reply-shortcuts">quick reply shortcut »</a>, instead.</td>
 </tr>
-<tr>
-<td><strong>video_timestamp</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.20?<a href="/type/int">int</a></td>
-<td>Start playing the video at the specified timestamp (seconds).</td>
-</tr>
-<tr>
-<td><strong>allow_paid_stars</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.21?<a href="/type/long">long</a></td>
-<td>For <a href="/api/paid-messages">paid messages »</a>, specifies the amount of <a href="/api/stars">Telegram Stars</a> the user has agreed to pay in order to send the message.</td>
-</tr>
-<tr>
-<td><strong>suggested_post</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.23?<a href="/type/SuggestedPost">SuggestedPost</a></td>
-<td>Used to <a href="/api/suggested-posts">suggest a post to a channel, see here »</a> for more info on the full flow.</td>
-</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#result" id="result" name="result"><i class="anchor-icon"></i></a>Result</h3>
 <p><a href="/type/Updates">Updates</a></p>
-<h3><a class="anchor" href="#both-users-and-bots-can-use-this-method" id="both-users-and-bots-can-use-this-method" name="both-users-and-bots-can-use-this-method"><i class="anchor-icon"></i></a>Both users and bots can use this method</h3>
 <h3><a class="anchor" href="#possible-errors" id="possible-errors" name="possible-errors"><i class="anchor-icon"></i></a>Possible errors</h3>
 <table class="table">
 <thead>
@@ -189,16 +168,6 @@
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>406</td>
-<td>ALLOW_PAYMENT_REQUIRED</td>
-<td>This peer only accepts <a href="/api/paid-messages">paid messages »</a>: this error is only emitted for older layers without paid messages support, so the client must be updated in order to use paid messages.  .</td>
-</tr>
-<tr>
-<td>403</td>
-<td>ALLOW_PAYMENT_REQUIRED_%d</td>
-<td>This peer charges %d <a href="/api/stars">Telegram Stars</a> per message, but the <code>allow_paid_stars</code> was not set or its value is smaller than %d.</td>
-</tr>
 <tr>
 <td>400</td>
 <td>BROADCAST_PUBLIC_VOTERS_FORBIDDEN</td>
@@ -261,11 +230,6 @@
 </tr>
 <tr>
 <td>403</td>
-<td>CHAT_SEND_INLINE_FORBIDDEN</td>
-<td>You can't send inline messages in this group.</td>
-</tr>
-<tr>
-<td>403</td>
 <td>CHAT_SEND_MEDIA_FORBIDDEN</td>
 <td>You can't send media in this chat.</td>
 </tr>
@@ -298,11 +262,6 @@
 <td>403</td>
 <td>CHAT_SEND_VOICES_FORBIDDEN</td>
 <td>You can't send voice recordings in this chat.</td>
-</tr>
-<tr>
-<td>403</td>
-<td>CHAT_SEND_WEBPAGE_FORBIDDEN</td>
-<td>You can't send webpage previews to this chat.</td>
 </tr>
 <tr>
 <td>403</td>
@@ -345,7 +304,7 @@
 <td>A detailed description of the error will be received separately as described <a href="/api/errors#406-not-acceptable">here »</a>.</td>
 </tr>
 <tr>
-<td>406</td>
+<td>400</td>
 <td>PEER_ID_INVALID</td>
 <td>The provided peer id is invalid.</td>
 </tr>
@@ -355,14 +314,9 @@
 <td>A premium account is required to execute this action.</td>
 </tr>
 <tr>
-<td>403</td>
+<td>406</td>
 <td>PRIVACY_PREMIUM_REQUIRED</td>
 <td>You need a <a href="/api/premium">Telegram Premium subscription</a> to send a message to this user.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>QUICK_REPLIES_BOT_NOT_ALLOWED</td>
-<td><a href="/api/business#quick-reply-shortcuts">Quick replies</a> cannot be used by bots.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -388,11 +342,6 @@
 <td>400</td>
 <td>REPLY_MESSAGES_TOO_MUCH</td>
 <td>Each shortcut can contain a maximum of <a href="/api/config#quick-reply-messages-limit">appConfig.<code>quick_reply_messages_limit</code></a> messages, the limit was reached.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>REPLY_TO_MONOFORUM_PEER_INVALID</td>
-<td>The specified inputReplyToMonoForum.monoforum_peer_id is invalid.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -423,11 +372,6 @@
 <td>420</td>
 <td>SLOWMODE_WAIT_%d</td>
 <td>Slowmode is enabled in this chat: wait %d seconds before sending another message to this chat.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>SUGGESTED_POST_PEER_INVALID</td>
-<td>You cannot send suggested posts to non-<a href="/api/monoforum">monoforum</a> peers.</td>
 </tr>
 <tr>
 <td>406</td>
@@ -466,22 +410,13 @@
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#bots-can-use-this-method" id="bots-can-use-this-method" name="bots-can-use-this-method"><i class="anchor-icon"></i></a>Bots can use this method</h3>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#bots-faq" id="bots-faq" name="bots-faq"><i class="anchor-icon"></i></a><a href="/bots/faq">Bots FAQ</a></h4>
 <h4><a class="anchor" href="#forums" id="forums" name="forums"><i class="anchor-icon"></i></a><a href="/api/forum">Forums</a></h4>
 <p>Telegram allows creating forums with multiple distinct topics.</p>
-<h4><a class="anchor" href="#inputreplytomonoforum" id="inputreplytomonoforum" name="inputreplytomonoforum"><i class="anchor-icon"></i></a><a href="/constructor/inputReplyToMonoForum">inputReplyToMonoForum</a></h4>
-<p>Used to send messages to a <a href="/api/monoforum">monoforum topic</a>.</p>
-<h4><a class="anchor" href="#monoforum" id="monoforum" name="monoforum"><i class="anchor-icon"></i></a><a href="/api/monoforum">Monoforum</a></h4>
-<p>Telegram supports direct messages to channels, which can also be used to suggest (even paid) channel posts.</p>
 <h4><a class="anchor" href="#business" id="business" name="business"><i class="anchor-icon"></i></a><a href="/api/business">Business</a></h4>
 <p>Users can turn their Telegram account into a business account, gaining access to business features such as opening hours, location, quick replies, automated messages, custom start pages, chatbot support, and more.</p>
-<h4><a class="anchor" href="#paid-messages" id="paid-messages" name="paid-messages"><i class="anchor-icon"></i></a><a href="/api/paid-messages">Paid messages</a></h4>
-<p>Telegram Stars can be used to pay for sending messages to users, supergroups and channels that have configured paid messages, requiring a payment for every message sent to them.</p>
-<h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
-<p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
-<h4><a class="anchor" href="#suggested-posts" id="suggested-posts" name="suggested-posts"><i class="anchor-icon"></i></a><a href="/api/suggested-posts">Suggested posts</a></h4>
-<p>Telegram offers a powerful monetization feature to channel administrators: suggested posts.</p>
 <h4><a class="anchor" href="#discussion-groups" id="discussion-groups" name="discussion-groups"><i class="anchor-icon"></i></a><a href="/api/discussion">Discussion groups</a></h4>
 <p>Groups can be associated to a channel as a discussion group, to allow users to discuss about posts.</p>
 <h4><a class="anchor" href="#error-handling" id="error-handling" name="error-handling"><i class="anchor-icon"></i></a><a href="/api/errors">Error handling </a></h4>

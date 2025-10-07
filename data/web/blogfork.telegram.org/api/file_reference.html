@@ -42,18 +42,9 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/file_reference" >File references</a></li></ul></div>
   <h1 id="dev_page_title">File references</h1>
   
-  <div id="dev_page_content"><p>File references are strings of bytes, that can be encountered in the <code>file_reference</code> fields of <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.</p>
-<p>They must be cached by the client, along with the <strong>origin context</strong> where the document/photo object was found, in order to be refetched when the file reference expires.</p>
-<p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
-<h4><a class="anchor" href="#another-example" id="another-example" name="another-example"><i class="anchor-icon"></i></a>Another example:</h4>
-<p>Assume you receive a <a href="/constructor/message">message</a> from your friend: that message contains a <a href="/constructor/messageMediaPhoto">messageMediaPhoto</a> with a <a href="/constructor/photo">photo</a>.</p>
-<p>Your client has to cache not only the <code>file_reference</code> field of the photo, but also the context in which the file reference was seen (in this case, a message coming from a specific user).</p>
-<p>The context info is in this case, <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L74">an origin context of type message</a>, containing the message ID and the peer ID of the chat/channel/user where the message was seen.</p>
-<p>The context info has to be associated with the file reference: when downloading a file using <a href="/method/upload.getFile">upload.getFile</a> or resending it using <a href="/method/messages.sendMedia">messages.sendMedia</a>, a <code>FILE_REFERENCE_EXPIRED</code> error may be returned.<br>
-<a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> returns a variation of the same error, as a <code>FILE_REFERENCE_%d_EXPIRED</code> error (where <code>%d</code> is the index of the media with the expired file reference in the passed media array).<br>
-If this happens, the context info must be used to refetch the object that contained the file reference: in this example, the peer info and the message ID have to be used with <a href="/method/channels.getMessages">channels.getMessages</a> or <a href="/method/messages.getMessages">messages.getMessages</a> to <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L481">refetch the message</a>, recache the file reference and use it in a new file download request.</p>
-<p>More than one origin context can be associated to one file reference, for greater resilience (in the case of a message that was deleted in one chat but was also forwarded in another chat, the file reference can be refetched from the second chat, instead).</p>
-<p>Origin contexts for objects returned by method calls with certain parameters can be considered, too (for example, in the case of favorited sticker sets returned by <a href="/method/messages.getFavedStickers">messages.getFavedStickers</a>).</p></div>
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>This page was moved <a href="/api/file-references">here »</a>.</p></div>
   
 </div>
           

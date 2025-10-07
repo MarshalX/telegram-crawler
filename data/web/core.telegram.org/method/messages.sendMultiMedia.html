@@ -149,10 +149,17 @@
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.18?<a href="/type/long">long</a></td>
 <td>Specifies a <a href="/api/effects">message effect »</a> to use for the message.</td>
 </tr>
+<tr>
+<td><strong>allow_paid_stars</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.21?<a href="/type/long">long</a></td>
+<td>For <a href="/api/paid-messages">paid messages »</a>, specifies the amount of <a href="/api/stars">Telegram Stars</a> the user has agreed to pay in order to send the message.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#result" id="result" name="result"><i class="anchor-icon"></i></a>Result</h3>
 <p><a href="/type/Updates">Updates</a></p>
+<h3><a class="anchor" href="#both-users-and-bots-can-use-this-method" id="both-users-and-bots-can-use-this-method" name="both-users-and-bots-can-use-this-method"><i class="anchor-icon"></i></a>Both users and bots can use this method</h3>
+<h3><a class="anchor" href="#this-method-can-be-invoked-over-a-business-connection-" id="this-method-can-be-invoked-over-a-business-connection-" name="this-method-can-be-invoked-over-a-business-connection-"><i class="anchor-icon"></i></a>This method can be invoked over a <a href="/api/bots/connected-business-bots">business connection »</a></h3>
 <h3><a class="anchor" href="#possible-errors" id="possible-errors" name="possible-errors"><i class="anchor-icon"></i></a>Possible errors</h3>
 <table class="table">
 <thead>
@@ -163,6 +170,16 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>403</td>
+<td>ALLOW_PAYMENT_REQUIRED_%d</td>
+<td>This peer charges %d <a href="/api/stars">Telegram Stars</a> per message, but the <code>allow_paid_stars</code> was not set or its value is smaller than %d.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>BUSINESS_CONNECTION_INVALID</td>
+<td>The <code>connection_id</code> passed to the wrapping <a href="/api/business">invokeWithBusinessConnection</a> call is invalid.</td>
+</tr>
 <tr>
 <td>400</td>
 <td>BUSINESS_PEER_INVALID</td>
@@ -210,18 +227,23 @@
 </tr>
 <tr>
 <td>400</td>
+<td>EFFECT_ID_INVALID</td>
+<td>The specified effect ID is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>ENTITY_BOUNDS_INVALID</td>
 <td>A specified <a href="/api/entities#entity-length">entity offset or length</a> is invalid, see <a href="/api/entities#entity-length">here »</a> for info on how to properly compute the entity offset/length.</td>
 </tr>
 <tr>
 <td>400</td>
 <td>FILE_REFERENCE_%d_EXPIRED</td>
-<td>The file reference of the media file at index %d in the passed media array expired, it <a href="/api/file_reference">must be refreshed</a>.</td>
+<td>The file reference of the media file at index %d in the passed media array expired, it <a href="/api/file-references">must be refreshed as specified in the documentation</a>. .</td>
 </tr>
 <tr>
 <td>400</td>
 <td>FILE_REFERENCE_%d_INVALID</td>
-<td>The file reference of the media file at index %d in the passed media array is invalid.</td>
+<td>The <a href="/api/file-references">file reference</a> of the media file at index %d in the passed media array is invalid.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -252,6 +274,11 @@
 <td>400</td>
 <td>PEER_ID_INVALID</td>
 <td>The provided peer id is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>QUICK_REPLIES_BOT_NOT_ALLOWED</td>
+<td><a href="/api/business#quick-reply-shortcuts">Quick replies</a> cannot be used by bots.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -315,7 +342,6 @@
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#bots-can-use-this-method" id="bots-can-use-this-method" name="bots-can-use-this-method"><i class="anchor-icon"></i></a>Bots can use this method</h3>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#message-drafts" id="message-drafts" name="message-drafts"><i class="anchor-icon"></i></a><a href="/api/drafts">Message drafts</a></h4>
 <p>How to handle message drafts</p>
@@ -324,15 +350,20 @@
 <h4><a class="anchor" href="#bots-faq" id="bots-faq" name="bots-faq"><i class="anchor-icon"></i></a><a href="/bots/faq">Bots FAQ</a></h4>
 <h4><a class="anchor" href="#messagesuploadmedia" id="messagesuploadmedia" name="messagesuploadmedia"><i class="anchor-icon"></i></a><a href="/method/messages.uploadMedia">messages.uploadMedia</a></h4>
 <p>Upload a file and associate it to a chat (without actually sending it to the chat)</p>
+<p>May also be used in a <a href="/api/bots/connected-business-bots">business connection</a>, <em>not</em> by wrapping the query in <a href="/method/invokeWithBusinessConnection">invokeWithBusinessConnection »</a>, but rather by specifying the business connection ID in the <code>business_connection_id</code> parameter.</p>
 <h4><a class="anchor" href="#business" id="business" name="business"><i class="anchor-icon"></i></a><a href="/api/business">Business</a></h4>
 <p>Users can turn their Telegram account into a business account, gaining access to business features such as opening hours, location, quick replies, automated messages, custom start pages, chatbot support, and more.</p>
 <h4><a class="anchor" href="#animated-message-effects" id="animated-message-effects" name="animated-message-effects"><i class="anchor-icon"></i></a><a href="/api/effects">Animated message effects</a></h4>
 <p>Telegram allows adding spectacular animated effects to messages you send.</p>
+<h4><a class="anchor" href="#paid-messages" id="paid-messages" name="paid-messages"><i class="anchor-icon"></i></a><a href="/api/paid-messages">Paid messages</a></h4>
+<p>Telegram Stars can be used to pay for sending messages to users, supergroups and channels that have configured paid messages, requiring a payment for every message sent to them.</p>
+<h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
+<p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
 <h4><a class="anchor" href="#uploading-and-downloading-files" id="uploading-and-downloading-files" name="uploading-and-downloading-files"><i class="anchor-icon"></i></a><a href="/api/files">Uploading and Downloading Files</a></h4>
 <p>How to transfer large data batches correctly.</p>
 <h4><a class="anchor" href="#styled-text-with-message-entities" id="styled-text-with-message-entities" name="styled-text-with-message-entities"><i class="anchor-icon"></i></a><a href="/api/entities">Styled text with message entities</a></h4>
 <p>How to create styled text with message entities</p>
-<h4><a class="anchor" href="#file-references" id="file-references" name="file-references"><i class="anchor-icon"></i></a><a href="/api/file_reference">File references</a></h4>
+<h4><a class="anchor" href="#file-references" id="file-references" name="file-references"><i class="anchor-icon"></i></a><a href="/api/file-references">File references</a></h4>
 <p>How to handle file references.</p>
 <h4><a class="anchor" href="#client-configuration" id="client-configuration" name="client-configuration"><i class="anchor-icon"></i></a><a href="/api/config">Client configuration</a></h4>
 <p>The MTProto API has multiple configuration parameters that can be fetched with the appropriate methods.</p></div>

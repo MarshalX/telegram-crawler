@@ -116,7 +116,6 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <li>mention - Whether the current user was mentioned/replied to in this new message</li>
 <li>silent - Whether the message was posted silently (no sound should be played for this notification)</li>
 <li>schedule - Whether the message is outgoing and was sent via <a href="/api/scheduled-messages">scheduled messages</a></li>
-<li>report_delivery_until_date - If set and the current unixtime is bigger than the specified unixtime, invoke <a href="/method/messages.reportMessagesDelivery">messages.reportMessagesDelivery</a>, setting the <code>push</code> flag and passing the ID and the peer of this message as soon as it is received by the client (optionally batching requests for the same peer), used for <a href="https://telegram.org/blog/star-messages-gateway-2-0-and-more#save-even-more-on-user-verification">Telegram Gateway verification messages</a>.</li>
 <li>edit_date - When was the message last edited</li>
 <li>top_msg_id - thread_id for new mentions/replies in <a href="/api/threads">threads</a></li>
 </ul>
@@ -331,21 +330,6 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>1. Channel name<br>2. Message body</td>
 </tr>
 <tr>
-<td>CHANNEL_MESSAGE_TODO</td>
-<td>{1} posted a checklist {2}</td>
-<td>1. Channel name<br>2. Checklist title</td>
-</tr>
-<tr>
-<td>CHANNEL_MESSAGE_TODO_APPEND</td>
-<td>{1} added {2} tasks</td>
-<td>1. Channel name<br>2. Number of added tasks</td>
-</tr>
-<tr>
-<td>CHANNEL_MESSAGE_TODO_DONE</td>
-<td>{1} toggled {2} tasks</td>
-<td>1. Channel name<br>2. Number of toggled tasks</td>
-</tr>
-<tr>
 <td>CHANNEL_MESSAGE_VIDEO</td>
 <td>{1} posted a video</td>
 <td>1. Channel name</td>
@@ -516,21 +500,6 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>1. Message author<br>2. Chat name<br>3. Message body</td>
 </tr>
 <tr>
-<td>CHAT_MESSAGE_TODO</td>
-<td>{1} sent a checklist {3} to the group {2}</td>
-<td>1. User<br>2. Group name<br>3. Checklist title</td>
-</tr>
-<tr>
-<td>CHAT_MESSAGE_TODO_APPEND</td>
-<td>{1} added {3} tasks in the group {2}</td>
-<td>1. User<br>2. Group name<br>3. Number of added tasks</td>
-</tr>
-<tr>
-<td>CHAT_MESSAGE_TODO_DONE</td>
-<td>{1} toggled {3} tasks in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Number of toggled tasks</td>
-</tr>
-<tr>
 <td>CHAT_MESSAGE_VIDEO</td>
 <td>{1} sent a video to the group {2}</td>
 <td>1. Message author<br>2. Chat name</td>
@@ -631,11 +600,6 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>1. User name<br>2. Group name<br>3. Reaction<br>4. Message body</td>
 </tr>
 <tr>
-<td>CHAT_REACT_TODO</td>
-<td>{1}: {3} to your checklist {4} in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Checklist title</td>
-</tr>
-<tr>
 <td>CHAT_REACT_VIDEO</td>
 <td>{1}: {3} to your video in {2}</td>
 <td>1. User name<br>2. Group name<br>3. Reaction</td>
@@ -674,11 +638,6 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>CHAT_VOICECHAT_START</td>
 <td>{1} started a voice chat in the group {2}</td>
 <td>1. User name<br>2. Chat name</td>
-</tr>
-<tr>
-<td>CONF_CALL_MISSED</td>
-<td>You missed a call from {1}</td>
-<td>1. User name</td>
 </tr>
 <tr>
 <td>CONTACT_JOINED</td>
@@ -846,11 +805,6 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>1. User name<br>2. Number of Telegram Stars</td>
 </tr>
 <tr>
-<td>MESSAGE_STARGIFT_UPGRADE</td>
-<td>{1} upgraded your Gift</td>
-<td>1. User name</td>
-</tr>
-<tr>
 <td>MESSAGE_STICKER</td>
 <td>{1} sent you a {2} sticker</td>
 <td>1. User name<br>2. Sticker emoji</td>
@@ -869,16 +823,6 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>MESSAGE_TEXT</td>
 <td>{1}: {2}</td>
 <td>1. Message author<br>2. Message body</td>
-</tr>
-<tr>
-<td>MESSAGE_TODO</td>
-<td>{1} sent you a checklist {2}</td>
-<td>1. User name<br>2. Checklist title</td>
-</tr>
-<tr>
-<td>MESSAGE_UNIQUE_STARGIFT</td>
-<td>{1} transferred you a Gift!</td>
-<td>1. User name</td>
 </tr>
 <tr>
 <td>MESSAGE_VIDEO</td>
@@ -1091,16 +1035,6 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>1. User name<br>2. Group name<br>3. Message body</td>
 </tr>
 <tr>
-<td>PINNED_TODO</td>
-<td>{1} pinned a checklist {2}</td>
-<td>1. User name<br>2. Checklist title</td>
-</tr>
-<tr>
-<td>PINNED_TODO</td>
-<td>{1} pinned a checklist {3} in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Checklist title</td>
-</tr>
-<tr>
 <td>PINNED_VIDEO</td>
 <td>{1} pinned a video</td>
 <td>1. User name</td>
@@ -1204,11 +1138,6 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <td>REACT_TEXT</td>
 <td>{1}: {2} to your "{3}"</td>
 <td>1. User name<br>2. Reaction<br>3. Message body</td>
-</tr>
-<tr>
-<td>REACT_TODO</td>
-<td>{1}: {2} to your checklist {3}</td>
-<td>1. User name<br>2. Reaction<br>3. Checklist title</td>
 </tr>
 <tr>
 <td>REACT_VIDEO</td>

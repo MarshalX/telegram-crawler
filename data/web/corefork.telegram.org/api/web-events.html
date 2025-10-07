@@ -312,7 +312,7 @@ The mini app must also be expanded when the user swipes up on the webview.  </p>
 </ul>
 <p>Configures the main button, located immediately below the webview: when the user presses it a <a href="/api/bots/webapps#main-button-pressed"><code>main_button_pressed</code> event should be emitted by the client</a>.  </p>
 <p>Some clients implement a horizontal media type tab bar located at the bottom of the screen, opened when the user clicks on the attachment menu button: this tab bar contains a horizontal list of buttons used to attach media of a certain type and to open installed <a href="/api/bots/attach">attachment menu mini apps</a>.<br>
-In clients that implements a tab bar, if and only if the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_main_button</code> with <code>is_visible=true</code>, the main button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.  </p>
+In clients that implements a tab bar, iff the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_main_button</code> with <code>is_visible=true</code>, the main button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.  </p>
 <p>Otherwise, the main button can be displayed right away with no user interaction when receiving a <code>web_app_setup_main_button</code> event with <code>is_visible=true</code>.</p>
 <h4><a class="anchor" href="#web-app-setup-back-button" id="web-app-setup-back-button" name="web-app-setup-back-button"><i class="anchor-icon"></i></a><code>web_app_setup_back_button</code></h4>
 <p>Event data: a JSON object with an <code>is_visible</code> boolean field.</p>
@@ -345,7 +345,7 @@ Note that on supported platforms, the OS back button can be used instead of a cu
 <p>Configures the secondary button, located immediately below the webview, either on the left, right, top or bottom of the main button (if it is visible, otherwise it is located where the main button is usually located).  </p>
 <p>When the user presses it a <a href="/api/bots/webapps#secondary-button-pressed"><code>secondary_button_pressed</code> event should be emitted by the client</a>.  </p>
 <p>Some clients implement a horizontal media type tab bar located at the bottom of the screen, opened when the user clicks on the attachment menu button: this tab bar contains a horizontal list of buttons used to attach media of a certain type and to open installed <a href="/api/bots/attach">attachment menu mini apps</a>.<br>
-In clients that implements a tab bar, if and only if the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_secondary_button</code> with <code>is_visible=true</code>, the secondary button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.  </p>
+In clients that implements a tab bar, iff the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_secondary_button</code> with <code>is_visible=true</code>, the secondary button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.  </p>
 <p>Otherwise, the secondary button can be displayed right away with no user interaction when receiving a <code>web_app_setup_secondary_button</code> event with <code>is_visible=true</code>.</p>
 <h4><a class="anchor" href="#web-app-share-to-story" id="web-app-share-to-story" name="web-app-share-to-story"><i class="anchor-icon"></i></a><code>web_app_share_to_story</code></h4>
 <p>Event payload: JSON object with the following fields:</p>
@@ -475,78 +475,6 @@ Ignore further <code>web_app_request_file_download</code> events until step 3 is
 <h4><a class="anchor" href="#web-app-toggle-orientation-lock" id="web-app-toggle-orientation-lock" name="web-app-toggle-orientation-lock"><i class="anchor-icon"></i></a><code>web_app_toggle_orientation_lock</code></h4>
 <p>Event data: a JSON object with a <code>locked</code> boolean field (defaults to <code>false</code>).</p>
 <p>Used by <a href="/api/bots/webapps">bot web apps</a> to enable or disable the orientation lock.</p>
-<h4><a class="anchor" href="#web-app-device-storage-save-key" id="web-app-device-storage-save-key" name="web-app-device-storage-save-key"><i class="anchor-icon"></i></a><code>web_app_device_storage_save_key</code></h4>
-<p>Event data: a JSON object with the following keys:</p>
-<ul>
-<li><code>req_id</code> - A string with the ID of the current request</li>
-<li><code>key</code> - A string with the key to save</li>
-<li><code>value</code> - A string with the value to save, or <code>null</code> to remove the key.  </li>
-</ul>
-<p>Used by <a href="/api/bots/webapps">bot web apps</a> to save or remove a key from a persistent local storage on the user's device, associated to the currently logged in user and mini app.  </p>
-<p>All data is stored locally and is available only to the bot that created it. Each bot can store up to 5 MB per user using this storage.  </p>
-<p>Emits a <a href="/api/bots/webapps#device-storage-key-saved">device_storage_key_saved event »</a> on success and a <a href="/api/bots/webapps#device-storage-failed">device_storage_failed event »</a> on failure.</p>
-<h4><a class="anchor" href="#web-app-device-storage-get-key" id="web-app-device-storage-get-key" name="web-app-device-storage-get-key"><i class="anchor-icon"></i></a><code>web_app_device_storage_get_key</code></h4>
-<p>Event data: a JSON object with the following keys:</p>
-<ul>
-<li><code>req_id</code> - A string with the ID of the current request</li>
-<li><code>key</code> - A string with the key to fetch</li>
-</ul>
-<p>Used by <a href="/api/bots/webapps">bot web apps</a> to fetch a key from a persistent local storage on the user's device, associated to the currently logged in user and mini app.  </p>
-<p>Emits a <a href="/api/bots/webapps#device-storage-key-received">device_storage_key_received event »</a> on success and a <a href="/api/bots/webapps#device-storage-failed">device_storage_failed event »</a> on failure.</p>
-<h4><a class="anchor" href="#web-app-device-storage-clear" id="web-app-device-storage-clear" name="web-app-device-storage-clear"><i class="anchor-icon"></i></a><code>web_app_device_storage_clear</code></h4>
-<p>Event data: a JSON object with the following keys:</p>
-<ul>
-<li><code>req_id</code> - A string with the ID of the current request</li>
-</ul>
-<p>Used by <a href="/api/bots/webapps">bot web apps</a> to clear the persistent local storage on the user's device, associated to the currently logged in user and mini app.  </p>
-<p>Emits a <a href="/api/bots/webapps#device-storage-cleared">device_storage_cleared event »</a> on success and a <a href="/api/bots/webapps#device-storage-failed">device_storage_failed event »</a> on failure.</p>
-<h4><a class="anchor" href="#web-app-secure-storage-save-key" id="web-app-secure-storage-save-key" name="web-app-secure-storage-save-key"><i class="anchor-icon"></i></a><code>web_app_secure_storage_save_key</code></h4>
-<p>Event data: a JSON object with the following keys:</p>
-<ul>
-<li><code>req_id</code> - A string with the ID of the current request</li>
-<li><code>key</code> - A string with the key to save</li>
-<li><code>value</code> - A string with the value to save, or <code>null</code> to remove the key.  </li>
-</ul>
-<p>Used by <a href="/api/bots/webapps">bot web apps</a> to save or remove a key from a secure storage on the user's device, associated to the currently logged in user and mini app.  </p>
-<p>On <strong>iOS</strong>, it uses the system <strong>Keychain</strong>; on <strong>Android</strong>, it uses the <strong>Keystore</strong>. This ensures that all stored values are encrypted at rest and inaccessible to unauthorized applications.  </p>
-<p>Secure storage is suitable for storing tokens, secrets, authentication state, and other sensitive user-specific information. Each bot can store up to <strong>10 items per user</strong>.   </p>
-<p>Emits a <a href="/api/bots/webapps#secure-storage-key-saved">secure_storage_key_saved event »</a> on success and a <a href="/api/bots/webapps#secure-storage-failed">secure_storage_failed event »</a> on failure.</p>
-<h4><a class="anchor" href="#web-app-secure-storage-get-key" id="web-app-secure-storage-get-key" name="web-app-secure-storage-get-key"><i class="anchor-icon"></i></a><code>web_app_secure_storage_get_key</code></h4>
-<p>Event data: a JSON object with the following keys:</p>
-<ul>
-<li><code>req_id</code> - A string with the ID of the current request</li>
-<li><code>key</code> - A string with the key to get.  </li>
-</ul>
-<p>Used by <a href="/api/bots/webapps">bot web apps</a> to fetch a key from a secure storage on the user's device, associated to the currently logged in user and mini app.  </p>
-<p>Emits a <a href="/api/bots/webapps#secure-storage-key-received">secure_storage_key_received event »</a> on success and a <a href="/api/bots/webapps#secure-storage-failed">secure_storage_failed event »</a> on failure.</p>
-<p>If the returned <code>can_restore</code> flag is true, the key will not be returned, but it can be restored by invoking <a href="/api/web-events#web-app-secure-storage-restore-key">web_app_secure_storage_restore_key</a>.</p>
-<h4><a class="anchor" href="#web-app-secure-storage-clear" id="web-app-secure-storage-clear" name="web-app-secure-storage-clear"><i class="anchor-icon"></i></a><code>web_app_secure_storage_clear</code></h4>
-<p>Event data: a JSON object with the following keys:</p>
-<ul>
-<li><code>req_id</code> - A string with the ID of the current request</li>
-</ul>
-<p>Used by <a href="/api/bots/webapps">bot web apps</a> to clear the secure storage on the user's device, associated to the currently logged in user and mini app.  </p>
-<p>Emits a <a href="/api/bots/webapps#secure-storage-cleared">secure_storage_cleared event »</a> on success and a <a href="/api/bots/webapps#secure-storage-failed">secure_storage_failed event »</a> on failure.</p>
-<h4><a class="anchor" href="#web-app-secure-storage-restore-key" id="web-app-secure-storage-restore-key" name="web-app-secure-storage-restore-key"><i class="anchor-icon"></i></a><code>web_app_secure_storage_restore_key</code></h4>
-<p>Event data: a JSON object with the following keys:</p>
-<ul>
-<li><code>req_id</code> - A string with the ID of the current request</li>
-<li><code>key</code> - A string with the key to restore.  </li>
-</ul>
-<p>Used by <a href="/api/bots/webapps">bot web apps</a> to restore a key from a secure storage on the user's device, associated to the currently logged in user and mini app.  </p>
-<p>Emits a <a href="/api/bots/webapps#secure-storage-key-restored">secure_storage_key_restored event »</a> on success and a <a href="/api/bots/webapps#secure-storage-failed">secure_storage_failed event »</a> on failure.</p>
-<h4><a class="anchor" href="#web-app-hide-keyboard" id="web-app-hide-keyboard" name="web-app-hide-keyboard"><i class="anchor-icon"></i></a><code>web_app_hide_keyboard</code></h4>
-<p>Event payload: <code>null</code></p>
-<p>Hides the on-screen keyboard, if it is currently visible. Does nothing if the keyboard is not active.</p>
-<h4><a class="anchor" href="#web-app-verify-age" id="web-app-verify-age" name="web-app-verify-age"><i class="anchor-icon"></i></a><code>web_app_verify_age</code></h4>
-<p>Event payload: a JSON object with the following keys:</p>
-<ul>
-<li><code>passed</code> - Boolean, indicates whether the user passed age verification</li>
-<li><code>age</code> - Optional integer, detected age if the user passed age verification</li>
-<li><code>gender</code> - Optional boolean, indicates the detected gender if the user passed age verification</li>
-<li><code>genderProbability</code> - Optional float, probability of the detected gender if the user passed age verification</li>
-</ul>
-<p>Indicates the result of <a href="/api/age-verification">age verification, see here for more info on the full flow »</a>.</p>
 <!-- end events --></div>
   
 </div>

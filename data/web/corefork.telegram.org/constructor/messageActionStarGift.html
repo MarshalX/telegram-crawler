@@ -79,37 +79,12 @@
 <tr>
 <td><strong>saved</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/constructor/true">true</a></td>
-<td>Whether this gift was added to the destination user's profile (may be toggled using <a href="/method/payments.saveStarGift">payments.saveStarGift</a> and fetched using <a href="/method/payments.getSavedStarGifts">payments.getSavedStarGifts</a>)</td>
+<td>Whether this gift was added to the destination user's profile (may be toggled using <a href="/method/payments.saveStarGift">payments.saveStarGift</a> and fetched using <a href="/method/payments.getUserStarGifts">payments.getUserStarGifts</a>)</td>
 </tr>
 <tr>
 <td><strong>converted</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/constructor/true">true</a></td>
 <td>Whether this gift was converted to <a href="/api/stars">Telegram Stars</a> and cannot be displayed on the profile anymore.</td>
-</tr>
-<tr>
-<td><strong>upgraded</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/constructor/true">true</a></td>
-<td>This gift was upgraded to a <a href="/api/gifts#collectible-gifts">collectible gift »</a>.</td>
-</tr>
-<tr>
-<td><strong>refunded</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.9?<a href="/constructor/true">true</a></td>
-<td>This gift is not available anymore because a request to refund the payment related to this gift was made, and the money was returned.</td>
-</tr>
-<tr>
-<td><strong>can_upgrade</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.10?<a href="/constructor/true">true</a></td>
-<td>If set, this gift can be <a href="/api/gifts#upgrade-a-gift-to-a-collectible-gift">upgraded to a collectible gift</a>; can only be set for the receiver of a gift.</td>
-</tr>
-<tr>
-<td><strong>prepaid_upgrade</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.13?<a href="/constructor/true">true</a></td>
-<td>The sender has already pre-paid for the upgrade of this gift to a collectible gift.</td>
-</tr>
-<tr>
-<td><strong>upgrade_separate</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.16?<a href="/constructor/true">true</a></td>
-<td>This service message is the notification of a <a href="/api/gifts#prepaying-for-someone-elses-upgrade">separate pre-payment for the upgrade of a gift we own</a>.</td>
 </tr>
 <tr>
 <td><strong>gift</strong></td>
@@ -126,41 +101,6 @@
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/type/long">long</a></td>
 <td>The receiver of this gift may convert it to this many Telegram Stars, instead of displaying it on their profile page.<br><code>convert_stars</code> will be equal to <code>stars</code> only if the gift was bought using recently bought Telegram Stars, otherwise it will be less than <code>stars</code>.</td>
 </tr>
-<tr>
-<td><strong>upgrade_msg_id</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/type/int">int</a></td>
-<td>If set, this gift was <a href="/api/gifts#upgrade-a-gift-to-a-collectible-gift">upgraded to a collectible gift</a>, and the corresponding <a href="/constructor/messageActionStarGiftUnique">messageActionStarGiftUnique</a> is available at the specified message ID.</td>
-</tr>
-<tr>
-<td><strong>upgrade_stars</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.8?<a href="/type/long">long</a></td>
-<td>The number of Telegram Stars the user can pay to <a href="/api/gifts#collectible-gifts">convert the gift into a collectible gift »</a>.</td>
-</tr>
-<tr>
-<td><strong>from_id</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.11?<a href="/type/Peer">Peer</a></td>
-<td>Sender of the gift (unset for anonymous gifts).</td>
-</tr>
-<tr>
-<td><strong>peer</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.12?<a href="/type/Peer">Peer</a></td>
-<td>Receiver of the gift.</td>
-</tr>
-<tr>
-<td><strong>saved_id</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.12?<a href="/type/long">long</a></td>
-<td>For channel gifts, ID to use in <a href="/constructor/inputSavedStarGiftChat">inputSavedStarGiftChat</a> constructors.</td>
-</tr>
-<tr>
-<td><strong>prepaid_upgrade_hash</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/type/string">string</a></td>
-<td><a href="/api/gifts#prepaying-for-someone-elses-upgrade">Hash to prepay for a gift upgrade separately »</a>.</td>
-</tr>
-<tr>
-<td><strong>gift_msg_id</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.15?<a href="/type/int">int</a></td>
-<td>For <a href="/api/gifts#prepaying-for-someone-elses-upgrade">separate upgrades</a>, the identifier of the message with the gift whose upgrade was prepaid (only valid for the receiver of the service message).</td>
-</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
@@ -168,17 +108,13 @@
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#paymentssavestargift" id="paymentssavestargift" name="paymentssavestargift"><i class="anchor-icon"></i></a><a href="/method/payments.saveStarGift">payments.saveStarGift</a></h4>
 <p>Display or remove a <a href="/api/gifts">received gift »</a> from our profile.</p>
-<h4><a class="anchor" href="#paymentsgetsavedstargifts" id="paymentsgetsavedstargifts" name="paymentsgetsavedstargifts"><i class="anchor-icon"></i></a><a href="/method/payments.getSavedStarGifts">payments.getSavedStarGifts</a></h4>
-<p>Fetch the full list of <a href="/api/gifts">gifts</a> owned by a peer.</p>
-<p>Note that unlike what the name suggests, the method can be used to fetch both "saved" and "unsaved" gifts (aka gifts both pinned and not pinned) to the profile, depending on the passed flags.</p>
+<h4><a class="anchor" href="#paymentsgetuserstargifts" id="paymentsgetuserstargifts" name="paymentsgetuserstargifts"><i class="anchor-icon"></i></a><a href="/method/payments.getUserStarGifts">payments.getUserStarGifts</a></h4>
+<p>Get the <a href="/api/gifts">gifts »</a> pinned on a specific user's profile.</p>
+<p>May also be used to fetch all gifts received by the current user.</p>
 <h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
 <p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
 <h4><a class="anchor" href="#telegram-gifts" id="telegram-gifts" name="telegram-gifts"><i class="anchor-icon"></i></a><a href="/api/gifts">Telegram Gifts</a></h4>
-<p>Users can send Gifts to their friends. The recipients of gifts can display them on their profile pages or turn them into Telegram Stars ». Telegram Stars can be used for many things, including supporting creators and buying services in mini apps.</p>
-<h4><a class="anchor" href="#messageactionstargiftunique" id="messageactionstargiftunique" name="messageactionstargiftunique"><i class="anchor-icon"></i></a><a href="/constructor/messageActionStarGiftUnique">messageActionStarGiftUnique</a></h4>
-<p>A <a href="/api/gifts">gift »</a> was upgraded to a <a href="/api/gifts#collectible-gifts">collectible gift »</a>.</p>
-<h4><a class="anchor" href="#inputsavedstargiftchat" id="inputsavedstargiftchat" name="inputsavedstargiftchat"><i class="anchor-icon"></i></a><a href="/constructor/inputSavedStarGiftChat">inputSavedStarGiftChat</a></h4>
-<p>A gift received by a channel we own.</p></div>
+<p>Users can send Gifts to their friends. The recipients of gifts can display them on their profile pages or turn them into Telegram Stars ». Telegram Stars can be used for many things, including supporting creators and buying services in mini apps.</p></div>
   
 </div>
           

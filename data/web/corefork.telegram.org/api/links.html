@@ -76,7 +76,6 @@
 <li><code>joinchat</code></li>
 <li><code>login</code></li>
 <li><code>m</code></li>
-<li><code>nft</code></li>
 <li><code>proxy</code></li>
 <li><code>setlanguage</code></li>
 <li><code>share</code></li>
@@ -144,37 +143,7 @@
 </tr>
 </tbody>
 </table>
-<p>Note that <a href="#message-links">message links</a> and <a href="#monoforum-links">monoforum links</a> have the same or similar syntax, with extra parameters.  </p>
-<h3><a class="anchor" href="#monoforum-links" id="monoforum-links" name="monoforum-links"><i class="anchor-icon"></i></a>Monoforum links</h3>
-<p>Used to open the direct messages chat (aka <a href="/api/monoforum">monoforum »</a>) associated to a channel, see <a href="/api/monoforum">here for more info on monoforums »</a>.  </p>
-<p><strong>Note</strong>: when sharing messages sent to a monoforum, use <a href="#message-links">normal message links »</a> with the ID of the monoforum, not the ID of the associated channel; the same rule applies for all other chat-related links involving a monoforum.  </p>
-<p><code>t.me</code> syntax:</p>
-<pre><code>t.me/&lt;username&gt;?direct</code></pre>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://resolve?domain=&lt;username&gt;&amp;direct</code></pre>
-<p>Parameters:</p>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th style="text-align: center;">Optional</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>username</code></td>
-<td style="text-align: center;">Required</td>
-<td>Username of the channel, that has an associated monoforum.</td>
-</tr>
-<tr>
-<td><code>direct</code></td>
-<td style="text-align: center;">Required</td>
-<td>Distinguishes monoforum links from other link types.</td>
-</tr>
-</tbody>
-</table>
-<p>Note that <a href="#public-username-links">public username links</a> have a similar syntax, but don't have the <code>direct</code> flag.  </p>
+<p>Note that <a href="#message-links">message links</a> have the same syntax, with extra parameters.  </p>
 <h3><a class="anchor" href="#temporary-profile-links" id="temporary-profile-links" name="temporary-profile-links"><i class="anchor-icon"></i></a>Temporary profile links</h3>
 <p>Used to link to user profiles, generated using <a href="/method/contacts.exportContactToken">contacts.exportContactToken</a>.<br>
 These links can be generated even for profiles that don't have a username, and they have an expiration date, specified by the <code>expires</code> field of the <a href="/constructor/exportedContactToken">exportedContactToken</a> constructor returned by <a href="/method/contacts.exportContactToken">contacts.exportContactToken</a>.  </p>
@@ -356,9 +325,7 @@ These links should be handled as follows:</p>
 <li>Append and select the <code>text</code>, if present</li>
 </ul>
 <p><code>t.me</code> syntax:</p>
-<pre><code>t.me/share?url=&lt;url&gt;&amp;text=&lt;text&gt;
-t.me/share/url?url=&lt;url&gt;&amp;text=&lt;text&gt;
-t.me/share/url/?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
+<pre><code>t.me/share?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://msg_url?url=&lt;url&gt;&amp;text=&lt;text&gt;</code></pre>
 <p>Parameters:</p>
@@ -448,29 +415,6 @@ tg://resolve?domain=&lt;username&gt;&amp;voicechat=&lt;invite_hash&gt;</code></p
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#conference-links" id="conference-links" name="conference-links"><i class="anchor-icon"></i></a>Conference links</h3>
-<p>Used to link to <a href="/api/end-to-end/group-calls">E2E conference calls</a>.</p>
-<p><code>t.me</code> syntax:</p>
-<pre><code>t.me/call/&lt;slug&gt;</code></pre>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://call?slug=&lt;slug&gt;</code></pre>
-<p>Parameters:</p>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th style="text-align: center;">Optional</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>slug</code></td>
-<td style="text-align: center;">Required</td>
-<td>E2E conference call invitation hash to pass to the conference call methods.</td>
-</tr>
-</tbody>
-</table>
 <h3><a class="anchor" href="#stickerset-links" id="stickerset-links" name="stickerset-links"><i class="anchor-icon"></i></a>Stickerset links</h3>
 <p>Used to import stickersets or <a href="/api/custom-emoji">custom emoji</a> stickersets as described <a href="/api/stickers#installing-stickersets">here »</a>.</p>
 <p><code>t.me</code> syntax:</p>
@@ -544,35 +488,6 @@ tg://addemoji?set=&lt;slug&gt;</code></pre>
 <td><code>story_id</code></td>
 <td style="text-align: center;">Required</td>
 <td>ID of the <a href="/api/stories#watching-stories">Telegram Story to be fetched and viewed as described here »</a>.</td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" href="#story-album-links" id="story-album-links" name="story-album-links"><i class="anchor-icon"></i></a>Story album links</h3>
-<p>Identifies a <a href="/api/stories#story-albums">story album »</a> on a peer's profile: use <a href="/method/stories.getAlbumStories">stories.getAlbumStories</a> to fetch stories within the specified album.  </p>
-<p><code>t.me</code> syntax:</p>
-<pre><code>t.me/&lt;username&gt;?album=&lt;album_id&gt;
-t.me/&lt;username&gt;/a/&lt;album_id&gt;</code></pre>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://resolve?domain=&lt;username&gt;&amp;album=&lt;album_id&gt;</code></pre>
-<p>Parameters:</p>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th style="text-align: center;">Optional</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>username</code></td>
-<td style="text-align: center;">Required</td>
-<td>Username of the peer that owns the collection.</td>
-</tr>
-<tr>
-<td><code>album_id</code></td>
-<td style="text-align: center;">Required</td>
-<td>Integer ID of the <a href="/api/stories#story-albums">story album »</a>, from <a href="/constructor/storyAlbum">storyAlbum</a>.<code>album_id</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -1061,7 +976,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 <tr>
 <td><code>admin</code></td>
 <td style="text-align: center;">Optional for group links, required for channel links</td>
-<td>A combination of the following identifiers separated by <code>+</code>, each corresponding to the appropriate flag in the <a href="/constructor/chatAdminRights">chatAdminRights »</a> constructor: <br>- <code>change_info</code> - <a href="/constructor/chatAdminRights">chatAdminRights.change_info</a> <br>- <code>post_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.post_messages</a> <br>- <code>edit_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.edit_messages</a> <br>- <code>delete_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.delete_messages</a> <br>- <code>restrict_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.ban_users</a> <br>- <code>invite_users</code> - <a href="/constructor/chatAdminRights">chatAdminRights.invite_users</a> <br>- <code>pin_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.pin_messages</a> <br>- <code>manage_topics</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_topics</a> <br>- <code>promote_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.add_admins</a> <br>- <code>manage_video_chats</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_call</a> <br>- <code>anonymous</code> - <a href="/constructor/chatAdminRights">chatAdminRights.anonymous</a> <br>- <code>manage_chat</code> - <a href="/constructor/chatAdminRights">chatAdminRights.other</a> <br>- <code>post_stories</code> - <a href="/constructor/chatAdminRights">chatAdminRights.post_stories</a> <br>- <code>edit_stories</code> - <a href="/constructor/chatAdminRights">chatAdminRights.edit_stories</a> <br>- <code>delete_stories</code> - <a href="/constructor/chatAdminRights">chatAdminRights.delete_stories</a> <br>- <code>manage_direct_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_direct_messages</a></td>
+<td>A combination of the following identifiers separated by <code>+</code>, each corresponding to the appropriate flag in the <a href="/constructor/chatAdminRights">chatAdminRights »</a> constructor: <br>- <code>change_info</code> - <a href="/constructor/chatAdminRights">chatAdminRights.change_info</a> <br>- <code>post_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.post_messages</a> <br>- <code>edit_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.edit_messages</a> <br>- <code>delete_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.delete_messages</a> <br>- <code>restrict_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.ban_users</a> <br>- <code>invite_users</code> - <a href="/constructor/chatAdminRights">chatAdminRights.invite_users</a> <br>- <code>pin_messages</code> - <a href="/constructor/chatAdminRights">chatAdminRights.pin_messages</a> <br>- <code>manage_topics</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_topics</a> <br>- <code>promote_members</code> - <a href="/constructor/chatAdminRights">chatAdminRights.add_admins</a> <br>- <code>manage_video_chats</code> - <a href="/constructor/chatAdminRights">chatAdminRights.manage_call</a> <br>- <code>anonymous</code> - <a href="/constructor/chatAdminRights">chatAdminRights.anonymous</a> <br>- <code>manage_chat</code> - <a href="/constructor/chatAdminRights">chatAdminRights.other</a> <br>- <code>post_stories</code> - <a href="/constructor/chatAdminRights">chatAdminRights.post_stories</a> <br>- <code>edit_stories</code> - <a href="/constructor/chatAdminRights">chatAdminRights.edit_stories</a> <br>- <code>delete_stories</code> - <a href="/constructor/chatAdminRights">chatAdminRights.delete_stories</a></td>
 </tr>
 </tbody>
 </table>
@@ -1100,14 +1015,6 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 </tbody>
 </table>
 <h3><a class="anchor" href="#settings-links" id="settings-links" name="settings-links"><i class="anchor-icon"></i></a>Settings links</h3>
-<h3><a class="anchor" href="#my-stars-links" id="my-stars-links" name="my-stars-links"><i class="anchor-icon"></i></a>My stars links</h3>
-<p>Used to bring the user to the My Stars page, containing the topup button, the Star transaction history, statistics, and <a href="/api/stars">much more »</a>.  </p>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://stars</code></pre>
-<h3><a class="anchor" href="#my-toncoins-links" id="my-toncoins-links" name="my-toncoins-links"><i class="anchor-icon"></i></a>My toncoins links</h3>
-<p>Used to bring the user to the TON balance page, containing the topup button, the TON transaction history and statistics.  </p>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://ton</code></pre>
 <h4><a class="anchor" href="#settings-link" id="settings-link" name="settings-link"><i class="anchor-icon"></i></a>Settings link</h4>
 <p>Used to bring the user to the app settings.  </p>
 <p><code>tg:</code> syntax:</p>
@@ -1568,59 +1475,7 @@ If not, this link must bring the user to the <a href="/api/stars#buying-or-gifti
 <tr>
 <td><code>purpose</code></td>
 <td style="text-align: center;">Optional</td>
-<td>Contains a string indicating the reason why the topup is required, that must be shown on the topup page (if activated), possible values: <!-- start topup --><br><br>- <code>subs</code> - Buy <strong>Stars</strong> to keep your channel subscriptions.<br>- <code>subadvance12</code> - Buy <strong>Stars</strong> to keep your subscriptions active for the next 12 months.<br><br><!-- end topup --></td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" href="#collectible-gift-link" id="collectible-gift-link" name="collectible-gift-link"><i class="anchor-icon"></i></a>Collectible gift link</h3>
-<p>Identifies a unique <a href="/api/gifts#collectible-gifts">collectible gift »</a>: use <a href="/method/payments.getUniqueStarGift">payments.getUniqueStarGift</a> to fetch info about the collectible.  </p>
-<p><code>t.me</code> syntax:</p>
-<pre><code>t.me/nft/&lt;slug&gt;</code></pre>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://nft?slug=&lt;slug&gt;</code></pre>
-<p>Parameters:</p>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th style="text-align: center;">Optional</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>slug</code></td>
-<td style="text-align: center;">Required</td>
-<td>Identifier of the collectible gift, to pass to <a href="/method/payments.getUniqueStarGift">payments.getUniqueStarGift</a>.</td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" href="#gift-collection-links" id="gift-collection-links" name="gift-collection-links"><i class="anchor-icon"></i></a>Gift collection links</h3>
-<p>Identifies a <a href="/api/gifts#gift-collections">star gift collection »</a> on a peer's profile: use <a href="/method/payments.getSavedStarGifts">payments.getSavedStarGifts</a> with the <code>collection_id</code> flag set to fetch gifts within a collection.  </p>
-<p><code>t.me</code> syntax:</p>
-<pre><code>t.me/&lt;username&gt;?collection=&lt;collection_id&gt;
-t.me/&lt;username&gt;/c/&lt;collection_id&gt;</code></pre>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://resolve?domain=&lt;username&gt;&amp;collection=&lt;collection_id&gt;</code></pre>
-<p>Parameters:</p>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th style="text-align: center;">Optional</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>username</code></td>
-<td style="text-align: center;">Required</td>
-<td>Username of the peer that owns the collection.</td>
-</tr>
-<tr>
-<td><code>collection_id</code></td>
-<td style="text-align: center;">Required</td>
-<td>Integer ID of the <a href="/api/gifts#gift-collections">star gift collection »</a>, from <a href="/constructor/starGiftCollection">starGiftCollection</a>.<code>collection_id</code>.</td>
+<td>Contains a string indicating the reason why the topup is required, that must be shown on the topup page (if activated), possible values: <!-- start topup --><br><br>- <code>subs</code> - Buy <strong>Stars</strong> to keep your channel subscriptions.<br>- <code>subadvance12</code> - Buy <strong>Stars</strong> to keep your subscriptions active for the next 12 months.<br><!-- end topup --></td>
 </tr>
 </tbody>
 </table>
@@ -1702,7 +1557,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;start={prefix}&lt;referrer&gt;</cod
 <p>If a client encounters a <code>tg:</code> link type not listed on this page, <a href="/method/help.getDeepLinkInfo">help.getDeepLinkInfo</a> should be invoked with just the <code>path</code> component of the link.  </p>
 <p>Schema:</p>
 <pre><code><a href='/constructor/help.deepLinkInfoEmpty'>help.deepLinkInfoEmpty</a>#66afa166 = <a href='/type/help.DeepLinkInfo'>help.DeepLinkInfo</a>;
-<a href='/constructor/help.deepLinkInfo'>help.deepLinkInfo</a>#6a4ee832 flags:<a href='/type/%23'>#</a> update_app:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> message:<a href='/type/string'>string</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; = <a href='/type/help.DeepLinkInfo'>help.DeepLinkInfo</a>;
+<a href='/constructor/help.deepLinkInfo'>help.deepLinkInfo</a>#6a4ee832 flags:<a href='/type/%23'>#</a> update_app:flags.0?<a href='/constructor/true'>true</a> message:<a href='/type/string'>string</a> entities:flags.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; = <a href='/type/help.DeepLinkInfo'>help.DeepLinkInfo</a>;
 
 ---functions---
 

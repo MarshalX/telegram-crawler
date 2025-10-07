@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>channels.searchPosts</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Globally search for posts from public channels » (including those we aren&#39;t a member of) containing either a specific hashtag, or a full text query.  Exactly one of query and hashtag must be set.">
+    <meta property="description" content="Globally search for posts from public channels » (including those we aren&#39;t a member of) containing a specific hashtag.">
     <meta property="og:title" content="channels.searchPosts">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Globally search for posts from public channels » (including those we aren&#39;t a member of) containing either a specific hashtag, or a full text query.  Exactly one of query and hashtag must be set.">
+    <meta property="og:description" content="Globally search for posts from public channels » (including those we aren&#39;t a member of) containing a specific hashtag.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -42,8 +42,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/methods" >All Methods</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/method/channels.searchPosts" >channels.searchPosts</a></li></ul></div>
   <h1 id="dev_page_title">channels.searchPosts</h1>
   
-  <div id="dev_page_content"><p>Globally search for posts from public <a href="/api/channel">channels »</a> (<em>including</em> those we aren't a member of) containing either a specific hashtag, <em>or</em> a full text query.</p>
-<p>Exactly one of <code>query</code> and <code>hashtag</code> must be set.</p>
+  <div id="dev_page_content"><p>Globally search for posts from public <a href="/api/channel">channels »</a> (<em>including</em> those we aren't a member of) containing a specific hashtag.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -73,24 +72,14 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>flags</strong></td>
-<td style="text-align: center;"><a href="/type/%23">#</a></td>
-<td>Flags, see <a href="/mtproto/TL-combinators#conditional-fields">TL conditional fields</a></td>
-</tr>
-<tr>
 <td><strong>hashtag</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/string">string</a></td>
+<td style="text-align: center;"><a href="/type/string">string</a></td>
 <td>The hashtag to search, without the <code>#</code> character.</td>
-</tr>
-<tr>
-<td><strong>query</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/string">string</a></td>
-<td>The full text query: each user has a limited amount of free full text search slots, after which payment is required, see <a href="/api/search#posts-tab">here »</a> for more info on the full flow.</td>
 </tr>
 <tr>
 <td><strong>offset_rate</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
-<td>Initially 0, then set to the <a href="/constructor/messages.messagesSlice"><code>next_rate</code> parameter of messages.messagesSlice</a>, or if that is absent, the <code>date</code> of the last returned message.</td>
+<td>Initially 0, then set to the <a href="/constructor/messages.messagesSlice"><code>next_rate</code> parameter of messages.messagesSlice</a></td>
 </tr>
 <tr>
 <td><strong>offset_peer</strong></td>
@@ -107,44 +96,17 @@
 <td style="text-align: center;"><a href="/type/int">int</a></td>
 <td>Maximum number of results to return, <a href="/api/offsets">see pagination</a></td>
 </tr>
-<tr>
-<td><strong>allow_paid_stars</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/long">long</a></td>
-<td>For full text post searches (<code>query</code>), allows payment of the specified amount of Stars for the search, see <a href="/api/search#posts-tab">here »</a> for more info on the full flow.</td>
-</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#result" id="result" name="result"><i class="anchor-icon"></i></a>Result</h3>
 <p><a href="/type/messages.Messages">messages.Messages</a></p>
-<h3><a class="anchor" href="#only-users-can-use-this-method" id="only-users-can-use-this-method" name="only-users-can-use-this-method"><i class="anchor-icon"></i></a>Only users can use this method</h3>
-<h3><a class="anchor" href="#possible-errors" id="possible-errors" name="possible-errors"><i class="anchor-icon"></i></a>Possible errors</h3>
-<table class="table">
-<thead>
-<tr>
-<th>Code</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>420</td>
-<td>FROZEN_METHOD_INVALID</td>
-<td>The current account is <a href="/api/auth#frozen-accounts">frozen</a>, and thus cannot execute the specified action.</td>
-</tr>
-</tbody>
-</table>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
-<h4><a class="anchor" href="#search" id="search" name="search"><i class="anchor-icon"></i></a><a href="/api/search">Search</a></h4>
-<p>Telegram allows applying detailed message filters while looking for messages in chats.</p>
 <h4><a class="anchor" href="#messagesmessagesslice" id="messagesmessagesslice" name="messagesmessagesslice"><i class="anchor-icon"></i></a><a href="/constructor/messages.messagesSlice">messages.messagesSlice</a></h4>
 <p>Incomplete list of messages and auxiliary data.</p>
 <h4><a class="anchor" href="#pagination-in-the-api" id="pagination-in-the-api" name="pagination-in-the-api"><i class="anchor-icon"></i></a><a href="/api/offsets">Pagination in the API</a></h4>
 <p>How to fetch results from large lists of objects.</p>
 <h4><a class="anchor" href="#channels-supergroups-gigagroups-and-basic-groups" id="channels-supergroups-gigagroups-and-basic-groups" name="channels-supergroups-gigagroups-and-basic-groups"><i class="anchor-icon"></i></a><a href="/api/channel">Channels, supergroups, gigagroups and basic groups</a></h4>
-<p>How to handle channels, supergroups, gigagroups, basic groups, and what's the difference between them.</p>
-<h4><a class="anchor" href="#user-authorization" id="user-authorization" name="user-authorization"><i class="anchor-icon"></i></a><a href="/api/auth">User Authorization</a></h4>
-<p>How to register a user's phone to start using the API.</p></div>
+<p>How to handle channels, supergroups, gigagroups, basic groups, and what's the difference between them.</p></div>
   
 </div>
           
