@@ -219,7 +219,20 @@ The returned <code>url</code> will lead to a page where the user will be able to
 <p>The number of available stars on the user's balance may be fetched by invoking <a href="/method/payments.getStarsStatus">payments.getStarsStatus</a> with peer=<a href="/constructor/inputPeerSelf">inputPeerSelf</a> over the business connection.  </p>
 <p>To transfer the stars, invoke <a href="/method/payments.getPaymentForm">payments.getPaymentForm</a> with <a href="/constructor/inputInvoiceBusinessBotTransferStars">inputInvoiceBusinessBotTransferStars</a> (with <code>bot</code>=<a href="/constructor/inputPeerSelf">inputPeerSelf</a>), and follow the usual <a href="/api/payments#22-getting-invoice-info-about-the-product">payment flow »</a>, <strong>with all method calls executed over the business connection</strong>.  </p>
 <h3><a class="anchor" href="#my-stars-deep-links" id="my-stars-deep-links" name="my-stars-deep-links"><i class="anchor-icon"></i></a>My Stars deep links</h3>
-<p><a href="/api/links#my-stars-links">My Stars deep links »</a> and <a href="/api/links#my-toncoins-links">my Toncoin deep links »</a> can be used to bring the user to the My Stars/My Toncoin page, containing the topup button, the Star/TON transaction history, statistics, and much more, as specified in the above sections.</p></div>
+<p><a href="/api/links#my-stars-links">My Stars deep links »</a> and <a href="/api/links#my-toncoins-links">my Toncoin deep links »</a> can be used to bring the user to the My Stars/My Toncoin page, containing the topup button, the Star/TON transaction history, statistics, and much more, as specified in the above sections.    </p>
+<h3><a class="anchor" href="#toncoin" id="toncoin" name="toncoin"><i class="anchor-icon"></i></a>Toncoin</h3>
+<pre><code><a href='/constructor/starsTonAmount'>starsTonAmount</a>#74aee3e0 amount:<a href='/type/long'>long</a> = <a href='/type/StarsAmount'>StarsAmount</a>;
+
+<a href='/constructor/messageActionGiftTon'>messageActionGiftTon</a>#a8a3c699 flags:<a href='/type/%23'>#</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> crypto_currency:<a href='/type/string'>string</a> crypto_amount:<a href='/type/long'>long</a> transaction_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> = <a href='/type/MessageAction'>MessageAction</a>;
+
+<a href='/constructor/inputStickerSetTonGifts'>inputStickerSetTonGifts</a>#1cf671a0 = <a href='/type/InputStickerSet'>InputStickerSet</a>;</code></pre>
+<p>In some places in the API, it's possible to use toncoins instead of Stars: in this case, a <a href="/constructor/starsTonAmount">starsTonAmount</a> constructor will be used instead of <a href="/constructor/starsAmount">starsAmount</a>, specifying an amount of TONs in the smallest unit of the cryptocurrency, currently <em>nanotons</em>, <code>1/1_000_000_000</code>th (a billionth) of a toncoin.  </p>
+<p>When TONs are gifted to the user, a <a href="/constructor/messageActionGiftTon">messageActionGiftTon</a> is received: this constructor, along with its contents, should be displayed next to the appropriate sticker from the <a href="/constructor/inputStickerSetTonGifts">inputStickerSetTonGifts »</a> <a href="/api/stickers#stickersets">stickerset »</a>:</p>
+<ul>
+<li>If <code>crypto_amount &lt;= 10_000_000_000</code>, choose the sticker with emoji equal to "<img class="emoji" src="//telegram.org/img/emoji/40/32E283A3.png" width="20" height="20" alt="2️⃣" />"</li>
+<li>If <code>crypto_amount &lt;= 50_000_000_000</code>, choose the sticker with emoji equal to "<img class="emoji" src="//telegram.org/img/emoji/40/31E283A3.png" width="20" height="20" alt="1️⃣" />"</li>
+<li>Otherwise, choose the sticker with emoji equal to "<img class="emoji" src="//telegram.org/img/emoji/40/33E283A3.png" width="20" height="20" alt="3️⃣" />"</li>
+</ul></div>
   
 </div>
           
