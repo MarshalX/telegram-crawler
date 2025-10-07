@@ -69,12 +69,54 @@
 <tr>
 <td><strong>chats</strong></td>
 <td style="text-align: center;"><a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/long">long</a>&gt;</td>
-<td>Disallowed chat IDs</td>
+<td>Disallowed chat IDs (either a <a href="/constructor/chat">chat</a> or a <a href="/constructor/channel">supergroup</a> ID, verbatim the way it is received in the constructor (i.e. unlike with bot API IDs, here group and supergroup IDs should be treated in the same way)).</td>
 </tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
-<p><a href="/type/InputPrivacyRule">InputPrivacyRule</a></p></div>
+<p><a href="/type/InputPrivacyRule">InputPrivacyRule</a></p>
+<h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#chat" id="chat" name="chat"><i class="anchor-icon"></i></a><a href="/constructor/chat">chat</a></h4>
+<p>Info about a group.</p>
+<p>When updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
+<p>See <a href="https://github.com/tdlib/td/blob/a24af0992245f838f2b4b418a0a2d5fa9caa27b5/td/telegram/ChatManager.cpp#L5152">here »</a> for an implementation of the logic to use when updating the <a href="/api/peers">local user peer database</a>.</p>
+<h4><a class="anchor" href="#channel" id="channel" name="channel"><i class="anchor-icon"></i></a><a href="/constructor/channel">channel</a></h4>
+<p>Channel/supergroup info</p>
+<p>When updating the <a href="/api/peers">local peer database</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
+<p>The only exception to the above rule is when the <code>min</code> flag is set, in which case <strong>only</strong> the following fields must be applied over any locally stored version:</p>
+<ul>
+<li><code>title</code></li>
+<li><code>megagroup</code></li>
+<li><code>color</code></li>
+<li><code>photo</code></li>
+<li><code>username</code></li>
+<li><code>usernames</code></li>
+<li><code>has_geo</code></li>
+<li><code>noforwards</code></li>
+<li><code>emoji_status</code></li>
+<li><code>has_link</code></li>
+<li><code>slow_mode_enabled</code></li>
+<li><code>scam</code></li>
+<li><code>fake</code></li>
+<li><code>gigagroup</code></li>
+<li><code>forum</code></li>
+<li><code>level</code></li>
+<li><code>restricted</code></li>
+<li><code>restriction_reason</code></li>
+<li><code>join_to_send</code></li>
+<li><code>join_request</code></li>
+<li><code>is_verified</code></li>
+<li><code>default_banned_rights</code></li>
+<li><code>signature_profiles</code></li>
+<li><code>autotranslation</code></li>
+<li><code>broadcast_messages_allowed</code></li>
+<li><code>monoforum</code></li>
+<li><code>forum_tabs</code></li>
+<li><code>linked_monoforum_id</code></li>
+<li><code>send_paid_messages_stars</code></li>
+<li><code>bot_verification_icon</code></li>
+</ul>
+<p>See <a href="https://github.com/tdlib/td/blob/a24af0992245f838f2b4b418a0a2d5fa9caa27b5/td/telegram/ChatManager.cpp#L8329">here »</a> for an implementation of the logic to use when updating the <a href="/api/peers">local user peer database</a>.</p></div>
   
 </div>
           

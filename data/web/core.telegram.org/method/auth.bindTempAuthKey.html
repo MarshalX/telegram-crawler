@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>auth.bindTempAuthKey</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Binds a temporary authorization key temp_auth_key_id to the permanent authorization key perm_auth_key_id. Each permanent key may only be bound to one temporary key at a time, binding a new temporary key overwrites the previous one.">
+    <meta property="description" content="Binds a temporary authorization key temp_auth_key_id to the permanent authorization key perm_auth_key_id. Each permanent key may only be bound to one temporary key at a time, binding a new temporary key overwrites the previous one.  For more information, see Perfect Forward Secrecy.">
     <meta property="og:title" content="auth.bindTempAuthKey">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Binds a temporary authorization key temp_auth_key_id to the permanent authorization key perm_auth_key_id. Each permanent key may only be bound to one temporary key at a time, binding a new temporary key overwrites the previous one.">
+    <meta property="og:description" content="Binds a temporary authorization key temp_auth_key_id to the permanent authorization key perm_auth_key_id. Each permanent key may only be bound to one temporary key at a time, binding a new temporary key overwrites the previous one.  For more information, see Perfect Forward Secrecy.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -94,33 +94,6 @@
 </table>
 <h3><a class="anchor" href="#result" id="result" name="result"><i class="anchor-icon"></i></a>Result</h3>
 <p><a href="/type/Bool">Bool</a></p>
-<h3><a class="anchor" href="#possible-errors" id="possible-errors" name="possible-errors"><i class="anchor-icon"></i></a>Possible errors</h3>
-<table class="table">
-<thead>
-<tr>
-<th>Code</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>400</td>
-<td>ENCRYPTED_MESSAGE_INVALID</td>
-<td>Encrypted message invalid.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>TEMP_AUTH_KEY_ALREADY_BOUND</td>
-<td>The passed temporary key is already bound to another <strong>perm_auth_key_id</strong>.</td>
-</tr>
-<tr>
-<td>400</td>
-<td>TEMP_AUTH_KEY_EMPTY</td>
-<td>No temporary auth key provided.</td>
-</tr>
-</tbody>
-</table>
 <h3><a class="anchor" href="#generating-encrypted-message" id="generating-encrypted-message" name="generating-encrypted-message"><i class="anchor-icon"></i></a>Generating encrypted_message</h3>
 <p>The client begins by creating a special binding message:</p>
 <h3><a class="anchor" href="#binding-message-contents" id="binding-message-contents" name="binding-message-contents"><i class="anchor-icon"></i></a>Binding message contents</h3>
@@ -165,16 +138,47 @@
 <p>This binding message is encrypted in <a href="/mtproto/description">the usual way, but with MTProto v1</a> using the <code>perm_auth_key</code>. In other words, one has to prepend <code>random:int128</code> (it replaces the customary <code>session_id:long</code> and <code>salt:long</code> that are irrelevant in this case), then append the same <code>msg_id</code> that will be used for the request, a <code>seqno</code> equal to zero, and the correct <code>msg_len</code> (40 bytes in this case); after that, one computes the <code>msg_key:int128</code> as SHA1 of the resulting string, appends padding necessary for a 16-byte alignment, encrypts the resulting string using the key derived from <code>perm_auth_key</code> and <code>msg_key</code>, and prepends <code>perm_auth_key_id</code> and <code>msg_key</code> to the encrypted data as usual.</p>
 <h3><a class="anchor" href="#binding" id="binding" name="binding"><i class="anchor-icon"></i></a>Binding</h3>
 <p>Once <strong>encrypted_message</strong> is ready, an <strong>auth.bindTempAuthKey</strong> request is sent to the server using <code>temp_auth_key</code> and <code>temp_session_id</code>. Don't forget to <a href="/api/invoking#saving-client-info">rewrite client info</a> using <a href="/method/initConnection">initConnection</a> when the binding is completed.</p>
-<h3><a class="anchor" href="#bots-can-use-this-method" id="bots-can-use-this-method" name="bots-can-use-this-method"><i class="anchor-icon"></i></a>Bots can use this method</h3>
+<h3><a class="anchor" href="#both-users-and-bots-can-use-this-method" id="both-users-and-bots-can-use-this-method" name="both-users-and-bots-can-use-this-method"><i class="anchor-icon"></i></a>Both users and bots can use this method</h3>
+<h3><a class="anchor" href="#this-method-can-be-invoked-over-an-unauthenticated-connection-" id="this-method-can-be-invoked-over-an-unauthenticated-connection-" name="this-method-can-be-invoked-over-an-unauthenticated-connection-"><i class="anchor-icon"></i></a>This method can be invoked over an <a href="/api/auth">unauthenticated connection »</a></h3>
+<h3><a class="anchor" href="#possible-errors" id="possible-errors" name="possible-errors"><i class="anchor-icon"></i></a>Possible errors</h3>
+<table class="table">
+<thead>
+<tr>
+<th>Code</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>400</td>
+<td>ENCRYPTED_MESSAGE_INVALID</td>
+<td>Encrypted message invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>EXPIRES_AT_INVALID</td>
+<td>The specified <code>expires_at</code> timestamp is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>TEMP_AUTH_KEY_ALREADY_BOUND</td>
+<td>The passed temporary key is already bound to another <strong>perm_auth_key_id</strong>.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>TEMP_AUTH_KEY_EMPTY</td>
+<td>No temporary auth key provided.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#perfect-forward-secrecy" id="perfect-forward-secrecy" name="perfect-forward-secrecy"><i class="anchor-icon"></i></a><a href="/api/pfs">Perfect Forward Secrecy</a></h4>
 <p>Binding temporary authorization key to permanent ones.</p>
 <h4><a class="anchor" href="#long" id="long" name="long"><i class="anchor-icon"></i></a><a href="/type/long">long</a></h4>
 <p>A basic bare type, elements of which correspond to two-element sequences, representing 64-bit signed numbers (little-endian).</p>
-<p><a href="/mtproto/serialize">More on basic types »</a></p>
 <h4><a class="anchor" href="#int" id="int" name="int"><i class="anchor-icon"></i></a><a href="/type/int">int</a></h4>
 <p>A basic bare type, the values of which correspond to single-element sequences, i.e. numbers from -2^31 to 2^31-1 which in this case represent themselves.</p>
-<p><a href="/mtproto/serialize">More on basic types »</a></p>
 <h4><a class="anchor" href="#mobile-protocol-detailed-description" id="mobile-protocol-detailed-description" name="mobile-protocol-detailed-description"><i class="anchor-icon"></i></a><a href="/mtproto/description">﻿Mobile Protocol: Detailed Description</a></h4>
 <h4><a class="anchor" href="#calling-api-methods" id="calling-api-methods" name="calling-api-methods"><i class="anchor-icon"></i></a><a href="/api/invoking">Calling API Methods</a></h4>
 <p>Additional options for calling methods.</p>

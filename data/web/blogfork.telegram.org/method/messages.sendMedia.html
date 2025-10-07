@@ -169,10 +169,22 @@
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.18?<a href="/type/long">long</a></td>
 <td>Specifies a <a href="/api/effects">message effect »</a> to use for the message.</td>
 </tr>
+<tr>
+<td><strong>allow_paid_stars</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.21?<a href="/type/long">long</a></td>
+<td>For <a href="/api/paid-messages">paid messages »</a>, specifies the amount of <a href="/api/stars">Telegram Stars</a> the user has agreed to pay in order to send the message.</td>
+</tr>
+<tr>
+<td><strong>suggested_post</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.22?<a href="/type/SuggestedPost">SuggestedPost</a></td>
+<td>Used to <a href="/api/suggested-posts">suggest a post to a channel, see here »</a> for more info on the full flow.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#result" id="result" name="result"><i class="anchor-icon"></i></a>Result</h3>
 <p><a href="/type/Updates">Updates</a></p>
+<h3><a class="anchor" href="#both-users-and-bots-can-use-this-method" id="both-users-and-bots-can-use-this-method" name="both-users-and-bots-can-use-this-method"><i class="anchor-icon"></i></a>Both users and bots can use this method</h3>
+<h3><a class="anchor" href="#this-method-can-be-invoked-over-a-business-connection-" id="this-method-can-be-invoked-over-a-business-connection-" name="this-method-can-be-invoked-over-a-business-connection-"><i class="anchor-icon"></i></a>This method can be invoked over a <a href="/api/bots/connected-business-bots">business connection »</a></h3>
 <h3><a class="anchor" href="#possible-errors" id="possible-errors" name="possible-errors"><i class="anchor-icon"></i></a>Possible errors</h3>
 <table class="table">
 <thead>
@@ -183,6 +195,16 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>406</td>
+<td>ALLOW_PAYMENT_REQUIRED</td>
+<td>This peer only accepts <a href="/api/paid-messages">paid messages »</a>: this error is only emitted for older layers without paid messages support, so the client must be updated in order to use paid messages.  .</td>
+</tr>
+<tr>
+<td>403</td>
+<td>ALLOW_PAYMENT_REQUIRED_%d</td>
+<td>This peer charges %d <a href="/api/stars">Telegram Stars</a> per message, but the <code>allow_paid_stars</code> was not set or its value is smaller than %d.</td>
+</tr>
 <tr>
 <td>400</td>
 <td>BOT_GAMES_DISABLED</td>
@@ -197,6 +219,11 @@
 <td>400</td>
 <td>BROADCAST_PUBLIC_VOTERS_FORBIDDEN</td>
 <td>You can't forward polls with public voters.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>BUSINESS_CONNECTION_INVALID</td>
+<td>The <code>connection_id</code> passed to the wrapping <a href="/api/business">invokeWithBusinessConnection</a> call is invalid.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -227,6 +254,11 @@
 <td>400</td>
 <td>BUTTON_URL_INVALID</td>
 <td>Button URL invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>BUTTON_USER_PRIVACY_RESTRICTED</td>
+<td>The privacy setting of the user specified in a <a href="/constructor/inputKeyboardButtonUserProfile">inputKeyboardButtonUserProfile</a> button do not allow creating such a button.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -330,6 +362,11 @@
 </tr>
 <tr>
 <td>400</td>
+<td>EFFECT_ID_INVALID</td>
+<td>The specified effect ID is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>EMOTICON_INVALID</td>
 <td>The specified emoji is invalid.</td>
 </tr>
@@ -342,6 +379,11 @@
 <td>400</td>
 <td>EXTENDED_MEDIA_AMOUNT_INVALID</td>
 <td>The specified <code>stars_amount</code> of the passed <a href="/constructor/inputMediaPaidMedia">inputMediaPaidMedia</a> is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>EXTENDED_MEDIA_INVALID</td>
+<td>The specified paid media is invalid.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -361,12 +403,12 @@
 <tr>
 <td>400</td>
 <td>FILE_REFERENCE_EMPTY</td>
-<td>An empty <a href="/api/file_reference">file reference</a> was specified.</td>
+<td>An empty <a href="/api/file-references">file reference</a> was specified.</td>
 </tr>
 <tr>
 <td>400</td>
 <td>FILE_REFERENCE_EXPIRED</td>
-<td>File reference expired, it must be refetched as described in <a href="/api/file_reference">the documentation</a>.</td>
+<td>File reference expired, it must be refetched as described in <a href="/api/file-references">the documentation</a>.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -429,7 +471,7 @@
 <td>The specified payment provider is invalid.</td>
 </tr>
 <tr>
-<td>400</td>
+<td>406</td>
 <td>PEER_ID_INVALID</td>
 <td>The provided peer id is invalid.</td>
 </tr>
@@ -482,6 +524,11 @@
 <td>403</td>
 <td>PRIVACY_PREMIUM_REQUIRED</td>
 <td>You need a <a href="/api/premium">Telegram Premium subscription</a> to send a message to this user.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>QUICK_REPLIES_BOT_NOT_ALLOWED</td>
+<td><a href="/api/business#quick-reply-shortcuts">Quick replies</a> cannot be used by bots.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -540,6 +587,11 @@
 </tr>
 <tr>
 <td>400</td>
+<td>REPLY_MESSAGE_ID_INVALID</td>
+<td>The specified reply-to message ID is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>SCHEDULE_BOT_NOT_ALLOWED</td>
 <td>Bots cannot schedule messages.</td>
 </tr>
@@ -580,8 +632,23 @@
 </tr>
 <tr>
 <td>400</td>
+<td>SUGGESTED_POST_PEER_INVALID</td>
+<td>You cannot send suggested posts to non-<a href="/api/monoforum">monoforum</a> peers.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>TERMS_URL_INVALID</td>
 <td>The specified <a href="/constructor/invoice">invoice</a>.<code>terms_url</code> is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>TODO_ITEMS_EMPTY</td>
+<td>A checklist was specified, but no <a href="/api/todo">checklist items</a> were passed.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>TODO_ITEM_DUPLICATE</td>
+<td>Duplicate <a href="/api/todo">checklist items</a> detected.</td>
 </tr>
 <tr>
 <td>406</td>
@@ -655,7 +722,6 @@
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#bots-can-use-this-method" id="bots-can-use-this-method" name="bots-can-use-this-method"><i class="anchor-icon"></i></a>Bots can use this method</h3>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#stickers" id="stickers" name="stickers"><i class="anchor-icon"></i></a><a href="/api/stickers">Stickers</a></h4>
 <p>Telegram clients support displaying static and animated stickers.</p>
@@ -668,13 +734,21 @@
 <p>Users can turn their Telegram account into a business account, gaining access to business features such as opening hours, location, quick replies, automated messages, custom start pages, chatbot support, and more.</p>
 <h4><a class="anchor" href="#animated-message-effects" id="animated-message-effects" name="animated-message-effects"><i class="anchor-icon"></i></a><a href="/api/effects">Animated message effects</a></h4>
 <p>Telegram allows adding spectacular animated effects to messages you send.</p>
+<h4><a class="anchor" href="#paid-messages" id="paid-messages" name="paid-messages"><i class="anchor-icon"></i></a><a href="/api/paid-messages">Paid messages</a></h4>
+<p>Telegram Stars can be used to pay for sending messages to users, supergroups and channels that have configured paid messages, requiring a payment for every message sent to them.</p>
+<h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
+<p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
+<h4><a class="anchor" href="#suggested-posts" id="suggested-posts" name="suggested-posts"><i class="anchor-icon"></i></a><a href="/api/suggested-posts">Suggested posts</a></h4>
+<p>Telegram offers a powerful monetization feature to channel administrators: suggested posts.</p>
 <h4><a class="anchor" href="#keyboardbuttoncopy" id="keyboardbuttoncopy" name="keyboardbuttoncopy"><i class="anchor-icon"></i></a><a href="/constructor/keyboardButtonCopy">keyboardButtonCopy</a></h4>
 <p>Clipboard button: when clicked, the attached text must be copied to the clipboard.</p>
+<h4><a class="anchor" href="#inputkeyboardbuttonuserprofile" id="inputkeyboardbuttonuserprofile" name="inputkeyboardbuttonuserprofile"><i class="anchor-icon"></i></a><a href="/constructor/inputKeyboardButtonUserProfile">inputKeyboardButtonUserProfile</a></h4>
+<p>Button that links directly to a user profile</p>
 <h4><a class="anchor" href="#discussion-groups" id="discussion-groups" name="discussion-groups"><i class="anchor-icon"></i></a><a href="/api/discussion">Discussion groups</a></h4>
 <p>Groups can be associated to a channel as a discussion group, to allow users to discuss about posts.</p>
 <h4><a class="anchor" href="#inputmediapaidmedia" id="inputmediapaidmedia" name="inputmediapaidmedia"><i class="anchor-icon"></i></a><a href="/constructor/inputMediaPaidMedia">inputMediaPaidMedia</a></h4>
 <p><a href="/api/paid-media">Paid media, see here »</a> for more info.</p>
-<h4><a class="anchor" href="#file-references" id="file-references" name="file-references"><i class="anchor-icon"></i></a><a href="/api/file_reference">File references</a></h4>
+<h4><a class="anchor" href="#file-references" id="file-references" name="file-references"><i class="anchor-icon"></i></a><a href="/api/file-references">File references</a></h4>
 <p>How to handle file references.</p>
 <h4><a class="anchor" href="#inputfile" id="inputfile" name="inputfile"><i class="anchor-icon"></i></a><a href="/type/InputFile">InputFile</a></h4>
 <p>Defines a file uploaded by the client.</p>
@@ -683,11 +757,15 @@
 <h4><a class="anchor" href="#client-configuration" id="client-configuration" name="client-configuration"><i class="anchor-icon"></i></a><a href="/api/config">Client configuration</a></h4>
 <p>The MTProto API has multiple configuration parameters that can be fetched with the appropriate methods.</p>
 <h4><a class="anchor" href="#star-subscriptions" id="star-subscriptions" name="star-subscriptions"><i class="anchor-icon"></i></a><a href="/api/subscriptions">Star subscriptions</a></h4>
-<p>Bots and channels may create subscriptions, periodically charging users a certain amount of <a href="/api/stars">Telegram Stars</a> in exchange for content and services.</p>
+<p>Bots and channels may create subscriptions, periodically charging users a certain amount of Telegram Stars in exchange for content and services.</p>
 <h4><a class="anchor" href="#paymentsexportinvoice" id="paymentsexportinvoice" name="paymentsexportinvoice"><i class="anchor-icon"></i></a><a href="/method/payments.exportInvoice">payments.exportInvoice</a></h4>
 <p>Generate an <a href="/api/links#invoice-links">invoice deep link</a></p>
+<h4><a class="anchor" href="#monoforum" id="monoforum" name="monoforum"><i class="anchor-icon"></i></a><a href="/api/monoforum">Monoforum</a></h4>
+<p>Telegram supports direct messages to channels, which can also be used to suggest (even paid) channel posts.</p>
 <h4><a class="anchor" href="#invoice" id="invoice" name="invoice"><i class="anchor-icon"></i></a><a href="/constructor/invoice">invoice</a></h4>
-<p>Invoice</p></div>
+<p>Invoice</p>
+<h4><a class="anchor" href="#todo" id="todo" name="todo"><i class="anchor-icon"></i></a><a href="/api/todo">Todo</a></h4>
+<p>Premium users can now create collaborative checklists in any chat to track tasks and coordinate teams — or manage shopping and to-do lists.</p></div>
   
 </div>
           

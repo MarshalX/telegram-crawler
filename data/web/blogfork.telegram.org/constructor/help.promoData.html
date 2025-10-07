@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>help.promoData</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="MTProxy/Public Service Announcement information">
+    <meta property="description" content="A set of useful suggestions and a PSA/MTProxy sponsored peer, see here » for more info.">
     <meta property="og:title" content="help.promoData">
     <meta property="og:image" content="">
-    <meta property="og:description" content="MTProxy/Public Service Announcement information">
+    <meta property="og:description" content="A set of useful suggestions and a PSA/MTProxy sponsored peer, see here » for more info.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -42,7 +42,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/help.promoData" >help.promoData</a></li></ul></div>
   <h1 id="dev_page_title">help.promoData</h1>
   
-  <div id="dev_page_content"><p>MTProxy/Public Service Announcement information</p>
+  <div id="dev_page_content"><p>A set of useful suggestions and a PSA/MTProxy sponsored peer, see <a href="/api/config#suggestions">here »</a> for more info.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -74,17 +74,42 @@
 <tr>
 <td><strong>proxy</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/constructor/true">true</a></td>
-<td>MTProxy-related channel</td>
+<td>Set when connecting using an MTProxy that has configured an associated peer (that will be passed in <code>peer</code>, i.e. the channel that sponsored the MTProxy) that should be pinned on top of the chat list.</td>
 </tr>
 <tr>
 <td><strong>expires</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
-<td>Expiry of PSA/MTProxy info</td>
+<td>Unixtime when to re-invoke <a href="/method/help.getPromoData">help.getPromoData</a>.</td>
 </tr>
 <tr>
 <td><strong>peer</strong></td>
-<td style="text-align: center;"><a href="/type/Peer">Peer</a></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/type/Peer">Peer</a></td>
 <td>MTProxy/PSA peer</td>
+</tr>
+<tr>
+<td><strong>psa_type</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/string">string</a></td>
+<td>For Public Service Announcement <code>peer</code>s, indicates the type of the PSA.</td>
+</tr>
+<tr>
+<td><strong>psa_message</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/string">string</a></td>
+<td>For Public Service Announcement <code>peer</code>s, contains the PSA itself.</td>
+</tr>
+<tr>
+<td><strong>pending_suggestions</strong></td>
+<td style="text-align: center;"><a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/string">string</a>&gt;</td>
+<td>Contains a list of <a href="/api/config#basic-suggestions">pending suggestions »</a>.</td>
+</tr>
+<tr>
+<td><strong>dismissed_suggestions</strong></td>
+<td style="text-align: center;"><a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/string">string</a>&gt;</td>
+<td>Contains a list of <a href="/api/config#inverted-suggestions">inverted suggestions »</a>.</td>
+</tr>
+<tr>
+<td><strong>custom_pending_suggestion</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/type/PendingSuggestion">PendingSuggestion</a></td>
+<td>Contains a list of <a href="/api/config#custom-suggestions">custom pending suggestions »</a>.</td>
 </tr>
 <tr>
 <td><strong>chats</strong></td>
@@ -96,20 +121,15 @@
 <td style="text-align: center;"><a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/User">User</a>&gt;</td>
 <td>User info</td>
 </tr>
-<tr>
-<td><strong>psa_type</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/string">string</a></td>
-<td>PSA type</td>
-</tr>
-<tr>
-<td><strong>psa_message</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/string">string</a></td>
-<td>PSA message</td>
-</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
-<p><a href="/type/help.PromoData">help.PromoData</a></p></div>
+<p><a href="/type/help.PromoData">help.PromoData</a></p>
+<h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#helpgetpromodata" id="helpgetpromodata" name="helpgetpromodata"><i class="anchor-icon"></i></a><a href="/method/help.getPromoData">help.getPromoData</a></h4>
+<p>Returns a set of useful suggestions and PSA/MTProxy sponsored peers, see <a href="/api/config#suggestions">here »</a> for more info.</p>
+<h4><a class="anchor" href="#client-configuration" id="client-configuration" name="client-configuration"><i class="anchor-icon"></i></a><a href="/api/config">Client configuration</a></h4>
+<p>The MTProto API has multiple configuration parameters that can be fetched with the appropriate methods.</p></div>
   
 </div>
           

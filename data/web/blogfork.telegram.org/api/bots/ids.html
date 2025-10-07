@@ -44,12 +44,12 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>The <code>id</code> field of <a href="/api/peers">peers »</a> (i.e. users, chats, channels, secret chats) contain four distinct sequences of unique 64-bit IDs used to identify a specific user, chat, channel or secret chat.  </p>
+<p>The <code>id</code> field of <a href="/api/peers">peers »</a> (i.e. users, chats, channels, secret chats) contains four distinct sequences of unique 64-bit IDs used to identify a specific user, chat, channel or secret chat.  </p>
 <p>The ID sequences of users, chats, channels and secret chats <strong>overlap</strong>, so it is a good idea to transform the peer IDs to bot API dialog IDs as specified below.  </p>
 <p>A bot API dialog ID is a single, unique 64-bit peer ID sequence derived from the user, chat, channel and secret chat ID sequences, maintaining uniqueness across all of them.<br>
 Bot API dialog IDs are already used in the <a href="/bots/api">bot API</a> and in the underlying <a href="https://github.com/tdlib/td">tdlib</a> library to identify peers.  </p>
 <p>As specified above, a bot API dialog ID may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But, thanks to the ranges of the underlying MTProto IDs (specified below), it has at most 52 significant bits, so a 64-bit integer or even a double-precision float type are safe for storing this identifier.  </p>
-<p>More specifically, a bot API dialog ID ranges from <code>-2002147483648</code> to <code>1099511627775</code>.  </p>
+<p>More specifically, a bot API dialog ID ranges from <code>-4000000000000</code> to <code>1099511627775</code>.  </p>
 <p>It's a good idea to transform peer IDs to bot dialog API IDs even if you do decide to use separate databases to <a href="/api/peers">store info about peers</a>, as it will make IDs more visually recognizable both for you and your users, as well as guarantee compatibility with the bot API, and allow your client to easily identify the type of a peer just by using its ID, thanks to the range checks specified below.</p>
 <p>Example implementation: <a href="https://github.com/tdlib/td/blob/cb164927417f22811c74cd8678ed4a5ab7cb80ba/td/telegram/DialogId.cpp">tdlib (bot API)</a>, <a href="https://github.com/danog/tg-dialog-id">MadelineProto</a>.  </p>
 <h3><a class="anchor" href="#user-ids" id="user-ids" name="user-ids"><i class="anchor-icon"></i></a>User IDs</h3>
@@ -60,19 +60,27 @@ $userId = $botApiUserId;</code></pre>
 <h3><a class="anchor" href="#chat-ids" id="chat-ids" name="chat-ids"><i class="anchor-icon"></i></a>Chat IDs</h3>
 <p><a href="/constructor/chat">Chat</a> IDs in the MTProto API range from <code>1</code> to <code>999999999999</code> (inclusive).  </p>
 <p>To convert MTProto chat IDs to bot API chat dialog IDs, make them negative (and vice versa).  </p>
-<p>Before conversion, always validate that they fall within the range specified above (appropriately transformed for bot API chat dialog IDs, i.e. <code>-999999999999</code> to <code>-1</code> inclusively).  </p>
+<p>Before conversion, always validate that they fall within the range specified above (and vice versa, the transformed range for bot API chat dialog IDs is <code>-999999999999</code> to <code>-1</code> inclusively).  </p>
 <pre><code>$botApiChatId = -$chatId;
 $chatId = -$botApiChatId;</code></pre>
 <h3><a class="anchor" href="#supergroup-channel-ids" id="supergroup-channel-ids" name="supergroup-channel-ids"><i class="anchor-icon"></i></a>Supergroup/channel IDs</h3>
 <p><a href="/constructor/channel">Supergroup/channel</a> IDs share the same sequence in the MTProto API, and they range from <code>1</code> to <code>997852516352</code> (inclusive).  </p>
 <p>To convert MTProto channel IDs to bot API channel dialog IDs, add <code>1000000000000</code> and make them negative (and vice versa).  </p>
-<p>Before conversion, always validate that they fall within the range specified above (appropriately transformed for bot API channel dialog IDs, i.e. <code>-1997852516352</code> to <code>-1000000000001</code> inclusively).  </p>
+<p>Before conversion, always validate that they fall within the range specified above (and vice versa, the transformed range for bot API channel dialog IDs is <code>-1997852516352</code> to <code>-1000000000001</code> inclusively).  </p>
 <pre><code>$botApiChannelId = -(1000000000000 + $channelId);
 $channelId = -$botApiChannelId - 1000000000000;</code></pre>
+<p><strong>Note</strong>: the above range does <strong>not</strong> apply to <a href="/api/monoforum">monoforums »</a>, which are a special kind of forum used for direct channel messages, represented by <a href="/constructor/channel">channel</a> constructors with the <code>monoforum</code> flag set: see <a href="#monoforum-ids">here »</a> for the range used by monoforums.  </p>
+<h3><a class="anchor" href="#monoforum-ids" id="monoforum-ids" name="monoforum-ids"><i class="anchor-icon"></i></a>Monoforum IDs</h3>
+<p><a href="/api/monoforum">Monoforums »</a> are a special kind of forum used for direct channel messages, represented by <a href="/constructor/channel">channel</a> constructors with the <code>monoforum</code> flag set.  </p>
+<p>The MTProto IDs of monoforums range from <code>1002147483649</code> to <code>3000000000000</code>.  </p>
+<p>To convert MTProto monoforum IDs to bot API monoforum IDs, add <code>1000000000000</code> and make them negative (and vice versa): this procedure is the same used for <a href="#supergroup-channel-ids">supergroup/channel IDs</a>, the only change is the source MTProto range.  </p>
+<p>Before conversion, always validate that they fall within the range specified above (and vice versa, the transformed range for bot API monoforum dialog IDs is <code>-2002147483649</code> to <code>-4000000000000</code> inclusively).  </p>
+<pre><code>$botApiMonoForumId = -(1000000000000 + $monoForumId);
+$monoForumId = -$botApiMonoForumId - 1000000000000;</code></pre>
 <h3><a class="anchor" href="#secret-chat-ids" id="secret-chat-ids" name="secret-chat-ids"><i class="anchor-icon"></i></a>Secret chat IDs</h3>
 <p><a href="/api/end-to-end">Secret chat IDs</a> in the MTProto API range from <code>-2147483648</code> to <code>2147483647</code> (inclusive, treat the secret chat ID as a signed little-endian 32-bit integer).  </p>
 <p>To convert MTProto chat IDs to bot API chat secret chat IDs, subtract <code>2000000000000</code>.  </p>
-<p>Before conversion, always validate that they fall within the range specified above (appropriately transformed for bot API secret chat dialog IDs, i.e. <code>-2002147483648</code> to <code>-1997852516353</code> inclusively).  </p>
+<p>Before conversion, always validate that they fall within the range specified above (and vice versa, the transformed range for bot API secret chat dialog IDs is <code>-2002147483648</code> to <code>-1997852516353</code> inclusively).  </p>
 <pre><code>$botApiSecretChatId = $secretChatId - 2000000000000;
 $secretChatId = $botApiSecretChatId + 2000000000000;</code></pre>
 <p>Note: while the official instance of the bot API does not support secret chats, the underlying <a href="https://github.com/tdlib/td/">tdlib</a> library does support them, and uses the format mentioned above for secret chat IDs.</p></div>

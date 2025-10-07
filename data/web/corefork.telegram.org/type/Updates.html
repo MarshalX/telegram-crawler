@@ -242,8 +242,36 @@
 </thead>
 <tbody>
 <tr>
+<td><a href="/method/account.getNotifyExceptions">account.getNotifyExceptions</a></td>
+<td>Returns list of chats with non-default notification settings</td>
+</tr>
+<tr>
+<td><a href="/method/account.updateConnectedBot">account.updateConnectedBot</a></td>
+<td>Connect a <a href="/api/bots/connected-business-bots">business bot »</a> to the current account, or to change the current connection settings.</td>
+</tr>
+<tr>
+<td><a href="/method/account.getBotBusinessConnection">account.getBotBusinessConnection</a></td>
+<td>Bots may invoke this method to re-fetch the <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> constructor associated with a specific <a href="/api/bots/connected-business-bots">business <code>connection_id</code>, see here »</a> for more info on connected business bots.  <br>This is needed for example for freshly logged in bots that are receiving some <a href="/constructor/updateBotNewBusinessMessage">updateBotNewBusinessMessage</a>, etc. updates because some users have already connected to the bot before it could login.  <br>In this case, the bot is receiving messages from the business connection, but it hasn't cached the associated <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> with info about the connection (can it reply to messages? etc.) yet, and cannot receive the old ones because they were sent when the bot wasn't logged into the session yet.  <br>This method can be used to fetch info about a not-yet-cached business connection, and should not be invoked if the info is already cached or to fetch changes, as eventual changes will automatically be sent as new <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> updates to the bot using the usual <a href="/api/updates">update delivery methods »</a>.</td>
+</tr>
+<tr>
 <td><a href="/method/contacts.deleteContacts">contacts.deleteContacts</a></td>
 <td>Deletes several contacts from the list.</td>
+</tr>
+<tr>
+<td><a href="/method/contacts.addContact">contacts.addContact</a></td>
+<td>Add an existing telegram user as contact.<br><br>Use <a href="/method/contacts.importContacts">contacts.importContacts</a> to add contacts by phone number, without knowing their Telegram ID.</td>
+</tr>
+<tr>
+<td><a href="/method/contacts.acceptContact">contacts.acceptContact</a></td>
+<td>If the <a href="/api/action-bar#add-contact">add contact action bar is active</a>, add that user as contact</td>
+</tr>
+<tr>
+<td><a href="/method/contacts.getLocated">contacts.getLocated</a></td>
+<td>Get users and geochats near you, see <a href="/api/nearby">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/contacts.blockFromReplies">contacts.blockFromReplies</a></td>
+<td>Stop getting notifications about <a href="/api/discussion">discussion replies</a> of a certain user in <code>@replies</code></td>
 </tr>
 <tr>
 <td><a href="/method/messages.sendMessage">messages.sendMessage</a></td>
@@ -278,44 +306,12 @@
 <td>Start a conversation with a bot using a <a href="/api/links#bot-links">deep linking parameter</a></td>
 </tr>
 <tr>
-<td><a href="/method/channels.createChannel">channels.createChannel</a></td>
-<td>Create a <a href="/api/channel">supergroup/channel</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/channels.editAdmin">channels.editAdmin</a></td>
-<td>Modify the admin rights of a user in a <a href="/api/channel">supergroup/channel</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/channels.editTitle">channels.editTitle</a></td>
-<td>Edit the name of a <a href="/api/channel">channel/supergroup</a></td>
-</tr>
-<tr>
-<td><a href="/method/channels.editPhoto">channels.editPhoto</a></td>
-<td>Change the photo of a <a href="/api/channel">channel/supergroup</a></td>
-</tr>
-<tr>
-<td><a href="/method/channels.joinChannel">channels.joinChannel</a></td>
-<td>Join a channel/supergroup</td>
-</tr>
-<tr>
-<td><a href="/method/channels.leaveChannel">channels.leaveChannel</a></td>
-<td>Leave a <a href="/api/channel">channel/supergroup</a></td>
-</tr>
-<tr>
-<td><a href="/method/channels.deleteChannel">channels.deleteChannel</a></td>
-<td>Delete a <a href="/api/channel">channel/supergroup</a></td>
-</tr>
-<tr>
 <td><a href="/method/messages.migrateChat">messages.migrateChat</a></td>
 <td>Turn a <a href="/api/channel#migration">basic group into a supergroup</a></td>
 </tr>
 <tr>
 <td><a href="/method/messages.sendInlineBotResult">messages.sendInlineBotResult</a></td>
 <td>Send a result obtained using <a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/channels.toggleSignatures">channels.toggleSignatures</a></td>
-<td>Enable/disable message signatures in channels</td>
 </tr>
 <tr>
 <td><a href="/method/messages.editMessage">messages.editMessage</a></td>
@@ -330,28 +326,8 @@
 <td>Use this method to set the score of the specified user in a game sent as a normal message (bots only).</td>
 </tr>
 <tr>
-<td><a href="/method/phone.discardCall">phone.discardCall</a></td>
-<td>Refuse or end running call</td>
-</tr>
-<tr>
-<td><a href="/method/phone.setCallRating">phone.setCallRating</a></td>
-<td>Rate a call, returns info about the rating message sent to the official VoIP bot.</td>
-</tr>
-<tr>
-<td><a href="/method/channels.editBanned">channels.editBanned</a></td>
-<td>Ban/unban/kick a user in a <a href="/api/channel">supergroup/channel</a>.</td>
-</tr>
-<tr>
 <td><a href="/method/messages.sendScreenshotNotification">messages.sendScreenshotNotification</a></td>
 <td>Notify the other user in a private chat that a screenshot of the chat was taken</td>
-</tr>
-<tr>
-<td><a href="/method/channels.deleteHistory">channels.deleteHistory</a></td>
-<td>Delete the history of a <a href="/api/channel">supergroup</a></td>
-</tr>
-<tr>
-<td><a href="/method/channels.togglePreHistoryHidden">channels.togglePreHistoryHidden</a></td>
-<td>Hide/unhide message history for new channel/supergroup users</td>
 </tr>
 <tr>
 <td><a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a></td>
@@ -360,10 +336,6 @@
 <tr>
 <td><a href="/method/messages.updatePinnedMessage">messages.updatePinnedMessage</a></td>
 <td>Pin a message</td>
-</tr>
-<tr>
-<td><a href="/method/account.getNotifyExceptions">account.getNotifyExceptions</a></td>
-<td>Returns list of chats with non-default notification settings</td>
 </tr>
 <tr>
 <td><a href="/method/messages.sendVote">messages.sendVote</a></td>
@@ -378,30 +350,6 @@
 <td>Edit the default banned rights of a <a href="/api/channel">channel/supergroup/group</a>.</td>
 </tr>
 <tr>
-<td><a href="/method/folders.editPeerFolders">folders.editPeerFolders</a></td>
-<td>Edit peers in <a href="/api/folders#peer-folders">peer folder</a></td>
-</tr>
-<tr>
-<td><a href="/method/contacts.addContact">contacts.addContact</a></td>
-<td>Add an existing telegram user as contact.<br><br>Use <a href="/method/contacts.importContacts">contacts.importContacts</a> to add contacts by phone number, without knowing their Telegram ID.</td>
-</tr>
-<tr>
-<td><a href="/method/contacts.acceptContact">contacts.acceptContact</a></td>
-<td>If the <a href="/api/action-bar#add-contact">add contact action bar is active</a>, add that user as contact</td>
-</tr>
-<tr>
-<td><a href="/method/channels.editCreator">channels.editCreator</a></td>
-<td>Transfer channel ownership</td>
-</tr>
-<tr>
-<td><a href="/method/contacts.getLocated">contacts.getLocated</a></td>
-<td>Get users and geochats near you, see <a href="/api/nearby">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/channels.toggleSlowMode">channels.toggleSlowMode</a></td>
-<td>Toggle supergroup slow mode: if enabled, users will only be able to send one message every <code>seconds</code> seconds</td>
-</tr>
-<tr>
 <td><a href="/method/messages.sendScheduledMessages">messages.sendScheduledMessages</a></td>
 <td>Send scheduled messages right away</td>
 </tr>
@@ -410,72 +358,12 @@
 <td>Delete scheduled messages</td>
 </tr>
 <tr>
-<td><a href="/method/contacts.blockFromReplies">contacts.blockFromReplies</a></td>
-<td>Stop getting notifications about <a href="/api/discussion">discussion replies</a> of a certain user in <code>@replies</code></td>
-</tr>
-<tr>
-<td><a href="/method/phone.createGroupCall">phone.createGroupCall</a></td>
-<td>Create a group call or livestream</td>
-</tr>
-<tr>
-<td><a href="/method/phone.joinGroupCall">phone.joinGroupCall</a></td>
-<td>Join a group call</td>
-</tr>
-<tr>
-<td><a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a></td>
-<td>Leave a group call</td>
-</tr>
-<tr>
-<td><a href="/method/phone.inviteToGroupCall">phone.inviteToGroupCall</a></td>
-<td>Invite a set of users to a group call.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.discardGroupCall">phone.discardGroupCall</a></td>
-<td>Terminate a group call</td>
-</tr>
-<tr>
-<td><a href="/method/phone.toggleGroupCallSettings">phone.toggleGroupCallSettings</a></td>
-<td>Change group call settings</td>
-</tr>
-<tr>
 <td><a href="/method/messages.setHistoryTTL">messages.setHistoryTTL</a></td>
 <td>Set maximum Time-To-Live of all messages in the specified chat</td>
 </tr>
 <tr>
-<td><a href="/method/channels.convertToGigagroup">channels.convertToGigagroup</a></td>
-<td>Convert a <a href="/api/channel">supergroup</a> to a <a href="/api/channel">gigagroup</a>, when requested by <a href="/api/config#channel-suggestions">channel suggestions</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.toggleGroupCallRecord">phone.toggleGroupCallRecord</a></td>
-<td>Start or stop recording a group call: the recorded audio and video streams will be automatically sent to <code>Saved messages</code> (the chat with ourselves).</td>
-</tr>
-<tr>
-<td><a href="/method/phone.editGroupCallParticipant">phone.editGroupCallParticipant</a></td>
-<td>Edit information about a given group call participant<br><br>Note: <a href="/mtproto/TL-combinators#conditional-fields">flags</a>.N?<a href="/type/Bool">Bool</a> parameters can have three possible values:<br><br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is not set, the previous value will not be changed.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolTrue">boolTrue</a>, the previous value will be overwritten to <code>true</code>.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolFalse">boolFalse</a>, the previous value will be overwritten to <code>false</code>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.editGroupCallTitle">phone.editGroupCallTitle</a></td>
-<td>Edit the title of a group call or livestream</td>
-</tr>
-<tr>
-<td><a href="/method/phone.toggleGroupCallStartSubscription">phone.toggleGroupCallStartSubscription</a></td>
-<td>Subscribe or unsubscribe to a scheduled group call</td>
-</tr>
-<tr>
-<td><a href="/method/phone.startScheduledGroupCall">phone.startScheduledGroupCall</a></td>
-<td>Start a scheduled group call.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.joinGroupCallPresentation">phone.joinGroupCallPresentation</a></td>
-<td>Start screen sharing in a call</td>
-</tr>
-<tr>
-<td><a href="/method/phone.leaveGroupCallPresentation">phone.leaveGroupCallPresentation</a></td>
-<td>Stop screen sharing in a group call</td>
-</tr>
-<tr>
 <td><a href="/method/messages.setChatTheme">messages.setChatTheme</a></td>
-<td>Change the chat theme of a certain chat</td>
+<td>Change the chat theme of a certain chat, see <a href="/api/themes#chat-themes">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.hideChatJoinRequest">messages.hideChatJoinRequest</a></td>
@@ -506,24 +394,116 @@
 <td>Used by the user to relay data from an opened <a href="/api/bots/webapps">reply keyboard bot mini app</a> to the bot that owns it.</td>
 </tr>
 <tr>
+<td><a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a></td>
+<td>Fetch updated information about <a href="/api/paid-media">paid media, see here »</a> for the full flow.<br><br>This method will return an array of <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> updates, only for messages containing <strong>already bought</strong> paid media.  <br>No information will be returned for messages containing not yet bought paid media.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a></td>
+<td>Send one or more chosen peers, as requested by a <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a> button.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a></td>
+<td>Set a custom <a href="/api/wallpapers">wallpaper »</a> in a specific private chat with another user.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.sendQuickReplyMessages">messages.sendQuickReplyMessages</a></td>
+<td>Send a <a href="/api/business#quick-reply-shortcuts">quick reply shortcut »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.deleteQuickReplyMessages">messages.deleteQuickReplyMessages</a></td>
+<td>Delete one or more messages from a <a href="/api/business#quick-reply-shortcuts">quick reply shortcut</a>. This will also emit an <a href="/constructor/updateDeleteQuickReplyMessages">updateDeleteQuickReplyMessages</a> update.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.editFactCheck">messages.editFactCheck</a></td>
+<td>Edit/create a <a href="/api/factcheck">fact-check</a> on a message.<br><br>Can only be used by independent fact-checkers as specified by the <a href="/api/config#can-edit-factcheck">appConfig.can_edit_factcheck</a> configuration flag.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.deleteFactCheck">messages.deleteFactCheck</a></td>
+<td>Delete a <a href="/api/factcheck">fact-check</a> from a message.<br><br>Can only be used by independent fact-checkers as specified by the <a href="/api/config#can-edit-factcheck">appConfig.can_edit_factcheck</a> configuration flag.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a></td>
+<td>Sends one or more <a href="/api/reactions#paid-reactions">paid Telegram Star reactions »</a>, transferring <a href="/api/stars">Telegram Stars »</a> to a channel's balance.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getPaidReactionPrivacy">messages.getPaidReactionPrivacy</a></td>
+<td>Fetches an <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> update with the current <a href="/api/reactions#paid-reactions">default paid reaction privacy, see here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.toggleTodoCompleted">messages.toggleTodoCompleted</a></td>
+<td>Mark one or more items of a <a href="/api/todo">todo list »</a> as completed or not completed.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.appendTodoList">messages.appendTodoList</a></td>
+<td>Appends one or more items to a <a href="/api/todo">todo list »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.toggleSuggestedPostApproval">messages.toggleSuggestedPostApproval</a></td>
+<td>Approve or reject a <a href="/api/suggested-posts">suggested post »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.createChannel">channels.createChannel</a></td>
+<td>Create a <a href="/api/channel">supergroup/channel</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.editAdmin">channels.editAdmin</a></td>
+<td>Modify the admin rights of a user in a <a href="/api/channel">supergroup/channel</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.editTitle">channels.editTitle</a></td>
+<td>Edit the name of a <a href="/api/channel">channel/supergroup</a></td>
+</tr>
+<tr>
+<td><a href="/method/channels.editPhoto">channels.editPhoto</a></td>
+<td>Change the photo of a <a href="/api/channel">channel/supergroup</a></td>
+</tr>
+<tr>
+<td><a href="/method/channels.joinChannel">channels.joinChannel</a></td>
+<td>Join a channel/supergroup</td>
+</tr>
+<tr>
+<td><a href="/method/channels.leaveChannel">channels.leaveChannel</a></td>
+<td>Leave a <a href="/api/channel">channel/supergroup</a></td>
+</tr>
+<tr>
+<td><a href="/method/channels.deleteChannel">channels.deleteChannel</a></td>
+<td>Delete a <a href="/api/channel">channel/supergroup</a></td>
+</tr>
+<tr>
+<td><a href="/method/channels.toggleSignatures">channels.toggleSignatures</a></td>
+<td>Enable/disable message signatures in channels</td>
+</tr>
+<tr>
+<td><a href="/method/channels.editBanned">channels.editBanned</a></td>
+<td>Ban/unban/kick a user in a <a href="/api/channel">supergroup/channel</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/channels.deleteHistory">channels.deleteHistory</a></td>
+<td>Delete the history of a <a href="/api/channel">supergroup</a></td>
+</tr>
+<tr>
+<td><a href="/method/channels.togglePreHistoryHidden">channels.togglePreHistoryHidden</a></td>
+<td>Hide/unhide message history for new channel/supergroup users</td>
+</tr>
+<tr>
+<td><a href="/method/channels.editCreator">channels.editCreator</a></td>
+<td>Transfer channel ownership</td>
+</tr>
+<tr>
+<td><a href="/method/channels.toggleSlowMode">channels.toggleSlowMode</a></td>
+<td>Toggle supergroup slow mode: if enabled, users will only be able to send one message every <code>seconds</code> seconds</td>
+</tr>
+<tr>
+<td><a href="/method/channels.convertToGigagroup">channels.convertToGigagroup</a></td>
+<td>Convert a <a href="/api/channel">supergroup</a> to a <a href="/api/channel">gigagroup</a>, when requested by <a href="/api/config#channel-suggestions">channel suggestions</a>.</td>
+</tr>
+<tr>
 <td><a href="/method/channels.toggleJoinToSend">channels.toggleJoinToSend</a></td>
 <td>Set whether all users <a href="/api/discussion#requiring-users-to-join-the-group">should join a discussion group in order to comment on a post »</a></td>
 </tr>
 <tr>
 <td><a href="/method/channels.toggleJoinRequest">channels.toggleJoinRequest</a></td>
 <td>Set whether all users should <a href="/api/invites#join-requests">request admin approval to join the group »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/payments.assignAppStoreTransaction">payments.assignAppStoreTransaction</a></td>
-<td>Informs server about a purchase made through the App Store: for official applications only.</td>
-</tr>
-<tr>
-<td><a href="/method/payments.assignPlayMarketTransaction">payments.assignPlayMarketTransaction</a></td>
-<td>Informs server about a purchase made through the Play Store: for official applications only.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a></td>
-<td>Fetch updated information about <a href="/api/paid-media">paid media, see here »</a> for the full flow.<br><br>This method will return an array of <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> updates, only for messages containing <strong>already bought</strong> paid media.  <br>No information will be returned for messages containing not yet bought paid media.</td>
 </tr>
 <tr>
 <td><a href="/method/channels.toggleForum">channels.toggleForum</a></td>
@@ -554,58 +534,6 @@
 <td>Hide or display the participants list in a <a href="/api/channel">supergroup</a>.<br><br>The supergroup must have at least <code>hidden_members_group_size_min</code> participants in order to use this method, as specified by the <a href="/api/config#client-configuration">client configuration parameters »</a>.</td>
 </tr>
 <tr>
-<td><a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a></td>
-<td>Send one or more chosen peers, as requested by a <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a> button.</td>
-</tr>
-<tr>
-<td><a href="/method/chatlists.joinChatlistInvite">chatlists.joinChatlistInvite</a></td>
-<td>Import a <a href="/api/links#chat-folder-links">chat folder deep link »</a>, joining some or all the chats in the folder.</td>
-</tr>
-<tr>
-<td><a href="/method/chatlists.joinChatlistUpdates">chatlists.joinChatlistUpdates</a></td>
-<td>Join channels and supergroups recently added to a <a href="/api/links#chat-folder-links">chat folder deep link »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/chatlists.leaveChatlist">chatlists.leaveChatlist</a></td>
-<td>Delete a folder imported using a <a href="/api/links#chat-folder-links">chat folder deep link »</a></td>
-</tr>
-<tr>
-<td><a href="/method/messages.setChatWallPaper">messages.setChatWallPaper</a></td>
-<td>Set a custom <a href="/api/wallpapers">wallpaper »</a> in a specific private chat with another user.</td>
-</tr>
-<tr>
-<td><a href="/method/stories.sendStory">stories.sendStory</a></td>
-<td>Uploads a <a href="/api/stories">Telegram Story</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/stories.editStory">stories.editStory</a></td>
-<td>Edit an uploaded <a href="/api/stories">story</a></td>
-</tr>
-<tr>
-<td><a href="/method/stories.activateStealthMode">stories.activateStealthMode</a></td>
-<td>Activates <a href="/api/stories#stealth-mode">stories stealth mode</a>, see <a href="/api/stories#stealth-mode">here »</a> for more info.<br><br>Will return an <a href="/constructor/updateStoriesStealthMode">updateStoriesStealthMode</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/stories.sendReaction">stories.sendReaction</a></td>
-<td>React to a story.</td>
-</tr>
-<tr>
-<td><a href="/method/bots.allowSendMessage">bots.allowSendMessage</a></td>
-<td>Allow the specified bot to send us messages</td>
-</tr>
-<tr>
-<td><a href="/method/stories.getAllReadPeerStories">stories.getAllReadPeerStories</a></td>
-<td>Obtain the latest read story ID for all peers when first logging in, returned as a list of <a href="/constructor/updateReadStories">updateReadStories</a> updates, see <a href="/api/stories#watching-stories">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/payments.applyGiftCode">payments.applyGiftCode</a></td>
-<td>Apply a <a href="/api/giveaways">Telegram Premium giftcode »</a></td>
-</tr>
-<tr>
-<td><a href="/method/payments.launchPrepaidGiveaway">payments.launchPrepaidGiveaway</a></td>
-<td>Launch a <a href="/api/giveaways">prepaid giveaway »</a>.</td>
-</tr>
-<tr>
 <td><a href="/method/channels.updateColor">channels.updateColor</a></td>
 <td>Update the <a href="/api/colors">accent color and background custom emoji »</a> of a channel.</td>
 </tr>
@@ -622,44 +550,172 @@
 <td>Admins with <a href="/constructor/chatAdminRights">ban_users admin rights »</a> may allow users that apply a certain number of <a href="/api/boost">booosts »</a> to the group to bypass <a href="/method/channels.toggleSlowMode">slow mode »</a> and <a href="/api/rights#default-rights">other »</a> supergroup restrictions, see <a href="/api/boost#bypass-slowmode-and-chat-restrictions">here »</a> for more info.</td>
 </tr>
 <tr>
-<td><a href="/method/messages.sendQuickReplyMessages">messages.sendQuickReplyMessages</a></td>
-<td>Send a <a href="/api/business#quick-reply-shortcuts">quick reply shortcut »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.deleteQuickReplyMessages">messages.deleteQuickReplyMessages</a></td>
-<td>Delete one or more messages from a <a href="/api/business#quick-reply-shortcuts">quick reply shortcut</a>. This will also emit an <a href="/constructor/updateDeleteQuickReplyMessages">updateDeleteQuickReplyMessages</a> update.</td>
-</tr>
-<tr>
-<td><a href="/method/account.updateConnectedBot">account.updateConnectedBot</a></td>
-<td>Connect a <a href="/api/business#connected-bots">business bot »</a> to the current account, or to change the current connection settings.</td>
-</tr>
-<tr>
-<td><a href="/method/account.getBotBusinessConnection">account.getBotBusinessConnection</a></td>
-<td>Bots may invoke this method to re-fetch the <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> constructor associated with a specific <a href="/api/business#connected-bots">business <code>connection_id</code>, see here »</a> for more info on connected business bots.  <br>This is needed for example for freshly logged in bots that are receiving some <a href="/constructor/updateBotNewBusinessMessage">updateBotNewBusinessMessage</a>, etc. updates because some users have already connected to the bot before it could login.  <br>In this case, the bot is receiving messages from the business connection, but it hasn't cached the associated <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> with info about the connection (can it reply to messages? etc.) yet, and cannot receive the old ones because they were sent when the bot wasn't logged into the session yet.  <br>This method can be used to fetch info about a not-yet-cached business connection, and should not be invoked if the info is already cached or to fetch changes, as eventual changes will automatically be sent as new <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> updates to the bot using the usual <a href="/api/updates">update delivery methods »</a>.</td>
-</tr>
-<tr>
 <td><a href="/method/channels.restrictSponsoredMessages">channels.restrictSponsoredMessages</a></td>
 <td>Disable ads on the specified channel, for all users.<br><br>Available only after reaching at least the <a href="/api/boost">boost level »</a> specified in the <a href="/api/config#channel-restrict-sponsored-level-min"><code>channel_restrict_sponsored_level_min</code> »</a> config parameter.</td>
 </tr>
 <tr>
-<td><a href="/method/messages.editFactCheck">messages.editFactCheck</a></td>
-<td>Edit/create a <a href="/api/factcheck">fact-check</a> on a message.<br><br>Can only be used by independent fact-checkers as specified by the <a href="/api/config#can-edit-factcheck">appConfig.can_edit_factcheck</a> configuration flag.</td>
+<td><a href="/method/channels.updatePaidMessagesPrice">channels.updatePaidMessagesPrice</a></td>
+<td>Enable or disable <a href="/api/paid-messages">paid messages »</a> in this <a href="/api/channel">supergroup</a> or <a href="/api/monoforum">monoforum</a>.<br><br>Also used to <a href="/api/monoforum">enable or disable monoforums aka direct messages in a channel</a>.<br><br>Note that passing the ID of the monoforum itself to <code>channel</code> will return a <code>CHANNEL_MONOFORUM_UNSUPPORTED</code> error: pass the ID of the associated channel to edit the settings of the associated monoforum, instead.</td>
 </tr>
 <tr>
-<td><a href="/method/messages.deleteFactCheck">messages.deleteFactCheck</a></td>
-<td>Delete a <a href="/api/factcheck">fact-check</a> from a message.<br><br>Can only be used by independent fact-checkers as specified by the <a href="/api/config#can-edit-factcheck">appConfig.can_edit_factcheck</a> configuration flag.</td>
+<td><a href="/method/channels.toggleAutotranslation">channels.toggleAutotranslation</a></td>
+<td>Toggle autotranslation in a channel, for all users: see <a href="/api/translation#autotranslation-for-channels">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.allowSendMessage">bots.allowSendMessage</a></td>
+<td>Allow the specified bot to send us messages</td>
+</tr>
+<tr>
+<td><a href="/method/payments.assignAppStoreTransaction">payments.assignAppStoreTransaction</a></td>
+<td>Informs server about a purchase made through the App Store: for official applications only.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.assignPlayMarketTransaction">payments.assignPlayMarketTransaction</a></td>
+<td>Informs server about a purchase made through the Play Store: for official applications only.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.applyGiftCode">payments.applyGiftCode</a></td>
+<td>Apply a <a href="/api/giveaways">Telegram Premium giftcode »</a></td>
+</tr>
+<tr>
+<td><a href="/method/payments.launchPrepaidGiveaway">payments.launchPrepaidGiveaway</a></td>
+<td>Launch a <a href="/api/giveaways">prepaid giveaway »</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/payments.refundStarsCharge">payments.refundStarsCharge</a></td>
 <td>Refund a <a href="/api/stars">Telegram Stars</a> transaction, see <a href="/api/payments#6-refunds">here »</a> for more info.</td>
 </tr>
 <tr>
-<td><a href="/method/messages.sendPaidReaction">messages.sendPaidReaction</a></td>
-<td>Sends one or more <a href="/api/reactions#paid-reactions">paid Telegram Star reactions »</a>, transferring <a href="/api/stars">Telegram Stars »</a> to a channel's balance.</td>
+<td><a href="/method/payments.upgradeStarGift">payments.upgradeStarGift</a></td>
+<td>Upgrade a <a href="/api/gifts">gift</a> to a <a href="/api/gifts#collectible-gifts">collectible gift</a>: can only be used if the upgrade was already paid by the gift sender; see <a href="/api/gifts#upgrade-a-gift-to-a-collectible-gift">here »</a> for more info on the full flow (including the different flow to use in case the upgrade was not paid by the gift sender).</td>
 </tr>
 <tr>
-<td><a href="/method/messages.getPaidReactionPrivacy">messages.getPaidReactionPrivacy</a></td>
-<td>Fetches an <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> update with the current <a href="/api/reactions#paid-reactions">default paid reaction privacy, see here »</a> for more info.</td>
+<td><a href="/method/payments.transferStarGift">payments.transferStarGift</a></td>
+<td>Transfer a <a href="/api/gifts#collectible-gifts">collectible gift</a> to another user or channel: can only be used if transfer is free (i.e. <a href="/constructor/messageActionStarGiftUnique">messageActionStarGiftUnique</a>.<code>transfer_stars</code> is not set); see <a href="/api/gifts#transferring-collectible-gifts">here »</a> for more info on the full flow (including the different flow to use in case the transfer isn't free).</td>
+</tr>
+<tr>
+<td><a href="/method/payments.updateStarGiftPrice">payments.updateStarGiftPrice</a></td>
+<td>A <a href="/api/gifts#collectible-gifts">collectible gift we own »</a> can be put up for sale on the <a href="https://telegram.org/blog/gift-marketplace-and-more">gift marketplace »</a> with this method, see <a href="/api/gifts#reselling-collectible-gifts">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.discardCall">phone.discardCall</a></td>
+<td>Refuse or end running call</td>
+</tr>
+<tr>
+<td><a href="/method/phone.setCallRating">phone.setCallRating</a></td>
+<td>Rate a call, returns info about the rating message sent to the official VoIP bot.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.createGroupCall">phone.createGroupCall</a></td>
+<td>Create a group call or livestream</td>
+</tr>
+<tr>
+<td><a href="/method/phone.joinGroupCall">phone.joinGroupCall</a></td>
+<td>Join a group call</td>
+</tr>
+<tr>
+<td><a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a></td>
+<td>Leave a group call</td>
+</tr>
+<tr>
+<td><a href="/method/phone.inviteToGroupCall">phone.inviteToGroupCall</a></td>
+<td>Invite a set of users to a group call.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.discardGroupCall">phone.discardGroupCall</a></td>
+<td>Terminate a group call</td>
+</tr>
+<tr>
+<td><a href="/method/phone.toggleGroupCallSettings">phone.toggleGroupCallSettings</a></td>
+<td>Change group call settings</td>
+</tr>
+<tr>
+<td><a href="/method/phone.toggleGroupCallRecord">phone.toggleGroupCallRecord</a></td>
+<td>Start or stop recording a group call: the recorded audio and video streams will be automatically sent to <code>Saved messages</code> (the chat with ourselves).</td>
+</tr>
+<tr>
+<td><a href="/method/phone.editGroupCallParticipant">phone.editGroupCallParticipant</a></td>
+<td>Edit information about a given group call participant<br><br>Note: <a href="/mtproto/TL-combinators#conditional-fields">flags</a>.N?<a href="/type/Bool">Bool</a> parameters can have three possible values:<br><br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is not set, the previous value will not be changed.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolTrue">boolTrue</a>, the previous value will be overwritten to <code>true</code>.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolFalse">boolFalse</a>, the previous value will be overwritten to <code>false</code>.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.editGroupCallTitle">phone.editGroupCallTitle</a></td>
+<td>Edit the title of a group call or livestream</td>
+</tr>
+<tr>
+<td><a href="/method/phone.toggleGroupCallStartSubscription">phone.toggleGroupCallStartSubscription</a></td>
+<td>Subscribe or unsubscribe to a scheduled group call</td>
+</tr>
+<tr>
+<td><a href="/method/phone.startScheduledGroupCall">phone.startScheduledGroupCall</a></td>
+<td>Start a scheduled group call.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.joinGroupCallPresentation">phone.joinGroupCallPresentation</a></td>
+<td>Start screen sharing in a call</td>
+</tr>
+<tr>
+<td><a href="/method/phone.leaveGroupCallPresentation">phone.leaveGroupCallPresentation</a></td>
+<td>Stop screen sharing in a group call</td>
+</tr>
+<tr>
+<td><a href="/method/phone.createConferenceCall">phone.createConferenceCall</a></td>
+<td>Create and optionally join a new conference call.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a></td>
+<td>Remove participants from a conference call.<br><br>Exactly one of the <code>only_left</code> and <code>kick</code> flags must be set.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.sendConferenceCallBroadcast">phone.sendConferenceCallBroadcast</a></td>
+<td>Broadcast a blockchain block to all members of a conference call, see <a href="/api/end-to-end/group-calls">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.inviteConferenceCallParticipant">phone.inviteConferenceCallParticipant</a></td>
+<td>Invite a user to a conference call.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.declineConferenceCallInvite">phone.declineConferenceCallInvite</a></td>
+<td>Declines a conference call invite.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a></td>
+<td>Fetch the blocks of a <a href="/api/end-to-end/group-calls">conference blockchain »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/folders.editPeerFolders">folders.editPeerFolders</a></td>
+<td>Edit peers in <a href="/api/folders#peer-folders">peer folder</a></td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.joinChatlistInvite">chatlists.joinChatlistInvite</a></td>
+<td>Import a <a href="/api/links#chat-folder-links">chat folder deep link »</a>, joining some or all the chats in the folder.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.joinChatlistUpdates">chatlists.joinChatlistUpdates</a></td>
+<td>Join channels and supergroups recently added to a <a href="/api/links#chat-folder-links">chat folder deep link »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/chatlists.leaveChatlist">chatlists.leaveChatlist</a></td>
+<td>Delete a folder imported using a <a href="/api/links#chat-folder-links">chat folder deep link »</a></td>
+</tr>
+<tr>
+<td><a href="/method/stories.sendStory">stories.sendStory</a></td>
+<td>Uploads a <a href="/api/stories">Telegram Story</a>.<br><br>May also be used in a <a href="/api/bots/connected-business-bots">business connection</a>, <em>not</em> by wrapping the query in <a href="/method/invokeWithBusinessConnection">invokeWithBusinessConnection »</a>, but rather by specifying the ID of a controlled business user in <code>peer</code>.</td>
+</tr>
+<tr>
+<td><a href="/method/stories.editStory">stories.editStory</a></td>
+<td>Edit an uploaded <a href="/api/stories">story</a><br><br>May also be used in a <a href="/api/bots/connected-business-bots">business connection</a>, <em>not</em> by wrapping the query in <a href="/method/invokeWithBusinessConnection">invokeWithBusinessConnection »</a>, but rather by specifying the ID of a controlled business user in <code>peer</code>: in this context, the method can only be used to edit stories posted by the same business bot on behalf of the user with <a href="/method/stories.sendStory">stories.sendStory</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/stories.activateStealthMode">stories.activateStealthMode</a></td>
+<td>Activates <a href="/api/stories#stealth-mode">stories stealth mode</a>, see <a href="/api/stories#stealth-mode">here »</a> for more info.<br><br>Will return an <a href="/constructor/updateStoriesStealthMode">updateStoriesStealthMode</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/stories.sendReaction">stories.sendReaction</a></td>
+<td>React to a story.</td>
+</tr>
+<tr>
+<td><a href="/method/stories.getAllReadPeerStories">stories.getAllReadPeerStories</a></td>
+<td>Obtain the latest read story ID for all peers when first logging in, returned as a list of <a href="/constructor/updateReadStories">updateReadStories</a> updates, see <a href="/api/stories#watching-stories">here »</a> for more info.</td>
 </tr>
 </tbody>
 </table></div>

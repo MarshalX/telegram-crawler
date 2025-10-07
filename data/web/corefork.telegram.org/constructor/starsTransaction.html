@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>starsTransaction</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Represents a Telegram Stars transaction ».">
+    <meta property="description" content="Represents a Telegram Stars or TON transaction ».">
     <meta property="og:title" content="starsTransaction">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Represents a Telegram Stars transaction ».">
+    <meta property="og:description" content="Represents a Telegram Stars or TON transaction ».">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -42,7 +42,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/starsTransaction" >starsTransaction</a></li></ul></div>
   <h1 id="dev_page_title">starsTransaction</h1>
   
-  <div id="dev_page_content"><p>Represents a <a href="/api/stars">Telegram Stars transaction »</a>.</p>
+  <div id="dev_page_content"><p>Represents a <a href="/api/stars">Telegram Stars or TON transaction »</a>.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -97,14 +97,39 @@
 <td>This transaction is a <a href="/api/reactions#paid-reactions">paid reaction »</a>.</td>
 </tr>
 <tr>
+<td><strong>stargift_upgrade</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.18?<a href="/constructor/true">true</a></td>
+<td>This transaction pays for the upgrade of a gift to a <a href="/api/gifts#collectible-gifts">collectible gift »</a>.</td>
+</tr>
+<tr>
+<td><strong>business_transfer</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.21?<a href="/constructor/true">true</a></td>
+<td>This transaction transfers stars from the balance of a user account <a href="/api/bots/connected-business-bots">connected to a business bot</a>, to the balance of the business bot, see <a href="/api/stars#transferring-stars-from-a-business-account-to-the-business-bot">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><strong>stargift_resale</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.22?<a href="/constructor/true">true</a></td>
+<td>This transaction is related to the <a href="/api/gifts#reselling-collectible-gifts">resale of a collectible gift »</a>.</td>
+</tr>
+<tr>
+<td><strong>posts_search</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.24?<a href="/constructor/true">true</a></td>
+<td>Represents payment for a <a href="/api/search#posts-tab">paid global post search »</a>.</td>
+</tr>
+<tr>
+<td><strong>stargift_prepaid_upgrade</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.25?<a href="/constructor/true">true</a></td>
+<td>Represents payment for a <a href="/api/gifts#prepaying-for-someone-elses-upgrade">separate prepaid upgrade of a gift</a>.</td>
+</tr>
+<tr>
 <td><strong>id</strong></td>
 <td style="text-align: center;"><a href="/type/string">string</a></td>
 <td>Transaction ID.</td>
 </tr>
 <tr>
-<td><strong>stars</strong></td>
+<td><strong>amount</strong></td>
 <td style="text-align: center;"><a href="/type/StarsAmount">StarsAmount</a></td>
-<td>Amount of Stars (negative for outgoing transactions).</td>
+<td>Amount of Telegram Stars or TON.</td>
 </tr>
 <tr>
 <td><strong>date</strong></td>
@@ -191,6 +216,26 @@
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.17?<a href="/type/StarsAmount">StarsAmount</a></td>
 <td>For transactions made by <a href="/api/bots/referrals">referred users</a>, the amount of Telegram Stars received by the affiliate, can be negative for refunds.</td>
 </tr>
+<tr>
+<td><strong>paid_messages</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.19?<a href="/type/int">int</a></td>
+<td>This transaction is related to the reception or transmission of a <a href="/api/paid-messages">paid message »</a>.</td>
+</tr>
+<tr>
+<td><strong>premium_gift_months</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.20?<a href="/type/int">int</a></td>
+<td>This transaction indicates the payment for a <a href="/api/premium#gifting-telegram-premium">gifted Telegram Premium subscription »</a>.</td>
+</tr>
+<tr>
+<td><strong>ads_proceeds_from_date</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.23?<a href="/type/int">int</a></td>
+<td>Indicates that this is payment for ad revenue from the specified unixtime (always set together with <strong>ads_proceeds_to_date</strong>).</td>
+</tr>
+<tr>
+<td><strong>ads_proceeds_to_date</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.23?<a href="/type/int">int</a></td>
+<td>Indicates that this is payment for ad revenue to the specified unixtime.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
@@ -198,14 +243,20 @@
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#message-reactions" id="message-reactions" name="message-reactions"><i class="anchor-icon"></i></a><a href="/api/reactions">Message reactions</a></h4>
 <p>Telegram allows users to react on any message using specific emojis, triggering cute lottie animations.</p>
+<h4><a class="anchor" href="#telegram-gifts" id="telegram-gifts" name="telegram-gifts"><i class="anchor-icon"></i></a><a href="/api/gifts">Telegram Gifts</a></h4>
+<p>Users can send Gifts to their friends. The recipients of gifts can display them on their profile pages or turn them into Telegram Stars ». Telegram Stars can be used for many things, including supporting creators and buying services in mini apps.</p>
+<h4><a class="anchor" href="#connected-business-bots" id="connected-business-bots" name="connected-business-bots"><i class="anchor-icon"></i></a><a href="/api/bots/connected-business-bots">Connected business bots</a></h4>
+<p>Business users can connect Telegram bots that will process and answer messages on their behalf. This allows businesses to seamlessly integrate any existing tools and workflows, or add AI assistants that manage their chats.</p>
+<h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
+<p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
+<h4><a class="anchor" href="#search" id="search" name="search"><i class="anchor-icon"></i></a><a href="/api/search">Search</a></h4>
+<p>Telegram allows applying detailed message filters while looking for messages in chats.</p>
 <h4><a class="anchor" href="#inputmediainvoice" id="inputmediainvoice" name="inputmediainvoice"><i class="anchor-icon"></i></a><a href="/constructor/inputMediaInvoice">inputMediaInvoice</a></h4>
 <p>Generated invoice of a <a href="/bots/payments">bot payment</a></p>
 <h4><a class="anchor" href="#payments-api" id="payments-api" name="payments-api"><i class="anchor-icon"></i></a><a href="/api/payments">Payments API</a></h4>
 <p>You can accept payments from Telegram users via Telegram Bots.</p>
 <h4><a class="anchor" href="#paid-media" id="paid-media" name="paid-media"><i class="anchor-icon"></i></a><a href="/api/paid-media">Paid media</a></h4>
 <p>Content creators can accept Stars by publishing paid photos or videos on their channels.  Subscribers will be allowed to view such posts only after paying the author to unlock them.</p>
-<h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
-<p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
 <h4><a class="anchor" href="#messagemediagiveaway" id="messagemediagiveaway" name="messagemediagiveaway"><i class="anchor-icon"></i></a><a href="/constructor/messageMediaGiveaway">messageMediaGiveaway</a></h4>
 <p>Contains info about a <a href="/api/giveaways">giveaway, see here »</a> for more info.</p>
 <h4><a class="anchor" href="#giveaways" id="giveaways" name="giveaways"><i class="anchor-icon"></i></a><a href="/api/giveaways">Giveaways</a></h4>
@@ -216,7 +267,11 @@
 <h4><a class="anchor" href="#affiliate-programs" id="affiliate-programs" name="affiliate-programs"><i class="anchor-icon"></i></a><a href="/api/bots/referrals">Affiliate programs</a></h4>
 <p>Developers can open affiliate programs for their mini app – allowing content creators, other mini app developers and any Telegram user to promote it and earn commissions on purchases made by people they referred.</p>
 <h4><a class="anchor" href="#deep-links" id="deep-links" name="deep-links"><i class="anchor-icon"></i></a><a href="/api/links">Deep links</a></h4>
-<p>Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps by registering OS handlers.</p></div>
+<p>Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps by registering OS handlers.</p>
+<h4><a class="anchor" href="#paid-messages" id="paid-messages" name="paid-messages"><i class="anchor-icon"></i></a><a href="/api/paid-messages">Paid messages</a></h4>
+<p>Telegram Stars can be used to pay for sending messages to users, supergroups and channels that have configured paid messages, requiring a payment for every message sent to them.</p>
+<h4><a class="anchor" href="#telegram-premium" id="telegram-premium" name="telegram-premium"><i class="anchor-icon"></i></a><a href="/api/premium">Telegram Premium</a></h4>
+<p>Telegram Premium is an optional subscription service that unlocks additional exclusive client-side and API-side features, while helping support the development of the app.</p></div>
   
 </div>
           

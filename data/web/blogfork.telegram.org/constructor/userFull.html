@@ -158,6 +158,11 @@
 <td>If set, this is a bot that can <a href="/api/emoji-status#setting-an-emoji-status-from-a-bot">change our emoji status »</a></td>
 </tr>
 <tr>
+<td><strong>display_gifts_button</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.16?<a href="/constructor/true">true</a></td>
+<td>If this flag is set for both us and another user (changed through <a href="/constructor/globalPrivacySettings">globalPrivacySettings</a>), a gift button should always be displayed in the text field in private chats with the other user: once clicked, the gift UI should be displayed, offering the user options to gift <a href="/api/premium">Telegram Premium »</a> subscriptions or <a href="/api/gifts">Telegram Gifts »</a>.</td>
+</tr>
+<tr>
 <td><strong>id</strong></td>
 <td style="text-align: center;"><a href="/type/long">long</a></td>
 <td>User ID</td>
@@ -218,9 +223,9 @@
 <td>Time To Live of all messages in this chat; once a message is this many seconds old, it must be deleted.</td>
 </tr>
 <tr>
-<td><strong>theme_emoticon</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.15?<a href="/type/string">string</a></td>
-<td>Emoji associated with chat theme</td>
+<td><strong>theme</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.15?<a href="/type/ChatTheme">ChatTheme</a></td>
+<td><a href="/api/themes#chat-themes">The chat theme associated with this user »</a>.</td>
 </tr>
 <tr>
 <td><strong>private_forward_name</strong></td>
@@ -236,11 +241,6 @@
 <td><strong>bot_broadcast_admin_rights</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.18?<a href="/type/ChatAdminRights">ChatAdminRights</a></td>
 <td>A <a href="/api/rights#suggested-bot-rights">suggested set of administrator rights</a> for the bot, to be shown when adding the bot as admin to a channel, see <a href="/api/rights#suggested-bot-rights">here for more info on how to handle them »</a>.</td>
-</tr>
-<tr>
-<td><strong>premium_gifts</strong></td>
-<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.19?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/PremiumGiftOption">PremiumGiftOption</a>&gt;</td>
-<td>Telegram Premium subscriptions gift options</td>
 </tr>
 <tr>
 <td><strong>wallpaper</strong></td>
@@ -302,6 +302,46 @@
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.11?<a href="/type/StarRefProgram">StarRefProgram</a></td>
 <td>This bot has an active <a href="/api/bots/referrals">referral program »</a></td>
 </tr>
+<tr>
+<td><strong>bot_verification</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.12?<a href="/type/BotVerification">BotVerification</a></td>
+<td>Describes a <a href="/api/bots/verification">bot verification icon »</a>.</td>
+</tr>
+<tr>
+<td><strong>send_paid_messages_stars</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.14?<a href="/type/long">long</a></td>
+<td>If set and bigger than 0, this user has enabled <a href="/api/paid-messages">paid messages »</a> and we <em>must</em> pay the specified amount of <a href="/api/stars">Stars</a> to send messages to them, see <a href="/api/paid-messages">here »</a> for the full flow. <br>If set and equal to 0, the user requires payment in general but we were exempted from paying <a href="/api/paid-messages">for any of the reasons specified in the docs »</a>.</td>
+</tr>
+<tr>
+<td><strong>disallowed_gifts</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.15?<a href="/type/DisallowedGiftsSettings">DisallowedGiftsSettings</a></td>
+<td>Disallows the reception of specific gift types.</td>
+</tr>
+<tr>
+<td><strong>stars_rating</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.17?<a href="/type/StarsRating">StarsRating</a></td>
+<td>The user's <a href="/api/stars#star-rating">star rating</a>.</td>
+</tr>
+<tr>
+<td><strong>stars_my_pending_rating</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.18?<a href="/type/StarsRating">StarsRating</a></td>
+<td>Our pending <a href="/api/stars#star-rating">star rating</a>, only visible for ourselves.</td>
+</tr>
+<tr>
+<td><strong>stars_my_pending_rating_date</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.18?<a href="/type/int">int</a></td>
+<td>When the pending <a href="/api/stars#star-rating">star rating</a> will be applied, only visible for ourselves.</td>
+</tr>
+<tr>
+<td><strong>main_tab</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.20?<a href="/type/ProfileTab">ProfileTab</a></td>
+<td>The main tab for the user's profile, see <a href="/api/profile#tabs">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><strong>saved_music</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags2</a>.21?<a href="/type/Document">Document</a></td>
+<td>The first song on the music tab of the profile, see <a href="/api/profile#music">here »</a> for more info on the music profile tab.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
@@ -337,20 +377,30 @@ To set <a href="/constructor/userFull">userFull</a>.<code>read_dates_private</co
 <p>Telegram has one of the most generous reward systems in the history of social media. Telegram channel and bot owners can now receive 50% of the revenue from ads displayed in their channels and bots.  This page describes the methods used to withdraw channel/bot ad revenue, as well as view detailed revenue stats.</p>
 <h4><a class="anchor" href="#emoji-status" id="emoji-status" name="emoji-status"><i class="anchor-icon"></i></a><a href="/api/emoji-status">Emoji status</a></h4>
 <p>Telegram allows users to set an emoticon or a custom emoji as status, to show next to their name in chats and profiles.</p>
+<h4><a class="anchor" href="#globalprivacysettings" id="globalprivacysettings" name="globalprivacysettings"><i class="anchor-icon"></i></a><a href="/constructor/globalPrivacySettings">globalPrivacySettings</a></h4>
+<p>Global privacy settings</p>
+<h4><a class="anchor" href="#telegram-gifts" id="telegram-gifts" name="telegram-gifts"><i class="anchor-icon"></i></a><a href="/api/gifts">Telegram Gifts</a></h4>
+<p>Users can send Gifts to their friends. The recipients of gifts can display them on their profile pages or turn them into Telegram Stars ». Telegram Stars can be used for many things, including supporting creators and buying services in mini apps.</p>
 <h4><a class="anchor" href="#pinned-messages" id="pinned-messages" name="pinned-messages"><i class="anchor-icon"></i></a><a href="/api/pin">Pinned messages</a></h4>
 <p>Telegram allows pinning multiple messages on top of a specific chat.</p>
 <h4><a class="anchor" href="#folders" id="folders" name="folders"><i class="anchor-icon"></i></a><a href="/api/folders">Folders</a></h4>
 <p>Telegram allows placing chats into folders, based on their type, mute status, or other custom criteria, thanks to folder blacklists and whitelists.</p>
+<h4><a class="anchor" href="#themes" id="themes" name="themes"><i class="anchor-icon"></i></a><a href="/api/themes">Themes</a></h4>
+<p>Telegram apps support generating, sharing and synchronizing app themes.</p>
 <h4><a class="anchor" href="#admin-banned-default-rights" id="admin-banned-default-rights" name="admin-banned-default-rights"><i class="anchor-icon"></i></a><a href="/api/rights">Admin, banned, default rights</a></h4>
 <p>How to handle admin permissions, granular bans and global permissions in channels, groups and supergroups.</p>
 <h4><a class="anchor" href="#profile" id="profile" name="profile"><i class="anchor-icon"></i></a><a href="/api/profile">Profile</a></h4>
 <p>Telegram offers many customization options for your profile!</p>
 <h4><a class="anchor" href="#channels-supergroups-gigagroups-and-basic-groups" id="channels-supergroups-gigagroups-and-basic-groups" name="channels-supergroups-gigagroups-and-basic-groups"><i class="anchor-icon"></i></a><a href="/api/channel">Channels, supergroups, gigagroups and basic groups</a></h4>
 <p>How to handle channels, supergroups, gigagroups, basic groups, and what's the difference between them.</p>
-<h4><a class="anchor" href="#telegram-gifts" id="telegram-gifts" name="telegram-gifts"><i class="anchor-icon"></i></a><a href="/api/gifts">Telegram Gifts</a></h4>
-<p>Users can send Gifts to their friends. The recipients of gifts can display them on their profile pages or turn them into Telegram Stars ». Telegram Stars can be used for many things, including supporting creators and buying services in mini apps.</p>
 <h4><a class="anchor" href="#affiliate-programs" id="affiliate-programs" name="affiliate-programs"><i class="anchor-icon"></i></a><a href="/api/bots/referrals">Affiliate programs</a></h4>
 <p>Developers can open affiliate programs for their mini app – allowing content creators, other mini app developers and any Telegram user to promote it and earn commissions on purchases made by people they referred.</p>
+<h4><a class="anchor" href="#third-party-verification" id="third-party-verification" name="third-party-verification"><i class="anchor-icon"></i></a><a href="/api/bots/verification">Third-party verification</a></h4>
+<p>To further improve transparency on Telegram, official third-party services are able to assign extra verification icons to user accounts and chats — in order to prevent scams and reduce misinformation.</p>
+<h4><a class="anchor" href="#paid-messages" id="paid-messages" name="paid-messages"><i class="anchor-icon"></i></a><a href="/api/paid-messages">Paid messages</a></h4>
+<p>Telegram Stars can be used to pay for sending messages to users, supergroups and channels that have configured paid messages, requiring a payment for every message sent to them.</p>
+<h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
+<p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
 <h4><a class="anchor" href="#peer-database" id="peer-database" name="peer-database"><i class="anchor-icon"></i></a><a href="/api/peers">Peer database</a></h4>
 <p>Many constructors in the API need to be stored in a local database upon reception and should only ever be updated reactively (passively) when received via updates or by other means (as specified in the documentation), to avoid overloading the server by continuously requesting changes for the same unchanged information.</p></div>
   

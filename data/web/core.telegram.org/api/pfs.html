@@ -69,9 +69,11 @@
 <li>Drop both the temporary and permanent auth keys.<br>
 If the dropped main auth key is the main logged in auth key (the one used for logging into the user's native DC), this means the user was also logged out.  </li>
 <li>Recreate temporary and permanent auth keys.</li>
+<li>Retry binding the temporary and permanent keys.</li>
+<li>On success, if the dropped auth key is <strong>not</strong> the main logged in auth key, re-import authorization from the user's native DC.</li>
 </ul>
 </li>
-<li>Unconditionally, retry binding the temporary and permanent keys.</li>
+<li>Otherwise, retry binding the temporary and permanent keys</li>
 </ul>
 <p>Once the temporary key expires, the client needs to generate a new temporary key using <strong>p_q_inner_data_temp</strong>. Then it needs to re-bind that new temporary key to the initial permanent key. A new key can also be generated in advance, so that the client has a new key ready by the time the old one has expired.</p>
 <p>For additional security, the client can store the temporary authorization key in RAM only and never save it in persistent storage.</p>
