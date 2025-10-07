@@ -101,6 +101,19 @@ php tools/gen_filerefmap.php &lt;inputSchema&gt; &lt;output&gt; &lt;outputJson&g
     ],
     'fileSourceStory'
 );</code></pre>
+<p>In this example, when encountering a <a href="/constructor/storyItem">storyItem</a> constructor, a new <code>fileSourceStory</code> is generated with the following fields:</p>
+<ul>
+<li><code>id</code>: <code>storyItem.id</code></li>
+<li><code>peer</code>: <code>peerStories.peer</code> (must have a <a href="/constructor/peerStories">peerStories</a> constructor as parent). 
+The generator automatically makes sure only one parent constructor is used (or none).  </li>
+</ul>
+<p>This <code>fileSourceStory</code> is then used, when a refresh is needed, in a <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a> method call with the following parameters:</p>
+<ul>
+<li><code>id</code>: <code>fileSourceStory.id</code></li>
+<li><code>peer</code>: <code>fileSourceStory.peer</code></li>
+</ul>
+<p>The generator automatically makes sure all method calls use the parameters of the file source in the same or compatible ways, to generate only one method call per file source.  </p>
+<p>As you can see, this definition combines extraction of the context, generation of the file source to store into the database, and the method call to use for the file source in a single, concise definition.  </p>
 <p><code>$locations</code> is a <code>HashMap&lt;Key, Vector&lt;Op&gt;&gt;</code>, where:</p>
 <ul>
 <li><code>Key</code> is the constructor where context capturing begins (must be equal to the first element of non-parent Paths)</li>
