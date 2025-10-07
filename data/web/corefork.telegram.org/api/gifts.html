@@ -72,8 +72,16 @@
 <p>The same gifting UI should always be (unconditionally) available through a chat picker, activated by a "Send a Gift" entry in the app's settings.  </p>
 <p>Users may disallow the reception of specific gift types by populating the <a href="/constructor/globalPrivacySettings">globalPrivacySettings</a>.<code>disallowed_gifts</code> flag, visible to other users in <a href="/constructor/userFull">userFull</a>.<code>disallowed_gifts</code>.  </p>
 <ul>
-<li>Use <a href="/method/payments.getStarGifts">payments.getStarGifts</a> to obtain the full list of available <a href="/constructor/starGift">starGifts</a>; this method may return some sold-out gifts that have the <code>availability_resale</code> flag set, which indicates that some gifts of this type are on <a href="#reselling-collectible-gifts">resale »</a></li>
-<li>Use <a href="/method/payments.getResaleStarGifts">payments.getResaleStarGifts</a> to fetch gifts currently on resale.  </li>
+<li>
+<p>Use <a href="/method/payments.getStarGifts">payments.getStarGifts</a> to obtain the full list of available <a href="/constructor/starGift">starGifts</a>; this method may return some sold-out gifts that have the <code>availability_resale</code> flag set, which indicates that some gifts of this type are on <a href="#reselling-collectible-gifts">resale »</a></p>
+</li>
+<li>
+<p>Use <a href="/method/payments.getResaleStarGifts">payments.getResaleStarGifts</a> to fetch gifts currently on resale.<br>
+The same method can also be used to fetch the full list of available attributes (<a href="/constructor/payments.resaleStarGifts">payments.resaleStarGifts</a>.<code>attributes</code>) for the specified gift type: to fetch it, the <code>attributes_hash</code> field <strong>must</strong> be populated and equal to <code>0</code>.<br>
+The same field can also be equal to the previously returned <a href="/constructor/payments.resaleStarGifts">payments.resaleStarGifts</a>.<code>attributes_hash</code>, to avoid refetching the attributes if they haven't changed.<br>
+If the <code>attributes_hash</code> parameter of the method is <em>not</em> set or if the <code>offset</code> parameter is non-empty, the <code>attributes</code> field will <em>not</em> be returned.  </p>
+<p>Additionally, when invoking <a href="/method/payments.getResaleStarGifts">payments.getResaleStarGifts</a> with an empty offset (i.e. on the first page), the method will always return a <a href="/constructor/payments.resaleStarGifts">payments.resaleStarGifts</a>.<code>counters</code> field, indicating the total number of gifts that have a specific attribute (related to the attributes returned in <a href="/constructor/payments.resaleStarGifts">payments.resaleStarGifts</a>.<code>attributes</code>).  </p>
+</li>
 </ul>
 <p><a href="/constructor/starGift">starGift</a>s with the <code>limited_per_user</code> flag set and <code>per_user_remains &lt;= 0</code> cannot be bought by the current user, since they already bought <code>per_user_total</code> gifts of the same type (either for themselves or for someone else).  </p>
 <p><a href="/constructor/starGift">starGift</a>s with the <code>locked_until_date</code> flag set <em>possibly</em> cannot be bought until the specified unixtime: to verify if that is the case, invoke <a href="/method/payments.checkCanSendGift">payments.checkCanSendGift</a>.<br>
