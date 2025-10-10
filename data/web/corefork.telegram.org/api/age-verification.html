@@ -65,10 +65,13 @@
 </ul>
 <p>If at least one of the <code>reason</code>s available after filtering is <strong>not</strong> equal to <code>sensitive</code>, access to the content must be completely restricted, showing the error specified in <a href="/constructor/restrictionReason">restrictionReason</a>.<code>text</code>.  </p>
 <p>If the only <code>reason</code> is equal to <code>sensitive</code>, and the <a href="/api/config#need-age-video-verification">need_age_video_verification »</a> client configuration key is not set or equal to <code>false</code>, age verification is disabled and the content may be accessed, provided it's hidden behind a <code>18+</code> spoiler.  </p>
-<p>If the only <code>reason</code> is equal to <code>sensitive</code>, and the <a href="/api/config#need-age-video-verification">need_age_video_verification »</a> client configuration key is equal to <code>true</code>, the content may only be accessed after age verification, initiated by clicking on the <code>18+</code> spoiler.  </p>
+<p>If the only <code>reason</code> is equal to <code>sensitive</code>, and the <a href="/api/config#need-age-video-verification">need_age_video_verification »</a> client configuration key is equal to <code>true</code>, the content may only be accessed after age verification, initiated by clicking on the <code>18+</code> spoiler.<br>
+If age verification succeeds, the content may be accessed, provided it's hidden behind a <code>18+</code> spoiler.  </p>
+<p>Upon successful or unsuccessful verification, the mini app will emit a <a href="/api/web-events#web-app-verify-age">web_app_verify_age</a> event, containing info about the detected age, and the server will toggle the value of <a href="/api/config#need-age-video-verification">need_age_video_verification »</a> accordingly (see below).  </p>
 <p>The following <a href="/api/config">client configuration parameters »</a> are used to implement age verification:</p>
 <ul>
-<li><a href="/api/config#need-age-video-verification">need_age_video_verification »</a> - Specifies whether age verification is required in the current jurisdiction.  </li>
+<li><a href="/api/config#need-age-video-verification">need_age_video_verification »</a> - Specifies whether age verification is required in the current jurisdiction.<br>
+This flag will also be set to <code>false</code> if the current jurisdiction requires age verification for restricted content, <strong>and</strong> the user has successfully passed it on another device, or on the current device.  </li>
 <li><a href="/api/config#verify-age-country">verify_age_country »</a> - Unique name for the country or region whose legislation required age verification.  </li>
 <li><a href="/api/config#verify-age-min">verify_age_min »</a> - Contains the minimum age required to view <code>sensitive</code> content</li>
 <li><a href="/api/config#verify-age-bot-username">verify_age_bot_username »</a> - Contains the username of the bot whose <a href="/api/bots/webapps#main-mini-apps">Main Mini App</a> must be opened in order to proceed with age verification.<br>
