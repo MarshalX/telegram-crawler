@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Contacts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Working with contacts.">
+    <meta property="og:title" content="Contacts">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Working with contacts.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/contacts" >Contacts</a></li></ul></div>
+  <h1 id="dev_page_title">Contacts</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Working with contacts.</p>
+<h3><a class="anchor" href="#importing-phone-contacts" id="importing-phone-contacts" name="importing-phone-contacts"><i class="anchor-icon"></i></a>Importing phone contacts</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/inputPhoneContact'>inputPhoneContact</a>#f392b7f4 client_id:<a href='/type/long'>long</a> phone:<a href='/type/string'>string</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> = <a href='/type/InputContact'>InputContact</a>;
+
+<a href='/constructor/importedContact'>importedContact</a>#c13e3c50 user_id:<a href='/type/long'>long</a> client_id:<a href='/type/long'>long</a> = <a href='/type/ImportedContact'>ImportedContact</a>;
+<a href='/constructor/popularContact'>popularContact</a>#5ce14175 client_id:<a href='/type/long'>long</a> importers:<a href='/type/int'>int</a> = <a href='/type/PopularContact'>PopularContact</a>;
+
+<a href='/constructor/contacts.importedContacts'>contacts.importedContacts</a>#77d01c3b imported:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ImportedContact'>ImportedContact</a>&gt; popular_invites:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PopularContact'>PopularContact</a>&gt; retry_contacts:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.ImportedContacts'>contacts.ImportedContacts</a>;
+
+---functions---
+
+<a href='/method/contacts.importContacts'>contacts.importContacts</a>#2c800be5 contacts:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputContact'>InputContact</a>&gt; = <a href='/type/contacts.ImportedContacts'>contacts.ImportedContacts</a>;</code></pre>
+<p>To upload the local contact list to Telegram and see which contacts are already signed up on telegram, use <a href="/method/contacts.importContacts">contacts.importContacts</a>, passing an array of <a href="/constructor/inputPhoneContact">inputPhoneContact</a> constructors, containing:</p>
+<ul>
+<li><code>phone</code> - The phone number in international format</li>
+<li><code>first_name</code> - First name</li>
+<li><code>last_name</code> - Last name, can be empty</li>
+<li><code>client_id</code> - An arbitrary 64-bit integer (<strong>not</strong> the contact's Telegram user ID, since we do not have it yet); make sure there are no collisions between the client_ids passed to a single <a href="/method/contacts.importContacts">contacts.importContacts</a> call (for example, use a simple incremental ID starting from 0)</li>
+</ul>
+<p>The method will return a <a href="/constructor/contacts.importedContacts">contacts.importedContacts</a> constructor, containing the following fields:</p>
+<ul>
+<li><code>imported</code> - A list of successfully imported contacts that have an associated Telegram account as <a href="/constructor/importedContact">importedContact</a> constructors.<br>
+<code>user_id</code> is the Telegram user ID, <code>client_id</code> is the <code>client_id</code> associated to the contact, passed during the method call.
+Note that according to the user's <a href="/api/privacy">privacy settings</a>, not all contacts which have an associated Telegram account may be returned here.</li>
+<li><code>users</code> - Contains info about the Telegram users mentioned in <code>imported</code></li>
+<li><code>popular_invites</code> - Contains info about popular contacts: each <a href="/constructor/popularContact">popularContact</a> constructor indicates that the contact with the specified <code>client_id</code> was imported <code>imported</code> times by that many Telegram users.</li>
+<li><code>retry_contacts</code> - List of contact ids that could not be imported due to a server-side system limitation and have to be reimported with another call to <a href="/constructor/contacts.importedContacts">contacts.importedContacts</a>.</li>
+</ul>
+<h3><a class="anchor" href="#adding-telegram-users-as-contacts" id="adding-telegram-users-as-contacts" name="adding-telegram-users-as-contacts"><i class="anchor-icon"></i></a>Adding Telegram users as contacts</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/users.userFull'>users.userFull</a>#3b6d152e full_user:<a href='/type/UserFull'>UserFull</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/users.UserFull'>users.UserFull</a>;
+
+<a href='/constructor/inputUser'>inputUser</a>#f21158c6 user_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputUser'>InputUser</a>;
+
+<a href='/constructor/user'>user</a>#20b1422 flags:<a href='/type/%23'>#</a> self:flags.10?<a href='/constructor/true'>true</a> contact:flags.11?<a href='/constructor/true'>true</a> mutual_contact:flags.12?<a href='/constructor/true'>true</a> deleted:flags.13?<a href='/constructor/true'>true</a> bot:flags.14?<a href='/constructor/true'>true</a> bot_chat_history:flags.15?<a href='/constructor/true'>true</a> bot_nochats:flags.16?<a href='/constructor/true'>true</a> verified:flags.17?<a href='/constructor/true'>true</a> restricted:flags.18?<a href='/constructor/true'>true</a> min:flags.20?<a href='/constructor/true'>true</a> bot_inline_geo:flags.21?<a href='/constructor/true'>true</a> support:flags.23?<a href='/constructor/true'>true</a> scam:flags.24?<a href='/constructor/true'>true</a> apply_min_photo:flags.25?<a href='/constructor/true'>true</a> fake:flags.26?<a href='/constructor/true'>true</a> bot_attach_menu:flags.27?<a href='/constructor/true'>true</a> premium:flags.28?<a href='/constructor/true'>true</a> attach_menu_enabled:flags.29?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> bot_can_edit:flags2.1?<a href='/constructor/true'>true</a> close_friend:flags2.2?<a href='/constructor/true'>true</a> stories_hidden:flags2.3?<a href='/constructor/true'>true</a> stories_unavailable:flags2.4?<a href='/constructor/true'>true</a> contact_require_premium:flags2.10?<a href='/constructor/true'>true</a> bot_business:flags2.11?<a href='/constructor/true'>true</a> bot_has_main_app:flags2.13?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:flags.0?<a href='/type/long'>long</a> first_name:flags.1?<a href='/type/string'>string</a> last_name:flags.2?<a href='/type/string'>string</a> username:flags.3?<a href='/type/string'>string</a> phone:flags.4?<a href='/type/string'>string</a> photo:flags.5?<a href='/type/UserProfilePhoto'>UserProfilePhoto</a> status:flags.6?<a href='/type/UserStatus'>UserStatus</a> bot_info_version:flags.14?<a href='/type/int'>int</a> restriction_reason:flags.18?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; bot_inline_placeholder:flags.19?<a href='/type/string'>string</a> lang_code:flags.22?<a href='/type/string'>string</a> emoji_status:flags.30?<a href='/type/EmojiStatus'>EmojiStatus</a> usernames:flags2.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Username'>Username</a>&gt; stories_max_id:flags2.5?<a href='/type/int'>int</a> color:flags2.8?<a href='/type/PeerColor'>PeerColor</a> profile_color:flags2.9?<a href='/type/PeerColor'>PeerColor</a> bot_active_users:flags2.12?<a href='/type/int'>int</a> bot_verification_icon:flags2.14?<a href='/type/long'>long</a> send_paid_messages_stars:flags2.15?<a href='/type/long'>long</a> = <a href='/type/User'>User</a>;
+
+<a href='/constructor/peerSettings'>peerSettings</a>#f47741f7 flags:<a href='/type/%23'>#</a> report_spam:flags.0?<a href='/constructor/true'>true</a> add_contact:flags.1?<a href='/constructor/true'>true</a> block_contact:flags.2?<a href='/constructor/true'>true</a> share_contact:flags.3?<a href='/constructor/true'>true</a> need_contacts_exception:flags.4?<a href='/constructor/true'>true</a> report_geo:flags.5?<a href='/constructor/true'>true</a> autoarchived:flags.7?<a href='/constructor/true'>true</a> invite_members:flags.8?<a href='/constructor/true'>true</a> request_chat_broadcast:flags.10?<a href='/constructor/true'>true</a> business_bot_paused:flags.11?<a href='/constructor/true'>true</a> business_bot_can_reply:flags.12?<a href='/constructor/true'>true</a> geo_distance:flags.6?<a href='/type/int'>int</a> request_chat_title:flags.9?<a href='/type/string'>string</a> request_chat_date:flags.9?<a href='/type/int'>int</a> business_bot_id:flags.13?<a href='/type/long'>long</a> business_bot_manage_url:flags.13?<a href='/type/string'>string</a> charge_paid_message_stars:flags.14?<a href='/type/long'>long</a> registration_month:flags.15?<a href='/type/string'>string</a> phone_country:flags.16?<a href='/type/string'>string</a> name_change_date:flags.17?<a href='/type/int'>int</a> photo_change_date:flags.18?<a href='/type/int'>int</a> = <a href='/type/PeerSettings'>PeerSettings</a>;
+
+<a href='/constructor/userFull'>userFull</a>#c577b5ad flags:<a href='/type/%23'>#</a> blocked:flags.0?<a href='/constructor/true'>true</a> phone_calls_available:flags.4?<a href='/constructor/true'>true</a> phone_calls_private:flags.5?<a href='/constructor/true'>true</a> can_pin_message:flags.7?<a href='/constructor/true'>true</a> has_scheduled:flags.12?<a href='/constructor/true'>true</a> video_calls_available:flags.13?<a href='/constructor/true'>true</a> voice_messages_forbidden:flags.20?<a href='/constructor/true'>true</a> translations_disabled:flags.23?<a href='/constructor/true'>true</a> stories_pinned_available:flags.26?<a href='/constructor/true'>true</a> blocked_my_stories_from:flags.27?<a href='/constructor/true'>true</a> wallpaper_overridden:flags.28?<a href='/constructor/true'>true</a> contact_require_premium:flags.29?<a href='/constructor/true'>true</a> read_dates_private:flags.30?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> sponsored_enabled:flags2.7?<a href='/constructor/true'>true</a> can_view_revenue:flags2.9?<a href='/constructor/true'>true</a> bot_can_manage_emoji_status:flags2.10?<a href='/constructor/true'>true</a> display_gifts_button:flags2.16?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> about:flags.1?<a href='/type/string'>string</a> settings:<a href='/type/PeerSettings'>PeerSettings</a> personal_photo:flags.21?<a href='/type/Photo'>Photo</a> profile_photo:flags.2?<a href='/type/Photo'>Photo</a> fallback_photo:flags.22?<a href='/type/Photo'>Photo</a> notify_settings:<a href='/type/PeerNotifySettings'>PeerNotifySettings</a> bot_info:flags.3?<a href='/type/BotInfo'>BotInfo</a> pinned_msg_id:flags.6?<a href='/type/int'>int</a> common_chats_count:<a href='/type/int'>int</a> folder_id:flags.11?<a href='/type/int'>int</a> ttl_period:flags.14?<a href='/type/int'>int</a> theme:flags.15?<a href='/type/ChatTheme'>ChatTheme</a> private_forward_name:flags.16?<a href='/type/string'>string</a> bot_group_admin_rights:flags.17?<a href='/type/ChatAdminRights'>ChatAdminRights</a> bot_broadcast_admin_rights:flags.18?<a href='/type/ChatAdminRights'>ChatAdminRights</a> wallpaper:flags.24?<a href='/type/WallPaper'>WallPaper</a> stories:flags.25?<a href='/type/PeerStories'>PeerStories</a> business_work_hours:flags2.0?<a href='/type/BusinessWorkHours'>BusinessWorkHours</a> business_location:flags2.1?<a href='/type/BusinessLocation'>BusinessLocation</a> business_greeting_message:flags2.2?<a href='/type/BusinessGreetingMessage'>BusinessGreetingMessage</a> business_away_message:flags2.3?<a href='/type/BusinessAwayMessage'>BusinessAwayMessage</a> business_intro:flags2.4?<a href='/type/BusinessIntro'>BusinessIntro</a> birthday:flags2.5?<a href='/type/Birthday'>Birthday</a> personal_channel_id:flags2.6?<a href='/type/long'>long</a> personal_channel_message:flags2.6?<a href='/type/int'>int</a> stargifts_count:flags2.8?<a href='/type/int'>int</a> starref_program:flags2.11?<a href='/type/StarRefProgram'>StarRefProgram</a> bot_verification:flags2.12?<a href='/type/BotVerification'>BotVerification</a> send_paid_messages_stars:flags2.14?<a href='/type/long'>long</a> disallowed_gifts:flags2.15?<a href='/type/DisallowedGiftsSettings'>DisallowedGiftsSettings</a> stars_rating:flags2.17?<a href='/type/StarsRating'>StarsRating</a> stars_my_pending_rating:flags2.18?<a href='/type/StarsRating'>StarsRating</a> stars_my_pending_rating_date:flags2.18?<a href='/type/int'>int</a> main_tab:flags2.20?<a href='/type/ProfileTab'>ProfileTab</a> saved_music:flags2.21?<a href='/type/Document'>Document</a> = <a href='/type/UserFull'>UserFull</a>;
+
+<a href='/constructor/updatePeerSettings'>updatePeerSettings</a>#6a7e7366 peer:<a href='/type/Peer'>Peer</a> settings:<a href='/type/PeerSettings'>PeerSettings</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/users.getFullUser'>users.getFullUser</a>#b60f5918 id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.UserFull'>users.UserFull</a>;
+
+<a href='/method/contacts.addContact'>contacts.addContact</a>#e8f463d0 flags:<a href='/type/%23'>#</a> add_phone_privacy_exception:flags.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputUser'>InputUser</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> phone:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Telegram users may also be added to the contact list (even if we do not have access to their phone number!) using <a href="/method/contacts.addContact">contacts.addContact</a>.  </p>
+<p>Set the <code>add_phone_privacy_exception</code> flag if we wish to allow the other user to see our phone number: this flag <strong>must</strong> be set if the <code>need_contacts_exception</code> flag of <a href="/constructor/peerSettings">peerSettings</a> is set (see the <a href="/api/action-bar">action bar documentation for more info »</a>).  </p>
+<p>The other user will be offered to also add us to the contact list via the <a href="/api/action-bar">add contact action bar</a>: if they accept, their phone number will be automatically added to our contact.  </p>
+<h3><a class="anchor" href="#share-our-phone-number" id="share-our-phone-number" name="share-our-phone-number"><i class="anchor-icon"></i></a>Share our phone number</h3>
+<pre><code>---functions---
+
+<a href='/method/contacts.acceptContact'>contacts.acceptContact</a>#f831a20f id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>This method is invoked if the user clicks on the add contact button in the <a href="/api/action-bar#add-contact">add contact chat bar</a>.  </p>
+<p>The bar is activated only if the other user has <a href="#adding-telegram-users-as-contacts">added us as a contact</a> using <a href="/method/contacts.addContact">contacts.addContact</a> without using a phone number, and none of the <code>add_contact</code>, <code>report_spam</code>, <code>block_contact</code> <a href="/api/action-bar">bar flags</a> are set, the <code>share_contact</code> flag are be set, indicating we can invoke <a href="/method/contacts.acceptContact">contacts.acceptContact</a> to share our phone number with the other user.  </p>
+<h3><a class="anchor" href="#fetching-the-contact-list" id="fetching-the-contact-list" name="fetching-the-contact-list"><i class="anchor-icon"></i></a>Fetching the contact list</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/contact'>contact</a>#145ade0b user_id:<a href='/type/long'>long</a> mutual:<a href='/type/Bool'>Bool</a> = <a href='/type/Contact'>Contact</a>;
+
+<a href='/constructor/user'>user</a>#20b1422 flags:<a href='/type/%23'>#</a> self:flags.10?<a href='/constructor/true'>true</a> contact:flags.11?<a href='/constructor/true'>true</a> mutual_contact:flags.12?<a href='/constructor/true'>true</a> deleted:flags.13?<a href='/constructor/true'>true</a> bot:flags.14?<a href='/constructor/true'>true</a> bot_chat_history:flags.15?<a href='/constructor/true'>true</a> bot_nochats:flags.16?<a href='/constructor/true'>true</a> verified:flags.17?<a href='/constructor/true'>true</a> restricted:flags.18?<a href='/constructor/true'>true</a> min:flags.20?<a href='/constructor/true'>true</a> bot_inline_geo:flags.21?<a href='/constructor/true'>true</a> support:flags.23?<a href='/constructor/true'>true</a> scam:flags.24?<a href='/constructor/true'>true</a> apply_min_photo:flags.25?<a href='/constructor/true'>true</a> fake:flags.26?<a href='/constructor/true'>true</a> bot_attach_menu:flags.27?<a href='/constructor/true'>true</a> premium:flags.28?<a href='/constructor/true'>true</a> attach_menu_enabled:flags.29?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> bot_can_edit:flags2.1?<a href='/constructor/true'>true</a> close_friend:flags2.2?<a href='/constructor/true'>true</a> stories_hidden:flags2.3?<a href='/constructor/true'>true</a> stories_unavailable:flags2.4?<a href='/constructor/true'>true</a> contact_require_premium:flags2.10?<a href='/constructor/true'>true</a> bot_business:flags2.11?<a href='/constructor/true'>true</a> bot_has_main_app:flags2.13?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:flags.0?<a href='/type/long'>long</a> first_name:flags.1?<a href='/type/string'>string</a> last_name:flags.2?<a href='/type/string'>string</a> username:flags.3?<a href='/type/string'>string</a> phone:flags.4?<a href='/type/string'>string</a> photo:flags.5?<a href='/type/UserProfilePhoto'>UserProfilePhoto</a> status:flags.6?<a href='/type/UserStatus'>UserStatus</a> bot_info_version:flags.14?<a href='/type/int'>int</a> restriction_reason:flags.18?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; bot_inline_placeholder:flags.19?<a href='/type/string'>string</a> lang_code:flags.22?<a href='/type/string'>string</a> emoji_status:flags.30?<a href='/type/EmojiStatus'>EmojiStatus</a> usernames:flags2.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Username'>Username</a>&gt; stories_max_id:flags2.5?<a href='/type/int'>int</a> color:flags2.8?<a href='/type/PeerColor'>PeerColor</a> profile_color:flags2.9?<a href='/type/PeerColor'>PeerColor</a> bot_active_users:flags2.12?<a href='/type/int'>int</a> bot_verification_icon:flags2.14?<a href='/type/long'>long</a> send_paid_messages_stars:flags2.15?<a href='/type/long'>long</a> = <a href='/type/User'>User</a>;
+
+<a href='/constructor/contacts.contacts'>contacts.contacts</a>#eae87e42 contacts:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Contact'>Contact</a>&gt; saved_count:<a href='/type/int'>int</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.Contacts'>contacts.Contacts</a>;
+<a href='/constructor/contacts.contactsNotModified'>contacts.contactsNotModified</a>#b74ba9d2 = <a href='/type/contacts.Contacts'>contacts.Contacts</a>;
+
+<a href='/constructor/savedPhoneContact'>savedPhoneContact</a>#1142bd56 phone:<a href='/type/string'>string</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> = <a href='/type/SavedContact'>SavedContact</a>;
+
+---functions---
+
+<a href='/method/contacts.getContacts'>contacts.getContacts</a>#5dd69e12 hash:<a href='/type/long'>long</a> = <a href='/type/contacts.Contacts'>contacts.Contacts</a>;
+
+<a href='/method/contacts.getSaved'>contacts.getSaved</a>#82f1e39f = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SavedContact'>SavedContact</a>&gt;;
+
+<a href='/method/contacts.getContactIDs'>contacts.getContactIDs</a>#7adc669d hash:<a href='/type/long'>long</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
+<p>Use <a href="/method/contacts.getContacts">contacts.getContacts</a> to obtain all members of the contact list that have an associated Telegram account.  </p>
+<p>Use <a href="/method/contacts.getContactIDs">contacts.getContactIDs</a> to obtain an array of Telegram user IDs for all contacts (0 is returned for contacts do not have an associated Telegram account or have hidden their account using privacy settings).  </p>
+<p>To obtain the <em>full</em> contact list, including contacts which do not have an associated Telegram account, use <a href="/method/contacts.getSaved">contacts.getSaved</a> in combination with a <a href="/api/takeout">takeout session »</a>.  </p>
+<h3><a class="anchor" href="#getting-contact-statuses" id="getting-contact-statuses" name="getting-contact-statuses"><i class="anchor-icon"></i></a>Getting contact statuses</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/userStatusEmpty'>userStatusEmpty</a>#9d05049 = <a href='/type/UserStatus'>UserStatus</a>;
+<a href='/constructor/userStatusOnline'>userStatusOnline</a>#edb93949 expires:<a href='/type/int'>int</a> = <a href='/type/UserStatus'>UserStatus</a>;
+<a href='/constructor/userStatusOffline'>userStatusOffline</a>#8c703f was_online:<a href='/type/int'>int</a> = <a href='/type/UserStatus'>UserStatus</a>;
+<a href='/constructor/userStatusRecently'>userStatusRecently</a>#7b197dc8 flags:<a href='/type/%23'>#</a> by_me:flags.0?<a href='/constructor/true'>true</a> = <a href='/type/UserStatus'>UserStatus</a>;
+<a href='/constructor/userStatusLastWeek'>userStatusLastWeek</a>#541a1d1a flags:<a href='/type/%23'>#</a> by_me:flags.0?<a href='/constructor/true'>true</a> = <a href='/type/UserStatus'>UserStatus</a>;
+<a href='/constructor/userStatusLastMonth'>userStatusLastMonth</a>#65899777 flags:<a href='/type/%23'>#</a> by_me:flags.0?<a href='/constructor/true'>true</a> = <a href='/type/UserStatus'>UserStatus</a>;
+
+<a href='/constructor/contactStatus'>contactStatus</a>#16d9703b user_id:<a href='/type/long'>long</a> status:<a href='/type/UserStatus'>UserStatus</a> = <a href='/type/ContactStatus'>ContactStatus</a>;
+
+---functions---
+
+<a href='/method/contacts.getStatuses'>contacts.getStatuses</a>#c4a353ee = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ContactStatus'>ContactStatus</a>&gt;;</code></pre>
+<p>Use <a href="/method/contacts.getStatuses">contacts.getStatuses</a> to obtain the online statuses of all contacts with an accessible Telegram account.  </p>
+<h3><a class="anchor" href="#searching-for-contacts" id="searching-for-contacts" name="searching-for-contacts"><i class="anchor-icon"></i></a>Searching for contacts</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/contacts.found'>contacts.found</a>#b3134d9d my_results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.Found'>contacts.Found</a>;
+
+<a href='/constructor/contacts.sponsoredPeersEmpty'>contacts.sponsoredPeersEmpty</a>#ea32b4b1 = <a href='/type/contacts.SponsoredPeers'>contacts.SponsoredPeers</a>;
+<a href='/constructor/contacts.sponsoredPeers'>contacts.sponsoredPeers</a>#eb032884 peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SponsoredPeer'>SponsoredPeer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.SponsoredPeers'>contacts.SponsoredPeers</a>;
+
+---functions---
+
+<a href='/method/contacts.search'>contacts.search</a>#11f812d8 q:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/contacts.Found'>contacts.Found</a>;
+
+<a href='/method/contacts.getSponsoredPeers'>contacts.getSponsoredPeers</a>#b6c8c393 q:<a href='/type/string'>string</a> = <a href='/type/contacts.SponsoredPeers'>contacts.SponsoredPeers</a>;</code></pre>
+<p>Use <a href="/method/contacts.search">contacts.search</a> to search within the contact list.  </p>
+<p><strong>Note</strong>: when using this method in global search, <a href="/method/contacts.getSponsoredPeers">contacts.getSponsoredPeers</a> should also be invoked, returning a list of sponsored peers to be displayed after the results in <a href="/constructor/contacts.found">contacts.found</a>.<code>my_results</code> and before the results in <a href="/constructor/contacts.found">contacts.found</a>.<code>results</code>: see <a href="/api/sponsored-messages#getting-sponsored-search-results">here »</a> for more info.  </p>
+<h3><a class="anchor" href="#deleting-contacts" id="deleting-contacts" name="deleting-contacts"><i class="anchor-icon"></i></a>Deleting contacts</h3>
+<p>Schema:</p>
+<pre><code>---functions---
+
+<a href='/method/contacts.deleteContacts'>contacts.deleteContacts</a>#96a0e00 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/contacts.deleteByPhones'>contacts.deleteByPhones</a>#1013fd9e phones:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/contacts.resetSaved'>contacts.resetSaved</a>#879537f1 = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Use <a href="/method/contacts.deleteContacts">contacts.deleteContacts</a> to delete contacts with an associated Telegram account; the returned <a href="/constructor/Updates">Updates</a> will contain updated user information.  </p>
+<p>Use <a href="/method/contacts.deleteByPhones">contacts.deleteByPhones</a> to delete contacts by their phone number, even if they don't have an associated Telegram account.  </p>
+<p>Use <a href="/method/contacts.resetSaved">contacts.resetSaved</a> to remove all contacts without an associated Telegram account.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
