@@ -283,7 +283,36 @@ var BotProfile = {
       $('.tm-welcome-message-content').text(value);
     });
 
+    $('.js-delete-welcome-pic').on('click', BotProfile.eClickRemoveWelcomePic);
     $('.js-upload-button').on('click', BotProfile.eUploadClick);
+    $('.js-welcome-pic').on('click', function (e) {
+      if ($(this).hasClass('empty')) {
+        e.stopPropagation();
+        var $upload_btn = $('.js-upload-button[data-target=welcome_msg_pic]');
+        BotProfile.eUploadClick.call($upload_btn[0]);
+      }
+    });
+  },
+  setWelcomePic(src, loading = false) {
+    $pic = $('.js-welcome-pic');
+    if (!src) {
+      $pic.attr('style', '').addClass('empty');
+      Aj.state.files['welcome_msg_pic'] = 0;
+      return;
+    }
+
+    $pic.removeClass('empty');
+
+    var blur = loading ? 'blur(15px)' : 'blur(0px)';
+    $pic.css({ 
+      'background-image': `url(${src})`,
+      'background-size': 'cover',
+      'filter': blur,
+      'border': 'none',
+    });  
+  },
+  eClickRemoveWelcomePic() {
+    BotProfile.setWelcomePic(false);
   },
   eUploadClick() {
     var target = this.dataset.target;
@@ -305,29 +334,22 @@ var BotProfile = {
     var bg = null;
     if (target == 'welcome_msg_pic') {
       requestUpload(target, res => {
-        if (!res.ok) {
-          $('.tm-image-input-container').attr('style', '');
+        if (res.cancel) {
           return;
         }
-        // temp
-        $('.tm-image-input-container').css({ 
-          'background-image': `${bg}url(${res.media.src})`,
-          'background-size': 'cover',
-          'filter': 'blur(0px)',
-          'border': 'none',
-        }); 
+        if (!res.ok) {
+          BotProfile.setWelcomePic(false);
+          return;
+        }
+        BotProfile.setWelcomePic(bg || res.media.src);
       }, 
       {
         onSelected(file) {
+          debugger;
           if (!file) return;
           var src = URL.createObjectURL(file);
-          bg = `url(${src}),`;
-          $('.tm-image-input-container').css({
-            'background-image': `url(${src})`,
-            'background-size': 'cover',
-            'filter': 'blur(15px)',
-            'border': 'none',
-          });
+          bg = src;
+          BotProfile.setWelcomePic(src, true);
         }
       });
     }
@@ -440,7 +462,7 @@ var BotCommandsList = {
     }
     $('.js-edit-command-list').toggleClass('list-prevent-edit', !edit);
     $('.js-edit-command-list').sortable(edit ? 'enable' : 'disable');
-    Aj.state.$editBtn.text(edit ? 'Done' : 'Edit');
+    Aj.state.$editBtn.text(edit ? l('WEB_COMMANDS_DONE_BTN') : l('WEB_COMMANDS_EDIT_BTN'));
   },
   submit() {
     var commands = $('.js-edit-command-list .js-sortable').toArray().map(el => {
@@ -451,7 +473,7 @@ var BotCommandsList = {
     Aj.apiRequest('reorderCommands', { 
       bid: Aj.state.botId,
       lang_code: Aj.state.lang,
-      commands: commands, 
+      commands: [], 
     }, (res) => {
       if (res.error) {
         Main.showErrorToast(res.error);
@@ -471,9 +493,9 @@ function botChangeSettings(key, value, callback = false) {
 
 var BotCommandEdit = {
   init() {
-    WebApp.MainButton.setText('Add');
+    WebApp.MainButton.setText(l('WEB_COMMANDS_ADD'));
     if (Aj.state.editingCommand) {
-      WebApp.MainButton.setText('Save');
+      WebApp.MainButton.setText(l('WEB_COMMANDS_SAVE'));
     }
     WebApp.MainButton.show();
     WebApp.MainButton.onClick(BotCommandEdit.submit);
@@ -835,7 +857,7 @@ var BotGames = {
     $('.js-game-copy').on('click', function (e) {
       // e.stopPropagation();
       navigator.clipboard.writeText(this.dataset.value);
-      Main.showToast('Link copied to clipboard.', { class: 'success' });
+      Main.showToast(l('WEB_LINK_COPIED'), { class: 'success' });
       WebApp.HapticFeedback.notificationOccurred('success');
     })
 
@@ -1109,7 +1131,7 @@ var BotApps = {
   init() {
     $('.js-game-copy').on('click', function (e) {
       navigator.clipboard.writeText(this.dataset.value);
-      Main.showToast('Link copied to clipboard.', { class: 'success' });
+      Main.showToast(l('WEB_LINK_COPIED'), { class: 'success' });
       WebApp.HapticFeedback.notificationOccurred('success');
     });
 
