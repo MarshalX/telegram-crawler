@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Working with Updates</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="How to subscribe to updates and handle them properly.">
+    <meta property="og:title" content="Working with Updates">
+    <meta property="og:image" content="9c2ddd579d3d7cedba">
+    <meta property="og:description" content="How to subscribe to updates and handle them properly.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/updates" >Working with Updates</a></li></ul></div>
+  <h1 id="dev_page_title">Working with Updates</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>When a client is being actively used, events will occur that affect the current user and that they must learn about as soon as possible, e.g. when a new message is received. To eliminate the need for the client itself to periodically download these events, there is an update delivery mechanism in which the server sends the user notifications over one of its available connections with the client.</p>
+<h3><a class="anchor" href="#subscribing-to-updates" id="subscribing-to-updates" name="subscribing-to-updates"><i class="anchor-icon"></i></a>Subscribing to Updates</h3>
+<p>Update events are sent to an authorized user into the last active connection (except for connections needed for downloading / uploading files).</p>
+<p>So to start receiving updates the client needs to init connection and call API method, e.g. to <a href="#fetching-state">fetch current state</a>.</p>
+<p>Make sure to <strong>always ignore updates received from unencrypted connections</strong> (i.e. before the handshake is completed).  </p>
+<p>If the connection is encrypted, but the session isn't logged in yet or was logged out, only the following updates may be handled:</p>
+<ul>
+<li><a href="/constructor/updateLoginToken">updateLoginToken</a> - For <a href="/api/qr-login">QR code logins</a></li>
+<li><a href="/constructor/updateSentPhoneCode">updateSentPhoneCode</a> - For paid SMS code <a href="/api/auth">logins</a></li>
+<li><a href="/constructor/updateDcOptions">updateDcOptions</a> - Changes in the data center connection options that must be applied</li>
+<li><a href="/constructor/updateConfig">updateConfig</a> - The server-side configuration has changed; the client should re-fetch the config using <a href="/method/help.getConfig">help.getConfig</a> and <a href="/method/help.getAppConfig">help.getAppConfig</a>.</li>
+<li><a href="/constructor/updateLangPackTooLong">updateLangPackTooLong</a>, <a href="/constructor/updateLangPack">updateLangPack</a> - Localization pack updates</li>
+</ul>
+<h3><a class="anchor" href="#event-sequences" id="event-sequences" name="event-sequences"><i class="anchor-icon"></i></a>Event sequences</h3>
+<p>All events are received from the socket as a sequence of TL-serialized <a href="/type/Updates">Updates</a> objects, which might be optionally gzip-compressed in the same way as <a href="/api/invoking#decompressing-data">responses to queries</a>.</p>
+<p>Each <a href="/type/Updates">Updates</a> object may contain single or multiple <a href="/type/Update">Update</a> objects, representing different events happening.</p>
+<p>In order to apply all updates in precise order and to guarantee that no update is missed or applied twice there is <code>seq</code> attribute in <a href="/type/Updates">Updates</a> constructors, and <code>pts</code> (with <code>pts_count</code>) or <code>qts</code> attributes in <a href="/type/Update">Update</a> constructors. The client must use those attributes values in combination with locally stored state to correctly apply incoming updates.</p>
+<p>When a gap in updates sequence occurs, it must be filled via calling one of the API methods. <a href="#recovering-gaps">More below »</a></p>
+<h3><a class="anchor" href="#updates-sequence" id="updates-sequence" name="updates-sequence"><i class="anchor-icon"></i></a><a href="/type/Updates">Updates</a> sequence</h3>
+<p>As said earlier, each payload with updates has a TL-type <a href="/type/Updates">Updates</a>. It can be seen from the schema below that this type has several constructors.</p>
+<pre><code><a href='/constructor/updatesTooLong'>updatesTooLong</a>#e317af7e = <a href='/type/Updates'>Updates</a>;
+<a href='/constructor/updateShort'>updateShort</a>#78d4dec1 update:<a href='/type/Update'>Update</a> date:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/constructor/updateShortMessage'>updateShortMessage</a>#313bc7f8 flags:<a href='/type/%23'>#</a> out:flags.1?<a href='/constructor/true'>true</a> mentioned:flags.4?<a href='/constructor/true'>true</a> media_unread:flags.5?<a href='/constructor/true'>true</a> silent:flags.13?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> user_id:<a href='/type/long'>long</a> message:<a href='/type/string'>string</a> pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> fwd_from:flags.2?<a href='/type/MessageFwdHeader'>MessageFwdHeader</a> via_bot_id:flags.11?<a href='/type/long'>long</a> reply_to:flags.3?<a href='/type/MessageReplyHeader'>MessageReplyHeader</a> entities:flags.7?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; ttl_period:flags.25?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/constructor/updateShortChatMessage'>updateShortChatMessage</a>#4d6deea5 flags:<a href='/type/%23'>#</a> out:flags.1?<a href='/constructor/true'>true</a> mentioned:flags.4?<a href='/constructor/true'>true</a> media_unread:flags.5?<a href='/constructor/true'>true</a> silent:flags.13?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> from_id:<a href='/type/long'>long</a> chat_id:<a href='/type/long'>long</a> message:<a href='/type/string'>string</a> pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> fwd_from:flags.2?<a href='/type/MessageFwdHeader'>MessageFwdHeader</a> via_bot_id:flags.11?<a href='/type/long'>long</a> reply_to:flags.3?<a href='/type/MessageReplyHeader'>MessageReplyHeader</a> entities:flags.7?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; ttl_period:flags.25?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/constructor/updateShortSentMessage'>updateShortSentMessage</a>#9015e101 flags:<a href='/type/%23'>#</a> out:flags.1?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> media:flags.9?<a href='/type/MessageMedia'>MessageMedia</a> entities:flags.7?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; ttl_period:flags.25?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/constructor/updatesCombined'>updatesCombined</a>#725b04c3 updates:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Update'>Update</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; date:<a href='/type/int'>int</a> seq_start:<a href='/type/int'>int</a> seq:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/constructor/updates'>updates</a>#74ae4240 updates:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Update'>Update</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; date:<a href='/type/int'>int</a> seq:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p><a href="/constructor/updatesTooLong">updatesTooLong</a> indicates that there are too many events pending to be pushed to the client, so one needs to <a href="#recovering-gaps">fetch them manually</a>.</p>
+<p>Events inside <a href="/constructor/updateShort">updateShort</a> constructors, normally, have lower priority and are broadcast to a large number of users, i.e. one of the chat participants started entering text in a big conversation (<a href="/constructor/updateChatUserTyping">updateChatUserTyping</a>).</p>
+<p>The <a href="/constructor/updateShortMessage">updateShortMessage</a>, <a href="/constructor/updateShortMessage">updateShortSentMessage</a> and <a href="/constructor/updateShortChatMessage">updateShortChatMessage</a> constructors are redundant but help significantly reduce the transmitted message size for 90% of the updates. They should be transformed to <a href="/constructor/updateShort">updateShort</a> upon receival.</p>
+<p>Two remaining constructors <a href="/constructor/updates">updates</a> and <a href="/constructor/updatesCombined">updatesCombined</a> are part of the Updates sequence. Both of them have the <code>seq</code> attribute, which indicates the remote Updates state after the generation of the Updates, and <code>seq_start</code> indicates the remote Updates state after the <em>first</em> of the Updates in the packet is generated. For <a href="/constructor/updates">updates</a>, the <code>seq_start</code> attribute is omitted, because it is assumed that it is always equal to <code>seq</code>.</p>
+<h3><a class="anchor" href="#message-related-event-sequences" id="message-related-event-sequences" name="message-related-event-sequences"><i class="anchor-icon"></i></a>Message-related event sequences</h3>
+<p>Each <em>event</em> related to a message box (message created, message edited, message deleted, etc) is identified by a unique autoincremented <code>pts</code>, or <code>qts</code> in case of secret chat updates, certain bot updates, etc.</p>
+<p>Each message box can be considered as some server-side DB table that stores messages and events associated with them.
+All boxes are completely independent, and each pts sequence is tied to just one box (see below).</p>
+<p>The <a href="/type/Update">Update</a> object may contain info about <em>multiple events</em> (for example, <a href="/constructor/updateDeleteMessages">updateDeleteMessages</a>).
+That's why all single updates might have <code>pts_count</code> parameter indicating the <em>number of events</em> contained in the received <em>update</em> (with some exceptions, in this case, the <code>pts_count</code> is considered to be <code>0</code>).</p>
+<p>Each <a href="/api/channel#channels">channel</a> and <a href="/api/channel#supergroups">supergroup</a> has its message box and <em>its event sequence</em> as a result; private chats and <a href="/api/channel#basic-groups">basic groups</a> of one user have another <em>common event sequence</em>.<br>
+Secret chats, certain bot events and other kinds of updates have yet another <em>common secondary event sequence</em>.</p>
+<p>To recap, the client has to take care of the integrity of the following sequences to properly handle updates:</p>
+<ul>
+<li>Updates sequence (seq)<ul>
+<li>Common message box sequence (pts)</li>
+<li>Secondary event sequence (qts)</li>
+<li>Channel message box sequence 1 (pts)</li>
+<li>Channel message box sequence 2 (pts)</li>
+<li>Channel message box sequence 3 (pts)</li>
+<li>and so on...</li>
+</ul>
+</li>
+</ul>
+<h3><a class="anchor" href="#fetching-state" id="fetching-state" name="fetching-state"><i class="anchor-icon"></i></a>Fetching state</h3>
+<p>The <em>common</em> update state is represented by the <a href="/type/updates.State">updates.State</a> constructor.
+When the user logs in for the first time, a call to <a href="/method/updates.getState">updates.getState</a> has to be made to store the latest update state (which will not be the absolute initial state, just the latest state at the current time).
+The common update state can also be fetched from <a href="/constructor/updates.differenceTooLong">updates.differenceTooLong</a>.</p>
+<p>The <em>channel update state</em> is represented simply by the <code>pts</code> of the event sequence: when first logging in, the initial channel state can be obtained from the <a href="/constructor/dialog">dialog</a> constructor when fetching dialogs, from <a href="/constructor/channelFull">the full channel info</a>, or it can be received <a href="https://core.telegram.org/constructor/updateChannelTooLong">as an updateChannelTooLong update</a>.</p>
+<p>The <em>secondary update state</em> is represented by the <code>qts</code> of the secret event sequence, it is contained in the <a href="/type/updates.State">updates.State</a> of the <em>common update state</em>.</p>
+<p>The <em>Updates sequence state</em> is represented by the <code>date</code> and <code>seq</code> of the <em>Updates sequence</em>, it is contained in the <a href="/type/updates.State">updates.State</a> of the <em>common</em> update state.</p>
+<h3><a class="anchor" href="#update-handling" id="update-handling" name="update-handling"><i class="anchor-icon"></i></a>Update handling</h3>
+<p>Update handling in Telegram clients consists of receiving events, making sure there were no gaps and no events were missed based on the locally stored state of the correspondent event sequence, and then updating the locally stored state based on the parameters received.</p>
+<p>When the client receives payload with serialized updates, first of all, it needs to walk through all of the nested <a href="/type/Update">Update</a> objects and check if they belong to any of message box sequences (have <code>pts</code> or <code>qts</code> parameters). Those updates need to be handled separately according to corresponding local state and new <code>pts</code>/<code>qts</code> values. <a href="#pts-checking-and-applying">Details below »</a></p>
+<p>After message box updates are handled, if there are any other updates remaining the client needs to handle them with respect to <code>seq</code>. <a href="#seq-checking-and-applying">Details below »</a></p>
+<h4><a class="anchor" href="#pts-checking-and-applying" id="pts-checking-and-applying" name="pts-checking-and-applying"><i class="anchor-icon"></i></a><code>pts</code>: checking and applying</h4>
+<p>Here, <code>local_pts</code> will be the local state, <code>pts</code> will be the remote state, <code>pts_count</code> will be the number of events in the update.</p>
+<ul>
+<li>If <code>local_pts + pts_count === pts</code>, the update can be applied.</li>
+<li>If <code>local_pts + pts_count &gt; pts</code>, the update was already applied, and must be ignored.</li>
+<li>If <code>local_pts + pts_count &lt; pts</code>, there's an update gap that must be <a href="#recovering-gaps">filled</a>.</li>
+</ul>
+<p>For example, let's assume the client has the following local state for the channel <code>123456789</code>:</p>
+<pre><code>local_pts = 131</code></pre>
+<p>Now let's assume an <a href="/constructor/updateNewChannelMessage">updateNewChannelMessage</a> from channel <code>123456789</code> is received with <code>pts = 132</code> and <code>pts_count=1</code>.
+Since <code>local_pts + pts_count === pts</code>, the total number of events since the last stored state is, in fact, equal to <code>pts_count</code>: this means the update can be safely accepted and the remote <code>pts</code> applied:</p>
+<pre><code>local_pts = 132</code></pre>
+<p>Since:</p>
+<ul>
+<li><code>pts</code> indicates the server state <strong>after</strong> the new channel message events are generated</li>
+<li><code>pts_count</code> indicates the number of events in the new channel update</li>
+<li>The server state <strong>before the new channel message event was generated</strong> has to be: <code>pts_before = pts - pts_count = 131</code>, which is, in fact, equal to our local state.</li>
+</ul>
+<p>Now let's assume an <a href="/constructor/updateNewChannelMessage">updateNewChannelMessage</a> from channel <code>123456789</code> is received with <code>pts = 132</code> and <code>pts_count=1</code>.
+Since <code>local_pts + pts_count &gt; pts</code> (<code>133 &gt; 132</code>), the update is skipped because we've already handled this update (in fact, our current <code>local_pts</code> was set by this same update, and it was resent twice due to network issues or other issues).</p>
+<p>Now let's assume an <a href="/constructor/updateDeleteChannelMessages">updateDeleteChannelMessages</a> from channel <code>123456789</code> is received with <code>pts = 140</code> and <code>pts_count=5</code>.
+Since <code>local_pts + pts_count &lt; pts</code> (<code>137 &lt; 140</code>), this means that updates were missed, and the gap must be recovered.</p>
+<h5><a class="anchor" href="#secret-chats-amp-bots" id="secret-chats-amp-bots" name="secret-chats-amp-bots"><i class="anchor-icon"></i></a>Secret chats &amp; bots</h5>
+<p>The whole process is very similar for secret chats and certain bot updates, but there is a <code>qts</code> instead of <code>pts</code>, and events are never grouped, so it's assumed that <code>qts_count</code> is always equal to 1.</p>
+<h4><a class="anchor" href="#seq-checking-and-applying" id="seq-checking-and-applying" name="seq-checking-and-applying"><i class="anchor-icon"></i></a><code>seq</code>: checking and applying</h4>
+<p>On the top level when handling received <a href="/constructor/updates">updates</a> and <a href="/constructor/updatesCombined">updatesCombined</a> there are four possible cases:</p>
+<ul>
+<li>If <code>seq_start === 0</code>, the updates can be applied: this is a special case for updates that aren't ordered and should just be applied immediately.</li>
+<li>If <code>local_seq + 1 === seq_start</code>, the updates can be applied.</li>
+<li>If <code>local_seq + 1 &gt; seq_start</code>, the updates were already applied, and must be ignored.</li>
+<li>If <code>local_seq + 1 &lt; seq_start</code>, there's an updates gap that must be <a href="#recovering-gaps">filled</a> (updates.getDifference must be used as with common and secret event sequences).</li>
+</ul>
+<p>If the updates were applied, local <em>Updates state</em> must be updated with <code>seq</code> (unless it's 0) and <code>date</code> from the constructor.</p>
+<p>For all the other <a href="/type/Updates">Updates</a> type constructors there is no need to check <code>seq</code> or change a local state.</p>
+<h3><a class="anchor" href="#recovering-gaps" id="recovering-gaps" name="recovering-gaps"><i class="anchor-icon"></i></a>Recovering gaps</h3>
+<p>To do this, <a href="/method/updates.getDifference">updates.getDifference</a> (common/secret state) or <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> (channel state) with the respective local states must be called.  </p>
+<p>Manually obtaining updates through the above methods is required in the following situations:</p>
+<ul>
+<li>On startup, <em>only</em> <a href="/method/updates.getDifference">updates.getDifference</a> should be called, to fetch updates received while the client was offline (preferably with some flags to reduce server load, see the method's docs).<br>
+<a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> does <em>not</em> have to be manually called for all channels on startup.<br>
+Instead, <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> will be automatically triggered (only for channels that need catching up) by a set of <a href="/constructor/updateChannelTooLong">updateChannelTooLong</a> updates that will be returned by the <a href="/method/updates.getDifference">updates.getDifference</a> call.  </li>
+<li>Loss of sync: a gap was found in  <strong>seq</strong> / <strong>pts</strong> / <strong>qts</strong> (as described above). It may be useful to wait up to 0.5 seconds in this situation and abort the sync in case a new update arrives, that fills the gap.</li>
+<li>Session loss on the server: the client receives a <a href="https://core.telegram.org/mtproto/service_messages#new-session-creation-notification">new session created notification</a>. This can be caused by garbage collection on the MTProto server or a server reboot.</li>
+<li>Incorrect update: the client cannot deserialize the received data.</li>
+<li>Incomplete update: the client is missing data about a chat/user from one of the shortened constructors, such as <a href="/constructor/updateShortChatMessage">updateShortChatMessage</a>, etc.</li>
+<li>Long period without updates: no updates for 15 minutes or longer.</li>
+<li>The server requests the client to fetch the difference using <a href="/constructor/updateChannelTooLong">updateChannelTooLong</a> or <a href="/constructor/updatesTooLong">updatesTooLong</a>.</li>
+</ul>
+<p>When calling <a href="/method/updates.getDifference">updates.getDifference</a> if the <a href="/constructor/updates.differenceSlice">updates.differenceSlice</a> constructor is returned in response, the full difference was too large to be received in one request. The intermediate status, <strong>intermediate_state</strong>, must be saved on the client and the query must be repeated, using the intermediate status as the current status.</p>
+<p>To fetch the updates difference of a channel, <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> is used.<br>
+If the difference is too large to be received in one request, the <code>final</code> flag of the result is <strong>not</strong> set (see <a href="/type/updates.ChannelDifference">docs</a>).<br>
+The intermediate status, represented by the <strong>pts</strong>, must be saved on the client and the query must be repeated, using the intermediate status as the current status.  </p>
+<p>For performance reasons and for better user experience, client can set maximum gap size to be filled: <code>pts_total_limit</code> parameter of <a href="/method/updates.getDifference">updates.getDifference</a> and <code>limit</code> parameter for <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> can be used.</p>
+<p>If the gap is too large and there are too many updates to fetch, a <code>*TooLong</code> constructor will be returned. In this case, the client must <a href="#fetching-state">re-fetch the state</a>, re-start fetching updates from that state and follow the instructions that can be found <a href="/constructor/updates.channelDifferenceTooLong">here</a>.</p>
+<p>It is recommended to use limit <code>10-100</code> for channels and <code>1000-10000</code> otherwise.</p>
+<p>Do not re-invoke <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> if the returned difference is <code>final</code>, unless <a href="#subscribing-to-updates-of-channels-supergroups">the user has opened the channel/supergroup »</a>.  </p>
+<h3><a class="anchor" href="#subscribing-to-updates-of-channels-supergroups" id="subscribing-to-updates-of-channels-supergroups" name="subscribing-to-updates-of-channels-supergroups"><i class="anchor-icon"></i></a>Subscribing to updates of channels/supergroups</h3>
+<p>The API will automatically send passive updates (i.e. as standalone <a href="/type/Updates">Updates</a> constructors in the socket) for channels/supergroups the user/bot is a member of.  </p>
+<p>However, clients (user accounts only) should also additionally invoke <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> periodically for channels and supergroups the user is currently viewing (i.e. explicitly opened channels/supergroups in one or more tabs/windows).  </p>
+<p>If the returned difference is non-<code>final</code>, the method should be called immediately with the new parameters <a href="#recovering-gaps">as usual</a>.  </p>
+<p>If the returned difference is <code>final</code>, and the user is still viewing the messages of the supergroup/channel (i.e. via distinct tabs/windows), <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> should be re-invoked after <code>timeout</code> seconds (if the flag is specified, otherwise after 1 second).  </p>
+<p>This mechanism may also be used to enable <em>passive</em> reception of updates from channels or supergroups we're <em>not</em> a member of: if the specified channel or supergroup is public, or is private but temporarily available for a limited time thanks to a <a href="/constructor/chatInvitePeek">chatInvitePeek</a>, the API will start passively sending updates (i.e. as standalone <a href="/type/Updates">Updates</a> constructors in the socket, as is already the case for normal channels/supergroups we've already joined) to all logged-in sessions, as long as any of the sessions continues to periodically invoke <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> every <code>timeout</code> seconds (returned by the method, or every second if the <code>timeout</code> flag is absent from the return value of the method, or immediately with the new parameters if the returned difference is non-<code>final</code>).  </p>
+<p>Clients should stop <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> polling once the user closes the channel/supergroup: the API will continue emitting passive updates <strong>only</strong> if the user is a member of the channel/supergroup.  </p>
+<p>Clients should also limit to 10 the maximum number of channels/supergroups shortpolled using the above mechanism (i.e. if the user opens 11 windows on 11 different channels, shortpoll with <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> only the first 10).  </p>
+<h3><a class="anchor" href="#example-implementations" id="example-implementations" name="example-implementations"><i class="anchor-icon"></i></a>Example implementations</h3>
+<p>Implementations also have to take care to postpone updates received via the socket while filling gaps in the event and Update sequences, as well as avoid filling gaps in the same sequence.</p>
+<p>Example implementations: <a href="https://github.com/tdlib/td">tdlib</a>, <a href="https://github.com/danog/MadelineProto">MadelineProto</a>.  </p>
+<p>An interesting and easy way this can be implemented, instead of using various locks, is by running background loops, like in <a href="https://docs.madelineproto.xyz/docs/UPDATES_INTERNAL.html">MadelineProto »</a>.</p>
+<h3><a class="anchor" href="#push-notifications-about-updates" id="push-notifications-about-updates" name="push-notifications-about-updates"><i class="anchor-icon"></i></a><a href="/api/push-updates">PUSH Notifications about Updates</a></h3>
+<p>If a client does not have an active connection at the time of an event, <a href="/api/push-updates">PUSH Notifications</a> will also be useful.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
