@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Two-factor authentication</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="How to login to a user&#39;s account if they have enabled 2FA, how to change password.">
+    <meta property="og:title" content="Two-factor authentication">
+    <meta property="og:image" content="566f538655672c95c6">
+    <meta property="og:description" content="How to login to a user&#39;s account if they have enabled 2FA, how to change password.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/srp" >Two-factor authentication</a></li></ul></div>
+  <h1 id="dev_page_title">Two-factor authentication</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram uses the <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">Secure Remote Password protocol</a> version 6a to implement 2FA.</p>
+<p>Example implementation: <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/PasswordManager.cpp">tdlib</a>.</p>
+<h3><a class="anchor" href="#checking-the-password-with-srp" id="checking-the-password-with-srp" name="checking-the-password-with-srp"><i class="anchor-icon"></i></a>Checking the password with SRP</h3>
+<p>To login to an account protected by a 2FA password or to perform some other actions (like changing channel owner), you will need to verify the user's knowledge of the current 2FA account password.</p>
+<p>To do this, first the client needs to obtain SRP parameters and the KDF algorithm to use to check the validity of the password via <a href="/method/account.getPassword">account.getPassword</a> method. For now, only the <a href="/constructor/passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow">passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow</a> algorithm is supported, so we'll only explain that.</p>
+<p>Then, after the user provides a password, the client should generate an <a href="/type/InputCheckPasswordSRP">InputCheckPasswordSRP</a> object using SRP and a specific KDF algorithm as shown below and pass it to appropriate method (e.g. <a href="/method/auth.checkPassword">auth.checkPassword</a> in case of authorization).</p>
+<p>This extension of the <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">SRP protocol</a> uses the password-based <a href="https://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a> with 100000 iterations using sha512 (<code>PBKDF2HMACSHA512iter100000</code>).
+PBKDF2 is used to additionally rehash the <code>x</code> parameter, obtained using a method similar to the one described in <a href="https://tools.ietf.org/html/rfc2945#section-3">RFC 2945</a> (<code>H(s | H ( I | password | I) | s)</code> instead of <code>H(s | H ( I | ":" | password)</code>) (see below).</p>
+<p>Here, <code>|</code> denotes concatenation and <code>+</code> denotes the arithmetical operator <code>+</code>.
+In all cases where concatenation of numbers passed to hashing functions is done, the numbers must be used in big-endian form, padded to 2048 bits; all math is modulo <code>p</code>.
+Instead of <code>I</code>, <code>salt1</code> will be used (see <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">SRP protocol</a>).
+Instead of <code>s</code>, <code>salt2</code> will be used (see <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">SRP protocol</a>).</p>
+<p>The main hashing function <code>H</code> is sha256:</p>
+<ul>
+<li><code>H(data) := sha256(data)</code></li>
+</ul>
+<p>The salting hashing function <code>SH</code> is defined as follows:</p>
+<ul>
+<li><code>SH(data, salt) := H(salt | data | salt)</code></li>
+</ul>
+<p>The primary password hashing function is defined as follows:</p>
+<ul>
+<li><code>PH1(password, salt1, salt2) := SH(SH(password, salt1), salt2)</code></li>
+</ul>
+<p>The secondary password hashing function is defined as follows:</p>
+<ul>
+<li><code>PH2(password, salt1, salt2) := SH(pbkdf2(sha512, PH1(password, salt1, salt2), salt1, 100000), salt2)</code></li>
+</ul>
+<p>Client-side, the following parameters are extracted from the <a href="/constructor/passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow">passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow</a> object, contained in the <a href="/constructor/account.password">account.password</a> object.</p>
+<ul>
+<li>
+<p><code>g := algo.g</code></p>
+</li>
+<li>
+<p><code>p := algo.p</code>
+The client is expected to check whether <strong>p</strong> is a safe 2048-bit prime (meaning that both <strong>p</strong> and <strong>(p-1)/2</strong> are prime, and that <code>2^2047 &lt; p &lt; 2^2048</code>), and that <strong>g</strong> generates a cyclic subgroup of prime order <strong>(p-1)/2</strong>, i.e. is a quadratic residue <strong>mod p</strong>. Since <strong>g</strong> is always equal to 2, 3, 4, 5, 6 or 7, this is easily done using quadratic reciprocity law, yielding a simple condition on <strong>p mod 4g</strong> -- namely, <strong>p mod 8 = 7</strong> for <strong>g = 2</strong>; <strong>p mod 3 = 2</strong> for <strong>g = 3</strong>; no extra condition for <strong>g = 4</strong>; <strong>p mod 5 = 1 or 4</strong> for <strong>g = 5</strong>; <strong>p mod 24 = 19 or 23</strong> for <strong>g = 6</strong>; and <strong>p mod 7 = 3, 5 or 6</strong> for <strong>g = 7</strong>. After <strong>g</strong> and <strong>p</strong> have been checked by the client, it makes sense to cache the result, so as to avoid repeating lengthy computations in future. This cache might be shared with one used for <a href="/mtproto/auth_key">Authorization Key generation</a>.</p>
+<p>If the client has an inadequate random number generator, it makes sense to use the <strong>secure_random</strong> of account.password as additional seed.</p>
+</li>
+<li>
+<p><code>password := (user-provided password)</code></p>
+</li>
+<li>
+<p><code>salt1 := algo.salt1</code></p>
+</li>
+<li>
+<p><code>salt2 := algo.salt2</code></p>
+</li>
+<li>
+<p><code>g_b := srp_B</code>
+<code>srp_B</code> and <code>srp_id</code> are extracted from the <a href="/constructor/account.password">account.password</a> object.</p>
+</li>
+</ul>
+<p>The <code>k</code> parameter is generated, both on client and server:</p>
+<ul>
+<li><code>k := H(p | g)</code></li>
+</ul>
+<p>The shared param <code>u</code> is generated: the client does this, and the server does the same with the <code>g_a</code> we will send him later (see below)</p>
+<ul>
+<li><code>u := H(g_a | g_b)</code></li>
+</ul>
+<p>The final parameters are generated client-side only:</p>
+<ul>
+<li><code>x := PH2(password, salt1, salt2)</code></li>
+<li><code>v := pow(g, x) mod p</code></li>
+</ul>
+<p>The server already has <code>v</code>, from when we set the password.</p>
+<p>A final shared param is generated, for commodity:</p>
+<ul>
+<li><code>k_v := (k * v) mod p</code></li>
+</ul>
+<p>Finally, the <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol#Protocol">key exchange process</a> starts on both parties.</p>
+<p>The client computes a 2048-bit number <strong>a</strong> (using sufficient entropy or the server's <strong>random</strong>; see above) and generates:</p>
+<ul>
+<li><code>g_a := pow(g, a) mod p</code>.</li>
+</ul>
+<p>The server computes a 2048-bit number <strong>b</strong> using sufficient entropy and generates the <code>g_b</code> parameter that was sent to us (see above).</p>
+<ul>
+<li><code>g_b := (k_v + (pow(g, b) mod p)) mod p</code></li>
+</ul>
+<p>Finally, the <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol#Protocol">SRP session keys</a> are generated:</p>
+<p>Client side: </p>
+<ul>
+<li><code>t := (g_b - k_v) mod p</code> (positive modulo, if the result is negative increment by <code>p</code>) </li>
+<li><code>s_a := pow(t, a + u * x) mod p</code></li>
+<li><code>k_a := H(s_a)</code></li>
+</ul>
+<p>Server side: </p>
+<ul>
+<li><code>s_b := pow(g_a * (pow(v, u) mod p), b) mod p</code></li>
+<li><code>k_b := H(s_b)</code></li>
+</ul>
+<p>Since:</p>
+<ul>
+<li><code>g_b := (k_v + (pow(g, b) mod p)) mod p</code></li>
+<li><code>t := (g_b - k_v) mod p</code></li>
+<li><code>t :=  ((k_v + (pow(g, b) mod p)) - k_v) mod p</code></li>
+<li><code>t := pow(g, b) mod p</code></li>
+<li><code>s_a := pow(t, a + u * x) mod p</code></li>
+<li><code>s_a := pow(pow(g, b) mod p, a + u * x) mod p</code></li>
+</ul>
+<p>And:</p>
+<ul>
+<li>
+<p><code>g_a := pow(g, a) mod p</code></p>
+</li>
+<li>
+<p><code>v := pow(g, x) mod p</code></p>
+</li>
+<li>
+<p><code>s_b := pow(g_a * (pow(v, u) mod p), b) mod p</code></p>
+</li>
+<li>
+<p><code>s_b := pow((pow(g, a) mod p) * (pow(pow(g, x) mod p, u) mod p), b) mod p</code></p>
+</li>
+<li>
+<p><code>s_b := pow(pow(g, a + x * u) mod p, b) mod p</code></p>
+</li>
+<li>
+<p><code>s_b := pow(pow(g, b) mod p, a + u * x) mod p</code></p>
+</li>
+<li>
+<p><code>s_a := pow(pow(g, b) mod p, a + u * x) mod p</code></p>
+</li>
+</ul>
+<p>This means:</p>
+<ul>
+<li><code>s_b === s_a</code></li>
+<li><code>k_b === k_a</code></li>
+</ul>
+<p><strong>Finally, as per SRP</strong>:</p>
+<ul>
+<li><code>M1 := H(H(p) xor H(g) | H(salt1) | H(salt2) | g_a | g_b | k_a)</code></li>
+</ul>
+<p><code>M1</code> is passed to <a href="/constructor/inputCheckPasswordSRP">inputCheckPasswordSRP</a>, along with <code>g_a</code> (as <code>A</code> parameter) and the <code>srp_id</code>, extracted from the <a href="/constructor/account.password">account.password</a> object.</p>
+<p>The server then computes:</p>
+<ul>
+<li><code>M2 := H(H(p) xor H(g) | H(salt1) | H(salt2) | g_a | g_b | k_b)</code></li>
+</ul>
+<p>Since we said that:</p>
+<ul>
+<li><code>s_b === s_a</code></li>
+<li><code>k_b === k_a</code></li>
+</ul>
+<p>This means, if everything was done correctly,</p>
+<ul>
+<li><code>M1 === M2</code></li>
+</ul>
+<p>If the password isn't correct, <a href="/method/auth.checkPassword#possible-errors">400 PASSWORD_HASH_INVALID</a> will be returned.</p>
+<h3><a class="anchor" href="#setting-a-new-2fa-password" id="setting-a-new-2fa-password" name="setting-a-new-2fa-password"><i class="anchor-icon"></i></a>Setting a new 2FA password</h3>
+<p>To set a new 2FA password use the <a href="/method/account.updatePasswordSettings">account.updatePasswordSettings</a> method.<br>
+If a password is already set, generate an InputCheckPasswordSRP object as per <a href="#checking-the-password-with-srp">checking passwords with SRP</a>, and insert it in the <code>password</code> field of the <a href="/method/account.updatePasswordSettings">account.updatePasswordSettings</a> method.<br>
+To remove the current password, pass an empty <code>new_password_hash</code> in the <a href="/type/account.PasswordInputSettings">account.PasswordInputSettings</a> object.</p>
+<p>To set a new password, use the SRP parameters and the KDF algorithm obtained using <a href="/method/account.getPassword">account.getPassword</a> when generating the <code>password</code> field.
+Then generate a new <code>new_password_hash</code> using the KDF algorithm specified in the <code>new_settings</code>, just append 32 sufficiently random bytes to the <code>salt1</code>, first.
+Proceed as for <a href="#checking-the-password-with-srp">checking passwords with SRP</a>, just stop at the generation of the <code>v</code> parameter, and use it as <code>new_password_hash</code>:</p>
+<ul>
+<li><code>v := pow(g, x) mod p</code></li>
+</ul>
+<p>As usual in big endian form, padded to 2048 bits.</p>
+<h4><a class="anchor" href="#email-verification" id="email-verification" name="email-verification"><i class="anchor-icon"></i></a>Email verification</h4>
+<p>When setting up two-factor authorization, it is recommended to set up a  <strong>recovery email</strong>, to allow recovery of the password through the user's email address, in case they forget it.</p>
+<p>To set up a recovery email, it must first be verified.
+This can be done directly when setting the new password using <a href="/method/account.updatePasswordSettings">account.updatePasswordSettings</a> by setting the email parameter and flag in the <a href="/constructor/account.passwordInputSettings">account.passwordInputSettings</a> constructor.
+If the email isn't verified, an <a href="/method/account.updatePasswordSettings#possible-errors">EMAIL_UNCONFIRMED_X 400 error</a> will be returned, where X is the length of the verification code that was just sent to the email.
+Use <a href="/method/account.confirmPasswordEmail">account.confirmPasswordEmail</a> to enter the received verification code and enable the recovery email.
+Use <a href="/method/account.resendPasswordEmail">account.resendPasswordEmail</a> to resend the verification code.
+Use <a href="/method/account.cancelPasswordEmail">account.cancelPasswordEmail</a> to cancel the verification code.</p>
+<p>To get the current recovery email, use <a href="/method/account.getPasswordSettings">account.getPasswordSettings</a>.</p>
+<h3><a class="anchor" href="#password-recovery" id="password-recovery" name="password-recovery"><i class="anchor-icon"></i></a>Password recovery</h3>
+<p>If the user has forgotten their 2FA password, the following recovery options are available:  </p>
+<ul>
+<li>Logged-in sessions only: <a href="#password-reset">password reset »</a></li>
+<li>Logged-in and not logged-in sessions: <a href="#email-recovery">email recovery »</a></li>
+<li>Not logged-in sessions: <a href="#account-deletion">account deletion »</a></li>
+</ul>
+<h4><a class="anchor" href="#password-reset" id="password-reset" name="password-reset"><i class="anchor-icon"></i></a>Password reset</h4>
+<p>Password reset can be requested from logged-in sessions only.  </p>
+<p>The following procedure can be used to reset the password without deleting the account:</p>
+<pre><code><a href='/constructor/account.resetPasswordFailedWait'>account.resetPasswordFailedWait</a>#e3779861 retry_date:<a href='/type/int'>int</a> = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
+<a href='/constructor/account.resetPasswordRequestedWait'>account.resetPasswordRequestedWait</a>#e9effc7d until_date:<a href='/type/int'>int</a> = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
+<a href='/constructor/account.resetPasswordOk'>account.resetPasswordOk</a>#e926d63e = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
+
+---functions---
+
+<a href='/method/account.resetPassword'>account.resetPassword</a>#9308ce1b = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
+<a href='/method/account.declinePasswordReset'>account.declinePasswordReset</a>#4c9409f6 = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>If the user is already logged in and has forgotten their 2FA password, <a href="/method/account.resetPassword">account.resetPassword</a> can be used to initiate a password reset.<br>
+On success, the call will initially return a <a href="/constructor/account.resetPasswordRequestedWait">account.resetPasswordRequestedWait</a> constructor and start a 7-day server-side timer, during which the user can abort the reset process using a button sent by the Telegram service account or directly in-UI using <a href="/method/account.declinePasswordReset">account.declinePasswordReset</a>.  </p>
+<p>When the time comes, <a href="/method/account.resetPassword">account.resetPassword</a> is invoked once more, returning a <a href="/constructor/account.resetPasswordOk">account.resetPasswordOk</a> to indicate that the password was successfully reset.  </p>
+<p>If the user recently requested a password reset that was canceled, <a href="/constructor/account.resetPasswordFailedWait">account.resetPasswordFailedWait</a> will be returned by the initial <a href="/method/account.resetPassword">account.resetPassword</a> call, and they must wait until the specified date before requesting another reset.  </p>
+<p>Note that if the user already knows their 2FA password and simply wants to disable 2FA, <a href="#setting-a-new-2fa-password">the same process used to enable the password must also be used to disable it »</a>.</p>
+<h4><a class="anchor" href="#email-recovery" id="email-recovery" name="email-recovery"><i class="anchor-icon"></i></a>Email recovery</h4>
+<p>Email recovery can be requested from logged in sessions, and from non-logged in sessions if the user has successfully provided the login code.<br>
+In both cases, the account must have an associated <a href="#email-verification">recovery email »</a>.  </p>
+<p>In order to recover a forgotten 2FA password, an email must be sent to the <a href="#email-verification">previously specified address</a> using the <a href="/method/auth.requestPasswordRecovery">auth.requestPasswordRecovery</a> method.<br>
+Use <a href="/method/auth.checkRecoveryPassword">auth.checkRecoveryPassword</a> to make sure that the user provided a valid code.<br>
+Then use <a href="/method/auth.recoverPassword">auth.recoverPassword</a> with the received code to delete the current 2FA password, to set a new one follow <a href="/api/srp">these instructions »</a>.</p>
+<h4><a class="anchor" href="#account-deletion" id="account-deletion" name="account-deletion"><i class="anchor-icon"></i></a>Account deletion</h4>
+<p>If the user has successfully provided the login code, but they forgot their <a href="/api/srp">2FA</a> password and they don't have access to any other logged-in session, the account can be deleted following <a href="/api/account-deletion">these instructions »</a>.  </p>
+<h3><a class="anchor" href="#using-the-2fa-password" id="using-the-2fa-password" name="using-the-2fa-password"><i class="anchor-icon"></i></a>Using the 2FA password</h3>
+<p>Multiple methods in the API such as those used to make <a href="/api/payments">payments</a>, <a href="/method/channels.editCreator">transfer channel ownership</a> and others require the user to authenticate using the 2FA password passed as an <a href="/type/InputCheckPasswordSRP">InputCheckPasswordSRP</a> constructor, generated as specified <a href="#checking-the-password-with-srp">above</a>.  </p>
+<p>All such methods where a password verification is required <em>after login</em> may emit the following RPC errors:  </p>
+<ul>
+<li><code>PASSWORD_MISSING</code> - No 2FA password is configured, but one is <strong>required</strong> in order to invoke the method. <a href="#setting-a-new-2fa-password">Set a 2FA password</a> and then repeat the method call.</li>
+<li><code>PASSWORD_TOO_FRESH_%d</code> - The 2FA password was modified less than 24 hours ago, try again in <code>%d</code> seconds.</li>
+<li><code>SESSION_TOO_FRESH_%d</code> - This session was created less than 24 hours ago, try again in <code>%d</code> seconds.</li>
+<li><code>PASSWORD_HASH_INVALID</code> - The specified password is invalid (or an <a href="/constructor/inputCheckPasswordEmpty">inputCheckPasswordEmpty</a> was provided, but a 2FA password is required).  </li>
+</ul>
+<p>The usual flow for invoking such methods is to first invoke the method passing an <a href="/constructor/inputCheckPasswordEmpty">inputCheckPasswordEmpty</a> (as if no password is configured, even if one is actually configured); then, according to the returned RPC error, proceed to:</p>
+<ul>
+<li><code>PASSWORD_HASH_INVALID</code> - The 2FA password insertion flow, the re-invoke the method with the user-provided password</li>
+<li><code>PASSWORD_MISSING</code> - The 2FA password setup flow, then re-invoke the method with the newly provided password</li>
+<li>All other RPC errors - Show an error message with a description of the error</li>
+</ul>
+<p>This flow is useful to avoid race conditions with other currently logged-in sessions that may change the password.  </p>
+<h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#srp-design" id="srp-design" name="srp-design"><i class="anchor-icon"></i></a><a href="http://srp.stanford.edu/design.html">SRP design</a></h4></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
