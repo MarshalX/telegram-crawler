@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Formal description of TL combinators</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="﻿Formal declaration of TL combinators
+Main article: Formal description of TL. See also TL Language.
+Combinators in TL are…">
+    <meta property="og:title" content="Formal description of TL combinators">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="﻿Formal declaration of TL combinators
+Main article: Formal description of TL. See also TL Language.
+Combinators in TL are…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL-combinators" >Formal description of TL combinators</a></li></ul></div>
+  <h1 id="dev_page_title">Formal description of TL combinators</h1>
+  
+  <div id="dev_page_content"><p>﻿<a href="/mtproto/TL-combinators">Formal declaration of TL combinators</a></p>
+<p>Main article: <a href="TL-formal">Formal description of TL</a>. See also <a href="TL">TL Language</a>.</p>
+<p>Combinators in TL are declared as follows:</p>
+<div class="richcode">
+<p><em>combinator-decl</em> ::= <em>full-combinator-id</em> { <em>opt-args</em> } { <em>args</em> } <code>=</code> <em>result-type</em> <code>;</code><br>
+<em>full-combinator-id</em> ::= <em>lc-ident-full</em> | <code>_</code><br>
+<em>combinator-id</em> ::= <em>lc-ident-ns</em> | <code>_</code><br>
+<em>opt-args</em> ::= <code>{</code> <em>var-ident</em> { <em>var-ident</em> } : [<em>excl-mark</em>] <em>type-expr</em> <code>}</code><br>
+<em>args</em> ::= <em>var-ident-opt</em> <code>:</code> [ <em>conditional-arg-def</em> ] [ <code>!</code> ] <em>type-term</em><br>
+<em>args</em> ::= [ <em>var-ident-opt</em> <code>:</code> ] [ <em>multiplicity</em> <code>*</code>] <code>[</code> { <em>args</em> } <code>]</code><br>
+<em>args</em> ::= <code>(</code> <em>var-ident-opt</em> { <em>var-ident-opt</em> } <code>:</code> [<code>!</code>] <em>type-term</em> <code>)</code><br>
+<em>args</em> ::= [ <code>!</code> ] <em>type-term</em><br>
+<em>multiplicity</em> ::= <em>nat-term</em><br>
+<em>var-ident-opt</em> ::= <em>var-ident</em> | <code>_</code><br>
+<em>conditional-arg-def</em> ::= <em>var-ident</em> [ <code>.</code> <em>nat-const</em> ] <code>?</code><br>
+<em>result-type</em> ::= <em>boxed-type-ident</em> { <em>subexpr</em> }<br>
+<em>result-type</em> ::= <em>boxed-type-ident</em> <code>&lt;</code> <em>subexpr</em> { <code>,</code> <em>subexpr</em> } <code>&gt;</code>   </p>
+</div>
+<p>We shall clarify what all this means.</p>
+<ul>
+<li>
+<p>A combinator identifier is either an identifier starting with a lowercase Latin letter (<em>lc-ident</em>), or a namespace identifier (also <em>lc-ident</em>) followed by a period and another <em>lc-ident</em>. Therefore, <code>cons</code> and <code>lists.get</code> are valid combinator identifiers.</p>
+</li>
+<li>
+<p>A combinator has a <em>name</em>, also known as a <em>number</em> (not to be confused with the <em>designation</em>) -- a 32-bit number that unambiguously determines it. It is either calculated automatically (see below) or it is explicitly assigned in the declaration. To do this, a hash mark (<code>#</code>) and exactly 8 hexadecimal digits -- the combinator's name -- are added to the identifier of the combinator being defined.</p>
+</li>
+<li>
+<p>A combinator's declaration begins with its identifier, to which its name (separated by a hash mark) may have been added.</p>
+</li>
+<li>
+<p>After the combinator identifier comes the main part of the declaration, which consists of declarations of <em>fields</em> (or <em>variables</em>), including an indication of their <em>types</em>.</p>
+</li>
+<li>
+<p>First come declarations of optional fields (of which there may be several or none at all). Then there are the declarations of the required fields (there may not be any of these either).</p>
+</li>
+<li>
+<p>Any identifier that begins with an uppercase or lowercase letter and which does not contain references to a namespace can be a field (variable) identifier. Using <em>uc-ident</em> for identifiers of variable types and <em>lc-indent</em> for other variables is good practice. </p>
+</li>
+<li>
+<p>Next a combinator declaration contains the equals sign (<code>=</code>) and the result type (it may be composite or appearing for the first time). The result type may be polymorphic and/or dependent; any fields of the defined constructor's fields of type <code>Type</code> or <code>#</code> may be returned (as subexpressions).</p>
+</li>
+<li>
+<p>A combinator declaration is terminated with a semicolon.</p>
+</li>
+</ul>
+<p>In what follows, a constructor's <em>fields</em>, <em>variables</em>, and <em>arguments</em> mean the same thing.</p>
+<h3><a class="anchor" href="#optional-field-declarations" id="optional-field-declarations" name="optional-field-declarations"><i class="anchor-icon"></i></a>Optional field declarations</h3>
+<ul>
+<li>
+<p>These have the form <code>{</code> <em>field_1</em> ... <em>field_k</em> <code>:</code> <em>type-expr</em> <code>}</code>, where <em>field_i</em> is a variable (field) identifier that is unique within the scope of the combinator declaration, and <em>type-expr</em> is a type shared by all of the fields. </p>
+</li>
+<li>
+<p>If <em>k&gt;1</em>, this entry is functionally equivalent to <code>{</code> <em>field_1</em> <code>:</code> <em>type-expr</em> <code>}</code> ... <code>{</code> <em>field_k</em> <code>:</code> <em>type-expr</em> <code>}</code>. </p>
+</li>
+<li>
+<p>All optional fields must be explicitly named (using <code>_</code> instead of <em>field_i</em> is not allowed).</p>
+</li>
+<li>
+<p>Moreover, at present the names of all optional fields must share the combinator's result type (possibly more than once) and themselves be of type <code>#</code> (i,e., <code>nat</code>) or <code>Type</code>. Therefore, if the exact result type is known, it is possible to determine the values of all of the combinator's implicit parameters (possibly obtaining a contradiction of the form <code>2=3</code> in doing so, which means that the combinator is not allowed in the context).</p>
+</li>
+</ul>
+<h3><a class="anchor" href="#required-field-declarations" id="required-field-declarations" name="required-field-declarations"><i class="anchor-icon"></i></a>Required field declarations</h3>
+<ul>
+<li>
+<p>These may have the form <code>(</code> <em>field_1</em> ... <em>field_k</em> <code>:</code> <em>type-expr</em> <code>)</code>, similar to an optional field declaration, but with parentheses. This entry is equivalent to <code>(</code> <em>field_1</em> <code>:</code> <em>type-expr</em> <code>)</code> ... <code>(</code> <em>field_k</em> : <em>type-expr</em> <code>)</code>, where the fields are defined one at a time.</p>
+</li>
+<li>
+<p>The underscore sign (<code>_</code>) can be used as names of one or more fields (<em>field_i</em>), indicating that the field is anonymous (the exact name is unimportant).</p>
+</li>
+<li>
+<p>One field may be declared without outer parentheses, like this: <em>field_id</em> <code>:</code> <em>type-expr</em>. Here, however, if <em>type-expr</em> is a complex type, parentheses may be necessary around <em>type-expr</em> (this is reflected in BNF).</p>
+</li>
+<li>
+<p>Furthermore, one anonymous field may be declared using a <em>type-expr</em> entry, functionally equivalent to <code>_</code> <code>:</code> <em>type-expr</em>.</p>
+</li>
+<li>
+<p>Required field declarations follow one after another, separated by spaces (by any number of whitespace symbols, to be more precise).</p>
+</li>
+<li>
+<p>The declared field's type (<em>type-expr</em>) may use the declared combinator's previously defined variables (fields) as subexpressions (i.e. parameter values). For example:</p>
+<p>nil {X:Type} = List X;
+cons {X:Type} hd:X tl:(list X) = List X;
+typed_list (X:Type) (l : list X) = TypedList;</p>
+</li>
+</ul>
+<h3><a class="anchor" href="#repetitions" id="repetitions" name="repetitions"><i class="anchor-icon"></i></a>Repetitions</h3>
+<ul>
+<li>
+<p>These may only exist among required parameters. They have the form [ <em>field-id</em> <code>:</code> ] [ <em>multiplicity</em> <code>*</code> ] <code>[</code> <em>args</em> <code>]</code>, where <em>args</em> has the same format as the combinator's declaration of (several) required fields, except that all of the enclosing combinator's previously declared fields may be used in the argument types.</p>
+</li>
+<li>
+<p>The name of a field of an enclosing combinator that receives a repetition as a value may be specified (<em>field-id</em>), or bypassed, which is equivalent to using the underscore sign as a <em>field-id</em>.</p>
+</li>
+<li>
+<p>The <em>multiplicity</em> field is an expression of the type <code>#</code> (<code>nat</code>), which can be a real constant, the name of a preceding field of type <code>#</code>, or an expression in the form <code>(</code> <em>c</em> <code>+</code> <em>v</em> <code>)</code>, where <em>c</em> is a real constant and <em>v</em> is the name of a field of type <code>#</code>. The sense of the <em>multiplicity</em> field is to provide the length of the (repetition) vector, each element of which consists of values of the types enumerated in <em>args</em>.</p>
+</li>
+<li>
+<p>The <em>multiplicity</em> field may be bypassed. In this case, the last preceding parameter of type <code>#</code> from the enclosing combinator is used (it must be).</p>
+</li>
+<li>
+<p>Functionally, the repetition <em>field-id</em> <code>:</code> <em>multiplicity</em> <code>*</code> <code>[</code> <em>args</em> <code>]</code> is equivalent to the declaration of the single field <code>(</code> <em>field-id</em> <code>:</code> <code>%Tuple</code> <code>%AuxType</code> <em>multiplicity</em> <code>)</code>, where <code>aux_type</code> is an auxiliary type with a new name defined as <code>aux_type *args* = AuxType</code>. If any of the enclosing type's fields are used within <em>args</em>, they are added to the auxiliary constructor <code>aux_type</code> and to its <code>AuxType</code> result type as the first (optional) parameters. </p>
+</li>
+<li>
+<p>If <em>args</em> consists of one anonymous field of type <em>some-type</em>, then <em>some-type</em> can be used directly instead of <code>%AuxType</code>.</p>
+</li>
+<li>
+<p>If during implementation the repetitions are rewritten as indicated above, it is logical to use instead of <code>aux_type</code> and <code>AuxType</code>, some identifiers that contain the name of the outer combinator being defined and the repetition's index number inside its definition.</p>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>matrix {m n : #} a : m* [ n* [ double ] ] = Matrix m n;</code></pre>
+<p>is functionally equivalent to</p>
+<pre><code>aux_type {n : #} (_ : %Tuple double n) = AuxType n;
+matrix {m : #} {n : #} (a : %Tuple %(AuxType n) m) = Matrix m n;</code></pre>
+<p>Moreover, the built-in types <code>Tuple</code> and <code>Vector</code> could be defined as:</p>
+<pre><code>tnil {X : Type} = Tuple X 0;
+tcons {X : Type} {n : #} hd:X tl:%(Tuple X n) = Tuple X (S n);
+vector {X : Type} (n : #) (v : %(Tuple X n)) = Vector X;</code></pre>
+<p>Actually, the following equivalent entry is considered the definition of <code>Vector</code> (i.e. it is specifically this entry that is used to compute the name of the <code>vector</code> constructor and its partial applications):</p>
+<pre><code>vector {t : Type} # [ t ] = Vector t;</code></pre>
+<p>If we expand it using <code>Tuple</code>, we obtain the previous definition exactly.</p>
+<h3><a class="anchor" href="#conditional-fields" id="conditional-fields" name="conditional-fields"><i class="anchor-icon"></i></a>Conditional fields</h3>
+<p>The construction </p>
+<div class="richcode">
+<p><em>args</em> ::= <em>var-ident-opt</em> <code>:</code> [ <em>conditional-arg-def</em> ] [ <code>!</code> ] <em>type-term</em><br>
+<em>conditional-arg-def</em> ::= <em>var-ident</em> [ <code>.</code> <em>nat-const</em> ] <code>?</code>       </p>
+</div>
+<p>permits assigning fields which are only present if the value of a preceding mandatory or optional field of type <code>#</code> is not null (or if its chosen bit is not zero if the special binary bit-selection operator <code>.</code> is applied).
+Example:</p>
+<div class="richcode">
+<p>user {fields:#} id:int first_name:(fields.0?string) last_name:(fields.1?string) friends:(fields.2?%(Vector int)) = User fields;<br>
+get_users req_fields:# ids:%(Vector int) = Vector %(User req_fields)  </p>
+</div></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

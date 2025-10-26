@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Stories</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram users and channels can easily post and view stories through the API.">
+    <meta property="og:title" content="Stories">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram users and channels can easily post and view stories through the API.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/stories" >Stories</a></li></ul></div>
+  <h1 id="dev_page_title">Stories</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram users and channels can easily post and view <a href="https://telegram.org/blog/stories">stories</a> through the API.</p>
+<h3><a class="anchor" href="#posting-stories" id="posting-stories" name="posting-stories"><i class="anchor-icon"></i></a>Posting stories</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/inputPeerSelf'>inputPeerSelf</a>#7da07ec9 = <a href='/type/InputPeer'>InputPeer</a>;
+<a href='/constructor/inputPeerChannel'>inputPeerChannel</a>#27bcbbfc channel_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputPeer'>InputPeer</a>;
+
+<a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
+<a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
+
+<a href='/constructor/updateStory'>updateStory</a>#75b3b798 peer:<a href='/type/Peer'>Peer</a> story:<a href='/type/StoryItem'>StoryItem</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/updateStoryID'>updateStoryID</a>#1bf335b9 id:<a href='/type/int'>int</a> random_id:<a href='/type/long'>long</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/stories.canSendStory'>stories.canSendStory</a>#30eb63f0 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.CanSendStoryCount'>stories.CanSendStoryCount</a>;
+<a href='/method/stories.sendStory'>stories.sendStory</a>#737fc2ec flags:<a href='/type/%23'>#</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> fwd_modified:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> media_areas:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; random_id:<a href='/type/long'>long</a> period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/int'>int</a> fwd_from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/InputPeer'>InputPeer</a> fwd_from_story:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/int'>int</a> albums:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/stories.getChatsToSend'>stories.getChatsToSend</a>#a56a8b60 = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
+<p>Before posting a story, clients should invoke <a href="/method/stories.canSendStory">stories.canSendStory</a>, to make sure they can send stories to the specified <code>peer</code> (which can be <a href="/constructor/inputPeerSelf">inputPeerSelf</a> to send the story as a normal user and <a href="/constructor/inputPeerChannel">inputPeerChannel</a> to send a story as a channel or supergroup).  </p>
+<p>Use <a href="/method/stories.getChatsToSend">stories.getChatsToSend</a> to obtain a list of channels/supergroups where the user can post stories; <a href="/method/stories.canSendStory">stories.canSendStory</a> must still be used before uploading a story to make sure no other limit was reached, as described in the <a href="/api/stories#posting-stories">main documentation »</a>.
+Note that in order to obtain permission to post stories as a channel/supergroup, it must be boosted, first, see <a href="/api/boost">here »</a> for more info.  </p>
+<p><a href="/method/stories.canSendStory">stories.canSendStory</a> returns a <a href="/constructor/stories.canSendStoryCount">stories.canSendStoryCount</a> with the number of available active story slots (equal to the value of the <a href="/api/config#story-expiring-limit-default"><code>story_expiring_limit_*</code> client configuration parameter</a> minus the number of currently active stories) only if:</p>
+<ul>
+<li>If we're trying to send a story as a channel/supergroup:<ul>
+<li>The current user is an administrator of the channel/supergroup and has <a href="/constructor/chatAdminRights"><code>post_stories</code> admin rights</a>; otherwise, a <code>CHAT_ADMIN_REQUIRED</code> error is returned.</li>
+<li>AND the channel/supergroup has <a href="/api/boost">received enough boosts to post the story »</a>; otherwise, a <code>BOOSTS_REQUIRED</code> error is returned.</li>
+</ul>
+</li>
+<li>If we're trying to send a story as the current user:<ul>
+<li>The user can post stories according to the <a href="/api/config#stories-posting"><code>stories_posting</code> client configuration parameter</a>; otherwise, a <code>PREMIUM_ACCOUNT_REQUIRED</code> error is returned.</li>
+<li>AND The user hasn't hit the maximum active stories limit specified by the <a href="/api/config#story-expiring-limit-default"><code>story_expiring_limit_*</code> client configuration parameters</a>; otherwise a <code>STORIES_TOO_MUCH</code> error is returned, indicating that the user should buy a <a href="/api/premium">Premium</a> subscription, delete an active story, or wait for the oldest story to expire.</li>
+<li>AND The user hasn't hit the weekly story limit specified by the <a href="/api/config#stories-sent-weekly-limit-default"><code>stories_sent_weekly_limit_*</code> client configuration parameters</a>; otherwise, a <code>STORY_SEND_FLOOD_WEEKLY_%d</code> error is returned, indicating the number of seconds to wait before posting a new story.</li>
+<li>AND The user hasn't hit the monthly story limit specified by the <a href="/api/config#stories-sent-monthly-limit-default"><code>stories_sent_monthly_limit_*</code> client configuration parameters</a>; otherwise, a <code>STORY_SEND_FLOOD_MONTHLY_%d</code> error is returned, indicating the number of seconds to wait before posting a new story.</li>
+</ul>
+</li>
+</ul>
+<p>After checking if a story can be posted, the client may invoke <a href="/method/stories.sendStory">stories.sendStory</a> to upload the story.<br>
+Note that if any of the conditions changes in the period between the call to <a href="/method/stories.canSendStory">stories.canSendStory</a> and <a href="/method/stories.sendStory">stories.sendStory</a> (for example, the user uploads a story from another client, reaching the weekly limit), the same errors listed above for <a href="/method/stories.canSendStory">stories.canSendStory</a> will be emitted by <a href="/method/stories.sendStory">stories.sendStory</a>.  </p>
+<p>The parameters of <a href="/method/stories.sendStory">stories.sendStory</a> are fully described on the <a href="/method/stories.sendStory">method page »</a>, here are some of the most important ones:</p>
+<ul>
+<li><code>peer</code>: The peer to send the story as.</li>
+<li><code>media</code>:  The story media (a vertical photo or a vertical video, max 30 MB).</li>
+<li><code>media_areas</code>: <a href="/api/stories#media-areas">Media areas</a> associated to the story, see <a href="/api/stories#media-areas">here »</a> for more info.</li>
+<li><code>privacy_rules</code>: A set of <a href="/api/privacy#privacy-rules">privacy rules »</a> for the story as an array of <a href="/type/InputPrivacyRule">InputPrivacyRule</a> constructors, indicating who can or can't view the story.</li>
+<li><code>expire</code>: Period after which the story is moved to <a href="#pinned-or-archived-stories">archive</a> (and <a href="#pinned-or-archived-stories">to the profile</a> if <code>pinned</code> is set), in seconds; must be one of <code>6 * 3600</code>, <code>12 * 3600</code>, <code>86400</code>, or <code>2 * 86400</code> for Telegram Premium users, and <code>86400</code> otherwise.</li>
+<li><code>pinned</code>: Whether to also <a href="#pinned-or-archived-stories">add the story to the profile</a> automatically upon expiration. If not set, the story will only be added to the <a href="#pinned-or-archived-stories">archive</a>. </li>
+<li><code>caption</code> and <code>entities</code>: The story caption, and related <a href="/api/entities">styled text entities</a>; note that the story caption length is limited by the <a href="/api/config#story-caption-length-limit-default"><code>story_caption_length_limit_*</code> »</a> config keys, and story entities should only be sent and displayed according to the value of the <a href="/api/config#stories-entities">stories_entities »</a> config key.</li>
+</ul>
+<p>Once a story is successfully uploaded, an <a href="/constructor/updateStoryID">updateStoryID</a> will be returned, indicating the story ID (<code>id</code>) that was attributed to the story (like for messages, <code>random_id</code> indicates the <code>random_id</code> that was passed to <a href="/method/stories.sendStory">stories.sendStory</a>: this way, you can tell which story was assigned a specific <code>id</code> by checking which <a href="/method/stories.sendStory">stories.sendStory</a> call has the returned <code>random_id</code>).  </p>
+<p>Also, posting a story will emit an <a href="/constructor/updateStory">updateStory</a> both for us, and for our subscribers/contacts (even if they have <a href="#hiding-stories-of-other-users">hidden</a> our stories).  </p>
+<p>Additionally, a message containing a <a href="/constructor/messageMediaStory">messageMediaStory</a> with the <code>via_mention</code> flag coming from the story poster will also be generated automatically if the poster mentions us in the story's caption.  </p>
+<p><a href="/api/bots/webapps">Mini apps</a> may also request to share a story on the user's profile using the <a href="/api/web-events#web-app-share-to-story">web_app_share_to_story event »</a>.</p>
+<h4><a class="anchor" href="#editing-stories" id="editing-stories" name="editing-stories"><i class="anchor-icon"></i></a>Editing stories</h4>
+<pre><code><a href='/constructor/inputFile'>inputFile</a>#f52ff27f id:<a href='/type/long'>long</a> parts:<a href='/type/int'>int</a> name:<a href='/type/string'>string</a> md5_checksum:<a href='/type/string'>string</a> = <a href='/type/InputFile'>InputFile</a>;
+<a href='/constructor/inputFileBig'>inputFileBig</a>#fa4f0bb5 id:<a href='/type/long'>long</a> parts:<a href='/type/int'>int</a> name:<a href='/type/string'>string</a> = <a href='/type/InputFile'>InputFile</a>;
+<a href='/constructor/inputFileStoryDocument'>inputFileStoryDocument</a>#62dc8b48 id:<a href='/type/InputDocument'>InputDocument</a> = <a href='/type/InputFile'>InputFile</a>;
+
+<a href='/constructor/inputMediaUploadedPhoto'>inputMediaUploadedPhoto</a>#1e287d04 flags:<a href='/type/%23'>#</a> spoiler:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> file:<a href='/type/InputFile'>InputFile</a> stickers:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputDocument'>InputDocument</a>&gt; ttl_seconds:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
+<a href='/constructor/inputMediaUploadedDocument'>inputMediaUploadedDocument</a>#37c9330 flags:<a href='/type/%23'>#</a> nosound_video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> force_file:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> spoiler:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> file:<a href='/type/InputFile'>InputFile</a> thumb:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/InputFile'>InputFile</a> mime_type:<a href='/type/string'>string</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; stickers:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputDocument'>InputDocument</a>&gt; video_cover:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/InputPhoto'>InputPhoto</a> video_timestamp:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/int'>int</a> ttl_seconds:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
+<a href='/constructor/inputMediaPhoto'>inputMediaPhoto</a>#b3ba0635 flags:<a href='/type/%23'>#</a> spoiler:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> id:<a href='/type/InputPhoto'>InputPhoto</a> ttl_seconds:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
+<a href='/constructor/inputMediaDocument'>inputMediaDocument</a>#a8763ab5 flags:<a href='/type/%23'>#</a> spoiler:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> id:<a href='/type/InputDocument'>InputDocument</a> video_cover:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/InputPhoto'>InputPhoto</a> video_timestamp:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/int'>int</a> ttl_seconds:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> query:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
+---functions---
+
+<a href='/method/stories.editStory'>stories.editStory</a>#b583ba46 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputMedia'>InputMedia</a> media_areas:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>A story may also be edited using <a href="/method/stories.editStory">stories.editStory</a>.  </p>
+<p><strong>Note</strong>: <a href="/api/files#editing-uploaded-files">usually</a>, when editing just the <a href="/type/DocumentAttribute">DocumentAttribute</a>s of files (like the file name through <a href="/constructor/documentAttributeFilename">documentAttributeFilename</a>, the timestamp of a video thumbnail through <a href="/constructor/documentAttributeVideo">documentAttributeVideo</a>.<code>preload_prefix_size</code>, etc) without editing the media itself, a full download+reupload of the underlying media is required, as the attributes are baked into the media and cannot be modified through <a href="/constructor/inputMediaDocument">inputMediaDocument</a> (unlike some other attributes like <code>spoiler</code>, which may be edited without a reupload, simply by passing the old media in <a href="/constructor/inputMediaDocument">inputMediaDocument</a>.<code>id</code> and tweaking the appropriate flags of <a href="/constructor/inputMediaDocument">inputMediaDocument</a>).  </p>
+<p>However, a full download+reupload can be avoided <strong>just for video stories</strong>, when editing only the <a href="/constructor/documentAttributeVideo">documentAttributeVideo</a>.<code>video_start_ts</code> attribute: in this case, <a href="/constructor/inputMediaUploadedDocument">inputMediaUploadedDocument</a> should be used, passing to <code>file</code> an <a href="/constructor/inputFileStoryDocument">inputFileStoryDocument</a> with the old story media instead of the re-uploaded <a href="/constructor/inputFile">inputFile</a>, and populating the remaining fields and attributes with exactly the same values used previously, except for the <a href="/constructor/documentAttributeVideo">documentAttributeVideo</a>.<code>video_start_ts</code> attribute, which should contain the new value.  </p>
+<h4><a class="anchor" href="#pinned-or-archived-stories" id="pinned-or-archived-stories" name="pinned-or-archived-stories"><i class="anchor-icon"></i></a>Pinned or archived stories</h4>
+<pre><code><a href='/constructor/stories.stories'>stories.stories</a>#63c3dd0a flags:<a href='/type/%23'>#</a> count:<a href='/type/int'>int</a> stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryItem'>StoryItem</a>&gt; pinned_to_top:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.Stories'>stories.Stories</a>;
+
+---functions---
+
+<a href='/method/stories.togglePinned'>stories.togglePinned</a>#9a75a1ef peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; pinned:<a href='/type/Bool'>Bool</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
+<a href='/method/stories.togglePinnedToTop'>stories.togglePinnedToTop</a>#b297e9b peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/stories.getStoriesArchive'>stories.getStoriesArchive</a>#b4352016 peer:<a href='/type/InputPeer'>InputPeer</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.Stories'>stories.Stories</a>;
+
+<a href='/method/stories.getPinnedStories'>stories.getPinnedStories</a>#5821a5dc peer:<a href='/type/InputPeer'>InputPeer</a> offset_id:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.Stories'>stories.Stories</a>;</code></pre>
+<p>After an active story expires, it is automatically added to the story archive: stories in the story archive are only visible to the poster, or to channel/supergroup admins with <a href="/constructor/chatAdminRights"><code>edit_stories</code> admin rights</a> rights.  </p>
+<p>Use <a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a> to fetch stories in the story archive.  </p>
+<p>Archived stories may then be pinned on the profile, where they may be fetched using <a href="/method/stories.getPinnedStories">stories.getPinnedStories</a> by users who explicitly open your profile: use <a href="/method/stories.togglePinned">stories.togglePinned</a> to pin or unpin one or more stories to your profile.  </p>
+<p>Stories may also be autopinned upon expiration if the <code>pinned</code> flag is set <a href="#posting-stories">when posting them</a>.  </p>
+<p>Additionally, stories pinned to a profile may <strong>also</strong> be pinned <strong>to the top of the profile</strong> using <a href="/method/stories.togglePinnedToTop">stories.togglePinnedToTop</a>; stories that are pinned to the top of the profile (max <a href="/api/config#stories-pinned-to-top-count-max">stories_pinned_to_top_count_max</a>) should be displayed first when opening the profile.<br>
+Stories pinned to the top of the profile will be returned first when invoking <a href="/method/stories.getPinnedStories">stories.getPinnedStories</a> with <code>offset_id=0</code>, and their IDs will also be contained in <a href="/constructor/stories.stories">stories.stories</a>.<code>pinned_to_top</code>.  </p>
+<h4><a class="anchor" href="#deleting-stories" id="deleting-stories" name="deleting-stories"><i class="anchor-icon"></i></a>Deleting stories</h4>
+<pre><code>---functions---
+
+<a href='/method/stories.deleteStories'>stories.deleteStories</a>#ae59db5f peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
+<p>Use the <a href="/method/stories.deleteStories">stories.deleteStories</a> method to delete one or more active, pinned or archived stories by their IDs, passed in <code>id</code>.  </p>
+<h4><a class="anchor" href="#preventing-users-from-seeing-your-stories" id="preventing-users-from-seeing-your-stories" name="preventing-users-from-seeing-your-stories"><i class="anchor-icon"></i></a>Preventing users from seeing your stories</h4>
+<p>Users may be individually blocked from seeing all of your stories by adding them to the <a href="/api/block">story blocklist »</a>.  </p>
+<h3><a class="anchor" href="#story-albums" id="story-albums" name="story-albums"><i class="anchor-icon"></i></a>Story albums</h3>
+<pre><code><a href='/constructor/storyAlbum'>storyAlbum</a>#9325705a flags:<a href='/type/%23'>#</a> album_id:<a href='/type/int'>int</a> title:<a href='/type/string'>string</a> icon_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Photo'>Photo</a> icon_video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Document'>Document</a> = <a href='/type/StoryAlbum'>StoryAlbum</a>;
+
+<a href='/constructor/stories.albumsNotModified'>stories.albumsNotModified</a>#564edaeb = <a href='/type/stories.Albums'>stories.Albums</a>;
+<a href='/constructor/stories.albums'>stories.albums</a>#c3987a3a hash:<a href='/type/long'>long</a> albums:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryAlbum'>StoryAlbum</a>&gt; = <a href='/type/stories.Albums'>stories.Albums</a>;
+
+---functions---
+
+<a href='/method/stories.createAlbum'>stories.createAlbum</a>#a36396e5 peer:<a href='/type/InputPeer'>InputPeer</a> title:<a href='/type/string'>string</a> stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/StoryAlbum'>StoryAlbum</a>;
+<a href='/method/stories.getAlbums'>stories.getAlbums</a>#25b3eac7 peer:<a href='/type/InputPeer'>InputPeer</a> hash:<a href='/type/long'>long</a> = <a href='/type/stories.Albums'>stories.Albums</a>;
+<a href='/method/stories.updateAlbum'>stories.updateAlbum</a>#5e5259b6 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> album_id:<a href='/type/int'>int</a> title:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> delete_stories:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; add_stories:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; order:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/StoryAlbum'>StoryAlbum</a>;
+<a href='/method/stories.reorderAlbums'>stories.reorderAlbums</a>#8535fbd9 peer:<a href='/type/InputPeer'>InputPeer</a> order:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Bool'>Bool</a>;
+<a href='/method/stories.deleteAlbum'>stories.deleteAlbum</a>#8d3456d0 peer:<a href='/type/InputPeer'>InputPeer</a> album_id:<a href='/type/int'>int</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/stories.getAlbumStories'>stories.getAlbumStories</a>#ac806d61 peer:<a href='/type/InputPeer'>InputPeer</a> album_id:<a href='/type/int'>int</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.Stories'>stories.Stories</a>;</code></pre>
+<p>Stories may be organized in albums.  </p>
+<p>Use <a href="/method/stories.createAlbum">stories.createAlbum</a> to create a story album.</p>
+<p>Use <a href="/method/stories.getAlbums">stories.getAlbums</a> to get all story albums owned by a user.  </p>
+<p>Use <a href="/method/stories.getAlbumStories">stories.getAlbumStories</a> to fetch the stories added to an album.  </p>
+<p>Use the <strong>albums</strong> parameter of <a href="/method/stories.sendStory">stories.sendStory</a> to add a newly posted story to one or more albums.  </p>
+<p>Use <a href="/method/stories.updateAlbum">stories.updateAlbum</a> to rename an album, or add, delete and reorder stories in an album.  </p>
+<p>Use <a href="/method/stories.reorderAlbums">stories.reorderAlbums</a> to reorder albums on the profile.  </p>
+<p>Use <a href="/method/stories.deleteAlbum">stories.deleteAlbum</a> to delete an album.</p>
+<p>A profile can contain a maximum of <a href="/api/config#stories-albums-limit">stories_albums_limit »</a> albums, each containing a maximum of <a href="/api/config#stories-album-stories-limit">stories_album_stories_limit</a> stories.  </p>
+<p><a href="/api/links#story-album-links">Story album deep links »</a> can be used to share an album.  </p>
+<h3><a class="anchor" href="#watching-stories" id="watching-stories" name="watching-stories"><i class="anchor-icon"></i></a>Watching stories</h3>
+<pre><code><a href='/constructor/storyItem'>storyItem</a>#edf164f1 flags:<a href='/type/%23'>#</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> public:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> close_friends:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> min:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/constructor/true'>true</a> edited:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/constructor/true'>true</a> contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> selected_contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> out:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/Peer'>Peer</a> fwd_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/StoryFwdHeader'>StoryFwdHeader</a> expire_date:<a href='/type/int'>int</a> caption:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; media:<a href='/type/MessageMedia'>MessageMedia</a> media_areas:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; privacy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PrivacyRule'>PrivacyRule</a>&gt; views:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/StoryViews'>StoryViews</a> sent_reaction:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/Reaction'>Reaction</a> albums:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/StoryItem'>StoryItem</a>;
+<a href='/constructor/storyItemSkipped'>storyItemSkipped</a>#ffadc913 flags:<a href='/type/%23'>#</a> close_friends:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> expire_date:<a href='/type/int'>int</a> = <a href='/type/StoryItem'>StoryItem</a>;
+<a href='/constructor/storyItemDeleted'>storyItemDeleted</a>#51e6ee4f id:<a href='/type/int'>int</a> = <a href='/type/StoryItem'>StoryItem</a>;
+
+<a href='/constructor/peerStories'>peerStories</a>#9a35e999 flags:<a href='/type/%23'>#</a> peer:<a href='/type/Peer'>Peer</a> max_read_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryItem'>StoryItem</a>&gt; = <a href='/type/PeerStories'>PeerStories</a>;
+
+<a href='/constructor/storiesStealthMode'>storiesStealthMode</a>#712e27fd flags:<a href='/type/%23'>#</a> active_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> cooldown_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> = <a href='/type/StoriesStealthMode'>StoriesStealthMode</a>;
+
+<a href='/constructor/stories.allStories'>stories.allStories</a>#6efc5e81 flags:<a href='/type/%23'>#</a> has_more:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> count:<a href='/type/int'>int</a> state:<a href='/type/string'>string</a> peer_stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PeerStories'>PeerStories</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; stealth_mode:<a href='/type/StoriesStealthMode'>StoriesStealthMode</a> = <a href='/type/stories.AllStories'>stories.AllStories</a>;
+<a href='/constructor/stories.allStoriesNotModified'>stories.allStoriesNotModified</a>#1158fe3e flags:<a href='/type/%23'>#</a> state:<a href='/type/string'>string</a> stealth_mode:<a href='/type/StoriesStealthMode'>StoriesStealthMode</a> = <a href='/type/stories.AllStories'>stories.AllStories</a>;
+
+<a href='/constructor/stories.peerStories'>stories.peerStories</a>#cae68768 stories:<a href='/type/PeerStories'>PeerStories</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.PeerStories'>stories.PeerStories</a>;
+
+<a href='/constructor/updateReadStories'>updateReadStories</a>#f74e932b peer:<a href='/type/Peer'>Peer</a> max_id:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/stories.getAllStories'>stories.getAllStories</a>#eeb0d625 flags:<a href='/type/%23'>#</a> next:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> hidden:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> state:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> = <a href='/type/stories.AllStories'>stories.AllStories</a>;
+
+<a href='/method/stories.getStoriesByID'>stories.getStoriesByID</a>#5774ca74 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/stories.Stories'>stories.Stories</a>;
+<a href='/method/stories.getPeerStories'>stories.getPeerStories</a>#2c4ada50 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/stories.PeerStories'>stories.PeerStories</a>;
+
+<a href='/method/stories.readStories'>stories.readStories</a>#a556dac8 peer:<a href='/type/InputPeer'>InputPeer</a> max_id:<a href='/type/int'>int</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
+<a href='/method/stories.incrementStoryViews'>stories.incrementStoryViews</a>#b2028afb peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/stories.getAllReadPeerStories'>stories.getAllReadPeerStories</a>#9b5ae7f9 = <a href='/type/Updates'>Updates</a>;
+<a href='/method/stories.getPeerMaxIDs'>stories.getPeerMaxIDs</a>#535983c3 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
+<p>Active stories of contacts, subscribed channels/supergroups and the <a href="/api/config#stories-changelog-user-id">changelog user</a> should be shown in the action bar of the homescreen.<br>
+Use <a href="/method/stories.getAllStories">stories.getAllStories</a> to fetch the full list of active stories. </p>
+<p>Optionally, the <code>hidden</code> flag can be set to fetch the <a href="#hiding-stories-of-other-users">hidden stories to be shown in the archived tab</a>, instead of the main story list.  </p>
+<p>Pagination using this method is a bit different from usual: a <code>state</code> string is used to maintain the pagination state.  </p>
+<ul>
+<li>Initially, neither the <code>next</code> or <code>state</code> flags should be set: upon completion of the RPC call, a new <code>state</code> string is returned and should be stored locally, associated either to the main or hidden story list (depending on the value of <code>hidden</code> we passed); pass the locally stored <code>state</code> to all future calls of the method.  </li>
+<li>If more stories are available, the returned <a href="/constructor/stories.allStories">stories.allStories</a>.<code>has_more</code> flag will be set: in this case, the client should re-call the method with the newly returned <code>state</code> <strong>and</strong> the <code>next</code> flag set to fetch a new <code>state</code> and the remaining stories from the chosen story list; the process should be repeated until no more stories are available (<code>has_more</code> will <strong>not</strong> be set).  </li>
+</ul>
+<p>Once the full story list is fetched, <a href="/constructor/stories.allStories">stories.allStories</a> can be called with the stored <code>state</code> <strong>without</strong> setting the <code>next</code> flag to check for updates in an active story list: if no changes have occurred since our last call, <a href="/constructor/stories.allStoriesNotModified">stories.allStoriesNotModified</a> is returned, otherwise <a href="/constructor/stories.allStories">stories.allStories</a> is returned (possibly requiring further pagination as described above).<br>
+Note that a change is currently only defined as an addition or removal (i.e. by moving it to the hidden list or vice versa) of a peer to/from a story list, not as a new story being posted; those changes are received as simple <a href="/constructor/updateStory">updateStory</a> updates.  </p>
+<p>Changes to the active stories list are contained in the <a href="/constructor/stories.allStories">stories.allStories</a>.<code>peer_stories</code> field: this field contains a vector of <a href="/constructor/peerStories">peerStories</a> constructors, one for each peer, containing the peer ID, the ID of the maximum read story (if any), and a list of <a href="/type/StoryItem">StoryItem</a> constructors of type:</p>
+<ul>
+<li><a href="/constructor/storyItem">storyItem</a> - Represents an active story</li>
+<li><a href="/constructor/storyItemSkipped">storyItemSkipped</a> - Represents an active story, whose full information was omitted for space and performance reasons; use <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a> to fetch full info about the skipped story/stories when and if needed.</li>
+<li><a href="/constructor/storyItemDeleted">storyItemDeleted</a> - Represents a previously active story, that was now deleted</li>
+</ul>
+<p>Use <a href="/method/stories.getPeerStories">stories.getPeerStories</a> may also be used to fetch the full active story list of a specific peer.  </p>
+<p>Use <a href="/method/stories.readStories">stories.readStories</a> to mark all stories up to a certain ID as read, for a given peer: using this method will emit an <a href="/constructor/updateReadStories">updateReadStories</a> update to all logged-in sessions if a newer ID is marked as read.<br>
+Use <a href="/method/stories.getAllReadPeerStories">stories.getAllReadPeerStories</a> to obtain the latest read story ID for all peers when first logging in, returned as a list of <a href="/constructor/updateReadStories">updateReadStories</a> updates: further calls to this method are not needed after login, as updates to the latest read story ID will be sent using <a href="/constructor/updateReadStories">updateReadStories</a> updates, with the usual <a href="/api/updates">update delivering methods</a>.  </p>
+<p>Use <a href="/method/stories.incrementStoryViews">stories.incrementStoryViews</a> to actually increment the view counter of stories the user has seen (pass max 200 story IDs at a time).  </p>
+<h4><a class="anchor" href="#hiding-stories-of-other-users" id="hiding-stories-of-other-users" name="hiding-stories-of-other-users"><i class="anchor-icon"></i></a>Hiding stories of other users</h4>
+<pre><code><a href='/constructor/user'>user</a>#20b1422 flags:<a href='/type/%23'>#</a> self:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/constructor/true'>true</a> contact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/constructor/true'>true</a> mutual_contact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> deleted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> bot:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> bot_chat_history:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> bot_nochats:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> verified:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/constructor/true'>true</a> restricted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/constructor/true'>true</a> min:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/constructor/true'>true</a> bot_inline_geo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/constructor/true'>true</a> support:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.23?<a href='/constructor/true'>true</a> scam:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/constructor/true'>true</a> apply_min_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.25?<a href='/constructor/true'>true</a> fake:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.26?<a href='/constructor/true'>true</a> bot_attach_menu:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.27?<a href='/constructor/true'>true</a> premium:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/constructor/true'>true</a> attach_menu_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.29?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> bot_can_edit:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.1?<a href='/constructor/true'>true</a> close_friend:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.2?<a href='/constructor/true'>true</a> stories_hidden:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.3?<a href='/constructor/true'>true</a> stories_unavailable:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.4?<a href='/constructor/true'>true</a> contact_require_premium:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.10?<a href='/constructor/true'>true</a> bot_business:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.11?<a href='/constructor/true'>true</a> bot_has_main_app:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.13?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> first_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> last_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> phone:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/UserProfilePhoto'>UserProfilePhoto</a> status:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/UserStatus'>UserStatus</a> bot_info_version:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/int'>int</a> restriction_reason:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; bot_inline_placeholder:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/type/string'>string</a> lang_code:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/string'>string</a> emoji_status:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.30?<a href='/type/EmojiStatus'>EmojiStatus</a> usernames:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Username'>Username</a>&gt; stories_max_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.5?<a href='/type/int'>int</a> color:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.8?<a href='/type/PeerColor'>PeerColor</a> profile_color:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.9?<a href='/type/PeerColor'>PeerColor</a> bot_active_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.12?<a href='/type/int'>int</a> bot_verification_icon:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.14?<a href='/type/long'>long</a> send_paid_messages_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.15?<a href='/type/long'>long</a> = <a href='/type/User'>User</a>;
+
+---functions---
+
+<a href='/method/stories.togglePeerStoriesHidden'>stories.togglePeerStoriesHidden</a>#bd0415c4 peer:<a href='/type/InputPeer'>InputPeer</a> hidden:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/stories.toggleAllStoriesHidden'>stories.toggleAllStoriesHidden</a>#7c2557c4 hidden:<a href='/type/Bool'>Bool</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Use <a href="/method/stories.toggleAllStoriesHidden">stories.togglePeerStoriesHidden</a> to hide the active stories of a specific peer, preventing them from being displayed on the action bar on the homescreen.<br>
+When the stories of a user are marked as hidden, the <code>stories_hidden</code> flag is set on the related <a href="/constructor/user">user</a> constructor, and they should only be visible on the action bar when opening the <a href="/api/folders#peer-folders">archive folder</a>, by setting the <code>hidden</code> flag when calling <a href="/method/stories.getAllStories">stories.getAllStories</a>, see <a href="#watching-stories">here</a> for more info.  </p>
+<p>Note that the <a href="/api/folders#peer-folders">archive folder is the peer folder used for archived chats</a>: hidden stories are displayed there purely due to a UI implementation detail, not because they're actually added to the <a href="/api/folders#peer-folders">archive peer folder »</a> or the <a href="#pinned-or-archived-stories">story archive »</a>, which are different things.  </p>
+<h3><a class="anchor" href="#sharing-stories" id="sharing-stories" name="sharing-stories"><i class="anchor-icon"></i></a>Sharing stories</h3>
+<pre><code><a href='/constructor/inputMediaStory'>inputMediaStory</a>#89fdd778 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
+<a href='/constructor/messageMediaStory'>messageMediaStory</a>#68cb6283 flags:<a href='/type/%23'>#</a> via_mention:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> peer:<a href='/type/Peer'>Peer</a> id:<a href='/type/int'>int</a> story:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/StoryItem'>StoryItem</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
+
+---functions---
+
+<a href='/method/messages.sendMedia'>messages.sendMedia</a>#ac55d9c1 flags:<a href='/type/%23'>#</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> background:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> clear_draft:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> update_stickersets_order:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> invert_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> allow_paid_floodskip:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputReplyTo'>InputReplyTo</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/InputPeer'>InputPeer</a> quick_reply_shortcut:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/InputQuickReplyShortcut'>InputQuickReplyShortcut</a> effect:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/long'>long</a> allow_paid_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/type/long'>long</a> suggested_post:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/SuggestedPost'>SuggestedPost</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Stories can be shared as messages to any chat by simply using <a href="/method/messages.sendMedia">messages.sendMedia</a>, passing an <a href="/constructor/inputMediaStory">inputMediaStory</a> referencing the shared story.  </p>
+<p>The story will be shared as a <a href="/constructor/messageMediaStory">messageMediaStory</a>, and should be displayed as a message forwarded from the poster of the story (even though <a href="/method/messages.forwardMessages">messages.forwardMessages</a> was not used an the <code>fwd_from</code> field of the <a href="/constructor/message">message</a> <strong>won't</strong> be set).  </p>
+<p>A message containing a <a href="/constructor/messageMediaStory">messageMediaStory</a> with the <code>via_mention</code> flag coming from the story poster will also be generated automatically if the poster mentions us in the story's caption.  </p>
+<h3><a class="anchor" href="#fetching-the-interaction-list" id="fetching-the-interaction-list" name="fetching-the-interaction-list"><i class="anchor-icon"></i></a>Fetching the interaction list</h3>
+<pre><code><a href='/constructor/storyView'>storyView</a>#b0bdeac5 flags:<a href='/type/%23'>#</a> blocked:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> blocked_my_stories_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> user_id:<a href='/type/long'>long</a> date:<a href='/type/int'>int</a> reaction:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Reaction'>Reaction</a> = <a href='/type/StoryView'>StoryView</a>;
+<a href='/constructor/storyViewPublicForward'>storyViewPublicForward</a>#9083670b flags:<a href='/type/%23'>#</a> blocked:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> blocked_my_stories_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> message:<a href='/type/Message'>Message</a> = <a href='/type/StoryView'>StoryView</a>;
+<a href='/constructor/storyViewPublicRepost'>storyViewPublicRepost</a>#bd74cf49 flags:<a href='/type/%23'>#</a> blocked:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> blocked_my_stories_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> peer_id:<a href='/type/Peer'>Peer</a> story:<a href='/type/StoryItem'>StoryItem</a> = <a href='/type/StoryView'>StoryView</a>;
+
+<a href='/constructor/stories.storyViewsList'>stories.storyViewsList</a>#59d78fc5 flags:<a href='/type/%23'>#</a> count:<a href='/type/int'>int</a> views_count:<a href='/type/int'>int</a> forwards_count:<a href='/type/int'>int</a> reactions_count:<a href='/type/int'>int</a> views:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryView'>StoryView</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; next_offset:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> = <a href='/type/stories.StoryViewsList'>stories.StoryViewsList</a>;
+
+<a href='/constructor/storyReaction'>storyReaction</a>#6090d6d5 peer_id:<a href='/type/Peer'>Peer</a> date:<a href='/type/int'>int</a> reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/StoryReaction'>StoryReaction</a>;
+<a href='/constructor/storyReactionPublicForward'>storyReactionPublicForward</a>#bbab2643 message:<a href='/type/Message'>Message</a> = <a href='/type/StoryReaction'>StoryReaction</a>;
+<a href='/constructor/storyReactionPublicRepost'>storyReactionPublicRepost</a>#cfcd0f13 peer_id:<a href='/type/Peer'>Peer</a> story:<a href='/type/StoryItem'>StoryItem</a> = <a href='/type/StoryReaction'>StoryReaction</a>;
+
+<a href='/constructor/stories.storyReactionsList'>stories.storyReactionsList</a>#aa5f789c flags:<a href='/type/%23'>#</a> count:<a href='/type/int'>int</a> reactions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryReaction'>StoryReaction</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; next_offset:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> = <a href='/type/stories.StoryReactionsList'>stories.StoryReactionsList</a>;
+
+<a href='/constructor/storyViews'>storyViews</a>#8d595cd6 flags:<a href='/type/%23'>#</a> has_viewers:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> views_count:<a href='/type/int'>int</a> forwards_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> reactions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ReactionCount'>ReactionCount</a>&gt; reactions_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/int'>int</a> recent_viewers:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/StoryViews'>StoryViews</a>;
+<a href='/constructor/stories.storyViews'>stories.storyViews</a>#de9eed1d views:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/StoryViews'>StoryViews</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.StoryViews'>stories.StoryViews</a>;
+
+---functions---
+
+<a href='/method/stories.getStoryViewsList'>stories.getStoryViewsList</a>#7ed23c57 flags:<a href='/type/%23'>#</a> just_contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> reactions_first:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> forwards_first:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> q:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> id:<a href='/type/int'>int</a> offset:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.StoryViewsList'>stories.StoryViewsList</a>;
+
+<a href='/method/stories.getStoryReactionsList'>stories.getStoryReactionsList</a>#b9b2881f flags:<a href='/type/%23'>#</a> forwards_first:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> reaction:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Reaction'>Reaction</a> offset:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.StoryReactionsList'>stories.StoryReactionsList</a>;
+
+<a href='/method/stories.getStoriesViews'>stories.getStoriesViews</a>#28e16cc8 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/stories.StoryViews'>stories.StoryViews</a>;</code></pre>
+<p>Use <a href="/method/stories.getStoryViewsList">stories.getStoryViewsList</a> to obtain the full list of users that have interacted with a specific story we posted as a user, returned as a list of <a href="/type/StoryView">StoryView</a> constructors; pass the returned <code>next_offset</code> (if present) to <code>offset</code> to paginate through the results; the full list is available at all times only to <a href="/api/premium">Premium</a> users, and will be deleted on stories posted by non-<a href="/api/premium">Premium</a> users <a href="/api/config#story-viewers-expire-period">story_viewers_expire_period »</a> seconds after the story expires; if it's still viewable, the <code>has_viewers</code> flag will be set.  </p>
+<p>The above method can only be used for stories posted by users, to fetch almost the exact same information for stories posted by channels/supergroups, use <a href="/method/stories.getStoryReactionsList">stories.getStoryReactionsList</a>: the data returned by both methods is actually almost exactly the same, the only difference is that:</p>
+<ul>
+<li><a href="/method/stories.getStoryViewsList">stories.getStoryViewsList</a> can only be used for stories posted by the current user and also contains view and <a href="/api/block">blocklist</a> information.  </li>
+<li><a href="/method/stories.getStoryReactionsList">stories.getStoryReactionsList</a> can only be used for stories posted by channels/supergroups we're an admin of and does not contain view information</li>
+</ul>
+<p>For the rest, both methods return information about:</p>
+<ul>
+<li>Story reactions: <a href="/constructor/storyView">storyView</a>/<a href="/constructor/storyReaction">storyReaction</a></li>
+<li>Story forwards as a message to a public chat/channel: <a href="/constructor/storyViewPublicForward">storyViewPublicForward</a>/<a href="/constructor/storyReactionPublicForward">storyReactionPublicForward</a></li>
+<li>Story reposts (as a story to a public channel/supergroup/user): <a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a>/<a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a></li>
+</ul>
+<p>Additionally, <a href="/method/stories.getStoriesViews">stories.getStoriesViews</a> can be used to obtain info about the view count, forward count, reactions and recent viewers list of one or more stories, using a single, unpaginated method call, obviously potentially returning less info than <a href="/method/stories.getStoryViewsList">stories.getStoryViewsList</a>.  </p>
+<h3><a class="anchor" href="#replying-to-stories" id="replying-to-stories" name="replying-to-stories"><i class="anchor-icon"></i></a>Replying to stories</h3>
+<pre><code><a href='/constructor/inputReplyToStory'>inputReplyToStory</a>#5881323a peer:<a href='/type/InputPeer'>InputPeer</a> story_id:<a href='/type/int'>int</a> = <a href='/type/InputReplyTo'>InputReplyTo</a>;
+
+---functions---
+
+<a href='/method/messages.sendMessage'>messages.sendMessage</a>#fe05dc9a flags:<a href='/type/%23'>#</a> no_webpage:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> background:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> clear_draft:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> update_stickersets_order:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> invert_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> allow_paid_floodskip:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputReplyTo'>InputReplyTo</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/InputPeer'>InputPeer</a> quick_reply_shortcut:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/InputQuickReplyShortcut'>InputQuickReplyShortcut</a> effect:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/long'>long</a> allow_paid_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/type/long'>long</a> suggested_post:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/SuggestedPost'>SuggestedPost</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>You may reply to stories posted by users and supergroups by using <a href="/method/messages.sendMessage">messages.sendMessage</a>, <a href="/method/messages.sendMedia">messages.sendMedia</a> or any other method used to send messages, passing an <a href="/constructor/inputReplyToStory">inputReplyToStory</a> to <code>reply_to</code>, with the ID of the user that posted the story (which must also be the destination <code>peer</code> of the message) and the story ID.  </p>
+<h3><a class="anchor" href="#reposting-stories" id="reposting-stories" name="reposting-stories"><i class="anchor-icon"></i></a>Reposting stories</h3>
+<pre><code><a href='/constructor/storyFwdHeader'>storyFwdHeader</a>#b826e150 flags:<a href='/type/%23'>#</a> modified:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Peer'>Peer</a> from_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> story_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> = <a href='/type/StoryFwdHeader'>StoryFwdHeader</a>;
+
+<a href='/constructor/storyItem'>storyItem</a>#edf164f1 flags:<a href='/type/%23'>#</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> public:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> close_friends:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> min:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/constructor/true'>true</a> edited:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/constructor/true'>true</a> contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> selected_contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> out:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/Peer'>Peer</a> fwd_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/StoryFwdHeader'>StoryFwdHeader</a> expire_date:<a href='/type/int'>int</a> caption:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; media:<a href='/type/MessageMedia'>MessageMedia</a> media_areas:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; privacy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PrivacyRule'>PrivacyRule</a>&gt; views:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/StoryViews'>StoryViews</a> sent_reaction:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/Reaction'>Reaction</a> albums:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/StoryItem'>StoryItem</a>;
+
+---functions---
+
+<a href='/method/stories.sendStory'>stories.sendStory</a>#737fc2ec flags:<a href='/type/%23'>#</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> fwd_modified:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> media_areas:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; random_id:<a href='/type/long'>long</a> period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/int'>int</a> fwd_from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/InputPeer'>InputPeer</a> fwd_from_story:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/int'>int</a> albums:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Stories may be reposted by using <a href="/method/stories.sendStory">stories.sendStory</a>, populating the <code>fwd_from_story</code> field with the original story ID and the <code>fwd_from_id</code> with the peer that posted the original story.  </p>
+<p>The user may modify the story (for example by overlaying a round video reaction on top of the media); either way, the modified or the original media must be passed to the <code>media</code> field as usual, and the <code>fwd_modified</code> flag must be set if the media was modified.  </p>
+<p>Reposted stories will have the <a href="/constructor/storyItem">storyItem</a> set and populated with a <a href="/constructor/storyFwdHeader">storyFwdHeader</a> constructor, containing info about the original story.</p>
+<h3><a class="anchor" href="#searching-stories" id="searching-stories" name="searching-stories"><i class="anchor-icon"></i></a>Searching stories</h3>
+<pre><code><a href='/constructor/foundStory'>foundStory</a>#e87acbc0 peer:<a href='/type/Peer'>Peer</a> story:<a href='/type/StoryItem'>StoryItem</a> = <a href='/type/FoundStory'>FoundStory</a>;
+
+<a href='/constructor/stories.foundStories'>stories.foundStories</a>#e2de7737 flags:<a href='/type/%23'>#</a> count:<a href='/type/int'>int</a> stories:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FoundStory'>FoundStory</a>&gt; next_offset:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stories.FoundStories'>stories.FoundStories</a>;
+
+---functions---
+
+<a href='/method/stories.searchPosts'>stories.searchPosts</a>#d1810907 flags:<a href='/type/%23'>#</a> hashtag:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> area:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/MediaArea'>MediaArea</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/InputPeer'>InputPeer</a> offset:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/stories.FoundStories'>stories.FoundStories</a>;</code></pre>
+<p><a href="/method/stories.searchPosts">stories.searchPosts</a> may be used to globally search for stories from all users (even non-contacts and other peers we've never seen before) using either a hashtag passed to <code>hashtag</code> (without the <code>#</code>) or a <a href="#location-tags">location tag</a> passed to <code>area</code>.  </p>
+<p>Global search should be automatically triggered when clicking on a hashtag in the description of a story, or when clicking on a <a href="#location-tags">location tag</a> (results displayed under the map).  </p>
+<p>Note <a href="/constructor/mediaAreaGeoPoint">mediaAreaGeoPoint</a> areas may be searched only if they have an associated <code>address</code>.  </p>
+<p>Either <code>hashtag</code> or <code>area</code> must always be set when invoking the method, <code>offset</code> must initially be an empty string.<br>
+Paginate the results by re-calling the method, passing to <code>offset</code> the <a href="/constructor/stories.foundStories">stories.foundStories</a>.<code>next_offset</code> field returned by the previous call.  </p>
+<h3><a class="anchor" href="#reporting-stories" id="reporting-stories" name="reporting-stories"><i class="anchor-icon"></i></a>Reporting stories</h3>
+<pre><code><a href='/constructor/inputReportReasonSpam'>inputReportReasonSpam</a>#58dbcab8 = <a href='/type/ReportReason'>ReportReason</a>;
+<a href='/constructor/inputReportReasonViolence'>inputReportReasonViolence</a>#1e22c78d = <a href='/type/ReportReason'>ReportReason</a>;
+<a href='/constructor/inputReportReasonPornography'>inputReportReasonPornography</a>#2e59d922 = <a href='/type/ReportReason'>ReportReason</a>;
+<a href='/constructor/inputReportReasonChildAbuse'>inputReportReasonChildAbuse</a>#adf44ee3 = <a href='/type/ReportReason'>ReportReason</a>;
+<a href='/constructor/inputReportReasonOther'>inputReportReasonOther</a>#c1e4a2b1 = <a href='/type/ReportReason'>ReportReason</a>;
+<a href='/constructor/inputReportReasonCopyright'>inputReportReasonCopyright</a>#9b89f93a = <a href='/type/ReportReason'>ReportReason</a>;
+<a href='/constructor/inputReportReasonGeoIrrelevant'>inputReportReasonGeoIrrelevant</a>#dbd4feed = <a href='/type/ReportReason'>ReportReason</a>;
+<a href='/constructor/inputReportReasonFake'>inputReportReasonFake</a>#f5ddd6e7 = <a href='/type/ReportReason'>ReportReason</a>;
+<a href='/constructor/inputReportReasonIllegalDrugs'>inputReportReasonIllegalDrugs</a>#a8eb2be = <a href='/type/ReportReason'>ReportReason</a>;
+<a href='/constructor/inputReportReasonPersonalDetails'>inputReportReasonPersonalDetails</a>#9ec7863d = <a href='/type/ReportReason'>ReportReason</a>;
+
+---functions---
+
+<a href='/method/stories.report'>stories.report</a>#19d8eb45 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; option:<a href='/type/bytes'>bytes</a> message:<a href='/type/string'>string</a> = <a href='/type/ReportResult'>ReportResult</a>;</code></pre>
+<p>Use <a href="/method/stories.report">stories.report</a> to report one or more stories.  </p>
+<h3><a class="anchor" href="#story-links" id="story-links" name="story-links"><i class="anchor-icon"></i></a>Story links</h3>
+<pre><code><a href='/constructor/exportedStoryLink'>exportedStoryLink</a>#3fc9053b link:<a href='/type/string'>string</a> = <a href='/type/ExportedStoryLink'>ExportedStoryLink</a>;
+
+---functions---
+
+<a href='/method/stories.exportStoryLink'>stories.exportStoryLink</a>#7b8def20 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> = <a href='/type/ExportedStoryLink'>ExportedStoryLink</a>;</code></pre>
+<p>Use <a href="/method/stories.exportStoryLink">stories.exportStoryLink</a> to generate a <a href="/api/links#story-links">story deep link</a> for a specific story.  </p>
+<p>Upon encountering a story deep link, clients should open the specified story as <a href="#watching-stories">specified here »</a>.  </p>
+<p>See <a href="/api/links#story-links">here »</a> for more info on story deep links.</p>
+<h3><a class="anchor" href="#media-areas" id="media-areas" name="media-areas"><i class="anchor-icon"></i></a>Media areas</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/mediaAreaCoordinates'>mediaAreaCoordinates</a>#cfc9e002 flags:<a href='/type/%23'>#</a> x:<a href='/type/double'>double</a> y:<a href='/type/double'>double</a> w:<a href='/type/double'>double</a> h:<a href='/type/double'>double</a> rotation:<a href='/type/double'>double</a> radius:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/double'>double</a> = <a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a>;
+
+<a href='/constructor/storyItem'>storyItem</a>#edf164f1 flags:<a href='/type/%23'>#</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> public:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> close_friends:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> min:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/constructor/true'>true</a> edited:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/constructor/true'>true</a> contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> selected_contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> out:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/Peer'>Peer</a> fwd_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/StoryFwdHeader'>StoryFwdHeader</a> expire_date:<a href='/type/int'>int</a> caption:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; media:<a href='/type/MessageMedia'>MessageMedia</a> media_areas:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; privacy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PrivacyRule'>PrivacyRule</a>&gt; views:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/StoryViews'>StoryViews</a> sent_reaction:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/Reaction'>Reaction</a> albums:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/StoryItem'>StoryItem</a>;
+
+---functions---
+
+<a href='/method/stories.sendStory'>stories.sendStory</a>#737fc2ec flags:<a href='/type/%23'>#</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> fwd_modified:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> media_areas:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; random_id:<a href='/type/long'>long</a> period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/int'>int</a> fwd_from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/InputPeer'>InputPeer</a> fwd_from_story:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/int'>int</a> albums:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;
+<a href='/method/stories.editStory'>stories.editStory</a>#b583ba46 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputMedia'>InputMedia</a> media_areas:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MediaArea'>MediaArea</a>&gt; caption:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; privacy_rules:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPrivacyRule'>InputPrivacyRule</a>&gt; = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Stories can have so-called "media areas": clickable rectangular areas with animated overlays on top of the story offering functionality like location tags or reactions.  </p>
+<p>The coordinates and size of each media area is specified in a <a href="/constructor/mediaAreaCoordinates">mediaAreaCoordinates</a> constructor attached to each <a href="/type/MediaArea">MediaArea</a>, see <a href="/constructor/mediaAreaCoordinates">the constructor page »</a> for more info.  </p>
+<p>After construction, the vector of <a href="/type/MediaArea">MediaArea</a> constructors can be passed to <a href="/method/stories.sendStory">stories.sendStory</a> or <a href="/method/stories.editStory">stories.editStory</a>.</p>
+<h4><a class="anchor" href="#channel-posts" id="channel-posts" name="channel-posts"><i class="anchor-icon"></i></a>Channel posts</h4>
+<p>Schema:</p>
+<pre><code><a href='/constructor/inputMediaAreaChannelPost'>inputMediaAreaChannelPost</a>#2271f2bf coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> channel:<a href='/type/InputChannel'>InputChannel</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/MediaArea'>MediaArea</a>;
+
+<a href='/constructor/mediaAreaChannelPost'>mediaAreaChannelPost</a>#770416af coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> channel_id:<a href='/type/long'>long</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/MediaArea'>MediaArea</a>;</code></pre>
+<p>Messages from channels can be reposted to stories using <a href="/constructor/inputMediaAreaChannelPost">inputMediaAreaChannelPost</a>/<a href="/constructor/mediaAreaChannelPost">mediaAreaChannelPost</a>.</p>
+<p>Clients should fetch and display a copy of the channel post on top of the story according to the <a href="#media-areas">media area</a> <code>coordinates</code>: clicking on the media area should open the linked post.</p>
+<h4><a class="anchor" href="#location-tags" id="location-tags" name="location-tags"><i class="anchor-icon"></i></a>Location tags</h4>
+<p>Schema:</p>
+<pre><code><a href='/constructor/geoPoint'>geoPoint</a>#b2a2f663 flags:<a href='/type/%23'>#</a> long:<a href='/type/double'>double</a> lat:<a href='/type/double'>double</a> access_hash:<a href='/type/long'>long</a> accuracy_radius:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> = <a href='/type/GeoPoint'>GeoPoint</a>;
+<a href='/constructor/geoPointAddress'>geoPointAddress</a>#de4c5d93 flags:<a href='/type/%23'>#</a> country_iso2:<a href='/type/string'>string</a> state:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> city:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> street:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> = <a href='/type/GeoPointAddress'>GeoPointAddress</a>;
+
+<a href='/constructor/mediaAreaGeoPoint'>mediaAreaGeoPoint</a>#cad5452d flags:<a href='/type/%23'>#</a> coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> geo:<a href='/type/GeoPoint'>GeoPoint</a> address:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/GeoPointAddress'>GeoPointAddress</a> = <a href='/type/MediaArea'>MediaArea</a>;
+<a href='/constructor/mediaAreaVenue'>mediaAreaVenue</a>#be82db9c coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> geo:<a href='/type/GeoPoint'>GeoPoint</a> title:<a href='/type/string'>string</a> address:<a href='/type/string'>string</a> provider:<a href='/type/string'>string</a> venue_id:<a href='/type/string'>string</a> venue_type:<a href='/type/string'>string</a> = <a href='/type/MediaArea'>MediaArea</a>;
+
+<a href='/constructor/inputMediaAreaVenue'>inputMediaAreaVenue</a>#b282217f coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> query_id:<a href='/type/long'>long</a> result_id:<a href='/type/string'>string</a> = <a href='/type/MediaArea'>MediaArea</a>;</code></pre>
+<p>Location tags are represented by a <a href="/constructor/mediaAreaVenue">mediaAreaVenue</a> or <a href="/constructor/mediaAreaGeoPoint">mediaAreaGeoPoint</a>, associated to a location sticker on top of the story media with an associated <a href="#media-areas">clickable media area</a>.  </p>
+<p>Both constructors have an associated geolocation represented as a <a href="/constructor/geoPoint">geoPoint</a>, and information about the clickable media area on top of the story media as a <a href="/constructor/mediaAreaCoordinates">mediaAreaCoordinates</a> constructor.  </p>
+<p><a href="/constructor/mediaAreaGeoPoint">mediaAreaGeoPoint</a> is used to represent a simple geolocation with an <em>optional</em> textual address.<br>
+<a href="/constructor/mediaAreaVenue">mediaAreaVenue</a> is used to represent the location of a specific venue (i.e. a mall, a shop, a dance school et cetera), and apart from the venue's coordinates, it also contains a textual representation of the address, the venue name (<code>title</code>) and a venue type/ID (<code>venue_id</code>/<code>venue_type</code>) in a format supported by the venue provider specified in <code>provider</code>.   </p>
+<p>Currently, the only provider that needs to be supported is <code>foursquare</code>.  </p>
+<p>To send a <a href="/constructor/mediaAreaVenue">mediaAreaVenue</a>, clients should use <a href="/constructor/inputMediaAreaVenue">inputMediaAreaVenue</a>, constructed as follows:</p>
+<ul>
+<li>If the user gives permission to share their location with the location provider, query the inline bot specified in the <a href="/api/config#stories-venue-search-username"><code>stories_venue_search_username</code> client configuration parameter »</a>, as described as the <a href="/api/bots/inline">inline queries documentation »</a>, populating the <code>geo_point</code>.<br>
+Note that this should be done transparently in a map UI, not in the usual inline query UI in the chat text bar.  </li>
+<li>The results returned by the bot, containing a list of venues close to the specified <code>geo_point</code>, should be listed in the lower section of the map UI: upon selection, construct the <a href="/constructor/inputMediaAreaVenue">inputMediaAreaVenue</a> with:<ul>
+<li><code>query_id</code>: the <code>query_id</code> from <a href="/constructor/messages.botResults">messages.botResults</a>.</li>
+<li><code>result_id</code>: the <code>id</code> of the chosen result.</li>
+</ul>
+</li>
+</ul>
+<p>Clients may only re-use existing <a href="/constructor/mediaAreaVenue">mediaAreaVenue</a>s when repositioning a pre-existing location tag when editing a story; use <a href="/constructor/inputMediaAreaVenue">inputMediaAreaVenue</a> when posting a new story or adding a new location tag to an existing story.</p>
+<p><a href="#searching-stories">Global story search »</a> should be automatically triggered when clicking on a location, passing the <a href="/constructor/mediaAreaGeoPoint">mediaAreaGeoPoint</a>/<a href="/constructor/mediaAreaVenue">mediaAreaVenue</a> to <a href="/method/stories.searchPosts">stories.searchPosts</a>, with results displayed under the map.  </p>
+<p>Note <a href="/constructor/mediaAreaGeoPoint">mediaAreaGeoPoint</a> areas may be searched only if they have an associated <code>address</code>.  </p>
+<h4><a class="anchor" href="#reactions" id="reactions" name="reactions"><i class="anchor-icon"></i></a>Reactions</h4>
+<p>Schema:</p>
+<pre><code><a href='/constructor/reactionEmoji'>reactionEmoji</a>#1b2286b8 emoticon:<a href='/type/string'>string</a> = <a href='/type/Reaction'>Reaction</a>;
+<a href='/constructor/reactionCustomEmoji'>reactionCustomEmoji</a>#8935fc73 document_id:<a href='/type/long'>long</a> = <a href='/type/Reaction'>Reaction</a>;
+
+<a href='/constructor/mediaAreaSuggestedReaction'>mediaAreaSuggestedReaction</a>#14455871 flags:<a href='/type/%23'>#</a> dark:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> flipped:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/MediaArea'>MediaArea</a>;
+
+<a href='/constructor/updateSentStoryReaction'>updateSentStoryReaction</a>#7d627683 peer:<a href='/type/Peer'>Peer</a> story_id:<a href='/type/int'>int</a> reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/updateNewStoryReaction'>updateNewStoryReaction</a>#1824e40b story_id:<a href='/type/int'>int</a> peer:<a href='/type/Peer'>Peer</a> reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/stories.sendReaction'>stories.sendReaction</a>#7fd736b2 flags:<a href='/type/%23'>#</a> add_to_recent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> story_id:<a href='/type/int'>int</a> reaction:<a href='/type/Reaction'>Reaction</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Story <a href="/api/reactions">reactions</a> are implemented using a simple in-UI button that allows the user to send any reaction using <a href="/method/stories.sendReaction">stories.sendReaction</a>.  </p>
+<p>Sending this method will return an <a href="/constructor/updateSentStoryReaction">updateSentStoryReaction</a> update to all logged-in sessions.<br>
+The story poster will also receive an <a href="/constructor/updateNewStoryReaction">updateNewStoryReaction</a> update when a user reacts to their story, if enabled as specified <a href="/api/reactions#notifications-about-reactions">here »</a>.  </p>
+<p>However, the poster of a story may also use <a href="/constructor/mediaAreaSuggestedReaction">mediaAreaSuggestedReaction</a> <a href="#media-areas">media areas »</a> to suggest some specific reactions as simple clickable buttons: they're rendered as a round comic-style thought bubble with its "tail" on the right, white background and the <a href="/api/reactions">reaction »</a> from the <code>reaction</code> field located in its center.<br>
+If the <code>dark</code> flag is set, the background should be black.<br>
+If the <code>flipped</code> flag is set, the "tail" should be located on the left.
+The maximum number of story reaction media areas that can be added to a story is specified by the <a href="/api/config#stories-suggested-reactions-limit-default"><code>stories_suggested_reactions_limit_*</code> »</a> config keys.<br>
+Clicking it should invoke <a href="/method/stories.sendReaction">stories.sendReaction</a> as usual.</p>
+<p>See <a href="#fetching-the-interaction-list">here »</a> to get more info on how to fetch the reaction list of a <a href="/api/stories">story</a>.</p>
+<h4><a class="anchor" href="#urls" id="urls" name="urls"><i class="anchor-icon"></i></a>URLs</h4>
+<pre><code><a href='/constructor/mediaAreaUrl'>mediaAreaUrl</a>#37381085 coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> url:<a href='/type/string'>string</a> = <a href='/type/MediaArea'>MediaArea</a>;</code></pre>
+<p>URL media areas offer stickers that when clicked, should offer the user a prompt (implemented as a tooltip on the sticker) to open the specified <code>url</code>.  </p>
+<p>The maximum number of URL media areas that can be added to a story is specified by the <a href="/api/config#stories-area-url-max"><code>stories_area_url_max</code> »</a> config key.  </p>
+<h4><a class="anchor" href="#weather" id="weather" name="weather"><i class="anchor-icon"></i></a>Weather</h4>
+<pre><code><a href='/constructor/mediaAreaWeather'>mediaAreaWeather</a>#49a6549c coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> emoji:<a href='/type/string'>string</a> temperature_c:<a href='/type/double'>double</a> color:<a href='/type/int'>int</a> = <a href='/type/MediaArea'>MediaArea</a>;
+
+---functions---
+
+<a href='/method/messages.getInlineBotResults'>messages.getInlineBotResults</a>#514e999d flags:<a href='/type/%23'>#</a> bot:<a href='/type/InputUser'>InputUser</a> peer:<a href='/type/InputPeer'>InputPeer</a> geo_point:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputGeoPoint'>InputGeoPoint</a> query:<a href='/type/string'>string</a> offset:<a href='/type/string'>string</a> = <a href='/type/messages.BotResults'>messages.BotResults</a>;</code></pre>
+<p>Users can now share the weather in their stories by adding one weather media area represented by <a href="/constructor/mediaAreaWeather">mediaAreaWeather</a> to their stories.  </p>
+<p>The weather media area should be rendered using the background ARGB color specified in <code>color</code>, and should contain the emoji specified in <code>emoji</code> (rendered as an <a href="/api/animated-emojis">animated emoji</a>), followed by the temperature specified in <code>temperature_c</code> (Celsius, which should be converted by the client to Fahrenheit if required by the device's settings), followed by <code>°C</code> or <code>°F</code> depending on the unit used.  </p>
+<p>To fetch the current temperature and emoji to use when <em>creating</em> a weather media area when posting a story, clients should internally make an <a href="/api/bots/inline">inline query</a> with <a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a> to the <code>bot</code> specified in the <a href="/api/config#weather-search-username">weather_search_username</a> client configuration parameter, passing the user's current location in <code>geo_point</code> and <a href="/constructor/inputPeerEmpty">inputPeerEmpty</a> in <code>peer</code>.<br>
+This query will return a single <a href="/constructor/botInlineResult">botInlineResult</a>: the <code>emoji</code> to use will be contained in the <a href="/constructor/botInlineResult">botInlineResult</a>.<code>title</code> and the temperature (always in Celsius) will be contained in <a href="/constructor/botInlineResult">botInlineResult</a>.<code>description</code> (it will contain just the value without the unit, so it can be easily casted to a double).  </p>
+<p>The inline query should be made internally by the client when the user creates a new weather media area, not by showing the usual inline query UI, but by treating the inline query as an API call to fetch the weather for the current user's location.  </p>
+<p>If the <a href="/api/config#story-weather-preload">story_weather_preload</a> client configuration parameter is equal to true, clients should preload the weather using the flow specified above on startup (as opposed to only doing it when creating a weather media area).  </p>
+<h4><a class="anchor" href="#collectible-gifts" id="collectible-gifts" name="collectible-gifts"><i class="anchor-icon"></i></a>Collectible gifts</h4>
+<p>Schema:</p>
+<pre><code><a href='/constructor/mediaAreaStarGift'>mediaAreaStarGift</a>#5787686d coordinates:<a href='/type/MediaAreaCoordinates'>MediaAreaCoordinates</a> slug:<a href='/type/string'>string</a> = <a href='/type/MediaArea'>MediaArea</a>;</code></pre>
+<p>Owned <a href="/api/gifts#collectible-gifts">collectible gifts »</a> may be shared in a story using a <a href="/constructor/mediaAreaStarGift">mediaAreaStarGift</a>, containing the <code>slug</code> from <a href="/constructor/starGiftUnique">starGiftUnique</a>.<code>slug</code>, that can be resolved as <a href="/api/gifts#sharing-and-getting-info-about-a-collectible-gift">specified here »</a>.</p>
+<h3><a class="anchor" href="#stealth-mode" id="stealth-mode" name="stealth-mode"><i class="anchor-icon"></i></a>Stealth mode</h3>
+<p><a href="/api/premium">Premium users</a> may enable <a href="https://telegram.org/tour/stories#stealth-mode">stealth mode</a>, erasing their views from any stories they opened in the past <a href="/api/config#stories-stealth-past-period"><code>stories_stealth_past_period</code> seconds »</a>, and hiding their views on stories for the next <a href="/api/config#stories-stealth-future-period"><code>stories_stealth_future_period</code> seconds »</a>, as specified by the <a href="/api/config#client-configuration">client configuration »</a>.</p>
+<p>Schema:</p>
+<pre><code><a href='/constructor/storiesStealthMode'>storiesStealthMode</a>#712e27fd flags:<a href='/type/%23'>#</a> active_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> cooldown_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> = <a href='/type/StoriesStealthMode'>StoriesStealthMode</a>;
+
+<a href='/constructor/updateStoriesStealthMode'>updateStoriesStealthMode</a>#2c084dc1 stealth_mode:<a href='/type/StoriesStealthMode'>StoriesStealthMode</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/stories.activateStealthMode'>stories.activateStealthMode</a>#57bbd166 flags:<a href='/type/%23'>#</a> past:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> future:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Invoke <a href="/method/stories.activateStealthMode">stories.activateStealthMode</a> to activate stealth mode, passing the <code>past</code> flag to erase views from any stories opened in the past <a href="/api/config#stories-stealth-past-period"><code>stories_stealth_past_period</code> seconds »</a> and/or the <code>future</code> flag to hide future story views for the next <a href="/api/config#stories-stealth-future-period"><code>stories_stealth_future_period</code> seconds »</a>.  </p>
+<p>Clients can only invoke this method every <a href="/api/config#stories-stealth-cooldown-period"><code>stories_stealth_cooldown_period</code> seconds</a> as specified by the <a href="/api/config#client-configuration">client configuration</a>: invoking the method before the cooldown period has expired will trigger a <code>FLOOD_WAIT_X</code> error, with <code>X</code> being the number of seconds left before the cooldown period expires.  </p>
+<p>An <a href="/constructor/updateStoriesStealthMode">updateStoriesStealthMode</a> constructor will be returned, containing the following fields:</p>
+<ul>
+<li><code>active_until_date</code> - the date up to which stealth mode will be active</li>
+<li><code>cooldown_until_date</code> - the date starting from which the user will be allowed to call <a href="/method/stories.activateStealthMode">stories.activateStealthMode</a> again; calling the method earlier will return a <code>FLOOD_WAIT_X</code> error as specified above.</li>
+</ul>
+<h3><a class="anchor" href="#statistics" id="statistics" name="statistics"><i class="anchor-icon"></i></a>Statistics</h3>
+<pre><code><a href='/constructor/stats.storyStats'>stats.storyStats</a>#50cd067c views_graph:<a href='/type/StatsGraph'>StatsGraph</a> reactions_by_emotion_graph:<a href='/type/StatsGraph'>StatsGraph</a> = <a href='/type/stats.StoryStats'>stats.StoryStats</a>;
+
+<a href='/constructor/publicForwardMessage'>publicForwardMessage</a>#1f2bf4a message:<a href='/type/Message'>Message</a> = <a href='/type/PublicForward'>PublicForward</a>;
+<a href='/constructor/publicForwardStory'>publicForwardStory</a>#edf3add0 peer:<a href='/type/Peer'>Peer</a> story:<a href='/type/StoryItem'>StoryItem</a> = <a href='/type/PublicForward'>PublicForward</a>;
+
+<a href='/constructor/stats.publicForwards'>stats.publicForwards</a>#93037e20 flags:<a href='/type/%23'>#</a> count:<a href='/type/int'>int</a> forwards:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PublicForward'>PublicForward</a>&gt; next_offset:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/stats.PublicForwards'>stats.PublicForwards</a>;
+
+---functions---
+
+<a href='/method/stats.getStoryStats'>stats.getStoryStats</a>#374fef40 flags:<a href='/type/%23'>#</a> dark:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> = <a href='/type/stats.StoryStats'>stats.StoryStats</a>;
+
+<a href='/method/stats.getStoryPublicForwards'>stats.getStoryPublicForwards</a>#a6437ef6 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> offset:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/stats.PublicForwards'>stats.PublicForwards</a>;</code></pre>
+<p>Use <a href="/method/stats.getStoryStats">stats.getStoryStats</a> to obtain statistics about a story; the returned <a href="/type/StatsGraph">StatsGraph</a> graphs can be rendered <a href="/api/stats#graph-visualization">as described here »</a>.  </p>
+<p>Use <a href="/method/stats.getStoryPublicForwards">stats.getStoryPublicForwards</a> to obtain forwards of a story as a message to public chats and reposts by public channels.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
