@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Payments API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="You can accept payments from Telegram users via Telegram Bots.">
+    <meta property="og:title" content="Payments API">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="You can accept payments from Telegram users via Telegram Bots.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/payments" >Payments API</a></li></ul></div>
+  <h1 id="dev_page_title">Payments API</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>You can accept payments from Telegram users via <a href="/bots">Telegram Bots</a>.</p>
+<blockquote>
+<p>Note: This article is intended for MTProto API developers. If you're looking for a general overview of Telegram Payments, check out the <a href="https://telegram.org/blog/payments">Telegram blog</a> and the <a href="/bots/payments">bot API payment manual</a>.</p>
+</blockquote>
+<h3><a class="anchor" href="#introducing-payments" id="introducing-payments" name="introducing-payments"><i class="anchor-icon"></i></a>Introducing Payments</h3>
+<p>Telegram bots can accept payments for goods and services from users.
+For more info on how payments work, check out the <a href="https://telegram.org/blog/payments">Telegram Blog</a> and the <a href="/bots/payments">bot API payment manual</a>.</p>
+<p>This page will elaborate on the actions required to work with payments using the <strong>MTProto API</strong>.</p>
+<blockquote>
+<p>A simplified version of the process is available only for bots using the <a href="/bots/payments">bot API</a>.</p>
+</blockquote>
+<p>The first step for bots is <a href="/bots/payments#the-payments-api">enable payments as described here »</a>.</p>
+<p>Then, we work with payments as follows.</p>
+<h3><a class="anchor" href="#1-create-invoice" id="1-create-invoice" name="1-create-invoice"><i class="anchor-icon"></i></a>1. Create Invoice</h3>
+<h4><a class="anchor" href="#11-create-invoice-message" id="11-create-invoice-message" name="11-create-invoice-message"><i class="anchor-icon"></i></a>1.1 Create Invoice Message</h4>
+<pre><code><a href='/constructor/inputWebDocument'>inputWebDocument</a>#9bed434d url:<a href='/type/string'>string</a> size:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/InputWebDocument'>InputWebDocument</a>;
+
+<a href='/constructor/labeledPrice'>labeledPrice</a>#cb296bf8 label:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/LabeledPrice'>LabeledPrice</a>;
+
+<a href='/constructor/invoice'>invoice</a>#49ee584 flags:<a href='/type/%23'>#</a> test:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> name_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> phone_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> email_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> shipping_address_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> flexible:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> phone_to_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> email_to_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> recurring:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/constructor/true'>true</a> currency:<a href='/type/string'>string</a> prices:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/LabeledPrice'>LabeledPrice</a>&gt; max_tip_amount:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/long'>long</a> suggested_tip_amounts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; terms_url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/string'>string</a> subscription_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/int'>int</a> = <a href='/type/Invoice'>Invoice</a>;
+
+<a href='/constructor/inputMediaInvoice'>inputMediaInvoice</a>#405fef0d flags:<a href='/type/%23'>#</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputWebDocument'>InputWebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> payload:<a href='/type/bytes'>bytes</a> provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> provider_data:<a href='/type/DataJSON'>DataJSON</a> start_param:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> extended_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
+---functions---
+
+<a href='/method/messages.sendMedia'>messages.sendMedia</a>#ac55d9c1 flags:<a href='/type/%23'>#</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> background:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> clear_draft:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> update_stickersets_order:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> invert_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> allow_paid_floodskip:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputReplyTo'>InputReplyTo</a> media:<a href='/type/InputMedia'>InputMedia</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/InputPeer'>InputPeer</a> quick_reply_shortcut:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/InputQuickReplyShortcut'>InputQuickReplyShortcut</a> effect:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/long'>long</a> allow_paid_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/type/long'>long</a> suggested_post:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/SuggestedPost'>SuggestedPost</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>The user contacts the bot and requests to purchase something.
+The bot forms an <a href="/constructor/inputMediaInvoice">inputMediaInvoice</a> with an <a href="/constructor/invoice">invoice</a> constructor with a description of the goods or service, amount to be paid, as well as requested shipping info.
+The <code>provider</code> parameter of the <a href="/constructor/inputMediaInvoice">inputMediaInvoice</a> constructor is where you put the token value that <a href="/bots/payments#the-payments-api">you've obtained earlier via Botfather</a>. It is possible for one merchant bot to use several different tokens for different users or different goods and services.</p>
+<p>Use the <a href="/method/messages.sendMedia">messages.sendMedia</a> method to send the <a href="/constructor/invoice">invoice</a>. 
+You can also attach an inline keyboard to the message using the <code>reply_markup</code> field: if provided, the first button must be a <a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> button. Otherwise, an inline keyboard will be generated automatically, with a <code>Pay 'total price'</code> <a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> as only button.</p>
+<p>An invoice message with a pay button can only be sent to a private chat with the user. Groups and channels are not supported.</p>
+<h4><a class="anchor" href="#12-create-invoice-link" id="12-create-invoice-link" name="12-create-invoice-link"><i class="anchor-icon"></i></a>1.2 Create Invoice Link</h4>
+<pre><code><a href='/constructor/inputMediaInvoice'>inputMediaInvoice</a>#405fef0d flags:<a href='/type/%23'>#</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputWebDocument'>InputWebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> payload:<a href='/type/bytes'>bytes</a> provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> provider_data:<a href='/type/DataJSON'>DataJSON</a> start_param:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> extended_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/InputMedia'>InputMedia</a>;
+
+<a href='/constructor/payments.exportedInvoice'>payments.exportedInvoice</a>#aed0cbd9 url:<a href='/type/string'>string</a> = <a href='/type/payments.ExportedInvoice'>payments.ExportedInvoice</a>;
+
+---functions---
+
+<a href='/method/payments.exportInvoice'>payments.exportInvoice</a>#f91b065 invoice_media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/payments.ExportedInvoice'>payments.ExportedInvoice</a>;</code></pre>
+<p>Bots may also generate <a href="/api/links#invoice-links">invoice deep links</a> using <a href="/method/payments.exportInvoice">payments.exportInvoice</a>.  </p>
+<p>The returned <a href="/constructor/payments.exportedInvoice">payments.exportedInvoice</a> will contain an <a href="/api/links#invoice-links">invoice deep link</a> that can be shared directly, or sent in a bot mini app <a href="/api/web-events#web-app-open-invoice"><code>web_app_open_invoice</code> event</a>.</p>
+<h3><a class="anchor" href="#2-order-information" id="2-order-information" name="2-order-information"><i class="anchor-icon"></i></a>2. Order information</h3>
+<h4><a class="anchor" href="#21-invoice" id="21-invoice" name="21-invoice"><i class="anchor-icon"></i></a>2.1 Invoice</h4>
+<pre><code><a href='/constructor/keyboardButtonBuy'>keyboardButtonBuy</a>#afd93fbb text:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
+<a href='/constructor/keyboardButtonRow'>keyboardButtonRow</a>#77608b83 buttons:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButton'>KeyboardButton</a>&gt; = <a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>;
+<a href='/constructor/replyInlineMarkup'>replyInlineMarkup</a>#48a30254 rows:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>&gt; = <a href='/type/ReplyMarkup'>ReplyMarkup</a>;
+
+<a href='/constructor/webDocument'>webDocument</a>#1c570ed1 url:<a href='/type/string'>string</a> access_hash:<a href='/type/long'>long</a> size:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/WebDocument'>WebDocument</a>;
+<a href='/constructor/webDocumentNoProxy'>webDocumentNoProxy</a>#f9c8bcc6 url:<a href='/type/string'>string</a> size:<a href='/type/int'>int</a> mime_type:<a href='/type/string'>string</a> attributes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DocumentAttribute'>DocumentAttribute</a>&gt; = <a href='/type/WebDocument'>WebDocument</a>;
+
+<a href='/constructor/messageMediaInvoice'>messageMediaInvoice</a>#f6a548d3 flags:<a href='/type/%23'>#</a> shipping_address_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> test:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/WebDocument'>WebDocument</a> receipt_msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> start_param:<a href='/type/string'>string</a> extended_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/MessageExtendedMedia'>MessageExtendedMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
+
+<a href='/constructor/message'>message</a>#9815cec8 flags:<a href='/type/%23'>#</a> out:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> mentioned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> media_unread:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> post:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> from_scheduled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/constructor/true'>true</a> legacy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> edit_hide:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/constructor/true'>true</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.26?<a href='/constructor/true'>true</a> invert_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.27?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> offline:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.1?<a href='/constructor/true'>true</a> video_processing_pending:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.4?<a href='/constructor/true'>true</a> paid_suggested_post_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.8?<a href='/constructor/true'>true</a> paid_suggested_post_ton:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.9?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Peer'>Peer</a> from_boosts_applied:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.29?<a href='/type/int'>int</a> peer_id:<a href='/type/Peer'>Peer</a> saved_peer_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/type/Peer'>Peer</a> fwd_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/MessageFwdHeader'>MessageFwdHeader</a> via_bot_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/long'>long</a> via_business_bot_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.0?<a href='/type/long'>long</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/MessageReplyHeader'>MessageReplyHeader</a> date:<a href='/type/int'>int</a> message:<a href='/type/string'>string</a> media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/type/MessageMedia'>MessageMedia</a> reply_markup:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; views:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> forwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> replies:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.23?<a href='/type/MessageReplies'>MessageReplies</a> edit_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/int'>int</a> post_author:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/string'>string</a> grouped_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/long'>long</a> reactions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/type/MessageReactions'>MessageReactions</a> restriction_reason:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; ttl_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.25?<a href='/type/int'>int</a> quick_reply_shortcut_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.30?<a href='/type/int'>int</a> effect:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.2?<a href='/type/long'>long</a> factcheck:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.3?<a href='/type/FactCheck'>FactCheck</a> report_delivery_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.5?<a href='/type/int'>int</a> paid_message_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.6?<a href='/type/long'>long</a> suggested_post:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.7?<a href='/type/SuggestedPost'>SuggestedPost</a> = <a href='/type/Message'>Message</a>;
+
+<a href='/constructor/updateNewMessage'>updateNewMessage</a>#1f2b0afd message:<a href='/type/Message'>Message</a> pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;</code></pre>
+<p>The user receives an <a href="/api/links#invoice-links">invoice deep link</a> or an <a href="/constructor/updateNewMessage">updateNewMessage</a> constructor from the bot, containing a <a href="/constructor/messageMediaInvoice">messageMediaInvoice</a> constructor with basic info about the product.</p>
+<p>For invoice messages, the <a href="/constructor/message">message</a> will also have a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> keyboard attached to it.
+The first button of the keyboard will always be a <a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> button.</p>
+<p>Pass <code>XTR</code> as <code>currency</code> to request payment in <a href="/api/stars">Telegram Stars</a>.  </p>
+<h4><a class="anchor" href="#22-getting-invoice-info-about-the-product" id="22-getting-invoice-info-about-the-product" name="22-getting-invoice-info-about-the-product"><i class="anchor-icon"></i></a>2.2 Getting invoice info about the product</h4>
+<pre><code><a href='/constructor/inputStorePaymentPremiumGiveaway'>inputStorePaymentPremiumGiveaway</a>#160544ca flags:<a href='/type/%23'>#</a> only_new_subscribers:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> winners_are_visible:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> boost_peer:<a href='/type/InputPeer'>InputPeer</a> additional_peers:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; countries_iso2:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; prize_description:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> until_date:<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a>;
+<a href='/constructor/inputStorePaymentPremiumGiftCode'>inputStorePaymentPremiumGiftCode</a>#fb790393 flags:<a href='/type/%23'>#</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; boost_peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputPeer'>InputPeer</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a>;
+
+<a href='/constructor/inputInvoiceMessage'>inputInvoiceMessage</a>#c5b56859 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoiceSlug'>inputInvoiceSlug</a>#c326caef slug:<a href='/type/string'>string</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoicePremiumGiftCode'>inputInvoicePremiumGiftCode</a>#98986c0d purpose:<a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a> option:<a href='/type/PremiumGiftCodeOption'>PremiumGiftCodeOption</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoiceStars'>inputInvoiceStars</a>#65f00ce3 purpose:<a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoiceChatInviteSubscription'>inputInvoiceChatInviteSubscription</a>#34e793f1 hash:<a href='/type/string'>string</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoiceStarGift'>inputInvoiceStarGift</a>#e8625e92 flags:<a href='/type/%23'>#</a> hide_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> include_upgrade:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> gift_id:<a href='/type/long'>long</a> message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoiceStarGiftUpgrade'>inputInvoiceStarGiftUpgrade</a>#4d818d5d flags:<a href='/type/%23'>#</a> keep_original_details:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> stargift:<a href='/type/InputSavedStarGift'>InputSavedStarGift</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoiceStarGiftPrepaidUpgrade'>inputInvoiceStarGiftPrepaidUpgrade</a>#9a0b48b8 peer:<a href='/type/InputPeer'>InputPeer</a> hash:<a href='/type/string'>string</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoiceStarGiftTransfer'>inputInvoiceStarGiftTransfer</a>#4a5f5bd9 stargift:<a href='/type/InputSavedStarGift'>InputSavedStarGift</a> to_id:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoicePremiumGiftStars'>inputInvoicePremiumGiftStars</a>#dabab2ef flags:<a href='/type/%23'>#</a> user_id:<a href='/type/InputUser'>InputUser</a> months:<a href='/type/int'>int</a> message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoiceBusinessBotTransferStars'>inputInvoiceBusinessBotTransferStars</a>#f4997e42 bot:<a href='/type/InputUser'>InputUser</a> stars:<a href='/type/long'>long</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputInvoiceStarGiftResale'>inputInvoiceStarGiftResale</a>#c39f5324 flags:<a href='/type/%23'>#</a> ton:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> slug:<a href='/type/string'>string</a> to_id:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+
+<a href='/constructor/invoice'>invoice</a>#49ee584 flags:<a href='/type/%23'>#</a> test:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> name_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> phone_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> email_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> shipping_address_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> flexible:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> phone_to_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> email_to_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> recurring:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/constructor/true'>true</a> currency:<a href='/type/string'>string</a> prices:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/LabeledPrice'>LabeledPrice</a>&gt; max_tip_amount:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/long'>long</a> suggested_tip_amounts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; terms_url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/string'>string</a> subscription_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/int'>int</a> = <a href='/type/Invoice'>Invoice</a>;
+
+<a href='/constructor/paymentRequestedInfo'>paymentRequestedInfo</a>#909c3f94 flags:<a href='/type/%23'>#</a> name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> phone:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> email:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> shipping_address:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/PostAddress'>PostAddress</a> = <a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a>;
+
+<a href='/constructor/paymentSavedCredentialsCard'>paymentSavedCredentialsCard</a>#cdc27a1f id:<a href='/type/string'>string</a> title:<a href='/type/string'>string</a> = <a href='/type/PaymentSavedCredentials'>PaymentSavedCredentials</a>;
+
+<a href='/constructor/payments.paymentForm'>payments.paymentForm</a>#a0058751 flags:<a href='/type/%23'>#</a> can_save_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> password_missing:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> form_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> provider_id:<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> native_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> native_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/DataJSON'>DataJSON</a> additional_methods:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentFormMethod'>PaymentFormMethod</a>&gt; saved_info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> saved_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentSavedCredentials'>PaymentSavedCredentials</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;
+
+<a href='/constructor/payments.paymentFormStars'>payments.paymentFormStars</a>#7bf6b15c flags:<a href='/type/%23'>#</a> form_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;
+<a href='/constructor/payments.paymentFormStarGift'>payments.paymentFormStarGift</a>#b425cfe1 form_id:<a href='/type/long'>long</a> invoice:<a href='/type/Invoice'>Invoice</a> = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;
+
+---functions---
+
+<a href='/method/payments.getPaymentForm'>payments.getPaymentForm</a>#37148dbb flags:<a href='/type/%23'>#</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> theme_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;</code></pre>
+<p><a href="/method/payments.getPaymentForm">payments.getPaymentForm</a> is used to return a <a href="/constructor/payments.paymentForm">payment form</a> from an invoice, providing the following <code>invoice</code> parameter:</p>
+<ul>
+<li><a href="/constructor/inputInvoiceMessage">inputInvoiceMessage</a>, used:<ul>
+<li>If the user clicks on the <a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> button, contains the message ID of the invoice preview message.  </li>
+<li>When <a href="/api/paid-media">purchasing paid media »</a>.</li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoiceSlug">inputInvoiceSlug</a><ul>
+<li>If the user opens an <a href="/api/links#invoice-links">invoice deep link</a>, contains the <code>slug</code> parameter</li>
+<li>If the client has to process a <a href="/api/premium">Telegram Premium</a> payment, contains the <a href="/api/config#premium-invoice-slug"><code>premium_invoice_slug</code> app config parameter »</a></li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoicePremiumGiftCode">inputInvoicePremiumGiftCode</a> <ul>
+<li>Used if the user wishes to start a channel <a href="/api/giveaways">giveaway</a> or send some <a href="/api/giveaways">giftcodes</a> to members of a channel, in exchange for <a href="/api/boost">boosts</a>.<br>
+The <code>purpose</code> field should be populated with <a href="/constructor/inputStorePaymentPremiumGiveaway">inputStorePaymentPremiumGiveaway</a> for <a href="/api/giveaways">giveaways</a> and <a href="/constructor/inputStorePaymentPremiumGiftCode">inputStorePaymentPremiumGiftCode</a> for <a href="/api/giveaways">gifts</a>.<br>
+The <code>option</code> field should be populated with one of the giveaway options returned by <a href="/method/payments.getPremiumGiftCodeOptions">payments.getPremiumGiftCodeOptions</a>.<br>
+See the <a href="/api/giveaways">giveaways »</a> documentation for more info.  </li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoiceStars">inputInvoiceStars</a><ul>
+<li>Used to <a href="/api/stars#buying-or-gifting-stars">purchase Telegram Stars</a>.
+The <code>option</code> field should be populated with one of the star topup options returned by <a href="/method/payments.getStarsTopupOptions">payments.getStarsTopupOptions</a>.<br>
+See the <a href="/api/stars#buying-or-gifting-stars">stars »</a> documentation for more info.  </li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoiceChatInviteSubscription">inputInvoiceChatInviteSubscription</a><ul>
+<li>Used to implement bot and channel <a href="/api/subscriptions">subscriptions »</a>.<br>
+See the <a href="/api/subscriptions">subscriptions »</a> documentation for more info.</li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoiceStarGift">inputInvoiceStarGift</a><ul>
+<li>Used to <a href="/api/gifts">purchase Telegram Star Gifts</a>.<br>
+See the <a href="/api/gifts">gifts »</a> documentation for more info.  </li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoiceStarGiftUpgrade">inputInvoiceStarGiftUpgrade</a><ul>
+<li>Used to <a href="/api/gifts#upgrade-a-gift-to-a-collectible-gift">pay to upgrade a Gift to a collectible gift</a>.<br>
+See the <a href="/api/gifts#collectible-gifts">collectible gifts »</a> documentation for more info.  </li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoiceStarGiftPrepaidUpgrade">inputInvoiceStarGiftPrepaidUpgrade</a><ul>
+<li>Used to <a href="/api/gifts#prepaying-for-someone-elses-upgrade">pay for someone to upgrade a Gift to a collectible gift</a>.<br>
+See the <a href="/api/gifts#collectible-gifts">collectible gifts »</a> documentation for more info.  </li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoiceStarGiftTransfer">inputInvoiceStarGiftTransfer</a><ul>
+<li>Used to <a href="/api/gifts#transferring-collectible-gifts">pay to transfer a Gift to another peer</a>.<br>
+See the <a href="/api/gifts#transferring-collectible-gifts">gifts »</a> documentation for more info.  </li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoiceStarGiftResale">inputInvoiceStarGiftResale</a><ul>
+<li>Used to <a href="/api/gifts#reselling-collectible-gifts">to buy a Gift on resale</a>.<br>
+See the <a href="/api/gifts#reselling-collectible-gifts">gifts »</a> documentation for more info.  </li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoicePremiumGiftStars">inputInvoicePremiumGiftStars</a><ul>
+<li>Used to <a href="/api/premium">gift a Premium subscription to another user, paying with Telegram Stars</a>.<br>
+See the <a href="/api/premium">Telegram Premium »</a> documentation for more info</li>
+</ul>
+</li>
+<li><a href="/constructor/inputInvoiceBusinessBotTransferStars">inputInvoiceBusinessBotTransferStars</a><ul>
+<li>Used to <a href="/api/stars#transferring-stars-from-a-business-account-to-the-business-bot">transfer Telegram Stars from the balance of a user controlled by a business bot, to the bot's balance</a>.<br>
+See the <a href="/api/stars#transferring-stars-from-a-business-account-to-the-business-bot">Telegram Business »</a> documentation for more info.  </li>
+</ul>
+</li>
+</ul>
+<p>The returned form will contain fields that should be passed to the payment provider along with the full <a href="/constructor/invoice">invoice</a>.
+The payment form also contains info about previously saved payment credentials and order information (name, phone number, email, shipping address &amp; so on).</p>
+<p>The full <a href="/constructor/invoice">invoice</a> contains info about the information required for the order, the price and the currency, and whether this is a <code>test</code> order.
+The <code>recurring</code> flag will be set for recurring payments, and <code>recurring_terms_url</code> will link to the terms of service of the recurring payment: the user must read and accept them before continuing.  </p>
+<p>A <a href="/constructor/payments.paymentFormStars">payments.paymentFormStars</a>/<a href="/constructor/payments.paymentFormStarGift">payments.paymentFormStarGift</a> will be returned if the payment is to be made using <a href="/api/stars">Telegram Stars, see here »</a> for more info (note that this constructor is used for payments in Telegram Stars to bots and peers, it will <strong>not</strong> be returned when <em>topping up</em> the Telegram Star balance of the current account using <a href="/constructor/inputInvoiceStars">inputInvoiceStars</a>): the associated invoice will use <code>XTR</code> as <code>currency</code>.  </p>
+<h4><a class="anchor" href="#23-verifying-information" id="23-verifying-information" name="23-verifying-information"><i class="anchor-icon"></i></a>2.3 Verifying information</h4>
+<pre><code><a href='/constructor/invoice'>invoice</a>#49ee584 flags:<a href='/type/%23'>#</a> test:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> name_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> phone_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> email_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> shipping_address_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> flexible:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> phone_to_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> email_to_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> recurring:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/constructor/true'>true</a> currency:<a href='/type/string'>string</a> prices:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/LabeledPrice'>LabeledPrice</a>&gt; max_tip_amount:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/long'>long</a> suggested_tip_amounts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; terms_url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/string'>string</a> subscription_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/int'>int</a> = <a href='/type/Invoice'>Invoice</a>;
+
+<a href='/constructor/postAddress'>postAddress</a>#1e8caaeb street_line1:<a href='/type/string'>string</a> street_line2:<a href='/type/string'>string</a> city:<a href='/type/string'>string</a> state:<a href='/type/string'>string</a> country_iso2:<a href='/type/string'>string</a> post_code:<a href='/type/string'>string</a> = <a href='/type/PostAddress'>PostAddress</a>;
+
+<a href='/constructor/paymentRequestedInfo'>paymentRequestedInfo</a>#909c3f94 flags:<a href='/type/%23'>#</a> name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> phone:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> email:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> shipping_address:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/PostAddress'>PostAddress</a> = <a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a>;
+
+<a href='/constructor/payments.validatedRequestedInfo'>payments.validatedRequestedInfo</a>#d1451883 flags:<a href='/type/%23'>#</a> id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> shipping_options:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ShippingOption'>ShippingOption</a>&gt; = <a href='/type/payments.ValidatedRequestedInfo'>payments.ValidatedRequestedInfo</a>;
+
+---functions---
+
+<a href='/method/payments.validateRequestedInfo'>payments.validateRequestedInfo</a>#b6c8f12b flags:<a href='/type/%23'>#</a> save:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> info:<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> = <a href='/type/payments.ValidatedRequestedInfo'>payments.ValidatedRequestedInfo</a>;</code></pre>
+<p>If any data at all is requested by the <a href="/constructor/invoice"><strong>invoice</strong></a> (<code>name_requested</code>, <code>phone_requested</code>, <code>email_requested</code>, <code>shipping_address_requested</code>), the user must call <a href="/method/payments.validateRequestedInfo">payments.validateRequestedInfo</a>, providing the required data (as usual, <code>msg_id</code> is the ID of the invoice message).
+The user can choose to save order information for future use by setting the <code>save</code> flag.
+Data can be autofilled as described in <a href="#231-autofill">autofill</a>.</p>
+<p>If no errors are found in the submitted info, the <a href="/constructor/payments.ValidatedRequestedInfo">response</a> of the method will contain an <code>id</code> flag, to be used later to complete the payment.</p>
+<p>If the <code>flexible</code> flag of the invoice is set, calling the <a href="/method/payments.validateRequestedInfo">payments.validateRequestedInfo</a> method will send a <a href="/constructor/updateBotShippingQuery">shipping query update</a> to the bot, to which the bot will reply with the available shipping options for the specified address <a href="#24-select-delivery-option">as described here »</a>.
+The return value in this case will also contain a <code>shipping_options</code> field with the available shipping options.</p>
+<p>If any errors are found in the submitted data, a <a href="/constructor/updateServiceNotification">service notification</a> will be sent to the user, with a description of the error from the bot.</p>
+<h4><a class="anchor" href="#231-autofill" id="231-autofill" name="231-autofill"><i class="anchor-icon"></i></a>2.3.1 Autofill</h4>
+<pre><code><a href='/constructor/payments.savedInfo'>payments.savedInfo</a>#fb8fe43c flags:<a href='/type/%23'>#</a> has_saved_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> saved_info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> = <a href='/type/payments.SavedInfo'>payments.SavedInfo</a>;
+
+---functions---
+
+<a href='/method/payments.getSavedInfo'>payments.getSavedInfo</a>#227d824b = <a href='/type/payments.SavedInfo'>payments.SavedInfo</a>;
+<a href='/method/payments.clearSavedInfo'>payments.clearSavedInfo</a>#d83d70c1 flags:<a href='/type/%23'>#</a> credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The requested fields can be autofilled with the info provided in the <code>saved_info</code> field of the <a href="/constructor/payments.paymentForm">payment form</a>, or with the info fetched manually using <a href="/method/payments.getSavedInfo">payments.getSavedInfo</a>.</p>
+<p>Saved order information can also be cleared using <a href="/method/payments.clearSavedInfo">payments.clearSavedInfo</a>.</p>
+<h4><a class="anchor" href="#24-select-delivery-option" id="24-select-delivery-option" name="24-select-delivery-option"><i class="anchor-icon"></i></a>2.4 Select delivery option</h4>
+<pre><code><a href='/constructor/labeledPrice'>labeledPrice</a>#cb296bf8 label:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/LabeledPrice'>LabeledPrice</a>;
+
+<a href='/constructor/shippingOption'>shippingOption</a>#b6213cdf id:<a href='/type/string'>string</a> title:<a href='/type/string'>string</a> prices:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/LabeledPrice'>LabeledPrice</a>&gt; = <a href='/type/ShippingOption'>ShippingOption</a>;
+
+<a href='/constructor/updateBotShippingQuery'>updateBotShippingQuery</a>#b5aefd7d query_id:<a href='/type/long'>long</a> user_id:<a href='/type/long'>long</a> payload:<a href='/type/bytes'>bytes</a> shipping_address:<a href='/type/PostAddress'>PostAddress</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/messages.setBotShippingResults'>messages.setBotShippingResults</a>#e5f672fa flags:<a href='/type/%23'>#</a> query_id:<a href='/type/long'>long</a> error:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> shipping_options:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ShippingOption'>ShippingOption</a>&gt; = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>If a shipping address was requested and the bot included the parameter <code>flexible</code>, when the user <a href="#23-verifying-information">validates order information</a> the Telegram API will send an <a href="/constructor/updateBotShippingQuery">updateBotShippingQuery</a> to the bot. 
+The bot must respond using <a href="/method/messages.setBotShippingResults">messages.setBotShippingResults</a> either with a list of possible delivery options and the relevant delivery prices, or with an error (for example, if delivery to the specified address is not possible).</p>
+<p>The returned shipping options or the shipping error will be returned to the user while <a href="#23-verifying-information">validating order information</a>.</p>
+<h3><a class="anchor" href="#3-payment" id="3-payment" name="3-payment"><i class="anchor-icon"></i></a>3. Payment</h3>
+<h4><a class="anchor" href="#31-star-payment" id="31-star-payment" name="31-star-payment"><i class="anchor-icon"></i></a>3.1 Star payment</h4>
+<pre><code><a href='/constructor/payments.paymentFormStars'>payments.paymentFormStars</a>#7bf6b15c flags:<a href='/type/%23'>#</a> form_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;
+<a href='/constructor/payments.paymentFormStarGift'>payments.paymentFormStarGift</a>#b425cfe1 form_id:<a href='/type/long'>long</a> invoice:<a href='/type/Invoice'>Invoice</a> = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;
+
+---functions---
+
+<a href='/method/payments.sendStarsForm'>payments.sendStarsForm</a>#7998c914 form_id:<a href='/type/long'>long</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> = <a href='/type/payments.PaymentResult'>payments.PaymentResult</a>;</code></pre>
+<p>A <a href="/constructor/payments.paymentFormStars">payments.paymentFormStars</a> or <a href="/constructor/payments.paymentFormStarGift">payments.paymentFormStarGift</a> will be returned if the payment should be made using <a href="/api/stars">Telegram Stars</a>, invoking <a href="/method/payments.sendStarsForm">payments.sendStarsForm</a> instead of <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> at <a href="#4-pre-checkout">step 4 »</a>.  </p>
+<p>Calling <a href="/method/payments.sendStarsForm">payments.sendStarsForm</a> twice with the same <code>form_id</code> will <strong>not</strong> repeat the transaction.  </p>
+<p>Note that the returned form is only valid for 10 minutes, after which a call to <a href="/method/payments.sendStarsForm">payments.sendStarsForm</a> will return a <code>400</code> <code>FORM_EXPIRED</code> error.<br>
+When receiving this error, simply re-generate the form as specified in <a href="#22-getting-invoice-info-about-the-product">step 2.2 »</a> and re-call <a href="/method/payments.sendStarsForm">payments.sendStarsForm</a>.  </p>
+<p>A <code>400</code> <code>BALANCE_TOO_LOW</code> error will be emitted by <a href="/method/payments.sendStarsForm">payments.sendStarsForm</a> if the current Telegram Stars balance is not enough to complete the transaction: when receiving this error, the client should invite the user to <a href="/api/stars#buying-or-gifting-stars">topup their Telegram Stars balance »</a>, before re-invoking <a href="/method/payments.sendStarsForm">payments.sendStarsForm</a>.</p>
+<h4><a class="anchor" href="#32-web-payment" id="32-web-payment" name="32-web-payment"><i class="anchor-icon"></i></a>3.2 Web payment</h4>
+<pre><code><a href='/constructor/inputPaymentCredentials'>inputPaymentCredentials</a>#3417d728 flags:<a href='/type/%23'>#</a> save:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> data:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
+
+<a href='/constructor/payments.paymentForm'>payments.paymentForm</a>#a0058751 flags:<a href='/type/%23'>#</a> can_save_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> password_missing:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> form_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> provider_id:<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> native_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> native_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/DataJSON'>DataJSON</a> additional_methods:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentFormMethod'>PaymentFormMethod</a>&gt; saved_info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> saved_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentSavedCredentials'>PaymentSavedCredentials</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;
+
+<a href='/constructor/paymentFormMethod'>paymentFormMethod</a>#88f8f21b url:<a href='/type/string'>string</a> title:<a href='/type/string'>string</a> = <a href='/type/PaymentFormMethod'>PaymentFormMethod</a>;</code></pre>
+<p>The user can choose to use either the main payment platform, using the <code>url</code> of the <a href="/constructor/payments.paymentForm">payments.paymentForm</a>, or any of the additional payment platforms, using the <code>url</code> of the chosen <a href="/constructor/paymentFormMethod">paymentFormMethod</a>.<br>
+Payment takes place by opening the <code>url</code> of the chosen payment platform in the specified <a href="/constructor/payments.paymentForm">payment form</a>, which leads to a payment form on the website of the payment gateway.<br>
+Once the user finishes entering their payment credentials, a <a href="/api/web-events#payment-form-submit"><code>payment_form_submit</code> web event</a> is generated by the payment gateway, containing <code>credentials</code> and <code>title</code> JSON fields.</p>
+<p>The <code>title</code> is used by the client app to represent the payment credentials (typically a censored version of credit card information).
+The <code>credentials</code> are used to generate an <a href="/constructor/inputPaymentCredentials">inputPaymentCredentials</a> constructor.
+Eventually, you can set the <code>save</code> flag to save the credit card info for future use, only if <a href="/api/srp">2FA</a> is enabled.</p>
+<p>Telegram <strong>does not</strong> have access to your card information. Credit card details will be handled only by the payment system.</p>
+<h4><a class="anchor" href="#33-native-payment" id="33-native-payment" name="33-native-payment"><i class="anchor-icon"></i></a>3.3 Native payment</h4>
+<pre><code><a href='/constructor/inputPaymentCredentials'>inputPaymentCredentials</a>#3417d728 flags:<a href='/type/%23'>#</a> save:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> data:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
+
+<a href='/constructor/payments.paymentForm'>payments.paymentForm</a>#a0058751 flags:<a href='/type/%23'>#</a> can_save_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> password_missing:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> form_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> provider_id:<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> native_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> native_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/DataJSON'>DataJSON</a> additional_methods:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentFormMethod'>PaymentFormMethod</a>&gt; saved_info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> saved_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentSavedCredentials'>PaymentSavedCredentials</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;</code></pre>
+<p>Most telegram apps support working natively with the native APIs of some payment providers, without opening the website of the payment and receiving a JS event.</p>
+<p>This is done using the JSON <code>native_params</code> parameters field of the <a href="/constructor/payments.paymentForm">payments.paymentForm</a> constructor, which contains an object, which can contain one or more of the following fields:</p>
+<ul>
+<li><code>publishable_key</code>: Stripe API publishable key</li>
+<li><code>apple_pay_merchant_id</code>: Apple Pay merchant ID</li>
+<li><code>android_pay_public_key</code>: Android Pay public key</li>
+<li><code>android_pay_bgcolor</code>: Android Pay form background color</li>
+<li><code>android_pay_inverse</code>: Whether to use the dark theme in the Android Pay form</li>
+<li><code>need_country</code>: True, if the user country must be provided,</li>
+<li><code>need_zip</code>: True, if the user ZIP/postal code must be provided,</li>
+<li><code>need_cardholder_name</code>: True, if the cardholder name must be provided</li>
+</ul>
+<p>The payment gateway to use is decided based on the value of the <code>native_provider</code> field.</p>
+<h5><a class="anchor" href="#331-stripe" id="331-stripe" name="331-stripe"><i class="anchor-icon"></i></a>3.3.1 Stripe</h5>
+<pre><code><a href='/constructor/inputPaymentCredentials'>inputPaymentCredentials</a>#3417d728 flags:<a href='/type/%23'>#</a> save:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> data:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
+
+<a href='/constructor/payments.paymentForm'>payments.paymentForm</a>#a0058751 flags:<a href='/type/%23'>#</a> can_save_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> password_missing:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> form_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> provider_id:<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> native_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> native_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/DataJSON'>DataJSON</a> additional_methods:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentFormMethod'>PaymentFormMethod</a>&gt; saved_info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> saved_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentSavedCredentials'>PaymentSavedCredentials</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;</code></pre>
+<p>If the <code>native_provider</code> field is set and equal to <code>stripe</code>, the client can make use of the <a href="https://stripe.com/docs/api/tokens/object">native Stripe token APIs</a> with the <code>publishable_key</code> from the <code>native_params</code> to add a payment method to Stripe, and then use the token <code>type</code> and <code>id</code> to generate a JSON object:</p>
+<pre><code>{"type":"token.type", "id":"token.id"}"</code></pre>
+<p>The generated JSON object can then be passed to the <code>data</code> field of the <a href="/constructor/inputPaymentCredentials">inputPaymentCredentials</a>.
+Eventually, you can set the <code>save</code> flag to save the credit card info for future use, only if <a href="/api/srp">2FA</a> is enabled.</p>
+<p>Telegram <strong>does not</strong> have access to your card information. Credit card details will be handled only by the payment system.</p>
+<p>Example implementation: <a href="https://github.com/DrKLO/Telegram">Telegram for Android</a>.</p>
+<h4><a class="anchor" href="#34-apple-pay" id="34-apple-pay" name="34-apple-pay"><i class="anchor-icon"></i></a>3.4 Apple pay</h4>
+<pre><code><a href='/constructor/inputPaymentCredentialsApplePay'>inputPaymentCredentialsApplePay</a>#aa1c39f payment_data:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;</code></pre>
+<p>On iOS devices, Apple Pay can be used to generate payment data, which is then sent using the <a href="/constructor/inputPaymentCredentialsApplePay">inputPaymentCredentialsApplePay</a> constructor.</p>
+<p>Example implementation: <a href="https://github.com/TelegramMessenger/Telegram-iOS/">Telegram for iOS</a>.</p>
+<h4><a class="anchor" href="#35-android-pay" id="35-android-pay" name="35-android-pay"><i class="anchor-icon"></i></a>3.5 Android pay</h4>
+<pre><code><a href='/constructor/inputPaymentCredentialsGooglePay'>inputPaymentCredentialsGooglePay</a>#8ac32801 payment_token:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;</code></pre>
+<p>On Android devices, Google Pay can be used to generate payment data, which is then sent using the <a href="/constructor/inputPaymentCredentialsApplePay">inputPaymentCredentialsGooglePay</a> constructor.</p>
+<p>Example implementation: <a href="https://github.com/DrKLO/Telegram/blob/ff5735503e068a6f1cada09b977f633df7caf98d/TMessagesProj/src/main/java/org/telegram/ui/PaymentFormActivity.java">Telegram for Android</a>.</p>
+<h4><a class="anchor" href="#36-using-saved-payment-credentials" id="36-using-saved-payment-credentials" name="36-using-saved-payment-credentials"><i class="anchor-icon"></i></a>3.6 Using saved payment credentials</h4>
+<pre><code><a href='/constructor/inputPaymentCredentialsSaved'>inputPaymentCredentialsSaved</a>#c10eb2cf id:<a href='/type/string'>string</a> tmp_password:<a href='/type/bytes'>bytes</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
+
+<a href='/constructor/paymentSavedCredentialsCard'>paymentSavedCredentialsCard</a>#cdc27a1f id:<a href='/type/string'>string</a> title:<a href='/type/string'>string</a> = <a href='/type/PaymentSavedCredentials'>PaymentSavedCredentials</a>;
+
+<a href='/constructor/payments.paymentForm'>payments.paymentForm</a>#a0058751 flags:<a href='/type/%23'>#</a> can_save_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> password_missing:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> form_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> provider_id:<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> native_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> native_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/DataJSON'>DataJSON</a> additional_methods:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentFormMethod'>PaymentFormMethod</a>&gt; saved_info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> saved_credentials:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PaymentSavedCredentials'>PaymentSavedCredentials</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentForm'>payments.PaymentForm</a>;
+
+<a href='/constructor/account.tmpPassword'>account.tmpPassword</a>#db64fd34 tmp_password:<a href='/type/bytes'>bytes</a> valid_until:<a href='/type/int'>int</a> = <a href='/type/account.TmpPassword'>account.TmpPassword</a>;
+
+---functions---
+
+<a href='/method/account.getTmpPassword'>account.getTmpPassword</a>#449e0b51 password:<a href='/type/InputCheckPasswordSRP'>InputCheckPasswordSRP</a> period:<a href='/type/int'>int</a> = <a href='/type/account.TmpPassword'>account.TmpPassword</a>;</code></pre>
+<p>To reuse saved payment methods, the <code>saved_credentials</code> field of the <a href="/constructor/payments.paymentForm">payment form</a> is used.
+The <code>title</code> of the <a href="/constructor/paymentSavedCredentialsCard">paymentSavedCredentialsCard</a> can be used to preview a censored version of credit card info.
+The <code>id</code> field is provided by the payment provider directly to the Telegram servers when saving the payment method, and identifies the payment method.
+Full credit card info <strong>is not</strong> saved on Telegram Servers, and cannot be fetched by the user.</p>
+<p>In order to <strong>use</strong> the saved payment method, <a href="/api/srp">2FA</a> must be enabled: the user must verify their identity by entering their <a href="/api/srp">2FA</a> password, which is then used as described in the <a href="/api/srp">SRP docs</a> to generate SRP parameters which must be passed to <a href="/method/account.getTmpPassword">account.getTmpPassword</a>.</p>
+<p>The generated temporary password can then be used to make payments using the saved credentials using the <a href="/constructor/inputPaymentCredentialsSaved">inputPaymentCredentialsSaved</a> constructor.</p>
+<ul>
+<li>The <code>id</code> field is the <a href="/constructor/paymentSavedCredentialsCard">paymentSavedCredentialsCard</a> <code>id</code>.</li>
+<li>The <code>tmp_password</code> is the temporary payment password generated by the server, if the user provided a correct <a href="/api/srp">2FA password</a>.</li>
+</ul>
+<p>Example implementation: <a href="https://github.com/DrKLO/Telegram">Telegram for Android</a>.</p>
+<h3><a class="anchor" href="#4-pre-checkout" id="4-pre-checkout" name="4-pre-checkout"><i class="anchor-icon"></i></a>4. Pre-Checkout</h3>
+<pre><code><a href='/constructor/inputPaymentCredentialsSaved'>inputPaymentCredentialsSaved</a>#c10eb2cf id:<a href='/type/string'>string</a> tmp_password:<a href='/type/bytes'>bytes</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
+<a href='/constructor/inputPaymentCredentials'>inputPaymentCredentials</a>#3417d728 flags:<a href='/type/%23'>#</a> save:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> data:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
+<a href='/constructor/inputPaymentCredentialsApplePay'>inputPaymentCredentialsApplePay</a>#aa1c39f payment_data:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
+<a href='/constructor/inputPaymentCredentialsGooglePay'>inputPaymentCredentialsGooglePay</a>#8ac32801 payment_token:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a>;
+
+<a href='/constructor/payments.paymentResult'>payments.paymentResult</a>#4e5f810d updates:<a href='/type/Updates'>Updates</a> = <a href='/type/payments.PaymentResult'>payments.PaymentResult</a>;
+<a href='/constructor/payments.paymentVerificationNeeded'>payments.paymentVerificationNeeded</a>#d8411139 url:<a href='/type/string'>string</a> = <a href='/type/payments.PaymentResult'>payments.PaymentResult</a>;
+
+---functions---
+
+<a href='/method/payments.sendPaymentForm'>payments.sendPaymentForm</a>#2d03522f flags:<a href='/type/%23'>#</a> form_id:<a href='/type/long'>long</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> requested_info_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> shipping_option_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> credentials:<a href='/type/InputPaymentCredentials'>InputPaymentCredentials</a> tip_amount:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/long'>long</a> = <a href='/type/payments.PaymentResult'>payments.PaymentResult</a>;
+
+<a href='/method/payments.sendStarsForm'>payments.sendStarsForm</a>#7998c914 form_id:<a href='/type/long'>long</a> invoice:<a href='/type/InputInvoice'>InputInvoice</a> = <a href='/type/payments.PaymentResult'>payments.PaymentResult</a>;</code></pre>
+<p>After <a href="#23-verifying-information">verifying order information</a>, the final step for the client is to call <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> or <a href="/method/payments.sendStarsForm">payments.sendStarsForm</a> for <a href="#31-star-payment">payments using Telegram Stars »</a>, with the following parameters:</p>
+<ul>
+<li>The <code>form_id</code> is set to the ID of the form</li>
+<li>The <code>invoice</code> is set to the previously passed invoice</li>
+<li><code>requested_info_id</code> is set to the <code>id</code> of the <a href="#23-verifying-information">verified order information</a>, if it was requested</li>
+<li><code>shipping_option_id</code> is set to the <a href="#24-select-delivery-option">selected delivery option</a>, if shipping was requested.</li>
+<li><code>credentials</code> are the payment credentials generated by the payment provider, required to complete the order.</li>
+</ul>
+<p>Payment method info can also be saved to the Telegram Servers and reused, by setting the <code>save</code> flag of <a href="/constructor/inputPaymentCredentials">inputPaymentCredentials</a> when sending the form.
+This is only possible on accounts with <a href="/api/srp">2FA</a> enabled.</p>
+<p>The bot then <a href="#41-receiving-pre-checkout-query">replies to the received precheckout query</a>, finally the user <a href="#5-checkout">proceeds to checkout</a>.</p>
+<p>Please note that if the result of the method is a <a href="/constructor/payments.paymentVerificationNeeded">payments.paymentVerificationNeeded</a>, before <a href="#5-checkout">proceeding to checkout</a> the payment provider requires the user to verify their identity by opening the provided <code>url</code> and following instructions (ie 3-D Secure).<br>
+Once the user finishes working with the webpage, the client can <a href="#5-checkout">proceed to checkout</a>.</p>
+<p>Eventual errors are returned in the form of RPC errors (<code>rpc_error</code>), with the description of the error by the bot contained in additional <a href="/constructor/updateServiceNotification">service updates</a> received separately, see <a href="/api/errors#406-not-acceptable">here</a> for more info.  </p>
+<p>Note that eventual payment errors will not be sent to the client via MTProto if they occur during additional verification (if a <a href="/constructor/payments.paymentVerificationNeeded">payments.paymentVerificationNeeded</a> is returned and the user fails TOTP verification): such errors will only be displayed inside of the verification webview, no MTProto updates or RPC errors (<code>rpc_error</code>) will be received.  </p>
+<h4><a class="anchor" href="#41-receiving-pre-checkout-query" id="41-receiving-pre-checkout-query" name="41-receiving-pre-checkout-query"><i class="anchor-icon"></i></a>4.1 Receiving pre-checkout query</h4>
+<pre><code><a href='/constructor/paymentRequestedInfo'>paymentRequestedInfo</a>#909c3f94 flags:<a href='/type/%23'>#</a> name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> phone:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> email:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> shipping_address:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/PostAddress'>PostAddress</a> = <a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a>;
+
+<a href='/constructor/updateBotPrecheckoutQuery'>updateBotPrecheckoutQuery</a>#8caa9a96 flags:<a href='/type/%23'>#</a> query_id:<a href='/type/long'>long</a> user_id:<a href='/type/long'>long</a> payload:<a href='/type/bytes'>bytes</a> info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> shipping_option_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/messages.setBotPrecheckoutResults'>messages.setBotPrecheckoutResults</a>#9c2dd95 flags:<a href='/type/%23'>#</a> success:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> query_id:<a href='/type/long'>long</a> error:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The user enters their payment information as described above and presses the final pay button.
+At this moment the Telegram API sends an <a href="/constructor/updateBotPrecheckoutQuery">updateBotPrecheckoutQuery</a> constructor that contains all the available information about the order to the bot. 
+The bot must reply using <a href="/method/messages.setBotPrecheckoutResults">messages.setBotPrecheckoutResults</a> <strong>within 10 seconds</strong> after receiving this update or the transaction is canceled.</p>
+<p>The bot may return an error if it can't process the order for any reason. We highly recommend specifying a reason for failure to complete the order in human readable form (e.g. "Sorry, we're all out of rubber ducks! Would you be interested in a steel bear instead?"). Telegram will display this reason to the user.</p>
+<h3><a class="anchor" href="#5-checkout" id="5-checkout" name="5-checkout"><i class="anchor-icon"></i></a>5. Checkout</h3>
+<pre><code><a href='/constructor/keyboardButtonBuy'>keyboardButtonBuy</a>#afd93fbb text:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
+<a href='/constructor/keyboardButtonRow'>keyboardButtonRow</a>#77608b83 buttons:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButton'>KeyboardButton</a>&gt; = <a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>;
+<a href='/constructor/replyInlineMarkup'>replyInlineMarkup</a>#48a30254 rows:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>&gt; = <a href='/type/ReplyMarkup'>ReplyMarkup</a>;
+
+<a href='/constructor/messageMediaInvoice'>messageMediaInvoice</a>#f6a548d3 flags:<a href='/type/%23'>#</a> shipping_address_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> test:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/WebDocument'>WebDocument</a> receipt_msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> start_param:<a href='/type/string'>string</a> extended_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/MessageExtendedMedia'>MessageExtendedMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
+
+<a href='/constructor/message'>message</a>#9815cec8 flags:<a href='/type/%23'>#</a> out:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> mentioned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> media_unread:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> post:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> from_scheduled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/constructor/true'>true</a> legacy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> edit_hide:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/constructor/true'>true</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.26?<a href='/constructor/true'>true</a> invert_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.27?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> offline:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.1?<a href='/constructor/true'>true</a> video_processing_pending:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.4?<a href='/constructor/true'>true</a> paid_suggested_post_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.8?<a href='/constructor/true'>true</a> paid_suggested_post_ton:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.9?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Peer'>Peer</a> from_boosts_applied:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.29?<a href='/type/int'>int</a> peer_id:<a href='/type/Peer'>Peer</a> saved_peer_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/type/Peer'>Peer</a> fwd_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/MessageFwdHeader'>MessageFwdHeader</a> via_bot_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/long'>long</a> via_business_bot_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.0?<a href='/type/long'>long</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/MessageReplyHeader'>MessageReplyHeader</a> date:<a href='/type/int'>int</a> message:<a href='/type/string'>string</a> media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/type/MessageMedia'>MessageMedia</a> reply_markup:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; views:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> forwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> replies:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.23?<a href='/type/MessageReplies'>MessageReplies</a> edit_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/int'>int</a> post_author:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/string'>string</a> grouped_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/long'>long</a> reactions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/type/MessageReactions'>MessageReactions</a> restriction_reason:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; ttl_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.25?<a href='/type/int'>int</a> quick_reply_shortcut_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.30?<a href='/type/int'>int</a> effect:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.2?<a href='/type/long'>long</a> factcheck:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.3?<a href='/type/FactCheck'>FactCheck</a> report_delivery_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.5?<a href='/type/int'>int</a> paid_message_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.6?<a href='/type/long'>long</a> suggested_post:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.7?<a href='/type/SuggestedPost'>SuggestedPost</a> = <a href='/type/Message'>Message</a>;
+
+<a href='/constructor/updateNewMessage'>updateNewMessage</a>#1f2b0afd message:<a href='/type/Message'>Message</a> pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/payments.paymentReceipt'>payments.paymentReceipt</a>#70c4fe03 flags:<a href='/type/%23'>#</a> date:<a href='/type/int'>int</a> bot_id:<a href='/type/long'>long</a> provider_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> shipping:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/ShippingOption'>ShippingOption</a> tip_amount:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/long'>long</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> credentials_title:<a href='/type/string'>string</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentReceipt'>payments.PaymentReceipt</a>;
+
+<a href='/constructor/payments.paymentReceiptStars'>payments.paymentReceiptStars</a>#dabbf83a flags:<a href='/type/%23'>#</a> date:<a href='/type/int'>int</a> bot_id:<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/WebDocument'>WebDocument</a> invoice:<a href='/type/Invoice'>Invoice</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> transaction_id:<a href='/type/string'>string</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/payments.PaymentReceipt'>payments.PaymentReceipt</a>;
+
+---functions---
+
+<a href='/method/payments.getPaymentReceipt'>payments.getPaymentReceipt</a>#2478d1cc peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> = <a href='/type/payments.PaymentReceipt'>payments.PaymentReceipt</a>;</code></pre>
+<p>In case the bot confirms the order, Telegram requests the payment provider to complete the transaction. If the payment information was entered correctly and the payment goes through, the Telegram API will modify the invoice message and send a service message as described below. Once your bot receives this message, it should proceed with delivering the goods or services purchased by the user.</p>
+<p>If all is OK, the user receives a <a href="/constructor/payments.paymentResult">payments.paymentResult</a> in reply to the <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> query, containing info about the updated invoice message in the form of an <a href="/constructor/updateEditMessage">updateEditMessage</a>.</p>
+<p>The invoice message will be updated as follows: the attached <a href="/constructor/messageMediaInvoice">messageMediaInvoice</a> will now have a <code>receipt_msg_id</code> field.
+Clients should treat invoice messages with a <code>receipt_msg_id</code> field as receipt messages, <strong>locally</strong> modifying the label of the <a href="/constructor/keyboardButtonBuy">keyboardButtonBuy</a> button to a localized version of the word <code>Receipt</code>.
+From this point, clicking on the <code>Receipt</code> button should trigger a call to <a href="/method/payments.getPaymentReceipt">payments.getPaymentReceipt</a>, providing the <code>receipt_msg_id</code> to the <code>msg_id</code> field, which will return info about the transaction.</p>
+<p>The payment will also generate one service message of type <a href="/constructor/messageActionPaymentSent">messageActionPaymentSent</a> or <a href="/constructor/messageActionPaymentSentMe">messageActionPaymentSentMe</a>, replying to the invoice.
+For bots, the service message will be of type <a href="/constructor/messageActionPaymentSentMe">messageActionPaymentSentMe</a>, for users it will be a <a href="/constructor/messageActionPaymentSent">messageActionPaymentSent</a>.<br>
+The <code>recurring_init</code> flag will be set if this payment also enables future recurring payments.<br>
+Further recurring payments will automatically send <a href="/constructor/messageActionPaymentSentMe">messageActionPaymentSentMe</a> and <a href="/constructor/messageActionPaymentSent">messageActionPaymentSent</a> messages with the <code>recurring_used</code> flag set.  </p>
+<pre><code><a href='/constructor/messageActionPaymentSentMe'>messageActionPaymentSentMe</a>#ffa00ccc flags:<a href='/type/%23'>#</a> recurring_init:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> recurring_used:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> payload:<a href='/type/bytes'>bytes</a> info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> shipping_option_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> charge:<a href='/type/PaymentCharge'>PaymentCharge</a> subscription_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/int'>int</a> = <a href='/type/MessageAction'>MessageAction</a>;
+<a href='/constructor/messageActionPaymentSent'>messageActionPaymentSent</a>#c624b16e flags:<a href='/type/%23'>#</a> recurring_init:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> recurring_used:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> invoice_slug:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> subscription_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/int'>int</a> = <a href='/type/MessageAction'>MessageAction</a>;</code></pre>
+<h3><a class="anchor" href="#6-refunds" id="6-refunds" name="6-refunds"><i class="anchor-icon"></i></a>6. Refunds</h3>
+<pre><code><a href='/constructor/paymentCharge'>paymentCharge</a>#ea02c27e id:<a href='/type/string'>string</a> provider_charge_id:<a href='/type/string'>string</a> = <a href='/type/PaymentCharge'>PaymentCharge</a>;
+
+<a href='/constructor/messageActionPaymentSentMe'>messageActionPaymentSentMe</a>#ffa00ccc flags:<a href='/type/%23'>#</a> recurring_init:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> recurring_used:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> payload:<a href='/type/bytes'>bytes</a> info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PaymentRequestedInfo'>PaymentRequestedInfo</a> shipping_option_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> charge:<a href='/type/PaymentCharge'>PaymentCharge</a> subscription_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/int'>int</a> = <a href='/type/MessageAction'>MessageAction</a>;
+
+<a href='/constructor/messageActionPaymentRefunded'>messageActionPaymentRefunded</a>#41b3e202 flags:<a href='/type/%23'>#</a> peer:<a href='/type/Peer'>Peer</a> currency:<a href='/type/string'>string</a> total_amount:<a href='/type/long'>long</a> payload:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/bytes'>bytes</a> charge:<a href='/type/PaymentCharge'>PaymentCharge</a> = <a href='/type/MessageAction'>MessageAction</a>;
+
+---functions---
+
+<a href='/method/payments.refundStarsCharge'>payments.refundStarsCharge</a>#25ae8f4a user_id:<a href='/type/InputUser'>InputUser</a> charge_id:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Payments made using <a href="/api/stars">Telegram Stars »</a> may be refunded <em>by the user/bot that received them</em> by invoking <a href="/method/payments.refundStarsCharge">payments.refundStarsCharge</a>, passing to <code>user_id</code> the ID of the user that did the payment, and to <code>charge_id</code> the <code>provider_charge_id</code> from the <a href="/constructor/messageActionPaymentSentMe">messageActionPaymentSentMe</a> service message action of the incoming payment.  </p>
+<p>This will emit a <a href="/constructor/messageActionPaymentRefunded">messageActionPaymentRefunded</a> service message.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>﻿TL Language</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="TL (Type Language) serves to describe the used system of types, constructors, and existing functions. In fact, the combinator…">
+    <meta property="og:title" content="﻿TL Language">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="TL (Type Language) serves to describe the used system of types, constructors, and existing functions. In fact, the combinator…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL" >﻿TL Language</a></li></ul></div>
+  <h1 id="dev_page_title">﻿TL Language</h1>
+  
+  <div id="dev_page_content"><p>TL (Type Language) serves to describe the used system of types, constructors, and existing functions. In fact, the combinator description format presented in <a href="/mtproto/serialize">Binary Data Serialization</a> is used.</p>
+<p>See also:  </p>
+<ul>
+<li><a href="/mtproto/TL-polymorph">Polymorphism in TL</a></li>
+</ul>
+<p>Advanced topics:  </p>
+<ul>
+<li>
+<p><a href="/mtproto/TL-dependent">Dependent types in TL</a></p>
+</li>
+<li>
+<p><a href="/mtproto/TL-formal">Formal description of TL</a></p>
+</li>
+<li>
+<p><a href="/mtproto/TL-combinators">Formal description of TL combinators</a></p>
+</li>
+<li>
+<p><a href="/mtproto/TL-types">Type serialization</a></p>
+</li>
+<li>
+<p><a href="/mtproto/TL-tl">TL schema for serialization of TL schemas</a></p>
+</li>
+<li>
+<p><a href="/mtproto/TL-optargs">Optional combinator parameters and their values</a></p>
+</li>
+<li>
+<p><a href="/mtproto/TL-abstract-types">Binary serialization and abstract TL types</a></p>
+</li>
+<li>
+<p><a href="/mtproto/TL-patterns">Formal description of templates in TL</a></p>
+</li>
+</ul>
+<h3><a class="anchor" href="#overview" id="overview" name="overview"><i class="anchor-icon"></i></a>Overview</h3>
+<p>A TL program usually consists of two sections separated by keyword <code>---functions---</code>. The first section consists of declarations of built-in types and aggregate types (i.e. their constructors). The second section consists of the declared functions, i.e. functional combinators.</p>
+<p>Actually, both the first and second sections consist of combinator declarations, each of which ends with a semicolon. However, the first section contains only constructors, while the second section only involves functions. Each combinator is declared using a “combinator declaration” in the format explained above. However, the combinator number and field names may be explicitly assigned.</p>
+<p>If additional type declarations are required after functions have been declared, the keyword (section divider) <code>---types---</code> is used. Furthermore, a functional combinator may be declared in the type section if its result type begins with an exclamation point (in fact, when the function section is interpreted, this exclamation point is added automatically).</p>
+<p>To explicitly define 32-bit names of combinators, a hash mark (#) is added immediately after the combinator's name, followed by 8 hexadecimal digits.</p>
+<h3><a class="anchor" href="#namespaces" id="namespaces" name="namespaces"><i class="anchor-icon"></i></a>Namespaces</h3>
+<p>Composite constructions like <code>&lt;namespace_identifier&gt;.&lt;constructor_identifier&gt;</code> and <code>&lt;namespace_identifier&gt;.&lt;Type_identifier&gt;</code> can be used as constructor- or type identifiers. The portion of the identifier to the left of the period is called the <em>namespace</em>. Moreover, the rule about a first uppercase letter in type identifiers and lowercase letter in constructor identifiers applies to the part of the construction after the period. For example, <code>auth.Message</code> would be a type, while <code>auth.std_message</code> would be a constructor.</p>
+<p>Namespaces do not require a special declaration.</p>
+<h3><a class="anchor" href="#comments" id="comments" name="comments"><i class="anchor-icon"></i></a>Comments</h3>
+<p>Comments are the same as in C++.</p>
+<h3><a class="anchor" href="#example" id="example" name="example"><i class="anchor-icon"></i></a>Example</h3>
+<pre><code>// built-in types
+int#a8509bda ? = Int;
+long ? = Long;
+double ? = Double;
+string ? = String;
+null = Null;
+
+vector {t:Type} # [ t ] = Vector t;
+coupleInt {alpha:Type} int alpha = CoupleInt&lt;alpha&gt;;
+coupleStr {gamma:Type} string gamma = CoupleStr gamma;  
+/* The name of the type variable is irrelevant: "gamma" could be replaced with "alpha"; 
+   However, the combinator number will depend on the specific choice. */
+
+intHash {alpha:Type} vector&lt;coupleInt&lt;alpha&gt;&gt; = IntHash&lt;alpha&gt;;
+strHash {alpha:Type} (vector (coupleStr alpha)) = StrHash alpha;
+intSortedHash {alpha:Type} intHash&lt;alpha&gt; = IntSortedHash&lt;alpha&gt;;
+strSortedHash {alpha:Type} (strHash alpha) = StrSortedHash alpha;
+
+// custom types
+pair x:Object y:Object = Pair;
+triple x:Object y:Object z:Object = Triple;
+
+user#d23c81a3 id:int first_name:string last_name:string = User;
+no_user#c67599d1 id:int = User;
+group id:int title:string last_name:string = Group;
+no_group = Group;
+
+---functions---
+
+// Maybe some built-in arithmetic functions; inverse quotes make "identifiers" out of arbitrary non-alphanumeric strings
+`+` Int Int = Int;
+`-` Int Int = Int;
+`+` Double Double = Double;
+// ...
+
+// API functions (aka RPC functions)
+getUser#b0f732d5 int = User;
+getUsers#2d84d5f5 (Vector int) = Vector User;</code></pre>
+<p>In this case, the <code>user</code> constructor has been explicitly assigned a number (0xd23c81a3); In fact, this was not necessary, since this value is the CRC32 of the string <code>"user id:int first_name:string last_name:string = User"</code>, which would have been used by default.</p>
+<p>Special constructors are not required for Vector int, Vector User, Vector Object, etc. -- the same universal constructor can be used everywhere:</p>
+<pre><code>vector#1cb5c415 {t:Type} # [ t ] = Vector t;</code></pre>
+<p>Note that when the <code>getUsers (Vector int) = Vector User;</code> constructor number is calculated, the CRC32 of the string "getUsers Vector int = Vector User” is computed (from which all parentheses have been removed).</p>
+<p>Notation <code>T0&lt;T1,T2,...,Tn&gt;</code> is syntactic sugar for <code>(T0 (T1) (T2) ... (Tn))</code>. For example, <code>Vector&lt;User&gt;</code> and <code>(Vector User)</code> are entirely interchangeable.</p>
+<h4><a class="anchor" href="#example-of-an-rpc-query" id="example-of-an-rpc-query" name="example-of-an-rpc-query"><i class="anchor-icon"></i></a>Example of an RPC query</h4>
+<p>Suppose we want to call <code>getUsers([2,3,4])</code>. This query will be serialized into a sequence of 32-bit integers as follows:</p>
+<pre><code>0x2d84d5f5 0x1cb5c415 0x3 0x2 0x3 0x4</code></pre>
+<p>Please note that TL serialization yields sequences of 32-bit integers. When it has to be embedded into a byte stream, for example a network packet, each 32-bit integer is represented by four bytes in little-endian order. In this way the above query corresponds to the following byte stream:</p>
+<pre><code>F5 D5 84 2D 15 C4 B5 1C 03 00 00 00 02 00 00 00 03 00 00 00 04 00 00 00</code></pre>
+<p>The response might look something like this:</p>
+<pre><code>0x1cb5c415 0x3 0xd23c81a3 0x2 0x74655005 0x00007265 0x72615006 0x72656b 0xc67599d1 0x3 0xd23c81a3 0x4 0x686f4a04 0x6e 0x656f4403</code></pre>
+<p>This roughly corresponds to</p>
+<pre><code>[{"id":2,"first_name":"Peter", "last_name":"Parker"},{},{"id":4,"first_name":"John","last_name":"Doe"}]</code></pre>
+<p>Note that in both cases the same universal constructor <code>vector#1cb5c415</code> is used: in the request to serialize the value of type <code>Vector int</code>, and in the serialization of the value of type <code>Vector User</code> in the response. There is no ambiguity because in both cases the type of the value being (de)serialized is known before its (de)serialization begins. For example, after receiving the query, the server sees that the first part is <code>0x2d84d5f5</code>, which corresponds to the combinator <code>getUsers#2d84d5f5 (Vector int) = Vector User</code>. Thus, it is understood that what follows will be a value of type <code>Vector int</code>. After receiving the response to this query, the client knows that it must  receive a value of type <code>Vector User</code> and it deserializes the response accordingly.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
