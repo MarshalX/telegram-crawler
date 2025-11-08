@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>TL-formal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="See also TL Language.
+For the syntax of declaring combinators, see in article Formal declaration of TL combinators.
+For…">
+    <meta property="og:title" content="TL-formal">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="See also TL Language.
+For the syntax of declaring combinators, see in article Formal declaration of TL combinators.
+For…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL-formal" >TL-formal</a></li></ul></div>
+  <h1 id="dev_page_title">TL-formal</h1>
+  
+  <div id="dev_page_content"><p>See also <a href="TL">TL Language</a>. 
+For the syntax of declaring combinators, see in article <a href="TL-combinators">Formal declaration of TL combinators</a>. 
+For the syntax of patterns, see in article <a href="TL-patterns">Formal declaration of TL patterns</a>. </p>
+<h3><a class="anchor" href="#tokens" id="tokens" name="tokens"><i class="anchor-icon"></i></a>Tokens</h3>
+<p>Comments are the same as in C/C++. They are removed by a lexical parser (for example, being replaced by a single space). Whitespace separates tokens. Except for string constants, tokens cannot contain spaces. </p>
+<p>Character classes: </p>
+<div class="richcode">
+<p><em>lc-letter</em> ::= <code>a</code> | <code>b</code> | ... | <code>z</code><br>
+<em>uc-letter</em> ::= <code>A</code> | <code>B</code> | ... | <code>Z</code><br>
+<em>digit</em> ::= <code>0</code> | <code>1</code> | ... | <code>9</code><br>
+<em>hex-digit</em> ::= <em>digit</em> | <code>a</code> | <code>b</code> | <code>c</code> | <code>d</code> | <code>e</code> | <code>f</code><br>
+<em>underscore</em> ::= <code>_</code><br>
+<em>letter</em> ::= <em>lc-letter</em> | <em>uc-letter</em><br>
+<em>ident-char</em> ::= <em>letter</em> | <em>digit</em> | <em>underscore</em>   </p>
+</div>
+<p>Simple identifiers and keywords: </p>
+<div class="richcode">
+<p><em>lc-ident</em> ::= <em>lc-letter</em> { <em>ident-char</em> }<br>
+<em>uc-ident</em> ::= <em>uc-letter</em> { <em>ident-char</em> }<br>
+<em>namespace-ident</em> ::= <em>lc-ident</em><br>
+<em>lc-ident-ns</em> ::= [ <em>namespace-ident</em> <code>.</code> ] <em>lc-ident</em><br>
+<em>uc-ident-ns</em> ::= [ <em>namespace-ident</em> <code>.</code> ] <em>uc-ident</em><br>
+<em>lc-ident-full</em> ::= <em>lc-ident-ns</em> [ <code>#</code> <em>hex-digit</em> *8 ]   </p>
+</div>
+<p>Tokens:</p>
+<div class="richcode">
+<p><em>underscore</em> ::= <code>_</code><br>
+<em>colon</em> ::= <code>:</code><br>
+<em>semicolon</em> ::= <code>;</code><br>
+<em>open-par</em> ::= <code>(</code><br>
+<em>close-par</em> ::= <code>)</code><br>
+<em>open-bracket</em> ::= <code>[</code><br>
+<em>close-bracket</em> ::= <code>]</code><br>
+<em>open-brace</em> ::= <code>{</code><br>
+<em>close-brace</em> ::= <code>}</code><br>
+<em>triple-minus</em> ::= <code>---</code><br>
+<em>nat-const</em> ::= <em>digit</em> { <em>digit</em> }<br>
+<em>lc-ident-full</em><br>
+<em>lc-ident</em><br>
+<em>uc-ident-ns</em><br>
+<em>equals</em> ::= <code>=</code><br>
+<em>hash</em> ::= <code>#</code><br>
+<em>question-mark</em> ::= <code>?</code><br>
+<em>percent</em> ::= <code>%</code><br>
+<em>plus</em> ::= <code>+</code><br>
+<em>langle</em> ::= <code>&lt;</code><br>
+<em>rangle</em> ::= <code>&gt;</code><br>
+<em>comma</em> ::= <code>,</code><br>
+<em>dot</em> ::= <code>.</code><br>
+<em>asterisk</em> ::= <code>*</code><br>
+<em>excl-mark</em> ::= <code>!</code><br>
+<em>Final-kw</em> ::= <code>Final</code><br>
+<em>New-kw</em> ::= <code>New</code><br>
+<em>Empty-kw</em> ::= <code>Empty</code>  </p>
+</div>
+<p><code>Final</code> is a reserved keyword, e.g. a special token. Words like <code>Type</code> are not keywords, rather they are identifiers with preset values. </p>
+<p>Tokens consisting of one or more constant symbols shall be hereafter denoted using terms in quotation marks (for example, <code>---</code> replaces <em>triple-minus</em>). </p>
+<h2><a class="anchor" href="#syntax" id="syntax" name="syntax"><i class="anchor-icon"></i></a>Syntax</h2>
+<h3><a class="anchor" href="#general-syntax-of-a-tl-program" id="general-syntax-of-a-tl-program" name="general-syntax-of-a-tl-program"><i class="anchor-icon"></i></a>General syntax of a TL program</h3>
+<p>Syntactically, a TL program consists of a stream of tokens (separated by spaces, which are ignored at this stage). General program structure: </p>
+<div class="richcode">
+<p><em>TL-program</em> ::= <em>constr-declarations</em> { <code>---</code> <code>functions</code> <code>---</code> <em>fun-declarations</em> | <code>---</code> <code>types</code> <code>---</code> <em>constr-declarations</em> }   </p>
+</div>
+<p>Here the constructor- and function declarations are nearly identical in their syntax (they are both combinators): </p>
+<div class="richcode">
+<p><em>constr-declarations</em> ::= { <em>declaration</em> }<br>
+<em>fun-declarations</em> ::= { <em>declaration</em> }   </p>
+</div>
+<p>There are various declarations: </p>
+<div class="richcode">
+<p><em>declaration</em> ::= <em>combinator-decl</em> | <em>partial-app-decl</em> | <em>final-decl</em>   </p>
+</div>
+<p>Before explaining how declarations of combinators, partial applications, and type <code>finalization</code> are given, we will introduce additional syntactical categories: </p>
+<h3><a class="anchor" href="#syntactical-categories-and-constructions" id="syntactical-categories-and-constructions" name="syntactical-categories-and-constructions"><i class="anchor-icon"></i></a>Syntactical categories and constructions</h3>
+<p>The concept of an expression (<em>expr</em>) is important. There are type expressions (<em>type-expr</em>) and numeric expressions (<em>nat-expr</em>). However, they are defined the same way. Their correctness as type- or numeric expressions is checked when the type of the analyzed expression is checked. </p>
+<div class="richcode">
+<p><em>type-expr</em> ::= <em>expr</em><br>
+<em>nat-expr</em> ::= <em>expr</em><br>
+<em>expr</em> ::= { <em>subexpr</em> }<br>
+<em>subexpr</em> ::= <em>term</em> | <em>nat-const</em> <code>+</code> <em>subexpr</em> | <em>subexpr</em> <code>+</code> <em>nat-const</em><br>
+<em>term</em> ::= <code>(</code> <em>expr</em> <code>)</code> | <em>type-ident</em> | <em>var-ident</em> | <em>nat-const</em> | <code>%</code> <em>term</em> | <em>type-ident</em> <code>&lt;</code> <em>expr</em> { <code>,</code> <em>expr</em> } <code>&gt;</code><br>
+<em>type-ident</em> ::= <em>boxed-type-ident</em> | <em>lc-ident-ns</em> | <code>#</code><br>
+<em>boxed-type-ident</em> ::= <em>uc-ident-ns</em><br>
+<em>var-ident</em> ::= <em>lc-ident</em> | <em>uc-ident</em><br>
+<em>type-term</em> ::= <em>term</em><br>
+<em>nat-term</em> ::= <em>term</em>   </p>
+</div>
+<p>Note that writing <code>E = E_1 E_2 ... E_n</code> in the expression for <em>expr</em> means applying the function <em>E_1</em> to the argument <em>E_2</em>, applying the result to <em>E_3</em>, etc. Specifically, <code>E_1 E_2 E_3 = (E_1 E_2) E_3</code>. A solitary <code>#</code> is included in <em>type-ident</em>, because it is actually the identifier for a built-in type (<code>#</code> alias <code>nat</code>). </p>
+<p>The expression <code>E&lt;E_1,...,E_n&gt;</code> is syntactic sugar for <code>(E (E_1) ... (E_n))</code>, i.e. both expressions are transformed into the same internal representation. </p>
+<h3><a class="anchor" href="#combinator-declarations" id="combinator-declarations" name="combinator-declarations"><i class="anchor-icon"></i></a>Combinator declarations</h3>
+<div class="richcode">
+<p><em>combinator-decl</em> ::= <em>full-combinator-id</em> { <em>opt-args</em> } { <em>args</em> } <code>=</code> <em>result-type</em> <code>;</code><br>
+<em>full-combinator-id</em> ::= <em>lc-ident-full</em> | <code>_</code><br>
+<em>combinator-id</em> ::= <em>lc-ident-ns</em> | <code>_</code><br>
+<em>opt-args</em> ::= <code>{</code> <em>var-ident</em> { <em>var-ident </em>} : [<em>excl-mark</em>] <em>type-expr</em> <code>}</code><br>
+<em>args</em> ::= <em>var-ident-opt</em> <code>:</code> [ <em>conditional-def</em> ] [ <code>!</code> ] <em>type-term</em><br>
+<em>args</em> ::= [ <em>var-ident-opt</em> <code>:</code> ] [ <em>multiplicity</em> <code>*</code>] <code>[</code> { <em>args</em> } <code>]</code><br>
+<em>args</em> ::= <code>(</code> <em>var-ident-opt</em> { <em>var-ident-opt</em> } <code>:</code> [<code>!</code>] <em>type-term</em> <code>)</code><br>
+<em>args</em> ::= [ <code>!</code> ] <em>type-term</em><br>
+<em>multiplicity</em> ::= <em>nat-term</em><br>
+<em>var-ident-opt</em> ::= <em>var-ident</em> | <code>_</code><br>
+<em>conditional-def</em> ::= <em>var-ident</em> [ <code>.</code> <em>nat-const</em> ] <code>?</code><br>
+<em>result-type</em> ::= <em>boxed-type-ident</em> { <em>subexpr</em> }<br>
+<em>result-type</em> ::= <em>boxed-type-ident</em> <code>&lt;</code> <em>subexpr</em> { <code>,</code> <em>subexpr</em> } <code>&gt;</code>   </p>
+</div>
+<p>See <a href="TL-combinators">Formal declaration of TL combinators</a> for a description of what exactly this means. Here we will only note that when declaring the type of a combinator's next argument, only the names of previously arranged (more to the left) arguments of the same combinator may be used as variables, but when declaring the result type you can use all of its parameters (of type <code>Type</code> and <code>#</code>). </p>
+<p>Note that the names of combinators declared in this way may be used in TL itself only as the corresponding bare types. The only combinators that appear in declarations are built-in: <code>O : #</code> and <code>S : # -&gt; #</code>. </p>
+<p>There are also “pseudo-declarations” that are allowed only to declare built-in types (such as <code>int ? = Int;</code>): </p>
+<div class="richcode">
+<p><em>builtin-combinator-decl</em> ::= <em>full-combinator-id</em> <code>?</code> <code>=</code> <em>boxed-type-ident</em> <code>;</code>   </p>
+</div>
+<h3><a class="anchor" href="#partial-applications-patterns" id="partial-applications-patterns" name="partial-applications-patterns"><i class="anchor-icon"></i></a>Partial applications (patterns)</h3>
+<div class="richcode">
+<p><em>partial-app-decl</em> ::= <em>partial-type-app-decl</em> | <em>partial-comb-app-decl</em><br>
+<em>partial-type-app-decl</em> ::= <em>boxed-type-ident</em> <em>subexpr</em> { <em>subexpr</em> } <code>;</code>  | <em>boxed-type-ident</em> <code>&lt;</code> <em>expr</em> { <code>,</code> <em>expr</em> } <code>&gt;</code> <code>;</code><br>
+<em>partial-comb-app-decl</em> ::= <em>combinator-id</em> <em>subexpr</em> { <em>subexpr</em> } <code>;</code>   </p>
+</div>
+<p>See <a href="TL-patterns">Formal declaration of TL patterns</a>. </p>
+<h3><a class="anchor" href="#type-finalization" id="type-finalization" name="type-finalization"><i class="anchor-icon"></i></a>Type finalization</h3>
+<div class="richcode">
+<p><em>final-decl</em> ::= <code>New</code> <em>boxed-type-ident</em> <code>;</code> | <code>Final</code> <em>boxed-type-ident</em> <code>;</code> | <code>Empty</code> <em>boxed-type-ident</em> <code>;</code>  </p>
+</div>
+<p>This type of declaration means that there must not be any constructor for the indicated type: before the declaration for <code>New</code> and after the declaration for <code>Final</code>. The keyword <code>Empty</code> enables both effects.</p>
+<h3><a class="anchor" href="#predefined-identifiers" id="predefined-identifiers" name="predefined-identifiers"><i class="anchor-icon"></i></a>Predefined identifiers</h3>
+<p>Nearly all predefined identifiers may be given using the following schema (usually located in <code>common.tl</code>):</p>
+<div class="richcode">
+<p>/////<br>
+//<br>
+// Common Types<br>
+//<br>
+/////  </p>
+<p>// Built-in types<br>
+int ? = Int;<br>
+long ? = Long;<br>
+double ? = Double;<br>
+string ? = String;  </p>
+<p>// Boolean emulation<br>
+boolFalse = Bool;<br>
+boolTrue = Bool;  </p>
+<p>// Boolean for diagonal queries<br>
+boolStat statTrue:int statFalse:int statUnknown:int = BoolStat;  </p>
+<p>// Vector<br>
+vector {t:Type} # [t] = Vector t;<br>
+tuple {t:Type} {n:#} [t] = Tuple t n;<br>
+vectorTotal {t:Type} total_count:int vector:%(Vector t) = VectorTotal t;  </p>
+<p>/////<br>
+//<br>
+// Result- (Maybe-) types<br>
+//<br>
+/////  </p>
+<p>resultFalse {t:Type} = Maybe t;<br>
+resultTrue {t:Type} result:t = Maybe t;  </p>
+<p>pair {X:Type} {Y:Type} a:X b:Y = Pair X Y;<br>
+map {X:Type} {Y:Type} key:X value:Y = Map X Y;  </p>
+<p>Empty False;<br>
+true = True;  </p>
+<p>unit = Unit;  </p>
+</div>
+<ul>
+<li>
+<p>Predefined identifier <code>Type</code>: This type signifies the type of all types. It is usually used to specify the types of optional parameters in the constructors of polymorphic types. If strongly desired, it can be used in its own right, but this is very rarely needed in practice.</p>
+</li>
+<li>
+<p>Identifier <code>#</code>: This type is used to specify a special type of nonnegative integers in the range from 0 to 2^31-1; its main purpose is the same as that of <code>Type</code>. There are two built-in constructors: <code>O</code> : # and <code>S</code> : # -&gt; # (“null” and “next number”, respectively), which work as if <code>#</code> was defined using the schema</p>
+</li>
+</ul>
+<div class="richcode">
+<p>O = #;<br>
+S # = #;  </p>
+</div>
+<ul>
+<li>
+<p>Identifier <code>Tuple</code>: Type -&gt; # -&gt; Type denotes a set of the specified number of values of the indicated type. In other words, <em>Tuple X n</em> means “a set of <em>n</em> values of type <em>X</em>".</p>
+</li>
+<li>
+<p>The type<code>Bool</code>, with two constructors <code>boolTrue</code> and <code>boolFalse</code>, is used to transmit Boolean values.</p>
+</li>
+<li>
+<p>The constructor-less type <code>False</code> may be used instead of undeclared or invalid types in the construction of a TL schema, because any attempt to (de)serialize a value of type <code>False</code> will produce an error. Usage Example:</p>
+</li>
+</ul>
+<div class="richcode">
+<p>user {flags:#} id:flags.0?string first_name:flags.1?string last_name:flags.2?string reserved3:flags.3?False reserved4:flags.4?False = User flags;<br>
+user_present {flags:#} info:%(User flags) = UserInfo flags;<br>
+user_absent {flags:#} = UserInfo flags;<br>
+getUser flags:# id:int = !UserInfo flags;  </p>
+</div>
+<p>In the future, bits 3 and 4 in the <code>flags</code> field may be used to transmit new fields after changing the names and types of the <code>reserved3</code> and <code>reserved4</code> fields. This will change the <code>user</code> constructor's number, but this isn't too important, since the <code>User flags</code> type is only used as a bare type. Transmitting bits 3 or 4 in the <code>flags</code> field in a <code>getUser</code> query before these fields have actually been defined will lead to an error in the (de)serialization of the request.</p>
+<ul>
+<li>The type <code>True</code> with a single null constructor <code>true</code> plays a role similar to the void type in C/C++. It is especially useful as a bare type <code>%True</code>, alias <code>true</code>, because its serialization has zero length. For example, the <code>first_name:flags.1?string</code> constructor used above is in fact shorthand for (the as-yet unsupported) alternative-type general constructor <code>first_name:(flags.1?string:true)</code>.</li>
+</ul>
+<p>When directly used in a <a href="https://core.telegram.org/mtproto/TL-combinators#conditional-fields">conditional field</a> it may simply indicate the presence (absence) of a certain parameter with void type.
+If the conditional field exists, the associated parameter will not be populated; the conditional field simply exists and the existance value can be used to perform certain operations, example:</p>
+<pre><code>user {flags:#} id:flags.0?string first_name:flags.1?string last_name:flags.2?string bot:flags.3?true reserved4:flags.4?False = User flags;</code></pre>
+<p>If bit 3 of the <code>flags</code> parameter isn't set, the user is a normal user.
+If bit 3 of the <code>flags</code> parameter is set, this indicates that the specified user is a bot: however, during deserialization, the <code>bot</code> parameter must not be assigned any value, since <code>true</code> is actually a <code>void</code> type.</p>
+<ul>
+<li>The type<code>Unit</code> with a single null constructor <code>Unit</code> is similar to the previous type.</li>
+</ul>
+<h4><a class="anchor" href="#antlr-definition" id="antlr-definition" name="antlr-definition"><i class="anchor-icon"></i></a>ANTLR definition</h4>
+<p>An <a href="https://www.antlr.org">ANLTR</a> definition of TL grammar can be found <a href="https://gitlab.com/telekram/telekram/-/blob/master/generator/src/commonMain/antlr/TL.g4">here »</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

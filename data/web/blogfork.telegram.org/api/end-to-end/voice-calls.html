@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>End-to-End Encrypted Voice Calls</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="This document describes encryption in voice calls as implemented in Telegram apps with versions &lt; 7.0. See this document…">
+    <meta property="og:title" content="End-to-End Encrypted Voice Calls">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="This document describes encryption in voice calls as implemented in Telegram apps with versions &lt; 7.0. See this document…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/end-to-end%2Fvoice-calls" >End-to-End Encrypted Voice Calls</a></li></ul></div>
+  <h1 id="dev_page_title">End-to-End Encrypted Voice Calls</h1>
+  
+  <div id="dev_page_content"><blockquote>
+<p>This document describes encryption in <strong>voice calls</strong> as implemented in Telegram apps with versions <strong>&lt; 7.0</strong>. See <a href="https://core.telegram.org/api/end-to-end/video-calls">this document</a> for details on encryption used in <strong>voice and video calls</strong> in app versions released on <strong>August 14, 2020</strong> and later.</p>
+</blockquote>
+<h5><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related articles</h5>
+<p><div class="dev_page_nav_wrap"></p>
+<ul>
+<li><a href="/api/end-to-end/video-calls">End-to-End Encryption in Voice and Video Calls</a></li>
+<li><a href="/api/end-to-end">End-to-End Encryption in Secret Chats</a></li>
+<li><a href="/mtproto/security_guidelines">Security Guidelines for Client Developers</a>
+</div></li>
+</ul>
+<h2><a class="anchor" href="#establishing-voice-calls" id="establishing-voice-calls" name="establishing-voice-calls"><i class="anchor-icon"></i></a>Establishing voice calls</h2>
+<p>Before a voice call is ready, some preliminary actions have to be performed. The calling party needs to contact the party to be called and check whether it is ready to accept the call. Besides that, the parties have to negotiate the protocols to be used, learn the IP addresses of each other or of the Telegram relay servers to be used (so-called <em>reflectors</em>), and generate a one-time encryption key for this voice call with the aid of <em>Diffie--Hellman key exchange</em>. All of this is accomplished in parallel with the aid of several Telegram API methods and related notifications. This document details the generation of the encryption key. Other negotiations will be eventually documented elsewhere.</p>
+<h2><a class="anchor" href="#key-generation" id="key-generation" name="key-generation"><i class="anchor-icon"></i></a>Key Generation</h2>
+<p>The Diffie-Hellman key exchange, as well as the whole protocol used to create a new voice call, is quite similar to the one used for <a href="/api/end-to-end#key-generation">Secret Chats</a>. We recommend studying the linked article before proceeding.</p>
+<p>However, we have introduced some important changes to facilitate the <a href="#key-verification">key verification process</a>. Below is the entire exchange between the two communicating parties, the Caller (A) and the Callee (B), through the Telegram servers (S).</p>
+<ul>
+<li><em>A</em> executes <a href="/method/messages.getDhConfig">messages.getDhConfig</a> to find out the 2048-bit Diffie-Hellman prime <em>p</em> and generator <em>g</em>. The client is expected to check whether <em>p</em> is a safe prime and perform all the <a href="/api/end-to-end#sending-a-request">security checks</a> necessary for secret chats.</li>
+<li><em>A</em> chooses a random value of <em>a</em>, 1 &lt; a &lt; p-1, and computes <em>g_a:=power(g,a) mod p</em> (a 256-byte number) and <em>g_a_hash:=SHA256(g_a)</em> (32 bytes long).</li>
+<li><em>A</em> invokes (sends to server <em>S</em>) <a href="/method/phone.requestCall">phone.requestCall</a>, which has the field <code>g_a_hash:bytes</code>, among others. For this call, this field is to be filled with <em>g_a_hash</em>, <strong>not</strong> <em>g_a</em> itself.</li>
+<li>The Server <em>S</em> performs privacy checks and sends an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> update with a <a href="/constructor/phoneCallRequested">phoneCallRequested</a> constructor to all of <em>B</em>'s active devices. This update, apart from the identity of <em>A</em> and other relevant parameters, contains the <em>g_a_hash</em> field, filled with the value obtained from <em>A</em>.</li>
+<li><em>B</em> accepts the call on one of their devices, stores the received value of <em>g_a_hash</em> for this instance of the voice call creation protocol, chooses a random value of <em>b</em>, 1 &lt; b &lt; p-1, computes <em>g_b:=power(g,b) mod p</em>, performs all the required security checks, and invokes the <a href="/method/phone.acceptCall">phone.acceptCall</a> method, which has a <em>g_b:bytes</em> field (among others), to be filled with the value of <em>g_b</em> itself (not its hash).</li>
+<li>The Server <em>S</em> sends an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> with the <a href="/constructor/phoneCallDiscarded">phoneCallDiscarded</a> constructor to all other devices <em>B</em> has authorized, to prevent accepting the same call on any of the other devices. From this point on, the server <em>S</em> works only with that of <em>B</em>'s devices which has invoked <a href="/method/phone.acceptCall">phone.acceptCall</a> first.</li>
+<li>The Server <em>S</em> sends to <em>A</em> an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> update with <a href="/constructor/phoneCallAccepted">phoneCallAccepted</a> constructor, containing the value of <em>g_b</em> received from <em>B</em>.</li>
+<li><em>A</em> performs all the usual security checks on <em>g_b</em> and <em>a</em>, computes the Diffie--Hellman key <em>key:=power(g_b,a) mod p</em> and its fingerprint <em>key_fingerprint:long</em>, equal to the lower 64 bits of <em>SHA1(key)</em>, the same as with secret chats. Then <em>A</em> invokes the <a href="/method/phone.confirmCall">phone.confirmCall</a> method, containing <code>g_a:bytes</code> and <code>key_fingerprint:long</code>.</li>
+<li>The Server <em>S</em> sends to <em>B</em> an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> update with the <a href="/constructor/phoneCall">phoneCall</a> constructor, containing the value of <em>g_a</em> in <em>g_a_or_b:bytes</em> field, and <em>key_fingerprint:long</em></li>
+<li>At this point <em>B</em> receives the value of <em>g_a</em>. It checks that <em>SHA256(g_a)</em> is indeed equal to the previously received value of <em>g_a_hash</em>, performs all the <a href="/mtproto/security_guidelines">usual Diffie-Hellman security checks</a>, and computes the key <em>key:=power(g_a,b) mod p</em> and its fingerprint, equal to the lower 64 bits of <em>SHA1(key)</em>. Then it checks that this fingerprint equals the value of <code>key_fingerprint:long</code> received from the other side, as an implementation sanity check.</li>
+</ul>
+<p>At this point, the Diffie--Hellman key exchange is complete, and both parties have a 256-byte shared secret key <em>key</em> which is used to encrypt all further exchanges between <em>A</em> and <em>B</em>.</p>
+<p>It is of paramount importance to accept each update only once for each instance of the key generation protocol, discarding any duplicates or alternative versions of already received and processed messages (updates).</p>
+<h2><a class="anchor" href="#encryption-of-voice-data" id="encryption-of-voice-data" name="encryption-of-voice-data"><i class="anchor-icon"></i></a>Encryption of voice data</h2>
+<p>Both parties <em>A</em> (the Caller) and <em>B</em> (the Callee) transform the voice information into a sequence of small <em>chunks</em> or <em>packets</em>, not more than 1 kilobyte each. This information is to be encrypted using the shared key <em>key</em> generated during the initial exchange, and sent to the other party, either directly (P2P) or through Telegram's relay servers (so-called <em>reflectors</em>). This document describes only the encryption process for each chunk, leaving out voice encoding and the network-dependent parts.</p>
+<h3><a class="anchor" href="#encapsulation-of-low-level-voice-data" id="encapsulation-of-low-level-voice-data" name="encapsulation-of-low-level-voice-data"><i class="anchor-icon"></i></a>Encapsulation of low-level voice data</h3>
+<p>The low-level data chunk <code>raw_data:string</code>, obtained from voice encoder, is first encapsulated into one of the two constructors for the <a href="/type/DecryptedDataBlock">DecryptedDataBlock</a> type, similar to <a href="/type/DecryptedMessage">DecryptedMessage</a> used in secret chats:</p>
+<pre><code>decryptedDataBlock#dbf948c1 random_id:long random_bytes:string flags:# voice_call_id:flags.2?int128 in_seq_no:flags.4?int out_seq_no:flags.4?int recent_received_mask:flags.5?int proto:flags.3?int extra:flags.1?string raw_data:flags.0?string = DecryptedDataBlock;
+simpleDataBlock#cc0d0e76 random_id:long random_bytes:string raw_data:string = DecryptedDataBlock;</code></pre>
+<p>Here <code>out_seq_no</code> is the chunk's sequence number among all sent by this party (starting from one), <code>in_seq_no</code> -- the highest known out_seq_no from the received packets. The parameter <code>recent_received_mask</code> is a 32-bit mask, used to track delivery of the last 32 packets sent by the other party. The bit <em>i</em> is set if a packet with <code>out_seq_no</code> equal to <code>in_seq_no</code>-<em>i</em> has been received.</p>
+<p>The higher 8 bits in <code>flags</code> are reserved for use by the lower-level protocol (the one which generates and interprets <code>raw_data</code>), and will never be used for future extensions of <code>decryptedDataBlock</code>.</p>
+<p>The parameters <code>voice_call_id</code> and <code>proto</code> are mandatory until the other side confirms reception of at least one packet by sending a packet with a non-zero <code>in_seq_no</code>. After that, they become optional, and the <code>simpleDataBlock</code> constructor can be used if the lower level protocol wants to.</p>
+<p>The parameter <code>voice_call_id</code> is computed from the key <code>key</code> and equals the lower 128 bits of its SHA-256.</p>
+<p>The <code>random_bytes</code> string should contain at least 7 bytes of random data. The field <code>random_id</code> also contains 8 random bytes, which can be used as a unique packet identifier if necessary.</p>
+<h3><a class="anchor" href="#mtproto-encryption" id="mtproto-encryption" name="mtproto-encryption"><i class="anchor-icon"></i></a>MTProto encryption</h3>
+<p>Once the data is encapsulated in <code>DecryptedDataBlock</code>, it is <a href="/mtproto/TL">TL-serialized</a> and encrypted with <a href="https://core.telegram.org/mtproto/description#defining-aes-key-and-initialization-vector">MTProto</a>, using <code>key</code> instead of <code>auth_key</code>; the parameter <em>x</em> is to be set to <em>0</em> for messages from <em>A</em> to <em>B</em>, and to <em>8</em> for messages in the opposite direction. Encrypted data are prepended by the 128-bit <code>msg_key</code> (usual for MTProto); before that, either the 128-bit <code>voice_call_id</code> (if P2P is used) or the <code>peer_tag</code> (if reflectors are used) is prepended. The resulting data packet is sent by UDP either directly to the other party (if P2P is possible) or to the Telegram relay servers (reflectors).</p>
+<h2><a class="anchor" href="#key-verification" id="key-verification" name="key-verification"><i class="anchor-icon"></i></a>Key Verification</h2>
+<p>To verify the key, both parties concatenate the secret key <em>key</em> with the value <em>g_a</em> of the Caller ( <em>A</em> ), compute SHA256 and use it to generate a sequence of emoticons. More precisely, the SHA256 hash is split into four 64-bit integers; each of them is divided by the total number of emoticons used (currently 333), and the remainder is used to select specific emoticons. The specifics of the protocol guarantee that comparing four emoticons out of a set of 333 is sufficient to prevent eavesdropping (MiTM attack on DH) with a probability of <strong>0.9999999999</strong>.</p>
+<p>This is because instead of the standard Diffie-Hellman key exchange which requires only two messages between the parties:</p>
+<ul>
+<li>A-&gt;B : (generates a and) sends g_a := g^a</li>
+<li>B-&gt;A : (generates b and true key (g_a)^b, then) sends g_b := g^b</li>
+<li>A : computes key (g_b)^a</li>
+</ul>
+<p>we use a <strong>three-message modification</strong> thereof that works well when both parties are online (which also happens to be a requirement for voice calls):</p>
+<ul>
+<li>A-&gt;B : (generates a and) sends g_a_hash := hash(g^a)</li>
+<li>B-&gt;A : (stores g_a_hash, generates b and) sends g_b := g^b</li>
+<li>A-&gt;B : (computes key (g_b)^a, then) sends g_a := g^a</li>
+<li>B : checks hash(g_a) == g_a_hash, then computes key (g_a)^b</li>
+</ul>
+<p>The idea here is that <em>A</em> commits to a specific value of <em>a</em> (and of <em>g_a</em>) without disclosing it to <em>B</em>. <em>B</em> has to choose its value of <em>b</em> and <em>g_b</em> without knowing the true value of <em>g_a</em>, so that it cannot try different values of <em>b</em> to force the final key <em>(g_a)^b</em> to have any specific properties (such as fixed lower 32 bits of SHA256(key)). At this point, <em>B</em> commits to a specific value of <em>g_b</em> without knowing <em>g_a</em>. Then <em>A</em> has to send its value <em>g_a</em>; it cannot change it even though it knows <em>g_b</em> now, because the other party <em>B</em> would accept only a value of <em>g_a</em> that has a hash specified in the very first message of the exchange.</p>
+<p>If some impostor is pretending to be either <em>A</em> or <em>B</em> and tries to perform a Man-in-the-Middle Attack on this Diffie--Hellman key exchange, the above still holds. Party <em>A</em> will generate a shared key with <em>B</em> -- or whoever pretends to be <em>B</em> -- without having a second chance to change its exponent <em>a</em> depending on the value <em>g_b</em> received from the other side; and the impostor will not have a chance to adapt his value of <em>b</em> depending on <em>g_a</em>, because it has to commit to a value of <em>g_b</em> before learning <em>g_a</em>. The same is valid for the key generation between the impostor and the party <em>B</em>.</p>
+<p>The use of hash commitment in the DH exchange constrains the attacker to only <strong>one guess</strong> to generate the correct visualization in their attack, which means that using just over 33 bits of entropy represented by four emoji in the visualization is enough to make a successful attack highly improbable.</p>
+<blockquote>
+<p>For a slightly more user-friendly explanation of the above see: <a href="https://core.telegram.org/techfaq#q-how-are-voice-calls-authenticated">How are calls authenticated?</a></p>
+</blockquote></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
