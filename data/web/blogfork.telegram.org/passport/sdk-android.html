@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Android SDK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="The Android SDK helps you easily integrate Telegram Passport requests into your Android-based apps. Check out our GitHub…">
+    <meta property="og:title" content="Android SDK">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="The Android SDK helps you easily integrate Telegram Passport requests into your Android-based apps. Check out our GitHub…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/passport" >Telegram Passport</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/passport/sdk-android" >Android SDK</a></li></ul></div>
+  <h1 id="dev_page_title">Android SDK</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>The Android SDK helps you easily integrate Telegram Passport requests into your Android-based apps. Check out our <a href="https://github.com/TelegramMessenger/TGPassportAndroidSDK">GitHub repository</a> to see samples using this SDK.</p>
+<h3><a class="anchor" href="#installation" id="installation" name="installation"><i class="anchor-icon"></i></a>Installation</h3>
+<h4><a class="anchor" href="#installing-from-maven" id="installing-from-maven" name="installing-from-maven"><i class="anchor-icon"></i></a>Installing from Maven</h4>
+<p>Telegram Passport SDK is available from the Maven repository.
+Add this line to the dependencies section in your build.gradle:</p>
+<pre><code>compile 'org.telegram:passport:1.1'</code></pre>
+<p>and sync your project.</p>
+<h4><a class="anchor" href="#adding-as-a-module" id="adding-as-a-module" name="adding-as-a-module"><i class="anchor-icon"></i></a>Adding as a module</h4>
+<p>Download the library, unzip it and copy the library project to the root of your project directory (the one with settings.gradle and gradle.properties). Then, make the following changes to your Gradle scripts.</p>
+<p>In settings.gradle, add <code>':telegrampassport'</code> to includes:</p>
+<pre><code>include ':app', ':telegrampassport'</code></pre>
+<p>In the build.gradle file for your app, add this line to the dependencies section:</p>
+<pre><code>compile ':telegrampassport'</code></pre>
+<p>and sync your project.</p>
+<h3><a class="anchor" href="#usage" id="usage" name="usage"><i class="anchor-icon"></i></a>Usage</h3>
+<h4><a class="anchor" href="#adding-the-button" id="adding-the-button" name="adding-the-button"><i class="anchor-icon"></i></a>Adding the button</h4>
+<p>The SDK provides the "Log in with Telegram" button which we recommend using for a consistent user experience across different apps. You can either add it from your Java code:</p>
+<pre><code>TelegramLoginButton telegramButton;
+// ...
+telegramButton=new TelegramLoginButton(this);
+// Optionally you can change the roundness of the button corners
+// to better fit your design.
+telegramButton.setCornerRoundness(1f);
+viewGroupOfSomeSort.addView(telegramButton, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);</code></pre>
+<p>Or from XML:</p>
+<pre><code> &lt;org.telegram.passport.TelegramLoginButton
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             app:cornerRoundness="0.5"/&gt;</code></pre>
+<h4><a class="anchor" href="#requesting-authorization" id="requesting-authorization" name="requesting-authorization"><i class="anchor-icon"></i></a>Requesting authorization</h4>
+<p>The button doesn't do anything by itself; you need to set an OnClickListener on it to start the authorization flow (replace the comments with actual parameters):</p>
+<pre><code>private static final int TG_PASSPORT_RESULT=352; // this can be any integer less than 0xFFFF
+// ...
+telegramButton.setOnClickListener(new View.OnClickListener(){
+@Override
+public void onClick(View view){
+    TelegramPassport.AuthRequest req=new TelegramPassport.AuthRequest();
+    req.botID=/* your bot ID here */;
+    req.publicKey=/* your bot public key here */;
+    req.nonce=/* a unique nonce to pass to the bot server */;
+    // Request either a passport or an ID card with selfie, a driver license, personal details with
+    // name as it appears in the documents, address with any address document, and a phone number.
+    // You could also pass a raw JSON object here if that's what works better for you
+    // (for example, if you already get it from your server in the correct format).
+    req.scope=new PassportScope(
+        new PassportScopeElementOneOfSeveral(PassportScope.PASSPORT, PassportScope.IDENTITY_CARD).withSelfie(),
+        new PassportScopeElementOne(PassportScope.PERSONAL_DETAILS).withNativeNames(),
+        PassportScope.DRIVER_LICENSE,
+        PassportScope.ADDRESS,
+        PassportScope.ADDRESS_DOCUMENT,
+        PassportScope.PHONE_NUMBER
+    );
+    TelegramPassport.request(MyActivity.this, req, TG_PASSPORT_RESULT);
+}});</code></pre>
+<p>If you need more control over the process, the <code>TelegramPassport</code> class contains several more methods:</p>
+<ul>
+<li><code>getAuthIntent(AuthParams)</code> returns an <code>Intent</code> for you to use in <code>startActivityForResult</code> if you need to do that in some special way. Be sure to check that an app is present that can handle this intent before starting it by using <code>PackageManager</code> or <code>intent.resolveActivity</code>.</li>
+<li><code>showAppInstallAlert(Activity)</code> shows an alert that the user needs to install Telegram in order to continue. This is intended to be used together with the previous method for the cases when the app isn't installed.</li>
+</ul>
+<h4><a class="anchor" href="#handling-the-result" id="handling-the-result" name="handling-the-result"><i class="anchor-icon"></i></a>Handling the result</h4>
+<p>The result is delivered via the <code>onActivityResult</code> method in your activity with the request code you passed to <code>TelegramPassport.request</code>. Currently, the only meaningful parameter is <code>resultCode</code>, which is <code>RESULT_OK</code> if the authorization was successful and <code>RESULT_CANCELED</code> otherwise.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

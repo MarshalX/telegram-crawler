@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>End-to-End Encryption, Secret Chats</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="New feature for end-to-end-encrypted messaging.">
+    <meta property="og:title" content="End-to-End Encryption, Secret Chats">
+    <meta property="og:image" content="842181036bcb572cf0">
+    <meta property="og:description" content="New feature for end-to-end-encrypted messaging.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/end-to-end" >End-to-End Encryption, Secret Chats</a></li></ul></div>
+  <h1 id="dev_page_title">End-to-End Encryption, Secret Chats</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<blockquote>
+<p>This article on MTProto&#39;s End-to-End encryption is meant for <strong>advanced users</strong>.<br>If you want to learn more about <a href="https://telegram.org/faq#secret-chats">Secret Chats</a> from a less intimidating source, kindly see our <a href="https://telegram.org/faq#secret-chats">general FAQ</a>.</p>
+<p>Note that as of version 4.6, major Telegram clients are using <strong>MTProto 2.0</strong>.<br>MTProto v.1.0 is deprecated and is currently being phased out.</p>
+</blockquote>
+<hr>
+<h5><a class="anchor" name="related-articles" href="#related-articles"><i class="anchor-icon"></i></a>Related articles</h5>
+<p><div class="dev_page_nav_wrap"></p>
+<ul>
+<li><a href="/mtproto/security_guidelines">Security guidelines for developers</a></li>
+<li><a href="/api/end-to-end/pfs">Perfect Forward Secrecy in Secret Chats</a></li>
+<li><a href="/api/end-to-end/seq_no">Sequence numbers in Secret Chats</a></li>
+<li><a href="/schema/end-to-end">End-to-End TL Schema</a></li>
+</ul>
+<p></div></p>
+<hr>
+<p>Secret Chats are one-on-one chats wherein messages are encrypted with a key held only by the chat&#39;s participants. Note that the <a href="/schema/end-to-end">schema</a> for these end-to-end encrypted Secret Chats is different from what is used for <a href="/mtproto">cloud chats</a>:</p>
+<div>
+    <a href="/file/811140633/4/hHw6Zy2DPyQ.109500/cabc10049a7190694f" target="_blank"><img src="/file/811140633/4/hHw6Zy2DPyQ.109500/cabc10049a7190694f" title="End-to-end encryption in MTProto 2.0 (Secret Chats)"  class="dev_page_image" style="max-width: 600px" /></a>
+</div>
+
+<h4><a class="anchor" name="a-note-on-mtproto-2-0" href="#a-note-on-mtproto-2-0"><i class="anchor-icon"></i></a>A note on MTProto 2.0</h4>
+<p>This article describes the end-to-end encryption layer in the MTProto protocol version <strong>2.0</strong>.<br>The principal differences from version 1.0 (<a href="/api/end-to-end_v1">described here</a> for reference) are as follows:</p>
+<ul>
+<li>SHA-256 is used instead of SHA-1;</li>
+<li>Padding bytes are involved in the computation of msg_key;</li>
+<li>msg_key depends not only on the message to be encrypted, but on a portion of the secret chat key as well;</li>
+<li>12..1024 padding bytes are used instead of 0..15 padding bytes in v.1.0.</li>
+</ul>
+<p>See also: <a href="https://core.telegram.org/mtproto">MTProto 2.0: Cloud Chats, server-client encryption</a></p>
+<h3><a class="anchor" name="key-generation" href="#key-generation"><i class="anchor-icon"></i></a>Key Generation</h3>
+<p>Keys are generated using the <a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">Diffie-Hellman protocol</a>.</p>
+<p>Let us consider the following scenario: User <strong>A</strong> would like to initiate end-to-end encrypted communication with User <strong>B</strong>.</p>
+<h4><a class="anchor" name="sending-a-request" href="#sending-a-request"><i class="anchor-icon"></i></a>Sending a Request</h4>
+<p>User <strong>A</strong> executes <a href="/method/messages.getDhConfig">messages.getDhConfig</a> to obtain the Diffie-Hellman parameters: a prime <strong>p</strong>, and a high-order element <strong>g</strong>.</p>
+<p>Executing this method before each new key generation procedure is of vital importance. It makes sense to cache the values of the parameters together with the version in order to avoid having to receive all of the values every time. If the version stored on the client is still up-to-date, the server will return the constructor <a href="/constructor/messages.dhConfigNotModified">messages.dhConfigNotModified</a>.</p>
+<p>The client is expected to check whether <strong>p</strong> is a safe 2048-bit prime (meaning that both <strong>p</strong> and <strong>(p-1)/2</strong> are prime, and that 2<sup>2047 &lt; p &lt; 2</sup>2048), and that <strong>g</strong> generates a cyclic subgroup of prime order <strong>(p-1)/2</strong>, i.e. is a quadratic residue <strong>mod p</strong>. Since <strong>g</strong> is always equal to 2, 3, 4, 5, 6 or 7, this is easily done using quadratic reciprocity law, yielding a simple condition on <strong>p mod 4g</strong> — namely, <strong>p mod 8 = 7</strong> for <strong>g = 2</strong>; <strong>p mod 3 = 2</strong> for <strong>g = 3</strong>; no extra condition for <strong>g = 4</strong>; <strong>p mod 5 = 1 or 4</strong> for <strong>g = 5</strong>; <strong>p mod 24 = 19 or 23</strong> for <strong>g = 6</strong>; and <strong>p mod 7 = 3, 5 or 6</strong> for <strong>g = 7</strong>. After <strong>g</strong> and <strong>p</strong> have been checked by the client, it makes sense to cache the result, so as to avoid repeating lengthy computations in the future. This cache might be shared with one used for <a href="/mtproto/auth_key">Authorization Key generation</a>.</p>
+<p>If the client needs additional entropy for the random number generator, it can pass the <strong>random_length</strong> parameter (random_length&gt; 0) so the server generates its own random sequence <strong>random</strong> of the appropriate length.<br><strong>Important</strong>: using the server&#39;s random sequence in its raw form may be unsafe, it must be combined with a client sequence.</p>
+<p>Client <strong>A</strong> computes a 2048-bit number <strong>a</strong> (using sufficient entropy or the server&#39;s <strong>random</strong>; see above) and executes <a href="/method/messages.requestEncryption">messages.requestEncryption</a> after passing in <code>g_a := pow(g, a) mod dh_prime</code>.</p>
+<p>User <strong>B</strong> receives the update <a href="/constructor/updateEncryption">updateEncryption</a> for all associated authorization keys (all authorized devices) with the chat constructor <a href="/constructor/encryptedChatRequested">encryptedChatRequested</a>. The user must be shown basic information about User <strong>A</strong> and must be prompted to accept or reject the request.</p>
+<p>Both clients are to check that <strong>g</strong>, <strong>g_a</strong> and <strong>g_b</strong> are greater than one and smaller than <strong>p-1</strong>. We recommend checking that <strong>g_a</strong> and <strong>g_b</strong> are between <strong>2^{2048-64}</strong> and <strong>p - 2^{2048-64}</strong> as well.</p>
+<h4><a class="anchor" name="accepting-a-request" href="#accepting-a-request"><i class="anchor-icon"></i></a>Accepting a Request</h4>
+<p>After User <strong>B</strong> confirms the creation of a secret chat with <strong>A</strong> in the client interface, Client <strong>B</strong> also receives up-to-date configuration parameters for the Diffie-Hellman method. Thereafter, it generates a random 2048-bit number, <strong>b</strong>, using rules similar to those for <strong>a</strong>. </p>
+<p>Having received <strong>g_a</strong> from the update with <a href="/constructor/encryptedChatRequested">encryptedChatRequested</a>, it can immediately generate the final shared key: <code>key = (pow(g_a, b) mod dh_prime)</code>. If key length &lt; 256 bytes, add several leading zero bytes as padding — so that the key is exactly 256 bytes long. Its fingerprint, <strong>key_fingerprint</strong>, is equal to the 64 last bits of SHA1 (key). </p>
+<p><strong>Note 1:</strong> in this particular case SHA1 is used here even for MTProto 2.0 secret chats. </p>
+<p><strong>Note 2:</strong> this fingerprint is used as a sanity check for the key exchange procedure to detect bugs when developing client software — it is not connected to the key visualization used on the clients as means of external authentication in secret chats. <a href="/api/end-to-end/pfs#key-visualization">Key visualizations</a> on the clients are generated using the first 128 bits of SHA1(initial key) followed by the first 160 bits of SHA256(key used when secret chat was updated to layer 46).</p>
+<p>Client <strong>B</strong> executes <a href="/method/messages.acceptEncryption">messages.acceptEncryption</a> after passing it <code>g_b := pow(g, b) mod dh_prime</code> and <strong>key_fingerprint</strong>.</p>
+<p>For all of Client <strong>B&#39;s</strong> authorized devices, except the current one, <a href="/constructor/updateEncryption">updateEncryption</a> updates are sent with the constructor <a href="/constructor/encryptedChatDiscarded">encryptedChatDiscarded</a>. Thereafter, the only device that will be able to access the secret chat is Device <strong>B</strong>, which made the call to <a href="/method/messages.acceptEncryption">messages.acceptEncryption</a>.</p>
+<p>User <strong>A</strong> will be sent an <a href="/constructor/updateEncryption">updateEncryption</a> update with the constructor <a href="/constructor/encryptedChat">encryptedChat</a>, for the authorization key that initiated the chat.</p>
+<p>With <strong>g_b</strong> from the update, Client <strong>A</strong> can also compute the shared key <code>key = (pow(g_b, a) mod dh_prime)</code>. If key length &lt; 256 bytes, add several leading zero bytes as padding — so that the key is exactly 256 bytes long. If the fingerprint for the received key is identical to the one that was passed to <a href="/constructor/encryptedChat">encryptedChat</a>, incoming messages can be sent and processed. Otherwise, <a href="/method/messages.discardEncryption">messages.discardEncryption</a> must be executed and the user notified.</p>
+<h4><a class="anchor" name="perfect-forward-secrecy" href="#perfect-forward-secrecy"><i class="anchor-icon"></i></a>Perfect Forward Secrecy</h4>
+<p>In order to keep past communications safe, official Telegram clients will initiate re-keying once a key has been used to decrypt and encrypt more than 100 messages, or has been in use for more than one week, provided the key has been used to encrypt at least one message. Old keys are then securely discarded and cannot be reconstructed, even with access to the new keys currently in use.</p>
+<blockquote>
+<p>The re-keying protocol is further described in this article: <a href="/api/end-to-end/pfs">Perfect Forward Secrecy in Secret Chats</a>.</p>
+</blockquote>
+<p>Please note that your client must support Forward Secrecy in Secret Chats to be compatible with official Telegram clients. </p>
+<h3><a class="anchor" name="sending-and-receiving-messages-in-a-secret-chat" href="#sending-and-receiving-messages-in-a-secret-chat"><i class="anchor-icon"></i></a>Sending and Receiving Messages in a Secret Chat</h3>
+<h4><a class="anchor" name="serialization-and-encryption-of-outgoing-messages" href="#serialization-and-encryption-of-outgoing-messages"><i class="anchor-icon"></i></a>Serialization and Encryption of Outgoing Messages</h4>
+<p>A TL object of type <a href="/type/DecryptedMessage">DecryptedMessage</a> is created and contains the message in plain text. For backward compatibility, the object must be wrapped in the constructor <a href="/constructor/decryptedMessageLayer">decryptedMessageLayer</a> with an indication of the supported layer (starting with 46).</p>
+<blockquote>
+<p>The TL-Schema for the contents of end-to-end encrypted messages is available <a href="/schema/end-to-end">here »</a></p>
+</blockquote>
+<p>The resulting construct is serialized as an array of bytes using generic TL rules. The resulting array is prepended by 4 bytes containing the array length not counting these 4 bytes. </p>
+<p>The byte array is padded with 12 to 1024 random padding bytes to make its length divisible by 16 bytes. (In the older MTProto 1.0 encryption, only 0 to 15 padding bytes were used.)</p>
+<p>Message key, <strong>msg_key</strong>, is computed as the 128 middle bits of the SHA256 of the data obtained in the previous step, prepended by 32 bytes from the shared key <strong>key</strong>. (For the older MTProto 1.0 encryption, <strong>msg_key</strong> was computed differently, as the 128 lower bits of SHA1 of the data obtained in the previous steps, <em>excluding the padding bytes</em>.)</p>
+<p>For MTProto 2.0, the AES key <strong>aes_key</strong> and initialization vector <strong>aes_iv</strong> are computed ( <strong>key</strong> is the shared key obtained during <a href="#key-generation">Key Generation</a> ) as follows:</p>
+<ul>
+<li>msg_key_large = SHA256 (substr (key, 88+x, 32) + plaintext + random_padding);</li>
+<li>msg_key = substr (msg_key_large, 8, 16);</li>
+<li>sha256_a = SHA256 (msg_key + substr (key, x, 36));</li>
+<li>sha256_b = SHA256 (substr (key, 40+x, 36) + msg_key);</li>
+<li>aes_key = substr (sha256_a, 0, 8) + substr (sha256_b, 8, 16) + substr (sha256_a, 24, 8);</li>
+<li>aes_iv  = substr (sha256_b, 0, 8) + substr (sha256_a, 8, 16) + substr (sha256_b, 24, 8);</li>
+</ul>
+<p>For MTProto 2.0, <strong>x=0</strong> for messages from the originator of the secret chat, <strong>x=8</strong> for the messages in the opposite direction.</p>
+<p><em>For the obsolete MTProto 1.0, msg_key, aes_key, and aes_iv were computed differently (see <a href="/api/end-to-end_v1#serialization-and-encryption-of-outgoing-messages">this document</a> for reference).</em></p>
+<p>Data is encrypted with a 256-bit key, <strong>aes_key</strong>, and a 256-bit initialization vector, <strong>aes-iv</strong>, using AES-256 encryption with infinite garble extension (IGE). Encryption key fingerprint <strong>key_fingerprint</strong> and the message key <strong>msg_key</strong> are added at the top of the resulting byte array.</p>
+<p>Encrypted data is embedded into a <a href="/method/messages.sendEncrypted">messages.sendEncrypted</a> API call and passed to Telegram server for delivery to the other party of the Secret Chat.</p>
+<h4><a class="anchor" name="upgrading-to-mtproto-2-0-from-mtproto-1-0" href="#upgrading-to-mtproto-2-0-from-mtproto-1-0"><i class="anchor-icon"></i></a>Upgrading to MTProto 2.0 from MTProto 1.0</h4>
+<p>As soon as both parties in a secret chat are using at least Layer 73, they should only use MTProto 2.0 for all outgoing messages. Some of the first received messages may use MTProto 1.0, if a sufficiently high starting layer has not been negotiated during the creation of the secret chat. After the first message encrypted with MTProto 2.0 (or the first message with Layer 73 or higher) is received, all messages with higher <a href="#sequence-numbers">sequence numbers</a> must be encrypted with MTProto 2.0 as well.</p>
+<p>As long as the current layer is lower than 73, each party should try to decrypt received messages with MTProto 1.0, and if this is not successful (msg_key does not match), try MTProto 2.0. Once the first MTProto 2.0-encrypted message arrives (or the layer is upgraded to 73), there is no need to try MTProto 1.0 decryption for any of the further messages (unless the client is still waiting for some gaps to be closed).</p>
+<h4><a class="anchor" name="decrypting-an-incoming-message" href="#decrypting-an-incoming-message"><i class="anchor-icon"></i></a>Decrypting an Incoming Message</h4>
+<p>The steps above are performed in reverse order.<br>When an encrypted message is received, you <strong>must</strong> check that msg_key is <strong>in fact</strong> equal to the 128 middle bits of the SHA256 hash of the decrypted message, prepended by 32 bytes taken from the shared <strong>key</strong>.<br>If the message layer is greater than the one supported by the client, the user must be notified that the client version is out of date and prompted to update.</p>
+<h4><a class="anchor" name="sequence-numbers" href="#sequence-numbers"><i class="anchor-icon"></i></a>Sequence numbers</h4>
+<p>It is necessary to interpret all messages in their original order to protect against possible manipulations. Secret chats support a special mechanism for handling seq_no counters independently from the server.</p>
+<blockquote>
+<p>Proper handling of these counters is further described in this article: <a href="/api/end-to-end/seq_no">Sequence numbers in Secret Chats</a>.</p>
+</blockquote>
+<p>Please note that your client must support sequence numbers in Secret Chats to be compatible with official Telegram clients. </p>
+<h4><a class="anchor" name="sending-encrypted-files" href="#sending-encrypted-files"><i class="anchor-icon"></i></a>Sending Encrypted Files</h4>
+<p>All files sent to secret chats are encrypted with one-time keys that are in no way related to the chat&#39;s shared key. Before an encrypted file is sent, it is assumed that the encrypted file&#39;s address will be attached to the outside of an encrypted message using the <strong>file</strong> parameter of the <a href="/method/messages.sendEncryptedFile">messages.sendEncryptedFile</a> method and that the key for direct decryption will be sent in the body of the message (the <strong>key</strong> parameter in the constructors  <a href="/constructor/decryptedMessageMediaPhoto">decryptedMessageMediaPhoto</a>, <a href="/constructor/decryptedMessageMediaPhoto">decryptedMessageMediaVideo</a> and <a href="/constructor/decryptedMessageMediaPhoto">decryptedMessageMediaFile</a>.</p>
+<p>Prior to a file being sent to a secret chat, 2 random 256-bit numbers are computed which will serve as the AES key and initialization vector used to encrypt the file. AES-256 encryption with infinite garble extension (IGE) is used in like manner.</p>
+<p>The key fingerprint is computed as follows:</p>
+<ul>
+<li>digest = md5(key + iv)</li>
+<li>fingerprint = substr(digest, 0, 4) XOR substr(digest, 4, 4)</li>
+</ul>
+<p>The encrypted contents of a file are stored on the server in much the same way as those of a <a href="/api/files">file in cloud chats</a>: piece by piece using calls to <a href="/method/upload.saveFilePart">upload.saveFilePart</a>.<br>A subsequent call to <a href="/method/messages.sendEncryptedFile">messages.sendEncryptedFile</a> will assign an identifier to the stored file and send the address together with the message. The recipient will receive an update with  <a href="/constructor/encryptedMessage">encryptedMessage</a>, and the <strong>file</strong> parameter will contain file information.</p>
+<p>Incoming and outgoing encrypted files can be forwarded to other secret chats using the constructor <a href="/constructor/inputEncryptedFile">inputEncryptedFile</a> to avoid saving the same content on the server twice.</p>
+<h4><a class="anchor" name="working-with-an-update-box" href="#working-with-an-update-box"><i class="anchor-icon"></i></a>Working with an Update Box</h4>
+<p>Secret chats are associated with specific devices (or rather with <a href="/mtproto/description#creating-an-authorization-key">authorization keys</a>), not users. A conventional message box, which uses <strong>pts</strong> to describe the client&#39;s status, is not suitable, because it is designed for long-term message storage and message access from different devices.</p>
+<p>An additional temporary message queue is introduced as a solution to this problem. When an update regarding a message from a secret chat is sent, a new value of <strong>qts</strong> is sent, which helps reconstruct the difference if there has been a long break in the connection or in case of loss of an update.</p>
+<p>As the number of events increases, the value of <strong>qts</strong> increases by 1 with each new event. The initial value may not (and will not) be equal to 0.</p>
+<p>The fact that events from the temporary queue have been received and stored by the client is acknowledged explicitly by a call to the <a href="/method/messages.receivedQueue">messages.receivedQueue</a> method or implicitly by a call to <a href="/method/updates.getDifference">updates.getDifference</a> (the value of <strong>qts</strong> passed, not the final state). All messages acknowledged as delivered by the client, as well as any messages older than 7 days, may (and will) be deleted from the server.</p>
+<p>Upon de-authorization, the event queue of the corresponding device will be forcibly cleared, and the value of <strong>qts</strong> will become irrelevant.</p>
+<h2><a class="anchor" name="updating-to-new-layers" href="#updating-to-new-layers"><i class="anchor-icon"></i></a>Updating to new layers</h2>
+<p>Your client should always store the maximal layer that is known to be supported by the client on the other side of a secret chat. When the secret chat is first created, this value should be initialized to 46. This remote layer value must always be updated immediately after receiving <em>any</em> packet containing information of an upper layer, i.e.:</p>
+<ul>
+<li>any secret chat message containing <em>layer_no</em> in its <code>decryptedMessageLayer</code> with <em>layer</em>&gt;=46, or</li>
+<li>a <a href="/constructor/decryptedMessageActionNotifyLayer">decryptedMessageActionNotifyLayer</a> service message, wrapped as if it were the <a href="/constructor/decryptedMessageService">decryptedMessageService</a> constructor of the obsolete layer 8 (constructor <code>decryptedMessageService#aa48327d</code>).</li>
+</ul>
+<h4><a class="anchor" name="notifying-the-remote-client-about-your-local-layer" href="#notifying-the-remote-client-about-your-local-layer"><i class="anchor-icon"></i></a>Notifying the remote client about your local layer</h4>
+<p>In order to notify the remote client of your local layer, your client must send a message of the <code>decryptedMessageActionNotifyLayer</code> type. This notification must be wrapped in a constructor of an appropriate layer.</p>
+<p>There are two cases when your client must notify the remote client about its local layer:</p>
+<ol>
+<li>As soon as a new secret chat has been created, immediately after the secret key has been successfully exchanged.</li>
+<li>Immediately after the local client has been updated to support a new secret chat layer. In this case notifications must be sent to <strong>all</strong> currently existing secret chats. Note that this is only necessary when updating to new layers that contain changes in the secret chats implementation (e.g. you don&#39;t need to do this when your client is updated from Layer 46 to Layer 47).</li>
+</ol>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
