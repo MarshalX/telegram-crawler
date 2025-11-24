@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Invites</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Chats and channels may have a public username or a private invite link: private invite links may be further enhanced with per-user join requests.">
+    <meta property="og:title" content="Invites">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Chats and channels may have a public username or a private invite link: private invite links may be further enhanced with per-user join requests.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/invites" >Invites</a></li></ul></div>
+  <h1 id="dev_page_title">Invites</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p><a href="/api/channel">Chats and channels</a> may have a public username or a private invite link: private invite links may be further enhanced with per-user <a href="https://telegram.org/blog/shared-media-scrolling-calendar-join-requests-and-more#join-requests-for-groups-and-channels">join requests</a>.</p>
+<h3><a class="anchor" href="#public-usernames" id="public-usernames" name="public-usernames"><i class="anchor-icon"></i></a>Public usernames</h3>
+<pre><code><a href='/constructor/contacts.resolvedPeer'>contacts.resolvedPeer</a>#7f077ad9 peer:<a href='/type/Peer'>Peer</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.ResolvedPeer'>contacts.ResolvedPeer</a>;
+
+---functions---
+
+<a href='/method/contacts.resolveUsername'>contacts.resolveUsername</a>#725afbbc flags:<a href='/type/%23'>#</a> username:<a href='/type/string'>string</a> referer:flags.0?<a href='/type/string'>string</a> = <a href='/type/contacts.ResolvedPeer'>contacts.ResolvedPeer</a>;
+<a href='/method/channels.joinChannel'>channels.joinChannel</a>#24b524c5 channel:<a href='/type/InputChannel'>InputChannel</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/channels.checkUsername'>channels.checkUsername</a>#10e6bd2c channel:<a href='/type/InputChannel'>InputChannel</a> username:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/channels.updateUsername'>channels.updateUsername</a>#3514b3de channel:<a href='/type/InputChannel'>InputChannel</a> username:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Only <a href="/api/channel">supergroups and channels</a> may have a public usernames: <a href="/api/channel">normal groups</a> must be migrated to a <a href="/api/channel">supergroup</a> before they can be assigned a username, see the <a href="/api/channel#migration">migration docs »</a> for more info.  </p>
+<p><a href="/method/channels.updateUsername">channels.updateUsername</a> can be used to directly assign or change the public username of a supergroup or channel.<br>
+You can use <a href="/method/channels.updateUsername">channels.checkUsername</a> before assigning the username to make sure that the specified username is valid and available.  </p>
+<p><a href="/method/channels.joinChannel">channels.joinChannel</a> can be used to join a supergroup or channel using peer information obtained using <a href="/method/contacts.resolveUsername">contacts.resolveUsername</a>.</p>
+<h3><a class="anchor" href="#invite-links" id="invite-links" name="invite-links"><i class="anchor-icon"></i></a>Invite links</h3>
+<pre><code><a href='/constructor/chatInviteExported'>chatInviteExported</a>#a22cbd96 flags:<a href='/type/%23'>#</a> revoked:flags.0?<a href='/constructor/true'>true</a> permanent:flags.5?<a href='/constructor/true'>true</a> request_needed:flags.6?<a href='/constructor/true'>true</a> link:<a href='/type/string'>string</a> admin_id:<a href='/type/long'>long</a> date:<a href='/type/int'>int</a> start_date:flags.4?<a href='/type/int'>int</a> expire_date:flags.1?<a href='/type/int'>int</a> usage_limit:flags.2?<a href='/type/int'>int</a> usage:flags.3?<a href='/type/int'>int</a> requested:flags.7?<a href='/type/int'>int</a> subscription_expired:flags.10?<a href='/type/int'>int</a> title:flags.8?<a href='/type/string'>string</a> subscription_pricing:flags.9?<a href='/type/StarsSubscriptionPricing'>StarsSubscriptionPricing</a> = <a href='/type/ExportedChatInvite'>ExportedChatInvite</a>;
+
+<a href='/constructor/messages.exportedChatInvites'>messages.exportedChatInvites</a>#bdc62dcc count:<a href='/type/int'>int</a> invites:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ExportedChatInvite'>ExportedChatInvite</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.ExportedChatInvites'>messages.ExportedChatInvites</a>;
+
+<a href='/constructor/messages.exportedChatInvite'>messages.exportedChatInvite</a>#1871be50 invite:<a href='/type/ExportedChatInvite'>ExportedChatInvite</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.ExportedChatInvite'>messages.ExportedChatInvite</a>;
+<a href='/constructor/messages.exportedChatInviteReplaced'>messages.exportedChatInviteReplaced</a>#222600ef invite:<a href='/type/ExportedChatInvite'>ExportedChatInvite</a> new_invite:<a href='/type/ExportedChatInvite'>ExportedChatInvite</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.ExportedChatInvite'>messages.ExportedChatInvite</a>;
+
+
+<a href='/constructor/chatInviteImporter'>chatInviteImporter</a>#8c5adfd9 flags:<a href='/type/%23'>#</a> requested:flags.0?<a href='/constructor/true'>true</a> via_chatlist:flags.3?<a href='/constructor/true'>true</a> user_id:<a href='/type/long'>long</a> date:<a href='/type/int'>int</a> about:flags.2?<a href='/type/string'>string</a> approved_by:flags.1?<a href='/type/long'>long</a> = <a href='/type/ChatInviteImporter'>ChatInviteImporter</a>;
+
+<a href='/constructor/messages.chatInviteImporters'>messages.chatInviteImporters</a>#81b6b00a count:<a href='/type/int'>int</a> importers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ChatInviteImporter'>ChatInviteImporter</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.ChatInviteImporters'>messages.ChatInviteImporters</a>;
+
+
+<a href='/constructor/chatAdminWithInvites'>chatAdminWithInvites</a>#f2ecef23 admin_id:<a href='/type/long'>long</a> invites_count:<a href='/type/int'>int</a> revoked_invites_count:<a href='/type/int'>int</a> = <a href='/type/ChatAdminWithInvites'>ChatAdminWithInvites</a>;
+
+<a href='/constructor/messages.chatAdminsWithInvites'>messages.chatAdminsWithInvites</a>#b69b72d7 admins:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ChatAdminWithInvites'>ChatAdminWithInvites</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.ChatAdminsWithInvites'>messages.ChatAdminsWithInvites</a>;
+
+<a href='/constructor/chatInviteAlready'>chatInviteAlready</a>#5a686d7c chat:<a href='/type/Chat'>Chat</a> = <a href='/type/ChatInvite'>ChatInvite</a>;
+<a href='/constructor/chatInvite'>chatInvite</a>#5c9d3702 flags:<a href='/type/%23'>#</a> channel:flags.0?<a href='/constructor/true'>true</a> broadcast:flags.1?<a href='/constructor/true'>true</a> public:flags.2?<a href='/constructor/true'>true</a> megagroup:flags.3?<a href='/constructor/true'>true</a> request_needed:flags.6?<a href='/constructor/true'>true</a> verified:flags.7?<a href='/constructor/true'>true</a> scam:flags.8?<a href='/constructor/true'>true</a> fake:flags.9?<a href='/constructor/true'>true</a> can_refulfill_subscription:flags.11?<a href='/constructor/true'>true</a> title:<a href='/type/string'>string</a> about:flags.5?<a href='/type/string'>string</a> photo:<a href='/type/Photo'>Photo</a> participants_count:<a href='/type/int'>int</a> participants:flags.4?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; color:<a href='/type/int'>int</a> subscription_pricing:flags.10?<a href='/type/StarsSubscriptionPricing'>StarsSubscriptionPricing</a> subscription_form_id:flags.12?<a href='/type/long'>long</a> bot_verification:flags.13?<a href='/type/BotVerification'>BotVerification</a> = <a href='/type/ChatInvite'>ChatInvite</a>;
+<a href='/constructor/chatInvitePeek'>chatInvitePeek</a>#61695cb0 chat:<a href='/type/Chat'>Chat</a> expires:<a href='/type/int'>int</a> = <a href='/type/ChatInvite'>ChatInvite</a>;
+
+---functions---
+
+<a href='/method/messages.exportChatInvite'>messages.exportChatInvite</a>#a455de90 flags:<a href='/type/%23'>#</a> legacy_revoke_permanent:flags.2?<a href='/constructor/true'>true</a> request_needed:flags.3?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> expire_date:flags.0?<a href='/type/int'>int</a> usage_limit:flags.1?<a href='/type/int'>int</a> title:flags.4?<a href='/type/string'>string</a> subscription_pricing:flags.5?<a href='/type/StarsSubscriptionPricing'>StarsSubscriptionPricing</a> = <a href='/type/ExportedChatInvite'>ExportedChatInvite</a>;
+
+<a href='/method/messages.getExportedChatInvites'>messages.getExportedChatInvites</a>#a2b5a3f6 flags:<a href='/type/%23'>#</a> revoked:flags.3?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> admin_id:<a href='/type/InputUser'>InputUser</a> offset_date:flags.2?<a href='/type/int'>int</a> offset_link:flags.2?<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/messages.ExportedChatInvites'>messages.ExportedChatInvites</a>;
+<a href='/method/messages.getExportedChatInvite'>messages.getExportedChatInvite</a>#73746f5c peer:<a href='/type/InputPeer'>InputPeer</a> link:<a href='/type/string'>string</a> = <a href='/type/messages.ExportedChatInvite'>messages.ExportedChatInvite</a>;
+
+<a href='/method/messages.editExportedChatInvite'>messages.editExportedChatInvite</a>#bdca2f75 flags:<a href='/type/%23'>#</a> revoked:flags.2?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> link:<a href='/type/string'>string</a> expire_date:flags.0?<a href='/type/int'>int</a> usage_limit:flags.1?<a href='/type/int'>int</a> request_needed:flags.3?<a href='/type/Bool'>Bool</a> title:flags.4?<a href='/type/string'>string</a> = <a href='/type/messages.ExportedChatInvite'>messages.ExportedChatInvite</a>;
+
+<a href='/method/messages.deleteRevokedExportedChatInvites'>messages.deleteRevokedExportedChatInvites</a>#56987bd5 peer:<a href='/type/InputPeer'>InputPeer</a> admin_id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/messages.deleteExportedChatInvite'>messages.deleteExportedChatInvite</a>#d464a42b peer:<a href='/type/InputPeer'>InputPeer</a> link:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/messages.getAdminsWithInvites'>messages.getAdminsWithInvites</a>#3920e6ef peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/messages.ChatAdminsWithInvites'>messages.ChatAdminsWithInvites</a>;
+<a href='/method/messages.getChatInviteImporters'>messages.getChatInviteImporters</a>#df04dd4e flags:<a href='/type/%23'>#</a> requested:flags.0?<a href='/constructor/true'>true</a> subscription_expired:flags.3?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> link:flags.1?<a href='/type/string'>string</a> q:flags.2?<a href='/type/string'>string</a> offset_date:<a href='/type/int'>int</a> offset_user:<a href='/type/InputUser'>InputUser</a> limit:<a href='/type/int'>int</a> = <a href='/type/messages.ChatInviteImporters'>messages.ChatInviteImporters</a>;
+
+<a href='/method/messages.checkChatInvite'>messages.checkChatInvite</a>#3eadb1bb hash:<a href='/type/string'>string</a> = <a href='/type/ChatInvite'>ChatInvite</a>;
+<a href='/method/messages.importChatInvite'>messages.importChatInvite</a>#6c50051c hash:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Private invite links can optionally have an expiration date, a usage limit, and can even be set to only allow users into the channel, supergroup or group upon explicit approval of an admin: see <a href="#join-requests">join requests »</a> for more info.</p>
+<p>Invite links match the following regex: <code>@(?:t|telegram)\.(?:me|dog)/(joinchat/|\+)?([\w-]+)@i</code>.<br>
+The first matching group can be passed to the <code>hash</code> parameter of <a href="/method/messages.checkChatInvite">messages.checkChatInvite</a> to get info about the chat, and <a href="/method/messages.importChatInvite">messages.importChatInvite</a> to join the chat.<br>
+<a href="/method/messages.checkChatInvite">messages.checkChatInvite</a> may return <a href="/constructor/chatInvitePeek">chatInvitePeek</a> only for <a href="/api/channel">supergroups and channels</a>, in which case the user may directly fetch chat messages using <a href="/api/updates">updates</a>, <a href="/method/messages.getHistory">messages.getHistory</a> and <a href="/method/channels.getMessages">channels.getMessages</a> until the time indicated by the <code>expires</code> unixtime field.</p>
+<p>Newly created groups, supergroups and channel already have a default invite link.<br>
+To generate a new one, use <a href="/method/messages.exportChatInvite">messages.exportChatInvite</a>.<br>
+To get info about existing chat invites, optionally filtering only links created by a given admin, use <a href="/method/messages.getExportedChatInvites">messages.getExportedChatInvites</a>.<br>
+<a href="/method/messages.getExportedChatInvite">messages.getExportedChatInvite</a> can be used to obtain info about a specific invite link.  </p>
+<p><a href="/method/messages.editExportedChatInvite">messages.editExportedChatInvite</a> is used to edit or revoke existing invite links: revoked links cannot be used by users to join the group, but info about revoked links can still be fetched using <a href="/method/messages.getExportedChatInvites">messages.getExportedChatInvites</a> with the <code>revoked</code> flag set.<br>
+Use <a href="/method/messages.deleteExportedChatInvite">messages.deleteExportedChatInvite</a> to permanently remove an invite link, and <a href="/method/messages.deleteRevokedExportedChatInvites">messages.deleteRevokedExportedChatInvites</a> to permanently remove a revoked invite link.  </p>
+<p><a href="/method/messages.getChatInviteImporters">messages.getChatInviteImporters</a> can be used to fetch info about users that joined using a specific invite link.  </p>
+<p>Some basic stats about the number of invite links generated by a given admin can be fetched using <a href="/method/messages.getAdminsWithInvites">messages.getAdminsWithInvites</a>.  </p>
+<h4><a class="anchor" href="#paid-invite-links" id="paid-invite-links" name="paid-invite-links"><i class="anchor-icon"></i></a>Paid invite links</h4>
+<p>Channel administrators can now create special <a href="/api/invites#invite-links">invite links</a> that allow joining a channel in exchange for a monthly payment in Telegram Stars.  </p>
+<p>Subscribing to a channel using a paid invite link will transfer Telegram Stars to the channel's balance.  </p>
+<p>See <a href="/api/subscriptions#channel-subscriptions">here »</a> for more info on the full flow.</p>
+<h3><a class="anchor" href="#join-requests" id="join-requests" name="join-requests"><i class="anchor-icon"></i></a>Join requests</h3>
+<pre><code><a href='/constructor/channel'>channel</a>#fe685355 flags:<a href='/type/%23'>#</a> creator:flags.0?<a href='/constructor/true'>true</a> left:flags.2?<a href='/constructor/true'>true</a> broadcast:flags.5?<a href='/constructor/true'>true</a> verified:flags.7?<a href='/constructor/true'>true</a> megagroup:flags.8?<a href='/constructor/true'>true</a> restricted:flags.9?<a href='/constructor/true'>true</a> signatures:flags.11?<a href='/constructor/true'>true</a> min:flags.12?<a href='/constructor/true'>true</a> scam:flags.19?<a href='/constructor/true'>true</a> has_link:flags.20?<a href='/constructor/true'>true</a> has_geo:flags.21?<a href='/constructor/true'>true</a> slowmode_enabled:flags.22?<a href='/constructor/true'>true</a> call_active:flags.23?<a href='/constructor/true'>true</a> call_not_empty:flags.24?<a href='/constructor/true'>true</a> fake:flags.25?<a href='/constructor/true'>true</a> gigagroup:flags.26?<a href='/constructor/true'>true</a> noforwards:flags.27?<a href='/constructor/true'>true</a> join_to_send:flags.28?<a href='/constructor/true'>true</a> join_request:flags.29?<a href='/constructor/true'>true</a> forum:flags.30?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> stories_hidden:flags2.1?<a href='/constructor/true'>true</a> stories_hidden_min:flags2.2?<a href='/constructor/true'>true</a> stories_unavailable:flags2.3?<a href='/constructor/true'>true</a> signature_profiles:flags2.12?<a href='/constructor/true'>true</a> autotranslation:flags2.15?<a href='/constructor/true'>true</a> broadcast_messages_allowed:flags2.16?<a href='/constructor/true'>true</a> monoforum:flags2.17?<a href='/constructor/true'>true</a> forum_tabs:flags2.19?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:flags.13?<a href='/type/long'>long</a> title:<a href='/type/string'>string</a> username:flags.6?<a href='/type/string'>string</a> photo:<a href='/type/ChatPhoto'>ChatPhoto</a> date:<a href='/type/int'>int</a> restriction_reason:flags.9?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; admin_rights:flags.14?<a href='/type/ChatAdminRights'>ChatAdminRights</a> banned_rights:flags.15?<a href='/type/ChatBannedRights'>ChatBannedRights</a> default_banned_rights:flags.18?<a href='/type/ChatBannedRights'>ChatBannedRights</a> participants_count:flags.17?<a href='/type/int'>int</a> usernames:flags2.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Username'>Username</a>&gt; stories_max_id:flags2.4?<a href='/type/int'>int</a> color:flags2.7?<a href='/type/PeerColor'>PeerColor</a> profile_color:flags2.8?<a href='/type/PeerColor'>PeerColor</a> emoji_status:flags2.9?<a href='/type/EmojiStatus'>EmojiStatus</a> level:flags2.10?<a href='/type/int'>int</a> subscription_until_date:flags2.11?<a href='/type/int'>int</a> bot_verification_icon:flags2.13?<a href='/type/long'>long</a> send_paid_messages_stars:flags2.14?<a href='/type/long'>long</a> linked_monoforum_id:flags2.18?<a href='/type/long'>long</a> = <a href='/type/Chat'>Chat</a>;
+
+<a href='/constructor/chatInvite'>chatInvite</a>#5c9d3702 flags:<a href='/type/%23'>#</a> channel:flags.0?<a href='/constructor/true'>true</a> broadcast:flags.1?<a href='/constructor/true'>true</a> public:flags.2?<a href='/constructor/true'>true</a> megagroup:flags.3?<a href='/constructor/true'>true</a> request_needed:flags.6?<a href='/constructor/true'>true</a> verified:flags.7?<a href='/constructor/true'>true</a> scam:flags.8?<a href='/constructor/true'>true</a> fake:flags.9?<a href='/constructor/true'>true</a> can_refulfill_subscription:flags.11?<a href='/constructor/true'>true</a> title:<a href='/type/string'>string</a> about:flags.5?<a href='/type/string'>string</a> photo:<a href='/type/Photo'>Photo</a> participants_count:<a href='/type/int'>int</a> participants:flags.4?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; color:<a href='/type/int'>int</a> subscription_pricing:flags.10?<a href='/type/StarsSubscriptionPricing'>StarsSubscriptionPricing</a> subscription_form_id:flags.12?<a href='/type/long'>long</a> bot_verification:flags.13?<a href='/type/BotVerification'>BotVerification</a> = <a href='/type/ChatInvite'>ChatInvite</a>;
+
+<a href='/constructor/updatePendingJoinRequests'>updatePendingJoinRequests</a>#7063c3db peer:<a href='/type/Peer'>Peer</a> requests_pending:<a href='/type/int'>int</a> recent_requesters:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/Update'>Update</a>;
+<a href='/constructor/updateBotChatInviteRequester'>updateBotChatInviteRequester</a>#11dfa986 peer:<a href='/type/Peer'>Peer</a> date:<a href='/type/int'>int</a> user_id:<a href='/type/long'>long</a> about:<a href='/type/string'>string</a> invite:<a href='/type/ExportedChatInvite'>ExportedChatInvite</a> qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/messages.chatInviteImporters'>messages.chatInviteImporters</a>#81b6b00a count:<a href='/type/int'>int</a> importers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ChatInviteImporter'>ChatInviteImporter</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.ChatInviteImporters'>messages.ChatInviteImporters</a>;
+
+<a href='/constructor/peerSettings'>peerSettings</a>#f47741f7 flags:<a href='/type/%23'>#</a> report_spam:flags.0?<a href='/constructor/true'>true</a> add_contact:flags.1?<a href='/constructor/true'>true</a> block_contact:flags.2?<a href='/constructor/true'>true</a> share_contact:flags.3?<a href='/constructor/true'>true</a> need_contacts_exception:flags.4?<a href='/constructor/true'>true</a> report_geo:flags.5?<a href='/constructor/true'>true</a> autoarchived:flags.7?<a href='/constructor/true'>true</a> invite_members:flags.8?<a href='/constructor/true'>true</a> request_chat_broadcast:flags.10?<a href='/constructor/true'>true</a> business_bot_paused:flags.11?<a href='/constructor/true'>true</a> business_bot_can_reply:flags.12?<a href='/constructor/true'>true</a> geo_distance:flags.6?<a href='/type/int'>int</a> request_chat_title:flags.9?<a href='/type/string'>string</a> request_chat_date:flags.9?<a href='/type/int'>int</a> business_bot_id:flags.13?<a href='/type/long'>long</a> business_bot_manage_url:flags.13?<a href='/type/string'>string</a> charge_paid_message_stars:flags.14?<a href='/type/long'>long</a> registration_month:flags.15?<a href='/type/string'>string</a> phone_country:flags.16?<a href='/type/string'>string</a> name_change_date:flags.17?<a href='/type/int'>int</a> photo_change_date:flags.18?<a href='/type/int'>int</a> = <a href='/type/PeerSettings'>PeerSettings</a>;
+
+<a href='/constructor/messageActionChatJoinedByRequest'>messageActionChatJoinedByRequest</a>#ebbca3cb = <a href='/type/MessageAction'>MessageAction</a>;
+
+<a href='/constructor/channelAdminLogEventActionParticipantJoinByRequest'>channelAdminLogEventActionParticipantJoinByRequest</a>#afb6144a invite:<a href='/type/ExportedChatInvite'>ExportedChatInvite</a> approved_by:<a href='/type/long'>long</a> = <a href='/type/ChannelAdminLogEventAction'>ChannelAdminLogEventAction</a>;
+
+---functions---
+
+<a href='/method/messages.checkChatInvite'>messages.checkChatInvite</a>#3eadb1bb hash:<a href='/type/string'>string</a> = <a href='/type/ChatInvite'>ChatInvite</a>;
+<a href='/method/messages.importChatInvite'>messages.importChatInvite</a>#6c50051c hash:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/messages.getChatInviteImporters'>messages.getChatInviteImporters</a>#df04dd4e flags:<a href='/type/%23'>#</a> requested:flags.0?<a href='/constructor/true'>true</a> subscription_expired:flags.3?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> link:flags.1?<a href='/type/string'>string</a> q:flags.2?<a href='/type/string'>string</a> offset_date:<a href='/type/int'>int</a> offset_user:<a href='/type/InputUser'>InputUser</a> limit:<a href='/type/int'>int</a> = <a href='/type/messages.ChatInviteImporters'>messages.ChatInviteImporters</a>;
+
+<a href='/method/messages.hideChatJoinRequest'>messages.hideChatJoinRequest</a>#7fe7e815 flags:<a href='/type/%23'>#</a> approved:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> user_id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/messages.hideAllChatJoinRequests'>messages.hideAllChatJoinRequests</a>#e085f4ea flags:<a href='/type/%23'>#</a> approved:flags.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> link:flags.1?<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/channels.toggleJoinRequest'>channels.toggleJoinRequest</a>#4c2985b6 channel:<a href='/type/InputChannel'>InputChannel</a> enabled:<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>If the <code>request_needed</code> flag is set when <a href="#invite-links">generating or editing an invite link</a>, or if the appropriate option is toggled using <a href="/method/channels.toggleJoinRequest">channels.toggleJoinRequest</a>, users importing the invite link using <a href="/method/messages.importChatInvite">messages.importChatInvite</a> will receive an <code>INVITE_REQUEST_SENT</code> RPC error, indicating that an join request was successfully sent to the chat admins.  </p>
+<p>Related supergroup information will also have the <a href="/constructor/channel"><code>channel.join_request</code></a> flag set accordingly.  </p>
+<p>Bot administrators will receive a <a href="/constructor/updateBotChatInviteRequester">updateBotChatInviteRequester</a> update for each separate join request.<br>
+User administrators will receive an <a href="/constructor/updatePendingJoinRequests">updatePendingJoinRequests</a>, and should invoke <a href="/method/messages.getChatInviteImporters">messages.getChatInviteImporters</a> with the <code>requested</code> flag set to obtain a list of users waiting to be admitted into the group.  </p>
+<p>Administrators can then use <a href="/method/messages.hideChatJoinRequest">messages.hideChatJoinRequest</a> to approve or dismiss a join request, and <a href="/method/messages.hideAllChatJoinRequests">messages.hideAllChatJoinRequests</a> to approve or dismiss in bulk multiple join requests.  </p>
+<p>Administrators can also choose to send a message to the user before admitting them into the group: in this case, graphical clients <em>on the user side</em> should display a message on the dialog bar of the chat with the admin, indicating that the chat was initiated by the admin of a chat/channel they have recently requested to join, see the <a href="/api/action-bar#an-admin-from-a-recent-join-request-is-contacting-you">action bar documentation »</a> for more info.  </p>
+<h3><a class="anchor" href="#direct-invites" id="direct-invites" name="direct-invites"><i class="anchor-icon"></i></a>Direct invites</h3>
+<pre><code><a href='/constructor/missingInvitee'>missingInvitee</a>#628c9224 flags:<a href='/type/%23'>#</a> premium_would_allow_invite:flags.0?<a href='/constructor/true'>true</a> premium_required_for_pm:flags.1?<a href='/constructor/true'>true</a> user_id:<a href='/type/long'>long</a> = <a href='/type/MissingInvitee'>MissingInvitee</a>;
+
+<a href='/constructor/messages.invitedUsers'>messages.invitedUsers</a>#7f5defa6 updates:<a href='/type/Updates'>Updates</a> missing_invitees:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MissingInvitee'>MissingInvitee</a>&gt; = <a href='/type/messages.InvitedUsers'>messages.InvitedUsers</a>;
+
+---functions---
+
+<a href='/method/messages.addChatUser'>messages.addChatUser</a>#cbc6d107 chat_id:<a href='/type/long'>long</a> user_id:<a href='/type/InputUser'>InputUser</a> fwd_limit:<a href='/type/int'>int</a> = <a href='/type/messages.InvitedUsers'>messages.InvitedUsers</a>;
+<a href='/method/messages.createChat'>messages.createChat</a>#92ceddd4 flags:<a href='/type/%23'>#</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; title:<a href='/type/string'>string</a> ttl_period:flags.0?<a href='/type/int'>int</a> = <a href='/type/messages.InvitedUsers'>messages.InvitedUsers</a>;
+
+<a href='/method/channels.inviteToChannel'>channels.inviteToChannel</a>#c9e33d54 channel:<a href='/type/InputChannel'>InputChannel</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/messages.InvitedUsers'>messages.InvitedUsers</a>;</code></pre>
+<p>Users may also be directly invited to groups and channels during their creation (<a href="/api/channel">basic groups</a> via <a href="/method/messages.createChat">messages.createChat</a>) or afterwards (<a href="/api/channel">basic groups</a> via <a href="/method/messages.addChatUser">messages.addChatUser</a>, <a href="/api/channel">supergroups and channels</a> via <a href="/method/channels.inviteToChannel">channels.inviteToChannel</a>).  </p>
+<p>The methods will return a <a href="/constructor/messages.invitedUsers">messages.invitedUsers</a> constructor, containing a list of <a href="/api/updates">updates</a> about successfully invited users (and eventually info about the created group), and a list of <a href="/constructor/missingInvitee">missingInvitee</a>, with a list of users that could not be invited for some reason.  </p>
+<p>Specifically:</p>
+<ul>
+<li>If none of the <a href="/constructor/missingInvitee">missingInvitee</a> flags are set, we could not add the user because of their privacy settings, and we can create and directly share an <a href="#invite-links">invite link</a> with them using a normal message, instead.  </li>
+<li>If the <a href="/constructor/missingInvitee">missingInvitee</a>.<code>premium_would_allow_invite</code> flag is set, we could not add the user <em>only because</em> the current account needs to purchase a <a href="/api/premium">Telegram Premium</a> subscription to complete the operation.  </li>
+<li>If the <a href="/constructor/missingInvitee">missingInvitee</a>.<code>premium_required_for_pm</code> flag is set, we could not add the user because of their privacy settings, and additionally, the current account needs to purchase a <a href="/api/premium">Telegram Premium</a> subscription to directly share an invite link with the user via a private message.</li>
+</ul></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
