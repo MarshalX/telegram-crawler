@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Ringtones</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="The API allows uploading and synchronizing notification sounds associated to a specific chat.">
+    <meta property="og:title" content="Ringtones">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="The API allows uploading and synchronizing notification sounds associated to a specific chat.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?247" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/ringtones" >Ringtones</a></li></ul></div>
+  <h1 id="dev_page_title">Ringtones</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>The API allows uploading and synchronizing notification sounds associated to a specific chat.</p>
+<h3><a class="anchor" href="#uploading-notification-sounds" id="uploading-notification-sounds" name="uploading-notification-sounds"><i class="anchor-icon"></i></a>Uploading notification sounds</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/account.savedRingtonesNotModified'>account.savedRingtonesNotModified</a>#fbf6e8b1 = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;
+<a href='/constructor/account.savedRingtones'>account.savedRingtones</a>#c1e92cc5 hash:<a href='/type/long'>long</a> ringtones:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;
+
+<a href='/constructor/updateSavedRingtones'>updateSavedRingtones</a>#74d8be99 = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/account.savedRingtone'>account.savedRingtone</a>#b7263f6d = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;
+<a href='/constructor/account.savedRingtoneConverted'>account.savedRingtoneConverted</a>#1f307eb7 document:<a href='/type/Document'>Document</a> = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;
+
+---functions---
+
+<a href='/method/account.uploadRingtone'>account.uploadRingtone</a>#831a83a2 file:<a href='/type/InputFile'>InputFile</a> file_name:<a href='/type/string'>string</a> mime_type:<a href='/type/string'>string</a> = <a href='/type/Document'>Document</a>;
+<a href='/method/account.saveRingtone'>account.saveRingtone</a>#3dea5b03 id:<a href='/type/InputDocument'>InputDocument</a> unsave:<a href='/type/Bool'>Bool</a> = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;
+<a href='/method/account.getSavedRingtones'>account.getSavedRingtones</a>#e1902288 hash:<a href='/type/long'>long</a> = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;</code></pre>
+<p>A notification sound file may be uploaded using <a href="/method/account.uploadRingtone">account.uploadRingtone</a>.<br>
+After upload, the document should be provided to <a href="/method/account.saveRingtone">account.saveRingtone</a> to save the notification sound, returning a simple <a href="/constructor/account.savedRingtone">account.savedRingtone</a>.  </p>
+<p>Supported formats:</p>
+<ul>
+<li>MP3</li>
+<li>OGG OPUS</li>
+</ul>
+<p>An existing voice message may also be passed directly to <a href="/method/account.saveRingtone">account.saveRingtone</a>.<br>
+When passing existing voice messages to <a href="/method/account.saveRingtone">account.saveRingtone</a> an <a href="/constructor/account.savedRingtoneConverted">account.savedRingtoneConverted</a> constructor will be returned containing the new document to use <strong>instead of</strong> the original voice message document when <a href="#removing-notification-sounds">removing</a> or <a href="#setting-notification-sounds">using</a> notification sounds.  </p>
+<p>The following ringtone limits are specified in the <a href="/api/config#client-configuration">client configuration</a>:</p>
+<ul>
+<li><a href="/api/config#ringtone-duration-max">ringtone_duration_max</a> - The maximum duration in seconds of uploaded ringtones</li>
+<li><a href="/api/config#ringtone-saved-count-max">ringtone_saved_count_max</a> - The maximum number of saveable ringtones</li>
+<li><a href="/api/config#ringtone-size-max">ringtone_size_max</a> - The maximum (post-conversion) filesize in bytes of uploadable ringtones</li>
+</ul>
+<h3><a class="anchor" href="#removing-notification-sounds" id="removing-notification-sounds" name="removing-notification-sounds"><i class="anchor-icon"></i></a>Removing notification sounds</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/account.savedRingtone'>account.savedRingtone</a>#b7263f6d = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;
+
+---functions---
+
+<a href='/method/account.saveRingtone'>account.saveRingtone</a>#3dea5b03 id:<a href='/type/InputDocument'>InputDocument</a> unsave:<a href='/type/Bool'>Bool</a> = <a href='/type/account.SavedRingtone'>account.SavedRingtone</a>;</code></pre>
+<p>Pass true to <code>unsave</code> in <a href="/method/account.saveRingtone">account.saveRingtone</a> to remove an uploaded notification sound.  </p>
+<h3><a class="anchor" href="#getting-notification-sounds" id="getting-notification-sounds" name="getting-notification-sounds"><i class="anchor-icon"></i></a>Getting notification sounds</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/updateSavedRingtones'>updateSavedRingtones</a>#74d8be99 = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/account.savedRingtonesNotModified'>account.savedRingtonesNotModified</a>#fbf6e8b1 = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;
+<a href='/constructor/account.savedRingtones'>account.savedRingtones</a>#c1e92cc5 hash:<a href='/type/long'>long</a> ringtones:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Document'>Document</a>&gt; = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;
+
+---functions---
+
+<a href='/method/account.getSavedRingtones'>account.getSavedRingtones</a>#e1902288 hash:<a href='/type/long'>long</a> = <a href='/type/account.SavedRingtones'>account.SavedRingtones</a>;</code></pre>
+<p><a href="/method/account.getSavedRingtones">account.getSavedRingtones</a> can be used to obtain all saved notification sounds.<br>
+The client will receive an <a href="/constructor/updateSavedRingtones">updateSavedRingtones</a> update if the list is modified by the user on other clients, which should trigger a call to <a href="/method/account.getSavedRingtones">account.getSavedRingtones</a>.  </p>
+<h3><a class="anchor" href="#setting-notification-sounds" id="setting-notification-sounds" name="setting-notification-sounds"><i class="anchor-icon"></i></a>Setting notification sounds</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/notificationSoundDefault'>notificationSoundDefault</a>#97e8bebe = <a href='/type/NotificationSound'>NotificationSound</a>;
+<a href='/constructor/notificationSoundNone'>notificationSoundNone</a>#6f0c34df = <a href='/type/NotificationSound'>NotificationSound</a>;
+<a href='/constructor/notificationSoundLocal'>notificationSoundLocal</a>#830b9ae4 title:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/NotificationSound'>NotificationSound</a>;
+<a href='/constructor/notificationSoundRingtone'>notificationSoundRingtone</a>#ff6c8049 id:<a href='/type/long'>long</a> = <a href='/type/NotificationSound'>NotificationSound</a>;
+
+<a href='/constructor/inputNotifyPeer'>inputNotifyPeer</a>#b8bc5b0c peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/InputNotifyPeer'>InputNotifyPeer</a>;
+<a href='/constructor/inputNotifyUsers'>inputNotifyUsers</a>#193b4417 = <a href='/type/InputNotifyPeer'>InputNotifyPeer</a>;
+<a href='/constructor/inputNotifyChats'>inputNotifyChats</a>#4a95e84e = <a href='/type/InputNotifyPeer'>InputNotifyPeer</a>;
+<a href='/constructor/inputNotifyBroadcasts'>inputNotifyBroadcasts</a>#b1db7c7e = <a href='/type/InputNotifyPeer'>InputNotifyPeer</a>;
+
+<a href='/constructor/inputPeerNotifySettings'>inputPeerNotifySettings</a>#cacb6ae2 flags:<a href='/type/%23'>#</a> show_previews:flags.0?<a href='/type/Bool'>Bool</a> silent:flags.1?<a href='/type/Bool'>Bool</a> mute_until:flags.2?<a href='/type/int'>int</a> sound:flags.3?<a href='/type/NotificationSound'>NotificationSound</a> stories_muted:flags.6?<a href='/type/Bool'>Bool</a> stories_hide_sender:flags.7?<a href='/type/Bool'>Bool</a> stories_sound:flags.8?<a href='/type/NotificationSound'>NotificationSound</a> = <a href='/type/InputPeerNotifySettings'>InputPeerNotifySettings</a>;
+
+---functions---
+
+<a href='/method/account.updateNotifySettings'>account.updateNotifySettings</a>#84be5b93 peer:<a href='/type/InputNotifyPeer'>InputNotifyPeer</a> settings:<a href='/type/InputPeerNotifySettings'>InputPeerNotifySettings</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>To set the notification sound to play when receiving messages from a specific peer or from a category of peers, use <a href="/method/account.updateNotifySettings">account.updateNotifySettings</a>, populating the <code>ios_sound</code>, <code>android_sound</code> or <code>other_sound</code> fields according to the platform where the sound should be played.  </p>
+<p>The fields can be populated with the following constructors:</p>
+<ul>
+<li><a href="/constructor/notificationSoundDefault">notificationSoundDefault</a> - The default notification sound should be played</li>
+<li><a href="/constructor/notificationSoundNone">notificationSoundNone</a> - No notification sound should be played</li>
+<li><a href="/constructor/notificationSoundRingtone">notificationSoundRingtone</a> - A previously <a href="#uploading-notification-sounds">uploaded</a> notification sound identified by the uploaded/converted document <code>id</code> should be played.</li>
+<li><a href="/constructor/notificationSoundLocal">notificationSoundLocal</a> - A local notification sound (possibly provided by the OS) identified by the client-specific <code>data</code> payload should be played.</li>
+</ul></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
