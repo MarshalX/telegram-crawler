@@ -71,8 +71,10 @@ function fetchGraph(id, tokenData, retry) {
 function renderGraph(id, json, initial) {
   var domEl = document.getElementById(id);
   var loadingEl = domEl.querySelector('.chart_wrap_loading');
-  if (!json.columns.length ||
-      json.columns[0].length <= 2) {
+    var isScatter = json.scatter || (json.types && Object.keys(json.types).some(function(k){return json.types[k]=='scatter'}));
+
+    if (!isScatter && (!json.columns.length ||
+        json.columns[0].length <= 2)) {
     if (loadingEl) {
       loadingEl.innerHTML = 'Not enough data to display.';
     }
