@@ -660,6 +660,9 @@ var BotSettings = {
       if (field == 'btfrm') {
         botChangeSettings(field, value);
       }
+      if (field == 'btfnu') {
+        botChangeSettings(field, value);
+      }
       if (field == 'grps') {
         botChangeSettings(field, value);
       }
@@ -678,6 +681,11 @@ var BotSettings = {
 
     $('.js-broadcast-admin-rights-toggle').on('click', () => {
       $('.js-broadcast-admin-rights').toggleClass('hidden');
+      WebApp.HapticFeedback.impactOccurred('soft');
+    });
+
+    $('.js-threaded-mode-toggle').on('click', () => {
+      $('.js-threaded-mode-nouser-toggle').toggleClass('hidden');
       WebApp.HapticFeedback.impactOccurred('soft');
     });
 
