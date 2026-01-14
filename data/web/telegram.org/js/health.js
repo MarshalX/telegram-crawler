@@ -407,3 +407,135 @@ function fallbackCopyToClipboard(text) {
   }
   document.body.removeChild(textArea);
 }
+
+/** Autogen anchors **/
+function hlSlugify(text) {
+  return (text || '')
+      .toLowerCase()
+      .trim()
+      .replace(/['"]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'section';
+}
+
+function hlHasFollowingContent(header) {
+  var next = header.nextSibling;
+  var headingRegex = /^H[1-4]$/;
+  var ignoreTags = ['SCRIPT', 'STYLE', 'LINK', 'TEMPLATE', 'META'];
+
+  while (next) {
+    if (next.nodeType === 1) {
+
+      if (headingRegex.test(next.tagName)) {
+        // has txt
+        if (next.textContent && next.textContent.trim().length > 0) {
+          return false;
+        }
+        // no txt, ignore
+      }
+      // not header, check content
+      else if (ignoreTags.indexOf(next.tagName) === -1) {
+        // content
+        return true;
+      }
+    }
+
+    // txt node
+    else if (next.nodeType === 3) {
+      // non blnk
+      if (next.textContent && next.textContent.trim().length > 0) {
+        return true;
+      }
+    }
+
+    next = next.nextSibling;
+  }
+
+  // end of parent, no content
+  return false;
+}
+
+function hlInitAnchors() {
+  var selector = '.hl-page h1, .hl-page h2, .hl-page h3, .hl-page h4';
+  var headings = document.querySelectorAll(selector);
+  var usedIds = {};
+
+  headings.forEach(function(h) {
+    // doubl anchor
+    if (h.querySelector('.anchor')) return;
+
+    // no txt
+    if (!h.textContent || h.textContent.trim().length === 0) return;
+
+    // empty section under h
+    if (!hlHasFollowingContent(h)) return;
+
+    // get slug
+    var text = h.textContent;
+    var id = h.getAttribute('id');
+    if (!id) {
+      var baseSlug = hlSlugify(text);
+      id = baseSlug;
+      var counter = 1;
+      while (usedIds[id] || document.getElementById(id)) {
+        id = baseSlug + '-' + (++counter);
+      }
+      h.setAttribute('id', id);
+    }
+    usedIds[id] = true;
+
+    // add to dom
+    var anchor = document.createElement('a');
+    anchor.className = 'anchor';
+    anchor.href = '#' + id;
+    anchor.setAttribute('aria-label', 'Link to this section');
+
+    var icon = document.createElement('i');
+    icon.className = 'anchor-icon';
+    anchor.appendChild(icon);
+
+    h.prepend(anchor);
+  });
+}
+
+// anchor event
+document.addEventListener('click', function(e) {
+  var link = e.target.closest('.anchor');
+  if (!link) return;
+
+  var href = link.getAttribute('href');
+  if (!href || href.indexOf('#') !== 0) return;
+
+  e.preventDefault();
+  var id = href.substring(1);
+  var fullUrl = window.location.href.split('#')[0] + '#' + id;
+
+  copyToClipboard(fullUrl);
+
+  if (history.pushState) {
+    history.pushState(null, null, '#' + id);
+  } else {
+    window.location.hash = id;
+  }
+
+  var target = document.getElementById(id);
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+});
+
+// auto anchor init
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', hlInitAnchors);
+} else {
+  hlInitAnchors();
+}
+
+// hack bcs some tables load async but wrap their own header so it doesn't autogen anchor on load
+var hlObserverTimeout;
+var hlObserver = new MutationObserver(function(mutations) {
+  // dbounce
+  if (hlObserverTimeout) clearTimeout(hlObserverTimeout);
+  hlObserverTimeout = setTimeout(hlInitAnchors, 200);
+});
+hlObserver.observe(document.body, { childList: true, subtree: true });
