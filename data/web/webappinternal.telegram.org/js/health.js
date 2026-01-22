@@ -412,6 +412,7 @@ function fallbackCopyToClipboard(text) {
 function hlSlugify(text) {
   return (text || '')
       .toLowerCase()
+      .replace(/[0-9.,]+\s*[kmb]?/g, '')
       .trim()
       .replace(/['"]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
