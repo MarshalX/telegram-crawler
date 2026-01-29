@@ -71,25 +71,41 @@ function fetchGraph(id, tokenData, retry) {
 function renderGraph(id, json, initial) {
   var domEl = document.getElementById(id);
   var loadingEl = domEl.querySelector('.chart_wrap_loading');
-    var isScatter = json.scatter || (json.types && Object.keys(json.types).some(function(k){return json.types[k]=='scatter'}));
+  var isScatter = json.scatter || (json.types && Object.keys(json.types).some(function(k){return json.types[k]=='scatter'}));
+  var dynEnabled = isDynamicEnabled(json);
+  var rawJson = dynEnabled ? deepCloneJson(json) : null;
 
-    if (!isScatter && (!json.columns.length ||
-        json.columns[0].length <= 2)) {
+  if (!isScatter && (!json.columns.length || json.columns[0].length <= 2)) {
     if (loadingEl) {
       loadingEl.innerHTML = 'Not enough data to display.';
     }
     return;
   }
+
+  if (dynEnabled && detectModeFromJson(rawJson) === 'relative') {
+    delete json.x_on_zoom;
+  }
+
   json = prepareGraphJson(json);
   var chart = Graph.render(domEl, json);
   domEl.classList.add('chart_wrap_rendered');
   window.charts = window.charts || {};
   window.charts[id] = chart;
+
+  if (dynEnabled) {
+    try {
+      initDynamicModeToggle(domEl, chart, rawJson);
+    } catch (e) {
+      console.warn('dynamic toggle init failed', e);
+    }
+  }
+
   setTimeout(function () {
     if (loadingEl) {
       loadingEl.parentNode && loadingEl.parentNode.removeChild(loadingEl)
     }
   }, 1000);
+
   if (json.csvExport) {
     var exportHTML = '<div class="chart_csv_export_wrap"><a class="csv_link btn btn-default" href="' + json.csvExport + '"><span class="glyphicon glyphicon-download-alt"></span> CSV</a></div>';
     var t = document.createElement('div');
@@ -540,3 +556,256 @@ var hlObserver = new MutationObserver(function(mutations) {
   hlObserverTimeout = setTimeout(hlInitAnchors, 200);
 });
 hlObserver.observe(document.body, { childList: true, subtree: true });
+
+// dynamic graph
+
+function deepCloneJson(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function isScatterJson(json) {
+  if (json.scatter) return true;
+  if (json.types) {
+    for (var k in json.types) {
+      if (json.types[k] === 'scatter') return true;
+    }
+  }
+  return false;
+}
+
+function getYSeriesKeys(json) {
+  var keys = [];
+  if (!json.types) return keys;
+  for (var k in json.types) {
+    if (k !== 'x' && json.types[k] !== 'x') keys.push(k);
+  }
+  return keys;
+}
+
+function detectModeFromJson(json) {
+  // relative aka area graph
+  var keys = getYSeriesKeys(json);
+  for (var i = 0; i < keys.length; i++) {
+    if (json.types && json.types[keys[i]] === 'area') return 'relative';
+  }
+  return 'absolute';
+}
+
+function isDynamicEnabled(json) {
+  return !!(json && (json.dynamic === true || (json.dynamic && json.dynamic.enabled)));
+}
+
+function isDynamicEligible(rawJson) {
+  if (!isDynamicEnabled(rawJson)) return false;
+
+  if (isScatterJson(rawJson)) return false;
+  if (rawJson.y_scaled) return false;
+
+  var yKeys = getYSeriesKeys(rawJson);
+  if (yKeys.length < 2) return false;
+
+  // care for stacked-style charts for abs/rel
+  // stacked=true fot multi-series bars/areas
+  if (!rawJson.stacked) return false;
+
+  return true;
+}
+
+function buildModeJson(rawJson, mode) {
+  var j = deepCloneJson(rawJson);
+
+  var yKeys = getYSeriesKeys(j);
+  for (var i = 0; i < yKeys.length; i++) {
+    j.types[yKeys[i]] = (mode === 'relative') ? 'area' : 'bar';
+  }
+
+  // relative charts should not use server detail zoom token
+  // abs charts may use x_on_zoom
+  if (mode === 'relative') {
+    delete j.x_on_zoom;
+  }
+
+  // check pieZoomRange exists for relative pie zoom trans if bknd didnt give it
+  if (mode === 'relative' && j.pieZoomRange == null) {
+    try {
+      var xCol = j.columns && j.columns[0];
+      if (xCol && xCol.length >= 3 && xCol[0] === 'x') {
+        var xMin = xCol[1];
+        var xMax = xCol[xCol.length - 1];
+        j.pieZoomRange = xMax - xMin;
+      }
+    } catch (e) {}
+  }
+
+  return j;
+}
+
+function syncChartState(fromChart, toChart) {
+  var ysLen = (fromChart && fromChart.data && fromChart.data.ys) ? fromChart.data.ys.length : 0;
+  var enabled = new Array(ysLen);
+  var enabledCount = 0;
+
+  for (var i = 0; i < ysLen; i++) {
+    enabled[i] = !!fromChart.state['e_' + i];
+    if (enabled[i]) enabledCount++;
+  }
+  if (!enabledCount && ysLen) enabled[0] = true;
+
+  var x1 = fromChart.state.x1;
+  var x2 = fromChart.state.x2;
+
+  toChart.state.x1 = x1;
+  toChart.state.x2 = x2;
+
+  toChart.state.xg1 = fromChart.state.xg1;
+  toChart.state.xg2 = fromChart.state.xg2;
+  toChart.state.xgMin = fromChart.state.xgMin;
+  toChart.state.xgMax = fromChart.state.xgMax;
+  toChart.state.xg1Ind = fromChart.state.xg1Ind;
+  toChart.state.xg2Ind = fromChart.state.xg2Ind;
+
+  for (var j = 0; j < ysLen; j++) {
+    var e = enabled[j];
+    toChart.state['e_' + j] = e;
+    toChart.state['o_' + j] = e ? 1 : 0;
+    toChart.state['om_' + j] = e ? 1 : 0;
+  }
+  toChart.state.activeColumnsCount = enabledCount || 1;
+
+  var rangeGraph = toChart.getYMinMax(x1, x2, false, true);
+  var rangeMini = toChart.getYMinMax(toChart.state.xg1, toChart.state.xg2, true);
+
+  if (toChart.pairY) {
+    for (var k = 0; k < ysLen; k++) {
+      toChart.state['y1_' + k] = rangeGraph.min[k];
+      toChart.state['y2_' + k] = rangeGraph.max[k];
+      toChart.state['y1m_' + k] = rangeMini.min[k];
+      toChart.state['y2m_' + k] = rangeMini.max[k];
+    }
+  } else {
+    toChart.state.y1 = rangeGraph.min;
+    toChart.state.y2 = rangeGraph.max;
+    toChart.state.y1m = rangeMini.min;
+    toChart.state.y2m = rangeMini.max;
+  }
+
+  toChart.switchers && toChart.switchers.render(enabled);
+  toChart.axisX && toChart.axisX.setAnimation(false);
+  toChart.axisY && toChart.axisY.setAnimation(false);
+  toChart.axisY && toChart.axisY.setForceUpdate(true);
+  window.Graph && Graph.units && Graph.units.TUtils && Graph.units.TUtils.triggerEvent('chart-hide-tips', { except: null });
+  toChart.tip && toChart.tip.toggle(false);
+  toChart.composer && toChart.composer.render({ top: true, bottom: true });
+}
+
+function initDynamicModeToggle(domEl, baseChart, rawJson) {
+  if (!isDynamicEligible(rawJson)) return;
+
+  var wrapper = baseChart && baseChart.opts && baseChart.opts.container;
+  if (!wrapper) return;
+
+  // hack shift the zoom out btn to the right
+  // no layouts because tchart enforces weird abs positioning
+  // [!!] this took way too many attempts to get right, care if changing it, tchart is weird with the header Z stack
+  wrapper.classList.add('tchart-wrapper__dynamic');
+
+  var currentMode = detectModeFromJson(rawJson);
+
+  var charts = {
+    absolute: (currentMode === 'absolute') ? baseChart : null,
+    relative: (currentMode === 'relative') ? baseChart : null
+  };
+
+  function styleLayer(chart, active) {
+    if (!chart || !chart.$el) return;
+    chart.$el.classList.add('tchart__dynamic_layer');
+    chart.$el.style.position = chart === baseChart ? '' : 'absolute';
+    chart.$el.style.top = chart === baseChart ? '' : '0';
+    chart.$el.style.left = chart === baseChart ? '' : '0';
+    chart.$el.style.width = '100%';
+
+    chart.$el.style.opacity = active ? '1' : '0';
+    chart.$el.style.pointerEvents = active ? 'auto' : 'none';
+    chart.$el.style.zIndex = active ? '2' : '1';
+    chart.$el.style.visibility = 'visible';
+  }
+
+  // ui header
+  var btn = document.createElement('div');
+  btn.className = 'tchart--mode-btn'; // put btn left 17px
+
+  var icon = document.createElement('div');
+  btn.appendChild(icon);
+
+  var label = document.createElement('span');
+  btn.appendChild(label);
+
+  wrapper.appendChild(btn);
+
+  function updateButtons() {
+    // class based on current state to enable correct hover
+    // [!] there's a hack here, if changing, also fix tchart--mode-btn__clicked for hover continuity
+    if (currentMode === 'absolute') {
+      label.textContent = 'Relative';
+      // current is abs, vertical, hover to rel aka horiz
+      btn.classList.add('tchart--mode-btn__is-abs');
+      btn.classList.remove('tchart--mode-btn__is-rel');
+    } else {
+      label.textContent = 'Absolute';
+      // current rel, horiz, hover to avb aka vert
+      btn.classList.add('tchart--mode-btn__is-rel');
+      btn.classList.remove('tchart--mode-btn__is-abs');
+    }
+  }
+
+  function ensureChart(mode) {
+    if (charts[mode]) return charts[mode];
+    var modeJson = buildModeJson(rawJson, mode);
+    var prepared = prepareGraphJson(modeJson);
+    var ch = new Graph.units.TChart({ container: wrapper, data: prepared });
+    charts[mode] = ch;
+    styleLayer(ch, false);
+    return ch;
+  }
+
+  function setMode(mode) {
+    if (mode === currentMode) return;
+    var fromChart = charts[currentMode] || baseChart;
+    var toChart = ensureChart(mode);
+
+    var isZoomed = fromChart && (fromChart.state.zoomMode || fromChart.state.zoomModeSpecial);
+    if (isZoomed) {
+      try { fromChart.toggleZoom(false); } catch (e) {}
+      try { toChart.toggleZoom(false); } catch (e2) {}
+
+      setTimeout(function () {
+        syncChartState(fromChart, toChart);
+        styleLayer(fromChart, false);
+        styleLayer(toChart, true);
+        currentMode = mode;
+        updateButtons();
+      }, 520);
+      return;
+    }
+
+    syncChartState(fromChart, toChart);
+    styleLayer(fromChart, false);
+    styleLayer(toChart, true);
+    currentMode = mode;
+    updateButtons();
+  }
+
+  btn.addEventListener('click', function () {
+    var nextMode = (currentMode === 'absolute') ? 'relative' : 'absolute';
+    // hack to show continuity on hover after click
+    btn.classList.add('tchart--mode-btn__clicked');
+    setMode(nextMode);
+  });
+
+  btn.addEventListener('mouseleave', function() {
+    btn.classList.remove('tchart--mode-btn__clicked');
+  });
+
+  styleLayer(baseChart, true);
+  updateButtons();
+}
