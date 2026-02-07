@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>﻿Creating an Authorization Key</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="The query format is described using Binary Data Serialization and the TL Language. All large numbers are transmitted as…">
+    <meta property="og:title" content="﻿Creating an Authorization Key">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="The query format is described using Binary Data Serialization and the TL Language. All large numbers are transmitted as…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/auth_key" >﻿Creating an Authorization Key</a></li></ul></div>
+  <h1 id="dev_page_title">﻿Creating an Authorization Key</h1>
+  
+  <div id="dev_page_content"><p>The query format is described using <a href="/mtproto/serialize">Binary Data Serialization</a> and the <a href="/mtproto/TL">TL Language</a>. All large numbers are transmitted as strings containing the required sequence of bytes in big endian order. Hash functions, such as SHA1, return strings (of 20 bytes) which can also be interpreted as big endian numbers. Small numbers (<code>int</code>, <code>long</code>, <code>int128</code>, <code>int256</code>) are normally little endian; however, if they are part of SHA1, the bytes are not rearranged. This way, if <code>long</code> <code>x</code> is the 64 lower-order bits of SHA1 of string <code>s</code>, then the <em>final</em> 8 bytes of 20-byte string <code>SHA1(s)</code> are taken and interpreted as a 64-bit integer.</p>
+<p>Prior to sending off unencrypted messages (required in this instance to generate an authorization key), the client must undergo (p,q) authorization as follows.</p>
+<h4><a class="anchor" href="#dh-exchange-initiation" id="dh-exchange-initiation" name="dh-exchange-initiation"><i class="anchor-icon"></i></a>DH exchange initiation</h4>
+<h5><a class="anchor" href="#1-client-sends-query-to-server" id="1-client-sends-query-to-server" name="1-client-sends-query-to-server"><i class="anchor-icon"></i></a>1) Client sends query to server</h5>
+<pre><code>req_pq_multi#be7e8ef1 nonce:int128 = ResPQ;</code></pre>
+<p>The value of <em>nonce</em> is selected randomly by the client (random number) and identifies the client within this communication. Following this step, it is known to all.</p>
+<h5><a class="anchor" href="#2-server-sends-response-of-the-form" id="2-server-sends-response-of-the-form" name="2-server-sends-response-of-the-form"><i class="anchor-icon"></i></a>2) Server sends response of the form</h5>
+<pre><code>resPQ#05162463 nonce:int128 server_nonce:int128 pq:string server_public_key_fingerprints:Vector long = ResPQ;</code></pre>
+<p>Here, string pq is a representation of a natural number (in binary big endian format). This number is the product of two different odd prime numbers. Normally, pq is less than or equal to 2^63-1. The value of <em>server_nonce</em> is selected randomly by the server; following this step, it is known to all.</p>
+<p><code>server_public_key_fingerprints</code> is a list of public RSA key fingerprints (64 lower-order bits of SHA1 (server_public_key); the public key is represented as a bare type <code>rsa_public_key n:string e:string = RSAPublicKey</code>, where, as usual, n and e are numbers in big endian format serialized as strings of bytes, following which SHA1 is computed) received by the server.</p>
+<p>All subsequent messages contain the pair (nonce, server_nonce) both in the plain-text, and the encrypted portions which makes it possible to identify a “temporary session” — one run of the key generation protocol described on this page that uses the same (nonce, server_nonce) pair. An intruder could not create a parallel session with the server with the same parameters and reuse parts of server- or client-encrypted messages for its own purposes in such a parallel session, because a different server_nonce would be selected by the server for any new “temporary session”.</p>
+<h4><a class="anchor" href="#proof-of-work" id="proof-of-work" name="proof-of-work"><i class="anchor-icon"></i></a>Proof of work</h4>
+<h5><a class="anchor" href="#3-client-decomposes-pq-into-prime-factors-such-that-p--q" id="3-client-decomposes-pq-into-prime-factors-such-that-p--q" name="3-client-decomposes-pq-into-prime-factors-such-that-p--q"><i class="anchor-icon"></i></a>3) Client decomposes pq into prime factors such that p &lt; q.</h5>
+<p>This starts a round of Diffie-Hellman key exchanges.</p>
+<h4><a class="anchor" href="#presenting-proof-of-work-server-authentication" id="presenting-proof-of-work-server-authentication" name="presenting-proof-of-work-server-authentication"><i class="anchor-icon"></i></a>Presenting proof of work; Server authentication</h4>
+<h5><a class="anchor" href="#4-encrypted-data-payload-generation" id="4-encrypted-data-payload-generation" name="4-encrypted-data-payload-generation"><i class="anchor-icon"></i></a>4) <code>encrypted_data</code> payload generation</h5>
+<p>First of all, generate an <code>encrypted_data</code> payload as follows:</p>
+<ul>
+<li>
+<p>new_nonce := another (good) random number generated by the client; after this query, it is known to both client and server;</p>
+</li>
+<li>
+<p>data := a serialization of </p>
+<pre><code>p_q_inner_data_dc#a9f55f95 pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 dc:int = P_Q_inner_data;</code></pre>
+<p>or of</p>
+<pre><code>p_q_inner_data_temp_dc#56fddf88 pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 dc:int expires_in:int = P_Q_inner_data;</code></pre>
+<p>where <code>dc</code> is the ID of the DC we're talking to; <code>10000</code> has to be added to the DC ID when connecting to the test servers; it has to be made negative if the DC we're connecting to is a media (not CDN) DC.  </p>
+</li>
+<li>
+<p>encrypted_data := RSA_PAD (data, server_public_key), where RSA_PAD is a version of RSA with a variant of OAEP+ padding explained below in 4.1).</p>
+</li>
+</ul>
+<p>Someone might intercept the query and replace it with their own, independently decomposing pq into factors instead of the client. The only field that it makes sense to modify is new_nonce which would be the one an intruder would have to re-generate (because an intruder cannot decrypt the encrypted data sent by the client). Since all subsequent messages are encrypted using new_nonce or contain new_nonce_hash, they will not be processed by the client (an intruder would not be able to make it look as though they had been generated by the server because they would not contain new_nonce). Therefore, this intercept will only result in the intruder's completing the authorization key generation protocol in place of the client and creating a new key (that has nothing to do with the client); however, the same effect could be achieved simply by creating a new key in one's own name.</p>
+<p>An alternative form of inner data (<code>p_q_inner_data_temp_dc</code>) is used to create temporary keys, that are only stored in the server RAM and are discarded after at most <code>expires_in</code> seconds. The server is free to discard its copy earlier. In all other respects the temporary key generation protocol is the same. After a temporary key is created, the client usually binds it to its principal authorisation key by means of the <a href="/method/auth.bindTempAuthKey">auth.bindTempAuthKey</a> method, and uses it for all client-server communication until it expires; then a new temporary key is generated. Thus Perfect Forward Secrecy (PFS) in client-server communication is achieved. <a href="/api/pfs">Read more about PFS »</a></p>
+<h5><a class="anchor" href="#41-rsa-paddata-server-public-key-mentioned-above-is-implemented-as-follows" id="41-rsa-paddata-server-public-key-mentioned-above-is-implemented-as-follows" name="41-rsa-paddata-server-public-key-mentioned-above-is-implemented-as-follows"><i class="anchor-icon"></i></a>4.1) <code>RSA_PAD(data, server_public_key)</code> mentioned above is implemented as follows:</h5>
+<ul>
+<li>data_with_padding := data + random_padding_bytes; -- where random_padding_bytes are chosen so that the resulting length of data_with_padding is precisely 192 bytes, and data is the TL-serialized data to be encrypted as before. One has to check that data is not longer than 144 bytes.</li>
+<li>data_pad_reversed := BYTE_REVERSE(data_with_padding); -- is obtained from data_with_padding by reversing the byte order.</li>
+<li>a random 32-byte temp_key is generated.</li>
+<li>data_with_hash := data_pad_reversed + SHA256(temp_key + data_with_padding); -- after this assignment, data_with_hash is exactly 224 bytes long.</li>
+<li>aes_encrypted := AES256_IGE(data_with_hash, temp_key, 0); -- AES256-IGE encryption with zero IV.</li>
+<li>temp_key_xor := temp_key XOR SHA256(aes_encrypted); -- adjusted key, 32 bytes</li>
+<li>key_aes_encrypted := temp_key_xor + aes_encrypted; -- exactly 256 bytes (2048 bits) long</li>
+<li>The value of key_aes_encrypted is compared with the RSA-modulus of server_pubkey as a big-endian 2048-bit (256-byte) unsigned integer. If key_aes_encrypted turns out to be greater than or equal to the RSA modulus, the previous steps starting from the generation of new random temp_key are repeated. Otherwise the final step is performed:</li>
+<li>encrypted_data := RSA(key_aes_encrypted, server_pubkey); --  256-byte big-endian integer is elevated to the requisite power from the RSA public key modulo the RSA modulus, and the result is stored as a big-endian integer consisting of exactly 256 bytes (with leading zero bytes if required).</li>
+</ul>
+<h5><a class="anchor" href="#5-send-req-dh-params-query-with-generated-encrypted-data" id="5-send-req-dh-params-query-with-generated-encrypted-data" name="5-send-req-dh-params-query-with-generated-encrypted-data"><i class="anchor-icon"></i></a>5) Send req_DH_params query with generated <code>encrypted_data</code></h5>
+<pre><code>req_DH_params#d712e4be nonce:int128 server_nonce:int128 p:string q:string public_key_fingerprint:long encrypted_data:string = Server_DH_Params</code></pre>
+<h5><a class="anchor" href="#6-server-responds-with" id="6-server-responds-with" name="6-server-responds-with"><i class="anchor-icon"></i></a>6) Server responds with:</h5>
+<pre><code>server_DH_params_ok#d0e8075c nonce:int128 server_nonce:int128 encrypted_answer:string = Server_DH_Params;</code></pre>
+<blockquote>
+<p>If the query is incorrect, the server returns a <code>-404</code> error and the handshake must be restarted (any subsequent request also returns <code>-404</code>, even if it is correct).<br>
+A <code>-444</code> error may also be returned if a test DC ID is passed in <code>p_q_inner_data_(_temp)dc</code> when handshaking with a production DC, and vice versa.  </p>
+</blockquote>
+<p>Here, encrypted_answer is obtained as follows:</p>
+<ul>
+<li>new_nonce_hash := 128 lower-order bits of SHA1 (new_nonce);</li>
+<li>answer := serialization <pre><code>server_DH_inner_data#b5890dba nonce:int128 server_nonce:int128 g:int dh_prime:string g_a:string server_time:int = Server_DH_inner_data;</code></pre>
+</li>
+<li>answer_with_hash := SHA1(answer) + answer + (0-15 random bytes); such that the length be divisible by 16;</li>
+<li>tmp_aes_key := SHA1(new_nonce + server_nonce) + substr (SHA1(server_nonce + new_nonce), 0, 12);</li>
+<li>tmp_aes_iv := substr (SHA1(server_nonce + new_nonce), 12, 8) + SHA1(new_nonce + new_nonce) + substr (new_nonce, 0, 4);</li>
+<li>encrypted_answer := AES256_ige_encrypt (answer_with_hash, tmp_aes_key, tmp_aes_iv); here, tmp_aes_key is a 256-bit key, and  tmp_aes_iv is a 256-bit initialization vector. The same as in all the other instances that use AES encryption, the encrypted data is padded with random bytes to a length divisible by 16 immediately prior to encryption.</li>
+</ul>
+<p>Following this step, new_nonce is still known to client and server only. The client is certain that it is the server that responded and that the response was generated specifically in response to client query req_DH_params, since the response data are encrypted using new_nonce.</p>
+<p>Client is expected to check whether <strong>p = dh_prime</strong> is a safe 2048-bit prime (meaning that both <strong>p</strong> and <strong>(p-1)/2</strong> are prime, and that 2^2047 &lt; p &lt; 2^2048), and that <strong>g</strong> generates a cyclic subgroup of prime order <strong>(p-1)/2</strong>, i.e. is a quadratic residue <strong>mod p</strong>. Since <strong>g</strong> is always equal to 2, 3, 4, 5, 6 or 7, this is easily done using quadratic reciprocity law, yielding a simple condition on <strong>p mod 4g</strong> -- namely, <strong>p mod 8 = 7</strong> for <strong>g = 2</strong>; <strong>p mod 3 = 2</strong> for <strong>g = 3</strong>; no extra condition for <strong>g = 4</strong>; <strong>p mod 5 = 1 or 4</strong> for <strong>g = 5</strong>; <strong>p mod 24 = 19 or 23</strong> for <strong>g = 6</strong>; and <strong>p mod 7 = 3, 5 or 6</strong> for <strong>g = 7</strong>. After <strong>g</strong> and <strong>p</strong> have been checked by the client, it makes sense to cache the result, so as not to repeat lengthy computations in future.</p>
+<p>If the verification takes too long time (which is the case for older mobile devices), one might initially run only 15 Miller--Rabin iterations for verifying primeness of <strong>p</strong> and <strong>(p - 1)/2</strong> with error probability not exceeding one billionth, and do more iterations later in the background.</p>
+<p>Another optimization is to embed into the client application code a small table with some known "good" couples <strong>(g,p)</strong> (or just known safe primes <strong>p</strong>, since the condition on <strong>g</strong> is easily verified during execution), checked during code generation phase, so as to avoid doing such verification during runtime altogether. Server changes these values rarely, thus one usually has to put the current value of server's <strong>dh_prime</strong> into such a table. For example, current value of <strong>dh_prime</strong> equals (in big-endian byte order)</p>
+<pre><code>C7 1C AE B9 C6 B1 C9 04 8E 6C 52 2F 70 F1 3F 73 98 0D 40 23 8E 3E 21 C1 49 34 D0 37 56 3D 93 0F 48 19 8A 0A A7 C1 40 58 22 94 93 D2 25 30 F4 DB FA 33 6F 6E 0A C9 25 13 95 43 AE D4 4C CE 7C 37 20 FD 51 F6 94 58 70 5A C6 8C D4 FE 6B 6B 13 AB DC 97 46 51 29 69 32 84 54 F1 8F AF 8C 59 5F 64 24 77 FE 96 BB 2A 94 1D 5B CD 1D 4A C8 CC 49 88 07 08 FA 9B 37 8E 3C 4F 3A 90 60 BE E6 7C F9 A4 A4 A6 95 81 10 51 90 7E 16 27 53 B5 6B 0F 6B 41 0D BA 74 D8 A8 4B 2A 14 B3 14 4E 0E F1 28 47 54 FD 17 ED 95 0D 59 65 B4 B9 DD 46 58 2D B1 17 8D 16 9C 6B C4 65 B0 D6 FF 9C A3 92 8F EF 5B 9A E4 E4 18 FC 15 E8 3E BE A0 F8 7F A9 FF 5E ED 70 05 0D ED 28 49 F4 7B F9 59 D9 56 85 0C E9 29 85 1F 0D 81 15 F6 35 B1 05 EE 2E 4E 15 D0 4B 24 54 BF 6F 4F AD F0 34 B1 04 03 11 9C D8 E3 B9 2F CC 5B</code></pre>
+<h5><a class="anchor" href="#7-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message" id="7-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message" name="7-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message"><i class="anchor-icon"></i></a>7) Client computes random 2048-bit number <em>b</em> (using a sufficient amount of entropy) and sends the server a message</h5>
+<pre><code>set_client_DH_params#f5045f1f nonce:int128 server_nonce:int128 encrypted_data:string = Set_client_DH_params_answer;</code></pre>
+<p>Here, encrypted_data is obtained thus:</p>
+<ul>
+<li>g_b := pow(g, b) mod dh_prime;</li>
+<li>data := serialization <pre><code>client_DH_inner_data#6643b654 nonce:int128 server_nonce:int128 retry_id:long g_b:string = Client_DH_Inner_Data</code></pre>
+</li>
+<li>data_with_hash := SHA1(data) + data + (0-15 random bytes); such that length be divisible by 16;</li>
+<li>encrypted_data := AES256_ige_encrypt (data_with_hash, tmp_aes_key, tmp_aes_iv);</li>
+</ul>
+<p>The retry_id field is equal to zero at the time of the first attempt; otherwise, it is equal to auth_key_aux_hash from the previous failed attempt (see <a href="#9-server-responds-in-one-of-three-ways">Item 9</a>).</p>
+<h5><a class="anchor" href="#8-thereafter-auth-key-equals-powg-ab-mod-dh-prime-on-the-server-it-is-computed-as-powg-b-a-mod-dh-prime-and-on-the-client-as-g-ab-mod-dh-prime" id="8-thereafter-auth-key-equals-powg-ab-mod-dh-prime-on-the-server-it-is-computed-as-powg-b-a-mod-dh-prime-and-on-the-client-as-g-ab-mod-dh-prime" name="8-thereafter-auth-key-equals-powg-ab-mod-dh-prime-on-the-server-it-is-computed-as-powg-b-a-mod-dh-prime-and-on-the-client-as-g-ab-mod-dh-prime"><i class="anchor-icon"></i></a>8) Thereafter, auth_key equals <code>pow(g, {ab}) mod dh_prime</code>; on the server, it is computed as <code>pow(g_b, a) mod dh_prime</code>, and on the client as <code>(g_a)^b mod dh_prime</code>.</h5>
+<p>Auth_key_hash is computed := 64 lower-order bits of SHA1 (auth_key). The server checks whether there already is another key with the same auth_key_hash and responds in one of the following ways.</p>
+<h4><a class="anchor" href="#dh-key-exchange-complete" id="dh-key-exchange-complete" name="dh-key-exchange-complete"><i class="anchor-icon"></i></a>DH key exchange complete</h4>
+<h5><a class="anchor" href="#9-server-responds-in-one-of-three-ways" id="9-server-responds-in-one-of-three-ways" name="9-server-responds-in-one-of-three-ways"><i class="anchor-icon"></i></a>9) Server responds in one of three ways:</h5>
+<pre><code>dh_gen_ok#3bcbf734 nonce:int128 server_nonce:int128 new_nonce_hash1:int128 = Set_client_DH_params_answer;
+dh_gen_retry#46dc1fb9 nonce:int128 server_nonce:int128 new_nonce_hash2:int128 = Set_client_DH_params_answer;
+dh_gen_fail#a69dae02 nonce:int128 server_nonce:int128 new_nonce_hash3:int128 = Set_client_DH_params_answer;</code></pre>
+<ul>
+<li>new_nonce_hash1, new_nonce_hash2, and new_nonce_hash3 are obtained as the 128 lower-order bits of SHA1 of the byte string derived from the new_nonce string by adding a single byte with the value of 1, 2, or 3, and followed by another 8 bytes with auth_key_aux_hash. Different values are required to prevent an intruder from changing server response dh_gen_ok into dh_gen_retry.</li>
+<li>auth_key_aux_hash is the 64 <em>higher-order</em> bits of SHA1(auth_key). It must not be confused with auth_key_hash.</li>
+</ul>
+<p>In the other case, the client goes to <a href="/mtproto/auth_key#7-client-computes-random-2048-bit-number-b-using-a-sufficient-amount-of-entropy-and-sends-the-server-a-message">Item 7)</a> generating a new <em>b</em>.
+In the first case, the client and the server have negotiated auth_key, following which they forget all other temporary data, and the client creates another encrypted session using auth_key. At the same time, server_salt is initially set to <code>substr(new_nonce, 0, 8) XOR substr(server_nonce, 0, 8)</code>. If required, the client stores the difference between server_time received in 5) and its local time, to be able always to have a good approximation of server time which is required to generate correct message identifiers.</p>
+<p><strong>IMPORTANT</strong>: Apart from the conditions on the Diffie-Hellman prime <strong>dh_prime</strong> and generator <strong>g</strong>, both sides are to check that <strong>g</strong>, <strong>g_a</strong> and <strong>g_b</strong> are greater than <strong>1</strong> and less than <strong>dh_prime - 1</strong>. We recommend checking that <strong>g_a</strong> and <strong>g_b</strong> are between <strong>2^{2048-64}</strong> and <strong>dh_prime - 2^{2048-64}</strong> as well.</p>
+<h4><a class="anchor" href="#error-handling-lost-queries-and-responses" id="error-handling-lost-queries-and-responses" name="error-handling-lost-queries-and-responses"><i class="anchor-icon"></i></a>Error Handling (Lost Queries and Responses)</h4>
+<p>If the client fails to receive any response to its query from the server within a certain time interval, it may simply re-send the query. If the server has already sent a response to this query (<em>exactly</em> the same request and not just similar: all the parameters during the repeat request must take on the same values) but it did not get to the client, the server will simply re-send the same response. The server remembers the response for up to 10 minutes after having received the query in 1). If the server has already forgotten the response or the requisite temporary data, the client will have to start from the beginning.</p>
+<p>The server may consider that if the client has already sent in the next query using the data from the previous server response to the specific client, the response is known to have been received by the client and may be forgotten by the server.</p>
+<h4><a class="anchor" href="#usage-example" id="usage-example" name="usage-example"><i class="anchor-icon"></i></a>Usage Example</h4>
+<p>An example of a complete list of queries required to generate an authorization key is shown on <a href="/mtproto/samples-auth_key">a separate page</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

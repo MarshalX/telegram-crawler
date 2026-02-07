@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Encrypted CDNs for Speed and Security</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Following the launch of version 4.2 of the official apps, Telegram client apps may be required to download popular files…">
+    <meta property="og:title" content="Encrypted CDNs for Speed and Security">
+    <meta property="og:image" content="9ba979e9b9f66d5bdc">
+    <meta property="og:description" content="Following the launch of version 4.2 of the official apps, Telegram client apps may be required to download popular files…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"></div>
+  <h1 id="dev_page_title">Encrypted CDNs for Speed and Security</h1>
+  
+  <div id="dev_page_content"><p>Following the launch of version 4.2 of the official apps, Telegram client apps may be required to download popular files that were published in public channels with more than <strong>100,000</strong> members from secondary <a href="https://en.wikipedia.org/wiki/Content_delivery_network">Content Delivery Network</a> data centers. These CDN DCs are located in regions with significant Telegram traffic where we wouldn't want to place Telegram servers for various reasons.</p>
+<p>The CDN DCs are not a part of the Telegram cloud and should be considered enemy territory. For this reason, each file that is to be sent to these CDN DCs is encrypted with a unique key using AES-256-CTR encryption. The CDN <strong>can't access the data</strong> it stores because these keys are only accessible to the main MTProto server and to the authorized client.</p>
+<blockquote>
+<p><strong>See also:</strong> <a href="/techfaq#encrypted-cdns">More about CDNs and governments in the Advanced FAQ</a></p>
+</blockquote>
+<h3><a class="anchor" href="#how-this-works" id="how-this-works" name="how-this-works"><i class="anchor-icon"></i></a>How this works</h3>
+<p>When a file from a public channel with <strong>~100,000</strong> members becomes popular in a particular region, the Telegram server may encrypt this file with a unique AES-256-CTR key and send it to a relevant CDN DC for storage.</p>
+<p>When a file is stored in a CDN DC close to the end user, the download speed will be much higher because the data needs to travel smaller distances and will likely avoid many bottlenecks that exist between regions.</p>
+<p>This is secure because CDN DCs are treated the same way as internet providers / random third parties:</p>
+<ul>
+<li>CDN DCs don't have the keys to decrypt files that are stored there, so they can't access the data even if a DC becomes compromised.</li>
+<li>Encrypted files fragments are protected from tampering by their SHA-256 hash which is checked on the client upon receipt.</li>
+<li>No private data is stored in or passed to the CDN DCs.</li>
+<li>The server only allows media from public channels with more than <strong>100,000</strong> subscribers to be cached in CDN DCs (this includes media forwarded from those channels and viral media that originated from other large public channels).</li>
+</ul>
+<div>
+    <a href="/file/811140934/1815/aSQ-nSUHJzc.45662/40c2955965574cef80" target="_blank"><img src="/file/811140934/1815/aSQ-nSUHJzc.45662/40c2955965574cef80" title="CDNs explained" class="dev_page_image"></a>
+</div>
+<p>CDNs are very limited when it comes to communication: the master data center only uploads encrypted files for storage and will accept no data from the CDN. The client apps only download encrypted files and accept no other updates. The client apps obtain the keys necessary to decrypt the file from the main Telegram server and verify the integrity of the file by its hash, which means that the CDN may only supply the correct file – anything different will be immediately discarded by the client.</p>
+<p>CDN DCs do not store files on hard disks – only in memory. When a CDN server runs out of memory, a simple LRU algorithm is used to replace the least popular files with new ones.</p>
+<h3><a class="anchor" href="#how-cdn-dcs-are-different-from-the-master-dcs" id="how-cdn-dcs-are-different-from-the-master-dcs" name="how-cdn-dcs-are-different-from-the-master-dcs"><i class="anchor-icon"></i></a>How CDN DCs are different from the master DCs</h3>
+<ul>
+<li><strong>CDNs may not be trusted.</strong></li>
+<li>Client developers can use <a href="/method/help.getCdnConfig">help.getCdnConfig</a> to obtain a list of public RSA keys for CDN DCs, which are different from public RSA keys of the master DCs.</li>
+<li>CDNs support only the following methods: <a href="/method/upload.getCdnFile">upload.getCdnFile</a>, <a href="/method/initConnection">initConnection</a>, <a href="/method/invokeWithLayer">invokeWithLayer</a>.</li>
+<li>When working with CDNs, client developers must remember that auth_key may be deleted at any given moment (resulting in a -404 error, in which case a new key must be generated).</li>
+<li>Client apps must not accept updates from CDN DCs (apps should only accept updates from their main connection to the master DC).</li>
+<li>Clients must not allow the CDN DCs to substitute replies to queries sent to other DCs.</li>
+<li>Clients must not send private user info that is passed in <a href="/method/initConnection">initConnection</a> to the CDNs.</li>
+</ul>
+<h3><a class="anchor" href="#getting-files-from-a-cdn" id="getting-files-from-a-cdn" name="getting-files-from-a-cdn"><i class="anchor-icon"></i></a>Getting files from a CDN</h3>
+<p>The API may return the <a href="/constructor/upload.fileCdnRedirect">upload.fileCdnRedirect</a> constructor after an <a href="/method/upload.getFile">upload.getFile</a> query. In this case, the client must request the required file from a CDN DC. The <em>dc_id</em> in the response is the id of the new CDN. The IP address for the connection will be available in <a href="/method/help.getConfig">help.getConfig</a>, same as with the master DCs. The corresponding <a href="/constructor/dcOption">dcOption</a> will have the flag <em>cdn:flags.3?true</em>.</p>
+<p>Once a successful connection to the CDN-dc_id is established, the client must generate an auth_key (after confirming that the public RSA MTProto key of the CDN DC matches one from the list returned in <a href="/method/help.getCdnConfig">help.getCdnConfig</a>). Then the client must perform an <a href="/method/upload.getCdnFile">upload.getCdnFile</a> for each <em>offset</em>. For files of an unknown size it is necessary to repeat the query until an empty reply is returned.</p>
+<p><a href="/method/upload.getCdnFile">upload.getCdnFile</a> may return the <a href="/constructor/upload.cdnFileReuploadNeeded">upload.cdnFileReuploadNeeded</a> constructor. In this case, the client needs to send an <a href="/method/upload.reuploadCdnFile">upload.reuploadCdnFile</a> request to the DC that got the original <a href="/method/upload.getFile">upload.getFile</a> request. Once <a href="/method/upload.reuploadCdnFile">upload.reuploadCdnFile</a> is successful, the app needs to request the file from the CDN DC again.</p>
+<p>The main DC for a file is the DC where its main copy is stored (not to be confused with the main DC of the user) – either <em>userProfilePhoto.dc_id</em>, <em>chatPhoto.dc_id</em>, <em>photo.dc_id</em>, or <em>document.dc_id</em>.</p>
+<h3><a class="anchor" href="#decrypting-files" id="decrypting-files" name="decrypting-files"><i class="anchor-icon"></i></a>Decrypting files</h3>
+<p>In <a href="/constructor/upload.fileCdnRedirect">upload.fileCdnRedirect</a>, the server sends a decryption key and IV for the file (the fields <code>encryption_key:bytes</code> and <code>encryption_iv:bytes</code> respectively).</p>
+<p>Having received a portion of encrypted data from the CDN DC inside <a href="/constructor/upload.cdnFile">upload.cdnFile</a>, the client must decrypt this data using <code>AES-256-CTR</code>. For IV, it should use the value of <code>encryption_iv</code>, modified in the following manner: for each <code>offset</code> replace the last 4 bytes of the <code>encryption_iv</code> with <code>offset / 16</code> in big-endian. This allows to effectively decrypt a file and to use random access to a file's content (e.g., for streaming).</p>
+<h3><a class="anchor" href="#verifying-files" id="verifying-files" name="verifying-files"><i class="anchor-icon"></i></a>Verifying files</h3>
+<p>In order to confirm that the CDN DC passed an untampered file, clients must verify hashes for each downloaded part. <a href="/constructor/upload.fileCdnRedirect">upload.fileCdnRedirect</a>, <a href="/method/upload.reuploadCdnFile">upload.reuploadCdnFile</a> and <a href="/method/upload.getCdnFileHashes">upload.getCdnFileHashes</a> contain <a href="/type/FileHash">FileHash</a> constructors. Each of these constructors contains the SHA-256 hash of a part of the file that starts with <code>offset</code> and takes <code>limit</code> bytes.</p>
+<p>Before saving each portion of the data received from the CDN DC into the file, the client must confirm that its hash matches the hash that was received from the master DC. If missing a hash for any file part, client developers must use the <a href="/method/upload.getCdnFileHashes">upload.getCdnFileHashes</a> method to obtain the missing hash.</p>
+<h3><a class="anchor" href="#schema" id="schema" name="schema"><i class="anchor-icon"></i></a>Schema</h3>
+<pre><code><a href='/constructor/fileHash'>fileHash</a>#f39b035c offset:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/bytes'>bytes</a> = <a href='/type/FileHash'>FileHash</a>;
+
+<a href='/constructor/upload.fileCdnRedirect'>upload.fileCdnRedirect</a>#f18cda44 dc_id:<a href='/type/int'>int</a> file_token:<a href='/type/bytes'>bytes</a> encryption_key:<a href='/type/bytes'>bytes</a> encryption_iv:<a href='/type/bytes'>bytes</a> file_hashes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FileHash'>FileHash</a>&gt; = <a href='/type/upload.File'>upload.File</a>;
+
+<a href='/constructor/upload.cdnFileReuploadNeeded'>upload.cdnFileReuploadNeeded</a>#eea8e46e request_token:<a href='/type/bytes'>bytes</a> = <a href='/type/upload.CdnFile'>upload.CdnFile</a>;
+<a href='/constructor/upload.cdnFile'>upload.cdnFile</a>#a99fca4f bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/upload.CdnFile'>upload.CdnFile</a>;
+
+
+<a href='/constructor/dcOption'>dcOption</a>#18b7a10d flags:<a href='/type/%23'>#</a> ipv6:flags.0?<a href='/constructor/true'>true</a> media_only:flags.1?<a href='/constructor/true'>true</a> tcpo_only:flags.2?<a href='/constructor/true'>true</a> cdn:flags.3?<a href='/constructor/true'>true</a> static:flags.4?<a href='/constructor/true'>true</a> this_port_only:flags.5?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> ip_address:<a href='/type/string'>string</a> port:<a href='/type/int'>int</a> secret:flags.10?<a href='/type/bytes'>bytes</a> = <a href='/type/DcOption'>DcOption</a>;
+
+<a href='/constructor/cdnPublicKey'>cdnPublicKey</a>#c982eaba dc_id:<a href='/type/int'>int</a> public_key:<a href='/type/string'>string</a> = <a href='/type/CdnPublicKey'>CdnPublicKey</a>;
+
+
+<a href='/constructor/cdnConfig'>cdnConfig</a>#5725e40a public_keys:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/CdnPublicKey'>CdnPublicKey</a>&gt; = <a href='/type/CdnConfig'>CdnConfig</a>;
+
+---functions---
+
+// CDN DC
+<a href='/method/upload.getCdnFile'>upload.getCdnFile</a>#395f69da file_token:<a href='/type/bytes'>bytes</a> offset:<a href='/type/long'>long</a> limit:<a href='/type/int'>int</a> = <a href='/type/upload.CdnFile'>upload.CdnFile</a>;
+
+// Master DC
+<a href='/method/upload.reuploadCdnFile'>upload.reuploadCdnFile</a>#9b2754a8 file_token:<a href='/type/bytes'>bytes</a> request_token:<a href='/type/bytes'>bytes</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FileHash'>FileHash</a>&gt;;
+<a href='/method/upload.getCdnFileHashes'>upload.getCdnFileHashes</a>#91dc3f31 file_token:<a href='/type/bytes'>bytes</a> offset:<a href='/type/long'>long</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FileHash'>FileHash</a>&gt;;
+
+<a href='/method/help.getCdnConfig'>help.getCdnConfig</a>#52029342 = <a href='/type/CdnConfig'>CdnConfig</a>;</code></pre>
+<h3><a class="anchor" href="#restrictions-on-uploadgetfile-and-uploadgetcdnfile-parameters" id="restrictions-on-uploadgetfile-and-uploadgetcdnfile-parameters" name="restrictions-on-uploadgetfile-and-uploadgetcdnfile-parameters"><i class="anchor-icon"></i></a>Restrictions on upload.getFile and upload.getCdnFile parameters</h3>
+<ul>
+<li><code>offset</code> must be divisible by 4096 bytes</li>
+<li><code>limit</code> must be divisible by 4096 bytes</li>
+<li>1048576 (1MB) must be divisible by <code>limit</code></li>
+<li><code>offset / (1024 * 1024) == (offset + limit - 1) / (1024 * 1024)</code>
+(file parts that are being downloaded must always be inside the same megabyte-sized fragment)</li>
+</ul>
+<h3><a class="anchor" href="#possible-errors-and-their-meanings" id="possible-errors-and-their-meanings" name="possible-errors-and-their-meanings"><i class="anchor-icon"></i></a>Possible errors and their meanings</h3>
+<table class="table">
+<tbody>
+<tr>
+<td>upload.getCdnFile</td>
+<td>FILE_TOKEN_INVALID</td>
+<td>The CDN DC did not accept the <code>file_token</code> (e.g., the token has expired). Continue downloading the file from the master DC using upload.getFile.</td>
+</tr>
+<tr>
+<td>upload.reuploadCdnFile</td>
+<td>FILE_TOKEN_INVALID</td>
+<td>The master DC did not accept the <code>file_token</code> (e.g., the token has expired). Continue downloading the file from the master DC using upload.getFile.</td>
+</tr>
+<tr>
+<td>upload.reuploadCdnFile</td>
+<td>REQUEST_TOKEN_INVALID</td>
+<td>The master DC did not accept the <code>request_token</code> from the CDN DC. Continue downloading the file from the master DC using upload.getFile.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#testing-cdn-redirects" id="testing-cdn-redirects" name="testing-cdn-redirects"><i class="anchor-icon"></i></a>Testing CDN redirects</h3>
+<p>You may test CDN file redirects by logging into the <a href="/api/auth#test-accounts">test DCs</a> with a DC 2 account (phone number <code>999662YYYY</code>, where YYYY are random numbers, login code <code>22222</code>), uploading and then redownloading the uploaded file.  </p>
+<p>Make sure the chosen test account doesn't have a Telegram Premium test subscription, as CDN file downloads are disabled on the test DCs if a Telegram Premium test subscription is enabled (you can check this by making sure the <a href="/constructor/user">user</a> returned by a <a href="/method/users.getUsers">users.getUsers</a> call with <a href="/constructor/inputUserSelf">inputUserSelf</a> does not have the <code>premium</code> flag set).</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

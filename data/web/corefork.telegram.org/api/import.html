@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Imported messages</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram allows importing messages and media from foreign chat apps.">
+    <meta property="og:title" content="Imported messages">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram allows importing messages and media from foreign chat apps.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/import" >Imported messages</a></li></ul></div>
+  <h1 id="dev_page_title">Imported messages</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram allows importing messages and media from foreign chat apps.</p>
+<blockquote>
+<p>Note: This article is intended for MTProto API developers. If you're looking for a way to move history from other chat apps into Telegram, check out the related <a href="https://telegram.org/blog/move-history">Telegram blog post</a>.</p>
+</blockquote>
+<h3><a class="anchor" href="#1-validate-the-chat-export-file" id="1-validate-the-chat-export-file" name="1-validate-the-chat-export-file"><i class="anchor-icon"></i></a>1. Validate the chat export file</h3>
+<pre><code><a href='/constructor/messages.historyImportParsed'>messages.historyImportParsed</a>#5e0fb7b9 flags:<a href='/type/%23'>#</a> pm:flags.0?<a href='/constructor/true'>true</a> group:flags.1?<a href='/constructor/true'>true</a> title:flags.2?<a href='/type/string'>string</a> = <a href='/type/messages.HistoryImportParsed'>messages.HistoryImportParsed</a>;
+
+---functions---
+
+<a href='/method/messages.checkHistoryImport'>messages.checkHistoryImport</a>#43fe19f3 import_head:<a href='/type/string'>string</a> = <a href='/type/messages.HistoryImportParsed'>messages.HistoryImportParsed</a>;</code></pre>
+<p>The import process begins by calling <a href="/method/messages.checkHistoryImport">messages.checkHistoryImport</a>, passing to <code>import_head</code> up to 100 lines of the chat export file, starting from the beginning of the file.</p>
+<p>The returned constructor contains information about the exported chat, including its title or type.
+If the <code>pm</code> flag is set, the chat export file was generated from a private chat.
+If the <code>group</code> flag is set, the chat export file was generated from a group chat.
+If neither the <code>pm</code> or <code>group</code> flags are set, the specified chat export was generated from a chat of unknown type.</p>
+<h3><a class="anchor" href="#2-choosing-a-destination-telegram-chat" id="2-choosing-a-destination-telegram-chat" name="2-choosing-a-destination-telegram-chat"><i class="anchor-icon"></i></a>2. Choosing a destination Telegram chat</h3>
+<pre><code><a href='/constructor/messages.checkedHistoryImportPeer'>messages.checkedHistoryImportPeer</a>#a24de717 confirm_text:<a href='/type/string'>string</a> = <a href='/type/messages.CheckedHistoryImportPeer'>messages.CheckedHistoryImportPeer</a>;
+
+---functions---
+
+<a href='/method/messages.checkHistoryImportPeer'>messages.checkHistoryImportPeer</a>#5dc60f03 peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/messages.CheckedHistoryImportPeer'>messages.CheckedHistoryImportPeer</a>;</code></pre>
+<p>Using <a href="/method/messages.checkHistoryImportPeer">messages.checkHistoryImportPeer</a>, check whether chat history exported from another chat app can be imported into a specific Telegram <code>peer</code>, chosen by the user.<br>
+Typically, history imports are allowed for private chats with a mutual contact or <a href="/api/channel">supergroups</a> with <a href="/api/rights"><code>change_info</code> administrator rights »</a>.</p>
+<p>If the check succeeds, and no RPC errors are returned, a <a href="/type/messages.CheckedHistoryImportPeer">messages.CheckedHistoryImportPeer</a> constructor will be returned, with a confirmation text to be shown to the user in a confirmation prompt.<br>
+Upon final user confirmation, <a href="#3-initialize-the-import">the import process is initialized</a>.  </p>
+<h3><a class="anchor" href="#3-initialize-the-import" id="3-initialize-the-import" name="3-initialize-the-import"><i class="anchor-icon"></i></a>3. Initialize the import</h3>
+<pre><code><a href='/constructor/messages.historyImport'>messages.historyImport</a>#1662af0b id:<a href='/type/long'>long</a> = <a href='/type/messages.HistoryImport'>messages.HistoryImport</a>;
+
+---functions---
+
+<a href='/method/messages.initHistoryImport'>messages.initHistoryImport</a>#34090c3b peer:<a href='/type/InputPeer'>InputPeer</a> file:<a href='/type/InputFile'>InputFile</a> media_count:<a href='/type/int'>int</a> = <a href='/type/messages.HistoryImport'>messages.HistoryImport</a>;</code></pre>
+<p>Use <a href="/method/messages.initHistoryImport">messages.initHistoryImport</a> to initialize the import process, passing the following parameters:  </p>
+<ul>
+<li><code>peer</code> - The Telegram chat where the history should be imported.</li>
+<li><code>file</code> - The chat export file.</li>
+<li><code>media_count</code> - The number of media files associated with the export, to be uploaded in <a href="#4-uploading-media">the next step</a>.  </li>
+</ul>
+<h3><a class="anchor" href="#4-uploading-media" id="4-uploading-media" name="4-uploading-media"><i class="anchor-icon"></i></a>4. Uploading media</h3>
+<pre><code>---functions---
+
+<a href='/method/messages.uploadImportedMedia'>messages.uploadImportedMedia</a>#2a862092 peer:<a href='/type/InputPeer'>InputPeer</a> import_id:<a href='/type/long'>long</a> file_name:<a href='/type/string'>string</a> media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;</code></pre>
+<p>Use <a href="/method/messages.uploadImportedMedia">messages.uploadImportedMedia</a> to upload media files eventually associated with the chat export.<br>
+<code>import_id</code> is the <code>id</code> contained in the <a href="/constructor/messages.historyImport">messages.historyImport</a> constructor, returned by <a href="/method/messages.initHistoryImport">messages.initHistoryImport</a> <a href="#3-initialize-the-import">in the previous step</a>.  </p>
+<h3><a class="anchor" href="#5-finalize-the-import" id="5-finalize-the-import" name="5-finalize-the-import"><i class="anchor-icon"></i></a>5. Finalize the import</h3>
+<pre><code><a href='/constructor/message'>message</a>#9815cec8 flags:<a href='/type/%23'>#</a> out:flags.1?<a href='/constructor/true'>true</a> mentioned:flags.4?<a href='/constructor/true'>true</a> media_unread:flags.5?<a href='/constructor/true'>true</a> silent:flags.13?<a href='/constructor/true'>true</a> post:flags.14?<a href='/constructor/true'>true</a> from_scheduled:flags.18?<a href='/constructor/true'>true</a> legacy:flags.19?<a href='/constructor/true'>true</a> edit_hide:flags.21?<a href='/constructor/true'>true</a> pinned:flags.24?<a href='/constructor/true'>true</a> noforwards:flags.26?<a href='/constructor/true'>true</a> invert_media:flags.27?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> offline:flags2.1?<a href='/constructor/true'>true</a> video_processing_pending:flags2.4?<a href='/constructor/true'>true</a> paid_suggested_post_stars:flags2.8?<a href='/constructor/true'>true</a> paid_suggested_post_ton:flags2.9?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> from_id:flags.8?<a href='/type/Peer'>Peer</a> from_boosts_applied:flags.29?<a href='/type/int'>int</a> peer_id:<a href='/type/Peer'>Peer</a> saved_peer_id:flags.28?<a href='/type/Peer'>Peer</a> fwd_from:flags.2?<a href='/type/MessageFwdHeader'>MessageFwdHeader</a> via_bot_id:flags.11?<a href='/type/long'>long</a> via_business_bot_id:flags2.0?<a href='/type/long'>long</a> reply_to:flags.3?<a href='/type/MessageReplyHeader'>MessageReplyHeader</a> date:<a href='/type/int'>int</a> message:<a href='/type/string'>string</a> media:flags.9?<a href='/type/MessageMedia'>MessageMedia</a> reply_markup:flags.6?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:flags.7?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; views:flags.10?<a href='/type/int'>int</a> forwards:flags.10?<a href='/type/int'>int</a> replies:flags.23?<a href='/type/MessageReplies'>MessageReplies</a> edit_date:flags.15?<a href='/type/int'>int</a> post_author:flags.16?<a href='/type/string'>string</a> grouped_id:flags.17?<a href='/type/long'>long</a> reactions:flags.20?<a href='/type/MessageReactions'>MessageReactions</a> restriction_reason:flags.22?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; ttl_period:flags.25?<a href='/type/int'>int</a> quick_reply_shortcut_id:flags.30?<a href='/type/int'>int</a> effect:flags2.2?<a href='/type/long'>long</a> factcheck:flags2.3?<a href='/type/FactCheck'>FactCheck</a> report_delivery_until_date:flags2.5?<a href='/type/int'>int</a> paid_message_stars:flags2.6?<a href='/type/long'>long</a> suggested_post:flags2.7?<a href='/type/SuggestedPost'>SuggestedPost</a> = <a href='/type/Message'>Message</a>;
+
+<a href='/constructor/messageFwdHeader'>messageFwdHeader</a>#4e4df4bb flags:<a href='/type/%23'>#</a> imported:flags.7?<a href='/constructor/true'>true</a> saved_out:flags.11?<a href='/constructor/true'>true</a> from_id:flags.0?<a href='/type/Peer'>Peer</a> from_name:flags.5?<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> channel_post:flags.2?<a href='/type/int'>int</a> post_author:flags.3?<a href='/type/string'>string</a> saved_from_peer:flags.4?<a href='/type/Peer'>Peer</a> saved_from_msg_id:flags.4?<a href='/type/int'>int</a> saved_from_id:flags.8?<a href='/type/Peer'>Peer</a> saved_from_name:flags.9?<a href='/type/string'>string</a> saved_date:flags.10?<a href='/type/int'>int</a> psa_type:flags.6?<a href='/type/string'>string</a> = <a href='/type/MessageFwdHeader'>MessageFwdHeader</a>;
+
+---functions---
+
+<a href='/method/messages.startHistoryImport'>messages.startHistoryImport</a>#b43df344 peer:<a href='/type/InputPeer'>InputPeer</a> import_id:<a href='/type/long'>long</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Finally, invoke <a href="/method/messages.startHistoryImport">messages.startHistoryImport</a> to complete the <a href="/api/import">history import process</a>, importing all messages into the chat.<br>
+As usual, <code>import_id</code> is the <code>id</code> contained in the <a href="/constructor/messages.historyImport">messages.historyImport</a> constructor, returned by <a href="/method/messages.initHistoryImport">messages.initHistoryImport</a>.  </p>
+<p>Imported messages will show in the chat history as <a href="/constructor/message">messages</a> containing a <code>fwd_from</code> <a href="/constructor/messageFwdHeader">messageFwdHeader</a> constructor with the <code>imported</code> flag, and should be appropriately marked in the UI as messages imported from a foreign chat app.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

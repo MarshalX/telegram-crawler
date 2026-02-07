@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>File reference generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Implementation and maintenance of the file reference database &amp;raquo; may be fully automated by using the file reference database schema generator tool, and the file reference database map file it generates.">
+    <meta property="og:title" content="File reference generator">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Implementation and maintenance of the file reference database &amp;raquo; may be fully automated by using the file reference database schema generator tool, and the file reference database map file it generates.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/file-reference-generator" >File reference generator</a></li></ul></div>
+  <h1 id="dev_page_title">File reference generator</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Implementation and maintenance of the <a href="/api/file-references">file reference database »</a> may be fully automated by using the file reference database schema generator tool, and the <strong>file reference database map file</strong> it generates.  </p>
+<p>Dictionary:</p>
+<ul>
+<li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
+<li>A <strong>file reference origin</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </li>
+</ul>
+<p>The database map file contains <strong>all possible origins</strong>, for <strong>all possible file reference paths</strong>.  </p>
+<p>It is generated using a set of manually-specified rules (specifying the actual origins) within the generator and the latest API schema, to make sure the following rules are followed:</p>
+<ul>
+<li>
+<p>All possible and valid places where a <code>file_reference</code> appears have at least one valid associated origin: this is checked by recursively checking all possible deserialized object graphs, starting from:</p>
+<ul>
+<li>All constructors of type <code>Update</code></li>
+<li>All constructors which are directly returned by at least one method.</li>
+<li>All constructors which are directly returned by at least one method inside of a vector.</li>
+</ul>
+<p>This covers all possible TL payloads received from the API, which can only return method call responses, or <a href="/type/Update">Update</a> constructors contained inside <a href="/type/Updates">Updates</a>.  </p>
+<p>For example, when checking the graph of the <a href="/constructor/updateNewMessage">updateNewMessage</a> constructor, the following file reference paths are found:</p>
+<pre><code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference
+updateNewMessage.message -&gt; message.reply_to -&gt; messageReplyHeader.reply_media -&gt; messageMediaDocument.document -&gt; document.file_reference
+updateNewMessage.message -&gt; message.media -&gt; messageMediaInvoice.extended_media -&gt; messageExtendedMedia.media -&gt; messageMediaDocument.document -&gt; document.file_reference
+... and many others</code></pre>
+<p>... and for all paths, the system which generates the definition file makes sure that at least one origin covers the path.  </p>
+</li>
+<li>
+<p>All origins must be used in at least one path.</p>
+</li>
+<li>
+<p>All paths covered by origins which make use of flag fields (which may be absent, leading to an orphan, context-less file reference) must be covered by at least one non-flagged origin (or the flagged origin must be non-flagged in the specified path).  </p>
+<p>For example, the file reference path <code>updateStory.story -&gt; storyItem.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code> <em>would</em> rely on the origin <code>getStory{peer: storyItem.from_id, story_id: storyItem.id}</code> with <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.  </p>
+<p>However, the <code>from_id</code> field of <a href="/constructor/storyItem">storyItem</a> is actually a flag and in this specific path it is <strong>not</strong> set (it's only set when a <a href="/constructor/storyItem">storyItem</a> is returned by <a href="/method/stories.getAllStories">stories.getAllStories</a>).</p>
+<p>The validator (<a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">the code that generated the definition file, you DO NOT have to implement a validator yourself</a>) noticed that, which forced the manual addition of the valid fallback origin <code>getStory{peer: updateStory.peer, story_id: updateStory.story -&gt; storyItem.id}</code>, which is present in the final origin definition file.  </p>
+<p>Note that the definition file is already pre-validated, no additional validation is needed to implement it, the above is just an example of a case that is successfully covered by the <a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">validator implemented here »</a>.  </p>
+</li>
+</ul>
+<h3><a class="anchor" href="#running" id="running" name="running"><i class="anchor-icon"></i></a>Running</h3>
+<p>To run the generator on a newer layer, clone the repo, install deps, and run the generator:</p>
+<pre><code>git clone https://github.com/danog/MadelineProto.git --recursive
+cd MadelineProto
+composer update
+php tools/gen_filerefmap.php &lt;inputSchema&gt; &lt;output&gt; &lt;outputJson&gt;</code></pre>
+<p>Arguments:</p>
+<ul>
+<li><code>inputSchema</code> - The new API schema in JSON or TL format</li>
+<li><code>output</code> - The generated file reference database map file in serialized TL format</li>
+<li><code>outputJson</code> - The generated file reference database map file in JSON format </li>
+</ul>
+<p>The schema used for the map file is contained in <code>src/TL_file_ref_map_schema.tl</code>.  </p>
+<p>When new, not yet covered paths are found, an exception will be thrown: to cover the new paths, modify <code>tools/FileRefExtractor/FileRefGenerator.php</code>, adding a new <code>CallOp</code>, for example:</p>
+<pre><code>$locations['storyItem'][] = new CallOp(
+    'stories.getStoriesByID',
+    [
+        'id' =&gt; new ArrayOp(new CopyOp(new Path([['storyItem', 'id']]))),
+        'peer' =&gt; new GetInputPeerOp(new Path([['peerStories', 'peer']], true)),
+    ],
+    'fileSourceStory'
+);</code></pre>
+<p>In this example, when encountering a <a href="/constructor/storyItem">storyItem</a> constructor, a new <code>fileSourceStory</code> is generated with the following fields:</p>
+<ul>
+<li><code>id</code>: <code>storyItem.id</code></li>
+<li><code>peer</code>: <code>peerStories.peer</code> (must have a <a href="/constructor/peerStories">peerStories</a> constructor as parent).<br>
+The generator automatically asserts that only one parent constructor is used (or none).  </li>
+</ul>
+<p>The generator automatically asserts that the parameters of the file source are the same or compatible for all OPs, to generate only one file source constructor with the passed name (in this case <code>fileSourceStory</code>).  </p>
+<p>The structure of some file sources may be manually specified in the <code>$pre</code> array, in case of sources generated from partially conflicting fields, requiring flag fields within the source.  </p>
+<p>This <code>fileSourceStory</code> is then used, when a refresh is needed, in a <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a> method call with the following parameters:</p>
+<ul>
+<li><code>id</code>: <code>fileSourceStory.id</code></li>
+<li><code>peer</code>: <code>fileSourceStory.peer</code></li>
+</ul>
+<p>The generator automatically asserts that all method calls use the parameters of the file source in the same or compatible ways, to generate only one method call per file source.  </p>
+<p>As you can see, this definition combines:</p>
+<ul>
+<li>Extraction of the context</li>
+<li>Generation of the file source to store into the database</li>
+<li>The method call to use on the stored file source when refreshing the file reference</li>
+</ul>
+<p>...in a single, concise definition.  </p>
+<p><code>$locations</code> is a <code>HashMap&lt;Key, Vector&lt;Op&gt;&gt;</code>, where:</p>
+<ul>
+<li><code>Key</code> is the constructor where context capturing begins (must be equal to the first element of non-parent Paths)</li>
+<li><code>Op</code> is an object of type  <code>ActionOp</code> (<code>CallOp</code>, <code>CopyMethodCallOp</code>, <code>GetMessageOp</code>, <code>Noop</code>).</li>
+</ul></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

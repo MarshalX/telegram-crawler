@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="If you&#39;d like to test Telegram Passport, use this page to request data. If you&#39;d like to check out a real-life implementation…">
+    <meta property="og:title" content="Example">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="If you&#39;d like to test Telegram Passport, use this page to request data. If you&#39;d like to check out a real-life implementation…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    <link href="/css/bootstrap-extra.css?2" rel="stylesheet">
+<link href="/css/telegram-extra.css?9" rel="stylesheet">
+
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"></div>
+  <h1 id="dev_page_title">Example</h1>
+  
+  <div id="dev_page_content"><p>If you'd like to test <a href="https://telegram.org/blog/passport">Telegram Passport</a>, use this page to request data. If you'd like to check out a real-life implementation, please see <a href="https://telegram.org/blog/export-and-more#improved-telegram-passport">this blog post</a> for examples of services that have integrated Telegram Passport.</p>
+<h3><a class="anchor" href="#request-telegram-passport-data" id="request-telegram-passport-data" name="request-telegram-passport-data"><i class="anchor-icon"></i></a>Request Telegram Passport Data</h3>
+<p><script src="/js/telegram-passport2.js?2"></script>
+<form class="form-horizontal telegram-passport-form clearfix" id="telegram_passport_form" style="">
+  <div class="form-group visible-md-block visible-lg-block">
+    <div class="col-md-8 col-md-offset-3">
+      <div class="row">
+        <label class="col-md-2 col-md-offset-7 control-label">
+          <div class="text-center">Selfie</div>
+        </label>
+        <label class="col-md-3 control-label">
+          <div class="text-center">Translation</div>
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-md-3 control-label">Identity:</label>
+    <div class="col-md-8">
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="personal_details" value="1" onchange="updateForm()" checked />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Personal Details</span>
+      </label>
+      <div class="passport-opt">
+        <label class="checkbox-item checkbox-item-block">
+          <input type="checkbox" class="checkbox" name="personal_details_native_names" value="1" onchange="updateForm()" />
+          <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">name in the language of the user&#39;s country of residence</span>
+        </label>
+      </div>
+    </div>
+    <label class="col-md-3 control-label">ID Documents:</label>
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-md-7">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="passport" value="1" onchange="updateForm()" checked />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Passport</span>
+          </label>
+        </div>
+        <div class="col-md-2 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="passport_selfie" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with selfie</span>
+          </label>
+        </div>
+        <div class="col-md-3 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="passport_translation" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with translation</span>
+          </label>
+        </div>
+        <div class="col-md-7">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="driver_license" value="1" onchange="updateForm()" checked />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Driver License</span>
+          </label>
+        </div>
+        <div class="col-md-2 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="driver_license_selfie" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with selfie</span>
+          </label>
+        </div>
+        <div class="col-md-3 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="driver_license_translation" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with translation</span>
+          </label>
+        </div>
+        <div class="col-md-7">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="identity_card" value="1" onchange="updateForm()" checked />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Identity Card</span>
+          </label>
+        </div>
+        <div class="col-md-2 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="identity_card_selfie" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with selfie</span>
+          </label>
+        </div>
+        <div class="col-md-3 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="identity_card_translation" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with translation</span>
+          </label>
+        </div>
+        <div class="col-md-7">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="internal_passport" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Internal Passport</span>
+          </label>
+        </div>
+        <div class="col-md-2 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="internal_passport_selfie" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with selfie</span>
+          </label>
+        </div>
+        <div class="col-md-3 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="internal_passport_translation" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with translation</span>
+          </label>
+        </div>
+        <div class="col-md-12 sub-control-label">
+          <label class="radio-item">
+            <input type="radio" class="radio" name="id_mode" value="one_of" onchange="updateForm()" checked />
+            <span class="radio-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="radio-input-icon"></span></span><span class="radio-label">One of the selected</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" class="radio" name="id_mode" value="" onchange="updateForm()" />
+            <span class="radio-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="radio-input-icon"></span></span><span class="radio-label">All of the selected</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-3 control-label">Address:</label>
+    <div class="col-md-8">
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="address" value="1" onchange="updateForm()" checked />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Residential Address</span>
+      </label>
+    </div>
+    <label class="col-md-3 control-label">Proof of Address:</label>
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-md-9">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="utility_bill" value="1" onchange="updateForm()" checked />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Utility Bill</span>
+          </label>
+        </div>
+        <div class="col-md-3 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="utility_bill_translation" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with translation</span>
+          </label>
+        </div>
+        <div class="col-md-9">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="bank_statement" value="1" onchange="updateForm()" checked />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Bank Statement</span>
+          </label>
+        </div>
+        <div class="col-md-3 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="bank_statement_translation" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with translation</span>
+          </label>
+        </div>
+        <div class="col-md-9">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="rental_agreement" value="1" onchange="updateForm()" checked />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Rental Agreement</span>
+          </label>
+        </div>
+        <div class="col-md-3 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="rental_agreement_translation" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with translation</span>
+          </label>
+        </div>
+        <div class="col-md-9">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="passport_registration" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Registration page from Internal Passport</span>
+          </label>
+        </div>
+        <div class="col-md-3 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="passport_registration_translation" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with translation</span>
+          </label>
+        </div>
+        <div class="col-md-9">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="temporary_registration" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Temporary Registration</span>
+          </label>
+        </div>
+        <div class="col-md-3 passport-opt-col">
+          <label class="checkbox-item checkbox-item-block">
+            <input type="checkbox" class="checkbox" name="temporary_registration_translation" value="1" onchange="updateForm()" />
+            <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">with translation</span>
+          </label>
+        </div>
+        <div class="col-md-12 sub-control-label">
+          <label class="radio-item">
+            <input type="radio" class="radio" name="ad_mode" value="one_of" onchange="updateForm()" checked />
+            <span class="radio-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="radio-input-icon"></span></span><span class="radio-label">One of the selected</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" class="radio" name="ad_mode" value="" onchange="updateForm()" />
+            <span class="radio-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="radio-input-icon"></span></span><span class="radio-label">All of the selected</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-md-3 control-label">Contact:</label>
+    <div class="col-md-8">
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="phone_number" value="1" onchange="updateForm()" checked />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Phone Number</span>
+      </label>
+    </div>
+    <div class="col-md-8 col-md-offset-3">
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="email" value="1" onchange="updateForm()" checked />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Email</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="form-group telegram-passport-wrap">
+    <div class="col-md-8 col-md-offset-3">
+      <div class="telegram-passport-login-wrap" id="telegram_passport_login_btn"></div>
+      <script>
+Telegram.Passport.createAuthButton('telegram_passport_login_btn', function() {
+  var form = $('#telegram_passport_form').get(0);
+  var fields = ['personal_details', 'address', 'phone_number', 'email'];
+  var scope_data = [];
+  for (var i = 0; i < fields.length; i++) {
+    var field, opts = {}, has_opts = false;
+    if (form[fields[i]].checked) {
+      field = fields[i];
+      if (form[fields[i] + '_native_names'] &&
+          form[fields[i] + '_native_names'].checked) {
+        has_opts = true; opts.native_names = true;
+      }
+      if (has_opts) {
+        opts.type = field;
+        field = opts;
+      }
+      scope_data.push(field);
+    }
+  }
+  var id_fields = ['passport', 'internal_passport', 'driver_license', 'identity_card'];
+  var id_data = [];
+  for (var i = 0; i < id_fields.length; i++) {
+    var field, opts = {}, has_opts = false;
+    if (form[id_fields[i]].checked) {
+      field = id_fields[i];
+      if (form[id_fields[i] + '_selfie'] &&
+          form[id_fields[i] + '_selfie'].checked) {
+        has_opts = true; opts.selfie = true;
+      }
+      if (form[id_fields[i] + '_translation'] &&
+          form[id_fields[i] + '_translation'].checked) {
+        has_opts = true; opts.translation = true;
+      }
+      if (has_opts) {
+        opts.type = field;
+        field = opts;
+      }
+      id_data.push(field);
+    }
+  }
+  if (id_data.length > 1 && form['id_mode'].value == 'one_of') {
+    scope_data.push({one_of: id_data});
+  } else {
+    scope_data = scope_data.concat(id_data);
+  }
+  var ad_fields = ['utility_bill', 'bank_statement', 'rental_agreement', 'passport_registration', 'temporary_registration'];
+  var ad_data = [];
+  for (var i = 0; i < ad_fields.length; i++) {
+    var field, opts = {}, has_opts = false;
+    if (form[ad_fields[i]].checked) {
+      field = ad_fields[i];
+      if (form[ad_fields[i] + '_translation'] &&
+          form[ad_fields[i] + '_translation'].checked) {
+        has_opts = true; opts.translation = true;
+      }
+      if (has_opts) {
+        opts.type = field;
+        field = opts;
+      }
+      ad_data.push(field);
+    }
+  }
+  if (ad_data.length > 1 && form['ad_mode'].value == 'one_of') {
+    scope_data.push({one_of: ad_data});
+  } else {
+    scope_data = scope_data.concat(ad_data);
+  }
+  authOptions.scope = {data: scope_data, v: 1};
+  return authOptions;
+}, {
+  radius: 6
+});
+      </script>
+    </div>
+  </div>
+</form>
+<div id="telegram_passport_pending" style="display:none;">
+  <div class="telegram-passport-pending"><img width="128" height="128" src="/img/passport_processing.gif"></div>
+</div>
+<form id="telegram_passport_data" class="telegram-passport-form" style="display:none;" onsubmit="return false;"></form></p>
+<hr>
+<blockquote>
+<p>Note that the passport demo bot will only store data for <strong>1 hour</strong> and then discard it. After logging in here, you can use the logout button on this page to reset your session.</p>
+</blockquote></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/jquery-ui.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>function updatePending() {
+  $.ajax({
+    url: '/loadpassport?hash=telegram-crawler',
+    type: 'GET',
+    dataType: 'json',
+    success: function (data) {
+      console.log(data);
+      if (data.html) {
+        $('#telegram_passport_data').html(data.html);
+        $('#telegram_passport_pending').hide();
+        $('#telegram_passport_data').show();
+        initPassportData(data.data);
+      } else if (data.pending) {
+        setTimeout(updatePending, 1000);
+      } else {
+        $('#telegram_passport_pending').hide();
+        $('#telegram_passport_form').show();
+      }
+    },
+    error: function (xhr) {
+      alert(xhr.responseText || 'Unknown error');
+    }
+  });
+}
+function updateReject(el, className) {
+  $(el).parents('.' + className).toggleClass('item-rejected', el.checked);
+  if (window.passportData) {
+    var has_checked = false;
+    for (var i = 0; i < passportData.errors.length; i++) {
+      if (el.form['reject' + i].checked) {
+        has_checked = true; break;
+      }
+    }
+    $('#telegram_passport_errors_btn').attr('disabled', !has_checked);
+  }
+}
+function updateForm() {
+  var form = $('#telegram_passport_form').get(0);
+  var fields = ['passport', 'internal_passport', 'driver_license', 'identity_card', 'utility_bill', 'bank_statement', 'rental_agreement', 'passport_registration', 'temporary_registration'];
+  for (var i = 0; i < fields.length; i++) {
+    var field = fields[i];
+    if (form[field]) {
+      var sfield = field + '_selfie',
+          tfield = field + '_translation';
+      if (form[sfield]) {
+        if (form[field].checked) {
+          if (form[sfield].disabled) {
+            form[sfield].checked = form[sfield].old_checked;
+            form[sfield].disabled = false;
+          }
+        } else {
+          if (!form[sfield].disabled) {
+            form[sfield].old_checked = form[sfield].checked;
+            form[sfield].disabled = true;
+            form[sfield].checked = false;
+          }
+        }
+      }
+      if (form[tfield]) {
+        if (form[field].checked) {
+          if (form[tfield].disabled) {
+            form[tfield].checked = form[tfield].old_checked;
+            form[tfield].disabled = false;
+          }
+        } else {
+          if (!form[tfield].disabled) {
+            form[tfield].old_checked = form[tfield].checked;
+            form[tfield].disabled = true;
+            form[tfield].checked = false;
+          }
+        }
+      }
+    }
+  }
+  var field = 'personal_details';
+  var nfield = 'personal_details_native_names';
+  if (form[field].checked) {
+    if (form[nfield].disabled) {
+      form[nfield].checked = form[nfield].old_checked;
+      form[nfield].disabled = false;
+    }
+  } else {
+    if (!form[nfield].disabled) {
+      form[nfield].old_checked = form[nfield].checked;
+      form[nfield].disabled = true;
+      form[nfield].checked = false;
+    }
+  }
+  var id_fields = ['passport', 'internal_passport', 'driver_license', 'identity_card'];
+  var id_sel_cnt = 0;
+  for (var i = 0; i < id_fields.length; i++) {
+    var field = id_fields[i];
+    if (form[field].checked) {
+      id_sel_cnt++;
+    }
+  }
+  for (var i = 0; i < form.ad_mode.length; i++) {
+    form.id_mode[i].disabled = (id_sel_cnt <= 1);
+  }
+  var ad_fields = ['utility_bill', 'bank_statement', 'rental_agreement', 'passport_registration', 'temporary_registration'];
+  var ad_sel_cnt = 0;
+  for (var i = 0; i < ad_fields.length; i++) {
+    var field = ad_fields[i];
+    if (form[field].checked) {
+      ad_sel_cnt++;
+    }
+  }
+  for (var i = 0; i < form.ad_mode.length; i++) {
+    form.ad_mode[i].disabled = (ad_sel_cnt <= 1);
+  }
+}
+var authOptions = {"bot_id":543260180,"public_key":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv6m1zBF8lZOCqcxf8hnj\nkvHwuWdU8s4rBWaxKXH\/vDDUklcCS5uhSnmjhxWca9suubaG3lW4HxlCilkeJPVf\njimg5Q8ZqWrR3OoOihEpcG9iJZTOEpsEk7VtEiabgacBG3Quv9JslTrDe95Fn801\nt9d21HXwgMrHeHpWDOn31Dr+woEH+kwySUWa6L\/ZbnGwSNP7eeDTE7Amz1RMDk3t\n8EWGq58u0IQatPcEH09aUQlKzk6MIiALkZ9ILBKCBk6d2WCokKnsdBctovNbxwSx\nhP1qst1r+Yc8iPBZozsDC0ZsC5jXCkcODI3OC0tkNtYzN2XKalW5R0DjDRUDmGhT\nzQIDAQAB\n-----END PUBLIC KEY-----\n","nonce":"telegram-crawler","callback_url":"https:\/\/corefork.telegram.org\/passport\/example?passport_ssid=telegram-crawler"};
+function initPassportData(data) {
+  window.passportData = data;
+}
+function sendErrors(el) {
+  if (!window.passportData) {
+    return false;
+  }
+  var errors = [];
+  for (var i = 0; i < passportData.errors.length; i++) {
+    if (el.form['reject' + i].checked) {
+      errors.push(passportData.errors[i]);
+    }
+  }
+  $.ajax({
+    url: passportData.set_errors_url,
+    type: 'POST',
+    data: JSON.stringify(errors),
+    contentType: 'application/json',
+    dataType: 'json',
+    success: function (result) {
+      if (result) {
+        $('#telegram_passport_errors_sent').addClass('shown');
+        setTimeout(function() {
+          $('#telegram_passport_errors_sent').removeClass('shown');
+        }, 2000);
+      }
+    },
+    error: function (xhr) {
+      alert(xhr.responseText || 'Unknown error');
+    }
+  });
+  return false;
+}
+function restartAuth() {
+  $.ajax({
+    url: '/restartpassport?hash=telegram-crawler',
+    type: 'GET',
+  });
+  $('#telegram_passport_form').show();
+  $('#telegram_passport_data').hide();
+  $('#telegram_passport_pending').hide();
+  return false;
+}
+initRipple();
+updateForm();
+
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

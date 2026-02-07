@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Optional combinator parameters and their values</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="TL Language makes it possible to declare a combinator&#39;s first few parameters optional. Subsequently, they are almost never…">
+    <meta property="og:title" content="Optional combinator parameters and their values">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="TL Language makes it possible to declare a combinator&#39;s first few parameters optional. Subsequently, they are almost never…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL-optargs" >Optional combinator parameters and their…</a></li></ul></div>
+  <h1 id="dev_page_title">Optional combinator parameters and their values</h1>
+  
+  <div id="dev_page_content"><p><a href="TL">TL Language</a> makes it possible to declare a combinator's first few parameters optional. Subsequently, they are almost never required to be explicitly stated. This is directly related to another important property of TL: <a href="TL-polymorph">polymorphism</a>.</p>
+<p>All optional parameters are typically required to be part of the result type (at least once).</p>
+<p>A (sub)expression may be serialized/deserialized in one of two ways:</p>
+<ul>
+<li>
+<p>The result type is known (for example, we're parsing the response to a previously sent RPC query and therefore know the value of some type is expected). In this case, the result type may be used to determine the values of the combinator's implicit parameters.</p>
+</li>
+<li>
+<p>The result type is not known. It is determined as a result of (de)serialization (for example, we are serializing an RPC query). In this case, it is necessary to explicitly specify (and serialize) all of the combinator's optional parameters by using the full version of the combinator.</p>
+</li>
+</ul>
+<p>We will assume that the functional combinator only differs from the constructor in that before its result type the <code>!</code> modifier is implicitly added, and the (remote or local) computation of a functional expression may be presented as the execution of some polymorphic function <code>eval : !X -&gt; X</code>.</p>
+<p>Moreover, the unknown result type is obviously usually (but not always) bound to the serialization of an expression whose type has been modified by <code>!</code>.</p>
+<p>We can formulate the following rules. Let there be some constructor</p>
+<pre><code>C {a1:T1} ... {am:Tm} b1:U1 ... bn:Un = T;</code></pre>
+<p>Some of its arguments or its result may be marked with the <code>!</code> modifier (We consider a functional combinator to be a constructor whose result type has been modified by an implicit <code>!</code>).</p>
+<p>The following conditions must hold:</p>
+<ul>
+<li>
+<p>Each type <em>T1</em>, ..., <em>Tm</em>, <em>U1</em>, ..., <em>Un</em>, and <em>T</em> may depend on parameters of type <code>Type</code> or <code>#</code>, which have been declared to the left of the use of the given type.</p>
+</li>
+<li>
+<p>The types of implicit parameters <em>T1</em>, ..., <em>Tm</em> may not be modified by <code>!</code>.</p>
+</li>
+<li>
+<p>Only implicit parameters of type <code>Type</code> or <code>#</code> are allowed. In other words, <em>Ti</em> is either a <code>Type</code> or a <code>#</code>. (Unlike the previous rule, this rule may be relaxed in the future.)</p>
+</li>
+<li>
+<p>Each implicit parameter <em>a1</em>, ..., <em>am</em> must be used at least once -- either within one of the <em>Ui</em> types that have a <code>!</code>, or in the result type <em>T</em>, <em>if it does not have an explicit or implicit <code>!</code></em>. </p>
+</li>
+<li>
+<p>If an implicit parameter <em>ai</em> is not used in the result type, or if the result type has a <code>!</code>, then its first (leftmost) usage must be within a type <em>Uj</em> that is modified by <code>!</code>.</p>
+</li>
+</ul>
+<p>The idea is this: we assume that during (de)serialization of a value of a type modified by <code>!</code> that we do not know this type in advance and we will find out what it is only based on the result of the (de)serialization; Conversely, we assume that during (de)serialization of a value of a type that is not modified by <code>!</code> that we know this type in advance. In this case, complying with the rules stated above lets us always compute the values of all implicit parameters -- either from the (previously known) result type or from the type of one of the <code>bj:!Uj</code> parameters (which was obtained during the serialization process).</p>
+<p>In fact, <code>!</code> denotes the direction in which type information is flowing. By default, the result type is the source of information about types (and their parameters), while argument types are the recipients of that information. The use of <code>!</code> reverses the direction of information flow, making the result type the recipient and the argument type the source of type information.</p>
+<p>See also <a href="TL-abstract-types">Binary serialization and abstract TL types</a> and <a href="TL-polymorph">Polymorphism in TL</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    
+    <script>backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

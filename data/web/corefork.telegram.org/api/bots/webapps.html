@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Mini Apps on Telegram</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Bots can offer users interactive HTML5 web apps to completely replace any website.">
+    <meta property="og:title" content="Mini Apps on Telegram">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Bots can offer users interactive HTML5 web apps to completely replace any website.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/bots%2Fwebapps" >Mini Apps on Telegram</a></li></ul></div>
+  <h1 id="dev_page_title">Mini Apps on Telegram</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Interactive <a href="/bots/webapps">HTML5 Mini Apps</a> on Telegram can completely replace <strong>any website</strong>.  </p>
+<p>They support <a href="https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots">seamless authorization</a>, <a href="https://core.telegram.org/bots/payments">integrated payments</a> via multiple payment providers (with <em>Google Pay</em> and <em>Apple Pay</em> out of the box), delivering tailored push notifications to users, and <a href="https://core.telegram.org/bots">much more</a>.</p>
+<p>This article offers a client-side overview of the implementation of bot mini apps using the MTProto API: see <a href="/bots/webapps">here for an overview of the mini-app side JS API »</a>.  </p>
+<h3><a class="anchor" href="#main-mini-apps" id="main-mini-apps" name="main-mini-apps"><i class="anchor-icon"></i></a>Main Mini Apps</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/user'>user</a>#20b1422 flags:<a href='/type/%23'>#</a> self:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/constructor/true'>true</a> contact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/constructor/true'>true</a> mutual_contact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> deleted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> bot:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> bot_chat_history:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> bot_nochats:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> verified:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/constructor/true'>true</a> restricted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/constructor/true'>true</a> min:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/constructor/true'>true</a> bot_inline_geo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/constructor/true'>true</a> support:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.23?<a href='/constructor/true'>true</a> scam:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/constructor/true'>true</a> apply_min_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.25?<a href='/constructor/true'>true</a> fake:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.26?<a href='/constructor/true'>true</a> bot_attach_menu:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.27?<a href='/constructor/true'>true</a> premium:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/constructor/true'>true</a> attach_menu_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.29?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> bot_can_edit:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.1?<a href='/constructor/true'>true</a> close_friend:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.2?<a href='/constructor/true'>true</a> stories_hidden:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.3?<a href='/constructor/true'>true</a> stories_unavailable:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.4?<a href='/constructor/true'>true</a> contact_require_premium:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.10?<a href='/constructor/true'>true</a> bot_business:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.11?<a href='/constructor/true'>true</a> bot_has_main_app:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.13?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> first_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> last_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> phone:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/UserProfilePhoto'>UserProfilePhoto</a> status:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/UserStatus'>UserStatus</a> bot_info_version:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/int'>int</a> restriction_reason:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; bot_inline_placeholder:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/type/string'>string</a> lang_code:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/string'>string</a> emoji_status:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.30?<a href='/type/EmojiStatus'>EmojiStatus</a> usernames:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Username'>Username</a>&gt; stories_max_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.5?<a href='/type/int'>int</a> color:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.8?<a href='/type/PeerColor'>PeerColor</a> profile_color:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.9?<a href='/type/PeerColor'>PeerColor</a> bot_active_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.12?<a href='/type/int'>int</a> bot_verification_icon:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.14?<a href='/type/long'>long</a> send_paid_messages_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.15?<a href='/type/long'>long</a> = <a href='/type/User'>User</a>;
+
+<a href='/constructor/webViewResultUrl'>webViewResultUrl</a>#4d22ff98 flags:<a href='/type/%23'>#</a> fullsize:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> query_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+
+<a href='/constructor/botAppSettings'>botAppSettings</a>#c99b1950 flags:<a href='/type/%23'>#</a> placeholder_path:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/bytes'>bytes</a> background_color:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> background_dark_color:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> header_color:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/int'>int</a> header_dark_color:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/int'>int</a> = <a href='/type/BotAppSettings'>BotAppSettings</a>;
+<a href='/constructor/botInfo'>botInfo</a>#4d8a0299 flags:<a href='/type/%23'>#</a> has_preview_medias:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> user_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> description:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> description_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/Photo'>Photo</a> description_document:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/Document'>Document</a> commands:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotCommand'>BotCommand</a>&gt; menu_button:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/BotMenuButton'>BotMenuButton</a> privacy_policy_url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/string'>string</a> app_settings:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/BotAppSettings'>BotAppSettings</a> verifier_settings:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/type/BotVerifierSettings'>BotVerifierSettings</a> = <a href='/type/BotInfo'>BotInfo</a>;
+
+---functions---
+
+<a href='/method/messages.requestMainWebView'>messages.requestMainWebView</a>#c9e01e7b flags:<a href='/type/%23'>#</a> compact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> bot:<a href='/type/InputUser'>InputUser</a> start_param:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> theme_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;</code></pre>
+<p>Main Mini Apps are configured through <a href="https://t.me/botfather">@botfather</a>.  </p>
+<p>Once enabled, the <a href="/constructor/user">user</a>.<code>bot_has_main_app</code> flag will be set, and an "Open App" button should be shown on the bot's profile page.  </p>
+<p>Clicking on this button should open the Main Mini App, by invoking <a href="/method/messages.requestMainWebView">messages.requestMainWebView</a>: no URL needs to be passed to the method, because the Main Mini App URL is configured through <a href="https://t.me/botfather">@botfather</a>.  </p>
+<p>Apps may also specify a custom background, header color and placeholder SVG logo to be used during loading screens, specified in the <a href="/constructor/botAppSettings">botAppSettings</a> constructor, contained in the <a href="/constructor/botInfo">botInfo</a> constructor returned in <a href="/constructor/userFull">userFull</a>.  </p>
+<p>After invoking <a href="/method/messages.requestMainWebView">messages.requestMainWebView</a> and obtaining a <a href="/constructor/webViewResultUrl">webViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
+<p>The bot's profile page should also show a list of photos and videos, previewing the features offered by the Main Mini App, see <a href="#main-mini-app-previews">Main Mini App previews</a> for more info on how to configure and render them.  </p>
+<p>Main Mini Apps are also featured in the in-app <a href="/api/search#apps-tab">Mini App Store »</a>.  </p>
+<p>The Main Mini App should also be directly opened when <a href="/api/links#main-mini-app-links">clicking on a Main Mini App deep link »</a>; the <code>compact</code>/<code>fullscreen</code> flag of the method must be set if the <code>mode</code> parameter in the link is set and equal to <code>compact</code>/<code>fullscreen</code>; any eventual <code>start_param</code> present in the link must also be passed to the method.  </p>
+<h4><a class="anchor" href="#main-mini-app-previews" id="main-mini-app-previews" name="main-mini-app-previews"><i class="anchor-icon"></i></a>Main Mini App previews</h4>
+<pre><code><a href='/constructor/botInfo'>botInfo</a>#4d8a0299 flags:<a href='/type/%23'>#</a> has_preview_medias:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> user_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> description:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> description_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/Photo'>Photo</a> description_document:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/Document'>Document</a> commands:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotCommand'>BotCommand</a>&gt; menu_button:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/BotMenuButton'>BotMenuButton</a> privacy_policy_url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/string'>string</a> app_settings:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/BotAppSettings'>BotAppSettings</a> verifier_settings:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/type/BotVerifierSettings'>BotVerifierSettings</a> = <a href='/type/BotInfo'>BotInfo</a>;
+
+<a href='/constructor/user'>user</a>#20b1422 flags:<a href='/type/%23'>#</a> self:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/constructor/true'>true</a> contact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/constructor/true'>true</a> mutual_contact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> deleted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> bot:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> bot_chat_history:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> bot_nochats:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> verified:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/constructor/true'>true</a> restricted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/constructor/true'>true</a> min:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/constructor/true'>true</a> bot_inline_geo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/constructor/true'>true</a> support:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.23?<a href='/constructor/true'>true</a> scam:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/constructor/true'>true</a> apply_min_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.25?<a href='/constructor/true'>true</a> fake:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.26?<a href='/constructor/true'>true</a> bot_attach_menu:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.27?<a href='/constructor/true'>true</a> premium:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/constructor/true'>true</a> attach_menu_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.29?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> bot_can_edit:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.1?<a href='/constructor/true'>true</a> close_friend:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.2?<a href='/constructor/true'>true</a> stories_hidden:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.3?<a href='/constructor/true'>true</a> stories_unavailable:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.4?<a href='/constructor/true'>true</a> contact_require_premium:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.10?<a href='/constructor/true'>true</a> bot_business:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.11?<a href='/constructor/true'>true</a> bot_has_main_app:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.13?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> first_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> last_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> phone:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/UserProfilePhoto'>UserProfilePhoto</a> status:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/UserStatus'>UserStatus</a> bot_info_version:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/int'>int</a> restriction_reason:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; bot_inline_placeholder:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/type/string'>string</a> lang_code:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/string'>string</a> emoji_status:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.30?<a href='/type/EmojiStatus'>EmojiStatus</a> usernames:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Username'>Username</a>&gt; stories_max_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.5?<a href='/type/int'>int</a> color:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.8?<a href='/type/PeerColor'>PeerColor</a> profile_color:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.9?<a href='/type/PeerColor'>PeerColor</a> bot_active_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.12?<a href='/type/int'>int</a> bot_verification_icon:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.14?<a href='/type/long'>long</a> send_paid_messages_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.15?<a href='/type/long'>long</a> = <a href='/type/User'>User</a>;
+
+<a href='/constructor/botPreviewMedia'>botPreviewMedia</a>#23e91ba3 date:<a href='/type/int'>int</a> media:<a href='/type/MessageMedia'>MessageMedia</a> = <a href='/type/BotPreviewMedia'>BotPreviewMedia</a>;
+<a href='/constructor/bots.previewInfo'>bots.previewInfo</a>#0ca71d64 media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotPreviewMedia'>BotPreviewMedia</a>&gt; lang_codes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/bots.PreviewInfo'>bots.PreviewInfo</a>;
+
+---functions---
+
+<a href='/method/bots.getPreviewMedias'>bots.getPreviewMedias</a>#a2a5594d bot:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotPreviewMedia'>BotPreviewMedia</a>&gt;;
+
+<a href='/method/messages.uploadMedia'>messages.uploadMedia</a>#14967978 flags:<a href='/type/%23'>#</a> business_connection_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> peer:<a href='/type/InputPeer'>InputPeer</a> media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
+
+<a href='/method/bots.getPreviewInfo'>bots.getPreviewInfo</a>#423ab3ad bot:<a href='/type/InputUser'>InputUser</a> lang_code:<a href='/type/string'>string</a> = <a href='/type/bots.PreviewInfo'>bots.PreviewInfo</a>;
+<a href='/method/bots.addPreviewMedia'>bots.addPreviewMedia</a>#17aeb75a bot:<a href='/type/InputUser'>InputUser</a> lang_code:<a href='/type/string'>string</a> media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/BotPreviewMedia'>BotPreviewMedia</a>;
+<a href='/method/bots.editPreviewMedia'>bots.editPreviewMedia</a>#8525606f bot:<a href='/type/InputUser'>InputUser</a> lang_code:<a href='/type/string'>string</a> media:<a href='/type/InputMedia'>InputMedia</a> new_media:<a href='/type/InputMedia'>InputMedia</a> = <a href='/type/BotPreviewMedia'>BotPreviewMedia</a>;
+<a href='/method/bots.deletePreviewMedia'>bots.deletePreviewMedia</a>#2d0135b3 bot:<a href='/type/InputUser'>InputUser</a> lang_code:<a href='/type/string'>string</a> media:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputMedia'>InputMedia</a>&gt; = <a href='/type/Bool'>Bool</a>;
+<a href='/method/bots.reorderPreviewMedias'>bots.reorderPreviewMedias</a>#b627f3aa bot:<a href='/type/InputUser'>InputUser</a> lang_code:<a href='/type/string'>string</a> order:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputMedia'>InputMedia</a>&gt; = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>After enabling a <a href="#main-mini-apps">main mini app »</a> in <a href="https://t.me/botfather">@botfather</a>, bots gain the ability to display <strong>localized</strong> preview medias (photos and videos) on their profile page, offering examples of what the app can do.  </p>
+<p>If a bot has some preview medias, the <a href="/constructor/botInfo">botInfo</a>.<code>has_preview_medias</code> flag will be set (<a href="/constructor/botInfo">botInfo</a> is contained in the bot's <a href="/constructor/userFull">userFull</a>).<br>
+Clients should then invoke <a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a> to fetch&amp;download the preview medias once the user opens the bot's profile page.<br>
+The method will automatically select the correctly localized variant of each preview, according to the language code of the user (as passed to <a href="/method/initConnection">initConnection</a> when first setting up the client).  </p>
+<p>Bot owners may edit the preview medias directly through the API.  </p>
+<p>To check whether the current user can edit the preview medias of a bot, make sure both the <code>bot_can_edit</code> and <code>bot_has_main_app</code> flags of the bot's <a href="/constructor/user">user</a> constructor are set.  </p>
+<p>Then, <a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a> should be invoked by bot owners to fetch the previously configured preview medias.<br>
+Pass an empty string to <code>lang_code</code> when first invoking the method to fetch the previously configured default preview medias (used as fallback if there is no preview for the current user's language), and the list of <code>lang_codes</code> for which there are localized previews; then re-invoke the method to fetch the previously configured previews for each of the returned <code>lang_codes</code>.  </p>
+<p>(Note: technically non-owners may also invoke <a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a>, but it will always behave exactly as <a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a>, returning only previews for the current language and an empty <code>lang_codes</code> array, regardless of the passed <code>lang_code</code>, so please only use <a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a> if you're not the owner).  </p>
+<p>Then, use <a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>, <a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a>, <a href="/method/bots.reorderPreviewMedias">bots.reorderPreviewMedias</a>, <a href="/method/bots.deletePreviewMedia">bots.deletePreviewMedia</a>, uploading medias using <a href="/method/messages.uploadMedia">messages.uploadMedia</a> as usual to setup fallback and localized previews for existing and new languages.  </p>
+<p>As specified above, each language can have a distinct set of previews that may be edited and reordered independently. 
+The default, fallback language has an empty <code>lang_code</code>.  </p>
+<p>A maximum of <a href="/api/config#bot-preview-medias-max">bot_preview_medias_max »</a> preview medias may be added per localization key.</p>
+<h3><a class="anchor" href="#keyboard-button-mini-apps" id="keyboard-button-mini-apps" name="keyboard-button-mini-apps"><i class="anchor-icon"></i></a>Keyboard Button Mini Apps</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/replyKeyboardMarkup'>replyKeyboardMarkup</a>#85dd99d1 flags:<a href='/type/%23'>#</a> resize:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> single_use:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> selective:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> persistent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> rows:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/KeyboardButtonRow'>KeyboardButtonRow</a>&gt; placeholder:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> = <a href='/type/ReplyMarkup'>ReplyMarkup</a>;
+
+<a href='/constructor/keyboardButtonSimpleWebView'>keyboardButtonSimpleWebView</a>#a0c0505c text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
+<a href='/constructor/messageActionWebViewDataSentMe'>messageActionWebViewDataSentMe</a>#47dd8079 text:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/MessageAction'>MessageAction</a>;
+<a href='/constructor/messageActionWebViewDataSent'>messageActionWebViewDataSent</a>#b4c38cb5 text:<a href='/type/string'>string</a> = <a href='/type/MessageAction'>MessageAction</a>;
+
+<a href='/constructor/webViewResultUrl'>webViewResultUrl</a>#4d22ff98 flags:<a href='/type/%23'>#</a> fullsize:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> query_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+
+---functions---
+
+<a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#413a3e73 flags:<a href='/type/%23'>#</a> from_switch_webview:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> from_side_menu:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> compact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> start_param:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> theme_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+
+<a href='/method/messages.sendWebViewData'>messages.sendWebViewData</a>#dc0242c8 bot:<a href='/type/InputUser'>InputUser</a> random_id:<a href='/type/long'>long</a> button_text:<a href='/type/string'>string</a> data:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
+<p>Keyboard Button Mini Apps should be opened when the user clicks a <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> contained in a reply keyboard identified by a <a href="/constructor/replyKeyboardMarkup">replyKeyboardMarkup</a> constructor, by invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> passing the button's <code>url</code> to the <code>url</code> parameter.  </p>
+<p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/webViewResultUrl">webViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
+<p>Keyboard Button Mini Apps can send data back to the bot through the MTProto API via a <a href="/api/web-events#web-app-data-send"><code>web_app_data_send</code> JS event »</a>.  </p>
+<p>Upon receiving a <a href="/api/web-events#web-app-data-send"><code>web_app_data_send</code> JS event »</a> <strong>only</strong> from Keyboard Button Mini Apps, clients should invoke <a href="/method/messages.sendWebViewData">messages.sendWebViewData</a>, passing the following arguments:</p>
+<ul>
+<li><code>bot</code> - Bot ID</li>
+<li><code>random_id</code> - Unique random ID to avoid resending the same event multiple times</li>
+<li><code>button_text</code> - Text of the <a href="/constructor/keyboardButtonSimpleWebView">keyboardButtonSimpleWebView</a> that was pressed to open the simple Mini App</li>
+<li><code>data</code> - Contents of the <code>data</code> field of the JS event.  </li>
+</ul>
+<p>Make sure to ignore all <code>web_app_data_send</code> events sent after the first one, <a href="/method/messages.sendWebViewData">messages.sendWebViewData</a> must be called only once. The webview must be closed after invoking the <a href="/method/messages.sendWebViewData">messages.sendWebViewData</a> method.  </p>
+<p>This will generate a <a href="/constructor/messageActionWebViewDataSent">messageActionWebViewDataSent</a> update for the user, and a <a href="/constructor/messageActionWebViewDataSentMe">messageActionWebViewDataSentMe</a> update for the bot, containing the event data.  </p>
+<h3><a class="anchor" href="#inline-button-mini-apps" id="inline-button-mini-apps" name="inline-button-mini-apps"><i class="anchor-icon"></i></a>Inline button Mini Apps</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/keyboardButtonWebView'>keyboardButtonWebView</a>#13767230 text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
+<a href='/constructor/webViewResultUrl'>webViewResultUrl</a>#4d22ff98 flags:<a href='/type/%23'>#</a> fullsize:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> query_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+
+<a href='/constructor/inputBotInlineResult'>inputBotInlineResult</a>#88bf9319 flags:<a href='/type/%23'>#</a> id:<a href='/type/string'>string</a> type:<a href='/type/string'>string</a> title:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> description:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> thumb:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/InputWebDocument'>InputWebDocument</a> content:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/InputWebDocument'>InputWebDocument</a> send_message:<a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a> = <a href='/type/InputBotInlineResult'>InputBotInlineResult</a>;
+<a href='/constructor/inputBotInlineResultPhoto'>inputBotInlineResultPhoto</a>#a8d864a7 id:<a href='/type/string'>string</a> type:<a href='/type/string'>string</a> photo:<a href='/type/InputPhoto'>InputPhoto</a> send_message:<a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a> = <a href='/type/InputBotInlineResult'>InputBotInlineResult</a>;
+<a href='/constructor/inputBotInlineResultDocument'>inputBotInlineResultDocument</a>#fff8fdc4 flags:<a href='/type/%23'>#</a> id:<a href='/type/string'>string</a> type:<a href='/type/string'>string</a> title:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> description:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> document:<a href='/type/InputDocument'>InputDocument</a> send_message:<a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a> = <a href='/type/InputBotInlineResult'>InputBotInlineResult</a>;
+<a href='/constructor/inputBotInlineResultGame'>inputBotInlineResultGame</a>#4fa417f2 id:<a href='/type/string'>string</a> short_name:<a href='/type/string'>string</a> send_message:<a href='/type/InputBotInlineMessage'>InputBotInlineMessage</a> = <a href='/type/InputBotInlineResult'>InputBotInlineResult</a>;
+
+<a href='/constructor/updateWebViewResultSent'>updateWebViewResultSent</a>#1592b79d query_id:<a href='/type/long'>long</a> = <a href='/type/Update'>Update</a>;
+<a href='/constructor/webViewMessageSent'>webViewMessageSent</a>#c94511c flags:<a href='/type/%23'>#</a> msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputBotInlineMessageID'>InputBotInlineMessageID</a> = <a href='/type/WebViewMessageSent'>WebViewMessageSent</a>;
+
+---functions---
+
+<a href='/method/messages.requestWebView'>messages.requestWebView</a>#269dc2c1 flags:<a href='/type/%23'>#</a> from_bot_menu:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> compact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> bot:<a href='/type/InputUser'>InputUser</a> url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> start_param:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> theme_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputReplyTo'>InputReplyTo</a> send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+
+<a href='/method/messages.prolongWebView'>messages.prolongWebView</a>#b0d81a83 flags:<a href='/type/%23'>#</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> bot:<a href='/type/InputUser'>InputUser</a> query_id:<a href='/type/long'>long</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputReplyTo'>InputReplyTo</a> send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/messages.sendWebViewResultMessage'>messages.sendWebViewResultMessage</a>#a4314f5 bot_query_id:<a href='/type/string'>string</a> result:<a href='/type/InputBotInlineResult'>InputBotInlineResult</a> = <a href='/type/WebViewMessageSent'>WebViewMessageSent</a>;</code></pre>
+<p>Inline Button Mini Apps work similarly to <a href="/api/bots/inline">inline bots »</a>: they send messages on behalf of the user to the chat from which the query originated.</p>
+<p>When the user clicks on an <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a> inline button contained in an inline keyboard identified by a <a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> constructor, <a href="/method/messages.requestWebView">messages.requestWebView</a> should be invoked, passing <a href="/constructor/keyboardButtonWebView">keyboardButtonWebView</a>.<code>url</code> must be passed to the method's <code>url</code> parameter.  </p>
+<p>Then, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
+<p>After loading the webview, until it is closed by a <a href="/api/web-events#web-app-close">web_app_close event</a>, the user client must invoke <a href="/method/messages.prolongWebView">messages.prolongWebView</a> every 60 seconds: if the method call returns <code>QUERY_ID_INVALID</code>, the webview must be closed.  </p>
+<p>The opened URL's fragment parameters already contain basic information about the user and a <code>query_id</code> parameter, that is exposed by the <a href="/bots/webapps">bot Mini Apps JS library</a>: this <code>query_id</code> can then be passed to the bot (within the Mini App itself, for example via an AJAX query or form submission to the server hosting the Mini App and the bot) and then used <strong>by the bot</strong> to invoke <a href="/method/messages.sendWebViewResultMessage">messages.sendWebViewResultMessage</a>, passing an <a href="/type/InputBotInlineResult">InputBotInlineResult</a> constructor that will automatically send a message with optionally attached media, and even inline buttons on behalf of the user.  </p>
+<h3><a class="anchor" href="#menu-button-mini-apps" id="menu-button-mini-apps" name="menu-button-mini-apps"><i class="anchor-icon"></i></a>Menu button Mini Apps</h3>
+<p>Menu button Mini Apps work similarly to <a href="#inline-button-mini-apps">inline button Mini Apps »</a>: they send messages on behalf of the user to the chat from where the <a href="/api/bots/menu">bot menu button »</a> was clicked.  </p>
+<p>Menu button Mini Apps can be opened from a <a href="/constructor/botMenuButton">botMenuButton</a> <a href="/api/bots/menu">menu button »</a>: in this case, the <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>from_bot_menu</code> flag should be set, and the <a href="/constructor/botMenuButton">botMenuButton</a>.<code>url</code> field must be passed to the method's <code>url</code> parameter.  </p>
+<p>The full flow is identical to the flow for <a href="#inline-button-mini-apps">inline button Mini Apps »</a>, apart from the different flags passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>, as described above.</p>
+<h3><a class="anchor" href="#attachment-menu-mini-apps" id="attachment-menu-mini-apps" name="attachment-menu-mini-apps"><i class="anchor-icon"></i></a>Attachment menu Mini Apps</h3>
+<p>Attachment menu Mini Apps work similarly to <a href="#inline-button-mini-apps">inline button Mini Apps »</a>: they send messages on behalf of the user to the chat where the bot's <a href="/api/bots/attach">attachment menu »</a> was opened.  </p>
+<p>Attachment menu Mini Apps can be opened from an <a href="/api/bots/attach">attachment menu entry »</a>: in this case, no special flag should be set when invoking <a href="/method/messages.requestWebView">messages.requestWebView</a>.  </p>
+<p>Attachment menu Mini Apps can also be opened from a <a href="/api/links#bot-attachment-or-side-menu-links">bot attachment menu deep link</a>, in which case the <code>start_parameter</code> should be provided to <a href="/method/messages.requestWebView">messages.requestWebView</a>.<code>start_param</code>, if present, and the <code>compact</code>/<code>fullscreen</code> flag must be set if the <code>mode</code> parameter is set and equal to <code>compact</code>/<code>fullscreen</code>.</p>
+<p>The full flow is identical to the flow for <a href="#inline-button-mini-apps">inline button Mini Apps »</a>, apart from the different flags passed to <a href="/method/messages.requestWebView">messages.requestWebView</a>, as described above.</p>
+<h3><a class="anchor" href="#inline-mode-mini-apps" id="inline-mode-mini-apps" name="inline-mode-mini-apps"><i class="anchor-icon"></i></a>Inline mode Mini Apps</h3>
+<pre><code><a href='/constructor/messages.botResults'>messages.botResults</a>#e021f2f6 flags:<a href='/type/%23'>#</a> gallery:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> query_id:<a href='/type/long'>long</a> next_offset:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> switch_pm:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/InlineBotSwitchPM'>InlineBotSwitchPM</a> switch_webview:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/InlineBotWebView'>InlineBotWebView</a> results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotInlineResult'>BotInlineResult</a>&gt; cache_time:<a href='/type/int'>int</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.BotResults'>messages.BotResults</a>;
+
+<a href='/constructor/inlineBotWebView'>inlineBotWebView</a>#b57295d5 text:<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> = <a href='/type/InlineBotWebView'>InlineBotWebView</a>;
+
+<a href='/constructor/webViewResultUrl'>webViewResultUrl</a>#4d22ff98 flags:<a href='/type/%23'>#</a> fullsize:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> query_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+
+---functions---
+
+<a href='/method/messages.getInlineBotResults'>messages.getInlineBotResults</a>#514e999d flags:<a href='/type/%23'>#</a> bot:<a href='/type/InputUser'>InputUser</a> peer:<a href='/type/InputPeer'>InputPeer</a> geo_point:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputGeoPoint'>InputGeoPoint</a> query:<a href='/type/string'>string</a> offset:<a href='/type/string'>string</a> = <a href='/type/messages.BotResults'>messages.BotResults</a>;
+
+<a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#413a3e73 flags:<a href='/type/%23'>#</a> from_switch_webview:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> from_side_menu:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> compact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> start_param:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> theme_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;</code></pre>
+<p>Not to be confused with <a href="#inline-button-mini-apps">inline button mini apps »</a>.  </p>
+<p>Inline mode Mini Apps can be used to generate a custom set of inline results in response to a user's <a href="/api/bots/inline">inline query »</a> via a <a href="/api/web-events#web-app-switch-inline-query"><code>web_app_switch_inline_query</code> JS event »</a>.  </p>
+<p>Inline mode Mini Apps can be opened by clicking on an <a href="/constructor/inlineBotWebView">inlineBotWebView</a> button returned at the top of the inline result list, contained in <a href="/constructor/messages.botResults">messages.botResults</a>.<code>switch_webview</code>, returned by <a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a>.  </p>
+<p>Pass the <code>url</code> to <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>, while also setting the <code>from_switch_webview</code> flag.  </p>
+<p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/webViewResultUrl">webViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
+<p>Once the user has finished making their choices in the Mini App, a <a href="/api/web-events#web-app-switch-inline-query"><code>web_app_switch_inline_query</code> JS event »</a> should be emitted, containing a JSON object with the following fields:</p>
+<ul>
+<li><code>query</code> - The inline query that will be inserted in the chat's input field, after the bot's username.<br>
+May be an empty string, in which case just the bot's username will be inserted, triggering an empty inline query.</li>
+<li><code>chat_types</code> - An array of strings, containing a combination of <code>users</code>, <code>bots</code>, <code>groups</code>, <code>channels</code>.<br>
+If non-empty, the client should prompt the user to choose a specific chat of the specified type(s), then open the chosen chat and inserts the bot's username and the specified inline query in the input field.<br>
+The array values specify which types of chats the user will be able to choose from.<br>
+If empty, the current chat is used.  </li>
+</ul>
+<p>Upon receiving a <a href="/api/web-events#web-app-switch-inline-query"><code>web_app_switch_inline_query</code> JS event »</a> from the Mini App, the client should <a href="/api/bots/inline">make a new inline query »</a> to the same bot, with the newly specified <code>query</code>, either in the current chat or in the newly chosen chat, as specified by the <code>chat_types</code> field.  </p>
+<h3><a class="anchor" href="#side-menu-mini-apps" id="side-menu-mini-apps" name="side-menu-mini-apps"><i class="anchor-icon"></i></a>Side menu Mini Apps</h3>
+<pre><code><a href='/constructor/webViewResultUrl'>webViewResultUrl</a>#4d22ff98 flags:<a href='/type/%23'>#</a> fullsize:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> query_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+
+---functions---
+
+<a href='/method/messages.requestSimpleWebView'>messages.requestSimpleWebView</a>#413a3e73 flags:<a href='/type/%23'>#</a> from_switch_webview:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> from_side_menu:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> compact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> start_param:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> theme_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;</code></pre>
+<p>Side menu Mini Apps can be opened by clicking on the installed <a href="/api/bots/attach">side menu entry »</a>.  </p>
+<p>This action must trigger a <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> query with the <code>from_side_menu</code> flag set: clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
+<p>After invoking <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a> and obtaining a <a href="/constructor/webViewResultUrl">webViewResultUrl</a> result, clients should open a webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
+<h3><a class="anchor" href="#direct-link-mini-apps" id="direct-link-mini-apps" name="direct-link-mini-apps"><i class="anchor-icon"></i></a>Direct Link Mini Apps</h3>
+<p>Schema:</p>
+<pre><code><a href='/constructor/inputBotAppID'>inputBotAppID</a>#a920bd7a id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputBotApp'>InputBotApp</a>;
+<a href='/constructor/inputBotAppShortName'>inputBotAppShortName</a>#908c0407 bot_id:<a href='/type/InputUser'>InputUser</a> short_name:<a href='/type/string'>string</a> = <a href='/type/InputBotApp'>InputBotApp</a>;
+
+<a href='/constructor/botAppNotModified'>botAppNotModified</a>#5da674b7 = <a href='/type/BotApp'>BotApp</a>;
+<a href='/constructor/botApp'>botApp</a>#95fcd1d6 flags:<a href='/type/%23'>#</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> short_name:<a href='/type/string'>string</a> title:<a href='/type/string'>string</a> description:<a href='/type/string'>string</a> photo:<a href='/type/Photo'>Photo</a> document:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Document'>Document</a> hash:<a href='/type/long'>long</a> = <a href='/type/BotApp'>BotApp</a>;
+
+<a href='/constructor/messages.botApp'>messages.botApp</a>#eb50adf5 flags:<a href='/type/%23'>#</a> inactive:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> request_write_access:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> has_settings:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> app:<a href='/type/BotApp'>BotApp</a> = <a href='/type/messages.BotApp'>messages.BotApp</a>;
+
+<a href='/constructor/webViewResultUrl'>webViewResultUrl</a>#4d22ff98 flags:<a href='/type/%23'>#</a> fullsize:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> query_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> url:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;
+
+---functions---
+
+<a href='/method/messages.getBotApp'>messages.getBotApp</a>#34fdc5c3 app:<a href='/type/InputBotApp'>InputBotApp</a> hash:<a href='/type/long'>long</a> = <a href='/type/messages.BotApp'>messages.BotApp</a>;
+
+<a href='/method/messages.requestAppWebView'>messages.requestAppWebView</a>#53618bce flags:<a href='/type/%23'>#</a> write_allowed:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> compact:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> fullscreen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> app:<a href='/type/InputBotApp'>InputBotApp</a> start_param:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> theme_params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/DataJSON'>DataJSON</a> platform:<a href='/type/string'>string</a> = <a href='/type/WebViewResult'>WebViewResult</a>;</code></pre>
+<p>Another way to open Mini Apps is by using <a href="/api/links#direct-mini-app-links">Direct Mini App links »</a>.  </p>
+<p>These links are different from all other Mini App links, because they don't require the user to install an attachment menu, and a single bot can offer multiple Mini Apps, distinguished by their <code>short_name</code>.  </p>
+<p>These links should be handled as follows:  </p>
+<ul>
+<li>
+<p>Check if <code>bot_username</code> parameter of the link is indeed a bot username, if so then</p>
+</li>
+<li>
+<p>Invoke <a href="/method/messages.getBotApp">messages.getBotApp</a>, passing an <a href="/constructor/inputBotAppShortName">inputBotAppShortName</a> with the <code>short_name</code> contained in the <code>appname</code> query string parameter.
+If the client has already encountered an app with this short name from the same bot before, pass the <code>hash</code> of the cached <a href="/constructor/botApp">botApp</a> constructor to <a href="/method/messages.getBotApp">messages.getBotApp</a>.</p>
+</li>
+<li>
+<p>If a <a href="/constructor/messages.botApp">messages.botApp</a> constructor is returned, open the Mini App by invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>, generating an <a href="/constructor/inputBotAppID">inputBotAppID</a> constructor from <code>id</code> and <code>access_hash</code> of the returned <a href="/constructor/botApp">botApp</a>, or from previously cached information if we already met the bot app and <a href="/constructor/botAppNotModified">botAppNotModified</a> was returned.  </p>
+<ul>
+<li>
+<p>If the client has clicked on the link in a Telegram chat, pass the chat's peer information into <code>peer</code>; otherwise pass the bot's peer information, instead.</p>
+</li>
+<li>
+<p>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>request_write_access</code> flag is set, the bot is asking permission to send messages to the user: <strong>ask confirmation from the user</strong> with a prompt and a checkbox, and if the user agrees, set the <code>write_allowed</code> flag when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</p>
+</li>
+<li>
+<p>If the <a href="/constructor/messages.botApp">messages.botApp</a>.<code>inactive</code> flag is set, <strong>ask confirmation from the user</strong> before opening the Mini App; the <code>request_write_access</code> checkbox should be shown in this prompt, if needed.<br>
+Confirmation should <strong>always</strong> be asked, even if the <code>inactive</code> flag is not set, when opening the link from places where the full link is not visible (i.e. <a href="/constructor/messageEntityTextUrl">messageEntityTextUrl</a> text links, inline buttons etc.).  </p>
+<p>Don't use two prompts if confirmation to open the Mini App is required <em>and</em> <code>request_write_access</code> is set, use just one prompt with an optional checkbox for <code>request_write_access</code>.  </p>
+</li>
+<li>
+<p>If the <code>startapp</code> query string parameter is present, pass it to <code>start_param</code> when invoking <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a>.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>Finally, open the webview using the <code>url</code> contained in the returned <a href="/constructor/webViewResultUrl">webViewResultUrl</a>.  </p>
+<h3><a class="anchor" href="#outgoing-events-mini-app-to-client" id="outgoing-events-mini-app-to-client" name="outgoing-events-mini-app-to-client"><i class="anchor-icon"></i></a>Outgoing events: Mini App to client</h3>
+<p>Mini Apps can <em>send</em> web events starting with <code>web_app_</code>; see the <a href="/api/web-events">web event documentation for the full list of events that can be <em>sent</em> by the Mini App to the client »</a>.  </p>
+<h3><a class="anchor" href="#incoming-events-client-to-mini-app" id="incoming-events-client-to-mini-app" name="incoming-events-client-to-mini-app"><i class="anchor-icon"></i></a>Incoming events: Client to Mini App</h3>
+<p>Mini Apps can also <em>receive</em> events, by exposing a <code>window.Telegram.WebView.receiveEvent("event_name", params)</code> method.  </p>
+<p>Here's the full list of events that can be <em>received</em> by a Mini App from the client, if the client invokes the <code>receiveEvent</code> method.  </p>
+<!-- start app events -->
+<h4><a class="anchor" href="#main-button-pressed" id="main-button-pressed" name="main-button-pressed"><i class="anchor-icon"></i></a><code>main_button_pressed</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client when the user presses the main button located at the bottom of the webview, handle this event only if the main button was <a href="/api/web-events#web-app-setup-main-button">previously configured by a <code>web_app_setup_main_button</code> event »</a>.</p>
+<h4><a class="anchor" href="#back-button-pressed" id="back-button-pressed" name="back-button-pressed"><i class="anchor-icon"></i></a><code>back_button_pressed</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client when the user presses the (OS or UI) back button, if it was <a href="/api/web-events#web-app-setup-back-button">previously enabled by a <code>web_app_setup_back_button</code> event »</a>.</p>
+<h4><a class="anchor" href="#settings-button-pressed" id="settings-button-pressed" name="settings-button-pressed"><i class="anchor-icon"></i></a><code>settings_button_pressed</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client when the user presses the settings button, if it was <a href="/api/web-events#web-app-setup-settings-button">previously enabled by a <code>web_app_setup_settings_button</code> event »</a>.</p>
+<h4><a class="anchor" href="#invoice-closed" id="invoice-closed" name="invoice-closed"><i class="anchor-icon"></i></a><code>invoice_closed</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>slug</code> - Invoice identifier (string)</li>
+<li><code>status</code> - One of the following values (string):<ul>
+<li><code>cancelled</code> – The user closed the invoice popup without paying, before the call to <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a>.</li>
+<li><code>failed</code> – The user tried to pay, but the payment failed: the call to <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> returned an RPC error and the popup was closed.</li>
+<li><code>pending</code> – The payment is still processing: the bot will receive a further service message about a successful payment. <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> was successfully invoked returning <a href="/constructor/payments.paymentVerificationNeeded">payments.paymentVerificationNeeded</a>, the user completed all additional verification forms returned by the method and the invoice popup was closed, but the client hasn't received a <a href="/constructor/messageActionPaymentSent">messageActionPaymentSent</a> service message yet.<br>
+Note that eventual errors will not be sent as a <code>failed</code> event if the user fails additional validation (ie 3-D Secure) returned by <a href="/constructor/payments.paymentVerificationNeeded">payments.paymentVerificationNeeded</a>: the state will remaing <code>pending</code>.  </li>
+<li><code>paid</code> – The invoice was paid successfully: the client completed the <a href="/api/payments">payment flow »</a>, the invoice popup was closed and a <a href="/constructor/messageActionPaymentSent">messageActionPaymentSent</a> service message was received by the client.</li>
+</ul>
+</li>
+</ul>
+<p>Sent by the client to report the <a href="/api/payments">payment status</a> of an invoice obtained from a <a href="/api/web-events#web-app-open-invoice"><code>web_app_open_invoice</code> event »</a>.</p>
+<h4><a class="anchor" href="#viewport-changed" id="viewport-changed" name="viewport-changed"><i class="anchor-icon"></i></a><code>viewport_changed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>height</code> - The current height of the visible area of the Mini App (excluding the bottom <a href="#main-button-pressed">main button</a>, if visible) (integer)</li>
+<li><code>is_state_stable</code> - If true, the viewport is currently being resized (animation in progress), more events of this type may be emitted. (boolean)</li>
+<li><code>is_expanded</code> - Whether the Mini App is expanded to its maximum height after the user swiped up or after the Mini App emitted a <a href="/api/web-events#web-app-expand">web_app_expand</a> event (boolean)</li>
+</ul>
+<p>Emitted when the viewport is changed.</p>
+<h4><a class="anchor" href="#theme-changed" id="theme-changed" name="theme-changed"><i class="anchor-icon"></i></a><code>theme_changed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>theme_params</code> - A <a href="#theme-parameters">theme parameters object »</a> (object)</li>
+</ul>
+<p>Emitted when requested by the Mini App using a <a href="/api/web-events#web-app-request-theme"><code>web_app_request_theme</code> event »</a>, or when the app theme changes.  </p>
+<h5><a class="anchor" href="#theme-parameters" id="theme-parameters" name="theme-parameters"><i class="anchor-icon"></i></a>Theme parameters</h5>
+<p>Bot Mini Apps can be themed according to the following theme parameters, passed as a JSON object to the <code>theme_params</code> parameter of the <a href="/method/messages.requestSimpleWebView">messages.requestSimpleWebView</a>, <a href="/method/messages.requestWebView">messages.requestWebView</a> and <a href="/method/messages.requestAppWebView">messages.requestAppWebView</a> methods.  </p>
+<p>This JSON object has the following keys, containing color theme information (hex string, RGB, no alpha) to pass to the Mini App.  </p>
+<p>See <a href="/bots/webapps#themeparams">here »</a> for more info on the contents of the object.</p>
+<h4><a class="anchor" href="#popup-closed" id="popup-closed" name="popup-closed"><i class="anchor-icon"></i></a><code>popup_closed</code></h4>
+<p>Params: a JSON object with an optional <code>button_id</code> string field.</p>
+<p>Emitted when the user presses a button or cancels a popup brought up by a previous <a href="/api/web-events#web-app-open-popup"><code>web_app_open_popup</code> event »</a>.</p>
+<h4><a class="anchor" href="#write-access-requested" id="write-access-requested" name="write-access-requested"><i class="anchor-icon"></i></a><code>write_access_requested</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - <code>allowed</code> or <code>cancelled</code></li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-request-write-access"><code>web_app_request_write_access</code> event »</a>, indicating whether the user has allowed the bot to send messages to the user (<code>allowed</code>) or not (<code>cancelled</code>).</p>
+<h4><a class="anchor" href="#phone-requested" id="phone-requested" name="phone-requested"><i class="anchor-icon"></i></a><code>phone_requested</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - <code>sent</code> or <code>cancelled</code></li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-request-phone"><code>web_app_request_phone</code> event »</a>, indicating whether the user has shared their phone number with the bot (<code>allowed</code>) or not (<code>cancelled</code>).</p>
+<h4><a class="anchor" href="#biometry-info-received" id="biometry-info-received" name="biometry-info-received"><i class="anchor-icon"></i></a><code>biometry_info_received</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>available</code> - boolean, if true, indicates that biometric authentication is available on the current device.</li>
+<li><code>type</code> - optional string, set if <code>available</code> is true, contains the type of biometric authentication, one of:<ul>
+<li><code>finger</code> - fingerprint-based biometrics</li>
+<li><code>face</code> - face-based biometrics</li>
+<li><code>unknown</code> - biometrics of an unknown type</li>
+</ul>
+</li>
+<li><code>access_requested</code> - boolean, indicates whether the app has previously requested permission to use biometrics through a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a></li>
+<li><code>access_granted</code> - boolean, indicates whether the user has granted the app permission to use biometrics in response to a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>.<br>
+If false and <code>access_requested</code> is true, the user has denied the app permission to use biometrics, in which case the app should open a prompt notifying the user that the biometric settings must be changed to use biometrics, and if the user clicks on the in-app confirm button, a <a href="/api/web-events#web-app-biometry-open-settings">web_app_biometry_open_settings event »</a> must be emitted.</li>
+<li><code>token_saved</code> - boolean, whether a token was safely stored on-device by a previous <a href="/api/web-events#web-app-biometry-update-token">web_app_biometry_update_token event »</a>.  </li>
+<li><code>device_id</code> - string, a unique device identifier that can be used to match the token to the device.</li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-biometry-get-info"><code>web_app_biometry_get_info</code> event »</a> or a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>.</p>
+<h4><a class="anchor" href="#biometry-token-updated" id="biometry-token-updated" name="biometry-token-updated"><i class="anchor-icon"></i></a><code>biometry_token_updated</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - string, one of:<ul>
+<li><code>updated</code> - If the token was successfully updated.</li>
+<li><code>removed</code> - If the token was successfully removed.</li>
+<li><code>failed</code> - If biometric authentication failed, or the app doesn't have permission to use biometrics (a <a href="#biometry-info-received">biometry_info_received event »</a> event will also be emitted if the app hasn't previously initialized the state using <a href="/api/web-events#web-app-biometry-get-info"><code>web_app_biometry_get_info</code> event »</a> or a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>).  </li>
+</ul>
+</li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-biometry-update-token"><code>web_app_biometry_update_token</code> event »</a>.</p>
+<h4><a class="anchor" href="#biometry-auth-requested" id="biometry-auth-requested" name="biometry-auth-requested"><i class="anchor-icon"></i></a><code>biometry_auth_requested</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - string, either <code>authorized</code> or <code>failed</code>.<br>
+If <code>failed</code>, a <a href="#biometry-info-received">biometry_info_received event »</a> event will also be emitted if the app hasn't previously initialized the state using <a href="/api/web-events#web-app-biometry-get-info"><code>web_app_biometry_get_info</code> event »</a> or a <a href="/api/web-events#web-app-biometry-request-access"><code>web_app_biometry_request_access</code> event »</a>.  </li>
+<li><code>token</code> - optional string, set if <code>status</code> is <code>authorized</code>, contains the token previously set using the <a href="/api/web-events#web-app-biometry-update-token"><code>web_app_biometry_update_token</code> event »</a>.  </li>
+</ul>
+<p>Used by clients to reply to a <a href="/api/web-events#web-app-biometry-request-auth"><code>web_app_biometry_request_auth</code> biometric authentication request »</a>.</p>
+<h4><a class="anchor" href="#custom-method-invoked" id="custom-method-invoked" name="custom-method-invoked"><i class="anchor-icon"></i></a><code>custom_method_invoked</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_invoke_custom_method</code> request</li>
+<li><code>result</code> - The JSON data contained in the response of the <a href="/method/bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a> method, if the method call succeeded</li>
+<li><code>error</code> - The text of the RPC error, if the method call failed</li>
+</ul>
+<p>Used by clients to reply to <a href="/api/web-events#web-app-invoke-custom-method"><code>web_app_invoke_custom_method</code> events »</a>.</p>
+<h4><a class="anchor" href="#clipboard-text-received" id="clipboard-text-received" name="clipboard-text-received"><i class="anchor-icon"></i></a><code>clipboard_text_received</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_read_text_from_clipboard</code> request</li>
+<li><code>data</code> - A string with the clipboard contents (optional, if not provided consider the request failed)</li>
+</ul>
+<p>Used by clients to reply to <a href="/api/web-events#web-app-read-text-from-clipboard"><code>web_app_read_text_from_clipboard</code> events »</a>.</p>
+<h4><a class="anchor" href="#qr-text-received" id="qr-text-received" name="qr-text-received"><i class="anchor-icon"></i></a><code>qr_text_received</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>data</code> - string with the contents of a scanned QR code.</li>
+</ul>
+<p>Emitted by clients if a new QR code was scanned by the native QR code scanner opened with a <a href="/api/web-events#web-app-open-scan-qr-popup"><code>web_app_open_scan_qr_popup</code> event »</a>.</p>
+<h4><a class="anchor" href="#scan-qr-popup-closed" id="scan-qr-popup-closed" name="scan-qr-popup-closed"><i class="anchor-icon"></i></a><code>scan_qr_popup_closed</code></h4>
+<p>Params: <code>null</code> or an empty object</p>
+<p>Emitted by clients if the QR code scanner popup opened with a <a href="/api/web-events#web-app-open-scan-qr-popup"><code>web_app_open_scan_qr_popup</code> event »</a> was closed by the user or failed to open altogether due to permission issues.</p>
+<h4><a class="anchor" href="#visibility-changed" id="visibility-changed" name="visibility-changed"><i class="anchor-icon"></i></a><code>visibility_changed</code></h4>
+<p>Params: a JSON object with a single <code>is_visible=true|false</code> boolean field.</p>
+<p>Emitted the Mini App becomes active (<code>true</code>) or inactive (<code>false</code>), e.g., opened/closed from minimized state or selected/deselected among tabs).</p>
+<h4><a class="anchor" href="#secondary-button-pressed" id="secondary-button-pressed" name="secondary-button-pressed"><i class="anchor-icon"></i></a><code>secondary_button_pressed</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client when the user presses the secondary button located at the bottom of the webview, handle this event only if the secondary button was <a href="/api/web-events#web-app-setup-secondary-button">previously configured by a <code>web_app_setup_secondary_button</code> event »</a>.</p>
+<h4><a class="anchor" href="#fullscreen-changed" id="fullscreen-changed" name="fullscreen-changed"><i class="anchor-icon"></i></a><code>fullscreen_changed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>is_fullscreen</code> - boolean indicating whether the mini app is currently in fullscreen mode.</li>
+</ul>
+<p>Sent by the client when replying to <a href="/api/web-events#web-app-request-fullscreen">web_app_request_fullscreen</a> and <a href="/api/web-events#web-app-exit-fullscreen">web_app_exit_fullscreen</a> events.</p>
+<h4><a class="anchor" href="#fullscreen-failed" id="fullscreen-failed" name="fullscreen-failed"><i class="anchor-icon"></i></a><code>fullscreen_failed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>error</code> - string indicating the error, one of:<ul>
+<li><code>UNSUPPORTED</code> - Fullscreen mode is not supported on this device or platform</li>
+<li><code>ALREADY_FULLSCREEN</code> - The Mini App is already in fullscreen mode</li>
+</ul>
+</li>
+</ul>
+<p>Sent by the client if a failure occurs while handling <a href="/api/web-events#web-app-request-fullscreen">web_app_request_fullscreen</a> and <a href="/api/web-events#web-app-exit-fullscreen">web_app_exit_fullscreen</a> events.</p>
+<h4><a class="anchor" href="#accelerometer-started" id="accelerometer-started" name="accelerometer-started"><i class="anchor-icon"></i></a><code>accelerometer_started</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-start-accelerometer">web_app_start_accelerometer event »</a> if accelerometer tracking is started successfully.</p>
+<p>Until <a href="/api/web-events#web-app-stop-accelerometer">web_app_stop_accelerometer</a> is emitted by the mini app, the client will also emit <a href="#accelerometer-changed">accelerometer_changed events</a> at most every <code>refresh_rate</code> milliseconds with accelerometer readings.</p>
+<h4><a class="anchor" href="#accelerometer-failed" id="accelerometer-failed" name="accelerometer-failed"><i class="anchor-icon"></i></a><code>accelerometer_failed</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>error</code> - String, one of:<ul>
+<li><code>UNSUPPORTED</code> - Accelerometer tracking is not supported on this device or platform.</li>
+</ul>
+</li>
+</ul>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-start-accelerometer">web_app_start_accelerometer event »</a> if accelerometer tracking cannot be started.</p>
+<h4><a class="anchor" href="#accelerometer-stopped" id="accelerometer-stopped" name="accelerometer-stopped"><i class="anchor-icon"></i></a><code>accelerometer_stopped</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-stop-accelerometer">web_app_stop_accelerometer event »</a> if accelerometer tracking is stopped successfully.</p>
+<h4><a class="anchor" href="#accelerometer-changed" id="accelerometer-changed" name="accelerometer-changed"><i class="anchor-icon"></i></a><code>accelerometer_changed</code></h4>
+<p>Params: JSON object with <code>x</code>, <code>y</code> and <code>z</code> fields of type <code>float</code>, containing the current acceleration in the X, Y and Z-axis, measured in m/s².  </p>
+<p>Sent periodically by the client at most every <code>refresh_rate</code> milliseconds after <a href="/api/web-events#web-app-start-accelerometer">web_app_start_accelerometer »</a> is invoked and until <a href="/api/web-events#web-app-stop-accelerometer">web_app_stop_accelerometer</a> is invoked.</p>
+<h4><a class="anchor" href="#gyroscope-started" id="gyroscope-started" name="gyroscope-started"><i class="anchor-icon"></i></a><code>gyroscope_started</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-start-gyroscope">web_app_start_gyroscope event »</a> if gyroscope tracking is started successfully.</p>
+<p>Until <a href="/api/web-events#web-app-stop-gyroscope">web_app_stop_gyroscope</a> is emitted by the mini app, the client will also emit <a href="#gyroscope-changed">gyroscope_changed events</a> at most every <code>refresh_rate</code> milliseconds with gyroscope readings.</p>
+<h4><a class="anchor" href="#gyroscope-failed" id="gyroscope-failed" name="gyroscope-failed"><i class="anchor-icon"></i></a><code>gyroscope_failed</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>error</code> - String, one of:<ul>
+<li><code>UNSUPPORTED</code> - Gyroscope tracking is not supported on this device or platform.</li>
+</ul>
+</li>
+</ul>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-start-gyroscope">web_app_start_gyroscope event »</a> if gyroscope tracking cannot be started.</p>
+<h4><a class="anchor" href="#gyroscope-stopped" id="gyroscope-stopped" name="gyroscope-stopped"><i class="anchor-icon"></i></a><code>gyroscope_stopped</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-stop-gyroscope">web_app_stop_gyroscope event »</a> if gyroscope tracking is stopped successfully.</p>
+<h4><a class="anchor" href="#gyroscope-changed" id="gyroscope-changed" name="gyroscope-changed"><i class="anchor-icon"></i></a><code>gyroscope_changed</code></h4>
+<p>Params: JSON object with <code>x</code>, <code>y</code> and <code>z</code> fields of type <code>float</code>, containing the current rotation rate around the X, Y and Z-axis, measured in rad/s.  </p>
+<p>Sent periodically by the client at most every <code>refresh_rate</code> milliseconds after <a href="/api/web-events#web-app-start-gyroscope">web_app_start_gyroscope »</a> is invoked and until <a href="/api/web-events#web-app-stop-gyroscope">web_app_stop_gyroscope</a> is invoked.</p>
+<h4><a class="anchor" href="#device-orientation-started" id="device-orientation-started" name="device-orientation-started"><i class="anchor-icon"></i></a><code>device_orientation_started</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-start-device-orientation">web_app_start_device_orientation event »</a> if device orientation tracking is started successfully.</p>
+<p>Until <a href="/api/web-events#web-app-stop-device-orientation">web_app_stop_device_orientation</a> is emitted by the mini app, the client will also emit <a href="#device-orientation-changed">device_orientation events</a> at most every <code>refresh_rate</code> milliseconds with device orientation readings.</p>
+<h4><a class="anchor" href="#device-orientation-failed" id="device-orientation-failed" name="device-orientation-failed"><i class="anchor-icon"></i></a><code>device_orientation_failed</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>error</code> - String, one of:<ul>
+<li><code>UNSUPPORTED</code> - Device orientation tracking is not supported on this device or platform.</li>
+</ul>
+</li>
+</ul>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-start-device-orientation">web_app_start_device_orientation event »</a> if device orientation tracking cannot be started.</p>
+<h4><a class="anchor" href="#device-orientation-stopped" id="device-orientation-stopped" name="device-orientation-stopped"><i class="anchor-icon"></i></a><code>device_orientation_stopped</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-stop-device-orientation">web_app_stop_device_orientation event »</a> if device orientation tracking is stopped successfully.</p>
+<h4><a class="anchor" href="#device-orientation-changed" id="device-orientation-changed" name="device-orientation-changed"><i class="anchor-icon"></i></a><code>device_orientation_changed</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>alpha</code> - The rotation around the Z-axis, measured in radians.</li>
+<li><code>beta</code> - The rotation around the X-axis, measured in radians.</li>
+<li><code>gamma</code> - The rotation around the Y-axis, measured in radians.</li>
+<li><code>absolute</code> - A boolean that indicates whether or not the device is providing orientation data in absolute values (may be false even if absolute data was requested if and only if the device/platform doesn't support absolute orientation tracking).  </li>
+</ul>
+<p>Sent periodically by the client at most every <code>refresh_rate</code> milliseconds after <a href="/api/web-events#web-app-start-device-orientation">web_app_start_device_orientation »</a> is invoked and until <a href="/api/web-events#web-app-stop-device-orientation">web_app_stop_device_orientation</a> is invoked.</p>
+<h4><a class="anchor" href="#home-screen-added" id="home-screen-added" name="home-screen-added"><i class="anchor-icon"></i></a><code>home_screen_added</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-add-to-home-screen">web_app_add_to_home_screen event »</a> if the shortcut was (already) added successfully.  </p>
+<p>It is acceptable to not emit this event if the current platform doesn't have a way to determine the installation status of the shortcut.</p>
+<h4><a class="anchor" href="#home-screen-failed" id="home-screen-failed" name="home-screen-failed"><i class="anchor-icon"></i></a><code>home_screen_failed</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>error</code> - String, one of:<ul>
+<li><code>UNSUPPORTED</code> - Shortcuts are not supported on this platform, or installation of the shortcut failed, or status cannot be reported.</li>
+</ul>
+</li>
+</ul>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-add-to-home-screen">web_app_add_to_home_screen event »</a> if the shortcut could not be added.  </p>
+<p>It is acceptable to not emit this event if the current platform doesn't have a way to determine the installation status of the shortcut.</p>
+<h4><a class="anchor" href="#home-screen-checked" id="home-screen-checked" name="home-screen-checked"><i class="anchor-icon"></i></a><code>home_screen_checked</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - String, one of:  <ul>
+<li><code>unsupported</code> – the feature is not supported, and it is not possible to add the icon to the home screen,</li>
+<li><code>unknown</code> – the feature is supported, and the icon can be added, but it is not possible to determine if the icon has already been added,</li>
+<li><code>added</code> – the icon has already been added to the home screen,</li>
+<li><code>missed</code> – the icon has not been added to the home screen.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Always</strong> sent by the client in response to a <a href="/api/web-events#web-app-check-home-screen">web_app_check_home_screen event »</a>.</p>
+<h4><a class="anchor" href="#emoji-status-failed" id="emoji-status-failed" name="emoji-status-failed"><i class="anchor-icon"></i></a><code>emoji_status_failed</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>error</code> - String, one of:<ul>
+<li><code>UNSUPPORTED</code> – The feature is not supported by the client.</li>
+<li><code>SUGGESTED_EMOJI_INVALID</code> – One or more emoji identifiers are invalid.</li>
+<li><code>DURATION_INVALID</code> – The specified duration is invalid.</li>
+<li><code>USER_DECLINED</code> – The user closed the dialog without setting a status.</li>
+<li><code>SERVER_ERROR</code> – A server error occurred when attempting to set the status.</li>
+<li><code>UNKNOWN_ERROR</code> – An unknown error occurred.</li>
+</ul>
+</li>
+</ul>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-set-emoji-status">web_app_set_emoji_status event »</a> if the emoji status could not be set.</p>
+<h4><a class="anchor" href="#emoji-status-set" id="emoji-status-set" name="emoji-status-set"><i class="anchor-icon"></i></a><code>emoji_status_set</code></h4>
+<p>Params: <code>null</code></p>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-set-emoji-status">web_app_set_emoji_status event »</a> if the emoji status was set successfully.</p>
+<h4><a class="anchor" href="#emoji-status-access-requested" id="emoji-status-access-requested" name="emoji-status-access-requested"><i class="anchor-icon"></i></a><code>emoji_status_access_requested</code></h4>
+<p>Params: JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - String, one of:<ul>
+<li><code>allowed</code> – The user (already) granted the bot permission to edit their emoji status</li>
+<li><code>cancelled</code> – The user declined the request, or an error occurred. </li>
+</ul>
+</li>
+</ul>
+<p>Sent by the client in response to a <a href="/api/web-events#web-app-request-emoji-status-access">web_app_request_emoji_status_access event »</a>.</p>
+<h4><a class="anchor" href="#file-download-requested" id="file-download-requested" name="file-download-requested"><i class="anchor-icon"></i></a><code>file_download_requested</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>status</code> - Either <code>cancelled</code> (the download was aborted by the user or was not allowed by the API) or <code>downloading</code> (the download has successfully started).  </li>
+</ul>
+<p>Emitted by clients during the <a href="/api/bots/webapps">mini app</a> file download flow, initiated by the <a href="/api/web-events#web-app-request-file-download">web_app_request_file_download »</a> event.</p>
+<h4><a class="anchor" href="#prepared-message-failed" id="prepared-message-failed" name="prepared-message-failed"><i class="anchor-icon"></i></a><code>prepared_message_failed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>error</code> - Contains the text of the RPC error returned by <a href="/method/messages.getPreparedInlineMessage">messages.getPreparedInlineMessage</a>, or <code>USER_DECLINED</code> if the user aborted the sharing process, or <code>MESSAGE_SEND_FAILED</code> if sending fails for another reason.</li>
+</ul>
+<p>Emitted by clients in case of errors during the <a href="/api/bots/inline#21-using-a-prepared-inline-message">share prepared messages flow</a>, initiated by the <a href="/api/web-events#web-app-send-prepared-message">web_app_send_prepared_message »</a> event.</p>
+<h4><a class="anchor" href="#prepared-message-sent" id="prepared-message-sent" name="prepared-message-sent"><i class="anchor-icon"></i></a><code>prepared_message_sent</code></h4>
+<p>Params: <code>null</code></p>
+<p>Emitted by clients when the <a href="/api/bots/inline#21-using-a-prepared-inline-message">share prepared messages flow</a> initiated by the <a href="/api/web-events#web-app-send-prepared-message">web_app_send_prepared_message »</a> event completes successfully.</p>
+<h4><a class="anchor" href="#safe-area-changed" id="safe-area-changed" name="safe-area-changed"><i class="anchor-icon"></i></a><code>safe_area_changed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>top</code> - The top inset in pixels, representing the space to avoid at the top of the screen (integer).</li>
+<li><code>bottom</code> - The bottom inset in pixels, representing the space to avoid at the bottom of the screen (integer).</li>
+<li><code>left</code> - The left inset in pixels, representing the space to avoid on the left side of the screen (integer).</li>
+<li><code>right</code> - The right inset in pixels, representing the space to avoid on the left side of the screen (integer).</li>
+</ul>
+<p>Emitted by clients when any of the system-defined safe area inset padding values change, or when explicitly requested by the mini app using <a href="/api/web-events#web-app-request-safe-area">web_app_request_safe_area</a>.  </p>
+<p>See <a href="/bots/webapps#safeareainset">here »</a> for more info.</p>
+<h4><a class="anchor" href="#content-safe-area-changed" id="content-safe-area-changed" name="content-safe-area-changed"><i class="anchor-icon"></i></a><code>content_safe_area_changed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>top</code> - The top inset in pixels, representing the space to avoid at the top of the content area (integer).</li>
+<li><code>bottom</code> - The bottom inset in pixels, representing the space to avoid at the bottom of the content area (integer).</li>
+<li><code>left</code> - The left inset in pixels, representing the space to avoid on the left side of the content area (integer).</li>
+<li><code>right</code> - The right inset in pixels, representing the space to avoid on the left side of the content area (integer).</li>
+</ul>
+<p>Emitted by clients when any of the content-defined safe area inset padding values change, or when explicitly requested by the mini app using <a href="/api/web-events#web-app-request-content-safe-area">web_app_request_content_safe_area</a>.  </p>
+<p>See <a href="/bots/webapps#contentsafeareainset">here »</a> for more info.</p>
+<h4><a class="anchor" href="#location-requested" id="location-requested" name="location-requested"><i class="anchor-icon"></i></a><code>location_requested</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>available</code> - Boolean, indicates whether location data is available or not; if false, the following fields must not be set.  </li>
+<li><code>latitude</code> - Float, contains latitude in degrees.</li>
+<li><code>longitude</code> - Float, contains longitude in degrees.</li>
+<li><code>altitude</code> - Float or null, contains the altitude above the sea level in metres, must be null if not supported by the device or platform.</li>
+<li><code>course</code> - Float or null, contains the direction the device is moving in degrees, must be null if not supported by the device or platform.</li>
+<li><code>speed</code> - Float or null, contains the speed of the device in m/s, must be null if not supported by the device or platform.</li>
+<li><code>horizontal_accuracy</code> - Float or null, contains the accuracy of the latitude and longitude values in meters, must be null if not supported by the device or platform.</li>
+<li><code>vertical_accuracy</code> - Float or null, contains the accuracy of the altitude value in meters, must be null if not supported by the device or platform.</li>
+<li><code>course_accuracy</code> - Float or null, contains the accuracy of the course value in degrees, must be null if not supported by the device or platform.</li>
+<li><code>speed_accuracy</code> - Float or null, contains the accuracy of the speed value in m/s, must be null if not supported by the device or platform.</li>
+</ul>
+<p>Emitted in response to a <a href="/api/web-events#web-app-request-location">web_app_request_location event</a>.</p>
+<h4><a class="anchor" href="#location-checked" id="location-checked" name="location-checked"><i class="anchor-icon"></i></a><code>location_checked</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>available</code> - Boolean, indicates whether location data is available on the current platform or device.</li>
+<li><code>access_requested</code> - Optional boolean, must be set if <code>available</code> is true, indicates whether the mini app has already requested access to location data.</li>
+<li><code>access_granted</code> - Optional boolean, if set and <code>true</code> indicates that the user granted the mini app access to location data.</li>
+</ul>
+<p>Emitted in response to a <a href="/api/web-events#web-app-check-location">web_app_check_location event</a>.</p>
+<h4><a class="anchor" href="#device-storage-key-saved" id="device-storage-key-saved" name="device-storage-key-saved"><i class="anchor-icon"></i></a><code>device_storage_key_saved</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - String, <code>req_id</code> from the requesting <a href="/api/web-events#web-app-device-storage-save-key">web_app_device_storage_save_key event</a></li>
+</ul>
+<p>Indicates the key was saved or removed successfully.  </p>
+<p>Emitted in response to a <a href="/api/web-events#web-app-device-storage-save-key">web_app_device_storage_save_key event</a>.</p>
+<h4><a class="anchor" href="#device-storage-key-received" id="device-storage-key-received" name="device-storage-key-received"><i class="anchor-icon"></i></a><code>device_storage_key_received</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - String, <code>req_id</code> from the requesting <a href="/api/web-events#web-app-device-storage-get-key">web_app_device_storage_get_key event</a></li>
+<li><code>value</code> - String or null, the requested value or no value if the specified key is not set.  </li>
+</ul>
+<p>Returns the requested key.  </p>
+<p>Emitted in response to a <a href="/api/web-events#web-app-device-storage-get-key">web_app_device_storage_get_key event</a>.</p>
+<h4><a class="anchor" href="#device-storage-cleared" id="device-storage-cleared" name="device-storage-cleared"><i class="anchor-icon"></i></a><code>device_storage_cleared</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - String, <code>req_id</code> from the requesting <a href="/api/web-events#web-app-device-storage-clear">web_app_device_storage_clear event</a></li>
+</ul>
+<p>Indicates the storage was cleared.  </p>
+<p>Emitted in response to a <a href="/api/web-events#web-app-device-storage-clear">web_app_device_storage_clear event</a>.</p>
+<h4><a class="anchor" href="#device-storage-failed" id="device-storage-failed" name="device-storage-failed"><i class="anchor-icon"></i></a><code>device_storage_failed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - String, <code>req_id</code> from the requesting event</li>
+<li><code>error</code> - String, the error that prevented the request from succeeding.  </li>
+</ul>
+<p>Emitted in response to a <a href="/api/web-events#web-app-device-storage-save-key">web_app_device_storage_save_key</a>, <a href="/api/web-events#web-app-device-storage-get-key">web_app_device_storage_get_key</a> or <a href="/api/web-events#web-app-device-storage-clear">web_app_device_storage_clear</a> event.</p>
+<h4><a class="anchor" href="#secure-storage-key-saved" id="secure-storage-key-saved" name="secure-storage-key-saved"><i class="anchor-icon"></i></a><code>secure_storage_key_saved</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - String, <code>req_id</code> from the requesting <a href="/api/web-events#web-app-secure-storage-save-key">web_app_secure_storage_save_key event</a></li>
+</ul>
+<p>Indicates the key was saved or removed successfully.  </p>
+<p>Emitted in response to a <a href="/api/web-events#web-app-secure-storage-save-key">web_app_secure_storage_save_key event</a>.</p>
+<h4><a class="anchor" href="#secure-storage-key-received" id="secure-storage-key-received" name="secure-storage-key-received"><i class="anchor-icon"></i></a><code>secure_storage_key_received</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - String, <code>req_id</code> from the requesting <a href="/api/web-events#web-app-secure-storage-get-key">web_app_secure_storage_get_key event</a></li>
+<li><code>value</code> - String or null, the requested value or no value if the specified key is not set.  </li>
+<li><code>can_restore</code> - Boolean, true if <code>value</code> is null but the value can be restored using a <a href="/api/web-events#web-app-secure-storage-restore-key">web_app_secure_storage_restore_key event</a></li>
+</ul>
+<p>Returns the requested key.  </p>
+<p>Emitted in response to a <a href="/api/web-events#web-app-secure-storage-get-key">web_app_secure_storage_get_key event</a>.</p>
+<h4><a class="anchor" href="#secure-storage-key-restored" id="secure-storage-key-restored" name="secure-storage-key-restored"><i class="anchor-icon"></i></a><code>secure_storage_key_restored</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - String, <code>req_id</code> from the requesting <a href="/api/web-events#web-app-secure-storage-restore-key">web_app_secure_storage_restore_key event</a></li>
+<li><code>value</code> - String, the restored value</li>
+</ul>
+<p>Restores the requested key.  </p>
+<p>Emitted in response to a <a href="/api/web-events#web-app-secure-storage-restore-key">web_app_secure_storage_restore_key event</a>.</p>
+<h4><a class="anchor" href="#secure-storage-cleared" id="secure-storage-cleared" name="secure-storage-cleared"><i class="anchor-icon"></i></a><code>secure_storage_cleared</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - String, <code>req_id</code> from the requesting <a href="/api/web-events#web-app-secure-storage-clear">web_app_secure_storage_clear event</a></li>
+</ul>
+<p>Indicates the storage was cleared.  </p>
+<p>Emitted in response to a <a href="/api/web-events#web-app-secure-storage-clear">web_app_secure_storage_clear event</a>.</p>
+<h4><a class="anchor" href="#secure-storage-failed" id="secure-storage-failed" name="secure-storage-failed"><i class="anchor-icon"></i></a><code>secure_storage_failed</code></h4>
+<p>Params: a JSON object with the following fields:</p>
+<ul>
+<li><code>req_id</code> - String, <code>req_id</code> from the requesting event</li>
+<li><code>error</code> - String, the error that prevented the request from succeeding; most notably, <code>UNSUPPORTED</code> for platforms that do not support secure storage.  </li>
+</ul>
+<p>Emitted in response to a <a href="/api/web-events#web-app-secure-storage-save-key">web_app_secure_storage_save_key</a>, <a href="/api/web-events#web-app-secure-storage-get-key">web_app_secure_storage_get_key</a>, <a href="/api/web-events#web-app-secure-storage-restore-key">web_app_secure_storage_restore_key</a> or <a href="/api/web-events#web-app-secure-storage-clear">web_app_secure_storage_clear</a> event.</p>
+<!-- end app events --></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

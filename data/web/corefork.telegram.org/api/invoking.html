@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Calling API Methods</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Additional options for calling methods.">
+    <meta property="og:title" content="Calling API Methods">
+    <meta property="og:image" content="5901cb4c908e540453">
+    <meta property="og:description" content="Additional options for calling methods.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/invoking" >Calling API Methods</a></li></ul></div>
+  <h1 id="dev_page_title">Calling API Methods</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<h3><a class="anchor" href="#layers" id="layers" name="layers"><i class="anchor-icon"></i></a>Layers</h3>
+<p>Versioning in the API is supported by so-called TL layers.</p>
+<p>The need to add a new object constructor or to add/remove a field in a constructor creates a backwards compatibility problem for previous versions of API clients.  After all, simply changing a constructor in a schema also changes its number. To address this problem, each schema update is separated into a layer.</p>
+<p>A layer is a collection of updated methods or constructors in a TL schema. Each layer is numbered with sequentially increasing numbers starting with 2. The first layer is the base layer -- the TL schema without any changes.</p>
+<p>There is a helper method to let the API know that a client supports the Layer <code>layer</code>:</p>
+<pre><code>invokeWithLayer#da9b0d0d {X:Type} layer:int query:!X = X;</code></pre>
+<p>The helper method <strong><a href="/method/invokeWithLayer">invokeWithLayer</a></strong> can be used only together with <a href="/method/initConnection">initConnection</a>: the present layer will be saved with all other parameters of the client and any future requests will be using this saved value. <a href="#saving-client-info">See more below</a>.</p>
+<p><strong>Note</strong>: in some cases such as updates from big channels, the API may return constructors from older layers, different from the connection's current layer.  </p>
+<p>Clients should treat this as a <code>500</code> server error, and handle it by closing and reopening the TCP socket, re-reinitializing the session with <a href="/method/initConnection">initConnection</a> and invoking <a href="/api/updates">getDifference</a>.</p>
+<h4><a class="anchor" href="#list-of-available-layers" id="list-of-available-layers" name="list-of-available-layers"><i class="anchor-icon"></i></a><a href="/api/layers">List of Available Layers</a></h4>
+<h3><a class="anchor" href="#saving-client-info" id="saving-client-info" name="saving-client-info"><i class="anchor-icon"></i></a>Saving Client Info</h3>
+<p>It is possible to save information about the current client on the server in conjunction with an authorization key. This may help eliminate client-side problems with certain releases on certain devices or with certain localizations, as well as eliminate the need for sending layer information in each request.</p>
+<p>The helper method <strong><a href="/method/initConnection">initConnection</a></strong> accepts client parameters. This method must be called when first calling the API after the application has restarted or in case the value of one of the parameters could have changed.</p>
+<p><strong>initConnection</strong> must also be called after each <a href="/method/auth.bindTempAuthKey">auth.bindTempAuthKey</a>.</p>
+<p>When calling this method, the current layer used by the client is also saved (the layer in which <a href="/method/initConnection">initConnection</a> was wrapped is used). After a successful call to <a href="/method/initConnection">initConnection</a> it is no longer necessary to wrap each API call in <strong>invokeWithLayerN</strong>.</p>
+<h3><a class="anchor" href="#disabling-updates" id="disabling-updates" name="disabling-updates"><i class="anchor-icon"></i></a>Disabling updates</h3>
+<pre><code>invokeWithoutUpdates#bf9459b7 {X:Type} query:!X = X;</code></pre>
+<p><a href="/method/invokeWithoutUpdates">invokeWithoutUpdates</a> can be used to invoke a request without subscribing the used connection for <a href="/api/updates">updates</a> (this is enabled by default for <a href="/api/files">file queries</a>).</p>
+<h3><a class="anchor" href="#sequential-requests" id="sequential-requests" name="sequential-requests"><i class="anchor-icon"></i></a>Sequential Requests</h3>
+<p>By default, the server processes parallel requests in arbitrary order. Two helper methods exist for cases when the client needs certain requests to be processed in a certain order and intends to send a new request before the previous one is completed.<br>
+These methods allow reducing the latency for calls which require strict ordering, since the client doesn't have to wait for the result of the previous method call before sending the next one in the queue, and can just send them all together, (for example) each wrapped in an <code>invokeAfterMsg</code> with the <code>msg_id</code> of the previous request.  </p>
+<div class="richcode">
+<p><a href="/method/invokeAfterMsg">invokeAfterMsg</a>#cb9f372d {X:Type} msg_id:long query:!X = X;<br>
+<a href="/method/invokeAfterMsgs">invokeAfterMsgs</a>#3dc4b4f0 {X:Type} msg_ids:Vector<long> query:!X = X;  </long></p>
+</div>
+<p>They may be used, for example, when a client attempts to send messages that accumulated while waiting for the Internet connection to be restored for a long time. In this case, the 32-bit number <code>0xcb9f372d</code> must be added before the method number in each request, followed by a 64-bit message identifier, msg_id, which contains the previous request in the queue. </p>
+<p>The second method is similar, except it takes several messages that must be successfully processed before the current one.</p>
+<p>If the waiting period exceeds 0.5 seconds (this value may change in the future) and no result has appeared, the method will return the <code>MSG_WAIT_TIMEOUT</code> error: handle this error by resending the request, still wrapped in the same <code>invokeAfterMsg</code>/<code>invokeAfterMsgs</code> constructor with the same <code>id</code>/<code>ids</code>.  </p>
+<p>If any of the previous queries mentioned in <code>msg_ids</code> or <code>msg_id</code> fails (i.e. an RPC error is emitted by a query, including <code>FLOOD_WAIT_</code> errors), a <code>MSG_WAIT_FAILED</code> error will be returned for the current request: the simplest way to handle it is to simply enforce local synchronization, by waiting for a response from all previous <code>msg_ids</code>/<code>msg_id</code> before resending the request.  </p>
+<p>If and only if any of the previous requests also failed with <code>MSG_WAIT_FAILED</code>/<code>MSG_WAIT_TIMEOUT</code> errors and require resending, wrap the current request in another <code>invokeAfterMsg</code>/<code>invokeAfterMsgs</code> constructor with the new IDs of the previous requests, resent along with the current one.  </p>
+<h4><a class="anchor" href="#scenario-1" id="scenario-1" name="scenario-1"><i class="anchor-icon"></i></a>Scenario 1</h4>
+<p>To clarify, assume the following sequence of queries:</p>
+<ol>
+<li>msg_id=1; <code>messages.sendMessage message=a</code></li>
+<li>msg_id=2; <code>invokeAfterMsg msg_id=1 (messages.sendMessage message=b)</code></li>
+<li>msg_id=3; <code>invokeAfterMsg msg_id=2 (messages.sendMessage message=c)</code></li>
+</ol>
+<h5><a class="anchor" href="#scenario-11" id="scenario-11" name="scenario-11"><i class="anchor-icon"></i></a>Scenario 1.1</h5>
+<p>If the first messages.sendMessage query with <code>msg_id=1</code> fails, both queries with <code>msg_id=2</code> and <code>msg_id=3</code> will fail with a <code>MSG_WAIT_FAILED</code> and will have to be resent as follows.<br>
+To recover the call queue, send the following new sequence of queries:</p>
+<ol>
+<li>msg_id=4; <code>messages.sendMessage message=b</code> (resending the old query with <code>msg_id=2</code>)</li>
+<li>msg_id=5; <code>invokeAfterMsg msg_id=4 (messages.sendMessage message=c)</code> (resending the old query with <code>msg_id=3</code>)</li>
+</ol>
+<h5><a class="anchor" href="#scenario-12" id="scenario-12" name="scenario-12"><i class="anchor-icon"></i></a>Scenario 1.2</h5>
+<p>If the first messages.sendMessage query with <code>msg_id=1</code> succeeds but the second with <code>msg_id=2</code> fails, the query with <code>msg_id=3</code> will fail with a <code>MSG_WAIT_FAILED</code> and will have to be resent as follows.<br>
+To recover the call queue, send the following new sequence of queries:</p>
+<ol>
+<li>msg_id=4; <code>messages.sendMessage message=c</code> (resending the old query with <code>msg_id=3</code>)</li>
+</ol>
+<h4><a class="anchor" href="#scenario-2" id="scenario-2" name="scenario-2"><i class="anchor-icon"></i></a>Scenario 2</h4>
+<p>Now assume the following, different sequence of queries:</p>
+<ol>
+<li>msg_id=1; <code>messages.sendMessage message=a</code></li>
+<li>msg_id=2; <code>messages.sendMessage message=b</code></li>
+<li>msg_id=3; <code>invokeAfterMsgs msg_ids=[1, 2] (messages.sendMessage message=c)</code></li>
+</ol>
+<p>If either or both of the messages.sendMessage queries with <code>msg_id=1</code> and/or <code>msg_id=2</code> fail, the query with <code>msg_id=3</code> will also fail with a <code>MSG_WAIT_FAILED</code> and will have to be resent as follows.    </p>
+<p>To recover the call queue, first of all wait for a response from the queries with <code>msg_id=1</code> and <code>msg_id=2</code>.  </p>
+<p>Note how this is different from scenario 1, where we don't have to wait for a response from the previous queries: this is because in scenario 1, each <code>invokeAfterMsg</code> query was directly waiting for just one previous query, and any new query in the queue is chained to the previous <code>invokeAfterMsg</code>, thus any failure of any query with <code>msg_id=N</code> in the chain immediately blocked execution of all queries with <code>msg_id &lt;= N</code>.<br>
+In this case, however, we're waiting for two messages at the same time, and the failure of the query with <code>msg_id=1</code> does not prevent execution of the query with <code>msg_id=2</code>, and vice versa; thus when resending the query with <code>msg_id=3</code> we have to either:</p>
+<ul>
+<li>
+<p>Wait for replies (errors or successes) for <strong>all</strong> of the queries mentioned in <code>msg_ids</code>, and then send the following new query:  </p>
+<ul>
+<li>msg_id=4; <code>messages.sendMessage message=c</code> (resending the old query with <code>msg_id=3</code>)</li>
+</ul>
+</li>
+<li>
+<p>OR Wait for the receival of an RPC error for any of the queries mentioned in <code>msg_ids</code>, and then send the following new query:</p>
+<ul>
+<li>msg_id=4; <code>invokeAfterMsgs msg_ids=([1, 2] - [$errId]) (messages.sendMessage message=c)</code> (resending the old query with <code>msg_id=3</code>)</li>
+</ul>
+<p>I.e. resend the <code>invokeAfterMsgs</code> with all the initial <code>msg_ids</code> except for the one that failed.<br>
+It may be required to repeat the process if the newly sent <code>invokeAfterMsgs</code> also fails because the remaining query mentioned in <code>msg_ids</code> also failed (i.e. if queries <code>1</code> and <code>2</code> both fail at slightly different times).  </p>
+<p>Obviously the first option (waiting for replies (errors or successes) for <strong>all</strong> of the queries mentioned before proceeding) is the simplest.</p>
+</li>
+</ul>
+<p>An even simpler option is to always follow <a href="#scenario-1">Scenario 1</a>, never using <code>invokeAfterMsgs</code> and only using chained <code>invokeAfterMsg</code> calls, thus avoiding the use of this slightly more complicated recovery logic.</p>
+<h4><a class="anchor" href="#helper-method-sequence" id="helper-method-sequence" name="helper-method-sequence"><i class="anchor-icon"></i></a>Helper Method Sequence</h4>
+<p><strong>Important:</strong> if the helper methods <strong>invokeAfterMsg</strong> / <strong>invokeAfterMsgs</strong> are used together with <strong>invokeWithLayerN</strong> or other helper methods, <strong>invokeAfterMsg</strong> / <strong>invokeAfterMsgs</strong> must always be the outermost wrapper.</p>
+<h3><a class="anchor" href="#data-compression" id="data-compression" name="data-compression"><i class="anchor-icon"></i></a>Data Compression</h3>
+<p>We recommend using gzip compression when calling methods to reduce the amount of network traffic.</p>
+<p>The schema and constructor information are given in the <a href="/mtproto/service_messages#packed-object">protocol documentation</a>.</p>
+<h4><a class="anchor" href="#data-compression-when-making-a-request" id="data-compression-when-making-a-request" name="data-compression-when-making-a-request"><i class="anchor-icon"></i></a>Data Compression when Making a Request</h4>
+<p>Before transmitting a query, the string containing the entire body of the serialized high-level query (starting with the method number) must be compressed using gzip. If the resulting string is smaller than the original, it makes sense to transmit the <a href="/mtproto/service_messages#packed-object">gzip_packed</a> constructor.</p>
+<p>There is no point in doing the above when transmitting binary multimedia data (photos, videos) or small messages (up to 255 bytes).</p>
+<h4><a class="anchor" href="#decompressing-data" id="decompressing-data" name="decompressing-data"><i class="anchor-icon"></i></a>Decompressing Data</h4>
+<p>By default, the server compresses the response to any request as well as <a href="/api/updates">updates</a>, in accordance with the rules stated above. If the <a href="/mtproto/service_messages#packed-object">gzip_packed</a> constructor is received as a response in rpc_result, then the string that follows must be extracted and uncompressed. Processing then continues on the resulting new string.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

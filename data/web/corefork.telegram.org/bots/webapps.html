@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Telegram Mini Apps</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="With Mini Apps developers can use JavaScript to create infinitely flexible interfaces that can be launched right inside…">
+    <meta property="og:title" content="Telegram Mini Apps">
+    <meta property="og:image" content="https://corefork.telegram.org/file/464001388/10b1a/IYpn0wWfggw.1156850/fd9a32baa81dcecbe4">
+    <meta property="og:description" content="With Mini Apps developers can use JavaScript to create infinitely flexible interfaces that can be launched right inside…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/bots" >Bots</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/bots/webapps" >Telegram Mini Apps</a></li></ul></div>
+  <h1 id="dev_page_title">Telegram Mini Apps</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>With <strong>Mini Apps</strong> developers can use <em>JavaScript</em> to create <strong>infinitely flexible interfaces</strong> that can be launched right inside Telegram — and can completely replace <strong>any website</strong>.</p>
+<p>Like bots, <strong>Mini Apps</strong> support <a href="https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots">seamless authorization</a>, payments via third-party <a href="/bots/payments">payment providers</a> (with <em>Google Pay</em> and <em>Apple Pay</em> out of the box), delivering tailored push notifications to users, and <a href="/bots">much more</a>.</p>
+<div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/464001434/100bf/eWprjdgzEbE.100386/644bbea83084f44c8f" style="max-width: 600px;" title="console.log('Vive la révolution')" alt="Bot Revolution">
+  <source src="/file/464001679/11aa9/KQx_BlPVXRo.4922145.mp4/c65433c8ac11a347a8" type="video/mp4">
+ </video>
+</div>
+
+<blockquote>
+<p>To see a <strong>Mini App</strong> in action, try our sample <a href="https://t.me/durgerkingbot">@DurgerKingBot</a>.</p>
+</blockquote>
+<hr>
+<h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="july-3-2025" href="#july-3-2025"><i class="anchor-icon"></i></a>July 3, 2025</h4>
+<p><strong>Bot API 9.1</strong></p>
+<ul>
+<li>Added the method <em>hideKeyboard</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+</ul>
+<h4><a class="anchor" name="april-11-2025" href="#april-11-2025"><i class="anchor-icon"></i></a>April 11, 2025</h4>
+<p><strong>Bot API 9.0</strong></p>
+<ul>
+<li>Added the field <a href="#devicestorage">DeviceStorage</a>, allowing Mini Apps to use persistent local storage on the user&#39;s device.</li>
+<li>Added the field <a href="#securestorage">SecureStorage</a>, allowing Mini Apps to use a secure local storage on the user&#39;s device for sensitive data.</li>
+</ul>
+<h4><a class="anchor" name="november-17-2024" href="#november-17-2024"><i class="anchor-icon"></i></a>November 17, 2024</h4>
+<p><strong>Bot API 8.0</strong></p>
+<blockquote>
+<p>This is the <strong>largest update</strong> in the history of Telegram mini apps – adding more than <strong>10 new features</strong> and monetization options for developers. To read more about all these changes, check out this <a href="https://telegram.org/blog/fullscreen-miniapps-and-more">dedicated blog post</a>.</p>
+</blockquote>
+<p><strong>Full-screen Mode</strong></p>
+<ul>
+<li>Mini Apps are now able to <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#full-screen-mode">become full-screen</a> in both portrait and <strong>landscape mode</strong> – allowing them to host <strong>more games</strong>, play <strong>widescreen media</strong> and support <strong>immersive</strong> user experiences.</li>
+<li>Added the methods <em>requestFullscreen</em> and <em>exitFullscreen</em> to toggle full-screen mode.</li>
+<li>Added the fields <em>safeAreaInset</em> and <em>contentSafeAreaInset</em>, allowing Mini Apps to ensure that their content properly respects the device&#39;s safe area margins.</li>
+<li>Further added the fields <em>isActive</em> and <em>isFullscreen</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the <a href="#events-available-for-mini-apps">events</a> <em>activated</em>, <em>deactivated</em>, <em>safeAreaChanged</em>, <em>contentSafeAreaChanged</em>, <em>fullscreenChanged</em> and <em>fullscreenFailed</em>.</li>
+</ul>
+<p><strong>Homescreen Shortcuts</strong></p>
+<ul>
+<li>Mini Apps can now be accessed via <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#home-screen-shortcuts">direct shortcuts</a> added to the <strong>home screen</strong> of mobile devices.</li>
+<li>Added the method <em>addToHomeScreen</em> to create a shortcut for users to add to their home screens.</li>
+<li>Added the method <em>checkHomeScreenStatus</em> to determine the status and support of the home screen shortcut for the Mini App on the current device.</li>
+<li>Added the <a href="#events-available-for-mini-apps">events</a> <em>homeScreenAdded</em> and <em>homeScreenChecked</em>.</li>
+</ul>
+<p><strong>Emoji Status</strong></p>
+<ul>
+<li>Mini Apps can now prompt users to set their <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#emoji-statuses-from-apps">emoji status</a> – or request access to later sync it automatically with in-game badges, third-party APIs and more.</li>
+<li>Added the method <em>setEmojiStatus</em> to let users manually confirm a custom emoji as their new status via a native dialog.</li>
+<li>Added the method <em>requestEmojiStatusAccess</em> for obtaining permission to later update a user&#39;s emoji status via the Bot API method <a href="/bots/api#setuseremojistatus">setUserEmojiStatus</a>.</li>
+<li>Added the <a href="#events-available-for-mini-apps">events</a> <em>emojiStatusSet</em>, <em>emojiStatusFailed</em> and <em>emojiStatusAccessRequested</em>.</li>
+</ul>
+<p><strong>Media Sharing and File Downloads</strong></p>
+<ul>
+<li>Users can now <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#media-sharing">share media</a> directly from Mini Apps – sending <strong>referral codes</strong>, custom memes, artwork and more to <strong>any chat</strong> or posting them <a href="https://telegram.org/blog/w3-browser-mini-app-store#sharing-from-mini-apps-to-stories">as a story</a>.</li>
+<li>Added the method <em>shareMessage</em> to share media from Mini Apps to Telegram chats. Also see <a href="/bots/api#preparedinlinemessage">PreparedInlineMessage</a>.</li>
+<li>Added the method <em>downloadFile</em>, introducing support for a <strong>native popup</strong> that prompts users to download files from the Mini App.</li>
+<li>Added the <a href="#events-available-for-mini-apps">events</a> <em>shareMessageSent</em>, <em>shareMessageFailed</em> and <em>fileDownloadRequested</em>.</li>
+</ul>
+<p><strong>Geolocation Access</strong></p>
+<ul>
+<li>Mini Apps can now request <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#geolocation-access">geolocation access</a> to users, allowing them to build virtually any location-based service, from <strong>games</strong> with dynamic points of interest to <strong>interactive maps</strong> for events.</li>
+<li>Added the field <em>LocationManager</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the <a href="#events-available-for-mini-apps">events</a> <em>locationManagerUpdated</em> and <em>locationRequested</em>.</li>
+</ul>
+<p><strong>Device Motion Tracking</strong></p>
+<ul>
+<li>Mini Apps can now track detailed <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#device-motion-tracking">device motion data</a>, allowing them to implement better productivity tools, immersive <strong>VR experiences</strong> and more.</li>
+<li>Added the fields <em>isOrientationLocked</em>, <em>Accelerometer</em>, <em>DeviceOrientation</em> and <em>Gyroscope</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the methods <em>lockOrientation</em> and <em>unlockOrientation</em> to control the screen orientation.</li>
+<li>Added the <a href="#events-available-for-mini-apps">events</a> <em>accelerometerStarted</em>, <em>accelerometerStopped</em>, <em>accelerometerChanged</em>, <em>accelerometerFailed</em>, <em>deviceOrientationStarted</em>, <em>deviceOrientationStopped</em>, <em>deviceOrientationChanged</em>, <em>deviceOrientationFailed</em>, <em>gyroscopeStarted</em>, <em>gyroscopeStopped</em>, <em>gyroscopeChanged</em>, <em>gyroscopeFailed</em>.</li>
+</ul>
+<p><strong>Subscription Plans and Gifts for Telegram Stars</strong></p>
+<ul>
+<li>Mini Apps now support <strong>paid subscriptions</strong> powered by <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> – <strong>monetizing their efforts</strong> with multiple tiers of content and features.</li>
+<li>Mini Apps can use their balance of <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> to <strong>send gifts</strong> to their users.</li>
+<li>You can read more on implementing Paid Subscriptions and Gifts in our <a href="/bots/api-changelog#november-17-2024">Bot API documentation</a>.</li>
+</ul>
+<p><strong>Loading Screen Customization</strong></p>
+<ul>
+<li>Mini Apps can customize their loading screen, adding <strong>their own icon</strong> and <strong>specific colors</strong> for light and dark themes.</li>
+<li>You can access these customization settings in <a href="https://t.me/botfather">@BotFather</a> via <em>/mybots &gt; Select Bot &gt; Bot Settings &gt; Configure Mini App &gt; Enable Mini App</em></li>
+</ul>
+<p><strong>Hardware-specific Optimizations</strong></p>
+<ul>
+<li>Mini Apps running on Android can now receive <a href="#additional-data-in-user-agent">basic information</a> about a device&#39;s processing hardware, allowing them to <strong>optimize user experience</strong> based on the device&#39;s capabilities.</li>
+<li>This information includes the OS, App and SDK&#39;s respective versions as well as the device&#39;s model and performance class.</li>
+</ul>
+<p><strong> General </strong></p>
+<ul>
+<li>The field <em>photo_url</em> in the class <a href="#webappuser">WebAppUser</a> is now available to all Mini Apps, allowing them to access a user&#39;s profile photo if their privacy settings allow for it.</li>
+<li>Third parties (e.g., Mini App builders, external SDKs etc.) that receive or process data on behalf of Mini Apps are now able to <a href="#validating-data-for-third-party-use">validate it</a> without knowing the App&#39;s <a href="/bots/tutorial#obtain-your-bot-token">bot token</a>.</li>
+<li>Debugging <a href="#debug-mode-for-mini-apps">options</a> have been expanded to include full support for <strong>iOS devices</strong>. You can use these tools to find app-specific issues in your Mini App.</li>
+</ul>
+<h4><a class="anchor" name="september-6-2024" href="#september-6-2024"><i class="anchor-icon"></i></a>September 6, 2024</h4>
+<p><strong>Bot API 7.10</strong></p>
+<ul>
+<li>Added the field <em>SecondaryButton</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the event <em>secondaryButtonClicked</em>.</li>
+<li>Renamed the class <em>MainButton</em> to the class <a href="#bottombutton">BottomButton</a>.</li>
+<li>Added the field <em>bottomBarColor</em> and the method <em>setBottomBarColor</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the field <em>bottom_bar_bg_color</em> to the class <a href="#themeparams">ThemeParams</a>.</li>
+</ul>
+<h4><a class="anchor" name="july-31-2024" href="#july-31-2024"><i class="anchor-icon"></i></a>July 31, 2024</h4>
+<p><strong>Bot API 7.8</strong></p>
+<ul>
+<li>Added the option for bots to set a <a href="#launching-the-main-mini-app">Main Mini App</a>, which can be previewed and launched directly from a button in the bot&#39;s profile or a link.</li>
+<li>Added the method <em>shareToStory</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+</ul>
+<h4><a class="anchor" name="july-7-2024" href="#july-7-2024"><i class="anchor-icon"></i></a>July 7, 2024</h4>
+<p><strong>Bot API 7.7</strong></p>
+<ul>
+<li>Added the field <em>isVerticalSwipesEnabled</em> and the methods <em>enableVerticalSwipes</em>, <em>disableVerticalSwipes</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the event <em>scanQrPopupClosed</em>.</li>
+</ul>
+<h4><a class="anchor" name="july-1-2024" href="#july-1-2024"><i class="anchor-icon"></i></a>July 1, 2024</h4>
+<p><strong>Bot API 7.6</strong></p>
+<ul>
+<li>Added the field <em>section_separator_color</em> to the class <a href="#themeparams">ThemeParams</a>.</li>
+<li>Changed the default opening mode for <a href="#direct-link-mini-apps">Direct Link Mini Apps</a>.</li>
+</ul>
+<h4><a class="anchor" name="march-31-2024" href="#march-31-2024"><i class="anchor-icon"></i></a>March 31, 2024</h4>
+<p><strong>Bot API 7.2</strong></p>
+<ul>
+<li>Added the field <em>BiometricManager</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+</ul>
+<h4><a class="anchor" name="december-29-2023" href="#december-29-2023"><i class="anchor-icon"></i></a>December 29, 2023</h4>
+<p><strong>Bot API 7.0</strong></p>
+<ul>
+<li>Added the field <em>SettingsButton</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the fields <em>header_bg_color</em>, <em>accent_text_color</em>, <em>section_bg_color</em>, <em>section_header_text_color</em>, <em>subtitle_text_color</em>, <em>destructive_text_color</em> to the class <a href="#themeparams">ThemeParams</a>.</li>
+<li>Mini Apps no longer close when the method <em>WebApp.openTelegramLink</em> is called.</li>
+</ul>
+<h4><a class="anchor" name="september-22-2023" href="#september-22-2023"><i class="anchor-icon"></i></a>September 22, 2023</h4>
+<p><strong>Bot API 6.9</strong></p>
+<ul>
+<li>Added the field <em>CloudStorage</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the methods <em>requestWriteAccess</em> and <em>requestContact</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the fields <em>added_to_attachment_menu</em> and <em>allows_write_to_pm</em> to the class <a href="#webappuser">WebAppUser</a>.</li>
+<li>Added the events <em>writeAccessRequested</em> and <em>contactRequested</em>.</li>
+<li>Added the ability to set any header color using the <em>setHeaderColor</em> method.</li>
+</ul>
+<h4><a class="anchor" name="april-21-2023" href="#april-21-2023"><i class="anchor-icon"></i></a>April 21, 2023</h4>
+<p><strong>Bot API 6.7</strong></p>
+<ul>
+<li>Added support for launching Mini Apps from inline query results and from a direct link.</li>
+<li>Added the method <em>switchInlineQuery</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+</ul>
+<h4><a class="anchor" name="december-30-2022" href="#december-30-2022"><i class="anchor-icon"></i></a>December 30, 2022</h4>
+<p><strong>Bot API 6.4</strong></p>
+<ul>
+<li>Added the field <em>platform</em>, the optional parameter <em>options</em> to the method <em>openLink</em> and the methods <em>showScanQrPopup</em>, <em>closeScanQrPopup</em>, <em>readTextFromClipboard</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the events <em>qrTextReceived</em>, <em>clipboardTextReceived</em>.</li>
+</ul>
+<h4><a class="anchor" name="august-12-2022" href="#august-12-2022"><i class="anchor-icon"></i></a>August 12, 2022</h4>
+<p><strong>Bot API 6.2</strong></p>
+<ul>
+<li>Added the field <em>isClosingConfirmationEnabled</em> and the methods <em>enableClosingConfirmation</em>, <em>disableClosingConfirmation</em>, <em>showPopup</em>, <em>showAlert</em>, <em>showConfirm</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the field <em>is_premium</em> to the class <a href="#webappuser">WebAppUser</a>.</li>
+<li>Added the event <em>popupClosed</em>.</li>
+</ul>
+<h4><a class="anchor" name="june-20-2022" href="#june-20-2022"><i class="anchor-icon"></i></a>June 20, 2022</h4>
+<p><strong>Bot API 6.1</strong></p>
+<ul>
+<li>Added the ability to use bots added to the attachment menu in group, supergroup and channel chats.</li>
+<li>Added support for <a href="#adding-bots-to-the-attachment-menu">t.me links</a> that can be used to select the chat in which the attachment menu with the bot will be opened.</li>
+<li>Added the fields <em>version</em>, <em>headerColor</em>, <em>backgroundColor</em>, <em>BackButton</em>, <em>HapticFeedback</em> and the methods <em>isVersionAtLeast</em>, <em>setHeaderColor</em>, <em>setBackgroundColor</em>, <em>openLink</em>, <em>openTelegramLink</em>, <em>openInvoice</em> to the class <a href="#initializing-mini-apps">WebApp</a>.</li>
+<li>Added the field <em>secondary_bg_color</em> to the class <a href="#themeparams">ThemeParams</a>.</li>
+<li>Added the method <em>offClick</em> to the class <a href="#mainbutton">MainButton</a>.</li>
+<li>Added the fields <em>chat</em>, <em>can_send_after</em> to the class <a href="#webappinitdata">WebAppInitData</a>.</li>
+<li>Added the <a href="#events-available-for-mini-apps">events</a> <em>backButtonClicked</em>, <em>settingsButtonClicked</em>, <em>invoiceClosed</em>.</li>
+</ul>
+<hr>
+<h3><a class="anchor" name="designing-mini-apps" href="#designing-mini-apps"><i class="anchor-icon"></i></a>Designing Mini Apps</h3>
+<h4><a class="anchor" name="color-schemes" href="#color-schemes"><i class="anchor-icon"></i></a>Color Schemes</h4>
+<p>Mini Apps always receive data about the user&#39;s current <strong>color theme</strong> in real time, so you can adjust the appearance of your interfaces to match it. For example, when users switch between <strong>Day and Night</strong> modes or use various <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more#global-chat-themes-on-android">custom themes</a>.</p>
+<div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/464001576/10249/wikoQUNnrH4.112118/7b6c8d3366ada2615b" style="max-width: 600px;" title="" alt="Switching Colors">
+  <source src="/file/464001257/12087/QNQUbIi864k.909800.mp4/8ea7adad7db407388e" type="video/mp4">
+ </video>
+</div>
+
+<blockquote>
+<p><a href="#themeparams">Jump to technical information</a></p>
+</blockquote>
+<h4><a class="anchor" name="design-guidelines" href="#design-guidelines"><i class="anchor-icon"></i></a>Design Guidelines</h4>
+<p>Telegram apps are known for being snappy, smooth and following a consistent cross-platform design. Your Mini App should ideally reflect these principles.</p>
+<ul>
+<li>All elements should be responsive and designed with a mobile-first approach.</li>
+<li>Interactive elements should mimic the style, behavior, and intent of UI components that already exist.</li>
+<li>All included animations should be smooth, ideally 60fps.</li>
+<li>All inputs and images should contain labels for accessibility purposes.</li>
+<li>The app should deliver a seamless experience by monitoring the <a href="#color-schemes">dynamic theme-based colors</a> provided by the API and using them accordingly.</li>
+<li>Ensure that the app’s interface respects the <a href="#safeareainset">safe area</a> and <a href="#contentsafeareainset">content safe area</a> to avoid overlapping with control elements, especially when using fullscreen mode.</li>
+<li>For Android devices, consider the additional information in the User-Agent (see <a href="#additional-data-in-user-agent">User-Agent details</a>) and adjust for the device’s performance class, minimizing animations and visual effects on low-performance devices to ensure smooth performance.</li>
+</ul>
+<hr>
+<h3><a class="anchor" name="implementing-mini-apps" href="#implementing-mini-apps"><i class="anchor-icon"></i></a>Implementing Mini Apps</h3>
+<p>Telegram currently supports seven different ways of launching Mini Apps: the main Mini App from a <a href="#launching-the-main-mini-app">profile button</a>, from a <a href="#keyboard-button-mini-apps">keyboard button</a>, from an <a href="#inline-button-mini-apps">inline button</a>, from the <a href="#launching-mini-apps-from-the-menu-button">bot menu button</a>, via <a href="#inline-mode-mini-apps">inline mode</a>, from a <a href="#direct-link-mini-apps">direct link</a> – and even from the <a href="#launching-mini-apps-from-the-attachment-menu">attachment menu</a>.</p>
+<div>
+  <a href="/file/464001388/10b1a/IYpn0wWfggw.1156850/fd9a32baa81dcecbe4" target="_blank"><img src="/file/464001388/10b1a/IYpn0wWfggw.1156850/fd9a32baa81dcecbe4" title="" alt="Types of buttons" class="dev_page_image" /></a>
+</div>
+
+<h4><a class="anchor" name="keyboard-button-mini-apps" href="#keyboard-button-mini-apps"><i class="anchor-icon"></i></a>Keyboard Button Mini Apps</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> Mini Apps launched from a <strong>web_app</strong> type <a href="/bots/api#keyboardbutton">keyboard button</a> can send data back to the bot in a <em>service message</em> using <a href="#initializing-mini-apps">Telegram.WebApp.sendData</a>. This makes it possible for the bot to produce a response without communicating with any external servers.</p>
+</blockquote>
+<p>Users can interact with bots using <a href="/bots#keyboards">custom keyboards</a>, <a href="/bots#inline-keyboards-and-on-the-fly-updating">buttons under bot messages</a>, as well as by sending freeform <strong>text messages</strong> or any of the <strong>attachment types</strong> supported by Telegram: photos and videos, files, locations, contacts and polls. For even more flexibility, bots can utilize the full power of <strong>HTML5</strong> to create user-friendly input interfaces.</p>
+<p>You can send a <strong>web_app</strong> type <a href="/bots/api#keyboardbutton">KeyboardButton</a> that opens a Mini App from the specified URL.</p>
+<p>To transmit data from the user back to the bot, the Mini App can call the <a href="#initializing-mini-apps">Telegram.WebApp.sendData</a> method. Data will be transmitted to the bot as a String in a service message. The bot can continue communicating with the user after receiving it.</p>
+<p><strong>Good for:</strong></p>
+<ul>
+<li><strong>Сustom data input interfaces</strong> (a personalized calendar for selecting dates; selecting data from a list with advanced search options; a randomizer that lets the user “spin a wheel” and chooses one of the available options, etc.)</li>
+<li><strong>Reusable components</strong> that do not depend on a particular bot.</li>
+</ul>
+<h4><a class="anchor" name="inline-button-mini-apps" href="#inline-button-mini-apps"><i class="anchor-icon"></i></a>Inline Button Mini Apps</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> For more interactive Mini Apps like <a href="https://t.me/durgerkingbot">@DurgerKingBot</a>, use a <strong>web_app</strong> type <a href="/bots/api#inlinekeyboardbutton">Inline KeyboardButton</a>, which gets basic user information and can be used to send a message on behalf of the user to the chat with the bot.</p>
+</blockquote>
+<p>If receiving text data alone is insufficient or you need a more advanced and personalized interface, you can open a Mini App using a <strong>web_app</strong> type <a href="/bots/api#inlinekeyboardbutton">Inline KeyboardButton</a>.</p>
+<p>From the button, a Mini App will open with the URL specified in the button. In addition to the user&#39;s <a href="#color-schemes">theme settings</a>, it will receive basic user information (<code>ID</code>, <code>name</code>, <code>username</code>, <code>language_code</code>) and a unique identifier for the session, <strong>query_id</strong>, which allows messages on behalf of the user to be sent back to the bot.</p>
+<p>The bot can call the Bot API method <a href="/bots/api#answerwebappquery">answerWebAppQuery</a> to send an inline message from the user back to the bot and close the Mini App. After receiving the message, the bot can continue communicating with the user.</p>
+<p><strong>Good for:</strong></p>
+<ul>
+<li>Fully-fledged web services and integrations of any kind.</li>
+<li>The use cases are effectively <strong>unlimited</strong>.</li>
+</ul>
+<h4><a class="anchor" name="launching-mini-apps-from-the-menu-button" href="#launching-mini-apps-from-the-menu-button"><i class="anchor-icon"></i></a>Launching Mini Apps from the Menu Button</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> Mini Apps can be launched from a customized menu button. This simply offers a quicker way to access the app and is otherwise <strong>identical</strong> to <a href="#inline-button-mini-apps">launching a mini app from an inline button</a>.</p>
+</blockquote>
+<p>By default, chats with bots always show a convenient <strong>menu button</strong> that provides quick access to all listed <a href="/bots#commands">commands</a>. With <a href="/bots/api-changelog#april-16-2022">Bot API 6.0</a>, this button can be used to <strong>launch a Mini App</strong> instead.</p>
+<div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/464001829/12247/e6LoU12o4Ng.109921/1226afb8f18f8ea8c4
+" style="max-width: 600px;" title="" alt="Menu Button">
+  <source src="/file/464001838/10fa2/WrJmkuIMan0.1217917.mp4/e25a5f31bc4e6493f7" type="video/mp4">
+ </video>
+</div>
+
+<p>To configure the menu button, you must specify the text it should show and the Mini App URL. There are two ways to set these parameters:</p>
+<ul>
+<li>To customize the button for <strong>all users</strong>, use <a href="https://t.me/botfather">@BotFather</a> (the <code>/setmenubutton</code> command or <em>Bot Settings &gt; Menu Button</em>).</li>
+<li>To customize the button for both <strong>all users</strong> and <strong>specific users</strong>, use the <a href="/bots/api#setchatmenubutton">setChatMenuButton</a> method in the Bot API. For example, change the button text according to the user&#39;s language, or show links to different Mini Apps based on a user&#39;s settings in your bot.</li>
+</ul>
+<p>Apart from this, Mini Apps opened via the menu button work in the exact same way as when <a href="#inline-button-mini-apps">using inline buttons</a>.</p>
+<blockquote>
+<p><a href="https://t.me/durgerkingbot">@DurgerKingBot</a> allows launching its Mini App both from an inline button and from the menu button.</p>
+</blockquote>
+<h4><a class="anchor" name="launching-the-main-mini-app" href="#launching-the-main-mini-app"><i class="anchor-icon"></i></a>Launching the main Mini App</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> If your bot is a mini app, you can add a prominent <strong>Launch app</strong> button as well as high-quality demo videos and screenshots to the bot’s profile. To do this, go to <a href="https://t.me/botfather">@BotFather</a> and set up your bot&#39;s <strong>Main Mini App</strong>.</p>
+</blockquote>
+<p>If your bot is a mini app, you can unlock a number of features that streamline and simplify the way in which users view and interact with it. To do this, go to <a href="https://t.me/botfather">@BotFather</a> and set up your bot&#39;s <strong>Main Mini App</strong>.</p>
+<p>After setting a main mini app, you&#39;ll be able to upload detailed <strong>media preview demos</strong> to publicly highlight your app&#39;s key features on its profile. A <strong>Launch app</strong> button will also appear, allowing users to open your app directly from its profile. Bots that enabled a main mini app will be displayed in the <em>Apps</em> tab of the search for users who have launched them.</p>
+<blockquote>
+<p>Media previews support <a href="/bots/features#mini-app-previews">multiple languages</a> – so you can upload <strong>translated versions</strong> of your previews that will be shown to users based on their <strong>app language</strong>.</p>
+</blockquote>
+<p>A bot&#39;s <strong>main Mini App</strong> can also be opened in the current chat by direct link in the format <code>https://t.me/botusername?startapp</code>. If a non-empty <em>startapp</em> parameter is included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>. </p>
+<p><strong>Examples</strong></p>
+<p><code>https://t.me/botusername?startapp</code><br><code>https://t.me/botusername?startapp=command</code><br><code>https://t.me/botusername?startapp=command&amp;mode=compact</code></p>
+<p>In this mode, Mini Apps can use the <em>chat_type</em> and <em>chat_instance</em> parameters to keep track of the current chat context. This introduces support for <strong>concurrent</strong> and <strong>shared</strong> usage by multiple chat members – to create live whiteboards, group orders, multiplayer games and similar apps.</p>
+<p>By default, the main Mini App opens to full-screen height, and users cannot reduce them to half-height. However, you can change this behavior via <a href="https://t.me/botfather">@BotFather</a> or by including the parameter <code>mode=compact</code> in the link to the Mini App, in which case it will open to half-screen height by default.</p>
+<p><strong>Good for:</strong></p>
+<ul>
+<li>Fully-fledged web services and integrations that any user can open in one tap.</li>
+<li>Cooperative, multiplayer or teamwork-oriented services within a chat context.</li>
+<li>The use cases are effectively <strong>unlimited</strong>.</li>
+</ul>
+<blockquote>
+<p>Successful bots which <strong>enable</strong> a main Mini App and <strong>accept payments</strong> in <a href="/bots/payments-stars">Telegram Stars</a> may be featured in the Telegram <a href="https://t.me/BotNews/99">Mini App Store</a>. To increase the chances of being featured, we recommend uploading high-quality media showcasing your app on your bot&#39;s profile and following our <a href="#design-guidelines">design guidelines</a>.</p>
+</blockquote>
+<h4><a class="anchor" name="inline-mode-mini-apps" href="#inline-mode-mini-apps"><i class="anchor-icon"></i></a>Inline Mode Mini Apps</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> Mini Apps launched via <strong>web_app</strong> type <a href="/bots/api#inlinequeryresultsbutton">InlineQueryResultsButton</a> can be used anywhere in inline mode. Users can create content in a web interface and then seamlessly send it to the current chat via inline mode.</p>
+</blockquote>
+<p>You can use the <em>button</em> parameter in the <a href="/bots/api#answerinlinequery">answerInlineQuery</a> method to display a special &#39;Switch to Mini App&#39; button either above or in place of the inline results. This button will <strong>open a Mini App</strong> from the specified URL. Once done, you can call the <a href="#initializing-mini-apps">Telegram.WebApp.switchInlineQuery</a> method to send the user back to inline mode.</p>
+<p>Inline Mini Apps have <strong>no access</strong> to the chat – they can&#39;t read messages or send new ones on behalf of the user. To send messages, the user must be redirected to <strong>inline mode</strong> and actively pick a result.</p>
+<p><strong>Good for:</strong></p>
+<ul>
+<li>Fully-fledged web services and integrations in inline mode.</li>
+</ul>
+<h4><a class="anchor" name="direct-link-mini-apps" href="#direct-link-mini-apps"><i class="anchor-icon"></i></a>Direct Link Mini Apps</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> Mini App Bots can be launched from a direct link in any chat. They support a <em>startapp</em> parameter and are aware of the current chat context.</p>
+</blockquote>
+<p>You can use direct links to <strong>open a Mini App</strong> directly in the current chat. If a non-empty <em>startapp</em> parameter is included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>.</p>
+<p>In this mode, Mini Apps can use the <em>chat_type</em> and <em>chat_instance</em> parameters to keep track of the current chat context. This introduces support for <strong>concurrent</strong> and <strong>shared</strong> usage by multiple chat members – to create live whiteboards, group orders, multiplayer games and similar apps.</p>
+<p>Mini Apps opened from a direct link have <strong>no access</strong> to the chat – they can&#39;t read messages or send new ones on behalf of the user. To send messages, the user must be redirected to <strong>inline mode</strong> and actively pick a result.</p>
+<p>Starting from <mark>Bot API 7.6</mark>, by default, Mini Apps of this type open to full-screen height, and users cannot reduce them to half-height. However, you can change this behavior by including the parameter <code>mode=compact</code> in the link to the Mini App, in which case it will open to half-screen height by default.</p>
+<p><strong>Examples</strong></p>
+<p><code>https://t.me/botusername/appname</code><br><code>https://t.me/botusername/appname?startapp=command</code><br><code>https://t.me/botusername/appname?startapp=command&amp;mode=compact</code></p>
+<p><strong>Good for:</strong></p>
+<ul>
+<li>Fully-fledged web services and integrations that any user can open in one tap.</li>
+<li>Cooperative, multiplayer or teamwork-oriented services within a chat context.</li>
+<li>The use cases are effectively <strong>unlimited</strong>.</li>
+</ul>
+<h4><a class="anchor" name="launching-mini-apps-from-the-attachment-menu" href="#launching-mini-apps-from-the-attachment-menu"><i class="anchor-icon"></i></a>Launching Mini Apps from the Attachment Menu</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> Mini App Bots can request to be added directly to a user&#39;s attachment menu, allowing them to be quickly launched from any chat. To try this mode, open this <a href="https://t.me/durgerkingbot?startattach">attachment menu link</a> for <em>@DurgerKingBot</em>, then use the <img class="icon" src="/file/464001085/2/E4hNXSNQimQ.2503/bf6ffcab3cb3afd43d" alt="Attach"> menu in <strong>any type of chat</strong>.</p>
+</blockquote>
+<p>Mini App Bots can request to be added directly to a user&#39;s attachment menu, allowing them to be quickly launched from <strong>any type of chat</strong>. You can configure in which types of chats your mini app can be started from the attachment menu (private, groups, supergroups or channels).</p>
+<p>Attachment menu integration is currently only available for major advertisers on the <a href="https://promote.telegram.org/basics">Telegram Ad Platform</a>. However, <strong>all bots</strong> can use it in the <a href="#using-bots-in-the-test-environment">test server environment</a>.</p>
+<p>To enable this feature for your bot, open <a href="https://t.me/botfather">@BotFather</a> <a href="#using-bots-in-the-test-environment">from an account on the test server</a> and send the <code>/setattach</code> command – or go to <em>Bot Settings &gt; Configure Attachment Menu</em>. Then specify the URL that will be opened to launch the bot&#39;s Mini App via its icon in the attachment menu.</p>
+<p>You can add a &#39;Settings&#39; item to the context menu of your Mini App using <a href="https://t.me/botfather">@BotFather</a>. When users select this option from the menu, your bot will receive a <code>settingsButtonClicked</code> event.</p>
+<p>In addition to the user&#39;s <a href="#color-schemes">theme settings</a>, the bot will receive basic user information (<code>ID</code>, <code>name</code>, <code>username</code>, <code>language_code</code>, <code>photo</code>), as well as public info about the chat partner (<code>ID</code>, <code>name</code>, <code>username</code>, <code>photo</code>) or the chat info (<code>ID</code>, <code>type</code>, <code>title</code>, <code>username</code>, <code>photo</code>) and a unique identifier for the web view session <strong>query_id</strong>, which allows messages of any type to be sent to the chat on behalf of the user that opened the bot.</p>
+<p>The bot can call the Bot API method <a href="/bots/api#answerwebappquery">answerWebAppQuery</a>, which sends an inline message from the user via the bot to the chat where it was launched and closes the Mini App.</p>
+<blockquote>
+<p>You can read more about adding bots to the attachment menu <a href="#adding-bots-to-the-attachment-menu">here</a>.</p>
+</blockquote>
+<hr>
+<h3><a class="anchor" name="initializing-mini-apps" href="#initializing-mini-apps"><i class="anchor-icon"></i></a>Initializing Mini Apps</h3>
+<p>To connect your Mini App to the Telegram client, place the script <a href="https://telegram.org/js/telegram-web-app.js?59">telegram-web-app.js</a> in the <code>&lt;head&gt;</code> tag before any other scripts, using this code:</p>
+<pre><code>&lt;script src=&quot;https://telegram.org/js/telegram-web-app.js?59&quot;&gt;&lt;/script&gt;</code></pre>
+<p>Once the script is connected, a <code>window.Telegram.WebApp</code> object will become available with the following fields:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>initData</td>
+<td>String</td>
+<td>A string with raw data transferred to the Mini App, convenient for <a href="#validating-data-received-via-the-mini-app">validating data</a>.<br><strong>WARNING:</strong> <a href="#validating-data-received-via-the-mini-app">Validate data</a> from this field before using it on the bot&#39;s server.</td>
+</tr>
+<tr>
+<td>initDataUnsafe</td>
+<td><a href="#webappinitdata">WebAppInitData</a></td>
+<td>An object with input data transferred to the Mini App.<br><strong>WARNING:</strong> Data from this field should not be trusted. You should only use data from <em>initData</em> on the bot&#39;s server and only after it has been <a href="#validating-data-received-via-the-mini-app">validated</a>.</td>
+</tr>
+<tr>
+<td>version</td>
+<td>String</td>
+<td>The version of the Bot API available in the user&#39;s Telegram app.</td>
+</tr>
+<tr>
+<td>platform</td>
+<td>String</td>
+<td>The name of the platform of the user&#39;s Telegram app.</td>
+</tr>
+<tr>
+<td>colorScheme</td>
+<td>String</td>
+<td>The color scheme currently used in the Telegram app. Either “light” or “dark”.<br>Also available as the CSS variable <code>var(--tg-color-scheme)</code>.</td>
+</tr>
+<tr>
+<td>themeParams</td>
+<td><a href="#themeparams">ThemeParams</a></td>
+<td>An object containing the current theme settings used in the Telegram app.</td>
+</tr>
+<tr>
+<td>isActive <sup><mark>NEW</mark></sup></td>
+<td>Boolean</td>
+<td><mark>Bot API 8.0+</mark> <em>True</em>, if the Mini App is currently active. <em>False</em>, if the Mini App is minimized.</td>
+</tr>
+<tr>
+<td>isExpanded</td>
+<td>Boolean</td>
+<td><em>True</em>, if the Mini App is expanded to the maximum available height. False, if the Mini App occupies part of the screen and can be expanded to the full height using the <strong>expand()</strong> method.</td>
+</tr>
+<tr>
+<td>viewportHeight</td>
+<td>Float</td>
+<td>The current height of the visible area of the Mini App. Also available in CSS as the variable <code>var(--tg-viewport-height)</code>.<br><br>The application can display just the top part of the Mini App, with its lower part remaining outside the screen area. From this position, the user can “pull” the Mini App to its maximum height, while the bot can do the same by calling the <strong>expand()</strong> method. As the position of the Mini App changes, the current height value of the visible area will be updated in real time.<br><br>Please note that the refresh rate of this value is not sufficient to smoothly follow the lower border of the window. It should not be used to pin interface elements to the bottom of the visible area. It&#39;s more appropriate to use the value of the <code>viewportStableHeight</code> field for this purpose.</td>
+</tr>
+<tr>
+<td>viewportStableHeight</td>
+<td>Float</td>
+<td>The height of the visible area of the Mini App in its last stable state. Also available in CSS as a variable <code>var(--tg-viewport-stable-height)</code>.<br><br>The application can display just the top part of the Mini App, with its lower part remaining outside the screen area. From this position, the user can “pull” the Mini App to its maximum height, while the bot can do the same by calling the <strong>expand()</strong> method. Unlike the value of <code>viewportHeight</code>, the value of <code>viewportStableHeight</code> does not change as the position of the Mini App changes with user gestures or during animations. The value of <code>viewportStableHeight</code> will be updated after all gestures and animations are completed and the Mini App reaches its final size.<br><br><em>Note the <a href="#events-available-for-mini-apps">event</a> <code>viewportChanged</code> with the passed parameter <code>isStateStable=true</code>, which will allow you to track when the stable state of the height of the visible area changes.</em></td>
+</tr>
+<tr>
+<td>headerColor</td>
+<td>String</td>
+<td>Current header color in the <code>#RRGGBB</code> format.</td>
+</tr>
+<tr>
+<td>backgroundColor</td>
+<td>String</td>
+<td>Current background color in the <code>#RRGGBB</code> format.</td>
+</tr>
+<tr>
+<td>bottomBarColor</td>
+<td>String</td>
+<td>Current bottom bar color in the <code>#RRGGBB</code> format.</td>
+</tr>
+<tr>
+<td>isClosingConfirmationEnabled</td>
+<td>Boolean</td>
+<td><em>True</em>, if the confirmation dialog is enabled while the user is trying to close the Mini App. <em>False</em>, if the confirmation dialog is disabled.</td>
+</tr>
+<tr>
+<td>isVerticalSwipesEnabled</td>
+<td>Boolean</td>
+<td><em>True</em>, if vertical swipes to close or minimize the Mini App are enabled. <em>False</em>, if vertical swipes to close or minimize the Mini App are disabled. In any case, the user will still be able to minimize and close the Mini App by swiping the Mini App&#39;s header.</td>
+</tr>
+<tr>
+<td>isFullscreen <sup><mark>NEW</mark></sup></td>
+<td>Boolean</td>
+<td><em>True</em>, if the Mini App is currently being displayed in fullscreen mode.</td>
+</tr>
+<tr>
+<td>isOrientationLocked <sup><mark>NEW</mark></sup></td>
+<td>Boolean</td>
+<td><em>True</em>, if the Mini App’s orientation is currently locked. <em>False</em>, if orientation changes freely based on the device’s rotation.</td>
+</tr>
+<tr>
+<td>safeAreaInset <sup><mark>NEW</mark></sup></td>
+<td><a href="#safeareainset">SafeAreaInset</a></td>
+<td>An object representing the device&#39;s safe area insets, accounting for system UI elements like notches or navigation bars.</td>
+</tr>
+<tr>
+<td>contentSafeAreaInset <sup><mark>NEW</mark></sup></td>
+<td><a href="#contentsafeareainset">ContentSafeAreaInset</a></td>
+<td>An object representing the safe area for displaying content within the app, free from overlapping Telegram UI elements.</td>
+</tr>
+<tr>
+<td>BackButton</td>
+<td><a href="#backbutton">BackButton</a></td>
+<td>An object for controlling the back button which can be displayed in the header of the Mini App in the Telegram interface.</td>
+</tr>
+<tr>
+<td>MainButton</td>
+<td><a href="#bottombutton">BottomButton</a></td>
+<td>An object for controlling the main button, which is displayed at the bottom of the Mini App in the Telegram interface.</td>
+</tr>
+<tr>
+<td>SecondaryButton</td>
+<td><a href="#bottombutton">BottomButton</a></td>
+<td>An object for controlling the secondary button, which is displayed at the bottom of the Mini App in the Telegram interface.</td>
+</tr>
+<tr>
+<td>SettingsButton</td>
+<td><a href="#settingsbutton">SettingsButton</a></td>
+<td>An object for controlling the Settings item in the context menu of the Mini App in the Telegram interface.</td>
+</tr>
+<tr>
+<td>HapticFeedback</td>
+<td><a href="#hapticfeedback">HapticFeedback</a></td>
+<td>An object for controlling haptic feedback.</td>
+</tr>
+<tr>
+<td>CloudStorage</td>
+<td><a href="#cloudstorage">CloudStorage</a></td>
+<td>An object for controlling cloud storage.</td>
+</tr>
+<tr>
+<td>BiometricManager</td>
+<td><a href="#biometricmanager">BiometricManager</a></td>
+<td>An object for controlling biometrics on the device.</td>
+</tr>
+<tr>
+<td>Accelerometer <sup><mark>NEW</mark></sup></td>
+<td><a href="#accelerometer">Accelerometer</a></td>
+<td>An object for accessing accelerometer data on the device.</td>
+</tr>
+<tr>
+<td>DeviceOrientation <sup><mark>NEW</mark></sup></td>
+<td><a href="#deviceorientation">DeviceOrientation</a></td>
+<td>An object for accessing device orientation data on the device.</td>
+</tr>
+<tr>
+<td>Gyroscope <sup><mark>NEW</mark></sup></td>
+<td><a href="#gyroscope">Gyroscope</a></td>
+<td>An object for accessing gyroscope data on the device.</td>
+</tr>
+<tr>
+<td>LocationManager <sup><mark>NEW</mark></sup></td>
+<td><a href="#locationmanager">LocationManager</a></td>
+<td>An object for controlling location on the device.</td>
+</tr>
+<tr>
+<td>DeviceStorage <sup><mark>NEW</mark></sup></td>
+<td><a href="#devicestorage">DeviceStorage</a></td>
+<td>An object for storing and retrieving data from the device&#39;s local storage.</td>
+</tr>
+<tr>
+<td>SecureStorage <sup><mark>NEW</mark></sup></td>
+<td><a href="#securestorage">SecureStorage</a></td>
+<td>An object for storing and retrieving data from the device&#39;s secure storage.</td>
+</tr>
+<tr>
+<td>isVersionAtLeast(version)</td>
+<td>Function</td>
+<td>Returns true if the user&#39;s app supports a version of the Bot API that is equal to or higher than the version passed as the parameter.</td>
+</tr>
+<tr>
+<td>setHeaderColor(color)</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method that sets the app header color in the <code>#RRGGBB</code> format. You can also use keywords <em>bg_color</em> and <em>secondary_bg_color</em>.<br><br>Up to <mark>Bot API 6.9</mark> You can only pass <em>Telegram.WebApp.themeParams.bg_color</em> or <em>Telegram.WebApp.themeParams.secondary_bg_color</em> as a color or <em>bg_color</em>, <em>secondary_bg_color</em> keywords.</td>
+</tr>
+<tr>
+<td>setBackgroundColor(color)</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method that sets the app background color in the <code>#RRGGBB</code> format. You can also use keywords <em>bg_color</em> and <em>secondary_bg_color</em>.</td>
+</tr>
+<tr>
+<td>setBottomBarColor(color)</td>
+<td>Function</td>
+<td><mark>Bot API 7.10+</mark> A method that sets the app&#39;s bottom bar color in the <code>#RRGGBB</code> format. You can also use the keywords <em>bg_color</em>, <em>secondary_bg_color</em>, and <em>bottom_bar_bg_color</em>. This color is also applied to the navigation bar on Android.</td>
+</tr>
+<tr>
+<td>enableClosingConfirmation()</td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that enables a confirmation dialog while the user is trying to close the Mini App.</td>
+</tr>
+<tr>
+<td>disableClosingConfirmation()</td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that disables the confirmation dialog while the user is trying to close the Mini App.</td>
+</tr>
+<tr>
+<td>enableVerticalSwipes()</td>
+<td>Function</td>
+<td><mark>Bot API 7.7+</mark> A method that enables vertical swipes to close or minimize the Mini App. For user convenience, it is recommended to always enable swipes unless they conflict with the Mini App&#39;s own gestures.</td>
+</tr>
+<tr>
+<td>disableVerticalSwipes()</td>
+<td>Function</td>
+<td><mark>Bot API 7.7+</mark> A method that disables vertical swipes to close or minimize the Mini App. This method is useful if your Mini App uses swipe gestures that may conflict with the gestures for minimizing and closing the app.</td>
+</tr>
+<tr>
+<td>requestFullscreen() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that requests opening the Mini App in fullscreen mode. Although the header is transparent in fullscreen mode, it is recommended that the Mini App sets the header color using the <em>setHeaderColor</em> method. This color helps determine a contrasting color for the status bar and other UI controls.</td>
+</tr>
+<tr>
+<td>exitFullscreen() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that requests exiting fullscreen mode.</td>
+</tr>
+<tr>
+<td>lockOrientation() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that locks the Mini App’s orientation to its current mode (either portrait or landscape). Once locked, the orientation remains fixed, regardless of device rotation. This is useful if a stable orientation is needed during specific interactions.</td>
+</tr>
+<tr>
+<td>unlockOrientation() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that unlocks the Mini App’s orientation, allowing it to follow the device&#39;s rotation freely. Use this to restore automatic orientation adjustments based on the device orientation.</td>
+</tr>
+<tr>
+<td>addToHomeScreen() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that prompts the user to add the Mini App to the home screen. After successfully adding the icon, the <code>homeScreenAdded</code> event will be triggered if supported by the device. Note that if the device cannot determine the installation status, the event may not be received even if the icon has been added.</td>
+</tr>
+<tr>
+<td>checkHomeScreenStatus([callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that checks if adding to the home screen is supported and if the Mini App has already been added. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called with a single argument <em>status</em>, which is a string indicating the home screen status. Possible values for <em>status</em> are:<br>- <strong>unsupported</strong> – the feature is not supported, and it is not possible to add the icon to the home screen,<br>- <strong>unknown</strong> – the feature is supported, and the icon can be added, but it is not possible to determine if the icon has already been added,<br>- <strong>added</strong> – the icon has already been added to the home screen,<br>- <strong>missed</strong> – the icon has not been added to the home screen.</td>
+</tr>
+<tr>
+<td>onEvent(eventType, eventHandler)</td>
+<td>Function</td>
+<td>A method that sets the app event handler. Check <a href="#events-available-for-mini-apps">the list of available events</a>.</td>
+</tr>
+<tr>
+<td>offEvent(eventType, eventHandler)</td>
+<td>Function</td>
+<td>A method that deletes a previously set event handler.</td>
+</tr>
+<tr>
+<td>sendData(data)</td>
+<td>Function</td>
+<td>A method used to send data to the bot. When this method is called, a service message is sent to the bot containing the data <em>data</em> of the length up to 4096 bytes, and the Mini App is closed. See the field <em>web_app_data</em> in the class <a href="/bots/api#message">Message</a>.<br><br><em>This method is only available for Mini Apps launched via a <a href="#keyboard-button-mini-apps">Keyboard button</a>.</em></td>
+</tr>
+<tr>
+<td>switchInlineQuery(query[, choose_chat_types])</td>
+<td>Function</td>
+<td><mark>Bot API 6.7+</mark> A method that inserts the bot&#39;s username and the specified inline <em>query</em> in the current chat&#39;s input field. Query may be empty, in which case only the bot&#39;s username will be inserted. If an optional <em>choose_chat_types</em> parameter was passed, the client prompts the user to choose a specific chat, then opens that chat and inserts the bot&#39;s username and the specified inline query in the input field. You can specify which types of chats the user will be able to choose from. It can be one or more of the following types: <em>users</em>, <em>bots</em>, <em>groups</em>, <em>channels</em>.</td>
+</tr>
+<tr>
+<td>openLink(url[, options])</td>
+<td>Function</td>
+<td>A method that opens a link in an external browser. The Mini App will <em>not</em> be closed.<br><mark>Bot API 6.4+</mark> If the optional <em>options</em> parameter is passed with the field <em>try_instant_view=true</em>, the link will be opened in <a href="https://instantview.telegram.org/">Instant View</a> mode if possible.<br><br><em>Note that this method can be called only in response to user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button)</em></td>
+</tr>
+<tr>
+<td>openTelegramLink(url)</td>
+<td>Function</td>
+<td>A method that opens a telegram link inside the Telegram app. The Mini App will <em>not</em> be closed after this method is called.<br><br>Up to <mark>Bot API 7.0</mark> The Mini App <em>will</em> be closed after this method is called.</td>
+</tr>
+<tr>
+<td>openInvoice(url[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method that opens an invoice using the link <em>url</em>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>invoiceClosed</em> when the invoice is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the invoice status will be passed as the first argument.</td>
+</tr>
+<tr>
+<td>shareToStory(media_url[, params])</td>
+<td>Function</td>
+<td><mark>Bot API 7.8+</mark> A method that opens the native story editor with the media specified in the <em>media_url</em> parameter as an HTTPS URL. An optional <em>params</em> argument of the type <a href="#storyshareparams">StoryShareParams</a> describes additional sharing settings.</td>
+</tr>
+<tr>
+<td>shareMessage(msg_id[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that opens a dialog allowing the user to share a message provided by the bot. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called with a boolean as the first argument, indicating whether the message was successfully sent. The message id passed to this method must belong to a <a href="/bots/api#preparedinlinemessage">PreparedInlineMessage</a> previously obtained via the Bot API method <a href="/bots/api#savepreparedinlinemessage">savePreparedInlineMessage</a>.</td>
+</tr>
+<tr>
+<td>setEmojiStatus(custom_emoji_id[, params, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that opens a dialog allowing the user to set the specified custom emoji as their status. An optional <em>params</em> argument of type <a href="#emojistatusparams">EmojiStatusParams</a> specifies additional settings, such as duration. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called with a boolean as the first argument, indicating whether the status was set.<br><br><em>Note: this method opens a native dialog and cannot be used to set the emoji status without manual user interaction. For fully programmatic changes, you should instead use the Bot API method <a href="/bots/api#setuseremojistatus">setUserEmojiStatus</a> after obtaining authorization to do so via the Mini App method requestEmojiStatusAccess.</em></td>
+</tr>
+<tr>
+<td>requestEmojiStatusAccess([callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that shows a native popup requesting permission for the bot to manage user&#39;s emoji status. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed and the first argument will be a boolean indicating whether the user granted this access.</td>
+</tr>
+<tr>
+<td>downloadFile(params[, callback]) <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that displays a native popup prompting the user to download a file specified by the <em>params</em> argument of type <a href="#downloadfileparams">DownloadFileParams</a>. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called when the popup is closed, with the first argument as a boolean indicating whether the user accepted the download request.</td>
+</tr>
+<tr>
+<td>hideKeyboard() <sup><mark>NEW</mark></sup></td>
+<td>Function</td>
+<td><mark>Bot API 9.1+</mark> A method that hides the on-screen keyboard, if it is currently visible. Does nothing if the keyboard is not active.</td>
+</tr>
+<tr>
+<td>showPopup(params[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that shows a native popup described by the <em>params</em> argument of the type <a href="#popupparams">PopupParams</a>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>popupClosed</em> when the popup is closed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the field <em>id</em> of the pressed button will be passed as the first argument.</td>
+</tr>
+<tr>
+<td>showAlert(message[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that shows <em>message</em> in a simple alert with a &#39;Close&#39; button. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed.</td>
+</tr>
+<tr>
+<td>showConfirm(message[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.2+</mark> A method that shows <em>message</em> in a simple confirmation window with &#39;OK&#39; and &#39;Cancel&#39; buttons. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed and the first argument will be a boolean indicating whether the user pressed the &#39;OK&#39; button.</td>
+</tr>
+<tr>
+<td>showScanQrPopup(params[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.4+</mark> A method that shows a native popup for scanning a QR code described by the <em>params</em> argument of the type <a href="#scanqrpopupparams">ScanQrPopupParams</a>. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>qrTextReceived</em> every time the scanner catches a code with text data. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the text from the QR code will be passed as the first argument. Returning <em>true</em> inside this callback function causes the popup to be closed. Starting from <mark>Bot API 7.7</mark>, the Mini App will receive the <em>scanQrPopupClosed</em> event if the user closes the native popup for scanning a QR code.</td>
+</tr>
+<tr>
+<td>closeScanQrPopup()</td>
+<td>Function</td>
+<td><mark>Bot API 6.4+</mark> A method that closes the native popup for scanning a QR code opened with the <em>showScanQrPopup</em> method. Run it if you received valid data in the <a href="#events-available-for-mini-apps">event</a> <em>qrTextReceived</em>.</td>
+</tr>
+<tr>
+<td>readTextFromClipboard([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.4+</mark> A method that requests text from the clipboard. The Mini App will receive the <a href="#events-available-for-mini-apps">event</a> <em>clipboardTextReceived</em>. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the text from the clipboard will be passed as the first argument.<br><br><em>Note: this method can be called only for Mini Apps launched from the attachment menu and only in response to a user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button).</em></td>
+</tr>
+<tr>
+<td>requestWriteAccess([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that shows a native popup requesting permission for the bot to send messages to the user. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed and the first argument will be a boolean indicating whether the user granted this access.</td>
+</tr>
+<tr>
+<td>requestContact([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that shows a native popup prompting the user for their phone number. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the popup is closed and the first argument will be a boolean indicating whether the user shared its phone number.</td>
+</tr>
+<tr>
+<td>ready()</td>
+<td>Function</td>
+<td>A method that informs the Telegram app that the Mini App is ready to be displayed.<br>It is recommended to call this method as early as possible, as soon as all essential interface elements are loaded. Once this method is called, the loading placeholder is hidden and the Mini App is shown.<br>If the method is not called, the placeholder will be hidden only when the page is fully loaded.</td>
+</tr>
+<tr>
+<td>expand()</td>
+<td>Function</td>
+<td>A method that expands the Mini App to the maximum available height. To find out if the Mini App is expanded to the maximum height, refer to the value of the <em>Telegram.WebApp.isExpanded</em> parameter</td>
+</tr>
+<tr>
+<td>close()</td>
+<td>Function</td>
+<td>A method that closes the Mini App.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="themeparams" href="#themeparams"><i class="anchor-icon"></i></a>ThemeParams</h4>
+<p>Mini Apps can <a href="#color-schemes">adjust the appearance</a> of the interface to match the Telegram user&#39;s app in real time. This object contains the user&#39;s current theme settings:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bg_color</td>
+<td>String</td>
+<td><em>Optional</em>. Background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-bg-color)</code>.</td>
+</tr>
+<tr>
+<td>text_color</td>
+<td>String</td>
+<td><em>Optional</em>. Main text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-text-color)</code>.</td>
+</tr>
+<tr>
+<td>hint_color</td>
+<td>String</td>
+<td><em>Optional</em>. Hint text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-hint-color)</code>.</td>
+</tr>
+<tr>
+<td>link_color</td>
+<td>String</td>
+<td><em>Optional</em>. Link color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-link-color)</code>.</td>
+</tr>
+<tr>
+<td>button_color</td>
+<td>String</td>
+<td><em>Optional</em>. Button color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-button-color)</code>.</td>
+</tr>
+<tr>
+<td>button_text_color</td>
+<td>String</td>
+<td><em>Optional</em>. Button text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-button-text-color)</code>.</td>
+</tr>
+<tr>
+<td>secondary_bg_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 6.1+</mark> Secondary background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-secondary-bg-color)</code>.</td>
+</tr>
+<tr>
+<td>header_bg_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Header background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-header-bg-color)</code>.</td>
+</tr>
+<tr>
+<td>bottom_bar_bg_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.10+</mark> Bottom background color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-bottom-bar-bg-color)</code>.</td>
+</tr>
+<tr>
+<td>accent_text_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Accent text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-accent-text-color)</code>.</td>
+</tr>
+<tr>
+<td>section_bg_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Background color for the section in the <code>#RRGGBB</code> format. It is recommended to use this in conjunction with <em>secondary_bg_color</em>.<br>Also available as the CSS variable <code>var(--tg-theme-section-bg-color)</code>.</td>
+</tr>
+<tr>
+<td>section_header_text_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Header text color for the section in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-section-header-text-color)</code>.</td>
+</tr>
+<tr>
+<td>section_separator_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.6+</mark> Section separator color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-section-separator-color)</code>.</td>
+</tr>
+<tr>
+<td>subtitle_text_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Subtitle text color in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-subtitle-text-color)</code>.</td>
+</tr>
+<tr>
+<td>destructive_text_color</td>
+<td>String</td>
+<td><em>Optional</em>. <mark>Bot API 7.0+</mark> Text color for destructive actions in the <code>#RRGGBB</code> format.<br>Also available as the CSS variable <code>var(--tg-theme-destructive-text-color)</code>.</td>
+</tr>
+</tbody>
+</table>
+<div>
+  <a href="/file/400780400851/2/6GwDkk6T-aY.416569/b591d589108b487d63" target="_blank"><img src="/file/400780400851/2/6GwDkk6T-aY.416569/b591d589108b487d63" title="WebViewColors explained"  class="dev_page_image" /></a>
+</div>
+
+
+<h4><a class="anchor" name="storyshareparams" href="#storyshareparams"><i class="anchor-icon"></i></a>StoryShareParams</h4>
+<p>This object describes additional sharing settings for the native story editor.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. The caption to be added to the media, 0-200 characters for regular users and 0-2048 characters for <a href="https://telegram.org/faq_premium#telegram-premium">premium</a> subscribers.</td>
+</tr>
+<tr>
+<td>widget_link</td>
+<td><a href="#storywidgetlink">StoryWidgetLink</a></td>
+<td><em>Optional</em>. An object that describes a widget link to be included in the story. Note that only <a href="https://telegram.org/faq_premium#telegram-premium">premium</a> subscribers can post stories with links.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="storywidgetlink" href="#storywidgetlink"><i class="anchor-icon"></i></a>StoryWidgetLink</h4>
+<p>This object describes a widget link to be included in the story.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>url</td>
+<td>String</td>
+<td>The URL to be included in the story.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td><em>Optional</em>. The name to be displayed for the widget link, 0-48 characters.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="scanqrpopupparams" href="#scanqrpopupparams"><i class="anchor-icon"></i></a>ScanQrPopupParams</h4>
+<p>This object describes the native popup for scanning QR codes.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed under the &#39;Scan QR&#39; heading, 0-64 characters.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="popupparams" href="#popupparams"><i class="anchor-icon"></i></a>PopupParams</h4>
+<p>This object describes the native popup.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>title</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed in the popup title, 0-64 characters.</td>
+</tr>
+<tr>
+<td>message</td>
+<td>String</td>
+<td>The message to be displayed in the body of the popup, 1-256 characters.</td>
+</tr>
+<tr>
+<td>buttons</td>
+<td>Array of <a href="#popupbutton">PopupButton</a></td>
+<td><em>Optional</em>. List of buttons to be displayed in the popup, 1-3 buttons. Set to <em>[{“type”:“close”}]</em> by default.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="popupbutton" href="#popupbutton"><i class="anchor-icon"></i></a>PopupButton</h4>
+<p>This object describes the native popup button.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>String</td>
+<td><em>Optional</em>. Identifier of the button, 0-64 characters. Set to empty string by default.<br>If the button is pressed, its <em>id</em> is returned in the callback and the <em>popupClosed</em> event.</td>
+</tr>
+<tr>
+<td>type</td>
+<td>String</td>
+<td><em>Optional</em>. Type of the button. Set to <em>default</em> by default.<br>Can be one of these values:<br>- <em>default</em>, a button with the default style,<br>- <em>ok</em>, a button with the localized text “OK”,<br>- <em>close</em>, a button with the localized text “Close”,<br>- <em>cancel</em>, a button with the localized text “Cancel”,<br>- <em>destructive</em>, a button with a style that indicates a destructive action (e.g. “Remove”, “Delete”, etc.).</td>
+</tr>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed on the button, 0-64 characters. Required if <em>type</em> is <em>default</em> or <em>destructive</em>. Irrelevant for other types.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="emojistatusparams" href="#emojistatusparams"><i class="anchor-icon"></i></a>EmojiStatusParams</h4>
+<p>This object describes additional settings for setting an emoji status.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>duration</td>
+<td>Integer</td>
+<td><em>Optional</em>. The duration for which the status will remain set, in seconds.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="downloadfileparams" href="#downloadfileparams"><i class="anchor-icon"></i></a>DownloadFileParams</h4>
+<p>This object describes the parameters for the file download request.</p>
+<blockquote>
+<p><strong>Note:</strong> To ensure consistent file download behavior across platforms, include the HTTP headers <code>Content-Disposition: attachment; filename=&quot;&lt;file_name&gt;&quot;</code> and <code>Access-Control-Allow-Origin: https://web.telegram.org</code> in the server response. Without these headers, the download may not work as expected, especially on web platforms.</p>
+</blockquote>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>url</td>
+<td>String</td>
+<td>The HTTPS URL of the file to be downloaded.</td>
+</tr>
+<tr>
+<td>file_name</td>
+<td>String</td>
+<td>The suggested name for the downloaded file.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="safeareainset" href="#safeareainset"><i class="anchor-icon"></i></a>SafeAreaInset</h4>
+<p>This object represents the system-defined safe area insets, providing padding values to ensure content remains within visible boundaries, avoiding overlap with system UI elements like notches or navigation bars.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>top</td>
+<td>Integer</td>
+<td>The top inset in pixels, representing the space to avoid at the top of the screen. Also available as the CSS variable <code>var(--tg-safe-area-inset-top)</code>.</td>
+</tr>
+<tr>
+<td>bottom</td>
+<td>Integer</td>
+<td>The bottom inset in pixels, representing the space to avoid at the bottom of the screen. Also available as the CSS variable <code>var(--tg-safe-area-inset-bottom)</code>.</td>
+</tr>
+<tr>
+<td>left</td>
+<td>Integer</td>
+<td>The left inset in pixels, representing the space to avoid on the left side of the screen. Also available as the CSS variable <code>var(--tg-safe-area-inset-left)</code>.</td>
+</tr>
+<tr>
+<td>right</td>
+<td>Integer</td>
+<td>The right inset in pixels, representing the space to avoid on the right side of the screen. Also available as the CSS variable <code>var(--tg-safe-area-inset-right)</code>.</td>
+</tr>
+</tbody>
+</table>
+<div>
+  <a href="/file/400780400066/1/tTFDI7OC8tE.1374724/9e496dd312c7706a38" target="_blank"><img src="/file/400780400066/1/tTFDI7OC8tE.1374724/9e496dd312c7706a38" title="SafeAreaInset explained"  class="dev_page_image" /></a>
+</div>
+
+<h4><a class="anchor" name="contentsafeareainset" href="#contentsafeareainset"><i class="anchor-icon"></i></a>ContentSafeAreaInset</h4>
+<p>This object represents the content-defined safe area insets, providing padding values to ensure content remains within visible boundaries, avoiding overlap with Telegram UI elements.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>top</td>
+<td>Integer</td>
+<td>The top inset in pixels, representing the space to avoid at the top of the content area. Also available as the CSS variable <code>var(--tg-content-safe-area-inset-top)</code>.</td>
+</tr>
+<tr>
+<td>bottom</td>
+<td>Integer</td>
+<td>The bottom inset in pixels, representing the space to avoid at the bottom of the content area. Also available as the CSS variable <code>var(--tg-content-safe-area-inset-bottom)</code>.</td>
+</tr>
+<tr>
+<td>left</td>
+<td>Integer</td>
+<td>The left inset in pixels, representing the space to avoid on the left side of the content area. Also available as the CSS variable <code>var(--tg-content-safe-area-inset-left)</code>.</td>
+</tr>
+<tr>
+<td>right</td>
+<td>Integer</td>
+<td>The right inset in pixels, representing the space to avoid on the right side of the content area. Also available as the CSS variable <code>var(--tg-content-safe-area-inset-right)</code>.</td>
+</tr>
+</tbody>
+</table>
+<div>
+  <a href="/file/400780400676/2/8VT7jCQvpsk.1386608/d249aa072662450345" target="_blank"><img src="/file/400780400676/2/8VT7jCQvpsk.1386608/d249aa072662450345" title="ContentSafeAreaInset explained"  class="dev_page_image" /></a>
+</div>
+
+<h4><a class="anchor" name="backbutton" href="#backbutton"><i class="anchor-icon"></i></a>BackButton</h4>
+<p>This object controls the <strong>back</strong> button, which can be displayed in the header of the Mini App in the Telegram interface.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isVisible</td>
+<td>Boolean</td>
+<td>Shows whether the button is visible. Set to <em>false</em> by default.</td>
+</tr>
+<tr>
+<td>onClick(callback)</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method that sets the button press event handler. An alias for <code>Telegram.WebApp.onEvent(&#39;backButtonClicked&#39;, callback)</code></td>
+</tr>
+<tr>
+<td>offClick(callback)</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method that removes the button press event handler. An alias for <code>Telegram.WebApp.offEvent(&#39;backButtonClicked&#39;, callback)</code></td>
+</tr>
+<tr>
+<td>show()</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method to make the button active and visible.</td>
+</tr>
+<tr>
+<td>hide()</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method to hide the button.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the BackButton object so they can be chained.</p>
+<h4><a class="anchor" name="bottombutton" href="#bottombutton"><i class="anchor-icon"></i></a>BottomButton</h4>
+<p>This object controls the button that is displayed at the bottom of the Mini App in the Telegram interface.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td><em>Readonly.</em> Type of the button. It can be either <em>main</em> for the main button or <em>secondary</em> for the secondary button.</td>
+</tr>
+<tr>
+<td>text</td>
+<td>String</td>
+<td>Current button text. Set to <em>Continue</em> for the main button and <em>Cancel</em> for the secondary button by default.</td>
+</tr>
+<tr>
+<td>color</td>
+<td>String</td>
+<td>Current button color. Set to <em>themeParams.button_color</em> for the main button and <em>themeParams.bottom_bar_bg_color</em> for the secondary button by default.</td>
+</tr>
+<tr>
+<td>textColor</td>
+<td>String</td>
+<td>Current button text color. Set to <em>themeParams.button_text_color</em> for the main button and <em>themeParams.button_color</em> for the secondary button by default.</td>
+</tr>
+<tr>
+<td>isVisible</td>
+<td>Boolean</td>
+<td>Shows whether the button is visible. Set to <em>false</em> by default.</td>
+</tr>
+<tr>
+<td>isActive</td>
+<td>Boolean</td>
+<td>Shows whether the button is active. Set to <em>true</em> by default.</td>
+</tr>
+<tr>
+<td>hasShineEffect</td>
+<td>Boolean</td>
+<td><mark>Bot API 7.10+</mark> Shows whether the button has a shine effect. Set to <em>false</em> by default.</td>
+</tr>
+<tr>
+<td>position</td>
+<td>String</td>
+<td><mark>Bot API 7.10+</mark> Position of the secondary button. Not defined for the main button. It applies only if both the main and secondary buttons are visible. Set to <em>left</em> by default.<br>Supported values:<br>- <em>left</em>, displayed to the left of the main button,<br>- <em>right</em>, displayed to the right of the main button,<br>- <em>top</em>, displayed above the main button,<br>- <em>bottom</em>, displayed below the main button.</td>
+</tr>
+<tr>
+<td>isProgressVisible</td>
+<td>Boolean</td>
+<td><em>Readonly.</em> Shows whether the button is displaying a loading indicator.</td>
+</tr>
+<tr>
+<td>setText(text)</td>
+<td>Function</td>
+<td>A method to set the button text.</td>
+</tr>
+<tr>
+<td>onClick(callback)</td>
+<td>Function</td>
+<td>A method that sets the button&#39;s press event handler. An alias for <code>Telegram.WebApp.onEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
+</tr>
+<tr>
+<td>offClick(callback)</td>
+<td>Function</td>
+<td>A method that removes the button&#39;s press event handler. An alias for <code>Telegram.WebApp.offEvent(&#39;mainButtonClicked&#39;, callback)</code></td>
+</tr>
+<tr>
+<td>show()</td>
+<td>Function</td>
+<td>A method to make the button visible.<br><em>Note that opening the Mini App from the <a href="#launching-mini-apps-from-the-attachment-menu">attachment menu</a> hides the main button until the user interacts with the Mini App interface.</em></td>
+</tr>
+<tr>
+<td>hide()</td>
+<td>Function</td>
+<td>A method to hide the button.</td>
+</tr>
+<tr>
+<td>enable()</td>
+<td>Function</td>
+<td>A method to enable the button.</td>
+</tr>
+<tr>
+<td>disable()</td>
+<td>Function</td>
+<td>A method to disable the button.</td>
+</tr>
+<tr>
+<td>showProgress(leaveActive)</td>
+<td>Function</td>
+<td>A method to show a loading indicator on the button.<br>It is recommended to display loading progress if the action tied to the button may take a long time. By default, the button is disabled while the action is in progress. If the parameter <code>leaveActive=true</code> is passed, the button remains enabled.</td>
+</tr>
+<tr>
+<td>hideProgress()</td>
+<td>Function</td>
+<td>A method to hide the loading indicator.</td>
+</tr>
+<tr>
+<td>setParams(params)</td>
+<td>Function</td>
+<td>A method to set the button parameters. The <em>params</em> parameter is an object containing one or several fields that need to be changed:<br><strong>text</strong> - button text;<br><strong>color</strong> - button color;<br><strong>text_color</strong> - button text color;<br><strong>has_shine_effect</strong> - <mark>Bot API 7.10+</mark> enable shine effect;<br><strong>position</strong> - position of the secondary button;<br><strong>is_active</strong> - enable the button;<br><strong>is_visible</strong> - show the button.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the BottomButton object so they can be chained.</p>
+<h4><a class="anchor" name="settingsbutton" href="#settingsbutton"><i class="anchor-icon"></i></a>SettingsButton</h4>
+<p>This object controls the <strong>Settings</strong> item in the context menu of the Mini App in the Telegram interface.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isVisible</td>
+<td>Boolean</td>
+<td>Shows whether the context menu item is visible. Set to <em>false</em> by default.</td>
+</tr>
+<tr>
+<td>onClick(callback)</td>
+<td>Function</td>
+<td><mark>Bot API 7.0+</mark> A method that sets the press event handler for the Settings item in the context menu. An alias for <code>Telegram.WebApp.onEvent(&#39;settingsButtonClicked&#39;, callback)</code></td>
+</tr>
+<tr>
+<td>offClick(callback)</td>
+<td>Function</td>
+<td><mark>Bot API 7.0+</mark> A method that removes the press event handler from the Settings item in the context menu. An alias for <code>Telegram.WebApp.offEvent(&#39;settingsButtonClicked&#39;, callback)</code></td>
+</tr>
+<tr>
+<td>show()</td>
+<td>Function</td>
+<td><mark>Bot API 7.0+</mark> A method to make the Settings item in the context menu visible.</td>
+</tr>
+<tr>
+<td>hide()</td>
+<td>Function</td>
+<td><mark>Bot API 7.0+</mark> A method to hide the Settings item in the context menu.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#settingsbutton">SettingsButton</a> object so they can be chained.</p>
+<h4><a class="anchor" name="hapticfeedback" href="#hapticfeedback"><i class="anchor-icon"></i></a>HapticFeedback</h4>
+<p>This object controls haptic feedback.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>impactOccurred(style)</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method tells that an impact occurred. The Telegram app may play the appropriate haptics based on style value passed. Style can be one of these values:<br>- <em>light</em>, indicates a collision between small or lightweight UI objects,<br>- <em>medium</em>, indicates a collision between medium-sized or medium-weight UI objects,<br>- <em>heavy</em>, indicates a collision between large or heavyweight UI objects,<br>- <em>rigid</em>, indicates a collision between hard or inflexible UI objects,<br>- <em>soft</em>, indicates a collision between soft or flexible UI objects.</td>
+</tr>
+<tr>
+<td>notificationOccurred(type)</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method tells that a task or action has succeeded, failed, or produced a warning. The Telegram app may play the appropriate haptics based on type value passed. Type can be one of these values:<br>- <em>error</em>, indicates that a task or action has failed,<br>- <em>success</em>, indicates that a task or action has completed successfully,<br>- <em>warning</em>, indicates that a task or action produced a warning.</td>
+</tr>
+<tr>
+<td>selectionChanged()</td>
+<td>Function</td>
+<td><mark>Bot API 6.1+</mark> A method tells that the user has changed a selection. The Telegram app may play the appropriate haptics.<br><br><em>Do not use this feedback when the user makes or confirms a selection; use it only when the selection changes.</em></td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the HapticFeedback object so they can be chained.</p>
+<h4><a class="anchor" name="cloudstorage" href="#cloudstorage"><i class="anchor-icon"></i></a>CloudStorage</h4>
+<p>This object controls the cloud storage. Each bot can store up to 1024 items per user in the cloud storage.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>setItem(key, value[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that stores a value in the cloud storage using the specified key. The key should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. The value should contain 0-4096 characters. You can store up to 1024 keys in the cloud storage. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was stored.</td>
+</tr>
+<tr>
+<td>getItem(key, callback)</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that receives a value from the cloud storage using the specified key. The key should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the value will be passed as the second argument.</td>
+</tr>
+<tr>
+<td>getItems(keys, callback)</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that receives values from the cloud storage using the specified keys. The keys should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the values will be passed as the second argument.</td>
+</tr>
+<tr>
+<td>removeItem(key[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that removes a value from the cloud storage using the specified key. The key should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was removed.</td>
+</tr>
+<tr>
+<td>removeItems(keys[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that removes values from the cloud storage using the specified keys. The keys should contain 1-128 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the values were removed.</td>
+</tr>
+<tr>
+<td>getKeys(callback)</td>
+<td>Function</td>
+<td><mark>Bot API 6.9+</mark> A method that receives the list of all keys stored in the cloud storage. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the list of keys will be passed as the second argument.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#cloudstorage">CloudStorage</a> object, so they can be chained.</p>
+<h4><a class="anchor" name="biometricmanager" href="#biometricmanager"><i class="anchor-icon"></i></a>BiometricManager</h4>
+<p>This object controls biometrics on the device. Before the first use of this object, it needs to be initialized using the <em>init</em> method.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isInited</td>
+<td>Boolean</td>
+<td>Shows whether biometrics object is initialized.</td>
+</tr>
+<tr>
+<td>isBiometricAvailable</td>
+<td>Boolean</td>
+<td>Shows whether biometrics is available on the current device.</td>
+</tr>
+<tr>
+<td>biometricType</td>
+<td>String</td>
+<td>The type of biometrics currently available on the device. Can be one of these values:<br>- <em>finger</em>, fingerprint-based biometrics,<br>- <em>face</em>, face-based biometrics,<br>- <em>unknown</em>, biometrics of an unknown type.</td>
+</tr>
+<tr>
+<td>isAccessRequested</td>
+<td>Boolean</td>
+<td>Shows whether permission to use biometrics has been requested.</td>
+</tr>
+<tr>
+<td>isAccessGranted</td>
+<td>Boolean</td>
+<td>Shows whether permission to use biometrics has been granted.</td>
+</tr>
+<tr>
+<td>isBiometricTokenSaved</td>
+<td>Boolean</td>
+<td>Shows whether the token is saved in secure storage on the device.</td>
+</tr>
+<tr>
+<td>deviceId</td>
+<td>String</td>
+<td>A unique device identifier that can be used to match the token to the device.</td>
+</tr>
+<tr>
+<td>init([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that initializes the BiometricManager object. It should be called before the object&#39;s first use. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called when the object is initialized.</td>
+</tr>
+<tr>
+<td>requestAccess(params[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that requests permission to use biometrics according to the <em>params</em> argument of type <a href="#biometricrequestaccessparams">BiometricRequestAccessParams</a>. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the first argument will be a boolean indicating whether the user granted access.</td>
+</tr>
+<tr>
+<td>authenticate(params[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that authenticates the user using biometrics according to the <em>params</em> argument of type <a href="#biometricauthenticateparams">BiometricAuthenticateParams</a>. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the first argument will be a boolean indicating whether the user authenticated successfully. If so, the second argument will be a biometric token.</td>
+</tr>
+<tr>
+<td>updateBiometricToken(token, [callback])</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that updates the biometric token in secure storage on the device. To remove the token, pass an empty string. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called and the first argument will be a boolean indicating whether the token was updated.</td>
+</tr>
+<tr>
+<td>openSettings()</td>
+<td>Function</td>
+<td><mark>Bot API 7.2+</mark> A method that opens the biometric access settings for bots. Useful when you need to request biometrics access to users who haven&#39;t granted it yet.<br><br><em>Note that this method can be called only in response to user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button)</em></td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#biometricmanager">BiometricManager</a> object so they can be chained.</p>
+<h4><a class="anchor" name="biometricrequestaccessparams" href="#biometricrequestaccessparams"><i class="anchor-icon"></i></a>BiometricRequestAccessParams</h4>
+<p>This object describes the native popup for requesting permission to use biometrics.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reason</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed to a user in the popup describing why the bot needs access to biometrics, 0-128 characters.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="biometricauthenticateparams" href="#biometricauthenticateparams"><i class="anchor-icon"></i></a>BiometricAuthenticateParams</h4>
+<p>This object describes the native popup for authenticating the user using biometrics.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reason</td>
+<td>String</td>
+<td><em>Optional</em>. The text to be displayed to a user in the popup describing why you are asking them to authenticate and what action you will be taking based on that authentication, 0-128 characters.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="accelerometer" href="#accelerometer"><i class="anchor-icon"></i></a>Accelerometer</h4>
+<p>This object provides access to accelerometer data on the device.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isStarted</td>
+<td>Boolean</td>
+<td>Indicates whether accelerometer tracking is currently active.</td>
+</tr>
+<tr>
+<td>x</td>
+<td>Float</td>
+<td>The current acceleration in the X-axis, measured in m/s².</td>
+</tr>
+<tr>
+<td>y</td>
+<td>Float</td>
+<td>The current acceleration in the Y-axis, measured in m/s².</td>
+</tr>
+<tr>
+<td>z</td>
+<td>Float</td>
+<td>The current acceleration in the Z-axis, measured in m/s².</td>
+</tr>
+<tr>
+<td>start(params[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> Starts tracking accelerometer data using <em>params</em> of type <a href="#accelerometerstartparams">AccelerometerStartParams</a>. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called with a boolean indicating whether tracking was successfully started.</td>
+</tr>
+<tr>
+<td>stop([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> Stops tracking accelerometer data. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called with a boolean indicating whether tracking was successfully stopped.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#accelerometer">Accelerometer</a> object so they can be chained.</p>
+<div>
+  <a href="/file/400780400808/3/4R4bxuff6H0.529743/2a9f6212eaed26d194" target="_blank"><img src="/file/400780400808/3/4R4bxuff6H0.529743/2a9f6212eaed26d194" title="Accelerometer"  class="dev_page_image" width="480" /></a>
+</div>
+
+<h4><a class="anchor" name="accelerometerstartparams" href="#accelerometerstartparams"><i class="anchor-icon"></i></a>AccelerometerStartParams</h4>
+<p>This object defines the parameters for starting accelerometer tracking.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>refresh_rate</td>
+<td>Integer</td>
+<td><em>Optional.</em> The refresh rate in milliseconds, with acceptable values ranging from 20 to 1000. Set to <em>1000</em> by default. Note that <em>refresh_rate</em> may not be supported on all platforms, so the actual tracking frequency may differ from the specified value.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="deviceorientation" href="#deviceorientation"><i class="anchor-icon"></i></a>DeviceOrientation</h4>
+<p>This object provides access to orientation data on the device.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isStarted</td>
+<td>Boolean</td>
+<td>Indicates whether device orientation tracking is currently active.</td>
+</tr>
+<tr>
+<td>absolute</td>
+<td>Boolean</td>
+<td>A boolean that indicates whether or not the device is providing orientation data in absolute values.</td>
+</tr>
+<tr>
+<td>alpha</td>
+<td>Float</td>
+<td>The rotation around the Z-axis, measured in radians.</td>
+</tr>
+<tr>
+<td>beta</td>
+<td>Float</td>
+<td>The rotation around the X-axis, measured in radians.</td>
+</tr>
+<tr>
+<td>gamma</td>
+<td>Float</td>
+<td>The rotation around the Y-axis, measured in radians.</td>
+</tr>
+<tr>
+<td>start(params[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> Starts tracking device orientation data using <em>params</em> of type <a href="#deviceorientationstartparams">DeviceOrientationStartParams</a>. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called with a boolean indicating whether tracking was successfully started.</td>
+</tr>
+<tr>
+<td>stop([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> Stops tracking device orientation data. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called with a boolean indicating whether tracking was successfully stopped.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#deviceorientation">DeviceOrientation</a> object so they can be chained.</p>
+<div>
+  <a href="/file/400780400662/2/6ziukR8E4pc.4269149/aa2ec0a86b39709a92" target="_blank"><img src="/file/400780400662/2/6ziukR8E4pc.4269149/aa2ec0a86b39709a92" title="DeviceOrientation"  class="dev_page_image" /></a>
+</div>
+
+<h4><a class="anchor" name="deviceorientationstartparams" href="#deviceorientationstartparams"><i class="anchor-icon"></i></a>DeviceOrientationStartParams</h4>
+<p>This object defines the parameters for starting device orientation tracking.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>refresh_rate</td>
+<td>Integer</td>
+<td><em>Optional.</em> The refresh rate in milliseconds, with acceptable values ranging from 20 to 1000. Set to <em>1000</em> by default. Note that <em>refresh_rate</em> may not be supported on all platforms, so the actual tracking frequency may differ from the specified value.</td>
+</tr>
+<tr>
+<td>need_absolute</td>
+<td>Boolean</td>
+<td><em>Optional.</em> Pass <em>true</em> to receive absolute orientation data, allowing you to determine the device&#39;s attitude relative to magnetic north. Use this option if implementing features like a compass in your app. If relative data is sufficient, pass <em>false</em>. Set to <em>false</em> by default.<br><br><strong>Note:</strong> Keep in mind that some devices may not support absolute orientation data. In such cases, you will receive relative data even if <em>need_absolute=true</em> is passed. Check the <em>DeviceOrientation.absolute</em> parameter to determine whether the data provided is absolute or relative.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="gyroscope" href="#gyroscope"><i class="anchor-icon"></i></a>Gyroscope</h4>
+<p>This object provides access to gyroscope data on the device.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isStarted</td>
+<td>Boolean</td>
+<td>Indicates whether gyroscope tracking is currently active.</td>
+</tr>
+<tr>
+<td>x</td>
+<td>Float</td>
+<td>The current rotation rate around the X-axis, measured in rad/s.</td>
+</tr>
+<tr>
+<td>y</td>
+<td>Float</td>
+<td>The current rotation rate around the Y-axis, measured in rad/s.</td>
+</tr>
+<tr>
+<td>z</td>
+<td>Float</td>
+<td>The current rotation rate around the Z-axis, measured in rad/s.</td>
+</tr>
+<tr>
+<td>start(params[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> Starts tracking gyroscope data using <em>params</em> of type <a href="#gyroscopestartparams">GyroscopeStartParams</a>. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called with a boolean indicating whether tracking was successfully started.</td>
+</tr>
+<tr>
+<td>stop([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> Stops tracking gyroscope data. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called with a boolean indicating whether tracking was successfully stopped.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#gyroscope">Gyroscope</a> object so they can be chained.</p>
+<div>
+  <a href="/file/400780400892/5/GDxCwbAAG7U.579631/7895611bc90a998a13" target="_blank"><img src="/file/400780400892/5/GDxCwbAAG7U.579631/7895611bc90a998a13" title="Gyroscope"  class="dev_page_image" width="480" /></a>
+</div>
+
+<h4><a class="anchor" name="gyroscopestartparams" href="#gyroscopestartparams"><i class="anchor-icon"></i></a>GyroscopeStartParams</h4>
+<p>This object defines the parameters for starting gyroscope tracking.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>refresh_rate</td>
+<td>Integer</td>
+<td><em>Optional.</em> The refresh rate in milliseconds, with acceptable values ranging from 20 to 1000. Set to <em>1000</em> by default. Note that <em>refresh_rate</em> may not be supported on all platforms, so the actual tracking frequency may differ from the specified value.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="locationmanager" href="#locationmanager"><i class="anchor-icon"></i></a>LocationManager</h4>
+<p>This object controls location access on the device. Before the first use of this object, it needs to be initialized using the <em>init</em> method.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isInited</td>
+<td>Boolean</td>
+<td>Shows whether the LocationManager object has been initialized.</td>
+</tr>
+<tr>
+<td>isLocationAvailable</td>
+<td>Boolean</td>
+<td>Shows whether location services are available on the current device.</td>
+</tr>
+<tr>
+<td>isAccessRequested</td>
+<td>Boolean</td>
+<td>Shows whether permission to use location has been requested.</td>
+</tr>
+<tr>
+<td>isAccessGranted</td>
+<td>Boolean</td>
+<td>Shows whether permission to use location has been granted.</td>
+</tr>
+<tr>
+<td>init([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that initializes the LocationManager object. It should be called before the object&#39;s first use. If an optional <em>callback</em> parameter is provided, the <em>callback</em> function will be called when the object is initialized.</td>
+</tr>
+<tr>
+<td>getLocation(callback)</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that requests location data. The <em>callback</em> function will be called with <em>null</em> as the first argument if access to location was not granted, or an object of type <a href="#locationdata">LocationData</a> as the first argument if access was successful.</td>
+</tr>
+<tr>
+<td>openSettings()</td>
+<td>Function</td>
+<td><mark>Bot API 8.0+</mark> A method that opens the location access settings for bots. Useful when you need to request location access from users who haven&#39;t granted it yet.<br><br><em>Note that this method can be called only in response to user interaction with the Mini App interface (e.g., a click inside the Mini App or on the main button).</em></td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#locationmanager">LocationManager</a> object so they can be chained.</p>
+<h4><a class="anchor" name="locationdata" href="#locationdata"><i class="anchor-icon"></i></a>LocationData</h4>
+<p>This object contains data about the current location.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>latitude</td>
+<td>Float</td>
+<td>Latitude in degrees.</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>Float</td>
+<td>Longitude in degrees.</td>
+</tr>
+<tr>
+<td>altitude</td>
+<td>Float</td>
+<td>Altitude above sea level in meters. <em>null</em> if altitude data is not available on the device.</td>
+</tr>
+<tr>
+<td>course</td>
+<td>Float</td>
+<td>The direction the device is moving in degrees (0 = North, 90 = East, 180 = South, 270 = West). <em>null</em> if course data is not available on the device.</td>
+</tr>
+<tr>
+<td>speed</td>
+<td>Float</td>
+<td>The speed of the device in m/s. <em>null</em> if speed data is not available on the device.</td>
+</tr>
+<tr>
+<td>horizontal_accuracy</td>
+<td>Float</td>
+<td>Accuracy of the latitude and longitude values in meters. <em>null</em> if horizontal accuracy data is not available on the device.</td>
+</tr>
+<tr>
+<td>vertical_accuracy</td>
+<td>Float</td>
+<td>Accuracy of the altitude value in meters. <em>null</em> if vertical accuracy data is not available on the device.</td>
+</tr>
+<tr>
+<td>course_accuracy</td>
+<td>Float</td>
+<td>Accuracy of the course value in degrees. <em>null</em> if course accuracy data is not available on the device.</td>
+</tr>
+<tr>
+<td>speed_accuracy</td>
+<td>Float</td>
+<td>Accuracy of the speed value in m/s. <em>null</em> if speed accuracy data is not available on the device.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="devicestorage" href="#devicestorage"><i class="anchor-icon"></i></a>DeviceStorage</h4>
+<p>This object provides access to persistent local storage on the user’s device. It is conceptually similar to the browser&#39;s <code>localStorage</code> API, but integrated within the Telegram client. All data is stored locally and is available only to the bot that created it. Each bot can store up to <strong>5 MB per user</strong> using this storage.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>setItem(key, value[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that stores a value in the device&#39;s local storage using the specified key. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was stored.</td>
+</tr>
+<tr>
+<td>getItem(key, callback)</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that receives a value from the device&#39;s local storage using the specified key. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the value will be passed as the second argument.</td>
+</tr>
+<tr>
+<td>removeItem(key[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that removes a value from the device&#39;s local storage using the specified key. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was removed.</td>
+</tr>
+<tr>
+<td>clear([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that clears all keys previously stored by the bot in the device&#39;s local storage. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether all values were removed.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#devicestorage">DeviceStorage</a> object, so they can be chained.</p>
+<h4><a class="anchor" name="securestorage" href="#securestorage"><i class="anchor-icon"></i></a>SecureStorage</h4>
+<p>This object provides access to a secure storage on the user’s device for sensitive data. On <strong>iOS</strong>, it uses the system <strong>Keychain</strong>; on <strong>Android</strong>, it uses the <strong>Keystore</strong>. This ensures that all stored values are encrypted at rest and inaccessible to unauthorized applications.</p>
+<p>Secure storage is suitable for storing tokens, secrets, authentication state, and other sensitive user-specific information. Each bot can store up to <strong>10 items per user</strong>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>setItem(key, value[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that stores a value in the device&#39;s secure storage using the specified key. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was stored.</td>
+</tr>
+<tr>
+<td>getItem(key, callback)</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that receives a value from the device&#39;s secure storage using the specified key. In case of an error, the <em>callback</em> function will be called and the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the value will be passed as the second argument. If the key was not found, the second argument will be <em>null</em>, and the third argument will be a boolean indicating whether the key can be restored from the current device.</td>
+</tr>
+<tr>
+<td>restoreItem(key[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> Attempts to restore a key that previously existed on the current device. When called, the user will be asked for permission to restore the value. If the user declines or an error occurs, the first argument in the <em>callback</em> will contain the error. If restored successfully, the first argument will be <em>null</em> and the second argument will contain the restored value.</td>
+</tr>
+<tr>
+<td>removeItem(key[, callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that removes a value from the device&#39;s secure storage using the specified key. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether the value was removed.</td>
+</tr>
+<tr>
+<td>clear([callback])</td>
+<td>Function</td>
+<td><mark>Bot API 9.0+</mark> A method that clears all keys previously stored by the bot in the device&#39;s secure storage. If an optional <em>callback</em> parameter was passed, the <em>callback</em> function will be called. In case of an error, the first argument will contain the error. In case of success, the first argument will be <em>null</em> and the second argument will be a boolean indicating whether all values were removed.</td>
+</tr>
+</tbody>
+</table>
+<p>All these methods return the <a href="#securestorage">SecureStorage</a> object, so they can be chained.</p>
+<h4><a class="anchor" name="webappinitdata" href="#webappinitdata"><i class="anchor-icon"></i></a>WebAppInitData</h4>
+<p>This object contains data that is transferred to the Mini App when it is opened. It is empty if the Mini App was launched from a <a href="#keyboard-button-mini-apps">keyboard button</a> or from <a href="#inline-mode-mini-apps">inline mode</a>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>query_id</td>
+<td>String</td>
+<td><em>Optional.</em> A unique identifier for the Mini App session, required for sending messages via the <a href="/bots/api#answerwebappquery">answerWebAppQuery</a> method.</td>
+</tr>
+<tr>
+<td>user</td>
+<td><a href="#webappuser">WebAppUser</a></td>
+<td><em>Optional.</em> An object containing data about the current user.</td>
+</tr>
+<tr>
+<td>receiver</td>
+<td><a href="#webappuser">WebAppUser</a></td>
+<td><em>Optional.</em> An object containing data about the chat partner of the current user in the chat where the bot was launched via the attachment menu. Returned only for private chats and only for Mini Apps launched via the attachment menu.</td>
+</tr>
+<tr>
+<td>chat</td>
+<td><a href="#webappchat">WebAppChat</a></td>
+<td><em>Optional.</em> An object containing data about the chat where the bot was launched via the attachment menu. Returned for supergroups, channels and group chats – only for Mini Apps launched via the attachment menu.</td>
+</tr>
+<tr>
+<td>chat_type</td>
+<td>String</td>
+<td><em>Optional.</em> Type of the chat from which the Mini App was opened. Can be either “sender” for a private chat with the user opening the link, “private”, “group”, “supergroup”, or “channel”. Returned only for Mini Apps launched from direct links.</td>
+</tr>
+<tr>
+<td>chat_instance</td>
+<td>String</td>
+<td><em>Optional.</em> Global identifier, uniquely corresponding to the chat from which the Mini App was opened. Returned only for Mini Apps launched from a direct link.</td>
+</tr>
+<tr>
+<td>start_param</td>
+<td>String</td>
+<td><em>Optional.</em> The value of the <em>startattach</em> parameter, passed <a href="#adding-bots-to-the-attachment-menu">via link</a>. Only returned for Mini Apps when launched from the attachment menu via link.<br><br>The value of the <code>start_param</code> parameter will also be passed in the GET-parameter <code>tgWebAppStartParam</code>, so the Mini App can load the correct interface right away.</td>
+</tr>
+<tr>
+<td>can_send_after</td>
+<td>Integer</td>
+<td><em>Optional.</em> Time in seconds, after which a message can be sent via the <a href="/bots/api#answerwebappquery">answerWebAppQuery</a> method.</td>
+</tr>
+<tr>
+<td>auth_date</td>
+<td>Integer</td>
+<td>Unix time when the form was opened.</td>
+</tr>
+<tr>
+<td>hash</td>
+<td>String</td>
+<td>A hash of all passed parameters, which the bot server can use to <a href="#validating-data-received-via-the-mini-app">check their validity</a>.</td>
+</tr>
+<tr>
+<td>signature <sup><mark>NEW</mark></sup></td>
+<td>String</td>
+<td>A signature of all passed parameters (except <em>hash</em>), which the third party can use to <a href="#validating-data-for-third-party-use">check their validity</a>.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="webappuser" href="#webappuser"><i class="anchor-icon"></i></a>WebAppUser</h4>
+<p>This object contains the data of the Mini App user.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Integer</td>
+<td>A unique identifier for the user or bot. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. It has at most 52 significant bits, so a 64-bit integer or a double-precision float type is safe for storing this identifier.</td>
+</tr>
+<tr>
+<td>is_bot</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if this user is a bot. Returns in the <a href="#webappinitdata">receiver</a> field only.</td>
+</tr>
+<tr>
+<td>first_name</td>
+<td>String</td>
+<td>First name of the user or bot.</td>
+</tr>
+<tr>
+<td>last_name</td>
+<td>String</td>
+<td><em>Optional</em>. Last name of the user or bot.</td>
+</tr>
+<tr>
+<td>username</td>
+<td>String</td>
+<td><em>Optional</em>. Username of the user or bot.</td>
+</tr>
+<tr>
+<td>language_code</td>
+<td>String</td>
+<td><em>Optional</em>. <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF language tag</a> of the user&#39;s language. Returns in <em>user</em> field only.</td>
+</tr>
+<tr>
+<td>is_premium</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if this user is a Telegram Premium user.</td>
+</tr>
+<tr>
+<td>added_to_attachment_menu</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if this user added the bot to the attachment menu.</td>
+</tr>
+<tr>
+<td>allows_write_to_pm</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if this user allowed the bot to message them.</td>
+</tr>
+<tr>
+<td>photo_url</td>
+<td>String</td>
+<td><em>Optional</em>. URL of the user’s profile photo. The photo can be in .jpeg or .svg formats.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="webappchat" href="#webappchat"><i class="anchor-icon"></i></a>WebAppChat</h4>
+<p>This object represents a chat.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Integer</td>
+<td>Unique identifier for this chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.</td>
+</tr>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of chat, can be either “group”, “supergroup” or “channel”</td>
+</tr>
+<tr>
+<td>title</td>
+<td>String</td>
+<td>Title of the chat</td>
+</tr>
+<tr>
+<td>username</td>
+<td>String</td>
+<td><em>Optional</em>. Username of the chat</td>
+</tr>
+<tr>
+<td>photo_url</td>
+<td>String</td>
+<td><em>Optional</em>. URL of the chat’s photo. The photo can be in .jpeg or .svg formats. Only returned for Mini Apps launched from the attachment menu.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="validating-data-received-via-the-mini-app" href="#validating-data-received-via-the-mini-app"><i class="anchor-icon"></i></a>Validating data received via the Mini App</h4>
+<p>To validate data received via the Mini App, one should send the data from the <em>Telegram.WebApp.initData</em> field to the bot&#39;s backend. The data is a query string, which is composed of a series of field-value pairs.</p>
+<p>You can verify the integrity of the data received by comparing the received <em>hash</em> parameter with the hexadecimal representation of the <a href="https://en.wikipedia.org/wiki/Hash-based_message_authentication_code">HMAC-SHA-256</a> signature of the <strong>data-check-string</strong> with the secret key, which is the <a href="https://en.wikipedia.org/wiki/Hash-based_message_authentication_code">HMAC-SHA-256</a> signature of the <a href="/bots/tutorial#obtain-your-bot-token">bot&#39;s token</a> with the constant string <code>WebAppData</code> used as a key.</p>
+<p><strong>Data-check-string</strong> is a chain of all received fields, sorted alphabetically, in the format <code>key=&lt;value&gt;</code> with a <a href="https://en.wikipedia.org/wiki/Newline">line feed</a> character (&#39;\n&#39;, 0x0A) used as separator – e.g., <code>&#39;auth_date=&lt;auth_date&gt;\nquery_id=&lt;query_id&gt;\nuser=&lt;user&gt;&#39;</code>.</p>
+<p>The full check might look like:</p>
+<pre><code>data_check_string = ...
+secret_key = HMAC_SHA256(&lt;bot_token&gt;, &quot;WebAppData&quot;)
+if (hex(HMAC_SHA256(data_check_string, secret_key)) == hash) {
+  // data is from Telegram
+}</code></pre>
+<p>To prevent the use of outdated data, you can additionally check the <em>auth_date</em> field, which contains a Unix timestamp of when it was received by the Mini App.</p>
+<p>Once validated, the data may be used on your server. Complex data types are represented as JSON-serialized objects.</p>
+<h4><a class="anchor" name="validating-data-for-third-party-use" href="#validating-data-for-third-party-use"><i class="anchor-icon"></i></a>Validating data for Third-Party Use</h4>
+<p><sup><mark>NEW</mark></sup> If you need to share the data with a third party, they can validate the data without requiring access to your <a href="/bots/tutorial#obtain-your-bot-token">bot&#39;s token</a>. Simply provide them with the data from the <em>Telegram.WebApp.initData</em> field and your <em>bot_id</em>.</p>
+<p>The integrity of the data can be verified by validating the received <em>signature</em> parameter, which is the base64url-encoded representation of the <a href="https://en.wikipedia.org/wiki/EdDSA">Ed25519</a> signature of the <strong>data-check-string</strong>. The verification is performed using the public key provided by Telegram.</p>
+<p><strong>Data-check-string</strong> is constructed as follows:<br>1. Prepend the <em>bot_id</em>, followed by <code>:</code> and the constant string <code>WebAppData</code>.<br>2. Add a <a href="https://en.wikipedia.org/wiki/Newline">line feed</a> character (<code>&#39;\n&#39;</code>, 0x0A).<br>3. Append all received fields (except <em>hash</em> and <em>signature</em>), sorted alphabetically, in the format <code>key=&lt;value&gt;</code>.<br>4. Separate each key-value pair with a line feed character (<code>&#39;\n&#39;</code>, 0x0A).</p>
+<p><strong>Example:</strong><br><code>&#39;12345678:WebAppData\nauth_date=&lt;auth_date&gt;\nquery_id=&lt;query_id&gt;\nuser=&lt;user&gt;&#39;</code></p>
+<p>The verification process might look like this:</p>
+<pre><code>data_check_string = ...
+public_key = &quot;&lt;Telegram_public_key&gt;&quot;
+if (Ed25519_verify(public_key, data_check_string, signature)) {
+  // data is valid and originated from Telegram
+}</code></pre>
+<blockquote>
+<p>Telegram provides the following <a href="https://en.wikipedia.org/wiki/EdDSA">Ed25519</a> public keys for signature verification:</p>
+<p><strong>Test environment:</strong> <code>40055058a4ee38156a06562e52eece92a771bcd8346a8c4615cb7376eddf72ec</code> (hex)<br><strong>Production:</strong> <code>e7bf03a2fa4602af4580703d88dda5bb59f32ed8b02a56c187fe7d34caed242d</code> (hex)</p>
+</blockquote>
+<p>To prevent the use of outdated data, the third party should additionally validate the <em>auth_date</em> field. This field contains a Unix timestamp indicating when the data was received by the Mini App.</p>
+<p>Once validated, the data may be used. Complex data types are represented as JSON-serialized objects.</p>
+<h4><a class="anchor" name="events-available-for-mini-apps" href="#events-available-for-mini-apps"><i class="anchor-icon"></i></a>Events Available for Mini Apps</h4>
+<p>The Mini App can receive events from the Telegram app, onto which a handler can be attached using the <code>Telegram.WebApp.onEvent(eventType, eventHandler)</code> method. Inside <code>eventHandler</code> the <em>this</em> object refers to <em>Telegram.WebApp</em>, the set of parameters sent to the handler depends on the event type. Below is a list of possible events:</p>
+<table class="table">
+<thead>
+<tr>
+<th>eventType</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>activated</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when the Mini App becomes active (e.g., opened from minimized state or selected among tabs).<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>deactivated</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when the Mini App becomes inactive (e.g., minimized or moved to an inactive tab).<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>themeChanged</code></td>
+<td>Occurs whenever theme settings are changed in the user&#39;s Telegram app (including switching to night mode).<br><em>eventHandler</em> receives no parameters, new theme settings and color scheme can be received via <em>this.themeParams</em> and <em>this.colorScheme</em> respectively.</td>
+</tr>
+<tr>
+<td><code>viewportChanged</code></td>
+<td>Occurs when the visible section of the Mini App is changed.<br><em>eventHandler</em> receives an object with the single field <em>isStateStable</em>. If <em>isStateStable</em> is true, the resizing of the Mini App is finished. If it is false, the resizing is ongoing (the user is expanding or collapsing the Mini App or an animated object is playing). The current value of the visible section’s height is available in <em>this.viewportHeight</em>.</td>
+</tr>
+<tr>
+<td><code>safeAreaChanged</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when the device&#39;s safe area insets change (e.g., due to orientation change or screen adjustments).<br><em>eventHandler</em> receives no parameters. The current inset values can be accessed via <em>this.safeAreaInset</em>.</td>
+</tr>
+<tr>
+<td><code>contentSafeAreaChanged</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when the safe area for content changes (e.g., due to orientation change or screen adjustments).<br><em>eventHandler</em> receives no parameters. The current inset values can be accessed via <em>this.contentSafeAreaInset</em>.</td>
+</tr>
+<tr>
+<td><code>mainButtonClicked</code></td>
+<td>Occurs when the <a href="#bottombutton">main button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>secondaryButtonClicked</code></td>
+<td><mark>Bot API 7.10+</mark> Occurs when the <a href="#bottombutton">secondary button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>backButtonClicked</code></td>
+<td><mark>Bot API 6.1+</mark> Occurrs when the <a href="#backbutton">back button</a> is pressed.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>settingsButtonClicked</code></td>
+<td><mark>Bot API 6.1+</mark> Occurrs when the Settings item in context menu is pressed.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>invoiceClosed</code></td>
+<td><mark>Bot API 6.1+</mark> Occurrs when the opened invoice is closed.<br><em>eventHandler</em> receives an object with the two fields: <em>url</em> – invoice link provided and <em>status</em> – one of the invoice statuses:<br>- <strong>paid</strong> – invoice was paid successfully,<br>- <strong>cancelled</strong> – user closed this invoice without paying,<br>- <strong>failed</strong> – user tried to pay, but the payment was failed,<br>- <strong>pending</strong> – the payment is still processing. The bot will receive a service message about a <a href="/bots/api#successfulpayment">successful payment</a> when the payment is successfully paid.</td>
+</tr>
+<tr>
+<td><code>popupClosed</code></td>
+<td><mark>Bot API 6.2+</mark> Occurrs when the opened popup is closed.<br><em>eventHandler</em> receives an object with the single field <em>button_id</em> – the value of the field <em>id</em> of the pressed button. If no buttons were pressed, the field <em>button_id</em> will be <em>null</em>.</td>
+</tr>
+<tr>
+<td><code>qrTextReceived</code></td>
+<td><mark>Bot API 6.4+</mark> Occurs when the QR code scanner catches a code with text data.<br><em>eventHandler</em> receives an object with the single field <em>data</em> containing text data from the QR code.</td>
+</tr>
+<tr>
+<td><code>scanQrPopupClosed</code></td>
+<td><mark>Bot API 7.7+</mark> Occurs when the QR code scanner popup is closed by the user.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>clipboardTextReceived</code></td>
+<td><mark>Bot API 6.4+</mark> Occurrs when the <code>readTextFromClipboard</code> method is called.<br><em>eventHandler</em> receives an object with the single field <em>data</em> containing text data from the clipboard. If the clipboard contains non-text data, the field <em>data</em> will be an empty string. If the Mini App has no access to the clipboard, the field <em>data</em> will be <em>null</em>.</td>
+</tr>
+<tr>
+<td><code>writeAccessRequested</code></td>
+<td><mark>Bot API 6.9+</mark> Occurs when the write permission was requested.<br><em>eventHandler</em> receives an object with the single field <em>status</em> containing one of the statuses:<br>- <strong>allowed</strong> – user granted write permission to the bot,<br>- <strong>cancelled</strong> – user declined this request.</td>
+</tr>
+<tr>
+<td><code>contactRequested</code></td>
+<td><mark>Bot API 6.9+</mark> Occurrs when the user&#39;s phone number was requested.<br><em>eventHandler</em> receives an object with the single field <em>status</em> containing one of the statuses:<br>- <strong>sent</strong> – user shared their phone number with the bot,<br>- <strong>cancelled</strong> – user declined this request.</td>
+</tr>
+<tr>
+<td><code>biometricManagerUpdated</code></td>
+<td><mark>Bot API 7.2+</mark> Occurs whenever BiometricManager object is changed.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>biometricAuthRequested</code></td>
+<td><mark>Bot API 7.2+</mark> Occurs whenever biometric authentication was requested.<br><em>eventHandler</em> receives an object with the field <em>isAuthenticated</em> containing a boolean indicating whether the user was authenticated successfully. If <em>isAuthenticated</em> is true, the field <em>biometricToken</em> will contain the biometric token stored in secure storage on the device.</td>
+</tr>
+<tr>
+<td><code>biometricTokenUpdated</code></td>
+<td><mark>Bot API 7.2+</mark> Occurs whenever the biometric token was updated.<br><em>eventHandler</em> receives an object with the single field <em>isUpdated</em>, containing a boolean indicating whether the token was updated.</td>
+</tr>
+<tr>
+<td><code>fullscreenChanged</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs whenever the Mini App enters or exits fullscreen mode.<br><em>eventHandler</em> receives no parameters. The current fullscreen state can be checked via <em>this.isFullscreen</em>.</td>
+</tr>
+<tr>
+<td><code>fullscreenFailed</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs if a request to enter fullscreen mode fails.<br><em>eventHandler</em> receives an object with the single field <em>error</em>, describing the reason for the failure. Possible values for <em>error</em> are:<br><strong>UNSUPPORTED</strong> – Fullscreen mode is not supported on this device or platform.<br><strong>ALREADY_FULLSCREEN</strong> – The Mini App is already in fullscreen mode.</td>
+</tr>
+<tr>
+<td><code>homeScreenAdded</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when the Mini App is successfully added to the home screen.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>homeScreenChecked</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs after checking the home screen status.<br><em>eventHandler</em> receives an object with the field <em>status</em>, which is a string indicating the current home screen status. Possible values for <em>status</em> are:<br>- <strong>unsupported</strong> – the feature is not supported, and it is not possible to add the icon to the home screen,<br>- <strong>unknown</strong> – the feature is supported, and the icon can be added, but it is not possible to determine if the icon has already been added,<br>- <strong>added</strong> – the icon has already been added to the home screen,<br>- <strong>missed</strong> – the icon has not been added to the home screen.</td>
+</tr>
+<tr>
+<td><code>accelerometerStarted</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when accelerometer tracking has started successfully.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>accelerometerStopped</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when accelerometer tracking has stopped.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>accelerometerChanged</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs with the specified frequency after calling the <code>start</code> method, sending the current accelerometer data.<br><em>eventHandler</em> receives no parameters, the current acceleration values can be received via <em>this.x</em>, <em>this.y</em> and <em>this.z</em> respectively.</td>
+</tr>
+<tr>
+<td><code>accelerometerFailed</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs if a request to start accelerometer tracking fails.<br><em>eventHandler</em> receives an object with the single field <em>error</em>, describing the reason for the failure. Possible values for <em>error</em> are:<br><strong>UNSUPPORTED</strong> – Accelerometer tracking is not supported on this device or platform.</td>
+</tr>
+<tr>
+<td><code>deviceOrientationStarted</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when device orientation tracking has started successfully.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>deviceOrientationStopped</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when device orientation tracking has stopped.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>deviceOrientationChanged</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs with the specified frequency after calling the <code>start</code> method, sending the current orientation data.<br><em>eventHandler</em> receives no parameters, the current device orientation values can be received via <em>this.alpha</em>, <em>this.beta</em> and <em>this.gamma</em> respectively.</td>
+</tr>
+<tr>
+<td><code>deviceOrientationFailed</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs if a request to start device orientation tracking fails.<br><em>eventHandler</em> receives an object with the single field <em>error</em>, describing the reason for the failure. Possible values for <em>error</em> are:<br><strong>UNSUPPORTED</strong> – Device orientation tracking is not supported on this device or platform.</td>
+</tr>
+<tr>
+<td><code>gyroscopeStarted</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when gyroscope tracking has started successfully.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>gyroscopeStopped</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when gyroscope tracking has stopped.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>gyroscopeChanged</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs with the specified frequency after calling the <code>start</code> method, sending the current gyroscope data.<br><em>eventHandler</em> receives no parameters, the current rotation rates can be received via <em>this.x</em>, <em>this.y</em> and <em>this.z</em> respectively.</td>
+</tr>
+<tr>
+<td><code>gyroscopeFailed</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs if a request to start gyroscope tracking fails.<br><em>eventHandler</em> receives an object with the single field <em>error</em>, describing the reason for the failure. Possible values for <em>error</em> are:<br><strong>UNSUPPORTED</strong> – Gyroscope tracking is not supported on this device or platform.</td>
+</tr>
+<tr>
+<td><code>locationManagerUpdated</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs whenever LocationManager object is changed.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>locationRequested</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when location data is requested.<br><em>eventHandler</em> receives an object with the single field <em>locationData</em> of type <a href="#locationdata">LocationData</a>, containing the current location information.</td>
+</tr>
+<tr>
+<td><code>shareMessageSent</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when the message is successfully shared by the user.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>shareMessageFailed</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs if sharing the message fails.<br><em>eventHandler</em> receives an object with the single field <em>error</em>, describing the reason for the failure. Possible values for <em>error</em> are:<br><strong>UNSUPPORTED</strong> – The feature is not supported by the client.<br><strong>MESSAGE_EXPIRED</strong> – The message could not be retrieved because it has expired.<br><strong>MESSAGE_SEND_FAILED</strong> – An error occurred while attempting to send the message.<br><strong>USER_DECLINED</strong> – The user closed the dialog without sharing the message.<br><strong>UNKNOWN_ERROR</strong> – An unknown error occurred.</td>
+</tr>
+<tr>
+<td><code>emojiStatusSet</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when the emoji status is successfully set.<br><em>eventHandler</em> receives no parameters.</td>
+</tr>
+<tr>
+<td><code>emojiStatusFailed</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs if setting the emoji status fails.<br><em>eventHandler</em> receives an object with the single field <em>error</em>, describing the reason for the failure. Possible values for <em>error</em> are:<br><strong>UNSUPPORTED</strong> – The feature is not supported by the client.<br><strong>SUGGESTED_EMOJI_INVALID</strong> – One or more emoji identifiers are invalid.<br><strong>DURATION_INVALID</strong> – The specified duration is invalid.<br><strong>USER_DECLINED</strong> – The user closed the dialog without setting a status.<br><strong>SERVER_ERROR</strong> – A server error occurred when attempting to set the status.<br><strong>UNKNOWN_ERROR</strong> – An unknown error occurred.</td>
+</tr>
+<tr>
+<td><code>emojiStatusAccessRequested</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when the write permission was requested.<br><em>eventHandler</em> receives an object with the single field <em>status</em> containing one of the statuses:<br>- <strong>allowed</strong> – user granted emoji status permission to the bot,<br>- <strong>cancelled</strong> – user declined this request.</td>
+</tr>
+<tr>
+<td><code>fileDownloadRequested</code> <sup><mark>NEW</mark></sup></td>
+<td><mark>Bot API 8.0+</mark> Occurs when the user responds to the file download request.<br><em>eventHandler</em> receives an object with the single field <em>status</em> containing one of the statuses:<br>- <strong>downloading</strong> – the file download has started,<br>- <strong>cancelled</strong> – user declined this request.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="adding-bots-to-the-attachment-menu" href="#adding-bots-to-the-attachment-menu"><i class="anchor-icon"></i></a>Adding Bots to the Attachment Menu</h4>
+<p>Attachment menu integration is currently only available for major advertisers on the <a href="https://promote.telegram.org/basics">Telegram Ad Platform</a>. However, <strong>all bots</strong> can use it in the <a href="#using-bots-in-the-test-environment">test server environment</a>. Talk to Botfather on the test server to <a href="#using-bots-in-the-test-environment">set up the integration</a>.</p>
+<p>A special link is used to add bots to the attachment menu:</p>
+<p><code>https://t.me/botusername?startattach</code><br>or<br><code>https://t.me/botusername?startattach=command</code></p>
+<blockquote>
+<p>For example, open this <a href="https://t.me/durgerkingbot?startattach">attachment menu link</a> for <em>@DurgerKingBot</em>, then use the <img class="icon" src="/file/464001085/2/E4hNXSNQimQ.2503/bf6ffcab3cb3afd43d" alt="Attach"> menu in any <strong>private chat</strong>.</p>
+</blockquote>
+<p>Opening the link prompts the user to add the bot to their attachment menu. If the bot has already been added, the attachment menu will open in the current chat and redirect to the bot there (if the link is opened from a 1-on-1 chat). If a non-empty <em>startattach</em> parameter was included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>.</p>
+<p>The following link formats are also supported:</p>
+<p><code>https://t.me/username?attach=botusername</code><br><code>https://t.me/username?attach=botusername&amp;startattach=command</code><br><code>https://t.me/+1234567890?attach=botusername</code><br><code>https://t.me/+1234567890?attach=botusername&amp;startattach=command</code></p>
+<p>These links open the Mini App in the attachment menu in the chat with a specific user. If the bot wasn&#39;t already added to the attachment menu, the user will be prompted to do so. If a non-empty <em>startattach</em> parameter was included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>.</p>
+<p><mark>Bot API 6.1+</mark> supports a new link format:</p>
+<p><code>https://t.me/botusername?startattach&amp;choose=users+bots</code><br><code>https://t.me/botusername?startattach=command&amp;choose=groups+channels</code></p>
+<p>Opening such a link prompts the user to choose a specific chat and opens the attachment menu in that chat. If the bot wasn&#39;t already added to the attachment menu, the user will be prompted to do so. You can specify which types of chats the user will be able to choose  from. It can be one or more of the following types: <em>users</em>, <em>bots</em>, <em>groups</em>, <em>channels</em> separated by a <code>+</code> sign. If a non-empty <em>startattach</em> parameter was included in the link, it will be passed to the Mini App in the <em>start_param</em> field and in the GET parameter <em>tgWebAppStartParam</em>.</p>
+<h4><a class="anchor" name="additional-data-in-user-agent" href="#additional-data-in-user-agent"><i class="anchor-icon"></i></a>Additional Data in User-Agent</h4>
+<p>When the Mini App is running on Android, additional information is appended to the User-Agent string to provide more context about the app environment. This information includes the app version, device model, Android version, SDK version, and device performance class, formatted as follows:</p>
+<pre><code>Telegram-Android/{app_version} ({manufacturer} {model}; Android {android_version}; SDK {sdk_version}; {performance_class})</code></pre>
+<p>where:</p>
+<ul>
+<li><strong>{app_version}</strong> is the version of the Telegram app (e.g., <code>11.3.3</code>),</li>
+<li><strong>{manufacturer} {model}</strong> represents the device’s manufacturer and model (e.g., <code>Google sdk_gphone64_arm64</code>),</li>
+<li><strong>{android_version}</strong> is the Android OS version running on the device (e.g., <code>14</code>),</li>
+<li><strong>{sdk_version}</strong> indicates the Android SDK version (e.g., <code>34</code>),</li>
+<li><strong>{performance_class}</strong> specifies the device performance class as <code>LOW</code>, <code>AVERAGE</code>, or <code>HIGH</code>, indicating the device&#39;s performance capacity.</li>
+</ul>
+<blockquote>
+<p><strong>Example</strong><br><code>Mozilla/5.0 (Linux; Android 14; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5672.136 Mobile Safari/537.36 Telegram-Android/11.3.3 (Google sdk_gphone64_arm64; Android 14; SDK 34; LOW)</code></p>
+</blockquote>
+<p>We recommend using this information to optimize your Mini App based on the device&#39;s capabilities. For instance, you can adjust animations and visual effects in games on low-performance devices to ensure a smooth experience for all users, regardless of device specifications.</p>
+<h3><a class="anchor" name="testing-mini-apps" href="#testing-mini-apps"><i class="anchor-icon"></i></a>Testing Mini Apps</h3>
+<h4><a class="anchor" name="using-bots-in-the-test-environment" href="#using-bots-in-the-test-environment"><i class="anchor-icon"></i></a>Using bots in the test environment</h4>
+<p>To log in to the test environment, use either of the following:</p>
+<ul>
+<li><strong>iOS:</strong> tap 10 times on the Settings icon &gt; Accounts &gt; Login to another account &gt; Test.</li>
+<li><strong>Telegram Desktop:</strong> open ☰ Settings &gt; Shift + Alt + Right click ‘Add Account’ and select ‘Test Server’.</li>
+<li><strong>macOS:</strong> click the Settings icon 10 times to open the Debug Menu, ⌘ + click ‘Add Account’ and log in via phone number.</li>
+</ul>
+<p>The test environment is completely separate from the main environment, so you will need to create a <strong>new user account</strong> and a <strong>new bot</strong> with @BotFather.</p>
+<p>After receiving your bot token, you can send requests to the Bot API in this format: </p>
+<pre><code>https://api.telegram.org/bot&lt;token&gt;/test/METHOD_NAME</code></pre>
+<blockquote>
+<p><strong>Note:</strong> When working with the test environment, you may use HTTP links without TLS to test your Mini App.</p>
+</blockquote>
+<h4><a class="anchor" name="debug-mode-for-mini-apps" href="#debug-mode-for-mini-apps"><i class="anchor-icon"></i></a>Debug Mode for Mini Apps</h4>
+<p>Use these tools to find app-specific issues in your Mini App:</p>
+<p><strong>iOS</strong></p>
+<ul>
+<li>In Telegram tap 10 times on the Settings icon and toggle on <em>Allow Web View Inspection</em>.</li>
+<li>Connect your phone to your computer using a USB cable.</li>
+<li>Open Safari on your Mac, then go to <em>Develop &gt; [Your Device Name]</em> in the menu bar.</li>
+<li>Launch your Mini App on the iOS device – it will appear in the <em>Develop</em> menu under your device.</li>
+</ul>
+<p><strong>Android</strong></p>
+<ul>
+<li><a href="https://developer.chrome.com/docs/devtools/remote-debugging/">Enable USB-Debugging</a> on your device.</li>
+<li>In Telegram Settings, scroll all the way down, press and hold on the <strong>version number</strong> two times.</li>
+<li>Choose <em>Enable WebView Debug</em> in the Debug Settings.</li>
+<li>Connect your phone to your computer and open <code>chrome://inspect/#devices</code> in Chrome – you will see your Mini App there when you launch it on your phone.</li>
+</ul>
+<p><strong>Telegram Desktop on Windows and Linux</strong></p>
+<ul>
+<li>Download and launch the <a href="https://desktop.telegram.org/changelog#beta-version">Beta Version</a> of Telegram Desktop on <strong>Windows</strong> or <strong>Linux</strong> (not supported on Telegram Desktop for macOS yet).</li>
+<li>Go to <em>Settings &gt; Advanced &gt; Experimental settings &gt; Enable webview inspection</em>.</li>
+<li>Right click in the WebView and choose <em>Inspect</em>.</li>
+</ul>
+<p><strong>Telegram macOS</strong></p>
+<ul>
+<li>Download and launch the <a href="https://telegram.org/dl/macos/beta">Beta Version</a> of Telegram macOS.</li>
+<li>Quickly click 5 times on the Settings icon to open the debug menu and enable “Debug Mini Apps”.</li>
+<li>Right click in the Mini App and choose <em>Inspect Element</em>.</li>
+</ul>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+initScrollVideos(true);
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

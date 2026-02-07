@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Telegram Passport Encryption Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram Passport data is stored encrypted End-to-End which means that the Telegram server does not have access to the…">
+    <meta property="og:title" content="Telegram Passport Encryption Details">
+    <meta property="og:image" content="01b864b17e59449f0d">
+    <meta property="og:description" content="Telegram Passport data is stored encrypted End-to-End which means that the Telegram server does not have access to the…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/passport" >Telegram Passport</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/passport/encryption" >Telegram Passport Encryption Details</a></li></ul></div>
+  <h1 id="dev_page_title">Telegram Passport Encryption Details</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram Passport data is stored encrypted <strong>End-to-End</strong> which means that the Telegram server does not have access to the data and only functions as a storage for encrypted data it can't decipher. Encryption and decryption are handled exclusively by the Telegram clients, which are <strong>open source</strong>.</p>
+<h3><a class="anchor" href="#overview" id="overview" name="overview"><i class="anchor-icon"></i></a>Overview</h3>
+<p>To encrypt each particular element of Telegram Passport, the client generates a random secret. The secret is a 32-byte number with the modulo 255 sum of bytes equal to 239. This secret is in turn encrypted with the <a href="#passport-secret"><em>passport_secret</em></a> that is generated when the user creates their Telegram Passport. <em>passport_secret</em> is encrypted with the user's password and is stored encrypted in the Telegram Cloud.</p>
+<h3><a class="anchor" href="#passport-secret" id="passport-secret" name="passport-secret"><i class="anchor-icon"></i></a>Passport Secret</h3>
+<p>The passport secret is <em>one of</em> the secret parameters used to <a href="#data-and-file-encryption">encrypt the data</a> uploaded by the user to the Telegram Cloud.</p>
+<p>When first setting up Telegram Passport it must be created, encrypted and uploaded as described in <a href="#passport-secret-encryption">Passport Secret Encryption</a>.</p>
+<p>When using Telegram Passport normally, it must be downloaded and decrypted for use as described in <a href="#passport-secret-decryption">Passport Secret Decryption</a>.</p>
+<p>The passport secret must also be downloaded, re-encrypted and re-uploaded as described in <a href="#passport-secret-encryption">Passport Secret Encryption</a> if a new, more secure encryption algorithm is defined in a newer version of Telegram or the 2FA password is updated.</p>
+<h4><a class="anchor" href="#passport-secret-encryption" id="passport-secret-encryption" name="passport-secret-encryption"><i class="anchor-icon"></i></a>Passport Secret Encryption</h4>
+<p>First of all, server-side passport parameters are fetched, schema:</p>
+<pre><code><a href='/constructor/account.password'>account.password</a>#957b50fb flags:<a href='/type/%23'>#</a> has_recovery:flags.0?<a href='/constructor/true'>true</a> has_secure_values:flags.1?<a href='/constructor/true'>true</a> has_password:flags.2?<a href='/constructor/true'>true</a> current_algo:flags.2?<a href='/type/PasswordKdfAlgo'>PasswordKdfAlgo</a> srp_B:flags.2?<a href='/type/bytes'>bytes</a> srp_id:flags.2?<a href='/type/long'>long</a> hint:flags.3?<a href='/type/string'>string</a> email_unconfirmed_pattern:flags.4?<a href='/type/string'>string</a> new_algo:<a href='/type/PasswordKdfAlgo'>PasswordKdfAlgo</a> new_secure_algo:<a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a> secure_random:<a href='/type/bytes'>bytes</a> pending_reset_date:flags.5?<a href='/type/int'>int</a> login_email_pattern:flags.6?<a href='/type/string'>string</a> = <a href='/type/account.Password'>account.Password</a>;
+
+<a href='/constructor/securePasswordKdfAlgoUnknown'>securePasswordKdfAlgoUnknown</a>#4a8537 = <a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a>;
+<a href='/constructor/securePasswordKdfAlgoPBKDF2HMACSHA512iter100000'>securePasswordKdfAlgoPBKDF2HMACSHA512iter100000</a>#bbf2dda0 salt:<a href='/type/bytes'>bytes</a> = <a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a>;
+<a href='/constructor/securePasswordKdfAlgoSHA512'>securePasswordKdfAlgoSHA512</a>#86471d92 salt:<a href='/type/bytes'>bytes</a> = <a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a>;
+
+
+---functions---
+
+<a href='/method/account.getPassword'>account.getPassword</a>#548a30f5 = <a href='/type/account.Password'>account.Password</a>;</code></pre>
+<p>When Telegram Passport is first used, the client generates a <em>passport_secret</em> (a 32-byte number with the modulo 255 sum of bytes equal to 239), using a part of server-generated random <em>secure_random</em> from <a href="/constructor/account.password">account.password</a> as an additional source of entropy for OpenSSL (when re-encrypting the <em>passport_secret</em> with a more secure algorithm or after a 2FA password change, the previous <em>passport_secret</em> is used, instead). 
+Then <em>passport_secret</em> is then encrypted using the user's password and hashed using the schema and parameters specified in the <em>new_algo</em> field of <a href="/constructor/account.password">account.password</a>.</p>
+<p>The server should <strong>always</strong> return a <code>securePasswordKdfAlgoPBKDF2HMACSHA512iter100000</code> constructor in the <code>new_algo</code> field.
+If <code>securePasswordKdfAlgoUnknown</code> is returned, the remotely stored secret is encrypted using a new algorithm, not supported by the current client: the user should update their app.</p>
+<p>The other constructors may be used <strong>only</strong> when <a href="#passport-secret-decryption"><strong>decrypting</strong> old passport parameters</a> generated by a legacy client; in this case, the passport secret should be re-encrypted and updated using <code>new_algo</code>.</p>
+<ul>
+<li>
+<p>First of all, a fingerprint of the secret is calculated ( <em>passport_secret_fingerprint</em> ):</p>
+<pre><code>passport_secret_fingerprint = long( slice( SHA256( passport_secret ), 0, 8 ) )</code></pre>
+</li>
+<li>
+<p>Next the user's 2FA plaintext <code>password</code> is hashed using the specified algorithm.</p>
+<ul>
+<li>
+<p><a href="/constructor/securePasswordKdfAlgoPBKDF2HMACSHA512iter100000">securePasswordKdfAlgoPBKDF2HMACSHA512iter100000</a></p>
+<ul>
+<li>The following parameters are extracted/generated:<ul>
+<li>8 bytes of the server salt <em>server_passport_salt</em> from the <em>salt</em> field of <a href="/constructor/securePasswordKdfAlgoPBKDF2HMACSHA512iter100000">securePasswordKdfAlgoPBKDF2HMACSHA512iter100000</a> constructor</li>
+<li>32 random bytes of the client salt <em>client_passport_salt</em>.</li>
+</ul>
+</li>
+</ul>
+<p>To make the password hashes stored on the server more resilient to brute-force attacks while maintaining practical speeds on the range of devices popular among Telegram users, PBKDF2-HMAC-SHA512 with 100000 iterations is used: </p>
+<pre><code>server_passport_salt = new_algo.salt
+client_passport_salt = random_bytes(32)
+passport_secret_salt = server_passport_salt + client_passport_salt
+password_hash = PBKDF2( password, passport_secret_salt, HMACSHA512, 100000)</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>The <code>secret_key</code> and <code>iv</code> parameters are extracted from the generated <code>password_hash</code></p>
+<pre><code>secret_key = slice( password_hash, 0, 32 )
+iv = slice( password_hash, 32, 16 )</code></pre>
+</li>
+<li>
+<p>The <em>passport_secret</em> generated previously is encrypted using AES256-CBC with the key <em>secret_key</em> and <em>iv</em>:</p>
+<pre><code>encrypted_passport_secret = AES256_CBC_ENC(passport_secret, secret_key, iv)</code></pre>
+</li>
+<li>
+<p>The <em>encrypted_passport_secret</em> is stored on the server together with the <em>passport_secret_salt</em> and the fingerprint of the secret <em>passport_secret_fingerprint</em>:
+Schema: </p>
+<pre><code><a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
+<a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
+
+<a href='/constructor/inputCheckPasswordSRP'>inputCheckPasswordSRP</a>#d27ff082 srp_id:<a href='/type/long'>long</a> A:<a href='/type/bytes'>bytes</a> M1:<a href='/type/bytes'>bytes</a> = <a href='/type/InputCheckPasswordSRP'>InputCheckPasswordSRP</a>;
+
+<a href='/constructor/securePasswordKdfAlgoPBKDF2HMACSHA512iter100000'>securePasswordKdfAlgoPBKDF2HMACSHA512iter100000</a>#bbf2dda0 salt:<a href='/type/bytes'>bytes</a> = <a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a>;
+
+<a href='/constructor/secureSecretSettings'>secureSecretSettings</a>#1527bcac secure_algo:<a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a> secure_secret:<a href='/type/bytes'>bytes</a> secure_secret_id:<a href='/type/long'>long</a> = <a href='/type/SecureSecretSettings'>SecureSecretSettings</a>;
+
+<a href='/constructor/account.passwordInputSettings'>account.passwordInputSettings</a>#c23727c9 flags:<a href='/type/%23'>#</a> new_algo:flags.0?<a href='/type/PasswordKdfAlgo'>PasswordKdfAlgo</a> new_password_hash:flags.0?<a href='/type/bytes'>bytes</a> hint:flags.0?<a href='/type/string'>string</a> email:flags.1?<a href='/type/string'>string</a> new_secure_settings:flags.2?<a href='/type/SecureSecretSettings'>SecureSecretSettings</a> = <a href='/type/account.PasswordInputSettings'>account.PasswordInputSettings</a>;
+
+---functions---
+
+<a href='/method/account.updatePasswordSettings'>account.updatePasswordSettings</a>#a59b102f password:<a href='/type/InputCheckPasswordSRP'>InputCheckPasswordSRP</a> new_settings:<a href='/type/account.PasswordInputSettings'>account.PasswordInputSettings</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The client calls <a href="/method/account.updatePasswordSettings">account.updatePasswordSettings</a>.</p>
+<ul>
+<li>The <code>password</code> parameter is generated using the user's 2FA password as per <a href="/api/srp#setting-a-new-2fa-password">updating the 2FA password</a>.</li>
+<li>The <a href="/constructor/account.passwordInputSettings">account.passwordInputSettings</a> constructor in <code>new_settings</code> should contain <em>only</em> the <code>new_secure_setting</code> parameter with the <a href="/constructor/secureSecretSettings">secureSecretSettings</a>.</li>
+</ul>
+<p>The <a href="/constructor/secureSecretSettings">secureSecretSettings</a> constructor is generated thusly:</p>
+<ul>
+<li><code>secure_algo</code> is set to the <code>new_algo</code> field of <a href="/constructor/account.password">account.password</a>, used to generate the encrypted passport secret: <code>salt</code> is substituted with <code>passport_secret_salt</code></li>
+<li><code>secure_secret</code> is set to the new <code>encrypted_passport_secret</code></li>
+<li><code>secure_secret_id</code> is set to the new <code>passport_secret_fingerprint</code></li>
+</ul>
+</li>
+</ul>
+<p>Subsequently, <a href="#passport-secret-decryption">the client receives the encrypted <em>passport_secret</em> from the server and decrypts it after the user enters their password »</a>.</p>
+<p>In case the password is changed or a more secure algorithm is introduced in an update of the API, the client re-encrypts the <em>passport_secret</em> using the new password. 
+If the password is disabled, all Telegram Passport data is lost.</p>
+<h4><a class="anchor" href="#passport-secret-decryption" id="passport-secret-decryption" name="passport-secret-decryption"><i class="anchor-icon"></i></a>Passport Secret Decryption</h4>
+<p>Schema:</p>
+<pre><code><a href='/constructor/securePasswordKdfAlgoUnknown'>securePasswordKdfAlgoUnknown</a>#4a8537 = <a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a>;
+<a href='/constructor/securePasswordKdfAlgoPBKDF2HMACSHA512iter100000'>securePasswordKdfAlgoPBKDF2HMACSHA512iter100000</a>#bbf2dda0 salt:<a href='/type/bytes'>bytes</a> = <a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a>;
+<a href='/constructor/securePasswordKdfAlgoSHA512'>securePasswordKdfAlgoSHA512</a>#86471d92 salt:<a href='/type/bytes'>bytes</a> = <a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a>;
+
+<a href='/constructor/secureSecretSettings'>secureSecretSettings</a>#1527bcac secure_algo:<a href='/type/SecurePasswordKdfAlgo'>SecurePasswordKdfAlgo</a> secure_secret:<a href='/type/bytes'>bytes</a> secure_secret_id:<a href='/type/long'>long</a> = <a href='/type/SecureSecretSettings'>SecureSecretSettings</a>;
+
+<a href='/constructor/account.passwordSettings'>account.passwordSettings</a>#9a5c33e5 flags:<a href='/type/%23'>#</a> email:flags.0?<a href='/type/string'>string</a> secure_settings:flags.1?<a href='/type/SecureSecretSettings'>SecureSecretSettings</a> = <a href='/type/account.PasswordSettings'>account.PasswordSettings</a>;
+
+---functions---
+
+<a href='/method/account.getPasswordSettings'>account.getPasswordSettings</a>#9cd4eaf9 password:<a href='/type/InputCheckPasswordSRP'>InputCheckPasswordSRP</a> = <a href='/type/account.PasswordSettings'>account.PasswordSettings</a>;</code></pre>
+<p>The client requests the user's <a href="/api/srp">2FA password and generates the SRP paramaters</a> to be passed to <a href="/method/account.getPasswordSettings">account.getPasswordSettings</a>.</p>
+<p>If the password is correct, an <a href="/constructor/account.passwordSettings">account.passwordSettings</a> constructor with <a href="/constructor/secureSecretSettings">secureSecretSettings</a> is returned.</p>
+<p><code>encrypted_passport_secret</code>, <code>passport_secret_fingerprint</code> parameters are extracted from the <a href="/constructor/secureSecretSettings">secureSecretSettings</a> constructor:</p>
+<pre><code>encrypted_passport_secret = secureSecretSettings.secure_secret
+passport_secret_fingerprint = secureSecretSettings.secure_id</code></pre>
+<p>The combined <code>passport_secret_salt</code> is extracted from the <a href="/type/SecurePasswordKdfAlgo">SecurePasswordKdfAlgo</a>.</p>
+<pre><code>passport_secret_salt = SecurePasswordKdfAlgo.salt</code></pre>
+<p>Similar to <a href="#passport-secret-encryption">passport secret encryption</a>, the following process is used to decrypt and verify the <code>encrypted_passport_secret</code>:</p>
+<ul>
+<li>
+<p>The user's 2FA plaintext <code>password</code> is hashed using the specified algorithm.</p>
+<ul>
+<li>
+<p><a href="/constructor/securePasswordKdfAlgoPBKDF2HMACSHA512iter100000">securePasswordKdfAlgoPBKDF2HMACSHA512iter100000</a>
+To make the password hashes stored on the server more resilient to brute-force attacks while maintaining practical speeds on the range of devices popular among Telegram users, PBKDF2-HMAC-SHA512 with 100000 iterations is used: </p>
+<pre><code>password_hash = PBKDF2( password, passport_secret_salt, HMACSHA512, 100000)</code></pre>
+</li>
+<li>
+<p><a href="/constructor/securePasswordKdfAlgoSHA512">securePasswordKdfAlgoSHA512</a>
+This mode can only be found in hashes generated by legacy clients: hashes generated with this mode <strong>must</strong> be re-encrypted and updated using <a href="/constructor/securePasswordKdfAlgoPBKDF2HMACSHA512iter100000">securePasswordKdfAlgoPBKDF2HMACSHA512iter100000</a> as described in <a href="#passport-secret-encryption">Passport Secret Encryption</a>.</p>
+<pre><code>password_hash = SHA512( passport_secret_salt + password + passport_secret_salt )</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>The <code>secret_key</code> and <code>iv</code> parameters are extracted from the generated <code>password_hash</code></p>
+<pre><code>secret_key = slice( password_hash, 0, 32 )
+iv = slice( password_hash, 32, 16 )</code></pre>
+</li>
+<li>
+<p>The <em>encrypted_passport_secret</em> is decrypted using AES256-CBC with the key <em>secret_key</em> and <em>iv</em>:</p>
+<pre><code>passport_secret = AES256_CBC_DEC(encrypted_passport_secret, secret_key, iv)</code></pre>
+</li>
+<li>
+<p>The <em>passport_secret</em> is verified by generating and checking the fingerprint:</p>
+<pre><code>my_passport_secret_fingerprint = long( slice( SHA256( passport_secret ), 0, 8 ) )</code></pre>
+<p>The client must verify that <em>passport_secret_fingerprint</em> is indeed equal to <em>my_passport_secret_fingerprint</em>.</p>
+</li>
+</ul>
+<p>The <em>passport_secret</em> can now be used to decrypt encrypted passport data stored on telegram servers:</p>
+<h3><a class="anchor" href="#data-and-file-encryption" id="data-and-file-encryption" name="data-and-file-encryption"><i class="anchor-icon"></i></a>Data and File Encryption</h3>
+<h4><a class="anchor" href="#encryption" id="encryption" name="encryption"><i class="anchor-icon"></i></a>Encryption</h4>
+<p>To encrypt Telegram Passport data, the client generates a <em>data_secret</em> (a 32-byte number with the modulo 255 sum of bytes equal to 239). The data is encrypted according to the following scheme:</p>
+<ul>
+<li>
+<p>Data is padded to a length that is divisible by 16 bytes. To achieve this, 32 to 255 bytes are added at the beginning, where the first byte always holds the number of added bytes and the rest are random.</p>
+</li>
+<li>
+<p>We calculate the hash from this data <em>data_hash</em>:</p>
+<pre><code>data_hash = SHA256( data_bytes )</code></pre>
+</li>
+<li>
+<p>The encryption key <em>data_key</em> is calculated:</p>
+<pre><code>data_secret_hash = SHA512( data_secret + data_hash )
+data_key = slice( data_secret_hash, 0, 32 )
+iv = slice( data_secret_hash, 32, 16 )</code></pre>
+</li>
+<li>
+<p>Data is encrypted using AES256-CBC with the key <em>data_key</em> and <em>iv</em>:</p>
+<pre><code>encrypted_data = AES256_CBC_ENC(data, data_key, iv)</code></pre>
+</li>
+<li>
+<p><em>secret_key</em>, the key for encrypting the <em>data_secret</em>, is calculated: </p>
+<pre><code>secret_hash = SHA512( passport_secret + data_hash )
+secret_key = slice( secret_hash, 0, 32 )
+iv = slice( secret_hash, 32, 16 )</code></pre>
+</li>
+<li>
+<p><em>data_secret</em> is encrypted using AES256-CBC with the key <em>secret_key</em> and <em>iv</em>:</p>
+<pre><code>encrypted_data_secret = AES256_CBC_ENC(data_secret, secret_key, iv)</code></pre>
+</li>
+<li>
+<p><em>encrypted_data</em> together with the <em>encrypted_data_secret</em> and <em>data_hash</em> are saved on the server:</p>
+<p>Schema:</p>
+<pre><code><a href='/constructor/inputSecureFileUploaded'>inputSecureFileUploaded</a>#3334b0f0 id:<a href='/type/long'>long</a> parts:<a href='/type/int'>int</a> md5_checksum:<a href='/type/string'>string</a> file_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/InputSecureFile'>InputSecureFile</a>;
+<a href='/constructor/inputSecureFile'>inputSecureFile</a>#5367e5be id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputSecureFile'>InputSecureFile</a>;
+
+<a href='/constructor/secureValueTypePersonalDetails'>secureValueTypePersonalDetails</a>#9d2a81e3 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypePassport'>secureValueTypePassport</a>#3dac6a00 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeDriverLicense'>secureValueTypeDriverLicense</a>#6e425c4 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeIdentityCard'>secureValueTypeIdentityCard</a>#a0d0744b = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeInternalPassport'>secureValueTypeInternalPassport</a>#99a48f23 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeAddress'>secureValueTypeAddress</a>#cbe31e26 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeUtilityBill'>secureValueTypeUtilityBill</a>#fc36954e = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeBankStatement'>secureValueTypeBankStatement</a>#89137c0d = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeRentalAgreement'>secureValueTypeRentalAgreement</a>#8b883488 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypePassportRegistration'>secureValueTypePassportRegistration</a>#99e3806a = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeTemporaryRegistration'>secureValueTypeTemporaryRegistration</a>#ea02ec33 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypePhone'>secureValueTypePhone</a>#b320aadb = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeEmail'>secureValueTypeEmail</a>#8e3ca7ee = <a href='/type/SecureValueType'>SecureValueType</a>;
+
+<a href='/constructor/securePlainPhone'>securePlainPhone</a>#7d6099dd phone:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
+<a href='/constructor/securePlainEmail'>securePlainEmail</a>#21ec5a5f email:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
+
+<a href='/constructor/secureData'>secureData</a>#8aeabec3 data:<a href='/type/bytes'>bytes</a> data_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureData'>SecureData</a>;
+
+<a href='/constructor/inputSecureValue'>inputSecureValue</a>#db21d0a7 flags:<a href='/type/%23'>#</a> type:<a href='/type/SecureValueType'>SecureValueType</a> data:flags.0?<a href='/type/SecureData'>SecureData</a> front_side:flags.1?<a href='/type/InputSecureFile'>InputSecureFile</a> reverse_side:flags.2?<a href='/type/InputSecureFile'>InputSecureFile</a> selfie:flags.3?<a href='/type/InputSecureFile'>InputSecureFile</a> translation:flags.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSecureFile'>InputSecureFile</a>&gt; files:flags.4?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSecureFile'>InputSecureFile</a>&gt; plain_data:flags.5?<a href='/type/SecurePlainData'>SecurePlainData</a> = <a href='/type/InputSecureValue'>InputSecureValue</a>;
+
+---functions---
+
+<a href='/method/account.saveSecureValue'>account.saveSecureValue</a>#899fe31d value:<a href='/type/InputSecureValue'>InputSecureValue</a> secure_secret_id:<a href='/type/long'>long</a> = <a href='/type/SecureValue'>SecureValue</a>;</code></pre>
+<p><a href="/method/account.saveSecureValue">account.saveSecureValue</a> must be used to save an encrypted passport <a href="/constructor/secureValue">value</a> of a certain <a href="/type/SecureValueType">type</a>.
+The <code>secure_secret_id</code> parameter must be set to the <code>passport_secret_fingerprint</code> of the <code>passport_secret</code> used to encrypt the <code>data_secret</code>.</p>
+<p>The <a href="/constructor/inputSecureValue">inputSecureValue</a> constructor contains info about passport data of a certain <code>type</code>, identified by the chosen <a href="/type/SecureValueType">SecureValueType</a> constructor.</p>
+<p>Depending on the chosen type, encrypted data will have to be stored into a <a href="/constructor/secureData">secureData</a> constructor, uploaded as an <a href="/type/InputSecureFile">InputSecureFile</a>, or in the case of email addresses and phone numbers, verified and provided in a <a href="/type/SecurePlainData">SecurePlainData</a> constructor.
+For more info on each mode, and when each one should be used, read on.</p>
+</li>
+</ul>
+<h4><a class="anchor" href="#packing" id="packing" name="packing"><i class="anchor-icon"></i></a>Packing</h4>
+<h5><a class="anchor" href="#securedata" id="securedata" name="securedata"><i class="anchor-icon"></i></a><a href="/type/SecureData">SecureData</a></h5>
+<pre><code><a href='/constructor/secureData'>secureData</a>#8aeabec3 data:<a href='/type/bytes'>bytes</a> data_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureData'>SecureData</a>;</code></pre>
+<ul>
+<li><code>data</code> is an encrypted and padded (<a href="#encryption">see Encryption</a>) JSON-serialized object of one of the following types: <a href="/passport#personaldetails">PersonalDetails</a>, <a href="/passport#iddocumentdata">IdDocumentData</a>, <a href="/passport#residentialaddress">ResidentialAddress</a>, depending on the chosen <a href="/type/SecureValueType">type</a>.
+Data must be in JSON format and not TL, as it has to be passed directly to the service using E2E encryption, without the bot API middleman to convert TL objects.</li>
+<li><code>data_hash</code> is the <em>data_hash</em></li>
+<li><code>secret</code> is the <em>encrypted_data_secret</em></li>
+</ul>
+<p>Data is an encrypted and padded JSON-serialized object of one of the specified JSON types, depending on the chosen <a href="/type/SecureValueType">type</a>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Chosen type</th>
+<th>JSON object</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/constructor/secureValueTypePersonalDetails">secureValueTypePersonalDetails</a></td>
+<td><a href="/passport#personaldetails">PersonalDetails</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypePassport">secureValueTypePassport</a></td>
+<td><a href="/passport#iddocumentdata">IdDocumentData</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeDriverLicense">secureValueTypeDriverLicense</a></td>
+<td><a href="/passport#iddocumentdata">IdDocumentData</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeIdentityCard">secureValueTypeIdentityCard</a></td>
+<td><a href="/passport#iddocumentdata">IdDocumentData</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeInternalPassport">secureValueTypeInternalPassport</a></td>
+<td><a href="/passport#iddocumentdata">IdDocumentData</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeAddress">secureValueTypeAddress</a></td>
+<td><a href="/passport#residentialaddress">ResidentialAddress</a></td>
+</tr>
+</tbody>
+</table>
+<h5><a class="anchor" href="#inputsecurefile" id="inputsecurefile" name="inputsecurefile"><i class="anchor-icon"></i></a><a href="/type/InputSecureFile">InputSecureFile</a></h5>
+<pre><code><a href='/constructor/inputSecureFileUploaded'>inputSecureFileUploaded</a>#3334b0f0 id:<a href='/type/long'>long</a> parts:<a href='/type/int'>int</a> md5_checksum:<a href='/type/string'>string</a> file_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/InputSecureFile'>InputSecureFile</a>;
+<a href='/constructor/inputSecureFile'>inputSecureFile</a>#5367e5be id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputSecureFile'>InputSecureFile</a>;
+
+---functions---
+
+<a href='/method/upload.saveFilePart'>upload.saveFilePart</a>#b304a621 file_id:<a href='/type/long'>long</a> file_part:<a href='/type/int'>int</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Files (JPG format, max. 10 MB) are encrypted and padded (<a href="#encryption">see Encryption</a>), and then uploaded chunk by chunk as described in <a href="/api/files">files »</a>, except that instead of generating an <a href="/constructor/inputFile">inputFile</a>, an <a href="/constructor/inputSecureFile">inputSecureFile</a> should be generated, instead.</p>
+<ul>
+<li>As for secret chat files, the <code>md5_checksum</code> is to be set to the MD5 hash of the <em>encrypted</em> file, for a server-side integrity check.</li>
+<li>The <code>file_hash</code> field should be set to the <em>data_hash</em> of the data.</li>
+<li>The <code>secret</code> field is the <em>encrypted_data_secret</em>.</li>
+</ul>
+<h5><a class="anchor" href="#secureplaindata" id="secureplaindata" name="secureplaindata"><i class="anchor-icon"></i></a><a href="/type/SecurePlainData">SecurePlainData</a></h5>
+<pre><code><a href='/constructor/securePlainPhone'>securePlainPhone</a>#7d6099dd phone:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
+<a href='/constructor/securePlainEmail'>securePlainEmail</a>#21ec5a5f email:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
+
+<a href='/constructor/emailVerifyPurposePassport'>emailVerifyPurposePassport</a>#bbf51685 = <a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a>;
+
+---functions---
+
+<a href='/method/account.sendVerifyPhoneCode'>account.sendVerifyPhoneCode</a>#a5a356f9 phone_number:<a href='/type/string'>string</a> settings:<a href='/type/CodeSettings'>CodeSettings</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
+<a href='/method/account.verifyPhone'>account.verifyPhone</a>#4dd3a7f6 phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> phone_code:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/account.sendVerifyEmailCode'>account.sendVerifyEmailCode</a>#98e037bb purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> email:<a href='/type/string'>string</a> = <a href='/type/account.SentEmailCode'>account.SentEmailCode</a>;
+<a href='/method/account.verifyEmail'>account.verifyEmail</a>#32da4cf purpose:<a href='/type/EmailVerifyPurpose'>EmailVerifyPurpose</a> verification:<a href='/type/EmailVerification'>EmailVerification</a> = <a href='/type/account.EmailVerified'>account.EmailVerified</a>;
+
+<a href='/method/auth.resendCode'>auth.resendCode</a>#cae47523 flags:<a href='/type/%23'>#</a> phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> reason:flags.0?<a href='/type/string'>string</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
+<a href='/method/auth.cancelCode'>auth.cancelCode</a>#1f040578 phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The email/phone is passed in plaintext using the respective <a href="/type/SecurePlainData">SecurePlainData</a> constructor.
+To verify a phone number or email and use it in Telegram Passport, use the appropriate methods:</p>
+<ul>
+<li><a href="/method/account.sendVerifyEmailCode">account.sendVerifyEmailCode</a> - Send the verification email code for telegram <a href="/passport">passport</a>.</li>
+<li><a href="/method/account.verifyEmail">account.verifyEmail</a> - Verify an email address for telegram <a href="/passport">passport</a>.</li>
+<li><a href="/method/account.sendVerifyPhoneCode">account.sendVerifyPhoneCode</a> - Send the verification phone code for telegram <a href="/passport">passport</a>.</li>
+<li><a href="/method/account.verifyPhone">account.verifyPhone</a> - Verify a phone number for telegram <a href="/passport">passport</a>. </li>
+<li><a href="/method/auth.resendCode">auth.resendCode</a> - Only for phone code verification, resend the code using a different method</li>
+<li><a href="/method/auth.cancelCode">auth.cancelCode</a> - Only for phone code verification, cancel phone code verification</li>
+</ul>
+<p>The flow is similar to the one used for <a href="/api/auth">logging in</a>:</p>
+<ul>
+<li>Send email/phone code using the appropriate <code>account.sendVerify*Code</code> method<ul>
+<li>Make sure to pass <a href="/constructor/emailVerifyPurposePassport">emailVerifyPurposePassport</a> as verification purpose to <a href="/method/account.sendVerifyEmailCode">account.sendVerifyEmailCode</a>.</li>
+</ul>
+</li>
+<li>Pass the received code to the appropriate <code>account.verify*</code> method</li>
+<li>Only for phone code verification, you can also resend/cancel the phone code using <a href="/method/auth.resendCode">auth.resendCode</a>/<a href="/method/auth.cancelCode">auth.cancelCode</a>, as for <a href="/api/auth">logging in</a>.</li>
+</ul>
+<p>For more info, see the <a href="/api/auth">authorization docs</a>.</p>
+<h4><a class="anchor" href="#when-to-use-each-constructor" id="when-to-use-each-constructor" name="when-to-use-each-constructor"><i class="anchor-icon"></i></a>When to use each constructor.</h4>
+<pre><code><a href='/constructor/inputSecureFileUploaded'>inputSecureFileUploaded</a>#3334b0f0 id:<a href='/type/long'>long</a> parts:<a href='/type/int'>int</a> md5_checksum:<a href='/type/string'>string</a> file_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/InputSecureFile'>InputSecureFile</a>;
+<a href='/constructor/inputSecureFile'>inputSecureFile</a>#5367e5be id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputSecureFile'>InputSecureFile</a>;
+
+<a href='/constructor/secureValueTypePersonalDetails'>secureValueTypePersonalDetails</a>#9d2a81e3 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypePassport'>secureValueTypePassport</a>#3dac6a00 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeDriverLicense'>secureValueTypeDriverLicense</a>#6e425c4 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeIdentityCard'>secureValueTypeIdentityCard</a>#a0d0744b = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeInternalPassport'>secureValueTypeInternalPassport</a>#99a48f23 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeAddress'>secureValueTypeAddress</a>#cbe31e26 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeUtilityBill'>secureValueTypeUtilityBill</a>#fc36954e = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeBankStatement'>secureValueTypeBankStatement</a>#89137c0d = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeRentalAgreement'>secureValueTypeRentalAgreement</a>#8b883488 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypePassportRegistration'>secureValueTypePassportRegistration</a>#99e3806a = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeTemporaryRegistration'>secureValueTypeTemporaryRegistration</a>#ea02ec33 = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypePhone'>secureValueTypePhone</a>#b320aadb = <a href='/type/SecureValueType'>SecureValueType</a>;
+<a href='/constructor/secureValueTypeEmail'>secureValueTypeEmail</a>#8e3ca7ee = <a href='/type/SecureValueType'>SecureValueType</a>;
+
+<a href='/constructor/securePlainPhone'>securePlainPhone</a>#7d6099dd phone:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
+<a href='/constructor/securePlainEmail'>securePlainEmail</a>#21ec5a5f email:<a href='/type/string'>string</a> = <a href='/type/SecurePlainData'>SecurePlainData</a>;
+
+<a href='/constructor/secureData'>secureData</a>#8aeabec3 data:<a href='/type/bytes'>bytes</a> data_hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureData'>SecureData</a>;
+
+<a href='/constructor/inputSecureValue'>inputSecureValue</a>#db21d0a7 flags:<a href='/type/%23'>#</a> type:<a href='/type/SecureValueType'>SecureValueType</a> data:flags.0?<a href='/type/SecureData'>SecureData</a> front_side:flags.1?<a href='/type/InputSecureFile'>InputSecureFile</a> reverse_side:flags.2?<a href='/type/InputSecureFile'>InputSecureFile</a> selfie:flags.3?<a href='/type/InputSecureFile'>InputSecureFile</a> translation:flags.6?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSecureFile'>InputSecureFile</a>&gt; files:flags.4?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputSecureFile'>InputSecureFile</a>&gt; plain_data:flags.5?<a href='/type/SecurePlainData'>SecurePlainData</a> = <a href='/type/InputSecureValue'>InputSecureValue</a>;</code></pre>
+<p>The schema for the <a href="/constructor/inputSecureValue">inputSecureValue</a> constructor defines the constructor to use for each field.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>type</strong></td>
+<td><a href="/type/SecureValueType">SecureValueType</a></td>
+<td>Secure <a href="/passport">passport</a> value type</td>
+</tr>
+<tr>
+<td><strong>data</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/SecureData">SecureData</a></td>
+<td>Encrypted <a href="/passport">Telegram Passport</a> element data</td>
+</tr>
+<tr>
+<td><strong>front_side</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/InputSecureFile">InputSecureFile</a></td>
+<td>Encrypted <a href="/passport">passport</a> file with the front side of the document</td>
+</tr>
+<tr>
+<td><strong>reverse_side</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/InputSecureFile">InputSecureFile</a></td>
+<td>Encrypted <a href="/passport">passport</a> file with the reverse side of the document</td>
+</tr>
+<tr>
+<td><strong>selfie</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/type/InputSecureFile">InputSecureFile</a></td>
+<td>Encrypted <a href="/passport">passport</a> file with a selfie of the user holding the document</td>
+</tr>
+<tr>
+<td><strong>translation</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.6?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/InputSecureFile">InputSecureFile</a>&gt;</td>
+<td>Array of encrypted <a href="/passport">passport</a> files with translated versions of the provided documents</td>
+</tr>
+<tr>
+<td><strong>files</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/InputSecureFile">InputSecureFile</a>&gt;</td>
+<td>Array of encrypted <a href="/passport">passport</a> files with photos the of the documents</td>
+</tr>
+<tr>
+<td><strong>plain_data</strong></td>
+<td><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/type/SecurePlainData">SecurePlainData</a></td>
+<td>Plaintext verified <a href="/passport">passport</a> data</td>
+</tr>
+</tbody>
+</table>
+<p>Here's a list of possible <a href="/type/SecureValueType">SecureValueTypes</a>, and the parameters that can be set/requested when using each type.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Type</th>
+<th>Allowed fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/constructor/secureValueTypeEmail">secureValueTypeEmail</a></td>
+<td><code>plain_data</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeEmail">secureValueTypePhone</a></td>
+<td><code>plain_data</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypePersonalDetails">secureValueTypePersonalDetails</a></td>
+<td><code>data</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypePassport">secureValueTypePassport</a></td>
+<td><code>data</code>, <code>front_side</code>, <code>selfie</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeDriverLicense">secureValueTypeDriverLicense</a></td>
+<td><code>data</code>, <code>front_side</code>, <code>reverse_side</code>, <code>selfie</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeIdentityCard">secureValueTypeIdentityCard</a></td>
+<td><code>data</code>, <code>front_side</code>, <code>reverse_side</code>, <code>selfie</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeInternalPassport">secureValueTypeInternalPassport</a></td>
+<td><code>data</code>, <code>front_side</code>, <code>selfie</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeAddress">secureValueTypeAddress</a></td>
+<td><code>data</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeUtilityBill">secureValueTypeUtilityBill</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeBankStatement">secureValueTypeBankStatement</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeRentalAgreement">secureValueTypeRentalAgreement</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypePassportRegistration">secureValueTypePassportRegistration</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/secureValueTypeTemporaryRegistration">secureValueTypeTemporaryRegistration</a></td>
+<td><code>files</code>, <code>translation</code></td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#fetching-and-deleting-stored-passport-data" id="fetching-and-deleting-stored-passport-data" name="fetching-and-deleting-stored-passport-data"><i class="anchor-icon"></i></a>Fetching and deleting stored passport data</h4>
+<pre><code>---functions---
+
+<a href='/method/account.getAllSecureValues'>account.getAllSecureValues</a>#b288bc7d = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValue'>SecureValue</a>&gt;;
+<a href='/method/account.getSecureValue'>account.getSecureValue</a>#73665bc2 types:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValueType'>SecureValueType</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValue'>SecureValue</a>&gt;;
+<a href='/method/account.deleteSecureValue'>account.deleteSecureValue</a>#b880bc4b types:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SecureValueType'>SecureValueType</a>&gt; = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>The above methods can be used to fetch or remove encrypted Telegram Passport files stored in the Telegram Cloud by document type.</p>
+<h3><a class="anchor" href="#passport-credentials" id="passport-credentials" name="passport-credentials"><i class="anchor-icon"></i></a>Passport Credentials</h3>
+<p>When a service requests data, it passes a <em>nonce</em> to the client. The nonce is a cryptographically secure unique identifier which allows the service to identify a request when receiving data as well as confirm the integrity of the data. The Telegram server doesn't have access to this nonce.</p>
+<p>Once the user authorizes the Telegram Passport data transfer, the client forms the credentials (<a href="/passport#credentials">Credentials JSON object</a>). Credentials contain the <em>data_hash</em> and <em>data_secret</em> from each element of Telegram Passport to which the user has allowed access. In addition to this, the credentials will always contain the <em>nonce</em> that the client received from the service at the initiation of the request. </p>
+<p>Credentials are then passed to the service through the Bot API in encrypted form. To encrypt the credentials, the client generates a <em>credentials_secret</em> (a 32-byte number with the modulo 255 sum of bytes equal to 239). Then the credentials are encrypted according to the following scheme:</p>
+<ul>
+<li>
+<p>Credentials are padded to a length which is divisible by 16 bytes. To achieve this, 32 to 255 bytes are added at the beginning, where the first byte always holds the number of added bytes and the rest are random.</p>
+</li>
+<li>
+<p>A hash of the padded credentials <em>credentials_hash</em> is calculated:</p>
+<pre><code>credentials_hash = SHA256( credentials )</code></pre>
+</li>
+<li>
+<p>The encryption key <em>credentials_key</em> is calculated:</p>
+<pre><code>credentials_secret_hash = SHA512( credentials_secret + credentials_hash )
+credentials_key = slice( credentials_secret_hash, 0, 32 )
+iv = slice( credentials_secret_hash, 32, 16 )</code></pre>
+</li>
+<li>
+<p>Credentials are encrypted using AES256-CBC with the key <em>credentials_key</em> and <em>iv</em>.  </p>
+<pre><code>encrypted_credentials = AES256-CBC-ENC(credentials, credentials_key, iv)</code></pre>
+</li>
+<li>
+<p><em>credentials_secret</em> is encrypted with the public RSA-key of the service with OPENSSL_PKCS1_OAEP_PADDING.</p>
+<pre><code>encrypted_credentials_secret = RSA-ENC(credentials_secret, key, OPENSSL_PKCS1_OAEP_PADDING)</code></pre>
+</li>
+<li>
+<p>The encrypted credentials are passed to the service via the MTProto API together with the encrypred <em>credentials_secret</em> and <em>credentials_hash</em>. Along with the credentials, the service receives from the Telegram Cloud the data it requested in encrypted form. See <a href="/api/passport#submitting-the-passport-form">Submitting the Passport Form</a> and <a href="/bots/api#passportdata">PassportData</a>:</p>
+<pre><code><a href='/constructor/secureCredentialsEncrypted'>secureCredentialsEncrypted</a>#33f0ea47 data:<a href='/type/bytes'>bytes</a> hash:<a href='/type/bytes'>bytes</a> secret:<a href='/type/bytes'>bytes</a> = <a href='/type/SecureCredentialsEncrypted'>SecureCredentialsEncrypted</a>;</code></pre>
+</li>
+<li>
+<p><code>data</code> is the <em>encrypted_credentials</em></p>
+</li>
+<li>
+<p><code>hash</code> is the <em>credentials_hash</em></p>
+</li>
+<li>
+<p><code>secret</code> is the <em>encrypted_credentials_secret</em></p>
+</li>
+</ul>
+<p>Then the service decrypts the data as described <a href="https://core.telegram.org/passport#receiving-information">here</a>.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

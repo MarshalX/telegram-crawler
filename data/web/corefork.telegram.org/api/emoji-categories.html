@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Emoji categories</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Sticker, custom emoji and GIF selection UIs should offer a list of categories to quickly filter results by a (list of) emojis, or by some other criteria.">
+    <meta property="og:title" content="Emoji categories">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Sticker, custom emoji and GIF selection UIs should offer a list of categories to quickly filter results by a (list of) emojis, or by some other criteria.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/emoji-categories" >Emoji categories</a></li></ul></div>
+  <h1 id="dev_page_title">Emoji categories</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Sticker, emoji, custom emoji and GIF selection UIs should offer a list of categories to quickly filter results by a (list of) emojis, or by some other criteria.  </p>
+<pre><code><a href='/constructor/messages.emojiGroupsNotModified'>messages.emojiGroupsNotModified</a>#6fb4ad87 = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;
+<a href='/constructor/messages.emojiGroups'>messages.emojiGroups</a>#881fb94b hash:<a href='/type/int'>int</a> groups:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/EmojiGroup'>EmojiGroup</a>&gt; = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;
+
+<a href='/constructor/emojiGroup'>emojiGroup</a>#7a9abda9 title:<a href='/type/string'>string</a> icon_emoji_id:<a href='/type/long'>long</a> emoticons:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/EmojiGroup'>EmojiGroup</a>;
+<a href='/constructor/emojiGroupGreeting'>emojiGroupGreeting</a>#80d26cc7 title:<a href='/type/string'>string</a> icon_emoji_id:<a href='/type/long'>long</a> emoticons:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/EmojiGroup'>EmojiGroup</a>;
+<a href='/constructor/emojiGroupPremium'>emojiGroupPremium</a>#93bcf34 title:<a href='/type/string'>string</a> icon_emoji_id:<a href='/type/long'>long</a> = <a href='/type/EmojiGroup'>EmojiGroup</a>;
+
+---functions---
+
+<a href='/method/messages.getEmojiGroups'>messages.getEmojiGroups</a>#7488ce5b hash:<a href='/type/int'>int</a> = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;
+<a href='/method/messages.getEmojiStickerGroups'>messages.getEmojiStickerGroups</a>#1dd840f5 hash:<a href='/type/int'>int</a> = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;
+<a href='/method/messages.getEmojiStatusGroups'>messages.getEmojiStatusGroups</a>#2ecd56cd hash:<a href='/type/int'>int</a> = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;
+<a href='/method/messages.getEmojiProfilePhotoGroups'>messages.getEmojiProfilePhotoGroups</a>#21a548f3 hash:<a href='/type/int'>int</a> = <a href='/type/messages.EmojiGroups'>messages.EmojiGroups</a>;</code></pre>
+<p>Use:</p>
+<ul>
+<li><a href="/method/messages.getEmojiStickerGroups">messages.getEmojiStickerGroups</a> when choosing a sticker.  </li>
+<li><a href="/method/messages.getEmojiStatusGroups">messages.getEmojiStatusGroups</a> when choosing a custom emoji to set as <a href="/api/emoji-status">emoji status</a>.  </li>
+<li><a href="/method/messages.getEmojiProfilePhotoGroups">messages.getEmojiProfilePhotoGroups</a> when choosing a custom emoji to set as <a href="/api/files#sticker-profile-pictures">profile picture</a></li>
+<li><a href="/method/messages.getEmojiGroups">messages.getEmojiGroups</a> in all other cases (including GIFs, emojis and custom emojis).  </li>
+</ul>
+<p>The methods listed above must be used to fetch a categorized list of UTF-8 emojis, periodically refreshed by the client, passing the <code>hash</code> returned by the previous call.  </p>
+<p>Each category is described by a <code>title</code> (i.e. "Animals", "Faces", "Flags"), is represented in the UI by a single <a href="/api/custom-emoji">custom emoji »</a> (<code>icon_emoji_id</code>).  </p>
+<p>All categories should be displayed in the sticker/emoji/custom emoji/GIF search bar, located in the top section of the sticker/custom emoji/GIF selection UI, using the <code>icon_emoji_id</code>.  </p>
+<p>When the user clicks on a specific emoji category, the client should display:</p>
+<ul>
+<li>All <a href="/api/premium">Premium</a>-only stickers (i.e. those with a <a href="/api/stickers#premium-animated-sticker-effects">Premium effect »</a>)/<a href="/api/premium">Premium</a>-only <a href="/api/custom-emoji">custom emojis</a> (i.e. those where the <a href="/constructor/documentAttributeCustomEmoji">documentAttributeCustomEmoji</a>.<code>free</code> flag is <strong>not</strong> set) if the <a href="/constructor/emojiGroupPremium">emojiGroupPremium</a> category is clicked OR</li>
+<li>All stickers/<a href="/api/custom-emoji">custom emojis</a>/emojis/GIFs matching the emojis in <code>emoticons</code> for the selected category, if an <a href="/constructor/emojiGroup">emojiGroup</a>/<a href="/constructor/emojiGroupGreeting">emojiGroupGreeting</a> category is clicked.  </li>
+</ul>
+<p>Note:</p>
+<ul>
+<li>When <a href="/api/gifs">choosing GIFs</a>, include only <a href="/constructor/emojiGroup">emojiGroup</a>s in the category list.</li>
+<li>When choosing emojis, first list all (usable, i.e. Premium+non-Premium for Premium users, non-Premium only for non-Premium users) custom emojis matching the <code>emoticons</code> of the chosen category, then the <code>emoticons</code> themselves.  </li>
+<li>When choosing a sticker for a <a href="/api/business#business-introduction">business introduction</a>, locally sort the result of <a href="/method/messages.getEmojiStickerGroups">messages.getEmojiStickerGroups</a>, putting all <a href="/constructor/emojiGroupGreeting">emojiGroupGreeting</a> categories first.</li>
+</ul></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

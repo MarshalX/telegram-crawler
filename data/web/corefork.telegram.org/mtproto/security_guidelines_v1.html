@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Security Guidelines for Client Developers (v.1.0, DEPRECATED)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="This document describes security recommendations for clients using MTProto 1.0, its status is DEPRECATED.
+For up-to-date…">
+    <meta property="og:title" content="Security Guidelines for Client Developers (v.1.0, DEPRECATED)">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="This document describes security recommendations for clients using MTProto 1.0, its status is DEPRECATED.
+For up-to-date…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class="active"><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/security_guidelines_v1" >Security Guidelines for Client Developers…</a></li></ul></div>
+  <h1 id="dev_page_title">Security Guidelines for Client Developers (v.1.0, DEPRECATED)</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<blockquote>
+<p>This document describes security recommendations for clients using MTProto 1.0, its status is <strong>DEPRECATED</strong>.
+For up-to-date security recommendations, kindly see <a href="/mtproto/security_guidelines">this document</a>.</p>
+</blockquote>
+<p><strong>See also:</strong></p>
+<p><div class="dev_page_nav_wrap"></p>
+<ul>
+<li><a href="/api/pfs">Perfect Forward Secrecy</a></li>
+<li><a href="/api/end-to-end">Secret chats, end-to-end encryption</a></li>
+<li><a href="/api/end-to-end/pfs">Perfect Forward Secrecy in Secret Chats</a>
+</div></li>
+</ul>
+<p>While <a href="/mtproto">MTProto</a> is designed to be a reasonably fast and secure protocol, its advantages can be easily negated by careless implementation. We collected some security guidelines for client software developers on this page. All Telegram clients are required to comply with these.</p>
+<h3><a class="anchor" href="#diffie--hellman-key-exchange" id="diffie--hellman-key-exchange" name="diffie--hellman-key-exchange"><i class="anchor-icon"></i></a>Diffie--Hellman key exchange</h3>
+<p>We use DH key exchange in two cases:</p>
+<ul>
+<li><a href="/mtproto/auth_key">Creating an authorization key</a></li>
+<li><a href="/api/end-to-end">Establishing Secret Chats with end-to-end encryption</a></li>
+</ul>
+<p>In both cases, there are some verifications to be done whenever DH is used:</p>
+<h4><a class="anchor" href="#validation-of-dh-parameters" id="validation-of-dh-parameters" name="validation-of-dh-parameters"><i class="anchor-icon"></i></a>Validation of DH parameters</h4>
+<p>Client is expected to check whether <strong>p = dh_prime</strong> is a safe 2048-bit prime (meaning that both <strong>p</strong> and <strong>(p-1)/2</strong> are prime, and that 2^2047 &lt; p &lt; 2^2048), and that <strong>g</strong> generates a cyclic subgroup of prime order <strong>(p-1)/2</strong>, i.e. is a quadratic residue <strong>mod p</strong>. Since <strong>g</strong> is always equal to 2, 3, 4, 5, 6 or 7, this is easily done using quadratic reciprocity law, yielding a simple condition on <strong>p mod 4g</strong> -- namely, <strong>p mod 8 = 7</strong> for <strong>g = 2</strong>; <strong>p mod 3 = 2</strong> for <strong>g = 3</strong>; no extra condition for <strong>g = 4</strong>; <strong>p mod 5 = 1 or 4</strong> for <strong>g = 5</strong>; <strong>p mod 24 = 19 or 23</strong> for <strong>g = 6</strong>; and <strong>p mod 7 = 3, 5 or 6</strong> for <strong>g = 7</strong>. After <strong>g</strong> and <strong>p</strong> have been checked by the client, it makes sense to cache the result, so as not to repeat lengthy computations in future.</p>
+<p>If the verification takes too long (which is the case for older mobile devices), one might initially run only 15 Miller--Rabin iterations (use parameter 30 in Java) for verifying primeness of <strong>p</strong> and <strong>(p - 1)/2</strong> with error probability not exceeding one billionth, and do more iterations in the background later.</p>
+<p>Another way to optimize this is to embed into the client application code a small table with some known "good" couples <strong>(g,p)</strong> (or just known safe primes <strong>p</strong>, since the condition on <strong>g</strong> is easily verified during execution), checked during code generation phase, so as to avoid doing such verification during runtime altogether. The server rarely changes these values, thus one usually needs to put the current value of server's <strong>dh_prime</strong> into such a table. For example, the current value of <strong>dh_prime</strong> equals (in big-endian byte order)</p>
+<pre><code>C7 1C AE B9 C6 B1 C9 04 8E 6C 52 2F 70 F1 3F 73 98 0D 40 23 8E 3E 21 C1 49 34 D0 37 56 3D 93 0F 48 19 8A 0A A7 C1 40 58 22 94 93 D2 25 30 F4 DB FA 33 6F 6E 0A C9 25 13 95 43 AE D4 4C CE 7C 37 20 FD 51 F6 94 58 70 5A C6 8C D4 FE 6B 6B 13 AB DC 97 46 51 29 69 32 84 54 F1 8F AF 8C 59 5F 64 24 77 FE 96 BB 2A 94 1D 5B CD 1D 4A C8 CC 49 88 07 08 FA 9B 37 8E 3C 4F 3A 90 60 BE E6 7C F9 A4 A4 A6 95 81 10 51 90 7E 16 27 53 B5 6B 0F 6B 41 0D BA 74 D8 A8 4B 2A 14 B3 14 4E 0E F1 28 47 54 FD 17 ED 95 0D 59 65 B4 B9 DD 46 58 2D B1 17 8D 16 9C 6B C4 65 B0 D6 FF 9C A3 92 8F EF 5B 9A E4 E4 18 FC 15 E8 3E BE A0 F8 7F A9 FF 5E ED 70 05 0D ED 28 49 F4 7B F9 59 D9 56 85 0C E9 29 85 1F 0D 81 15 F6 35 B1 05 EE 2E 4E 15 D0 4B 24 54 BF 6F 4F AD F0 34 B1 04 03 11 9C D8 E3 B9 2F CC 5B</code></pre>
+<h4><a class="anchor" href="#g-a-and-g-b-validation" id="g-a-and-g-b-validation" name="g-a-and-g-b-validation"><i class="anchor-icon"></i></a>g_a and g_b validation</h4>
+<p>Apart from the conditions on the Diffie-Hellman prime <strong>dh_prime</strong> and generator <strong>g</strong>, both sides are to check that <strong>g</strong>, <strong>g_a</strong> and <strong>g_b</strong> are greater than <strong>1</strong> and less than <strong>dh_prime - 1</strong>. We recommend checking that <strong>g_a</strong> and <strong>g_b</strong> are between <strong>2^{2048-64}</strong> and <strong>dh_prime - 2^{2048-64}</strong> as well.</p>
+<h4><a class="anchor" href="#checking-sha1-hash-values" id="checking-sha1-hash-values" name="checking-sha1-hash-values"><i class="anchor-icon"></i></a>Checking SHA1 hash values</h4>
+<p>Once the client receives a <code>server_DH_params_ok</code> answer in step 5) of the Authorization Key generation protocol and decrypts it obtaining <code>answer_with_hash</code>, it MUST check that  </p>
+<pre><code>answer_with_hash := SHA1(answer) + answer + (0-15 random bytes)</code></pre>
+<p>In other words, the first 20 bytes of <code>answer_with_hash</code> must be equal to SHA1 of the remainder of the decrypted message without the padding random bytes.</p>
+<h4><a class="anchor" href="#checking-nonce-server-nonce-and-new-nonce-fields" id="checking-nonce-server-nonce-and-new-nonce-fields" name="checking-nonce-server-nonce-and-new-nonce-fields"><i class="anchor-icon"></i></a>Checking nonce, server_nonce and new_nonce fields</h4>
+<p>When the client receives and/or decrypts server messages during creation of Authorization Key, and these messages contain some nonce fields already known to the client from messages previously obtained during the same run of the protocol, the client is to check that these fields indeed contain the values previosly known.</p>
+<h4><a class="anchor" href="#using-secure-pseudorandom-number-generator-to-create-dh-secret-parameters-a-and-b" id="using-secure-pseudorandom-number-generator-to-create-dh-secret-parameters-a-and-b" name="using-secure-pseudorandom-number-generator-to-create-dh-secret-parameters-a-and-b"><i class="anchor-icon"></i></a>Using secure pseudorandom number generator to create DH secret parameters <code>a</code> and <code>b</code></h4>
+<p>Client must use a cryptographically secure PRNG to generate secret exponents <code>a</code> or <code>b</code> for DH key exchange. For secret chats, the client might request some entropy (random bytes) from the server while invoking <a href="/method/messages.getDhConfig">messages.getDhConfig</a> and feed these random bytes into its PRNG (for example, by <code>PRNG_seed</code> if OpenSSL library is used), but never using these "random" bytes by themselves or replacing by them the local PRNG seed. One should mix bytes received from server into local PRNG seed.</p>
+<h3><a class="anchor" href="#mtproto-encrypted-messages" id="mtproto-encrypted-messages" name="mtproto-encrypted-messages"><i class="anchor-icon"></i></a>MTProto Encrypted Messages</h3>
+<p>Some important checks are to be done while sending and especially receiving <a href="/mtproto/description">encrypted MTProto messages</a>.</p>
+<h4><a class="anchor" href="#checking-sha1-hash-value-of-msg-key" id="checking-sha1-hash-value-of-msg-key" name="checking-sha1-hash-value-of-msg-key"><i class="anchor-icon"></i></a>Checking SHA1 hash value of msg_key</h4>
+<p><code>msg_key</code> is used not only to compute the AES key and IV to decrypt the received message. After decryption, the client <strong>MUST</strong> check that <code>msg_key</code> is indeed equal to SHA1 of the plaintext obtained as the result of decryption (without the final padding bytes).</p>
+<p>If an error is encountered before this check could be performed, the client <strong>must</strong> perform the <code>msg-key</code> check anyway before returning any result. Note that the response to any error encountered before the <code>msg_key</code> check <strong>must</strong> be the same as the response to a failed <code>msg_key</code> check.</p>
+<h4><a class="anchor" href="#checking-message-length" id="checking-message-length" name="checking-message-length"><i class="anchor-icon"></i></a>Checking message length</h4>
+<p>The client is to check that the length of the message or container obtained from the decrypted message (computed from its <code>length</code> field) does not exceed the total size of the plaintext, and that the difference is not more than 15 bytes. Apart from this, knowing the total length is important for the previous verification.</p>
+<p>The length should be always divisible by 4 and non-negative. On no account the client is to access data past the end of the decryption buffer containing the plaintext message.</p>
+<h4><a class="anchor" href="#checking-session-id" id="checking-session-id" name="checking-session-id"><i class="anchor-icon"></i></a>Checking session_id</h4>
+<p>The client is to check that the <code>session_id</code> field in the decrypted message indeed equals to that of an active session created by the client.</p>
+<h4><a class="anchor" href="#checking-msg-id" id="checking-msg-id" name="checking-msg-id"><i class="anchor-icon"></i></a>Checking msg_id</h4>
+<p>The client must check that <code>msg_id</code> has even parity for messages from client to server, and odd parity for messages from server to client.</p>
+<p>In addition, the identifiers (msg_id) of the last N messages received from the other side must be stored, and if a message comes in with an msg_id lower than all or equal to any of the stored values, that message is to be ignored. Otherwise, the new message msg_id is added to the set, and, if the number of stored msg_id values is greater than N, the oldest (i. e. the lowest) is discarded.</p>
+<p>In addition, msg_id values that belong over 30 seconds in the future or over 300 seconds in the past are to be ignored (recall that <code>msg_id</code> approximately equals unixtime * 2^32). This is especially important for the server. The client would also find this useful (to protect from a replay attack), but only if it is certain of its time (for example, if its time has been synchronized with that of the server).</p>
+<p>Certain client-to-server service messages containing data sent by the client to the server (for example, <code>msg_id</code> of a recent client query) may, nonetheless, be processed on the client even if the time appears to be “incorrect”. This is especially true of messages to change server_salt and notifications about invalid time on the client. See <a href="/mtproto/service_messages">Mobile Protocol: Service Messages</a>.</p>
+<h2><a class="anchor" href="#behavior-in-case-of-mismatch" id="behavior-in-case-of-mismatch" name="behavior-in-case-of-mismatch"><i class="anchor-icon"></i></a>Behavior in case of mismatch</h2>
+<p>If one of the checks listed above fails, the client is to completely discard the message obtained from server. We also recommend closing and reestablishing the TCP connection to the server, then retrying the operation or the whole key generation protocol.</p>
+<p>No information from incorrect messages can be used. Even if the application throws an exception and dies, this is much better than continuing with invalid data.</p>
+<p>Notice that invalid messages will infrequently appear during normal work even if no malicious tampering is being done. This is due to network transmission errors. We recommend ignoring the invalid message and closing the TCP connection, then creating a new TCP connection to the server and retrying the original query.</p></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
