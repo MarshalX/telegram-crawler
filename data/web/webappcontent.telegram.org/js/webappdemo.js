@@ -5,16 +5,20 @@ var DemoApp = {
   SecondaryButton: Telegram.WebApp.SecondaryButton,
   BackButton: Telegram.WebApp.BackButton,
   SettingsButton: Telegram.WebApp.SettingsButton,
+  _options: {},
 
   init: function(options) {
     $('body').css('visibility', '');
+    DemoApp._options = options || {};
     Telegram.WebApp.ready();
     Telegram.WebApp.MainButton.setParams({
+      icon_custom_emoji_id: DemoApp._options.mainIcon || null,
       text: 'Close Webview',
       has_shine_effect: true,
       is_visible: true
     }).onClick(DemoApp.close);
     Telegram.WebApp.SecondaryButton.setParams({
+      icon_custom_emoji_id: DemoApp._options.secondaryIcon || null,
       text: 'Do Something',
       is_visible: true
     }).onClick(DemoApp.moveSecondaryButton);
@@ -580,6 +584,17 @@ var DemoApp = {
     } else {
       DemoApp.SecondaryButton.show();
       el.innerHTML = 'Hide Secondary Button';
+    }
+  },
+  toggleButtonIcons: function(el) {
+    if (DemoApp.MainButton.iconCustomEmojiId) {
+      DemoApp.MainButton.iconCustomEmojiId = null;
+      DemoApp.SecondaryButton.iconCustomEmojiId = null;
+      el.innerHTML = 'Show Button Icons';
+    } else {
+      DemoApp.MainButton.iconCustomEmojiId = DemoApp._options.mainIcon;
+      DemoApp.SecondaryButton.iconCustomEmojiId = DemoApp._options.secondaryIcon;
+      el.innerHTML = 'Hide Button Icons';
     }
   },
   toggleButtonsProgress: function(el) {
