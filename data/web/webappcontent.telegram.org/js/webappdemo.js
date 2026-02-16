@@ -588,13 +588,21 @@ var DemoApp = {
   },
   toggleButtonIcons: function(el) {
     if (DemoApp.MainButton.iconCustomEmojiId) {
-      DemoApp.MainButton.iconCustomEmojiId = null;
-      DemoApp.SecondaryButton.iconCustomEmojiId = null;
-      el.innerHTML = 'Show Button Icons';
+      if (DemoApp.MainButton.text) {
+        DemoApp.MainButton.text = '';
+        DemoApp.SecondaryButton.text = '';
+        el.innerHTML = 'Hide Button Icons';
+      } else {
+        DemoApp.MainButton.text = 'Close Webview';
+        DemoApp.SecondaryButton.text = 'Do Something';
+        DemoApp.MainButton.iconCustomEmojiId = null;
+        DemoApp.SecondaryButton.iconCustomEmojiId = null;
+        el.innerHTML = 'Show Button Icons';
+      }
     } else {
       DemoApp.MainButton.iconCustomEmojiId = DemoApp._options.mainIcon;
       DemoApp.SecondaryButton.iconCustomEmojiId = DemoApp._options.secondaryIcon;
-      el.innerHTML = 'Hide Button Icons';
+      el.innerHTML = 'Show Button Icons Only';
     }
   },
   toggleButtonsProgress: function(el) {
