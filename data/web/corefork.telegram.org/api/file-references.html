@@ -49,7 +49,7 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400179/7/3wdzoKPC6lQ.48390.json/054f333ae31bf83d35">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400508/3/GoYXuyX7OjI.48390.json/ad732f866bdc68394b">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
@@ -457,8 +457,10 @@ extractUserIdFromInputUserAndStore#7720aa2e from:Path to:string = FieldExtractor
 <p>Takes the <a href="/constructor/stickerSet">stickerSet</a> at <code>from</code>, transforms it into an <a href="/type/InputStickerSet">InputStickerSet</a>, and stores it into <code>$FileSource.$to</code>.</p>
 <h6><code>extractPeerIdFromPeerAndStore</code></h6>
 <p>Takes the <a href="/type/Peer">Peer</a> at <code>from</code>, transforms it into a <a href="/api/bots/ids">bot API peer ID (of type <code>long</code>) »</a>, and stores it into <code>$FileSource.$to</code>.  </p>
-<h6><code>extractPeerIdFromPeerAndStore</code></h6>
+<h6><code>extractPeerIdFromInputPeerAndStore</code></h6>
 <p>Takes the <a href="/type/InputPeer">InputPeer</a> at <code>from</code>, transforms it into a <a href="/api/bots/ids">bot API peer ID (of type <code>long</code>) »</a>, and stores it into <code>$FileSource.$to</code>.  </p>
+<p>If <code>from</code> points to an <a href="/constructor/inputPeerSelf">inputPeerSelf</a>, stores the ID of the current user, instead.  </p>
+<p>Aborts if <code>from</code> points to an <a href="/constructor/inputPeerEmpty">inputPeerEmpty</a>.  </p>
 <h6><code>extractChannelIdFromChannelAndStore</code></h6>
 <p>Takes the <a href="/constructor/channel">channel</a> at <code>from</code>, takes the <code>id</code> field and stores it into <code>$FileSource.$to</code>.  </p>
 <h6><code>extractChannelIdFromInputChannelAndStore</code></h6>
