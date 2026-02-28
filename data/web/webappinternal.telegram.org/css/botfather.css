@@ -254,7 +254,7 @@ i.icon {
 .form-control-wrap {
   display: flex;
   border-radius: var(--def-border-radius);
-  background: var(--field-bg-color);
+  background: var(--header-bg-color);
   position: relative;
 }
 .form-control {
@@ -734,6 +734,19 @@ i.icon {
   cursor: pointer;
   transition: visibility var(--def-transition), opacity var(--def-transition);
 }
+
+.tm-row-group-hide-empty {
+  display: none;
+}
+.tm-row-group-hide-empty:has(.tm-row) {
+  display: block;
+}
+
+.tm-row-group-header {
+  padding: 8px 14px 0px;
+  background: var(--header-bg-color);
+}
+
 .tm-search-loading {
   visibility: hidden;
   opacity: 0;
@@ -763,6 +776,13 @@ i.icon {
   width: 18px;
   height: 18px;
   background-image: var(--image-url-main-search-clear);
+}
+.icon-delete-item {
+  width: 22px;
+  height: 22px;
+  background-image: var(--image-url-main-search-clear);
+  margin: 12px;
+  background-size: 100%;
 }
 .tm-main-search-form .icon-search-error:before {
   width: 20px;
@@ -889,8 +909,13 @@ i.icon {
   min-width: 0;
 }
 
-.tm-row:hover {
+.tm-row:not(.tm-row-no-highlight,.tm-field):hover {
   background: var(--table-bg-hover-color);
+}
+
+.tm-row.tm-field {
+  padding: 0;
+  border-radius: 0;
 }
 
 .tm-row-link:after {
@@ -971,6 +996,13 @@ i.icon {
   align-self: flex-start;
 }
 
+.tm-table-header {
+  flex-shrink: 0;
+  margin-inline-end: 12px;
+  font-size: 12px;
+  color: #8794a1;
+}
+
 .tm-api-token-wrap {
   width: 100%;
   padding: 14px;
@@ -982,12 +1014,11 @@ i.icon {
   background: #2B3642;
   padding: 12px;
   border-radius: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 8px; 
   font-size: 14px;
   color: #fff;
   white-space: nowrap;
   text-overflow: ellipsis;
-  overflow: clip;
   align-items: center;
   text-overflow: ellipsis;
   padding: 9px 12px;
@@ -1017,11 +1048,34 @@ i.emoji {
   width: 24px;
   height: 24px;
   display: inline-block;
-  content: " ";
+  content: " "; 
   background-image: var(--image-url-key);
   margin-right: 4px;
   flex-shrink: 0;
   vertical-align: bottom;
+}
+
+.tm-api-token-wrap:has(.tm-api-token-client-secret) {
+  padding: 0px 0px;
+  width: 100%;
+  background: transparent;
+}
+
+.tm-api-token.tm-api-token-client-secret {
+  padding: 0px 0px;
+  margin: 0;
+  margin-top: -7px;
+  margin-inline-end: -14px;
+  margin-top: -3px;
+  background: none;
+}
+
+.tm-api-token.tm-api-token-client-secret::before {
+  content: none;
+}
+
+.tm-api-token-client-secret .js-spoiler {
+  flex-shrink: 1;
 }
 
 .tm-api-token-actions {
@@ -1584,6 +1638,8 @@ i.emoji {
 
   --image-url-copy-icon: url('data:image/svg+xml,%3Csvg%20height%3D%2218%22%20viewBox%3D%220%200%2013%2018%22%20width%3D%2213%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23fff%22%20stroke-width%3D%221.4%22%3E%3Crect%20height%3D%2211.5%22%20rx%3D%221.5%22%20width%3D%228.48%22%20x%3D%223.52%22%20y%3D%224.5%22%2F%3E%3Cpath%20d%3D%22m1%2012.25v-7.5c0-1.52%201.23-2.75%202.75-2.75h4.35%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
 
+  --image-url-copy-new: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Crect x='4.72' y='7.72' width='11.56' height='11.56' rx='1.78' stroke='%234CB2FF' stroke-width='1.44'/%3E%3Cpath d='M20 15.5V9.6C20 7.63982 20 6.65972 19.6185 5.91103C19.283 5.25247 18.7475 4.71703 18.089 4.38148C17.3403 4 16.3602 4 14.4 4H8.5' stroke='%234CB2FF' stroke-width='1.44' stroke-linecap='round'/%3E%3C/svg%3E");
+
   --image-url-copy-text-icon: url('data:image/svg+xml,%3Csvg%20height%3D%2218%22%20viewBox%3D%220%200%2013%2018%22%20width%3D%2213%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%234db2ff%22%20stroke-width%3D%221.4%22%3E%3Crect%20height%3D%2211.5%22%20rx%3D%221.5%22%20width%3D%228.48%22%20x%3D%223.52%22%20y%3D%224.5%22%2F%3E%3Cpath%20d%3D%22m1%2012.25v-7.5c0-1.52%201.23-2.75%202.75-2.75h4.35%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
 
   --image-url-tooltip-bottom: url('data:image/svg+xml,%3Csvg%20height%3D%226%22%20viewBox%3D%220%200%2015%206%22%20width%3D%2215%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m0%200h15c-.22%200-.47.1-.66.29l-4.71%204.64c-1.17%201.15-3.05%201.15-4.21%200l-4.72-4.64c-.19-.19-.44-.29-.7-.29z%22%20fill%3D%22%232d3c4c%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E');
@@ -1688,6 +1744,11 @@ i.emoji {
     left: 0;
     max-height: 234px;
     overflow-y: auto;
+}
+
+.dropdown-menu.dropdown-menu-left {
+  left: 0;
+  right: auto;
 }
 
 .tm-lang-add {
@@ -2037,6 +2098,7 @@ textarea {
   transition: color ease 0.15s;
   cursor: pointer;
   contain: content;
+  overflow: clip;
 }
 .js-spoiler.js-spoiler-revealed {
   color: inherit;
@@ -2348,4 +2410,27 @@ section {display:flex;flex-direction:column;align-items:center;justify-content:c
   max-width: 100%;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+.copy-btn {
+  width: 32px;
+  height: 32px;
+  background: no-repeat;
+  background-image: var(--image-url-copy-new);
+  background-size: 24px;
+  background-position: center;
+  flex-shrink: 0;
+  margin: -6px 0;
+  position: relative;
+  bottom: 10px;
+}
+
+.js-revoke-client-secret {
+  cursor: pointer;
+  color: #E3695D;
+}
+
+.js-revoke-client-secret:hover {
+  color: #E3695D;
+  
 }
