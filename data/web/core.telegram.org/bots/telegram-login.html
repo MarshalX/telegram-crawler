@@ -2,19 +2,20 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>Page not found</title>
+    <title>Log In With Telegram</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="">
-    <meta property="og:title" content="Page not found">
-    <meta property="og:image" content="">
-    <meta property="og:description" content="">
+    <meta property="description" content="Telegram offers app and website developers a free and open platform that lets over 1 billion users seamlessly sign up and…">
+    <meta property="og:title" content="Log In With Telegram">
+    <meta property="og:image" content="https://core.telegram.org/file/400780400680/1/LQAYyWKJXy0.260963.png/8fe2cdf47d8a182740">
+    <meta property="og:description" content="Telegram offers app and website developers a free and open platform that lets over 1 billion users seamlessly sign up and…">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
 <link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
     <link href="/css/bootstrap.min.css?3" rel="stylesheet">
-    
+    <link href="/css/bootstrap-extra.css?2" rel="stylesheet">
+
     <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
     <style>
     </style>
@@ -40,9 +41,355 @@
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
   <div class="dev_page_bread_crumbs"></div>
-  <h1 id="dev_page_title">Page not found</h1>
+  <h1 id="dev_page_title">Log In With Telegram</h1>
   
-  <div id="dev_page_content">The page has not been saved</div>
+  <div id="dev_page_content"><p>Telegram offers app and website developers <strong>a free and open platform</strong> that lets over <strong>1 billion</strong> users seamlessly <strong>sign up and log in</strong> with their Telegram accounts.</p>
+<div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400046/6/lzgRh3Hn0Ec.49953.jpg/d6bd5793f35f463749" style="max-width: 600px;" alt="Telegram Login">
+  <source src="/file/400780400885/2/Qc3SOZNZOLA.3171201.mp4/da53cf9e54f1eeab73" type="video/mp4">
+ </video></div>
+</div>
+
+<h4><a class="anchor" name="benefits-of-telegram-login" href="#benefits-of-telegram-login"><i class="anchor-icon"></i></a>Benefits of Telegram Login</h4>
+<ul>
+<li><p><strong>Higher conversion</strong><br>Users sign in with a few taps, boosting conversion and retention.</p>
+</li>
+<li><p><strong>Lower verification costs</strong><br>Users can share their <strong>verified phone number</strong>, removing the need for expensive codes.</p>
+</li>
+<li><p><strong>Direct communication channels</strong><br>You can reach your users within Telegram, with built-in push notification support.</p>
+</li>
+<li><p><strong>Further integration</strong><br>You can deliver more services directly via the <a href="https://core.telegram.org/bots">Bot API</a> and <a href="https://core.telegram.org/bots/webapps">Mini Apps</a>.</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> This document describes the Telegram Login library and the new <a href="https://en.wikipedia.org/wiki/OpenID#OpenID_Connect_(OIDC%29">OpenID Connect</a> login flow.<br>The legacy iframe-based JavaScript widget documentation is archived <a href="/widgets/login">here</a>.</p>
+</blockquote>
+<hr>
+<h3><a class="anchor" name="getting-started" href="#getting-started"><i class="anchor-icon"></i></a>Getting Started</h3>
+<p>Telegram offers a <a href="#using-the-telegram-login-library">compact tool</a> to quickly add Telegram login buttons to your interface. You can also directly access our library&#39;s <a href="#available-methods">JS API</a>. </p>
+<p>Alternatively, Telegram supports the standard <a href="https://en.wikipedia.org/wiki/OpenID#OpenID_Connect_(OIDC%29">OpenID Connect</a> protocol. This allows you to integrate Telegram authentication into your application using any OIDC-compatible library or authentication platform (e.g.,  Keycloak, Authentik, Auth0 etc.).</p>
+<p>Our implementation follows the standard <a href="https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth">Authorization Code Flow</a> with <strong>PKCE</strong> support.</p>
+<blockquote>
+<p>For an in-depth understanding of the general OIDC flow, please refer to the <a href="https://openid.net/developers/how-connect-works">OpenID Foundation&#39;s Developer Guide</a>.</p>
+</blockquote>
+<h4><a class="anchor" name="tldr" href="#tldr"><i class="anchor-icon"></i></a>TL;DR</h4>
+<ul>
+<li><strong><a href="#setting-up-a-bot">Set up a bot</a></strong> to represent your application.</li>
+<li><strong><a href="#registering-your-allowed-urls">Register your Allowed URLs</a></strong> via <a href="https://t.me/botfather">@BotFather</a> and obtain your Client ID and Secret.</li>
+<li><strong><a href="#using-the-telegram-login-library">Add the Telegram Login library</a></strong> to your page</li>
+<li><strong><a href="#validating-id-tokens">Validate ID tokens</a></strong> to cryptographically verify incoming requests.</li>
+</ul>
+<p>Alternatively, you can <a href="#openid-connect">use an OpenID integration</a>.</p>
+<blockquote>
+<p>Having trouble with any of the steps above? Feel free to reach out to us at <a href="https://t.me/botsupport">@BotSupport</a>, making sure to include the hashtag #oidc in your message.</p>
+</blockquote>
+<h4><a class="anchor" name="setting-up-a-bot" href="#setting-up-a-bot"><i class="anchor-icon"></i></a>Setting up a bot</h4>
+<p>To use Telegram Login, you&#39;ll need a <a href="/bots#how-do-i-create-a-bot"><strong>Telegram bot</strong></a> to represent your application.</p>
+<p>We strongly recommend that the <strong>profile picture</strong> of the bot corresponds with your website&#39;s logo, and that the bot&#39;s <strong>name</strong> reflects that connection. Users will see a confirmation box similar to the one below when logging in:</p>
+<div class="blog_image_wrap">
+  <a href="/file/400780400680/1/LQAYyWKJXy0.260963.png/8fe2cdf47d8a182740" target="_blank"><img src="/file/400780400680/1/LQAYyWKJXy0.260963.png/8fe2cdf47d8a182740" title="Login confirmation box" /></a>
+</div>
+
+<blockquote>
+<p>Users are much more likely to authorize your app if the bot has a name and logo they recognize and expect. Official services can also <a href="https://telegram.org/verify">apply for verification</a> from Telegram or <a href="https://telegram.org/verify#third-party-verification">third parties</a> for greater transparency. </p>
+</blockquote>
+<h4><a class="anchor" name="registering-your-allowed-urls" href="#registering-your-allowed-urls"><i class="anchor-icon"></i></a>Registering your Allowed URLs</h4>
+<p>Once you have chosen a bot, open the <a href="https://t.me/botfather?startapp"><strong>@BotFather</strong></a> mini app and navigate to <strong>Bot Settings &gt; Web Login</strong>.</p>
+<p>Add all <strong>Allowed URLs</strong> for your application. This includes the website origins where you embed the login widget (e.g., <code>https://example.com</code>) and specific redirect URIs for your OIDC flow (e.g., <code>https://example.com/auth/callback</code>). You can register multiple URLs to support different domains or endpoints.</p>
+<p>In this section, <a href="https://t.me/botfather">@BotFather</a> will also display your <strong>Client ID</strong> and <strong>Client Secret</strong>. Save these values securely – you will need them to configure your OIDC client.</p>
+<blockquote>
+<p><strong>Important:</strong> For security reasons, Telegram will only process logins or redirect users using your pre-registered URLs.</p>
+</blockquote>
+<h3><a class="anchor" name="using-the-telegram-login-library" href="#using-the-telegram-login-library"><i class="anchor-icon"></i></a>Using the Telegram Login library</h3>
+<p>Use the tool below to customize your button and get the HTML snippet for your website.</p>
+<p><style>.tg-auth-button { margin: 24px auto; }</style>
+<form class="form-horizontal form-telegram row" id="login_widget_config" style="min-height: 290px;">
+<div class="clearfix col-md-6">
+  <div class="form-group">
+    <label class="control-label">Client ID:</label>
+    <div style="max-width: 320px;">
+      <div class="textfield-item">
+        <input id="client_id" name="client_id" type="text" class="form-control" placeholder="Enter Client ID from BotFather" value="" onchange="updateWidget()" onblur="updateWidget()">
+        <div class="textfield-item-underline"></div>
+        <span class="textfield-item-error" id="client_id_error"></span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex;">
+      <div class="form-group" style="flex-grow: 1;">
+    <label class="control-label">Button Style:</label>
+    <div class="">
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="rounded" value="1" onchange="updateWidget(true)" checked />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Rounded</span>
+      </label>
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="outlined" value="1" onchange="updateWidget(true)" />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Outlined</span>
+      </label>
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="icon" value="1" onchange="updateWidget(true)" />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Icon</span>
+      </label>
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="shine" value="1" onchange="updateWidget(true)" />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Shine</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="form-group" style="flex-grow: 1;">
+    <label class="control-label">Scopes:</label>
+    <div class="">
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="request_write" value="1" onchange="updateWidget(true)" checked />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Request Direct Messages</span>
+      </label>
+      <label class="checkbox-item checkbox-item-block">
+        <input type="checkbox" class="checkbox" name="request_phone" value="1" onchange="updateWidget(true)" />
+        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Request Phone Number</span>
+      </label>
+    </div>
+  </div>
+</div>
+</div>
+<div class="clearfix col-md-6">
+  <div class="form-group">
+    <label for="embed_code" class="control-label">Embed Code:</label>
+    <div>
+      <textarea id="embed_code" class="form-control embed_code" rows="14" style="max-height: 240px;" readonly onclick="embedSelect(this)"></textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div>
+      <div class="widget_container" id="widget_container"></div>
+    </div>
+  </div>
+</div>
+</form></p>
+<p>Alternatively, you can interact with the library using the following JS methods:</p>
+<h4><a class="anchor" name="available-methods" href="#available-methods"><i class="anchor-icon"></i></a>Available Methods</h4>
+<table class="table">
+<thead>
+<tr>
+<th align="left">Method</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>Telegram.Login.init(InitOptions, callback)</code></td>
+<td align="left">Initialize the SDK and register an auth callback.</td>
+</tr>
+<tr>
+<td align="left"><code>Telegram.Login.open([callback])</code></td>
+<td align="left">Open the login popup using the initialized options.</td>
+</tr>
+<tr>
+<td align="left"><code>Telegram.Login.auth(InitOptions, callback)</code></td>
+<td align="left">Open the login popup with explicit options.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="initoptions" href="#initoptions"><i class="anchor-icon"></i></a>InitOptions</h4>
+<table class="table">
+<thead>
+<tr>
+<th align="left">Option</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>client_id</code></td>
+<td align="left">number</td>
+<td align="left">Your bot’s Client ID provided by <a href="https://t.me/botfather">@BotFather</a>.</td>
+</tr>
+<tr>
+<td align="left"><code>request_access</code></td>
+<td align="left">array(<code>phone</code> | <code>write</code>)</td>
+<td align="left"><em>Optional.</em> Ask for a phone number / permission to message the user.</td>
+</tr>
+<tr>
+<td align="left"><code>lang</code></td>
+<td align="left">string</td>
+<td align="left"><em>Optional.</em> UI language code (e.g., <code>en</code>, <code>es</code>).</td>
+</tr>
+<tr>
+<td align="left"><code>nonce</code></td>
+<td align="left">string</td>
+<td align="left"><em>Optional.</em> Server-generated random string to be included in the resulting <code>id_token</code> to prevent replay attacks.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="callback-data" href="#callback-data"><i class="anchor-icon"></i></a>Callback Data</h4>
+<p>When the login flow completes, the callback may receive either a success payload (user data) or an error.</p>
+<table class="table">
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>id_token</code></td>
+<td align="left">string</td>
+<td align="left">An OIDC JWT token containing user claims. <strong>Important: <a href="#validating-id-tokens">Verify the validity of ID token server-side</a></strong></td>
+</tr>
+<tr>
+<td align="left"><code>user</code></td>
+<td align="left"><a href="#user-data-structure">UserData</a></td>
+<td align="left">Decoded <code>id_token</code>, containing the requested user info.</td>
+</tr>
+<tr>
+<td align="left"><code>error</code></td>
+<td align="left">string</td>
+<td align="left">Error description.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3><a class="anchor" name="openid-connect" href="#openid-connect"><i class="anchor-icon"></i></a>OpenID Connect</h3>
+<p>If you are using an OIDC-compatible library or identity broker, you can use the standard configuration values below.</p>
+<p><strong>Discovery Document URL</strong></p>
+<pre><code>https://oauth.telegram.org/.well-known/openid-configuration</code></pre>
+<p><strong>Client Configuration</strong></p>
+<table class="table">
+<thead>
+<tr>
+<th align="left">Parameter</th>
+<th align="left">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>Client ID</strong></td>
+<td align="left">The Client ID provided by BotFather</td>
+</tr>
+<tr>
+<td align="left"><strong>Client Secret</strong></td>
+<td align="left">The Client Secret provided by BotFather</td>
+</tr>
+<tr>
+<td align="left"><strong>Response Type</strong></td>
+<td align="left"><code>code</code></td>
+</tr>
+<tr>
+<td align="left"><strong>PKCE</strong></td>
+<td align="left">Recommended (S256)</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="available-scopes" href="#available-scopes"><i class="anchor-icon"></i></a>Available Scopes</h4>
+<p>You can request specific permissions when initiating authorization. The <code>openid</code> scope is required.</p>
+<table class="table">
+<thead>
+<tr>
+<th align="left">Scope</th>
+<th align="left">Description</th>
+<th align="left">Claims Returned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>openid</code></td>
+<td align="left"><strong>Required.</strong> Returns the user&#39;s unique identifier and auth timestamp.</td>
+<td align="left"><code>sub</code>, <code>iss</code>, <code>iat</code>, <code>exp</code></td>
+</tr>
+<tr>
+<td align="left"><code>profile</code></td>
+<td align="left">User&#39;s basic info: name, username, and profile photo URL.</td>
+<td align="left"><code>name</code>, <code>preferred_username</code>, <code>picture</code></td>
+</tr>
+<tr>
+<td align="left"><code>phone</code></td>
+<td align="left">User&#39;s verified <strong>phone number</strong>. Requires user consent.</td>
+<td align="left"><code>phone_number</code></td>
+</tr>
+<tr>
+<td align="left"><code>telegram:bot_access</code></td>
+<td align="left">Allows your bot to send direct messages to the user after login.</td>
+<td align="left">—</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="user-data-structure" href="#user-data-structure"><i class="anchor-icon"></i></a>User Data Structure</h4>
+<p>All requested user information is returned directly in the <strong>ID token</strong>. After successful authentication, the decoded ID token will look like this:</p>
+<pre><code class="lang-json">{
+  &quot;iss&quot;: &quot;https://oauth.telegram.org&quot;,
+  &quot;aud&quot;: &quot;123456789&quot;,
+  &quot;sub&quot;: &quot;1234123412341234123&quot;,
+  &quot;iat&quot;: 1700000000,
+  &quot;exp&quot;: 1700003600,
+  &quot;id&quot;: 987654321,
+  &quot;name&quot;: &quot;John Doe&quot;,
+  &quot;preferred_username&quot;: &quot;johndoe&quot;,
+  &quot;picture&quot;: &quot;https://cdn4.telesco.pe/file...&quot;,
+  &quot;phone_number&quot;: &quot;971577777777&quot;
+}</code></pre>
+<blockquote>
+<p>Note that Telegram does not currently provide a separate <code>UserInfo</code> endpoint. However, some OIDC libraries may expect this endpoint by default, and you may need to <strong>configure them</strong> to skip a separate <code>userinfo</code> request.</p>
+</blockquote>
+<hr>
+<h3><a class="anchor" name="manual-implementation" href="#manual-implementation"><i class="anchor-icon"></i></a>Manual Implementation</h3>
+<p>If you are integrating the OIDC flow manually without a library, use the endpoints and flow details below.</p>
+<h4><a class="anchor" name="endpoints" href="#endpoints"><i class="anchor-icon"></i></a>Endpoints</h4>
+<ul>
+<li><strong>Authorization:</strong> <code>https://oauth.telegram.org/auth</code></li>
+<li><strong>Token:</strong> <code>https://oauth.telegram.org/token</code></li>
+<li><strong>Keys (JWKS):</strong> <code>https://oauth.telegram.org/.well-known/jwks.json</code></li>
+</ul>
+<h4><a class="anchor" name="initiate-authorization" href="#initiate-authorization"><i class="anchor-icon"></i></a>Initiate Authorization</h4>
+<p>Direct the user to the authorization endpoint with the following parameters. This URL must be opened in the user&#39;s browser.</p>
+<pre><code class="lang-http">GET https://oauth.telegram.org/auth?
+    client_id=&lt;YOUR_BOT_ID&gt;&amp;
+    redirect_uri=&lt;YOUR_CALLBACK_URL&gt;&amp;
+    response_type=code&amp;
+    scope=openid%20profile%20phone&amp;
+    state=&lt;RANDOM_STRING&gt;&amp;
+    code_challenge=&lt;PKCE_CHALLENGE&gt;&amp;
+    code_challenge_method=S256</code></pre>
+<ul>
+<li><strong>client_id</strong>: Client ID provided by BotFather.</li>
+<li><strong>state</strong>: A random string generated by your backend to prevent CSRF.</li>
+<li><strong>code_challenge</strong>: Base64URL-encoded SHA256 hash of your code verifier (PKCE).</li>
+</ul>
+<h4><a class="anchor" name="exchange-code-for-tokens" href="#exchange-code-for-tokens"><i class="anchor-icon"></i></a>Exchange Code for Tokens</h4>
+<p>If the user approves the login, they will be redirected to your <code>redirect_uri</code> with a <code>code</code> parameter. Exchange this code for an access token and ID token by making a server-side POST request.</p>
+<p>This request requires <strong>Basic Authorization</strong> using your Client ID and Client Secret (<code>base64(client_id:client_secret)</code>).</p>
+<pre><code class="lang-http">POST https://oauth.telegram.org/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic &lt;BASE64_CREDENTIALS&gt;
+
+grant_type=authorization_code&amp;
+code=&lt;AUTHORIZATION_CODE&gt;&amp;
+redirect_uri=&lt;YOUR_CALLBACK_URL&gt;&amp;
+client_id=&lt;YOUR_BOT_ID&gt;&amp;
+code_verifier=&lt;PKCE_VERIFIER&gt;</code></pre>
+<p><strong>Response:</strong></p>
+<pre><code class="lang-json">{
+  &quot;access_token&quot;: &quot;...&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;id_token&quot;: &quot;eyJhbGciOiJ...&quot;
+}</code></pre>
+<h4><a class="anchor" name="validating-id-tokens" href="#validating-id-tokens"><i class="anchor-icon"></i></a>Validating ID Tokens</h4>
+<p>The <code>id_token</code> is a signed JSON Web Token (JWT). Before trusting the user data inside, you <strong>must</strong> validate the signature:</p>
+<ol>
+<li><strong>Fetch Keys:</strong> specific public keys from the <a href="https://oauth.telegram.org/.well-known/jwks.json">JWKS endpoint</a>.</li>
+<li><strong>Verify Signature:</strong> Ensure the token was signed by Telegram.</li>
+<li><strong>Verify Claims:</strong> Check that <code>iss</code> is <code>https://oauth.telegram.org</code>, <code>aud</code> matches your Bot ID, and the token has not expired (<code>exp</code>).</li>
+</ol>
+<hr>
+<blockquote>
+<p>Once you have established a connection with the user, you can optionally use your <strong>linked bot</strong> to provide services <strong>directly in the chat interface</strong> via the <a href="https://core.telegram.org/bots">Bot API</a>, or seamlessly offer your <strong>entire web application inside Telegram</strong> using <a href="https://core.telegram.org/bots/webapps">Mini Apps</a>.</p>
+</blockquote>
+</div>
   
 </div>
           
@@ -106,8 +453,90 @@
 </div>
     </div>
     <script src="/js/main.js?47"></script>
-    
-    <script>backToTopInit("Go up");
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/jquery-ui.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+<script src="https://oauth.telegram.org/js/telegram-login.js?3"></script>
+
+    <script>function onTelegramAuth(data) {
+  if (!data.error) {
+    alert('Logged in as ' + data.user.name);
+  }
+}
+function updateWidget(widget_update, init) {
+  var form = $('#login_widget_config').get(0);
+  var tfi = $('#client_id').parents('.textfield-item');
+  var client_id = init ? 8521897198 : $('#client_id').val()?.trim();
+  var has_client_id = false;
+
+  if (/^\d+$/.test(client_id)) {
+    tfi.removeClass('is-invalid');
+    has_client_id = true;
+  } else {
+    if (!client_id) {
+      $('#client_id_error').html("Client ID required");
+    } else {
+      $('#client_id_error').html("Client ID is invalid");
+    }
+    $('#client_id_error').one('input', function() {
+      tfi.removeClass('is-invalid');
+    });
+    tfi.addClass('is-invalid');
+  }
+  var classes = [];
+  if (!form.rounded.checked) {
+    classes.push('square');
+  }
+  if (form.outlined.checked) {
+    classes.push('outlined');
+  }
+  if (form.icon.checked) {
+    classes.push('icon');
+  }
+  if (form.shine.checked) {
+    classes.push('shine');
+  }
+  classes = classes.join(' ');
+  var sign_in_label = "Sign In with Telegram";
+  if (widget_update) {
+    var code = `<div class="tg-auth-button" data-style="${classes}" tabindex="0" aria-label="Log in with Telegram">${sign_in_label}</div>`;
+    $('#widget_container').html(code);
+  }
+
+  var request_access = [];
+  if (form.request_write.checked) {
+    request_access.push('write');
+  }
+  if (form.request_phone.checked) {
+    request_access.push('phone');
+  }
+  var req_access_str = request_access.join(' ');
+
+  var code = '<script async src="https://oauth.telegram.org/js/telegram-login.js?3" data-client-id="' + client_id + '" data-onauth="console.log(data)"' + (req_access_str ? ' data-request-access="' + req_access_str + '"' : '') + '><\/script>';
+  code += `
+
+<button class="tg-auth-button"${classes ? ' data-style="' + classes + '"' : ''}>${sign_in_label}</button>`;
+
+  $('#embed_code').val(code);
+  $('#embed_code').height(0);
+  $('#embed_code').height($('#embed_code').get(0).scrollHeight);
+
+  Telegram.Login.init({client_id: 8521897198, request_access: request_access}, onTelegramAuth);
+
+  return has_client_id;
+}
+function embedSelect(el) {
+  if (updateWidget()) {
+    el.select();
+  } else {
+    $('#client_id').select();
+  }
+}
+updateWidget(true, true);
+initRipple();
+Telegram.Login.init({client_id: 8521897198, request_access: ['write']}, onTelegramAuth);
+initScrollVideos(true);
+backToTopInit("Go up");
 removePreloadInit();
 </script>
   </body>
