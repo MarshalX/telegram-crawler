@@ -49,11 +49,16 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400512/6/Sauo6rCt1WI.48390.json/5122f440eddfb619ba">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400751/3/ib7XXl-0xa0.48390.json/c337a1327ffef4087b">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
-<li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
-<li>A <strong>file reference origin</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </li>
+<li>
+<p>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </p>
+</li>
+<li>
+<p>A <strong>file reference origin</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </p>
+<p>The <a href="#file-source-dictionary">file source dictionary »</a> maps a <code>FileId</code> to one or more file reference origins.  </p>
+</li>
 </ul>
 <p>The database map file contains <strong>all possible origins</strong>, for <strong>all possible file reference paths</strong>.  </p>
 <p>It is automatically generated and validated by the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
