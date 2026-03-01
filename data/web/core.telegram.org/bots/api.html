@@ -53,6 +53,19 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="march-1-2026" href="#march-1-2026"><i class="anchor-icon"></i></a>March 1, 2026</h4>
+<p><strong>Bot API 9.5</strong></p>
+<ul>
+<li>Added the <a href="#messageentity">MessageEntity</a> type “date_time”, allowing bots to show a formatted date and time to the user.</li>
+<li>Allowed all bots to use the method <a href="#sendmessagedraft">sendMessageDraft</a>.</li>
+<li>Added the field <em>tag</em> to the classes <a href="#chatmembermember">ChatMemberMember</a> and <a href="#chatmemberrestricted">ChatMemberRestricted</a>.</li>
+<li>Added the method <a href="#setchatmembertag">setChatMemberTag</a>.</li>
+<li>Added the field <em>can_edit_tag</em> to the classes <a href="#chatmemberrestricted">ChatMemberRestricted</a> and <a href="#chatpermissions">ChatPermissions</a>.</li>
+<li>Added the field <em>can_manage_tags</em> to the classes <a href="#chatmemberadministrator">ChatMemberAdministrator</a> and <a href="#chatadministratorrights">ChatAdministratorRights</a>.</li>
+<li>Added the parameter <em>can_manage_tags</em> to the method <a href="#promotechatmember">promoteChatMember</a>.</li>
+<li>Added the field <em>sender_tag</em> to the class <a href="#message">Message</a>.</li>
+<li>Added the field <em>iconCustomEmojiId</em> to the class <a href="/bots/webapps#bottombutton">BottomButton</a>.</li>
+</ul>
 <h4><a class="anchor" name="february-9-2026" href="#february-9-2026"><i class="anchor-icon"></i></a>February 9, 2026</h4>
 <p><strong>Bot API 9.4</strong></p>
 <ul>
@@ -968,6 +981,11 @@ To learn how to create…">
 <td><em>Optional</em>. The bot that actually sent the message on behalf of the business account. Available only for outgoing messages sent on behalf of the connected business account.</td>
 </tr>
 <tr>
+<td>sender_tag</td>
+<td>String</td>
+<td><em>Optional</em>. Tag or custom title of the sender of the message; for supergroups only</td>
+</tr>
+<tr>
 <td>date</td>
 <td>Integer</td>
 <td>Date the message was sent in Unix time. It is always a positive number, representing a valid date.</td>
@@ -1050,7 +1068,7 @@ To learn how to create…">
 <tr>
 <td>media_group_id</td>
 <td>String</td>
-<td><em>Optional</em>. The unique identifier of a media message group this message belongs to</td>
+<td><em>Optional</em>. The unique identifier inside this chat of a media message group this message belongs to</td>
 </tr>
 <tr>
 <td>author_signature</td>
@@ -1525,7 +1543,7 @@ To learn how to create…">
 <tr>
 <td>type</td>
 <td>String</td>
-<td>Type of the entity. Currently, can be “mention” (<code>@username</code>), “hashtag” (<code>#hashtag</code> or <code>#hashtag@chatusername</code>), “cashtag” (<code>$USD</code> or <code>$USD@chatusername</code>), “bot_command” (<code>/start@jobs_bot</code>), “url” (<code>https://telegram.org</code>), “email” (<code>do-not-reply@telegram.org</code>), “phone_number” (<code>+1-212-555-0123</code>), “bold” (<strong>bold text</strong>), “italic” (<em>italic text</em>), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users <a href="https://telegram.org/blog/edit#new-mentions">without usernames</a>), “custom_emoji” (for inline custom emoji stickers)</td>
+<td>Type of the entity. Currently, can be “mention” (<code>@username</code>), “hashtag” (<code>#hashtag</code> or <code>#hashtag@chatusername</code>), “cashtag” (<code>$USD</code> or <code>$USD@chatusername</code>), “bot_command” (<code>/start@jobs_bot</code>), “url” (<code>https://telegram.org</code>), “email” (<code>do-not-reply@telegram.org</code>), “phone_number” (<code>+1-212-555-0123</code>), “bold” (<strong>bold text</strong>), “italic” (<em>italic text</em>), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users <a href="https://telegram.org/blog/edit#new-mentions">without usernames</a>), “custom_emoji” (for inline custom emoji stickers), or “date_time” (for formatted date and time)</td>
 </tr>
 <tr>
 <td>offset</td>
@@ -1556,6 +1574,16 @@ To learn how to create…">
 <td>custom_emoji_id</td>
 <td>String</td>
 <td><em>Optional</em>. For “custom_emoji” only, unique identifier of the custom emoji. Use <a href="#getcustomemojistickers">getCustomEmojiStickers</a> to get full information about the sticker</td>
+</tr>
+<tr>
+<td>unix_time</td>
+<td>Integer</td>
+<td><em>Optional</em>. For “date_time” only, the Unix time associated with the entity</td>
+</tr>
+<tr>
+<td>date_time_format</td>
+<td>String</td>
+<td><em>Optional</em>. For “date_time” only, the string that defines the formatting of the date and time. See <a href="#date-time-entity-formatting">date-time entity formatting</a> for more details.</td>
 </tr>
 </tbody>
 </table>
@@ -4872,6 +4900,11 @@ To learn how to create…">
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the administrator can manage direct messages of the channel and decline suggested posts; for channels only</td>
 </tr>
+<tr>
+<td>can_manage_tags</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the administrator can edit the tags of regular members; for groups and supergroups only. If omitted defaults to the value of can_pin_messages.</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="chatmemberupdated" href="#chatmemberupdated"><i class="anchor-icon"></i></a>ChatMemberUpdated</h4>
@@ -5077,6 +5110,11 @@ To learn how to create…">
 <td><em>Optional</em>. <em>True</em>, if the administrator can manage direct messages of the channel and decline suggested posts; for channels only</td>
 </tr>
 <tr>
+<td>can_manage_tags</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the administrator can edit the tags of regular members; for groups and supergroups only. If omitted defaults to the value of can_pin_messages.</td>
+</tr>
+<tr>
 <td>custom_title</td>
 <td>String</td>
 <td><em>Optional</em>. Custom title for this user</td>
@@ -5098,6 +5136,11 @@ To learn how to create…">
 <td>status</td>
 <td>String</td>
 <td>The member&#39;s status in the chat, always “member”</td>
+</tr>
+<tr>
+<td>tag</td>
+<td>String</td>
+<td><em>Optional</em>. Tag of the member</td>
 </tr>
 <tr>
 <td>user</td>
@@ -5126,6 +5169,11 @@ To learn how to create…">
 <td>status</td>
 <td>String</td>
 <td>The member&#39;s status in the chat, always “restricted”</td>
+</tr>
+<tr>
+<td>tag</td>
+<td>String</td>
+<td><em>Optional</em>. Tag of the member</td>
 </tr>
 <tr>
 <td>user</td>
@@ -5186,6 +5234,11 @@ To learn how to create…">
 <td>can_add_web_page_previews</td>
 <td>Boolean</td>
 <td><em>True</em>, if the user is allowed to add web page previews to their messages</td>
+</tr>
+<tr>
+<td>can_edit_tag</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to edit their own tag</td>
 </tr>
 <tr>
 <td>can_change_info</td>
@@ -5368,6 +5421,11 @@ To learn how to create…">
 <td>can_add_web_page_previews</td>
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the user is allowed to add web page previews to their messages</td>
+</tr>
+<tr>
+<td>can_edit_tag</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to edit their own tag</td>
 </tr>
 <tr>
 <td>can_change_info</td>
@@ -8218,6 +8276,17 @@ To learn how to create…">
 <li>Unless the user is a member of the chat where they were mentioned, these mentions are only guaranteed to work if the user has contacted the bot in private in the past or has sent a callback query to the bot via an inline button and doesn&#39;t have Forwarded Messages privacy enabled for the bot.</li>
 </ul>
 <p>You can find the list of programming and markup languages for which syntax highlighting is supported at <a href="https://github.com/TelegramMessenger/libprisma#supported-languages">libprisma#supported-languages</a>.</p>
+<h6><a class="anchor" name="date-time-entity-formatting" href="#date-time-entity-formatting"><i class="anchor-icon"></i></a>Date-time entity formatting</h6>
+<p>Date-time entity formatting is specified by a format string, which must adhere to the following regular expression: <code>r|w?[dD]?[tT]?</code>. </p>
+<p>If the format string is empty, the underlying text is displayed as-is; however, the user can still receive the underlying date in their local format. When populated, the format string determines the output based on the presence of the following control characters:</p>
+<ul>
+<li><strong><code>r</code></strong>: Displays the time relative to the current time. Cannot be combined with any other control characters.</li>
+<li><strong><code>w</code></strong>: Displays the day of the week in the user&#39;s localized language.</li>
+<li><strong><code>d</code></strong>: Displays the date in short form (e.g., “17.03.22”).</li>
+<li><strong><code>D</code></strong>: Displays the date in long form (e.g., “March 17, 2022”).</li>
+<li><strong><code>t</code></strong>: Displays the time in short form (e.g., “22:45”).</li>
+<li><strong><code>T</code></strong>: Displays the time in long form (e.g., “22:45:00”).</li>
+</ul>
 <h6><a class="anchor" name="markdownv2-style" href="#markdownv2-style"><i class="anchor-icon"></i></a>MarkdownV2 style</h6>
 <p>To use this mode, pass <em>MarkdownV2</em> in the <em>parse_mode</em> field. Use the following syntax in your message:</p>
 <pre><code>*bold \*text*
@@ -8229,6 +8298,10 @@ __underline__
 [inline URL](http://www.example.com/)
 [inline mention of a user](tg://user?id=123456789)
 ![<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍" />](tg://emoji?id=5368324170671202286)
+![22:45 tomorrow](tg://time?unix=1647531900&amp;format=wDT)
+![22:45 tomorrow](tg://time?unix=1647531900&amp;format=t)
+![22:45 tomorrow](tg://time?unix=1647531900&amp;format=r)
+![22:45 tomorrow](tg://time?unix=1647531900)
 `inline fixed-width code`
 ```
 pre-formatted fixed-width code block
@@ -8256,6 +8329,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <li>In case of ambiguity between <code>italic</code> and <code>underline</code> entities <code>__</code> is always greedily treated from left to right as beginning or end of an <code>underline</code> entity, so instead of <code>___italic underline___</code> use <code>___italic underline_**__</code>, adding an empty bold entity as a separator.</li>
 <li>A valid emoji must be provided as an alternative value for the custom emoji. The emoji will be shown instead of the custom emoji in places where a custom emoji cannot be displayed (e.g., system notifications) or if the message is forwarded by a non-premium user. It is recommended to use the emoji from the <strong>emoji</strong> field of the custom emoji <a href="#sticker">sticker</a>.</li>
 <li>Custom emoji entities can only be used by bots that purchased additional usernames on <a href="https://fragment.com">Fragment</a> or in the messages directly sent by the bot to private, group and supergroup chats if the owner of the bot has a Telegram Premium subscription.</li>
+<li>See <a href="#date-time-entity-formatting">date-time entity formatting</a> for more details about supported date-time formats.</li>
 </ul>
 <h6><a class="anchor" name="html-style" href="#html-style"><i class="anchor-icon"></i></a>HTML style</h6>
 <p>To use this mode, pass <em>HTML</em> in the <em>parse_mode</em> field. The following tags are currently supported:</p>
@@ -8268,6 +8342,10 @@ pre-formatted fixed-width code block written in the Python programming language
 &lt;a href=&quot;http://www.example.com/&quot;&gt;inline URL&lt;/a&gt;
 &lt;a href=&quot;tg://user?id=123456789&quot;&gt;inline mention of a user&lt;/a&gt;
 &lt;tg-emoji emoji-id=&quot;5368324170671202286&quot;&gt;<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍" />&lt;/tg-emoji&gt;
+&lt;tg-time unix=&quot;1647531900&quot; format=&quot;wDT&quot;&gt;22:45 tomorrow&lt;/tg-time&gt;
+&lt;tg-time unix=&quot;1647531900&quot; format=&quot;t&quot;&gt;22:45 tomorrow&lt;/tg-time&gt;
+&lt;tg-time unix=&quot;1647531900&quot; format=&quot;r&quot;&gt;22:45 tomorrow&lt;/tg-time&gt;
+&lt;tg-time unix=&quot;1647531900&quot;&gt;22:45 tomorrow&lt;/tg-time&gt;
 &lt;code&gt;inline fixed-width code&lt;/code&gt;
 &lt;pre&gt;pre-formatted fixed-width code block&lt;/pre&gt;
 &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;pre-formatted fixed-width code block written in the Python programming language&lt;/code&gt;&lt;/pre&gt;
@@ -8283,6 +8361,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <li>Programming language can&#39;t be specified for standalone <code>code</code> tags.</li>
 <li>A valid emoji must be used as the content of the <code>tg-emoji</code> tag. The emoji will be shown instead of the custom emoji in places where a custom emoji cannot be displayed (e.g., system notifications) or if the message is forwarded by a non-premium user. It is recommended to use the emoji from the <strong>emoji</strong> field of the custom emoji <a href="#sticker">sticker</a>.</li>
 <li>Custom emoji entities can only be used by bots that purchased additional usernames on <a href="https://fragment.com">Fragment</a> or in the messages directly sent by the bot to private, group and supergroup chats if the owner of the bot has a Telegram Premium subscription.</li>
+<li>See <a href="#date-time-entity-formatting">date-time entity formatting</a> for more details about supported date-time formats.</li>
 </ul>
 <h6><a class="anchor" name="markdown-style" href="#markdown-style"><i class="anchor-icon"></i></a>Markdown style</h6>
 <p>This is a legacy mode, retained for backward compatibility. To use this mode, pass <em>Markdown</em> in the <em>parse_mode</em> field. Use the following syntax in your message:</p>
@@ -10330,7 +10409,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendmessagedraft" href="#sendmessagedraft"><i class="anchor-icon"></i></a>sendMessageDraft</h4>
-<p>Use this method to stream a partial message to a user while the message is being generated; supported only for bots with forum topic mode enabled. Returns <em>True</em> on success.</p>
+<p>Use this method to stream a partial message to a user while the message is being generated. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -10810,6 +10889,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Optional</td>
 <td>Pass <em>True</em> if the administrator can manage direct messages within the channel and decline suggested posts; for channels only</td>
 </tr>
+<tr>
+<td>can_manage_tags</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the administrator can edit the tags of regular members; for groups and supergroups only</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="setchatadministratorcustomtitle" href="#setchatadministratorcustomtitle"><i class="anchor-icon"></i></a>setChatAdministratorCustomTitle</h4>
@@ -10841,6 +10926,38 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>String</td>
 <td>Yes</td>
 <td>New custom title for the administrator; 0-16 characters, emoji are not allowed</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="setchatmembertag" href="#setchatmembertag"><i class="anchor-icon"></i></a>setChatMemberTag</h4>
+<p>Use this method to set a tag for a regular member in a group or a supergroup. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_tags</em> administrator right. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier of the target user</td>
+</tr>
+<tr>
+<td>tag</td>
+<td>String</td>
+<td>Optional</td>
+<td>New tag for the member; 0-16 characters, emoji are not allowed</td>
 </tr>
 </tbody>
 </table>
