@@ -1089,6 +1089,7 @@
     var isActive = true;
     var hasShineEffect = false;
     var isProgressVisible = false;
+    var iconCustomEmojiId = false;
     var buttonType = type;
     var buttonText = buttonTextDefault;
     var buttonColor = false;
@@ -1098,6 +1099,11 @@
     var bottomButton = {};
     Object.defineProperty(bottomButton, 'type', {
       get: function(){ return buttonType; },
+      enumerable: true
+    });
+    Object.defineProperty(bottomButton, 'iconCustomEmojiId', {
+      set: function(val){ bottomButton.setParams({icon_custom_emoji_id: val}); },
+      get: function(){ return iconCustomEmojiId; },
       enumerable: true
     });
     Object.defineProperty(bottomButton, 'text', {
@@ -1182,6 +1188,7 @@
           is_visible: true,
           is_active: isActive,
           is_progress_visible: isProgressVisible,
+          icon_custom_emoji_id: iconCustomEmojiId,
           text: buttonText,
           color: color,
           text_color: text_color,
@@ -1237,9 +1244,20 @@
     }
 
     function setParams(params) {
+      if (typeof params.icon_custom_emoji_id !== 'undefined') {
+        var emoji_id = params.icon_custom_emoji_id;
+        if (emoji_id === false || emoji_id === null) {
+          emoji_id = '';
+        }
+        if (emoji_id !== '' && !/^[0-9]{10,20}$/.test(emoji_id)) {
+          console.error('[Telegram.WebApp] Bottom button icon custom emoji is invalid', params.icon_custom_emoji_id);
+          throw Error('WebAppBottomButtonParamInvalid');
+        }
+        iconCustomEmojiId = emoji_id;
+      }
       if (typeof params.text !== 'undefined') {
         var text = strTrim(params.text);
-        if (!text.length) {
+        if (!text.length && !iconCustomEmojiId) {
           console.error('[Telegram.WebApp] Bottom button text is required', params.text);
           throw Error('WebAppBottomButtonParamInvalid');
         }
