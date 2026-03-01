@@ -49,7 +49,7 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400699/3/k1SEeTL6NK4.48386.json/ca61db6357be9ac436">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400641/2/Z0P31N4EpLc.48386.json/ca5565b3a432cacea9">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file ID</strong> in the context of file references is an object that, when serialized to a string, can easily and uniquely identify a media file.  </li>
@@ -59,7 +59,6 @@
 <pre><code>fileIdPhoto#47a0bd49 id:long = FileId;
 fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <!-- end fileid -->
-<p><a href="#locations">Locations »</a> specify how to generate <code>FileId</code> constructors of the proper type.  </p>
 <ul>
 <li>
 <p>A <strong>file reference</strong> is a string of bytes that can be encountered in the <code>file_reference</code> fields of media files, such as <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects, and is required to download or resend all media.  </p>
@@ -67,15 +66,41 @@ fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <p>The <a href="#file-reference-dictionary">file reference dictionary »</a> maps a <strong>file ID</strong> to exactly one <strong>file reference</strong>.  </p>
 </li>
 <li>
+<p><a href="#locations">Location objects »</a> specify how to</p>
+<ul>
+<li>Generate <code>FileId</code> constructors and</li>
+<li>Extract file references</li>
+</ul>
+<p>...from photos, documents, etc.  </p>
+</li>
+<li>
 <p>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </p>
 </li>
 <li>
-<p>A <strong>file reference source</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </p>
+<p>A <a href="#source">file reference source »</a> contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </p>
 <p>The <a href="#file-source-dictionary">file source dictionary »</a> maps a <strong>file ID</strong> to one or more <strong>file reference sources</strong>.  </p>
 </li>
 </ul>
-<p>The database map file contains <strong>all possible sources</strong>, for <strong>all possible file reference paths</strong>.  </p>
+<ul>
+<li><a href="#actions">Actions »</a> are used to refresh an expired file reference according to <code>FileSource</code>s associated to the <code>FileId</code>.  </li>
+</ul>
+<ul>
+<li>
+<p>The <a href="#map-file">file reference database map file »</a> contains</p>
+<ul>
+<li><strong>All possible sources</strong>, for <strong>all possible file reference paths</strong></li>
+<li><strong>All actions</strong></li>
+<li><strong>All locations</strong></li>
+<li>The TL schema for the file reference database itself, which contains:<ul>
+<li>The schema of file IDs</li>
+<li>The schema of sources </li>
+<li>The usual helper types (vector, bool, true)</li>
+</ul>
+</li>
+</ul>
 <p>It is automatically generated and validated by the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
+</li>
+</ul>
 <h3><a class="anchor" href="#implementation" id="implementation" name="implementation"><i class="anchor-icon"></i></a>Implementation</h3>
 <p>Here's how to use file reference database <strong>map file</strong> to generate all the logic needed for a file reference database within an MTProto client.</p>
 <p>At least two dictionaries are needed to implement the file reference database:</p>
