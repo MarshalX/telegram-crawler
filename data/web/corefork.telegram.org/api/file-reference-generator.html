@@ -48,13 +48,13 @@
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
-<li>A <strong>file reference origin</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </li>
+<li>A <strong>file reference source</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </li>
 </ul>
-<p>The database map file contains <strong>all possible origins</strong>, for <strong>all possible file reference paths</strong>.  </p>
-<p>It is generated using a set of manually-specified rules (specifying the actual origins) within the generator and the latest API schema, to make sure the following rules are followed:</p>
+<p>The database map file contains <strong>all possible sources</strong>, for <strong>all possible file reference paths</strong>.  </p>
+<p>It is generated using a set of manually-specified rules (specifying the actual sources) within the generator and the latest API schema, to make sure the following rules are followed:</p>
 <ul>
 <li>
-<p>All possible and valid places where a <code>file_reference</code> appears have at least one valid associated origin: this is checked by recursively checking all possible deserialized object graphs, starting from:</p>
+<p>All possible and valid places where a <code>file_reference</code> appears have at least one valid associated source: this is checked by recursively checking all possible deserialized object graphs, starting from:</p>
 <ul>
 <li>All constructors of type <code>Update</code></li>
 <li>All constructors which are directly returned by at least one method.</li>
@@ -66,16 +66,16 @@
 updateNewMessage.message -&gt; message.reply_to -&gt; messageReplyHeader.reply_media -&gt; messageMediaDocument.document -&gt; document.file_reference
 updateNewMessage.message -&gt; message.media -&gt; messageMediaInvoice.extended_media -&gt; messageExtendedMedia.media -&gt; messageMediaDocument.document -&gt; document.file_reference
 ... and many others</code></pre>
-<p>... and for all paths, the system which generates the definition file makes sure that at least one origin covers the path.  </p>
+<p>... and for all paths, the system which generates the definition file makes sure that at least one source covers the path.  </p>
 </li>
 <li>
-<p>All origins must be used in at least one path.</p>
+<p>All sources must be used in at least one path.</p>
 </li>
 <li>
-<p>All paths covered by origins which make use of flag fields (which may be absent, leading to an orphan, context-less file reference) must be covered by at least one non-flagged origin (or the flagged origin must be non-flagged in the specified path).  </p>
-<p>For example, the file reference path <code>updateStory.story -&gt; storyItem.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code> <em>would</em> rely on the origin <code>getStory{peer: storyItem.from_id, story_id: storyItem.id}</code> with <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.  </p>
+<p>All paths covered by sources which make use of flag fields (which may be absent, leading to an orphan, context-less file reference) must be covered by at least one non-flagged source (or the flagged source must be non-flagged in the specified path).  </p>
+<p>For example, the file reference path <code>updateStory.story -&gt; storyItem.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code> <em>would</em> rely on the source <code>getStory{peer: storyItem.from_id, story_id: storyItem.id}</code> with <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.  </p>
 <p>However, the <code>from_id</code> field of <a href="/constructor/storyItem">storyItem</a> is actually a flag and in this specific path it is <strong>not</strong> set (it's only set when a <a href="/constructor/storyItem">storyItem</a> is returned by <a href="/method/stories.getAllStories">stories.getAllStories</a>).</p>
-<p>The validator (<a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">the code that generated the definition file, you DO NOT have to implement a validator yourself</a>) noticed that, which forced the manual addition of the valid fallback origin <code>getStory{peer: updateStory.peer, story_id: updateStory.story -&gt; storyItem.id}</code>, which is present in the final origin definition file.  </p>
+<p>The validator (<a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">the code that generated the definition file, you DO NOT have to implement a validator yourself</a>) noticed that, which forced the manual addition of the valid fallback source <code>getStory{peer: updateStory.peer, story_id: updateStory.story -&gt; storyItem.id}</code>, which is present in the final source definition file.  </p>
 <p>Note that the definition file is already pre-validated, no additional validation is needed to implement it, the above is just an example of a case that is successfully covered by the <a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">validator implemented here »</a>.  </p>
 </li>
 </ul>

@@ -744,11 +744,11 @@ Clients should treat this as a <code>500</code> server error, and handle it by c
 <li>Added boolTrue - The constructor can be interpreted as a <strong>boolean</strong><code>true</code> value.</li>
 <li>Added true - See <a href="/mtproto/TL-formal#predefined-identifiers">predefined identifiers</a>.</li>
 <li>Added vector - A universal vector constructor.</li>
-<li>Added fileReferenceOrigins</li>
+<li>Added fileReferenceMap</li>
 <li>Added locationIncoming</li>
 <li>Added locationOutgoing</li>
-<li>Added origin</li>
-<li>Added skippedOrigin</li>
+<li>Added source</li>
+<li>Added skippedSource</li>
 <li>Added action</li>
 <li>Added paramNotFlag</li>
 <li>Added paramIsFlagAbortIfEmpty</li>
@@ -789,11 +789,11 @@ Clients should treat this as a <code>500</code> server error, and handle it by c
 <a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;<br>
 <a href='/constructor/true'>true</a>#3fedd339 = <a href='/type/True'>True</a>;<br>
 vector#1cb5c415 {t:Type} # [ t ] = Vector t;<br>
-fileReferenceOrigins#ed01a4f1 db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; origins:Vector&lt;Origin&gt; skipped:Vector&lt;SkippedOrigin&gt; actions:Vector&lt;Action&gt; = FileReferenceOrigins;<br>
+fileReferenceMap#4dba8c2c db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; sources:Vector&lt;Source&gt; skipped:Vector&lt;SkippedSource&gt; actions:Vector&lt;Action&gt; = FileReferenceMap;<br>
 locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
 locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;<br>
-origin#b62177bf flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = origin;<br>
-skippedOrigin#7c62809e flags:# predicate:string is_constructor:flags.0?true why:string = SkippedOrigin;<br>
+source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;
+skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;<br>
 action#9539f410 stored_constructor:string action:ActionOp = Action;<br>
 paramNotFlag#acd9d5cf = ParamFlag;
 paramIsFlagAbortIfEmpty#f8fe9fee = ParamFlag;
@@ -905,7 +905,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added <a href="/constructor/document">document</a> - <code>fileIdDocument</code> (incoming)</li>
 <li>Added <a href="/constructor/photo">photo</a> - <code>fileIdPhoto</code> (incoming)</li>
 </ul>
-<h5><a class="anchor" href="#new-origins" id="new-origins" name="new-origins"><i class="anchor-icon"></i></a>New Origins</h5>
+<h5><a class="anchor" href="#new-sources" id="new-sources" name="new-sources"><i class="anchor-icon"></i></a>New Sources</h5>
 <ul>
 <li>Added <a href="/constructor/message">message</a> - <pre><code>fileSourceMessage{from_scheduled: <a href="/constructor/message">message</a>.from_scheduled?passthrough, quick_reply_shortcut_id: <a href="/constructor/message">message</a>.quick_reply_shortcut_id?passthrough, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/message">message</a>.peer_id), id: <a href="/constructor/message">message</a>.id}</code></pre></li>
 <li>Added <a href="/constructor/messageService">messageService</a> - <pre><code>fileSourceMessage{peer: extractPeerIdFromPeerAndStore(<a href="/constructor/messageService">messageService</a>.peer_id), id: <a href="/constructor/messageService">messageService</a>.id, from_scheduled: false, quick_reply_shortcut_id: false}</code></pre></li>

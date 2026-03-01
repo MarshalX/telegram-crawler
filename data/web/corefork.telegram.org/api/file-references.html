@@ -45,20 +45,21 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>File references are strings of bytes, that can be encountered in the <code>file_reference</code> fields of <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.</p>
-<p>They must be cached by the client, along with the <strong>origin</strong> where the document/photo object was found, in order to be refetched when the file reference expires.</p>
+<p>They must be cached by the client, along with the <strong>source</strong> where the document/photo object was found, in order to be refetched when the file reference expires.</p>
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h2><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h2>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400555/1/VYfwNo4RNYk.48390.json/115f56238407c39e5c">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400699/3/k1SEeTL6NK4.48386.json/ca61db6357be9ac436">Latest file reference database map file for the current layer »</a></p>
 <p>Dictionary:</p>
 <ul>
 <li>A <strong>file ID</strong> in the context of file references is an object that, when serialized to a string, can easily and uniquely identify a media file.  </li>
 </ul>
 <p>Currently, the following file ID objects are available:</p>
 <!-- start fileid -->
-<pre><code>  fileIdPhoto#47a0bd49 id:long = FileId;
-  fileIdDocument#461b1d89 id:long = FileId;</code></pre>
+<pre><code>fileIdPhoto#47a0bd49 id:long = FileId;
+fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <!-- end fileid -->
+<p><a href="#locations">Locations »</a> specify how to generate <code>FileId</code> constructors of the proper type.  </p>
 <ul>
 <li>
 <p>A <strong>file reference</strong> is a string of bytes that can be encountered in the <code>file_reference</code> fields of media files, such as <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects, and is required to download or resend all media.  </p>
@@ -69,11 +70,11 @@
 <p>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </p>
 </li>
 <li>
-<p>A <strong>file reference origin</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </p>
-<p>The <a href="#file-source-dictionary">file source dictionary »</a> maps a <strong>file ID</strong> to one or more <strong>file reference origins</strong>.  </p>
+<p>A <strong>file reference source</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </p>
+<p>The <a href="#file-source-dictionary">file source dictionary »</a> maps a <strong>file ID</strong> to one or more <strong>file reference sources</strong>.  </p>
 </li>
 </ul>
-<p>The database map file contains <strong>all possible origins</strong>, for <strong>all possible file reference paths</strong>.  </p>
+<p>The database map file contains <strong>all possible sources</strong>, for <strong>all possible file reference paths</strong>.  </p>
 <p>It is automatically generated and validated by the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
 <h3><a class="anchor" href="#implementation" id="implementation" name="implementation"><i class="anchor-icon"></i></a>Implementation</h3>
 <p>Here's how to use file reference database <strong>map file</strong> to generate all the logic needed for a file reference database within an MTProto client.</p>
@@ -112,14 +113,14 @@
 vector#1cb5c415 {t:Type} # [ t ] = Vector t;
 
 // Root
-fileReferenceOrigins#ed01a4f1 db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; origins:Vector&lt;Origin&gt; skipped:Vector&lt;SkippedOrigin&gt; actions:Vector&lt;Action&gt; = FileReferenceOrigins;
+fileReferenceMap#4dba8c2c db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; sources:Vector&lt;Source&gt; skipped:Vector&lt;SkippedSource&gt; actions:Vector&lt;Action&gt; = FileReferenceMap;
 
 locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
 locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
 
-origin#b62177bf flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = origin;
+source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;
 
-skippedOrigin#7c62809e flags:# predicate:string is_constructor:flags.0?true why:string = SkippedOrigin;
+skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;
 
 action#9539f410 stored_constructor:string action:ActionOp = Action;
 
@@ -261,8 +262,8 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>fileSourceDocumentByHash - <pre><code><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>(sha256: copyOp(sha256), size: copyOp(size), mime_type: copyOp(mime_type))</code></pre></li>
 </ul>
 <!-- end actions -->
-<p>Origins:</p>
-<!-- start origins -->
+<p>Sources:</p>
+<!-- start sources -->
 <ul>
 <li><a href="/constructor/message">message</a> - <pre><code>fileSourceMessage{from_scheduled: <a href="/constructor/message">message</a>.from_scheduled?passthrough, quick_reply_shortcut_id: <a href="/constructor/message">message</a>.quick_reply_shortcut_id?passthrough, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/message">message</a>.peer_id), id: <a href="/constructor/message">message</a>.id}</code></pre></li>
 <li><a href="/constructor/messageService">messageService</a> - <pre><code>fileSourceMessage{peer: extractPeerIdFromPeerAndStore(<a href="/constructor/messageService">messageService</a>.peer_id), id: <a href="/constructor/messageService">messageService</a>.id, from_scheduled: false, quick_reply_shortcut_id: false}</code></pre></li>
@@ -320,7 +321,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>(3) <a href="/constructor/document">document</a> - <pre><code>(needs <a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>) fileSourceSavedMusic{user_id: extractUserIdFromInputUserAndStore(<a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>.id), id: <a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/document">document</a>.access_hash}</code></pre></li>
 <li><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a> - <pre><code>fileSourceDocumentByHash{sha256: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.sha256, size: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.size, mime_type: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.mime_type}</code></pre></li>
 </ul>
-<!-- end origins -->
+<!-- end sources -->
 <p>Skipped:</p>
 <!-- start skipped -->
 <ul>
@@ -348,17 +349,17 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <!-- end skipped -->
 <p>Here's a detailed description of the constructors.</p>
 <h4><a class="anchor" href="#root" id="root" name="root"><i class="anchor-icon"></i></a>Root</h4>
-<pre><code>fileReferenceOrigins#ed01a4f1 db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; origins:Vector&lt;Origin&gt; skipped:Vector&lt;SkippedOrigin&gt; actions:Vector&lt;Action&gt; = FileReferenceOrigins;
+<pre><code>fileReferenceMap#4dba8c2c db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; sources:Vector&lt;Source&gt; skipped:Vector&lt;SkippedSource&gt; actions:Vector&lt;Action&gt; = FileReferenceMap;
 
 locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
 locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
 
-origin#b62177bf flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = origin;
+source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;
 
-skippedOrigin#7c62809e flags:# predicate:string is_constructor:flags.0?true why:string = SkippedOrigin;
+skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;
 
 action#9539f410 stored_constructor:string action:ActionOp = Action;</code></pre>
-<p>The map file is composed of a single <code>fileReferenceOrigins</code> constructor, which contains:</p>
+<p>The map file is composed of a single <code>fileReferenceMap</code> constructor, which contains:</p>
 <ul>
 <li>
 <p>The <code>db_schema</code> and <code>db_schema_json</code> fields with the TL <strong>database</strong> schema of <code>FileId</code>s and <code>FileSource</code>s.<br>
@@ -368,18 +369,18 @@ action#9539f410 stored_constructor:string action:ActionOp = Action;</code></pre>
 <p>A list of <code>Location</code> constructors, containing the full list of constructors that have a <code>file_reference</code> field, and info on how to generate a <code>FileId</code> from them.  </p>
 </li>
 <li>
-<p>A list of <code>origin</code> constructors, containing instructions on how to generate <code>FileSource</code>s from received constructors or method responses.   </p>
+<p>A list of <code>source</code> constructors, containing instructions on how to generate <code>FileSource</code>s from received constructors or method responses.   </p>
 </li>
 <li>
 <p>A list of <code>action</code> constructors, containing the method call to invoke when refreshing a file reference using a previously stored <code>FileId</code> and <code>FileSource</code>.  </p>
 </li>
 <li>
-<p>A list of <code>skippedOrigin</code> constructors.
-These constructors indicate that the origin should be ignored completely (including during codegen): <code>skippedOrigin</code> origins are used internally to make sure all file reference paths are still covered in some way during validation, including paths for ephemeral media like inline results, or for media without any associated origin (for example, media uploaded using <a href="/method/messages.uploadMedia">messages.uploadMedia</a> but not yet sent anywhere obviously does not have any associated origin).  </p>
+<p>A list of <code>skippedSource</code> constructors.
+These constructors indicate that the source should be ignored completely (including during codegen): <code>skippedSource</code> sources are used internally to make sure all file reference paths are still covered in some way during validation, including paths for ephemeral media like inline results, or for media without any associated source (for example, media uploaded using <a href="/method/messages.uploadMedia">messages.uploadMedia</a> but not yet sent anywhere obviously does not have any associated source).  </p>
 <ul>
-<li><code>skippedOrigin.predicate</code> - Indicates the name of the ignored constructor or method.</li>
-<li><code>skippedOrigin.is_constructor</code> - If set, <code>predicate</code> points to a constructor, otherwise it points to a method.</li>
-<li><code>skippedOrigin.why</code> - A human-readable reason as to why this origin should be ignored.</li>
+<li><code>skippedSource.predicate</code> - Indicates the name of the ignored constructor or method.</li>
+<li><code>skippedSource.is_constructor</code> - If set, <code>predicate</code> points to a constructor, otherwise it points to a method.</li>
+<li><code>skippedSource.why</code> - A human-readable reason as to why this source should be ignored.</li>
 </ul>
 <p>Each skipped predicate can have one associated reason.  </p>
 </li>
@@ -409,20 +410,20 @@ locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
 <p>When encountering one of the objects on the left, use the <code>id</code> field to generate a <code>FileId</code> of the type on the right.  </p>
 <p>When refreshing references, replace the <code>file_reference</code> field of the object on the left.  </p>
 <p>(Legacy <code>inputFileLocation</code> constructors are ignored by the current map file).</p>
-<h4><a class="anchor" href="#origin" id="origin" name="origin"><i class="anchor-icon"></i></a>Origin</h4>
-<pre><code>origin#b62177bf flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = origin;</code></pre>
-<p>An <code>origin</code> contains instructions on how to extract and store file reference origins from an incoming method response or update.  </p>
+<h4><a class="anchor" href="#source" id="source" name="source"><i class="anchor-icon"></i></a>Source</h4>
+<pre><code>source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;</code></pre>
+<p>A <code>source</code> contains instructions on how to extract and store file reference sources from an incoming method response or update.  </p>
 <p><strong>Note</strong>: The following sections assume that all <a href="/type/Updates">Updates</a> constructors have already been converted to a vector of <a href="/type/Update">Update</a> constructors, <strong>including short variants</strong> like <a href="/constructor/updateShortMessage">updateShortMessage</a>, <a href="/constructor/updateShortSentMessage">updateShortSentMessage</a>, <a href="/constructor/updateShortChatMessage">updateShortChatMessage</a>, which must be pre-converted to <a href="/type/Update">Update</a> constructors by the client using information extracted from the method call.<br>
 While this operation could be done within the map file, it would needlessly increase the number of paths: given that most clients already convert short constructors to Update constructors, the map file only considers paths starting from the Update constructors.  </p>
 <p>Parameters:</p>
 <ul>
-<li><code>predicate</code> - Indicates the name of the constructor or of the method where extraction of the origin fields must start.</li>
+<li><code>predicate</code> - Indicates the name of the constructor or of the method where extraction of the fields must start.</li>
 <li><code>is_constructor</code> - If set, <code>predicate</code> points to a constructor, otherwise it points to a method.</li>
 <li><code>needs_parent</code> - If set, contains the name of a constructor which needs to appear as a parent in the deserialized object or a method whose response we're deserializing, as it will be used by one or more of the paths in the action.</li>
 <li><code>parent_is_constructor</code> - If set, <code>needs_parent</code> points to a constructor; otherwise it points to a method.</li>
-<li><code>stored_constructor</code> - Contains the name of a <code>FileSource</code> constructor from the TL schema specified in <code>fileReferenceOrigins.db_schema</code>, which should be stored to the database after being populated by <code>stored_params</code> as specified below.</li>
+<li><code>stored_constructor</code> - Contains the name of a <code>FileSource</code> constructor from the TL schema specified in <code>fileReferenceMap.db_schema</code>, which should be stored to the database after being populated by <code>stored_params</code> as specified below.</li>
 <li><code>stored_params</code> - Contains info on how to populate the <code>FileSource</code> constructor specified in <code>stored_constructor</code></li>
-<li><code>skipped_flags</code> - In some cases, some <strong>flag</strong> fields of <code>stored_constructor</code> aren't referenced by <code>action</code>: this field contains the full list of flags which are never referenced by the current origin and must be unset.  </li>
+<li><code>skipped_flags</code> - In some cases, some <strong>flag</strong> fields of <code>stored_constructor</code> aren't referenced by <code>action</code>: this field contains the full list of flags which are never referenced by the current source and must be unset.  </li>
 </ul>
 <p>Each unique predicate can have one or more <code>stored_constructor</code>s with different params.  </p>
 <p>If the <code>is_constructor</code> flag is set, when deserializing a constructor with predicate equal to <code>predicate</code>, contained in an incoming <a href="/type/Update">Update</a> or in at any depth in a method call response, do the following:</p>
@@ -430,16 +431,16 @@ While this operation could be done within the map file, it would needlessly incr
 <li><strong>Before</strong> beginning deserialization of the constructor, push a new <code>FileSource</code> of type <code>stored_constructor</code> to the file source stack.<br>
 Skip pushing the <code>FileSource</code> if <code>needs_parent</code> is set but we don't have a constructor or method of type <code>needs_parent</code> in our parents.</li>
 <li>During deserialization, associate all encountered <code>FileId</code>s (generated according to the <a href="#locations">locations schema</a>) to all sources <strong>of all types</strong> currently on the stack.</li>
-<li><strong>After</strong> deserialization of the constructor, pop the pushed <code>FileSource</code> of type <code>stored_constructor</code>, make sure it can be processed according to <code>stored_params</code> (all required flag fields are set, all paths can be correctly extracted), and if yes, populate the <code>FileSource</code> of type <code>stored_constructor</code> accordingly and commit the origin to the database (using the <code>FileId</code>s associated at step 2 as keys, and <code>stored_constructor</code> as value).<br>
+<li><strong>After</strong> deserialization of the constructor, pop the pushed <code>FileSource</code> of type <code>stored_constructor</code>, make sure it can be processed according to <code>stored_params</code> (all required flag fields are set, all paths can be correctly extracted), and if yes, populate the <code>FileSource</code> of type <code>stored_constructor</code> accordingly and commit the source to the database (using the <code>FileId</code>s associated at step 2 as keys, and <code>stored_constructor</code> as value).<br>
 Skip this step if <code>needs_parent</code> is set but we don't have a constructor or method of type <code>needs_parent</code> in our parents.</li>
 </ul>
 <p>If the <code>is_constructor</code> flag is <strong>not</strong> set, when deserializing the response of the method with name equal to <code>predicate</code>, do the following:</p>
 <ul>
 <li><strong>Before</strong> beginning deserialization of the method <strong>response</strong>, push a new <code>FileSource</code> of type <code>stored_constructor</code> to the file source stack.</li>
 <li>During deserialization, associate all encountered <code>FileId</code>s (generated according to the <a href="#locations">locations schema</a>) to all sources <strong>of all types</strong> currently on the stack.</li>
-<li><strong>After</strong> deserialization of the method <strong>response</strong>, pop the pushed <code>FileSource</code> of type <code>stored_constructor</code>, make sure it can be processed according to <code>stored_params</code> (all required flag fields are set, all paths can be correctly extracted), and if yes, populate the <code>FileSource</code> of type <code>stored_constructor</code> accordingly and commit the origin to the database (using the <code>FileId</code>s associated at step 2 as keys, and <code>stored_constructor</code> as value).   </li>
+<li><strong>After</strong> deserialization of the method <strong>response</strong>, pop the pushed <code>FileSource</code> of type <code>stored_constructor</code>, make sure it can be processed according to <code>stored_params</code> (all required flag fields are set, all paths can be correctly extracted), and if yes, populate the <code>FileSource</code> of type <code>stored_constructor</code> accordingly and commit the source to the database (using the <code>FileId</code>s associated at step 2 as keys, and <code>stored_constructor</code> as value).   </li>
 </ul>
-<p>Note that method origins cannot make use of <code>needs_parent</code>.   </p>
+<p>Note that method sources cannot make use of <code>needs_parent</code>.   </p>
 <h4><a class="anchor" href="#field-extraction" id="field-extraction" name="field-extraction"><i class="anchor-icon"></i></a>Field extraction</h4>
 <pre><code>// Extractor
 extractAndStore#72069549 from:Path to:string = FieldExtractor;
@@ -508,15 +509,15 @@ extractUserIdFromInputUserAndStore#7720aa2e from:Path to:string = FieldExtractor
 <h5><a class="anchor" href="#paths" id="paths" name="paths"><i class="anchor-icon"></i></a>Paths</h5>
 <p>The first part of the path always points to:</p>
 <ul>
-<li>The constructor/method of the <code>origin</code> (<code>origin.predicate</code>), for <code>path</code></li>
-<li>The constructor/method of the parent contained in <code>origin.needs_parent</code>, for <code>pathParent</code></li>
+<li>The constructor/method of the <code>source</code> (<code>source.predicate</code>), for <code>path</code></li>
+<li>The constructor/method of the parent contained in <code>source.needs_parent</code>, for <code>pathParent</code></li>
 </ul>
 <p>A path is composed of multiple <code>pathPart</code>s.  </p>
 <p>Each <code>pathPart</code> contains the following fields, which describe how to extract the field.  </p>
 <ul>
 <li><code>constructor</code> - Indicates the required constructor/method predicate. 
 If a different constructor type is encountered (i.e. <a href="/constructor/documentEmpty">documentEmpty</a> instead of <a href="/constructor/document">document</a>), abort extraction.<br>
-By definition, if a method name is passed, it will always be equal to the method of the associated origin.</li>
+By definition, if a method name is passed, it will always be equal to the method of the associated source.</li>
 <li><code>param</code> - Indicates the required parameter; if it's an empty string, it indicates the return value of a method.  </li>
 <li><code>flag</code> - Contains exactly one of the following constructors:<ul>
 <li><code>paramNotFlag</code> - The current parameter is not a flag</li>
@@ -607,12 +608,12 @@ themeFormatLiteralOp#8e4f9208 = TypedOpOp;</code></pre>
 ### Another example:
 Assume you receive a [message](/constructor/message) from your friend: that message contains a [messageMediaPhoto](/constructor/messageMediaPhoto) with a [photo](/constructor/photo).
 Your client has to cache not only the `file_reference` field of the photo, but also the context in which the file reference was seen (in this case, a message coming from a specific user).
-The context info is in this case, [an origin of type message](https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L74), containing the message ID and the peer ID of the chat/channel/user where the message was seen.
+The context info is in this case, [an source of type message](https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L74), containing the message ID and the peer ID of the chat/channel/user where the message was seen.
 The context info has to be associated with the file reference: when downloading a file using [upload.getFile](/method/upload.getFile) or resending it using [messages.sendMedia](/method/messages.sendMedia), a `FILE_REFERENCE_EXPIRED` error may be returned.  
 [messages.sendMultiMedia](/method/messages.sendMultiMedia) returns a variation of the same error, as a `FILE_REFERENCE_%d_EXPIRED` error (where `%d` is the index of the media with the expired file reference in the passed media array).  
 If this happens, the context info must be used to refetch the object that contained the file reference: in this example, the peer info and the message ID have to be used with [channels.getMessages](/method/channels.getMessages) or [messages.getMessages](/method/messages.getMessages) to [refetch the message](https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L481), recache the file reference and use it in a new file download request.
-More than one origin can be associated to one file reference, for greater resilience (in the case of a message that was deleted in one chat but was also forwarded in another chat, the file reference can be refetched from the second chat, instead).
-Origins for objects returned by method calls with certain parameters can be considered, too (for example, in the case of favorited sticker sets returned by [messages.getFavedStickers](/method/messages.getFavedStickers)).
+More than one source can be associated to one file reference, for greater resilience (in the case of a message that was deleted in one chat but was also forwarded in another chat, the file reference can be refetched from the second chat, instead).
+sources for objects returned by method calls with certain parameters can be considered, too (for example, in the case of favorited sticker sets returned by [messages.getFavedStickers](/method/messages.getFavedStickers)).
 --></div>
   
 </div>
