@@ -130,7 +130,6 @@ CRAWL_RULES = {
         'deny': {
             'bots/payments',
             'tdlib/docs/classtd',
-            'validatedRequestedInfo',
             'constructor/Updates',
         },
     },
