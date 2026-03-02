@@ -49,11 +49,11 @@
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h3><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h3>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400624/5/aQsY5USws6k.48386.json/8fe936578bf066f2aa">Latest file reference database map file for the current layer »</a></p>
+<p><a href="/file/400780400947/3/njITX-qWSDg.48386.json/92a2c108a28d7ec423">Latest file reference database map file for the current layer »</a></p>
 <p>Overview:</p>
 <ul>
 <li>
-<p>A <strong>file ID</strong> in the context of file references is an object that, when serialized to a string, can easily and uniquely identify a media file.  </p>
+<p>A <strong>file ID</strong> (in the context of the file reference DB) is an object that, when serialized to a string, can easily and uniquely identify a media file.  </p>
 <p>Currently, the following file ID objects are available:</p>
 <!-- start fileid -->
 <pre><code>fileIdPhoto#47a0bd49 id:long = FileId;
@@ -64,17 +64,26 @@ fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <p><a href="#locations">Locations »</a> specify how to generate a file ID object from all media objects.  </p>
 <ul>
 <li>
-<p>A <strong>file reference</strong> is a string of bytes that can be encountered in the <code>file_reference</code> fields of media files, such as <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects, and is required to download or resend all media.  </p>
-<p>A file reference may <strong>expire</strong>, in which case it must be refreshed by refetching the message, <a href="/api/stories">story</a>, etc where the media last appeared.</p>
-<p><a href="#locations">Locations »</a> specify how to extract file references from all media objects.  </p>
+<p>A <strong>file reference</strong> is a string of bytes that is be encountered in the <code>file_reference</code> fields of</p>
+<ul>
+<li>
+<p><em>Incoming</em> media constructors, such as <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.  </p>
+<p>A <strong>file ID</strong> can be generated from all <em>incoming</em> media constructors, as specified by the <a href="#locations">location objects »</a>.  </p>
+</li>
+<li>
+<p><em>Outgoing</em> media constructors like <a href="/constructor/inputDocument">inputDocument</a>, <a href="/constructor/inputPhoto">inputPhoto</a>, etc, where it must be populated by the client in order to download or resend all media.  </p>
+<p>A <strong>file ID</strong> can be generated from all <em>outgoing</em> media constructors, as specified by the <a href="#locations">location objects »</a>.  </p>
+<p>A file reference may <strong>expire</strong>, in which case it cannot be used in outgoing constructors: it must be refreshed by refetching the message, <a href="/api/stories">story</a>, etc where the media last appeared, as specified below.</p>
+</li>
+</ul>
 </li>
 <li>
 <p><a href="#locations">Locations »</a> specify how to</p>
 <ul>
 <li>Generate <code>FileId</code> constructors and</li>
-<li>Extract file references</li>
+<li>Extract/populate file references</li>
 </ul>
-<p>...from photos, documents, etc.  </p>
+<p>...from both incoming and outgoing media objects.</p>
 <p>Locations are used to populate the <a href="#file-reference-dictionary">file reference dictionary »</a>, which maps a <strong>file ID</strong> to exactly one <strong>file reference</strong>.  </p>
 </li>
 <li>
