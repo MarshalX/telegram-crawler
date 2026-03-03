@@ -47,346 +47,26 @@
 <p>File references are strings of bytes, that can be encountered in the <code>file_reference</code> fields of <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.</p>
 <p>They must be cached by the client, along with the <strong>source</strong> where the document/photo object was found, in order to be refetched when the file reference expires.</p>
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
-<h3><a class="anchor" href="#automatic-generation" id="automatic-generation" name="automatic-generation"><i class="anchor-icon"></i></a>Automatic generation</h3>
-<p>Implementation and maintenance of the file reference database may be fully automated by using the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p><a href="/file/400780400474/3/5sewhqxNfHs.48386.json/2a3471248de44471c4">Latest file reference database map file for the current layer »</a></p>
-<p>Overview:</p>
-<ul>
-<li>
-<p>A <strong>file ID</strong> (in the context of the file reference DB) is an object that, when serialized to a string, can easily and uniquely identify a media file.  </p>
-<p>Currently, the following file ID objects are available:</p>
-<!-- start fileid -->
-</li>
-</ul>
-<pre><code>fileIdPhoto#47a0bd49 id:long = FileId;
-fileIdDocument#461b1d89 id:long = FileId;</code></pre>
-<!-- end fileid -->
-<p><a href="#locations">Locations »</a> specify how to generate a file ID object from all media objects.  </p>
-<ul>
-<li>
-<p>A <strong>file reference</strong> is a string of bytes that is be encountered in the <code>file_reference</code> fields of</p>
-<ul>
-<li>
-<p><em>Incoming</em> media constructors, such as <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.  </p>
-<p>A <strong>file ID</strong> can be generated from all <em>incoming</em> media constructors, as specified by the <a href="#locations">location objects »</a>.  </p>
-</li>
-<li>
-<p><em>Outgoing</em> media constructors like <a href="/constructor/inputDocument">inputDocument</a>, <a href="/constructor/inputPhoto">inputPhoto</a>, etc, where it must be populated by the client in order to download or resend all media.  </p>
-<p>A <strong>file ID</strong> can be generated from all <em>outgoing</em> media constructors, as specified by the <a href="#locations">location objects »</a>.  </p>
-<p>A file reference may <strong>expire</strong>, in which case it cannot be used in outgoing constructors: it must be refreshed by refetching the message, <a href="/api/stories">story</a>, etc where the media last appeared, as specified below.</p>
-</li>
-</ul>
-</li>
-<li>
-<p><a href="#locations">Locations »</a> specify how to</p>
-<ul>
-<li>Generate <code>FileId</code> constructors and</li>
-<li>Extract/populate file references</li>
-</ul>
-<p>...from both incoming and outgoing media objects.</p>
-<p>Locations are used to populate the <a href="#file-reference-dictionary">file reference dictionary »</a>, which maps a <strong>file ID</strong> to exactly one <strong>file reference</strong>.  </p>
-</li>
-<li>
-<p>A <a href="#source">file reference source »</a> contains information that the client may use to re-fetch the document (and the new file reference), by invoking a specific <strong>action</strong>.  </p>
-<p>Each source type is associated to a specific <a href="#actions">action »</a>.</p>
-<p><a href="#locations">Locations »</a> and <a href="#source">sources »</a> are used together to populate the <a href="#file-source-dictionary">file source dictionary »</a>, which maps a <strong>file ID</strong> to one or more <strong>file reference sources</strong>.  </p>
-</li>
-<li>
-<p><a href="#actions">Actions »</a> are used to refresh an expired file reference of a media file according to the <a href="#source">file reference sources »</a> stored in the <a href="#file-source-dictionary">file source dictionary »</a>, associated to the <code>FileId</code>.  </p>
-<p>For example for the <strong>file reference path</strong> specified below it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </p>
-</li>
-<li>
-<p>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </p>
-</li>
-<li>
+<h3><a class="anchor" href="#map-file" id="map-file" name="map-file"><i class="anchor-icon"></i></a>Map file</h3>
+<p>Implementation and maintenance of the file reference database may be fully automated by using the <strong>file reference database map file</strong>.  </p>
 <p>The <a href="#map-file">file reference database map file »</a> contains</p>
 <ul>
 <li>The TL schema for the file reference database itself, which contains:<ul>
-<li>The schema of file IDs</li>
-<li>The schema of file reference sources</li>
+<li>The schema of <a href="#locations">file IDs</a></li>
+<li>The schema of <a href="#source">file reference sources</a></li>
 <li>The usual helper types (vector, bool, true)</li>
 </ul>
 </li>
-<li><strong>All locations</strong></li>
-<li><strong>All actions</strong></li>
-<li><strong>All possible sources</strong>, for <strong>all possible file reference paths</strong></li>
+<li>All <a href="#locations">locations</a></li>
+<li>All <a href="#actions">actions</a></li>
+<li>All possible <a href="#source">sources</a> for <strong>all possible file reference paths</strong></li>
 </ul>
-<p>It is automatically generated and validated by the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
-</li>
-</ul>
-<h3><a class="anchor" href="#implementation" id="implementation" name="implementation"><i class="anchor-icon"></i></a>Implementation</h3>
-<p>Here's how to use <a href="#map-file">file reference database map file »</a> to generate all the logic needed for a file reference database within an MTProto client.</p>
-<p>At least two dictionaries are needed to implement the file reference database:</p>
-<ul>
-<li><a href="#file-reference-dictionary">File reference dictionary</a></li>
-<li><a href="#file-source-dictionary">File source dictionary</a></li>
-</ul>
-<h3><a class="anchor" href="#file-reference-dictionary" id="file-reference-dictionary" name="file-reference-dictionary"><i class="anchor-icon"></i></a>File reference dictionary</h3>
-<p>The file reference dictionary can be represented by the following type:</p>
-<pre><code>HashMap&lt;FileId, bytes&gt;</code></pre>
-<p>This dictionary maps a <code>FileId</code> (which uniquely identifies a photo or a document) to a file reference.  </p>
-<p>This dictionary is populated as specified by the <a href="#locations">locations »</a> contained in the <a href="#map-file">map file »</a>.  </p>
-<p>The file reference can alternatively be stored, for example, in the document and photo DBs along with other metadata, or in any other way that uniquely associates a <code>FileId</code> to a file reference.  </p>
-<h3><a class="anchor" href="#file-source-dictionary" id="file-source-dictionary" name="file-source-dictionary"><i class="anchor-icon"></i></a>File source dictionary</h3>
-<pre><code>HashMap&lt;FileId, Vector&lt;FileSource&gt;&gt;</code></pre>
-<p>It maps a <code>FileId</code> to one or more objects of type <code>FileSource</code>: the exact structure and possible types of <code>FileId</code> and <code>FileSource</code> are specified within the <a href="#map-file">map file »</a>.  </p>
-<p>New entries are added when deserializing objects of a specific type received from the API, mapping a received file ID to one or more <code>FileSource</code>s; the exact procedure and affected objects are fully specified within the <a href="#map-file">map file »</a>.  </p>
-<p>Later, when a file is used (for example when sending or downloading a media file), and a <code>FILE_REFERENCE_EXPIRED</code> RPC error is received for a specific <code>FileId</code>, the client must fetch the <code>List&lt;FileSource&gt;</code> associated to the used <code>FileId</code>, and execute the method call associated to each <code>FileSource</code>, until either:</p>
-<ul>
-<li>The <a href="#file-reference-dictionary">file reference dictionary »</a> entry associated to the same <code>FileId</code> is updated with a new value, in which case the failed method call is retried with the new file reference OR</li>
-<li>There are no remaining entries in the file source list, in which case the error should be rethrown to the user.  </li>
-</ul>
-<h3><a class="anchor" href="#map-file" id="map-file" name="map-file"><i class="anchor-icon"></i></a>Map file</h3>
+<p><a href="/file/400780400238/3/KBcJ1jjEFbk.48398.json/919197650156255986">Latest file reference database map file for the current layer (JSON version) »</a></p>
+<p>Implementation and maintenance of the <a href="/api/file-references">file reference database »</a> may be fully automated by using the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
 <p>The map file itself follows a custom TL schema, and is available in JSON or serialized TL format.  </p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">Serialized TL version of map file »</a></p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">JSON map file »</a> - The constructor predicate is serialized under the <code>_</code> key, <code>bytes</code> fields are serialized as <code>{"_": "bytes", "bytes": "&lt;base64 encoded value&gt;"}</code></p>
-<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.tl">TL schema of map file »</a></p>
-<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.json">JSON version of TL schema of map file »</a></p>
-<p>This is the TL schema of the map file:</p>
-<!-- start schema -->
-<pre><code><a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
-<a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
-<a href='/constructor/true'>true</a>#3fedd339 = <a href='/type/True'>True</a>;
-
-vector#1cb5c415 {t:Type} # [ t ] = Vector t;
-
-// Root
-fileReferenceMap#4dba8c2c db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; sources:Vector&lt;Source&gt; skipped:Vector&lt;SkippedSource&gt; actions:Vector&lt;Action&gt; = FileReferenceMap;
-
-locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
-locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
-
-source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;
-
-skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;
-
-action#9539f410 stored_constructor:string action:ActionOp = Action;
-
-// Field extraction path
-paramNotFlag#acd9d5cf = ParamFlag;
-paramIsFlagAbortIfEmpty#f8fe9fee = ParamFlag;
-paramIsFlagFallback#202b77a1 fallback:TypedOp = ParamFlag;
-paramIsFlagPassthrough#1dc6e17d = ParamFlag;
-
-pathPart#8dc6ff46 constructor:string param:string flag:ParamFlag = PathPart;
-
-path#0c3586a2 parts:Vector&lt;PathPart&gt; = Path;
-pathParent#58f13684 parts:Vector&lt;PathPart&gt; = Path;
-
-// Extractor
-extractAndStore#72069549 from:Path to:string = FieldExtractor;
-
-extractInputStickerSetFromDocumentAttributesAndStore#369d8d14 from:Path to:string = FieldExtractor;
-extractInputStickerSetFromStickerSetAndStore#c167d470 from:Path to:string = FieldExtractor;
-
-extractPeerIdFromPeerAndStore#7d33019c from:Path to:string = FieldExtractor;
-extractPeerIdFromInputPeerAndStore#a51acfb4 from:Path to:string = FieldExtractor;
-
-extractChannelIdFromChannelAndStore#5675bc97 from:Path to:string = FieldExtractor;
-extractChannelIdFromInputChannelAndStore#b662660e from:Path to:string = FieldExtractor;
-
-extractUserIdFromUserAndStore#4778ec63 from:Path to:string = FieldExtractor;
-extractUserIdFromInputUserAndStore#7720aa2e from:Path to:string = FieldExtractor;
-
-// Actions
-callOp#c2ff3383 method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
-getMessageOp#237849e8 peer:TypedOp id:TypedOp from_scheduled:TypedOp quick_reply_shortcut_id:TypedOp = ActionOp;
-
-// For string =&gt; TypedOp dictionaries
-typedOpArg#3a2930c2 key:string value:TypedOp = TypedOpArg;
-
-// Typed constructors, the type is specified to simplify codegen,
-// but isn't strictly necessary as it can be inferred from the TypedOpOp.
-// It is fully pre-validated during the generation of the definition file.
-typedOp#705b10ec type:string op:TypedOpOp = TypedOp;
-
-// The actual ops
-copyOp#f48f418f from:string = TypedOpOp;
-
-getInputChannelByIdOp#3cb47531 from:string = TypedOpOp;
-getInputUserByIdOp#c0ee4326 from:string = TypedOpOp;
-getInputPeerByIdOp#19813750 from:string = TypedOpOp;
-
-// Literals &amp; constructors (methods not allowed or needed here)
-constructorOp#107f8d8a constructor:string args:Vector&lt;TypedOpArg&gt; = TypedOpOp;
-
-vectorOp#f8fb8f72 values:Vector&lt;TypedOp&gt; = TypedOpOp;
-
-intLiteralOp#cbfabe7c value:int = TypedOpOp;
-longLiteralOp#d08b8d3a value:long = TypedOpOp;
-stringLiteralOp#2b56ea8e value:string = TypedOpOp;
-bytesLiteralOp#fdb395a4 value:bytes = TypedOpOp;
-boolLiteralOp#37e07911 value:Bool = TypedOpOp;
-doubleLiteralOp#3651e3bf value:double = TypedOpOp;
-themeFormatLiteralOp#8e4f9208 = TypedOpOp;
-</code></pre>
-<!-- end schema -->
-<p>Current values for the current layer:</p>
-<p>DB schema:</p>
-<!-- start db schema -->
-<pre><code><a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
-<a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
-<a href='/constructor/true'>true</a>#3fedd339 = <a href='/type/True'>True</a>;
-vector#1cb5c415 {t:Type} # [ t ] = Vector t;
-
-fileIdPhoto#47a0bd49 id:long = FileId;
-fileIdDocument#461b1d89 id:long = FileId;
-
-fileSourceMessage#7e015bb0 flags:# from_scheduled:flags.0?true quick_reply_shortcut_id:flags.1?int peer:long id:int = FileSource;
-fileSourceStarsTransaction#c1bac8c7 flags:# peer:long id:string refund:flags.0?true ton:flags.1?true = FileSource;
-fileSourceStory#c820e3eb id:int peer:long = FileSource;
-fileSourceWebPage#9e5b749c url:string = FileSource;
-fileSourceBotApp#01cf8b7a id:long access_hash:long = FileSource;
-fileSourceUserFull#70fdb7b0 id:long = FileSource;
-fileSourceAdminLog#4797f959 channel:long max_id:long = FileSource;
-fileSourceStoryAlbum#5e01f223 peer:long = FileSource;
-fileSourceBotPreviewMedia#0aa91441 bot:long = FileSource;
-fileSourceBotPreviewInfo#f9d2d6fc bot:long lang_code:string = FileSource;
-fileSourcePaidMedia#b18d9042 id:int peer:long = FileSource;
-fileSourceSavedMusic#dd1a7664 user_id:long id:long access_hash:long = FileSource;
-fileSourceChatFull#9de75fde chat_id:long = FileSource;
-fileSourceChannelFull#6fe19339 channel:long = FileSource;
-fileSourcePremiumPromo#c907a44f = FileSource;
-fileSourceAttachMenuBot#c3002694 bot:long = FileSource;
-fileSourceTheme#92d05e0c id:long access_hash:long = FileSource;
-fileSourceWallPaper#50dbf2f7 id:long access_hash:long = FileSource;
-fileSourceStickerSet#34c73709 stickerset:InputStickerSet = FileSource;
-fileSourceSavedGifs#13e78e07 = FileSource;
-fileSourceSavedRingtones#2b25ef1b = FileSource;
-fileSourceAvailableEffects#eb8578f0 = FileSource;
-fileSourceAvailableReactions#0e432388 = FileSource;
-fileSourceUserProfilePhoto#e39ee274 user_id:long max_id:long = FileSource;
-fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = FileSource;
-</code></pre>
-<!-- end db schema -->
-<p>Locations:</p>
-<!-- start locations -->
-<ul>
-<li><a href="/constructor/inputPhoto">inputPhoto</a> - <code>fileIdPhoto</code> (outgoing)</li>
-<li><a href="/constructor/inputDocument">inputDocument</a> - <code>fileIdDocument</code> (outgoing)</li>
-<li><a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a> - <code>fileIdDocument</code> (outgoing)</li>
-<li><a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a> - <code>fileIdPhoto</code> (outgoing)</li>
-<li><a href="/constructor/document">document</a> - <code>fileIdDocument</code> (incoming)</li>
-<li><a href="/constructor/photo">photo</a> - <code>fileIdPhoto</code> (incoming)</li>
-</ul>
-<!-- end locations -->
-<p>Actions:</p>
-<!-- start actions -->
-<ul>
-<li>fileSourceMessage - <pre><code><a href="/api/file-references#getmessageop">getMessageOp</a>(peer: getInputPeerByIdOp(peer), id: copyOp(id), from_scheduled: copyOp(from_scheduled), quick_reply_shortcut_id: copyOp(quick_reply_shortcut_id))</code></pre></li>
-<li>fileSourceStory - <pre><code><a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>(id: [copyOp(id)], peer: getInputPeerByIdOp(peer))</code></pre></li>
-<li>fileSourceWebPage - <pre><code><a href="/method/messages.getWebPage">messages.getWebPage</a>(url: copyOp(url), hash: 0)</code></pre></li>
-<li>fileSourceBotApp - <pre><code><a href="/method/messages.getBotApp">messages.getBotApp</a>(app: <a href="/constructor/inputBotAppID">inputBotAppID</a>{id: copyOp(id), access_hash: copyOp(access_hash)}, hash: 0)</code></pre></li>
-<li>fileSourceUserFull - <pre><code><a href="/method/users.getFullUser">users.getFullUser</a>(id: getInputUserByIdOp(id))</code></pre></li>
-<li>fileSourceAdminLog - <pre><code><a href="/method/channels.getAdminLog">channels.getAdminLog</a>(channel: getInputChannelByIdOp(channel), max_id: copyOp(max_id), min_id: copyOp(max_id), limit: 1, q: "")</code></pre></li>
-<li>fileSourceStoryAlbum - <pre><code><a href="/method/stories.getAlbums">stories.getAlbums</a>(peer: getInputPeerByIdOp(peer), hash: 0)</code></pre></li>
-<li>fileSourceBotPreviewMedia - <pre><code><a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a>(bot: getInputUserByIdOp(bot))</code></pre></li>
-<li>fileSourceBotPreviewInfo - <pre><code><a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a>(bot: getInputUserByIdOp(bot), lang_code: copyOp(lang_code))</code></pre></li>
-<li>fileSourcePaidMedia - <pre><code><a href="/method/messages.getExtendedMedia">messages.getExtendedMedia</a>(id: [copyOp(id)], peer: getInputPeerByIdOp(peer))</code></pre></li>
-<li>fileSourceSavedMusic - <pre><code><a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>(id: getInputUserByIdOp(user_id), documents: [<a href="/constructor/inputDocument">inputDocument</a>{id: copyOp(id), access_hash: copyOp(access_hash), file_reference: base64_decode("")}])</code></pre></li>
-<li>fileSourceChatFull - <pre><code><a href="/method/messages.getFullChat">messages.getFullChat</a>(chat_id: copyOp(chat_id))</code></pre></li>
-<li>fileSourceChannelFull - <pre><code><a href="/method/channels.getFullChannel">channels.getFullChannel</a>(channel: getInputChannelByIdOp(channel))</code></pre></li>
-<li>fileSourcePremiumPromo - <pre><code><a href="/method/help.getPremiumPromo">help.getPremiumPromo</a>()</code></pre></li>
-<li>fileSourceStarsTransaction - <pre><code><a href="/method/payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a>(peer: getInputPeerByIdOp(peer), ton: copyOp(ton), id: [<a href="/constructor/inputStarsTransaction">inputStarsTransaction</a>{id: copyOp(id), refund: copyOp(refund)}])</code></pre></li>
-<li>fileSourceAttachMenuBot - <pre><code><a href="/method/messages.getAttachMenuBot">messages.getAttachMenuBot</a>(bot: getInputUserByIdOp(bot))</code></pre></li>
-<li>fileSourceTheme - <pre><code><a href="/method/account.getTheme">account.getTheme</a>(theme: <a href="/constructor/inputTheme">inputTheme</a>{id: copyOp(id), access_hash: copyOp(access_hash)}, format: $themeFormat)</code></pre></li>
-<li>fileSourceWallPaper - <pre><code><a href="/method/account.getWallPaper">account.getWallPaper</a>(wallpaper: <a href="/constructor/inputWallPaper">inputWallPaper</a>{id: copyOp(id), access_hash: copyOp(access_hash)})</code></pre></li>
-<li>fileSourceStickerSet - <pre><code><a href="/method/messages.getStickerSet">messages.getStickerSet</a>(stickerset: copyOp(stickerset), hash: 0)</code></pre></li>
-<li>fileSourceSavedGifs - <pre><code><a href="/method/messages.getSavedGifs">messages.getSavedGifs</a>(hash: 0)</code></pre></li>
-<li>fileSourceSavedRingtones - <pre><code><a href="/method/account.getSavedRingtones">account.getSavedRingtones</a>(hash: 0)</code></pre></li>
-<li>fileSourceAvailableEffects - <pre><code><a href="/method/messages.getAvailableEffects">messages.getAvailableEffects</a>(hash: 0)</code></pre></li>
-<li>fileSourceAvailableReactions - <pre><code><a href="/method/messages.getAvailableReactions">messages.getAvailableReactions</a>(hash: 0)</code></pre></li>
-<li>fileSourceUserProfilePhoto - <pre><code><a href="/method/photos.getUserPhotos">photos.getUserPhotos</a>(user_id: getInputUserByIdOp(user_id), offset: -1, max_id: copyOp(max_id), limit: 1)</code></pre></li>
-<li>fileSourceDocumentByHash - <pre><code><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>(sha256: copyOp(sha256), size: copyOp(size), mime_type: copyOp(mime_type))</code></pre></li>
-</ul>
-<!-- end actions -->
-<p>Sources:</p>
-<!-- start sources -->
-<ul>
-<li><a href="/constructor/message">message</a> - <pre><code>fileSourceMessage{from_scheduled: <a href="/constructor/message">message</a>.from_scheduled?passthrough, quick_reply_shortcut_id: <a href="/constructor/message">message</a>.quick_reply_shortcut_id?passthrough, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/message">message</a>.peer_id), id: <a href="/constructor/message">message</a>.id}</code></pre></li>
-<li><a href="/constructor/messageService">messageService</a> - <pre><code>fileSourceMessage{peer: extractPeerIdFromPeerAndStore(<a href="/constructor/messageService">messageService</a>.peer_id), id: <a href="/constructor/messageService">messageService</a>.id, from_scheduled: false, quick_reply_shortcut_id: false}</code></pre></li>
-<li>(1) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getPinnedStories">stories.getPinnedStories</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getPinnedStories">stories.getPinnedStories</a>.peer)}</code></pre></li>
-<li>(2) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getStoriesArchive">stories.getStoriesArchive</a>.peer)}</code></pre></li>
-<li>(3) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.peer)}</code></pre></li>
-<li>(4) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/method/stories.getAlbumStories">stories.getAlbumStories</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getAlbumStories">stories.getAlbumStories</a>.peer)}</code></pre></li>
-<li>(5) <a href="/constructor/storyItem">storyItem</a> - <pre><code>(needs <a href="/constructor/peerStories">peerStories</a>) fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/peerStories">peerStories</a>.peer)}</code></pre></li>
-<li>(6) <a href="/constructor/storyItem">storyItem</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyItem">storyItem</a>.from_id?abort_if_empty)}</code></pre></li>
-<li><a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyViewPublicRepost">storyViewPublicRepost</a>.peer_id)}</code></pre></li>
-<li><a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a> - <pre><code>fileSourceStory{id: <a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/storyReactionPublicRepost">storyReactionPublicRepost</a>.peer_id)}</code></pre></li>
-<li><a href="/constructor/foundStory">foundStory</a> - <pre><code>fileSourceStory{id: <a href="/constructor/foundStory">foundStory</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/foundStory">foundStory</a>.peer)}</code></pre></li>
-<li><a href="/constructor/publicForwardStory">publicForwardStory</a> - <pre><code>fileSourceStory{id: <a href="/constructor/publicForwardStory">publicForwardStory</a>.story.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/publicForwardStory">publicForwardStory</a>.peer)}</code></pre></li>
-<li><a href="/constructor/webPageAttributeStory">webPageAttributeStory</a> - <pre><code>fileSourceStory{id: <a href="/constructor/webPageAttributeStory">webPageAttributeStory</a>.story?abort_if_empty.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/webPageAttributeStory">webPageAttributeStory</a>.peer)}</code></pre></li>
-<li><a href="/constructor/messageMediaStory">messageMediaStory</a> - <pre><code>fileSourceStory{id: <a href="/constructor/messageMediaStory">messageMediaStory</a>.story?abort_if_empty.<a href="/constructor/storyItem">storyItem</a>.id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/messageMediaStory">messageMediaStory</a>.peer)}</code></pre></li>
-<li><a href="/constructor/webPage">webPage</a> - <pre><code>fileSourceWebPage{url: <a href="/constructor/webPage">webPage</a>.url}</code></pre></li>
-<li><a href="/constructor/botApp">botApp</a> - <pre><code>fileSourceBotApp{id: <a href="/constructor/botApp">botApp</a>.id, access_hash: <a href="/constructor/botApp">botApp</a>.access_hash}</code></pre></li>
-<li><a href="/constructor/botInfo">botInfo</a> - <pre><code>fileSourceUserFull{id: <a href="/constructor/botInfo">botInfo</a>.user_id?abort_if_empty}</code></pre></li>
-<li><a href="/constructor/channelAdminLogEvent">channelAdminLogEvent</a> - <pre><code>(needs <a href="/method/channels.getAdminLog">channels.getAdminLog</a>) fileSourceAdminLog{channel: extractChannelIdFromInputChannelAndStore(<a href="/method/channels.getAdminLog">channels.getAdminLog</a>.channel), max_id: <a href="/constructor/channelAdminLogEvent">channelAdminLogEvent</a>.id}</code></pre></li>
-<li><a href="/method/stories.createAlbum">stories.createAlbum</a> - <pre><code>fileSourceStoryAlbum{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.createAlbum">stories.createAlbum</a>.peer)}</code></pre></li>
-<li><a href="/method/stories.getAlbums">stories.getAlbums</a> - <pre><code>fileSourceStoryAlbum{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.getAlbums">stories.getAlbums</a>.peer)}</code></pre></li>
-<li><a href="/method/stories.updateAlbum">stories.updateAlbum</a> - <pre><code>fileSourceStoryAlbum{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/stories.updateAlbum">stories.updateAlbum</a>.peer)}</code></pre></li>
-<li><a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a> - <pre><code>fileSourceBotPreviewMedia{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.getPreviewMedias">bots.getPreviewMedias</a>.bot)}</code></pre></li>
-<li><a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a>.bot), lang_code: <a href="/method/bots.getPreviewInfo">bots.getPreviewInfo</a>.lang_code}</code></pre></li>
-<li><a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>.bot), lang_code: <a href="/method/bots.addPreviewMedia">bots.addPreviewMedia</a>.lang_code}</code></pre></li>
-<li><a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a> - <pre><code>fileSourceBotPreviewInfo{bot: extractUserIdFromInputUserAndStore(<a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a>.bot), lang_code: <a href="/method/bots.editPreviewMedia">bots.editPreviewMedia</a>.lang_code}</code></pre></li>
-<li><a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a> - <pre><code>fileSourcePaidMedia{id: <a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a>.msg_id, peer: extractPeerIdFromPeerAndStore(<a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a>.peer)}</code></pre></li>
-<li>(1) <a href="/constructor/userFull">userFull</a> - <pre><code>fileSourceUserFull{id: <a href="/constructor/userFull">userFull</a>.id}</code></pre></li>
-<li>(2) <a href="/constructor/userFull">userFull</a> - <pre><code>fileSourceSavedMusic{user_id: <a href="/constructor/userFull">userFull</a>.id, id: <a href="/constructor/userFull">userFull</a>.saved_music?abort_if_empty.<a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/userFull">userFull</a>.saved_music?abort_if_empty.<a href="/constructor/document">document</a>.access_hash}</code></pre></li>
-<li><a href="/constructor/chatFull">chatFull</a> - <pre><code>fileSourceChatFull{chat_id: <a href="/constructor/chatFull">chatFull</a>.id}</code></pre></li>
-<li><a href="/constructor/channelFull">channelFull</a> - <pre><code>fileSourceChannelFull{channel: <a href="/constructor/channelFull">channelFull</a>.id}</code></pre></li>
-<li><a href="/method/help.getPremiumPromo">help.getPremiumPromo</a> - <pre><code>fileSourcePremiumPromo{}</code></pre></li>
-<li>(1) <a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>(needs <a href="/method/payments.getStarsStatus">payments.getStarsStatus</a>) fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsStatus">payments.getStarsStatus</a>.peer), ton: <a href="/method/payments.getStarsStatus">payments.getStarsStatus</a>.ton?passthrough, id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough}</code></pre></li>
-<li>(2) <a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>(needs <a href="/method/payments.getStarsTransactions">payments.getStarsTransactions</a>) fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsTransactions">payments.getStarsTransactions</a>.peer), ton: <a href="/method/payments.getStarsTransactions">payments.getStarsTransactions</a>.ton?passthrough, id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough}</code></pre></li>
-<li>(3) <a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>(needs <a href="/method/payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a>) fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a>.peer), ton: <a href="/method/payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a>.ton?passthrough, id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough}</code></pre></li>
-<li>(4) <a href="/constructor/starsTransaction">starsTransaction</a> - <pre><code>(needs <a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a>) fileSourceStarsTransaction{peer: extractPeerIdFromInputPeerAndStore(<a href="/method/payments.getStarsSubscriptions">payments.getStarsSubscriptions</a>.peer), id: <a href="/constructor/starsTransaction">starsTransaction</a>.id, refund: <a href="/constructor/starsTransaction">starsTransaction</a>.refund?passthrough, ton: false}</code></pre></li>
-<li><a href="/constructor/attachMenuBot">attachMenuBot</a> - <pre><code>fileSourceAttachMenuBot{bot: <a href="/constructor/attachMenuBot">attachMenuBot</a>.bot_id}</code></pre></li>
-<li><a href="/constructor/theme">theme</a> - <pre><code>fileSourceTheme{id: <a href="/constructor/theme">theme</a>.id, access_hash: <a href="/constructor/theme">theme</a>.access_hash}</code></pre></li>
-<li><a href="/constructor/wallPaper">wallPaper</a> - <pre><code>fileSourceWallPaper{id: <a href="/constructor/wallPaper">wallPaper</a>.id, access_hash: <a href="/constructor/wallPaper">wallPaper</a>.access_hash}</code></pre></li>
-<li><a href="/constructor/stickerSetMultiCovered">stickerSetMultiCovered</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromStickerSetAndStore(<a href="/constructor/stickerSetMultiCovered">stickerSetMultiCovered</a>.set)}</code></pre></li>
-<li><a href="/constructor/stickerSetFullCovered">stickerSetFullCovered</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromStickerSetAndStore(<a href="/constructor/stickerSetFullCovered">stickerSetFullCovered</a>.set)}</code></pre></li>
-<li><a href="/constructor/messages.stickerSet">messages.stickerSet</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromStickerSetAndStore(<a href="/constructor/messages.stickerSet">messages.stickerSet</a>.set)}</code></pre></li>
-<li><a href="/constructor/messages.savedGifs">messages.savedGifs</a> - <pre><code>fileSourceSavedGifs{}</code></pre></li>
-<li><a href="/constructor/account.savedRingtones">account.savedRingtones</a> - <pre><code>fileSourceSavedRingtones{}</code></pre></li>
-<li><a href="/constructor/account.savedRingtoneConverted">account.savedRingtoneConverted</a> - <pre><code>fileSourceSavedRingtones{}</code></pre></li>
-<li><a href="/method/account.uploadRingtone">account.uploadRingtone</a> - <pre><code>fileSourceSavedRingtones{}</code></pre></li>
-<li><a href="/constructor/messages.availableEffects">messages.availableEffects</a> - <pre><code>fileSourceAvailableEffects{}</code></pre></li>
-<li><a href="/constructor/messages.availableReactions">messages.availableReactions</a> - <pre><code>fileSourceAvailableReactions{}</code></pre></li>
-<li><a href="/constructor/photo">photo</a> - <pre><code>(needs <a href="/method/photos.getUserPhotos">photos.getUserPhotos</a>) fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.getUserPhotos">photos.getUserPhotos</a>.user_id), max_id: <a href="/constructor/photo">photo</a>.id}</code></pre></li>
-<li><a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a>.bot?fallback(<a href="/constructor/inputUserSelf">inputUserSelf</a>{})), max_id: <a href="/method/photos.updateProfilePhoto">photos.updateProfilePhoto</a>.(return value).<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
-<li><a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a>.bot?fallback(<a href="/constructor/inputUserSelf">inputUserSelf</a>{})), max_id: <a href="/method/photos.uploadProfilePhoto">photos.uploadProfilePhoto</a>.(return value).<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
-<li><a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a> - <pre><code>fileSourceUserProfilePhoto{user_id: extractUserIdFromInputUserAndStore(<a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a>.user_id), max_id: <a href="/method/photos.uploadContactProfilePhoto">photos.uploadContactProfilePhoto</a>.(return value).<a href="/constructor/photos.photo">photos.photo</a>.photo.<a href="/constructor/photo">photo</a>.id}</code></pre></li>
-<li>(1) <a href="/constructor/document">document</a> - <pre><code>fileSourceStickerSet{stickerset: extractInputStickerSetFromDocumentAttributesAndStore(<a href="/constructor/document">document</a>.attributes)}</code></pre></li>
-<li>(2) <a href="/constructor/document">document</a> - <pre><code>(needs <a href="/method/users.getSavedMusic">users.getSavedMusic</a>) fileSourceSavedMusic{user_id: extractUserIdFromInputUserAndStore(<a href="/method/users.getSavedMusic">users.getSavedMusic</a>.id), id: <a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/document">document</a>.access_hash}</code></pre></li>
-<li>(3) <a href="/constructor/document">document</a> - <pre><code>(needs <a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>) fileSourceSavedMusic{user_id: extractUserIdFromInputUserAndStore(<a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>.id), id: <a href="/constructor/document">document</a>.id, access_hash: <a href="/constructor/document">document</a>.access_hash}</code></pre></li>
-<li><a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a> - <pre><code>fileSourceDocumentByHash{sha256: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.sha256, size: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.size, mime_type: <a href="/method/messages.getDocumentByHash">messages.getDocumentByHash</a>.mime_type}</code></pre></li>
-</ul>
-<!-- end sources -->
-<p>Skipped:</p>
-<!-- start skipped -->
-<ul>
-<li><a href="/method/messages.getSponsoredMessages">messages.getSponsoredMessages</a> - Do not store file references from sponsored messages</li>
-<li><a href="/method/help.getAppUpdate">help.getAppUpdate</a> - Don't handle file references from ephemeral app update info</li>
-<li><a href="/method/help.getRecentMeUrls">help.getRecentMeUrls</a> - Don't handle file references from recent t.me URLs</li>
-<li><a href="/constructor/recentMeUrlChatInvite">recentMeUrlChatInvite</a> - Do not store references based on chat invite links</li>
-<li><a href="/method/messages.checkChatInvite">messages.checkChatInvite</a> - Do not store references based on chat invite links</li>
-<li><a href="/method/messages.getInlineBotResults">messages.getInlineBotResults</a> - Inline bot results are ephemeral</li>
-<li><a href="/method/messages.getPreparedInlineMessage">messages.getPreparedInlineMessage</a> - Inline bot results are ephemeral</li>
-<li><a href="/method/messages.uploadMedia">messages.uploadMedia</a> - A freshly uploaded media file will obtain a context only once it is sent to a chat</li>
-<li><a href="/method/messages.uploadImportedMedia">messages.uploadImportedMedia</a> - A freshly uploaded media file will obtain a context only once it is sent to a chat</li>
-<li><a href="/constructor/updateServiceNotification">updateServiceNotification</a> - Cannot refetch service notifications</li>
-<li><a href="/method/messages.getWebPagePreview">messages.getWebPagePreview</a> - No locations are added for the method call, as it doesn't use persistent IDs as input; the location is instead extracted from the persistent IDs in the returned WebPage object</li>
-<li><a href="/constructor/payments.resaleStarGifts">payments.resaleStarGifts</a> - Contexts for star gifts are not yet implemented</li>
-<li><a href="/constructor/payments.starGiftUpgradePreview">payments.starGiftUpgradePreview</a> - Contexts for star gifts are not yet implemented</li>
-<li><a href="/constructor/starGift">starGift</a> - Contexts for star gifts are not yet implemented</li>
-<li><a href="/constructor/starGiftUnique">starGiftUnique</a> - Contexts for star gifts are not yet implemented</li>
-<li><a href="/constructor/starGiftCollection">starGiftCollection</a> - Contexts for star gifts are not yet implemented</li>
-<li><a href="/constructor/payments.starGiftCollections">payments.starGiftCollections</a> - Contexts for star gifts are not yet implemented</li>
-<li><a href="/constructor/payments.starGiftUpgradeAttributes">payments.starGiftUpgradeAttributes</a> - Contexts for star gifts are not yet implemented</li>
-<li><a href="/method/messages.getCustomEmojiDocuments">messages.getCustomEmojiDocuments</a> - Do not store file references in this context</li>
-<li><a href="/method/account.uploadTheme">account.uploadTheme</a> - A freshly uploaded theme file will obtain a context only once it is created via account.createTheme</li>
-</ul>
-<!-- end skipped -->
-<p>Here's a detailed description of the constructors.</p>
-<h3><a class="anchor" href="#root" id="root" name="root"><i class="anchor-icon"></i></a>Root</h3>
+<p>It is automatically generated and validated by the <a href="/api/file-reference-generator">file reference generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
 <pre><code>fileReferenceMap#4dba8c2c db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; sources:Vector&lt;Source&gt; skipped:Vector&lt;SkippedSource&gt; actions:Vector&lt;Action&gt; = FileReferenceMap;
 
 locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
@@ -423,7 +103,56 @@ These constructors indicate that the source should be ignored completely (includ
 <p>Each skipped predicate can have one associated reason.  </p>
 </li>
 </ul>
+<p>Here's how to use <a href="#map-file">file reference database map file »</a> to generate all the logic needed for a file reference database within an MTProto client.</p>
+<p>At least two dictionaries are needed to implement the file reference database:</p>
+<ul>
+<li><a href="#file-reference-dictionary">File reference dictionary</a></li>
+<li><a href="#file-source-dictionary">File source dictionary</a></li>
+</ul>
+<h4><a class="anchor" href="#file-reference-dictionary" id="file-reference-dictionary" name="file-reference-dictionary"><i class="anchor-icon"></i></a>File reference dictionary</h4>
+<p>The file reference dictionary can be represented by the following type:</p>
+<pre><code>HashMap&lt;FileId, bytes&gt;</code></pre>
+<p>This dictionary maps a <a href="#file-ids">file ID »</a> (which uniquely identifies a photo or a document) to a file reference.  </p>
+<p>This dictionary is populated as specified by the <a href="#locations">locations »</a> contained in the <a href="#map-file">map file »</a>.  </p>
+<p>The file reference can alternatively be stored, for example, in the document and photo DBs along with other metadata, or in any other way that uniquely associates a <code>FileId</code> to a file reference.  </p>
+<h4><a class="anchor" href="#file-source-dictionary" id="file-source-dictionary" name="file-source-dictionary"><i class="anchor-icon"></i></a>File source dictionary</h4>
+<pre><code>HashMap&lt;FileId, Vector&lt;FileSource&gt;&gt;</code></pre>
+<p>It maps a <code>FileId</code> to one or more objects of type <code>FileSource</code>: the exact structure and possible types of <code>FileId</code> and <code>FileSource</code> are specified within the <a href="#map-file">map file »</a>.  </p>
+<p>New entries are added when deserializing objects of a specific type received from the API, mapping a received file ID to one or more <code>FileSource</code>s; the exact procedure and affected objects are fully specified within the <a href="#map-file">map file »</a>.  </p>
+<p>Later, when a file is used (for example when sending or downloading a media file), and a <code>FILE_REFERENCE_EXPIRED</code> RPC error is received for a specific <code>FileId</code>, the client must fetch the <code>List&lt;FileSource&gt;</code> associated to the used <code>FileId</code>, and execute the method call associated to each <code>FileSource</code>, until either:</p>
+<ul>
+<li>The <a href="#file-reference-dictionary">file reference dictionary »</a> entry associated to the same <code>FileId</code> is updated with a new value, in which case the failed method call is retried with the new file reference OR</li>
+<li>There are no remaining entries in the file source list, in which case the error should be rethrown to the user.  </li>
+</ul>
+<h3><a class="anchor" href="#file-ids" id="file-ids" name="file-ids"><i class="anchor-icon"></i></a>File IDs</h3>
+<p>A <strong>file ID</strong> (in the context of the file reference DB) is an object that, when serialized to a string, can easily and uniquely identify a media file.  </p>
+<p>Currently, the following file ID objects are available:</p>
+<!-- start fileid -->
+<pre><code>fileIdPhoto#47a0bd49 id:long = FileId;
+fileIdDocument#461b1d89 id:long = FileId;</code></pre>
+<!-- end fileid -->
+<p><a href="#locations">Locations »</a> specify how to generate a file ID object from all media objects.  </p>
+<h3><a class="anchor" href="#file-references" id="file-references" name="file-references"><i class="anchor-icon"></i></a>File references</h3>
+<p>A <strong>file reference</strong> is a string of bytes that is be encountered in the <code>file_reference</code> fields of</p>
+<ul>
+<li>
+<p><em>Incoming</em> media constructors, such as <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.  </p>
+<p>A <strong>file ID</strong> can be generated from all <em>incoming</em> media constructors, as specified by the <a href="#locations">location objects »</a>.  </p>
+</li>
+<li>
+<p><em>Outgoing</em> media constructors like <a href="/constructor/inputDocument">inputDocument</a>, <a href="/constructor/inputPhoto">inputPhoto</a>, etc, where it must be populated by the client in order to download or resend all media.  </p>
+<p>A <strong>file ID</strong> can be generated from all <em>outgoing</em> media constructors, as specified by the <a href="#locations">location objects »</a>.  </p>
+<p>A file reference may <strong>expire</strong>, in which case it cannot be used in outgoing constructors: it must be refreshed by refetching the message, <a href="/api/stories">story</a>, etc where the media last appeared, as specified below.</p>
+</li>
+</ul>
 <h3><a class="anchor" href="#locations" id="locations" name="locations"><i class="anchor-icon"></i></a>Locations</h3>
+<p><a href="#locations">Locations »</a> specify how to</p>
+<ul>
+<li>Generate <code>FileId</code> constructors and</li>
+<li>Extract/populate file references</li>
+</ul>
+<p>...from both incoming and outgoing media objects.</p>
+<p>Locations are used to populate the <a href="#file-reference-dictionary">file reference dictionary »</a>, which maps a <strong>file ID</strong> to exactly one <strong>file reference</strong>.  </p>
 <pre><code>locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
 locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;</code></pre>
 <p>Locations contain the full list of constructors (never methods) that have a <code>file_reference</code> and an <code>id</code> field.  </p>
@@ -451,6 +180,10 @@ locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
 <p>When refreshing references, replace the <code>file_reference</code> field of the object on the left.  </p>
 <p>(Legacy <code>inputFileLocation</code> constructors are ignored by the current map file).</p>
 <h3><a class="anchor" href="#source" id="source" name="source"><i class="anchor-icon"></i></a>Source</h3>
+<p>A file reference source contains information that the client may use to re-fetch the document (and the new file reference), by invoking a specific <strong>action</strong>.  </p>
+<p>Each source type is associated to a specific <a href="#actions">action »</a>.</p>
+<p><a href="#locations">Locations »</a> and <a href="#source">sources »</a> are used together to populate the <a href="#file-source-dictionary">file source dictionary »</a>, which maps a <strong>file ID</strong> to one or more <strong>file reference sources</strong>.  </p>
+<p>Schema:</p>
 <pre><code>source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;</code></pre>
 <p>A <code>source</code> contains instructions on how to extract and store file reference sources from an incoming method response or update.  </p>
 <p><strong>Note</strong>: The following sections assume that all <a href="/type/Updates">Updates</a> constructors have already been converted to a vector of <a href="/type/Update">Update</a> constructors, <strong>including short variants</strong> like <a href="/constructor/updateShortMessage">updateShortMessage</a>, <a href="/constructor/updateShortSentMessage">updateShortSentMessage</a>, <a href="/constructor/updateShortChatMessage">updateShortChatMessage</a>, which must be pre-converted to <a href="/type/Update">Update</a> constructors by the client using information extracted from the method call.<br>
@@ -569,6 +302,11 @@ Note that OPs of type <code>copyOp</code>, <code>getInputChannelByIdOp</code>, <
 </li>
 </ul>
 <h3><a class="anchor" href="#actions" id="actions" name="actions"><i class="anchor-icon"></i></a>Actions</h3>
+<p>Actions are used to refresh an expired file reference of a media file according to the <a href="#source">file reference sources »</a> stored in the <a href="#file-source-dictionary">file source dictionary »</a>, associated to the <code>FileId</code>.  </p>
+<ul>
+<li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
+</ul>
+<p>For example for the <strong>file reference path</strong> specified below it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </p>
 <pre><code>action#9539f410 stored_constructor:string action:ActionOp = Action;
 
 // Actions
@@ -598,7 +336,7 @@ typedOp#705b10ec type:string op:TypedOpOp = TypedOp;</code></pre>
 <p><code>getMessageOp</code> is a specialized action which invokes either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <code>peer</code> (which is always a subtype of <a href="/type/InputPeer">InputPeer</a>), passing the <code>id</code> as the only element to the vector <code>id</code> parameter.<br>
 If the flag to which the <code>from_scheduled</code> points is set, <a href="/method/messages.getScheduledMessages">messages.getScheduledMessages</a> should be executed instead.<br>
 If the flag to which the <code>quick_reply_shortcut_id</code> points is set, <a href="/method/messages.getQuickReplyMessages">messages.getQuickReplyMessages</a> should be executed instead, passing the value of the <code>quick_reply_shortcut_id</code> flag to <a href="/method/messages.getQuickReplyMessages">messages.getQuickReplyMessages</a>.<code>shortcut_id</code> and the <code>id</code> as the only element of a vector, passed to <a href="/method/messages.getQuickReplyMessages">messages.getQuickReplyMessages</a>.<code>id</code>.  </p>
-<h3><a class="anchor" href="#action-parameters" id="action-parameters" name="action-parameters"><i class="anchor-icon"></i></a>Action parameters</h3>
+<h4><a class="anchor" href="#action-parameters" id="action-parameters" name="action-parameters"><i class="anchor-icon"></i></a>Action parameters</h4>
 <pre><code>copyOp#f48f418f from:string = TypedOpOp;
 
 getInputChannelByIdOp#3cb47531 from:string = TypedOpOp;
