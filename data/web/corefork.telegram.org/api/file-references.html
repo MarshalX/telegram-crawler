@@ -47,26 +47,55 @@
 <p>File references are strings of bytes, that can be encountered in the <code>file_reference</code> fields of <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.</p>
 <p>They must be cached by the client, along with the <strong>source</strong> where the document/photo object was found, in order to be refetched when the file reference expires.</p>
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
-<h3><a class="anchor" href="#map-file" id="map-file" name="map-file"><i class="anchor-icon"></i></a>Map file</h3>
+<h3><a class="anchor" href="#automatic-implementation" id="automatic-implementation" name="automatic-implementation"><i class="anchor-icon"></i></a>Automatic implementation</h3>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <strong>file reference database map file</strong>.  </p>
-<p>The <a href="#map-file">file reference database map file »</a> contains</p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">Latest JSON map file for the current layer »</a> - The constructor predicate is serialized under the <code>_</code> key, <code>bytes</code> fields are serialized as <code>{"_": "bytes", "bytes": "&lt;base64 encoded value&gt;"}</code></p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.dat">Serialized TL version of the latest map file for the current layer »</a></p>
+<p>See <a href="/api/file-references/map-schema">here »</a> for the TL schema of the map file.</p>
+<p>The map file is automatically generated and validated by the <a href="/api/file-reference-generator">file reference generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
+<p>To implement it, start by setting up the following two tables:</p>
 <ul>
-<li>The TL schema for the file reference database itself, which contains:<ul>
-<li>The schema of <a href="#locations">file IDs</a></li>
-<li>The schema of <a href="#source">file reference sources</a></li>
-<li>The usual helper types (vector, bool, true)</li>
+<li><a href="#file-reference-table">File reference table</a></li>
+<li><a href="#file-source-table">File source table</a></li>
 </ul>
+<p>The map file contains and specifies, for the current layer:</p>
+<ul>
+<li>
+<p>TL schemas for:</p>
+<ul>
+<li><a href="#file-ids">File IDs »</a>, used in the file reference DB as keys in the <a href="#file-reference-table">file reference table</a> and <a href="#file-source-table">file source table</a></li>
+<li><a href="#file-sources">File sources »</a>, used in the file reference DB as values in the <a href="#file-source-table">file source table</a></li>
+</ul>
+<p>These TL schemas can be used as a guideline for the file reference and file source table DBMS schema, or by directly serializing file IDs and file sources if a simple string =&gt; string KV DB is used.</p>
 </li>
-<li>All <a href="#locations">locations</a></li>
-<li>All <a href="#actions">actions</a></li>
-<li>All possible <a href="#source">sources</a> for <strong>all possible file reference paths</strong></li>
+<li>
+<p>The following extractors:</p>
+<ul>
+<li>All <a href="#source-extractors">file source extractors »</a>: extractors used to generate <a href="#source">file sources</a> from incoming constructors.</li>
+<li>All <a href="#location-extractors">location extractors »</a>, used to extract and store file references from incoming and outgoing constructors.</li>
 </ul>
-<p><a href="/file/400780400238/3/KBcJ1jjEFbk.48398.json/919197650156255986">Latest file reference database map file for the current layer (JSON version) »</a></p>
-<p>Implementation and maintenance of the <a href="/api/file-references">file reference database »</a> may be fully automated by using the <a href="/api/file-reference-generator">file reference database schema generator tool »</a>, and the <strong>file reference database map file</strong> it generates.  </p>
-<p>The map file itself follows a custom TL schema, and is available in JSON or serialized TL format.  </p>
-<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">Serialized TL version of map file »</a></p>
-<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">JSON map file »</a> - The constructor predicate is serialized under the <code>_</code> key, <code>bytes</code> fields are serialized as <code>{"_": "bytes", "bytes": "&lt;base64 encoded value&gt;"}</code></p>
-<p>It is automatically generated and validated by the <a href="/api/file-reference-generator">file reference generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
+<p>Extractors should be used by hooking the TL serialization and deserialization logic in order to invoke the correct extractor(s) when a certain constructor is serialized and deserialized.  </p>
+<p>The extraction logic can also be implemented externally from the TL parser, or on the contrary built directly into it via codegen.</p>
+</li>
+<li>
+<p>All <a href="#actions">actions »</a>: actions are instructions used to refresh expired file references according to <a href="#file-source">file sources »</a> stored in the <a href="#file-source-table">file source table</a></p>
+</li>
+</ul>
+<h4><a class="anchor" href="#file-reference-table" id="file-reference-table" name="file-reference-table"><i class="anchor-icon"></i></a>File reference table</h4>
+<p>The file reference table can be represented by the following type:</p>
+<pre><code>HashMap&lt;FileId, bytes&gt;</code></pre>
+<p>This table maps a <a href="#file-ids">file ID »</a> (which uniquely identifies a photo or a document) to a <a href="#file-references">file reference »</a>.   </p>
+<p>This table is populated by the <a href="#location-extractors">location extractors »</a> contained in the <a href="#map-file">map file »</a>.  </p>
+<p>The file reference can alternatively be stored, for example, in the document and photo DBs along with other metadata, or in any other way that uniquely associates a <code>FileId</code> to a file reference.  </p>
+<h4><a class="anchor" href="#file-source-table" id="file-source-table" name="file-source-table"><i class="anchor-icon"></i></a>File source table</h4>
+<pre><code>HashMap&lt;FileId, Vector&lt;FileSource&gt;&gt;</code></pre>
+<p>It maps a <a href="#file-ids">file ID »</a> to one or more <a href="#file-sources">file sources »</a>.  </p>
+<p>Later, when a file is used (for example when sending or downloading a media file), and a <code>FILE_REFERENCE_EXPIRED</code> RPC error is received for a specific <code>FileId</code>, the client must fetch the <code>List&lt;FileSource&gt;</code> associated to the used <code>FileId</code>, and execute the method call associated to each <code>FileSource</code>, until either:</p>
+<ul>
+<li>The <a href="#file-reference-table">file reference table »</a> entry associated to the same <code>FileId</code> is updated with a new value, in which case the failed method call is retried with the new file reference OR</li>
+<li>There are no remaining entries in the file source list, in which case the error should be rethrown to the user.  </li>
+</ul>
+<h4><a class="anchor" href="#map" id="map" name="map"><i class="anchor-icon"></i></a>Map</h4>
 <pre><code>fileReferenceMap#4dba8c2c db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; sources:Vector&lt;Source&gt; skipped:Vector&lt;SkippedSource&gt; actions:Vector&lt;Action&gt; = FileReferenceMap;
 
 locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
@@ -103,50 +132,29 @@ These constructors indicate that the source should be ignored completely (includ
 <p>Each skipped predicate can have one associated reason.  </p>
 </li>
 </ul>
-<p>Here's how to use <a href="#map-file">file reference database map file »</a> to generate all the logic needed for a file reference database within an MTProto client.</p>
-<p>At least two dictionaries are needed to implement the file reference database:</p>
-<ul>
-<li><a href="#file-reference-dictionary">File reference dictionary</a></li>
-<li><a href="#file-source-dictionary">File source dictionary</a></li>
-</ul>
-<h4><a class="anchor" href="#file-reference-dictionary" id="file-reference-dictionary" name="file-reference-dictionary"><i class="anchor-icon"></i></a>File reference dictionary</h4>
-<p>The file reference dictionary can be represented by the following type:</p>
-<pre><code>HashMap&lt;FileId, bytes&gt;</code></pre>
-<p>This dictionary maps a <a href="#file-ids">file ID »</a> (which uniquely identifies a photo or a document) to a file reference.  </p>
-<p>This dictionary is populated as specified by the <a href="#locations">locations »</a> contained in the <a href="#map-file">map file »</a>.  </p>
-<p>The file reference can alternatively be stored, for example, in the document and photo DBs along with other metadata, or in any other way that uniquely associates a <code>FileId</code> to a file reference.  </p>
-<h4><a class="anchor" href="#file-source-dictionary" id="file-source-dictionary" name="file-source-dictionary"><i class="anchor-icon"></i></a>File source dictionary</h4>
-<pre><code>HashMap&lt;FileId, Vector&lt;FileSource&gt;&gt;</code></pre>
-<p>It maps a <code>FileId</code> to one or more objects of type <code>FileSource</code>: the exact structure and possible types of <code>FileId</code> and <code>FileSource</code> are specified within the <a href="#map-file">map file »</a>.  </p>
-<p>New entries are added when deserializing objects of a specific type received from the API, mapping a received file ID to one or more <code>FileSource</code>s; the exact procedure and affected objects are fully specified within the <a href="#map-file">map file »</a>.  </p>
-<p>Later, when a file is used (for example when sending or downloading a media file), and a <code>FILE_REFERENCE_EXPIRED</code> RPC error is received for a specific <code>FileId</code>, the client must fetch the <code>List&lt;FileSource&gt;</code> associated to the used <code>FileId</code>, and execute the method call associated to each <code>FileSource</code>, until either:</p>
-<ul>
-<li>The <a href="#file-reference-dictionary">file reference dictionary »</a> entry associated to the same <code>FileId</code> is updated with a new value, in which case the failed method call is retried with the new file reference OR</li>
-<li>There are no remaining entries in the file source list, in which case the error should be rethrown to the user.  </li>
-</ul>
 <h3><a class="anchor" href="#file-ids" id="file-ids" name="file-ids"><i class="anchor-icon"></i></a>File IDs</h3>
 <p>A <strong>file ID</strong> (in the context of the file reference DB) is an object that, when serialized to a string, can easily and uniquely identify a media file.  </p>
-<p>Currently, the following file ID objects are available:</p>
+<p>Currently, the following file ID objects are available (taken from the DB schema inside of the <a href="#map">map file</a>):</p>
 <!-- start fileid -->
 <pre><code>fileIdPhoto#47a0bd49 id:long = FileId;
 fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <!-- end fileid -->
-<p><a href="#locations">Locations »</a> specify how to generate a file ID object from all media objects.  </p>
+<p><a href="#location-extractors">Location extractors »</a> specify how to generate a file ID object from all media objects.  </p>
 <h3><a class="anchor" href="#file-references" id="file-references" name="file-references"><i class="anchor-icon"></i></a>File references</h3>
 <p>A <strong>file reference</strong> is a string of bytes that is be encountered in the <code>file_reference</code> fields of</p>
 <ul>
 <li>
 <p><em>Incoming</em> media constructors, such as <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.  </p>
-<p>A <strong>file ID</strong> can be generated from all <em>incoming</em> media constructors, as specified by the <a href="#locations">location objects »</a>.  </p>
+<p>A <strong>file ID</strong> can be generated from all <em>incoming</em> media constructors, as specified by the <a href="#location-extractors">location extractors »</a>.  </p>
 </li>
 <li>
 <p><em>Outgoing</em> media constructors like <a href="/constructor/inputDocument">inputDocument</a>, <a href="/constructor/inputPhoto">inputPhoto</a>, etc, where it must be populated by the client in order to download or resend all media.  </p>
-<p>A <strong>file ID</strong> can be generated from all <em>outgoing</em> media constructors, as specified by the <a href="#locations">location objects »</a>.  </p>
+<p>A <strong>file ID</strong> can be generated from all <em>outgoing</em> media constructors, as specified by the <a href="#location-extractors">location objects »</a>.  </p>
 <p>A file reference may <strong>expire</strong>, in which case it cannot be used in outgoing constructors: it must be refreshed by refetching the message, <a href="/api/stories">story</a>, etc where the media last appeared, as specified below.</p>
 </li>
 </ul>
-<h3><a class="anchor" href="#locations" id="locations" name="locations"><i class="anchor-icon"></i></a>Locations</h3>
-<p><a href="#locations">Locations »</a> specify how to</p>
+<h3><a class="anchor" href="#location-extractors" id="location-extractors" name="location-extractors"><i class="anchor-icon"></i></a>Location extractors</h3>
+<p><a href="#location-extractors">Locations extractors »</a> specify how to</p>
 <ul>
 <li>Generate <code>FileId</code> constructors and</li>
 <li>Extract/populate file references</li>
@@ -179,13 +187,13 @@ locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
 <p>When encountering one of the objects on the left, use the <code>id</code> field to generate a <code>FileId</code> of the type on the right.  </p>
 <p>When refreshing references, replace the <code>file_reference</code> field of the object on the left.  </p>
 <p>(Legacy <code>inputFileLocation</code> constructors are ignored by the current map file).</p>
-<h3><a class="anchor" href="#source" id="source" name="source"><i class="anchor-icon"></i></a>Source</h3>
-<p>A file reference source contains information that the client may use to re-fetch the document (and the new file reference), by invoking a specific <strong>action</strong>.  </p>
+<h3><a class="anchor" href="#source-extraction" id="source-extraction" name="source-extraction"><i class="anchor-icon"></i></a>Source extraction</h3>
+<p>A file source contains information that the client may use to re-fetch the document (and the new file reference), by invoking a specific <strong>action</strong>.  </p>
 <p>Each source type is associated to a specific <a href="#actions">action »</a>.</p>
-<p><a href="#locations">Locations »</a> and <a href="#source">sources »</a> are used together to populate the <a href="#file-source-dictionary">file source dictionary »</a>, which maps a <strong>file ID</strong> to one or more <strong>file reference sources</strong>.  </p>
+<p><a href="#location-extractors">Locations extractors »</a> and <a href="#source">sources »</a> are used together to populate the <a href="#file-source-dictionary">file source dictionary »</a>, which maps a <strong>file ID</strong> to one or more <strong>file sources</strong>.  </p>
 <p>Schema:</p>
 <pre><code>source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;</code></pre>
-<p>A <code>source</code> contains instructions on how to extract and store file reference sources from an incoming method response or update.  </p>
+<p>A <code>source</code> contains instructions on how to extract and store file sources from an incoming method response or update.  </p>
 <p><strong>Note</strong>: The following sections assume that all <a href="/type/Updates">Updates</a> constructors have already been converted to a vector of <a href="/type/Update">Update</a> constructors, <strong>including short variants</strong> like <a href="/constructor/updateShortMessage">updateShortMessage</a>, <a href="/constructor/updateShortSentMessage">updateShortSentMessage</a>, <a href="/constructor/updateShortChatMessage">updateShortChatMessage</a>, which must be pre-converted to <a href="/type/Update">Update</a> constructors by the client using information extracted from the method call.<br>
 While this operation could be done within the map file, it would needlessly increase the number of paths: given that most clients already convert short constructors to Update constructors, the map file only considers paths starting from the Update constructors.  </p>
 <p>Parameters:</p>
@@ -203,18 +211,18 @@ While this operation could be done within the map file, it would needlessly incr
 <ul>
 <li><strong>Before</strong> beginning deserialization of the constructor, push a new <code>FileSource</code> of type <code>stored_constructor</code> to the file source stack.<br>
 Skip pushing the <code>FileSource</code> if <code>needs_parent</code> is set but we don't have a constructor or method of type <code>needs_parent</code> in our parents.</li>
-<li>During deserialization, associate all encountered <code>FileId</code>s (generated according to the <a href="#locations">locations schema</a>) to all sources <strong>of all types</strong> currently on the stack.</li>
+<li>During deserialization, associate all encountered <code>FileId</code>s (generated according to the <a href="#location-extractors">locations schema</a>) to all sources <strong>of all types</strong> currently on the stack.</li>
 <li><strong>After</strong> deserialization of the constructor, pop the pushed <code>FileSource</code> of type <code>stored_constructor</code>, make sure it can be processed according to <code>stored_params</code> (all required flag fields are set, all paths can be correctly extracted), and if yes, populate the <code>FileSource</code> of type <code>stored_constructor</code> accordingly and commit the source to the database (using the <code>FileId</code>s associated at step 2 as keys, and <code>stored_constructor</code> as value).<br>
 Skip this step if <code>needs_parent</code> is set but we don't have a constructor or method of type <code>needs_parent</code> in our parents.</li>
 </ul>
 <p>If the <code>is_constructor</code> flag is <strong>not</strong> set, when deserializing the response of the method with name equal to <code>predicate</code>, do the following:</p>
 <ul>
 <li><strong>Before</strong> beginning deserialization of the method <strong>response</strong>, push a new <code>FileSource</code> of type <code>stored_constructor</code> to the file source stack.</li>
-<li>During deserialization, associate all encountered <code>FileId</code>s (generated according to the <a href="#locations">locations schema</a>) to all sources <strong>of all types</strong> currently on the stack.</li>
+<li>During deserialization, associate all encountered <code>FileId</code>s (generated according to the <a href="#location-extractors">locations schema</a>) to all sources <strong>of all types</strong> currently on the stack.</li>
 <li><strong>After</strong> deserialization of the method <strong>response</strong>, pop the pushed <code>FileSource</code> of type <code>stored_constructor</code>, make sure it can be processed according to <code>stored_params</code> (all required flag fields are set, all paths can be correctly extracted), and if yes, populate the <code>FileSource</code> of type <code>stored_constructor</code> accordingly and commit the source to the database (using the <code>FileId</code>s associated at step 2 as keys, and <code>stored_constructor</code> as value).   </li>
 </ul>
 <p>Note that method sources cannot make use of <code>needs_parent</code>.   </p>
-<h3><a class="anchor" href="#field-extraction" id="field-extraction" name="field-extraction"><i class="anchor-icon"></i></a>Field extraction</h3>
+<h4><a class="anchor" href="#field-extraction" id="field-extraction" name="field-extraction"><i class="anchor-icon"></i></a>Field extraction</h4>
 <pre><code>// Extractor
 extractAndStore#72069549 from:Path to:string = FieldExtractor;
 
@@ -302,7 +310,7 @@ Note that OPs of type <code>copyOp</code>, <code>getInputChannelByIdOp</code>, <
 </li>
 </ul>
 <h3><a class="anchor" href="#actions" id="actions" name="actions"><i class="anchor-icon"></i></a>Actions</h3>
-<p>Actions are used to refresh an expired file reference of a media file according to the <a href="#source">file reference sources »</a> stored in the <a href="#file-source-dictionary">file source dictionary »</a>, associated to the <code>FileId</code>.  </p>
+<p>Actions are used to refresh an expired file reference of a media file according to the <a href="#source">file sources »</a> stored in the <a href="#file-source-dictionary">file source dictionary »</a>, associated to the <code>FileId</code>.  </p>
 <ul>
 <li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
 </ul>

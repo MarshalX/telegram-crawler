@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Map-schema</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="This is the TL schema of the file reference map file ».
+Download TL schema of map file »
+Download JSON version of TL schema…">
+    <meta property="og:title" content="Map-schema">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="This is the TL schema of the file reference map file ».
+Download TL schema of map file »
+Download JSON version of TL schema…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/file-references%2Fmap-schema" >Map-schema</a></li></ul></div>
+  <h1 id="dev_page_title">Map-schema</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>This is the TL schema of the <a href="/api/file-references">file reference map file »</a>.</p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.tl">Download TL schema of map file »</a></p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.json">Download JSON version of TL schema of map file »</a></p>
+<!-- start schema -->
+<pre><code><a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
+<a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
+<a href='/constructor/true'>true</a>#3fedd339 = <a href='/type/True'>True</a>;
+
+vector#1cb5c415 {t:Type} # [ t ] = Vector t;
+
+// Root
+fileReferenceMap#4dba8c2c db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; sources:Vector&lt;Source&gt; skipped:Vector&lt;SkippedSource&gt; actions:Vector&lt;Action&gt; = FileReferenceMap;
+
+locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
+locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
+
+source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;
+
+skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;
+
+action#9539f410 stored_constructor:string action:ActionOp = Action;
+
+// Field extraction path
+paramNotFlag#acd9d5cf = ParamFlag;
+paramIsFlagAbortIfEmpty#f8fe9fee = ParamFlag;
+paramIsFlagFallback#202b77a1 fallback:TypedOp = ParamFlag;
+paramIsFlagPassthrough#1dc6e17d = ParamFlag;
+
+pathPart#8dc6ff46 constructor:string param:string flag:ParamFlag = PathPart;
+
+path#0c3586a2 parts:Vector&lt;PathPart&gt; = Path;
+pathParent#58f13684 parts:Vector&lt;PathPart&gt; = Path;
+
+// Extractor
+extractAndStore#72069549 from:Path to:string = FieldExtractor;
+
+extractInputStickerSetFromDocumentAttributesAndStore#369d8d14 from:Path to:string = FieldExtractor;
+extractInputStickerSetFromStickerSetAndStore#c167d470 from:Path to:string = FieldExtractor;
+
+extractPeerIdFromPeerAndStore#7d33019c from:Path to:string = FieldExtractor;
+extractPeerIdFromInputPeerAndStore#a51acfb4 from:Path to:string = FieldExtractor;
+
+extractChannelIdFromChannelAndStore#5675bc97 from:Path to:string = FieldExtractor;
+extractChannelIdFromInputChannelAndStore#b662660e from:Path to:string = FieldExtractor;
+
+extractUserIdFromUserAndStore#4778ec63 from:Path to:string = FieldExtractor;
+extractUserIdFromInputUserAndStore#7720aa2e from:Path to:string = FieldExtractor;
+
+// Actions
+callOp#c2ff3383 method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
+getMessageOp#237849e8 peer:TypedOp id:TypedOp from_scheduled:TypedOp quick_reply_shortcut_id:TypedOp = ActionOp;
+
+// For string =&gt; TypedOp dictionaries
+typedOpArg#3a2930c2 key:string value:TypedOp = TypedOpArg;
+
+// Typed constructors, the type is specified to simplify codegen,
+// but isn't strictly necessary as it can be inferred from the TypedOpOp.
+// It is fully pre-validated during the generation of the definition file.
+typedOp#705b10ec type:string op:TypedOpOp = TypedOp;
+
+// The actual ops
+copyOp#f48f418f from:string = TypedOpOp;
+
+getInputChannelByIdOp#3cb47531 from:string = TypedOpOp;
+getInputUserByIdOp#c0ee4326 from:string = TypedOpOp;
+getInputPeerByIdOp#19813750 from:string = TypedOpOp;
+
+// Literals &amp; constructors (methods not allowed or needed here)
+constructorOp#107f8d8a constructor:string args:Vector&lt;TypedOpArg&gt; = TypedOpOp;
+
+vectorOp#f8fb8f72 values:Vector&lt;TypedOp&gt; = TypedOpOp;
+
+intLiteralOp#cbfabe7c value:int = TypedOpOp;
+longLiteralOp#d08b8d3a value:long = TypedOpOp;
+stringLiteralOp#2b56ea8e value:string = TypedOpOp;
+bytesLiteralOp#fdb395a4 value:bytes = TypedOpOp;
+boolLiteralOp#37e07911 value:Bool = TypedOpOp;
+doubleLiteralOp#3651e3bf value:double = TypedOpOp;
+themeFormatLiteralOp#8e4f9208 = TypedOpOp;
+</code></pre>
+<!-- end schema --></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
