@@ -153,39 +153,84 @@ fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <p>A file reference may <strong>expire</strong>, in which case it cannot be used in outgoing constructors: it must be refreshed by refetching the message, <a href="/api/stories">story</a>, etc where the media last appeared, as specified below.</p>
 </li>
 </ul>
-<h3><a class="anchor" href="#location-extractors" id="location-extractors" name="location-extractors"><i class="anchor-icon"></i></a>Location extractors</h3>
-<p><a href="#location-extractors">Locations extractors »</a> specify how to</p>
-<ul>
-<li>Generate <code>FileId</code> constructors and</li>
-<li>Extract/populate file references</li>
-</ul>
-<p>...from both incoming and outgoing media objects.</p>
-<p>Locations are used to populate the <a href="#file-reference-dictionary">file reference dictionary »</a>, which maps a <strong>file ID</strong> to exactly one <strong>file reference</strong>.  </p>
-<pre><code>locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
-locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;</code></pre>
-<p>Locations contain the full list of constructors (never methods) that have a <code>file_reference</code> and an <code>id</code> field.  </p>
-<p>The <code>id</code> field of <code>predicate</code> must be used to generate a <code>FileId</code> object of type <code>stored_constructor</code>.  </p>
-<p><code>locationIncoming</code> references constructors that can only be received from the API.<br>
-<code>locationOutgoing</code> references constructors that can only be sent to the API.  </p>
+<h3><a class="anchor" href="#incoming-location-extractors" id="incoming-location-extractors" name="incoming-location-extractors"><i class="anchor-icon"></i></a>Incoming location extractors</h3>
+<p>Schema:</p>
+<pre><code>locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;</code></pre>
+<p>Incoming location extractors extract a <a href="#file-ids">file ID »</a> =&gt; <a href="#file-references">file reference »</a> pair from incoming media objects <strong>received</strong> from the API, and store it to the <a href="#file-reference-table">file reference table »</a>.  </p>
+<p>They are also used together with <a href="#source-extraction">source extractors</a> to extract multiple <a href="#file-ids">file ID »</a> =&gt; <a href="#source-extraction">file source »</a> pairs from incoming media objects <strong>received</strong> from the API, and store them to the <a href="#file-source-table">file source table »</a>.  </p>
 <p>Params:</p>
 <ul>
-<li><code>predicate</code> - The name of the API constructor.</li>
-<li><code>stored_constructor</code> - The name of the <code>FileId</code> object to be used for database read/writes.  </li>
+<li><code>stored_constructor</code> - The type of the <a href="#file-ids">file ID</a> that must be stored to the <a href="#file-reference-table">file reference table »</a> (for example, <code>fileIdDocument</code>, <code>fileIdPhoto</code>)</li>
+<li><code>predicate</code> - The name of the incoming media constructor received from the API (for example, <code>document</code>, <code>photo</code>).
+This constructor is guaranteed to have an <code>id</code> field and a <code>file_reference</code> field.  </li>
 </ul>
-<p>Each unique predicate can only have one <code>stored_constructor</code>.  </p>
-<p>For example, current API layers have the following locations:</p>
-<!-- start locations -->
+<p>When a media constructor of type <code>locationIncoming.predicate</code> is received, the client must:</p>
 <ul>
-<li><a href="/constructor/inputPhoto">inputPhoto</a> - <code>fileIdPhoto</code> (outgoing)</li>
-<li><a href="/constructor/inputDocument">inputDocument</a> - <code>fileIdDocument</code> (outgoing)</li>
-<li><a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a> - <code>fileIdDocument</code> (outgoing)</li>
-<li><a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a> - <code>fileIdPhoto</code> (outgoing)</li>
-<li><a href="/constructor/document">document</a> - <code>fileIdDocument</code> (incoming)</li>
-<li><a href="/constructor/photo">photo</a> - <code>fileIdPhoto</code> (incoming)</li>
+<li>Extract the <code>file_reference</code> field of the media constructor</li>
+<li>Extract the <code>id</code> field of the media constructor, generating a new file ID of type <code>locationIncoming.stored_constructor</code></li>
+<li>Store both in the <a href="#file-reference-table">file reference table »</a>, using the file ID as key and the file reference as value.</li>
+<li>Store all <a href="#source-extraction">file sources</a> currently on the source stack into the <a href="#file-source-table">file source table »</a>, using the file ID as key and the file source as value (multiple values can be stored for the same key). </li>
 </ul>
-<!-- end locations -->
-<p>When encountering one of the objects on the left, use the <code>id</code> field to generate a <code>FileId</code> of the type on the right.  </p>
-<p>When refreshing references, replace the <code>file_reference</code> field of the object on the left.  </p>
+<p>For example:</p>
+<ul>
+<li>Assume a <code>document{id: 12345, file_reference: "...", ...}</code> is received from the API; two <a href="#file-source-table">file sources</a> are currently present on the source when the <a href="/constructor/document">document</a> is deserialized, one <code>fileSourceMessage{...}</code> and one <code>fileSourceWebPage{...}</code>.</li>
+<li>A new <code>fileIdDocument{id: 12345} =&gt; "..."</code> entry must be added to the <a href="#file-reference-table">file reference table »</a></li>
+<li>Two new <code>fileIdDocument{id: 12345} =&gt; fileSourceMessage{...}</code> and <code>fileIdDocument{id: 12345} =&gt; fileSourceWebPage{...}</code> entries must be added to the <a href="#file-source-table">file source table »</a>.</li>
+</ul>
+<p>The <a href="#map">map file »</a> contains incoming locations extractors for all incoming constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
+The current map file has the following location extractors:</p>
+<!-- start locations_incoming -->
+<ul>
+<li>predicate: <a href="/constructor/document">document</a>, stored_constructor: <code>fileIdDocument</code></li>
+<li>predicate: <a href="/constructor/photo">photo</a>, stored_constructor: <code>fileIdPhoto</code></li>
+</ul>
+<!-- end locations_incoming -->
+<h3><a class="anchor" href="#outgoing-location-extractors" id="outgoing-location-extractors" name="outgoing-location-extractors"><i class="anchor-icon"></i></a>Outgoing location extractors</h3>
+<p>Schema:</p>
+<pre><code>locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;</code></pre>
+<p>Outgoing location extract a <a href="#file-ids">file ID »</a> from outgoing media objects <strong>sent</strong> to the API, and use it to update and refresh the <a href="#file-references">file reference »</a> within that same outgoing media object before it is sent.  </p>
+<p>Params:</p>
+<ul>
+<li><code>stored_constructor</code> - The type of the <a href="#file-ids">file ID</a> that must be used to lookup values in the <a href="#file-reference-table">file reference table »</a> and <a href="#file-source-table">file source table »</a> (for example, <code>fileIdDocument</code>, <code>fileIdPhoto</code>)</li>
+<li><code>predicate</code> - The name of the outgoing media constructor sent to the API (for example, <code>inputPhoto</code>, <code>inputPhoto</code>).
+This constructor is guaranteed to have an <code>id</code> field and a <code>file_reference</code> field.  </li>
+</ul>
+<p>Outgoing location extractors are triggered when a media method call returns a <code>FILE_REFERENCE_EXPIRED</code> or <code>FILE_REFERENCE_INVALID</code> RPC error.</p>
+<p>Methods dealing with multiple media files at the same time like <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> may also return file reference errors in a slightly different form, as <code>FILE_REFERENCE_%d_EXPIRED</code> errors (or a <code>FILE_REFERENCE_%d_INVALID</code>, which should be treated in the same way): in this case, the media with the file reference to refresh will be located at index <code>%d</code> of the passed <code>multi_media</code> vector.  </p>
+<p>When the error is received, clients should:  </p>
+<ul>
+<li>Locate all outgoing media constructor(s) of type <code>locationOutgoing.predicate</code> contained in the arguments of the failed method call<ul>
+<li>For <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> calls, select the correct one according to the index in the received RPC error.</li>
+</ul>
+</li>
+<li>Using the <code>id</code> field of the selected constructor of type <code>locationOutgoing.predicate</code> , generate a new <a href="#file-ids">file ID »</a> of type <code>locationOutgoing.stored_constructor</code>.</li>
+<li>Use the <a href="#file-ids">file ID »</a> to lookup <a href="#source-extraction">file sources »</a> from the <a href="#file-source-tables">file source table</a></li>
+<li>Refresh the <a href="#file-references">file reference</a> using the <a href="#actions">actions »</a> associated to the file sources</li>
+<li>Fetch the new <a href="#file-references">file reference</a> from the <a href="#file-reference-table">file reference table »</a> and store it in the <code>file_reference</code> field of the selected constructor from step 1</li>
+<li>Repeat the call</li>
+</ul>
+<p>For example, when a <code>messages.sendMedia{media: inputMediaPhoto{id: inputPhoto{id: 12345, file_reference: "...", ...}, ...}, ...}</code> method call sent the API fails with <code>FILE_REFERENCE_EXPIRED</code>, a new <code>fileIdPhoto{id: 12345}</code> is used to fetch all associated <a href="#source-extraction">file sources »</a> from the <a href="#file-source-tables">file source table</a>, refresh them, then fetch the new file reference (<code>abc</code>) from the <a href="#file-reference-table">file reference table »</a>, and resend the new method call: <code>messages.sendMedia{media: inputMediaPhoto{id: inputPhoto{id: 12345, file_reference: "abc", ...}, ...}, ...}</code>.</p>
+<p>It's also possible to pre-emptively replace the file reference of media method calls by running the following simplified flow for all method calls, without waiting for an RPC error (this can be useful in cases where an expired file reference may be cached in some other database or provided externally):</p>
+<ul>
+<li>Locate all outgoing media constructor(s) of type <code>locationOutgoing.predicate</code> contained in the arguments of the failed method call</li>
+<li>For all selected constructors:<ul>
+<li>Using the <code>id</code> field of the selected constructor of type <code>locationOutgoing.predicate</code>, generate a new <a href="#file-ids">file ID »</a> of type <code>locationOutgoing.stored_constructor</code>.</li>
+<li>If present, fetch the current <a href="#file-references">file reference</a> from the <a href="#file-reference-table">file reference table »</a> and store it in the <code>file_reference</code> field of the selected constructor</li>
+</ul>
+</li>
+<li>Proceed with the call</li>
+</ul>
+<p>It's also possible to avoid using outgoing location extractors altogether if the FileId or FileSources are already passed as external metadata to the client function that invokes the method call (i.e. as a separate additional argument, separate from the ones passed to the API).  </p>
+<p>The <a href="#map">map file »</a> contains outgoing locations extractors for all outgoing media constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
+The current map file has the following location extractors:</p>
+<!-- start locations_outgoing -->
+<ul>
+<li>predicate: <a href="/constructor/inputPhoto">inputPhoto</a>, stored_constructor: <code>fileIdPhoto</code></li>
+<li>predicate: <a href="/constructor/inputDocument">inputDocument</a>, stored_constructor: <code>fileIdDocument</code></li>
+<li>predicate: <a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a>, stored_constructor: <code>fileIdDocument</code> (outgoing)</li>
+<li>predicate: <a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a>, stored_constructor: <code>fileIdPhoto</code></li>
+</ul>
+<!-- end locations_outgoing -->
 <p>(Legacy <code>inputFileLocation</code> constructors are ignored by the current map file).</p>
 <h3><a class="anchor" href="#source-extraction" id="source-extraction" name="source-extraction"><i class="anchor-icon"></i></a>Source extraction</h3>
 <p>A file source contains information that the client may use to re-fetch the document (and the new file reference), by invoking a specific <strong>action</strong>.  </p>
