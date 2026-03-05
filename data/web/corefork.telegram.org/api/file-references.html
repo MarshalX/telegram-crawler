@@ -146,10 +146,12 @@ fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <li><em>Outgoing</em> media constructors like <a href="/constructor/inputDocument">inputDocument</a>, <a href="/constructor/inputPhoto">inputPhoto</a>, etc, where it must be populated by the client in order to download or resend all media.  </li>
 </ul>
 <p>A file reference may <strong>expire</strong>, in which case it cannot be used in outgoing constructors: it must be refreshed by refetching the message, <a href="/api/stories">story</a>, etc where the media last appeared, as specified below.</p>
-<h3><a class="anchor" href="#file-source" id="file-source" name="file-source"><i class="anchor-icon"></i></a>File source</h3>
-<p>A <strong>file source</strong> contains information that the client may use to re-fetch the document (and the new file reference), by invoking a specific <strong>action</strong>.  </p>
+<h3><a class="anchor" href="#file-sources" id="file-sources" name="file-sources"><i class="anchor-icon"></i></a>File sources</h3>
+<p>A <strong>file source</strong> contains information that the client may use to re-fetch a media (and a new file reference for it), by invoking a specific <strong>action</strong>.  </p>
 <p>Each source type is associated to a specific <a href="#actions">action »</a>.</p>
 <p><a href="#incoming-location-extractors">Incoming location extractors »</a> and <a href="#source-extraction">source extractors</a> are used together to populate the <a href="#file-source-table">file source table »</a>, which maps a <strong>file ID</strong> to one or more <strong>file sources</strong>.  </p>
+<p>The <a href="#map">map file »</a> contains all sources needed to implement the file reference database, including some skipped sources which are not handled by any extractor.  </p>
+<p>See <a href="/api/file-references/sources">here »</a> for the full list of sources contained by the current map file.  </p>
 <h3><a class="anchor" href="#incoming-location-extractors" id="incoming-location-extractors" name="incoming-location-extractors"><i class="anchor-icon"></i></a>Incoming location extractors</h3>
 <p>Schema:</p>
 <pre><code>locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;</code></pre>
@@ -174,7 +176,7 @@ This constructor is guaranteed to have an <code>id</code> field and a <code>file
 <li>A new <code>fileIdDocument{id: 12345} =&gt; "..."</code> entry must be added to the <a href="#file-reference-table">file reference table »</a></li>
 <li>Two new <code>fileIdDocument{id: 12345} =&gt; fileSourceMessage{...}</code> and <code>fileIdDocument{id: 12345} =&gt; fileSourceWebPage{...}</code> entries must be added to the <a href="#file-source-table">file source table »</a>.</li>
 </ul>
-<p>The <a href="#map">map file »</a> contains incoming locations extractors for all incoming constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
+<p>The <a href="#map">map file »</a> contains incoming location extractors for all incoming constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
 The current map file has the following location extractors:</p>
 <!-- start locations_incoming -->
 <ul>
@@ -235,7 +237,7 @@ This constructor is guaranteed to have an <code>id</code> field and a <code>file
 <li>Proceed with the call</li>
 </ul>
 <p>It's also possible to avoid using outgoing location extractors altogether if the FileId or FileSources are already passed as external metadata to the client function that invokes the method call (i.e. as a separate additional argument, separate from the ones passed to the API).  </p>
-<p>The <a href="#map">map file »</a> contains outgoing locations extractors for all outgoing media constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
+<p>The <a href="#map">map file »</a> contains outgoing location extractors for all outgoing media constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
 The current map file has the following location extractors:</p>
 <!-- start locations_outgoing -->
 <ul>
@@ -249,7 +251,7 @@ The current map file has the following location extractors:</p>
 <h3><a class="anchor" href="#source-extraction" id="source-extraction" name="source-extraction"><i class="anchor-icon"></i></a>Source extraction</h3>
 <p>A file source contains information that the client may use to re-fetch the document (and the new file reference), by invoking a specific <strong>action</strong>.  </p>
 <p>Each source type is associated to a specific <a href="#actions">action »</a>.</p>
-<p><a href="#location-extractors">Locations extractors »</a> and <a href="#source">sources »</a> are used together to populate the <a href="#file-source-table">file source table »</a>, which maps a <strong>file ID</strong> to one or more <strong>file sources</strong>.  </p>
+<p><a href="#location-extractors">location extractors »</a> and <a href="#source">sources »</a> are used together to populate the <a href="#file-source-table">file source table »</a>, which maps a <strong>file ID</strong> to one or more <strong>file sources</strong>.  </p>
 <p>Schema:</p>
 <pre><code>source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;</code></pre>
 <p>A <code>source</code> contains instructions on how to extract and store file sources from an incoming method response or update.  </p>
