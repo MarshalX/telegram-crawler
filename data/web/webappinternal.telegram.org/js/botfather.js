@@ -727,6 +727,9 @@ var BotSettings = {
     });
 
     $('body').on('change', 'input[name="allowed_url[]"]', BotSettings.updateAllowedUrls);
+    $('body').on('input', 'input[name="allowed_url[]"]', function () {
+      $(this).removeClass('error');
+    });
 
     Aj.state.webLoginDebounce = debounce();
     function submitWebLogic() {
@@ -740,6 +743,7 @@ var BotSettings = {
         if (res.error) {
           $('.hint-text[data-for=web_login]').text('Domain is invalid').toggleClass('hint-text-error', true);
         } else {
+          $('.js-migrate-oauth-section').toggleClass('hidden', !!val);
           $('.hint-text[data-for=web_login]').text('').toggleClass('hint-text-error', false);
         }
       })
@@ -852,11 +856,25 @@ var BotSettings = {
       var url = URL.parse(this.value)?.href || this.value;
       inputAllowedUrls.push({type: this.dataset.type, url: url})
     });
+
+    var reqNumber = (Aj.state.allowedUrlsReq || 0) + 1;
+    Aj.state.allowedUrlsReq = reqNumber;
+
     Aj.apiRequest('setAllowedUrls', {
       allowed_urls: inputAllowedUrls,
       bid: Aj.state.botId,
     }, res => {
-
+      if (reqNumber != Aj.state.allowedUrlsReq) {
+        return;
+      }
+      if (res.allowed_urls) {
+        $('input[name="allowed_url[]"]').each(function (i) {
+          $(this).val(res.allowed_urls[i].url);
+          if (res.allowed_urls[i].error) {
+            $(this).addClass('error');
+          }
+        })
+      }
     })
   },
 
