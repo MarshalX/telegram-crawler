@@ -44,12 +44,12 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>File references are strings of bytes, that can be encountered in the <code>file_reference</code> fields of <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.</p>
+<p>File references are strings of bytes that can be encountered in the <code>file_reference</code> fields of <a href="/constructor/document">document</a> and <a href="/constructor/photo">photo</a> objects.</p>
 <p>They must be cached by the client, along with the <strong>source</strong> where the document/photo object was found, in order to be refetched when the file reference expires.</p>
 <p>Example implementation of a reference database: <a href="https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php">MadelineProto</a>, <a href="https://github.com/DrKLO/Telegram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/FileRefController.java">android</a>, <a href="https://github.com/telegramdesktop/tdesktop/blob/bec39d89e19670eb436dc794a8f20b657cb87c71/Telegram/SourceFiles/data/data_file_origin.cpp">telegram desktop</a>, <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/FileReferenceManager.cpp">tdlib</a>.</p>
 <h3><a class="anchor" href="#automatic-implementation" id="automatic-implementation" name="automatic-implementation"><i class="anchor-icon"></i></a>Automatic implementation</h3>
 <p>Implementation and maintenance of the file reference database may be fully automated by using the <strong>file reference database map file</strong>.  </p>
-<p>To start, start by setting up the following two tables:</p>
+<p>To start, set up the following two tables:</p>
 <ul>
 <li><a href="#file-reference-table">File reference table »</a>: <code>HashMap&lt;FileId, bytes&gt;</code></li>
 <li><a href="#file-source-table">File source table »</a>: <code>HashMap&lt;FileId, Vector&lt;FileSource&gt;&gt;</code></li>
@@ -96,8 +96,6 @@ skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:
 <li>
 <p><code>traversers_outgoing</code> contains <a href="#outgoing-traversers">outgoing traversers »</a>, used to swap expired <a href="#file-references">file references »</a> from outgoing media method calls.</p>
 </li>
-</ul>
-<ul>
 <li>
 <p><code>refresh_actions</code> contains <a href="#refresh-actions">refresh actions »</a>, instructions used to refresh expired file references according to <a href="#file-sources">file sources »</a> stored in the <a href="#file-source-table">file source table</a>.</p>
 </li>
@@ -134,7 +132,34 @@ fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <p>Each source type is associated to a specific <a href="#refresh-actions">refresh action »</a>.</p>
 <p><a href="#incoming-traversers">Incoming traversers »</a> and <a href="#source-extraction">source extraction logic</a> are used together to populate the <a href="#file-source-table">file source table »</a>, which maps a <strong>file ID</strong> to one or more <strong>file sources</strong>.  </p>
 <p>The <a href="#map-file">map file »</a> contains all sources needed to implement the file reference database, including some skipped sources which are not handled by any extractor.  </p>
-<p>See <a href="/api/file-references/sources">here »</a> for the full list of sources contained by the current map file.  </p>
+<p>This is the full list of valid sources contained by the current map file:  </p>
+<!-- start filesource -->
+<pre><code>fileSourceMessage#7e015bb0 flags:# from_scheduled:flags.0?true quick_reply_shortcut_id:flags.1?int peer:long id:int = FileSource;
+fileSourceStarsTransaction#c1bac8c7 flags:# peer:long id:string refund:flags.0?true ton:flags.1?true = FileSource;
+fileSourceStory#c820e3eb id:int peer:long = FileSource;
+fileSourceWebPage#9e5b749c url:string = FileSource;
+fileSourceBotApp#01cf8b7a id:long access_hash:long = FileSource;
+fileSourceUserFull#70fdb7b0 id:long = FileSource;
+fileSourceAdminLog#4797f959 channel:long max_id:long = FileSource;
+fileSourceStoryAlbum#5e01f223 peer:long = FileSource;
+fileSourceBotPreviewMedia#0aa91441 bot:long = FileSource;
+fileSourceBotPreviewInfo#f9d2d6fc bot:long lang_code:string = FileSource;
+fileSourcePaidMedia#b18d9042 id:int peer:long = FileSource;
+fileSourceSavedMusic#dd1a7664 user_id:long id:long access_hash:long = FileSource;
+fileSourceChatFull#9de75fde chat_id:long = FileSource;
+fileSourceChannelFull#6fe19339 channel:long = FileSource;
+fileSourcePremiumPromo#c907a44f = FileSource;
+fileSourceAttachMenuBot#c3002694 bot:long = FileSource;
+fileSourceTheme#92d05e0c id:long access_hash:long = FileSource;
+fileSourceWallPaper#50dbf2f7 id:long access_hash:long = FileSource;
+fileSourceStickerSet#34c73709 stickerset:InputStickerSet = FileSource;
+fileSourceSavedGifs#13e78e07 = FileSource;
+fileSourceSavedRingtones#2b25ef1b = FileSource;
+fileSourceAvailableEffects#eb8578f0 = FileSource;
+fileSourceAvailableReactions#0e432388 = FileSource;
+fileSourceUserProfilePhoto#e39ee274 user_id:long max_id:long = FileSource;
+fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = FileSource;</code></pre>
+<!-- end filesource -->
 <h3><a class="anchor" href="#incoming-traversers" id="incoming-traversers" name="incoming-traversers"><i class="anchor-icon"></i></a>Incoming traversers</h3>
 <p>Schema:</p>
 <pre><code>traverseMethodResult#fda9f236 name:string push_sources:Vector&lt;Source&gt; is_needed_parent:Bool = TraverserIncoming;
@@ -157,10 +182,33 @@ source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_cons
 <p>The results of all methods covered by <code>traverseMethodResult</code> traversers.  </p>
 </li>
 <li>
-<p><a href="/type/Update">Update</a> constructors, either delivered passively by the API, through <a href="/api/updates">catchup polling with getDifference</a>, or returned by a method.  </p>
+<p><a href="/type/Update">Update</a> constructors, either delivered passively by the API, through <a href="/api/updates">catchup polling with getDifference</a>, or returned by a method (the map file does not contain traversers for Updates returned by methods, as those are supposed to be handled by the update system).  </p>
 <p><strong>Note</strong>: All <a href="/type/Updates">Updates</a> constructors must be converted to a vector of <a href="/type/Update">Update</a> constructors, <strong>including short variants</strong> like <a href="/constructor/updateShortMessage">updateShortMessage</a>, <a href="/constructor/updateShortSentMessage">updateShortSentMessage</a>, <a href="/constructor/updateShortChatMessage">updateShortChatMessage</a>, which must be pre-converted to <a href="/type/Update">Update</a> constructors by the client using information extracted from the method call (not included in the map file for simplicity).  </p>
 </li>
 </ul>
+<p>Practical implementation tip: use two separate runtime structures during traversal.  </p>
+<ul>
+<li><code>HashMap&lt;predicate, Vector&lt;object&gt;&gt; parentContext</code> for <code>is_needed_parent</code>/<code>needs_parent</code> checks.</li>
+<li><code>Vector&lt;FileSource&gt; sourceStack</code> for the source stack.</li>
+</ul>
+<p><code>parentContext</code> controls eligibility during <a href="#source-extraction">source extraction »</a> with <code>needs_parent</code>; <code>sourceStack</code> provides values to commit at <code>traverseCommitSourceLocation</code>.</p>
+<p>Execution order at runtime:</p>
+<ol>
+<li>Start from an allowed entry point (<code>traverseMethodResult</code> or <a href="/type/Update">Update</a>).  </li>
+<li>Apply traversers recursively as follows:<br>
+2.1. Push valid sources from <code>push_sources</code> to <code>sourceStack</code>.<br>
+A source is valid if <a href="#source-extraction">source extraction »</a> can be processed according to <code>stored_params</code> (all required flag fields are set and all paths can be correctly extracted), and if <code>parentContext</code> contains an entry for <code>source.needs_parent</code> (if set).<br>
+2.2. If <code>is_needed_parent</code> is set, push the current constructor/method to <code>parentContext</code>, using its predicate as key.<br>
+2.3. Recurse into children as specified by <code>params</code>, or into the method result for <code>traverseMethodResult</code>.<br>
+2.4. If <code>is_needed_parent</code> is set, pop the value that was pushed in step 2.2.<br>
+2.5. Pop only the sources that were pushed in step 2.1 (keep all other sources unchanged).  </li>
+<li>When <code>traverseCommitSourceLocation</code> matches a constructor:<br>
+3.1. Push valid sources from <code>push_sources</code> to <code>sourceStack</code> (some <code>traverseCommitSourceLocation</code> constructors can also contain sources).<br>
+3.2. Commit <code>FileId -&gt; file_reference</code> to the <a href="#file-reference-table">file reference table »</a> and <code>FileId -&gt; FileSource</code> to the <a href="#file-source-table">file source table »</a> for all currently active sources on the source stack.<br>
+3.3. Pop only the sources that were pushed in step 3.1 (keep all other sources unchanged).</li>
+<li>Continue traversal to collect all matches in the same payload.</li>
+</ol>
+<p>In other words, incoming traversal is a DFS-like walk where sources are pushed as context and committed only when a media location constructor is reached.</p>
 <p>Traverser type list:</p>
 <ul>
 <li>
@@ -170,7 +218,7 @@ source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_cons
 <ul>
 <li><code>name</code> - The name of the method call to attach to (for example, <code>messages.getMessages</code>).</li>
 <li><code>push_sources</code> - A list of sources to push when the traverser is triggered.  </li>
-<li><code>is_needed_parent</code> - If set, indicates that the specified method call is required as a parent in some source contained by child traversers (i.e. a downstream traverser contains a source with the <code>needs_parent</code> flag pointing to the method).  </li>
+<li><code>is_needed_parent</code> - If set, the traversal must expose this method result as parent context for downstream source extraction, because at least one downstream <code>Source</code> has <code>needs_parent</code> pointing to this method. Keep this object in a separate parent context map, keyed by predicate (for example, <code>HashMap&lt;predicate, Vector&lt;object&gt;&gt;</code>).  </li>
 </ul>
 <p>The <a href="#map-file">map file »</a> contains <code>traverseMethodResult</code>s for all methods that return file references.   </p>
 </li>
@@ -188,12 +236,12 @@ source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_cons
 <p><code>push_sources</code> - A list of sources to push when the traverser is triggered.  </p>
 </li>
 <li>
-<p><code>is_needed_parent</code> - If set, indicates that the specified constructor is required as a parent in some source contained by child traversers (i.e. a downstream traverser contains a source with the <code>needs_parent</code> flag pointing to the constructor).  </p>
+<p><code>is_needed_parent</code> - If set, the traversal must expose this constructor as parent context for downstream source extraction, because at least one downstream <code>Source</code> has <code>needs_parent</code> pointing to this constructor. Keep this object in a separate parent context map, keyed by predicate (for example, <code>HashMap&lt;predicate, Vector&lt;object&gt;&gt;</code>).  </p>
 </li>
 <li>
 <p><code>params</code> - A list of parameters to traverse.<br>
 Only traverse the parameter if the contained constructor has a matching <code>traverseIncomingConstructor</code>.  </p>
-<p><code>traverseParam</code> contains the name of the parameter to traverse, and (for simplicity, even if this info can be extracted from the schema) the parameter's type, and whether it's a flag, a vector or a flagged vector.<br>
+<p><code>traverseParam</code> contains the name of the parameter to traverse and (for simplicity, even if this info can be extracted from the schema) the parameter's type, and whether it's a flag, a vector, or a flagged vector.<br>
 The <code>type</code> will always contain the type of the underlying parameter (i.e. without <code>Vector&lt;&gt;</code> or <code>flags.X?</code>).  </p>
 </li>
 </ul>
@@ -218,7 +266,7 @@ This constructor is guaranteed to have an <code>id</code> field and a <code>file
 </ul>
 <p>For example:</p>
 <ul>
-<li>Assume a <code>document{id: 12345, file_reference: "...", ...}</code> is received from the API; two <a href="#file-sources">file sources</a> are currently present on the source when the <a href="/constructor/document">document</a> is traverseds, one <code>fileSourceMessage{...}</code> and one <code>fileSourceWebPage{...}</code>.</li>
+<li>Assume a <code>document{id: 12345, file_reference: "...", ...}</code> is received from the API; two <a href="#file-sources">file sources</a> are currently present on the source stack when the <a href="/constructor/document">document</a> is traversed, one <code>fileSourceMessage{...}</code> and one <code>fileSourceWebPage{...}</code>.</li>
 <li>A new <code>fileIdDocument{id: 12345} =&gt; "..."</code> entry must be added to the <a href="#file-reference-table">file reference table »</a></li>
 <li>Two new <code>fileIdDocument{id: 12345} =&gt; fileSourceMessage{...}</code> and <code>fileIdDocument{id: 12345} =&gt; fileSourceWebPage{...}</code> entries must be added to the <a href="#file-source-table">file source table »</a>.</li>
 </ul>
@@ -247,11 +295,11 @@ traverseParam#62161b67 flags:# name:string is_flag:flags.0?true is_vector:flags.
 <p>Params:</p>
 <ul>
 <li>
-<p><code>name</code> - Name of the method whose parameters should be traversed</p>
+<p><code>name</code> - The name of the method whose parameters should be traversed.</p>
 </li>
 <li>
 <p><code>params</code> - The parameters to traverse.  </p>
-<p><code>traverseParam</code> contains the name of the parameter to traverse, and (for simplicity, even if this info can be extracted from the schema) the parameter's type, and whether it's a flag, a vector or a flagged vector.<br>
+<p><code>traverseParam</code> contains the name of the parameter to traverse and (for simplicity, even if this info can be extracted from the schema) the parameter's type, and whether it's a flag, a vector, or a flagged vector.<br>
 The <code>type</code> will always contain the type of the underlying parameter (i.e. without <code>Vector&lt;&gt;</code> or <code>flags.X?</code>).  </p>
 </li>
 </ul>
@@ -264,11 +312,11 @@ The <code>type</code> will always contain the type of the underlying parameter (
 <p><code>type</code> - The type of the constructor to traverse (for example, <code>InputMedia</code>).</p>
 </li>
 <li>
-<p><code>predicate</code> - The name of the constructor to traverse (for example, <code>inputMediaDocument</code>, <code>inputMediaDocument</code>, etc).</p>
+<p><code>predicate</code> - The name of the constructor to traverse (for example, <code>inputMediaDocument</code>, <code>inputMediaPhoto</code>, etc).</p>
 </li>
 <li>
 <p><code>params</code> - The parameters to traverse.  </p>
-<p><code>traverseParam</code> contains the name of the parameter to traverse, and (for simplicity, even if this info can be extracted from the schema) the parameter's type, and whether it's a flag, a vector or a flagged vector.<br>
+<p><code>traverseParam</code> contains the name of the parameter to traverse and (for simplicity, even if this info can be extracted from the schema) the parameter's type, and whether it's a flag, a vector, or a flagged vector.<br>
 The <code>type</code> will always contain the type of the underlying parameter (i.e. without <code>Vector&lt;&gt;</code> or <code>flags.X?</code>).  </p>
 </li>
 </ul>
@@ -278,7 +326,7 @@ The <code>type</code> will always contain the type of the underlying parameter (
 <p>Params:</p>
 <ul>
 <li><code>type</code> - The type of the outgoing media constructor sent to the API (for example, <code>InputMedia</code>).</li>
-<li><code>predicate</code> - The name of the outgoing media constructor sent to the API (for example, <code>inputPhoto</code>, <code>inputPhoto</code>).
+<li><code>predicate</code> - The name of the outgoing media constructor sent to the API (for example, <code>inputPhoto</code>, <code>inputDocument</code>).
 This constructor is guaranteed to have an <code>id</code> field and a <code>file_reference</code> field.  </li>
 <li><code>stored_constructor</code> - The type of the <a href="#file-ids">file ID</a> used to lookup values in the <a href="#file-reference-table">file reference table »</a> and <a href="#file-source-table">file source table »</a> (for example, <code>fileIdDocument</code>, <code>fileIdPhoto</code>)</li>
 </ul>
@@ -352,28 +400,14 @@ While this operation could be done within the map file, it would needlessly incr
 <ul>
 <li><code>predicate</code> - Indicates the name of the constructor or of the method where extraction of the fields must start.</li>
 <li><code>is_constructor</code> - If set, <code>predicate</code> points to a constructor, otherwise it points to a method.</li>
-<li><code>needs_parent</code> - If set, contains the name of a constructor which needs to appear as a parent in the traversed object or a method whose response we're traversed, as it will be used by one or more of the paths in the action.</li>
+<li><code>needs_parent</code> - If set, contains the name of a constructor that must be present as a parent in the current traversal branch, or a method whose response is currently being traversed; this parent object is required by one or more path extractors in the source.</li>
 <li><code>parent_is_constructor</code> - If set, <code>needs_parent</code> points to a constructor; otherwise it points to a method.</li>
 <li><code>stored_constructor</code> - Contains the name of a <code>FileSource</code> constructor from the TL schema specified in <code>fileReferenceMap.db_schema</code>, which should be stored to the database after being populated by <code>stored_params</code> as specified below.</li>
 <li><code>stored_params</code> - Contains info on how to populate the <code>FileSource</code> constructor specified in <code>stored_constructor</code></li>
 <li><code>skipped_flags</code> - In some cases, some <strong>flag</strong> fields of <code>stored_constructor</code> aren't referenced by <code>action</code>: this field contains the full list of flags which are never referenced by the current source and must be unset.  </li>
 </ul>
-<p>Each unique predicate can have one or more <code>stored_constructor</code>s with different params.  </p>
-<p>If the <code>is_constructor</code> flag is set, when traversing a constructor with predicate equal to <code>predicate</code>, contained in an incoming <a href="/type/Update">Update</a> or at any depth in a method call response, do the following:</p>
-<ul>
-<li><strong>Before</strong> traversing the constructor, push a new <code>FileSource</code> of type <code>stored_constructor</code> to the file source stack.<br>
-Skip pushing the <code>FileSource</code> if <code>needs_parent</code> is set but we don't have a constructor or method of type <code>needs_parent</code> in our parents.</li>
-<li>While traversing, associate all encountered <code>FileId</code>s (generated according to the <a href="#incoming-traversers">incoming traversers</a>) to all sources <strong>of all types</strong> currently on the stack.</li>
-<li><strong>After</strong> traversing of the constructor, pop the pushed <code>FileSource</code> of type <code>stored_constructor</code>, make sure it can be processed according to <code>stored_params</code> (all required flag fields are set, all paths can be correctly extracted), and if yes, populate the <code>FileSource</code> of type <code>stored_constructor</code> accordingly and commit the source to the database (using the <code>FileId</code>s associated at step 2 as keys, and <code>stored_constructor</code> as value).<br>
-Skip this step if <code>needs_parent</code> is set but we don't have a constructor or method of type <code>needs_parent</code> in our parents.</li>
-</ul>
-<p>If the <code>is_constructor</code> flag is <strong>not</strong> set, when traversing the response of the method with name equal to <code>predicate</code>, do the following:</p>
-<ul>
-<li><strong>Before</strong> traversing of the method <strong>response</strong>, push a new <code>FileSource</code> of type <code>stored_constructor</code> to the file source stack.</li>
-<li>While traversing, associate all encountered <code>FileId</code>s (generated according to the <a href="#incoming-traversers">incoming traversers</a>) to all sources <strong>of all types</strong> currently on the stack.</li>
-<li><strong>After</strong> traversing the method <strong>response</strong>, pop the pushed <code>FileSource</code> of type <code>stored_constructor</code>, make sure it can be processed according to <code>stored_params</code> (all required flag fields are set, all paths can be correctly extracted), and if yes, populate the <code>FileSource</code> of type <code>stored_constructor</code> accordingly and commit the source to the database (using the <code>FileId</code>s associated at step 2 as keys, and <code>stored_constructor</code> as value).   </li>
-</ul>
-<p>Note that method sources cannot make use of <code>needs_parent</code>.   </p>
+<p>Each unique predicate can have one or more <code>stored_constructor</code>s with different params.<br>
+Note that method sources cannot make use of <code>needs_parent</code>.   </p>
 <h4><a class="anchor" href="#source-field-extraction" id="source-field-extraction" name="source-field-extraction"><i class="anchor-icon"></i></a>Source field extraction</h4>
 <pre><code>// Extractor
 extractAndStore#72069549 from:Path to:string = FieldExtractor;
@@ -493,7 +527,7 @@ typedOp#705b10ec type:string op:TypedOpOp = TypedOp;</code></pre>
 <h4><a class="anchor" href="#getmessageop" id="getmessageop" name="getmessageop"><i class="anchor-icon"></i></a><code>getMessageOp</code></h4>
 <p><code>getMessageOp</code> is a specialized action which invokes either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <code>peer</code> (which is always a subtype of <a href="/type/InputPeer">InputPeer</a>), passing the <code>id</code> as the only element to the vector <code>id</code> parameter.<br>
 If the flag to which the <code>from_scheduled</code> points is set, <a href="/method/messages.getScheduledMessages">messages.getScheduledMessages</a> should be executed instead.<br>
-If the flag to which the <code>quick_reply_shortcut_id</code> points is set, <a href="/method/messages.getQuickReplyMessages">messages.getQuickReplyMessages</a> should be executed instead, passing the value of the <code>quick_reply_shortcut_id</code> flag to <a href="/method/messages.getQuickReplyMessages">messages.getQuickReplyMessages</a>.<code>shortcut_id</code> and the <code>id</code> as the only element of a vector, passed to <a href="/method/messages.getQuickReplyMessages">messages.getQuickReplyMessages</a>.<code>id</code>.  </p>
+If the flag to which <code>quick_reply_shortcut_id</code> points is set, <a href="/method/messages.getQuickReplyMessages">messages.getQuickReplyMessages</a> should be executed instead, passing <code>quick_reply_shortcut_id</code> to the <code>shortcut_id</code> parameter and <code>id</code> as the only element of the <code>id</code> vector parameter.  </p>
 <h4><a class="anchor" href="#action-parameters" id="action-parameters" name="action-parameters"><i class="anchor-icon"></i></a>Action parameters</h4>
 <pre><code>copyOp#f48f418f from:string = TypedOpOp;
 
@@ -519,7 +553,7 @@ themeFormatLiteralOp#8e4f9208 = TypedOpOp;</code></pre>
 <h4><a class="anchor" href="#getinputchannelbyidop" id="getinputchannelbyidop" name="getinputchannelbyidop"><i class="anchor-icon"></i></a><code>getInputChannelByIdOp</code></h4>
 <p>Returns an <a href="/type/InputChannel">InputChannel</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the channel ID of type <a href="/type/long">long</a> specified in the stored <code>$FileSource.$from</code>.  </p>
 <h4><a class="anchor" href="#getinputuserbyidop" id="getinputuserbyidop" name="getinputuserbyidop"><i class="anchor-icon"></i></a><code>getInputUserByIdOp</code></h4>
-<p>Returns an <a href="/type/InputUser">InputUser</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the channel ID of type <a href="/type/long">long</a> specified in the stored <code>$FileSource.$from</code>.    </p>
+<p>Returns an <a href="/type/InputUser">InputUser</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the user ID of type <a href="/type/long">long</a> specified in the stored <code>$FileSource.$from</code>.    </p>
 <h4><a class="anchor" href="#getinputpeerbyidop" id="getinputpeerbyidop" name="getinputpeerbyidop"><i class="anchor-icon"></i></a><code>getInputPeerByIdOp</code></h4>
 <p>Returns an <a href="/type/InputPeer">InputPeer</a> constructor from the client's <a href="/api/peers">peer database</a>, based on the <a href="/api/bots/ids">bot API peer ID »</a> of type <a href="/type/long">long</a> specified in the stored <code>$FileSource.$from</code>.  </p>
 <h4><a class="anchor" href="#constructorop" id="constructorop" name="constructorop"><i class="anchor-icon"></i></a><code>constructorOp</code></h4>
@@ -544,12 +578,12 @@ themeFormatLiteralOp#8e4f9208 = TypedOpOp;</code></pre>
 ## Another example:
 Assume you receive a [message](/constructor/message) from your friend: that message contains a [messageMediaPhoto](/constructor/messageMediaPhoto) with a [photo](/constructor/photo).
 Your client has to cache not only the `file_reference` field of the photo, but also the context in which the file reference was seen (in this case, a message coming from a specific user).
-The context info is in this case, [an source of type message](https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L74), containing the message ID and the peer ID of the chat/channel/user where the message was seen.
+The context info is, in this case, [a source of type message](https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L74), containing the message ID and the peer ID of the chat/channel/user where the message was seen.
 The context info has to be associated with the file reference: when downloading a file using [upload.getFile](/method/upload.getFile) or resending it using [messages.sendMedia](/method/messages.sendMedia), a `FILE_REFERENCE_EXPIRED` error may be returned.  
 [messages.sendMultiMedia](/method/messages.sendMultiMedia) returns a variation of the same error, as a `FILE_REFERENCE_%d_EXPIRED` error (where `%d` is the index of the media with the expired file reference in the passed media array).  
 If this happens, the context info must be used to refetch the object that contained the file reference: in this example, the peer info and the message ID have to be used with [channels.getMessages](/method/channels.getMessages) or [messages.getMessages](/method/messages.getMessages) to [refetch the message](https://github.com/danog/MadelineProto/blob/v8/src/MTProtoTools/ReferenceDatabase.php#L481), recache the file reference and use it in a new file download request.
 More than one source can be associated to one file reference, for greater resilience (in the case of a message that was deleted in one chat but was also forwarded in another chat, the file reference can be refetched from the second chat, instead).
-sources for objects returned by method calls with certain parameters can be considered, too (for example, in the case of favorited sticker sets returned by [messages.getFavedStickers](/method/messages.getFavedStickers)).
+Sources for objects returned by method calls with certain parameters can be considered, too (for example, in the case of favorited sticker sets returned by [messages.getFavedStickers](/method/messages.getFavedStickers)).
 --></div>
   
 </div>
