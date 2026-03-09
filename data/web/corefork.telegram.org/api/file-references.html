@@ -69,29 +69,8 @@
 <h3><a class="anchor" href="#map-file" id="map-file" name="map-file"><i class="anchor-icon"></i></a>Map file</h3>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">Download latest JSON file reference map for the current layer »</a> - The constructor predicate is serialized under the <code>_</code> key, <code>bytes</code> fields are serialized as <code>{"_": "bytes", "bytes": "&lt;base64 encoded value&gt;"}</code></p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.dat">Download latest serialized TL version of the file reference map for the current layer »</a></p>
-<p>The file reference map file contains and specifies, for the current layer:</p>
-<ul>
-<li>
-<p>TL schemas for:</p>
-<ul>
-<li><a href="#file-ids">File IDs »</a>, used in the file reference DB as keys in the <a href="#file-reference-table">file reference table »</a> and <a href="#file-source-table">file source table »</a></li>
-<li><a href="#file-sources">File sources »</a>, used in the file reference DB as values in the <a href="#file-source-table">file source table »</a></li>
-</ul>
-<p>These TL schemas can be used as a guideline for the file reference and file source table DBMS schema, or by directly serializing file IDs and file source vectors if a simple string =&gt; string KV DB is used.</p>
-</li>
-<li>
-<p>The following traversers:</p>
-<ul>
-<li>All <a href="#incoming-location-extractors">incoming traversers »</a>, used to extract and store <a href="#file-references">file references »</a> from incoming media constructors.</li>
-<li>All <a href="#outgoing-location-extractors">outgoing traversers »</a>, used to swap expired <a href="#file-references">file references »</a> from outgoing media method calls.</li>
-</ul>
-</li>
-<li>
-<p>All <a href="#refresh-actions">refresh actions »</a>: actions are instructions used to refresh expired file references according to <a href="#file-source">file sources »</a> stored in the <a href="#file-source-table">file source table</a></p>
-</li>
-</ul>
-<p>See <a href="/api/file-references/map-schema">here »</a> for the TL schema of the map file.</p>
-<p>The map file is automatically generated and validated by the <a href="/api/file-reference-generator">file reference generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
+<p>See <a href="/api/file-references/map-schema">here »</a> for the full TL schema of the map file.</p>
+<p>Subset of the schema: </p>
 <pre><code>fileReferenceMap#72a99250 layer:int db_schema:string db_schema_json:string traversers_incoming:Vector&lt;TraverserIncoming&gt; traversers_outgoing:Vector&lt;TraverserOutgoing&gt; refresh_actions:Vector&lt;RefreshAction&gt; skipped_incoming_sources:Vector&lt;SkippedSource&gt; = FileReferenceMap;
 
 skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;</code></pre>
@@ -103,19 +82,27 @@ skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:
 <li>
 <p><code>db_schema</code> and <code>db_schema_json</code> fields with the TL <strong>database</strong> schema of <code>FileId</code>s and <code>FileSource</code>s.<br>
 <code>db_schema</code> is text TL schema, <code>db_schema_json</code> is the same TL schema in the JSON format <a href="/schema">also used for the API schema »</a>.  </p>
+<p>This DB schema is used for:</p>
+<ul>
+<li><a href="#file-ids">File IDs »</a>, used in the file reference DB as keys in the <a href="#file-reference-table">file reference table »</a> and <a href="#file-source-table">file source table »</a></li>
+<li><a href="#file-sources">File sources »</a>, used in the file reference DB as values in the <a href="#file-source-table">file source table »</a></li>
+</ul>
+<p>These TL schemas can be used as a guideline for the file reference and file source table DBMS schema, or by directly serializing file IDs and file source vectors if a simple string =&gt; string KV DB is used.</p>
 <p>See <a href="/api/file-references/db-schema">here »</a> for the current TL schema of the file reference database.  </p>
 </li>
 <li>
-<p>A list of <code>TraverserIncoming</code> constructors, containing <a href="#incoming-location-extractors">incoming traversers »</a>.</p>
+<p><code>traversers_incoming</code> contains <a href="#incoming-location-extractors">incoming traversers »</a>, used to extract and store <a href="#file-references">file references »</a> from incoming media constructors.</p>
 </li>
 <li>
-<p>A list of <code>TraverserOutgoing</code> constructors, containing <a href="#outgoing-location-extractors">outging traversers »</a>.</p>
+<p><code>traversers_outgoing</code> contains <a href="#outgoing-location-extractors">outgoing traversers »</a>, used to swap expired <a href="#file-references">file references »</a> from outgoing media method calls.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><code>refresh_actions</code> contains <a href="#refresh-actions">refresh actions »</a>, instructions used to refresh expired file references according to <a href="#file-source">file sources »</a> stored in the <a href="#file-source-table">file source table</a>.</p>
 </li>
 <li>
-<p>A list of <code>RefreshAction</code> constructors, containing <a href="#refresh-actions">refresh actions »</a>, aka method calls to invoke when refreshing a file reference using a previously stored <code>FileId</code> and <code>FileSource</code>.  </p>
-</li>
-<li>
-<p>A list of <code>skippedSource</code> constructors.
+<p><code>skipped_incoming_sources</code> contains skipped sources (see below).<br>
 These constructors indicate that the source should be ignored completely (including during codegen): <code>skippedSource</code> sources are used internally to make sure all file reference paths are still covered in some way during validation, including paths for ephemeral media like inline results, or for media without any associated source (for example, media uploaded using <a href="/method/messages.uploadMedia">messages.uploadMedia</a> but not yet sent anywhere obviously does not have any associated source).  </p>
 <ul>
 <li><code>skippedSource.predicate</code> - Indicates the name of the ignored constructor or method.</li>
@@ -125,6 +112,7 @@ These constructors indicate that the source should be ignored completely (includ
 <p>Each skipped predicate can have one associated reason.  </p>
 </li>
 </ul>
+<p>The map file is automatically generated and validated by the <a href="/api/file-reference-generator">file reference generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
 <h3><a class="anchor" href="#file-ids" id="file-ids" name="file-ids"><i class="anchor-icon"></i></a>File IDs</h3>
 <p>A <strong>file ID</strong> (in the context of the file reference DB) is an object that, when serialized to a string, can easily and uniquely identify a media file.  </p>
 <p>Currently, the following file ID objects are available (taken from the DB schema inside of the <a href="#map">map file</a>):</p>
