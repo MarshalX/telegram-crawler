@@ -160,6 +160,7 @@ fileSourceAvailableReactions#0e432388 = FileSource;
 fileSourceUserProfilePhoto#e39ee274 user_id:long max_id:long = FileSource;
 fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = FileSource;</code></pre>
 <!-- end filesource -->
+<p>See <a href="#refresh-actions">here »</a> for the refresh action associated to each file source type.  </p>
 <h3><a class="anchor" href="#incoming-traversers" id="incoming-traversers" name="incoming-traversers"><i class="anchor-icon"></i></a>Incoming traversers</h3>
 <p>Schema:</p>
 <pre><code>traverseMethodResult#fda9f236 name:string push_sources:Vector&lt;Source&gt; is_needed_parent:Bool = TraverserIncoming;
@@ -179,11 +180,12 @@ source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_cons
 <p>The only allowed entry points for traversers are:</p>
 <ul>
 <li>
-<p>The results of all methods covered by <code>traverseMethodResult</code> traversers.  </p>
+<p>The results of all methods covered by a <code>traverseMethodResult</code> traverser.  </p>
 </li>
 <li>
-<p><a href="/type/Update">Update</a> constructors, either delivered passively by the API, through <a href="/api/updates">catchup polling with getDifference</a>, or returned by a method (the map file does not contain traversers for Updates returned by methods, as those are supposed to be handled by the update system).  </p>
+<p><a href="/type/Update">Update</a> constructors covered by a <code>traverseCommitSourceLocation</code> traversers. </p>
 <p><strong>Note</strong>: All <a href="/type/Updates">Updates</a> constructors must be converted to a vector of <a href="/type/Update">Update</a> constructors, <strong>including short variants</strong> like <a href="/constructor/updateShortMessage">updateShortMessage</a>, <a href="/constructor/updateShortSentMessage">updateShortSentMessage</a>, <a href="/constructor/updateShortChatMessage">updateShortChatMessage</a>, which must be pre-converted to <a href="/type/Update">Update</a> constructors by the client using information extracted from the method call (not included in the map file for simplicity).  </p>
+<p>The map file does not contain traversers for <a href="/type/Updates">Updates</a> returned by methods, as those are supposed to be handled by the update system: <a href="/type/Update">Update</a> constructors should only be traversed after they are properly extracted, deduplicated and reordered by the <a href="/api/updates">update system</a>; traversal can be triggered directly from the update system.  </p>
 </li>
 </ul>
 <p>Practical implementation tip: use two separate runtime structures during traversal.  </p>
