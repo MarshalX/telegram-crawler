@@ -54,7 +54,22 @@
 <li><a href="#file-reference-table">File reference table »</a>: <code>HashMap&lt;FileId, bytes&gt;</code></li>
 <li><a href="#file-source-table">File source table »</a>: <code>HashMap&lt;FileId, Vector&lt;FileSource&gt;&gt;</code></li>
 </ul>
-<p>Then, download the <a href="#map">map file »</a>, which contains and specifies, for the current layer:</p>
+<p>Then, download and implement the <a href="#map">map file »</a>.  </p>
+<h4><a class="anchor" href="#file-reference-table" id="file-reference-table" name="file-reference-table"><i class="anchor-icon"></i></a>File reference table</h4>
+<p>The file reference table can be represented by the following type:</p>
+<pre><code>HashMap&lt;FileId, bytes&gt;</code></pre>
+<p>This table maps a <a href="#file-ids">file ID »</a> (which uniquely identifies a photo or a document) to a <a href="#file-references">file reference »</a>.   </p>
+<p>This table is populated by the <a href="#incoming-location-extractors">incoming traversers »</a> contained in the <a href="#map-file">map file »</a>.  </p>
+<p>The file reference can alternatively be stored, for example, in the document and photo DBs along with other metadata, or in any other way that uniquely associates a <code>FileId</code> to a file reference.  </p>
+<h4><a class="anchor" href="#file-source-table" id="file-source-table" name="file-source-table"><i class="anchor-icon"></i></a>File source table</h4>
+<pre><code>HashMap&lt;FileId, Vector&lt;FileSource&gt;&gt;</code></pre>
+<p>It maps a <a href="#file-ids">file ID »</a> to one or more <a href="#file-sources">file sources »</a>.  </p>
+<p>This table is populated by the <a href="#incoming-location-extractors">incoming traversers »</a> contained in the <a href="#map-file">map file »</a>.  </p>
+<p>To reduce the size of the file source table, it's possible to only allow storing one file source per source type per file ID (max N file sources per file ID, for N file source types), or even just one file source per file ID (max 1 source per file ID).</p>
+<h3><a class="anchor" href="#map-file" id="map-file" name="map-file"><i class="anchor-icon"></i></a>Map file</h3>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">Download latest JSON file reference map for the current layer »</a> - The constructor predicate is serialized under the <code>_</code> key, <code>bytes</code> fields are serialized as <code>{"_": "bytes", "bytes": "&lt;base64 encoded value&gt;"}</code></p>
+<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.dat">Download latest serialized TL version of the file reference map for the current layer »</a></p>
+<p>The file reference map file contains and specifies, for the current layer:</p>
 <ul>
 <li>
 <p>TL schemas for:</p>
@@ -65,59 +80,39 @@
 <p>These TL schemas can be used as a guideline for the file reference and file source table DBMS schema, or by directly serializing file IDs and file source vectors if a simple string =&gt; string KV DB is used.</p>
 </li>
 <li>
-<p>The following extractors:</p>
+<p>The following traversers:</p>
 <ul>
-<li>All <a href="#source-extractors">file source extractors »</a>, used to generate and store <a href="#source">file sources »</a> from incoming constructors.</li>
-<li>All <a href="#incoming-location-extractors">incoming location extractors »</a>, used to extract and store <a href="#file-references">file references »</a> from incoming media constructors.</li>
-<li>All <a href="#outgoing-location-extractors">outgoing location extractors »</a>, used to swap expired <a href="#file-references">file references »</a> from outgoing media method calls.</li>
+<li>All <a href="#incoming-location-extractors">incoming traversers »</a>, used to extract and store <a href="#file-references">file references »</a> from incoming media constructors.</li>
+<li>All <a href="#outgoing-location-extractors">outgoing traversers »</a>, used to swap expired <a href="#file-references">file references »</a> from outgoing media method calls.</li>
 </ul>
-<p>Extractors hook the TL serialization and deserialization logic in order to be invoked when a certain constructor is serialized and deserialized.  </p>
-<p>The extraction logic can also be implemented externally from the TL parser, or on the contrary built directly into it via codegen.</p>
 </li>
 <li>
-<p>All <a href="#actions">actions »</a>: actions are instructions used to refresh expired file references according to <a href="#file-source">file sources »</a> stored in the <a href="#file-source-table">file source table</a></p>
+<p>All <a href="#refresh-actions">refresh actions »</a>: actions are instructions used to refresh expired file references according to <a href="#file-source">file sources »</a> stored in the <a href="#file-source-table">file source table</a></p>
 </li>
 </ul>
-<h4><a class="anchor" href="#file-reference-table" id="file-reference-table" name="file-reference-table"><i class="anchor-icon"></i></a>File reference table</h4>
-<p>The file reference table can be represented by the following type:</p>
-<pre><code>HashMap&lt;FileId, bytes&gt;</code></pre>
-<p>This table maps a <a href="#file-ids">file ID »</a> (which uniquely identifies a photo or a document) to a <a href="#file-references">file reference »</a>.   </p>
-<p>This table is populated by the <a href="#incoming-location-extractors">incoming location extractors »</a> contained in the <a href="#map-file">map file »</a>.  </p>
-<p>The file reference can alternatively be stored, for example, in the document and photo DBs along with other metadata, or in any other way that uniquely associates a <code>FileId</code> to a file reference.  </p>
-<h4><a class="anchor" href="#file-source-table" id="file-source-table" name="file-source-table"><i class="anchor-icon"></i></a>File source table</h4>
-<pre><code>HashMap&lt;FileId, Vector&lt;FileSource&gt;&gt;</code></pre>
-<p>It maps a <a href="#file-ids">file ID »</a> to one or more <a href="#file-sources">file sources »</a>.  </p>
-<p>This table is populated by the <a href="#incoming-location-extractors">incoming location extractors »</a> contained in the <a href="#map-file">map file »</a>.  </p>
-<p>To reduce the size of the file source table, it's possible to only allow storing one file source per source type per file ID (max N file sources per file ID, for N file source types), or even just one file source per file ID (max 1 source per file ID).</p>
-<h3><a class="anchor" href="#map" id="map" name="map"><i class="anchor-icon"></i></a>Map</h3>
-<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.json">Latest JSON map file for the current layer »</a> - The constructor predicate is serialized under the <code>_</code> key, <code>bytes</code> fields are serialized as <code>{"_": "bytes", "bytes": "&lt;base64 encoded value&gt;"}</code></p>
-<p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/file_ref_map.dat">Serialized TL version of the latest map file for the current layer »</a></p>
 <p>See <a href="/api/file-references/map-schema">here »</a> for the TL schema of the map file.</p>
 <p>The map file is automatically generated and validated by the <a href="/api/file-reference-generator">file reference generator tool »</a>; this tool can be manually run on newer or experimental layers, to generate the <strong>file reference database map file</strong> for a given API schema: see <a href="/api/file-reference-generator">here »</a> for more info.  </p>
-<pre><code>fileReferenceMap#4dba8c2c db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; sources:Vector&lt;Source&gt; skipped:Vector&lt;SkippedSource&gt; actions:Vector&lt;Action&gt; = FileReferenceMap;
+<pre><code>fileReferenceMap#72a99250 layer:int db_schema:string db_schema_json:string traversers_incoming:Vector&lt;TraverserIncoming&gt; traversers_outgoing:Vector&lt;TraverserOutgoing&gt; refresh_actions:Vector&lt;RefreshAction&gt; skipped_incoming_sources:Vector&lt;SkippedSource&gt; = FileReferenceMap;
 
-locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
-locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
-
-source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;
-
-skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;
-
-action#9539f410 stored_constructor:string action:ActionOp = Action;</code></pre>
+skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;</code></pre>
 <p>The map file is composed of a single <code>fileReferenceMap</code> constructor, which contains:</p>
 <ul>
 <li>
-<p>The <code>db_schema</code> and <code>db_schema_json</code> fields with the TL <strong>database</strong> schema of <code>FileId</code>s and <code>FileSource</code>s.<br>
+<p>In the <code>layer</code> field, the layer version from which the map file was generated.  </p>
+</li>
+<li>
+<p><code>db_schema</code> and <code>db_schema_json</code> fields with the TL <strong>database</strong> schema of <code>FileId</code>s and <code>FileSource</code>s.<br>
 <code>db_schema</code> is text TL schema, <code>db_schema_json</code> is the same TL schema in the JSON format <a href="/schema">also used for the API schema »</a>.  </p>
+<p>See <a href="/api/file-references/db-schema">here »</a> for the current TL schema of the file reference database.  </p>
 </li>
 <li>
-<p>A list of <code>Location</code> constructors, containing the full list of constructors that have a <code>file_reference</code> field, and info on how to generate a <code>FileId</code> from them.  </p>
+<p>A list of <code>TraverserIncoming</code> constructors, containing <a href="#incoming-location-extractors">incoming traversers »</a>.</p>
 </li>
 <li>
-<p>A list of <code>source</code> constructors, containing instructions on how to generate <code>FileSource</code>s from received constructors or method responses.   </p>
+<p>A list of <code>TraverserOutgoing</code> constructors, containing <a href="#outgoing-location-extractors">outging traversers »</a>.</p>
 </li>
 <li>
-<p>A list of <code>action</code> constructors, containing the method call to invoke when refreshing a file reference using a previously stored <code>FileId</code> and <code>FileSource</code>.  </p>
+<p>A list of <code>RefreshAction</code> constructors, containing <a href="#refresh-actions">refresh actions »</a>, aka method calls to invoke when refreshing a file reference using a previously stored <code>FileId</code> and <code>FileSource</code>.  </p>
 </li>
 <li>
 <p>A list of <code>skippedSource</code> constructors.
@@ -138,7 +133,7 @@ These constructors indicate that the source should be ignored completely (includ
 fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <!-- end fileid -->
 <p>This TL schema can be used as a guideline for the file reference and file source table DBMS schema, or by directly serializing file IDs and file source vectors if a simple string =&gt; string KV DB is used.</p>
-<p><a href="#outgoing-location-extractors">Outgoing location extractors »</a> and <a href="#incoming-location-extractors">incoming location extractors »</a> specify how to generate a file ID object from all media objects.  </p>
+<p><a href="#outgoing-location-extractors">Outgoing traversers »</a> and <a href="#incoming-location-extractors">incoming traversers »</a> specify how to generate a file ID object from all media objects.  </p>
 <h3><a class="anchor" href="#file-references" id="file-references" name="file-references"><i class="anchor-icon"></i></a>File references</h3>
 <p>A <strong>file reference</strong> is a string of bytes that is be encountered in the <code>file_reference</code> fields of</p>
 <ul>
@@ -149,24 +144,87 @@ fileIdDocument#461b1d89 id:long = FileId;</code></pre>
 <h3><a class="anchor" href="#file-sources" id="file-sources" name="file-sources"><i class="anchor-icon"></i></a>File sources</h3>
 <p>A <strong>file source</strong> contains information that the client may use to re-fetch a media (and a new file reference for it), by invoking a specific <strong>action</strong>.  </p>
 <p>Each source type is associated to a specific <a href="#actions">action »</a>.</p>
-<p><a href="#incoming-location-extractors">Incoming location extractors »</a> and <a href="#source-extraction">source extractors</a> are used together to populate the <a href="#file-source-table">file source table »</a>, which maps a <strong>file ID</strong> to one or more <strong>file sources</strong>.  </p>
+<p><a href="#incoming-location-extractors">Incoming traversers »</a> and <a href="#source-extraction">source extractors</a> are used together to populate the <a href="#file-source-table">file source table »</a>, which maps a <strong>file ID</strong> to one or more <strong>file sources</strong>.  </p>
 <p>The <a href="#map">map file »</a> contains all sources needed to implement the file reference database, including some skipped sources which are not handled by any extractor.  </p>
 <p>See <a href="/api/file-references/sources">here »</a> for the full list of sources contained by the current map file.  </p>
-<h3><a class="anchor" href="#incoming-location-extractors" id="incoming-location-extractors" name="incoming-location-extractors"><i class="anchor-icon"></i></a>Incoming location extractors</h3>
+<h3><a class="anchor" href="#incoming-traversers" id="incoming-traversers" name="incoming-traversers"><i class="anchor-icon"></i></a>Incoming traversers</h3>
 <p>Schema:</p>
-<pre><code>locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;</code></pre>
-<p>Incoming location extractors extract a <a href="#file-ids">file ID »</a> =&gt; <a href="#file-references">file reference »</a> pair from incoming media objects <strong>received</strong> from the API, and store it to the <a href="#file-reference-table">file reference table »</a>.  </p>
-<p>They are also used together with <a href="#source-extraction">source extractors</a> to extract multiple <a href="#file-ids">file ID »</a> =&gt; <a href="#source-extraction">file source »</a> pairs from incoming media objects <strong>received</strong> from the API, and store them to the <a href="#file-source-table">file source table »</a>.  </p>
+<pre><code>traverseMethodResult#fda9f236 name:string push_sources:Vector&lt;Source&gt; is_needed_parent:Bool = TraverserIncoming;
+traverseIncomingConstructor#6e4d00b6 type:string predicate:string params:Vector&lt;TraverseParam&gt; push_sources:Vector&lt;Source&gt; is_needed_parent:Bool = TraverserIncoming;
+traverseCommitSourceLocation#94cc59c5 type:string predicate:string push_sources:Vector&lt;Source&gt; stored_constructor:string = TraverserIncoming;
+
+traverseParam#62161b67 flags:# name:string is_flag:flags.0?true is_vector:flags.1?true type:string = TraverseParam;
+
+source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;</code></pre>
+<p>Incoming traversers traverse constructors <strong>received</strong> from the API, and use the gathered information to:</p>
+<ul>
+<li>Extract <a href="#file-ids">file ID »</a> =&gt; <a href="#source-extraction">file source »</a> pairs from incoming media objects <strong>received</strong> from the API, and store them to the <a href="#file-source-table">file source table »</a>.  </li>
+<li>Extract <a href="#file-ids">file ID »</a> =&gt; <a href="#file-references">file reference »</a> pairs from incoming media objects <strong>received</strong> from the API, and store them to the <a href="#file-reference-table">file reference table »</a>.  </li>
+</ul>
+<p>There are three traverser types.  </p>
+<p>All three traverser types have an optional <code>push_sources</code> field, which may contain a list of <a href="#source-extraction">sources</a> to push to the source stack when the traverser is triggered: these sources will be used to store file sources to the <a href="#file-source-table">file source table »</a> when a <code>traverseCommitSourceLocation</code> is reached.  </p>
+<p>The only allowed entry points for traversers are:</p>
+<ul>
+<li>
+<p>The results of all methods covered by <code>traverseMethodResult</code> traversers.  </p>
+</li>
+<li>
+<p><a href="/type/Update">Update</a> constructors, either delivered passively by the API, through <a href="/api/updates">catchup polling with getDifference</a>, or returned by a method.  </p>
+<p><strong>Note</strong> All <a href="/type/Updates">Updates</a> constructors must be converted to a vector of <a href="/type/Update">Update</a> constructors, <strong>including short variants</strong> like <a href="/constructor/updateShortMessage">updateShortMessage</a>, <a href="/constructor/updateShortSentMessage">updateShortSentMessage</a>, <a href="/constructor/updateShortChatMessage">updateShortChatMessage</a>, which must be pre-converted to <a href="/type/Update">Update</a> constructors by the client using information extracted from the method call (not included in the map file for simplicity).  </p>
+</li>
+</ul>
+<p>Traverser type list:</p>
+<ul>
+<li>
+<p><code>traverseMethodResult</code> - For method calls: attaches sources using method call parameters, then traverses on the method result.  </p>
+<p>Only traverse the method result if the returned constructor has a matching <code>traverseIncomingConstructor</code>.  </p>
 <p>Params:</p>
 <ul>
-<li><code>stored_constructor</code> - The type of the <a href="#file-ids">file ID</a> that must be stored to the <a href="#file-reference-table">file reference table »</a> (for example, <code>fileIdDocument</code>, <code>fileIdPhoto</code>)</li>
+<li><code>name</code> - The name of the method call to attach to (for example, <code>messages.getMessages</code>).</li>
+<li><code>push_sources</code> - A list of sources to push when the traverser is triggered.  </li>
+<li><code>is_needed_parent</code> - If set, indicates that the specified method call is required as a parent in some source contained by child traversers (i.e. a downstream traverser contains a source with the <code>needs_parent</code> flag pointing to the method).  </li>
+</ul>
+<p>The <a href="#map">map file »</a> contains <code>traverseMethodResult</code>s for all methods that return file references.   </p>
+</li>
+<li>
+<p><code>traverseIncomingConstructor</code> - Attaches sources on constructors with a specific predicate (name), then traverses on some of the constructor's parameters.  </p>
+<p>Params:</p>
+<ul>
+<li>
+<p><code>type</code> - The type of the constructor to traverse (for example, <code>Document</code>, <code>Photo</code>, etc, present to simplify codegen).</p>
+</li>
+<li>
+<p><code>predicate</code> - The name of the constructor to traverse (for example, <code>document</code>, <code>photo</code>, etc).</p>
+</li>
+<li>
+<p><code>push_sources</code> - A list of sources to push when the traverser is triggered.  </p>
+</li>
+<li>
+<p><code>is_needed_parent</code> - If set, indicates that the specified constructor is required as a parent in some source contained by child traversers (i.e. a downstream traverser contains a source with the <code>needs_parent</code> flag pointing to the constructor).  </p>
+</li>
+<li>
+<p><code>params</code> - A list of parameters to traverse.<br>
+Only traverse the parameter if the contained constructor has a matching <code>traverseIncomingConstructor</code>.  </p>
+<p><code>traverseParam</code> contains the name of the parameter to traverse, and (for simplicity, even if this info can be extracted from the schema) the parameter's type, and whether it's a flag, a vector or a flagged vector.<br>
+The <code>type</code> will always contain the type of the underlying parameter (i.e. without <code>Vector&lt;&gt;</code> or <code>flags.X?</code>).  </p>
+</li>
+</ul>
+<p>The <a href="#map">map file »</a> contains <code>traverseIncomingConstructor</code>s for all incoming constructors that contain file references.   </p>
+</li>
+<li>
+<p><code>traverseCommitSourceLocation</code> - Stores the file reference contained in the current constructor and file sources currently on the source stack to the <a href="#file-source-table">file source table »</a> and <a href="#file-reference-table">file reference table »</a>.  </p>
+<p>Params:</p>
+<ul>
+<li><code>type</code> - The type of the constructor in <code>predicate</code> (for example, <code>Document</code>, <code>Photo</code>, etc, present to simplify codegen).</li>
 <li><code>predicate</code> - The name of the incoming media constructor received from the API (for example, <code>document</code>, <code>photo</code>).
 This constructor is guaranteed to have an <code>id</code> field and a <code>file_reference</code> field.  </li>
+<li><code>push_sources</code> - A list of sources to push when the traverser is triggered, before any sources are stored to the file source table.    </li>
+<li><code>stored_constructor</code> - The type of the <a href="#file-ids">file ID</a> that will be used to populate the <a href="#file-reference-table">file reference table »</a> and <a href="#file-reference-table">file source table »</a> (for example, <code>fileIdDocument</code>, <code>fileIdPhoto</code>).  </li>
 </ul>
-<p>When a media constructor of type <code>locationIncoming.predicate</code> is received, the client must:</p>
+<p>When a media constructor of predicate <code>traverseCommitSourceLocation.predicate</code> is received, the client must:</p>
 <ul>
 <li>Extract the <code>file_reference</code> field of the media constructor</li>
-<li>Extract the <code>id</code> field of the media constructor, generating a new file ID of type <code>locationIncoming.stored_constructor</code></li>
+<li>Extract the <code>id</code> field of the media constructor, generating a new file ID of type <code>traverseCommitSourceLocation.stored_constructor</code></li>
 <li>Store both in the <a href="#file-reference-table">file reference table »</a>, using the file ID as key and the file reference as value.</li>
 <li>Store all <a href="#source-extraction">file sources</a> currently on the source stack into the <a href="#file-source-table">file source table »</a>, using the file ID as key and the file source as value (multiple values can be stored for the same key). </li>
 </ul>
@@ -176,43 +234,105 @@ This constructor is guaranteed to have an <code>id</code> field and a <code>file
 <li>A new <code>fileIdDocument{id: 12345} =&gt; "..."</code> entry must be added to the <a href="#file-reference-table">file reference table »</a></li>
 <li>Two new <code>fileIdDocument{id: 12345} =&gt; fileSourceMessage{...}</code> and <code>fileIdDocument{id: 12345} =&gt; fileSourceWebPage{...}</code> entries must be added to the <a href="#file-source-table">file source table »</a>.</li>
 </ul>
-<p>The <a href="#map">map file »</a> contains incoming location extractors for all incoming constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
-The current map file has the following location extractors:</p>
+<p>The <a href="#map">map file »</a> contains <code>traverseCommitSourceLocation</code>s for all incoming constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
+The current map file has the following <code>traverseCommitSourceLocation</code>s:</p>
 <!-- start locations_incoming -->
+</li>
+</ul>
 <ul>
-<li>predicate: <a href="/constructor/document">document</a>, stored_constructor: <code>fileIdDocument</code></li>
-<li>predicate: <a href="/constructor/photo">photo</a>, stored_constructor: <code>fileIdPhoto</code></li>
+<li>traverseCommitSourceLocation{type: <a href="/type/Document">Document</a>, predicate: <a href="/constructor/document">document</a>, stored_constructor: <code>fileIdDocument</code>}</li>
+<li>traverseCommitSourceLocation{type: <a href="/type/Photo">Photo</a>, predicate: <a href="/constructor/photo">photo</a>, stored_constructor: <code>fileIdPhoto</code>}</li>
 </ul>
 <!-- end locations_incoming -->
-<h3><a class="anchor" href="#outgoing-location-extractors" id="outgoing-location-extractors" name="outgoing-location-extractors"><i class="anchor-icon"></i></a>Outgoing location extractors</h3>
+<h3><a class="anchor" href="#outgoing-traversers" id="outgoing-traversers" name="outgoing-traversers"><i class="anchor-icon"></i></a>Outgoing traversers</h3>
 <p>Schema:</p>
-<pre><code>locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;</code></pre>
-<p>Outgoing location extractors extract a <a href="#file-ids">file ID »</a> from outgoing media objects <strong>sent</strong> to the API, and use it to update and refresh the <a href="#file-references">file reference »</a> within that same outgoing media object before it is sent.  </p>
-<p>Params:</p>
-<ul>
-<li><code>stored_constructor</code> - The type of the <a href="#file-ids">file ID</a> used to lookup values in the <a href="#file-reference-table">file reference table »</a> and <a href="#file-source-table">file source table »</a> (for example, <code>fileIdDocument</code>, <code>fileIdPhoto</code>)</li>
-<li><code>predicate</code> - The name of the outgoing media constructor sent to the API (for example, <code>inputPhoto</code>, <code>inputPhoto</code>).
-This constructor is guaranteed to have an <code>id</code> field and a <code>file_reference</code> field.  </li>
-</ul>
-<p>Outgoing location extractors are triggered when a media method call returns a <code>FILE_REFERENCE_EXPIRED</code> or <code>FILE_REFERENCE_INVALID</code> RPC error.</p>
-<p>Methods dealing with multiple media files at the same time like <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> may also return file reference errors in a slightly different form, as <code>FILE_REFERENCE_%d_EXPIRED</code> errors (or a <code>FILE_REFERENCE_%d_INVALID</code>, which should be treated in the same way): in this case, the media with the file reference to refresh will be located at index <code>%d</code> of the passed <code>multi_media</code> vector.  </p>
-<p>When the error is received, clients should:  </p>
+<pre><code>traverseMethodCall#9244f5bb name:string params:Vector&lt;TraverseParam&gt; = TraverserOutgoing;
+traverseOutgoingConstructor#3fc5026d type:string predicate:string params:Vector&lt;TraverseParam&gt; = TraverserOutgoing;
+traverseSwapLocation#032bf95d type:string predicate:string stored_constructor:string = TraverserOutgoing;
+
+traverseParam#62161b67 flags:# name:string is_flag:flags.0?true is_vector:flags.1?true type:string = TraverseParam;</code></pre>
+<p>Outgoing traversers extract a <a href="#file-ids">file ID »</a> from outgoing media objects <strong>sent</strong> to the API and use it to update and swap the <a href="#file-references">file reference »</a> within that same outgoing media object before it is sent.  </p>
+<p>There are three traverser types:  </p>
 <ul>
 <li>
-<p>Locate all outgoing media constructor(s) of type <code>locationOutgoing.predicate</code> contained in the arguments of the failed method call</p>
+<p><code>traverseMethodCall</code> - Traverses the specified method call parameters. </p>
+<p>Params:</p>
 <ul>
-<li>For <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> calls, select the correct one according to the index in the received RPC error.</li>
+<li>
+<p><code>name</code> - Name of the method whose parameters should be traversed</p>
+</li>
+<li>
+<p><code>params</code> - The parameters to traverse.  </p>
+<p><code>traverseParam</code> contains the name of the parameter to traverse, and (for simplicity, even if this info can be extracted from the schema) the parameter's type, and whether it's a flag, a vector or a flagged vector.<br>
+The <code>type</code> will always contain the type of the underlying parameter (i.e. without <code>Vector&lt;&gt;</code> or <code>flags.X?</code>).  </p>
+</li>
 </ul>
 </li>
 <li>
-<p>Using the <code>id</code> field of the selected constructor of type <code>locationOutgoing.predicate</code>, generate a new <a href="#file-ids">file ID »</a> of type <code>locationOutgoing.stored_constructor</code>.</p>
+<p><code>traverseOutgoingConstructor</code> - Traverses the specified constructor parameters.</p>
+<p>Params:</p>
+<ul>
+<li>
+<p><code>type</code> - The type of the constructor to traverse (for example, <code>InputMedia</code>).</p>
+</li>
+<li>
+<p><code>predicate</code> - The name of the constructor to traverse (for example, <code>inputMediaDocument</code>, <code>inputMediaDocument</code>, etc).</p>
+</li>
+<li>
+<p><code>params</code> - The parameters to traverse.  </p>
+<p><code>traverseParam</code> contains the name of the parameter to traverse, and (for simplicity, even if this info can be extracted from the schema) the parameter's type, and whether it's a flag, a vector or a flagged vector.<br>
+The <code>type</code> will always contain the type of the underlying parameter (i.e. without <code>Vector&lt;&gt;</code> or <code>flags.X?</code>).  </p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>traverseSwapLocation</code> - Refreshes the file reference contained in the current constructor using the file sources stored in the <a href="#file-source-table">file source table »</a>.  </p>
+<p>Params:</p>
+<ul>
+<li><code>type</code> - The type of the outgoing media constructor sent to the API (for example, <code>InputMedia</code>).</li>
+<li><code>predicate</code> - The name of the outgoing media constructor sent to the API (for example, <code>inputPhoto</code>, <code>inputPhoto</code>).
+This constructor is guaranteed to have an <code>id</code> field and a <code>file_reference</code> field.  </li>
+<li><code>stored_constructor</code> - The type of the <a href="#file-ids">file ID</a> used to lookup values in the <a href="#file-reference-table">file reference table »</a> and <a href="#file-source-table">file source table »</a> (for example, <code>fileIdDocument</code>, <code>fileIdPhoto</code>)</li>
+</ul>
+<p>The <a href="#map">map file »</a> contains outgoing location extractors for all outgoing media constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
+The current map file has the following location extractors:</p>
+<!-- start locations_outgoing -->
+</li>
+<li>
+<p>traverseSwapLocation{type: <a href="/type/InputPhoto">InputPhoto</a>, predicate: <a href="/constructor/inputPhoto">inputPhoto</a>, stored_constructor: <code>fileIdPhoto</code>}</p>
+</li>
+<li>
+<p>traverseSwapLocation{type: <a href="/type/InputDocument">InputDocument</a>, predicate: <a href="/constructor/inputDocument">inputDocument</a>, stored_constructor: <code>fileIdDocument</code>}</p>
+</li>
+<li>
+<p>traverseSwapLocation{type: <a href="/type/InputFileLocation">InputFileLocation</a>, predicate: <a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a>, stored_constructor: <code>fileIdDocument</code>}</p>
+</li>
+<li>
+<p>traverseSwapLocation{type: <a href="/type/InputFileLocation">InputFileLocation</a>, predicate: <a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a>, stored_constructor: <code>fileIdPhoto</code>}</p>
+</li>
+</ul>
+<!-- end locations_outgoing -->
+<p>(Legacy <code>inputFileLocation</code> constructors are ignored by the current map file).</p>
+<p>Outgoing traversers are triggered when a media method call returns a <code>FILE_REFERENCE_EXPIRED</code> or <code>FILE_REFERENCE_INVALID</code> RPC error.</p>
+<p>Methods dealing with multiple media files at the same time like <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> may also return file reference errors in a slightly different form, as <code>FILE_REFERENCE_%d_EXPIRED</code> errors (or a <code>FILE_REFERENCE_%d_INVALID</code>, which should be treated in the same way): in this case, the media with the file reference to refresh will be located at index <code>%d</code> of the passed <code>multi_media</code> vector.  </p>
+<p>The same <code>FILE_REFERENCE_%d_INVALID</code> error may also be emitted by <a href="/method/messages.sendMedia">messages.sendMedia</a> or other methods requiring a single <a href="/type/InputMedia">InputMedia</a> constructor, when an <a href="/constructor/inputMediaPaidMedia">inputMediaPaidMedia</a> is provided with an array of <code>extended_media</code> media files.  </p>
+<p>When the error is received, clients should:  </p>
+<ul>
+<li>
+<p>Use the traversers to find all outgoing media constructor(s) matching <code>traverseSwapLocation</code>, contained in the arguments of the failed method call.  </p>
+<ul>
+<li>For <code>FILE_REFERENCE_%d_INVALID</code> errors, select the correct one according to the index, otherwise select the first one.  </li>
+</ul>
+</li>
+<li>
+<p>Using the <code>id</code> field of the selected constructor, generate a new <a href="#file-ids">file ID »</a> of type <code>traverseSwapLocation.stored_constructor</code>.</p>
 </li>
 <li>
 <p>Use the <a href="#file-ids">file ID »</a> to lookup <a href="#source-extraction">file sources »</a> from the <a href="#file-source-tables">file source table</a></p>
 </li>
 <li>
-<p>Refresh the <a href="#file-references">file reference</a> using the <a href="#actions">actions »</a> associated to the file sources:</p>
-<p>Loop once through all stored file sources, executing the associated action, exiting from the loop immediately if:</p>
+<p>Refresh the <a href="#file-references">file reference</a> using the <a href="#refresh-actions">actions »</a> associated to the file sources:</p>
+<p>Loop once through all stored file sources, executing the associated <a href="#refresh-actions">refresh action »</a>, exiting from the loop immediately if:</p>
 <ul>
 <li>The <a href="#file-reference-table">file reference table »</a> entry associated to the same <a href="#file-ids">file ID »</a> is updated with a new value OR</li>
 <li>There are no remaining sources, in which case the original <code>FILE_REFERENCE_EXPIRED</code> error should be rethrown to the user.  </li>
@@ -222,36 +342,25 @@ This constructor is guaranteed to have an <code>id</code> field and a <code>file
 <p>Fetch the new <a href="#file-references">file reference</a> from the <a href="#file-reference-table">file reference table »</a> and store it in the <code>file_reference</code> field of the selected constructor from step 1</p>
 </li>
 <li>
-<p>Repeat the call</p>
+<p>Repeat the original call.</p>
 </li>
 </ul>
-<p>For example, when a <code>messages.sendMedia{media: inputMediaPhoto{id: inputPhoto{id: 12345, file_reference: "...", ...}, ...}, ...}</code> method call sent the API fails with <code>FILE_REFERENCE_EXPIRED</code>, a new <code>fileIdPhoto{id: 12345}</code> is used to fetch all associated <a href="#source-extraction">file sources »</a> from the <a href="#file-source-tables">file source table</a>, refresh them, then fetch the new file reference (<code>abc</code>) from the <a href="#file-reference-table">file reference table »</a>, and resend the new method call: <code>messages.sendMedia{media: inputMediaPhoto{id: inputPhoto{id: 12345, file_reference: "abc", ...}, ...}, ...}</code>.</p>
-<p>It's also possible to pre-emptively replace the file reference of media method calls by running the following simplified flow for all method calls, without waiting for an RPC error (this can be useful in cases where an expired file reference may be cached in some other database or provided externally):</p>
+<p>For example, when a <code>messages.sendMedia{media: inputMediaPhoto{id: inputPhoto{id: 12345, file_reference: "...", ...}, ...}, ...}</code> method call sent to the API fails with <code>FILE_REFERENCE_EXPIRED</code>, a new <code>fileIdPhoto{id: 12345}</code> is used to fetch all associated <a href="#source-extraction">file sources »</a> from the <a href="#file-source-tables">file source table</a>, refresh the file reference, then fetch the new file reference (<code>abc</code>) from the <a href="#file-reference-table">file reference table »</a>, and resend the new method call: <code>messages.sendMedia{media: inputMediaPhoto{id: inputPhoto{id: 12345, file_reference: "abc", ...}, ...}, ...}</code>.</p>
+<p>It's also possible to pre-emptively replace the file reference of media method calls by running the following simplified flow for all method calls, without waiting for an RPC error (this can be useful in cases where an expired file reference may be cached in some other database or provided externally, such as via an old <a href="/constructor/draftMessage">draftMessage</a> returned by the API):</p>
 <ul>
-<li>Locate all outgoing media constructor(s) of type <code>locationOutgoing.predicate</code> contained in the arguments of the failed method call</li>
-<li>For all selected constructors:<ul>
-<li>Using the <code>id</code> field of the selected constructor of type <code>locationOutgoing.predicate</code>, generate a new <a href="#file-ids">file ID »</a> of type <code>locationOutgoing.stored_constructor</code>.</li>
+<li>Use the traversers to find all outgoing media constructor(s) matching <code>traverseSwapLocation</code>, contained in the arguments of the method call.  </li>
+<li>For all outgoing media constructors:<ul>
+<li>Using the <code>id</code> field of the selected constructor of type <code>traverseSwapLocation.predicate</code>, generate a new <a href="#file-ids">file ID »</a> of type <code>traverseSwapLocation.stored_constructor</code>.</li>
 <li>If present, fetch the current <a href="#file-references">file reference</a> from the <a href="#file-reference-table">file reference table »</a> and store it in the <code>file_reference</code> field of the selected constructor</li>
 </ul>
 </li>
 <li>Proceed with the call</li>
 </ul>
-<p>It's also possible to avoid using outgoing location extractors altogether if the FileId or FileSources are already passed as external metadata to the client function that invokes the method call (i.e. as a separate additional argument, separate from the ones passed to the API).  </p>
-<p>The <a href="#map">map file »</a> contains outgoing location extractors for all outgoing media constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
-The current map file has the following location extractors:</p>
-<!-- start locations_outgoing -->
-<ul>
-<li>predicate: <a href="/constructor/inputPhoto">inputPhoto</a>, stored_constructor: <code>fileIdPhoto</code></li>
-<li>predicate: <a href="/constructor/inputDocument">inputDocument</a>, stored_constructor: <code>fileIdDocument</code></li>
-<li>predicate: <a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a>, stored_constructor: <code>fileIdDocument</code> (outgoing)</li>
-<li>predicate: <a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a>, stored_constructor: <code>fileIdPhoto</code></li>
-</ul>
-<!-- end locations_outgoing -->
-<p>(Legacy <code>inputFileLocation</code> constructors are ignored by the current map file).</p>
+<p>It's also possible to avoid using outgoing traversers altogether if the FileId or FileSources are already passed as external metadata to the client function that invokes the method call (i.e. as a separate additional argument, separate from the ones passed to the API).  </p>
 <h3><a class="anchor" href="#source-extraction" id="source-extraction" name="source-extraction"><i class="anchor-icon"></i></a>Source extraction</h3>
 <p>A file source contains information that the client may use to re-fetch the document (and the new file reference), by invoking a specific <strong>action</strong>.  </p>
 <p>Each source type is associated to a specific <a href="#actions">action »</a>.</p>
-<p><a href="#location-extractors">location extractors »</a> and <a href="#source">sources »</a> are used together to populate the <a href="#file-source-table">file source table »</a>, which maps a <strong>file ID</strong> to one or more <strong>file sources</strong>.  </p>
+<p><a href="#incoming-traversers">Incoming traversers »</a> and <a href="#source">sources »</a> are used together to populate the <a href="#file-source-table">file source table »</a>, which maps a <strong>file ID</strong> to one or more <strong>file sources</strong>.  </p>
 <p>Schema:</p>
 <pre><code>source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;</code></pre>
 <p>A <code>source</code> contains instructions on how to extract and store file sources from an incoming method response or update.  </p>
@@ -283,7 +392,7 @@ Skip this step if <code>needs_parent</code> is set but we don't have a construct
 <li><strong>After</strong> deserialization of the method <strong>response</strong>, pop the pushed <code>FileSource</code> of type <code>stored_constructor</code>, make sure it can be processed according to <code>stored_params</code> (all required flag fields are set, all paths can be correctly extracted), and if yes, populate the <code>FileSource</code> of type <code>stored_constructor</code> accordingly and commit the source to the database (using the <code>FileId</code>s associated at step 2 as keys, and <code>stored_constructor</code> as value).   </li>
 </ul>
 <p>Note that method sources cannot make use of <code>needs_parent</code>.   </p>
-<h4><a class="anchor" href="#field-extraction" id="field-extraction" name="field-extraction"><i class="anchor-icon"></i></a>Field extraction</h4>
+<h4><a class="anchor" href="#source-field-extraction" id="source-field-extraction" name="source-field-extraction"><i class="anchor-icon"></i></a>Source field extraction</h4>
 <pre><code>// Extractor
 extractAndStore#72069549 from:Path to:string = FieldExtractor;
 
@@ -305,7 +414,7 @@ paramIsFlagAbortIfEmpty#f8fe9fee = ParamFlag;
 paramIsFlagFallback#202b77a1 fallback:TypedOp = ParamFlag;
 paramIsFlagPassthrough#1dc6e17d = ParamFlag;
 
-pathPart#8dc6ff46 constructor:string param:string flag:ParamFlag = PathPart;
+pathPart#19a10fbf type:string constructor:string param:string param_type:string flag:ParamFlag = PathPart;
 
 path#c3586a2 parts:Vector&lt;PathPart&gt; = Path;
 pathParent#58f13684 parts:Vector&lt;PathPart&gt; = Path;</code></pre>
@@ -360,7 +469,9 @@ extractUserIdFromInputUserAndStore#7720aa2e from:Path to:string = FieldExtractor
 <li><code>constructor</code> - Indicates the required constructor/method predicate. 
 If a different constructor type is encountered (i.e. <a href="/constructor/documentEmpty">documentEmpty</a> instead of <a href="/constructor/document">document</a>), abort extraction.<br>
 By definition, if a method name is passed, it will always be equal to the method of the associated source.</li>
+<li><code>type</code> - Indicates the type of the required constructor/method.</li>
 <li><code>param</code> - Indicates the required parameter; if it's an empty string, it indicates the return value of a method.  </li>
+<li><code>param_type</code> - Indicates the type of the required parameter; if the parameter is a flag, the underlying type is specified; if <code>param</code> points to the return value of a method, <code>param_type</code> will be equal to <code>type</code>.    </li>
 <li><code>flag</code> - Contains exactly one of the following constructors:<ul>
 <li><code>paramNotFlag</code> - The current parameter is not a flag</li>
 <li><code>paramIsFlagAbortIfEmpty</code> - The current parameter is a flag, and if it's not set, abort extraction.  </li>
@@ -370,13 +481,10 @@ Note that OPs of type <code>copyOp</code>, <code>getInputChannelByIdOp</code>, <
 </ul>
 </li>
 </ul>
-<h3><a class="anchor" href="#actions" id="actions" name="actions"><i class="anchor-icon"></i></a>Actions</h3>
-<p>Actions are used to refresh an expired file reference of a media file according to the <a href="#source">file sources »</a> stored in the <a href="#file-source-table">file source table »</a>, associated to the <code>FileId</code>.  </p>
-<ul>
-<li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
-</ul>
-<p>For example for the <strong>file reference path</strong> specified below it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </p>
-<pre><code>action#9539f410 stored_constructor:string action:ActionOp = Action;
+<h3><a class="anchor" href="#refresh-actions" id="refresh-actions" name="refresh-actions"><i class="anchor-icon"></i></a>Refresh actions</h3>
+<p>Refresh actions are used to refresh an expired file reference of a media file according to the <a href="#source">file sources »</a> stored in the <a href="#file-source-table">file source table »</a>, associated to the <code>FileId</code>.  </p>
+<p>See <a href="/api/file-references/refresh-actions">here »</a> for the full list of refresh actions contained by the current map file.  </p>
+<pre><code>refreshAction#d4e15689 stored_constructor:string action:ActionOp = RefreshAction;
 
 // Actions
 callOp#c2ff3383 method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
@@ -389,13 +497,12 @@ typedOpArg#3a2930c2 key:string value:TypedOp = TypedOpArg;
 // but isn't strictly necessary as it can be inferred from the TypedOpOp.
 // It is fully pre-validated during the generation of the definition file.
 typedOp#705b10ec type:string op:TypedOpOp = TypedOp;</code></pre>
-<p>Actions are used to refresh an expired file reference of a media file according to the <code>FileSource</code>s stored in the <a href="#file-source-table">file source table »</a>, associated to the <code>FileId</code>.  </p>
 <p>Params:</p>
 <ul>
-<li><code>stored_constructor</code> - The name of an object of type <code>FileSource</code>, specified in the <code>db_schema</code>.</li>
+<li><code>stored_constructor</code> - The name of a <a href="#file-sources">file source</a> (an object of type <code>FileSource</code>), specified in the <code>db_schema</code>.</li>
 <li><code>action</code> - The action to execute when refreshing a file source of type <code>stored_constructor</code>.  </li>
 </ul>
-<p>There can only be one action per constructor.</p>
+<p>There can only be one action per file source type.</p>
 <p>The arguments of the action are composed of a set of <code>typedOp</code> constructors.  </p>
 <p><a href="#action-parameters"><code>typedOp</code> »</a> is a wrapper for a <code>TypedOpOp</code> constructor which also contains the TL <code>type</code> of the associated <code>TypedOpOp</code>; this isn't strictly necessary for evaluation, but it can be useful during automatic code generation from the definition file.  </p>
 <h4><a class="anchor" href="#callop" id="callop" name="callop"><i class="anchor-icon"></i></a><code>callOp</code></h4>

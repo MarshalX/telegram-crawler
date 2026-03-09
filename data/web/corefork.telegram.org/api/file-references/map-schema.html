@@ -51,6 +51,7 @@ Download JSON version of TL schema…">
 <p>This is the TL schema of the <a href="/api/file-references">file reference map file »</a>.</p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.tl">Download TL schema of map file »</a></p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.json">Download JSON version of TL schema of map file »</a></p>
+<p>See <a href="/api/file-references">here »</a> for more info on the file reference database.  </p>
 <!-- start schema -->
 <pre><code><a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
 <a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
@@ -59,16 +60,27 @@ Download JSON version of TL schema…">
 vector#1cb5c415 {t:Type} # [ t ] = Vector t;
 
 // Root
-fileReferenceMap#4dba8c2c db_schema:string db_schema_json:string locations:Vector&lt;Location&gt; sources:Vector&lt;Source&gt; skipped:Vector&lt;SkippedSource&gt; actions:Vector&lt;Action&gt; = FileReferenceMap;
+fileReferenceMap#72a99250 layer:int db_schema:string db_schema_json:string traversers_incoming:Vector&lt;TraverserIncoming&gt; traversers_outgoing:Vector&lt;TraverserOutgoing&gt; refresh_actions:Vector&lt;RefreshAction&gt; skipped_incoming_sources:Vector&lt;SkippedSource&gt; = FileReferenceMap;
 
-locationIncoming#e18770f4 predicate:string stored_constructor:string = Location;
-locationOutgoing#e7740ae0 predicate:string stored_constructor:string = Location;
+// Traversers (incoming)
+traverseParam#62161b67 flags:# name:string is_flag:flags.0?true is_vector:flags.1?true type:string = TraverseParam;
+
+traverseIncomingConstructor#6e4d00b6 type:string predicate:string params:Vector&lt;TraverseParam&gt; push_sources:Vector&lt;Source&gt; is_needed_parent:Bool = TraverserIncoming;
+traverseCommitSourceLocation#94cc59c5 type:string predicate:string push_sources:Vector&lt;Source&gt; stored_constructor:string = TraverserIncoming;
+traverseMethodResult#fda9f236 name:string push_sources:Vector&lt;Source&gt; is_needed_parent:Bool = TraverserIncoming;
 
 source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;
 
+// Traversers (outgoing)
+traverseOutgoingConstructor#3fc5026d type:string predicate:string params:Vector&lt;TraverseParam&gt; = TraverserOutgoing;
+traverseSwapLocation#032bf95d type:string predicate:string stored_constructor:string = TraverserOutgoing;
+traverseMethodCall#9244f5bb name:string params:Vector&lt;TraverseParam&gt; = TraverserOutgoing;
+
+// Skipped sources
 skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;
 
-action#9539f410 stored_constructor:string action:ActionOp = Action;
+// Refresh actions
+refreshAction#d4e15689 stored_constructor:string action:ActionOp = RefreshAction;
 
 // Field extraction path
 paramNotFlag#acd9d5cf = ParamFlag;
@@ -76,7 +88,7 @@ paramIsFlagAbortIfEmpty#f8fe9fee = ParamFlag;
 paramIsFlagFallback#202b77a1 fallback:TypedOp = ParamFlag;
 paramIsFlagPassthrough#1dc6e17d = ParamFlag;
 
-pathPart#8dc6ff46 constructor:string param:string flag:ParamFlag = PathPart;
+pathPart#19a10fbf type:string constructor:string param:string param_type:string flag:ParamFlag = PathPart;
 
 path#0c3586a2 parts:Vector&lt;PathPart&gt; = Path;
 pathParent#58f13684 parts:Vector&lt;PathPart&gt; = Path;
