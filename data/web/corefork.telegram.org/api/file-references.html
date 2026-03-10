@@ -220,7 +220,7 @@ A source is valid if <a href="#source-extraction">source extraction »</a> can b
 <ul>
 <li><code>name</code> - The name of the method call to attach to (for example, <code>messages.getMessages</code>).</li>
 <li><code>push_sources</code> - A list of sources to push when the traverser is triggered.  </li>
-<li><code>is_needed_parent</code> - If set, the traversal must expose this method result as parent context for downstream source extraction, because at least one downstream <code>Source</code> has <code>needs_parent</code> pointing to this method. Keep this object in a separate parent context map, keyed by predicate (for example, <code>HashMap&lt;predicate, Vector&lt;object&gt;&gt;</code>).  </li>
+<li><code>is_needed_parent</code> - If set, the traversal must expose this method result as parent context for downstream source extraction, because at least one downstream <code>Source</code> has <code>needs_parent</code> pointing to this method. Push the method call to a separate parent context map, keyed by method name (can be the same context map used for constructors with <code>is_needed_parent=true</code>, for example, <code>HashMap&lt;predicate, Vector&lt;object&gt;&gt;</code>).  </li>
 </ul>
 <p>The <a href="#map-file">map file »</a> contains <code>traverseMethodResult</code>s for all methods that return file references.   </p>
 </li>
@@ -238,7 +238,7 @@ A source is valid if <a href="#source-extraction">source extraction »</a> can b
 <p><code>push_sources</code> - A list of sources to push when the traverser is triggered.  </p>
 </li>
 <li>
-<p><code>is_needed_parent</code> - If set, the traversal must expose this constructor as parent context for downstream source extraction, because at least one downstream <code>Source</code> has <code>needs_parent</code> pointing to this constructor. Keep this object in a separate parent context map, keyed by predicate (for example, <code>HashMap&lt;predicate, Vector&lt;object&gt;&gt;</code>).  </p>
+<p><code>is_needed_parent</code> - If set, the traversal must expose this constructor as parent context for downstream source extraction, because at least one downstream <code>Source</code> has <code>needs_parent</code> pointing to this constructor. Push this object to a separate parent context map, keyed by predicate (for example, <code>HashMap&lt;predicate, Vector&lt;object&gt;&gt;</code>).  </p>
 </li>
 <li>
 <p><code>params</code> - A list of parameters to traverse.<br>
