@@ -2534,6 +2534,9 @@
     var reqTo, fallbackTo, reqDelay = 0;
     var reqInvoke = function() {
       invokeCustomMethod('getRequestedContact', {}, function(err, res) {
+        if (res.substr(0, 1) == '"' && res.substr(-1) == '"') { // macos fix
+          res = JSON.parse(res);
+        }
         if (res && res.length) {
           clearTimeout(fallbackTo);
           callback(res);
