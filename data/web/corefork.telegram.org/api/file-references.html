@@ -218,12 +218,12 @@ A source is valid and can be pushed if <a href="#source-extraction">source extra
 <p>Use the following runtime structures:</p>
 <ul>
 <li><code>Vector&lt;FileId&gt; sourceFileIds</code> - append-only list of file IDs discovered during deserialization: do not remove elements from this list during deserialization, drop it only after deserialization of the entire API response is completed. </li>
-<li><code>HashMap&lt;predicate, Vector&lt;Tuple{object, Vector&lt;FileId&gt;}&gt;&gt; parentContext</code> - deferred context used for <code>is_needed_parent</code>/<code>needs_parent</code> matching.</li>
+<li><code>HashMap&lt;predicate, Vector&lt;Tuple{object, Vector&lt;FileId&gt;}&gt;&gt; parentContext</code> - deferred context used for <code>is_needed_parent</code>/<code>needs_parent</code> matching, drop it after deserialization of the entire API response is completed. </li>
 </ul>
 <p>Execution order at runtime:</p>
 <ol>
 <li>
-<p>When deserializing a constructor matched by a <code>traverseMethodResult</code> or <code>traverseIncomingConstructor</code> traverser:<br>
+<p>When deserializing a constructor/method response matched by a <code>traverseMethodResult</code> or <code>traverseIncomingConstructor</code> traverser:<br>
 1.1. Store <code>len(sourceFileIds)</code> to a temporary <code>fileIdsIdx</code> variable<br>
 1.2. Deserialize the object or the method response<br>
 1.3. For file IDs <code>sourceFileIds[fileIdsIdx:]</code> (all file IDs starting from <code>fileIdsIdx</code>) and all valid sources in <code>push_sources</code>, populate and add <code>FileId -&gt; FileSource</code> to the <a href="#file-source-table">file source table »</a>.<br>
@@ -232,6 +232,7 @@ A source is valid and can be added if <a href="#source-extraction">source extrac
 <p>Do not remove elements from <code>sourceFileIds</code> on completion.<br>
 1.4. If <code>is_needed_parent</code> is set, extract all entries from <code>parentContext[predicate]</code>, and using the extracted object and file ID list (not the <code>sourceFileIds[fileIdsIdx:]</code> from above) populate and add <code>FileId -&gt; FileSource</code> to the <a href="#file-source-table">file source table »</a>.<br>
 A source is valid and can be added if <a href="#source-extraction">source extraction »</a> can be populated according to <code>stored_params</code> (all required flag fields are set and all paths can be correctly extracted).  </p>
+<p>On completion, clear <code>parentContext[predicate]</code>.  </p>
 </li>
 <li>
 <p>When <code>traverseCommitSourceLocation</code> matches a constructor:<br>
