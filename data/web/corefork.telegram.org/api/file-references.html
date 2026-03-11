@@ -275,14 +275,18 @@ This constructor is guaranteed to have an <code>id</code> field and a <code>file
 </ul>
 <p>The <a href="#map-file">map file »</a> contains <code>traverseCommitSourceLocation</code>s for all incoming constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
 The current map file has the following <code>traverseCommitSourceLocation</code>s:</p>
-<!-- start locations_incoming -->
+<!-- start incoming_locations -->
 <ul>
-<li>traverseCommitSourceLocation{type: <a href="/type/Document">Document</a>, predicate: <a href="/constructor/document">document</a>, stored_constructor: <code>fileIdDocument</code>, push_sources: <a href="/api/file-references/sources#source-document-filesourcestickerset">fileSourceStickerSet</a>, <a href="/api/file-references/sources#source-document-filesourcesavedmusic-users-getsavedmusic">fileSourceSavedMusic (needs [users.getSavedMusic](/method/users.getSavedMusic))</a>, <a href="/api/file-references/sources#source-document-filesourcesavedmusic-users-getsavedmusicbyid">fileSourceSavedMusic (needs [users.getSavedMusicByID](/method/users.getSavedMusicByID))</a>}</li>
-<li>traverseCommitSourceLocation{type: <a href="/type/Photo">Photo</a>, predicate: <a href="/constructor/photo">photo</a>, stored_constructor: <code>fileIdPhoto</code>, push_sources: <a href="/api/file-references/sources#source-photo-filesourceuserprofilephoto-photos-getuserphotos">fileSourceUserProfilePhoto (needs [photos.getUserPhotos](/method/photos.getUserPhotos))</a>}</li>
+<li>
+<pre><code>traverseCommitSourceLocation{type: <a href="/type/Document">Document</a>, predicate: <a href="/constructor/document">document</a>, stored_constructor: 'fileIdDocument', push_sources: [<a href="/api/file-references/sources#source-document-filesourcestickerset">fileSourceStickerSet</a>, <a href="/api/file-references/sources#source-document-filesourcesavedmusic-users-getsavedmusic">fileSourceSavedMusic (needs </a><a href="/method/users.getSavedMusic">users.getSavedMusic</a>), <a href="/api/file-references/sources#source-document-filesourcesavedmusic-users-getsavedmusicbyid">fileSourceSavedMusic (needs </a><a href="/method/users.getSavedMusicByID">users.getSavedMusicByID</a>)]}</code></pre>
+</li>
+<li>
+<pre><code>traverseCommitSourceLocation{type: <a href="/type/Photo">Photo</a>, predicate: <a href="/constructor/photo">photo</a>, stored_constructor: 'fileIdPhoto', push_sources: [<a href="/api/file-references/sources#source-photo-filesourceuserprofilephoto-photos-getuserphotos">fileSourceUserProfilePhoto (needs </a><a href="/method/photos.getUserPhotos">photos.getUserPhotos</a>)]}</code></pre>
+</li>
 </ul>
 </li>
 </ul>
-<!-- end locations_incoming -->
+<!-- end incoming_locations -->
 <h3><a class="anchor" href="#outgoing-traversers" id="outgoing-traversers" name="outgoing-traversers"><i class="anchor-icon"></i></a>Outgoing traversers</h3>
 <p>See <a href="/api/file-references/outgoing-traversers">here »</a> for the full list of outgoing traversers contained by the current map file.</p>
 <p>Schema:</p>
@@ -336,16 +340,24 @@ This constructor is guaranteed to have an <code>id</code> field and a <code>file
 </ul>
 <p>The <a href="#map-file">map file »</a> contains outgoing traversers for all outgoing media constructors that have a <code>file_reference</code> and an <code>id</code> field.<br>
 The current map file has the following outgoing traversers:</p>
-<!-- start locations_outgoing -->
+<!-- start outgoing_locations -->
 <ul>
-<li>traverseSwapLocation{type: <a href="/type/InputPhoto">InputPhoto</a>, predicate: <a href="/constructor/inputPhoto">inputPhoto</a>, stored_constructor: <code>fileIdPhoto</code>}</li>
-<li>traverseSwapLocation{type: <a href="/type/InputDocument">InputDocument</a>, predicate: <a href="/constructor/inputDocument">inputDocument</a>, stored_constructor: <code>fileIdDocument</code>}</li>
-<li>traverseSwapLocation{type: <a href="/type/InputFileLocation">InputFileLocation</a>, predicate: <a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a>, stored_constructor: <code>fileIdDocument</code>}</li>
-<li>traverseSwapLocation{type: <a href="/type/InputFileLocation">InputFileLocation</a>, predicate: <a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a>, stored_constructor: <code>fileIdPhoto</code>}</li>
+<li>
+<pre><code>traverseSwapLocation{type: <a href="/type/InputPhoto">InputPhoto</a>, predicate: <a href="/constructor/inputPhoto">inputPhoto</a>, stored_constructor: 'fileIdPhoto'}</code></pre>
+</li>
+<li>
+<pre><code>traverseSwapLocation{type: <a href="/type/InputDocument">InputDocument</a>, predicate: <a href="/constructor/inputDocument">inputDocument</a>, stored_constructor: 'fileIdDocument'}</code></pre>
+</li>
+<li>
+<pre><code>traverseSwapLocation{type: <a href="/type/InputFileLocation">InputFileLocation</a>, predicate: <a href="/constructor/inputDocumentFileLocation">inputDocumentFileLocation</a>, stored_constructor: 'fileIdDocument'}</code></pre>
+</li>
+<li>
+<pre><code>traverseSwapLocation{type: <a href="/type/InputFileLocation">InputFileLocation</a>, predicate: <a href="/constructor/inputPhotoFileLocation">inputPhotoFileLocation</a>, stored_constructor: 'fileIdPhoto'}</code></pre>
+</li>
 </ul>
 </li>
 </ul>
-<!-- end locations_outgoing -->
+<!-- end outgoing_locations -->
 <p>(Legacy <code>inputFileLocation</code> constructors are ignored by the current map file).</p>
 <p>Outgoing traversers are triggered when a media method call returns a <code>FILE_REFERENCE_EXPIRED</code> or <code>FILE_REFERENCE_INVALID</code> RPC error.</p>
 <p>Methods dealing with multiple media files at the same time like <a href="/method/messages.sendMultiMedia">messages.sendMultiMedia</a> may also return file reference errors in a slightly different form, as <code>FILE_REFERENCE_%d_EXPIRED</code> errors (or a <code>FILE_REFERENCE_%d_INVALID</code>, which should be treated in the same way): in this case, the media with the file reference to refresh will be located at index <code>%d</code> of the passed <code>multi_media</code> vector.  </p>
