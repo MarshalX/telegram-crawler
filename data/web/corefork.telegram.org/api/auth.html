@@ -83,7 +83,9 @@ If any of the future auth tokens matches the account we're trying to login into 
 <a href='/constructor/auth.sentCodeSuccess'>auth.sentCodeSuccess</a>#2390fe44 authorization:<a href='/type/auth.Authorization'>auth.Authorization</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
 <a href='/constructor/auth.sentCodePaymentRequired'>auth.sentCodePaymentRequired</a>#e0955a3c store_product:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> support_email_address:<a href='/type/string'>string</a> support_email_subject:<a href='/type/string'>string</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;
 
-<a href='/constructor/inputInvoicePremiumAuthCode'>inputInvoicePremiumAuthCode</a>#a purpose:<a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
+<a href='/constructor/inputStorePaymentAuthCode'>inputStorePaymentAuthCode</a>#9bb2636d flags:<a href='/type/%23'>#</a> restore:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> currency:<a href='/type/string'>string</a> amount:<a href='/type/long'>long</a> = <a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a>;
+
+<a href='/constructor/inputInvoicePremiumAuthCode'>inputInvoicePremiumAuthCode</a>#3e77f614 purpose:<a href='/type/InputStorePaymentPurpose'>InputStorePaymentPurpose</a> = <a href='/type/InputInvoice'>InputInvoice</a>;
 
 ---functions---
 
@@ -92,7 +94,7 @@ If any of the future auth tokens matches the account we're trying to login into 
 
 <a href='/method/auth.requestFirebaseSms'>auth.requestFirebaseSms</a>#8e39261e flags:<a href='/type/%23'>#</a> phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> safety_net_token:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> play_integrity_token:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> ios_push_secret:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
 
-<a href='/method/auth.checkPaidAuth'>auth.checkPaidAuth</a>#a phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> form_id:<a href='/type/long'>long</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;</code></pre>
+<a href='/method/auth.checkPaidAuth'>auth.checkPaidAuth</a>#56e59f9c phone_number:<a href='/type/string'>string</a> phone_code_hash:<a href='/type/string'>string</a> form_id:<a href='/type/long'>long</a> = <a href='/type/auth.SentCode'>auth.SentCode</a>;</code></pre>
 <p>The <a href="/method/auth.sendCode">auth.sendCode</a> method has parameters for enabling/disabling use of flash calls and missed calls, and allows passing an SMS token that will be included in the sent SMS.
 For example, the latter is required in newer versions of android, to use the <a href="https://developers.google.com/identity/sms-retriever/overview">android SMS receiver APIs</a>.</p>
 <p>The returned <a href="/constructor/auth.sentCode">auth.sentCode</a> object will contain multiple parameters:</p>
@@ -166,6 +168,7 @@ The last digits of the phone number that calls are the code that must be entered
 <p>If the message takes too long (<code>timeout</code> seconds) to arrive at the phone, the <a href="/method/auth.resendCode">auth.resendCode</a> method may be invoked to resend a code of type <code>next_type</code>.
 If the same happens again, you can use <a href="/method/auth.resendCode">auth.resendCode</a> with the <code>next_type</code> returned by the previous call to <a href="/method/auth.resendCode">auth.resendCode</a>.
 To cancel the verification code use <a href="/method/auth.cancelCode">auth.cancelCode</a>.</p>
+<h5><a class="anchor" href="#paid-auth" id="paid-auth" name="paid-auth"><i class="anchor-icon"></i></a>Paid auth</h5>
 <p>Official apps may receive an <a href="/constructor/auth.sentCodePaymentRequired">auth.sentCodePaymentRequired</a> instead: this constructor indicates that due to the high cost of SMS verification codes for the user's country/provider, the user must purchase a Telegram Premium subscription in order to proceed with the login/signup.  </p>
 <ul>
 <li>
@@ -175,7 +178,7 @@ To cancel the verification code use <a href="/method/auth.cancelCode">auth.cance
 <li>
 <p>All other clients should use <a href="https://core.telegram.org/api/payments#22-getting-invoice-info-about-the-product">the usual invoice payment flow »</a> with <a href="/constructor/inputInvoicePremiumAuthCode">inputInvoicePremiumAuthCode</a>, containing an <a href="/constructor/inputStorePaymentAuthCode">inputStorePaymentAuthCode</a>.  </p>
 <p>Do not proceed to step 5+, the last call must be the one to <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a> at step 4.  </p>
-<p>After completion of step 4 (and after the eventual 3-D secure webview is closed), to detect a successful payment clients must immediately invoke <a href="/method/auth.checkPaidAuth">auth.checkPaidAuth</a>, which will return either:</p>
+<p>After completion of step 4 (and after the eventual 3-D secure webview is closed), to detect a successful payment clients must immediately invoke <a href="/method/auth.checkPaidAuth">auth.checkPaidAuth</a> with the <code>form_id</code> passed to <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a>, which will return either:</p>
 <ul>
 <li>An <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor, on successful payment</li>
 <li>A <code>420</code> <code>FLOOD_WAIT_%d</code> RPC error, used to implement shortpolling: the client must keep invoking the method after waiting <code>%d</code> seconds, until the payment either succeeds or fails and either <a href="/constructor/auth.sentCode">auth.sentCode</a> or a different RPC error is returned.  </li>
