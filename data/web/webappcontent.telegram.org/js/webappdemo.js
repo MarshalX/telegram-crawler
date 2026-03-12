@@ -856,6 +856,40 @@ var DemoApp = {
       $('#prev_activity').html(', <br>previously was active for <b>' + Math.round(prevDuration / 1000) + '</b> sec');
     }
   },
+  requesteBotCreate: function(btn, type) {
+    $('button').prop('disabled', true);
+    $('#btn_status').text('Sending...').removeClass('ok err').show();
+    DemoApp.apiRequest('requestBotCreate', {
+      type: type,
+    }, function(result) {
+      $('button').prop('disabled', false);
+      if (result.response) {
+        if (result.response.ok) {
+          var fail_handler = function(params) {
+            DemoApp.showAlert('requestedChatFailed: ' + params.error);
+          };
+          Telegram.WebApp.onEvent('requestedChatFailed', fail_handler);
+          Telegram.WebApp.requestChat(result.response.result.request_id, function(sent) {
+            Telegram.WebApp.offEvent('requestedChatFailed', fail_handler);
+            if (sent) {
+              $('#btn_status').text('Chat sent successfully!').addClass('ok').show();
+            } else {
+              $('#btn_status').text('Chat send failed!').addClass('err').show();
+            }
+          });
+        } else {
+          $('#btn_status').text(result.response.description).addClass('err').show();
+          alert(result.response.description);
+        }
+      } else if (result.error) {
+        $('#btn_status').text(result.error).addClass('err').show();
+        alert(result.error);
+      } else {
+        $('#btn_status').text('Unknown error').addClass('err').show();
+        alert('Unknown error');
+      }
+    });
+  },
   showAlert: function(message) {
     Telegram.WebApp.showAlert(message);
   },
