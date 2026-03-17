@@ -869,7 +869,7 @@ var DemoApp = {
             DemoApp.showAlert('requestedChatFailed: ' + params.error);
           };
           Telegram.WebApp.onEvent('requestedChatFailed', fail_handler);
-          Telegram.WebApp.requestChat(result.response.result.request_id, function(sent) {
+          Telegram.WebApp.requestChat(result.response.result.webapp_req_id, function(sent) {
             Telegram.WebApp.offEvent('requestedChatFailed', fail_handler);
             if (sent) {
               $('#btn_status').text('Chat sent successfully!').addClass('ok').show();
