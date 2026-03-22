@@ -159,13 +159,17 @@ Updating/reordering usernames will emit an <a href="/constructor/updateUserName"
 
 <a href='/constructor/privacyKeyBirthday'>privacyKeyBirthday</a>#2000a518 = <a href='/type/PrivacyKey'>PrivacyKey</a>;
 
+<a href='/constructor/messageActionSuggestBirthday'>messageActionSuggestBirthday</a>#2c8f2a25 birthday:<a href='/type/Birthday'>Birthday</a> = <a href='/type/MessageAction'>MessageAction</a>;
+
 ---functions---
 
 <a href='/method/account.updateBirthday'>account.updateBirthday</a>#cc6e0c11 flags:<a href='/type/%23'>#</a> birthday:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Birthday'>Birthday</a> = <a href='/type/Bool'>Bool</a>;
 
 <a href='/method/contacts.getBirthdays'>contacts.getBirthdays</a>#daeda864 = <a href='/type/contacts.ContactBirthdays'>contacts.ContactBirthdays</a>;
 
-<a href='/method/help.dismissSuggestion'>help.dismissSuggestion</a>#f50dbaa1 peer:<a href='/type/InputPeer'>InputPeer</a> suggestion:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<a href='/method/help.dismissSuggestion'>help.dismissSuggestion</a>#f50dbaa1 peer:<a href='/type/InputPeer'>InputPeer</a> suggestion:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/users.suggestBirthday'>users.suggestBirthday</a>#fc533372 id:<a href='/type/InputUser'>InputUser</a> birthday:<a href='/type/Birthday'>Birthday</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
 <p>Use <a href="/method/account.updateBirthday">account.updateBirthday</a> to set a birthday date that will be displayed to the users specified in the <a href="/api/privacy">privacy settings »</a>, according to the current privacy setting of <a href="/constructor/inputPrivacyKeyBirthday">inputPrivacyKeyBirthday</a> (only contacts by default).  </p>
 <p>The birthday (if accessible to the current user) will be present in <a href="/constructor/user">user</a>.<code>birthday</code>, changing it will emit an <a href="/constructor/updateUser">updateUser</a> update.  </p>
 <p>Setting the actual birth <code>year</code> is optional, and if set, the allowed age range is currently <code>0 &lt;= years &lt;= 150</code> (checked only when updating the birthday); a <code>400 BIRTHDAY_INVALID</code> error will be emitted otherwise.  </p>
@@ -177,6 +181,11 @@ Updating/reordering usernames will emit an <a href="/constructor/updateUserName"
 Since <code>BIRTHDAY_CONTACTS_TODAY</code> is an <em>inverted</em> suggestion, dismissing it will actually <em>enable</em> it in the <a href="/api/config#client-configuration">client configuration</a> on all currently logged-in sessions, notified by an <a href="/constructor/updateConfig">updateConfig</a>, and its <em>presence</em> should be treated as a signal to <em>not</em> display the birthday action bar.  </p>
 <p>The suggestion is also automatically enabled by the server if the user gifts one or more Telegram Premium subscriptions to friends with birthdays falling within the next/previous 24 hours, thus hiding the birthday action bar to other logged-in sessions.  </p>
 <p>Additionally, if a user has a birthday falling within the specified time range (+1/-1 days) as specified in <a href="/constructor/user">user</a>.<code>birthday</code>, a gift icon tooltip should be shown in the text input bar in private chats with them, leading to the <a href="/api/premium#gifting-telegram-premium">Telegram Premium gift flow »</a> (this also applies to non-contacts that have allowed us to see their birthday date), regardless of the presence or absence of <code>BIRTHDAY_CONTACTS_TODAY</code>.  </p>
+<p>Users may suggest a specific birthday to other users using <a href="/method/users.suggestBirthday">users.suggestBirthday</a>.  </p>
+<p>Birthdays can be successfully suggested to users that do not have a birthday set, or to users that do have a birthday set, but that birthday is not visible to the currently logged in user due to the <a href="/constructor/inputPrivacyKeyBirthday">inputPrivacyKeyBirthday</a> <a href="/api/privacy">privacy setting »</a>.  </p>
+<p>On success, a <a href="/constructor/messageActionSuggestBirthday">messageActionSuggestBirthday</a> service message will be sent to the specified user.  </p>
+<p>The <a href="/api/push-updates">push notification counterpart »</a> to that update is <code>MESSAGE_SUGGEST_BIRTHDAY</code>.  </p>
+<p>Otherwise, if the specified user already has a birthday specified and that birthday is visible to the currently logged in user, a <code>400</code> <code>BIRTHDAY_ALREADY</code> RPC error will be emitted.</p>
 <h3><a class="anchor" href="#personal-channel" id="personal-channel" name="personal-channel"><i class="anchor-icon"></i></a>Personal channel</h3>
 <pre><code><a href='/constructor/inputChannel'>inputChannel</a>#f35aec28 channel_id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputChannel'>InputChannel</a>;
 <a href='/constructor/inputChannelEmpty'>inputChannelEmpty</a>#ee8c1e86 = <a href='/type/InputChannel'>InputChannel</a>;
