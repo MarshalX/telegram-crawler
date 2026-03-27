@@ -681,6 +681,9 @@ var BotSettings = {
       if (field == 'flskp') {
         botChangeSettings(field, value);
       }
+      if (field == 'mgr') {
+        botChangeSettings(field, value);
+      }
     });
 
     $('.js-group-admin-rights-toggle').on('click', () => {
