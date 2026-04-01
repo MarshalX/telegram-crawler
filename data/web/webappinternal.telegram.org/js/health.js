@@ -107,7 +107,7 @@ function renderGraph(id, json, initial) {
   }, 1000);
 
   if (json.csvExport) {
-    var exportHTML = '<div class="chart_csv_export_wrap"><a class="csv_link btn btn-default" href="' + json.csvExport + '"><span class="glyphicon glyphicon-download-alt"></span> CSV</a></div>';
+    var exportHTML = '<div class="chart_csv_export_wrap"><a class="csv_link btn btn-default" href="' + json.csvExport + '"><span class="glyphicon glyphicon-download-alt"></span> CSV</a>'+(json.addExport||'')+'</div>';
     var t = document.createElement('div');
     t.innerHTML = exportHTML;
     domEl.appendChild(t.firstChild);
