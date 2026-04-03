@@ -427,6 +427,40 @@ width=44% /></a>
 <blockquote>
 <p>Please keep in mind that operating bots on Telegram is subject to the <a href="https://telegram.org/tos/bot-developers">Telegram Bot Developer Terms of Service</a>. Specifically, for Telegram Business, make sure you have read and understood <a href="https://telegram.org/tos/bot-developers#5-4-telegram-business">Section 5.4</a>.</p>
 </blockquote>
+<h3><a class="anchor" name="managed-bots" href="#managed-bots"><i class="anchor-icon"></i></a>Managed Bots</h3>
+<p>Telegram allows bots to create and <strong>manage other bots</strong> on behalf of their owners. You can choose an existing third-party bot as a manager or create your own.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted style="max-width: 400px;" alt="AI Managed Bot">
+  <source src="/file/400780400324/6/GkwTVCnGHaw.2913685.mp4/b5e8e586657ac3e204" type="video/mp4">
+ </video></div>
+</div>
+
+<blockquote>
+<p>Your bot manager can allow users to seamlessly spin up their own personal <strong>AI agents</strong>, <a href="#bots-for-business">business bots</a>, games, custom productivity tools and more.</p>
+</blockquote>
+<h4><a class="anchor" name="creating-your-own-management-bot" href="#creating-your-own-management-bot"><i class="anchor-icon"></i></a>Creating Your Own Management Bot</h4>
+<p>To make your own management bot, simply do the following:</p>
+<ol>
+<li>Choose one of your existing bots or <a href="https://core.telegram.org/bots/features#creating-a-new-bot">create a new bot</a> via <a href="https://t.me/botfather">@BotFather</a>.</li>
+<li>Open the bot&#39;s settings in BotFather’s <a href="https://t.me/Botfather?startapp">MiniApp</a> and enable <em>&#39;Bot Management Mode&#39;</em>. </li>
+</ol>
+<h4><a class="anchor" name="sharing-your-management-bot" href="#sharing-your-management-bot"><i class="anchor-icon"></i></a>Sharing Your Management Bot</h4>
+<p>Once enabled, you can allow others to utilize your bot to create and manage their own bots.</p>
+<p>To do so, send users a link in this format:</p>
+<pre><code>https://t.me/newbot/{manager_bot_username}/{new_username}?name={new_name}</code></pre>
+<div><br></div>
+
+<p>For example, if the bot you created was called <strong>@ManagerBot</strong>, it could look like this – where <code>new_username</code> is a suggested placeholder for the user&#39;s new bot and <code>new_name</code> is a suggested display name:</p>
+<pre><code>https://t.me/newbot/ManagerBot/CoolAIAgentBot?name=Cool+AI+Agent</code></pre>
+<p>When the user opens the link, they will see a window to finish creating their bot, where the bot&#39;s @username and display name are pre-filled, but editable. </p>
+<h4><a class="anchor" name="using-your-management-bot" href="#using-your-management-bot"><i class="anchor-icon"></i></a>Using Your Management Bot</h4>
+<p>Once the user confirms the information, the bot is created:</p>
+<ul>
+<li>Your <strong>@ManagerBot</strong> receives a <code>managed_bot</code> update with a <a href="/bots/api#managedbotupdated">ManagedBotUpdated</a> object.</li>
+<li>This object includes basic information on the new bot and its creator.</li>
+<li>You can use the Bot API method <a href="/bots/api#getmanagedbottoken">getManagedBotToken</a> to fetch the bot&#39;s access token.</li>
+<li>You can then control the new bot via the Bot API, receive and respond to messages, change its <a href="/bots/api#setmyprofilephoto">profile</a>, <a href="https://core.telegram.org/bots/api#setmycommands">settings</a> and more.</li>
+</ul>
 <h3><a class="anchor" name="payments" href="#payments"><i class="anchor-icon"></i></a>Payments</h3>
 <blockquote>
 <p>If your bot or mini app sells <strong>digital goods and services</strong>, be sure to carry out the payment in <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> by specifying <code>XTR</code> as currency. In compliance with third-party store policies, Telegram does not support the sale of digital goods and services using other currencies.</p>
