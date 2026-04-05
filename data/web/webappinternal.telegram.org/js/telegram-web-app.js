@@ -671,6 +671,30 @@
     }
   }
 
+  var WebAppRequestChatOpened = false;
+  function onRequestedChatSent(eventType, eventData) {
+    if (WebAppRequestChatOpened) {
+      var requestData = WebAppRequestChatOpened;
+      WebAppRequestChatOpened = false;
+      if (requestData.callback) {
+        requestData.callback(true);
+      }
+      receiveWebViewEvent('requestedChatSent');
+    }
+  }
+  function onRequestedChatFailed(eventType, eventData) {
+    if (WebAppRequestChatOpened) {
+      var requestData = WebAppRequestChatOpened;
+      WebAppRequestChatOpened = false;
+      if (requestData.callback) {
+        requestData.callback(false);
+      }
+      receiveWebViewEvent('requestedChatFailed', {
+        error: eventData.error
+      });
+    }
+  }
+
   var WebAppEmojiStatusRequested = false;
   function onEmojiStatusSet(eventType, eventData) {
     if (WebAppEmojiStatusRequested) {
@@ -3251,6 +3275,20 @@
     };
     WebView.postEvent('web_app_send_prepared_message', false, {id: msg_id});
   };
+  WebApp.requestChat = function (req_id, callback) {
+    if (!versionAtLeast('9.6')) {
+      console.error('[Telegram.WebApp] Method requestChat is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    if (WebAppRequestChatOpened) {
+      console.error('[Telegram.WebApp] Request chat is already opened');
+      throw Error('WebAppRequestChatOpened');
+    }
+    WebAppRequestChatOpened = {
+      callback: callback
+    };
+    WebView.postEvent('web_app_request_chat', false, {req_id: req_id});
+  };
   WebApp.setEmojiStatus = function (custom_emoji_id, params, callback) {
     params = params || {};
     if (!versionAtLeast('8.0')) {
@@ -3341,6 +3379,8 @@
   WebView.onEvent('home_screen_checked', onHomeScreenChecked);
   WebView.onEvent('prepared_message_sent', onPreparedMessageSent);
   WebView.onEvent('prepared_message_failed', onPreparedMessageFailed);
+  WebView.onEvent('requested_chat_sent', onRequestedChatSent);
+  WebView.onEvent('requested_chat_failed', onRequestedChatFailed);
   WebView.onEvent('emoji_status_set', onEmojiStatusSet);
   WebView.onEvent('emoji_status_failed', onEmojiStatusFailed);
   WebView.onEvent('emoji_status_access_requested', onEmojiStatusAccessRequested);
