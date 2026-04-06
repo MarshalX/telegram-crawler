@@ -684,6 +684,9 @@ var BotSettings = {
       if (field == 'mgr') {
         botChangeSettings(field, value);
       }
+      if (field == 'loop') {
+        botChangeSettings(field, value);
+      }
     });
 
     $('.js-group-admin-rights-toggle').on('click', () => {
