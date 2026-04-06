@@ -67,6 +67,8 @@
 <li><a href="#integration"><strong>Integration</strong></a><ul>
 <li><a href="#mini-apps">Mini Apps</a></li>
 <li><a href="#bots-for-business">Bots for Business</a></li>
+<li><a href="#managed-bots">Managed Bots</a></li>
+<li><a href="#bot-to-bot-communication">Bot-to-Bot Communication</a></li>
 <li><a href="#payments">Payments</a></li>
 <li><a href="#web-login">Web Login</a></li>
 <li><a href="#html5-games">HTML5 Games</a></li>
@@ -79,7 +81,7 @@
 <li><a href="#privacy-mode">Privacy Mode</a></li>
 <li><a href="#testing-your-bot">Testing Your Bot</a></li>
 <li><a href="#status-alerts">Status Alerts</a></li>
-<li><a href="#local-bot-api">Local API</a></li>
+<li><a href="#local-bot-api">Local API</a>  </li>
 </ul>
 </li>
 <li><a href="#botfather"><strong>BotFather, creating and managing bots</strong></a></li>
@@ -461,6 +463,38 @@ width=44% /></a>
 <li>You can use the Bot API method <a href="/bots/api#getmanagedbottoken">getManagedBotToken</a> to fetch the bot&#39;s access token.</li>
 <li>You can then control the new bot via the Bot API, receive and respond to messages, change its <a href="/bots/api#setmyprofilephoto">profile</a>, <a href="https://core.telegram.org/bots/api#setmycommands">settings</a> and more.</li>
 </ul>
+<h3><a class="anchor" name="bot-to-bot-communication" href="#bot-to-bot-communication"><i class="anchor-icon"></i></a>Bot-to-Bot Communication</h3>
+<p>On Telegram, bots generally <strong>cannot see</strong> messages from other bots. However, in specific contexts, Bot-to-Bot communication is <strong>allowed</strong> – unlocking complex agentic flows and AI-powered use cases.</p>
+<blockquote>
+<p>Regardless of context, you should make sure <em>Bot-to-Bot Communication Mode</em> is enabled for your bot in <a href="https://t.me/botfather">@BotFather</a> to take full advantage of this feature.</p>
+</blockquote>
+<h5><a class="anchor" name="communication-in-group-chats" href="#communication-in-group-chats"><i class="anchor-icon"></i></a>Communication in Group Chats</h5>
+<p>A bot can interact with another bot within the same group by:</p>
+<ul>
+<li>Mentioning a command: <code>/command@OtherBot</code>.</li>
+<li>Replying directly to a message from another bot.</li>
+</ul>
+<p>If at least one of the bots has <em>Bot-to-Bot Communication Mode</em> enabled, the receiving bot will get the message and will be able to respond.</p>
+<blockquote>
+<p><strong>Example</strong><br>A contributor bot may request a code review from a reviewer bot and processes feedback directly in the group – optionally with human supervision.</p>
+</blockquote>
+<h5><a class="anchor" name="communication-via-business-accounts" href="#communication-via-business-accounts"><i class="anchor-icon"></i></a>Communication via Business Accounts</h5>
+<p>If a bot is connected to a business account using <em>Chat Access Mode</em>, it can send messages to other bots used by that business account.</p>
+<p>This requires <em>Bot-to-Bot Communication Mode</em> to be enabled for the bot that is sending the messages.</p>
+<blockquote>
+<p><strong>Example</strong><br>Using another bot as a <strong>tool</strong> within business workflows – to book reservations, process customer queries, or perform complex tasks on behalf of a user.</p>
+</blockquote>
+<h4><a class="anchor" name="loop-prevention-requirements" href="#loop-prevention-requirements"><i class="anchor-icon"></i></a>Loop Prevention Requirements</h4>
+<p>Bot-to-bot communication can easily result in <strong>infinite interaction loops</strong>. When enabling this feature, you must implement safeguards to ensure interactions terminate.</p>
+<p><strong>Recommended Safeguards</strong></p>
+<ul>
+<li>Deduplicate repeated messages.</li>
+<li>Apply rate limits (e.g., no more than one reply every few seconds per bot).</li>
+<li>Enforce maximum interaction depth or timeouts, both globally and per sender/receiver.</li>
+</ul>
+<blockquote>
+<p><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> <strong>Important</strong><br>Your bot must remain stable even if another bot intentionally responds instantly and continuously.<br>Failure to handle loops properly may lead to degraded performance or platform restrictions.</p>
+</blockquote>
 <h3><a class="anchor" name="payments" href="#payments"><i class="anchor-icon"></i></a>Payments</h3>
 <blockquote>
 <p>If your bot or mini app sells <strong>digital goods and services</strong>, be sure to carry out the payment in <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> by specifying <code>XTR</code> as currency. In compliance with third-party store policies, Telegram does not support the sale of digital goods and services using other currencies.</p>
