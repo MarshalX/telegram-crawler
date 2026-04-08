@@ -809,3 +809,120 @@ function initDynamicModeToggle(domEl, baseChart, rawJson) {
   styleLayer(baseChart, true);
   updateButtons();
 }
+
+var healthSearchModal = null;
+var healthSearchTimeout = null;
+var healthSearchCurrentQuery = '';
+
+function healthSearchShowModal() {
+  if (healthSearchModal) {
+    healthSearchModal.style.display = 'flex';
+    document.getElementById('health-search-input').focus();
+    return;
+  }
+
+  var overlay = document.createElement('div');
+  overlay.id = 'health-search-modal';
+  overlay.className = 'health-search-modal';
+
+  var modal = document.createElement('div');
+  modal.className = 'health-search-dialog';
+
+  var header = document.createElement('div');
+  header.className = 'health-search-header';
+  header.innerHTML = '<span class="health-search-title">Search Health Pages</span><span class="health-search-close" onclick="healthSearchCloseModal();">&times;</span>';
+
+  var inputContainer = document.createElement('div');
+  inputContainer.className = 'health-search-input-wrap';
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'health-search-input';
+  input.className = 'form-control health-search-input';
+  input.placeholder = 'Search pages...';
+  input.addEventListener('input', function() {
+    healthSearchDoSearch(this.value);
+  });
+  inputContainer.appendChild(input);
+
+  var resultsContainer = document.createElement('div');
+  resultsContainer.id = 'health-search-results';
+  resultsContainer.className = 'health-search-results';
+
+  modal.appendChild(header);
+  modal.appendChild(inputContainer);
+  modal.appendChild(resultsContainer);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  healthSearchModal = overlay;
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      healthSearchCloseModal();
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && healthSearchModal) {
+      healthSearchCloseModal();
+    }
+  });
+
+  input.focus();
+}
+
+function healthSearchCloseModal() {
+  if (healthSearchModal) {
+    healthSearchModal.style.display = 'none';
+  }
+}
+
+function healthSearchDoSearch(query) {
+  query = query.trim();
+  if (query === healthSearchCurrentQuery) {
+    return;
+  }
+  healthSearchCurrentQuery = query;
+
+  if (healthSearchTimeout) {
+    clearTimeout(healthSearchTimeout);
+  }
+
+  if (query.length < 2) {
+    document.getElementById('health-search-results').innerHTML = '';
+    return;
+  }
+
+  healthSearchTimeout = setTimeout(function() {
+    var basePath = window.basePath || '';
+    fetch(basePath + '/healthsearch?query=' + encodeURIComponent(query), {
+      credentials: 'same-origin'
+    }).then(function(response) {
+      return response.json();
+    }).then(function(results) {
+      healthSearchRenderResults(results);
+    }).catch(function(err) {
+      console.error('Search error:', err);
+      document.getElementById('health-search-results').innerHTML = '<div style="color:red;">Search failed</div>';
+    });
+  }, 1000);
+}
+
+function healthSearchRenderResults(results) {
+  var container = document.getElementById('health-search-results');
+  if (!results || results.length === 0) {
+    container.innerHTML = '<div class="health-search-no-results">No results found</div>';
+    return;
+  }
+
+  var html = '';
+  for (var i = 0; i < results.length; i++) {
+    var r = results[i];
+    var url = typeof r.url === 'object' ? r.url[Object.keys(r.url)[0]] : r.url;
+    html += '<a href="' + url + '" class="health-search-result">';
+    html += '<div class="health-search-result-title">' + r.title + '</div>';
+    html += '<div class="health-search-result-url">' + url + '</div>';
+    html += '</a>';
+  }
+  container.innerHTML = html;
+}
