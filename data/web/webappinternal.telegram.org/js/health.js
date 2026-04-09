@@ -107,11 +107,45 @@ function renderGraph(id, json, initial) {
   }, 1000);
 
   if (json.csvExport) {
-    var exportHTML = '<div class="chart_csv_export_wrap"><a class="csv_link btn btn-default" href="' + json.csvExport + '"><span class="glyphicon glyphicon-download-alt"></span> CSV</a>'+(json.addExport||'')+'</div>';
+    var exportHTML = '<div class="chart_csv_export_wrap"><a class="csv_link" href="' + json.csvExport + '"><span class="glyphicon glyphicon-download-alt"></span> CSV</a>'+(json.addExport||'')+'</div>';
     var t = document.createElement('div');
     t.innerHTML = exportHTML;
     domEl.appendChild(t.firstChild);
   }
+
+  if (json.descEditData || domEl.getAttribute('data-desc-addr')) {
+    var editPill = document.createElement('a');
+    editPill.className = 'graph_desc_edit_pill';
+    editPill.innerHTML = '<span class="glyphicon glyphicon-pencil"></span>';
+    var descData = json.descEditData || {
+      addr: domEl.getAttribute('data-desc-addr'),
+      graphId: domEl.getAttribute('data-desc-graph-id'),
+      keywords: domEl.getAttribute('data-desc-keywords'),
+      descMd: domEl.getAttribute('data-desc-md')
+    };
+    editPill.setAttribute('data-addr', descData.addr);
+    editPill.setAttribute('data-graph-id', descData.graphId);
+    editPill.setAttribute('data-keywords', descData.keywords);
+    editPill.setAttribute('data-desc-md', descData.descMd);
+
+    var exportWrap = domEl.querySelector('.chart_csv_export_wrap');
+    if (exportWrap) {
+      exportWrap.appendChild(editPill);
+    } else {
+      var wrap = document.createElement('div');
+      wrap.className = 'chart_csv_export_wrap';
+      wrap.appendChild(editPill);
+      domEl.appendChild(wrap);
+    }
+  }
+
+  if (json.descHtml) {
+    var descRow = document.createElement('div');
+    descRow.className = 'graph_desc_row';
+    descRow.innerHTML = '<span class="graph_desc_text">' + json.descHtml + '</span>';
+    domEl.parentNode.insertBefore(descRow, domEl.nextSibling);
+  }
+
   return chart;
 }
 
@@ -813,105 +847,108 @@ function initDynamicModeToggle(domEl, baseChart, rawJson) {
 var healthSearchModal = null;
 var healthSearchTimeout = null;
 var healthSearchCurrentQuery = '';
+var healthSearchFocusedIndex = -1;
 
 function healthSearchShowModal() {
   if (healthSearchModal) {
-    healthSearchModal.style.display = 'flex';
-    document.getElementById('health-search-input').focus();
+    healthSearchModal.show();
+    $('#health-search-input').focus();
     return;
   }
 
-  var overlay = document.createElement('div');
-  overlay.id = 'health-search-modal';
-  overlay.className = 'health-search-modal';
+  healthSearchModal = $('<div>', {'class': 'health-search-modal', 'id': 'health-search-modal'}).append(
+    $('<div>', {'class': 'health-search-dialog'}).append(
+      $('<div>', {'class': 'health-search-header'}).html('<span class="health-search-title">Search Health Pages</span><span class="health-search-close" onclick="healthSearchCloseModal();">&times;</span>'),
+      $('<div>', {'class': 'health-search-input-wrap'}).append(
+        $('<input>', {'type': 'text', 'id': 'health-search-input', 'class': 'form-control health-search-input', 'placeholder': 'Search pages...'}).on('input', function() {
+          healthSearchDoSearch(this.value);
+        })
+      ),
+      $('<div>', {'class': 'health-search-results', 'id': 'health-search-results'})
+    )
+  );
 
-  var modal = document.createElement('div');
-  modal.className = 'health-search-dialog';
+  $('body').append(healthSearchModal);
 
-  var header = document.createElement('div');
-  header.className = 'health-search-header';
-  header.innerHTML = '<span class="health-search-title">Search Health Pages</span><span class="health-search-close" onclick="healthSearchCloseModal();">&times;</span>';
-
-  var inputContainer = document.createElement('div');
-  inputContainer.className = 'health-search-input-wrap';
-  var input = document.createElement('input');
-  input.type = 'text';
-  input.id = 'health-search-input';
-  input.className = 'form-control health-search-input';
-  input.placeholder = 'Search pages...';
-  input.addEventListener('input', function() {
-    healthSearchDoSearch(this.value);
-  });
-  inputContainer.appendChild(input);
-
-  var resultsContainer = document.createElement('div');
-  resultsContainer.id = 'health-search-results';
-  resultsContainer.className = 'health-search-results';
-
-  modal.appendChild(header);
-  modal.appendChild(inputContainer);
-  modal.appendChild(resultsContainer);
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
-
-  healthSearchModal = overlay;
-
-  overlay.addEventListener('click', function(e) {
-    if (e.target === overlay) {
+  healthSearchModal.on('click', function(e) {
+    if ($(e.target).is(healthSearchModal)) {
       healthSearchCloseModal();
     }
   });
 
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && healthSearchModal) {
+  $(document).on('keydown.healthsearch', function(e) {
+    if (!healthSearchModal || !healthSearchModal.is(':visible')) {
+      return;
+    }
+    if (e.key === 'Escape') {
       healthSearchCloseModal();
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter') {
+      var items = $('.health-search-result');
+      if (!items.length) {
+        return;
+      }
+      e.preventDefault();
+      if (e.key === 'ArrowDown') {
+        healthSearchFocusedIndex = Math.min(healthSearchFocusedIndex + 1, items.length - 1);
+      } else if (e.key === 'ArrowUp') {
+        healthSearchFocusedIndex = Math.max(healthSearchFocusedIndex - 1, 0);
+      } else if (e.key === 'Enter' && healthSearchFocusedIndex >= 0) {
+        items.eq(healthSearchFocusedIndex)[0].click();
+        return;
+      }
+      healthSearchUpdateFocus(items);
     }
   });
 
-  input.focus();
+  $('#health-search-input').focus();
+}
+
+function healthSearchUpdateFocus(items) {
+  items.removeClass('health-search-result-active');
+  items.eq(healthSearchFocusedIndex).addClass('health-search-result-active').scrollIntoView({block: 'nearest'});
 }
 
 function healthSearchCloseModal() {
   if (healthSearchModal) {
-    healthSearchModal.style.display = 'none';
+    healthSearchModal.hide();
+    healthSearchFocusedIndex = -1;
   }
 }
 
 function healthSearchDoSearch(query) {
-  query = query.trim();
+  query = $.trim(query);
   if (query === healthSearchCurrentQuery) {
     return;
   }
   healthSearchCurrentQuery = query;
+  healthSearchFocusedIndex = -1;
 
   if (healthSearchTimeout) {
     clearTimeout(healthSearchTimeout);
   }
 
   if (query.length < 2) {
-    document.getElementById('health-search-results').innerHTML = '';
+    $('#health-search-results').html('');
     return;
   }
 
   healthSearchTimeout = setTimeout(function() {
     var basePath = window.basePath || '';
-    fetch(basePath + '/healthsearch?query=' + encodeURIComponent(query), {
-      credentials: 'same-origin'
-    }).then(function(response) {
-      return response.json();
-    }).then(function(results) {
+    $.getJSON(basePath + '/healthsearch?query=' + encodeURIComponent(query), function(results) {
       healthSearchRenderResults(results);
-    }).catch(function(err) {
+    }).fail(function(err) {
       console.error('Search error:', err);
-      document.getElementById('health-search-results').innerHTML = '<div style="color:red;">Search failed</div>';
+      $('#health-search-results').html('<div style="color:red;">Search failed</div>');
     });
-  }, 1000);
+  }, 300);
 }
 
 function healthSearchRenderResults(results) {
-  var container = document.getElementById('health-search-results');
-  if (!results || results.length === 0) {
-    container.innerHTML = '<div class="health-search-no-results">No results found</div>';
+  var container = $('#health-search-results');
+  if (!results || !results.length) {
+    container.html('<div class="health-search-no-results">No results found</div>');
     return;
   }
 
@@ -920,9 +957,114 @@ function healthSearchRenderResults(results) {
     var r = results[i];
     var url = typeof r.url === 'object' ? r.url[Object.keys(r.url)[0]] : r.url;
     html += '<a href="' + url + '" class="health-search-result">';
-    html += '<div class="health-search-result-title">' + r.title + '</div>';
-    html += '<div class="health-search-result-url">' + url + '</div>';
+    html += '<div class="health-search-result-title">' + (r.title || '') + '</div>';
+    if (r.snippet) {
+      html += '<div class="health-search-result-snippet">' + r.snippet + '</div>';
+    }
+    if (r.breadcrumb) {
+      html += '<div class="health-search-result-breadcrumb">' + r.breadcrumb + '</div>';
+    }
     html += '</a>';
   }
-  container.innerHTML = html;
+  container.html(html);
 }
+
+document.addEventListener('click', function(e) {
+  var pill = e.target.closest('.graph_desc_edit_pill');
+  if (!pill) return;
+  e.preventDefault();
+  var addr = pill.getAttribute('data-addr');
+  var graphId = pill.getAttribute('data-graph-id');
+  var keywords = pill.getAttribute('data-keywords') || '';
+  var descMd = (pill.getAttribute('data-desc-md') || '').replace(/\\n/g, '\n');
+
+  var outerWrap = pill.closest('.chart_wrap_outer');
+  if (!outerWrap) return;
+
+  var existingForm = outerWrap.querySelector('.graph_desc_edit_form');
+  if (existingForm) {
+    existingForm.remove();
+    var rowEl = outerWrap.querySelector('.graph_desc_row');
+    if (rowEl) rowEl.style.display = '';
+    return;
+  }
+
+  var rowEl = outerWrap.querySelector('.graph_desc_row');
+  if (rowEl) rowEl.style.display = 'none';
+
+  var form = document.createElement('div');
+  form.className = 'graph_desc_edit_form';
+  form.innerHTML =
+    '<div><input type="text" class="form-control graph_desc_edit_keywords" value="' + keywords.replace(/"/g, '&quot;') + '" placeholder="Keywords"></div>' +
+    '<div style="margin-top:3px"><textarea class="form-control graph_desc_edit_md" rows="2" maxlength="256" placeholder="Description (markdown, max 256 chars)">' + descMd.replace(/</g, '&lt;') + '</textarea></div>' +
+    '<div class="graph_desc_edit_actions">' +
+      '<button class="btn btn-primary btn-xs graph_desc_edit_save">Save</button> ' +
+      '<button class="btn btn-default btn-xs graph_desc_edit_cancel">Cancel</button>' +
+    '</div>';
+
+  var chartWrap = outerWrap.querySelector('.chart_wrap');
+  chartWrap.parentNode.insertBefore(form, chartWrap.nextSibling);
+
+  form.querySelector('.graph_desc_edit_md').focus();
+
+  form.querySelector('.graph_desc_edit_cancel').addEventListener('click', function() {
+    form.remove();
+    if (rowEl) rowEl.style.display = '';
+  });
+
+  form.querySelector('.graph_desc_edit_save').addEventListener('click', function() {
+    var saveBtn = form.querySelector('.graph_desc_edit_save');
+    if (saveBtn.disabled) return;
+
+    var newKeywords = form.querySelector('.graph_desc_edit_keywords').value;
+    var newDescMd = form.querySelector('.graph_desc_edit_md').value;
+    if (newDescMd.length > 256) {
+      alert('Description too long (max 256 characters)');
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+
+    var basePath = window.basePath || '';
+    fetch(basePath + '/graph_desc_save', {
+      method: 'post',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      credentials: 'same-origin',
+      body: 'addr=' + encodeURIComponent(addr) +
+            '&graph_id=' + encodeURIComponent(graphId) +
+            '&keywords=' + encodeURIComponent(newKeywords) +
+            '&desc_md=' + encodeURIComponent(newDescMd)
+    }).then(function(response) {
+      return response.json();
+    }).then(function(result) {
+      if (result.ok) {
+        pill.setAttribute('data-keywords', newKeywords);
+        pill.setAttribute('data-desc-md', newDescMd.replace(/\n/g, '\\n'));
+        if (result.desc_html) {
+          if (rowEl) {
+            rowEl.innerHTML = '<span class="graph_desc_text">' + result.desc_html + '</span>';
+            rowEl.style.display = '';
+          } else {
+            var newRow = document.createElement('div');
+            newRow.className = 'graph_desc_row';
+            newRow.innerHTML = '<span class="graph_desc_text">' + result.desc_html + '</span>';
+            var chartWrap2 = outerWrap.querySelector('.chart_wrap');
+            chartWrap2.parentNode.insertBefore(newRow, chartWrap2.nextSibling);
+          }
+        } else {
+          if (rowEl) rowEl.remove();
+        }
+        form.remove();
+      } else {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save';
+        alert('Save failed: ' + (result.error || 'unknown error'));
+      }
+    }).catch(function(err) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save';
+      alert('Save failed: ' + err.message);
+    });
+  });
+});
