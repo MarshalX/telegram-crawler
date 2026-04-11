@@ -687,6 +687,9 @@ var BotSettings = {
       if (field == 'loop') {
         botChangeSettings(field, value);
       }
+      if (field == 'gst') {
+        botChangeSettings(field, value);
+      }
     });
 
     $('.js-group-admin-rights-toggle').on('click', () => {
