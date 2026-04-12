@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Ai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram bots offer a number of features for AI chatbots.
+Live response streaming
+sendMessageTextDraftAction#376d975c random_id:long…">
+    <meta property="og:title" content="Ai">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram bots offer a number of features for AI chatbots.
+Live response streaming
+sendMessageTextDraftAction#376d975c random_id:long…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/bots%2Fai" >Ai</a></li></ul></div>
+  <h1 id="dev_page_title">Ai</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram bots offer a number of features for AI chatbots.</p>
+<h3><a class="anchor" href="#live-response-streaming" id="live-response-streaming" name="live-response-streaming"><i class="anchor-icon"></i></a>Live response streaming</h3>
+<pre><code><a href='/constructor/sendMessageTextDraftAction'>sendMessageTextDraftAction</a>#376d975c random_id:<a href='/type/long'>long</a> text:<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/SendMessageAction'>SendMessageAction</a>;
+
+<a href='/constructor/updateUserTyping'>updateUserTyping</a>#2a17bf5c flags:<a href='/type/%23'>#</a> user_id:<a href='/type/long'>long</a> top_msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> action:<a href='/type/SendMessageAction'>SendMessageAction</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/messages.setTyping'>messages.setTyping</a>#58943ee2 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> top_msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> action:<a href='/type/SendMessageAction'>SendMessageAction</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>Live response streaming allows chatbots to stream text responses to the user as they are generated.  </p>
+<p>Live response streaming is implemented using live drafts, represented by the <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> typing action, sent using <a href="/method/messages.setTyping">messages.setTyping</a> and received inside of <a href="/constructor/updateUserTyping">updateUserTyping</a> updates.  </p>
+<p>Unlike other typing notifications, incoming live drafts are rendered as a normal messages, always pinned to the bottom of the chat, as if they were the last sent message in the chat.  </p>
+<p>Currently, live drafts can only be sent to users.<br>
+Both bots and normal users can send live drafts to other users.  </p>
+<p>Every live draft is identified by an ID, contained in <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a>.<code>random_id</code>: it is unique within the destination chat (or within the specified bot forum topic, for <a href="#bot-forums">bot forums »</a>).  </p>
+<p>To update a live draft, simply send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with the same <code>random_id</code>: graphical clients should render this by updating the pending message like for normal edits.    </p>
+<p>To create a new live draft, send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with a different <code>random_id</code>: this will replace any previous live draft, and graphical clients should render this differently, by briefly replacing the text of the previous live draft (if present) with a loading overlay, and then showing the contents of the new draft.  </p>
+<p>As mentioned above, each chat (or each bot forum topic, for <a href="#bot-forums">bot forums »</a>) can have at most one live draft, with each new draft replacing the previous one, with slightly different update rendering depending on whether the previous draft had the same or a different ID.  </p>
+<p>Live draft messages should be deleted automatically by graphical clients <a href="/api/config#message-typing-draft-ttl">message_typing_draft_ttl »</a> seconds after they're received, or when receiving a normal message within the same chat/bot forum topic, whichever comes first.  </p>
+<p>The exact batching of live draft updates is up to the bot: live drafts can be sent, for example, every N generated UTF-8 chars or every M seconds, whichever comes first.  </p>
+<h3><a class="anchor" href="#bot-forums" id="bot-forums" name="bot-forums"><i class="anchor-icon"></i></a>Bot forums</h3></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
