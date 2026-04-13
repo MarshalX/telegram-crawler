@@ -58,9 +58,15 @@
 <p>Unlike other typing notifications, incoming live drafts are rendered as a normal messages, always pinned to the bottom of the chat, as if they were the last sent message in the chat.  </p>
 <p>Currently, live drafts can only be sent to users.<br>
 Both bots and normal users can send live drafts to other users.  </p>
-<p>Every live draft is identified by an ID, contained in <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a>.<code>random_id</code>: it is unique within the destination chat (or within the specified bot forum topic, for <a href="#bot-forums">bot forums »</a>).  </p>
-<p>To update a live draft, simply send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with the same <code>random_id</code>: graphical clients should render this by updating the live draft message, fading in (or otherwise animating) the added characters (the number of chars to fade in is equal to <code>max(0, strlen(new) - strlen(prev))</code>).    </p>
-<p>To create a new live draft, send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with a different <code>random_id</code>: this will replace any previous live draft, and graphical clients should render this by updating the entire live draft message, fading in (or otherwise animating) all characters (the number of chars to fade in is equal to <code>strlen(new)</code>).  </p>
+<p>Every live draft is identified by a combination of the following values:</p>
+<ul>
+<li>Live draft ID, contained in <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a>.<code>random_id</code></li>
+<li>Chat ID</li>
+<li>Topic ID (for <a href="#bot-forums">bot forums</a>)</li>
+</ul>
+<p>This means that <code>{random_id: 1, chat_id: 1234, topic_id: 2}</code> and <code>{random_id: 1, chat_id: 1234, topic_id: 3}</code> point to different live drafts that can be updated independently.  </p>
+<p>To update a live draft, simply send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with the same <code>random_id</code> to the same chat and topic: graphical clients should render this by updating the live draft message, fading in (or otherwise animating) the added characters (the number of chars to fade in is equal to <code>max(0, strlen(new) - strlen(prev))</code>).    </p>
+<p>To create a new live draft, send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with a different <code>random_id</code> to the same chat and topic: this will replace any previous live draft, and graphical clients should render this by updating the entire live draft message, fading in (or otherwise animating) all characters (the number of chars to fade in is equal to <code>strlen(new)</code>).  </p>
 <p>To recap, each chat (or each bot forum topic, for <a href="#bot-forums">bot forums »</a>) can have at most one live draft, with each new draft replacing the previous one, with slightly different update rendering depending on whether the previous draft had the same or a different ID.  </p>
 <p>Live draft messages should be deleted automatically by graphical clients <a href="/api/config#message-typing-draft-ttl">message_typing_draft_ttl »</a> seconds after they're received, or when receiving a normal message within the same chat/bot forum topic, whichever comes first.  </p>
 <p>The exact batching of live draft updates is up to the bot: live drafts can be sent, for example, every N generated UTF-8 chars or every M seconds, whichever comes first.  </p>
