@@ -64,7 +64,7 @@ Both bots and normal users can send live drafts to other users.  </p>
 <li>Chat ID</li>
 <li>Topic ID (for <a href="#bot-forums">bot forums</a>)</li>
 </ul>
-<p>This means that <code>{random_id: 1, chat_id: 1234, topic_id: 2}</code> and <code>{random_id: 1, chat_id: 1234, topic_id: 3}</code> point to different live drafts that can be updated independently.  </p>
+<p>This means that i.e. <code>{random_id: 1, chat_id: 1234, topic_id: 2}</code> and <code>{random_id: 1, chat_id: 1234, topic_id: 3}</code> point to different live drafts that can be updated independently.  </p>
 <p>To update a live draft, simply send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with the same <code>random_id</code> to the same chat and topic: graphical clients should render this by updating the live draft message, fading in (or otherwise animating) the added characters (the number of chars to fade in is equal to <code>max(0, strlen(new) - strlen(prev))</code>).    </p>
 <p>To create a new live draft, send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with a different <code>random_id</code> to the same chat and topic: this will replace any previous live draft, and graphical clients should render this by updating the entire live draft message, fading in (or otherwise animating) all characters (the number of chars to fade in is equal to <code>strlen(new)</code>).  </p>
 <p>To recap, each chat (or each bot forum topic, for <a href="#bot-forums">bot forums »</a>) can have at most one live draft, with each new draft replacing the previous one, with slightly different update rendering depending on whether the previous draft had the same or a different ID.  </p>
