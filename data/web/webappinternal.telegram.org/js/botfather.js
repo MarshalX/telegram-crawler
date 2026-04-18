@@ -259,7 +259,7 @@ var CreateBot = {
 var BotProfile = {
   init() {
     Aj.state.files ||= {};
-    WebApp.MainButton.setText('Update');
+    WebApp.MainButton.setText(l('WEB_PROFILE_UPDATE'));
     WebApp.MainButton.show();
     WebApp.MainButton.onClick(BotProfile.eMainClick);
 
@@ -690,6 +690,60 @@ var BotSettings = {
       if (field == 'gst') {
         botChangeSettings(field, value);
       }
+      if (field == 'access') {
+        botChangeSettings(field, value);
+        $('.js-access-users').toggleClass('hidden', !value);
+      }
+    });
+
+    function updateAccessUsersUI(label, plusLabel, clearVisible) {
+      var $status = $('.js-access-users-status');
+      var $pill = $('.js-access-users-pill');
+      var $plus = $('.js-access-users-plus');
+      $status.text(label);
+      $plus.text(plusLabel);
+      $pill.toggleClass('hidden', !clearVisible);
+    }
+
+    $('.js-access-users').on('click', function(e) {
+      if ($(e.target).closest('.js-access-users-clear').length) {
+        return;
+      }
+      if ($(e.target).closest('.js-access-users-pill').length) {
+        e.stopPropagation();
+        botChangeSettings('access_clear', true, function (res) {
+          if (res.ok) {
+            updateAccessUsersUI(res.label, res.plus_label, res.clear_visible);
+          }
+        });
+        return;
+      }
+      Aj.apiRequest('requestBotAccessUsers', { bid: Aj.state.botId }, function(res) {
+        if (res.error) {
+          Main.showErrorToast(res.error);
+          return;
+        }
+        WebApp.requestChat(res.webapp_req_id, function(sent) {
+          if (sent) {
+            setTimeout(function () {
+              Aj.apiRequest('getBotAccessInfo', { bid: Aj.state.botId }, function(res) {
+                if (res.ok) {
+                  updateAccessUsersUI(res.label, res.plus_label, res.clear_visible);
+                }
+              });
+            }, 2000);
+          }
+        });
+      });
+    });
+
+    $('.js-access-users-clear').on('click', function(e) {
+      e.stopPropagation();
+      botChangeSettings('access_clear', true, function (res) {
+        if (res.ok) {
+          updateAccessUsersUI(res.label, res.plus_label, res.clear_visible);
+        }
+      });
     });
 
     $('.js-group-admin-rights-toggle').on('click', () => {
@@ -2073,4 +2127,97 @@ var SimpleSpoiler = {
       dy: k * y,
     };
   }
+};
+
+var BotCloud = {
+  init() {
+    $('.js-cloud-toggle').on('click', function () {
+      var toggleEl = this.querySelector('.tm-toggle');
+      var isOn = toggleEl.classList.contains('tm-toggle-on');
+      if (isOn) {
+        WebApp.showPopup({
+          title: uncleanHTML(l('WEB_CLOUD_DISABLE_CONFIRM_TITLE')),
+          message: uncleanHTML(l('WEB_CLOUD_DISABLE_CONFIRM_BODY')),
+          buttons: [
+            { type: 'cancel' },
+            { id: 'disable', text: l('WEB_CLOUD_DISABLE'), type: 'destructive' },
+          ]
+        }, (result) => {
+          if (result !== 'disable') return;
+          toggleEl.classList.remove('tm-toggle-on');
+          Aj.apiRequest('disableCloud', { bid: Aj.state.botId }, (res) => {
+            if (res.error) {
+              toggleEl.classList.add('tm-toggle-on');
+              Main.showErrorToast(res.error);
+            } else {
+              Aj.onUnload(() => Main.showSuccessToast(l('WEB_CLOUD_DISABLED')));
+              Aj.location('/botfather/bot/' + Aj.state.botId + '/cloud');
+            }
+          });
+        });
+      } else {
+        toggleEl.classList.add('tm-toggle-on');
+        Aj.apiRequest('enableCloud', { bid: Aj.state.botId }, (res) => {
+          if (res.error) {
+            toggleEl.classList.remove('tm-toggle-on');
+            Main.showErrorToast(res.error);
+          } else {
+            Aj.onUnload(() => Main.showSuccessToast(l('WEB_CLOUD_ENABLED')));
+            Aj.location('/botfather/bot/' + Aj.state.botId + '/cloud');
+          }
+        });
+      }
+    });
+
+    $('.js-spoiler').each(function () {
+      SimpleSpoiler.init(this);
+    });
+    $('body').on('click', '.js-spoiler', BotCloud.eClickSpoiler);
+
+    $('.tm-api-token-actions .tm-active-button').on('click', BotCloud.copyToken);
+    $('.tm-api-token-actions .tm-revoke-button').on('click', BotCloud.askRevoke);
+
+    Aj.onUnload(() => {
+      $('body').off('click', '.js-spoiler', BotCloud.eClickSpoiler);
+    });
+  },
+  eClickSpoiler() {
+    if (this.classList.contains('js-spoiler-revealed')) {
+      return BotCloud.copyToken();
+    }
+    SimpleSpoiler.destroy(this);
+    this.classList.add('js-spoiler-revealed');
+  },
+  copyToken() {
+    var token = $('.tm-api-token').text().trim();
+    navigator.clipboard.writeText(token);
+    Main.showSuccessToast(l('WEB_CLOUD_TOKEN_COPY_SUCCESS'));
+  },
+  askRevoke() {
+    WebApp.showPopup({
+      title: l('WEB_CLOUD_TOKEN_REVOKE_TITLE'),
+      message: l('WEB_CLOUD_TOKEN_REVOKE_TEXT'),
+      buttons: [
+        { type: 'cancel' },
+        { id: 'revoke', text: l('WEB_CLOUD_TOKEN_REVOKE_BTN'), type: 'destructive' },
+      ]
+    }, (result) => {
+      if (result === 'revoke') {
+        Aj.apiRequest('revokeCloudToken', {
+          bid: Aj.state.botId,
+        }, (response) => {
+          if (response.error) {
+            Main.showErrorToast(response.error);
+          }
+          if (response.ok) {
+            $('.tm-api-token').html('<span class="js-spoiler">' + response.token + '</span>');
+            $('.tm-api-token .js-spoiler').each(function () {
+              SimpleSpoiler.init(this);
+            });
+            Main.showSuccessToast(l('WEB_CLOUD_TOKEN_REVOKE_SUCCESS'));
+          }
+        });
+      }
+    });
+  },
 };

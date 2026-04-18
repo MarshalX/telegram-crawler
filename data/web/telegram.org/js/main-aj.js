@@ -710,6 +710,10 @@ function cleanHTML(value) {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, getBR());
 }
 
+function uncleanHTML(value) {
+  return value.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/<br\s*\/?>/gi, '\n');
+}
+
 function cleanRE(value) {
   return value.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&");
 }

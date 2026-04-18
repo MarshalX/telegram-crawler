@@ -694,10 +694,10 @@ var NewPack = {
     var url = URL.createObjectURL(file);
     var $item;
     if (file.type == 'application/x-tgsticker') {
-      $item = $(`<picture class="tm-grid-item tm-grid-item-sticker tm-sticker-loading" data-blob="${url}" data-type="tgs"><source type="application/x-tgsticker" srcset="${url}"></picture>`);
+      $item = $(`<picture class="tm-grid-item tm-grid-item-sticker tm-grid-item-sticker-animated tm-sticker-loading" data-blob="${url}" data-type="tgs"><source type="application/x-tgsticker" srcset="${url}"></picture>`);
       RLottie.init($item[0], {noAutoPlay: true});
     } else if (file.type == 'video/webm') {
-      $item = $(`<div class="tm-grid-item tm-grid-item-sticker tm-sticker-loading" data-blob="${url}" data-type="webm"><video muted src="${url}"></div>`);      
+      $item = $(`<div class="tm-grid-item tm-grid-item-sticker tm-grid-item-sticker-animated tm-sticker-loading" data-blob="${url}" data-type="webm"><video muted src="${url}"></div>`);      
     } else {
       $item = $(`<div class="tm-grid-item tm-grid-item-sticker tm-sticker-loading" data-blob="${url}" data-type="webp"><img src="${url}"></div>`);
     }
@@ -1023,7 +1023,7 @@ var EditPack = {
   eStickerPickerInput(e) {
     var $grid = $('.js-sortable-table');
 
-    e.originalEvent.detail.forEach(el => {
+    e.originalEvent.detail.reverse().forEach(el => {
       if ($(`.tm-sticker-row[data-doc-id=${el.docId}]`).length) {
         return;
       }
@@ -1035,7 +1035,7 @@ var EditPack = {
         <span class="tm-icon tm-icon-end tm-icon-close js-delete-sticker"></span>
       </div>`);
       $item.attr('id', 'i' + el.docId);
-      $item.appendTo($grid);
+      $item.prependTo($grid);
     });
   },
   addFile(file) {
@@ -1044,13 +1044,13 @@ var EditPack = {
     var $thumb;
     if (file.type == 'application/x-tgsticker') {
       $thumb = $(`<picture class="tm-row-pic"><source type="application/x-tgsticker" srcset="${url}"></picture>`);
-      RLottie.init($item[0], {noAutoPlay: true});
+      RLottie.init($thumb[0], {noAutoPlay: true});
     } else if (file.type == 'video/webm') {
       $thumb = $(`<video class="tm-row-pic" muted src="${url}">`);
     } else {
       $thumb = $(`<img class="tm-row-pic" src="${url}">`);
     }
-    $item = $(`<div class="tm-row tm-sticker-row tm-sticker-row-edit tm-sticker-loading">
+    var $item = $(`<div class="tm-row tm-sticker-row tm-sticker-row-edit tm-sticker-loading">
         <span class="tm-icon js-sortable-handle ui-sortable-handle" style="--icon-s: var(--image-url-rearrange)"></span>
         <div class="tm-row-pic"></div>
         <input type="text" class="form-control tm-input" name="emoji" placeholder="${l('WEB_EDITPACK_EMOJI_PLACEHOLDER')}" autocomplete="off" value="" spellcheck="false">
@@ -1069,7 +1069,7 @@ var EditPack = {
         Main.showErrorToast(res.error);
       }
     });
-    $item.appendTo($grid);
+    $item.prependTo($grid);
   },
   uploadThumb() {
     var src = false;
