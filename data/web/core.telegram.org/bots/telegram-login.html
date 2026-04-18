@@ -67,6 +67,7 @@
 <hr>
 <h3><a class="anchor" name="getting-started" href="#getting-started"><i class="anchor-icon"></i></a>Getting Started</h3>
 <p>Telegram offers a <a href="#using-the-telegram-login-library">compact tool</a> to quickly add Telegram login buttons to your interface. You can also directly access our library&#39;s <a href="#available-methods">JS API</a>. </p>
+<p>For mobile developers, we also provide ready-to-use <strong><a href="#native-sdks">Native SDKs</a></strong> for iOS and Android.</p>
 <p>Alternatively, Telegram supports the standard <a href="https://en.wikipedia.org/wiki/OpenID#OpenID_Connect_(OIDC%29">OpenID Connect</a> protocol. This allows you to integrate Telegram authentication into your application using any OIDC-compatible library or authentication platform (e.g.,  Keycloak, Authentik, Auth0 etc.).</p>
 <p>Our implementation follows the standard <a href="https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth">Authorization Code Flow</a> with <strong>PKCE</strong> support.</p>
 <blockquote>
@@ -76,7 +77,8 @@
 <ul>
 <li><strong><a href="#setting-up-a-bot">Set up a bot</a></strong> to represent your application.</li>
 <li><strong><a href="#registering-your-allowed-urls">Register your Allowed URLs</a></strong> via <a href="https://t.me/botfather">@BotFather</a> and obtain your Client ID and Secret.</li>
-<li><strong><a href="#using-the-telegram-login-library">Add the Telegram Login library</a></strong> to your page</li>
+<li><strong><a href="#using-the-telegram-login-library">Add the Telegram Login library</a></strong> to your page.</li>
+<li><strong><a href="#native-sdks">Integrate Native SDKs</a></strong> if you are building an iOS or Android mobile application.</li>
 <li><strong><a href="#validating-id-tokens">Validate ID tokens</a></strong> to cryptographically verify incoming requests.</li>
 </ul>
 <p>Alternatively, you can <a href="#openid-connect">use an OpenID integration</a>.</p>
@@ -253,6 +255,21 @@
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong>Important:</strong> The <code>telegram-login.js</code> library relies on communicating with a popup window to complete the authentication flow. If your website serves the <code>Cross-Origin-Opener-Policy: same-origin</code> HTTP header, this cross-window communication will be blocked and the login process will fail. To ensure the JavaScript library functions correctly, you must either remove this header or use a more permissive policy, such as <code>Cross-Origin-Opener-Policy: same-origin-allow-popups</code>.</p>
+</blockquote>
+<hr>
+<h3><a class="anchor" name="native-sdks" href="#native-sdks"><i class="anchor-icon"></i></a>Native SDKs</h3>
+<p>If you are building a native mobile application, Telegram provides dedicated SDKs to streamline the login experience on iOS and Android devices, bypassing the need for web-based views.</p>
+<ul>
+<li><p><strong><a href="https://github.com/TelegramMessenger/telegram-login-ios">Telegram Login for iOS</a></strong><br>A native Swift package for integrating Telegram authentication into your iOS or iPadOS applications. </p>
+</li>
+<li><p><strong><a href="https://github.com/TelegramMessenger/telegram-login-android">Telegram Login for Android</a></strong><br>A native Android library allowing you to seamlessly authenticate users within your Kotlin or Java Android applications.</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> Complete setup guides, installation instructions, and usage examples for each platform can be found directly in the README files of their respective GitHub repositories.</p>
+</blockquote>
 <hr>
 <h3><a class="anchor" name="openid-connect" href="#openid-connect"><i class="anchor-icon"></i></a>OpenID Connect</h3>
 <p>If you are using an OIDC-compatible library or identity broker, you can use the standard configuration values below.</p>
