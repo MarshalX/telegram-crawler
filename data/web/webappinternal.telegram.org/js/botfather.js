@@ -1064,7 +1064,7 @@ var BotSettings = {
             Main.showErrorToast(response.error);
           } 
           if (response.ok) {
-            Aj.location(`/botfather/bot/${Aj.state.botId}/login`);
+            location.reload();
           }
         });
       }
