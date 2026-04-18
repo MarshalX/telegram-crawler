@@ -645,6 +645,8 @@ var BotGeneral = {
 
 var BotSettings = {
   init() {
+    var cont = Aj.ajContainer;
+
     $('.js-add-allowed-url').on('click', function () {
       var field_type = this.dataset.type;
       var container = field_type == 'redirect_uri' ? '.js-redirect-uris' : '.js-trusted-origins';
@@ -784,13 +786,13 @@ var BotSettings = {
       Aj.state.privacyUrlDebounce(submitPrivacy, 0);
     });
 
-    $('body').on('click', '.js-delete-allowed-url', function () {
+    $(cont).on('click.curPage', '.js-delete-allowed-url', function () {
       $(this).parent('.tm-row').remove();
       BotSettings.updateAllowedUrls();
     });
 
-    $('body').on('change', 'input[name="allowed_url[]"]', BotSettings.updateAllowedUrls);
-    $('body').on('input', 'input[name="allowed_url[]"]', function () {
+    $(cont).on('change.curPage', 'input[name="allowed_url[]"]', BotSettings.updateAllowedUrls);
+    $(cont).on('input.curPage', 'input[name="allowed_url[]"]', function () {
       $(this).removeClass('error');
     });
 
@@ -899,7 +901,7 @@ var BotSettings = {
     });
     $('body').on('click', '.js-spoiler', BotSettings.eClickSpoiler);
 
-    $('.copy-btn').on('click', function () {
+    $(cont).on('click.curPage', '.copy-btn', function () {
       navigator.clipboard.writeText(this.dataset.value);
       Main.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
     })
@@ -910,6 +912,99 @@ var BotSettings = {
 
     $('.js-migrate-oauth').on('click', function () {
       BotSettings.askMigrateOauth();
+    });
+
+    $(cont).on('click.curPage', '.js-add-native-app-platform', function () {
+      var platform = this.dataset.platform;
+      BotSettings.addNativeAppEntry(platform);
+    });
+
+    $(cont).on('click.curPage', '.js-delete-native-app', function () {
+      var $entry = $(this).closest('.js-native-app-entry');
+      var hash = $entry.data('hash');
+      if (hash) {
+        Aj.apiRequest('removeNativeApp', { bid: Aj.state.botId, app_hash: hash }, res => {
+          if (res.error) {
+            Main.showErrorToast(res.error);
+            return;
+          }
+          $entry.remove();
+        });
+      } else {
+        $entry.remove();
+      }
+    });
+
+    $(cont).on('change.curPage', '.js-native-app-field1, .js-native-app-field2', function () {
+      var $entry = $(this).closest('.js-native-app-entry');
+      BotSettings.submitNativeApp($entry);
+    });
+  },
+
+  addNativeAppEntry(platform) {
+    var platformLabel = platform == 'android' ? l('WEB_NATIVE_APP_PLATFORM_ANDROID') : l('WEB_NATIVE_APP_PLATFORM_IOS');
+    var platformClass = platform == 'android' ? 'tm-native-app-chip-android' : 'tm-native-app-chip-ios';
+    var field1Placeholder = platform == 'android' ? l('WEB_NATIVE_APP_PACKAGE_NAME') : l('WEB_NATIVE_APP_TEAM_ID');
+    var field2Placeholder = platform == 'android' ? l('WEB_NATIVE_APP_SHA256_FINGERPRINT') : l('WEB_NATIVE_APP_BUNDLE_ID');
+
+    var html = `<div class="tm-native-app-entry js-native-app-entry" data-platform="${platform}">
+      <div class="tm-row tm-row-no-highlight" style="gap: 8px; padding: 8px 16px;">
+        <span class="tm-native-app-chip ${platformClass}">${platformLabel}<span class="js-delete-native-app"></span></span>
+      </div>
+      <div class="tm-field" style="margin-bottom: 1px;">
+        <input type="text" class="form-control tm-input js-native-app-field1" value="" placeholder="${field1Placeholder}" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="tm-field" style="margin-bottom: 1px;">
+        <input type="text" class="form-control tm-input js-native-app-field2" value="" placeholder="${field2Placeholder}" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="tm-row tm-row-no-highlight js-native-app-url-row" style="align-items: stretch; flex-direction: column; display:none;">
+        <span class="tm-table-header">${l('WEB_NATIVE_APP_URL')}</span>
+        <div class="tm-api-token tm-api-token-client-secret">
+          <span class="js-native-app-url-value" style="flex-grow: 1; word-break: break-all;"></span>
+          <div class="copy-btn" data-value=""></div>
+        </div>
+      </div>
+    </div>`;
+
+    $('.js-native-apps-list').append(html);
+    WebApp.HapticFeedback.impactOccurred('soft');
+  },
+
+  submitNativeApp($entry) {
+    var platform = $entry.data('platform');
+    var field1 = $entry.find('.js-native-app-field1').val()?.trim();
+    var field2 = $entry.find('.js-native-app-field2').val()?.trim();
+
+    if (!field1 || !field2) return;
+
+    var oldHash = $entry.data('hash') || '';
+    var params = { bid: Aj.state.botId, platform: platform, app_hash: oldHash };
+    if (platform == 'android') {
+      params.package_name = field1;
+      params.sha256_fingerprint = field2;
+    } else {
+      params.team_id = field1;
+      params.bundle_id = field2;
+    }
+
+    $entry.find('.js-native-app-field1, .js-native-app-field2').removeClass('error');
+
+    Aj.apiRequest('addNativeApp', params, res => {
+      if (res.error) {
+        Main.showErrorToast(res.error);
+        if (res.field == 'field1') $entry.find('.js-native-app-field1').addClass('error');
+        if (res.field == 'field2') $entry.find('.js-native-app-field2').addClass('error');
+        return;
+      }
+      if (res.ok && res.native_app_url) {
+        $entry.data('hash', res.hash);
+        $entry.attr('data-hash', res.hash);
+        var $urlRow = $entry.find('.js-native-app-url-row');
+        $urlRow.show();
+        $urlRow.find('.js-native-app-url-value').text(res.native_app_url);
+        $urlRow.find('.copy-btn').attr('data-value', res.native_app_url);
+        Main.showSuccessToast(l('WEB_NATIVE_APP_REGISTERED'));
+      }
     });
   },
 
@@ -969,7 +1064,7 @@ var BotSettings = {
             Main.showErrorToast(response.error);
           } 
           if (response.ok) {
-            window.location.search += '?migrate=1';
+            Aj.location(`/botfather/bot/${Aj.state.botId}/login`);
           }
         });
       }
