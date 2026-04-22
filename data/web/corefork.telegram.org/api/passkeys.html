@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Passkeys</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram allows creating a passkey on your device to instantly log in to Telegram with a PIN or biometric data like Face…">
+    <meta property="og:title" content="Passkeys">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram allows creating a passkey on your device to instantly log in to Telegram with a PIN or biometric data like Face…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/passkeys" >Passkeys</a></li></ul></div>
+  <h1 id="dev_page_title">Passkeys</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram allows creating a passkey on your device to instantly log in to Telegram with a PIN or biometric data like Face ID and fingerprints — instead of an SMS code.  </p>
+<p>Telegram passkey login implements the <a href="https://w3c.github.io/webauthn/">Web Authentication standard »</a> (webauthn), make sure to familiarize yourself with webauthn by reading the <a href="https://w3c.github.io/webauthn/">standard »</a>, first.</p>
+<p>A simpler overview of the standard is available on <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API">MDN »</a>.  </p>
+<p>Passkeys can be used on all major browsers and all major platforms (including without using a browser).  </p>
+<h3><a class="anchor" href="#creating-a-passkey" id="creating-a-passkey" name="creating-a-passkey"><i class="anchor-icon"></i></a>Creating a passkey</h3>
+<pre><code><a href='/constructor/account.passkeyRegistrationOptions'>account.passkeyRegistrationOptions</a>#e16b5ce1 options:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/account.PasskeyRegistrationOptions'>account.PasskeyRegistrationOptions</a>;
+
+<a href='/constructor/inputPasskeyResponseRegister'>inputPasskeyResponseRegister</a>#3e63935c client_data:<a href='/type/DataJSON'>DataJSON</a> attestation_data:<a href='/type/bytes'>bytes</a> = <a href='/type/InputPasskeyResponse'>InputPasskeyResponse</a>;
+<a href='/constructor/inputPasskeyCredentialPublicKey'>inputPasskeyCredentialPublicKey</a>#3c27b78f id:<a href='/type/string'>string</a> raw_id:<a href='/type/string'>string</a> response:<a href='/type/InputPasskeyResponse'>InputPasskeyResponse</a> = <a href='/type/InputPasskeyCredential'>InputPasskeyCredential</a>;
+
+<a href='/constructor/passkey'>passkey</a>#98613ebf flags:<a href='/type/%23'>#</a> id:<a href='/type/string'>string</a> name:<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> software_emoji_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> last_usage_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> = <a href='/type/Passkey'>Passkey</a>;
+
+---functions---
+
+<a href='/method/account.initPasskeyRegistration'>account.initPasskeyRegistration</a>#429547e8 = <a href='/type/account.PasskeyRegistrationOptions'>account.PasskeyRegistrationOptions</a>;
+
+<a href='/method/account.registerPasskey'>account.registerPasskey</a>#55b41fd6 credential:<a href='/type/InputPasskeyCredential'>InputPasskeyCredential</a> = <a href='/type/Passkey'>Passkey</a>;</code></pre>
+<p>To create a passkey linked to the currently logged in account, start by invoking <a href="/method/account.initPasskeyRegistration">account.initPasskeyRegistration</a>.  </p>
+<p>This method will return a JSON object in <a href="/constructor/account.passkeyRegistrationOptions">account.passkeyRegistrationOptions</a>.<code>options</code>, containing a single key:  </p>
+<ul>
+<li><code>publicKey</code> - Contains a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions">PublicKeyCredentialCreationOptions »</a> JSON object  </li>
+</ul>
+<p>Then, pass <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions">PublicKeyCredentialCreationOptions »</a> to <a href="https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/create">navigator.credentials.create</a> inside browsers (or equivalent APIs on other platforms): on success, this will generate a new passkey, returning a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> object.  </p>
+<p>Some platforms (like Android) may instead return a JSON representation of <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>, which has the same overall structure, with the difference that fields marked as <strong>binary</strong> below are base64url-encoded and should be base64url-decoded, before being used inside TL constructors.  </p>
+<p>Note that some binary fields like <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>clientDataJSON</code> contain normal, valid UTF-8 strings like JSON payloads that (a bit counterintuitively) are still base64url-encoded, and still have to be base64url-decoded (like all other binary fields) before using them in the API.    </p>
+<p>Take the <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> and transform it into an <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> as follows:</p>
+<ol>
+<li>
+<p>Extract the <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a> object contained in <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>response</code>.<br>
+Use it to generate an <a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a> with the following fields:  </p>
+<ul>
+<li><a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a>.<code>client_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>clientDataJSON</code>, <strong>binary field</strong>: base64url-decode first if working with the JSON representation, then pass the value directly into <a href="/constructor/dataJSON">dataJSON</a>.<code>data</code>, then pass the <a href="/constructor/dataJSON">dataJSON</a> into <code>client_data</code>.  </li>
+<li><a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a>.<code>attestation_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>attestationObject</code>, <strong>binary field</strong>: base64url-decode first if working with the JSON representation, then pass into <code>attestation_data</code>.</li>
+</ul>
+</li>
+<li>
+<p>Then, generate an <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> with the following fields:</p>
+<ul>
+<li><code>response</code> - The <a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a> generated at step 1</li>
+<li><code>id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>id</code>,  <strong>binary field</strong>: base64url-decode first if working with the JSON representation, then pass into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a>.<code>id</code>.<br>
+Also needs base64url-decoding when working with the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> in browsers.  </li>
+<li><code>raw_id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>rawId</code>, <strong>binary field</strong>: base64url-decode first if working with the JSON representation, then pass into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> .<code>raw_id</code></li>
+</ul>
+<p>Note that again, a bit counterintuitively</p>
+</li>
+</ol>
+<h3><a class="anchor" href="#loggin" id="loggin" name="loggin"><i class="anchor-icon"></i></a>Loggin</h3></div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
