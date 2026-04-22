@@ -45,12 +45,13 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Telegram allows creating a passkey on your device to instantly log in to Telegram with a PIN or biometric data like Face ID and fingerprints — instead of an SMS code.  </p>
+<h3><a class="anchor" href="#introduction" id="introduction" name="introduction"><i class="anchor-icon"></i></a>Introduction</h3>
 <p>Telegram passkey login implements the <a href="https://w3c.github.io/webauthn/">Web Authentication standard »</a> (webauthn), make sure to familiarize yourself with webauthn by reading the <a href="https://w3c.github.io/webauthn/">standard »</a>, first.</p>
 <p>A simpler overview of the standard is available on <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API">MDN »</a>.  </p>
 <p>Put plainly, passkeys are composed of a public-private keypair: the private key is stored safely on the device (for example in a TEE enclave), the public key is sent to Telegram's servers.  </p>
-<p>When logging in, Telegram sends a challenge, which is signed using the local private key associated to the account: this signature is then verified by Telegram against the public key counterpart; if signatures matched, the user can login.  </p>
+<p>When logging in, Telegram sends a challenge, which is signed using the local private key associated to the account: this signature is then verified by Telegram against the public key counterpart; if verification succeeds, the user is logged in.  </p>
 <p>Note that if the user configured a <a href="/api/srp">2FA password</a>, they will still have to enter it when <a href="#logging-in-with-a-passkey">logging in with a passkey »</a>.  </p>
-<p>Passkeys can be used on all major browsers and all major platforms (including without using a browser).  </p>
+<p>Passkeys can be used on all major browsers and all major platforms (and even outside of a browser).  </p>
 <h3><a class="anchor" href="#creating-a-passkey" id="creating-a-passkey" name="creating-a-passkey"><i class="anchor-icon"></i></a>Creating a passkey</h3>
 <pre><code><a href='/constructor/account.passkeyRegistrationOptions'>account.passkeyRegistrationOptions</a>#e16b5ce1 options:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/account.PasskeyRegistrationOptions'>account.PasskeyRegistrationOptions</a>;
 
@@ -109,10 +110,13 @@ Use it to generate an <a href="/constructor/inputPasskeyResponseRegister">inputP
 ---functions---
 
 <a href='/method/account.getPasskeys'>account.getPasskeys</a>#ea1f0c52 = <a href='/type/account.Passkeys'>account.Passkeys</a>;</code></pre>
+<p>Use <a href="/method/account.getPasskeys">account.getPasskeys</a> to list the passkeys that can be used to log into the current account.  </p>
+<p>Passkeys are represented by <a href="/constructor/passkey">passkey</a> constructors, containing info like the passkey name, its ID, a <a href="/api/custom-emoji">custom emoji »</a> used as icon (usually coincides with the password manager's icon), its creation date and the date when it was last used.  </p>
 <h3><a class="anchor" href="#delete-passkeys" id="delete-passkeys" name="delete-passkeys"><i class="anchor-icon"></i></a>Delete passkeys</h3>
 <pre><code>---functions---
 
 <a href='/method/account.deletePasskey'>account.deletePasskey</a>#f5b5563f id:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
+<p>To delete a passkey associated to the current account, use <a href="/method/account.deletePasskey">account.deletePasskey</a>, passing the passkey's ID (usually obtained using <a href="/method/account.getPasskeys">account.getPasskeys</a> as described <a href="#list-passkeys">above »</a>).</p>
 <h3><a class="anchor" href="#logging-in-with-a-passkey" id="logging-in-with-a-passkey" name="logging-in-with-a-passkey"><i class="anchor-icon"></i></a>Logging in with a passkey</h3>
 <pre><code><a href='/constructor/auth.passkeyLoginOptions'>auth.passkeyLoginOptions</a>#e2037789 options:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/auth.PasskeyLoginOptions'>auth.PasskeyLoginOptions</a>;
 
@@ -120,19 +124,21 @@ Use it to generate an <a href="/constructor/inputPasskeyResponseRegister">inputP
 <a href='/constructor/inputPasskeyCredentialPublicKey'>inputPasskeyCredentialPublicKey</a>#3c27b78f id:<a href='/type/string'>string</a> raw_id:<a href='/type/string'>string</a> response:<a href='/type/InputPasskeyResponse'>InputPasskeyResponse</a> = <a href='/type/InputPasskeyCredential'>InputPasskeyCredential</a>;
 
 <a href='/constructor/auth.authorization'>auth.authorization</a>#2ea2c0d4 flags:<a href='/type/%23'>#</a> setup_password_required:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> otherwise_relogin_days:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> tmp_sessions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> future_auth_token:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/bytes'>bytes</a> user:<a href='/type/User'>User</a> = <a href='/type/auth.Authorization'>auth.Authorization</a>;
-<a href='/constructor/auth.authorizationSignUpRequired'>auth.authorizationSignUpRequired</a>#44747e9a flags:<a href='/type/%23'>#</a> terms_of_service:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/help.TermsOfService'>help.TermsOfService</a> = <a href='/type/auth.Authorization'>auth.Authorization</a>;
 
 ---functions---
 
 <a href='/method/auth.initPasskeyLogin'>auth.initPasskeyLogin</a>#518ad0b7 api_id:<a href='/type/int'>int</a> api_hash:<a href='/type/string'>string</a> = <a href='/type/auth.PasskeyLoginOptions'>auth.PasskeyLoginOptions</a>;
 
 <a href='/method/auth.finishPasskeyLogin'>auth.finishPasskeyLogin</a>#9857ad07 flags:<a href='/type/%23'>#</a> credential:<a href='/type/InputPasskeyCredential'>InputPasskeyCredential</a> from_dc_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> from_auth_key_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> = <a href='/type/auth.Authorization'>auth.Authorization</a>;</code></pre>
-<p>To login with a passkey, start by invoking <a href="/method/auth.initPasskeyLogin">auth.initPasskeyLogin</a>: this method will return a JSON object in <a href="/constructor/auth.passkeyLoginOptions">auth.passkeyLoginOptions</a>.<code>options</code>, containing a single key:  </p>
+<p>To login with a passkey, start by invoking <a href="/method/auth.initPasskeyLogin">auth.initPasskeyLogin</a>.  </p>
+<p>Store the DC ID that was used to make the query into a <code>initDcId</code> variable, to be used later.  </p>
+<p>This method will return a JSON object in <a href="/constructor/auth.passkeyLoginOptions">auth.passkeyLoginOptions</a>.<code>options</code>, containing a single key:  </p>
 <ul>
 <li><code>publicKey</code> - Contains a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential »</a> JSON object (with base64url-encoded strings used in place of buffer properties)  </li>
 </ul>
 <p>Parse the JSON payload, base64url-decoding binary fields for example using <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/parseRequestOptionsFromJSON_static">PublicKeyCredential.parseRequestOptionsFromJSON</a>.  </p>
-<p>Then, pass the <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential »</a> to <a href="https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get">navigator.credentials.get</a> inside browsers (or equivalent APIs on other platforms): on success, this will prompt the user to choose a Telegram passkey (also choosing the account to log into), and will return it as a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> object.  </p>
+<p>Then, pass the <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential »</a> to <a href="https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get">navigator.credentials.get</a> inside browsers (or equivalent APIs on other platforms): on success, this will prompt the user to choose a Telegram passkey (choosing the account to log into), and will return it as a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> object.  </p>
+<p>Some platforms (like Android) may instead return a JSON representation of <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>, which has the same overall structure, with the difference that fields marked as <strong>binary</strong> below are base64url-encoded and should in some cases be base64url-decoded before being used inside TL constructors.  </p>
 <p>Take the <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> and transform it into an <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> using the following steps</p>
 <ol>
 <li>
@@ -162,9 +168,24 @@ Use it to generate an <a href="/constructor/inputPasskeyResponseLogin">inputPass
 <li><code>raw_id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>rawId</code>, <strong>binary field</strong>: pass directly into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> .<code>raw_id</code> <strong>without</strong> base64url-decoding.</li>
 </ul>
 </li>
+<li>
+<p>Take the <code>user_handle</code> stored in the generated <a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a> (<a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a>.<code>response</code>.<code>user_handle</code>) and parse it using the following printf/scanf format string: <code>%d:%lld</code>.  </p>
+<p>The user handle is composed by the DC ID (a 32-bit integer) and the user ID (a 64-bit long), separated by a colon (<code>:</code>): store these values in separate variables (<code>userDcId</code> and <code>userId</code>) to be used later.  </p>
+</li>
 </ol>
-<p>Then, pass the generated <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> to <a href="/method/auth.finishPasskeyLogin">auth.finishPasskeyLogin</a></p>
-<p>If the user configured a <a href="/api/srp">2FA password</a>, they will still have to enter it even when logging in with a passkey.</p></div>
+<p>If the current client is already logged into an account with user ID equal to <code>userId</code>, ask the user to choose a different passkey (if any) and restart the passkey login process.  </p>
+<p>Otherwise, invoke <a href="/method/auth.finishPasskeyLogin">auth.finishPasskeyLogin</a>, passing the following arguments:  </p>
+<ul>
+<li><code>credential</code> - The <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> generated above.  </li>
+<li><code>from_dc_id</code> - If and only if <code>userDcId != initDcId</code> (i.e. <code>userDcId</code> is <strong>not</strong> equal to the DC ID that was used to invoke <a href="/method/auth.initPasskeyLogin">auth.initPasskeyLogin</a>), populate this field with <code>initDcId</code></li>
+<li><code>from_auth_key_id</code> - If and only if <code>userDcId != initDcId</code> (i.e. <code>userDcId</code> is <strong>not</strong> equal to the DC ID that was used to invoke <a href="/method/auth.initPasskeyLogin">auth.initPasskeyLogin</a>), populate this field with the auth key ID of the connection to <code>initDcId</code> (if <a href="/api/pfs">PFS</a> is in use, use the permanent auth key ID).  </li>
+</ul>
+<p><a href="/method/auth.finishPasskeyLogin">auth.finishPasskeyLogin</a> can throw the following RPC errors:</p>
+<ul>
+<li><code>SESSION_PASSWORD_NEEDED</code> - If the user configured a <a href="/api/srp">2FA password</a>, they will still have to enter it even when logging in with a passkey: simply proceed with the <a href="/api/auth#2fa">usual 2FA auth flow »</a> to login.</li>
+<li><code>PASSKEY_CREDENTIAL_NOT_FOUND</code> - The specified passkey cannot be found on the server (for example, it could've been <a href="#delete-passkeys">removed »</a> by the user).  </li>
+</ul>
+<p>On success (except for the 2FA case), the user is logged in, and the method directly returns an <a href="/constructor/auth.authorization">auth.authorization</a> constructor.</p></div>
   
 </div>
           
