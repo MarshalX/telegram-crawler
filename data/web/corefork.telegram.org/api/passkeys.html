@@ -68,26 +68,29 @@
 </ul>
 <p>Then, pass <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions">PublicKeyCredentialCreationOptions »</a> to <a href="https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/create">navigator.credentials.create</a> inside browsers (or equivalent APIs on other platforms): on success, this will generate a new passkey, returning a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> object.  </p>
 <p>Some platforms (like Android) may instead return a JSON representation of <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>, which has the same overall structure, with the difference that fields marked as <strong>binary</strong> below are base64url-encoded and should be base64url-decoded, before being used inside TL constructors.  </p>
-<p>Note that some binary fields like <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>clientDataJSON</code> contain normal, valid UTF-8 strings like JSON payloads that (a bit counterintuitively) are still base64url-encoded, and still have to be base64url-decoded (like all other binary fields) before using them in the API.    </p>
+<p>For simplicity, the documentation will <strong>always refer to the JSON representation of the object</strong>, which in browsers can be obtained by simply invoking <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON">PublicKeyCredential.toJSON</a>.  </p>
 <p>Take the <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> and transform it into an <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> as follows:</p>
 <ol>
 <li>
 <p>Extract the <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a> object contained in <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>response</code>.<br>
 Use it to generate an <a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a> with the following fields:  </p>
 <ul>
-<li><a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a>.<code>client_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>clientDataJSON</code>, <strong>binary field</strong>: base64url-decode first if working with the JSON representation, then pass the value directly into <a href="/constructor/dataJSON">dataJSON</a>.<code>data</code>, then pass the <a href="/constructor/dataJSON">dataJSON</a> into <code>client_data</code>.  </li>
-<li><a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a>.<code>attestation_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>attestationObject</code>, <strong>binary field</strong>: base64url-decode first if working with the JSON representation, then pass into <code>attestation_data</code>.</li>
+<li>
+<p><a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a>.<code>client_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>clientDataJSON</code>, <strong>binary field</strong>: base64url-decode, then pass the value directly into <a href="/constructor/dataJSON">dataJSON</a>.<code>data</code>, then pass the <a href="/constructor/dataJSON">dataJSON</a> into <code>client_data</code>.  </p>
+<p>Even if it's treated as a binary field by the webauthn standard, <code>clientDataJSON</code> contains a valid, UTF-8 JSON payload that is additionally base64url-encoded.  </p>
+</li>
+<li>
+<p><a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a>.<code>attestation_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>attestationObject</code>, <strong>binary field</strong>: base64url-decode, then pass into <code>attestation_data</code>.</p>
+</li>
 </ul>
 </li>
 <li>
 <p>Then, generate an <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> with the following fields:</p>
 <ul>
 <li><code>response</code> - The <a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a> generated at step 1</li>
-<li><code>id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>id</code>,  <strong>binary field</strong>: base64url-decode first if working with the JSON representation, then pass into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a>.<code>id</code>.<br>
-Also needs base64url-decoding when working with the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> in browsers.  </li>
-<li><code>raw_id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>rawId</code>, <strong>binary field</strong>: base64url-decode first if working with the JSON representation, then pass into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> .<code>raw_id</code></li>
+<li><code>id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>id</code>, <strong>binary field</strong>: base64url-decode, then pass into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a>.<code>id</code>.  </li>
+<li><code>raw_id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>rawId</code>, <strong>binary field</strong>: base64url-decode, then pass into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> .<code>raw_id</code></li>
 </ul>
-<p>Note that again, a bit counterintuitively</p>
 </li>
 </ol>
 <h3><a class="anchor" href="#loggin" id="loggin" name="loggin"><i class="anchor-icon"></i></a>Loggin</h3></div>
