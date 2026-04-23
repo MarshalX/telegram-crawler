@@ -533,12 +533,12 @@
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/account.initPasskeyRegistration">account.initPasskeyRegistration</a> - </li>
-<li>Added <a href="/method/account.registerPasskey">account.registerPasskey</a> - </li>
-<li>Added <a href="/method/account.getPasskeys">account.getPasskeys</a> - </li>
-<li>Added <a href="/method/account.deletePasskey">account.deletePasskey</a> - </li>
-<li>Added <a href="/method/auth.initPasskeyLogin">auth.initPasskeyLogin</a> - </li>
-<li>Added <a href="/method/auth.finishPasskeyLogin">auth.finishPasskeyLogin</a> - </li>
+<li>Added <a href="/method/account.initPasskeyRegistration">account.initPasskeyRegistration</a> - Initialize passkey registration for the current account, see <a href="/api/passkeys#creating-a-passkey">here »</a> for more info on the full flow.</li>
+<li>Added <a href="/method/account.registerPasskey">account.registerPasskey</a> - Complete passkey registration for the current account, see <a href="/api/passkeys#creating-a-passkey">here »</a> for more info on the full flow.</li>
+<li>Added <a href="/method/account.getPasskeys">account.getPasskeys</a> - List the passkeys associated to the current account that can be used to log in, see <a href="/api/passkeys#list-passkeys">here »</a> for more info on passkeys.</li>
+<li>Added <a href="/method/account.deletePasskey">account.deletePasskey</a> - Delete a passkey associated to the current account, see <a href="/api/passkeys#delete-passkeys">here »</a> for more info.</li>
+<li>Added <a href="/method/auth.initPasskeyLogin">auth.initPasskeyLogin</a> - Initialize login with a passkey over an unauthenticated connection, see <a href="/api/passkeys#logging-in-with-a-passkey">here »</a> for more info.</li>
+<li>Added <a href="/method/auth.finishPasskeyLogin">auth.finishPasskeyLogin</a> - Complete login with a passkey over an unauthenticated connection, see <a href="/api/passkeys#logging-in-with-a-passkey">here »</a> for more info.</li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
@@ -546,13 +546,13 @@
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/passkey">passkey</a> - </li>
-<li>Added <a href="/constructor/account.passkeys">account.passkeys</a> - </li>
-<li>Added <a href="/constructor/account.passkeyRegistrationOptions">account.passkeyRegistrationOptions</a> - </li>
-<li>Added <a href="/constructor/auth.passkeyLoginOptions">auth.passkeyLoginOptions</a> - </li>
-<li>Added <a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a> - </li>
-<li>Added <a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a> - </li>
-<li>Added <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> - </li>
+<li>Added <a href="/constructor/passkey">passkey</a> - Human-readable info about a passkey associated to an account, returned when <a href="/api/passkeys#creating-a-passkey">creating a passkey »</a> or <a href="/api/passkeys#list-passkeys">listing passkeys »</a>.</li>
+<li>Added <a href="/constructor/account.passkeys">account.passkeys</a> - List of <a href="/api/passkeys#list-passkeys">passkeys »</a> associated to the current account.</li>
+<li>Added <a href="/constructor/account.passkeyRegistrationOptions">account.passkeyRegistrationOptions</a> - Passkey registration options, see <a href="/api/passkeys#creating-a-passkey">here »</a> for more info on the full flow.</li>
+<li>Added <a href="/constructor/auth.passkeyLoginOptions">auth.passkeyLoginOptions</a> - Passkey login options, see <a href="/api/passkeys#logging-in-with-a-passkey">here »</a> for more info on the full flow.</li>
+<li>Added <a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a> - WebAuthn registration response used when registering a new passkey, see <a href="/api/passkeys#creating-a-passkey">here »</a> for more info on the full flow.</li>
+<li>Added <a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a> - WebAuthn authentication response used when logging in with a passkey, see <a href="/api/passkeys#logging-in-with-a-passkey">here »</a> for more info on the full flow.</li>
+<li>Added <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> - Public-key passkey credential used both for registration and for login, see <a href="/api/passkeys#creating-a-passkey">creating a passkey »</a> and <a href="/api/passkeys#logging-in-with-a-passkey">logging in with a passkey »</a> for the full flows.</li>
 </ul>
 <h5><a class="anchor" href="#changed-constructors" id="changed-constructors" name="changed-constructors"><i class="anchor-icon"></i></a>Changed Constructors</h5>
 <ul>
@@ -2484,7 +2484,7 @@ This change also simplifies the Telegram Premium gift flow, fully replacing the 
 <ul>
 <li>Added <a href="/constructor/paidReactionPrivacyDefault">paidReactionPrivacyDefault</a> - Uses the default reaction privacy, set using <a href="/method/messages.togglePaidReactionPrivacy">messages.togglePaidReactionPrivacy</a>.</li>
 <li>Added <a href="/constructor/paidReactionPrivacyAnonymous">paidReactionPrivacyAnonymous</a> - Send paid reactions anonymously.</li>
-<li>Added <a href="/constructor/paidReactionPrivacyPeer">paidReactionPrivacyPeer</a> - Send paid reactions as the specified peer, fetched using <a href="/method/channels.getSendAs">channels.getSendAs</a>.</li>
+<li>Added <a href="/constructor/paidReactionPrivacyPeer">paidReactionPrivacyPeer</a> - Send paid reactions as the specified peer, fetched using <a href="/method/channels.getSendAs">channels.getSendAs</a> with the <code>for_paid_reactions</code> flag set.</li>
 <li>Added <a href="/constructor/inputPrivacyKeyNoPaidMessages">inputPrivacyKeyNoPaidMessages</a> - Who can send you messages without paying, if <a href="/api/paid-messages">paid messages »</a> are enabled.</li>
 <li>Added <a href="/constructor/privacyKeyNoPaidMessages">privacyKeyNoPaidMessages</a> - Who can send you messages without paying, if <a href="/api/paid-messages">paid messages »</a> are enabled.</li>
 <li>Added <a href="/constructor/account.paidMessagesRevenue">account.paidMessagesRevenue</a> - Total number of non-refunded <a href="/api/stars">Telegram Stars</a> a user has spent on sending us messages either directly or through a channel, see <a href="/api/paid-messages">here »</a> for more info on paid messages.</li>
