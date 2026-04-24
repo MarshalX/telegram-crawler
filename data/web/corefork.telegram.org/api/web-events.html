@@ -125,7 +125,7 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the user to share their phone number as a contact.</p>
 <p>Upon receiving this event, clients should show a prompt to the user, indicating that the bot is asking them to share their phone number (optionally also asking the user to unblock the bot, if it's currently blocked).</p>
 <p>If they accept, the user's phone number should be shared by sending a contact to the bot (unblocking it first, if it's currently blocked by the user); if all RPC queries (to unblock the bot, to send the message) succeed, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "sent"}</code>.</p>
-<p>If the user refuses or any intermdiate method call fails, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "cancelled"}</code>.</p>
+<p>If the user refuses or any intermediate method call fails, a <a href="/api/bots/webapps#write-access-requested">phone_requested event »</a> should be sent with <code>{"status": "cancelled"}</code>.</p>
 <h4><a class="anchor" href="#web-app-biometry-get-info" id="web-app-biometry-get-info" name="web-app-biometry-get-info"><i class="anchor-icon"></i></a><code>web_app_biometry_get_info</code></h4>
 <p>Event data: <code>null</code></p>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to ask the client to initialize the biometric authentication manager object for the current bot, emitting a <a href="/api/bots/webapps#biometry-info-received"><code>biometry_info_received</code> event »</a> on completion.</p>
@@ -174,7 +174,7 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 <li><code>req_id</code> - A string with the ID of the current request</li>
 </ul>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to obtain the contents of the system clipboard.</p>
-<p>Only for Mini Apps owned by bots added to the <a href="/api/bots/attach">attachment menu</a>, regardles of how the Mini App itself was launched, this event should trigger a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the following payload:</p>
+<p>Only for Mini Apps owned by bots added to the <a href="/api/bots/attach">attachment menu</a>, regardless of how the Mini App itself was launched, this event should trigger a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the following payload:</p>
 <ul>
 <li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_read_text_from_clipboard</code> request</li>
 <li><code>data</code> - A string with the clipboard contents</li>
@@ -246,7 +246,7 @@ If empty, the current chat is used.</li>
 <li><code>soft</code> - Indicates a collision between soft or flexible UI objects</li>
 </ul>
 </li>
-<li><code>notification_type</code> - Only for <code>notification</code> feedbacks, one of the folowing values (string):
+<li><code>notification_type</code> - Only for <code>notification</code> feedbacks, one of the following values (string):
 <ul>
 <li><code>error</code> - Indicates that a task or action has failed</li>
 <li><code>success</code> - Indicates that a task or action has completed successfully</li>
@@ -271,7 +271,7 @@ If empty, the current chat is used.</li>
 <li><code>duckduckgo</code> or <code>duckduckgo-browser</code> - Duckduckgo Browser</li>
 <li><code>samsung</code> or <code>samsung-browser</code> - Samsung Browser</li>
 <li><code>vivaldi</code> or <code>vivaldi-browser</code> - Vivaldi</li>
-<li><code>kiwi</code> or <code>ĸiwi-browser</code> - Kiwi</li>
+<li><code>kiwi</code> or <code>kiwi-browser</code> - Kiwi</li>
 <li><code>uc</code> or <code>uc-browser</code> - UC browser</li>
 <li><code>tor</code> or <code>tor-browser</code> - TOR browser</li>
 </ul>
@@ -321,7 +321,7 @@ The mini app must also be expanded when the user swipes up on the webview.</p>
 </ul>
 <p>Configures the main button, located immediately below the webview: when the user presses it a <a href="/api/bots/webapps#main-button-pressed"><code>main_button_pressed</code> event should be emitted by the client</a>.</p>
 <p>Some clients implement a horizontal media type tab bar located at the bottom of the screen, opened when the user clicks on the attachment menu button: this tab bar contains a horizontal list of buttons used to attach media of a certain type and to open installed <a href="/api/bots/attach">attachment menu mini apps</a>.<br>
-In clients that implements a tab bar, if and only if the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_main_button</code> with <code>is_visible=true</code>, the main button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.</p>
+In clients that implement a tab bar, if and only if the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_main_button</code> with <code>is_visible=true</code>, the main button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.</p>
 <p>Otherwise, the main button can be displayed right away with no user interaction when receiving a <code>web_app_setup_main_button</code> event with <code>is_visible=true</code>.</p>
 <h4><a class="anchor" href="#web-app-setup-back-button" id="web-app-setup-back-button" name="web-app-setup-back-button"><i class="anchor-icon"></i></a><code>web_app_setup_back_button</code></h4>
 <p>Event data: a JSON object with an <code>is_visible</code> boolean field.</p>
@@ -335,7 +335,7 @@ Note that on supported platforms, the OS back button can be used instead of a cu
 <p>Called by supported pages inside of <a href="https://instantview.telegram.org">IV</a> iframe embeds, indicates the new size of the embed frame.</p>
 <h4><a class="anchor" href="#web-app-setup-swipe-behavior" id="web-app-setup-swipe-behavior" name="web-app-setup-swipe-behavior"><i class="anchor-icon"></i></a><code>web_app_setup_swipe_behavior</code></h4>
 <p>Event payload: JSON object with boolean <code>allow_vertical_swipe</code> field.</p>
-<p>Called <a href="/api/bots/webapps">bot web apps</a> to tell the client to enable or disable the vertical swipe gesture usually used on mobile to minimize the web app.</p>
+<p>Called by <a href="/api/bots/webapps">bot web apps</a> to tell the client to enable or disable the vertical swipe gesture usually used on mobile to minimize the web app.</p>
 <h4><a class="anchor" href="#web-app-set-bottom-bar-color" id="web-app-set-bottom-bar-color" name="web-app-set-bottom-bar-color"><i class="anchor-icon"></i></a><code>web_app_set_bottom_bar_color</code></h4>
 <p>Event data: a JSON object with a string <code>color</code> with a hex RGB color.</p>
 <p>Used to set the mini app bottom bar color.</p>
@@ -354,7 +354,7 @@ Note that on supported platforms, the OS back button can be used instead of a cu
 <p>Configures the secondary button, located immediately below the webview, either on the left, right, top or bottom of the main button (if it is visible, otherwise it is located where the main button is usually located).</p>
 <p>When the user presses it a <a href="/api/bots/webapps#secondary-button-pressed"><code>secondary_button_pressed</code> event should be emitted by the client</a>.</p>
 <p>Some clients implement a horizontal media type tab bar located at the bottom of the screen, opened when the user clicks on the attachment menu button: this tab bar contains a horizontal list of buttons used to attach media of a certain type and to open installed <a href="/api/bots/attach">attachment menu mini apps</a>.<br>
-In clients that implements a tab bar, if and only if the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_secondary_button</code> with <code>is_visible=true</code>, the secondary button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.</p>
+In clients that implement a tab bar, if and only if the user opens a mini app through a tab bar button and the mini app emits a <code>web_app_setup_secondary_button</code> with <code>is_visible=true</code>, the secondary button should be displayed (replacing the tab bar) only after the first tap inside of the webview, to prevent bots from immediately blocking the tab bar.</p>
 <p>Otherwise, the secondary button can be displayed right away with no user interaction when receiving a <code>web_app_setup_secondary_button</code> event with <code>is_visible=true</code>.</p>
 <h4><a class="anchor" href="#web-app-share-to-story" id="web-app-share-to-story" name="web-app-share-to-story"><i class="anchor-icon"></i></a><code>web_app_share_to_story</code></h4>
 <p>Event payload: JSON object with the following fields:</p>

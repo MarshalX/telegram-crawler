@@ -64,7 +64,7 @@ At all times, the future auth token database should contain at most 20 tokens: e
 When invoking <a href="/method/auth.sendCode">auth.sendCode</a>, all future auth tokens present in the database should be provided to <code>codeSettings.logout_tokens</code>.<br>
 If any of the future auth tokens matches the account we're trying to login into and the token hasn't expired:</p>
 <ul>
-<li>If <a href="/api/srp">2FA</a> is not enabled, <a href="/method/auth.sendCode">auth.sendCode</a> will is directly return an <a href="/constructor/auth.sentCodeSuccess">auth.sentCodeSuccess</a> constructor with session info, indicating the session is authorized.</li>
+<li>If <a href="/api/srp">2FA</a> is not enabled, <a href="/method/auth.sendCode">auth.sendCode</a> will directly return an <a href="/constructor/auth.sentCodeSuccess">auth.sentCodeSuccess</a> constructor with session info, indicating the session is authorized.</li>
 <li>If <a href="/api/srp">2FA</a> is enabled, <a href="/method/auth.sendCode">auth.sendCode</a> will return a <code>SESSION_PASSWORD_NEEDED</code> RPC error, asking the user to <a href="#2fa">enter the 2FA password</a>, without sending any authorization code.</li>
 </ul>
 <p>Otherwise, the system will send an authorization code using the following logic:</p>
@@ -194,7 +194,7 @@ To cancel the verification code use <a href="/method/auth.cancelCode">auth.cance
 <p>After completion of step 4 (and after the eventual 3-D secure webview is closed), to detect a successful payment clients must immediately invoke <a href="/method/auth.checkPaidAuth">auth.checkPaidAuth</a> with the <code>form_id</code> passed to <a href="/method/payments.sendPaymentForm">payments.sendPaymentForm</a>, which will return either:</p>
 <ul>
 <li>An <a href="/constructor/auth.sentCode">auth.sentCode</a> constructor, on successful payment</li>
-<li>A <code>420</code> <code>FLOOD_WAIT_%d</code> RPC error, used to implement shortpolling: the client must keep invoking the method after waiting <code>%d</code> seconds, until the payment either succeeds or fails and either <a href="/constructor/auth.sentCode">auth.sentCode</a> or a different RPC error is returned.</li>
+<li>A <code>420</code> <code>FLOOD_WAIT_%d</code> RPC error, used to implement short polling: the client must keep invoking the method after waiting <code>%d</code> seconds, until the payment either succeeds or fails and either <a href="/constructor/auth.sentCode">auth.sentCode</a> or a different RPC error is returned.</li>
 <li>A <code>400</code> <code>PHONE_CODE_EXPIRED</code> RPC error, if login timed out (this should bring the user back to the login page)</li>
 <li>A <code>400</code> <code>FORM_EXPIRED</code> RPC error if the payment failed (will be returned after around five minutes of polling, should bring the user back to the login page)</li>
 </ul>
@@ -293,7 +293,7 @@ In this case, instructions for <a href="/api/srp">SRP 2FA authentication</a> mus
 If the <code>unconfirmed</code> flag is set, clients should display a notification, asking the user if they recognize the session.</p>
 <p>If the user clicks on the Yes button, invoke <a href="/method/account.changeAuthorizationSettings">account.changeAuthorizationSettings</a> with the new session's <code>hash</code> and the <code>confirmed</code> flag set, confirming the specified session.</p>
 <p>If the user clicks on the No button, invoke <a href="/method/account.resetAuthorization">account.resetAuthorization</a> with the new session's <code>hash</code>, logging out the specified session.</p>
-<p>If no action is taken by the user, the session will be autoconfirmed <code>authorization_autoconfirm_period</code> seconds after login (see the associated <a href="/api/config#authorization-autoconfirm-period">client configuration parameter »</a>).</p>
+<p>If no action is taken by the user, the session will be automatically confirmed <code>authorization_autoconfirm_period</code> seconds after login (see the associated <a href="/api/config#authorization-autoconfirm-period">client configuration parameter »</a>).</p>
 <h3><a class="anchor" href="#invalidating-login-codes" id="invalidating-login-codes" name="invalidating-login-codes"><i class="anchor-icon"></i></a>Invalidating login codes</h3>
 <p>Telegram's servers will automatically invalidate login codes if they are sent by the user to another Telegram chat, either by forwarding them or by sending them inside of a message: however, clients should also manually and immediately invalidate login codes if the user attempts to screenshot or forward a message sent by the login notification service user (ID <code>777000</code>) containing login codes.</p>
 <p>If an incoming message that is:</p>
@@ -304,7 +304,7 @@ If the <code>unconfirmed</code> flag is set, clients should display a notificati
 </ul>
 <p>Is either:</p>
 <ul>
-<li>Screenshotted by the user</li>
+<li>Captured in a screenshot by the user</li>
 <li>OR forwarded by the user to any chat</li>
 </ul>
 <p><a href="/method/account.invalidateSignInCodes">account.invalidateSignInCodes</a> should be invoked, passing the extracted login <code>codes</code> (excluding any <code>-</code> characters).</p>

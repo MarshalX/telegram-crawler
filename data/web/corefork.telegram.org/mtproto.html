@@ -122,7 +122,7 @@ MTProto v1.0 (<a href="/mtproto_v1">described here</a> for reference) is depreca
 <li><em>Multipart message</em> or <em>container</em> (a container that holds several messages; needed to send several RPC calls at once over an HTTP connection, for example; also, a container may support gzip).</li>
 </ul>
 <p>From the standpoint of lower level protocols, a message is a binary data stream aligned along a 4 or 16-byte boundary.  The first several fields in the message are fixed and are used by the cryptographic/authorization system.</p>
-<p>Each message, either individual or inside a container, consists of a <em>message identifier</em> (64 bits, see below), a <em>message sequence  number within a session</em> (32 bits), the <em>length</em> (of the message body in bytes; 32 bits), and a <em>body</em> (any size which is a multiple of 4 bytes). In addition, when a container or a single message is sent, an <em>internal header</em> is added at the top (see below), then the entire message is encrypted, and an <em>external header</em> is placed at the top of the message (a 64-bit <em>key identifier</em> and a 128-bit <em>message key</em>).</p>
+<p>Each message, either individual or inside a container, consists of a <em>message identifier</em> (64 bits, see below), a <em>message sequence number within a session</em> (32 bits), the <em>length</em> (of the message body in bytes; 32 bits), and a <em>body</em> (any size which is a multiple of 4 bytes). In addition, when a container or a single message is sent, an <em>internal header</em> is added at the top (see below), then the entire message is encrypted, and an <em>external header</em> is placed at the top of the message (a 64-bit <em>key identifier</em> and a 128-bit <em>message key</em>).</p>
 <p>A <em>message body</em> normally consists of a 32-bit <em>message type</em> followed by type-dependent <em>parameters</em>. In particular, each RPC function has a corresponding message type. For more detail, see <a href="/mtproto/serialize">Binary Data Serialization</a>, <a href="/mtproto/service_messages">Mobile Protocol: Service Messages</a>.</p>
 <p>All numbers are written as little endian. However, very large numbers (2048-bit or <code>pq</code>, <code>p</code>, <code>q</code> params) used in RSA and DH are written in the big endian format because that is how the OpenSSL library does it.</p>
 <h4><a class="anchor" href="#authorization-and-encryption" id="authorization-and-encryption" name="authorization-and-encryption"><i class="anchor-icon"></i></a>Authorization and Encryption</h4>
@@ -139,21 +139,21 @@ MTProto v1.0 (<a href="/mtproto_v1">described here</a> for reference) is depreca
 <h3><a class="anchor" href="#mtproto-transport" id="mtproto-transport" name="mtproto-transport"><i class="anchor-icon"></i></a>MTProto transport</h3>
 <p>Before being sent using the selected transport protocol, the payload has to be wrapped in a secondary protocol header, defined by the appropriate MTProto transport protocol.</p>
 <ul>
-<li><a href="mtproto/mtproto-transports#abridged">Abridged</a></li>
-<li><a href="mtproto/mtproto-transports#intermediate">Intermediate</a></li>
-<li><a href="mtproto/mtproto-transports#padded-intermediate">Padded intermediate</a></li>
-<li><a href="mtproto/mtproto-transports#full">Full</a></li>
+<li><a href="/mtproto/mtproto-transports#abridged">Abridged</a></li>
+<li><a href="/mtproto/mtproto-transports#intermediate">Intermediate</a></li>
+<li><a href="/mtproto/mtproto-transports#padded-intermediate">Padded intermediate</a></li>
+<li><a href="/mtproto/mtproto-transports#full">Full</a></li>
 </ul>
 <p>The server recognizes these different protocols (and distinguishes them from HTTP, too) by the header.
 Additionally, the following transport features can be used:</p>
 <ul>
-<li><a href="mtproto/mtproto-transports#quick-ack">Quick ack</a></li>
-<li><a href="mtproto/mtproto-transports#transport-errors">Transport errors</a></li>
-<li><a href="mtproto/mtproto-transports#transport-obfuscation">Transport obfuscation</a></li>
+<li><a href="/mtproto/mtproto-transports#quick-ack">Quick ack</a></li>
+<li><a href="/mtproto/mtproto-transports#transport-errors">Transport errors</a></li>
+<li><a href="/mtproto/mtproto-transports#transport-obfuscation">Transport obfuscation</a></li>
 </ul>
 <p>Example implementations for these protocols can be seen in <a href="https://github.com/tdlib/td/blob/master/td/mtproto/TcpTransport.cpp">tdlib</a> and <a href="https://github.com/danog/MadelineProto/tree/v8/src/Stream/MTProtoTransport">MadelineProto</a>.</p>
 <h3><a class="anchor" href="#transport" id="transport" name="transport"><i class="anchor-icon"></i></a>Transport</h3>
-<p>Enables the delivery of encrypted containers together with the external header (hereinafter, <em>Payload</em>) from client to server and back.
+<p>Enables the delivery of encrypted containers together with the external header (hereinafter, <em>payload</em>) from client to server and back.
 Multiple transport protocols are defined:</p>
 <ul>
 <li><a href="/mtproto/transports#tcp">TCP</a></li>
