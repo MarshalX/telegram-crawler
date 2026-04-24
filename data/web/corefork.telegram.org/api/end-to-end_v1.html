@@ -62,7 +62,7 @@ For information on end-to-end encryption used in up-to-date Telegram clients, ki
 <hr>
 <p>Secret Chats are one-on-one chats wherein messages are encrypted with a key held only by the chat's participants. Please note that the <a href="/schema/end-to-end">schema</a> for end-to-end encrypted Secret Chats is different from what is used for <a href="/mtproto">cloud chats</a>:</p>
 <div>
-    <a href="/file/811140845/3/3aEkph1_NYU/cf861ae5ea85912769" target="_blank"><img src="/file/811140845/3/3aEkph1_NYU/cf861ae5ea85912769" title="End-to-end encryption in MTProto (Secret Chats)" class="dev_page_image"></a>
+	<a href="/file/811140845/3/3aEkph1_NYU/cf861ae5ea85912769" target="_blank"><img src="/file/811140845/3/3aEkph1_NYU/cf861ae5ea85912769" title="End-to-end encryption in MTProto (Secret Chats)" class="dev_page_image"></a>
 </div>
 <h3><a class="anchor" href="#key-generation" id="key-generation" name="key-generation"><i class="anchor-icon"></i></a>Key Generation</h3>
 <p>The Diffie-Hellman protocol is used for key generation. For more information, see <a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">Wikipedia</a>.</p>
@@ -77,7 +77,7 @@ For information on end-to-end encryption used in up-to-date Telegram clients, ki
 <p>User <strong>B</strong> receives the update <a href="/constructor/updateEncryption">updateEncryption</a> for all associated authorization keys (all authorized devices) with the chat constructor <a href="/constructor/encryptedChatRequested">encryptedChatRequested</a>. The user must be shown basic information about User <strong>A</strong> and must be prompted to accept or reject the request.</p>
 <p>Both clients are to check that <strong>g</strong>, <strong>g_a</strong> and <strong>g_b</strong> are greater than one and smaller than <strong>p-1</strong>. We recommend checking that <strong>g_a</strong> and <strong>g_b</strong> are between <strong>2^{2048-64}</strong> and <strong>p - 2^{2048-64}</strong> as well.</p>
 <h4><a class="anchor" href="#accepting-a-request" id="accepting-a-request" name="accepting-a-request"><i class="anchor-icon"></i></a>Accepting a Request</h4>
-<p>After User <strong>B</strong> confirms the creation of a secret chat with <strong>A</strong> in the client interface, Client <strong>B</strong> also receives up-to-date configuration parameters for the Diffie-Hellman method. Thereafter, it generates a random 2048-bit number, <strong>b</strong>, using rules similar to those for <strong>a</strong>. </p>
+<p>After User <strong>B</strong> confirms the creation of a secret chat with <strong>A</strong> in the client interface, Client <strong>B</strong> also receives up-to-date configuration parameters for the Diffie-Hellman method. Thereafter, it generates a random 2048-bit number, <strong>b</strong>, using rules similar to those for <strong>a</strong>.</p>
 <p>Having received <strong>g_a</strong> from the update with <a href="/constructor/encryptedChatRequested">encryptedChatRequested</a>, it can immediately generate the final shared key: <code>key = (pow(g_a, b) mod dh_prime)</code>. If key length &lt; 256 bytes, add several leading zero bytes as padding — so that the key is exactly 256 bytes long. Its fingerprint, <strong>key_fingerprint</strong>, is equal to the 64 last bits of SHA1 (key).</p>
 <p><strong>Note:</strong> this fingerprint is used as a sanity check for the key exchange procedure to detect bugs while developing client software — it is not connected to the key visualization used on the clients as means of external authentication in secret chats. <a href="/api/end-to-end/pfs#key-visualization">Key visualizations</a> on the clients are generated using the first 128 bits of SHA1(initial key) followed by the first 160 bits of SHA256(key used when secret chat was updated to layer 46).</p>
 <p>Client <strong>B</strong> executes <a href="/method/messages.acceptEncryption">messages.acceptEncryption</a> after passing it <code>g_b := pow(g, b) mod dh_prime</code> and <strong>key_fingerprint</strong>.</p>
@@ -89,7 +89,7 @@ For information on end-to-end encryption used in up-to-date Telegram clients, ki
 <blockquote>
 <p>The re-keying protocol is further described in this article: <a href="/api/end-to-end/pfs">Perfect Forward Secrecy in Secret Chats</a>.</p>
 </blockquote>
-<p>Please note that your client must support Forward Secrecy in Secret Chats to be compatible with official Telegram clients. </p>
+<p>Please note that your client must support Forward Secrecy in Secret Chats to be compatible with official Telegram clients.</p>
 <h3><a class="anchor" href="#sending-and-receiving-messages-in-a-secret-chat" id="sending-and-receiving-messages-in-a-secret-chat" name="sending-and-receiving-messages-in-a-secret-chat"><i class="anchor-icon"></i></a>Sending and Receiving Messages in a Secret Chat</h3>
 <h4><a class="anchor" href="#serialization-and-encryption-of-outgoing-messages" id="serialization-and-encryption-of-outgoing-messages" name="serialization-and-encryption-of-outgoing-messages"><i class="anchor-icon"></i></a>Serialization and Encryption of Outgoing Messages</h4>
 <p>A TL object of type <a href="/type/DecryptedMessage">DecryptedMessage</a> is created and contains the message in plain text. For backward compatibility, the object must be wrapped in the constructor <a href="/constructor/decryptedMessageLayer">decryptedMessageLayer</a> with an indication of the supported layer (starting with 8).
@@ -110,7 +110,7 @@ An AES key and an initialization vector are computed ( <strong>key</strong> is t
 <p>Data is encrypted with a 256-bit key, <strong>aes_key</strong>, and a 256-bit initialization vector, <strong>aes-iv</strong>, using AES-256 encryption with infinite garble extension (IGE). Encryption key fingerprint <strong>key_fingerprint</strong> and the message key <strong>msg_key</strong> are added at the top of the resulting byte array.</p>
 <p>Encrypted data is embedded into a <a href="/method/messages.sendEncrypted">messages.sendEncrypted</a> API call and passed to Telegram server for delivery to the other party of the Secret Chat.</p>
 <h4><a class="anchor" href="#decrypting-an-incoming-message" id="decrypting-an-incoming-message" name="decrypting-an-incoming-message"><i class="anchor-icon"></i></a>Decrypting an Incoming Message</h4>
-<p>The steps above are performed in reverse order. 
+<p>The steps above are performed in reverse order.
 When an encrypted message is received, you <strong>must</strong> check that msg_key is <strong>in fact</strong> equal to the 128 low-order bits of the SHA1 hash of the decrypted message.
 If the message layer is greater than the one supported by the client, the user must be notified that the client version is out of date and prompted to update.</p>
 <h4><a class="anchor" href="#sequence-numbers" id="sequence-numbers" name="sequence-numbers"><i class="anchor-icon"></i></a>Sequence numbers</h4>
@@ -118,7 +118,7 @@ If the message layer is greater than the one supported by the client, the user m
 <blockquote>
 <p>Proper handling of these counters is further described in this article: <a href="/api/end-to-end/seq_no">Sequence numbers in Secret Chats</a>.</p>
 </blockquote>
-<p>Please note that your client must support sequence numbers in Secret Chats to be compatible with official Telegram clients. </p>
+<p>Please note that your client must support sequence numbers in Secret Chats to be compatible with official Telegram clients.</p>
 <h4><a class="anchor" href="#sending-encrypted-files" id="sending-encrypted-files" name="sending-encrypted-files"><i class="anchor-icon"></i></a>Sending Encrypted Files</h4>
 <p>All files sent to secret chats are encrypted with one-time keys that are in no way related to the chat's shared key. Before an encrypted file is sent, it is assumed that the encrypted file's address will be attached to the outside of an encrypted message using the <strong>file</strong> parameter of the <a href="/method/messages.sendEncryptedFile">messages.sendEncryptedFile</a> method and that the key for direct decryption will be sent in the body of the message (the <strong>key</strong> parameter in the constructors  <a href="/constructor/decryptedMessageMediaPhoto">decryptedMessageMediaPhoto</a>, <a href="/constructor/decryptedMessageMediaPhoto">decryptedMessageMediaVideo</a> and <a href="/constructor/decryptedMessageMediaPhoto">decryptedMessageMediaFile</a>.</p>
 <p>Prior to a file being sent to a secret chat, 2 random 256-bit numbers are computed which will serve as the AES key and initialization vector used to encrypt the file. AES-256 encryption with infinite garble extension (IGE) is used in like manner.</p>
@@ -152,7 +152,8 @@ A subsequent call to <a href="/method/messages.sendEncryptedFile">messages.sendE
 </ol>
 <blockquote>
 <p>Note that all pending obsolete layer messages must be sent prior to the layer update notification (more on this in <a href="/api/end-to-end/seq_no#preventing-gaps">Handling Sequence numbers</a>).</p>
-</blockquote></div>
+</blockquote>
+</div>
   
 </div>
           

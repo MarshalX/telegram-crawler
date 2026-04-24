@@ -51,14 +51,15 @@
 
 ---functions---
 
-<a href='/method/account.initTakeoutSession'>account.initTakeoutSession</a>#8ef3eab0 flags:<a href='/type/%23'>#</a> contacts:flags.0?<a href='/constructor/true'>true</a> message_users:flags.1?<a href='/constructor/true'>true</a> message_chats:flags.2?<a href='/constructor/true'>true</a> message_megagroups:flags.3?<a href='/constructor/true'>true</a> message_channels:flags.4?<a href='/constructor/true'>true</a> files:flags.5?<a href='/constructor/true'>true</a> file_max_size:flags.5?<a href='/type/long'>long</a> = <a href='/type/account.Takeout'>account.Takeout</a>;
+<a href='/method/account.initTakeoutSession'>account.initTakeoutSession</a>#8ef3eab0 flags:<a href='/type/%23'>#</a> contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> message_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> message_chats:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> message_megagroups:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> message_channels:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> files:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> file_max_size:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/long'>long</a> = <a href='/type/account.Takeout'>account.Takeout</a>;
 
 invokeWithTakeout#aca9fd2e {X:Type} takeout_id:long query:!X = X;
 
-<a href='/method/account.finishTakeoutSession'>account.finishTakeoutSession</a>#1d2652ee flags:<a href='/type/%23'>#</a> success:flags.0?<a href='/constructor/true'>true</a> = <a href='/type/Bool'>Bool</a>;</code></pre>
-<p>Use <a href="/method/account.initTakeoutSession">account.initTakeoutSession</a> to initialize a takeout session: pass the appropriate flags to enable usage of the corresponding methods, as described below.  </p>
-<p>When invoking the methods described below, each query must be wrapped using <a href="/method/invokeWithTakeout">invokeWithTakeout</a>, with the <code>id</code> returned by <a href="/method/account.initTakeoutSession">account.initTakeoutSession</a>.  </p>
-<p>After finishing the export, terminate the session using <a href="/method/account.finishTakeoutSession">account.finishTakeoutSession</a>.  </p>
+<a href='/method/account.finishTakeoutSession'>account.finishTakeoutSession</a>#1d2652ee flags:<a href='/type/%23'>#</a> success:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>Use <a href="/method/account.initTakeoutSession">account.initTakeoutSession</a> to initialize a takeout session: pass the appropriate flags to enable usage of the corresponding methods, as described below.</p>
+<p>When invoking the methods described below, each query must be wrapped using <a href="/method/invokeWithTakeout">invokeWithTakeout</a>, with the <code>id</code> returned by <a href="/method/account.initTakeoutSession">account.initTakeoutSession</a>.</p>
+<p>After finishing the export, terminate the session using <a href="/method/account.finishTakeoutSession">account.finishTakeoutSession</a>.</p>
 <h3><a class="anchor" href="#split-ranges" id="split-ranges" name="split-ranges"><i class="anchor-icon"></i></a>Split ranges</h3>
 <pre><code><a href='/constructor/messageRange'>messageRange</a>#ae30253 min_id:<a href='/type/int'>int</a> max_id:<a href='/type/int'>int</a> = <a href='/type/MessageRange'>MessageRange</a>;
 
@@ -66,26 +67,27 @@ invokeWithTakeout#aca9fd2e {X:Type} takeout_id:long query:!X = X;
 
 <a href='/method/messages.getSplitRanges'>messages.getSplitRanges</a>#1cff7e08 = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageRange'>MessageRange</a>&gt;;
 
-invokeWithMessagesRange#365275f2 {X:Type} range:MessageRange query:!X = X;</code></pre>
-<p>Some method calls require additional pagination using message ranges.  </p>
-<p>First of all, obtain a list of message ranges by invoking <a href="/method/messages.getSplitRanges">messages.getSplitRanges</a> (wrapping it in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> as usual).  </p>
-<p>Then, when invoking methods that require message range pagination, wrap the method using <a href="/method/invokeWithMessagesRange">invokeWithMessagesRange</a>, before also wrapping it in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> as usual.  </p>
+invokeWithMessagesRange#365275f2 {X:Type} range:MessageRange query:!X = X;
+</code></pre>
+<p>Some method calls require additional pagination using message ranges.</p>
+<p>First of all, obtain a list of message ranges by invoking <a href="/method/messages.getSplitRanges">messages.getSplitRanges</a> (wrapping it in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> as usual).</p>
+<p>Then, when invoking methods that require message range pagination, wrap the method using <a href="/method/invokeWithMessagesRange">invokeWithMessagesRange</a>, before also wrapping it in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> as usual.</p>
 <p>Start by passing the first message range; continue passing the same message range while paginating using the <a href="/api/offsets">usual <code>offset_*</code>, <code>limit</code>, etc parameters</a>; once there are no more results left, switch to the next message range, re-starting <code>offset_*</code>, <code>limit</code> pagination from the beginning.<br>
-Repeat until you've finished all the message ranges that were returned by <a href="/method/messages.getSplitRanges">messages.getSplitRanges</a>.  </p>
+Repeat until you've finished all the message ranges that were returned by <a href="/method/messages.getSplitRanges">messages.getSplitRanges</a>.</p>
 <h3><a class="anchor" href="#procedure" id="procedure" name="procedure"><i class="anchor-icon"></i></a>Procedure</h3>
-<p>Example implementation: <a href="https://github.com/telegramdesktop/tdesktop/tree/dev/Telegram/SourceFiles/export">tdesktop</a>.  </p>
-<p>Here's an overview of the steps required to export account information.  </p>
-<p>All requests must be wrapped in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> constructors, including <a href="/method/upload.getFile">upload.getFile</a> calls to save files.  </p>
-<p>Unless otherwise specified, all requests do <strong>not</strong> require pagination using <a href="#split-ranges">split ranges</a>.  </p>
+<p>Example implementation: <a href="https://github.com/telegramdesktop/tdesktop/tree/dev/Telegram/SourceFiles/export">tdesktop</a>.</p>
+<p>Here's an overview of the steps required to export account information.</p>
+<p>All requests must be wrapped in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> constructors, including <a href="/method/upload.getFile">upload.getFile</a> calls to save files.</p>
+<p>Unless otherwise specified, all requests do <strong>not</strong> require pagination using <a href="#split-ranges">split ranges</a>.</p>
 <ul>
 <li>
 <p>If the user wants to download messages from chats, groups or channels:</p>
 <ul>
 <li>
-<p>First of all, fetch and save the dialog list using <a href="#split-ranges">split ranges</a> and <a href="/method/messages.getDialogs">messages.getDialogs</a>; at the beginning of each split range, make an initial request with all offsets set to <code>0</code> and <code>limit=1</code> to fetch total dialog <code>count</code> to display a proper progress bar.  </p>
+<p>First of all, fetch and save the dialog list using <a href="#split-ranges">split ranges</a> and <a href="/method/messages.getDialogs">messages.getDialogs</a>; at the beginning of each split range, make an initial request with all offsets set to <code>0</code> and <code>limit=1</code> to fetch total dialog <code>count</code> to display a proper progress bar.</p>
 </li>
 <li>
-<p><a href="#left-channels">Request and save info about left channels and supergroups</a> if the user wants to export channel and group messages.  </p>
+<p><a href="#left-channels">Request and save info about left channels and supergroups</a> if the user wants to export channel and group messages.</p>
 </li>
 <li>
 <p>For all dialogs, check if they match the dialog types chosen by the user, and if yes download all messages using <a href="#split-ranges">split ranges</a> and <a href="/method/messages.getHistory">messages.getHistory</a>; for each split range, make an initial request with all offsets set to <code>0</code> and <code>limit=1</code> to fetch the initial message count to display a proper progress bar.<br>
@@ -93,10 +95,10 @@ Use the single message returned by the initial <code>limit=1</code> request to a
 If the user also chose to download only messages within a specific date interval, skip ranges whose:</p>
 <ul>
 <li>Last message (returned by that same initial <code>limit=1</code> call) has a <code>date</code> bigger than the top of the specified date interval.</li>
-<li>First message (returned by a new call to <a href="/method/messages.getHistory">messages.getHistory</a> with <code>limit=1</code>, <code>offset_id=1</code>, <code>add_offset=-1</code>) has a <code>date</code> smaller than the bottom of the specified date interval.   </li>
+<li>First message (returned by a new call to <a href="/method/messages.getHistory">messages.getHistory</a> with <code>limit=1</code>, <code>offset_id=1</code>, <code>add_offset=-1</code>) has a <code>date</code> smaller than the bottom of the specified date interval.</li>
 </ul>
-<p>For each downloaded and saved message, also download and save all attached media, including <a href="/api/custom-emoji">custom emojis</a> present in messages and captions, respecting the per-file download filesize limits imposed by the user.  </p>
-<p>If the user chose to download only their own messages, not messages sent by other users, use <a href="/method/messages.search">messages.search</a> with <code>peer</code> set to <a href="/constructor/inputPeerSelf">inputPeerSelf</a> instead of <a href="/method/messages.getHistory">messages.getHistory</a>.  </p>
+<p>For each downloaded and saved message, also download and save all attached media, including <a href="/api/custom-emoji">custom emojis</a> present in messages and captions, respecting the per-file download filesize limits imposed by the user.</p>
+<p>If the user chose to download only their own messages, not messages sent by other users, use <a href="/method/messages.search">messages.search</a> with <code>peer</code> set to <a href="/constructor/inputPeerSelf">inputPeerSelf</a> instead of <a href="/method/messages.getHistory">messages.getHistory</a>.</p>
 </li>
 </ul>
 </li>
@@ -119,13 +121,13 @@ If the user also chose to download only messages within a specific date interval
 </ul>
 </li>
 <li>
-<p>If the user wants to export their contact list: </p>
+<p>If the user wants to export their contact list:</p>
 <ul>
 <li>See <a href="#contacts">here »</a></li>
 </ul>
 </li>
 <li>
-<p>If the user wants to export their sessions: </p>
+<p>If the user wants to export their sessions:</p>
 <ul>
 <li>Invoke and store the result of <a href="/method/account.getAuthorizations">account.getAuthorizations</a> and <a href="/method/account.getWebAuthorizations">account.getWebAuthorizations</a></li>
 </ul>
@@ -142,8 +144,9 @@ If the user also chose to download only messages within a specific date interval
 
 ---functions---
 
-<a href='/method/contacts.getSaved'>contacts.getSaved</a>#82f1e39f = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SavedContact'>SavedContact</a>&gt;;</code></pre>
-<p>This method does <strong>not</strong> require pagination using <a href="#split-ranges">message ranges</a>.  </p>
+<a href='/method/contacts.getSaved'>contacts.getSaved</a>#82f1e39f = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SavedContact'>SavedContact</a>&gt;;
+</code></pre>
+<p>This method does <strong>not</strong> require pagination using <a href="#split-ranges">message ranges</a>.</p>
 <p>Use <a href="/method/contacts.getSaved">contacts.getSaved</a> to export the full contact list, see <a href="/api/contacts#fetching-the-contact-list">here »</a> for another alternative method that may be used to fetch the full list of all contacts with a Telegram account, without using a takeout session.</p>
 <h4><a class="anchor" href="#left-channels" id="left-channels" name="left-channels"><i class="anchor-icon"></i></a>Left channels</h4>
 <pre><code><a href='/constructor/messages.chats'>messages.chats</a>#64ff9fd5 chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; = <a href='/type/messages.Chats'>messages.Chats</a>;
@@ -151,9 +154,11 @@ If the user also chose to download only messages within a specific date interval
 
 ---functions---
 
-<a href='/method/channels.getLeftChannels'>channels.getLeftChannels</a>#8341ecc0 offset:<a href='/type/int'>int</a> = <a href='/type/messages.Chats'>messages.Chats</a>;</code></pre>
-<p>This method does <strong>not</strong> require pagination using <a href="#split-ranges">message ranges</a>.  </p>
-<p>Use <a href="/method/channels.getLeftChannels">channels.getLeftChannels</a> to get a list of channels or supergroups we left.</p></div>
+<a href='/method/channels.getLeftChannels'>channels.getLeftChannels</a>#8341ecc0 offset:<a href='/type/int'>int</a> = <a href='/type/messages.Chats'>messages.Chats</a>;
+</code></pre>
+<p>This method does <strong>not</strong> require pagination using <a href="#split-ranges">message ranges</a>.</p>
+<p>Use <a href="/method/channels.getLeftChannels">channels.getLeftChannels</a> to get a list of channels or supergroups we left.</p>
+</div>
   
 </div>
           

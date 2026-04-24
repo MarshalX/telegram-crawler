@@ -78,11 +78,13 @@ See <a href="/passport/encryption">this page</a> if you're interested in encrypt
 <p>To request data from Telegram Passport users, your bot will need to generate a pair of encryption keys.</p>
 <h4><a class="anchor" href="#generating-a-private-key" id="generating-a-private-key" name="generating-a-private-key"><i class="anchor-icon"></i></a>Generating a private key</h4>
 <p>First, use a console to generate a <strong>private</strong> key:</p>
-<pre><code>openssl genrsa 2048 &gt; private.key</code></pre>
-<p><strong>WARNING: Keep your private key SECRET!</strong> </p>
+<pre><code>openssl genrsa 2048 &gt; private.key
+</code></pre>
+<p><strong>WARNING: Keep your private key SECRET!</strong></p>
 <h4><a class="anchor" href="#generating-your-public-key" id="generating-your-public-key" name="generating-your-public-key"><i class="anchor-icon"></i></a>Generating your public key</h4>
 <p>Then use the console to print the corresponding <strong>public</strong> key:</p>
-<pre><code>openssl rsa -in private.key -pubout</code></pre>
+<pre><code>openssl rsa -in private.key -pubout
+</code></pre>
 <p>Use the <strong>/setpublickey</strong> command with <a href="https://t.me/BotFather">@BotFather</a> to connect this public key with your bot.</p>
 <h4><a class="anchor" href="#privacy-policy" id="privacy-policy" name="privacy-policy"><i class="anchor-icon"></i></a>Privacy Policy</h4>
 <p>Add a link to your Privacy Policy by using the <strong>/setprivacypolicy</strong> command. Users will see this link when offered to authorize you to access their data.</p>
@@ -97,43 +99,52 @@ See <a href="/passport/encryption">this page</a> if you're interested in encrypt
 <h4><a class="anchor" href="#request-parameters" id="request-parameters" name="request-parameters"><i class="anchor-icon"></i></a>Request Parameters</h4>
 <p>Use the following parameters to request information with the SDK:</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Parameters</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Required</strong></td>
+<th>Parameters</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>bot_id</td>
 <td>Integer</td>
 <td>Yes</td>
+<td>Unique identifier for the bot. You can get it from bot token. For example, for the bot token <code>1234567:4TT8bAc8GHUspu3ERYn-KGcvsvGB9u_n4ddy</code>, the bot id is <code>1234567</code>.</td>
 </tr>
 <tr>
 <td>scope</td>
 <td><a href="#passportscope">PassportScope</a></td>
 <td>Yes</td>
+<td>A JSON-serialized object describing the data you want to request</td>
 </tr>
 <tr>
 <td>public_key</td>
 <td>String</td>
 <td>Yes</td>
+<td>Public key of the bot</td>
 </tr>
 <tr>
 <td>nonce</td>
 <td>String</td>
 <td>Yes</td>
+<td>Bot-specified nonce. <strong>Important:</strong> For security purposes it should be a cryptographically secure unique identifier of the request. In particular, it should be long enough and it should be generated using a cryptographically secure pseudorandom number generator. You should never accept credentials with the same nonce twice.</td>
 </tr>
 </tbody>
 </table>
 <h4><a class="anchor" href="#passportscope" id="passportscope" name="passportscope"><i class="anchor-icon"></i></a>PassportScope</h4>
 <p>This object represents the data to be requested.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>data</td>
 <td>Array of <a href="#passportscopeelement">PassportScopeElement</a></td>
@@ -155,12 +166,14 @@ See <a href="/passport/encryption">this page</a> if you're interested in encrypt
 <h4><a class="anchor" href="#passportscopeelementoneofseveral" id="passportscopeelementoneofseveral" name="passportscopeelementoneofseveral"><i class="anchor-icon"></i></a>PassportScopeElementOneOfSeveral</h4>
 <p>This object represents several elements one of which must be provided.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>one_of</td>
 <td>Array of <a href="#passportscopeelementone">PassportScopeElementOne</a></td>
@@ -181,12 +194,14 @@ See <a href="/passport/encryption">this page</a> if you're interested in encrypt
 <h4><a class="anchor" href="#passportscopeelementone" id="passportscopeelementone" name="passportscopeelementone"><i class="anchor-icon"></i></a>PassportScopeElementOne</h4>
 <p>This object represents one particular element that must be provided. If no options are needed, <em>String</em> can be used instead of this object to specify the type of the element.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>type</td>
 <td>String</td>
@@ -209,7 +224,7 @@ See <a href="/passport/encryption">this page</a> if you're interested in encrypt
 </tr>
 </tbody>
 </table>
-<p>You can also use the special type "id_document" as an alias for one of "passport", "driver_license", "identity_card" and the special type "address_document" as an alias for one of "utility_bill", "bank_statement", "rental_agreement". 
+<p>You can also use the special type "id_document" as an alias for one of "passport", "driver_license", "identity_card" and the special type "address_document" as an alias for one of "utility_bill", "bank_statement", "rental_agreement".
 So <code>{"type":"id_document",selfie:true}</code> is equal to <code>{"one_of":["passport","driver_license","identity_card"],selfie:true}</code>.</p>
 <h4><a class="anchor" href="#fields" id="fields" name="fields"><i class="anchor-icon"></i></a>Fields</h4>
 <p>Your bot can request personal details, one or several types of identity document, residential address, one or several types of proof of address document, a phone number, or an email address. You can also request optional <strong>selfies</strong> with the document and certified <strong>English translations</strong> of the document.
@@ -259,12 +274,14 @@ This is just a list of data types that can be requested, and the encrypted objec
 <h4><a class="anchor" href="#personaldetails" id="personaldetails" name="personaldetails"><i class="anchor-icon"></i></a>PersonalDetails</h4>
 <p>This object represents personal details.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>first_name</td>
 <td>String</td>
@@ -320,12 +337,14 @@ This is just a list of data types that can be requested, and the encrypted objec
 <h4><a class="anchor" href="#residentialaddress" id="residentialaddress" name="residentialaddress"><i class="anchor-icon"></i></a>ResidentialAddress</h4>
 <p>This object represents a residential address.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>street_line1</td>
 <td>String</td>
@@ -361,12 +380,14 @@ This is just a list of data types that can be requested, and the encrypted objec
 <h4><a class="anchor" href="#iddocumentdata" id="iddocumentdata" name="iddocumentdata"><i class="anchor-icon"></i></a>IdDocumentData</h4>
 <p>This object represents the data of an identity document.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>document_no</td>
 <td>String</td>
@@ -396,7 +417,8 @@ This is just a list of data types that can be requested, and the encrypted objec
 <p>Use this secret and the credentials hash ( <em>hash</em> field in <a href="/bots/api#encryptedcredentials">EncryptedCredentials</a>) to calculate <em>credentials_key</em> and <em>credentials_iv</em> as described below:</p>
 <pre><code> credentials_secret_hash = SHA512( credentials_secret + credentials_hash )
  credentials_key = slice( credentials_secret_hash, 0, 32 )
- credentials_iv = slice( credentials_secret_hash, 32, 16 )</code></pre>
+ credentials_iv = slice( credentials_secret_hash, 32, 16 )
+</code></pre>
 </li>
 <li>
 <p>Decrypt the credentials data ( <em>data</em> field in <a href="/bots/api#encryptedcredentials">EncryptedCredentials</a>) by AES256-CBC using these <em>credentials_key</em> and <em>credentials_iv</em>. <strong>IMPORTANT:</strong> At this step, make sure that the credentials hash is equal to <code>SHA256( credentials_data )</code></p>
@@ -411,12 +433,14 @@ This is just a list of data types that can be requested, and the encrypted objec
 <h4><a class="anchor" href="#credentials" id="credentials" name="credentials"><i class="anchor-icon"></i></a>Credentials</h4>
 <p>Credentials is a JSON-serialized object.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>secure_data</td>
 <td><a href="#securedata">SecureData</a></td>
@@ -433,12 +457,14 @@ This is just a list of data types that can be requested, and the encrypted objec
 <h4><a class="anchor" href="#securedata" id="securedata" name="securedata"><i class="anchor-icon"></i></a>SecureData</h4>
 <p>This object represents the credentials required to decrypt encrypted data. All fields are optional and depend on <a href="#fields">fields</a> that were requested.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>personal_details</td>
 <td><a href="#securevalue">SecureValue</a></td>
@@ -499,12 +525,14 @@ This is just a list of data types that can be requested, and the encrypted objec
 <h4><a class="anchor" href="#securevalue" id="securevalue" name="securevalue"><i class="anchor-icon"></i></a>SecureValue</h4>
 <p>This object represents the credentials required to decrypt encrypted values. All fields are optional and depend on the type of <a href="#fields">fields</a> that were requested.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>data</td>
 <td><a href="#datacredentials">DataCredentials</a></td>
@@ -540,12 +568,14 @@ This is just a list of data types that can be requested, and the encrypted objec
 <h4><a class="anchor" href="#datacredentials" id="datacredentials" name="datacredentials"><i class="anchor-icon"></i></a>DataCredentials</h4>
 <p>These credentials can be used to decrypt encrypted data from the <em>data</em> field in <a href="/bots/api#encryptedpassportelement">EncryptedPassportElement</a>.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>data_hash</td>
 <td>String</td>
@@ -563,7 +593,8 @@ This is just a list of data types that can be requested, and the encrypted objec
 <p>To decrypt data, use the corresponding secret and data_hash from <a href="#datacredentials">DataCredentials</a> as described below:</p>
 <pre><code> data_secret_hash = SHA512( data_secret + data_hash )
  data_key = slice( data_secret_hash, 0, 32 )
- data_iv = slice( data_secret_hash, 32, 16 )</code></pre>
+ data_iv = slice( data_secret_hash, 32, 16 )
+</code></pre>
 </li>
 <li>
 <p>Use AES256-CBC with this <em>data_key</em> and <em>data_iv</em> to decrypt the data (the <em>data</em> field in <a href="/bots/api#encryptedpassportelement">EncryptedPassportElement</a>). <strong>IMPORTANT:</strong> At this step, make sure that data_hash from the credentials is equal to <code>SHA256( data )</code>.</p>
@@ -578,12 +609,14 @@ This is just a list of data types that can be requested, and the encrypted objec
 <h4><a class="anchor" href="#filecredentials" id="filecredentials" name="filecredentials"><i class="anchor-icon"></i></a>FileCredentials</h4>
 <p>These credentials can be used to decrypt encrypted files from the <em>front_side</em>, <em>reverse_side</em>, <em>selfie</em>, <em>files</em> and <em>translation</em> fields in <a href="/bots/api#encryptedpassportelement">EncryptedPassportElement</a>.</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>file_hash</td>
 <td>String</td>
@@ -601,7 +634,8 @@ This is just a list of data types that can be requested, and the encrypted objec
 <p>To decrypt the file, use the corresponding secret and file_hash from <a href="#filecredentials">FileCredentials</a> as described below:</p>
 <pre><code> file_secret_hash = SHA512( file_secret + file_hash )
  file_key = slice( file_secret_hash, 0, 32 )
- file_iv = slice( file_secret_hash, 32, 16 )</code></pre>
+ file_iv = slice( file_secret_hash, 32, 16 )
+</code></pre>
 </li>
 <li>
 <p>Download the encrypted file using the <a href="/bots/api#getfile">getFile</a> method.</p>
@@ -614,7 +648,8 @@ This is just a list of data types that can be requested, and the encrypted objec
 </li>
 </ol>
 <h3><a class="anchor" href="#fixing-errors" id="fixing-errors" name="fixing-errors"><i class="anchor-icon"></i></a>Fixing errors</h3>
-<p>If the data you received contains errors, the bot can use the <a href="/bots/api#setpassportdataerrors">setPassportDataErrors</a> method to inform the user and <a href="#requesting-information">request information</a> again. The user will not be able to resend the data, until all errors are fixed.</p></div>
+<p>If the data you received contains errors, the bot can use the <a href="/bots/api#setpassportdataerrors">setPassportDataErrors</a> method to inform the user and <a href="#requesting-information">request information</a> again. The user will not be able to resend the data, until all errors are fixed.</p>
+</div>
   
 </div>
           

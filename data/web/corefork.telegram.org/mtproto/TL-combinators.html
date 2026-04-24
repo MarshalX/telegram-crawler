@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <title>Formal description of TL combinators</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="﻿Formal declaration of TL combinators
+    <meta property="description" content="Formal declaration of TL combinators
 Main article: Formal description of TL. See also TL Language.
 Combinators in TL are…">
     <meta property="og:title" content="Formal description of TL combinators">
     <meta property="og:image" content="">
-    <meta property="og:description" content="﻿Formal declaration of TL combinators
+    <meta property="og:description" content="Formal declaration of TL combinators
 Main article: Formal description of TL. See also TL Language.
 Combinators in TL are…">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
@@ -46,7 +46,7 @@ Combinators in TL are…">
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/mtproto" >Mobile Protocol</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/mtproto/TL-combinators" >Formal description of TL combinators</a></li></ul></div>
   <h1 id="dev_page_title">Formal description of TL combinators</h1>
   
-  <div id="dev_page_content"><p>﻿<a href="/mtproto/TL-combinators">Formal declaration of TL combinators</a></p>
+  <div id="dev_page_content"><p><a href="/mtproto/TL-combinators">Formal declaration of TL combinators</a></p>
 <p>Main article: <a href="TL-formal">Formal description of TL</a>. See also <a href="TL">TL Language</a>.</p>
 <p>Combinators in TL are declared as follows:</p>
 <div class="richcode">
@@ -62,7 +62,7 @@ Combinators in TL are…">
 <em>var-ident-opt</em> ::= <em>var-ident</em> | <code>_</code><br>
 <em>conditional-arg-def</em> ::= <em>var-ident</em> [ <code>.</code> <em>nat-const</em> ] <code>?</code><br>
 <em>result-type</em> ::= <em>boxed-type-ident</em> { <em>subexpr</em> }<br>
-<em>result-type</em> ::= <em>boxed-type-ident</em> <code>&lt;</code> <em>subexpr</em> { <code>,</code> <em>subexpr</em> } <code>&gt;</code>   </p>
+<em>result-type</em> ::= <em>boxed-type-ident</em> <code>&lt;</code> <em>subexpr</em> { <code>,</code> <em>subexpr</em> } <code>&gt;</code></p>
 </div>
 <p>We shall clarify what all this means.</p>
 <ul>
@@ -82,7 +82,7 @@ Combinators in TL are…">
 <p>First come declarations of optional fields (of which there may be several or none at all). Then there are the declarations of the required fields (there may not be any of these either).</p>
 </li>
 <li>
-<p>Any identifier that begins with an uppercase or lowercase letter and which does not contain references to a namespace can be a field (variable) identifier. Using <em>uc-ident</em> for identifiers of variable types and <em>lc-indent</em> for other variables is good practice. </p>
+<p>Any identifier that begins with an uppercase or lowercase letter and which does not contain references to a namespace can be a field (variable) identifier. Using <em>uc-ident</em> for identifiers of variable types and <em>lc-indent</em> for other variables is good practice.</p>
 </li>
 <li>
 <p>Next a combinator declaration contains the equals sign (<code>=</code>) and the result type (it may be composite or appearing for the first time). The result type may be polymorphic and/or dependent; any fields of the defined constructor's fields of type <code>Type</code> or <code>#</code> may be returned (as subexpressions).</p>
@@ -95,10 +95,10 @@ Combinators in TL are…">
 <h3><a class="anchor" href="#optional-field-declarations" id="optional-field-declarations" name="optional-field-declarations"><i class="anchor-icon"></i></a>Optional field declarations</h3>
 <ul>
 <li>
-<p>These have the form <code>{</code> <em>field_1</em> ... <em>field_k</em> <code>:</code> <em>type-expr</em> <code>}</code>, where <em>field_i</em> is a variable (field) identifier that is unique within the scope of the combinator declaration, and <em>type-expr</em> is a type shared by all of the fields. </p>
+<p>These have the form <code>{</code> <em>field_1</em> ... <em>field_k</em> <code>:</code> <em>type-expr</em> <code>}</code>, where <em>field_i</em> is a variable (field) identifier that is unique within the scope of the combinator declaration, and <em>type-expr</em> is a type shared by all of the fields.</p>
 </li>
 <li>
-<p>If <em>k&gt;1</em>, this entry is functionally equivalent to <code>{</code> <em>field_1</em> <code>:</code> <em>type-expr</em> <code>}</code> ... <code>{</code> <em>field_k</em> <code>:</code> <em>type-expr</em> <code>}</code>. </p>
+<p>If <em>k&gt;1</em>, this entry is functionally equivalent to <code>{</code> <em>field_1</em> <code>:</code> <em>type-expr</em> <code>}</code> ... <code>{</code> <em>field_k</em> <code>:</code> <em>type-expr</em> <code>}</code>.</p>
 </li>
 <li>
 <p>All optional fields must be explicitly named (using <code>_</code> instead of <em>field_i</em> is not allowed).</p>
@@ -146,7 +146,7 @@ typed_list (X:Type) (l : list X) = TypedList;</p>
 <p>The <em>multiplicity</em> field may be bypassed. In this case, the last preceding parameter of type <code>#</code> from the enclosing combinator is used (it must be).</p>
 </li>
 <li>
-<p>Functionally, the repetition <em>field-id</em> <code>:</code> <em>multiplicity</em> <code>*</code> <code>[</code> <em>args</em> <code>]</code> is equivalent to the declaration of the single field <code>(</code> <em>field-id</em> <code>:</code> <code>%Tuple</code> <code>%AuxType</code> <em>multiplicity</em> <code>)</code>, where <code>aux_type</code> is an auxiliary type with a new name defined as <code>aux_type *args* = AuxType</code>. If any of the enclosing type's fields are used within <em>args</em>, they are added to the auxiliary constructor <code>aux_type</code> and to its <code>AuxType</code> result type as the first (optional) parameters. </p>
+<p>Functionally, the repetition <em>field-id</em> <code>:</code> <em>multiplicity</em> <code>*</code> <code>[</code> <em>args</em> <code>]</code> is equivalent to the declaration of the single field <code>(</code> <em>field-id</em> <code>:</code> <code>%Tuple</code> <code>%AuxType</code> <em>multiplicity</em> <code>)</code>, where <code>aux_type</code> is an auxiliary type with a new name defined as <code>aux_type *args* = AuxType</code>. If any of the enclosing type's fields are used within <em>args</em>, they are added to the auxiliary constructor <code>aux_type</code> and to its <code>AuxType</code> result type as the first (optional) parameters.</p>
 </li>
 <li>
 <p>If <em>args</em> consists of one anonymous field of type <em>some-type</em>, then <em>some-type</em> can be used directly instead of <code>%AuxType</code>.</p>
@@ -156,29 +156,34 @@ typed_list (X:Type) (l : list X) = TypedList;</p>
 </li>
 </ul>
 <p>Example:</p>
-<pre><code>matrix {m n : #} a : m* [ n* [ double ] ] = Matrix m n;</code></pre>
+<pre><code>matrix {m n : #} a : m* [ n* [ double ] ] = Matrix m n;
+</code></pre>
 <p>is functionally equivalent to</p>
 <pre><code>aux_type {n : #} (_ : %Tuple double n) = AuxType n;
-matrix {m : #} {n : #} (a : %Tuple %(AuxType n) m) = Matrix m n;</code></pre>
+matrix {m : #} {n : #} (a : %Tuple %(AuxType n) m) = Matrix m n;
+</code></pre>
 <p>Moreover, the built-in types <code>Tuple</code> and <code>Vector</code> could be defined as:</p>
 <pre><code>tnil {X : Type} = Tuple X 0;
 tcons {X : Type} {n : #} hd:X tl:%(Tuple X n) = Tuple X (S n);
-vector {X : Type} (n : #) (v : %(Tuple X n)) = Vector X;</code></pre>
+vector {X : Type} (n : #) (v : %(Tuple X n)) = Vector X;
+</code></pre>
 <p>Actually, the following equivalent entry is considered the definition of <code>Vector</code> (i.e. it is specifically this entry that is used to compute the name of the <code>vector</code> constructor and its partial applications):</p>
-<pre><code>vector {t : Type} # [ t ] = Vector t;</code></pre>
+<pre><code>vector {t : Type} # [ t ] = Vector t;
+</code></pre>
 <p>If we expand it using <code>Tuple</code>, we obtain the previous definition exactly.</p>
 <h3><a class="anchor" href="#conditional-fields" id="conditional-fields" name="conditional-fields"><i class="anchor-icon"></i></a>Conditional fields</h3>
-<p>The construction </p>
+<p>The construction</p>
 <div class="richcode">
 <p><em>args</em> ::= <em>var-ident-opt</em> <code>:</code> [ <em>conditional-arg-def</em> ] [ <code>!</code> ] <em>type-term</em><br>
-<em>conditional-arg-def</em> ::= <em>var-ident</em> [ <code>.</code> <em>nat-const</em> ] <code>?</code>       </p>
+<em>conditional-arg-def</em> ::= <em>var-ident</em> [ <code>.</code> <em>nat-const</em> ] <code>?</code></p>
 </div>
 <p>permits assigning fields which are only present if the value of a preceding mandatory or optional field of type <code>#</code> is not null (or if its chosen bit is not zero if the special binary bit-selection operator <code>.</code> is applied).
 Example:</p>
 <div class="richcode">
 <p>user {fields:#} id:int first_name:(fields.0?string) last_name:(fields.1?string) friends:(fields.2?%(Vector int)) = User fields;<br>
-get_users req_fields:# ids:%(Vector int) = Vector %(User req_fields)  </p>
-</div></div>
+get_users req_fields:# ids:%(Vector int) = Vector %(User req_fields)</p>
+</div>
+</div>
   
 </div>
           

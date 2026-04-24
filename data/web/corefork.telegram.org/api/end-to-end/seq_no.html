@@ -45,12 +45,14 @@
   <div id="dev_page_content"><p>It is necessary to interpret <strong>all</strong> messages in their original order to protect against reordering, reflection, replay, omission and other manipulations (<a href="/constructor/decryptedMessageActionResend">decryptedMessageActionResend</a> messages are the only exception to this rule, see <a href="#avoiding-concurrent-gaps">avoiding concurrent gaps</a>). Secret chats support a special mechanism for handling <strong>seq_no</strong> counters independently from the server. Note that any <em>service messages</em> in secret chats must also increment the <strong>seq_no</strong>.</p>
 <p>All Secret Chats messages in clients using Layer 17 or higher are wrapped in <a href="/constructor/decryptedMessageLayer">decryptedMessageLayer</a> and have <strong>seq_no</strong> (sequence number) counters attached to them. The <strong>seq_no</strong> counters in their raw form are initialized with <strong>(out_seq_no, in_seq_no) := (0,0)</strong>, and incremented strictly by 1 after any message (service or not) is sent/received and processed. They must be protected from mirroring before being sent to the remote client by transformation according to formula <strong>2*raw_seq_no+x</strong>, where <strong>x</strong> is 0 or 1, determined by the following rule:</p>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td> </td>
-<td><strong>in_seq_no</strong></td>
-<td><strong>out_seq_no</strong></td>
+<th> </th>
+<th><strong>in_seq_no</strong></th>
+<th><strong>out_seq_no</strong></th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>secret chat initiated by sender</td>
 <td>0</td>
@@ -65,7 +67,7 @@
 </table>
 <p>In this way the least significant bit of each <strong>seq_no</strong> field included in the message is different for incoming and outgoing messages. This is done to prevent a possible attacker from mirroring the messages. If any of the received <strong>in_seq_no</strong> or <strong>out_seq_no</strong> are not consistent in terms of parity (see table above), the client is required to immediately abort the secret chat.</p>
 <blockquote>
-<p>E.g., the first message the local client sends to any secret chat will have <strong>out_seq_no</strong> of <strong>0+x_out</strong>, the second one will have <strong>out_seq_no</strong> of <strong>2*1+x_out</strong>, and so on, where <strong>x_out</strong> is 0 if the chat was initiated by the remote client, 1 otherwise; similarly for the received messages, but there <strong>x_in</strong> is used instead of <strong>x_out</strong> and is equal to 0 if the chat was initiated by the local client, 1 otherwise. </p>
+<p>E.g., the first message the local client sends to any secret chat will have <strong>out_seq_no</strong> of <strong>0+x_out</strong>, the second one will have <strong>out_seq_no</strong> of <strong>2*1+x_out</strong>, and so on, where <strong>x_out</strong> is 0 if the chat was initiated by the remote client, 1 otherwise; similarly for the received messages, but there <strong>x_in</strong> is used instead of <strong>x_out</strong> and is equal to 0 if the chat was initiated by the local client, 1 otherwise.</p>
 </blockquote>
 <p>Raw sequence numbers will be used in the remaining part of this text, unless otherwise specified.</p>
 <h4><a class="anchor" href="#preventing-gaps" id="preventing-gaps" name="preventing-gaps"><i class="anchor-icon"></i></a>Preventing gaps</h4>
@@ -101,7 +103,8 @@
 <li>change the local copy of the original message to <code>decryptedMessageActionDeleteMessages</code> with <strong>random_id</strong> equal to its own <strong>random_id</strong>;</li>
 <li>create a new outgoing message deleting the original message.</li>
 </ul>
-<p>This must be done because your client doesn't know whether the remote client really received the message or not. In the case the message was already received, it will be deleted by the second message; otherwise it must arrive as a "self-delete" message to maintain the correct sequence of seq_no.</p></div>
+<p>This must be done because your client doesn't know whether the remote client really received the message or not. In the case the message was already received, it will be deleted by the second message; otherwise it must arrive as a "self-delete" message to maintain the correct sequence of seq_no.</p>
+</div>
   
 </div>
           

@@ -66,7 +66,8 @@ tuple {t:Type} {n:#} [t] = Tuple t n;
 vectorTotal {t:Type} total_count:int vector:%(Vector t) = VectorTotal t;
 
 Empty False;
-true = True;</code></pre>
+true = True;
+</code></pre>
 <p>Next, properly, comes <code>tl.tl</code> itself. Note that the declaration for a fairly complex data type required only twenty lines in TL. This demonstrates the expressiveness and compactness of the TL language.</p>
 <pre><code>/////
 //
@@ -75,7 +76,7 @@ true = True;</code></pre>
 /////
 tls.schema_v2 version:int date:int types_num:# types:types_num*[tls.Type] 
 
-    constructor_num:# constructors:constructor_num*[tls.Combinator] 
+	constructor_num:# constructors:constructor_num*[tls.Combinator] 
     functions_num:# functions:functions_num*[tls.Combinator] = tls.Schema;
 tls.type name:int id:string constructors_num:int flags:int arity:int params_type:long = tls.Type;
 
@@ -95,11 +96,13 @@ tls.natVar dif:int var_num:int = tls.NatExpr;
 tls.typeVar var_num:int flags:int = tls.TypeExpr;
 
 tls.array multiplicity:tls.NatExpr args_num:# args:args_num*[tls.Arg] = tls.TypeExpr;
-tls.typeExpr name:int flags:int children_num:# children:children_num*[tls.Expr] = tls.TypeExpr;</code></pre>
+tls.typeExpr name:int flags:int children_num:# children:children_num*[tls.Expr] = tls.TypeExpr;
+</code></pre>
 <h2><a class="anchor" href="#remarks" id="remarks" name="remarks"><i class="anchor-icon"></i></a>Remarks</h2>
 <p>Schema serialization (version 2) always begins with the index number of the <code>tls.schema_v2</code> constructor for <code>tls.Schema</code>.
 Because the CRC32 of the string</p>
-<pre><code>tls.schema_v2 version:int date:int types_num:# types:types_num*[ tls.Type ] constructor_num:# constructors:constructor_num*[ tls.Combinator ] functions_num:# functions:functions_num*[ tls.Combinator ] = tls.Schema</code></pre>
+<pre><code>tls.schema_v2 version:int date:int types_num:# types:types_num*[ tls.Type ] constructor_num:# constructors:constructor_num*[ tls.Combinator ] functions_num:# functions:functions_num*[ tls.Combinator ] = tls.Schema
+</code></pre>
 <p>is 0x3a2f9be2, this constant is in fact the magic number for tlo files in the current version's format.
 If the format is extended in the future (for example, if TL's additional features are supported), then a <code>tls.schema_v3</code> constructor with a different number will appear.</p>
 <h2><a class="anchor" href="#example" id="example" name="example"><i class="anchor-icon"></i></a>Example</h2>
@@ -234,8 +237,9 @@ If the format is extended in the future (for example, if TL's additional feature
 <strong>0fc0</strong>: 6572646c 756e5f6e 0000006d 00000004  00000000 c1863d08 70659eff 00000000<br>
 <strong>0fe0</strong>: 00000000 29dfe61b 69686308 6572646c  0000006e 00000000 d9fb20de 4e8a14f0<br>
 <strong>1000</strong>: 00000000 00000000 00000001 29dfe61b  00000000 00000000 c1863d08 307d41a0<br>
-<strong>1020</strong>: 00000000 00000000 2c064372 c1863d08  193fd378 00000000 00000000 00000000  </p>
-</div></div>
+<strong>1020</strong>: 00000000 00000000 2c064372 c1863d08  193fd378 00000000 00000000 00000000</p>
+</div>
+</div>
   
 </div>
           

@@ -58,7 +58,7 @@
 <li>The server only allows media from public channels with more than <strong>100,000</strong> subscribers to be cached in CDN DCs (this includes media forwarded from those channels and viral media that originated from other large public channels).</li>
 </ul>
 <div>
-    <a href="/file/811140934/1815/aSQ-nSUHJzc.45662/40c2955965574cef80" target="_blank"><img src="/file/811140934/1815/aSQ-nSUHJzc.45662/40c2955965574cef80" title="CDNs explained" class="dev_page_image"></a>
+	<a href="/file/811140934/1815/aSQ-nSUHJzc.45662/40c2955965574cef80" target="_blank"><img src="/file/811140934/1815/aSQ-nSUHJzc.45662/40c2955965574cef80" title="CDNs explained" class="dev_page_image"></a>
 </div>
 <p>CDNs are very limited when it comes to communication: the master data center only uploads encrypted files for storage and will accept no data from the CDN. The client apps only download encrypted files and accept no other updates. The client apps obtain the keys necessary to decrypt the file from the main Telegram server and verify the integrity of the file by its hash, which means that the CDN may only supply the correct file – anything different will be immediately discarded by the client.</p>
 <p>CDN DCs do not store files on hard disks – only in memory. When a CDN server runs out of memory, a simple LRU algorithm is used to replace the least popular files with new ones.</p>
@@ -92,7 +92,7 @@
 <a href='/constructor/upload.cdnFile'>upload.cdnFile</a>#a99fca4f bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/upload.CdnFile'>upload.CdnFile</a>;
 
 
-<a href='/constructor/dcOption'>dcOption</a>#18b7a10d flags:<a href='/type/%23'>#</a> ipv6:flags.0?<a href='/constructor/true'>true</a> media_only:flags.1?<a href='/constructor/true'>true</a> tcpo_only:flags.2?<a href='/constructor/true'>true</a> cdn:flags.3?<a href='/constructor/true'>true</a> static:flags.4?<a href='/constructor/true'>true</a> this_port_only:flags.5?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> ip_address:<a href='/type/string'>string</a> port:<a href='/type/int'>int</a> secret:flags.10?<a href='/type/bytes'>bytes</a> = <a href='/type/DcOption'>DcOption</a>;
+<a href='/constructor/dcOption'>dcOption</a>#18b7a10d flags:<a href='/type/%23'>#</a> ipv6:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> media_only:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> tcpo_only:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> cdn:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> static:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> this_port_only:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> ip_address:<a href='/type/string'>string</a> port:<a href='/type/int'>int</a> secret:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/bytes'>bytes</a> = <a href='/type/DcOption'>DcOption</a>;
 
 <a href='/constructor/cdnPublicKey'>cdnPublicKey</a>#c982eaba dc_id:<a href='/type/int'>int</a> public_key:<a href='/type/string'>string</a> = <a href='/type/CdnPublicKey'>CdnPublicKey</a>;
 
@@ -108,7 +108,8 @@
 <a href='/method/upload.reuploadCdnFile'>upload.reuploadCdnFile</a>#9b2754a8 file_token:<a href='/type/bytes'>bytes</a> request_token:<a href='/type/bytes'>bytes</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FileHash'>FileHash</a>&gt;;
 <a href='/method/upload.getCdnFileHashes'>upload.getCdnFileHashes</a>#91dc3f31 file_token:<a href='/type/bytes'>bytes</a> offset:<a href='/type/long'>long</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/FileHash'>FileHash</a>&gt;;
 
-<a href='/method/help.getCdnConfig'>help.getCdnConfig</a>#52029342 = <a href='/type/CdnConfig'>CdnConfig</a>;</code></pre>
+<a href='/method/help.getCdnConfig'>help.getCdnConfig</a>#52029342 = <a href='/type/CdnConfig'>CdnConfig</a>;
+</code></pre>
 <h3><a class="anchor" href="#restrictions-on-uploadgetfile-and-uploadgetcdnfile-parameters" id="restrictions-on-uploadgetfile-and-uploadgetcdnfile-parameters" name="restrictions-on-uploadgetfile-and-uploadgetcdnfile-parameters"><i class="anchor-icon"></i></a>Restrictions on upload.getFile and upload.getCdnFile parameters</h3>
 <ul>
 <li><code>offset</code> must be divisible by 4096 bytes</li>
@@ -119,6 +120,13 @@
 </ul>
 <h3><a class="anchor" href="#possible-errors-and-their-meanings" id="possible-errors-and-their-meanings" name="possible-errors-and-their-meanings"><i class="anchor-icon"></i></a>Possible errors and their meanings</h3>
 <table class="table">
+<thead>
+<tr>
+<th>Method</th>
+<th>Error</th>
+<th>Description</th>
+</tr>
+</thead>
 <tbody>
 <tr>
 <td>upload.getCdnFile</td>
@@ -138,8 +146,9 @@
 </tbody>
 </table>
 <h3><a class="anchor" href="#testing-cdn-redirects" id="testing-cdn-redirects" name="testing-cdn-redirects"><i class="anchor-icon"></i></a>Testing CDN redirects</h3>
-<p>You may test CDN file redirects by logging into the <a href="/api/auth#test-accounts">test DCs</a> with a DC 2 account (phone number <code>999662YYYY</code>, where YYYY are random numbers, login code <code>22222</code>), uploading and then redownloading the uploaded file.  </p>
-<p>Make sure the chosen test account doesn't have a Telegram Premium test subscription, as CDN file downloads are disabled on the test DCs if a Telegram Premium test subscription is enabled (you can check this by making sure the <a href="/constructor/user">user</a> returned by a <a href="/method/users.getUsers">users.getUsers</a> call with <a href="/constructor/inputUserSelf">inputUserSelf</a> does not have the <code>premium</code> flag set).</p></div>
+<p>You may test CDN file redirects by logging into the <a href="/api/auth#test-accounts">test DCs</a> with a DC 2 account (phone number <code>999662YYYY</code>, where YYYY are random numbers, login code <code>22222</code>), uploading and then redownloading the uploaded file.</p>
+<p>Make sure the chosen test account doesn't have a Telegram Premium test subscription, as CDN file downloads are disabled on the test DCs if a Telegram Premium test subscription is enabled (you can check this by making sure the <a href="/constructor/user">user</a> returned by a <a href="/method/users.getUsers">users.getUsers</a> call with <a href="/constructor/inputUserSelf">inputUserSelf</a> does not have the <code>premium</code> flag set).</p>
+</div>
   
 </div>
           

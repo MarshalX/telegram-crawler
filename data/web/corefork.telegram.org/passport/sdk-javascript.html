@@ -47,7 +47,8 @@
 <p>The Javascript SDK helps you easily integrate Telegram Passport requests into your website. Check out our <a href="https://github.com/TelegramMessenger/TGPassportPHPSample">GitHub repository</a> to see samples using this SDK.</p>
 <h3><a class="anchor" href="#installation" id="installation" name="installation"><i class="anchor-icon"></i></a>Installation</h3>
 <p><a href="https://github.com/TelegramMessenger/TGPassportJsSDK">Download</a> and include the Javascript SDK in the head section of your page:</p>
-<pre><code>&lt;script src="telegram-passport.js"&gt;&lt;/script&gt;</code></pre>
+<pre><code>&lt;script src="telegram-passport.js"&gt;&lt;/script&gt;
+</code></pre>
 <h3><a class="anchor" href="#usage" id="usage" name="usage"><i class="anchor-icon"></i></a>Usage</h3>
 <p>Simply call <a href="#createauthbutton">Telegram.Passport.createAuthButton</a> to create the default Telegram Passport button:</p>
 <pre><code>&lt;div id="telegram_passport_auth"&gt;&lt;/div&gt;
@@ -59,43 +60,52 @@
     nonce:        'ab2df83746a87d2f3bd6...', // place nonce here
     callback_url: 'https://example.com/callback/' // place callback url here
   });
-&lt;/script&gt;</code></pre>
+&lt;/script&gt;
+</code></pre>
 <blockquote>
 <p>Note that if you use a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy">Content-Security-Policy</a> (CSP) header with the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src">frame-src</a>/<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/child-src">child-src</a> directive you should allow <code>tg:</code> source to prevent errors in some browsers (e.g. Firefox)</p>
 </blockquote>
 <h4><a class="anchor" href="#createauthbutton" id="createauthbutton" name="createauthbutton"><i class="anchor-icon"></i></a>createAuthButton</h4>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Parameters</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Required</strong></td>
+<th>Parameters</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>element</td>
 <td>String or DOMNode</td>
 <td>Yes</td>
+<td>ID of the element or the element which will be the container for the button</td>
 </tr>
 <tr>
 <td>auth_params</td>
 <td><a href="#authparameters">AuthParameters</a> or Function</td>
 <td>Yes</td>
+<td>Javascript object with auth parameters or a function which returns <a href="#authparameters">AuthParameters</a></td>
 </tr>
 <tr>
 <td>options</td>
 <td><a href="#authbuttonoptions">AuthButtonOptions</a></td>
 <td>Optional</td>
+<td>Button options</td>
 </tr>
 </tbody>
 </table>
 <h4><a class="anchor" href="#authparameters" id="authparameters" name="authparameters"><i class="anchor-icon"></i></a>AuthParameters</h4>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>bot_id</td>
 <td>Integer</td>
@@ -125,12 +135,14 @@
 </table>
 <h4><a class="anchor" href="#authbuttonoptions" id="authbuttonoptions" name="authbuttonoptions"><i class="anchor-icon"></i></a>AuthButtonOptions</h4>
 <table class="table">
-<tbody>
+<thead>
 <tr>
-<td><strong>Field</strong></td>
-<td><strong>Type</strong></td>
-<td><strong>Description</strong></td>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>text</td>
 <td>String</td>
@@ -170,7 +182,7 @@
     callback_url:  'https://example.com/callback/' // place callback url here
   };
   auth_button.addEventListener('click', function() {
-    Telegram.Passport.auth(auth_params, function(show) {
+  	Telegram.Passport.auth(auth_params, function(show) {
       if (show) {
         // some code to show tooltip
       } else {
@@ -178,11 +190,13 @@
       }
     });
   }, false);
-&lt;/script&gt;</code></pre>
+&lt;/script&gt;
+</code></pre>
 <h3><a class="anchor" href="#receiving-information" id="receiving-information" name="receiving-information"><i class="anchor-icon"></i></a>Receiving information</h3>
 <p>When the user confirms your request by pressing the "Authorize" button, it will be redirected to the URL specified in the <em>callback_url</em> with the parameter <code>tg_passport=success</code> and the Bot API will send the bot an <a href="/bots/api#update">Update</a> with the field <em>passport_data</em> which contains encrypted <a href="/bots/api#passportdata">Telegram Passport data</a>.</p>
 <p>If the user cancels your request, it will be redirected to the URL specified in the <em>callback_url</em> with the parameter <code>tg_passport=cancel</code>.</p>
-<p>If an error occurs during the request, the user will be redirected to the URL specified in the <em>callback_url</em> with the parameter <code>tg_passport=error</code>. The parameter <code>error</code> will contain one of the following values: <strong>BOT_INVALID</strong>, <strong>PUBLIC_KEY_REQUIRED</strong>, <strong>PUBLIC_KEY_INVALID</strong>, <strong>SCOPE_EMPTY</strong>, <strong>NONCE_EMPTY</strong>.</p></div>
+<p>If an error occurs during the request, the user will be redirected to the URL specified in the <em>callback_url</em> with the parameter <code>tg_passport=error</code>. The parameter <code>error</code> will contain one of the following values: <strong>BOT_INVALID</strong>, <strong>PUBLIC_KEY_REQUIRED</strong>, <strong>PUBLIC_KEY_INVALID</strong>, <strong>SCOPE_EMPTY</strong>, <strong>NONCE_EMPTY</strong>.</p>
+</div>
   
 </div>
           
