@@ -81,6 +81,22 @@ This article describes the full button flow, using the MTProto API.</p>
 <li><a href="/constructor/replyKeyboardForceReply">replyKeyboardForceReply</a> - Sends a <a href="/bots/api#forcereply">force reply</a> constructor <br>    User clients receiving a message with this constructor should act as if the user had clicked on the reply button of the message, displaying the reply UI.</li>
 <li><a href="/constructor/replyInlineMarkup">replyInlineMarkup</a> - Attaches an <a href="/bots/features#inline-keyboards">inline keyboard</a> to the message, allowing users to send callback data to the bot without sending actual messages to the current chat.</li>
 </ul>
+<h4><a class="anchor" href="#button-styles" id="button-styles" name="button-styles"><i class="anchor-icon"></i></a>Button styles</h4>
+<pre><code><a href='/constructor/keyboardButtonStyle'>keyboardButtonStyle</a>#4fdd3430 flags:<a href='/type/%23'>#</a> bg_primary:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> bg_danger:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> bg_success:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> icon:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/long'>long</a> = <a href='/type/KeyboardButtonStyle'>KeyboardButtonStyle</a>;
+</code></pre>
+<p>Buttons may be additionally styled by a <a href="/constructor/keyboardButtonStyle">keyboardButtonStyle</a> constructor, which can be attached to any button via the <code>style</code> flag.</p>
+<p>This constructor allows changing the background color of the button to one of the following predefined colors, by setting the appropriate flag:</p>
+<ul>
+<li><code>bg_primary</code> - a dark blue color, recommended for main actions.</li>
+<li><code>bg_danger</code> - a red color, recommended for destructive actions.</li>
+<li><code>bg_success</code> - a green color, recommended for positive actions.</li>
+<li>If none of the above flags are set, the default transparent (inline keyboards) or white (reply keyboards) background color will be used, recommended for neutral actions.</li>
+</ul>
+<p>The first three colors above must be appropriately modified according to the current <a href="/api/themes">theme</a> (i.e. for dark mode).</p>
+<p>Only one (or none, if an <code>icon</code> is additionally specified) of the background color flags can be set at a time.</p>
+<p>Additionally, <code>icon</code> can be populated with a <a href="/api/custom-emoji">custom emoji ID</a>, to display it before the button text.</p>
+<p><code>icon</code> can be used with or without custom button background colors.</p>
+<p>Custom emoji icons can only be used inside of buttons the bot purchased additional usernames on <a href="https://fragment.com/">Fragment</a>, or if the bot's owner has an active <a href="/api/premium">Telegram Premium</a> subscription.</p>
 <h3><a class="anchor" href="#pressing-buttons" id="pressing-buttons" name="pressing-buttons"><i class="anchor-icon"></i></a>Pressing buttons</h3>
 <pre><code><a href='/constructor/requestPeerTypeUser'>requestPeerTypeUser</a>#5f3b8a00 flags:<a href='/type/%23'>#</a> bot:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Bool'>Bool</a> premium:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Bool'>Bool</a> = <a href='/type/RequestPeerType'>RequestPeerType</a>;
 <a href='/constructor/requestPeerTypeChat'>requestPeerTypeChat</a>#c9f06e1b flags:<a href='/type/%23'>#</a> creator:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> bot_participant:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> has_username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Bool'>Bool</a> forum:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/Bool'>Bool</a> user_admin_rights:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/ChatAdminRights'>ChatAdminRights</a> bot_admin_rights:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/ChatAdminRights'>ChatAdminRights</a> = <a href='/type/RequestPeerType'>RequestPeerType</a>;
