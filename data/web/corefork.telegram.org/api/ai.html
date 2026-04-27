@@ -2,14 +2,12 @@
 <html class="">
   <head>
     <meta charset="utf-8">
-    <title>Ai</title>
+    <title>AI features</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Telegram offers many AI features powered by Cocoon — a decentralized network designed to maximize privacy.
-Compose messages…">
-    <meta property="og:title" content="Ai">
+    <meta property="description" content="Telegram offers many AI features powered by Cocoon — a decentralized network designed to maximize privacy.">
+    <meta property="og:title" content="AI features">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Telegram offers many AI features powered by Cocoon — a decentralized network designed to maximize privacy.
-Compose messages…">
+    <meta property="og:description" content="Telegram offers many AI features powered by Cocoon — a decentralized network designed to maximize privacy.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -41,8 +39,8 @@ Compose messages…">
       <div class="container clearfix">
         <div class="dev_page">
           <div id="dev_page_content_wrap" class=" ">
-  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/ai" >Ai</a></li></ul></div>
-  <h1 id="dev_page_title">Ai</h1>
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/ai" >AI features</a></li></ul></div>
+  <h1 id="dev_page_title">AI features</h1>
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
@@ -61,6 +59,7 @@ Compose messages…">
 <a href='/method/messages.composeMessageWithAI'>messages.composeMessageWithAI</a>#fd426afe flags:<a href='/type/%23'>#</a> proofread:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> emojify:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> text:<a href='/type/TextWithEntities'>TextWithEntities</a> translate_to_lang:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> change_tone:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> = <a href='/type/messages.ComposedMessageWithAI'>messages.ComposedMessageWithAI</a>;
 </code></pre>
 <p>Use <a href="/method/messages.composeMessageWithAI">messages.composeMessageWithAI</a> when writing a message to invoke telegram's AI Editor that can translate, transform, fixup and/or emojify your text in a number of different ways, privately powered by <a href="https://cocoon.org">Cocoon</a>!</p>
+<p>This method is invoked when pressing the AI button in the text input bar in chats: the AI button should be shown only for messages with more than 3 lines of text (even if the method itself doesn't have any limitation).</p>
 <p>There are multiple available editor modes, enabled by the appropriate flag:</p>
 <ul>
 <li><code>proofread</code> - Proofread and fix mistakes in the message</li>
@@ -69,9 +68,9 @@ Compose messages…">
 <li><code>emojify</code> - Add emojis to the message</li>
 </ul>
 <p>All of the modes specified above can be combined.</p>
-<p>Pass the text to transform in <code>text</code>: the method will return a <a href="/constructor/messages.composedMessageWithAI">messages.composedMessageWithAI</a> constructor, containing the transformed message in the <code>result_text</code> field.</p>
-<p>If <strong>only</strong> the proofreading mode (<code>proofread</code>) is enabled, the method will additionally populate <a href="/constructor/messages.composedMessageWithAI">messages.composedMessageWithAI</a>.<code>diff_text</code> with a "pre-rendered" diff between the old and the new, fixed message text.</p>
-<p><code>diff_text</code> should be rendered by simply rendering the <code>textWithEntities</code>, which only in this case will contain <strong>only</strong> <a href="/api/entities#diff-entities">diff entities, rendered as specified here »</a>.</p>
+<p>Pass the text to transform in <code>text</code>: the method will return a <a href="/constructor/messages.composedMessageWithAI">messages.composedMessageWithAI</a> constructor, containing the transformed message in the <code>result_text</code> field, with all <a href="/api/entities">styled text entities</a> offsets appropriately moved/resized/deleted as needed.</p>
+<p>If <strong>only</strong> the proofreading mode (<code>proofread</code>) is enabled, the method will additionally populate <a href="/constructor/messages.composedMessageWithAI">messages.composedMessageWithAI</a>.<code>diff_text</code> with a "pre-rendered" diff between the old and the new message text.</p>
+<p><code>diff_text</code> should be rendered by simply rendering the <code>textWithEntities</code>, which only in this case will contain <strong>only</strong> <a href="/api/entities#diff-entities">diff entities, rendered as specified here »</a> (normal styled text entities will always be stripped only in <code>diff_text</code>, never in <code>result_text</code>).</p>
 <h4><a class="anchor" href="#ai-compose-tones" id="ai-compose-tones" name="ai-compose-tones"><i class="anchor-icon"></i></a>AI compose tones</h4>
 <p>The full and up to date list of available AI composer tones is available in the <a href="/api/config#ai-compose-styles">ai_compose_styles client configuration key »</a>, example value:</p>
 <pre><code>[
