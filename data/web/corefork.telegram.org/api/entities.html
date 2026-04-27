@@ -152,12 +152,12 @@ for byte in text {
 <p>Diff entities simplify the client-side logic, by letting the server pre-generate the diff between two texts.</p>
 <p>These entities are rendered only within the context of the containing <a href="/constructor/textWithEntities">textWithEntities</a>: no other information apart from <code>text</code> and <code>entities</code> is needed (i.e. no need to do any diffing manually).</p>
 <ul>
-<li><a href="/constructor/messageEntityDiffInsert">messageEntityDiffInsert</a> - Represents an addition: render it by simply <u>underlining</u> the specified section and coloring it in green.</li>
-<li><a href="/constructor/messageEntityDiffInsert">messageEntityDiffInsert</a> - Represents a deletion: render it by simply <u>underlining</u> the specified section and coloring it in red.</li>
+<li><a href="/constructor/messageEntityDiffInsert">messageEntityDiffInsert</a> - Represents an addition: render it by simply <u>underlining</u> the section delimited by <code>offset</code> and <code>limit</code> and coloring it in green.</li>
+<li><a href="/constructor/messageEntityDiffInsert">messageEntityDiffInsert</a> - Represents a deletion: render it by simply <u>underlining</u> the section delimited by <code>offset</code> and <code>limit</code> and coloring it in red.</li>
 <li><a href="/constructor/messageEntityDiffReplace">messageEntityDiffReplace</a> - Represents a replacement, render it by:
 <ul>
-<li>Inserting <a href="/constructor/messageEntityDiffReplace">messageEntityDiffReplace</a>.<code>old_text</code> into the text at offset <code>offset</code>, <u>underlining</u> it and coloring it in red: note that this insertion not affect the offsets of entities that come after it.</li>
-<li><u>underlining</u> the specified section and coloring it in green</li>
+<li>Inserting <a href="/constructor/messageEntityDiffReplace">messageEntityDiffReplace</a>.<code>old_text</code> into the text at offset <code>offset</code>, <u>underlining</u> it and coloring it in red: note that this insertion does not affect the offsets of entities that come after it.</li>
+<li><u>underlining</u> the section delimited by <code>offset</code> and <code>limit</code> and coloring it in green.</li>
 </ul>
 </li>
 </ul>
@@ -186,7 +186,7 @@ for byte in text {
             "_": "messageEntityDiffReplace",
             "offset": 66,
             "length": 1,
-            "old_text": "u"
+            "old_text": "uuu"
         },
         {
             "_": "messageEntityDiffDelete",
@@ -198,9 +198,9 @@ for byte in text {
 </code></pre>
 <p>Is rendered like this:</p>
 <div>
-  <a href="/file/400780400324/7/0ihDitmmUuk.20855.jpg/ffb016385e89015a3e" target="_blank"><img src="/file/400780400324/7/0ihDitmmUuk.20855.jpg/ffb016385e89015a3e" title="e.jpg, 20.37KB" class="dev_page_image"></a>
+  <a href="/file/400780400224/3/mT5D09bwVMk.26923.png/17ab4a219f971e78b0" target="_blank"><img src="/file/400780400224/3/mT5D09bwVMk.26923.png/17ab4a219f971e78b0" title="Diff entity render example" class="dev_page_image"></a>
 </div>
-<p>Note how the final <a href="/constructor/messageEntityDiffDelete">messageEntityDiffDelete</a>'s offset is not changed by the <code>u</code> inserted by the preceding <a href="/constructor/messageEntityDiffReplace">messageEntityDiffReplace</a>.</p>
+<p>Note how the final <a href="/constructor/messageEntityDiffDelete">messageEntityDiffDelete</a>'s offset is not changed by the <code>uuu</code> inserted by the preceding <a href="/constructor/messageEntityDiffReplace">messageEntityDiffReplace</a>.</p>
 </div>
   
 </div>
