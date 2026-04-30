@@ -140,7 +140,7 @@
 <li>If <code>version</code> is bigger than <code>cached_version+1</code>, skip the update, and invalidate and refetch the local <a href="/constructor/chat">chat</a> and <a href="/constructor/chatFull">chatFull</a> using <a href="/method/messages.getFullChat">messages.getFullChat</a></li>
 <li>If there is no locally cached <a href="/constructor/chat">chat</a> for this chat, skip the update and fetch full info using using <a href="/method/messages.getFullChat">messages.getFullChat</a></li>
 </ul>
-<p>Note that [chatParticipants].<code>version</code> (contained in <a href="/constructor/chatFull">chatFull</a>) points to exactly the same sequence contained in <a href="/constructor/chat">chat</a>.<code>version</code>.</p>
+<p>Note that <a href="/constructor/chatParticipants">chatParticipants</a>.<code>version</code> (contained in <a href="/constructor/chatFull">chatFull</a>) points to exactly the same sequence contained in <a href="/constructor/chat">chat</a>.<code>version</code>.</p>
 <p>Here's the full list of updates related to basic groups which have the <code>version</code> field, and which parts of the stored <a href="/constructor/chat">chat</a>/<a href="/constructor/chatFull">chatFull</a> should they update if applied:</p>
 <ul>
 <li><a href="/constructor/updateChatParticipants">updateChatParticipants</a> - Update <a href="/constructor/chat">chat</a>.<code>participants_count</code>, <a href="/constructor/chatFull">chatFull</a>.<code>participants</code> (note that the <code>version</code> is contained in the <a href="/constructor/chatParticipants">chatParticipants</a> inside <a href="/constructor/updateChatParticipants">updateChatParticipants</a>.<code>participants</code>, not in the top constructor, and is not present in the banned <a href="/constructor/chatParticipantsForbidden">chatParticipantsForbidden</a> variant).</li>
@@ -151,6 +151,7 @@
 <li><a href="/constructor/updateChatDefaultBannedRights">updateChatDefaultBannedRights</a> - Update <a href="/constructor/chat">chat</a>.<code>default_banned_rights</code></li>
 <li><a href="/constructor/updateChatParticipantRank">updateChatParticipantRank</a> - Update the <a href="/type/ChatParticipant">ChatParticipant</a>.<code>rank</code> (contained in <a href="/constructor/chatFull">chatFull</a>.<code>participants</code>) of the specified user</li>
 </ul>
+<p><a href="/constructor/updateChatParticipant">updateChatParticipant</a> is the only update usable only by basic groups that doesn't have a <code>version</code> field and can be applied unconditionally.</p>
 <h4><a class="anchor" href="#manual-refreshes" id="manual-refreshes" name="manual-refreshes"><i class="anchor-icon"></i></a>Manual refreshes</h4>
 <p>For performance reasons, the server will not always send updates containing updated information about all peers: for this reason, information about <em>already cached</em> peers may be refreshed manually in certain conditions using the bulked <a href="/method/users.getUsers">users.getUsers</a>, <a href="/method/messages.getChats">messages.getChats</a>, <a href="/method/channels.getChannels">channels.getChannels</a> methods, all requiring the previously cached <code>access_hash</code>.</p>
 <p>The following list is non-exhaustive, and clients may choose to refresh peer information in some other conditions as well (i.e. when opening the profile page, etc).</p>
