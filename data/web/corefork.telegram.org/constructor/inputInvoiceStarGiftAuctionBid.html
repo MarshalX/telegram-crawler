@@ -4,32 +4,10 @@
     <meta charset="utf-8">
     <title>inputInvoiceStarGiftAuctionBid</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Parameters
-Name
-Type
-Description
-flags
-#
-Flags, see TL conditional fields
-hide_name
-flags.0?true
- 
-update_bid
-flags.2?true…">
+    <meta property="description" content="Used to place a bid in a collectible gift auction ».">
     <meta property="og:title" content="inputInvoiceStarGiftAuctionBid">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Parameters
-Name
-Type
-Description
-flags
-#
-Flags, see TL conditional fields
-hide_name
-flags.0?true
- 
-update_bid
-flags.2?true…">
+    <meta property="og:description" content="Used to place a bid in a collectible gift auction ».">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -64,7 +42,8 @@ flags.2?true…">
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/inputInvoiceStarGiftAuctionBid" >inputInvoiceStarGiftAuctionBid</a></li></ul></div>
   <h1 id="dev_page_title">inputInvoiceStarGiftAuctionBid</h1>
   
-  <div id="dev_page_content"><p><div class="clearfix">
+  <div id="dev_page_content"><p>Used to place a bid in a <a href="/api/auctions">collectible gift auction »</a>.</p>
+<p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
       <a class="dropdown-toggle"  onclick="return dropdownClick(this, event)" href="#">Layer 223 <b class="caret"></b></a>
@@ -95,37 +74,49 @@ flags.2?true…">
 <tr>
 <td><strong>hide_name</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>If set, your name will be hidden if the destination peer decides to display the gift on their profile (they will still see that you sent the gift).  <br>  Must not be set when updating an existing bid, as the value cannot be changed for existing bids.</td>
 </tr>
 <tr>
 <td><strong>update_bid</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>Must be set when increasing an already existing bid.</td>
 </tr>
 <tr>
 <td><strong>peer</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/type/InputPeer">InputPeer</a></td>
-<td> </td>
+<td>Identifier of the user or channel (only if <a href="/constructor/channelFull">channelFull</a>.<code>stargifts_available</code> is set) that will receive the gift.</td>
 </tr>
 <tr>
 <td><strong>gift_id</strong></td>
 <td style="text-align: center;"><a href="/type/long">long</a></td>
-<td> </td>
+<td>Identifier of the gift, from <a href="/constructor/starGift">starGift</a>.<code>id</code></td>
 </tr>
 <tr>
 <td><strong>bid_amount</strong></td>
 <td style="text-align: center;"><a href="/type/long">long</a></td>
-<td> </td>
+<td>Total amount of the bid in <a href="/api/stars">Telegram Stars</a>.</td>
 </tr>
 <tr>
 <td><strong>message</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/type/TextWithEntities">TextWithEntities</a></td>
-<td> </td>
+<td>Optional message that will be attached with the gift if we end up winning this round: the maximum length for this field is specified in the <a href="/api/config#stargifts-message-length-max">stargifts_message_length_max client configuration value »</a>.  <br>  Must not be set when updating an existing bid, as the value cannot be changed for existing bids.</td>
 </tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
-<p><a href="/type/InputInvoice">InputInvoice</a></p></div>
+<p><a href="/type/InputInvoice">InputInvoice</a></p>
+<h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#channelfull" id="channelfull" name="channelfull"><i class="anchor-icon"></i></a><a href="/constructor/channelFull">channelFull</a></h4>
+<p>Full info about a <a href="/api/channel#channels">channel</a>, <a href="/api/channel#supergroups">supergroup</a> or <a href="/api/channel#gigagroups">gigagroup</a>.</p>
+<p>When updating the <a href="/api/peers">local peer database »</a>, all fields from the newly received constructor take priority over the old constructor cached locally (including by removing fields that aren't set in the new constructor).</p>
+<h4><a class="anchor" href="#stargift" id="stargift" name="stargift"><i class="anchor-icon"></i></a><a href="/constructor/starGift">starGift</a></h4>
+<p>Represents a <a href="/api/gifts">star gift, see here »</a> for more info.</p>
+<h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
+<p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
+<h4><a class="anchor" href="#client-configuration" id="client-configuration" name="client-configuration"><i class="anchor-icon"></i></a><a href="/api/config">Client configuration</a></h4>
+<p>The MTProto API has multiple configuration parameters that can be fetched with the appropriate methods.</p>
+<h4><a class="anchor" href="#auctions" id="auctions" name="auctions"><i class="anchor-icon"></i></a><a href="/api/auctions">Auctions</a></h4>
+</div>
   
 </div>
           
