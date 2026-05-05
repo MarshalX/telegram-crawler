@@ -316,6 +316,7 @@ The resulting <a href="/constructor/messageActionStarGift">messageActionStarGift
 <p>To guarantee fair distribution of collectible gifts, new gift releases will be based on <strong>auctions</strong> — allowing users to place bids with Stars for new gifts over several rounds.</p>
 <p>Each auction will distribute a specific amount of variants of a specific gift to top bidders: auction information is split between its <a href="/type/StarGiftAuctionState">StarGiftAuctionState</a> object, its related <a href="/constructor/starGift">starGift</a> object and the user's <a href="/constructor/starGiftAuctionUserState">starGiftAuctionUserState</a>, if the user placed a bid in the auction.</p>
 <p>Any <a href="/constructor/starGift">starGift</a> with the <code>auction</code> flag (and linked flags) set is auction-only: it must <strong>not</strong> be bought through the normal <a href="#sending-gifts">gift sending flow »</a>.</p>
+<p><a href="/constructor/starGift">starGift</a>.<code>auction_slug</code> contains an <a href="/api/links#auction-links">auction deep link slug »</a> that can be used to generate an <a href="/api/links#auction-links">auction deep link »</a>.</p>
 <p>All three of the objects mentioned above will be returned together:</p>
 <ul>
 <li>
@@ -369,7 +370,6 @@ The resulting <a href="/constructor/messageActionStarGift">messageActionStarGift
 <a href='/method/payments.getStarGiftAuctionAcquiredGifts'>payments.getStarGiftAuctionAcquiredGifts</a>#6ba2cbec gift_id:<a href='/type/long'>long</a> = <a href='/type/payments.StarGiftAuctionAcquiredGifts'>payments.StarGiftAuctionAcquiredGifts</a>;
 </code></pre>
 <p>Auctions start at <a href="/type/StarGiftAuctionState">StarGiftAuctionState</a>.<code>start_date</code> and end at <a href="/type/StarGiftAuctionState">StarGiftAuctionState</a>.<code>end_date</code> (both fields are UNIX timestamps).</p>
-<p><a href="/constructor/starGift">starGift</a>.<code>auction_slug</code> contains an <a href="/api/links#auction-links">auction deep link slug »</a> that can be used to generate an <a href="/api/links#auction-links">auction deep link »</a> and/or fetch info about the auction <a href="#collectible-gift-auctions">as specified above »</a>.</p>
 <p>Each auction has <a href="/constructor/starGiftAuctionState">starGiftAuctionState</a>.<code>total_rounds</code> rounds: in each round, a specific amount (N = <a href="/constructor/starGift">starGift</a>.<code>gifts_per_round</code>) of variants of a specific gift is distributed to the top <code>N</code> bidders, for a total of <a href="/constructor/starGift">starGift</a>.<code>gifts_per_round</code> <code>*</code> <a href="/constructor/starGiftAuctionState">starGiftAuctionState</a>.<code>total_rounds</code> gifts.</p>
 <p><a href="/constructor/starGiftAuctionState">starGiftAuctionState</a>.<code>current_round</code> indicates the current active auction round.</p>
 <p>If your bid didn't end up in the top <code>N</code>, it automatically carries over to the next round. Once all the gifts have been awarded, any remaining bids will be automatically refunded.</p>
@@ -438,8 +438,8 @@ If no <a href="/constructor/auctionBidLevel">auctionBidLevel</a> matched using t
 </ul>
 <p>Won gifts are delivered as <a href="/constructor/messageActionStarGift">messageActionStarGift</a> service messages with the <code>auction_acquired</code> flag set.<br>
 <code>to_id</code> identifies the final recipient of the gift, and <code>gift_num</code> contains the collectible number.</p>
-<p>Use <a href="/method/payments.getStarGiftAuctionAcquiredGifts">payments.getStarGiftAuctionAcquiredGifts</a> to list the gifts that were already distributed by an auction.<br>
-Each returned <a href="/constructor/starGiftAuctionAcquiredGift">starGiftAuctionAcquiredGift</a> contains the winner, bid amount, round, position, optional message, hidden-name flag and optional <code>gift_num</code>.</p>
+<p>Use <a href="/method/payments.getStarGiftAuctionAcquiredGifts">payments.getStarGiftAuctionAcquiredGifts</a> to list the gifts that the current user won in an auction.</p>
+<p>Each returned <a href="/constructor/starGiftAuctionAcquiredGift">starGiftAuctionAcquiredGift</a> contains the destination peer, bid amount, round number, position, optional message, hidden-name flag and optional <code>gift_num</code>.</p>
 <p>Once an auction ends, <a href="/method/payments.getStarGiftAuctionState">payments.getStarGiftAuctionState</a> will return <a href="/constructor/starGiftAuctionStateFinished">starGiftAuctionStateFinished</a>, containing the final <code>start_date</code>, <code>end_date</code>, <code>average_price</code>, and optional secondary-market counters/URL (<code>listed_count</code>, <code>fragment_listed_count</code>, <code>fragment_listed_url</code>).</p>
 <p><a href="/api/links#auction-links">Auction deep link previous »</a> have a <a href="/constructor/webPage">webPage</a>.<code>type</code> equal to <code>telegram_auction</code> and contain the <a href="/constructor/webPageAttributeStarGiftAuction">webPageAttributeStarGiftAuction</a> attribute.</p>
 <h4><a class="anchor" href="#reselling-collectible-gifts" id="reselling-collectible-gifts" name="reselling-collectible-gifts"><i class="anchor-icon"></i></a>Reselling collectible gifts</h4>
