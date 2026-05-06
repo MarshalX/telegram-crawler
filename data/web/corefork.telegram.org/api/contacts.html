@@ -56,7 +56,8 @@
 
 ---functions---
 
-<a href='/method/contacts.importContacts'>contacts.importContacts</a>#2c800be5 contacts:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputContact'>InputContact</a>&gt; = <a href='/type/contacts.ImportedContacts'>contacts.ImportedContacts</a>;</code></pre>
+<a href='/method/contacts.importContacts'>contacts.importContacts</a>#2c800be5 contacts:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputContact'>InputContact</a>&gt; = <a href='/type/contacts.ImportedContacts'>contacts.ImportedContacts</a>;
+</code></pre>
 <p>To upload the local contact list to Telegram and see which contacts are already signed up on telegram, use <a href="/method/contacts.importContacts">contacts.importContacts</a>, passing an array of <a href="/constructor/inputPhoneContact">inputPhoneContact</a> constructors, containing:</p>
 <ul>
 <li><code>phone</code> - The phone number in international format</li>
@@ -68,11 +69,22 @@
 <ul>
 <li><code>imported</code> - A list of successfully imported contacts that have an associated Telegram account as <a href="/constructor/importedContact">importedContact</a> constructors.<br>
 <code>user_id</code> is the Telegram user ID, <code>client_id</code> is the <code>client_id</code> associated to the contact, passed during the method call.
-Note that according to the user's <a href="/api/privacy">privacy settings</a>, not all contacts which have an associated Telegram account may be returned here.</li>
+Note that according to the user's <a href="/api/privacy">privacy settings</a> (specifically, the <a href="/constructor/inputPrivacyKeyAddedByPhone">inputPrivacyKeyAddedByPhone</a> privacy key), not all contacts which have an associated Telegram account may be returned here.</li>
 <li><code>users</code> - Contains info about the Telegram users mentioned in <code>imported</code></li>
 <li><code>popular_invites</code> - Contains info about popular contacts: each <a href="/constructor/popularContact">popularContact</a> constructor indicates that the contact with the specified <code>client_id</code> was imported <code>imported</code> times by that many Telegram users.</li>
 <li><code>retry_contacts</code> - List of contact ids that could not be imported due to a server-side system limitation and have to be reimported with another call to <a href="/constructor/contacts.importedContacts">contacts.importedContacts</a>.</li>
 </ul>
+<h3><a class="anchor" href="#resolve-a-phone-number" id="resolve-a-phone-number" name="resolve-a-phone-number"><i class="anchor-icon"></i></a>Resolve a phone number</h3>
+<pre><code><a href='/constructor/contacts.resolvedPeer'>contacts.resolvedPeer</a>#7f077ad9 peer:<a href='/type/Peer'>Peer</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.ResolvedPeer'>contacts.ResolvedPeer</a>;
+
+---functions---
+
+<a href='/method/contacts.resolvePhone'>contacts.resolvePhone</a>#8af94344 phone:<a href='/type/string'>string</a> = <a href='/type/contacts.ResolvedPeer'>contacts.ResolvedPeer</a>;
+</code></pre>
+<p>You can use <a href="/method/contacts.resolvePhone">contacts.resolvePhone</a> to check if a phone number has an associated Telegram account, without importing it as a contact.</p>
+<p>If there is no Telegram account associated with the specified phone number, <code>PHONE_NOT_OCCUPIED</code> will be returned.</p>
+<p>The same error will be returned if the target account's <a href="/api/privacy">privacy settings »</a> (specifically, the <a href="/constructor/inputPrivacyKeyAddedByPhone">inputPrivacyKeyAddedByPhone</a> privacy key) prevent phone number lookups of their account.</p>
+<p>Make sure to implement client-side ratelimiting/debounce for this method, allowing at most 1 call every 3 seconds.</p>
 <h3><a class="anchor" href="#adding-telegram-users-as-contacts" id="adding-telegram-users-as-contacts" name="adding-telegram-users-as-contacts"><i class="anchor-icon"></i></a>Adding Telegram users as contacts</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/users.userFull'>users.userFull</a>#3b6d152e full_user:<a href='/type/UserFull'>UserFull</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/users.UserFull'>users.UserFull</a>;
@@ -91,17 +103,40 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 <a href='/method/users.getFullUser'>users.getFullUser</a>#b60f5918 id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.UserFull'>users.UserFull</a>;
 
-<a href='/method/contacts.addContact'>contacts.addContact</a>#d9ba2e54 flags:<a href='/type/%23'>#</a> add_phone_privacy_exception:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputUser'>InputUser</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> phone:<a href='/type/string'>string</a> note:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
-<p>Telegram users may also be added to the contact list (even if we do not have access to their phone number!) using <a href="/method/contacts.addContact">contacts.addContact</a>.  </p>
-<p>Set the <code>add_phone_privacy_exception</code> flag if we wish to allow the other user to see our phone number: this flag <strong>must</strong> be set if the <code>need_contacts_exception</code> flag of <a href="/constructor/peerSettings">peerSettings</a> is set (see the <a href="/api/action-bar">action bar documentation for more info »</a>).  </p>
-<p>The other user will be offered to also add us to the contact list via the <a href="/api/action-bar">add contact action bar</a>: if they accept, their phone number will be automatically added to our contact.  </p>
-<p>When adding or editing a contact, you can now include a private note — to help you remember how you met, where they work, or their favorite ice cream flavor; see <a href="/api/profile#private-notes-for-contacts">here »</a> for more info.  </p>
+<a href='/method/contacts.addContact'>contacts.addContact</a>#d9ba2e54 flags:<a href='/type/%23'>#</a> add_phone_privacy_exception:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputUser'>InputUser</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> phone:<a href='/type/string'>string</a> note:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<p>Telegram users may also be added to the contact list (even if we do not have access to their phone number!) using <a href="/method/contacts.addContact">contacts.addContact</a>.</p>
+<p>Set the <code>add_phone_privacy_exception</code> flag if we wish to allow the other user to see our phone number: this flag <strong>must</strong> be set if the <code>need_contacts_exception</code> flag of <a href="/constructor/peerSettings">peerSettings</a> is set (see the <a href="/api/action-bar">action bar documentation for more info »</a>).</p>
+<p>The other user will be offered to also add us to the contact list via the <a href="/api/action-bar">add contact action bar</a>: if they accept, their phone number will be automatically added to our contact.</p>
+<p>When adding or editing a contact, you can now include a private note — to help you remember how you met, where they work, or their favorite ice cream flavor; see <a href="/api/contacts#private-notes-for-contacts">here »</a> for more info.</p>
+<h3><a class="anchor" href="#private-notes-for-contacts" id="private-notes-for-contacts" name="private-notes-for-contacts"><i class="anchor-icon"></i></a>Private notes for contacts</h3>
+<pre><code><a href='/constructor/inputPhoneContact'>inputPhoneContact</a>#6a1dc4be flags:<a href='/type/%23'>#</a> client_id:<a href='/type/long'>long</a> phone:<a href='/type/string'>string</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> note:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/InputContact'>InputContact</a>;
+
+<a href='/constructor/userFull'>userFull</a>#6cbe645 flags:<a href='/type/%23'>#</a> blocked:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> phone_calls_available:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> phone_calls_private:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> can_pin_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> has_scheduled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> video_calls_available:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> voice_messages_forbidden:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/constructor/true'>true</a> translations_disabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.23?<a href='/constructor/true'>true</a> stories_pinned_available:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.26?<a href='/constructor/true'>true</a> blocked_my_stories_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.27?<a href='/constructor/true'>true</a> wallpaper_overridden:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/constructor/true'>true</a> contact_require_premium:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.29?<a href='/constructor/true'>true</a> read_dates_private:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.30?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> sponsored_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.7?<a href='/constructor/true'>true</a> can_view_revenue:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.9?<a href='/constructor/true'>true</a> bot_can_manage_emoji_status:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.10?<a href='/constructor/true'>true</a> display_gifts_button:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.16?<a href='/constructor/true'>true</a> noforwards_my_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.23?<a href='/constructor/true'>true</a> noforwards_peer_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.24?<a href='/constructor/true'>true</a> unofficial_security_risk:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.26?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> about:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> settings:<a href='/type/PeerSettings'>PeerSettings</a> personal_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/type/Photo'>Photo</a> profile_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Photo'>Photo</a> fallback_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/Photo'>Photo</a> notify_settings:<a href='/type/PeerNotifySettings'>PeerNotifySettings</a> bot_info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/BotInfo'>BotInfo</a> pinned_msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/int'>int</a> common_chats_count:<a href='/type/int'>int</a> folder_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/int'>int</a> ttl_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/int'>int</a> theme:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/ChatTheme'>ChatTheme</a> private_forward_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/string'>string</a> bot_group_admin_rights:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/ChatAdminRights'>ChatAdminRights</a> bot_broadcast_admin_rights:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/ChatAdminRights'>ChatAdminRights</a> wallpaper:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/type/WallPaper'>WallPaper</a> stories:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.25?<a href='/type/PeerStories'>PeerStories</a> business_work_hours:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.0?<a href='/type/BusinessWorkHours'>BusinessWorkHours</a> business_location:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.1?<a href='/type/BusinessLocation'>BusinessLocation</a> business_greeting_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.2?<a href='/type/BusinessGreetingMessage'>BusinessGreetingMessage</a> business_away_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.3?<a href='/type/BusinessAwayMessage'>BusinessAwayMessage</a> business_intro:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.4?<a href='/type/BusinessIntro'>BusinessIntro</a> birthday:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.5?<a href='/type/Birthday'>Birthday</a> personal_channel_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.6?<a href='/type/long'>long</a> personal_channel_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.6?<a href='/type/int'>int</a> stargifts_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.8?<a href='/type/int'>int</a> starref_program:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.11?<a href='/type/StarRefProgram'>StarRefProgram</a> bot_verification:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.12?<a href='/type/BotVerification'>BotVerification</a> send_paid_messages_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.14?<a href='/type/long'>long</a> disallowed_gifts:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.15?<a href='/type/DisallowedGiftsSettings'>DisallowedGiftsSettings</a> stars_rating:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.17?<a href='/type/StarsRating'>StarsRating</a> stars_my_pending_rating:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.18?<a href='/type/StarsRating'>StarsRating</a> stars_my_pending_rating_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.18?<a href='/type/int'>int</a> main_tab:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.20?<a href='/type/ProfileTab'>ProfileTab</a> saved_music:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.21?<a href='/type/Document'>Document</a> note:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.22?<a href='/type/TextWithEntities'>TextWithEntities</a> bot_manager_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.25?<a href='/type/long'>long</a> = <a href='/type/UserFull'>UserFull</a>;
+
+---functions---
+
+<a href='/method/contacts.addContact'>contacts.addContact</a>#d9ba2e54 flags:<a href='/type/%23'>#</a> add_phone_privacy_exception:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> id:<a href='/type/InputUser'>InputUser</a> first_name:<a href='/type/string'>string</a> last_name:<a href='/type/string'>string</a> phone:<a href='/type/string'>string</a> note:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/contacts.importContacts'>contacts.importContacts</a>#2c800be5 contacts:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputContact'>InputContact</a>&gt; = <a href='/type/contacts.ImportedContacts'>contacts.ImportedContacts</a>;
+
+<a href='/method/contacts.updateContactNote'>contacts.updateContactNote</a>#139f63fb id:<a href='/type/InputUser'>InputUser</a> note:<a href='/type/TextWithEntities'>TextWithEntities</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/users.getFullUser'>users.getFullUser</a>#b60f5918 id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/users.UserFull'>users.UserFull</a>;
+</code></pre>
+<p>When adding or editing a <strong>Telegram contact</strong>, you can now include a private note — to help you remember how you met, where they work, or their favorite ice cream flavor.</p>
+<p>Notes for contacts are <strong>only visible to you</strong> and appear on the user's Telegram <a href="/api/profile">profile »</a> under their bio.</p>
+<p>A note can be added when adding contacts using <a href="/method/contacts.addContact">contacts.addContact</a>.<code>note</code>, when importing contacts with <a href="/method/contacts.importContacts">contacts.importContacts</a> (passing it to <a href="/constructor/inputPhoneContact">inputPhoneContact</a>.<code>note</code>).</p>
+<p>Edit notes of existing contacts using <a href="/method/contacts.updateContactNote">contacts.updateContactNote</a>.</p>
+<p>The maximum note length is specified in the <a href="/api/config#contact-note-length-limit">contact_note_length_limit client configuration key »</a>.</p>
+<p>Note that Telegram users may be added to the contact list (and thus may have an associated private note) even if we do not have access to their phone number using <a href="/method/contacts.addContact">contacts.addContact</a>, see <a href="/api/contacts#adding-telegram-users-as-contacts">here »</a> for more info.</p>
+<p>The note will then be available in <a href="/constructor/userFull">userFull</a>.<code>note</code>, and can be fetched using <a href="/method/users.getFullUser">users.getFullUser</a>.</p>
 <h3><a class="anchor" href="#share-our-phone-number" id="share-our-phone-number" name="share-our-phone-number"><i class="anchor-icon"></i></a>Share our phone number</h3>
 <pre><code>---functions---
 
-<a href='/method/contacts.acceptContact'>contacts.acceptContact</a>#f831a20f id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Updates'>Updates</a>;</code></pre>
-<p>This method is invoked if the user clicks on the add contact button in the <a href="/api/action-bar#add-contact">add contact chat bar</a>.  </p>
-<p>The bar is activated only if the other user has <a href="#adding-telegram-users-as-contacts">added us as a contact</a> using <a href="/method/contacts.addContact">contacts.addContact</a> without using a phone number, and none of the <code>add_contact</code>, <code>report_spam</code>, <code>block_contact</code> <a href="/api/action-bar">bar flags</a> are set, the <code>share_contact</code> flag are be set, indicating we can invoke <a href="/method/contacts.acceptContact">contacts.acceptContact</a> to share our phone number with the other user.  </p>
+<a href='/method/contacts.acceptContact'>contacts.acceptContact</a>#f831a20f id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<p>This method is invoked if the user clicks on the add contact button in the <a href="/api/action-bar#add-contact">add contact chat bar</a>.</p>
+<p>The bar is activated only if the other user has <a href="#adding-telegram-users-as-contacts">added us as a contact</a> using <a href="/method/contacts.addContact">contacts.addContact</a> without using a phone number, and none of the <code>add_contact</code>, <code>report_spam</code>, <code>block_contact</code> <a href="/api/action-bar">bar flags</a> are set, the <code>share_contact</code> flag are be set, indicating we can invoke <a href="/method/contacts.acceptContact">contacts.acceptContact</a> to share our phone number with the other user.</p>
 <h3><a class="anchor" href="#fetching-the-contact-list" id="fetching-the-contact-list" name="fetching-the-contact-list"><i class="anchor-icon"></i></a>Fetching the contact list</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/contact'>contact</a>#145ade0b user_id:<a href='/type/long'>long</a> mutual:<a href='/type/Bool'>Bool</a> = <a href='/type/Contact'>Contact</a>;
@@ -119,10 +154,11 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 <a href='/method/contacts.getSaved'>contacts.getSaved</a>#82f1e39f = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/SavedContact'>SavedContact</a>&gt;;
 
-<a href='/method/contacts.getContactIDs'>contacts.getContactIDs</a>#7adc669d hash:<a href='/type/long'>long</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;</code></pre>
-<p>Use <a href="/method/contacts.getContacts">contacts.getContacts</a> to obtain all members of the contact list that have an associated Telegram account.  </p>
-<p>Use <a href="/method/contacts.getContactIDs">contacts.getContactIDs</a> to obtain an array of Telegram user IDs for all contacts (0 is returned for contacts do not have an associated Telegram account or have hidden their account using privacy settings).  </p>
-<p>To obtain the <em>full</em> contact list, including contacts which do not have an associated Telegram account, use <a href="/method/contacts.getSaved">contacts.getSaved</a> in combination with a <a href="/api/takeout">takeout session »</a>.  </p>
+<a href='/method/contacts.getContactIDs'>contacts.getContactIDs</a>#7adc669d hash:<a href='/type/long'>long</a> = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
+</code></pre>
+<p>Use <a href="/method/contacts.getContacts">contacts.getContacts</a> to obtain all members of the contact list that have an associated Telegram account.</p>
+<p>Use <a href="/method/contacts.getContactIDs">contacts.getContactIDs</a> to obtain an array of Telegram user IDs for all contacts (0 is returned for contacts do not have an associated Telegram account or have hidden their account using privacy settings).</p>
+<p>To obtain the <em>full</em> contact list, including contacts which do not have an associated Telegram account, use <a href="/method/contacts.getSaved">contacts.getSaved</a> in combination with a <a href="/api/takeout">takeout session »</a>.</p>
 <h3><a class="anchor" href="#getting-contact-statuses" id="getting-contact-statuses" name="getting-contact-statuses"><i class="anchor-icon"></i></a>Getting contact statuses</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/userStatusEmpty'>userStatusEmpty</a>#9d05049 = <a href='/type/UserStatus'>UserStatus</a>;
@@ -136,8 +172,9 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 ---functions---
 
-<a href='/method/contacts.getStatuses'>contacts.getStatuses</a>#c4a353ee = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ContactStatus'>ContactStatus</a>&gt;;</code></pre>
-<p>Use <a href="/method/contacts.getStatuses">contacts.getStatuses</a> to obtain the online statuses of all contacts with an accessible Telegram account.  </p>
+<a href='/method/contacts.getStatuses'>contacts.getStatuses</a>#c4a353ee = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/ContactStatus'>ContactStatus</a>&gt;;
+</code></pre>
+<p>Use <a href="/method/contacts.getStatuses">contacts.getStatuses</a> to obtain the online statuses of all contacts with an accessible Telegram account.</p>
 <h3><a class="anchor" href="#searching-for-contacts" id="searching-for-contacts" name="searching-for-contacts"><i class="anchor-icon"></i></a>Searching for contacts</h3>
 <p>Schema:</p>
 <pre><code><a href='/constructor/contacts.found'>contacts.found</a>#b3134d9d my_results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; results:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/contacts.Found'>contacts.Found</a>;
@@ -149,9 +186,10 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 <a href='/method/contacts.search'>contacts.search</a>#11f812d8 q:<a href='/type/string'>string</a> limit:<a href='/type/int'>int</a> = <a href='/type/contacts.Found'>contacts.Found</a>;
 
-<a href='/method/contacts.getSponsoredPeers'>contacts.getSponsoredPeers</a>#b6c8c393 q:<a href='/type/string'>string</a> = <a href='/type/contacts.SponsoredPeers'>contacts.SponsoredPeers</a>;</code></pre>
-<p>Use <a href="/method/contacts.search">contacts.search</a> to search within the contact list.  </p>
-<p><strong>Note</strong>: when using this method in global search, <a href="/method/contacts.getSponsoredPeers">contacts.getSponsoredPeers</a> should also be invoked, returning a list of sponsored peers to be displayed after the results in <a href="/constructor/contacts.found">contacts.found</a>.<code>my_results</code> and before the results in <a href="/constructor/contacts.found">contacts.found</a>.<code>results</code>: see <a href="/api/sponsored-messages#getting-sponsored-search-results">here »</a> for more info.  </p>
+<a href='/method/contacts.getSponsoredPeers'>contacts.getSponsoredPeers</a>#b6c8c393 q:<a href='/type/string'>string</a> = <a href='/type/contacts.SponsoredPeers'>contacts.SponsoredPeers</a>;
+</code></pre>
+<p>Use <a href="/method/contacts.search">contacts.search</a> to search within the contact list.</p>
+<p><strong>Note</strong>: when using this method in global search, <a href="/method/contacts.getSponsoredPeers">contacts.getSponsoredPeers</a> should also be invoked, returning a list of sponsored peers to be displayed after the results in <a href="/constructor/contacts.found">contacts.found</a>.<code>my_results</code> and before the results in <a href="/constructor/contacts.found">contacts.found</a>.<code>results</code>: see <a href="/api/sponsored-messages#getting-sponsored-search-results">here »</a> for more info.</p>
 <h3><a class="anchor" href="#deleting-contacts" id="deleting-contacts" name="deleting-contacts"><i class="anchor-icon"></i></a>Deleting contacts</h3>
 <p>Schema:</p>
 <pre><code>---functions---
@@ -160,10 +198,12 @@ Note that according to the user's <a href="/api/privacy">privacy settings</a>, n
 
 <a href='/method/contacts.deleteByPhones'>contacts.deleteByPhones</a>#1013fd9e phones:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/Bool'>Bool</a>;
 
-<a href='/method/contacts.resetSaved'>contacts.resetSaved</a>#879537f1 = <a href='/type/Bool'>Bool</a>;</code></pre>
-<p>Use <a href="/method/contacts.deleteContacts">contacts.deleteContacts</a> to delete contacts with an associated Telegram account; the returned <a href="/type/Updates">Updates</a> will contain updated user information.  </p>
-<p>Use <a href="/method/contacts.deleteByPhones">contacts.deleteByPhones</a> to delete contacts by their phone number, even if they don't have an associated Telegram account.  </p>
-<p>Use <a href="/method/contacts.resetSaved">contacts.resetSaved</a> to remove all contacts without an associated Telegram account.</p></div>
+<a href='/method/contacts.resetSaved'>contacts.resetSaved</a>#879537f1 = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>Use <a href="/method/contacts.deleteContacts">contacts.deleteContacts</a> to delete contacts with an associated Telegram account; the returned <a href="/type/Updates">Updates</a> will contain updated user information.</p>
+<p>Use <a href="/method/contacts.deleteByPhones">contacts.deleteByPhones</a> to delete contacts by their phone number, even if they don't have an associated Telegram account.</p>
+<p>Use <a href="/method/contacts.resetSaved">contacts.resetSaved</a> to remove all contacts without an associated Telegram account.</p>
+</div>
   
 </div>
           
