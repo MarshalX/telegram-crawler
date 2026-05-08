@@ -53,6 +53,60 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="may-8-2026" href="#may-8-2026"><i class="anchor-icon"></i></a>May 8, 2026</h4>
+<p><strong>Bot API 10.0</strong></p>
+<p><strong>Guest Mode</strong></p>
+<ul>
+<li>Introduced support for <a href="/bots/features#guest-bots">guest mode</a>, allowing bots to receive certain messages and issue replies within chats they are not a member of.</li>
+<li>Added the field <em>supports_guest_queries</em> to the class <a href="#user">User</a>.</li>
+<li>Added the fields <em>guest_bot_caller_user</em> and <em>guest_bot_caller_chat</em> to the class <a href="#message">Message</a>.</li>
+<li>Added the field <em>guest_query_id</em> to the class <a href="#message">Message</a>.</li>
+<li>Added the field <em>guest_message</em> to the class <a href="#update">Update</a>.</li>
+<li>Added the class <a href="#sentguestmessage">SentGuestMessage</a> and the method <a href="#answerguestquery">answerGuestQuery</a>.</li>
+</ul>
+<p><strong>Chat Management</strong></p>
+<ul>
+<li>Added the field <em>can_react_to_messages</em> to the classes <a href="#chatmemberrestricted">ChatMemberRestricted</a> and <a href="#chatpermissions">ChatPermissions</a>.</li>
+<li>Added the parameter <em>return_bots</em> to the method <a href="#getchatadministrators">getChatAdministrators</a>.</li>
+<li>Added the method <a href="#deleteallmessagereactions">deleteAllMessageReactions</a>.</li>
+<li>Added the method <a href="#deletemessagereaction">deleteMessageReaction</a>.</li>
+<li>Added the ability to see certain messages sent by other bots in groups.</li>
+</ul>
+<p><strong>Polls</strong></p>
+<ul>
+<li>Added the classes <a href="#inputmediasticker">InputMediaSticker</a>, <a href="#inputmedialocation">InputMediaLocation</a>, and <a href="#inputmediavenue">InputMediaVenue</a>.</li>
+<li>Added the class <a href="#pollmedia">PollMedia</a>, representing a media in a poll.</li>
+<li>Added the field <em>media</em> to the class <a href="#poll">Poll</a>, allowing bots to see media in polls.</li>
+<li>Added the field <em>explanation_media</em> to the class <a href="#poll">Poll</a>, allowing bots to see media in quiz explanations.</li>
+<li>Added the field <em>media</em> to the class <a href="#polloption">PollOption</a>, allowing bots to see media in poll options.</li>
+<li>Added the class <a href="#inputpollmedia">InputPollMedia</a> and the parameters <em>media</em> and <em>explanation_media</em> to the method <a href="#sendpoll">sendPoll</a>, allowing bots to add media to polls.</li>
+<li>Added the class <a href="#inputpolloptionmedia">InputPollOptionMedia</a> and the field <em>media</em> to the class <a href="#inputpolloption">InputPollOption</a>, allowing bots to add media to poll options.</li>
+<li>Added the field <em>members_only</em> to the class <a href="#poll">Poll</a>.</li>
+<li>Added the parameter <em>members_only</em> to the method <a href="#sendpoll">sendPoll</a>.</li>
+<li>Added the field <em>country_codes</em> to the class <a href="#poll">Poll</a>.</li>
+<li>Added the parameter <em>country_codes</em> to the method <a href="#sendpoll">sendPoll</a>.</li>
+<li>Decreased the minimum number of poll options from 2 to 1.</li>
+</ul>
+<p><strong>Live photos</strong></p>
+<ul>
+<li>Added the class <a href="#livephoto">LivePhoto</a>, which represents a photo with a short video.</li>
+<li>Added the class <a href="#inputmedialivephoto">InputMediaLivePhoto</a>.</li>
+<li>Added the field <em>live_photo</em> to the classes <a href="#message">Message</a> and <a href="#externalreplyinfo">ExternalReplyInfo</a>.</li>
+<li>Added the method <a href="#sendlivephoto">sendLivePhoto</a>, allowing bots to send live photos.</li>
+<li>Added the class <a href="#paidmedialivephoto">PaidMediaLivePhoto</a>, which describes a paid media with a live photo.</li>
+<li>Added the class <a href="#inputpaidmedialivephoto">InputPaidMediaLivePhoto</a>, allowing bots to send live photos as paid media.</li>
+<li>Allowed to use live photos in <a href="#sendmediagroup">sendMediaGroup</a> and <a href="#editmessagemedia">editMessageMedia</a>,</li>
+</ul>
+<p><strong>General</strong></p>
+<ul>
+<li>Allowed Business Bots to manage user accounts without a Telegram Premium subscription.</li>
+<li>Added the ability to send messages to other bots via username if both bots enabled bot-to-bot communication.</li>
+<li>Added the ability to reply to other bots from a business bot if the business bot enabled bot-to-bot communication.</li>
+<li>Allowed bots to pass an empty text in the method <a href="#sendmessagedraft">sendMessageDraft</a>.</li>
+<li>Added the class <a href="#botaccesssettings">BotAccessSettings</a> and the method <a href="#getmanagedbotaccesssettings">getManagedBotAccessSettings</a>.</li>
+<li>Added the method <a href="#setmanagedbotaccesssettings">setManagedBotAccessSettings</a>.</li>
+<li>Added the method <a href="#getuserpersonalchatmessages">getUserPersonalChatMessages</a>.</li>
+</ul>
 <h4><a class="anchor" name="april-3-2026" href="#april-3-2026"><i class="anchor-icon"></i></a>April 3, 2026</h4>
 <p><strong>Bot API 9.6</strong></p>
 <p><strong>Managed Bots</strong></p>
@@ -162,7 +216,7 @@ To learn how to create…">
 <p>There are two mutually exclusive ways of receiving updates for your bot - the <a href="#getupdates">getUpdates</a> method on one hand and <a href="#setwebhook">webhooks</a> on the other. Incoming updates are stored on the server until the bot receives them either way, but they will not be kept longer than 24 hours.</p>
 <p>Regardless of which option you choose, you will receive JSON-serialized <a href="#update">Update</a> objects as a result.</p>
 <h4><a class="anchor" name="update" href="#update"><i class="anchor-icon"></i></a>Update</h4>
-<p>This <a href="#available-types">object</a> represents an incoming update.<br>At most <strong>one</strong> of the optional parameters can be present in any given update.</p>
+<p>This <a href="#available-types">object</a> represents an incoming update.<br>At most <strong>one</strong> of the optional fields can be present in any given update.</p>
 <table class="table">
 <thead>
 <tr>
@@ -216,6 +270,11 @@ To learn how to create…">
 <td>deleted_business_messages</td>
 <td><a href="#businessmessagesdeleted">BusinessMessagesDeleted</a></td>
 <td><em>Optional</em>. Messages were deleted from a connected business account</td>
+</tr>
+<tr>
+<td>guest_message</td>
+<td><a href="#message">Message</a></td>
+<td><em>Optional</em>. New guest message. The bot can use the field <em>Message.guest_query_id</em> and the method <a href="#answerguestquery">answerGuestQuery</a> to send a message in response.</td>
 </tr>
 <tr>
 <td>message_reaction</td>
@@ -549,6 +608,11 @@ To learn how to create…">
 <td><em>Optional</em>. <em>True</em>, if <a href="/bots/features#privacy-mode">privacy mode</a> is disabled for the bot. Returned only in <a href="#getme">getMe</a>.</td>
 </tr>
 <tr>
+<td>supports_guest_queries</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the bot supports guest queries from chats it is not a member of. Returned only in <a href="#getme">getMe</a>.</td>
+</tr>
+<tr>
 <td>supports_inline_queries</td>
 <td>Boolean</td>
 <td><em>Optional</em>. <em>True</em>, if the bot supports inline queries. Returned only in <a href="#getme">getMe</a>.</td>
@@ -556,7 +620,7 @@ To learn how to create…">
 <tr>
 <td>can_connect_to_business</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the bot can be connected to a Telegram Business account to receive its messages. Returned only in <a href="#getme">getMe</a>.</td>
+<td><em>Optional</em>. <em>True</em>, if the bot can be connected to a user account to manage it. Returned only in <a href="#getme">getMe</a>.</td>
 </tr>
 <tr>
 <td>has_main_web_app</td>
@@ -958,6 +1022,11 @@ To learn how to create…">
 <td>Date the message was sent in Unix time. It is always a positive number, representing a valid date.</td>
 </tr>
 <tr>
+<td>guest_query_id</td>
+<td>String</td>
+<td><em>Optional</em>. The unique identifier for the guest query. Use this identifier with the method <a href="#answerguestquery">answerGuestQuery</a> to send a response message. If non-empty, the message belongs to the chat where the guest bot was summoned, which may not coincide with other existing bot chats sharing the same identifier.</td>
+</tr>
+<tr>
 <td>business_connection_id</td>
 <td>String</td>
 <td><em>Optional</em>. Unique identifier of the business connection from which the message was received. If non-empty, the message belongs to a chat of the corresponding business account that is independent from any potential bot chat which might share the same identifier.</td>
@@ -1016,6 +1085,16 @@ To learn how to create…">
 <td>via_bot</td>
 <td><a href="#user">User</a></td>
 <td><em>Optional</em>. Bot through which the message was sent</td>
+</tr>
+<tr>
+<td>guest_bot_caller_user</td>
+<td><a href="#user">User</a></td>
+<td><em>Optional</em>. For a message sent by a guest bot, this is the user whose original message triggered the bot&#39;s response</td>
+</tr>
+<tr>
+<td>guest_bot_caller_chat</td>
+<td><a href="#chat">Chat</a></td>
+<td><em>Optional</em>. For a message sent by a guest bot, this is the chat whose original message triggered the bot&#39;s response</td>
 </tr>
 <tr>
 <td>edit_date</td>
@@ -1091,6 +1170,11 @@ To learn how to create…">
 <td>document</td>
 <td><a href="#document">Document</a></td>
 <td><em>Optional</em>. Message is a general file, information about the file</td>
+</tr>
+<tr>
+<td>live_photo</td>
+<td><a href="#livephoto">LivePhoto</a></td>
+<td><em>Optional</em>. Message is a live photo, information about the live photo. For backward compatibility, when this field is set, the <em>photo</em> field will also be set</td>
 </tr>
 <tr>
 <td>paid_media</td>
@@ -1654,6 +1738,11 @@ To learn how to create…">
 <td><em>Optional</em>. Message is a general file, information about the file</td>
 </tr>
 <tr>
+<td>live_photo</td>
+<td><a href="#livephoto">LivePhoto</a></td>
+<td><em>Optional</em>. Message is a live photo, information about the live photo</td>
+</tr>
+<tr>
 <td>paid_media</td>
 <td><a href="#paidmediainfo">PaidMediaInfo</a></td>
 <td><em>Optional</em>. Message contains paid media; information about the paid media</td>
@@ -1764,7 +1853,7 @@ To learn how to create…">
 <tr>
 <td>chat_id</td>
 <td>Integer or String</td>
-<td><em>Optional</em>. If the message to be replied to is from a different chat, unique identifier for the chat or username of the channel (in the format <code>@channelusername</code>). Not supported for messages sent on behalf of a business account and messages from channel direct messages chats.</td>
+<td><em>Optional</em>. If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format <code>@username</code>. Not supported for messages sent on behalf of a business account and messages from channel direct messages chats.</td>
 </tr>
 <tr>
 <td>allow_sending_without_reply</td>
@@ -2135,6 +2224,59 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="livephoto" href="#livephoto"><i class="anchor-icon"></i></a>LivePhoto</h4>
+<p>This object represents a live photo.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>photo</td>
+<td>Array of <a href="#photosize">PhotoSize</a></td>
+<td><em>Optional</em>. Available sizes of the corresponding static photo</td>
+</tr>
+<tr>
+<td>file_id</td>
+<td>String</td>
+<td>Identifier for the video file which can be used to download or reuse the file</td>
+</tr>
+<tr>
+<td>file_unique_id</td>
+<td>String</td>
+<td>Unique identifier for the video file which is supposed to be the same over time and for different bots. Can&#39;t be used to download or reuse the file.</td>
+</tr>
+<tr>
+<td>width</td>
+<td>Integer</td>
+<td>Video width as defined by the sender</td>
+</tr>
+<tr>
+<td>height</td>
+<td>Integer</td>
+<td>Video height as defined by the sender</td>
+</tr>
+<tr>
+<td>duration</td>
+<td>Integer</td>
+<td>Duration of the video in seconds as defined by the sender</td>
+</tr>
+<tr>
+<td>mime_type</td>
+<td>String</td>
+<td><em>Optional</em>. MIME type of the file as defined by the sender</td>
+</tr>
+<tr>
+<td>file_size</td>
+<td>Integer</td>
+<td><em>Optional</em>. File size in bytes. It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="story" href="#story"><i class="anchor-icon"></i></a>Story</h4>
 <p>This object represents a story.</p>
 <table class="table">
@@ -2381,10 +2523,56 @@ To learn how to create…">
 <h4><a class="anchor" name="paidmedia" href="#paidmedia"><i class="anchor-icon"></i></a>PaidMedia</h4>
 <p>This object describes paid media. Currently, it can be one of</p>
 <ul>
-<li><a href="#paidmediapreview">PaidMediaPreview</a></li>
+<li><a href="#paidmedialivephoto">PaidMediaLivePhoto</a></li>
 <li><a href="#paidmediaphoto">PaidMediaPhoto</a></li>
+<li><a href="#paidmediapreview">PaidMediaPreview</a></li>
 <li><a href="#paidmediavideo">PaidMediaVideo</a></li>
 </ul>
+<h4><a class="anchor" name="paidmedialivephoto" href="#paidmedialivephoto"><i class="anchor-icon"></i></a>PaidMediaLivePhoto</h4>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the paid media, always “live_photo”</td>
+</tr>
+<tr>
+<td>live_photo</td>
+<td><a href="#livephoto">LivePhoto</a></td>
+<td>The photo</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="paidmediaphoto" href="#paidmediaphoto"><i class="anchor-icon"></i></a>PaidMediaPhoto</h4>
+<p>The paid media is a photo.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the paid media, always “photo”</td>
+</tr>
+<tr>
+<td>photo</td>
+<td>Array of <a href="#photosize">PhotoSize</a></td>
+<td>The photo</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="paidmediapreview" href="#paidmediapreview"><i class="anchor-icon"></i></a>PaidMediaPreview</h4>
 <p>The paid media isn&#39;t available before the payment.</p>
 <table class="table">
@@ -2415,29 +2603,6 @@ To learn how to create…">
 <td>duration</td>
 <td>Integer</td>
 <td><em>Optional</em>. Duration of the media in seconds as defined by the sender</td>
-</tr>
-</tbody>
-</table>
-<h4><a class="anchor" name="paidmediaphoto" href="#paidmediaphoto"><i class="anchor-icon"></i></a>PaidMediaPhoto</h4>
-<p>The paid media is a photo.</p>
-<table class="table">
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>type</td>
-<td>String</td>
-<td>Type of the paid media, always “photo”</td>
-</tr>
-<tr>
-<td>photo</td>
-<td>Array of <a href="#photosize">PhotoSize</a></td>
-<td>The photo</td>
 </tr>
 </tbody>
 </table>
@@ -2525,6 +2690,87 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="pollmedia" href="#pollmedia"><i class="anchor-icon"></i></a>PollMedia</h4>
+<p>At most <strong>one</strong> of the optional fields can be present in any given object.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>animation</td>
+<td><a href="#animation">Animation</a></td>
+<td><em>Optional</em>. Media is an animation, information about the animation</td>
+</tr>
+<tr>
+<td>audio</td>
+<td><a href="#audio">Audio</a></td>
+<td><em>Optional</em>. Media is an audio file, information about the file; currently, can&#39;t be received in a poll option</td>
+</tr>
+<tr>
+<td>document</td>
+<td><a href="#document">Document</a></td>
+<td><em>Optional</em>. Media is a general file, information about the file; currently, can&#39;t be received in a poll option</td>
+</tr>
+<tr>
+<td>live_photo</td>
+<td><a href="#livephoto">LivePhoto</a></td>
+<td><em>Optional</em>. Media is a live photo, information about the live photo</td>
+</tr>
+<tr>
+<td>location</td>
+<td><a href="#location">Location</a></td>
+<td><em>Optional</em>. Media is a shared location, information about the location</td>
+</tr>
+<tr>
+<td>photo</td>
+<td>Array of <a href="#photosize">PhotoSize</a></td>
+<td><em>Optional</em>. Media is a photo, available sizes of the photo</td>
+</tr>
+<tr>
+<td>sticker</td>
+<td><a href="#sticker">Sticker</a></td>
+<td><em>Optional</em>. Media is a sticker, information about the sticker; currently, for poll options only</td>
+</tr>
+<tr>
+<td>venue</td>
+<td><a href="#venue">Venue</a></td>
+<td><em>Optional</em>. Media is a venue, information about the venue</td>
+</tr>
+<tr>
+<td>video</td>
+<td><a href="#video">Video</a></td>
+<td><em>Optional</em>. Media is a video, information about the video</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="inputpollmedia" href="#inputpollmedia"><i class="anchor-icon"></i></a>InputPollMedia</h4>
+<p>This object represents the content of a poll description or a quiz explanation to be sent. It should be one of</p>
+<ul>
+<li><a href="#inputmediaanimation">InputMediaAnimation</a></li>
+<li><a href="#inputmediaaudio">InputMediaAudio</a></li>
+<li><a href="#inputmediadocument">InputMediaDocument</a></li>
+<li><a href="#inputmedialivephoto">InputMediaLivePhoto</a></li>
+<li><a href="#inputmedialocation">InputMediaLocation</a></li>
+<li><a href="#inputmediaphoto">InputMediaPhoto</a></li>
+<li><a href="#inputmediavenue">InputMediaVenue</a></li>
+<li><a href="#inputmediavideo">InputMediaVideo</a></li>
+</ul>
+<h4><a class="anchor" name="inputpolloptionmedia" href="#inputpolloptionmedia"><i class="anchor-icon"></i></a>InputPollOptionMedia</h4>
+<p>This object represents the content of a poll option to be sent. It should be one of</p>
+<ul>
+<li><a href="#inputmediaanimation">InputMediaAnimation</a></li>
+<li><a href="#inputmedialivephoto">InputMediaLivePhoto</a></li>
+<li><a href="#inputmedialocation">InputMediaLocation</a></li>
+<li><a href="#inputmediaphoto">InputMediaPhoto</a></li>
+<li><a href="#inputmediasticker">InputMediaSticker</a></li>
+<li><a href="#inputmediavenue">InputMediaVenue</a></li>
+<li><a href="#inputmediavideo">InputMediaVideo</a></li>
+</ul>
 <h4><a class="anchor" name="polloption" href="#polloption"><i class="anchor-icon"></i></a>PollOption</h4>
 <p>This object contains information about one answer option in a poll.</p>
 <table class="table">
@@ -2550,6 +2796,11 @@ To learn how to create…">
 <td>text_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. Special entities that appear in the option <em>text</em>. Currently, only custom emoji entities are allowed in poll option texts</td>
+</tr>
+<tr>
+<td>media</td>
+<td><a href="#pollmedia">PollMedia</a></td>
+<td><em>Optional</em>. Media added to the poll option</td>
 </tr>
 <tr>
 <td>voter_count</td>
@@ -2598,6 +2849,11 @@ To learn how to create…">
 <td>text_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. A JSON-serialized list of special entities that appear in the poll option text. It can be specified instead of <em>text_parse_mode</em></td>
+</tr>
+<tr>
+<td>media</td>
+<td><a href="#inputpolloptionmedia">InputPollOptionMedia</a></td>
+<td><em>Optional</em>. Media added to the poll option</td>
 </tr>
 </tbody>
 </table>
@@ -2701,6 +2957,16 @@ To learn how to create…">
 <td><em>True</em>, if the poll allows to change the chosen answer options</td>
 </tr>
 <tr>
+<td>members_only</td>
+<td>Boolean</td>
+<td><em>True</em> if voting is limited to users who have been members of the chat where the poll was originally sent for more than 24 hours</td>
+</tr>
+<tr>
+<td>country_codes</td>
+<td>Array of String</td>
+<td><em>Optional</em>. A list of two-letter <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country codes indicating the countries from which users can vote in the poll. If omitted, then users from any country can participate in the poll.</td>
+</tr>
+<tr>
 <td>correct_option_ids</td>
 <td>Array of Integer</td>
 <td><em>Optional</em>. Array of 0-based identifiers of the correct answer options. Available only for polls in quiz mode which are closed or were sent (not forwarded) by the bot or to the private chat with the bot.</td>
@@ -2714,6 +2980,11 @@ To learn how to create…">
 <td>explanation_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. Special entities like usernames, URLs, bot commands, etc. that appear in the <em>explanation</em></td>
+</tr>
+<tr>
+<td>explanation_media</td>
+<td><a href="#pollmedia">PollMedia</a></td>
+<td><em>Optional</em>. Media added to the quiz explanation</td>
 </tr>
 <tr>
 <td>open_period</td>
@@ -2734,6 +3005,11 @@ To learn how to create…">
 <td>description_entities</td>
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td><em>Optional</em>. Special entities like usernames, URLs, bot commands, etc. that appear in the description</td>
+</tr>
+<tr>
+<td>media</td>
+<td><a href="#pollmedia">PollMedia</a></td>
+<td><em>Optional</em>. Media added to the poll description; for polls inside the <a href="#message">Message</a> object only</td>
 </tr>
 </tbody>
 </table>
@@ -4310,7 +4586,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="replykeyboardmarkup" href="#replykeyboardmarkup"><i class="anchor-icon"></i></a>ReplyKeyboardMarkup</h4>
-<p>This object represents a <a href="/bots/features#keyboards">custom keyboard</a> with reply options (see <a href="/bots/features#keyboards">Introduction to bots</a> for details and examples). Not supported in channels and for messages sent on behalf of a Telegram Business account.</p>
+<p>This object represents a <a href="/bots/features#keyboards">custom keyboard</a> with reply options (see <a href="/bots/features#keyboards">Introduction to bots</a> for details and examples). Not supported in channels and for messages sent on behalf of a business account.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4578,7 +4854,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="replykeyboardremove" href="#replykeyboardremove"><i class="anchor-icon"></i></a>ReplyKeyboardRemove</h4>
-<p>Upon receiving a message with this object, Telegram clients will remove the current custom keyboard and display the default letter-keyboard. By default, custom keyboards are displayed until a new keyboard is sent by a bot. An exception is made for one-time keyboards that are hidden immediately after the user presses a button (see <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a>). Not supported in channels and for messages sent on behalf of a Telegram Business account.</p>
+<p>Upon receiving a message with this object, Telegram clients will remove the current custom keyboard and display the default letter-keyboard. By default, custom keyboards are displayed until a new keyboard is sent by a bot. An exception is made for one-time keyboards that are hidden immediately after the user presses a button (see <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a>). Not supported in channels and for messages sent on behalf of a business account.</p>
 <table class="table">
 <thead>
 <tr>
@@ -4657,7 +4933,7 @@ To learn how to create…">
 <tr>
 <td>web_app</td>
 <td><a href="#webappinfo">WebAppInfo</a></td>
-<td><em>Optional</em>. Description of the <a href="/bots/webapps">Web App</a> that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method <a href="#answerwebappquery">answerWebAppQuery</a>. Available only in private chats between a user and the bot. Not supported for messages sent on behalf of a Telegram Business account.</td>
+<td><em>Optional</em>. Description of the <a href="/bots/webapps">Web App</a> that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method <a href="#answerwebappquery">answerWebAppQuery</a>. Available only in private chats between a user and the bot. Not supported for messages sent on behalf of a business account.</td>
 </tr>
 <tr>
 <td>login_url</td>
@@ -4667,17 +4943,17 @@ To learn how to create…">
 <tr>
 <td>switch_inline_query</td>
 <td>String</td>
-<td><em>Optional</em>. If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot&#39;s username and the specified inline query in the input field. May be empty, in which case just the bot&#39;s username will be inserted. Not supported for messages sent in channel direct messages chats and on behalf of a Telegram Business account.</td>
+<td><em>Optional</em>. If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot&#39;s username and the specified inline query in the input field. May be empty, in which case just the bot&#39;s username will be inserted. Not supported for messages sent in channel direct messages chats and on behalf of a business account.</td>
 </tr>
 <tr>
 <td>switch_inline_query_current_chat</td>
 <td>String</td>
-<td><em>Optional</em>. If set, pressing the button will insert the bot&#39;s username and the specified inline query in the current chat&#39;s input field. May be empty, in which case only the bot&#39;s username will be inserted.<br><br>This offers a quick way for the user to open your bot in inline mode in the same chat - good for selecting something from multiple options. Not supported in channels and for messages sent in channel direct messages chats and on behalf of a Telegram Business account.</td>
+<td><em>Optional</em>. If set, pressing the button will insert the bot&#39;s username and the specified inline query in the current chat&#39;s input field. May be empty, in which case only the bot&#39;s username will be inserted.<br><br>This offers a quick way for the user to open your bot in inline mode in the same chat - good for selecting something from multiple options. Not supported in channels and for messages sent in channel direct messages chats and on behalf of a business account.</td>
 </tr>
 <tr>
 <td>switch_inline_query_chosen_chat</td>
 <td><a href="#switchinlinequerychosenchat">SwitchInlineQueryChosenChat</a></td>
-<td><em>Optional</em>. If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot&#39;s username and the specified inline query in the input field. Not supported for messages sent in channel direct messages chats and on behalf of a Telegram Business account.</td>
+<td><em>Optional</em>. If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot&#39;s username and the specified inline query in the input field. Not supported for messages sent in channel direct messages chats and on behalf of a business account.</td>
 </tr>
 <tr>
 <td>copy_text</td>
@@ -4845,7 +5121,7 @@ To learn how to create…">
 <p><strong>NOTE:</strong> After the user presses a callback button, Telegram clients will display a progress bar until you call <a href="#answercallbackquery">answerCallbackQuery</a>. It is, therefore, necessary to react by calling <a href="#answercallbackquery">answerCallbackQuery</a> even if no notification to the user is needed (e.g., without specifying any of the optional parameters).</p>
 </blockquote>
 <h4><a class="anchor" name="forcereply" href="#forcereply"><i class="anchor-icon"></i></a>ForceReply</h4>
-<p>Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot&#39;s message and tapped &#39;Reply&#39;). This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice <a href="/bots/features#privacy-mode">privacy mode</a>. Not supported in channels and for messages sent on behalf of a Telegram Business account.</p>
+<p>Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot&#39;s message and tapped &#39;Reply&#39;). This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice <a href="/bots/features#privacy-mode">privacy mode</a>. Not supported in channels and for messages sent on behalf of a user account.</p>
 <table class="table">
 <thead>
 <tr>
@@ -5408,6 +5684,11 @@ To learn how to create…">
 <td><em>True</em>, if the user is allowed to add web page previews to their messages</td>
 </tr>
 <tr>
+<td>can_react_to_messages</td>
+<td>Boolean</td>
+<td><em>True</em>, if the user is allowed to react to messages</td>
+</tr>
+<tr>
 <td>can_edit_tag</td>
 <td>Boolean</td>
 <td><em>True</em>, if the user is allowed to edit their own tag</td>
@@ -5595,9 +5876,14 @@ To learn how to create…">
 <td><em>Optional</em>. <em>True</em>, if the user is allowed to add web page previews to their messages</td>
 </tr>
 <tr>
+<td>can_react_to_messages</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to react to messages. If omitted, defaults to the value of <em>can_send_messages</em>.</td>
+</tr>
+<tr>
 <td>can_edit_tag</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the user is allowed to edit their own tag</td>
+<td><em>Optional</em>. <em>True</em>, if the user is allowed to edit their own tag. If omitted, defaults to the value of <em>can_pin_messages</em>.</td>
 </tr>
 <tr>
 <td>can_change_info</td>
@@ -6921,6 +7207,29 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="botaccesssettings" href="#botaccesssettings"><i class="anchor-icon"></i></a>BotAccessSettings</h4>
+<p>This object describes the access settings of a bot.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>is_access_restricted</td>
+<td>Boolean</td>
+<td><em>True</em>, if only selected users can access the bot. The bot&#39;s owner can always access it.</td>
+</tr>
+<tr>
+<td>added_users</td>
+<td>Array of <a href="#user">User</a></td>
+<td><em>Optional</em>. The list of other users who have access to the bot if the access is restricted</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="acceptedgifttypes" href="#acceptedgifttypes"><i class="anchor-icon"></i></a>AcceptedGiftTypes</h4>
 <p>This object describes the types of gifts that can be gifted to a user or a chat.</p>
 <table class="table">
@@ -7133,7 +7442,7 @@ To learn how to create…">
 <tr>
 <td>chat_id</td>
 <td>Integer or String</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>). Channel direct messages chats and channel chats aren&#39;t supported.</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code>. Channel direct messages chats and channel chats aren&#39;t supported.</td>
 </tr>
 </tbody>
 </table>
@@ -7156,7 +7465,7 @@ To learn how to create…">
 <tr>
 <td>chat_id</td>
 <td>Integer or String</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>). Channel direct messages chats and channel chats aren&#39;t supported.</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code>. Channel direct messages chats and channel chats aren&#39;t supported.</td>
 </tr>
 </tbody>
 </table>
@@ -7179,7 +7488,7 @@ To learn how to create…">
 <tr>
 <td>chat_id</td>
 <td>Integer or String</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>). Channel direct messages chats and channel chats aren&#39;t supported.</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code>. Channel direct messages chats and channel chats aren&#39;t supported.</td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -7508,7 +7817,7 @@ To learn how to create…">
 <tr>
 <td>new_owner</td>
 <td><a href="#user">User</a></td>
-<td><em>Optional</em>. The user which will be the new owner of the chat if the previous owner does not return to the chat</td>
+<td><em>Optional</em>. The user who will become the new owner of the chat if the previous owner does not return to the chat</td>
 </tr>
 </tbody>
 </table>
@@ -7720,6 +8029,24 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="sentguestmessage" href="#sentguestmessage"><i class="anchor-icon"></i></a>SentGuestMessage</h4>
+<p>Describes an inline message sent by a guest bot.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inline_message_id</td>
+<td>String</td>
+<td>Identifier of the sent inline message</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="preparedinlinemessage" href="#preparedinlinemessage"><i class="anchor-icon"></i></a>PreparedInlineMessage</h4>
 <p>Describes an inline message to be sent by a user of a Mini App.</p>
 <table class="table">
@@ -7788,142 +8115,12 @@ To learn how to create…">
 <p>This object represents the content of a media message to be sent. It should be one of</p>
 <ul>
 <li><a href="#inputmediaanimation">InputMediaAnimation</a></li>
-<li><a href="#inputmediadocument">InputMediaDocument</a></li>
 <li><a href="#inputmediaaudio">InputMediaAudio</a></li>
+<li><a href="#inputmediadocument">InputMediaDocument</a></li>
+<li><a href="#inputmedialivephoto">InputMediaLivePhoto</a></li>
 <li><a href="#inputmediaphoto">InputMediaPhoto</a></li>
 <li><a href="#inputmediavideo">InputMediaVideo</a></li>
 </ul>
-<h4><a class="anchor" name="inputmediaphoto" href="#inputmediaphoto"><i class="anchor-icon"></i></a>InputMediaPhoto</h4>
-<p>Represents a photo to be sent.</p>
-<table class="table">
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>type</td>
-<td>String</td>
-<td>Type of the result, must be <em>photo</em></td>
-</tr>
-<tr>
-<td>media</td>
-<td>String</td>
-<td>File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
-</tr>
-<tr>
-<td>caption</td>
-<td>String</td>
-<td><em>Optional</em>. Caption of the photo to be sent, 0-1024 characters after entities parsing</td>
-</tr>
-<tr>
-<td>parse_mode</td>
-<td>String</td>
-<td><em>Optional</em>. Mode for parsing entities in the photo caption. See <a href="#formatting-options">formatting options</a> for more details.</td>
-</tr>
-<tr>
-<td>caption_entities</td>
-<td>Array of <a href="#messageentity">MessageEntity</a></td>
-<td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
-</tr>
-<tr>
-<td>show_caption_above_media</td>
-<td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
-</tr>
-<tr>
-<td>has_spoiler</td>
-<td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if the photo needs to be covered with a spoiler animation</td>
-</tr>
-</tbody>
-</table>
-<h4><a class="anchor" name="inputmediavideo" href="#inputmediavideo"><i class="anchor-icon"></i></a>InputMediaVideo</h4>
-<p>Represents a video to be sent.</p>
-<table class="table">
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>type</td>
-<td>String</td>
-<td>Type of the result, must be <em>video</em></td>
-</tr>
-<tr>
-<td>media</td>
-<td>String</td>
-<td>File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
-</tr>
-<tr>
-<td>thumbnail</td>
-<td>String</td>
-<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
-</tr>
-<tr>
-<td>cover</td>
-<td>String</td>
-<td><em>Optional</em>. Cover for the video in the message. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
-</tr>
-<tr>
-<td>start_timestamp</td>
-<td>Integer</td>
-<td><em>Optional</em>. Start timestamp for the video in the message</td>
-</tr>
-<tr>
-<td>caption</td>
-<td>String</td>
-<td><em>Optional</em>. Caption of the video to be sent, 0-1024 characters after entities parsing</td>
-</tr>
-<tr>
-<td>parse_mode</td>
-<td>String</td>
-<td><em>Optional</em>. Mode for parsing entities in the video caption. See <a href="#formatting-options">formatting options</a> for more details.</td>
-</tr>
-<tr>
-<td>caption_entities</td>
-<td>Array of <a href="#messageentity">MessageEntity</a></td>
-<td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
-</tr>
-<tr>
-<td>show_caption_above_media</td>
-<td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
-</tr>
-<tr>
-<td>width</td>
-<td>Integer</td>
-<td><em>Optional</em>. Video width</td>
-</tr>
-<tr>
-<td>height</td>
-<td>Integer</td>
-<td><em>Optional</em>. Video height</td>
-</tr>
-<tr>
-<td>duration</td>
-<td>Integer</td>
-<td><em>Optional</em>. Video duration in seconds</td>
-</tr>
-<tr>
-<td>supports_streaming</td>
-<td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if the uploaded video is suitable for streaming</td>
-</tr>
-<tr>
-<td>has_spoiler</td>
-<td>Boolean</td>
-<td><em>Optional</em>. Pass <em>True</em> if the video needs to be covered with a spoiler animation</td>
-</tr>
-</tbody>
-</table>
 <h4><a class="anchor" name="inputmediaanimation" href="#inputmediaanimation"><i class="anchor-icon"></i></a>InputMediaAnimation</h4>
 <p>Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.</p>
 <table class="table">
@@ -8098,14 +8295,346 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="inputmedialivephoto" href="#inputmedialivephoto"><i class="anchor-icon"></i></a>InputMediaLivePhoto</h4>
+<p>Represents a live photo to be sent.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the result, must be <em>live_photo</em></td>
+</tr>
+<tr>
+<td>media</td>
+<td>String</td>
+<td>Video of the live photo to send. Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a>. Sending live photos by a URL is currently unsupported.</td>
+</tr>
+<tr>
+<td>photo</td>
+<td>String</td>
+<td>The static photo to send. Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a>. Sending live photos by a URL is currently unsupported.</td>
+</tr>
+<tr>
+<td>caption</td>
+<td>String</td>
+<td><em>Optional</em>. Caption of the live photo to be sent, 0-1024 characters after entities parsing</td>
+</tr>
+<tr>
+<td>parse_mode</td>
+<td>String</td>
+<td><em>Optional</em>. Mode for parsing entities in the live photo caption. See <a href="#formatting-options">formatting options</a> for more details.</td>
+</tr>
+<tr>
+<td>caption_entities</td>
+<td>Array of <a href="#messageentity">MessageEntity</a></td>
+<td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
+<td>has_spoiler</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> if the live photo needs to be covered with a spoiler animation</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="inputmedialocation" href="#inputmedialocation"><i class="anchor-icon"></i></a>InputMediaLocation</h4>
+<p>Represents a location to be sent.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the result, must be <em>location</em></td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>Float</td>
+<td>Latitude of the location</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>Float</td>
+<td>Longitude of the location</td>
+</tr>
+<tr>
+<td>horizontal_accuracy</td>
+<td>Float</td>
+<td><em>Optional</em>. The radius of uncertainty for the location, measured in meters; 0-1500</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="inputmediaphoto" href="#inputmediaphoto"><i class="anchor-icon"></i></a>InputMediaPhoto</h4>
+<p>Represents a photo to be sent.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the result, must be <em>photo</em></td>
+</tr>
+<tr>
+<td>media</td>
+<td>String</td>
+<td>File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>caption</td>
+<td>String</td>
+<td><em>Optional</em>. Caption of the photo to be sent, 0-1024 characters after entities parsing</td>
+</tr>
+<tr>
+<td>parse_mode</td>
+<td>String</td>
+<td><em>Optional</em>. Mode for parsing entities in the photo caption. See <a href="#formatting-options">formatting options</a> for more details.</td>
+</tr>
+<tr>
+<td>caption_entities</td>
+<td>Array of <a href="#messageentity">MessageEntity</a></td>
+<td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
+<td>has_spoiler</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> if the photo needs to be covered with a spoiler animation</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="inputmediasticker" href="#inputmediasticker"><i class="anchor-icon"></i></a>InputMediaSticker</h4>
+<p>Represents a sticker file to be sent.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the result, must be <em>sticker</em></td>
+</tr>
+<tr>
+<td>media</td>
+<td>String</td>
+<td>File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a .WEBP sticker from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>emoji</td>
+<td>String</td>
+<td><em>Optional</em>. Emoji associated with the sticker; only for just uploaded stickers</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="inputmediavenue" href="#inputmediavenue"><i class="anchor-icon"></i></a>InputMediaVenue</h4>
+<p>Represents a venue to be sent.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the result, must be <em>venue</em></td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>Float</td>
+<td>Latitude of the location</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>Float</td>
+<td>Longitude of the location</td>
+</tr>
+<tr>
+<td>title</td>
+<td>String</td>
+<td>Name of the venue</td>
+</tr>
+<tr>
+<td>address</td>
+<td>String</td>
+<td>Address of the venue</td>
+</tr>
+<tr>
+<td>foursquare_id</td>
+<td>String</td>
+<td><em>Optional</em>. Foursquare identifier of the venue</td>
+</tr>
+<tr>
+<td>foursquare_type</td>
+<td>String</td>
+<td><em>Optional</em>. Foursquare type of the venue, if known. (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)</td>
+</tr>
+<tr>
+<td>google_place_id</td>
+<td>String</td>
+<td><em>Optional</em>. Google Places identifier of the venue</td>
+</tr>
+<tr>
+<td>google_place_type</td>
+<td>String</td>
+<td><em>Optional</em>. Google Places type of the venue. (See <a href="https://developers.google.com/places/web-service/supported_types">supported types</a>.)</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="inputmediavideo" href="#inputmediavideo"><i class="anchor-icon"></i></a>InputMediaVideo</h4>
+<p>Represents a video to be sent.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the result, must be <em>video</em></td>
+</tr>
+<tr>
+<td>media</td>
+<td>String</td>
+<td>File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>thumbnail</td>
+<td>String</td>
+<td><em>Optional</em>. Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail&#39;s width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can&#39;t be reused and can be only uploaded as a new file, so you can pass “attach://&lt;file_attach_name&gt;” if the thumbnail was uploaded using multipart/form-data under &lt;file_attach_name&gt;. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>cover</td>
+<td>String</td>
+<td><em>Optional</em>. Cover for the video in the message. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a></td>
+</tr>
+<tr>
+<td>start_timestamp</td>
+<td>Integer</td>
+<td><em>Optional</em>. Start timestamp for the video in the message</td>
+</tr>
+<tr>
+<td>caption</td>
+<td>String</td>
+<td><em>Optional</em>. Caption of the video to be sent, 0-1024 characters after entities parsing</td>
+</tr>
+<tr>
+<td>parse_mode</td>
+<td>String</td>
+<td><em>Optional</em>. Mode for parsing entities in the video caption. See <a href="#formatting-options">formatting options</a> for more details.</td>
+</tr>
+<tr>
+<td>caption_entities</td>
+<td>Array of <a href="#messageentity">MessageEntity</a></td>
+<td><em>Optional</em>. List of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
+<td>width</td>
+<td>Integer</td>
+<td><em>Optional</em>. Video width</td>
+</tr>
+<tr>
+<td>height</td>
+<td>Integer</td>
+<td><em>Optional</em>. Video height</td>
+</tr>
+<tr>
+<td>duration</td>
+<td>Integer</td>
+<td><em>Optional</em>. Video duration in seconds</td>
+</tr>
+<tr>
+<td>supports_streaming</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> if the uploaded video is suitable for streaming</td>
+</tr>
+<tr>
+<td>has_spoiler</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> if the video needs to be covered with a spoiler animation</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="inputfile" href="#inputfile"><i class="anchor-icon"></i></a>InputFile</h4>
 <p>This object represents the contents of a file to be uploaded. Must be posted using multipart/form-data in the usual way that files are uploaded via the browser.</p>
 <h4><a class="anchor" name="inputpaidmedia" href="#inputpaidmedia"><i class="anchor-icon"></i></a>InputPaidMedia</h4>
 <p>This object describes the paid media to be sent. Currently, it can be one of</p>
 <ul>
+<li><a href="#inputpaidmedialivephoto">InputPaidMediaLivePhoto</a></li>
 <li><a href="#inputpaidmediaphoto">InputPaidMediaPhoto</a></li>
 <li><a href="#inputpaidmediavideo">InputPaidMediaVideo</a></li>
 </ul>
+<h4><a class="anchor" name="inputpaidmedialivephoto" href="#inputpaidmedialivephoto"><i class="anchor-icon"></i></a>InputPaidMediaLivePhoto</h4>
+<p>The paid media to send is a live photo.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the media, must be <em>live_photo</em></td>
+</tr>
+<tr>
+<td>media</td>
+<td>String</td>
+<td>Video of the live photo to send. Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a>. Sending live photos by a URL is currently unsupported.</td>
+</tr>
+<tr>
+<td>photo</td>
+<td>String</td>
+<td>The static photo to send. Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://&lt;file_attach_name&gt;” to upload a new one using multipart/form-data under &lt;file_attach_name&gt; name. <a href="#sending-files">More information on Sending Files »</a>. Sending live photos by a URL is currently unsupported.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="inputpaidmediaphoto" href="#inputpaidmediaphoto"><i class="anchor-icon"></i></a>InputPaidMediaPhoto</h4>
 <p>The paid media to send is a photo.</p>
 <table class="table">
@@ -8415,7 +8944,7 @@ To learn how to create…">
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -8469,7 +8998,7 @@ To learn how to create…">
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -8615,7 +9144,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <li>Escaping inside entities is not allowed, so entity must be closed first and reopened again: use <code>_snake_\__case_</code> for italic <code>snake_case</code> and <code>*2*\**2=4*</code> for bold <code>2*2=4</code>.</li>
 </ul>
 <h4><a class="anchor" name="paid-broadcasts" href="#paid-broadcasts"><i class="anchor-icon"></i></a>Paid Broadcasts</h4>
-<p>By default, all bots are able to broadcast up to <a href="https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this">30 messages</a> per second to their users. Developers can increase this limit by enabling <em>Paid Broadcasts</em> in <a href="https://t.me/botfather">@Botfather</a> - allowing their bot to broadcast <strong>up to 1000 messages</strong> per second.</p>
+<p>By default, all bots are able to broadcast up to <a href="https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this">30 messages</a> per second to their users. Developers can increase this limit by enabling <em>Paid Broadcasts</em> in <a href="https://t.me/botfather">@BotFather</a> - allowing their bot to broadcast <strong>up to 1000 messages</strong> per second.</p>
 <p>Each message broadcasted over the free amount of 30 messages per second incurs a cost of 0.1 Stars per message, paid with Telegram Stars from the bot&#39;s balance. In order to use this feature, a bot must have at least <em>10,000 Stars</em> on its balance.</p>
 <blockquote>
 <p>Bots with increased limits are only charged for messages that are broadcasted successfully.</p>
@@ -8636,7 +9165,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -8654,7 +9183,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>from_chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the chat where the original message was sent (or channel username in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format <code>@username</code>)</td>
 </tr>
 <tr>
 <td>video_start_timestamp</td>
@@ -8710,7 +9239,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -8728,7 +9257,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>from_chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the chat where the original messages were sent (or channel username in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format <code>@username</code>)</td>
 </tr>
 <tr>
 <td>message_ids</td>
@@ -8766,7 +9295,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -8784,7 +9313,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>from_chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the chat where the original message was sent (or channel username in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format <code>@username</code>)</td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -8838,7 +9367,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -8882,7 +9411,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -8900,7 +9429,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>from_chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the chat where the original messages were sent (or channel username in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format <code>@username</code>)</td>
 </tr>
 <tr>
 <td>message_ids</td>
@@ -8950,7 +9479,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -9016,7 +9545,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -9044,6 +9573,128 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="sendlivephoto" href="#sendlivephoto"><i class="anchor-icon"></i></a>sendLivePhoto</h4>
+<p>Use this method to send live photos. On success, the sent <a href="#message">Message</a> is returned.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>business_connection_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the business connection on behalf of which the message will be sent</td>
+</tr>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only</td>
+</tr>
+<tr>
+<td>direct_messages_topic_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
+</tr>
+<tr>
+<td>live_photo</td>
+<td><a href="#inputfile">InputFile</a> or String</td>
+<td>Yes</td>
+<td>Live photo video to send. The video must be no longer than 10 seconds and must not exceed 10 MB in size. Pass a file_id as String to send a video that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. <a href="#sending-files">More information on Sending Files »</a>. Sending live photos by a URL is currently unsupported.</td>
+</tr>
+<tr>
+<td>photo</td>
+<td><a href="#inputfile">InputFile</a> or String</td>
+<td>Yes</td>
+<td>The static photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. <a href="#sending-files">More information on Sending Files »</a>. Sending live photos by a URL is currently unsupported.</td>
+</tr>
+<tr>
+<td>caption</td>
+<td>String</td>
+<td>Optional</td>
+<td>Video caption (may also be used when resending videos by <em>file_id</em>), 0-1024 characters after entities parsing</td>
+</tr>
+<tr>
+<td>parse_mode</td>
+<td>String</td>
+<td>Optional</td>
+<td>Mode for parsing entities in the video caption. See <a href="#formatting-options">formatting options</a> for more details.</td>
+</tr>
+<tr>
+<td>caption_entities</td>
+<td>Array of <a href="#messageentity">MessageEntity</a></td>
+<td>Optional</td>
+<td>A JSON-serialized list of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em>, if the caption must be shown above the message media</td>
+</tr>
+<tr>
+<td>has_spoiler</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the video needs to be covered with a spoiler animation</td>
+</tr>
+<tr>
+<td>disable_notification</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Sends the message <a href="https://telegram.org/blog/channels-2-0#silent-messages">silently</a>. Users will receive a notification with no sound.</td>
+</tr>
+<tr>
+<td>protect_content</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Protects the contents of the sent message from forwarding and saving</td>
+</tr>
+<tr>
+<td>allow_paid_broadcast</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
+</tr>
+<tr>
+<td>message_effect_id</td>
+<td>String</td>
+<td>Optional</td>
+<td>Unique identifier of the message effect to be added to the message; for private chats only</td>
+</tr>
+<tr>
+<td>suggested_post_parameters</td>
+<td><a href="#suggestedpostparameters">SuggestedPostParameters</a></td>
+<td>Optional</td>
+<td>A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.</td>
+</tr>
+<tr>
+<td>reply_parameters</td>
+<td><a href="#replyparameters">ReplyParameters</a></td>
+<td>Optional</td>
+<td>Description of the message to reply to</td>
+</tr>
+<tr>
+<td>reply_markup</td>
+<td><a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a> or <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a> or <a href="#replykeyboardremove">ReplyKeyboardRemove</a> or <a href="#forcereply">ForceReply</a></td>
+<td>Optional</td>
+<td>Additional interface options. A JSON-serialized object for an <a href="/bots/features#inline-keyboards">inline keyboard</a>, <a href="/bots/features#keyboards">custom reply keyboard</a>, instructions to remove a reply keyboard or to force a reply from the user.</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="sendaudio" href="#sendaudio"><i class="anchor-icon"></i></a>sendAudio</h4>
 <p>Use this method to send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .MP3 or .M4A format. On success, the sent <a href="#message">Message</a> is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.</p>
 <p>For sending voice messages, use the <a href="#sendvoice">sendVoice</a> method instead.</p>
@@ -9067,7 +9718,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -9145,7 +9796,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -9195,7 +9846,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -9261,7 +9912,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -9311,7 +9962,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -9419,7 +10070,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -9469,7 +10120,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -9559,7 +10210,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -9609,7 +10260,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -9669,7 +10320,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -9719,7 +10370,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -9773,7 +10424,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -9823,7 +10474,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>). If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat&#39;s balance. Otherwise, they will be credited to the bot&#39;s balance.</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>. If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat&#39;s balance. Otherwise, they will be credited to the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -9895,7 +10546,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>suggested_post_parameters</td>
@@ -9918,7 +10569,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendmediagroup" href="#sendmediagroup"><i class="anchor-icon"></i></a>sendMediaGroup</h4>
-<p>Use this method to send a group of photos, videos, documents or audios as an album. Documents and audio files can be only grouped in an album with messages of the same type. On success, an array of <a href="#message">Message</a> objects that were sent is returned.</p>
+<p>Use this method to send a group of photos, live photos, videos, documents or audios as an album. Documents and audio files can be only grouped in an album with messages of the same type. On success, an array of <a href="#message">Message</a> objects that were sent is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -9939,7 +10590,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -9955,7 +10606,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 <tr>
 <td>media</td>
-<td>Array of <a href="#inputmediaaudio">InputMediaAudio</a>, <a href="#inputmediadocument">InputMediaDocument</a>, <a href="#inputmediaphoto">InputMediaPhoto</a> and <a href="#inputmediavideo">InputMediaVideo</a></td>
+<td>Array of <a href="#inputmediaaudio">InputMediaAudio</a>, <a href="#inputmediadocument">InputMediaDocument</a>, <a href="#inputmedialivephoto">InputMediaLivePhoto</a>, <a href="#inputmediaphoto">InputMediaPhoto</a> and <a href="#inputmediavideo">InputMediaVideo</a></td>
 <td>Yes</td>
 <td>A JSON-serialized array describing messages to be sent, must include 2-10 items</td>
 </tr>
@@ -9975,7 +10626,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -10013,7 +10664,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -10079,7 +10730,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -10129,7 +10780,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -10207,7 +10858,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -10257,7 +10908,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -10311,7 +10962,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -10361,7 +11012,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>). Polls can&#39;t be sent to channel direct messages chats.</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>. Polls can&#39;t be sent to channel direct messages chats.</td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -10391,7 +11042,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>options</td>
 <td>Array of <a href="#inputpolloption">InputPollOption</a></td>
 <td>Yes</td>
-<td>A JSON-serialized list of 2-12 answer options</td>
+<td>A JSON-serialized list of 1-12 answer options</td>
 </tr>
 <tr>
 <td>is_anonymous</td>
@@ -10436,6 +11087,18 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Pass <em>True</em>, if poll results must be shown only after the poll closes</td>
 </tr>
 <tr>
+<td>members_only</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em>, if voting is limited to users who have been members of the chat where the poll is being sent for more than 24 hours; for channel chats only</td>
+</tr>
+<tr>
+<td>country_codes</td>
+<td>Array of String</td>
+<td>Optional</td>
+<td>A JSON-serialized list of 0-12 two-letter <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country codes indicating the countries from which users can vote in the poll; for channel chats only. If omitted or empty, then users from any country can participate in the poll.</td>
+</tr>
+<tr>
 <td>correct_option_ids</td>
 <td>Array of Integer</td>
 <td>Optional</td>
@@ -10458,6 +11121,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td>Optional</td>
 <td>A JSON-serialized list of special entities that appear in the poll explanation. It can be specified instead of <em>explanation_parse_mode</em></td>
+</tr>
+<tr>
+<td>explanation_media</td>
+<td><a href="#inputpollmedia">InputPollMedia</a></td>
+<td>Optional</td>
+<td>Media added to the quiz explanation</td>
 </tr>
 <tr>
 <td>open_period</td>
@@ -10496,6 +11165,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>A JSON-serialized list of special entities that appear in the poll description, which can be specified instead of <em>description_parse_mode</em></td>
 </tr>
 <tr>
+<td>media</td>
+<td><a href="#inputpollmedia">InputPollMedia</a></td>
+<td>Optional</td>
+<td>Media added to the poll description</td>
+</tr>
+<tr>
 <td>disable_notification</td>
 <td>Boolean</td>
 <td>Optional</td>
@@ -10511,7 +11186,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -10553,9 +11228,9 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 <tr>
 <td>chat_id</td>
-<td>Integer</td>
+<td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat</td>
+<td>Unique identifier for the target chat or username of the target bot in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>checklist</td>
@@ -10617,7 +11292,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -10653,7 +11328,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -10682,7 +11357,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendmessagedraft" href="#sendmessagedraft"><i class="anchor-icon"></i></a>sendMessageDraft</h4>
-<p>Use this method to stream a partial message to a user while the message is being generated. Returns <em>True</em> on success.</p>
+<p>Use this method to stream a partial message to a user while the message is being generated. Note that the streamed draft is ephemeral and acts as a temporary 30-second preview - once the output is finalized, you <strong>must</strong> call <a href="#sendmessage">sendMessage</a> with the complete message to persist it in the user&#39;s chat. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -10709,13 +11384,13 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>draft_id</td>
 <td>Integer</td>
 <td>Yes</td>
-<td>Unique identifier of the message draft; must be non-zero. Changes of drafts with the same identifier are animated</td>
+<td>Unique identifier of the message draft; must be non-zero. Changes of drafts with the same identifier are animated.</td>
 </tr>
 <tr>
 <td>text</td>
 <td>String</td>
-<td>Yes</td>
-<td>Text of the message to be sent, 1-4096 characters after entities parsing</td>
+<td>Optional</td>
+<td>Text of the message to be sent, 0-4096 characters after entities parsing. Pass an empty text to show a “Thinking…” placeholder.</td>
 </tr>
 <tr>
 <td>parse_mode</td>
@@ -10757,7 +11432,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>). Channel chats and channel direct messages chats aren&#39;t supported.</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>. Channel chats and channel direct messages chats aren&#39;t supported.</td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -10789,7 +11464,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -10944,7 +11619,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target group or username of the target supergroup or channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target group or username of the target supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -10982,7 +11657,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target group or username of the target supergroup or channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target group or username of the target supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -11014,7 +11689,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -11058,7 +11733,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -11186,7 +11861,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -11218,7 +11893,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -11250,7 +11925,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>sender_chat_id</td>
@@ -11276,7 +11951,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>sender_chat_id</td>
@@ -11302,7 +11977,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>permissions</td>
@@ -11334,7 +12009,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -11357,7 +12032,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>name</td>
@@ -11401,7 +12076,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>invite_link</td>
@@ -11451,7 +12126,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target channel chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target channel chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>name</td>
@@ -11489,7 +12164,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>invite_link</td>
@@ -11521,7 +12196,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier of the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier of the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>invite_link</td>
@@ -11547,7 +12222,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -11573,7 +12248,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -11599,7 +12274,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>photo</td>
@@ -11625,7 +12300,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -11645,7 +12320,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>title</td>
@@ -11671,7 +12346,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>description</td>
@@ -11703,7 +12378,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -11741,7 +12416,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -11767,7 +12442,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -11787,7 +12462,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup or channel (in the format <code>@channelusername</code>). Channel direct messages chats aren&#39;t supported; leave the corresponding channel instead.</td>
+<td>Unique identifier for the target chat or username of the target supergroup or channel in the format <code>@username</code>. Channel direct messages chats aren&#39;t supported; leave the corresponding channel instead.</td>
 </tr>
 </tbody>
 </table>
@@ -11807,12 +12482,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup or channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup or channel in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="getchatadministrators" href="#getchatadministrators"><i class="anchor-icon"></i></a>getChatAdministrators</h4>
-<p>Use this method to get a list of administrators in a chat, which aren&#39;t bots. Returns an Array of <a href="#chatmember">ChatMember</a> objects.</p>
+<p>Use this method to get a list of administrators in a chat. Returns an Array of <a href="#chatmember">ChatMember</a> objects.</p>
 <table class="table">
 <thead>
 <tr>
@@ -11827,7 +12502,13 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup or channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup or channel in the format <code>@username</code></td>
+</tr>
+<tr>
+<td>return_bots</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> to additionally receive all bots that are administrators of the chat. By default, bots other than the current bot are omitted.</td>
 </tr>
 </tbody>
 </table>
@@ -11847,7 +12528,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup or channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup or channel in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -11867,13 +12548,39 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup or channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
 <td>Integer</td>
 <td>Yes</td>
 <td>Unique identifier of the target user</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="getuserpersonalchatmessages" href="#getuserpersonalchatmessages"><i class="anchor-icon"></i></a>getUserPersonalChatMessages</h4>
+<p>Use this method to get the last messages from the personal chat (i.e., the chat currently added to their profile) of a given user. On success, an array of <a href="#message">Message</a> objects is returned.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Unique identifier for the target user</td>
+</tr>
+<tr>
+<td>limit</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>The maximum number of messages to return; 1-20</td>
 </tr>
 </tbody>
 </table>
@@ -11893,7 +12600,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>sticker_set_name</td>
@@ -11919,7 +12626,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -11941,7 +12648,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>name</td>
@@ -11979,7 +12686,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -12017,7 +12724,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -12043,7 +12750,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -12069,7 +12776,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -12095,7 +12802,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -12121,7 +12828,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>name</td>
@@ -12147,7 +12854,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -12167,7 +12874,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -12187,7 +12894,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -12207,7 +12914,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -12227,7 +12934,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target supergroup in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -12278,6 +12985,32 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="answerguestquery" href="#answerguestquery"><i class="anchor-icon"></i></a>answerGuestQuery</h4>
+<p>Use this method to reply to a received guest message. On success, a <a href="#sentguestmessage">SentGuestMessage</a> object is returned.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>guest_query_id</td>
+<td>String</td>
+<td>Yes</td>
+<td>Unique identifier for the query to be answered</td>
+</tr>
+<tr>
+<td>result</td>
+<td><a href="#inlinequeryresult">InlineQueryResult</a></td>
+<td>Yes</td>
+<td>A JSON-serialized object describing the message to be sent</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="getuserchatboosts" href="#getuserchatboosts"><i class="anchor-icon"></i></a>getUserChatBoosts</h4>
 <p>Use this method to get the list of boosts added to a chat by a user. Requires administrator rights in the chat. Returns a <a href="#userchatboosts">UserChatBoosts</a> object.</p>
 <table class="table">
@@ -12294,7 +13027,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the chat or username of the channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the chat or username of the channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>user_id</td>
@@ -12361,6 +13094,58 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Integer</td>
 <td>Yes</td>
 <td>User identifier of the managed bot whose token will be replaced</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="getmanagedbotaccesssettings" href="#getmanagedbotaccesssettings"><i class="anchor-icon"></i></a>getManagedBotAccessSettings</h4>
+<p>Use this method to get the access settings of a managed bot. Returns a <a href="#botaccesssettings">BotAccessSettings</a> object on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>User identifier of the managed bot whose access settings will be returned</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="setmanagedbotaccesssettings" href="#setmanagedbotaccesssettings"><i class="anchor-icon"></i></a>setManagedBotAccessSettings</h4>
+<p>Use this method to change the access settings of a managed bot. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>User identifier of the managed bot whose access settings will be changed</td>
+</tr>
+<tr>
+<td>is_access_restricted</td>
+<td>Boolean</td>
+<td>Yes</td>
+<td>Pass <em>True</em>, if only selected users can access the bot. The bot&#39;s owner can always access it.</td>
+</tr>
+<tr>
+<td>added_user_ids</td>
+<td>Array of Integer</td>
+<td>Optional</td>
+<td>A JSON-serialized list of up to 10 identifiers of users who will have access to the bot in addition to its owner. Ignored if <em>is_access_restricted</em> is false.</td>
 </tr>
 </tbody>
 </table>
@@ -12724,7 +13509,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Optional</td>
-<td>Required if <em>user_id</em> is not specified. Unique identifier for the chat or username of the channel (in the format <code>@channelusername</code>) that will receive the gift.</td>
+<td>Required if <em>user_id</em> is not specified. Unique identifier for the chat or username of the channel (in the format <code>@username</code>) that will receive the gift.</td>
 </tr>
 <tr>
 <td>gift_id</td>
@@ -12850,7 +13635,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>). Channel direct messages chats can&#39;t be verified.</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>. Channel direct messages chats can&#39;t be verified.</td>
 </tr>
 <tr>
 <td>custom_description</td>
@@ -12896,7 +13681,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot or channel in the format <code>@username</code></td>
 </tr>
 </tbody>
 </table>
@@ -13342,7 +14127,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>exclude_unsaved</td>
@@ -13837,7 +14622,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Optional</td>
-<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>.</td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -13905,7 +14690,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Optional</td>
-<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>.</td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -13952,7 +14737,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="editmessagemedia" href="#editmessagemedia"><i class="anchor-icon"></i></a>editMessageMedia</h4>
-<p>Use this method to edit animation, audio, document, photo, or video messages, or to add media to text messages. If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo or a video otherwise. When an inline message is edited, a new file can&#39;t be uploaded; use a previously uploaded file via its file_id or specify a URL. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned, otherwise <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
+<p>Use this method to edit animation, audio, document, live photo, photo, or video messages, or to add media to text messages. If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo, a live photo, or a video otherwise. When an inline message is edited, a new file can&#39;t be uploaded; use a previously uploaded file via its file_id or specify a URL. On success, if the edited message is not an inline message, the edited <a href="#message">Message</a> is returned, otherwise <em>True</em> is returned. Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within <strong>48 hours</strong> from the time they were sent.</p>
 <table class="table">
 <thead>
 <tr>
@@ -13973,7 +14758,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Optional</td>
-<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>.</td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -14023,7 +14808,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Optional</td>
-<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>.</td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -14103,7 +14888,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Optional</td>
-<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>.</td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -14145,9 +14930,9 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 <tr>
 <td>chat_id</td>
-<td>Integer</td>
+<td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat</td>
+<td>Unique identifier for the target chat or username of the target bot in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -14191,7 +14976,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Optional</td>
-<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Required if <em>inline_message_id</em> is not specified. Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code>.</td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -14235,7 +15020,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -14331,7 +15116,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_id</td>
@@ -14357,13 +15142,83 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_ids</td>
 <td>Array of Integer</td>
 <td>Yes</td>
 <td>A JSON-serialized list of 1-100 identifiers of messages to delete. See <a href="#deletemessage">deleteMessage</a> for limitations on which messages can be deleted</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="deletemessagereaction" href="#deletemessagereaction"><i class="anchor-icon"></i></a>deleteMessageReaction</h4>
+<p>Use this method to remove a reaction from a message in a group or a supergroup chat. The bot must have the &#39;can_delete_messages&#39; administrator right in the chat. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@username</code>)</td>
+</tr>
+<tr>
+<td>message_id</td>
+<td>Integer</td>
+<td>Yes</td>
+<td>Identifier of the target message</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Identifier of the user whose reaction will be removed, if the reaction was added by a user</td>
+</tr>
+<tr>
+<td>actor_chat_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Identifier of the chat whose reaction will be removed, if the reaction was added by a chat</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="deleteallmessagereactions" href="#deleteallmessagereactions"><i class="anchor-icon"></i></a>deleteAllMessageReactions</h4>
+<p>Use this method to remove up to 10000 recent reactions in a group or a supergroup chat added by a given user or chat. The bot must have the &#39;can_delete_messages&#39; administrator right in the chat. Returns <em>True</em> on success.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat_id</td>
+<td>Integer or String</td>
+<td>Yes</td>
+<td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@username</code>)</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Identifier of the user whose reactions will be removed, if the reactions were added by a user</td>
+</tr>
+<tr>
+<td>actor_chat_id</td>
+<td>Integer</td>
+<td>Optional</td>
+<td>Identifier of the chat whose reactions will be removed, if the reactions were added by a chat</td>
 </tr>
 </tbody>
 </table>
@@ -14588,7 +15443,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -14630,7 +15485,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -16952,7 +17807,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>chat_id</td>
 <td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat or username of the target channel (in the format <code>@channelusername</code>)</td>
+<td>Unique identifier for the target chat or username of the target bot, supergroup or channel in the format <code>@username</code></td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -17108,7 +17963,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
@@ -18714,9 +19569,9 @@ pre-formatted fixed-width code block written in the Python programming language
 </tr>
 <tr>
 <td>chat_id</td>
-<td>Integer</td>
+<td>Integer or String</td>
 <td>Yes</td>
-<td>Unique identifier for the target chat. Games can&#39;t be sent to channel direct messages chats and channel chats.</td>
+<td>Unique identifier for the target chat or username of the target bot in the format <code>@username</code>. Games can&#39;t be sent to channel direct messages chats and channel chats.</td>
 </tr>
 <tr>
 <td>message_thread_id</td>
@@ -18746,7 +19601,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>allow_paid_broadcast</td>
 <td>Boolean</td>
 <td>Optional</td>
-<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance</td>
+<td>Pass <em>True</em> to allow up to 1000 messages per second, ignoring <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">broadcasting limits</a> for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot&#39;s balance.</td>
 </tr>
 <tr>
 <td>message_effect_id</td>
