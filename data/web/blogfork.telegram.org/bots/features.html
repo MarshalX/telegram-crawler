@@ -484,11 +484,28 @@ width=44% /></a>
 <blockquote>
 <p><strong>Example</strong><br>A contributor bot may request a code review from a reviewer bot and processes feedback directly in the group – optionally with human supervision.</p>
 </blockquote>
+<h5><a class="anchor" name="communication-in-private-chats" href="#communication-in-private-chats"><i class="anchor-icon"></i></a>Communication in Private Chats</h5>
+<p>Bots can send private messages to other bots by passing their <code>@username</code> to the <a href="/bots/api/sendmessage">sendMessage</a> method.</p>
+<p>This requires <em>Bot-to-Bot Communication Mode</em> to be enabled for both the sender and the recipient of the message.</p>
+<blockquote>
+<p><strong>Example</strong><br>Two AI agent bots could coordinate directly via private messages to orchestrate a complex multi-step flow.</p>
+</blockquote>
 <h5><a class="anchor" name="communication-via-business-accounts" href="#communication-via-business-accounts"><i class="anchor-icon"></i></a>Communication via Business Accounts</h5>
 <p>If a bot is connected to a business account using <em>Chat Access Mode</em>, it can send messages to other bots used by that business account.</p>
 <p>This requires <em>Bot-to-Bot Communication Mode</em> to be enabled for the bot that is sending the messages.</p>
 <blockquote>
 <p><strong>Example</strong><br>Using another bot as a <strong>tool</strong> within business workflows – to book reservations, process customer queries, or perform complex tasks on behalf of a user.</p>
+</blockquote>
+<h4><a class="anchor" name="loop-prevention-requirements" href="#loop-prevention-requirements"><i class="anchor-icon"></i></a>Loop Prevention Requirements</h4>
+<p>Bot-to-bot communication can easily result in <strong>infinite interaction loops</strong>. When enabling this feature, you must implement safeguards to ensure interactions terminate.</p>
+<p><strong>Recommended Safeguards</strong></p>
+<ul>
+<li>Deduplicate repeated messages.</li>
+<li>Apply rate limits (e.g., no more than one reply every few seconds per bot).</li>
+<li>Enforce maximum interaction depth or timeouts, both globally and per sender/receiver.</li>
+</ul>
+<blockquote>
+<p><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> <strong>Important</strong><br>Your bot must remain stable even if another bot intentionally responds instantly and continuously.<br>Failure to handle loops properly may lead to degraded performance or platform restrictions.</p>
 </blockquote>
 <h3><a class="anchor" name="guest-bots" href="#guest-bots"><i class="anchor-icon"></i></a>Guest Bots</h3>
 <p>Telegram bots can enable <strong>Guest Mode</strong> to easily interact with users in any <strong>group</strong> or <strong>private chat</strong> on Telegram. This allows for seamless utility integration without the overhead of chat management or access to message history.</p>
@@ -526,17 +543,6 @@ width=44% /></a>
 <li><strong>Quick Utilities:</strong> Fetching calculations, formatting text, or checking quick stats on the fly.</li>
 <li><strong>Flexible Attachments:</strong> Using inline Mini Apps (e.g., try <code>@durgerkingbot</code>) to attach or access interactive menus, complex interfaces and custom items on the fly.</li>
 </ul>
-<h4><a class="anchor" name="loop-prevention-requirements" href="#loop-prevention-requirements"><i class="anchor-icon"></i></a>Loop Prevention Requirements</h4>
-<p>Bot-to-bot communication can easily result in <strong>infinite interaction loops</strong>. When enabling this feature, you must implement safeguards to ensure interactions terminate.</p>
-<p><strong>Recommended Safeguards</strong></p>
-<ul>
-<li>Deduplicate repeated messages.</li>
-<li>Apply rate limits (e.g., no more than one reply every few seconds per bot).</li>
-<li>Enforce maximum interaction depth or timeouts, both globally and per sender/receiver.</li>
-</ul>
-<blockquote>
-<p><img class="emoji" src="//telegram.org/img/emoji/40/E29AA0.png" width="20" height="20" alt="⚠️" /> <strong>Important</strong><br>Your bot must remain stable even if another bot intentionally responds instantly and continuously.<br>Failure to handle loops properly may lead to degraded performance or platform restrictions.</p>
-</blockquote>
 <h3><a class="anchor" name="payments" href="#payments"><i class="anchor-icon"></i></a>Payments</h3>
 <blockquote>
 <p>If your bot or mini app sells <strong>digital goods and services</strong>, be sure to carry out the payment in <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> by specifying <code>XTR</code> as currency. In compliance with third-party store policies, Telegram does not support the sale of digital goods and services using other currencies.</p>
