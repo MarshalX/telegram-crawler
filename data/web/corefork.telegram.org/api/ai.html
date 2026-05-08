@@ -64,13 +64,14 @@
 <ul>
 <li><code>proofread</code> - Proofread and fix mistakes in the message</li>
 <li><code>translate_to_lang</code> - Translate the message to the specified language (pass the desired language code)</li>
-<li><code>change_tone</code> - Rephrase the message using the specified <a href="#ai-compose-tones">tone »</a> (pass the style ID)</li>
+<li><code>change_tone</code> - Rephrase the message using the specified <a href="#ai-compose-tones">tone »</a> (pass the Tone ID)</li>
 <li><code>emojify</code> - Add emojis to the message</li>
 </ul>
 <p>All of the modes specified above can be combined.</p>
 <p>Pass the text to transform in <code>text</code>: the method will return a <a href="/constructor/messages.composedMessageWithAI">messages.composedMessageWithAI</a> constructor, containing the transformed message in the <code>result_text</code> field, with all <a href="/api/entities">styled text entities</a> offsets appropriately moved/resized/deleted as needed.</p>
 <p>If <strong>only</strong> the proofreading mode (<code>proofread</code>) is enabled, the method will additionally populate <a href="/constructor/messages.composedMessageWithAI">messages.composedMessageWithAI</a>.<code>diff_text</code> with a "pre-rendered" diff between the old and the new message text.</p>
 <p><code>diff_text</code> should be rendered by simply rendering the <code>textWithEntities</code>, which only in this case will contain <strong>only</strong> <a href="/api/entities#diff-entities">diff entities, rendered as specified here »</a> (normal styled text entities will always be stripped only in <code>diff_text</code>, never in <code>result_text</code>).</p>
+<p><a href="/api/premium">Premium</a> users have <strong>50x</strong> times more AI text transformations per day: if a non-premium user reaches the daily limit, an <code>AICOMPOSE_FLOOD_PREMIUM</code> RPC error will be emitted, which should show a <a href="/api/premium">Premium</a> modal with the <a href="/api/premium#ai-compose">ai_compose » feature identifier</a>.</p>
 <h4><a class="anchor" href="#ai-compose-tones" id="ai-compose-tones" name="ai-compose-tones"><i class="anchor-icon"></i></a>AI compose tones</h4>
 <p>The full and up to date list of available AI composer tones is available in the <a href="/api/config#ai-compose-styles">ai_compose_styles client configuration key »</a>, example value:</p>
 <pre><code>[
@@ -90,7 +91,7 @@
 <p>The <code>ai_compose_styles</code> key contains an array of tone descriptors.</p>
 <p>The tone descriptor is itself an array with three elements, in the specified order:</p>
 <ul>
-<li>Style ID (string)</li>
+<li>Tone ID (string)</li>
 <li><a href="/api/custom-emoji">Custom emoji ID</a> of the style's icon (string, containing a 64-bit signed long decimal integer)</li>
 <li>Localized, human-readable name of the style (string)</li>
 </ul>

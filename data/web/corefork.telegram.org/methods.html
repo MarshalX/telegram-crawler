@@ -334,6 +334,10 @@ Look for updates of telegram&#39;s terms of service…">
 <td><a href="/method/account.invalidateSignInCodes">account.invalidateSignInCodes</a></td>
 <td>Invalidate the specified login codes, see <a href="/api/auth#invalidating-login-codes">here »</a> for more info.</td>
 </tr>
+<tr>
+<td><a href="/method/auth.checkPaidAuth">auth.checkPaidAuth</a></td>
+<td>Checks the status of a <a href="/api/auth#paid-auth">login payment</a>.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-sms-jobs" id="working-with-sms-jobs" name="working-with-sms-jobs"><i class="anchor-icon"></i></a>Working with SMS jobs</h3>
@@ -1506,6 +1510,44 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-collectible-gift-auctions-" id="working-with-collectible-gift-auctions-" name="working-with-collectible-gift-auctions-"><i class="anchor-icon"></i></a>Working with <a href="/api/auctions">collectible gift auctions »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/payments.getStarGiftAuctionState">payments.getStarGiftAuctionState</a></td>
+<td>Returns info about a <a href="/api/auctions">collectible gift auction »</a>; also subscribes the user to auction updates, see <a href="/api/auctions">here »</a> for more info on the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.getStarGiftAuctionAcquiredGifts">payments.getStarGiftAuctionAcquiredGifts</a></td>
+<td>Fetches all the gifts that the current user won in an <a href="/api/auctions">auction</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.getStarGiftActiveAuctions">payments.getStarGiftActiveAuctions</a></td>
+<td>Fetches all currently active <a href="/api/auctions">gift auctions</a> <strong>where the user has placed a bid</strong>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-content-protection-" id="working-with-content-protection-" name="working-with-content-protection-"><i class="anchor-icon"></i></a>Working with <a href="/api/content-protection">content protection »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.toggleNoForwards">messages.toggleNoForwards</a></td>
+<td>Enable or disable <a href="/api/content-protection">content protection</a> on a channel, group or private chat.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-custom-animated-emojis" id="working-with-custom-animated-emojis" name="working-with-custom-animated-emojis"><i class="anchor-icon"></i></a>Working with <a href="/api/custom-emoji">custom animated emojis</a></h3>
 <table class="table">
 <thead>
@@ -1880,6 +1922,34 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/channels.toggleViewForumAsMessages">channels.toggleViewForumAsMessages</a></td>
 <td>Users may also choose to display messages from all topics of a <a href="/api/forum">forum</a> as if they were sent to a normal group, using a "View as messages" setting in the local client: this setting only affects the current account, and is synced to other logged in sessions using this method.<br><br>Invoking this method will update the value of the <code>view_forum_as_messages</code> flag of <a href="/constructor/channelFull">channelFull</a> or <a href="/constructor/dialog">dialog</a> and emit an <a href="/constructor/updateChannelViewForumAsMessages">updateChannelViewForumAsMessages</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getForumTopics">messages.getForumTopics</a></td>
+<td>Get <a href="/api/forum">topics of a forum</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.getForumTopicsByID">messages.getForumTopicsByID</a></td>
+<td>Get forum topics by their ID</td>
+</tr>
+<tr>
+<td><a href="/method/messages.editForumTopic">messages.editForumTopic</a></td>
+<td>Edit <a href="/api/forum">forum topic</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.updatePinnedForumTopic">messages.updatePinnedForumTopic</a></td>
+<td>Pin or unpin <a href="/api/forum">forum topics</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.reorderPinnedForumTopics">messages.reorderPinnedForumTopics</a></td>
+<td>Reorder pinned forum topics</td>
+</tr>
+<tr>
+<td><a href="/method/messages.createForumTopic">messages.createForumTopic</a></td>
+<td>Create a <a href="/api/forum">forum topic</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.deleteTopicHistory">messages.deleteTopicHistory</a></td>
+<td>Delete message history of a <a href="/api/forum">forum topic</a></td>
 </tr>
 </tbody>
 </table>
@@ -2923,6 +2993,10 @@ Look for updates of telegram&#39;s terms of service…">
 <td>Update our <a href="/api/profile#birthday">birthday, see here »</a> for more info.</td>
 </tr>
 <tr>
+<td><a href="/method/contacts.updateContactNote">contacts.updateContactNote</a></td>
+<td>Update the private note associated to a contact; see <a href="/api/contacts#private-notes-for-contacts">here »</a> for more info.</td>
+</tr>
+<tr>
 <td><a href="/method/contacts.getBirthdays">contacts.getBirthdays</a></td>
 <td>Fetch all users with birthdays that fall within +1/-1 days, relative to the current day: this method should be invoked by clients every 6-8 hours, and if the result is non-empty, it should be used to appropriately update locally cached birthday information in <a href="/constructor/user">user</a>.<code>birthday</code>.<br><br><a href="/api/profile#birthday">See here »</a> for more info.</td>
 </tr>
@@ -3640,10 +3714,6 @@ Look for updates of telegram&#39;s terms of service…">
 <td><a href="/api/pin">Unpin</a> all pinned messages</td>
 </tr>
 <tr>
-<td><a href="/method/messages.toggleNoForwards">messages.toggleNoForwards</a></td>
-<td>Enable or disable <a href="/api/protected-content">content protection</a> on a channel, group or private chat.</td>
-</tr>
-<tr>
 <td><a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a></td>
 <td>Change the default peer that should be used when sending messages, reactions, poll votes to a specific group</td>
 </tr>
@@ -3859,6 +3929,25 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/account.setContentSettings">account.setContentSettings</a></td>
 <td>Set sensitive content settings (for viewing or hiding NSFW content)</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-the-ai-features-" id="working-with-the-ai-features-" name="working-with-the-ai-features-"><i class="anchor-icon"></i></a>Working with the <a href="/api/ai">AI features »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.composeMessageWithAI">messages.composeMessageWithAI</a></td>
+<td>Invokes telegram's AI Editor that can translate, transform, fixup and/or emojify your message in a number of different ways, privately powered by <a href="https://cocoon.org">Cocoon</a>, see <a href="/api/ai#compose-messages">here »</a> for more info!<br><br>All of the modes specified below can be combined.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.summarizeText">messages.summarizeText</a></td>
+<td>Summarize the contents of a message with AI, see <a href="/api/ai#summarize-messages">here »</a> for more info.</td>
 </tr>
 </tbody>
 </table>
@@ -4126,52 +4215,12 @@ Look for updates of telegram&#39;s terms of service…">
 </thead>
 <tbody>
 <tr>
-<td><a href="/method/auth.checkPaidAuth">auth.checkPaidAuth</a></td>
-<td>Checks the status of a <a href="/api/auth#paid-auth">login payment</a>.</td>
-</tr>
-<tr>
 <td><a href="/method/users.suggestBirthday">users.suggestBirthday</a></td>
 <td>Suggest a birthday to another user, see <a href="/api/profile#birthday">here »</a> for more info on birthdays in the API.</td>
 </tr>
 <tr>
-<td><a href="/method/contacts.updateContactNote">contacts.updateContactNote</a></td>
-<td>Update the private note associated to a contact; see <a href="/api/contacts#private-notes-for-contacts">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getForumTopics">messages.getForumTopics</a></td>
-<td>Get <a href="/api/forum">topics of a forum</a></td>
-</tr>
-<tr>
-<td><a href="/method/messages.getForumTopicsByID">messages.getForumTopicsByID</a></td>
-<td>Get forum topics by their ID</td>
-</tr>
-<tr>
-<td><a href="/method/messages.editForumTopic">messages.editForumTopic</a></td>
-<td>Edit <a href="/api/forum">forum topic</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.updatePinnedForumTopic">messages.updatePinnedForumTopic</a></td>
-<td>Pin or unpin <a href="/api/forum">forum topics</a></td>
-</tr>
-<tr>
-<td><a href="/method/messages.reorderPinnedForumTopics">messages.reorderPinnedForumTopics</a></td>
-<td>Reorder pinned forum topics</td>
-</tr>
-<tr>
-<td><a href="/method/messages.createForumTopic">messages.createForumTopic</a></td>
-<td>Create a <a href="/api/forum">forum topic</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.deleteTopicHistory">messages.deleteTopicHistory</a></td>
-<td>Delete message history of a <a href="/api/forum">forum topic</a></td>
-</tr>
-<tr>
 <td><a href="/method/messages.getEmojiGameInfo">messages.getEmojiGameInfo</a></td>
 <td> </td>
-</tr>
-<tr>
-<td><a href="/method/messages.summarizeText">messages.summarizeText</a></td>
-<td>Summarize the contents of a message with AI, see <a href="/api/ai#summarize-messages">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.editChatCreator">messages.editChatCreator</a></td>
@@ -4192,10 +4241,6 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a></td>
 <td> </td>
-</tr>
-<tr>
-<td><a href="/method/messages.composeMessageWithAI">messages.composeMessageWithAI</a></td>
-<td>Invokes telegram's AI Editor that can translate, transform, fixup and/or emojify your message in a number of different ways, privately powered by <a href="https://cocoon.org">Cocoon</a>, see <a href="/api/ai#compose-messages">here »</a> for more info!<br><br>All of the modes specified below can be combined.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.reportReadMetrics">messages.reportReadMetrics</a></td>
@@ -4240,18 +4285,6 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a></td>
 <td> </td>
-</tr>
-<tr>
-<td><a href="/method/payments.getStarGiftAuctionState">payments.getStarGiftAuctionState</a></td>
-<td>Returns info about a <a href="/api/auctions">collectible gift auction »</a>; also subscribes the user to auction updates, see <a href="/api/auctions">here »</a> for more info on the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/payments.getStarGiftAuctionAcquiredGifts">payments.getStarGiftAuctionAcquiredGifts</a></td>
-<td>Fetches all the gifts that the current user won in an <a href="/api/auctions">auction</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/payments.getStarGiftActiveAuctions">payments.getStarGiftActiveAuctions</a></td>
-<td>Fetches all currently active <a href="/api/auctions">gift auctions</a> <strong>where the user has placed a bid</strong>.</td>
 </tr>
 <tr>
 <td><a href="/method/payments.resolveStarGiftOffer">payments.resolveStarGiftOffer</a></td>
