@@ -332,6 +332,47 @@ The resulting <a href="/constructor/messageActionStarGift">messageActionStarGift
 <p>Crafting has a specific success rate, expressed as a percentage in the UI, and as a permilleage in the API.</p>
 <p>The success rate is computed by adding the <a href="/constructor/starGiftUnique">starGiftUnique</a>.<code>craft_chance_permille</code> fields of all passed gifts, so passing more gifts to crafting methods increases the chances of a successful craft.</p>
 <p>To display the summed <code>craft_chance_permille</code> in the UI, round it up by adding <code>5</code>, then divide by <code>10</code> to obtain a percentage.</p>
+<p>When showing the attribute preview for the crafting UI, use the <a href="/api/config#stargifts-craft-attribute-permilles"><code>stargifts_craft_attribute_permilles</code> client configuration value »</a> to display the probability that an attribute from the input gifts will persist in the crafted gift.</p>
+<p>This is an array of 4 arrays of integers: the subarray with index N has N+1 integers, each containing a probability in permille.</p>
+<p>First, select the subarray corresponding to the number of chosen gifts for crafting (index equal to <code>count(craft_input_gifts)-1</code>):</p>
+<pre><code>attr_probability := stargifts_craft_attribute_permilles[count(craft_input_gifts)-1]
+</code></pre>
+<p>Then, for each gift in <code>craft_input_gifts</code>, group together into <code>grouped_attrs</code>:</p>
+<ul>
+<li>pattern attributes with the same pattern document ID.</li>
+<li>backdrop attributes with the same <code>backdrop_id</code></li>
+</ul>
+<pre><code>grouped_attr_patterns := Map&lt;long, Vector&lt;starGiftAttributePattern&gt;&gt;
+grouped_attr_backdrop := Map&lt;int, Vector&lt;starGiftAttributeBackdrop&gt;&gt;
+
+for gift := range craft_input_gifts {
+    for attr := range gift.attributes {
+        if cons(attr) == starGiftAttributePattern {
+            grouped_attr_patterns[attr.document.id].append(attr)
+        } else if cons(attr) == starGiftAttributeBackdrop {
+            grouped_attr_backdrop[attr.backdrop_id].append(attr)
+        }
+    }
+}
+</code></pre>
+<p>For each grouped attribute, the permille probability of obtaining that specific attribute in the crafted gift is equal to <code>attr_probability[count(grouped_attrs)-1]</code>:</p>
+<pre><code>grouped_attr_pattern_probabilities := Map&lt;long, int&gt;
+grouped_attr_backdrop_probabilities := Map&lt;int, int&gt;
+
+for idx, grouped_attrs := range grouped_attr_patterns {
+    probability := attr_probability[count(grouped_attrs)-1]
+
+    grouped_attr_pattern_probabilities[idx] = probability
+}
+
+for idx, grouped_attrs := range grouped_attr_backdrop {
+    probability := attr_probability[count(grouped_attrs)-1]
+
+    grouped_attr_backdrop_probabilities[idx] = probability
+}
+</code></pre>
+<p>For example, if we're passing three gifts to crafting, and the selected gifts use a green backdrop two times and a black backdrop once, and the third row of <code>stargifts_craft_attribute_permilles</code> is <code>[60, 180, 450]</code>, the green backdrop has an 18% persistence probability and the black one has a 6% persistence probability.</p>
+<p>For both patterns and backdrops, UI should display either the attribute with the highest probability or cycle through the selected attributes every few seconds.</p>
 <p>Regardless of the outcome of crafting (except for cases where crafting fails for other reasons, like passing gifts of different types, non-craftable gifts or not yet craftable gifts according to <code>can_craft_at</code>, or other reasons that make any of the passed gifts unusable for crafting), all gifts passed to <a href="/method/payments.craftStarGift">payments.craftStarGift</a> will be burned (destroyed): the <a href="/constructor/starGiftUnique">starGiftUnique</a>.<code>burned</code> attribute will be set, and the gift won't be usable anymore.</p>
 <p>If crafting succeeds, a <a href="/constructor/messageActionStarGiftUnique">messageActionStarGiftUnique</a> gift will be emitted with the <code>craft</code> flag set (the corresponding <a href="/constructor/starGiftUnique">starGiftUnique</a> will also have the <code>crafted</code> flag set), and the first gift's <code>id</code> will be reused for the newly crafted gift (so the first passed gift must <strong>not</strong> be <a href="#withdraw-a-collectible-gift-to-the-ton-blockchain">located on the TON blockchain</a>).</p>
 <p>If crafting fails, an <a href="/constructor/updateStarGiftCraftFail">updateStarGiftCraftFail</a> will be emitted by the method call.</p>
