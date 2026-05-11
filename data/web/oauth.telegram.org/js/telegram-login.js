@@ -157,6 +157,7 @@
       var query_params = 'scope=' + scopes.join(' ');
       query_params += '&origin=' + encodeURIComponent(location.origin);
       query_params += '&client_id=' + clientId;
+      query_params += '&response_type=id_token';
 
       var result = await fetch(INAPP_URL + '?' + query_params);
       result = (await result.json());
