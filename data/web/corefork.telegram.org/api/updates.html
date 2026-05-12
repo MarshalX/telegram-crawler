@@ -137,7 +137,7 @@ Secret chats, certain bot events and other kinds of updates have yet another <em
 <ul>
 <li>
 <p>Common message ID sequence.</p>
-<p>Monotonically increasing, applies to all <a href="/type/Message">Message</a> constructors located in private chats and <a href="/api/channel#basic-groups">basic group</a>.</p>
+<p>Monotonically increasing, applies to all <a href="/type/Message">Message</a> constructors located in private chats and <a href="/api/channel#basic-groups">basic groups</a>.</p>
 <p>The sequence is shared by all private chats and <a href="/api/channel#basic-groups">basic group</a> messages within the current account, meaning that:</p>
 <ul>
 <li>Message IDs from the common sequence will be the same across all sessions of the same account, i.e. a specific message in a specific private chat/basic group will have the same ID when viewed by different sessions of the same account.</li>
@@ -147,7 +147,13 @@ Secret chats, certain bot events and other kinds of updates have yet another <em
 <ul>
 <li><a href="/constructor/updateNewMessage">updateNewMessage</a> - A new incoming/outgoing message belonging to the common message ID sequence was received/sent</li>
 <li><a href="/constructor/updateEditMessage">updateEditMessage</a> - A message belonging to the common message ID sequence was edited</li>
-<li><a href="/constructor/updateDeleteMessages">updateDeleteMessages</a> -  A message belonging to the common message ID sequence was deleted</li>
+<li><a href="/constructor/updateDeleteMessages">updateDeleteMessages</a> - A message belonging to the common message ID sequence was deleted</li>
+</ul>
+<p>Also note that the following updates may be received from <a href="/api/bots/connected-business-bots">users connected to a bot via a business connection »</a>: in this case, messages located in private chats and <a href="/api/channel#basic-groups">basic groups</a> will use the connected user's common message ID sequence, <strong>not</strong> the bot's common message ID sequence.</p>
+<ul>
+<li><a href="/constructor/updateBotNewBusinessMessage">updateBotNewBusinessMessage</a> - A new incoming/outgoing message was received/sent in one of the connected user's chats</li>
+<li><a href="/constructor/updateBotEditBusinessMessage">updateBotEditBusinessMessage</a> - A message was edited in one of the connected user's chats</li>
+<li><a href="/constructor/updateBotDeleteBusinessMessage">updateBotDeleteBusinessMessage</a> - A message was deleted from one of the connected user's chats</li>
 </ul>
 </li>
 <li>
@@ -164,10 +170,16 @@ Secret chats, certain bot events and other kinds of updates have yet another <em
 <li><a href="/constructor/updateEditChannelMessage">updateEditChannelMessage</a> - A channel/supergroup message was edited</li>
 <li><a href="/constructor/updateDeleteChannelMessages">updateDeleteChannelMessages</a> - A channel/supergroup message was deleted</li>
 </ul>
+<p>Also note that the following updates may be received from <a href="/api/bots/connected-business-bots">users connected to a bot via a business connection »</a>: in this case, messages located in channels/supergroups will use the same ID sequence used by the bot (and by everyone else on Telegram).</p>
+<ul>
+<li><a href="/constructor/updateBotNewBusinessMessage">updateBotNewBusinessMessage</a> - A new incoming/outgoing message was received/sent in one of the connected user's chats</li>
+<li><a href="/constructor/updateBotEditBusinessMessage">updateBotEditBusinessMessage</a> - A message was edited in one of the connected user's chats</li>
+<li><a href="/constructor/updateBotDeleteBusinessMessage">updateBotDeleteBusinessMessage</a> - A message was deleted from one of the connected user's chats</li>
+</ul>
 </li>
 <li>
 <p>Secret chat message ID sequence.</p>
-<p><strong>Not</strong> monotonically increasing: each secret chat message (represented by a <a href="/constructor/DecryptedMessage">DecryptedMessage</a> constructor, <strong>not</strong> the containing <a href="/type/EncryptedMessage">EncryptedMessage</a>) is uniquely identified by its <code>random_id</code>, a completely random 64-bit long integer chosen by the sender.</p>
+<p><strong>Not</strong> monotonically increasing: each secret chat message (represented by a <a href="/constructor/decryptedMessage">DecryptedMessage</a> constructor, <strong>not</strong> the containing <a href="/type/EncryptedMessage">EncryptedMessage</a>) is uniquely identified by its <code>random_id</code>, a completely random 64-bit long integer chosen by the sender.</p>
 <p>Each secret chat has its own sequence (one sequence, shared for both ends of the chat); ordering of secret chat messages is guaranteed by the <a href="/api/end-to-end/seq_no">sequence number</a>, not the message ID.</p>
 <p>Secret chat message IDs are obviously the same for the two ends of the secret chat.</p>
 <p>Updates about sent/received encrypted messages are contained in <a href="/constructor/updateNewEncryptedMessage">updateNewEncryptedMessage</a>.</p>
@@ -184,7 +196,7 @@ Secret chats, certain bot events and other kinds of updates have yet another <em
 </li>
 <li>
 <p><a href="/api/business#quick-reply-shortcuts">Quick reply shortcut message »</a> ID sequence.</p>
-<p>Monotonically increasing, applies to all <a href="/api/scheduled-messages">quick reply shortcut messages</a> located in a quick reply shortcut; when sent, the message will be duplicated, obtaining a new message ID that will be generated from the common message ID sequence or a channel/supergroup ID sequence.</p>
+<p>Monotonically increasing, applies to all <a href="/api/scheduled-messages">quick reply shortcut messages</a> located in quick reply shortcuts; when sent, the message will be duplicated, obtaining a new message ID that will be generated from the common message ID sequence or a channel/supergroup ID sequence.</p>
 <p>Note that sending a quick reply shortcut will not delete messages from the shortcut: they will remain in the shortcut, keeping the same shortcut message ID.</p>
 <p>All quick reply shortcut messages from all shortcuts share the same ID sequence.</p>
 <p>Here are the most important updates about messages belonging to a quick reply shortcut:</p>
@@ -271,9 +283,9 @@ The intermediate status, represented by the <strong>pts</strong>, must be saved 
 <p>Do not re-invoke <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> if the returned difference is <code>final</code>, unless <a href="#subscribing-to-updates-of-channels-supergroups">the user has opened the channel/supergroup »</a>.</p>
 <h4><a class="anchor" href="#recovering-gaps-for-very-old-messages" id="recovering-gaps-for-very-old-messages" name="recovering-gaps-for-very-old-messages"><i class="anchor-icon"></i></a>Recovering gaps for very old messages</h4>
 <p>The various <a href="#event-sequences">message boxes</a> (the common message box, channel message boxes, etc) have a fixed <code>size</code>: the exact size of message boxes is a server-side implementation detail that clients should not rely on, but it is usually very large, 100000 for channels and 5000000 for the common message box.</p>
-<p>Very old messages with a <code>pts &lt; (latestPts - size)</code> will be deleted from a message box and will not be fetchable anymore using <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a>/<a href="/method/updates.getDifference">updates.getDifference</a>: invoking those methods with a <code>pts &lt; (latestPts - size)</code> will return a <a href="/constructor/updates.channelDifferenceTooLong">updates.channelDifferenceTooLong</a>/<a href="/constructor/updates.differenceTooLong">updates.differenceTooLong</a> constructor, and clients have to handle this by <a href="#fetching-state">re-fetching the latest state for that message box</a> and re-start fetching updates from that state, and filling any gaps in older messages manually by using <a href="/method/messages.getHistory">messages.getHistory</a> and <a href="/method/messages.getMessages">messages.getMessages</a>, if necessary (i.e. if the user scrolls back far enough in the message/chat history).</p>
-<p>Please note that the <a href="/constructor/updatesTooLong">updatesTooLong</a>/<a href="/constructor/updateChannelTooLong">updateChannelTooLong</a> constructors, on the other hand, do <strong>not</strong> necessarily indicate the message box size limit was reached, they simply indicate that the number of queued updates for a message box is too large to be delivered passively through the socket, and <a href="/method/updates.getDifference">updates.getDifference</a>/<a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> can be invoked normally to fetch the difference.</p>
-<p>Note the subtle difference between filling gaps normally using getChannelDifference/getDifference, and filling gaps for really old messages (<code>&lt; (latestPts - size)</code>) using <a href="/method/messages.getHistory">messages.getHistory</a>/<a href="/method/messages.getMessages">messages.getMessages</a>:</p>
+<p>Very old messages with a <code>pts &lt; (latestPts - size)</code> will be deleted from a message box and will not be fetchable anymore using <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a>/<a href="/method/updates.getDifference">updates.getDifference</a>: invoking those methods with a <code>pts &lt; (latestPts - size)</code> will return a <a href="/constructor/updates.channelDifferenceTooLong">updates.channelDifferenceTooLong</a>/<a href="/constructor/updates.differenceTooLong">updates.differenceTooLong</a> constructor, and clients have to handle this by <a href="#fetching-state">re-fetching the latest state for that message box</a> and re-start fetching updates from that state, and filling any gaps in older messages manually by using <a href="/method/channels.getMessages">channels.getMessages</a> and <a href="/method/messages.getMessages">messages.getMessages</a>, if necessary (i.e. if the user scrolls back far enough in the message/chat history).</p>
+<p>Please note that the <a href="/constructor/updatesTooLong">updatesTooLong</a>/<a href="/constructor/updateChannelTooLong">updateChannelTooLong</a> updates, on the other hand, do <strong>not</strong> necessarily indicate the message box size limit was reached, they simply indicate that the number of queued updates for a message box is too large to be delivered passively through the socket, and <a href="/method/updates.getDifference">updates.getDifference</a>/<a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> can be invoked normally to fetch the difference.</p>
+<p>Note the subtle difference between filling gaps normally using getChannelDifference/getDifference, and filling gaps for really old messages (<code>&lt; (latestPts - size)</code>) using <a href="/method/channels.getMessages">channels.getMessages</a>/<a href="/method/messages.getMessages">messages.getMessages</a>:</p>
 <ul>
 <li>
 <p>With the normal gap filling logic with getChannelDifference/getDifference, it's enough to simply store the last known PTS, and request new updates by passing that PTS to getDifference, eventually paginating through updates until the client catches up.</p>
@@ -281,14 +293,33 @@ The intermediate status, represented by the <strong>pts</strong>, must be saved 
 <p>With the normal gap filling logic, there's no need to worry if gaps in the message ID sequence are encountered in the local message database, as it's guaranteed that getDifference will deliver all relevant updates needed to fill the message database, and message ID gaps are caused (for example) by deleted messages, and must not be "filled".</p>
 </li>
 <li>
-<p>With the edge case gap filling logic with <a href="/method/messages.getHistory">messages.getHistory</a>/<a href="/method/messages.getMessages">messages.getMessages</a>, suddenly message ID gaps encountered in the local message database become a problem: are they legitimate gaps caused by deleted messages that should be ignored, or gaps caused by an unrecoverable getDifference hole that must be recovered using <a href="/method/messages.getHistory">messages.getHistory</a>/<a href="/method/messages.getMessages">messages.getMessages</a> because they may contain actual, non-deleted messages?</p>
-<p>One of the many ways to handle this is with a PTS gap database, with the following simple structure:</p>
-<pre><code>List&lt;Pair&lt;int, int&gt;&gt;
+<p>With the edge case gap filling logic with <a href="/method/channels.getMessages">channels.getMessages</a>/<a href="/method/messages.getMessages">messages.getMessages</a>, suddenly message ID gaps encountered in the local message database become a problem: are they legitimate gaps caused by deleted messages that should be ignored, or gaps caused by an unrecoverable getDifference hole that must be recovered using <a href="/method/channels.getMessages">channels.getMessages</a>/<a href="/method/messages.getMessages">messages.getMessages</a> because they may contain actual, non-deleted messages?</p>
+<p>One of the many ways to handle this is to keep track of known message ID ranges that do not contain gaps using a data structure like a segment tree, or any other data structure that allows to efficiently check if a message ID is contained by any range.</p>
+<p>All messages belonging to private chats and <a href="/api/channel#basic-groups">basic groups »</a> are stored in the one single instance of this datastructure (because they share the same <a href="#message-id-sequences">id sequence</a>).<br>
+Messages belonging to supergroup and channels are stored each in their own instance of the datastructure, one per channel/supergroup (as channels and supergroups each have their own independent <a href="#message-id-sequences">id sequence</a>).</p>
+<p>For example, a somewhat naïve and inefficient implementation could store <code>[start_msg_id, end_msg_id]</code> message IDs of valid ranges in a simple list structure:</p>
+<pre><code>struct {
+  list: List&lt;Pair[int, int]&gt;,
+  pending: bool,
+}
 </code></pre>
-<p>This structure should be populated with the starting and ending message ID</p>
+<p>The structure is first initialized with an empty list and <code>pending</code> set to true.</p>
+<p>Messages received by updates/getDifference/getChannelDifference will have the following effects:</p>
+<ul>
+<li>If <code>pending</code> is equal to true, the first processed message will atomically append a new <code>Pair{}</code> to <code>list</code> (with both range elements equal to the message ID) and set <code>pending</code> to false.</li>
+<li>If <code>pending</code> is equal to true, incoming messages will atomically update the <code>end_msg_id</code> of the last <code>Pair</code> in <code>list</code> (setting it to the message ID).</li>
+<li>If an unfillable gap is encountered when invoking getChannelDifference/getDifference, <code>pending</code> is set to <code>true</code>, the update state (pts) is refetched from scratch, and getChannelDifference/getDifference is re-invoked with the new pts.</li>
+</ul>
+<p>When scrolling back in the message history or viewing context around individual messages, always keep track of the range of the messages being displayed, and if a gap is detected (either because there are no more ranges, or because the range changed), fill it by invoking:</p>
+<ul>
+<li><a href="/method/messages.getMessages">messages.getMessages</a> for all basic groups and private chats, passing up to 200 IDs from the range that needs filling, re-invoking the method until the desired range is fetched</li>
+<li><a href="/method/channels.getMessages">channels.getMessages</a> for individual supergroups and channels, passing up to 200 IDs from the range that needs filling, re-invoking the method until the desired range is fetched</li>
+</ul>
+<p>Messages returned by those methods should be appropriately loaded into the message database and update existing ranges (or create new ones, if the returned range does not touch other existing ranges).</p>
+<p>These methods will return placeholder <a href="/constructor/messageEmpty">messageEmpty</a> constructors for deleted or otherwise non-representable messages, so that the entire fetched range is returned, in one way or another.</p>
+<p>Messages obtained via other methods may also extend/generate ranges.</p>
 </li>
 </ul>
-<p>with <a href="/method/messages.getHistory">messages.getHistory</a>/<a href="/method/messages.getMessages">messages.getMessages</a>, the client can't simply invoke those methods every time a gap in the message ID is encountered, because</p>
 <h3><a class="anchor" href="#subscribing-to-updates-of-channels-supergroups" id="subscribing-to-updates-of-channels-supergroups" name="subscribing-to-updates-of-channels-supergroups"><i class="anchor-icon"></i></a>Subscribing to updates of channels/supergroups</h3>
 <p>The API will <em>usually</em> send passive updates (i.e. as standalone <a href="/type/Updates">Updates</a> constructors in the socket) for channels/supergroups the user/bot is a member of.</p>
 <p>However, in some cases the API may stop sending updates (or send fewer updates) for some channels/supergroups: thus clients (user accounts only) should also additionally invoke <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> periodically for channels and supergroups the user is currently viewing (i.e. explicitly opened channels/supergroups in one or more tabs/windows).</p>
