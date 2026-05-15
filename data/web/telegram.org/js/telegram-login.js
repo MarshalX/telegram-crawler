@@ -158,7 +158,7 @@
       if (inAppRequestPending) return;
       inAppRequestPending = Date.now();
 
-      var query_params = 'scope=' + scopes.join(' ');
+      var query_params = 'scope=' + scope.join(' ');
       query_params += '&origin=' + encodeURIComponent(location.origin);
       query_params += '&client_id=' + clientId;
       query_params += '&response_type=id_token';
