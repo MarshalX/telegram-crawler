@@ -939,6 +939,14 @@ var BotSettings = {
       var $entry = $(this).closest('.js-native-app-entry');
       BotSettings.submitNativeApp($entry);
     });
+
+    $('.js-login-alg-item').on('click', function () {
+      var value = this.dataset.value;
+      $('.js-login-alg-value').text(this.text);
+      $('li.selected:has(.js-login-alg-item)').toggleClass('selected');
+      $(this).parent().toggleClass('selected');
+      botChangeSettings('oauth_alg', value);
+    });
   },
 
   addNativeAppEntry(platform) {
