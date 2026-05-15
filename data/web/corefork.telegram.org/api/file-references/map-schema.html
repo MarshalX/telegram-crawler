@@ -47,7 +47,7 @@
 <p>This is the TL schema of the <a href="/api/file-references">file reference map file »</a>.</p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.tl">Download TL schema of map file »</a></p>
 <p><a href="https://raw.githubusercontent.com/danog/MadelineProto/refs/heads/v8/src/TL_file_ref_map_schema.json">Download JSON version of TL schema of map file »</a></p>
-<p>See <a href="/api/file-references">here »</a> for more info on the file reference database.  </p>
+<p>See <a href="/api/file-references">here »</a> for more info on the file reference database.</p>
 <!-- start schema -->
 <pre><code><a href='/constructor/boolFalse'>boolFalse</a>#bc799737 = <a href='/type/Bool'>Bool</a>;
 <a href='/constructor/boolTrue'>boolTrue</a>#997275b5 = <a href='/type/Bool'>Bool</a>;
@@ -65,7 +65,10 @@ traverseMethodResult#fda9f236 name:string push_sources:Vector&lt;Source&gt; is_n
 traverseIncomingConstructor#6e4d00b6 type:string predicate:string params:Vector&lt;TraverseParam&gt; push_sources:Vector&lt;Source&gt; is_needed_parent:Bool = TraverserIncoming;
 traverseCommitSourceLocation#94cc59c5 type:string predicate:string push_sources:Vector&lt;Source&gt; stored_constructor:string = TraverserIncoming;
 
-source#dd27c696 flags:# predicate:string is_constructor:flags.0?true stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?string parent_is_constructor:flags.4?true = Source;
+// Points to a constructor or method
+predicate#de3bc05a predicate:string is_constructor:Bool = Predicate;
+
+source#4ec4751a flags:# predicate:Predicate stored_constructor:string stored_params:Vector&lt;FieldExtractor&gt; skipped_flags:Vector&lt;string&gt; needs_parent:flags.3?Predicate needs_not_parents:Vector&lt;Predicate&gt; = Source;
 
 // Traversers (outgoing)
 traverseOutgoingConstructor#3fc5026d type:string predicate:string params:Vector&lt;TraverseParam&gt; = TraverserOutgoing;
@@ -73,7 +76,7 @@ traverseSwapLocation#032bf95d type:string predicate:string stored_constructor:st
 traverseMethodCall#9244f5bb name:string params:Vector&lt;TraverseParam&gt; = TraverserOutgoing;
 
 // Skipped sources
-skippedSource#1d53cd15 flags:# predicate:string is_constructor:flags.0?true why:string = SkippedSource;
+skippedSource#2b543f6f predicate:Predicate why:string = SkippedSource;
 
 // Refresh actions
 refreshAction#d4e15689 stored_constructor:string action:ActionOp = RefreshAction;
@@ -106,7 +109,7 @@ extractUserIdFromInputUserAndStore#7720aa2e from:Path to:string = FieldExtractor
 
 // Actions
 callOp#c2ff3383 method:string args:Vector&lt;TypedOpArg&gt; = ActionOp;
-getMessageOp#237849e8 peer:TypedOp id:TypedOp from_scheduled:TypedOp quick_reply_shortcut_id:TypedOp = ActionOp;
+getMessageOp#8da4c2ae peer:TypedOp id:TypedOp quick_reply_shortcut_id:TypedOp = ActionOp;
 
 // For string =&gt; TypedOp dictionaries
 typedOpArg#3a2930c2 key:string value:TypedOp = TypedOpArg;
@@ -135,8 +138,10 @@ bytesLiteralOp#fdb395a4 value:bytes = TypedOpOp;
 boolLiteralOp#37e07911 value:Bool = TypedOpOp;
 doubleLiteralOp#3651e3bf value:double = TypedOpOp;
 themeFormatLiteralOp#8e4f9208 = TypedOpOp;
+
 </code></pre>
-<!-- end schema --></div>
+<!-- end schema -->
+</div>
   
 </div>
           

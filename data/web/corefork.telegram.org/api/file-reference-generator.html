@@ -44,13 +44,13 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>Implementation and maintenance of the <a href="/api/file-references">file reference database »</a> may be fully automated by using the file reference database schema generator tool, and the <strong>file reference database map file</strong> it generates.  </p>
+<p>Implementation and maintenance of the <a href="/api/file-references">file reference database »</a> may be fully automated by using the file reference database schema generator tool, and the <strong>file reference database map file</strong> it generates.</p>
 <p>Dictionary:</p>
 <ul>
-<li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.  </li>
-<li>A <strong>file reference source</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.  </li>
+<li>A <strong>file reference path</strong> is a deserialization path where a <code>file_reference</code> field may appear, for example <code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code>.</li>
+<li>A <strong>file reference source</strong> (or <code>FileSource</code>) contains information that the client may use to re-fetch the document (and the new file reference), for example for the above path it's <code>getMessage{peer: updateNewMessage.message.peer, id: updateNewMessage.message.id}</code>, which can be used to refetch the document using either <a href="/method/messages.getMessages">messages.getMessages</a> or <a href="/method/channels.getMessages">channels.getMessages</a> depending on the type of the <a href="/type/Peer">Peer</a>.</li>
 </ul>
-<p>The database map file contains <strong>all possible sources</strong>, for <strong>all possible file reference paths</strong>.  </p>
+<p>The database map file contains <strong>all possible sources</strong>, for <strong>all possible file reference paths</strong>.</p>
 <p>It is generated using a set of manually-specified rules (specifying the actual sources) within the generator and the latest API schema, to make sure the following rules are followed:</p>
 <ul>
 <li>
@@ -60,23 +60,24 @@
 <li>All constructors which are directly returned by at least one method.</li>
 <li>All constructors which are directly returned by at least one method inside of a vector.</li>
 </ul>
-<p>This covers all possible TL payloads received from the API, which can only return method call responses, or <a href="/type/Update">Update</a> constructors contained inside <a href="/type/Updates">Updates</a>.  </p>
+<p>This covers all possible TL payloads received from the API, which can only return method call responses, or <a href="/type/Update">Update</a> constructors contained inside <a href="/type/Updates">Updates</a>.</p>
 <p>For example, when checking the graph of the <a href="/constructor/updateNewMessage">updateNewMessage</a> constructor, the following file reference paths are found:</p>
 <pre><code>updateNewMessage.message -&gt; message.media -&gt; messageMediaDocument.document -&gt; document.file_reference
 updateNewMessage.message -&gt; message.reply_to -&gt; messageReplyHeader.reply_media -&gt; messageMediaDocument.document -&gt; document.file_reference
 updateNewMessage.message -&gt; message.media -&gt; messageMediaInvoice.extended_media -&gt; messageExtendedMedia.media -&gt; messageMediaDocument.document -&gt; document.file_reference
-... and many others</code></pre>
-<p>... and for all paths, the system which generates the definition file makes sure that at least one source covers the path.  </p>
+... and many others
+</code></pre>
+<p>... and for all paths, the system which generates the definition file makes sure that at least one source covers the path.</p>
 </li>
 <li>
 <p>All sources must be used in at least one path.</p>
 </li>
 <li>
-<p>All paths covered by sources which make use of flag fields (which may be absent, leading to an orphan, context-less file reference) must be covered by at least one non-flagged source (or the flagged source must be non-flagged in the specified path).  </p>
-<p>For example, the file reference path <code>updateStory.story -&gt; storyItem.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code> <em>would</em> rely on the source <code>getStory{peer: storyItem.from_id, story_id: storyItem.id}</code> with <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.  </p>
+<p>All paths covered by sources which make use of flag fields (which may be absent, leading to an orphan, context-less file reference) must be covered by at least one non-flagged source (or the flagged source must be non-flagged in the specified path).</p>
+<p>For example, the file reference path <code>updateStory.story -&gt; storyItem.media -&gt; messageMediaDocument.document -&gt; document.file_reference</code> <em>would</em> rely on the source <code>getStory{peer: storyItem.from_id, story_id: storyItem.id}</code> with <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a>.</p>
 <p>However, the <code>from_id</code> field of <a href="/constructor/storyItem">storyItem</a> is actually a flag and in this specific path it is <strong>not</strong> set (it's only set when a <a href="/constructor/storyItem">storyItem</a> is returned by <a href="/method/stories.getAllStories">stories.getAllStories</a>).</p>
-<p>The validator (<a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">the code that generated the definition file, you DO NOT have to implement a validator yourself</a>) noticed that, which forced the manual addition of the valid fallback source <code>getStory{peer: updateStory.peer, story_id: updateStory.story -&gt; storyItem.id}</code>, which is present in the final source definition file.  </p>
-<p>Note that the definition file is already pre-validated, no additional validation is needed to implement it, the above is just an example of a case that is successfully covered by the <a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">validator implemented here »</a>.  </p>
+<p>The validator (<a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">the code that generated the definition file, you DO NOT have to implement a validator yourself</a>) noticed that, which forced the manual addition of the valid fallback source <code>getStory{peer: updateStory.peer, story_id: updateStory.story -&gt; storyItem.id}</code>, which is present in the final source definition file.</p>
+<p>Note that the definition file is already pre-validated, no additional validation is needed to implement it, the above is just an example of a case that is successfully covered by the <a href="https://github.com/danog/MadelineProto/blob/v8/tools/gen_filerefmap.php">validator implemented here »</a>.</p>
 </li>
 </ul>
 <h3><a class="anchor" href="#running" id="running" name="running"><i class="anchor-icon"></i></a>Running</h3>
@@ -84,15 +85,16 @@ updateNewMessage.message -&gt; message.media -&gt; messageMediaInvoice.extended_
 <pre><code>git clone https://github.com/danog/MadelineProto.git --recursive
 cd MadelineProto
 composer update
-php tools/gen_filerefmap.php &lt;layer&gt; &lt;inputSchema&gt; &lt;output&gt; &lt;outputJson&gt;</code></pre>
+php tools/gen_filerefmap.php &lt;layer&gt; &lt;inputSchema&gt; &lt;output&gt; &lt;outputJson&gt;
+</code></pre>
 <p>Arguments:</p>
 <ul>
 <li><code>layer</code> - Layer version</li>
 <li><code>inputSchema</code> - The new API schema in JSON or TL format</li>
 <li><code>output</code> - The generated file reference database map file in serialized TL format</li>
-<li><code>outputJson</code> - The generated file reference database map file in JSON format </li>
+<li><code>outputJson</code> - The generated file reference database map file in JSON format</li>
 </ul>
-<p>The schema used for the map file is contained in <code>src/TL_file_ref_map_schema.tl</code>.  </p>
+<p>The schema used for the map file is contained in <code>src/TL_file_ref_map_schema.tl</code>.</p>
 <p>When new, not yet covered paths are found, an exception will be thrown: to cover the new paths, modify <code>tools/FileRefExtractor/FileRefGenerator.php</code>, adding a new <code>CallOp</code>, for example:</p>
 <pre><code>$locations['storyItem'][] = new CallOp(
     'stories.getStoriesByID',
@@ -101,33 +103,35 @@ php tools/gen_filerefmap.php &lt;layer&gt; &lt;inputSchema&gt; &lt;output&gt; &l
         'peer' =&gt; new GetInputPeerOp(new Path([['peerStories', 'peer']], true)),
     ],
     'fileSourceStory'
-);</code></pre>
+);
+</code></pre>
 <p>In this example, when encountering a <a href="/constructor/storyItem">storyItem</a> constructor, a new <code>fileSourceStory</code> is generated with the following fields:</p>
 <ul>
 <li><code>id</code>: <code>storyItem.id</code></li>
 <li><code>peer</code>: <code>peerStories.peer</code> (must have a <a href="/constructor/peerStories">peerStories</a> constructor as parent).<br>
-The generator automatically asserts that only one parent constructor is used (or none).  </li>
+The generator automatically asserts that only one parent constructor is used (or none).</li>
 </ul>
-<p>The generator automatically asserts that the parameters of the file source are the same or compatible for all OPs, to generate only one file source constructor with the passed name (in this case <code>fileSourceStory</code>).  </p>
-<p>The structure of some file sources may be manually specified in the <code>$pre</code> array, in case of sources generated from partially conflicting fields, requiring flag fields within the source.  </p>
+<p>The generator automatically asserts that the parameters of the file source are the same or compatible for all OPs, to generate only one file source constructor with the passed name (in this case <code>fileSourceStory</code>).</p>
+<p>The structure of some file sources may be manually specified in the <code>$pre</code> array, in case of sources generated from partially conflicting fields, requiring flag fields within the source.</p>
 <p>This <code>fileSourceStory</code> is then used, when a refresh is needed, in a <a href="/method/stories.getStoriesByID">stories.getStoriesByID</a> method call with the following parameters:</p>
 <ul>
 <li><code>id</code>: <code>fileSourceStory.id</code></li>
 <li><code>peer</code>: <code>fileSourceStory.peer</code></li>
 </ul>
-<p>The generator automatically asserts that all method calls use the parameters of the file source in the same or compatible ways, to generate only one method call per file source.  </p>
+<p>The generator automatically asserts that all method calls use the parameters of the file source in the same or compatible ways, to generate only one method call per file source.</p>
 <p>As you can see, this definition combines:</p>
 <ul>
 <li>Extraction of the context</li>
 <li>Generation of the file source to store into the database</li>
 <li>The method call to use on the stored file source when refreshing the file reference</li>
 </ul>
-<p>...in a single, concise definition.  </p>
+<p>...in a single, concise definition.</p>
 <p><code>$locations</code> is a <code>HashMap&lt;Key, Vector&lt;Op&gt;&gt;</code>, where:</p>
 <ul>
 <li><code>Key</code> is the constructor where context capturing begins (must be equal to the first element of non-parent Paths)</li>
 <li><code>Op</code> is an object of type  <code>ActionOp</code> (<code>CallOp</code>, <code>CopyMethodCallOp</code>, <code>GetMessageOp</code>, <code>Noop</code>).</li>
-</ul></div>
+</ul>
+</div>
   
 </div>
           
