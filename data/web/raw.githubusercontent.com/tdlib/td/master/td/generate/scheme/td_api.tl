@@ -11460,7 +11460,7 @@ removeTextCompositionStyle name:string = Ok;
 //@to_language_code Language code of the language to which the message is translated. Must be one of
 //-"af", "sq", "am", "ar", "hy", "az", "eu", "be", "bn", "bs", "bg", "ca", "ceb", "zh-CN", "zh", "zh-Hans", "zh-TW", "zh-Hant", "co", "hr", "cs", "da", "nl", "en", "eo", "et",
 //-"fi", "fr", "fy", "gl", "ka", "de", "el", "gu", "ht", "ha", "haw", "he", "iw", "hi", "hmn", "hu", "is", "ig", "id", "in", "ga", "it", "ja", "jv", "kn", "kk", "km", "rw", "ko",
-//-"ku", "ky", "lo", "la", "lv", "lt", "lb", "mk", "mg", "ms", "ml", "mt", "mi", "mr", "mn", "my", "ne", "no", "ny", "or", "ps", "fa", "pl", "pt", "pa", "ro", "ru", "sm", "gd", "sr",
+//-"ku", "ky", "lo", "la", "lv", "lt", "lb", "mk", "mg", "ms", "ml", "mt", "mi", "mr", "mn", "my", "ne", "no", "ny", "or", "ps", "fa", "pl", "pt", "pt-BR", "pa", "ro", "ru", "sm", "gd", "sr",
 //-"st", "sn", "sd", "si", "sk", "sl", "so", "es", "su", "sw", "sv", "tl", "tg", "ta", "tt", "te", "th", "tr", "tk", "uk", "ur", "ug", "uz", "vi", "cy", "xh", "yi", "ji", "yo", "zu"
 //@tone Tone of the translation; must be one of "", "formal", "neutral", "casual"; defaults to "neutral"
 translateText text:formattedText to_language_code:string tone:string = FormattedText;
@@ -12823,7 +12823,7 @@ canTransferOwnership = CanTransferOwnershipResult;
 transferChatOwnership chat_id:int53 user_id:int53 password:string = Ok;
 
 //@description Returns the user who will become the owner of the chat after 7 days if the current user does not return to the supergroup or channel during that period or immediately for basic groups; requires owner privileges in the chat.
-//-Available only for supergroups, basic groups and channel chats
+//-Available only for basic groups, supergroups, and channel chats
 //@chat_id Chat identifier
 getChatOwnerAfterLeaving chat_id:int53 = User;
 
