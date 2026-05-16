@@ -88,7 +88,8 @@ for byte in text {
 <p><strong>Note</strong>: the <em>length</em> of an entity <strong>must not</strong> include the length of trailing newlines or whitespaces, <code>rtrim</code> entities before computing their length: however, the next <em>offset</em> <strong>must</strong> include the length of newlines or whitespaces that precede it.</p>
 <p>Example implementations: <a href="https://github.com/tdlib/td/tree/master/td/telegram/MessageEntity.cpp">tdlib</a>, <a href="https://github.com/danog/telegram-entities/blob/master/src/Entities.php">MadelineProto</a>.</p>
 <h3><a class="anchor" href="#allowed-entities" id="allowed-entities" name="allowed-entities"><i class="anchor-icon"></i></a>Allowed entities</h3>
-<p>For example the following HTML/Markdown aliases for message entities can be used:</p>
+<h4><a class="anchor" href="#manual-entities" id="manual-entities" name="manual-entities"><i class="anchor-icon"></i></a>Manual entities</h4>
+<p>The following entities need to be manually specified by the user through formatting options.</p>
 <ul>
 <li>
 <p><a href="https://core.telegram.org/constructor/messageEntityBold"><strong>messageEntityBold</strong></a> =&gt; <code>&lt;b&gt;bold&lt;/b&gt;</code>, <code>&lt;strong&gt;bold&lt;/strong&gt;</code>, <code>**bold**</code></p>
@@ -130,8 +131,72 @@ for byte in text {
 <p><a href="/constructor/messageEntityCustomEmoji">messageEntityCustomEmoji</a> =&gt; used for <a href="/api/custom-emoji">custom emojis »</a></p>
 </li>
 <li>
-<p><a href="/constructor/messageEntityFormattedDate">messageEntityFormattedDate</a> =&gt; used to point at a specific point in time, rendered as specified in the <a href="/constructor/messageEntityFormattedDate">constructor page</a>; cannot be nested inside other entities</p>
+<p><a href="/constructor/messageEntityFormattedDate">messageEntityFormattedDate</a> =&gt; used to point at a specific point in time, rendered as specified <a href="/constructor/messageEntityFormattedDate">here »</a>; cannot be nested inside other entities.</p>
 </li>
+</ul>
+<h5><a class="anchor" href="#date-entities" id="date-entities" name="date-entities"><i class="anchor-icon"></i></a>Date entities</h5>
+<pre><code><a href='/constructor/messageEntityFormattedDate'>messageEntityFormattedDate</a>#904ac7c7 flags:<a href='/type/%23'>#</a> relative:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> short_time:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> long_time:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> short_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> long_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> day_of_week:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> offset:<a href='/type/int'>int</a> length:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> = <a href='/type/MessageEntity'>MessageEntity</a>;
+</code></pre>
+<p>The <a href="/constructor/messageEntityFormattedDate">messageEntityFormattedDate</a> entity represents a specific point in time.</p>
+<p>The <code>date</code> field must be populated with a UNIX timestamp, ranging from <code>0</code> to the current date plus 1098 days (<code>time()+1098*86400</code>).</p>
+<p>Clicking on this entity should bring up a context menu with three options:</p>
+<ul>
+<li>Copy the date (formatted using the <code>long_date</code> + <code>long_time</code> format, regardless of the value of the flags) to the clipboard</li>
+<li>Add the date to the system calendar</li>
+<li>Schedule a reminder, by scheduling the message to saved messages, invoking <a href="/method/messages.forwardMessages">messages.forwardMessages</a> with the ID of the current message, <code>schedule_date</code> set to the date specified in this entity and <code>to_peer</code>=<a href="/constructor/inputPeerSelf">inputPeerSelf</a></li>
+</ul>
+<p>If none of the optional flags are set, the selected text should be rendered as a link, without changes to the text itself.</p>
+<p>Otherwise, it should be rendered as a link, replacing the text with the date rendered using the current user's timezone and the format specified by the provided flags:</p>
+<ul>
+<li>
+<p><code>relative</code>: if set, render a relative date, i.e. <code>In 1 second/minute/hour/day/week/month/year</code> or <code>1 second/minute/hour/day/week/month/year ago</code>.<br>
+Round down to the closest unit only, for example, depending on the value passed to <code>date</code>:</p>
+<ul>
+<li><code>time()+10</code> - <code>in 10 seconds</code></li>
+<li><code>time()+60+10</code> - <code>in 1 minute</code></li>
+<li><code>time()+3600+60+10</code> - <code>in 1 hour</code></li>
+<li><code>time()+86400+60+10</code> - <code>in 1 day</code></li>
+<li><code>time()+31*86400+86400+60+10</code> - <code>in 1 month</code></li>
+<li><code>time()+365*86400+31*86400+86400+60+10</code> - <code>in 1 year</code></li>
+</ul>
+<p>And the same for dates in the past:</p>
+<ul>
+<li><code>time()-10</code> - <code>10 seconds ago</code></li>
+<li><code>time()-60-10</code> - <code>1 minute ago</code></li>
+<li><code>time()-3600-60-10</code> - <code>1 hour ago</code></li>
+<li><code>time()-86400-60-10</code> - <code>1 day ago</code></li>
+<li><code>time()-31*86400-86400-60-10</code> - <code>1 month ago</code></li>
+<li><code>time()-365*86400-31*86400-86400-60-10</code> - <code>1 year ago</code></li>
+</ul>
+<p>The date must be updated in realtime by the client when the message is visible by the user, according to the current date.</p>
+</li>
+<li>
+<p><code>short_time</code>: renders the time in short format: hours and minutes, according to the user's locale settings</p>
+</li>
+<li>
+<p><code>long_time</code>: renders the time in long format: hours, minutes, seconds and maybe timezone, according to the user's locale settings</p>
+</li>
+<li>
+<p><code>short_date</code>: renders the time in short format: month, date, (and year, if different from the current one), all according the user's locale settings.</p>
+</li>
+<li>
+<p><code>long_date</code>: renders the time in long format: always month, date and year, all according the user's locale settings.</p>
+</li>
+<li>
+<p><code>day_of_week</code>: renders the day of the week according to the user's locale settings.</p>
+</li>
+</ul>
+<p>All flags are optional, with the following limitations:</p>
+<ul>
+<li><code>relative</code> cannot combined with any other flag</li>
+<li><code>short_time</code> and <code>long_time</code> cannot be combined with each other</li>
+<li><code>short_date</code> and <code>long_date</code> cannot be combined with each other</li>
+</ul>
+<p>If any of the flags are combined, their rendering order in the text is the following:</p>
+<ul>
+<li><code>day_of_week</code></li>
+<li><code>short_time</code>/<code>long_time</code></li>
+<li><code>short_date</code>/<code>long_date</code></li>
 </ul>
 <h4><a class="anchor" href="#autogenerated-entities" id="autogenerated-entities" name="autogenerated-entities"><i class="anchor-icon"></i></a>Autogenerated entities</h4>
 <p>The following entities are automatically generated by the server for URLs, hashtags, emails, bot commands, etc, simplifying the message rendering logic for clients (so they don't have to implement autolinking for URLs and other common clickable sections).</p>

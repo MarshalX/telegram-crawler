@@ -42,14 +42,19 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/messageEntityFormattedDate" >messageEntityFormattedDate</a></li></ul></div>
   <h1 id="dev_page_title">messageEntityFormattedDate</h1>
   
-  <div id="dev_page_content"><p>Represents a specific point in time.</p>
-<p>Clicking on this entity should bring up a context menu with three options:</p>
+  <div id="dev_page_content"><p>Represents a specific point in time, rendered as specified <a href="/api/entities#date-entities">here »</a></p>
+<p>All flags are optional, with the following limitations:</p>
 <ul>
-<li>Copy the date (formatted according to the flags) to the clipboard</li>
-<li>Add the date to the system calendar</li>
-<li>Schedule a reminder, by scheduling the message to saved messages, invoking <a href="/method/messages.forwardMessages">messages.forwardMessages</a> with the ID of the current message, <code>schedule_date</code> set to the date specified in this entity and <code>to_peer</code>=<a href="/constructor/inputPeerSelf">inputPeerSelf</a></li>
+<li><code>relative</code> cannot combined with any other flag</li>
+<li><code>short_time</code> and <code>long_time</code> cannot be combined with each other</li>
+<li><code>short_date</code> and <code>long_date</code> cannot be combined with each other</li>
 </ul>
-<p>If none of the optional flags are set, the selected text should be rendered as a link, without changes to the text itself: clicking on it should bring up the user's calendar with an invitatino</p>
+<p>If any of the flags are combined, their rendering order in the text is the following:</p>
+<ul>
+<li><code>day_of_week</code></li>
+<li><code>short_time</code>/<code>long_time</code></li>
+<li><code>short_date</code>/<code>long_date</code></li>
+</ul>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -81,47 +86,47 @@
 <tr>
 <td><strong>relative</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>If set, render a relative date, see <a href="/api/entities#date-entities">here »</a> for more info. Cannot be combined with any of the other flags.</td>
 </tr>
 <tr>
 <td><strong>short_time</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>Renders the time in short format: hours and minutes, according to the user's locale settings; cannot be combined with <code>long_time</code>.</td>
 </tr>
 <tr>
 <td><strong>long_time</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>Renders the time in long format: hours, minutes, seconds and maybe timezone, according to the user's locale settings; cannot be combined with <code>short_time</code>.</td>
 </tr>
 <tr>
 <td><strong>short_date</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>Renders the time in short format: month, date, (and year, if different from the current one), all according the user's locale settings; cannot be combined with <code>long_date</code>.</td>
 </tr>
 <tr>
 <td><strong>long_date</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>Renders the time in long format: always month, date and year, all according the user's locale settings; cannot be combined with <code>short_date</code>.</td>
 </tr>
 <tr>
 <td><strong>day_of_week</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>Renders the day of the week according to the user's locale settings.</td>
 </tr>
 <tr>
 <td><strong>offset</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
-<td> </td>
+<td>Offset of message entity within message (in <a href="/api/entities#entity-length">UTF-16 code units</a>)</td>
 </tr>
 <tr>
 <td><strong>length</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
-<td> </td>
+<td>Length of message entity within message (in <a href="/api/entities#entity-length">UTF-16 code units</a>)</td>
 </tr>
 <tr>
 <td><strong>date</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
-<td> </td>
+<td>The date as a UNIX timestamp: the allowed value ranges from <code>0</code> to the current date plus 1098 days (<code>time()+1098*86400</code>).</td>
 </tr>
 </tbody>
 </table>
