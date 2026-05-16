@@ -133,1139 +133,1711 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <p>In principle, <strong>data.loc_key</strong>, <strong>data.custom</strong>, and an Internet connection are sufficient to generate a notification. Obviously, if possible, when generating a visual notification you need not use all of the transmitted data and may rely on the information already stored on the client. But if a user or a chat is not cached locally, the values passed in loc_args may also be used. <strong>data.user_id</strong> is the ID of the account to which the PUSH notification should be delivered, in case of clients with multiple accounts active and running.</p>
 <h3><a class="anchor" href="#service-notifications" id="service-notifications" name="service-notifications"><i class="anchor-icon"></i></a>Service notifications</h3>
 <p>The following notifications can be used to update app settings.</p>
-<table class="table">
-<thead>
-<tr>
-<th>Type</th>
-<th>Extra custom arguments</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a id="service-notification-dc-update" href="#service-notification-dc-update">DC_UPDATE</a></td>
-<td><strong>data.custom.dc</strong> - number of the data-center<br><strong>data.custom.addr</strong> - server address with port number in the format <code>111.112.113.114:443</code></td>
-<td>In case the client gets this notification, it is necessary to add the received server address to the list of possible addresses. In case the address of the first DC was passed (<code>dc=1</code>), it is recommended to call it immediately using <a href="/method/help.getConfig">help.getConfig</a> to update dc-configuration.</td>
-</tr>
-<tr>
-<td><a id="service-notification-message-deleted" href="#service-notification-message-deleted">MESSAGE_DELETED</a></td>
-<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.messages</strong>: Comma-separated IDs of messages that were deleted</td>
-<td>Messages were deleted, remove multiple notifications for this chat</td>
-</tr>
-<tr>
-<td><a id="service-notification-read-reaction" href="#service-notification-read-reaction">READ_REACTION</a></td>
-<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.messages</strong>: Comma-separated IDs of messages whose reactions were read</td>
-<td>Reactions were read on messages, remove reaction-related notifications for those messages</td>
-</tr>
-<tr>
-<td><a id="service-notification-read-history" href="#service-notification-read-history">READ_HISTORY</a></td>
-<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read messages</td>
-<td>Message history was read, remove multiple notifications for this chat</td>
-</tr>
-<tr>
-<td><a id="service-notification-read-stories" href="#service-notification-read-stories">READ_STORIES</a></td>
-<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read story</td>
-<td>Notifications from stories were read, remove story-related notifications for this chat</td>
-</tr>
-<tr>
-<td><a id="service-notification-story-deleted" href="#service-notification-story-deleted">STORY_DELETED</a></td>
-<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</td>
-<td>A story was deleted, remove notifications for this story</td>
-</tr>
-<tr>
-<td><a id="service-notification-story-notext" href="#service-notification-story-notext">STORY_NOTEXT</a></td>
-<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</td>
-<td>A story was deleted, remove notifications for this story</td>
-</tr>
-<tr>
-<td><a id="service-notification-story-live" href="#service-notification-story-live">STORY_LIVE</a></td>
-<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</td>
-<td>A story was deleted, remove notifications for this story</td>
-</tr>
-<tr>
-<td><a id="service-notification-story-hidden-author" href="#service-notification-story-hidden-author">STORY_HIDDEN_AUTHOR</a></td>
-<td><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</td>
-<td>A story was deleted, remove notifications for this story</td>
-</tr>
-<tr>
-<td><a id="service-notification-geo-live-pending" href="#service-notification-geo-live-pending">GEO_LIVE_PENDING</a></td>
-<td> </td>
-<td>Any of the live locations currently being shared should be updated</td>
-</tr>
-<tr>
-<td><a id="service-notification-session-revoke" href="#service-notification-session-revoke">SESSION_REVOKE</a></td>
-<td> </td>
-<td>Logout and remove DB for specified session by <strong>data.user_id</strong>, only apply if coming from an <a href="#notification-encryption">MTProto-encrypted payload</a></td>
-</tr>
-<tr>
-<td><a id="service-notification-message-muted" href="#service-notification-message-muted">MESSAGE_MUTED</a></td>
-<td> </td>
-<td>Sent rarely, every 10th message in chats or once per 15 sec in PM, to update badge or download messages</td>
-</tr>
-<tr>
-<td><a id="service-notification-message-announcement" href="#service-notification-message-announcement">MESSAGE_ANNOUNCEMENT</a></td>
-<td><strong>data.announcement</strong>: Announcement</td>
-<td>Roughly equivalent to a message received from the service notifications (<a href="/constructor/updateServiceNotification">updateServiceNotification</a> with <code>type="announcement"</code>), but is delivered via push notifications, without contacting the API.</td>
-</tr>
-</tbody>
-</table>
+<h4><a class="anchor" href="#dc-update" id="dc-update" name="dc-update"><i class="anchor-icon"></i></a>DC_UPDATE</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.custom.dc</strong> - number of the data-center<br><strong>data.custom.addr</strong> - server address with port number in the format <code>111.112.113.114:443</code></p>
+<p><strong>Description</strong></p>
+<p>In case the client gets this notification, it is necessary to add the received server address to the list of possible addresses. In case the address of the first DC was passed (<code>dc=1</code>), it is recommended to call it immediately using <a href="/method/help.getConfig">help.getConfig</a> to update dc-configuration.</p>
+<p><strong>Template example</strong></p>
+<p><code>Open this notification to update app settings</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#message-deleted" id="message-deleted" name="message-deleted"><i class="anchor-icon"></i></a>MESSAGE_DELETED</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.messages</strong>: Comma-separated IDs of messages that were deleted</p>
+<p><strong>Description</strong></p>
+<p>Messages were deleted, remove multiple notifications for this chat</p>
+<h4><a class="anchor" href="#read-reaction" id="read-reaction" name="read-reaction"><i class="anchor-icon"></i></a>READ_REACTION</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.messages</strong>: Comma-separated IDs of messages whose reactions were read</p>
+<p><strong>Description</strong></p>
+<p>Reactions were read on messages, remove reaction-related notifications for those messages</p>
+<h4><a class="anchor" href="#read-history" id="read-history" name="read-history"><i class="anchor-icon"></i></a>READ_HISTORY</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read messages</p>
+<p><strong>Description</strong></p>
+<p>Message history was read, remove multiple notifications for this chat</p>
+<h4><a class="anchor" href="#read-stories" id="read-stories" name="read-stories"><i class="anchor-icon"></i></a>READ_STORIES</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read story</p>
+<p><strong>Description</strong></p>
+<p>Notifications from stories were read, remove story-related notifications for this chat</p>
+<h4><a class="anchor" href="#story-deleted" id="story-deleted" name="story-deleted"><i class="anchor-icon"></i></a>STORY_DELETED</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</p>
+<p><strong>Description</strong></p>
+<p>A story was deleted, remove notifications for this story</p>
+<h4><a class="anchor" href="#story-notext" id="story-notext" name="story-notext"><i class="anchor-icon"></i></a>STORY_NOTEXT</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</p>
+<p><strong>Description</strong></p>
+<p>A story was deleted, remove notifications for this story</p>
+<p><strong>Template example</strong></p>
+<p><code>posted a story</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#story-live" id="story-live" name="story-live"><i class="anchor-icon"></i></a>STORY_LIVE</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</p>
+<p><strong>Description</strong></p>
+<p>A story was deleted, remove notifications for this story</p>
+<p><strong>Template example</strong></p>
+<p><code>started a live stream!</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#story-hidden-author" id="story-hidden-author" name="story-hidden-author"><i class="anchor-icon"></i></a>STORY_HIDDEN_AUTHOR</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</p>
+<p><strong>Description</strong></p>
+<p>A story was deleted, remove notifications for this story</p>
+<p><strong>Template example</strong></p>
+<p><code>A new story was posted</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#geo-live-pending" id="geo-live-pending" name="geo-live-pending"><i class="anchor-icon"></i></a>GEO_LIVE_PENDING</h4>
+<p><strong>Description</strong></p>
+<p>Any of the live locations currently being shared should be updated</p>
+<h4><a class="anchor" href="#session-revoke" id="session-revoke" name="session-revoke"><i class="anchor-icon"></i></a>SESSION_REVOKE</h4>
+<p><strong>Description</strong></p>
+<p>Logout and remove DB for specified session by <strong>data.user_id</strong>, only apply if coming from an <a href="#notification-encryption">MTProto-encrypted payload</a></p>
+<h4><a class="anchor" href="#message-muted" id="message-muted" name="message-muted"><i class="anchor-icon"></i></a>MESSAGE_MUTED</h4>
+<p><strong>Description</strong></p>
+<p>Sent rarely, every 10th message in chats or once per 15 sec in PM, to update badge or download messages</p>
+<h4><a class="anchor" href="#message-announcement" id="message-announcement" name="message-announcement"><i class="anchor-icon"></i></a>MESSAGE_ANNOUNCEMENT</h4>
+<p><strong>Extra custom arguments</strong></p>
+<p><strong>data.announcement</strong>: Announcement</p>
+<p><strong>Description</strong></p>
+<p>Roughly equivalent to a message received from the service notifications (<a href="/constructor/updateServiceNotification">updateServiceNotification</a> with <code>type="announcement"</code>), but is delivered via push notifications, without contacting the API.</p>
 <h3><a class="anchor" href="#possible-notifications" id="possible-notifications" name="possible-notifications"><i class="anchor-icon"></i></a>Possible Notifications</h3>
-<table class="table">
-<thead>
-<tr>
-<th>Type</th>
-<th>Template example</th>
-<th>Arguments</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a id="possible-notification-auth-region" href="#possible-notification-auth-region">AUTH_REGION</a></td>
-<td>New login from unrecognized device {1}, location: {2}</td>
-<td>1. Device name<br>2. Location</td>
-</tr>
-<tr>
-<td><a id="possible-notification-auth-unknown" href="#possible-notification-auth-unknown">AUTH_UNKNOWN</a></td>
-<td>New login from unrecognized device {1}</td>
-<td>1. Device name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-messages" href="#possible-notification-channel-messages">CHANNEL_MESSAGES</a></td>
-<td>{1} posted an album</td>
-<td>1. Message author</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-audio" href="#possible-notification-channel-message-audio">CHANNEL_MESSAGE_AUDIO</a></td>
-<td>{1} posted a voice message</td>
-<td>1. Message author</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-contact" href="#possible-notification-channel-message-contact">CHANNEL_MESSAGE_CONTACT</a></td>
-<td>{1} posted a contact {2}</td>
-<td>1. Message author<br>2. Contact name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-doc" href="#possible-notification-channel-message-doc">CHANNEL_MESSAGE_DOC</a></td>
-<td>{1} posted a file</td>
-<td>1. Message author</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-docs" href="#possible-notification-channel-message-docs">CHANNEL_MESSAGE_DOCS</a></td>
-<td>{1} posted {2} files</td>
-<td>1. Channel name<br>2. Number of documents that were posted</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-fwds" href="#possible-notification-channel-message-fwds">CHANNEL_MESSAGE_FWDS</a></td>
-<td>{1} posted {2} forwarded messages</td>
-<td>1. Message author<br>2. Number of forwarded messages</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-game" href="#possible-notification-channel-message-game">CHANNEL_MESSAGE_GAME</a></td>
-<td>{1} invited you to play {2}</td>
-<td>1. Message author<br>2. Game name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-game-score" href="#possible-notification-channel-message-game-score">CHANNEL_MESSAGE_GAME_SCORE</a></td>
-<td>{1} scored {3} in game {2}</td>
-<td>1. User<br>2. Game name<br>3. Score</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-geo" href="#possible-notification-channel-message-geo">CHANNEL_MESSAGE_GEO</a></td>
-<td>{1} posted a location</td>
-<td>1. Channel name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-geolive" href="#possible-notification-channel-message-geolive">CHANNEL_MESSAGE_GEOLIVE</a></td>
-<td>{1} posted a live location</td>
-<td>1. Channel name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-gif" href="#possible-notification-channel-message-gif">CHANNEL_MESSAGE_GIF</a></td>
-<td>{1} posted a GIF</td>
-<td>1. Channel name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-giveaway" href="#possible-notification-channel-message-giveaway">CHANNEL_MESSAGE_GIVEAWAY</a></td>
-<td>{1} posted a giveaway of {2}x {3}m Premium subscriptions</td>
-<td>1. Channel name<br>2. Number of Telegram Premium subscriptions in the giveaway<br>3. Duration in months of each Telegram Premium subscription in the giveaway</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-giveaway-stars" href="#possible-notification-channel-message-giveaway-stars">CHANNEL_MESSAGE_GIVEAWAY_STARS</a></td>
-<td>{1} posted a giveaway of {3} stars {2}</td>
-<td>1. Channel name<br>2. Number of winners in the giveaway<br>3. Number of Telegram Stars being given away</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-notext" href="#possible-notification-channel-message-notext">CHANNEL_MESSAGE_NOTEXT</a></td>
-<td>{1} posted a message</td>
-<td>1. Channel name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-paid-media" href="#possible-notification-channel-message-paid-media">CHANNEL_MESSAGE_PAID_MEDIA</a></td>
-<td>{1} posted a paid post for {2} star</td>
-<td>1. Channel name<br>2. <a href="/api/stars">Stars</a></td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-photo" href="#possible-notification-channel-message-photo">CHANNEL_MESSAGE_PHOTO</a></td>
-<td>{1} posted a photo</td>
-<td>1. Channel name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-photos" href="#possible-notification-channel-message-photos">CHANNEL_MESSAGE_PHOTOS</a></td>
-<td>{1} posted {2} photos</td>
-<td>1. Channel name<br>2. Number of photos that was sent</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-playlist" href="#possible-notification-channel-message-playlist">CHANNEL_MESSAGE_PLAYLIST</a></td>
-<td>{1} posted {2} music files</td>
-<td>1. Channel name<br>2. Number of audio files that were posted</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-poll" href="#possible-notification-channel-message-poll">CHANNEL_MESSAGE_POLL</a></td>
-<td>{1} posted a poll {2}</td>
-<td>1. Channel name<br>2. Poll name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-quiz" href="#possible-notification-channel-message-quiz">CHANNEL_MESSAGE_QUIZ</a></td>
-<td>{1} posted a quiz {2}</td>
-<td>1. Channel name<br>2. Quiz name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-round" href="#possible-notification-channel-message-round">CHANNEL_MESSAGE_ROUND</a></td>
-<td>{1} posted a video message</td>
-<td>1. Channel name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-sticker" href="#possible-notification-channel-message-sticker">CHANNEL_MESSAGE_STICKER</a></td>
-<td>{1} posted a {2} sticker</td>
-<td>1. Channel name<br>2. Sticker emoji</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-story" href="#possible-notification-channel-message-story">CHANNEL_MESSAGE_STORY</a></td>
-<td>{1} shared a story</td>
-<td>1. Channel name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-text" href="#possible-notification-channel-message-text">CHANNEL_MESSAGE_TEXT</a></td>
-<td>{1}: {2}</td>
-<td>1. Channel name<br>2. Message body</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-todo" href="#possible-notification-channel-message-todo">CHANNEL_MESSAGE_TODO</a></td>
-<td>{1} posted a checklist {2}</td>
-<td>1. Channel name<br>2. Checklist title</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-todo-append" href="#possible-notification-channel-message-todo-append">CHANNEL_MESSAGE_TODO_APPEND</a></td>
-<td>{1} added {2} tasks</td>
-<td>1. Channel name<br>2. Number of added tasks</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-todo-done" href="#possible-notification-channel-message-todo-done">CHANNEL_MESSAGE_TODO_DONE</a></td>
-<td>{1} toggled {2} tasks</td>
-<td>1. Channel name<br>2. Number of toggled tasks</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-video" href="#possible-notification-channel-message-video">CHANNEL_MESSAGE_VIDEO</a></td>
-<td>{1} posted a video</td>
-<td>1. Channel name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-channel-message-videos" href="#possible-notification-channel-message-videos">CHANNEL_MESSAGE_VIDEOS</a></td>
-<td>{1} posted {2} videos</td>
-<td>1. Channel name<br>2. Number of videos that were posted</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-add-member" href="#possible-notification-chat-add-member">CHAT_ADD_MEMBER</a></td>
-<td>{1} invited {3} to the group {2}</td>
-<td>1. Message author<br>2. Chat name<br>3. New participant name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-add-you" href="#possible-notification-chat-add-you">CHAT_ADD_YOU</a></td>
-<td>{1} invited you to the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-created" href="#possible-notification-chat-created">CHAT_CREATED</a></td>
-<td>{1} invited you to the group {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-delete-member" href="#possible-notification-chat-delete-member">CHAT_DELETE_MEMBER</a></td>
-<td>{1} removed {3} from the group {2}</td>
-<td>1. Message author<br>2. Chat name<br>3. Dropped participant name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-delete-you" href="#possible-notification-chat-delete-you">CHAT_DELETE_YOU</a></td>
-<td>{1} removed you from the group {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-joined" href="#possible-notification-chat-joined">CHAT_JOINED</a></td>
-<td>{1} joined the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-left" href="#possible-notification-chat-left">CHAT_LEFT</a></td>
-<td>{1} left the group {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-messages" href="#possible-notification-chat-messages">CHAT_MESSAGES</a></td>
-<td>{1} sent an album to the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-audio" href="#possible-notification-chat-message-audio">CHAT_MESSAGE_AUDIO</a></td>
-<td>{1} sent a voice message to the group {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-contact" href="#possible-notification-chat-message-contact">CHAT_MESSAGE_CONTACT</a></td>
-<td>{1} shared a contact {3} in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Contact name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-doc" href="#possible-notification-chat-message-doc">CHAT_MESSAGE_DOC</a></td>
-<td>{1} sent a file to the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-docs" href="#possible-notification-chat-message-docs">CHAT_MESSAGE_DOCS</a></td>
-<td>{1} sent {3} files to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Number of documents that were sent</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-fwds" href="#possible-notification-chat-message-fwds">CHAT_MESSAGE_FWDS</a></td>
-<td>{1} forwarded {3} messages to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Number of messages that were forwarded</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-game" href="#possible-notification-chat-message-game">CHAT_MESSAGE_GAME</a></td>
-<td>{1} invited the group {2} to play {3}</td>
-<td>1. User name<br>2. Group name<br>3. Game name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-game-score" href="#possible-notification-chat-message-game-score">CHAT_MESSAGE_GAME_SCORE</a></td>
-<td>{1} scored {4} in game {3} in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Game name<br>4. Score</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-geo" href="#possible-notification-chat-message-geo">CHAT_MESSAGE_GEO</a></td>
-<td>{1} sent a location to the group {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-geolive" href="#possible-notification-chat-message-geolive">CHAT_MESSAGE_GEOLIVE</a></td>
-<td>{1} shared a live location with the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-gif" href="#possible-notification-chat-message-gif">CHAT_MESSAGE_GIF</a></td>
-<td>{1} sent a GIF to the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-giveaway" href="#possible-notification-chat-message-giveaway">CHAT_MESSAGE_GIVEAWAY</a></td>
-<td>{1} sent a giveaway of {3}x {4}m Premium subscriptions to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Number of Telegram Premium subscriptions in the giveaway<br>4. Duration in months of each Telegram Premium subscription in the giveaway</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-giveaway-stars" href="#possible-notification-chat-message-giveaway-stars">CHAT_MESSAGE_GIVEAWAY_STARS</a></td>
-<td>{1} sent a giveaway of {4} stars {3} to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Number of winners in the giveaway<br>4. Number of Telegram Stars being given away</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-invoice" href="#possible-notification-chat-message-invoice">CHAT_MESSAGE_INVOICE</a></td>
-<td>{1} sent an invoice to the group {2} for {3}</td>
-<td>1. User name<br>2. Group name<br>3. Product name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-notext" href="#possible-notification-chat-message-notext">CHAT_MESSAGE_NOTEXT</a></td>
-<td>{1} sent a message to the group {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-paid-media" href="#possible-notification-chat-message-paid-media">CHAT_MESSAGE_PAID_MEDIA</a></td>
-<td>{1} posted a paid post in {2} group for {3} star</td>
-<td>1. Message author<br>2. Chat name<br>3. <a href="/api/stars">Stars</a></td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-photo" href="#possible-notification-chat-message-photo">CHAT_MESSAGE_PHOTO</a></td>
-<td>{1} sent a photo to the group {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-photos" href="#possible-notification-chat-message-photos">CHAT_MESSAGE_PHOTOS</a></td>
-<td>{1} sent {3} photos to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Number of photos that were sent</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-playlist" href="#possible-notification-chat-message-playlist">CHAT_MESSAGE_PLAYLIST</a></td>
-<td>{1} sent {3} music files to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Number of audio files that were sent</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-poll" href="#possible-notification-chat-message-poll">CHAT_MESSAGE_POLL</a></td>
-<td>{1} sent a poll {3} to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Poll name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-quiz" href="#possible-notification-chat-message-quiz">CHAT_MESSAGE_QUIZ</a></td>
-<td>{1} sent a quiz {3} to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Quiz name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-round" href="#possible-notification-chat-message-round">CHAT_MESSAGE_ROUND</a></td>
-<td>{1} sent a video message to the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-sticker" href="#possible-notification-chat-message-sticker">CHAT_MESSAGE_STICKER</a></td>
-<td>{1} sent a {3} sticker to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Sticker emoji</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-story" href="#possible-notification-chat-message-story">CHAT_MESSAGE_STORY</a></td>
-<td>{1} shared a story to the group</td>
-<td>1. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-text" href="#possible-notification-chat-message-text">CHAT_MESSAGE_TEXT</a></td>
-<td>{1} @ {2}: {3}</td>
-<td>1. Message author<br>2. Chat name<br>3. Message body</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-todo" href="#possible-notification-chat-message-todo">CHAT_MESSAGE_TODO</a></td>
-<td>{1} sent a checklist {3} to the group {2}</td>
-<td>1. User<br>2. Group name<br>3. Checklist title</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-todo-append" href="#possible-notification-chat-message-todo-append">CHAT_MESSAGE_TODO_APPEND</a></td>
-<td>{1} added {3} tasks in the group {2}</td>
-<td>1. User<br>2. Group name<br>3. Number of added tasks</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-todo-done" href="#possible-notification-chat-message-todo-done">CHAT_MESSAGE_TODO_DONE</a></td>
-<td>{1} toggled {3} tasks in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Number of toggled tasks</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-video" href="#possible-notification-chat-message-video">CHAT_MESSAGE_VIDEO</a></td>
-<td>{1} sent a video to the group {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-message-videos" href="#possible-notification-chat-message-videos">CHAT_MESSAGE_VIDEOS</a></td>
-<td>{1} sent {3} videos to the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Number of videos that were sent</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-photo-edited" href="#possible-notification-chat-photo-edited">CHAT_PHOTO_EDITED</a></td>
-<td>{1} changed the group photo for {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-audio" href="#possible-notification-chat-react-audio">CHAT_REACT_AUDIO</a></td>
-<td>{1}: {3} to your voice message in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-contact" href="#possible-notification-chat-react-contact">CHAT_REACT_CONTACT</a></td>
-<td>{1}: {3} to your contact {4} in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Contact name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-doc" href="#possible-notification-chat-react-doc">CHAT_REACT_DOC</a></td>
-<td>{1}: {3} to your file in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-game" href="#possible-notification-chat-react-game">CHAT_REACT_GAME</a></td>
-<td>{1}: {3} to your game in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-geo" href="#possible-notification-chat-react-geo">CHAT_REACT_GEO</a></td>
-<td>{1}: {3} to your map in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-geolive" href="#possible-notification-chat-react-geolive">CHAT_REACT_GEOLIVE</a></td>
-<td>{1}: {3} to your live location in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-gif" href="#possible-notification-chat-react-gif">CHAT_REACT_GIF</a></td>
-<td>{1}: {3} to your GIF in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-giveaway" href="#possible-notification-chat-react-giveaway">CHAT_REACT_GIVEAWAY</a></td>
-<td>{1} reacted {3} in group {2} to your giveaway</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-invoice" href="#possible-notification-chat-react-invoice">CHAT_REACT_INVOICE</a></td>
-<td>{1}: {3} to your invoice in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-notext" href="#possible-notification-chat-react-notext">CHAT_REACT_NOTEXT</a></td>
-<td>{1}: {3} to your message in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-paid-media" href="#possible-notification-chat-react-paid-media">CHAT_REACT_PAID_MEDIA</a></td>
-<td>{1} reacted {3} in group {2} to your paid post for {4} star</td>
-<td>1. User name<br>2. Group name<br>3. Reaction<br>4. <a href="/api/stars">Stars</a></td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-photo" href="#possible-notification-chat-react-photo">CHAT_REACT_PHOTO</a></td>
-<td>{1}: {3} to your photo in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-poll" href="#possible-notification-chat-react-poll">CHAT_REACT_POLL</a></td>
-<td>{1}: {3} to your poll {4} in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Poll name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-quiz" href="#possible-notification-chat-react-quiz">CHAT_REACT_QUIZ</a></td>
-<td>{1}: {3} to your quiz {4} in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Quiz name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-round" href="#possible-notification-chat-react-round">CHAT_REACT_ROUND</a></td>
-<td>{1}: {3} to your video message in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-sticker" href="#possible-notification-chat-react-sticker">CHAT_REACT_STICKER</a></td>
-<td>{1}: {3} to your {4} sticker in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Sticker emoji</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-text" href="#possible-notification-chat-react-text">CHAT_REACT_TEXT</a></td>
-<td>{1}: {3} in {2} to your "{4}"</td>
-<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Message body</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-todo" href="#possible-notification-chat-react-todo">CHAT_REACT_TODO</a></td>
-<td>{1}: {3} to your checklist {4} in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction<br>4. Checklist title</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-react-video" href="#possible-notification-chat-react-video">CHAT_REACT_VIDEO</a></td>
-<td>{1}: {3} to your video in {2}</td>
-<td>1. User name<br>2. Group name<br>3. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-req-joined" href="#possible-notification-chat-req-joined">CHAT_REQ_JOINED</a></td>
-<td>{2}|{1} was accepted into the group</td>
-<td>1. User name<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-returned" href="#possible-notification-chat-returned">CHAT_RETURNED</a></td>
-<td>{1} returned to the group {2}</td>
-<td>1. Message author<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-title-edited" href="#possible-notification-chat-title-edited">CHAT_TITLE_EDITED</a></td>
-<td>{1} renamed the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-voicechat-end" href="#possible-notification-chat-voicechat-end">CHAT_VOICECHAT_END</a></td>
-<td>{1} ended a voice chat in the group {2}</td>
-<td>1. User name<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-voicechat-invite" href="#possible-notification-chat-voicechat-invite">CHAT_VOICECHAT_INVITE</a></td>
-<td>{1} invited {3} to a voice chat in the group {2}</td>
-<td>1. User name<br>2. Chat name<br>3. Invited users</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-voicechat-invite-you" href="#possible-notification-chat-voicechat-invite-you">CHAT_VOICECHAT_INVITE_YOU</a></td>
-<td>{1} invited you to a voice chat in the group {2}</td>
-<td>1. User name<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-chat-voicechat-start" href="#possible-notification-chat-voicechat-start">CHAT_VOICECHAT_START</a></td>
-<td>{1} started a voice chat in the group {2}</td>
-<td>1. User name<br>2. Chat name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-conf-call-missed" href="#possible-notification-conf-call-missed">CONF_CALL_MISSED</a></td>
-<td>You missed a call from {1}</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-contact-joined" href="#possible-notification-contact-joined">CONTACT_JOINED</a></td>
-<td>{1} joined Telegram!</td>
-<td>1. Contact name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-encrypted-message" href="#possible-notification-encrypted-message">ENCRYPTED_MESSAGE</a></td>
-<td>You have a new message</td>
-<td> </td>
-</tr>
-<tr>
-<td><a id="possible-notification-encryption-accept" href="#possible-notification-encryption-accept">ENCRYPTION_ACCEPT</a></td>
-<td>You have a new message</td>
-<td> </td>
-</tr>
-<tr>
-<td><a id="possible-notification-encryption-request" href="#possible-notification-encryption-request">ENCRYPTION_REQUEST</a></td>
-<td>You have a new message</td>
-<td> </td>
-</tr>
-<tr>
-<td><a id="possible-notification-locked-message" href="#possible-notification-locked-message">LOCKED_MESSAGE</a></td>
-<td>You have a new message</td>
-<td> </td>
-</tr>
-<tr>
-<td><a id="possible-notification-messages" href="#possible-notification-messages">MESSAGES</a></td>
-<td>{1} sent you an album</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-audio" href="#possible-notification-message-audio">MESSAGE_AUDIO</a></td>
-<td>{1} sent you a voice message</td>
-<td>1. Message author</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-contact" href="#possible-notification-message-contact">MESSAGE_CONTACT</a></td>
-<td>{1} shared a contact {2} with you</td>
-<td>1. User name<br>2. Contact name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-doc" href="#possible-notification-message-doc">MESSAGE_DOC</a></td>
-<td>{1} sent you a file</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-docs" href="#possible-notification-message-docs">MESSAGE_DOCS</a></td>
-<td>{1} sent you {2} files</td>
-<td>1. User name<br>2. Number of documents that were sent</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-fwds" href="#possible-notification-message-fwds">MESSAGE_FWDS</a></td>
-<td>{1} forwarded you {2} messages</td>
-<td>1. User name<br>2. Number of messages that were forwarded</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-game" href="#possible-notification-message-game">MESSAGE_GAME</a></td>
-<td>{1} invited you to play {2}</td>
-<td>1. User name<br>2. Game name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-game-score" href="#possible-notification-message-game-score">MESSAGE_GAME_SCORE</a></td>
-<td>{1} scored {3} in game {2}</td>
-<td>1. User name<br>2. Game name<br>3. Score</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-geo" href="#possible-notification-message-geo">MESSAGE_GEO</a></td>
-<td>{1} sent you a location</td>
-<td>1. Message author</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-geolive" href="#possible-notification-message-geolive">MESSAGE_GEOLIVE</a></td>
-<td>{1} sent you a live location</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-gif" href="#possible-notification-message-gif">MESSAGE_GIF</a></td>
-<td>{1} sent you a GIF</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-giftcode" href="#possible-notification-message-giftcode">MESSAGE_GIFTCODE</a></td>
-<td>{1} sent you a Gift Code for {2} of Telegram Premium</td>
-<td>1. User name<br>2. Duration of Telegram Premium subscription</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-giveaway" href="#possible-notification-message-giveaway">MESSAGE_GIVEAWAY</a></td>
-<td>{1} sent you a giveaway of {2}x {3}m Premium subscriptions</td>
-<td>1. User name<br>2. Number of Telegram Premium subscriptions in the giveaway<br>3. Duration in months of each Telegram Premium subscription in the giveaway</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-giveaway-stars" href="#possible-notification-message-giveaway-stars">MESSAGE_GIVEAWAY_STARS</a></td>
-<td>{1} sent you a giveaway of {3} stars {2}</td>
-<td>1. User name<br>2. Number of winners in the giveaway<br>3. Number of Telegram Stars being given away</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-invoice" href="#possible-notification-message-invoice">MESSAGE_INVOICE</a></td>
-<td>{1} sent you an invoice for {2}</td>
-<td>1. User name<br>2. Product</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-notext" href="#possible-notification-message-notext">MESSAGE_NOTEXT</a></td>
-<td>{1} sent you a message</td>
-<td>1. Message author</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-paid-media" href="#possible-notification-message-paid-media">MESSAGE_PAID_MEDIA</a></td>
-<td>{1} sent you a paid post for {2} star</td>
-<td>1. Message author<br>2. <a href="/api/stars">Stars</a></td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-photo" href="#possible-notification-message-photo">MESSAGE_PHOTO</a></td>
-<td>{1} sent you a photo</td>
-<td>1. Message author</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-photos" href="#possible-notification-message-photos">MESSAGE_PHOTOS</a></td>
-<td>{1} sent you {2} photos</td>
-<td>1. User name<br>2. Number of photos that were sent</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-photo-secret" href="#possible-notification-message-photo-secret">MESSAGE_PHOTO_SECRET</a></td>
-<td>{1} sent you a self-destructing photo</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-playlist" href="#possible-notification-message-playlist">MESSAGE_PLAYLIST</a></td>
-<td>{1} sent you {2} music files</td>
-<td>1. User name<br>2. Number of audio files that were sent</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-poll" href="#possible-notification-message-poll">MESSAGE_POLL</a></td>
-<td>{1} sent you a poll {2}</td>
-<td>1. User name<br>2. Poll name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-quiz" href="#possible-notification-message-quiz">MESSAGE_QUIZ</a></td>
-<td>{1} sent you a quiz {2}</td>
-<td>1. User name<br>2. Quiz name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-recurring-pay" href="#possible-notification-message-recurring-pay">MESSAGE_RECURRING_PAY</a></td>
-<td>You were charged {2} by {1}</td>
-<td>1. The entity to which money was sent for a recurring subscription<br>2. The amount of money charged for a recurring subscription</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-round" href="#possible-notification-message-round">MESSAGE_ROUND</a></td>
-<td>{1} sent you a video message</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-same-wallpaper" href="#possible-notification-message-same-wallpaper">MESSAGE_SAME_WALLPAPER</a></td>
-<td>{1} set a same wallpaper for this chat</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-screenshot" href="#possible-notification-message-screenshot">MESSAGE_SCREENSHOT</a></td>
-<td>{1} took a screenshot</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-stargift" href="#possible-notification-message-stargift">MESSAGE_STARGIFT</a></td>
-<td>{1} sent you a Gift worth {2} Stars</td>
-<td>1. User name<br>2. Number of Telegram Stars</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-stargift-unpack-upgrade" href="#possible-notification-message-stargift-unpack-upgrade">MESSAGE_STARGIFT_UNPACK_UPGRADE</a></td>
-<td>{1} unpacked the Gift that you helped upgrade</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-stargift-upgrade" href="#possible-notification-message-stargift-upgrade">MESSAGE_STARGIFT_UPGRADE</a></td>
-<td>{1} upgraded your Gift</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-sticker" href="#possible-notification-message-sticker">MESSAGE_STICKER</a></td>
-<td>{1} sent you a {2} sticker</td>
-<td>1. User name<br>2. Sticker emoji</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-story" href="#possible-notification-message-story">MESSAGE_STORY</a></td>
-<td>{1} shared a story with you</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-story-mention" href="#possible-notification-message-story-mention">MESSAGE_STORY_MENTION</a></td>
-<td>{1} mentioned you in a story</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-suggest-birthday" href="#possible-notification-message-suggest-birthday">MESSAGE_SUGGEST_BIRTHDAY</a></td>
-<td>{1} suggested you your birthday</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-text" href="#possible-notification-message-text">MESSAGE_TEXT</a></td>
-<td>{1}: {2}</td>
-<td>1. Message author<br>2. Message body</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-todo" href="#possible-notification-message-todo">MESSAGE_TODO</a></td>
-<td>{1} sent you a checklist {2}</td>
-<td>1. User name<br>2. Checklist title</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-unique-stargift" href="#possible-notification-message-unique-stargift">MESSAGE_UNIQUE_STARGIFT</a></td>
-<td>{1} transferred you a Gift!</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-video" href="#possible-notification-message-video">MESSAGE_VIDEO</a></td>
-<td>{1} sent you a video</td>
-<td>1. Message author</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-videos" href="#possible-notification-message-videos">MESSAGE_VIDEOS</a></td>
-<td>{1} sent you {2} videos</td>
-<td>1. User name<br>2. Number of videos that were sent</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-video-secret" href="#possible-notification-message-video-secret">MESSAGE_VIDEO_SECRET</a></td>
-<td>{1} sent you a self-destructing video</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-message-wallpaper" href="#possible-notification-message-wallpaper">MESSAGE_WALLPAPER</a></td>
-<td>{1} set a new wallpaper for this chat</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-oauth-request" href="#possible-notification-oauth-request">OAUTH_REQUEST</a></td>
-<td>Login request for {1} from {2}</td>
-<td>1. Domain of the URL where the user is trying to log in, the full URL is passed in the <code>data_url</code> field of the custom arguments<br>2. Human-readable description of a country and a region from which the authorization is performed, based on the IP address of the user</td>
-</tr>
-<tr>
-<td><a id="possible-notification-phone-call-missed" href="#possible-notification-phone-call-missed">PHONE_CALL_MISSED</a></td>
-<td>You missed a call from {1}</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-phone-call-request" href="#possible-notification-phone-call-request">PHONE_CALL_REQUEST</a></td>
-<td>{1} is calling you!</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-audio" href="#possible-notification-pinned-audio">PINNED_AUDIO</a></td>
-<td>{1} pinned a voice message</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-audio" href="#possible-notification-pinned-audio">PINNED_AUDIO</a></td>
-<td>{1} pinned a voice message in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-contact" href="#possible-notification-pinned-contact">PINNED_CONTACT</a></td>
-<td>{1} pinned a contact {2}</td>
-<td>1. User name<br>2. Contact name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-contact" href="#possible-notification-pinned-contact">PINNED_CONTACT</a></td>
-<td>{1} pinned a contact {3} in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Contact name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-doc" href="#possible-notification-pinned-doc">PINNED_DOC</a></td>
-<td>{1} pinned a file</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-doc" href="#possible-notification-pinned-doc">PINNED_DOC</a></td>
-<td>{1} pinned a file in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-game" href="#possible-notification-pinned-game">PINNED_GAME</a></td>
-<td>{1} pinned a game</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-game" href="#possible-notification-pinned-game">PINNED_GAME</a></td>
-<td>{1} pinned a game in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-game-score" href="#possible-notification-pinned-game-score">PINNED_GAME_SCORE</a></td>
-<td>{1} pinned a game score</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-game-score" href="#possible-notification-pinned-game-score">PINNED_GAME_SCORE</a></td>
-<td>{1} pinned a game score in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-geo" href="#possible-notification-pinned-geo">PINNED_GEO</a></td>
-<td>{1} pinned a map</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-geo" href="#possible-notification-pinned-geo">PINNED_GEO</a></td>
-<td>{1} pinned a map in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-geolive" href="#possible-notification-pinned-geolive">PINNED_GEOLIVE</a></td>
-<td>{1} pinned a live location</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-geolive" href="#possible-notification-pinned-geolive">PINNED_GEOLIVE</a></td>
-<td>{1} pinned a live location in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-gif" href="#possible-notification-pinned-gif">PINNED_GIF</a></td>
-<td>{1} pinned a GIF</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-gif" href="#possible-notification-pinned-gif">PINNED_GIF</a></td>
-<td>{1} pinned a GIF in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-giveaway" href="#possible-notification-pinned-giveaway">PINNED_GIVEAWAY</a></td>
-<td>{1} pinned a giveaway</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-giveaway" href="#possible-notification-pinned-giveaway">PINNED_GIVEAWAY</a></td>
-<td>{1} pinned a giveaway in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-invoice" href="#possible-notification-pinned-invoice">PINNED_INVOICE</a></td>
-<td>{1} pinned an invoice</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-invoice" href="#possible-notification-pinned-invoice">PINNED_INVOICE</a></td>
-<td>{1} pinned an invoice in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-notext" href="#possible-notification-pinned-notext">PINNED_NOTEXT</a></td>
-<td>{1} pinned a message</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-notext" href="#possible-notification-pinned-notext">PINNED_NOTEXT</a></td>
-<td>{1} pinned a message in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-paid-media" href="#possible-notification-pinned-paid-media">PINNED_PAID_MEDIA</a></td>
-<td>{1} pinned a paid post for {2} star</td>
-<td>1. User name<br>2. <a href="/api/stars">Stars</a></td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-paid-media" href="#possible-notification-pinned-paid-media">PINNED_PAID_MEDIA</a></td>
-<td>{1} pinned a paid post for {3} star in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. <a href="/api/stars">Stars</a></td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-photo" href="#possible-notification-pinned-photo">PINNED_PHOTO</a></td>
-<td>{1} pinned a photo</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-photo" href="#possible-notification-pinned-photo">PINNED_PHOTO</a></td>
-<td>{1} pinned a photo in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-poll" href="#possible-notification-pinned-poll">PINNED_POLL</a></td>
-<td>{1} pinned a poll {2}</td>
-<td>1. User name<br>2. Poll name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-poll" href="#possible-notification-pinned-poll">PINNED_POLL</a></td>
-<td>{1} pinned a poll {3} in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Poll name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-quiz" href="#possible-notification-pinned-quiz">PINNED_QUIZ</a></td>
-<td>{1} pinned a quiz {2}</td>
-<td>1. User name<br>2. Quiz name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-quiz" href="#possible-notification-pinned-quiz">PINNED_QUIZ</a></td>
-<td>{1} pinned a quiz {3} in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Quiz name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-round" href="#possible-notification-pinned-round">PINNED_ROUND</a></td>
-<td>{1} pinned a video message</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-round" href="#possible-notification-pinned-round">PINNED_ROUND</a></td>
-<td>{1} pinned a video message in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-sticker" href="#possible-notification-pinned-sticker">PINNED_STICKER</a></td>
-<td>{1} pinned a {2} sticker</td>
-<td>1. User name<br>2. Sticker emoji</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-sticker" href="#possible-notification-pinned-sticker">PINNED_STICKER</a></td>
-<td>{1} pinned a {3} sticker in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Sticker emoji</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-text" href="#possible-notification-pinned-text">PINNED_TEXT</a></td>
-<td>{1} pinned "{2}"</td>
-<td>1. User name<br>2. Message body</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-text" href="#possible-notification-pinned-text">PINNED_TEXT</a></td>
-<td>{1} pinned "{3}" in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Message body</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-todo" href="#possible-notification-pinned-todo">PINNED_TODO</a></td>
-<td>{1} pinned a checklist {2}</td>
-<td>1. User name<br>2. Checklist title</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-todo" href="#possible-notification-pinned-todo">PINNED_TODO</a></td>
-<td>{1} pinned a checklist {3} in the group {2}</td>
-<td>1. User name<br>2. Group name<br>3. Checklist title</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-video" href="#possible-notification-pinned-video">PINNED_VIDEO</a></td>
-<td>{1} pinned a video</td>
-<td>1. User name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-pinned-video" href="#possible-notification-pinned-video">PINNED_VIDEO</a></td>
-<td>{1} pinned a video in the group {2}</td>
-<td>1. User name<br>2. Group name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-audio" href="#possible-notification-react-audio">REACT_AUDIO</a></td>
-<td>{1}: {2} to your voice message</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-contact" href="#possible-notification-react-contact">REACT_CONTACT</a></td>
-<td>{1}: {2} to your contact {3}</td>
-<td>1. User name<br>2. Reaction<br>3. Contact name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-doc" href="#possible-notification-react-doc">REACT_DOC</a></td>
-<td>{1}: {2} to your file</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-game" href="#possible-notification-react-game">REACT_GAME</a></td>
-<td>{1}: {2} to your game</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-geo" href="#possible-notification-react-geo">REACT_GEO</a></td>
-<td>{1}: {2} to your map</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-geolive" href="#possible-notification-react-geolive">REACT_GEOLIVE</a></td>
-<td>{1}: {2} to your live location</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-gif" href="#possible-notification-react-gif">REACT_GIF</a></td>
-<td>{1}: {2} to your GIF</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-giveaway" href="#possible-notification-react-giveaway">REACT_GIVEAWAY</a></td>
-<td>{1} reacted {2} to your giveaway</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-hidden" href="#possible-notification-react-hidden">REACT_HIDDEN</a></td>
-<td>New reaction to your message</td>
-<td> </td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-invoice" href="#possible-notification-react-invoice">REACT_INVOICE</a></td>
-<td>{1}: {2} to your invoice</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-notext" href="#possible-notification-react-notext">REACT_NOTEXT</a></td>
-<td>{1}: {2} to your message</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-photo" href="#possible-notification-react-photo">REACT_PHOTO</a></td>
-<td>{1}: {2} to your photo</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-poll" href="#possible-notification-react-poll">REACT_POLL</a></td>
-<td>{1}: {2} to your poll {3}</td>
-<td>1. User name<br>2. Reaction<br>3. Poll name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-quiz" href="#possible-notification-react-quiz">REACT_QUIZ</a></td>
-<td>{1}: {2} to your quiz {3}</td>
-<td>1. User name<br>2. Reaction<br>3. Quiz name</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-round" href="#possible-notification-react-round">REACT_ROUND</a></td>
-<td>{1}: {2} to your video message</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-sticker" href="#possible-notification-react-sticker">REACT_STICKER</a></td>
-<td>{1}: {2} to your {3} sticker</td>
-<td>1. User name<br>2. Reaction<br>3. Sticker emoji</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-story" href="#possible-notification-react-story">REACT_STORY</a></td>
-<td>{1}: {2} to your story</td>
-<td>1. Peer where the story was posted<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-story-hidden" href="#possible-notification-react-story-hidden">REACT_STORY_HIDDEN</a></td>
-<td>New reaction to your story</td>
-<td> </td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-text" href="#possible-notification-react-text">REACT_TEXT</a></td>
-<td>{1}: {2} to your "{3}"</td>
-<td>1. User name<br>2. Reaction<br>3. Message body</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-todo" href="#possible-notification-react-todo">REACT_TODO</a></td>
-<td>{1}: {2} to your checklist {3}</td>
-<td>1. User name<br>2. Reaction<br>3. Checklist title</td>
-</tr>
-<tr>
-<td><a id="possible-notification-react-video" href="#possible-notification-react-video">REACT_VIDEO</a></td>
-<td>{1}: {2} to your video</td>
-<td>1. User name<br>2. Reaction</td>
-</tr>
-<tr>
-<td><a id="possible-notification-story-hidden-author" href="#possible-notification-story-hidden-author">STORY_HIDDEN_AUTHOR</a></td>
-<td>A new story was posted</td>
-<td> </td>
-</tr>
-<tr>
-<td><a id="possible-notification-story-live" href="#possible-notification-story-live">STORY_LIVE</a></td>
-<td>started a live stream!</td>
-<td> </td>
-</tr>
-<tr>
-<td><a id="possible-notification-story-notext" href="#possible-notification-story-notext">STORY_NOTEXT</a></td>
-<td>posted a story</td>
-<td> </td>
-</tr>
-</tbody>
-</table>
+<h4><a class="anchor" href="#auth-region" id="auth-region" name="auth-region"><i class="anchor-icon"></i></a>AUTH_REGION</h4>
+<p><strong>Template example</strong></p>
+<p><code>New login from unrecognized device {1}, location: {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Device name</li>
+<li>Location</li>
+</ol>
+<h4><a class="anchor" href="#auth-unknown" id="auth-unknown" name="auth-unknown"><i class="anchor-icon"></i></a>AUTH_UNKNOWN</h4>
+<p><strong>Template example</strong></p>
+<p><code>New login from unrecognized device {1}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Device name</li>
+</ol>
+<h4><a class="anchor" href="#channel-messages" id="channel-messages" name="channel-messages"><i class="anchor-icon"></i></a>CHANNEL_MESSAGES</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted an album</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-audio" id="channel-message-audio" name="channel-message-audio"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_AUDIO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a voice message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-contact" id="channel-message-contact" name="channel-message-contact"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_CONTACT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a contact {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Contact name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-doc" id="channel-message-doc" name="channel-message-doc"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_DOC</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a file</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-docs" id="channel-message-docs" name="channel-message-docs"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_DOCS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted {2} files</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Number of documents that were posted</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-fwds" id="channel-message-fwds" name="channel-message-fwds"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_FWDS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted {2} forwarded messages</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Number of forwarded messages</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-game" id="channel-message-game" name="channel-message-game"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_GAME</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} invited you to play {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Game name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-game-score" id="channel-message-game-score" name="channel-message-game-score"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_GAME_SCORE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} scored {3} in game {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User</li>
+<li>Game name</li>
+<li>Score</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-geo" id="channel-message-geo" name="channel-message-geo"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_GEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a location</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-geolive" id="channel-message-geolive" name="channel-message-geolive"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_GEOLIVE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a live location</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-gif" id="channel-message-gif" name="channel-message-gif"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_GIF</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a GIF</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-giveaway" id="channel-message-giveaway" name="channel-message-giveaway"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_GIVEAWAY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a giveaway of {2}x {3}m Premium subscriptions</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Number of Telegram Premium subscriptions in the giveaway</li>
+<li>Duration in months of each Telegram Premium subscription in the giveaway</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-giveaway-stars" id="channel-message-giveaway-stars" name="channel-message-giveaway-stars"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_GIVEAWAY_STARS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a giveaway of {3} stars {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Number of winners in the giveaway</li>
+<li>Number of Telegram Stars being given away</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-notext" id="channel-message-notext" name="channel-message-notext"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_NOTEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-paid-media" id="channel-message-paid-media" name="channel-message-paid-media"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_PAID_MEDIA</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a paid post for {2} star</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li><a href="/api/stars">Stars</a></li>
+</ol>
+<h4><a class="anchor" href="#channel-message-photo" id="channel-message-photo" name="channel-message-photo"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_PHOTO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a photo</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-photos" id="channel-message-photos" name="channel-message-photos"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_PHOTOS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted {2} photos</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Number of photos that was sent</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-playlist" id="channel-message-playlist" name="channel-message-playlist"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_PLAYLIST</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted {2} music files</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Number of audio files that were posted</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-poll" id="channel-message-poll" name="channel-message-poll"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_POLL</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a poll {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Poll name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-quiz" id="channel-message-quiz" name="channel-message-quiz"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_QUIZ</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a quiz {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Quiz name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-round" id="channel-message-round" name="channel-message-round"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_ROUND</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a video message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-sticker" id="channel-message-sticker" name="channel-message-sticker"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_STICKER</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a {2} sticker</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Sticker emoji</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-story" id="channel-message-story" name="channel-message-story"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_STORY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} shared a story</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-text" id="channel-message-text" name="channel-message-text"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_TEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Message body</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-todo" id="channel-message-todo" name="channel-message-todo"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_TODO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a checklist {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Checklist title</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-todo-append" id="channel-message-todo-append" name="channel-message-todo-append"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_TODO_APPEND</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} added {2} tasks</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Number of added tasks</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-todo-done" id="channel-message-todo-done" name="channel-message-todo-done"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_TODO_DONE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} toggled {2} tasks</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Number of toggled tasks</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-video" id="channel-message-video" name="channel-message-video"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_VIDEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a video</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+</ol>
+<h4><a class="anchor" href="#channel-message-videos" id="channel-message-videos" name="channel-message-videos"><i class="anchor-icon"></i></a>CHANNEL_MESSAGE_VIDEOS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted {2} videos</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Channel name</li>
+<li>Number of videos that were posted</li>
+</ol>
+<h4><a class="anchor" href="#chat-add-member" id="chat-add-member" name="chat-add-member"><i class="anchor-icon"></i></a>CHAT_ADD_MEMBER</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} invited {3} to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+<li>New participant name</li>
+</ol>
+<h4><a class="anchor" href="#chat-add-you" id="chat-add-you" name="chat-add-you"><i class="anchor-icon"></i></a>CHAT_ADD_YOU</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} invited you to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#chat-created" id="chat-created" name="chat-created"><i class="anchor-icon"></i></a>CHAT_CREATED</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} invited you to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-delete-member" id="chat-delete-member" name="chat-delete-member"><i class="anchor-icon"></i></a>CHAT_DELETE_MEMBER</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} removed {3} from the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+<li>Dropped participant name</li>
+</ol>
+<h4><a class="anchor" href="#chat-delete-you" id="chat-delete-you" name="chat-delete-you"><i class="anchor-icon"></i></a>CHAT_DELETE_YOU</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} removed you from the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-joined" id="chat-joined" name="chat-joined"><i class="anchor-icon"></i></a>CHAT_JOINED</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} joined the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#chat-left" id="chat-left" name="chat-left"><i class="anchor-icon"></i></a>CHAT_LEFT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} left the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-messages" id="chat-messages" name="chat-messages"><i class="anchor-icon"></i></a>CHAT_MESSAGES</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent an album to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-audio" id="chat-message-audio" name="chat-message-audio"><i class="anchor-icon"></i></a>CHAT_MESSAGE_AUDIO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a voice message to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-contact" id="chat-message-contact" name="chat-message-contact"><i class="anchor-icon"></i></a>CHAT_MESSAGE_CONTACT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} shared a contact {3} in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Contact name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-doc" id="chat-message-doc" name="chat-message-doc"><i class="anchor-icon"></i></a>CHAT_MESSAGE_DOC</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a file to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-docs" id="chat-message-docs" name="chat-message-docs"><i class="anchor-icon"></i></a>CHAT_MESSAGE_DOCS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent {3} files to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Number of documents that were sent</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-fwds" id="chat-message-fwds" name="chat-message-fwds"><i class="anchor-icon"></i></a>CHAT_MESSAGE_FWDS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} forwarded {3} messages to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Number of messages that were forwarded</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-game" id="chat-message-game" name="chat-message-game"><i class="anchor-icon"></i></a>CHAT_MESSAGE_GAME</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} invited the group {2} to play {3}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Game name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-game-score" id="chat-message-game-score" name="chat-message-game-score"><i class="anchor-icon"></i></a>CHAT_MESSAGE_GAME_SCORE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} scored {4} in game {3} in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Game name</li>
+<li>Score</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-geo" id="chat-message-geo" name="chat-message-geo"><i class="anchor-icon"></i></a>CHAT_MESSAGE_GEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a location to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-geolive" id="chat-message-geolive" name="chat-message-geolive"><i class="anchor-icon"></i></a>CHAT_MESSAGE_GEOLIVE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} shared a live location with the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-gif" id="chat-message-gif" name="chat-message-gif"><i class="anchor-icon"></i></a>CHAT_MESSAGE_GIF</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a GIF to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-giveaway" id="chat-message-giveaway" name="chat-message-giveaway"><i class="anchor-icon"></i></a>CHAT_MESSAGE_GIVEAWAY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a giveaway of {3}x {4}m Premium subscriptions to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Number of Telegram Premium subscriptions in the giveaway</li>
+<li>Duration in months of each Telegram Premium subscription in the giveaway</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-giveaway-stars" id="chat-message-giveaway-stars" name="chat-message-giveaway-stars"><i class="anchor-icon"></i></a>CHAT_MESSAGE_GIVEAWAY_STARS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a giveaway of {4} stars {3} to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Number of winners in the giveaway</li>
+<li>Number of Telegram Stars being given away</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-invoice" id="chat-message-invoice" name="chat-message-invoice"><i class="anchor-icon"></i></a>CHAT_MESSAGE_INVOICE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent an invoice to the group {2} for {3}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Product name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-notext" id="chat-message-notext" name="chat-message-notext"><i class="anchor-icon"></i></a>CHAT_MESSAGE_NOTEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a message to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-paid-media" id="chat-message-paid-media" name="chat-message-paid-media"><i class="anchor-icon"></i></a>CHAT_MESSAGE_PAID_MEDIA</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} posted a paid post in {2} group for {3} star</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+<li><a href="/api/stars">Stars</a></li>
+</ol>
+<h4><a class="anchor" href="#chat-message-photo" id="chat-message-photo" name="chat-message-photo"><i class="anchor-icon"></i></a>CHAT_MESSAGE_PHOTO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a photo to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-photos" id="chat-message-photos" name="chat-message-photos"><i class="anchor-icon"></i></a>CHAT_MESSAGE_PHOTOS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent {3} photos to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Number of photos that were sent</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-playlist" id="chat-message-playlist" name="chat-message-playlist"><i class="anchor-icon"></i></a>CHAT_MESSAGE_PLAYLIST</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent {3} music files to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Number of audio files that were sent</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-poll" id="chat-message-poll" name="chat-message-poll"><i class="anchor-icon"></i></a>CHAT_MESSAGE_POLL</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a poll {3} to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Poll name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-quiz" id="chat-message-quiz" name="chat-message-quiz"><i class="anchor-icon"></i></a>CHAT_MESSAGE_QUIZ</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a quiz {3} to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Quiz name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-round" id="chat-message-round" name="chat-message-round"><i class="anchor-icon"></i></a>CHAT_MESSAGE_ROUND</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a video message to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-sticker" id="chat-message-sticker" name="chat-message-sticker"><i class="anchor-icon"></i></a>CHAT_MESSAGE_STICKER</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a {3} sticker to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Sticker emoji</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-story" id="chat-message-story" name="chat-message-story"><i class="anchor-icon"></i></a>CHAT_MESSAGE_STORY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} shared a story to the group</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-text" id="chat-message-text" name="chat-message-text"><i class="anchor-icon"></i></a>CHAT_MESSAGE_TEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} @ {2}: {3}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+<li>Message body</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-todo" id="chat-message-todo" name="chat-message-todo"><i class="anchor-icon"></i></a>CHAT_MESSAGE_TODO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a checklist {3} to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User</li>
+<li>Group name</li>
+<li>Checklist title</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-todo-append" id="chat-message-todo-append" name="chat-message-todo-append"><i class="anchor-icon"></i></a>CHAT_MESSAGE_TODO_APPEND</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} added {3} tasks in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User</li>
+<li>Group name</li>
+<li>Number of added tasks</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-todo-done" id="chat-message-todo-done" name="chat-message-todo-done"><i class="anchor-icon"></i></a>CHAT_MESSAGE_TODO_DONE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} toggled {3} tasks in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Number of toggled tasks</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-video" id="chat-message-video" name="chat-message-video"><i class="anchor-icon"></i></a>CHAT_MESSAGE_VIDEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent a video to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-message-videos" id="chat-message-videos" name="chat-message-videos"><i class="anchor-icon"></i></a>CHAT_MESSAGE_VIDEOS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent {3} videos to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Number of videos that were sent</li>
+</ol>
+<h4><a class="anchor" href="#chat-photo-edited" id="chat-photo-edited" name="chat-photo-edited"><i class="anchor-icon"></i></a>CHAT_PHOTO_EDITED</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} changed the group photo for {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-audio" id="chat-react-audio" name="chat-react-audio"><i class="anchor-icon"></i></a>CHAT_REACT_AUDIO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your voice message in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-contact" id="chat-react-contact" name="chat-react-contact"><i class="anchor-icon"></i></a>CHAT_REACT_CONTACT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your contact {4} in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+<li>Contact name</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-doc" id="chat-react-doc" name="chat-react-doc"><i class="anchor-icon"></i></a>CHAT_REACT_DOC</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your file in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-game" id="chat-react-game" name="chat-react-game"><i class="anchor-icon"></i></a>CHAT_REACT_GAME</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your game in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-geo" id="chat-react-geo" name="chat-react-geo"><i class="anchor-icon"></i></a>CHAT_REACT_GEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your map in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-geolive" id="chat-react-geolive" name="chat-react-geolive"><i class="anchor-icon"></i></a>CHAT_REACT_GEOLIVE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your live location in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-gif" id="chat-react-gif" name="chat-react-gif"><i class="anchor-icon"></i></a>CHAT_REACT_GIF</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your GIF in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-giveaway" id="chat-react-giveaway" name="chat-react-giveaway"><i class="anchor-icon"></i></a>CHAT_REACT_GIVEAWAY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} reacted {3} in group {2} to your giveaway</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-invoice" id="chat-react-invoice" name="chat-react-invoice"><i class="anchor-icon"></i></a>CHAT_REACT_INVOICE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your invoice in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-notext" id="chat-react-notext" name="chat-react-notext"><i class="anchor-icon"></i></a>CHAT_REACT_NOTEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your message in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-paid-media" id="chat-react-paid-media" name="chat-react-paid-media"><i class="anchor-icon"></i></a>CHAT_REACT_PAID_MEDIA</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} reacted {3} in group {2} to your paid post for {4} star</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+<li><a href="/api/stars">Stars</a></li>
+</ol>
+<h4><a class="anchor" href="#chat-react-photo" id="chat-react-photo" name="chat-react-photo"><i class="anchor-icon"></i></a>CHAT_REACT_PHOTO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your photo in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-poll" id="chat-react-poll" name="chat-react-poll"><i class="anchor-icon"></i></a>CHAT_REACT_POLL</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your poll {4} in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+<li>Poll name</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-quiz" id="chat-react-quiz" name="chat-react-quiz"><i class="anchor-icon"></i></a>CHAT_REACT_QUIZ</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your quiz {4} in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+<li>Quiz name</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-round" id="chat-react-round" name="chat-react-round"><i class="anchor-icon"></i></a>CHAT_REACT_ROUND</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your video message in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-sticker" id="chat-react-sticker" name="chat-react-sticker"><i class="anchor-icon"></i></a>CHAT_REACT_STICKER</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your {4} sticker in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+<li>Sticker emoji</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-text" id="chat-react-text" name="chat-react-text"><i class="anchor-icon"></i></a>CHAT_REACT_TEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} in {2} to your "{4}"</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+<li>Message body</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-todo" id="chat-react-todo" name="chat-react-todo"><i class="anchor-icon"></i></a>CHAT_REACT_TODO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your checklist {4} in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+<li>Checklist title</li>
+</ol>
+<h4><a class="anchor" href="#chat-react-video" id="chat-react-video" name="chat-react-video"><i class="anchor-icon"></i></a>CHAT_REACT_VIDEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {3} to your video in {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#chat-req-joined" id="chat-req-joined" name="chat-req-joined"><i class="anchor-icon"></i></a>CHAT_REQ_JOINED</h4>
+<p><strong>Template example</strong></p>
+<p><code>{2}|{1} was accepted into the group</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-returned" id="chat-returned" name="chat-returned"><i class="anchor-icon"></i></a>CHAT_RETURNED</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} returned to the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-title-edited" id="chat-title-edited" name="chat-title-edited"><i class="anchor-icon"></i></a>CHAT_TITLE_EDITED</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} renamed the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#chat-voicechat-end" id="chat-voicechat-end" name="chat-voicechat-end"><i class="anchor-icon"></i></a>CHAT_VOICECHAT_END</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} ended a voice chat in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-voicechat-invite" id="chat-voicechat-invite" name="chat-voicechat-invite"><i class="anchor-icon"></i></a>CHAT_VOICECHAT_INVITE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} invited {3} to a voice chat in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Chat name</li>
+<li>Invited users</li>
+</ol>
+<h4><a class="anchor" href="#chat-voicechat-invite-you" id="chat-voicechat-invite-you" name="chat-voicechat-invite-you"><i class="anchor-icon"></i></a>CHAT_VOICECHAT_INVITE_YOU</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} invited you to a voice chat in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#chat-voicechat-start" id="chat-voicechat-start" name="chat-voicechat-start"><i class="anchor-icon"></i></a>CHAT_VOICECHAT_START</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} started a voice chat in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Chat name</li>
+</ol>
+<h4><a class="anchor" href="#conf-call-missed" id="conf-call-missed" name="conf-call-missed"><i class="anchor-icon"></i></a>CONF_CALL_MISSED</h4>
+<p><strong>Template example</strong></p>
+<p><code>You missed a call from {1}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#contact-joined" id="contact-joined" name="contact-joined"><i class="anchor-icon"></i></a>CONTACT_JOINED</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} joined Telegram!</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Contact name</li>
+</ol>
+<h4><a class="anchor" href="#encrypted-message" id="encrypted-message" name="encrypted-message"><i class="anchor-icon"></i></a>ENCRYPTED_MESSAGE</h4>
+<p><strong>Template example</strong></p>
+<p><code>You have a new message</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#encryption-accept" id="encryption-accept" name="encryption-accept"><i class="anchor-icon"></i></a>ENCRYPTION_ACCEPT</h4>
+<p><strong>Template example</strong></p>
+<p><code>You have a new message</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#encryption-request" id="encryption-request" name="encryption-request"><i class="anchor-icon"></i></a>ENCRYPTION_REQUEST</h4>
+<p><strong>Template example</strong></p>
+<p><code>You have a new message</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#locked-message" id="locked-message" name="locked-message"><i class="anchor-icon"></i></a>LOCKED_MESSAGE</h4>
+<p><strong>Template example</strong></p>
+<p><code>You have a new message</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#messages" id="messages" name="messages"><i class="anchor-icon"></i></a>MESSAGES</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you an album</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-audio" id="message-audio" name="message-audio"><i class="anchor-icon"></i></a>MESSAGE_AUDIO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a voice message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+</ol>
+<h4><a class="anchor" href="#message-contact" id="message-contact" name="message-contact"><i class="anchor-icon"></i></a>MESSAGE_CONTACT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} shared a contact {2} with you</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Contact name</li>
+</ol>
+<h4><a class="anchor" href="#message-doc" id="message-doc" name="message-doc"><i class="anchor-icon"></i></a>MESSAGE_DOC</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a file</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-docs" id="message-docs" name="message-docs"><i class="anchor-icon"></i></a>MESSAGE_DOCS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you {2} files</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Number of documents that were sent</li>
+</ol>
+<h4><a class="anchor" href="#message-fwds" id="message-fwds" name="message-fwds"><i class="anchor-icon"></i></a>MESSAGE_FWDS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} forwarded you {2} messages</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Number of messages that were forwarded</li>
+</ol>
+<h4><a class="anchor" href="#message-game" id="message-game" name="message-game"><i class="anchor-icon"></i></a>MESSAGE_GAME</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} invited you to play {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Game name</li>
+</ol>
+<h4><a class="anchor" href="#message-game-score" id="message-game-score" name="message-game-score"><i class="anchor-icon"></i></a>MESSAGE_GAME_SCORE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} scored {3} in game {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Game name</li>
+<li>Score</li>
+</ol>
+<h4><a class="anchor" href="#message-geo" id="message-geo" name="message-geo"><i class="anchor-icon"></i></a>MESSAGE_GEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a location</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+</ol>
+<h4><a class="anchor" href="#message-geolive" id="message-geolive" name="message-geolive"><i class="anchor-icon"></i></a>MESSAGE_GEOLIVE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a live location</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-gif" id="message-gif" name="message-gif"><i class="anchor-icon"></i></a>MESSAGE_GIF</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a GIF</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-giftcode" id="message-giftcode" name="message-giftcode"><i class="anchor-icon"></i></a>MESSAGE_GIFTCODE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a Gift Code for {2} of Telegram Premium</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Duration of Telegram Premium subscription</li>
+</ol>
+<h4><a class="anchor" href="#message-giveaway" id="message-giveaway" name="message-giveaway"><i class="anchor-icon"></i></a>MESSAGE_GIVEAWAY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a giveaway of {2}x {3}m Premium subscriptions</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Number of Telegram Premium subscriptions in the giveaway</li>
+<li>Duration in months of each Telegram Premium subscription in the giveaway</li>
+</ol>
+<h4><a class="anchor" href="#message-giveaway-stars" id="message-giveaway-stars" name="message-giveaway-stars"><i class="anchor-icon"></i></a>MESSAGE_GIVEAWAY_STARS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a giveaway of {3} stars {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Number of winners in the giveaway</li>
+<li>Number of Telegram Stars being given away</li>
+</ol>
+<h4><a class="anchor" href="#message-invoice" id="message-invoice" name="message-invoice"><i class="anchor-icon"></i></a>MESSAGE_INVOICE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you an invoice for {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Product</li>
+</ol>
+<h4><a class="anchor" href="#message-notext" id="message-notext" name="message-notext"><i class="anchor-icon"></i></a>MESSAGE_NOTEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+</ol>
+<h4><a class="anchor" href="#message-paid-media" id="message-paid-media" name="message-paid-media"><i class="anchor-icon"></i></a>MESSAGE_PAID_MEDIA</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a paid post for {2} star</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li><a href="/api/stars">Stars</a></li>
+</ol>
+<h4><a class="anchor" href="#message-photo" id="message-photo" name="message-photo"><i class="anchor-icon"></i></a>MESSAGE_PHOTO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a photo</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+</ol>
+<h4><a class="anchor" href="#message-photos" id="message-photos" name="message-photos"><i class="anchor-icon"></i></a>MESSAGE_PHOTOS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you {2} photos</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Number of photos that were sent</li>
+</ol>
+<h4><a class="anchor" href="#message-photo-secret" id="message-photo-secret" name="message-photo-secret"><i class="anchor-icon"></i></a>MESSAGE_PHOTO_SECRET</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a self-destructing photo</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-playlist" id="message-playlist" name="message-playlist"><i class="anchor-icon"></i></a>MESSAGE_PLAYLIST</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you {2} music files</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Number of audio files that were sent</li>
+</ol>
+<h4><a class="anchor" href="#message-poll" id="message-poll" name="message-poll"><i class="anchor-icon"></i></a>MESSAGE_POLL</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a poll {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Poll name</li>
+</ol>
+<h4><a class="anchor" href="#message-quiz" id="message-quiz" name="message-quiz"><i class="anchor-icon"></i></a>MESSAGE_QUIZ</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a quiz {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Quiz name</li>
+</ol>
+<h4><a class="anchor" href="#message-recurring-pay" id="message-recurring-pay" name="message-recurring-pay"><i class="anchor-icon"></i></a>MESSAGE_RECURRING_PAY</h4>
+<p><strong>Template example</strong></p>
+<p><code>You were charged {2} by {1}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>The entity to which money was sent for a recurring subscription</li>
+<li>The amount of money charged for a recurring subscription</li>
+</ol>
+<h4><a class="anchor" href="#message-round" id="message-round" name="message-round"><i class="anchor-icon"></i></a>MESSAGE_ROUND</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a video message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-same-wallpaper" id="message-same-wallpaper" name="message-same-wallpaper"><i class="anchor-icon"></i></a>MESSAGE_SAME_WALLPAPER</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} set a same wallpaper for this chat</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-screenshot" id="message-screenshot" name="message-screenshot"><i class="anchor-icon"></i></a>MESSAGE_SCREENSHOT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} took a screenshot</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-stargift" id="message-stargift" name="message-stargift"><i class="anchor-icon"></i></a>MESSAGE_STARGIFT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a Gift worth {2} Stars</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Number of Telegram Stars</li>
+</ol>
+<h4><a class="anchor" href="#message-stargift-unpack-upgrade" id="message-stargift-unpack-upgrade" name="message-stargift-unpack-upgrade"><i class="anchor-icon"></i></a>MESSAGE_STARGIFT_UNPACK_UPGRADE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} unpacked the Gift that you helped upgrade</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-stargift-upgrade" id="message-stargift-upgrade" name="message-stargift-upgrade"><i class="anchor-icon"></i></a>MESSAGE_STARGIFT_UPGRADE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} upgraded your Gift</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-sticker" id="message-sticker" name="message-sticker"><i class="anchor-icon"></i></a>MESSAGE_STICKER</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a {2} sticker</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Sticker emoji</li>
+</ol>
+<h4><a class="anchor" href="#message-story" id="message-story" name="message-story"><i class="anchor-icon"></i></a>MESSAGE_STORY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} shared a story with you</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-story-mention" id="message-story-mention" name="message-story-mention"><i class="anchor-icon"></i></a>MESSAGE_STORY_MENTION</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} mentioned you in a story</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-suggest-birthday" id="message-suggest-birthday" name="message-suggest-birthday"><i class="anchor-icon"></i></a>MESSAGE_SUGGEST_BIRTHDAY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} suggested you your birthday</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-text" id="message-text" name="message-text"><i class="anchor-icon"></i></a>MESSAGE_TEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+<li>Message body</li>
+</ol>
+<h4><a class="anchor" href="#message-todo" id="message-todo" name="message-todo"><i class="anchor-icon"></i></a>MESSAGE_TODO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a checklist {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Checklist title</li>
+</ol>
+<h4><a class="anchor" href="#message-unique-stargift" id="message-unique-stargift" name="message-unique-stargift"><i class="anchor-icon"></i></a>MESSAGE_UNIQUE_STARGIFT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} transferred you a Gift!</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-video" id="message-video" name="message-video"><i class="anchor-icon"></i></a>MESSAGE_VIDEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a video</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Message author</li>
+</ol>
+<h4><a class="anchor" href="#message-videos" id="message-videos" name="message-videos"><i class="anchor-icon"></i></a>MESSAGE_VIDEOS</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you {2} videos</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Number of videos that were sent</li>
+</ol>
+<h4><a class="anchor" href="#message-video-secret" id="message-video-secret" name="message-video-secret"><i class="anchor-icon"></i></a>MESSAGE_VIDEO_SECRET</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} sent you a self-destructing video</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#message-wallpaper" id="message-wallpaper" name="message-wallpaper"><i class="anchor-icon"></i></a>MESSAGE_WALLPAPER</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} set a new wallpaper for this chat</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#oauth-request" id="oauth-request" name="oauth-request"><i class="anchor-icon"></i></a>OAUTH_REQUEST</h4>
+<p><strong>Template example</strong></p>
+<p><code>Login request for {1} from {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Domain of the URL where the user is trying to log in, the full URL is passed in the <code>data_url</code> field of the custom arguments</li>
+<li>Human-readable description of a country and a region from which the authorization is performed, based on the IP address of the user</li>
+</ol>
+<h4><a class="anchor" href="#phone-call-missed" id="phone-call-missed" name="phone-call-missed"><i class="anchor-icon"></i></a>PHONE_CALL_MISSED</h4>
+<p><strong>Template example</strong></p>
+<p><code>You missed a call from {1}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#phone-call-request" id="phone-call-request" name="phone-call-request"><i class="anchor-icon"></i></a>PHONE_CALL_REQUEST</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} is calling you!</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-audio" id="pinned-audio" name="pinned-audio"><i class="anchor-icon"></i></a>PINNED_AUDIO</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a voice message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a voice message in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-contact" id="pinned-contact" name="pinned-contact"><i class="anchor-icon"></i></a>PINNED_CONTACT</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a contact {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Contact name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a contact {3} in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Contact name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-doc" id="pinned-doc" name="pinned-doc"><i class="anchor-icon"></i></a>PINNED_DOC</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a file</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a file in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-game" id="pinned-game" name="pinned-game"><i class="anchor-icon"></i></a>PINNED_GAME</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a game</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a game in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-game-score" id="pinned-game-score" name="pinned-game-score"><i class="anchor-icon"></i></a>PINNED_GAME_SCORE</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a game score</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a game score in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-geo" id="pinned-geo" name="pinned-geo"><i class="anchor-icon"></i></a>PINNED_GEO</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a map</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a map in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-geolive" id="pinned-geolive" name="pinned-geolive"><i class="anchor-icon"></i></a>PINNED_GEOLIVE</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a live location</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a live location in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-gif" id="pinned-gif" name="pinned-gif"><i class="anchor-icon"></i></a>PINNED_GIF</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a GIF</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a GIF in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-giveaway" id="pinned-giveaway" name="pinned-giveaway"><i class="anchor-icon"></i></a>PINNED_GIVEAWAY</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a giveaway</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a giveaway in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-invoice" id="pinned-invoice" name="pinned-invoice"><i class="anchor-icon"></i></a>PINNED_INVOICE</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned an invoice</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned an invoice in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-notext" id="pinned-notext" name="pinned-notext"><i class="anchor-icon"></i></a>PINNED_NOTEXT</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a message in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-paid-media" id="pinned-paid-media" name="pinned-paid-media"><i class="anchor-icon"></i></a>PINNED_PAID_MEDIA</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a paid post for {2} star</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li><a href="/api/stars">Stars</a></li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a paid post for {3} star in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li><a href="/api/stars">Stars</a></li>
+</ol>
+<h4><a class="anchor" href="#pinned-photo" id="pinned-photo" name="pinned-photo"><i class="anchor-icon"></i></a>PINNED_PHOTO</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a photo</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a photo in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-poll" id="pinned-poll" name="pinned-poll"><i class="anchor-icon"></i></a>PINNED_POLL</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a poll {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Poll name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a poll {3} in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Poll name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-quiz" id="pinned-quiz" name="pinned-quiz"><i class="anchor-icon"></i></a>PINNED_QUIZ</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a quiz {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Quiz name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a quiz {3} in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Quiz name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-round" id="pinned-round" name="pinned-round"><i class="anchor-icon"></i></a>PINNED_ROUND</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a video message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a video message in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#pinned-sticker" id="pinned-sticker" name="pinned-sticker"><i class="anchor-icon"></i></a>PINNED_STICKER</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a {2} sticker</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Sticker emoji</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a {3} sticker in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Sticker emoji</li>
+</ol>
+<h4><a class="anchor" href="#pinned-text" id="pinned-text" name="pinned-text"><i class="anchor-icon"></i></a>PINNED_TEXT</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned "{2}"</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Message body</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned "{3}" in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Message body</li>
+</ol>
+<h4><a class="anchor" href="#pinned-todo" id="pinned-todo" name="pinned-todo"><i class="anchor-icon"></i></a>PINNED_TODO</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a checklist {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Checklist title</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a checklist {3} in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+<li>Checklist title</li>
+</ol>
+<h4><a class="anchor" href="#pinned-video" id="pinned-video" name="pinned-video"><i class="anchor-icon"></i></a>PINNED_VIDEO</h4>
+<p><strong>Template example 1</strong></p>
+<p><code>{1} pinned a video</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+</ol>
+<p><strong>Template example 2</strong></p>
+<p><code>{1} pinned a video in the group {2}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Group name</li>
+</ol>
+<h4><a class="anchor" href="#react-audio" id="react-audio" name="react-audio"><i class="anchor-icon"></i></a>REACT_AUDIO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your voice message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-contact" id="react-contact" name="react-contact"><i class="anchor-icon"></i></a>REACT_CONTACT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your contact {3}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+<li>Contact name</li>
+</ol>
+<h4><a class="anchor" href="#react-doc" id="react-doc" name="react-doc"><i class="anchor-icon"></i></a>REACT_DOC</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your file</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-game" id="react-game" name="react-game"><i class="anchor-icon"></i></a>REACT_GAME</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your game</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-geo" id="react-geo" name="react-geo"><i class="anchor-icon"></i></a>REACT_GEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your map</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-geolive" id="react-geolive" name="react-geolive"><i class="anchor-icon"></i></a>REACT_GEOLIVE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your live location</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-gif" id="react-gif" name="react-gif"><i class="anchor-icon"></i></a>REACT_GIF</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your GIF</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-giveaway" id="react-giveaway" name="react-giveaway"><i class="anchor-icon"></i></a>REACT_GIVEAWAY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1} reacted {2} to your giveaway</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-hidden" id="react-hidden" name="react-hidden"><i class="anchor-icon"></i></a>REACT_HIDDEN</h4>
+<p><strong>Template example</strong></p>
+<p><code>New reaction to your message</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#react-invoice" id="react-invoice" name="react-invoice"><i class="anchor-icon"></i></a>REACT_INVOICE</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your invoice</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-notext" id="react-notext" name="react-notext"><i class="anchor-icon"></i></a>REACT_NOTEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-photo" id="react-photo" name="react-photo"><i class="anchor-icon"></i></a>REACT_PHOTO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your photo</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-poll" id="react-poll" name="react-poll"><i class="anchor-icon"></i></a>REACT_POLL</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your poll {3}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+<li>Poll name</li>
+</ol>
+<h4><a class="anchor" href="#react-quiz" id="react-quiz" name="react-quiz"><i class="anchor-icon"></i></a>REACT_QUIZ</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your quiz {3}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+<li>Quiz name</li>
+</ol>
+<h4><a class="anchor" href="#react-round" id="react-round" name="react-round"><i class="anchor-icon"></i></a>REACT_ROUND</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your video message</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-sticker" id="react-sticker" name="react-sticker"><i class="anchor-icon"></i></a>REACT_STICKER</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your {3} sticker</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+<li>Sticker emoji</li>
+</ol>
+<h4><a class="anchor" href="#react-story" id="react-story" name="react-story"><i class="anchor-icon"></i></a>REACT_STORY</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your story</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>Peer where the story was posted</li>
+<li>Reaction</li>
+</ol>
+<h4><a class="anchor" href="#react-story-hidden" id="react-story-hidden" name="react-story-hidden"><i class="anchor-icon"></i></a>REACT_STORY_HIDDEN</h4>
+<p><strong>Template example</strong></p>
+<p><code>New reaction to your story</code></p>
+<p><strong>Arguments</strong></p>
+<p>This notification does not use placeholder arguments.</p>
+<h4><a class="anchor" href="#react-text" id="react-text" name="react-text"><i class="anchor-icon"></i></a>REACT_TEXT</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your "{3}"</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+<li>Message body</li>
+</ol>
+<h4><a class="anchor" href="#react-todo" id="react-todo" name="react-todo"><i class="anchor-icon"></i></a>REACT_TODO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your checklist {3}</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+<li>Checklist title</li>
+</ol>
+<h4><a class="anchor" href="#react-video" id="react-video" name="react-video"><i class="anchor-icon"></i></a>REACT_VIDEO</h4>
+<p><strong>Template example</strong></p>
+<p><code>{1}: {2} to your video</code></p>
+<p><strong>Arguments</strong></p>
+<ol>
+<li>User name</li>
+<li>Reaction</li>
+</ol>
 </div>
   
 </div>
