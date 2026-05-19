@@ -1021,7 +1021,7 @@ var NewAd = {
         var excludeValueFull = $excludeField.data('valueFull');
         var already_excluded = false;
         excludeValueFull && $.each(excludeValueFull, function(val, item) {
-          if (item.val == result.exclude_channel.id) {
+          if (item.val == result.exclude_channel.val) {
             already_excluded = true;
           } else if (item._auto) {
             $excludeField.trigger('deselectval', [val]);
@@ -1035,16 +1035,12 @@ var NewAd = {
           if (!Aj.state.autoExcluded) {
             Aj.state.autoExcluded = {};
           }
-          if (!Aj.state.autoExcluded[result.exclude_channel.id]) {
-            var item = {
-              val: result.exclude_channel.id,
-              name: result.exclude_channel.title,
-              photo: result.exclude_channel.photo,
-              _auto: true
-            };
+          if (!Aj.state.autoExcluded[result.exclude_channel.val]) {
+            var item = result.exclude_channel;
+            item._auto = true;
             $excludeField.trigger('selectval', [item, true]);
             $excludeField.data('prevval', '');
-            Aj.state.autoExcluded[result.exclude_channel.id] = true;
+            Aj.state.autoExcluded[result.exclude_channel.val] = true;
           }
         }
       }
@@ -1139,12 +1135,7 @@ var NewAd = {
         return false;
       }
       if (result.bot) {
-        var item = {
-          val: result.bot.id,
-          name: result.bot.title,
-          photo: result.bot.photo,
-          username: result.bot.username
-        };
+        var item = result.bot;
         $fieldEl.trigger('selectval', [item, true]);
         $fieldEl.data('prevval', '');
       }
@@ -1384,7 +1375,7 @@ var NewAd = {
             for (var i = 0; i < result.channels.length; i++) {
               var item = result.channels[i];
               html += item.cb_item;
-              channel_items['ch' + item.id] = item;
+              channel_items[item.val] = item;
             }
             var has_items = result.channels.length > 0;
             $empty.toggleClass('hide', has_items);
@@ -1436,13 +1427,7 @@ var NewAd = {
       if ($(this).prop('checked')) {
         var name = $(this).prop('name');
         var channel = channel_items[name];
-        var item = {
-          val: channel.id,
-          name: channel.title,
-          photo: channel.photo,
-          username: channel.username
-        };
-        add_items.push(item);
+        add_items.push(channel);
       }
     });
     if (add_items.length > 0) {
@@ -1485,7 +1470,7 @@ var NewAd = {
             for (var i = 0; i < result.bots.length; i++) {
               var item = result.bots[i];
               html += item.cb_item;
-              bot_items['bot' + item.id] = item;
+              bot_items[item.val] = item;
             }
             var has_items = result.bots.length > 0;
             $empty.toggleClass('hide', has_items);
@@ -1532,13 +1517,7 @@ var NewAd = {
       if ($(this).prop('checked')) {
         var name = $(this).prop('name');
         var bot = bot_items[name];
-        var item = {
-          val: bot.id,
-          name: bot.title,
-          photo: bot.photo,
-          username: bot.username
-        };
-        add_items.push(item);
+        add_items.push(bot);
       }
     });
     if (add_items.length > 0) {
