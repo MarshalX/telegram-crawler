@@ -79,17 +79,17 @@
 <tr>
 <td><strong>request_phone_number</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>The app/website is requesting the user's phone number; if the user consents, set <code>share_phone_number</code> when calling <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a></td>
 </tr>
 <tr>
 <td><strong>match_codes_first</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>Can only be set if <code>match_codes</code> is also set; if set, clients must ask the user to select the matching code <em>before</em> showing the rest of the login confirmation UI, and must validate the selection with <a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a> before proceeding</td>
 </tr>
 <tr>
 <td><strong>is_app</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.6?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>Set if an OAuth request originated from an app rather than a website; when set, <code>domain</code> must be replaced in the confirmation prompt by <code>verified_app_name</code> (if present) or "Unverified App"</td>
 </tr>
 <tr>
 <td><strong>bot</strong></td>
@@ -104,45 +104,54 @@
 <tr>
 <td><strong>browser</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/string">string</a></td>
-<td> </td>
+<td>The browser the user used to make the OAuth request</td>
 </tr>
 <tr>
 <td><strong>platform</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/string">string</a></td>
-<td> </td>
+<td>The platform (operating system) of the user that made the OAuth request</td>
 </tr>
 <tr>
 <td><strong>ip</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/string">string</a></td>
-<td> </td>
+<td>The IP address of the user making the OAuth request</td>
 </tr>
 <tr>
 <td><strong>region</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/string">string</a></td>
-<td> </td>
+<td>The location of the user, inferred from the IP address</td>
 </tr>
 <tr>
 <td><strong>match_codes</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/string">string</a>&gt;</td>
-<td> </td>
+<td>A list of emojis or codes, one of which is currently being shown on the login page of the website/app; the user must select the matching one and pass it to <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a>.<code>match_code</code></td>
 </tr>
 <tr>
 <td><strong>user_id_hint</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/type/long">long</a></td>
-<td> </td>
+<td>May contain the ID of the account for which the login request was created; if it matches a logged-in account, clients should automatically switch to that account and re-invoke <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> before showing the prompt</td>
 </tr>
 <tr>
 <td><strong>verified_app_name</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.7?<a href="/type/string">string</a></td>
-<td> </td>
+<td>Can only be set if <code>is_app</code> is set and the app is verified; must replace <code>domain</code> in the confirmation prompt when present</td>
 </tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
 <p><a href="/type/UrlAuthResult">UrlAuthResult</a></p>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#messagesaccepturlauth" id="messagesaccepturlauth" name="messagesaccepturlauth"><i class="anchor-icon"></i></a><a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a></h4>
+<p>Use this to accept a Seamless Telegram Login authorization request, for more info <a href="/api/url-authorization">click here »</a></p>
+<h4><a class="anchor" href="#messagescheckurlauthmatchcode" id="messagescheckurlauthmatchcode" name="messagescheckurlauthmatchcode"><i class="anchor-icon"></i></a><a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a></h4>
+<p>Validate the match code selected by the user against the code shown on the login page, as part of the <a href="/api/url-authorization#oauth-authorization">OAuth authorization flow »</a>.</p>
+<p>Only usable when both <code>match_codes</code> and <code>match_codes_first</code> are set in the <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a> returned by <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a>.<br>
+If <a href="/constructor/boolTrue">boolTrue</a> is returned, proceed with the login flow and pass the verified code to <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a>.<code>match_code</code>.</p>
+<h4><a class="anchor" href="#messagesrequesturlauth" id="messagesrequesturlauth" name="messagesrequesturlauth"><i class="anchor-icon"></i></a><a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a></h4>
+<p>Get more info about a Seamless Telegram Login authorization request, for more info <a href="/api/url-authorization">click here »</a></p>
 <h4><a class="anchor" href="#seamless-telegram-login" id="seamless-telegram-login" name="seamless-telegram-login"><i class="anchor-icon"></i></a><a href="/api/url-authorization">Seamless Telegram Login</a></h4>
-<p>Handle Seamless Telegram Login URL authorization requests.</p></div>
+<p>Handle Seamless Telegram Login URL authorization requests.</p>
+</div>
   
 </div>
           

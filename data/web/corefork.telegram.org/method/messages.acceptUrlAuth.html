@@ -83,7 +83,7 @@
 <tr>
 <td><strong>share_phone_number</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/constructor/true">true</a></td>
-<td> </td>
+<td>Set this flag to share the user's phone number with the bot (if requested via <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a>.<code>request_phone_number</code> and consented to by the user)</td>
 </tr>
 <tr>
 <td><strong>peer</strong></td>
@@ -108,7 +108,7 @@
 <tr>
 <td><strong>match_code</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/type/string">string</a></td>
-<td> </td>
+<td>If <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a>.<code>match_codes</code> was set, the emoji or code selected by the user from the provided list; must always be provided when <code>match_codes</code> is set, even if <code>match_codes_first</code> was set and the code was already validated via <a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a></td>
 </tr>
 </tbody>
 </table>
@@ -116,8 +116,15 @@
 <p><a href="/type/UrlAuthResult">UrlAuthResult</a></p>
 <h3><a class="anchor" href="#only-users-can-use-this-method" id="only-users-can-use-this-method" name="only-users-can-use-this-method"><i class="anchor-icon"></i></a>Only users can use this method</h3>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#urlauthresultrequest" id="urlauthresultrequest" name="urlauthresultrequest"><i class="anchor-icon"></i></a><a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a></h4>
+<p>Details about the authorization request, for more info <a href="/api/url-authorization">click here »</a></p>
 <h4><a class="anchor" href="#seamless-telegram-login" id="seamless-telegram-login" name="seamless-telegram-login"><i class="anchor-icon"></i></a><a href="/api/url-authorization">Seamless Telegram Login</a></h4>
-<p>Handle Seamless Telegram Login URL authorization requests.</p></div>
+<p>Handle Seamless Telegram Login URL authorization requests.</p>
+<h4><a class="anchor" href="#messagescheckurlauthmatchcode" id="messagescheckurlauthmatchcode" name="messagescheckurlauthmatchcode"><i class="anchor-icon"></i></a><a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a></h4>
+<p>Validate the match code selected by the user against the code shown on the login page, as part of the <a href="/api/url-authorization#oauth-authorization">OAuth authorization flow »</a>.</p>
+<p>Only usable when both <code>match_codes</code> and <code>match_codes_first</code> are set in the <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a> returned by <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a>.<br>
+If <a href="/constructor/boolTrue">boolTrue</a> is returned, proceed with the login flow and pass the verified code to <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a>.<code>match_code</code>.</p>
+</div>
   
 </div>
           

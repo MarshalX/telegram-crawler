@@ -63,7 +63,7 @@
 <p>This section documents the flow used by Telegram <em>clients</em> in order to authorize an incoming OIDC (OAuth) request.</p>
 <p>The flow begins when the client receives a request to open an <a href="/api/links#oauth-links">OAuth deep link »</a>.</p>
 <p><strong>Note</strong>: only handle this deep link if the request to open it comes from outside the app; do <strong>not</strong> handle it if it was clicked inside of the app, for example in messages, <a href="/api/bots/buttons">buttons</a>, the builtin browser and <a href="/api/bots/webapps">mini apps</a>, etc.</p>
-<p>Note that mini apps can still use OAuth login but <a href="#oauth-authorization-from-the-in-app-browser">in a slightly different manner »</a>.</p>
+<p>Note that mini apps can still use OAuth login but <a href="#oauth-authorization-for-mini-apps">in a slightly different manner »</a>.</p>
 <p>Handle <a href="/api/links#oauth-links">OAuth deep links »</a> by passing the <strong>entire</strong> deep link (not just the <code>token</code> parameter) to the <code>url</code> parameter of <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a>, without setting any other flag.</p>
 <p>If the returned result is <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a>, a confirmation prompt should be shown, using the following returned fields (<strong>always</strong> returned for OAuth requests):</p>
 <ul>
@@ -111,24 +111,25 @@ Only if the method returns <a href="/constructor/boolTrue">boolTrue</a>, proceed
 <li><code>match_code</code>: if <code>match_codes</code> is set, the emoji chosen by the user (must be always provided if <code>match_codes</code> is set, even if <code>match_codes_first</code> is set and the code was already validated using <a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a>)</li>
 </ul>
 <p>On success, the result will be a <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a>.<br>
-If its <code>url</code> field is present, the returned URL should be opened in the external browser, if possible using the same browser from which the deep link originated; the URL may also use a custom scheme for direct switching to another app.<br>
+If its <code>url</code> field is present, the returned URL should be opened in the external browser (<strong>not</strong> the in-app browser), if possible using the same browser from which the deep link originated; the URL may also use a custom scheme for direct switching to another app.<br>
 If the <code>url</code> field is absent, clients should simply show a toast or a similar message confirming that the login succeeded.</p>
 <p>Both <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> and <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> may return a <code>URL_EXPIRED</code> error.</p>
 <h4><a class="anchor" href="#oauth-authorization-from-push-notifications" id="oauth-authorization-from-push-notifications" name="oauth-authorization-from-push-notifications"><i class="anchor-icon"></i></a>OAuth authorization from push notifications</h4>
-<p>The <code>data_url</code> contained in <a href="/api/push-updates#oauth-request">OAUTH_REQUEST push notifications</a> is valid for 60 seconds.</p>
-<h4><a class="anchor" href="#oauth-authorization-from-the-in-app-browser" id="oauth-authorization-from-the-in-app-browser" name="oauth-authorization-from-the-in-app-browser"><i class="anchor-icon"></i></a>OAuth authorization from the in-app browser</h4>
+<p>The OAuth authorization flow may also be started by clicking on an <a href="/api/push-updates#oauth-request">OAUTH_REQUEST push notifications</a>: this should trigger the usual <a href="#oauth-authorization">oauth flow »</a>, using the <a href="/api/links#oauth-links">oauth deep link »</a> contained in  <code>custom.data_url</code>.</p>
+<p>Note that received <a href="/api/push-updates#oauth-request">OAUTH_REQUEST push notifications</a> are only valid for 60 seconds.</p>
+<h4><a class="anchor" href="#oauth-authorization-for-mini-apps" id="oauth-authorization-for-mini-apps" name="oauth-authorization-for-mini-apps"><i class="anchor-icon"></i></a>OAuth authorization for mini apps</h4>
 <p><a href="#oauth-authorization">OAuth authorization</a> from the in-app browser or <a href="/api/bots/webapps">mini apps</a> follows a slightly different flow.</p>
-<p>To begin, the official Telegram OAuth JS library will emit an <a href="/api/web-events#oauth-request"><code>oauth_request</code> event</a> event when running inside of the in-app browser/a miniapp.</p>
-<p>Regardless of the contents of the event, the client should immediately reply with the <a href="/api/bots/webapps#oauth-supported"><code>oauth_supported</code> event</a>.</p>
-<p>Then if the <code>url</code> parameter was passed in the <a href="/api/web-events#oauth-request"><code>oauth_request</code> event</a>, the client should call <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> with the following arguments:</p>
+<p>The flow begins when the client receives an <a href="/api/web-events#oauth-request"><code>oauth_request</code> event</a> when running inside of the in-app browser/a <a href="/api/bots/webapps">mini app</a>.</p>
+<p>Regardless of the contents of the event, the client should immediately reply with the <a href="/api/bots/webapps#oauth-supported"><code>oauth_supported</code> event</a> (this is required especially for <a href="/api/web-events#oauth-request"><code>oauth_request</code> events</a> with no <code>url</code>, used to check if the client supports OAuth logins).</p>
+<p>In addition to the <a href="/api/bots/webapps#oauth-supported"><code>oauth_supported</code> event</a> emission above, if a valid <a href="/api/links#oauth-links">OAuth deep link</a> was passed in the <code>url</code> parameter of the <a href="/api/web-events#oauth-request"><code>oauth_request</code> event</a>, the client should also call <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> with the following arguments:</p>
 <ul>
-<li><code>url</code>: The passed <code>url</code></li>
-<li><code>in_app_origin</code> set to the origin of the webview in the format <code>scheme://host</code> (or <code>scheme://host:port</code> for non-default ports).<br>
-If the platform does not allow reliable  the origin of the event itself, clients may use the origin of the page currently opened in the webview.</li>
+<li><code>url</code>: Must contain the <a href="/api/links#oauth-links">OAuth deep link</a> from <a href="/api/web-events#oauth-request">oauth_request.url</a>.</li>
+<li><code>in_app_origin</code>: Must be set to the origin of the webview event in the following format: <code>scheme://host</code> (or <code>scheme://host:port</code> for non-default ports).</li>
 </ul>
-<p>After following the usual <a href="#oauth-authorization">OAuth confirmation flow »</a>, on success, the <code>url</code> contained in the returned <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a> should be returned to the same webview by emitting an <code>oauth_result_confirmed</code> event with <code>result_url</code> set to the returned URL, or to <code>null</code> if <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a> did not contain a URL.<br>
-Before emitting the event, clients should make sure that the origin of the webview did not change.<br>
-If the user refuses the request or an error occurs, clients should emit <code>oauth_result_failed</code> instead.</p>
+<p>Then, follow the usual <a href="#oauth-authorization">OAuth confirmation flow »</a>.</p>
+<p>On success, the returned <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a> should be passed back to the mini app by emitting an <a href="/api/bots/webapps#oauth-result-confirmed"><code>oauth_result_confirmed</code> event</a> with <code>result_url</code> equal to the returned <code>url</code>, or to <code>null</code> if the <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a> did not contain a <code>url</code>.</p>
+<p>Before emitting the <a href="/api/bots/webapps#oauth-result-confirmed"><code>oauth_result_confirmed</code> event</a>, clients should make sure that the origin of the webview did not change.</p>
+<p>On failure or if the OAuth process is cancelled by the user, clients should emit an <a href="/api/bots/webapps#oauth-result-failed"><code>oauth_result_failed</code> event</a>, instead.</p>
 <h3><a class="anchor" href="#bot-button-url-authorization" id="bot-button-url-authorization" name="bot-button-url-authorization"><i class="anchor-icon"></i></a>Bot button URL authorization</h3>
 <pre><code><a href='/constructor/keyboardButtonUrlAuth'>keyboardButtonUrlAuth</a>#f51006f9 flags:<a href='/type/%23'>#</a> style:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/KeyboardButtonStyle'>KeyboardButtonStyle</a> text:<a href='/type/string'>string</a> fwd_text:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
 
