@@ -53,13 +53,13 @@
 
 <a href='/method/account.initTakeoutSession'>account.initTakeoutSession</a>#8ef3eab0 flags:<a href='/type/%23'>#</a> contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> message_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> message_chats:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> message_megagroups:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> message_channels:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> files:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> file_max_size:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/long'>long</a> = <a href='/type/account.Takeout'>account.Takeout</a>;
 
-invokeWithTakeout#aca9fd2e {X:Type} takeout_id:long query:!X = X;
+<a href='/method/invokeWithTakeout'>invokeWithTakeout</a>#aca9fd2e {X:Type} takeout_id:<a href='/type/long'>long</a> query:!X = X;
 
 <a href='/method/account.finishTakeoutSession'>account.finishTakeoutSession</a>#1d2652ee flags:<a href='/type/%23'>#</a> success:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> = <a href='/type/Bool'>Bool</a>;
 </code></pre>
 <p>Use <a href="/method/account.initTakeoutSession">account.initTakeoutSession</a> to initialize a takeout session: pass the appropriate flags to enable usage of the corresponding methods, as described below.</p>
 <p>When invoking the methods described below, each query must be wrapped using <a href="/method/invokeWithTakeout">invokeWithTakeout</a>, with the <code>id</code> returned by <a href="/method/account.initTakeoutSession">account.initTakeoutSession</a>.</p>
-<p>After finishing the export, terminate the session using <a href="/method/account.finishTakeoutSession">account.finishTakeoutSession</a>.</p>
+<p>After finishing the export, terminate the session using <a href="/method/account.finishTakeoutSession">account.finishTakeoutSession</a> (wrapping it in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> as usual).</p>
 <h3><a class="anchor" href="#split-ranges" id="split-ranges" name="split-ranges"><i class="anchor-icon"></i></a>Split ranges</h3>
 <pre><code><a href='/constructor/messageRange'>messageRange</a>#ae30253 min_id:<a href='/type/int'>int</a> max_id:<a href='/type/int'>int</a> = <a href='/type/MessageRange'>MessageRange</a>;
 
@@ -67,7 +67,7 @@ invokeWithTakeout#aca9fd2e {X:Type} takeout_id:long query:!X = X;
 
 <a href='/method/messages.getSplitRanges'>messages.getSplitRanges</a>#1cff7e08 = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageRange'>MessageRange</a>&gt;;
 
-invokeWithMessagesRange#365275f2 {X:Type} range:MessageRange query:!X = X;
+<a href='/method/invokeWithMessagesRange'>invokeWithMessagesRange</a>#365275f2 {X:Type} range:<a href='/type/MessageRange'>MessageRange</a> query:!X = X;
 </code></pre>
 <p>Some method calls require additional pagination using message ranges.</p>
 <p>First of all, obtain a list of message ranges by invoking <a href="/method/messages.getSplitRanges">messages.getSplitRanges</a> (wrapping it in an <a href="/method/invokeWithTakeout">invokeWithTakeout</a> as usual).</p>

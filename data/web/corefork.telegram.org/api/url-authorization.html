@@ -44,8 +44,91 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>Bots or Telegram websites may <a href="/bots/api#loginurl">ask users to login to a certain website via Telegram</a> when clicking on certain links or URL buttons in inline keyboards.</p>
-<h3><a class="anchor" href="#oaauth-authorization" id="oaauth-authorization" name="oaauth-authorization"><i class="anchor-icon"></i></a>OAauth authorization</h3>
+<p>Bots, Telegram websites and apps may <a href="/bots/api#loginurl">ask users to login to a certain website via Telegram</a> when clicking on certain links or URL buttons in inline keyboards.</p>
+<h3><a class="anchor" href="#oauth-authorization" id="oauth-authorization" name="oauth-authorization"><i class="anchor-icon"></i></a>OAuth authorization</h3>
+<pre><code><a href='/constructor/urlAuthResultRequest'>urlAuthResultRequest</a>#3cd623ec flags:<a href='/type/%23'>#</a> request_write_access:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> request_phone_number:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> match_codes_first:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> is_app:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> bot:<a href='/type/User'>User</a> domain:<a href='/type/string'>string</a> browser:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> platform:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> ip:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> region:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> match_codes:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; user_id_hint:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/long'>long</a> verified_app_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/string'>string</a> = <a href='/type/UrlAuthResult'>UrlAuthResult</a>;
+<a href='/constructor/urlAuthResultAccepted'>urlAuthResultAccepted</a>#623a8fa0 flags:<a href='/type/%23'>#</a> url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> = <a href='/type/UrlAuthResult'>UrlAuthResult</a>;
+
+---functions---
+
+<a href='/method/messages.requestUrlAuth'>messages.requestUrlAuth</a>#894cc99c flags:<a href='/type/%23'>#</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> button_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> in_app_origin:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> = <a href='/type/UrlAuthResult'>UrlAuthResult</a>;
+
+<a href='/method/messages.acceptUrlAuth'>messages.acceptUrlAuth</a>#67a3f0de flags:<a href='/type/%23'>#</a> write_allowed:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> share_phone_number:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> button_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> url:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> match_code:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/string'>string</a> = <a href='/type/UrlAuthResult'>UrlAuthResult</a>;
+
+<a href='/method/messages.declineUrlAuth'>messages.declineUrlAuth</a>#35436bbc url:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/messages.checkUrlAuthMatchCode'>messages.checkUrlAuthMatchCode</a>#c9a47b0b url:<a href='/type/string'>string</a> match_code:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>Telegram allows websites to log in with Telegram using the OpenID Connect (OIDC) protocol, see <a href="https://core.telegram.org/bots/telegram-login">here »</a> for more info on how to use Telegram Login.</p>
+<p>This section documents the flow used by Telegram <em>clients</em> in order to authorize an incoming OIDC (OAuth) request.</p>
+<p>The flow begins when the client receives a request to open an <a href="/api/links#oauth-links">OAuth deep link »</a>.</p>
+<p><strong>Note</strong>: only handle this deep link if the request to open it comes from outside the app; do <strong>not</strong> handle it if it was clicked inside of the app, for example in messages, <a href="/api/bots/buttons">buttons</a>, the builtin browser and <a href="/api/bots/webapps">mini apps</a>, etc.</p>
+<p>Note that mini apps can still use OAuth login but <a href="#oauth-authorization-from-the-in-app-browser">in a slightly different manner »</a>.</p>
+<p>Handle <a href="/api/links#oauth-links">OAuth deep links »</a> by passing the <strong>entire</strong> deep link (not just the <code>token</code> parameter) to the <code>url</code> parameter of <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a>, without setting any other flag.</p>
+<p>If the returned result is <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a>, a confirmation prompt should be shown, using the following returned fields (<strong>always</strong> returned for OAuth requests):</p>
+<ul>
+<li><code>bot</code>: Identifier of the bot linked to the website making the login request (as specified in <a href="https://t.me/botfather">@BotFather</a>)</li>
+<li><code>domain</code>: The domain name of the website on which the user is trying to login.</li>
+<li><code>platform</code>: The platform (i.e. operating system) of the user that made the OAuth request</li>
+<li><code>browser</code>: The browser the user used to make the OAuth request</li>
+<li><code>ip</code>: The IP address of the user</li>
+<li><code>region</code>: The location of the user, inferred from the IP address</li>
+</ul>
+<p>Additionally, the following flags will be set if the request originated from an app (as opposed to a website):</p>
+<ul>
+<li><code>is_app</code>: Set if the request originated from an app</li>
+<li><code>verified_app_name</code>: Can only be set if <code>is_app</code> is set <strong>and</strong> the app is verified</li>
+</ul>
+<p>If the request originated from an app, when rendering the confirmation prompt, <code>domain</code> must be replaced with <code>verified_app_name</code> (if set, otherwise, it must be replaced with "Unverified App").</p>
+<p>The following flags may also be set:</p>
+<ul>
+<li>
+<p><code>request_write_access</code>: If set, the app/website is requesting permission to write to the user via Telegram (using the bot associated with the website).</p>
+</li>
+<li>
+<p><code>request_phone_number</code>: If set, the app/website is requesting the user's phone number.</p>
+</li>
+<li>
+<p><code>user_id_hint</code>: may contain the ID of a user, for which the login request was created.<br>
+If this flag is set and it points to one of the logged-in accounts, clients should automatically switch to that account and re-invoke <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> from that account, before showing the prompt.</p>
+</li>
+<li>
+<p><code>match_codes</code>: Contains a list of emojis, one of which is currently being shown on the login page of the original website/app.<br>
+If this flag is set, after the user accepts the login request but before sending the final <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> request, the user must choose the matching emoji and pass it to <code>match_code</code> when finally invoking <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a>.</p>
+</li>
+<li>
+<p><code>match_codes_first</code>: Can be optionally be set if and only if <code>match_codes</code> is set. If set, clients should ask the user to select the matching code <em>before</em> showing the rest of the login confirmation UI, not after, and should validate the selected code using <a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a>, passing the selected code and the OAuth deep link.<br>
+Only if the method returns <a href="/constructor/boolTrue">boolTrue</a>, proceed with the login flow, re-passing the selected and verified code to <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a>.<code>match_code</code>.</p>
+<p>Note that <a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a> can only be used if both <code>match_codes</code> and <code>match_codes_first</code> are set: if <strong>only</strong> the <code>match_codes</code> flag is set, the code must be provided to <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a>.<code>match_code</code> without <a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a> verification (an error will be returned by <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> if the selected code is invalid).</p>
+</li>
+</ul>
+<p>If the user manually switches accounts in the confirmation prompt, <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> should be called again using the newly selected account, because the returned authorization data may differ.</p>
+<p>If the user explicitly refuses the login request, <a href="/method/messages.declineUrlAuth">messages.declineUrlAuth</a> should be called, passing the OAuth deep link to <code>url</code>.</p>
+<p>If the user accepts the login request, <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> should be called, passing the following parameters:</p>
+<ul>
+<li><code>url</code>: The OAuth deep link</li>
+<li><code>write_allowed</code>/<code>share_phone_number</code>: if requested and consented to by the user</li>
+<li><code>match_code</code>: if <code>match_codes</code> is set, the emoji chosen by the user (must be always provided if <code>match_codes</code> is set, even if <code>match_codes_first</code> is set and the code was already validated using <a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a>)</li>
+</ul>
+<p>On success, the result will be a <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a>.<br>
+If its <code>url</code> field is present, the returned URL should be opened in the external browser, if possible using the same browser from which the deep link originated; the URL may also use a custom scheme for direct switching to another app.<br>
+If the <code>url</code> field is absent, clients should simply show a toast or a similar message confirming that the login succeeded.</p>
+<p>Both <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> and <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> may return a <code>URL_EXPIRED</code> error.</p>
+<h4><a class="anchor" href="#oauth-authorization-from-push-notifications" id="oauth-authorization-from-push-notifications" name="oauth-authorization-from-push-notifications"><i class="anchor-icon"></i></a>OAuth authorization from push notifications</h4>
+<p>The <code>data_url</code> contained in <a href="/api/push-updates#oauth-request">OAUTH_REQUEST push notifications</a> is valid for 60 seconds.</p>
+<h4><a class="anchor" href="#oauth-authorization-from-the-in-app-browser" id="oauth-authorization-from-the-in-app-browser" name="oauth-authorization-from-the-in-app-browser"><i class="anchor-icon"></i></a>OAuth authorization from the in-app browser</h4>
+<p><a href="#oauth-authorization">OAuth authorization</a> from the in-app browser or <a href="/api/bots/webapps">mini apps</a> follows a slightly different flow.</p>
+<p>To begin, the official Telegram OAuth JS library will emit an <a href="/api/web-events#oauth-request"><code>oauth_request</code> event</a> event when running inside of the in-app browser/a miniapp.</p>
+<p>Regardless of the contents of the event, the client should immediately reply with the <a href="/api/bots/webapps#oauth-supported"><code>oauth_supported</code> event</a>.</p>
+<p>Then if the <code>url</code> parameter was passed in the <a href="/api/web-events#oauth-request"><code>oauth_request</code> event</a>, the client should call <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a> with the following arguments:</p>
+<ul>
+<li><code>url</code>: The passed <code>url</code></li>
+<li><code>in_app_origin</code> set to the origin of the webview in the format <code>scheme://host</code> (or <code>scheme://host:port</code> for non-default ports).<br>
+If the platform does not allow reliable  the origin of the event itself, clients may use the origin of the page currently opened in the webview.</li>
+</ul>
+<p>After following the usual <a href="#oauth-authorization">OAuth confirmation flow »</a>, on success, the <code>url</code> contained in the returned <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a> should be returned to the same webview by emitting an <code>oauth_result_confirmed</code> event with <code>result_url</code> set to the returned URL, or to <code>null</code> if <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a> did not contain a URL.<br>
+Before emitting the event, clients should make sure that the origin of the webview did not change.<br>
+If the user refuses the request or an error occurs, clients should emit <code>oauth_result_failed</code> instead.</p>
 <h3><a class="anchor" href="#bot-button-url-authorization" id="bot-button-url-authorization" name="bot-button-url-authorization"><i class="anchor-icon"></i></a>Bot button URL authorization</h3>
 <pre><code><a href='/constructor/keyboardButtonUrlAuth'>keyboardButtonUrlAuth</a>#f51006f9 flags:<a href='/type/%23'>#</a> style:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/KeyboardButtonStyle'>KeyboardButtonStyle</a> text:<a href='/type/string'>string</a> fwd_text:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> url:<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
 
@@ -71,7 +154,7 @@ The returned <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a
 <div><div class="blog_image_wrap">
   <a href="/file/811140015/1734/8VZFkwWXalM.97872/6127fa62d8a0bf2b3c" target="_blank"><img src="/file/811140909/1631/20k1Z53eiyY.23995/c541e89b74253623d9" title="TITLE" alt="TITLE" srcset="/file/811140015/1734/8VZFkwWXalM.97872/6127fa62d8a0bf2b3c , 2x"></a>
 </div></div>
-<p>If the user agrees to login to the URL, <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> should be called (eventually setting the <code>write_allowed</code>/<code>share_phone_number</code> flags if requested by <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a>.<code>request_write_access</code>/<code>request_phone_number</code> and the user consented).
+<p>If the user agrees to login to the URL, <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> should be called, eventually setting the <code>write_allowed</code>/<code>share_phone_number</code> flags if requested by <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a>.<code>request_write_access</code>/<code>request_phone_number</code> and consented to by the user.
 The result will be a <a href="/constructor/urlAuthResultAccepted">urlAuthResultAccepted</a> with the final URL to open (always set for bot button URL authorization and <a href="#link-url-authorization">link URL authorization</a>), which will include a query string with the requested info and a hash that <a href="/widgets/login#receiving-authorization-data">must be verified upon receipt by the service</a>.</p>
 <p><a href="/constructor/urlAuthResultDefault">urlAuthResultDefault</a> could also be returned, instead, in which case the <code>url</code> of the <a href="/constructor/keyboardButtonUrlAuth">keyboardButtonUrlAuth</a> must be opened, instead.</p>
 <p>The <code>url</code> of the <a href="/constructor/keyboardButtonUrlAuth">keyboardButtonUrlAuth</a> must be also directly opened without a further call to <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a> if the user opens the link while refusing the authorization request by pressing "Cancel" in the popup above.</p>

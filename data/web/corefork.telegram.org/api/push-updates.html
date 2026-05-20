@@ -123,91 +123,121 @@ Simple push works by sending a simple PUT request with a <code>version=number</c
 <li>edit_date - When was the message last edited</li>
 <li>top_msg_id - thread_id for new mentions/replies in <a href="/api/threads">threads</a></li>
 <li>data_url - Full URL of the webpage trying to login using OAUTH_REQUEST</li>
+<li>announcement - ID of an announcement, used by MESSAGE_ANNOUNCEMENT</li>
 </ul>
 </li>
 <li>sound - The name of an audio file to be played.</li>
 <li>user_id - ID of the account to which the PUSH notification should be delivered, in case of clients with multiple accounts active and running.</li>
-<li>announcement - Roughly equivalent to a message received from the service notifications (Telegram Notifications, id <code>777000</code>) user, but must be delivered via push notifications, without contacting the API.</li>
+<li>message - Optional notification text, currently used by MESSAGE_ANNOUNCEMENT</li>
 </ul>
 <h3><a class="anchor" href="#processing-notifications" id="processing-notifications" name="processing-notifications"><i class="anchor-icon"></i></a>Processing notifications</h3>
 <p>In principle, <strong>data.loc_key</strong>, <strong>data.custom</strong>, and an Internet connection are sufficient to generate a notification. Obviously, if possible, when generating a visual notification you need not use all of the transmitted data and may rely on the information already stored on the client. But if a user or a chat is not cached locally, the values passed in loc_args may also be used. <strong>data.user_id</strong> is the ID of the account to which the PUSH notification should be delivered, in case of clients with multiple accounts active and running.</p>
 <h3><a class="anchor" href="#service-notifications" id="service-notifications" name="service-notifications"><i class="anchor-icon"></i></a>Service notifications</h3>
-<p>The following notifications can be used to update app settings.</p>
+<p>The following notifications are handled specially by clients to update local app state or synthesize lightweight local events, instead of displaying an ordinary message notification.</p>
 <h4><a class="anchor" href="#dc-update" id="dc-update" name="dc-update"><i class="anchor-icon"></i></a>DC_UPDATE</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.custom.dc</strong> - number of the data-center<br><strong>data.custom.addr</strong> - server address with port number in the format <code>111.112.113.114:443</code></p>
+<p><strong>data.custom.dc</strong> - number of the data-center<br>
+<strong>data.custom.addr</strong> - server address with port number in the format <code>111.112.113.114:443</code></p>
 <p><strong>Description</strong></p>
-<p>In case the client gets this notification, it is necessary to add the received server address to the list of possible addresses. In case the address of the first DC was passed (<code>dc=1</code>), it is recommended to call it immediately using <a href="/method/help.getConfig">help.getConfig</a> to update dc-configuration.</p>
+<p>Add the received server address to the list of possible addresses for the specified DC.</p>
+<p>If the address of the first DC was passed (<code>dc=1</code>), it is recommended to call <a href="/method/help.getConfig">help.getConfig</a> immediately to refresh the DC configuration.</p>
 <p><strong>Template example</strong></p>
 <p><code>Open this notification to update app settings</code></p>
 <p><strong>Arguments</strong></p>
 <p>This notification does not use placeholder arguments.</p>
 <h4><a class="anchor" href="#message-deleted" id="message-deleted" name="message-deleted"><i class="anchor-icon"></i></a>MESSAGE_DELETED</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.messages</strong>: Comma-separated IDs of messages that were deleted</p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br>
+<strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br>
+<strong>data.custom.from_id</strong>: For PMs, Author identifier<br>
+<strong>data.custom.messages</strong>: Comma-separated IDs of messages that were deleted</p>
 <p><strong>Description</strong></p>
-<p>Messages were deleted, remove multiple notifications for this chat</p>
+<p>Messages were deleted in the specified dialog: remove local notifications for the listed messages.</p>
+<p><strong>data.custom.messages</strong> contains a comma-separated list of server-side message IDs.</p>
 <h4><a class="anchor" href="#read-reaction" id="read-reaction" name="read-reaction"><i class="anchor-icon"></i></a>READ_REACTION</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.messages</strong>: Comma-separated IDs of messages whose reactions were read</p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br>
+<strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br>
+<strong>data.custom.from_id</strong>: For PMs, Author identifier<br>
+<strong>data.custom.topic_id</strong>: Optional forum topic identifier<br>
+<strong>data.custom.messages</strong>: Comma-separated IDs of messages whose reactions were read</p>
 <p><strong>Description</strong></p>
-<p>Reactions were read on messages, remove reaction-related notifications for those messages</p>
+<p>Reactions were read on the specified messages: remove local reaction-related notifications for those messages.</p>
 <h4><a class="anchor" href="#read-history" id="read-history" name="read-history"><i class="anchor-icon"></i></a>READ_HISTORY</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br><strong>data.custom.from_id</strong>: For PMs, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read messages</p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br>
+<strong>data.custom.chat_id</strong>: For <a href="/api/channel">chats</a>, <a href="/api/channel">Chat</a> identifier<br>
+<strong>data.custom.from_id</strong>: For PMs, Author identifier<br>
+<strong>data.custom.max_id</strong>: Maximum ID of read messages</p>
 <p><strong>Description</strong></p>
-<p>Message history was read, remove multiple notifications for this chat</p>
+<p>Message history was read in the specified non-secret dialog: mark incoming history up to <strong>data.custom.max_id</strong> as read and remove the corresponding notifications.</p>
 <h4><a class="anchor" href="#read-stories" id="read-stories" name="read-stories"><i class="anchor-icon"></i></a>READ_STORIES</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.max_id</strong>: Maximum ID of read story</p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br>
+<strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br>
+<strong>data.custom.max_id</strong>: Maximum ID of read story</p>
 <p><strong>Description</strong></p>
-<p>Notifications from stories were read, remove story-related notifications for this chat</p>
+<p>Story notifications were read for the specified user or channel: mark stories up to <strong>data.custom.max_id</strong> as read and remove the corresponding story-related notifications.</p>
 <h4><a class="anchor" href="#story-deleted" id="story-deleted" name="story-deleted"><i class="anchor-icon"></i></a>STORY_DELETED</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br>
+<strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br>
+<strong>data.custom.story_id</strong>: Comma-separated list of IDs of deleted stories</p>
 <p><strong>Description</strong></p>
-<p>A story was deleted, remove notifications for this story</p>
+<p>A story was deleted: remove local notifications for that story.</p>
 <h4><a class="anchor" href="#story-notext" id="story-notext" name="story-notext"><i class="anchor-icon"></i></a>STORY_NOTEXT</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br>
+<strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br>
+<strong>data.custom.story_id</strong>: ID of the story</p>
 <p><strong>Description</strong></p>
-<p>A story was deleted, remove notifications for this story</p>
+<p>A new story without text was posted.</p>
 <p><strong>Template example</strong></p>
 <p><code>posted a story</code></p>
 <p><strong>Arguments</strong></p>
 <p>This notification does not use placeholder arguments.</p>
 <h4><a class="anchor" href="#story-live" id="story-live" name="story-live"><i class="anchor-icon"></i></a>STORY_LIVE</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br>
+<strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br>
+<strong>data.custom.story_id</strong>: ID of the story</p>
 <p><strong>Description</strong></p>
-<p>A story was deleted, remove notifications for this story</p>
+<p>A story live stream was started.</p>
 <p><strong>Template example</strong></p>
 <p><code>started a live stream!</code></p>
 <p><strong>Arguments</strong></p>
 <p>This notification does not use placeholder arguments.</p>
 <h4><a class="anchor" href="#story-hidden-author" id="story-hidden-author" name="story-hidden-author"><i class="anchor-icon"></i></a>STORY_HIDDEN_AUTHOR</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br><strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br><strong>data.custom.story_id</strong>: ID of deleted story</p>
+<p><strong>data.custom.channel_id</strong>: For <a href="/api/channel">channels and supergroups</a>, <a href="/api/channel">Channel/supergroup</a> identifier<br>
+<strong>data.custom.from_id</strong>: For user-sent stories, Author identifier<br>
+<strong>data.custom.story_id</strong>: ID of the story</p>
 <p><strong>Description</strong></p>
-<p>A story was deleted, remove notifications for this story</p>
+<p>A new story was posted, but the client should not expose the author in the visible notification text.</p>
 <p><strong>Template example</strong></p>
 <p><code>A new story was posted</code></p>
 <p><strong>Arguments</strong></p>
 <p>This notification does not use placeholder arguments.</p>
 <h4><a class="anchor" href="#geo-live-pending" id="geo-live-pending" name="geo-live-pending"><i class="anchor-icon"></i></a>GEO_LIVE_PENDING</h4>
 <p><strong>Description</strong></p>
-<p>Any of the live locations currently being shared should be updated</p>
+<p>Refresh any live locations currently being watched or shared.</p>
+<p>This push is a wake-up hint and does not need placeholder arguments or a user-visible notification.</p>
 <h4><a class="anchor" href="#session-revoke" id="session-revoke" name="session-revoke"><i class="anchor-icon"></i></a>SESSION_REVOKE</h4>
 <p><strong>Description</strong></p>
 <p>Logout and remove DB for specified session by <strong>data.user_id</strong>, only apply if coming from an <a href="#notification-encryption">MTProto-encrypted payload</a></p>
 <h4><a class="anchor" href="#message-muted" id="message-muted" name="message-muted"><i class="anchor-icon"></i></a>MESSAGE_MUTED</h4>
 <p><strong>Description</strong></p>
-<p>Sent rarely, every 10th message in chats or once per 15 sec in PM, to update badge or download messages</p>
+<p>Sent rarely for muted chats, roughly every 10th muted chat message or about once every 15 seconds in PMs, to refresh badge state or trigger fetching updates from the server.</p>
+<p>This push is not meant to be shown to the user as a visible notification.</p>
 <h4><a class="anchor" href="#message-announcement" id="message-announcement" name="message-announcement"><i class="anchor-icon"></i></a>MESSAGE_ANNOUNCEMENT</h4>
 <p><strong>Extra custom arguments</strong></p>
-<p><strong>data.announcement</strong>: Announcement</p>
+<p><strong>data.custom.announcement</strong>: Announcement ID (integer)</p>
+<p><strong>Extra top-level arguments</strong></p>
+<p><strong>data.message</strong>: Non-empty announcement text</p>
 <p><strong>Description</strong></p>
 <p>Roughly equivalent to a message received from the service notifications (<a href="/constructor/updateServiceNotification">updateServiceNotification</a> with <code>type="announcement"</code>), but is delivered via push notifications, without contacting the API.</p>
+<p>The push text is taken from <strong>data.message</strong>.</p>
+<p>Clients may deduplicate repeated announcements using the announcement ID in <strong>data.custom.announcement</strong>: for example, by storing received IDs for 7 days, persisting the cache across restarts.</p>
 <h3><a class="anchor" href="#possible-notifications" id="possible-notifications" name="possible-notifications"><i class="anchor-icon"></i></a>Possible Notifications</h3>
 <h4><a class="anchor" href="#auth-region" id="auth-region" name="auth-region"><i class="anchor-icon"></i></a>AUTH_REGION</h4>
 <p><strong>Template example</strong></p>
