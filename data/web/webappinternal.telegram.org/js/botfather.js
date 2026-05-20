@@ -1440,6 +1440,41 @@ var BotAppEdit = {
 
 var BotApps = {
   init() {
+    $('.tm-row-toggle').on('click', function () {
+      var toggleEl = this.querySelector('.tm-toggle');
+      var value = toggleEl.classList.toggle('tm-toggle-on');
+      WebApp.HapticFeedback.impactOccurred('light');
+      var field = this.dataset.field;
+      if (!field) return;
+      if (!value) value = 0;
+      if (field == 'sor') {
+        botChangeSettings(field, value);
+        $('.js-sameorigin-opt-out-wrap').addClass('hidden');
+      }
+    });
+
+    $('.js-sameorigin-opt-out').on('click', function () {
+      WebApp.showPopup({
+        title: l('WEB_MINIAPPS_SAME_ORIGIN_OPT_OUT_TITLE'),
+        message: l('WEB_MINIAPPS_SAME_ORIGIN_OPT_OUT_DESC'),
+        buttons: [
+          {
+            id: 'delete',
+            text: l('WEB_MINIAPPS_SAME_ORIGIN_OPT_OUT_BTN'),
+            type: 'destructive',
+          },
+          {
+            type: 'cancel',
+          },
+        ]
+      }, (result) => {
+        if (result != 'delete') return;
+        botChangeSettings('sor', 0);
+        $('[data-field=sor] .tm-toggle').removeClass('tm-toggle-on');
+        $('.js-sameorigin-opt-out-wrap').addClass('hidden');
+      });
+    });
+
     $('.js-game-copy').on('click', function (e) {
       navigator.clipboard.writeText(this.dataset.value);
       Main.showToast(l('WEB_LINK_COPIED'), { class: 'success' });
