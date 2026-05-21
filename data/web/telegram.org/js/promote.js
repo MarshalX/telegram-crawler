@@ -3254,14 +3254,61 @@ var ReviewAds = {
       cont.on('click.curPage', '.ad-decline-btn', ReviewAds.eDeclineAd);
       cont.on('click.curPage', '.js-translate-ad', ReviewAds.eTranslateAd);
       cont.on('click.curPage', '.js-show-original-ad', ReviewAds.eOriginalAd);
+      var $fromDatePicker = $('.js-from-date-picker', cont);
+      if ($fromDatePicker.size()) {
+        $('input[type="date"]', $fromDatePicker).initDatePicker();
+        state.$fromDatePicker = $fromDatePicker;
+        cont.on('click.curPage', '.js-from-date-item', ReviewAds.eFromDateClick);
+        cont.on('click.curPage', '.js-from-date-change', ReviewAds.eFromDateChangeClick);
+        $('input[type="date"]', $fromDatePicker).on('change', ReviewAds.eFromDateChange);
+      }
       $(window).on('scroll resize', ReviewAds.onScroll);
       ReviewAds.onScroll();
     });
     Aj.onUnload(function(state) {
       state.$form.off('submit', ReviewAds.onSubmit);
       Ads.fieldDestroy(state.$searchField);
+      if (state.$fromDatePicker) {
+        $('input[type="date"]', state.$fromDatePicker).destroyDatePicker();
+        $('input[type="date"]', state.$fromDatePicker).off('change', ReviewAds.eFromDateChange);
+      }
       $(window).off('scroll resize', ReviewAds.onScroll);
     });
+  },
+  eFromDateClick: function(e) {
+    if ($(this).attr('data-toggle') == 'dropdown') {
+      return;
+    }
+    e.preventDefault();
+    var $cont = Aj.ajContainer;
+    var $dateInput = $('.js-from-date-picker input[type="date"]', $cont);
+    if ($dateInput.size()) {
+      $dateInput.trigger('focusval');
+    }
+  },
+  eFromDateChangeClick: function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).parents('.open').find('.dropdown-toggle').dropdown('toggle');
+    var $cont = Aj.ajContainer;
+    var $dateInput = $('.js-from-date-picker input[type="date"]', $cont);
+    if ($dateInput.size()) {
+      $dateInput.trigger('focusval');
+    }
+  },
+  eFromDateChange: function() {
+    var val = $(this).val();
+    if (val) {
+      var url = $(this).data('url');
+      if (url) {
+        Aj.location(url.replace('__from_date__', val.replace(/-/g, '')));
+      }
+    } else {
+      var clearUrl = $(this).data('clear-url');
+      if (clearUrl) {
+        Aj.location(clearUrl);
+      }
+    }
   },
   onScroll: function() {
     $('.js-load-more').each(function() {
@@ -3507,14 +3554,61 @@ var ReviewTargets = {
       cont.on('click.curPage', '.pr-search-reset', ReviewTargets.eClearSearch);
       cont.on('click.curPage', '.ad-approve-btn', ReviewTargets.eApproveAd);
       cont.on('click.curPage', '.ad-decline-btn', ReviewTargets.eDeclineAd);
+      var $fromDatePicker = $('.js-from-date-picker', cont);
+      if ($fromDatePicker.size()) {
+        $('input[type="date"]', $fromDatePicker).initDatePicker();
+        state.$fromDatePicker = $fromDatePicker;
+        cont.on('click.curPage', '.js-from-date-item', ReviewTargets.eFromDateClick);
+        cont.on('click.curPage', '.js-from-date-change', ReviewTargets.eFromDateChangeClick);
+        $('input[type="date"]', $fromDatePicker).on('change', ReviewTargets.eFromDateChange);
+      }
       $(window).on('scroll resize', ReviewTargets.onScroll);
       ReviewTargets.onScroll();
     });
     Aj.onUnload(function(state) {
       state.$form.off('submit', ReviewTargets.onSubmit);
       Ads.fieldDestroy(state.$searchField);
+      if (state.$fromDatePicker) {
+        $('input[type="date"]', state.$fromDatePicker).destroyDatePicker();
+        $('input[type="date"]', state.$fromDatePicker).off('change', ReviewTargets.eFromDateChange);
+      }
       $(window).off('scroll resize', ReviewTargets.onScroll);
     });
+  },
+  eFromDateClick: function(e) {
+    if ($(this).attr('data-toggle') == 'dropdown') {
+      return;
+    }
+    e.preventDefault();
+    var $cont = Aj.ajContainer;
+    var $dateInput = $('.js-from-date-picker input[type="date"]', $cont);
+    if ($dateInput.size()) {
+      $dateInput.trigger('focusval');
+    }
+  },
+  eFromDateChangeClick: function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).parents('.open').find('.dropdown-toggle').dropdown('toggle');
+    var $cont = Aj.ajContainer;
+    var $dateInput = $('.js-from-date-picker input[type="date"]', $cont);
+    if ($dateInput.size()) {
+      $dateInput.trigger('focusval');
+    }
+  },
+  eFromDateChange: function() {
+    var val = $(this).val();
+    if (val) {
+      var url = $(this).data('url');
+      if (url) {
+        Aj.location(url.replace('__from_date__', val.replace(/-/g, '')));
+      }
+    } else {
+      var clearUrl = $(this).data('clear-url');
+      if (clearUrl) {
+        Aj.location(clearUrl);
+      }
+    }
   },
   onScroll: function() {
     $('.js-load-more').each(function() {
