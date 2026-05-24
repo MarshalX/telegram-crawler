@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="">
+  <head>
+    <meta charset="utf-8">
+    <title>Group calls</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram supports E2E-encrypted group calls.
+This page describes the API methods used to work with group calls.
+phone.…">
+    <meta property="og:title" content="Group calls">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram supports E2E-encrypted group calls.
+This page describes the API methods used to work with group calls.
+phone.…">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?249" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter"><a href="https://twitter.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i><span> Twitter</span></a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/group-calls" >Group calls</a></li></ul></div>
+  <h1 id="dev_page_title">Group calls</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram supports E2E-encrypted group calls.</p>
+<p>This page describes the API methods used to work with group calls.</p>
+<pre><code><a href='/constructor/phone.joinAsPeers'>phone.joinAsPeers</a>#afe5623f peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/phone.JoinAsPeers'>phone.JoinAsPeers</a>;
+
+
+<a href='/constructor/phone.groupCall'>phone.groupCall</a>#9e727aad call:<a href='/type/GroupCall'>GroupCall</a> participants:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/GroupCallParticipant'>GroupCallParticipant</a>&gt; participants_next_offset:<a href='/type/string'>string</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/phone.GroupCall'>phone.GroupCall</a>;
+
+---functions---
+
+<a href='/method/phone.createGroupCall'>phone.createGroupCall</a>#48cdc6d8 flags:<a href='/type/%23'>#</a> rtmp_stream:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> random_id:<a href='/type/int'>int</a> title:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> schedule_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/phone.getGroupCall'>phone.getGroupCall</a>#41845db call:<a href='/type/InputGroupCall'>InputGroupCall</a> limit:<a href='/type/int'>int</a> = <a href='/type/phone.GroupCall'>phone.GroupCall</a>;
+<a href='/method/phone.toggleGroupCallStartSubscription'>phone.toggleGroupCallStartSubscription</a>#219c34e6 call:<a href='/type/InputGroupCall'>InputGroupCall</a> subscribed:<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/phone.startScheduledGroupCall'>phone.startScheduledGroupCall</a>#5680e342 call:<a href='/type/InputGroupCall'>InputGroupCall</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/phone.getGroupCallJoinAs'>phone.getGroupCallJoinAs</a>#ef7c213a peer:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/phone.JoinAsPeers'>phone.JoinAsPeers</a>;
+<a href='/method/phone.saveDefaultGroupCallJoinAs'>phone.saveDefaultGroupCallJoinAs</a>#575e1f8c peer:<a href='/type/InputPeer'>InputPeer</a> join_as:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/phone.joinGroupCall'>phone.joinGroupCall</a>#8fb53057 flags:<a href='/type/%23'>#</a> muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> video_stopped:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> join_as:<a href='/type/InputPeer'>InputPeer</a> invite_hash:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/int256'>int256</a> block:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/bytes'>bytes</a> params:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/phone.leaveGroupCall'>phone.leaveGroupCall</a>#500377f9 call:<a href='/type/InputGroupCall'>InputGroupCall</a> source:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+
+///
+
+<a href='/method/phone.inviteToGroupCall'>phone.inviteToGroupCall</a>#7b393160 call:<a href='/type/InputGroupCall'>InputGroupCall</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.discardGroupCall'>phone.discardGroupCall</a>#7a777135 call:<a href='/type/InputGroupCall'>InputGroupCall</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.toggleGroupCallSettings'>phone.toggleGroupCallSettings</a>#974392f2 flags:<a href='/type/%23'>#</a> reset_invite_hash:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> join_muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Bool'>Bool</a> messages_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Bool'>Bool</a> send_paid_messages_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/long'>long</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.checkGroupCall'>phone.checkGroupCall</a>#b59cf977 call:<a href='/type/InputGroupCall'>InputGroupCall</a> sources:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt;;
+<a href='/method/phone.toggleGroupCallRecord'>phone.toggleGroupCallRecord</a>#f128c708 flags:<a href='/type/%23'>#</a> start:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> title:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> video_portrait:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.editGroupCallParticipant'>phone.editGroupCallParticipant</a>#a5273abf flags:<a href='/type/%23'>#</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> participant:<a href='/type/InputPeer'>InputPeer</a> muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Bool'>Bool</a> volume:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> raise_hand:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Bool'>Bool</a> video_stopped:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Bool'>Bool</a> video_paused:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/Bool'>Bool</a> presentation_paused:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/Bool'>Bool</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.editGroupCallTitle'>phone.editGroupCallTitle</a>#1ca6ac0a call:<a href='/type/InputGroupCall'>InputGroupCall</a> title:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.exportGroupCallInvite'>phone.exportGroupCallInvite</a>#e6aa647f flags:<a href='/type/%23'>#</a> can_self_unmute:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> = <a href='/type/phone.ExportedGroupCallInvite'>phone.ExportedGroupCallInvite</a>;
+
+<a href='/method/phone.joinGroupCallPresentation'>phone.joinGroupCallPresentation</a>#cbea6bc4 call:<a href='/type/InputGroupCall'>InputGroupCall</a> params:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.leaveGroupCallPresentation'>phone.leaveGroupCallPresentation</a>#1c50d144 call:<a href='/type/InputGroupCall'>InputGroupCall</a> = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<h3><a class="anchor" href="#group-call-types" id="group-call-types" name="group-call-types"><i class="anchor-icon"></i></a>Group call types</h3>
+<pre><code><a href='/constructor/groupCall'>groupCall</a>#efb2b617 flags:<a href='/type/%23'>#</a> join_muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> can_change_join_muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> join_date_asc:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> schedule_start_subscribed:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> can_start_video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/constructor/true'>true</a> record_video_active:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/constructor/true'>true</a> rtmp_stream:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> listeners_hidden:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> conference:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> creator:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> messages_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/constructor/true'>true</a> can_change_messages_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/constructor/true'>true</a> min:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> participants_count:<a href='/type/int'>int</a> title:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> stream_dc_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/int'>int</a> record_start_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/int'>int</a> schedule_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/int'>int</a> unmuted_video_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> unmuted_video_limit:<a href='/type/int'>int</a> version:<a href='/type/int'>int</a> invite_link:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/string'>string</a> send_paid_messages_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/type/long'>long</a> default_send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/type/Peer'>Peer</a> = <a href='/type/GroupCall'>GroupCall</a>;
+<a href='/constructor/groupCallDiscarded'>groupCallDiscarded</a>#7780bcb4 id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> duration:<a href='/type/int'>int</a> = <a href='/type/GroupCall'>GroupCall</a>;
+
+<a href='/constructor/inputGroupCall'>inputGroupCall</a>#d8aa840f id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputGroupCall'>InputGroupCall</a>;
+<a href='/constructor/inputGroupCallSlug'>inputGroupCallSlug</a>#fe06823f slug:<a href='/type/string'>string</a> = <a href='/type/InputGroupCall'>InputGroupCall</a>;
+<a href='/constructor/inputGroupCallInviteMessage'>inputGroupCallInviteMessage</a>#8c10603f msg_id:<a href='/type/int'>int</a> = <a href='/type/InputGroupCall'>InputGroupCall</a>;
+
+<a href='/constructor/updateGroupCall'>updateGroupCall</a>#9d2216e0 flags:<a href='/type/%23'>#</a> live_story:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Peer'>Peer</a> call:<a href='/type/GroupCall'>GroupCall</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/chatFull'>chatFull</a>#2633421b flags:<a href='/type/%23'>#</a> can_set_username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> has_scheduled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> translations_disabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> about:<a href='/type/string'>string</a> participants:<a href='/type/ChatParticipants'>ChatParticipants</a> chat_photo:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Photo'>Photo</a> notify_settings:<a href='/type/PeerNotifySettings'>PeerNotifySettings</a> exported_invite:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/ExportedChatInvite'>ExportedChatInvite</a> bot_info:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotInfo'>BotInfo</a>&gt; pinned_msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/int'>int</a> folder_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/int'>int</a> call:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/type/InputGroupCall'>InputGroupCall</a> ttl_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/int'>int</a> groupcall_default_join_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/Peer'>Peer</a> theme_emoticon:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/string'>string</a> requests_pending:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/int'>int</a> recent_requesters:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; available_reactions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/ChatReactions'>ChatReactions</a> reactions_limit:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/type/int'>int</a> = <a href='/type/ChatFull'>ChatFull</a>;
+
+<a href='/constructor/channelFull'>channelFull</a>#e4e0b29d flags:<a href='/type/%23'>#</a> can_view_participants:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> can_set_username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> can_set_stickers:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> hidden_prehistory:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/constructor/true'>true</a> can_set_location:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> has_scheduled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> can_view_stats:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/constructor/true'>true</a> blocked:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> can_delete_channel:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.0?<a href='/constructor/true'>true</a> antispam:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.1?<a href='/constructor/true'>true</a> participants_hidden:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.2?<a href='/constructor/true'>true</a> translations_disabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.3?<a href='/constructor/true'>true</a> stories_pinned_available:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.5?<a href='/constructor/true'>true</a> view_forum_as_messages:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.6?<a href='/constructor/true'>true</a> restricted_sponsored:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.11?<a href='/constructor/true'>true</a> can_view_revenue:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.12?<a href='/constructor/true'>true</a> paid_media_allowed:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.14?<a href='/constructor/true'>true</a> can_view_stars_revenue:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.15?<a href='/constructor/true'>true</a> paid_reactions_available:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.16?<a href='/constructor/true'>true</a> stargifts_available:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.19?<a href='/constructor/true'>true</a> paid_messages_available:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.20?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> about:<a href='/type/string'>string</a> participants_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> admins_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> kicked_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> banned_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> online_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/int'>int</a> read_inbox_max_id:<a href='/type/int'>int</a> read_outbox_max_id:<a href='/type/int'>int</a> unread_count:<a href='/type/int'>int</a> chat_photo:<a href='/type/Photo'>Photo</a> notify_settings:<a href='/type/PeerNotifySettings'>PeerNotifySettings</a> exported_invite:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.23?<a href='/type/ExportedChatInvite'>ExportedChatInvite</a> bot_info:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/BotInfo'>BotInfo</a>&gt; migrated_from_chat_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/long'>long</a> migrated_from_max_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/int'>int</a> pinned_msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/int'>int</a> stickerset:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/StickerSet'>StickerSet</a> available_min_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/type/int'>int</a> folder_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/int'>int</a> linked_chat_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/long'>long</a> location:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/ChannelLocation'>ChannelLocation</a> slowmode_seconds:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/int'>int</a> slowmode_next_send_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/int'>int</a> stats_dc:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/type/int'>int</a> pts:<a href='/type/int'>int</a> call:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/type/InputGroupCall'>InputGroupCall</a> ttl_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/type/int'>int</a> pending_suggestions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.25?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; groupcall_default_join_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.26?<a href='/type/Peer'>Peer</a> theme_emoticon:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.27?<a href='/type/string'>string</a> requests_pending:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/type/int'>int</a> recent_requesters:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; default_send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.29?<a href='/type/Peer'>Peer</a> available_reactions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.30?<a href='/type/ChatReactions'>ChatReactions</a> reactions_limit:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.13?<a href='/type/int'>int</a> stories:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.4?<a href='/type/PeerStories'>PeerStories</a> wallpaper:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.7?<a href='/type/WallPaper'>WallPaper</a> boosts_applied:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.8?<a href='/type/int'>int</a> boosts_unrestrict:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.9?<a href='/type/int'>int</a> emojiset:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.10?<a href='/type/StickerSet'>StickerSet</a> bot_verification:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.17?<a href='/type/BotVerification'>BotVerification</a> stargifts_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.18?<a href='/type/int'>int</a> send_paid_messages_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.21?<a href='/type/long'>long</a> main_tab:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.22?<a href='/type/ProfileTab'>ProfileTab</a> = <a href='/type/ChatFull'>ChatFull</a>;
+</code></pre>
+<p>All group calls are represented by the <a href="/constructor/groupCall">groupCall</a> constructor, or by a <a href="/constructor/groupCallDiscarded">groupCallDiscarded</a> constructor after it ends.</p>
+<p>Group calls can be classified in the following categories:</p>
+<ul>
+<li><a href="#video-chats">Video chats</a></li>
+<li><a href="#livestreams">Livestreams</a></li>
+<li><a href="#live-stories">Live stories</a></li>
+<li><a href="#conference-calls">Conferences</a></li>
+</ul>
+<h4><a class="anchor" href="#video-chats" id="video-chats" name="video-chats"><i class="anchor-icon"></i></a>Video chats</h4>
+<p>A video chat is a group call associated to a specific <a href="/api/channel">basic group or supergroup</a>.</p>
+<p>A group can have only one associated video chat: starting a new one will terminate the previous one.</p>
+<p>To interact with a video chat, use <strong>only</strong> the <a href="/constructor/inputGroupCall">inputGroupCall</a> constructor which will always be present in the basic group/supergroup's <a href="/constructor/chatFull">chatFull</a>/<a href="/constructor/channelFull">channelFull</a>, if a video chat is currently active or scheduled.</p>
+<p>Updates to info about a video chat are delivered using <a href="/constructor/updateGroupCall">updateGroupCall</a>, to all subscribers of the group, and even to non-subscribers that subscribe to video chat updates for a certain group using <a href="/method/phone.toggleGroupCallStartSubscription">phone.toggleGroupCallStartSubscription</a>.</p>
+<h4><a class="anchor" href="#livestreams" id="livestreams" name="livestreams"><i class="anchor-icon"></i></a>Livestreams</h4>
+<p>A Livestream is aa group call associated to a specific channel.</p>
+<p>A channel can have only one associated livestream: starting a new one will terminate the previous one.</p>
+<p>In livestreams, non-admins are muted by default.</p>
+<p>To interact with a livestream, use <strong>only</strong> the <a href="/constructor/inputGroupCall">inputGroupCall</a> constructor which will always be present in the channel's <a href="/constructor/channelFull">channelFull</a>, if a livestream is currently active.</p>
+<p>Updates to info about a livestream are delivered using <a href="/constructor/updateGroupCall">updateGroupCall</a>, to all subscribers of the channel, and even to non-subscribers that subscribe to livestream updates for a certain livestream using <a href="/method/phone.toggleGroupCallStartSubscription">phone.toggleGroupCallStartSubscription</a>.</p>
+<h4><a class="anchor" href="#live-stories" id="live-stories" name="live-stories"><i class="anchor-icon"></i></a>Live stories</h4>
+<p>A live story is a group call associated to a specific <a href="/api/stories">story</a> of a user, <a href="/api/channel">supergroup or channel</a>.</p>
+<p>A peer can only have one associated active live story, which can be created by the user or by supergroup/channel admins by invoking <a href="/method/stories.startLive">stories.startLive</a>.</p>
+<p>If someone attempts to create a new live story on a peer that already has one, a <code>STORY_LIVE_ALREADY_%d</code> RPC error will be emitted, containing the ID of the currently active live story: make sure to prevent the user from creating a new live story if a live story is already currently active.</p>
+<p>A supergroup/channel can have both an active live story and an active video chat/livestream: the main difference is that live stories also support comments with donations, and are visible in the top bar of the dialog list of subscribers.</p>
+<p>Since <a href="/api/channel#basic-groups">basic groups</a> cannot post stories, they also cannot have an associated live story.</p>
+<p>To interact with a live story, use <strong>only</strong> the <a href="/constructor/inputGroupCall">inputGroupCall</a> constructor which will always be present in the <a href="/constructor/messageMediaVideoStream">messageMediaVideoStream</a> contained in the story's <a href="/constructor/storyItem">storyItem</a>.<code>media</code>, if a live story is currently active.</p>
+<p>Updates to info about a livestory are delivered using <a href="/constructor/updateGroupCall">updateGroupCall</a>, to all subscribers of the group/channel and all contacts for user live stories.</p>
+<p>See <a href="/api/stories#live-stories">here »</a> for more info on live stories.</p>
+<h4><a class="anchor" href="#conference-calls" id="conference-calls" name="conference-calls"><i class="anchor-icon"></i></a>Conference calls</h4>
+<p>A conference call is a group call <strong>not</strong> associated to any group or channel, uniquely identified by a link.</p>
+<h3><a class="anchor" href="#getting-info-about-a-group-call" id="getting-info-about-a-group-call" name="getting-info-about-a-group-call"><i class="anchor-icon"></i></a>Getting info about a group call</h3>
+<p>To fetch the currently active <a href="/constructor/groupCall">groupCall</a>, invoke <a href="/method/phone.getGroupCall">phone.getGroupCall</a> passing the appropriate subtype of <a href="/type/InputGroupCall">InputGroupCall</a>; this method can also be used to fetch some of the group's participants (the max number of returned participants can be controlled by the <code>limit</code> parameter).</p>
+<p>If the number of returned participants is less than <a href="/constructor/groupCall">groupCall</a>.<code>participants_count</code>, you can later <a href="/api/offsets">paginate</a> through the remaining participants using <a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a>, passing to <code>offset</code> the <a href="/constructor/phone.groupCall">phone.groupCall</a>.<code>participants_next_offset</code> returned by <a href="/method/phone.getGroupCall">phone.getGroupCall</a>, and then the <a href="/constructor/phone.groupParticipants">phone.groupParticipants</a>.<code>next_offset</code> returned by <a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a>.</p>
+<p>Note: if no more results are available, <a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a> will return an empty <code>next_offset</code>; thus, avoid providing the <code>next_offset</code> returned in <a href="/constructor/phone.groupParticipants">phone.groupParticipants</a> if it is empty, to avoid an infinite loop.</p>
+<h3><a class="anchor" href="#creating-a-group-call" id="creating-a-group-call" name="creating-a-group-call"><i class="anchor-icon"></i></a>Creating a group call</h3>
+<ol>
+<li>To start, an admin can create a group call by invoking <a href="/method/phone.createGroupCall">phone.createGroupCall</a>; <code>schedule_date</code> can be set to schedule the creation of the group call to a later date.</li>
+</ol>
+<p>Before the scheduled start, users may subscribe or unsubscribe to reminders with <a href="/method/phone.toggleGroupCallStartSubscription">phone.toggleGroupCallStartSubscription</a>, and an admin may later start the room immediately with <a href="/method/phone.startScheduledGroupCall">phone.startScheduledGroupCall</a>.</p>
+<ol start="2">
+<li>
+<p>Before joining a group call, you can fetch the list of identities that can be used to create/join the group call by invoking <a href="/method/phone.getGroupCallJoinAs">phone.getGroupCallJoinAs</a>, choose one, and persist the preferred choice with <a href="/method/phone.saveDefaultGroupCallJoinAs">phone.saveDefaultGroupCallJoinAs</a>.</p>
+</li>
+<li>
+<p>Join with <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a>, passing the chosen <code>join_as</code>, the current local mute/camera state in <code>muted</code> and <code>video_stopped</code>, and an opaque local join payload in <code>params</code>. If the user entered through an invite link, pass the <code>invite_hash</code>.</p>
+</li>
+<li>
+<p>Process the returned updates: official clients look for <a href="/constructor/updateGroupCallParticipants">updateGroupCallParticipants</a> to learn their own media source, and <a href="/constructor/updateGroupCallConnection">updateGroupCallConnection</a> to feed the server join response back into the running group-call engine. The same <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a> flow is reused for reconnects.</p>
+</li>
+<li>
+<p>Use <a href="/method/phone.getGroupCall">phone.getGroupCall</a>, <a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a> and <a href="/method/phone.checkGroupCall">phone.checkGroupCall</a> to keep local state in sync. In particular, Android uses <a href="/method/phone.checkGroupCall">phone.checkGroupCall</a> as a short poll to verify that the current source is still active and recreates the local group instance if the server stops reporting it.</p>
+</li>
+<li>
+<p>Screen sharing is a separate join flow: after starting capture, official clients call <a href="/method/phone.joinGroupCallPresentation">phone.joinGroupCallPresentation</a> with another opaque <code>params</code> payload, then later <a href="/method/phone.leaveGroupCallPresentation">phone.leaveGroupCallPresentation</a> to stop the presentation connection. This is separate from simply toggling the camera inside the main group call.</p>
+</li>
+<li>
+<p>Use <a href="/method/phone.inviteToGroupCall">phone.inviteToGroupCall</a>, <a href="/method/phone.exportGroupCallInvite">phone.exportGroupCallInvite</a>, <a href="/method/phone.editGroupCallParticipant">phone.editGroupCallParticipant</a>, <a href="/method/phone.editGroupCallTitle">phone.editGroupCallTitle</a>, <a href="/method/phone.toggleGroupCallSettings">phone.toggleGroupCallSettings</a>, and <a href="/method/phone.toggleGroupCallRecord">phone.toggleGroupCallRecord</a> to manage the room. Use <a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a> to leave your current media source without ending the room; use <a href="/method/phone.discardGroupCall">phone.discardGroupCall</a> to end the room for everyone.</p>
+</li>
+</ol>
+<h3><a class="anchor" href="#conference-calls" id="conference-calls" name="conference-calls"><i class="anchor-icon"></i></a>Conference calls</h3>
+<pre><code><a href='/constructor/groupCall'>groupCall</a>#efb2b617 flags:<a href='/type/%23'>#</a> join_muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> can_change_join_muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> join_date_asc:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> schedule_start_subscribed:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> can_start_video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/constructor/true'>true</a> record_video_active:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/constructor/true'>true</a> rtmp_stream:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> listeners_hidden:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> conference:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> creator:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> messages_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/constructor/true'>true</a> can_change_messages_enabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/constructor/true'>true</a> min:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> participants_count:<a href='/type/int'>int</a> title:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/string'>string</a> stream_dc_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/int'>int</a> record_start_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/type/int'>int</a> schedule_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/int'>int</a> unmuted_video_count:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> unmuted_video_limit:<a href='/type/int'>int</a> version:<a href='/type/int'>int</a> invite_link:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/string'>string</a> send_paid_messages_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/type/long'>long</a> default_send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/type/Peer'>Peer</a> = <a href='/type/GroupCall'>GroupCall</a>;
+
+<a href='/constructor/updateGroupCall'>updateGroupCall</a>#9d2216e0 flags:<a href='/type/%23'>#</a> live_story:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Peer'>Peer</a> call:<a href='/type/GroupCall'>GroupCall</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/messageActionConferenceCall'>messageActionConferenceCall</a>#2ffe2f7a flags:<a href='/type/%23'>#</a> missed:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> active:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> call_id:<a href='/type/long'>long</a> duration:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> other_participants:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; = <a href='/type/MessageAction'>MessageAction</a>;
+
+<a href='/constructor/inputGroupCall'>inputGroupCall</a>#d8aa840f id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> = <a href='/type/InputGroupCall'>InputGroupCall</a>;
+<a href='/constructor/inputGroupCallSlug'>inputGroupCallSlug</a>#fe06823f slug:<a href='/type/string'>string</a> = <a href='/type/InputGroupCall'>InputGroupCall</a>;
+<a href='/constructor/inputGroupCallInviteMessage'>inputGroupCallInviteMessage</a>#8c10603f msg_id:<a href='/type/int'>int</a> = <a href='/type/InputGroupCall'>InputGroupCall</a>;
+
+---functions---
+
+<a href='/method/phone.createConferenceCall'>phone.createConferenceCall</a>#7d0444bb flags:<a href='/type/%23'>#</a> muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> video_stopped:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> join:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> random_id:<a href='/type/int'>int</a> public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/int256'>int256</a> block:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/bytes'>bytes</a> params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.inviteConferenceCallParticipant'>phone.inviteConferenceCallParticipant</a>#bcf22685 flags:<a href='/type/%23'>#</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> user_id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.joinGroupCall'>phone.joinGroupCall</a>#8fb53057 flags:<a href='/type/%23'>#</a> muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> video_stopped:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> join_as:<a href='/type/InputPeer'>InputPeer</a> invite_hash:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/int256'>int256</a> block:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/bytes'>bytes</a> params:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/Updates'>Updates</a>;
+
+
+<a href='/method/phone.deleteConferenceCallParticipants'>phone.deleteConferenceCallParticipants</a>#8ca60525 flags:<a href='/type/%23'>#</a> only_left:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> kick:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> ids:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; block:<a href='/type/bytes'>bytes</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.sendConferenceCallBroadcast'>phone.sendConferenceCallBroadcast</a>#c6701900 call:<a href='/type/InputGroupCall'>InputGroupCall</a> block:<a href='/type/bytes'>bytes</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.declineConferenceCallInvite'>phone.declineConferenceCallInvite</a>#3c479971 msg_id:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+
+<a href='/method/phone.getGroupCallChainBlocks'>phone.getGroupCallChainBlocks</a>#ee9f88a6 call:<a href='/type/InputGroupCall'>InputGroupCall</a> sub_chain_id:<a href='/type/int'>int</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.sendGroupCallMessage'>phone.sendGroupCallMessage</a>#b1d11410 flags:<a href='/type/%23'>#</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> random_id:<a href='/type/long'>long</a> message:<a href='/type/TextWithEntities'>TextWithEntities</a> allow_paid_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.sendGroupCallEncryptedMessage'>phone.sendGroupCallEncryptedMessage</a>#e5afa56d call:<a href='/type/InputGroupCall'>InputGroupCall</a> encrypted_message:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/phone.deleteGroupCallMessages'>phone.deleteGroupCallMessages</a>#f64f54f7 flags:<a href='/type/%23'>#</a> report_spam:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> messages:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.deleteGroupCallParticipantMessages'>phone.deleteGroupCallParticipantMessages</a>#1dbfeca0 flags:<a href='/type/%23'>#</a> report_spam:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> participant:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.getGroupCallStars'>phone.getGroupCallStars</a>#6f636302 call:<a href='/type/InputGroupCall'>InputGroupCall</a> = <a href='/type/phone.GroupCallStars'>phone.GroupCallStars</a>;
+<a href='/method/phone.saveDefaultSendAs'>phone.saveDefaultSendAs</a>#4167add1 call:<a href='/type/InputGroupCall'>InputGroupCall</a> send_as:<a href='/type/InputPeer'>InputPeer</a> = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>Conference calls (unlike <a href="#group-calls">group calls</a>) are E2E-encrypted and backed by the end-to-end blockchain described in <a href="/api/end-to-end/group-calls#overview">the dedicated E2E conference calls article »</a>.</p>
+<p>Unlike <a href="#group-calls">group calls</a>, they're not linked to a group and always have an <code>invite_link</code>, which can be used to share the call.</p>
+<p>Here's the E2E conference call flow:</p>
+<ol>
+<li>Create the conference with <a href="/method/phone.createConferenceCall">phone.createConferenceCall</a>: this will return an <a href="/constructor/updateGroupCall">updateGroupCall</a> containing the <a href="/constructor/groupCall">groupCall</a> constructor, which also contains the invite link (<code>invite_ink</code>) that other users can use to initially interact with the call.</li>
+<li>Invite users to join the conference either by using the link, or by invoking <a href="/method/phone.inviteConferenceCallParticipant">phone.inviteConferenceCallParticipant</a>, passing an <a href="/constructor/inputGroupCall">inputGroupCall</a> generated from the previously returned <a href="/constructor/groupCall">groupCall</a> and the ID of the user to invite.<br>
+If <a href="/method/phone.inviteConferenceCallParticipant">phone.inviteConferenceCallParticipant</a> is used, the destination user will receive a <a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a> constructor: if <a href="/api/config#call-requests-disabled">the call_requests_disabled client configuration key »</a> is not set or false, an incoming <a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a> with the <code>missed</code> and <code>active</code> flags <strong>not</strong> set should trigger ringing and an incoming call screen, just like for one-on-one calls.</li>
+<li>The newly created conference can be joined by invoking <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a>, passing the following arguments:</li>
+</ol>
+<ul>
+<li><code>call</code>: one of:
+<ul>
+<li><a href="/constructor/inputGroupCall">inputGroupCall</a> if we created the group call and we already have the <a href="/constructor/groupCall">groupCall</a>'s <code>id</code> and <code>access_hash</code></li>
+<li>[inputGroupCallSlug] if we only have a <a href="/api/links#conference-links">conference deep link »</a></li>
+<li><a href="/constructor/inputGroupCallInviteMessage">inputGroupCallInviteMessage</a> if we were invited using <a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a>: <code>msg_id</code> should point to the ID of the <a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a> service message (no need to specify the peer, because <a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a> can only be received in private chats, which share a single ID sequence)</li>
+</ul>
+</li>
+<li><code>join_as</code>: always <a href="/constructor/inputPeerSelf">inputPeerSelf</a> for conference calls</li>
+<li><code>muted</code>: if set, mutes the current</li>
+</ul>
+<p>Conference creators can also use <a href="/method/phone.createConferenceCall">phone.createConferenceCall</a>'s <code>join</code> flag to create and immediately join the conference in a single query, sending the initial <code>public_key</code>, <code>block</code> and local <code>params</code> together with the usual mute/video flags.
+3) To join an existing conference, first synchronize the latest blockchain state with <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a>. After computing the local "add self" block and public key, join the conference with <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a>, this time setting <code>public_key</code> and <code>block</code> in addition to the normal group-call fields. In other words, existing conferences are joined with the same RPC as ordinary group calls, but with extra E2E payloads.
+4) After joining, keep the conference blockchain synchronized: official clients broadcast locally-produced blocks with <a href="/method/phone.sendConferenceCallBroadcast">phone.sendConferenceCallBroadcast</a>, and request more blocks or subchains with <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> whenever they detect gaps.
+5) Manage membership with <a href="/method/phone.inviteConferenceCallParticipant">phone.inviteConferenceCallParticipant</a>, <a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a> and <a href="/method/phone.declineConferenceCallInvite">phone.declineConferenceCallInvite</a>. Telegram Android also uses <code>phoneCallDiscardReasonMigrateConferenceCall</code> when escalating a one-to-one call into a conference call.
+6) Conference message overlays use <a href="/method/phone.sendGroupCallEncryptedMessage">phone.sendGroupCallEncryptedMessage</a> instead of plain <a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a>: official clients serialize the local in-call message object, encrypt it with the conference state, and then send the ciphertext through this RPC.</p>
+<h3><a class="anchor" href="#livestreams" id="livestreams" name="livestreams"><i class="anchor-icon"></i></a>Livestreams</h3>
+<pre><code>---functions---
+<a href='/method/phone.getGroupCallStreamChannels'>phone.getGroupCallStreamChannels</a>#1ab21940 call:<a href='/type/InputGroupCall'>InputGroupCall</a> = <a href='/type/phone.GroupCallStreamChannels'>phone.GroupCallStreamChannels</a>;
+<a href='/method/phone.getGroupCallStreamRtmpUrl'>phone.getGroupCallStreamRtmpUrl</a>#5af4c73a flags:<a href='/type/%23'>#</a> live_story:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> revoke:<a href='/type/Bool'>Bool</a> = <a href='/type/phone.GroupCallStreamRtmpUrl'>phone.GroupCallStreamRtmpUrl</a>;
+</code></pre>
+<p>Livestreams are a special <code>rtmp_stream</code> mode of <a href="/method/phone.createGroupCall">phone.createGroupCall</a>. Official clients still create and join them as group calls, but publishing and playback diverge from normal RTC rooms.</p>
+<ol>
+<li>Create the livestream with <a href="/method/phone.createGroupCall">phone.createGroupCall</a>, setting the <code>rtmp_stream</code> flag. As with ordinary group calls, <code>schedule_date</code> may be used to schedule the start for later.</li>
+<li>Before the stream starts, fetch the RTMP server URL and stream key with <a href="/method/phone.getGroupCallStreamRtmpUrl">phone.getGroupCallStreamRtmpUrl</a>. Telegram Desktop's RTMP start flow and Telegram Android's RTMP sheet both do this before the actual stream begins, and use <code>revoke=true</code> to rotate the key. On Android, <code>live_story</code> is set when requesting RTMP credentials for a live story instead of a chat or channel livestream.</li>
+<li>Publishers still join the call with <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a> and send the usual opaque local <code>params</code>, but the local engine is initialized in RTMP/broadcast mode instead of ordinary RTC mode.</li>
+<li>Viewers and listeners also join with <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a>. The difference is in the returned connection data: both official clients inspect <a href="/constructor/updateGroupCallConnection">updateGroupCallConnection</a> and switch into stream playback mode when the response indicates a broadcast stream instead of a normal RTC session.</li>
+<li>Use <a href="/method/phone.getGroupCallStreamChannels">phone.getGroupCallStreamChannels</a> to fetch the currently available stream channels and the latest stream timestamp. Official clients use this both when first attaching to a livestream and later while requesting playback time updates; the media chunks themselves are then downloaded from the <code>stream_dc_id</code> download DC via <a href="/method/upload.getFile">upload.getFile</a> with <code>inputGroupCallStream</code>.</li>
+<li>The same transient in-call message overlay used by group calls and livestreams is sent with <a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a>. In livestreams, official clients also use its <code>allow_paid_stars</code> and <code>send_as</code> fields for paid messages/reactions and for choosing the commenting identity; persist the preferred identity with <a href="/method/phone.saveDefaultSendAs">phone.saveDefaultSendAs</a>.</li>
+<li>Use <a href="/method/phone.getGroupCallStars">phone.getGroupCallStars</a> to fetch the current livestream donor/paid-message leaderboard. Moderation of the message overlay uses <a href="/method/phone.deleteGroupCallMessages">phone.deleteGroupCallMessages</a> to remove specific messages and <a href="/method/phone.deleteGroupCallParticipantMessages">phone.deleteGroupCallParticipantMessages</a> to purge all messages from one participant; both official clients process the corresponding delete updates to remove the local message bubbles.</li>
+<li>Livestream comments and similar viewer-facing settings still live on the underlying group call object. For example, official Android clients use <a href="/method/phone.toggleGroupCallSettings">phone.toggleGroupCallSettings</a> with <code>messages_enabled</code> to enable or disable livestream comments.</li>
+</ol>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/moderation">Safety</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?47"></script>
+    <script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
