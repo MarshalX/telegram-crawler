@@ -541,14 +541,17 @@ var BotCommandEdit = {
       }
     })
 
+    var ephemeral = $('.tm-toggle', '[data-field=ephemeral]').hasClass('tm-toggle-on');
+
     WebApp.MainButton.showProgress();
     Aj.apiRequest('setCommand', { 
       bid: Aj.state.botId,
       lang_code: Aj.state.lang || '',
       scopes: scopes,
       command: value, 
-      description: desc, 
+      description: desc,
       replace: Aj.state.editingCommand || '',
+      ephemeral: ephemeral,
     }, (res) => {
       if (res.error) {
         WebApp.MainButton.hideProgress();
