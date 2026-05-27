@@ -695,6 +695,9 @@ var BotSettings = {
       if (field == 'gst') {
         botChangeSettings(field, value);
       }
+      if (field == 'grd') {
+        botChangeSettings(field, value);
+      }
       if (field == 'access') {
         botChangeSettings(field, value);
         $('.js-access-users').toggleClass('hidden', !value);
