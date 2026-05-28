@@ -67,14 +67,16 @@
 <h4><a class="anchor" href="#joining-a-call" id="joining-a-call" name="joining-a-call"><i class="anchor-icon"></i></a>Joining a Call</h4>
 <ol>
 <li><strong>Fetch State:</strong> A user wishing to join requests the latest blockchain block (representing the current call state) from the server.</li>
-<li><strong>Create Join Block:</strong> The user constructs a new block proposal. This block:<ul>
+<li><strong>Create Join Block:</strong> The user constructs a new block proposal. This block:
+<ul>
 <li>References the previous block's hash.</li>
 <li>Includes a <code>ChangeSetGroupState</code> change adding the user to the participant list.</li>
 <li>Includes a <code>ChangeSetSharedKey</code> change establishing a new shared key, encrypted for all participants (including the joining user). The joining user <em>must</em> be listed as a participant in the group state change <em>within the same block</em> to be able to create the shared key.</li>
 </ul>
 </li>
 <li><strong>Submit Block:</strong> The user sends this proposed block to the server.</li>
-<li><strong>Server Validation &amp; Broadcast:</strong> The server validates the block (ensuring it only adds the joining user, follows sequence rules, etc.).<ul>
+<li><strong>Server Validation &amp; Broadcast:</strong> The server validates the block (ensuring it only adds the joining user, follows sequence rules, etc.).
+<ul>
 <li>If the block is valid and no conflicting block for the same height has already been accepted, the server applies it and broadcasts the new block to all current participants.</li>
 <li>If the block is invalid or a conflict exists (e.g., another user joined simultaneously, resulting in a block at the same height), the operation fails, and the user may need to retry starting from the latest block.</li>
 </ul>
@@ -84,7 +86,8 @@
 <h4><a class="anchor" href="#removing-a-participant" id="removing-a-participant" name="removing-a-participant"><i class="anchor-icon"></i></a>Removing a Participant</h4>
 <ol>
 <li><strong>Initiation:</strong> Any active participant with the necessary permissions (<code>remove_users</code> flag) can initiate the removal of another (e.g., inactive) participant.</li>
-<li><strong>Create Removal Block:</strong> The initiating participant creates a block proposal containing:<ul>
+<li><strong>Create Removal Block:</strong> The initiating participant creates a block proposal containing:
+<ul>
 <li>A <code>ChangeSetGroupState</code> change removing the target participant.</li>
 <li>A subsequent <code>ChangeSetSharedKey</code> change establishing a new key encrypted only for the <em>remaining</em> participants.</li>
 </ul>
@@ -105,7 +108,8 @@
 <p>A dedicated blockchain provides a distributed, verifiable, and synchronized history of the group call's state.</p>
 <h4><a class="anchor" href="#block-structure" id="block-structure" name="block-structure"><i class="anchor-icon"></i></a>Block Structure</h4>
 <p>Blocks form the chain, linking sequentially to maintain history. The structure is defined as follows (based on <code>e2e_api.tl</code>):</p>
-<pre><code class="language-tlang">e2e.chain.block flags:# signature:int512 prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;</code></pre>
+<pre><code class="language-tlang">e2e.chain.block flags:# signature:int512 prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;
+</code></pre>
 <p>Namely:</p>
 <ul>
 <li><code>signature</code>: A cryptographic signature verifying the block's authenticity.</li>
@@ -116,13 +120,14 @@
 <li><code>signature_public_key</code>: The public key of the participant who created and signed the block.</li>
 </ul>
 <h4><a class="anchor" href="#blockchain-state" id="blockchain-state" name="blockchain-state"><i class="anchor-icon"></i></a>Blockchain State</h4>
-<pre><code class="language-tlang">e2e.chain.stateProof flags:# kv_hash:int256 group_state:flags.0?e2e.chain.GroupState shared_key:flags.1?e2e.chain.SharedKey = e2e.chain.StateProof;</code></pre>
+<pre><code class="language-tlang">e2e.chain.stateProof flags:# kv_hash:int256 group_state:flags.0?e2e.chain.GroupState shared_key:flags.1?e2e.chain.SharedKey = e2e.chain.StateProof;
+</code></pre>
 <p>Blockchain states consist of:</p>
-<ol>
-<li><strong>Group State</strong>: List of group participants and their permissions.</li>
-<li><strong>Shared Key</strong>: Shared group key encrypted for each group participant.</li>
-<li><strong>Key Value Storage</strong>: This is out of scope of the current document.</li>
-</ol>
+<ul>
+<li><code>kv_hash</code> - <strong>Key Value Storage hash</strong>: This is out of scope of the current document.</li>
+<li><code>group_state</code> - <strong>Group State</strong>: List of group participants and their permissions.</li>
+<li><code>shared_key</code> - <strong>Shared Key</strong>: Shared group key encrypted for each group participant.</li>
+</ul>
 <h4><a class="anchor" href="#signature-and-hash-generation" id="signature-and-hash-generation" name="signature-and-hash-generation"><i class="anchor-icon"></i></a>Signature and Hash Generation</h4>
 <ul>
 <li><strong>Signature:</strong> Calculated over the TL-serialized block with the <code>signature</code> field itself zeroed out. The specific serialization format follows standard TL rules.</li>
@@ -131,19 +136,26 @@
 <h4><a class="anchor" href="#change-types-for-group-calls" id="change-types-for-group-calls" name="change-types-for-group-calls"><i class="anchor-icon"></i></a>Change Types for Group Calls</h4>
 <p>Blocks contain changes that modify the blockchain state. The types used in group calls are:</p>
 <ol>
-<li><strong>ChangeSetGroupState</strong>: Modifies the list of participants and their permissions. This action <em>clears</em> the current shared key, requiring a subsequent <code>ChangeSetSharedKey</code> in a later block if encryption is needed.<pre><code class="language-tlang">e2e.chain.groupParticipant user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
+<li><strong>ChangeSetGroupState</strong>: Modifies the list of participants and their permissions. This action <em>clears</em> the current shared key, requiring a subsequent <code>ChangeSetSharedKey</code> in a later block if encryption is needed.
+<pre><code class="language-tlang">e2e.chain.groupParticipant user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
 e2e.chain.groupState participants:vector&lt;e2e.chain.GroupParticipant&gt; = e2e.chain.GroupState;
-e2e.chain.changeSetGroupState group_state:e2e.chain.GroupState = e2e.chain.Change;</code></pre>
+e2e.chain.changeSetGroupState group_state:e2e.chain.GroupState = e2e.chain.Change;
+</code></pre>
 </li>
-<li><strong>ChangeSetSharedKey</strong>: Establishes a new shared encryption key, encrypted individually for each listed participant.<pre><code class="language-tlang">e2e.chain.sharedKey ek:int256 encrypted_shared_key:string dest_user_id:vector&lt;long&gt; dest_header:vector&lt;bytes&gt; = e2e.chain.SharedKey;
-e2e.chain.changeSetSharedKey shared_key:e2e.chain.SharedKey = e2e.chain.Change;</code></pre>
+<li><strong>ChangeSetSharedKey</strong>: Establishes a new shared encryption key, encrypted individually for each listed participant.
+<pre><code class="language-tlang">e2e.chain.sharedKey ek:int256 encrypted_shared_key:string dest_user_id:vector&lt;long&gt; dest_header:vector&lt;bytes&gt; = e2e.chain.SharedKey;
+e2e.chain.changeSetSharedKey shared_key:e2e.chain.SharedKey = e2e.chain.Change;
+</code></pre>
 </li>
-<li><strong>ChangeNoop</strong>: A no-operation change, potentially used for hash randomization. Must be present in the initial "zero block".<pre><code class="language-tlang">e2e.chain.changeNoop random:int256 = e2e.chain.Change;</code></pre>
+<li><strong>ChangeNoop</strong>: A no-operation change, potentially used for hash randomization. Must be present in the initial "zero block".
+<pre><code class="language-tlang">e2e.chain.changeNoop random:int256 = e2e.chain.Change;
+</code></pre>
 </li>
 </ol>
 <h4><a class="anchor" href="#participants-and-permissions" id="participants-and-permissions" name="participants-and-permissions"><i class="anchor-icon"></i></a>Participants and Permissions</h4>
 <p>Participants are defined by their <code>user_id</code>, <code>public_key</code>, and associated permissions within the <code>GroupState</code>:</p>
-<pre><code class="language-tlang">e2e.chain.groupParticipant user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;</code></pre>
+<pre><code class="language-tlang">e2e.chain.groupParticipant user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
+</code></pre>
 <ul>
 <li><code>add_users</code>: Permission to add new participants.</li>
 <li><code>remove_users</code>: Permission to remove existing participants.</li>
@@ -158,7 +170,8 @@ e2e.chain.changeSetSharedKey shared_key:e2e.chain.SharedKey = e2e.chain.Change;<
 <li><strong>Previous Hash Check:</strong> The block's <code>prev_block_hash</code> must match the hash of the last applied block. If not, the block is invalid.</li>
 <li><strong>Permission Check (Initial):</strong> Determine the permissions of the block creator (identified by <code>signature_public_key</code>). Permissions are sourced from the <em>previous</em> block's state or <code>external_permissions</code> if the creator wasn't already a participant.</li>
 <li><strong>Signature Verification:</strong> Verify the block's <code>signature</code> using the creator's public key. If invalid, the block is rejected.</li>
-<li><strong>Apply Changes Sequentially:</strong> Iterate through the <code>changes</code> vector:<ul>
+<li><strong>Apply Changes Sequentially:</strong> Iterate through the <code>changes</code> vector:
+<ul>
 <li>Verify the creator has sufficient permissions for the specific change, using their <em>current</em> permissions (which might have been updated by a previous change <em>within the same block</em>). If permissions are insufficient, the entire block is invalid.</li>
 <li>Apply the change to the state (updating the group state or shared key info). If the change itself is malformed or invalid (e.g., invalid participant data), the entire block is invalid.</li>
 </ul>
@@ -171,14 +184,16 @@ e2e.chain.changeSetSharedKey shared_key:e2e.chain.SharedKey = e2e.chain.Change;<
 </blockquote>
 <h4><a class="anchor" href="#applying-specific-changes" id="applying-specific-changes" name="applying-specific-changes"><i class="anchor-icon"></i></a>Applying Specific Changes</h4>
 <ul>
-<li><strong>Participant Management (<code>ChangeSetGroupState</code>):</strong><ul>
+<li><strong>Participant Management (<code>ChangeSetGroupState</code>):</strong>
+<ul>
 <li>Requires the <code>add_users</code> permission to add participants. Added users receive permissions that are a non-strict subset of the creator's permissions (with an exception allowing granting permissions to others).</li>
 <li>Requires the <code>remove_users</code> permission to remove participants.</li>
 <li>Participant <code>user_id</code> and <code>public_key</code> must be unique.</li>
 <li>This change <em>always clears</em> the existing shared key state. A new key must be set in a subsequent block if needed.</li>
 </ul>
 </li>
-<li><strong>Shared Key Updates (<code>ChangeSetSharedKey</code>):</strong><ul>
+<li><strong>Shared Key Updates (<code>ChangeSetSharedKey</code>):</strong>
+<ul>
 <li>Can only be initiated by an existing participant.</li>
 <li>Cannot overwrite an existing key directly; requires a <code>ChangeSetGroupState</code> (which clears the key) first, followed by a new <code>ChangeSetSharedKey</code> in a subsequent block.</li>
 <li>The <code>dest_user_id</code> list in the <code>SharedKey</code> structure must exactly match the current list of participants in the group state.</li>
@@ -222,7 +237,8 @@ large_msg_id = HMAC-SHA256(hmac_secret, padded_data || extra_data || len(extra_d
 msg_id = large_msg_id[0:16]
 (aes_key, aes_iv) = HMAC-SHA512(encrypt_secret, msg_id)[0:48]
 encrypted = aes_cbc(aes_key, aes_iv, padded_data)
-Result: (msg_id || encrypted), large_msg_id</code></pre>
+Result: (msg_id || encrypted), large_msg_id
+</code></pre>
 <ul>
 <li><strong>encrypt_header(header, encrypted_msg, secret)</strong></li>
 </ul>
@@ -237,7 +253,8 @@ Result: (msg_id || encrypted), large_msg_id</code></pre>
 <pre><code>msg_id = encrypted_msg[0:16]
 encrypt_secret = KDF(secret, "tde2e_encrypt_header")[0:32]
 (aes_key, aes_iv) = HMAC-SHA512(encrypt_secret, msg_id)[0:48]
-encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
+encrypted_header = aes_cbc(aes_key, aes_iv, header)
+</code></pre>
 <p><strong>Security:</strong></p>
 <ul>
 <li>Decryption routines <strong>must</strong> re-calculate and verify the <code>msg_id</code> before processing the decrypted payload.</li>
@@ -282,7 +299,8 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 <li>
 <p><strong>Generate Header B (Encrypted One-Time Keys):</strong></p>
 <ul>
-<li>For each <code>i</code> in <code>active_epochs</code>:<ul>
+<li>For each <code>i</code> in <code>active_epochs</code>:
+<ul>
 <li><code>encrypted_key[i] = encrypt_header(one_time_key, encrypted_payload, active_epochs[i].shared_key)</code></li>
 </ul>
 </li>
@@ -321,7 +339,8 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 <li>
 <p><strong>Encrypt <code>one_time_secret</code> for Each Participant:</strong></p>
 <ul>
-<li>For each <code>participant</code> in the current group state:<ul>
+<li>For each <code>participant</code> in the current group state:
+<ul>
 <li><code>shared_secret = compute_shared_secret(e_private_key, participant.public_key)</code></li>
 <li><code>encrypted_header = encrypt_header(one_time_secret, encrypted_group_shared_key, shared_secret)</code></li>
 </ul>
@@ -335,7 +354,7 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 <p><strong>Generate the real shared key used for packets encryption:</strong></p>
 <ul>
 <li><code>block_hash</code> is the hash of the block where this shared key is set.</li>
-<li><code>group_shared_key</code> = <code>HMAC-SHA512(raw_group_shared_key, block_hash)[0:32]</code> </li>
+<li><code>group_shared_key</code> = <code>HMAC-SHA512(raw_group_shared_key, block_hash)[0:32]</code></li>
 </ul>
 </li>
 </ol>
@@ -389,7 +408,8 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)</code></pre>
 e2e.chain.groupBroadcastNonceCommit signature:int512 public_key:int256 chain_height:int32 chain_hash:int256 nonce_hash:int256 = e2e.chain.GroupBroadcast;
 
 // Phase 2: Reveal
-e2e.chain.groupBroadcastNonceReveal signature:int512 public_key:int256 chain_height:int32 chain_hash:int256 nonce:int256 = e2e.chain.GroupBroadcast;</code></pre>
+e2e.chain.groupBroadcastNonceReveal signature:int512 public_key:int256 chain_height:int32 chain_hash:int256 nonce:int256 = e2e.chain.GroupBroadcast;
+</code></pre>
 <p>The <code>signature</code> in both cases covers the TL-serialized object with the signature field itself zeroed out.</p>
 <h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
@@ -416,7 +436,9 @@ e2e.chain.stateProof flags:# kv_hash:int256 group_state:flags.0?e2e.chain.GroupS
 e2e.chain.block#639a3db6 signature:int512 flags:# prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;
 
 e2e.callPacket = e2e.CallPacket;
-e2e.callPacketLargeMsgId = e2e.CallPacketLargeMsgId;</code></pre></div>
+e2e.callPacketLargeMsgId = e2e.CallPacketLargeMsgId;
+</code></pre>
+</div>
   
 </div>
           
