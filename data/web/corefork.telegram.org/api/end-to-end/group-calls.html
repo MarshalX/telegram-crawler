@@ -48,6 +48,7 @@
 <h5><a class="anchor" href="#related-articles" id="related-articles" name="related-articles"><i class="anchor-icon"></i></a>Related Articles</h5>
 <p><div class="dev_page_nav_wrap"></p>
 <ul>
+<li><a href="/api/group-calls">Group calls (API overview) »</a></li>
 <li><a href="/api/end-to-end">End-to-End Encryption in Secret Chats</a></li>
 <li><a href="/mtproto/security_guidelines">Security Guidelines for Client Developers</a></li>
 <li><a href="/mtproto/TL">TL Language</a></li>
@@ -81,7 +82,7 @@
 <li>If the block is invalid or a conflict exists (e.g., another user joined simultaneously, resulting in a block at the same height), the operation fails, and the user may need to retry starting from the latest block.</li>
 </ul>
 </li>
-<li><strong>Client Update:</strong> Eventually, all participants receive the new block from the server, apply it locally, and start accepting packets encrypted for the new epoch.
+<li><strong>Client Update:</strong> Eventually, all participants receive the new block from the server, apply it locally, and start accepting packets encrypted for the new epoch.<br>
 Every time the client accepts a <a href="#subchains">main subchain</a> (<code>subchain=0</code>) block, it must immediately generate a fresh nonce commitment message bound to the new block height and hash, submit it through the <a href="#subchains">broadcast subchain</a> (<code>subchain=1</code>), and wait for the commit-reveal protocol described below to complete before displaying verification emojis for that state.</li>
 </ol>
 <h4><a class="anchor" href="#removing-a-participant" id="removing-a-participant" name="removing-a-participant"><i class="anchor-icon"></i></a>Removing a Participant</h4>
@@ -95,9 +96,8 @@ Every time the client accepts a <a href="#subchains">main subchain</a> (<code>su
 </li>
 <li><strong>Submit &amp; Broadcast:</strong> Similar to joining, the block is submitted to the server, validated, and broadcast to the remaining participants upon success.</li>
 </ol>
-<blockquote>
 <p><strong>Note:</strong> Self-removal is not supported via this mechanism, as a participant cannot create a block that removes themselves while simultaneously generating a new key for the others.</p>
-</blockquote>
+<p>After a user leaves their media connection with <a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a>, any other active participant with the <code>remove_users</code> permission will prune that user from the E2E group state.</p>
 <h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li>Clients <strong>must</strong> only apply blocks received from the server, even those they proposed themselves. The server enforces block ordering and prevents forks.</li>
@@ -127,11 +127,11 @@ Every time the client accepts a <a href="#subchains">main subchain</a> (<code>su
 </code></pre>
 <p>E2E-call schema:</p>
 <pre><code class="language-tlang">// Chain 0 blocks
-e2e.chain.block#639a3db6 signature:int512 flags:# prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;
+<a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
 
 // Chain 1 blocks
-e2e.chain.groupBroadcastNonceCommit#d1512ae7 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce_hash:int256 = e2e.chain.GroupBroadcast;
-e2e.chain.groupBroadcastNonceReveal#83f4f9d8 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce:int256 = e2e.chain.GroupBroadcast;
+<a href='/constructor/e2e.chain.groupBroadcastNonceCommit'>e2e.chain.groupBroadcastNonceCommit</a>#d1512ae7 signature:<a href='/type/int512'>int512</a> user_id:<a href='/type/int64'>int64</a> chain_height:<a href='/type/int32'>int32</a> chain_hash:<a href='/type/int256'>int256</a> nonce_hash:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.GroupBroadcast'>e2e.chain.GroupBroadcast</a>;
+<a href='/constructor/e2e.chain.groupBroadcastNonceReveal'>e2e.chain.groupBroadcastNonceReveal</a>#83f4f9d8 signature:<a href='/type/int512'>int512</a> user_id:<a href='/type/int64'>int64</a> chain_height:<a href='/type/int32'>int32</a> chain_hash:<a href='/type/int256'>int256</a> nonce:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.GroupBroadcast'>e2e.chain.GroupBroadcast</a>;
 </code></pre>
 <p>Currently, each and every conference call has two independent blockchains, independent from other calls and from each other.</p>
 <p>These two blockchains are identified by their subchain ID:</p>
@@ -169,8 +169,8 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <p>When <strong>submitting</strong> blocks to the server, use the canonical constructor IDs (<code>639a3db6</code>, <code>d1512ae7</code>, <code>83f4f9d8</code>).</p>
 <p>Clients must apply both main-chain blocks and verification messages only from the server: this includes blocks and verification messages created by the local client, apply only the blocks echoed back from the server.</p>
 <h4><a class="anchor" href="#block-structure" id="block-structure" name="block-structure"><i class="anchor-icon"></i></a>Block Structure</h4>
-<p>Blocks form the chain, linking sequentially to maintain history. The structure is defined as follows (based on <code>e2e_api.tl</code>):</p>
-<pre><code class="language-tlang">e2e.chain.block#639a3db6 signature:int512 flags:# prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;
+<p>Blocks form the chain, linking sequentially to maintain history. The structure is defined as follows:</p>
+<pre><code class="language-tlang"><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
 </code></pre>
 <p>Namely:</p>
 <ul>
@@ -187,12 +187,12 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <li><strong>Block Hash:</strong> The SHA256 hash of the complete TL-serialized block.</li>
 </ul>
 <h4><a class="anchor" href="#blockchain-state" id="blockchain-state" name="blockchain-state"><i class="anchor-icon"></i></a>Blockchain State</h4>
-<pre><code class="language-tlang">e2e.chain.stateProof#d6b679e6 flags:# kv_hash:int256 group_state:flags.0?e2e.chain.GroupState shared_key:flags.1?e2e.chain.SharedKey = e2e.chain.StateProof;
+<pre><code class="language-tlang"><a href='/constructor/e2e.chain.stateProof'>e2e.chain.stateProof</a>#d6b679e6 flags:<a href='/type/%23'>#</a> kv_hash:<a href='/type/int256'>int256</a> group_state:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a> shared_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a> = <a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a>;
 
-e2e.chain.groupState#1ddc7584 participants:vector&lt;e2e.chain.GroupParticipant&gt; external_permissions:int = e2e.chain.GroupState;
-e2e.chain.groupParticipant#28852f20 user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
+<a href='/constructor/e2e.chain.groupState'>e2e.chain.groupState</a>#1ddc7584 participants:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>&gt; external_permissions:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a>;
+<a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
 
-e2e.chain.sharedKey#8a847e7f ek:int256 encrypted_shared_key:string dest_user_id:vector&lt;long&gt; dest_header:vector&lt;bytes&gt; = e2e.chain.SharedKey;
+<a href='/constructor/e2e.chain.sharedKey'>e2e.chain.sharedKey</a>#8a847e7f ek:<a href='/type/int256'>int256</a> encrypted_shared_key:<a href='/type/string'>string</a> dest_user_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; dest_header:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; = <a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a>;
 </code></pre>
 <p>Blockchain states consist of:</p>
 <ul>
@@ -230,7 +230,7 @@ e2e.chain.sharedKey#8a847e7f ek:int256 encrypted_shared_key:string dest_user_id:
 <li><code>shared_key=*empty*</code></li>
 </ul>
 <h4><a class="anchor" href="#versioning" id="versioning" name="versioning"><i class="anchor-icon"></i></a>Versioning</h4>
-<pre><code>e2e.chain.groupParticipant#28852f20 user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
+<pre><code><a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
 </code></pre>
 <p>The E2E group call encryption protocol specified in this article may change in the future: to preserve backwards-compatibility with clients that do not support newer protocols yet, each participant must announce its maximum supported version in <code>e2e.chain.groupParticipant.version</code>.</p>
 <p>The protocol version used when generating and applying blocks must be equal to the smallest <code>version</code> contained in the participant list.</p>
@@ -240,12 +240,12 @@ e2e.chain.sharedKey#8a847e7f ek:int256 encrypted_shared_key:string dest_user_id:
 <li>Version <code>1</code>: The shared group key now <strong>must</strong> be hashed via <code>HMAC-SHA512(raw_group_shared_key, block_hash)[0:32]</code> before use (step 5 in <a href="#shared-key-encryption">shared key encryption »</a>).</li>
 </ul>
 <h4><a class="anchor" href="#change-types-for-group-calls" id="change-types-for-group-calls" name="change-types-for-group-calls"><i class="anchor-icon"></i></a>Change Types for Group Calls</h4>
-<pre><code>e2e.chain.block#639a3db6 signature:int512 flags:# prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;
+<pre><code><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
 
-e2e.chain.changeSetGroupState#2cf17146 group_state:e2e.chain.GroupState = e2e.chain.Change;
-e2e.chain.changeSetSharedKey#987a2158 shared_key:e2e.chain.SharedKey = e2e.chain.Change;
-e2e.chain.changeSetValue#7c4f9bfa key:bytes value:bytes = e2e.chain.Change;
-e2e.chain.changeNoop#deb4a41b nonce:int256 = e2e.chain.Change;
+<a href='/constructor/e2e.chain.changeSetGroupState'>e2e.chain.changeSetGroupState</a>#2cf17146 group_state:<a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
+<a href='/constructor/e2e.chain.changeSetSharedKey'>e2e.chain.changeSetSharedKey</a>#987a2158 shared_key:<a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
+<a href='/constructor/e2e.chain.changeSetValue'>e2e.chain.changeSetValue</a>#7c4f9bfa key:<a href='/type/bytes'>bytes</a> value:<a href='/type/bytes'>bytes</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
+<a href='/constructor/e2e.chain.changeNoop'>e2e.chain.changeNoop</a>#deb4a41b nonce:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
 </code></pre>
 <p>Blocks contain changes that modify the blockchain state.</p>
 <p>A block must contain <em>at least</em> a <code>ChangeSetGroupState</code> or a <code>ChangeSetValue</code>.<br>
@@ -254,9 +254,9 @@ A block containing only <code>ChangeNoop</code> or only <code>ChangeSetSharedKey
 <ol>
 <li>
 <p><strong>ChangeSetGroupState</strong>: Modifies the list of participants and their permissions. This action <em>clears</em> the current shared key, requiring a subsequent <code>ChangeSetSharedKey</code> <strong>within the same block</strong>.</p>
-<pre><code class="language-tlang">e2e.chain.groupParticipant#28852f20 user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
-e2e.chain.groupState#1ddc7584 participants:vector&lt;e2e.chain.GroupParticipant&gt; external_permissions:int = e2e.chain.GroupState;
-e2e.chain.changeSetGroupState#2cf17146 group_state:e2e.chain.GroupState = e2e.chain.Change;
+<pre><code class="language-tlang"><a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
+<a href='/constructor/e2e.chain.groupState'>e2e.chain.groupState</a>#1ddc7584 participants:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>&gt; external_permissions:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a>;
+<a href='/constructor/e2e.chain.changeSetGroupState'>e2e.chain.changeSetGroupState</a>#2cf17146 group_state:<a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
 </code></pre>
 <p>The initial local value of the local <code>group_state</code> when at the conceptual <code>height=-1</code>, <strong>only</strong> used when applying the first block of the blockchain with <code>height=0</code>, must be equal to:</p>
 <ul>
@@ -271,13 +271,13 @@ e2e.chain.changeSetGroupState#2cf17146 group_state:e2e.chain.GroupState = e2e.ch
 <p>Initialize <code>incoming_group_state</code> with the incoming <code>e2e.chain.GroupState</code>.</p>
 </li>
 <li>
-<p>Initialize <code>local_permissions</code> with the permissions of the block's author, looked up in <code>local_group_state.participants</code> based on block's <code>signature_public_key</code>: if no matching entry can be found for the public key, fallback to <code>local_group_state.external_permission</code>.</p>
+<p>Initialize <code>local_permissions</code> with the permissions of the block's author, looked up in <code>local_group_state.participants</code> based on block's <code>signature_public_key</code>: if no matching entry can be found for the public key, fallback to <code>local_group_state.external_permissions</code>.</p>
 </li>
 <li>
-<p>Validate that <code>incoming_group_state.external_permission</code> is exactly equal to or a subset of <code>add_users | remove_users | set_value</code> (don't allow unknown flags)</p>
+<p>Validate that <code>incoming_group_state.external_permissions</code> is exactly equal to or a subset of <code>add_users | remove_users | set_value</code> (don't allow unknown flags)</p>
 </li>
 <li>
-<p>Validate that <code>incoming_group_state.external_permission</code> is equal to or is a strict subset of <code>local_group_state.external_permission</code>, i.e. <code>(incoming_group_state-&gt;external_permissions &amp; ~local_group_state-&gt;external_permissions) == 0</code>.<br>
+<p>Validate that <code>incoming_group_state.external_permissions</code> is equal to or is a strict subset of <code>local_group_state.external_permissions</code>, i.e. <code>(incoming_group_state-&gt;external_permissions &amp; ~local_group_state-&gt;external_permissions) == 0</code>.<br>
 In other words, <code>external_permissions</code> cannot be increased compared to the previous state, though it may be reduced.</p>
 </li>
 <li>
@@ -287,14 +287,14 @@ In other words, <code>external_permissions</code> cannot be increased compared t
 <p>Validate that all <code>public_key</code> values are unique across <code>incoming_group_state.participants</code></p>
 </li>
 <li>
-<p>Validate <code>incoming_group_state.participants</code>: note that in this context, each participant must be uniquely identified by <strong>both</strong> the <code>user_id</code> <strong>and</strong> the <code>public_key</code> fields (i.e. generate a new combined identifier by concatenating the binary version of <code>user_id</code> and <code>public_key</code>).</p>
+<p>Validate <code>incoming_group_state.participants</code>: note that in this context, each participant must be uniquely identified by <strong>both</strong> the <code>user_id</code> <strong>and</strong> the <code>public_key</code> fields (i.e. generate a new combined identifier by concatenating the binary version of <code>user_id</code> and <code>public_key</code>), this is used when comparing participants in the local and incoming list.</p>
 <ul>
 <li>Validate that the <code>flags</code> of all <code>incoming_group_state.participants</code> are exactly equal to or a subset of <code>add_users | remove_users | set_value</code> (don't allow unknown flags)</li>
 <li>If at least one participant present in <code>local_group_state.participants</code> is <strong>not</strong> present in <code>incoming_group_state.participants</code>, validate that <code>local_permissions</code> contains <code>remove_users</code> (the block signer must have the <code>remove_users</code> permission to remove users)</li>
 <li>For all participants present in <code>incoming_group_state.participants</code> but <strong>not</strong> present in <code>local_group_state.participants</code>:
 <ul>
-<li>Validate that <code>local_permissions</code> contains <code>add_users</code> (the block signer must have the <code>add_users</code> permission to remove users, or <code>add_users</code> must be present in <code>local_group_state.external_permission</code> for self-add blocks)</li>
-<li>Validate that <code>incoming_participant.flags</code> is equal to or is a subset of <code>local_permissions</code> (a newly added user cannot have more permissions than the adder, or more permissions than <code>local_group_state.external_permission</code> for self-add blocks)</li>
+<li>Validate that <code>local_permissions</code> contains <code>add_users</code> (the block signer must have the <code>add_users</code> permission to remove users, or <code>add_users</code> must be present in <code>local_group_state.external_permissions</code> for self-add blocks)</li>
+<li>Validate that <code>incoming_participant.flags</code> is equal to or is a subset of <code>local_permissions</code> (a newly added user cannot have more permissions than the adder, or more permissions than <code>local_group_state.external_permissions</code> for self-add blocks)</li>
 </ul>
 </li>
 <li>For all participants present <strong>both</strong> in <code>incoming_group_state.participants</code> <strong>and</strong> <code>local_group_state.participants</code>, if the local <code>flags</code> field differs from the incoming <code>flags</code> field:
@@ -316,20 +316,17 @@ A new key <strong>must</strong> be set by a subsequent <code>ChangeSetSharedKey<
 </ul>
 <p>Please note that these state updates (like all other state updates triggered by all change types) <strong>must</strong> be rolled back if any of the changes within the current block fails validation.</p>
 <p>One of the reasons why all changes must be applied to the local state even if the entire block wasn't processed yet (and then rolled back on error) is because the <code>ChangeSetSharedKey</code> that <strong>must</strong> follow a <code>ChangeSetGroupState</code> relies on the user being already present in the local participant list.</p>
-<blockquote>
-<p><strong>Note:</strong> The public conference-call API does not use self-removal blocks. A user leaves their media connection with <a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a>, and another active participant with the <code>remove_users</code> permission can later prune that user from the E2E group state.</p>
-</blockquote>
 </li>
 <li>
 <p><strong>ChangeSetSharedKey</strong>: Establishes a new shared encryption key, encrypted individually for each listed participant.</p>
-<pre><code class="language-tlang">e2e.chain.sharedKey#8a847e7f ek:int256 encrypted_shared_key:string dest_user_id:vector&lt;long&gt; dest_header:vector&lt;bytes&gt; = e2e.chain.SharedKey;
-e2e.chain.changeSetSharedKey#987a2158 shared_key:e2e.chain.SharedKey = e2e.chain.Change;
+<pre><code class="language-tlang"><a href='/constructor/e2e.chain.sharedKey'>e2e.chain.sharedKey</a>#8a847e7f ek:<a href='/type/int256'>int256</a> encrypted_shared_key:<a href='/type/string'>string</a> dest_user_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; dest_header:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; = <a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a>;
+<a href='/constructor/e2e.chain.changeSetSharedKey'>e2e.chain.changeSetSharedKey</a>#987a2158 shared_key:<a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
 </code></pre>
 <p>To apply incoming changes of this type, follow these steps:</p>
 <ul>
-<li>Validate that the local state does <strong>not</strong> contain the shared encryption key (this can happen if the call was just initialized, or if the key was cleared by a previous <code>ChangeSetGroupState</code>)</li>
+<li>Validate that the local state does <strong>not</strong> contain the shared encryption key (in other words, only apply the change if the call was just initialized, or if the key was cleared by a previous <code>ChangeSetGroupState</code>)</li>
 <li>Initialize <code>local_group_state</code> with the locally stored <code>e2e.chain.GroupState</code>, before the application of this change.</li>
-<li>Initialize <code>local_permissions</code> with the permissions of the block's author, looked up in <code>local_group_state.participants</code> based on block's <code>signature_public_key</code>, abort validation if no matching entry can be found for the public key: <strong>do not</strong> fallback to <code>local_group_state.external_permission</code>.</li>
+<li>Initialize <code>local_permissions</code> with the permissions of the block's author, looked up in <code>local_group_state.participants</code> based on block's <code>signature_public_key</code>, abort validation if no matching entry can be found for the public key: <strong>do not</strong> fallback to <code>local_group_state.external_permissions</code>.</li>
 <li>Validate that <code>local_permissions</code> contains <code>add_users</code> and/or <code>remove_users</code></li>
 <li>Validate that <code>dest_user_id</code> and <code>dest_header</code> contain the same number of elements</li>
 <li>Validate that <code>dest_user_id</code> doesn't contain duplicated user IDs</li>
@@ -339,7 +336,7 @@ e2e.chain.changeSetSharedKey#987a2158 shared_key:e2e.chain.SharedKey = e2e.chain
 </li>
 <li>
 <p><strong>ChangeSetValue</strong>: Updates the key-value trie.</p>
-<pre><code class="language-tlang">e2e.chain.changeSetValue#7c4f9bfa key:bytes value:bytes = e2e.chain.Change;
+<pre><code class="language-tlang"><a href='/constructor/e2e.chain.changeSetValue'>e2e.chain.changeSetValue</a>#7c4f9bfa key:<a href='/type/bytes'>bytes</a> value:<a href='/type/bytes'>bytes</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
 </code></pre>
 <p>Clients that do not implement the key-value trie must still store the latest accepted <code>kv_hash</code>, and handle blockchain updates as follows:</p>
 <ul>
@@ -349,7 +346,7 @@ e2e.chain.changeSetSharedKey#987a2158 shared_key:e2e.chain.SharedKey = e2e.chain
 </li>
 <li>
 <p><strong>ChangeNoop</strong>: A no-operation change, potentially used for hash randomization.</p>
-<pre><code class="language-tlang">e2e.chain.changeNoop#deb4a41b nonce:int256 = e2e.chain.Change;
+<pre><code class="language-tlang"><a href='/constructor/e2e.chain.changeNoop'>e2e.chain.changeNoop</a>#deb4a41b nonce:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
 </code></pre>
 </li>
 </ol>
@@ -363,18 +360,19 @@ e2e.chain.changeSetSharedKey#987a2158 shared_key:e2e.chain.SharedKey = e2e.chain
 <li><strong>Apply Changes Sequentially:</strong> Iterate through the <code>changes</code> vector:
 <ul>
 <li>Verify the creator has sufficient permissions for the specific change, using their <em>current</em> permissions (which might have been updated by a previous change <em>within the same block</em>). If permissions are insufficient, the entire block is invalid.</li>
-<li>Apply the change to the state (updating the group state or shared key info). If the change itself is malformed or invalid (e.g., invalid participant data), the entire block is invalid.</li>
+<li>Apply the change to the state <a href="#change-types-for-group-calls">as specified above »</a>. If the change itself is malformed or invalid (e.g., invalid participant data), the entire block is invalid.</li>
 </ul>
 </li>
 <li><strong>State Proof Validation:</strong> After applying all changes, verify that the resulting state matches the information provided in the block's <code>state_proof</code>. If not, the block is invalid.</li>
 </ol>
+<p>If the block is invalid, all changes made by the block must be rolled back (or, the block application process can run on a copy of the local state which is mutated when iterating over the changes, and only applied if the block is fully validated).</p>
 <p>The blockchain starts with a conceptual "genesis" block at <code>height: -1</code> with a hash of <code>UInt256(0)</code>.</p>
 <blockquote>
 <p><strong>Note:</strong> For optimization purposes, the <code>signature_public_key</code> can be omitted if it matches the first participant's key in the group state (except for the block at height <code>0</code>).<br>
 Similarly, state proof components (<code>group_state</code>, <code>shared_key</code>) <strong>must</strong> be omitted if corresponding <code>Set*</code> changes are present in the block, as specified below.</p>
 </blockquote>
 <h4><a class="anchor" href="#state-proof-omission-rules" id="state-proof-omission-rules" name="state-proof-omission-rules"><i class="anchor-icon"></i></a>State Proof Omission Rules</h4>
-<pre><code>e2e.chain.stateProof#d6b679e6 flags:# kv_hash:int256 group_state:flags.0?e2e.chain.GroupState shared_key:flags.1?e2e.chain.SharedKey = e2e.chain.StateProof;
+<pre><code><a href='/constructor/e2e.chain.stateProof'>e2e.chain.stateProof</a>#d6b679e6 flags:<a href='/type/%23'>#</a> kv_hash:<a href='/type/int256'>int256</a> group_state:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a> shared_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a> = <a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a>;
 </code></pre>
 <p><code>state_proof.kv_hash</code> must be always present.</p>
 <p>The optional <code>group_state</code> and <code>shared_key</code> fields are included only when they are not already carried by changes in the same block:</p>
@@ -494,8 +492,8 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 </li>
 </ol>
 <p>The final <code>unencrypted_prefix_size</code> is a 4-byte little-endian integer stored at the end of the packet. On decryption, receivers first remove this trailer, split off the unencrypted prefix, parse <code>header_a</code> and <code>header_b</code>, and then try the advertised epochs until one decrypts the one-time key successfully.</p>
-<p><code>magic1</code> is the CRC32 constructor magic (the part after <code>#</code>) for <code>e2e.callPacket#40a6bee9 = e2e.CallPacket;</code>
-<code>magic2</code> is the CRC32 constructor magic (the part after <code>#</code>) for <code>e2e.callPacketLargeMsgId#1ce56c2d = e2e.CallPacketLargeMsgId;</code></p>
+<p><code>magic1</code> is the CRC32 constructor magic (the part after <code>#</code>) for <code><a href='/constructor/e2e.callPacket'>e2e.callPacket</a>#40a6bee9 = <a href='/type/e2e.CallPacket'>e2e.CallPacket</a>;</code>
+<code>magic2</code> is the CRC32 constructor magic (the part after <code>#</code>) for <code><a href='/constructor/e2e.callPacketLargeMsgId'>e2e.callPacketLargeMsgId</a>#1ce56c2d = <a href='/type/e2e.CallPacketLargeMsgId'>e2e.CallPacketLargeMsgId</a>;</code></p>
 <h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li><strong>Replay Protection:</strong> The <code>seqno</code> must be unique and monotonically increasing for each <code>(public key, channel_id)</code> pair. In case of overflow, the client must leave the call. Receivers must track recently received <code>seqno</code> values and discard packets with old or duplicate numbers.</li>
@@ -590,10 +588,10 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 </ol>
 <h4><a class="anchor" href="#tl-schema-for-broadcasts" id="tl-schema-for-broadcasts" name="tl-schema-for-broadcasts"><i class="anchor-icon"></i></a>TL Schema for Broadcasts</h4>
 <pre><code class="language-tlang">// Phase 1: Commit
-e2e.chain.groupBroadcastNonceCommit#d1512ae7 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce_hash:int256 = e2e.chain.GroupBroadcast;
+<a href='/constructor/e2e.chain.groupBroadcastNonceCommit'>e2e.chain.groupBroadcastNonceCommit</a>#d1512ae7 signature:<a href='/type/int512'>int512</a> user_id:<a href='/type/int64'>int64</a> chain_height:<a href='/type/int32'>int32</a> chain_hash:<a href='/type/int256'>int256</a> nonce_hash:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.GroupBroadcast'>e2e.chain.GroupBroadcast</a>;
 
 // Phase 2: Reveal
-e2e.chain.groupBroadcastNonceReveal#83f4f9d8 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce:int256 = e2e.chain.GroupBroadcast;
+<a href='/constructor/e2e.chain.groupBroadcastNonceReveal'>e2e.chain.groupBroadcastNonceReveal</a>#83f4f9d8 signature:<a href='/type/int512'>int512</a> user_id:<a href='/type/int64'>int64</a> chain_height:<a href='/type/int32'>int32</a> chain_hash:<a href='/type/int256'>int256</a> nonce:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.GroupBroadcast'>e2e.chain.GroupBroadcast</a>;
 </code></pre>
 <p>The <code>public_key</code> is extracted from the user's <code>e2e.chain.groupParticipant</code> object using the <code>user_id</code>.</p>
 <p>The <code>signature</code> in both cases covers the TL-serialized object with the signature field itself zeroed out.</p>
@@ -605,25 +603,30 @@ e2e.chain.groupBroadcastNonceReveal#83f4f9d8 signature:int512 user_id:int64 chai
 </ul>
 <hr>
 <h3><a class="anchor" href="#full-tl-schema" id="full-tl-schema" name="full-tl-schema"><i class="anchor-icon"></i></a>Full TL Schema</h3>
-<pre><code>e2e.chain.groupBroadcastNonceCommit#d1512ae7 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce_hash:int256 = e2e.chain.GroupBroadcast;
-e2e.chain.groupBroadcastNonceReveal#83f4f9d8 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce:int256 = e2e.chain.GroupBroadcast;
+<!-- start full schema -->
+<pre><code><a href='/constructor/e2e.chain.groupBroadcastNonceCommit'>e2e.chain.groupBroadcastNonceCommit</a>#d1512ae7 signature:<a href='/type/int512'>int512</a> user_id:<a href='/type/int64'>int64</a> chain_height:<a href='/type/int32'>int32</a> chain_hash:<a href='/type/int256'>int256</a> nonce_hash:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.GroupBroadcast'>e2e.chain.GroupBroadcast</a>;
+<a href='/constructor/e2e.chain.groupBroadcastNonceReveal'>e2e.chain.groupBroadcastNonceReveal</a>#83f4f9d8 signature:<a href='/type/int512'>int512</a> user_id:<a href='/type/int64'>int64</a> chain_height:<a href='/type/int32'>int32</a> chain_hash:<a href='/type/int256'>int256</a> nonce:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.GroupBroadcast'>e2e.chain.GroupBroadcast</a>;
 
-e2e.chain.groupParticipant#28852f20 user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
-e2e.chain.groupState#1ddc7584 participants:vector&lt;e2e.chain.GroupParticipant&gt; external_permissions:int = e2e.chain.GroupState;
-e2e.chain.sharedKey#8a847e7f ek:int256 encrypted_shared_key:string dest_user_id:vector&lt;long&gt; dest_header:vector&lt;bytes&gt; = e2e.chain.SharedKey;
+<a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
 
-e2e.chain.changeNoop#deb4a41b nonce:int256 = e2e.chain.Change;
-e2e.chain.changeSetValue#7c4f9bfa key:bytes value:bytes = e2e.chain.Change;
-e2e.chain.changeSetGroupState#2cf17146 group_state:e2e.chain.GroupState = e2e.chain.Change;
-e2e.chain.changeSetSharedKey#987a2158 shared_key:e2e.chain.SharedKey = e2e.chain.Change;
+<a href='/constructor/e2e.chain.groupState'>e2e.chain.groupState</a>#1ddc7584 participants:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>&gt; external_permissions:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a>;
 
-e2e.chain.stateProof#d6b679e6 flags:# kv_hash:int256 group_state:flags.0?e2e.chain.GroupState shared_key:flags.1?e2e.chain.SharedKey = e2e.chain.StateProof;
+<a href='/constructor/e2e.chain.sharedKey'>e2e.chain.sharedKey</a>#8a847e7f ek:<a href='/type/int256'>int256</a> encrypted_shared_key:<a href='/type/string'>string</a> dest_user_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; dest_header:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; = <a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a>;
 
-e2e.chain.block#639a3db6 signature:int512 flags:# prev_block_hash:int256 changes:vector&lt;e2e.chain.Change&gt; height:int state_proof:e2e.chain.StateProof signature_public_key:flags.0?int256 = e2e.chain.Block;
+<a href='/constructor/e2e.chain.changeNoop'>e2e.chain.changeNoop</a>#deb4a41b nonce:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
+<a href='/constructor/e2e.chain.changeSetValue'>e2e.chain.changeSetValue</a>#7c4f9bfa key:<a href='/type/bytes'>bytes</a> value:<a href='/type/bytes'>bytes</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
+<a href='/constructor/e2e.chain.changeSetGroupState'>e2e.chain.changeSetGroupState</a>#2cf17146 group_state:<a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
+<a href='/constructor/e2e.chain.changeSetSharedKey'>e2e.chain.changeSetSharedKey</a>#987a2158 shared_key:<a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a> = <a href='/type/e2e.chain.Change'>e2e.chain.Change</a>;
 
-e2e.callPacket#40a6bee9 = e2e.CallPacket;
-e2e.callPacketLargeMsgId#1ce56c2d = e2e.CallPacketLargeMsgId;
+<a href='/constructor/e2e.chain.stateProof'>e2e.chain.stateProof</a>#d6b679e6 flags:<a href='/type/%23'>#</a> kv_hash:<a href='/type/int256'>int256</a> group_state:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a> shared_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a> = <a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a>;
+
+<a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
+
+<a href='/constructor/e2e.callPacket'>e2e.callPacket</a>#40a6bee9 = <a href='/type/e2e.CallPacket'>e2e.CallPacket</a>;
+
+<a href='/constructor/e2e.callPacketLargeMsgId'>e2e.callPacketLargeMsgId</a>#1ce56c2d = <a href='/type/e2e.CallPacketLargeMsgId'>e2e.CallPacketLargeMsgId</a>;
 </code></pre>
+<!-- end full schema -->
 </div>
   
 </div>
