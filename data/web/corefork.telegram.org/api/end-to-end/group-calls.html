@@ -86,18 +86,53 @@
 Every time the client accepts a <a href="#subchains">main subchain</a> (<code>subchain=0</code>) block, it must immediately generate a fresh nonce commitment message bound to the new block height and hash, submit it through the <a href="#subchains">broadcast subchain</a> (<code>subchain=1</code>), and wait for the commit-reveal protocol described below to complete before displaying verification emojis for that state.</li>
 </ol>
 <h4><a class="anchor" href="#removing-a-participant" id="removing-a-participant" name="removing-a-participant"><i class="anchor-icon"></i></a>Removing a Participant</h4>
-<ol>
-<li><strong>Initiation:</strong> Any active participant with the necessary permissions (<code>remove_users</code> flag) can initiate the removal of another (e.g., inactive) participant.</li>
-<li><strong>Create Removal Block:</strong> The initiating participant creates a block proposal containing:
+<pre><code class="language-tlang"><a href='/constructor/groupCallParticipant'>groupCallParticipant</a>#2a3dc7ac flags:<a href='/type/%23'>#</a> muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> left:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> can_self_unmute:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> just_joined:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> versioned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> min:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> muted_by_you:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/constructor/true'>true</a> volume_by_admin:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/constructor/true'>true</a> self:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/constructor/true'>true</a> video_joined:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> peer:<a href='/type/Peer'>Peer</a> date:<a href='/type/int'>int</a> active_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/int'>int</a> source:<a href='/type/int'>int</a> volume:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/int'>int</a> about:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/string'>string</a> raise_hand_rating:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/long'>long</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/GroupCallParticipantVideo'>GroupCallParticipantVideo</a> presentation:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/type/GroupCallParticipantVideo'>GroupCallParticipantVideo</a> paid_stars_total:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/long'>long</a> = <a href='/type/GroupCallParticipant'>GroupCallParticipant</a>;
+
+<a href='/constructor/updateGroupCallParticipants'>updateGroupCallParticipants</a>#f2ebdb4e call:<a href='/type/InputGroupCall'>InputGroupCall</a> participants:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/GroupCallParticipant'>GroupCallParticipant</a>&gt; version:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/phone.leaveGroupCall'>phone.leaveGroupCall</a>#500377f9 call:<a href='/type/InputGroupCall'>InputGroupCall</a> source:<a href='/type/int'>int</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.deleteConferenceCallParticipants'>phone.deleteConferenceCallParticipants</a>#8ca60525 flags:<a href='/type/%23'>#</a> only_left:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> kick:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> call:<a href='/type/InputGroupCall'>InputGroupCall</a> ids:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; block:<a href='/type/bytes'>bytes</a> = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<p>There are two distinct removal operations, distinguished by the flag passed to <a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a>:</p>
 <ul>
-<li>A <code>ChangeSetGroupState</code> change removing the target participant.</li>
-<li>A subsequent <code>ChangeSetSharedKey</code> change establishing a new key encrypted only for the <em>remaining</em> participants.</li>
+<li><strong><code>only_left=true</code></strong> — Pruning of participants that already disconnected from the media layer.</li>
+<li><strong><code>kick=true</code></strong> — Forced removal of a currently active participant.</li>
+</ul>
+<p><strong>Note:</strong> Self-removal is not supported via <a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a>, as a participant cannot create a block that removes themselves while simultaneously generating a new shared key for the others; instead, the other participants must prune from the blockchain users that left the call, as specified below.</p>
+<h5><a class="anchor" href="#stale-pruning-only-left" id="stale-pruning-only-left" name="stale-pruning-only-left"><i class="anchor-icon"></i></a>Stale Pruning (<code>only_left</code>)</h5>
+<p>After a participant disconnects from the RTC media layer by invoking <a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a>, a <a href="/constructor/updateGroupCallParticipants">updateGroupCallParticipants</a> update with <code>groupCallParticipant.left=true</code> is delivered to all other participants. However, the departing user's entry persists in the E2E blockchain (<code>e2e.chain.groupState</code>). Any other active participant that holds the <code>remove_users</code> permission must prune these stale entries from the blockchain.</p>
+<p><strong>Detecting stale participants:</strong></p>
+<p>Clients detect stale participants via two complementary paths:</p>
+<ul>
+<li>
+<p><strong>Via incoming <a href="/constructor/updateGroupCallParticipants">updateGroupCallParticipants</a>:</strong> When a <a href="/constructor/groupCallParticipant">groupCallParticipant</a> with <code>left=true</code> is received for a user currently listed in the local E2E blockchain state (<code>e2e.chain.groupState.participants</code>), that user is immediately considered stale.</p>
+</li>
+<li>
+<p><strong>Via full participant list comparison:</strong> When the E2E blockchain state is updated (e.g., after applying a new main-chain block that changes the participant list), the client compares the blockchain's <code>e2e.chain.groupState.participants</code> against the RTC participant list fetched from the server via <a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a>. Any user present in the blockchain state but absent from the server-reported RTC participant list is stale. If the full RTC participant list has not yet been loaded, the client first paginates through it with <a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a> and performs this check once all pages have been received.</p>
+</li>
+</ul>
+<p><strong>Submitting the removal:</strong></p>
+<p>Once one or more stale participants are identified:</p>
+<ol>
+<li><strong>Create Removal Block:</strong> Construct a new block containing:
+<ul>
+<li>A <code>ChangeSetGroupState</code> change that removes all stale participants from the participant list.</li>
+<li>A subsequent <code>ChangeSetSharedKey</code> change establishing a new shared key encrypted only for the <em>remaining</em> participants.</li>
 </ul>
 </li>
-<li><strong>Submit &amp; Broadcast:</strong> Similar to joining, the block is submitted to the server, validated, and broadcast to the remaining participants upon success.</li>
+<li><strong>Submit:</strong> Invoke <a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a> with:
+<ul>
+<li><code>only_left=true</code> — signals to the server that these users already left the media layer.</li>
+<li><code>ids</code> — the list of user IDs being pruned.</li>
+<li><code>block</code> — the serialized E2E chain block.</li>
+</ul>
+</li>
+<li><strong>Broadcast:</strong> The server validates the block and, if accepted, broadcasts it to all remaining participants via <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>, who apply it as any other main-chain block.</li>
 </ol>
-<p><strong>Note:</strong> Self-removal is not supported via this mechanism, as a participant cannot create a block that removes themselves while simultaneously generating a new key for the others.</p>
-<p>After a user leaves their media connection with <a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a>, any other active participant with the <code>remove_users</code> permission will prune that user from the E2E group state.</p>
+<h5><a class="anchor" href="#forced-removal-kick" id="forced-removal-kick" name="forced-removal-kick"><i class="anchor-icon"></i></a>Forced Removal (<code>kick</code>)</h5>
+<p>An active participant may forcefully remove another <em>currently active</em> participant by invoking <a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a> with <code>kick=true</code> (instead of <code>only_left=true</code>), along with the same <code>ids</code> and <code>block</code> fields described above. As with stale pruning, the <code>remove_users</code> permission is required.</p>
 <h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li>Clients <strong>must</strong> only apply blocks received from the server, even those they proposed themselves. The server enforces block ordering and prevents forks.</li>
@@ -161,9 +196,9 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <p>The full block history for a specific subchain of a specific call may be fetched using <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a>, which also returns <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> updates, inside an <a href="/type/Updates">Updates</a> object.</p>
 <p><strong>Note</strong>: the constructor IDs of all blocks <strong>returned by the server</strong> inside of <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> either passively or actively from <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> are <strong>modified</strong>, adding 1 to the constructor ID, so for example:</p>
 <ul>
-<li><code>e2e.chain.block#639a3db6</code> becomes <code>639a3db7</code></li>
-<li><code>e2e.chain.groupBroadcastNonceCommit#d1512ae7</code> becomes <code>d1512ae8</code></li>
-<li><code>e2e.chain.groupBroadcastNonceReveal#83f4f9d8</code> becomes <code>83f4f9d8</code></li>
+<li><a href="/constructor/e2e.chain.block">e2e.chain.block</a><code>#639a3db6</code> becomes <code>639a3db7</code></li>
+<li><a href="/constructor/e2e.chain.groupBroadcastNonceCommit">e2e.chain.groupBroadcastNonceCommit</a><code>#d1512ae7</code> becomes <code>d1512ae8</code></li>
+<li><a href="/constructor/e2e.chain.groupBroadcastNonceReveal">e2e.chain.groupBroadcastNonceReveal</a><code>#83f4f9d8</code> becomes <code>83f4f9d8</code></li>
 </ul>
 <p><strong>Only</strong> accept blocks received from the server if their ID is the increased version (specifically, only accept <code>639a3db7</code> for the main subchain, and <code>d1512ae8</code>, <code>83f4f9d8</code> for the verification subchain).</p>
 <p>When <strong>submitting</strong> blocks to the server, use the canonical constructor IDs (<code>639a3db6</code>, <code>d1512ae7</code>, <code>83f4f9d8</code>).</p>
@@ -201,8 +236,8 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 </li>
 <li>
 <p><code>group_state</code> - <strong>Group State</strong>: List of group participants and their permissions.</p>
-<p>Participants are contained in the <code>e2e.chain.groupState.participants</code> field, and are identified by <code>user_id</code> or <code>public_key</code>.</p>
-<p>Each participant is represented by a <code>e2e.chain.GroupParticipant</code> object, containing the following fields:</p>
+<p>Participants are contained in the <a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>participants</code> field, and are identified by <code>user_id</code> or <code>public_key</code>.</p>
+<p>Each participant is represented by a <a href="/constructor/e2e.chain.groupParticipant">e2e.chain.groupParticipant</a> object, containing the following fields:</p>
 <ul>
 <li><code>user_id</code>: Contains the participant's Telegram user ID</li>
 <li><code>public_key</code>: Contains the participant's public key</li>
@@ -212,11 +247,11 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <li><code>set_value</code>: If set, this user has permission to modify the kv trie.</li>
 </ul>
 <blockquote>
-<p><strong>Note:</strong> For improved user experience, any person can currently join a call with server permission, without requiring explicit confirmation from existing participants. While the blockchain supports an explicit confirmation mode, we currently use <code>e2e.chain.groupState.external_permissions</code> in the blockchain state to allow self-addition to groups.</p>
+<p><strong>Note:</strong> For improved user experience, any person can currently join a call with server permission, without requiring explicit confirmation from existing participants. While the blockchain supports an explicit confirmation mode, we currently use <a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>external_permissions</code> in the blockchain state to allow self-addition to groups.</p>
 </blockquote>
-<p><code>e2e.chain.groupState.external_permissions</code> is used when the client needs to fetch permissions for a user that isn't present in the <code>participants</code> vector of the current (pre-block application) <code>e2e.chain.groupState</code>.</p>
-<p><code>e2e.chain.groupState.external_permissions</code> can contain exactly the same bitflags that can be contained in <code>e2e.chain.groupParticipant.flags</code> (add_users, remove_users, set_value).</p>
-<p><code>e2e.chain.groupState.external_permissions</code> is <strong>only</strong> used when applying changes of type <code>ChangeSetGroupState</code>.</p>
+<p><a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>external_permissions</code> is used when the client needs to fetch permissions for a user that isn't present in the <code>participants</code> vector of the current (pre-block application) <a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.</p>
+<p><a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>external_permissions</code> can contain exactly the same bitflags that can be contained in <a href="/constructor/e2e.chain.groupParticipant">e2e.chain.groupParticipant</a>.<code>flags</code> (add_users, remove_users, set_value).</p>
+<p><a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>external_permissions</code> is <strong>only</strong> used when applying changes of type <code>ChangeSetGroupState</code>.</p>
 </li>
 <li>
 <p><code>shared_key</code> - <strong>Shared Key</strong>: Shared group key encrypted for each group participant.</p>
@@ -232,7 +267,7 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <h4><a class="anchor" href="#versioning" id="versioning" name="versioning"><i class="anchor-icon"></i></a>Versioning</h4>
 <pre><code><a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
 </code></pre>
-<p>The E2E group call encryption protocol specified in this article may change in the future: to preserve backwards-compatibility with clients that do not support newer protocols yet, each participant must announce its maximum supported version in <code>e2e.chain.groupParticipant.version</code>.</p>
+<p>The E2E group call encryption protocol specified in this article may change in the future: to preserve backwards-compatibility with clients that do not support newer protocols yet, each participant must announce its maximum supported version in <a href="/constructor/e2e.chain.groupParticipant">e2e.chain.groupParticipant</a>.<code>version</code>.</p>
 <p>The protocol version used when generating and applying blocks must be equal to the smallest <code>version</code> contained in the participant list.</p>
 <p>Protocol changelog:</p>
 <ul>
@@ -340,8 +375,8 @@ A new key <strong>must</strong> be set by a subsequent <code>ChangeSetSharedKey<
 </code></pre>
 <p>Clients that do not implement the key-value trie must still store the latest accepted <code>kv_hash</code>, and handle blockchain updates as follows:</p>
 <ul>
-<li>For ordinary group-call blocks that do not contain <code>e2e.chain.changeSetValue</code>, the <code>incoming.state_proof.kv_hash</code> must be identical to the locally stored value.</li>
-<li>If a block containing an <code>e2e.chain.changeSetValue</code> is received, ignore the <code>key</code> and <code>value</code> contents and just accept the <code>incoming.state_proof.kv_hash</code> (from the containing block), storing that value as the new local <code>kv_hash</code>, but only if the block author has the <code>set_value</code> permission.</li>
+<li>For ordinary group-call blocks that do not contain <a href="/constructor/e2e.chain.changeSetValue">e2e.chain.changeSetValue</a>, the <code>incoming.state_proof.kv_hash</code> must be identical to the locally stored value.</li>
+<li>If a block containing an <a href="/constructor/e2e.chain.changeSetValue">e2e.chain.changeSetValue</a> is received, ignore the <code>key</code> and <code>value</code> contents and just accept the <code>incoming.state_proof.kv_hash</code> (from the containing block), storing that value as the new local <code>kv_hash</code>, but only if the block author has the <code>set_value</code> permission.</li>
 </ul>
 </li>
 <li>
@@ -492,8 +527,8 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 </li>
 </ol>
 <p>The final <code>unencrypted_prefix_size</code> is a 4-byte little-endian integer stored at the end of the packet. On decryption, receivers first remove this trailer, split off the unencrypted prefix, parse <code>header_a</code> and <code>header_b</code>, and then try the advertised epochs until one decrypts the one-time key successfully.</p>
-<p><code>magic1</code> is the CRC32 constructor magic (the part after <code>#</code>) for <code><a href='/constructor/e2e.callPacket'>e2e.callPacket</a>#40a6bee9 = <a href='/type/e2e.CallPacket'>e2e.CallPacket</a>;</code>
-<code>magic2</code> is the CRC32 constructor magic (the part after <code>#</code>) for <code><a href='/constructor/e2e.callPacketLargeMsgId'>e2e.callPacketLargeMsgId</a>#1ce56c2d = <a href='/type/e2e.CallPacketLargeMsgId'>e2e.CallPacketLargeMsgId</a>;</code></p>
+<p><code>magic1</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacket">e2e.callPacket</a><code>#40a6bee9 = e2e.CallPacket;</code>
+<code>magic2</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacketLargeMsgId">e2e.callPacketLargeMsgId</a><code>#1ce56c2d = e2e.CallPacketLargeMsgId;</code></p>
 <h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li><strong>Replay Protection:</strong> The <code>seqno</code> must be unique and monotonically increasing for each <code>(public key, channel_id)</code> pair. In case of overflow, the client must leave the call. Receivers must track recently received <code>seqno</code> values and discard packets with old or duplicate numbers.</li>
@@ -563,7 +598,7 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 <p><strong>Commit Phase:</strong></p>
 <ul>
 <li>Each participant broadcasts their <code>nonce_hash</code>, <code>chain_height</code> and <code>chain_hash</code> with a signature.</li>
-<li>Use the <code>e2e.chain.groupBroadcastNonceCommit</code> structure.</li>
+<li>Use the <a href="/constructor/e2e.chain.groupBroadcastNonceCommit">e2e.chain.groupBroadcastNonceCommit</a> structure.</li>
 <li>The system (coordinated via the server) waits until commits have been received from <em>all</em> expected participants (based on the blockchain state at the specified height).</li>
 </ul>
 </li>
@@ -571,7 +606,7 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 <p><strong>Reveal Phase:</strong></p>
 <ul>
 <li>Once all commits are collected, each participant broadcasts their original <code>nonce</code>, again with a signature.</li>
-<li>Use the <code>e2e.chain.groupBroadcastNonceReveal</code> structure.</li>
+<li>Use the <a href="/constructor/e2e.chain.groupBroadcastNonceReveal">e2e.chain.groupBroadcastNonceReveal</a> structure.</li>
 <li>The system verifies each revealed <code>nonce</code> by checking <code>SHA256(revealed_nonce) == committed_nonce_hash</code>.</li>
 <li>The system waits until all valid nonces have been revealed.</li>
 </ul>
@@ -593,7 +628,7 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 // Phase 2: Reveal
 <a href='/constructor/e2e.chain.groupBroadcastNonceReveal'>e2e.chain.groupBroadcastNonceReveal</a>#83f4f9d8 signature:<a href='/type/int512'>int512</a> user_id:<a href='/type/int64'>int64</a> chain_height:<a href='/type/int32'>int32</a> chain_hash:<a href='/type/int256'>int256</a> nonce:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.GroupBroadcast'>e2e.chain.GroupBroadcast</a>;
 </code></pre>
-<p>The <code>public_key</code> is extracted from the user's <code>e2e.chain.groupParticipant</code> object using the <code>user_id</code>.</p>
+<p>The <code>public_key</code> is extracted from the user's <a href="/constructor/e2e.chain.groupParticipant">e2e.chain.groupParticipant</a> object using the <code>user_id</code>.</p>
 <p>The <code>signature</code> in both cases covers the TL-serialized object with the signature field itself zeroed out.</p>
 <h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
