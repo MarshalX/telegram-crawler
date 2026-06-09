@@ -203,83 +203,41 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <p><strong>Only</strong> accept blocks received from the server if their ID is the increased version (specifically, only accept <code>639a3db7</code> for the main subchain, and <code>d1512ae8</code>, <code>83f4f9d8</code> for the verification subchain).</p>
 <p>When <strong>submitting</strong> blocks to the server, use the canonical constructor IDs (<code>639a3db6</code>, <code>d1512ae7</code>, <code>83f4f9d8</code>).</p>
 <p>Clients must apply both main-chain blocks and verification messages only from the server: this includes blocks and verification messages created by the local client, apply only the blocks echoed back from the server.</p>
-<h4><a class="anchor" href="#block-structure-and-application-process" id="block-structure-and-application-process" name="block-structure-and-application-process"><i class="anchor-icon"></i></a>Block Structure and application process</h4>
+<h4><a class="anchor" href="#block-structure" id="block-structure" name="block-structure"><i class="anchor-icon"></i></a>Block Structure</h4>
 <p>Blocks form the chain, linking sequentially to maintain history. The structure is defined as follows:</p>
 <pre><code class="language-tlang"><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
-
-<a href='/constructor/e2e.chain.stateProof'>e2e.chain.stateProof</a>#d6b679e6 flags:<a href='/type/%23'>#</a> kv_hash:<a href='/type/int256'>int256</a> group_state:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a> shared_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a> = <a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a>;
 </code></pre>
 <p>Namely:</p>
 <ul>
 <li>
-<p><code>signature</code>: A cryptographic signature verifying the block's authenticity.</p>
+<p><code>signature</code>: A cryptographic signature verifying the block's authenticity, calculated over the TL serialization of the <code>e2e.chain.block</code> with the <code>signature</code> field itself zeroed out.</p>
 </li>
 <li>
-<p><code>prev_block_hash</code>: The SHA256 hash of the preceding block, forming the chain link.</p>
+<p><code>prev_block_hash</code>: The SHA256 hash of the complete TL serialization of the preceding <code>e2e.chain.block</code>, forming the chain link.</p>
 </li>
 <li>
 <p><code>changes</code>: A list of state modifications applied by this block.</p>
+<p>A block must contain <em>at least</em> a <code>ChangeSetGroupState</code> or a <code>ChangeSetValue</code>.<br>
+A block containing only <code>ChangeNoop</code> or only <code>ChangeSetSharedKey</code> is invalid.</p>
+<p>See <a href="#change-types-for-group-calls">here »</a> for the full list of available change types and how to apply them.</p>
 </li>
 <li>
 <p><code>height</code>: The sequential number of the block in the chain.</p>
 </li>
 <li>
 <p><code>state_proof</code>: Cryptographic proof of the blockchain state <em>after</em> this block is applied, including the key-value state hash and, depending on the block contents, the group state and shared key state.</p>
-<p>State proof components (<code>state_proof.group_state</code>, <code>state_proof.shared_key</code>) <strong>must</strong> be omitted if corresponding <code>Set*</code> changes are present in the block, as specified below.</p>
-<p><code>state_proof.kv_hash</code> must be always present.</p>
-<p>The optional <code>state_proof.group_state</code> and <code>state_proof.shared_key</code> fields are included only when they are not already carried by changes in the same block:</p>
-<ul>
-<li><code>state_proof.group_state</code> <strong>must</strong> be omitted if the block contains a <code>ChangeSetGroupState</code> action</li>
-<li><code>state_proof.group_state</code> <strong>must</strong> be present if the block doesn't contain a <code>ChangeSetGroupState</code> action</li>
-<li><code>state_proof.shared_key</code> <strong>must</strong> be omitted if the block contains a <code>ChangeSetGroupState</code> action <em>and/or</em> a <code>ChangeSetSharedKey</code> action</li>
-<li><code>state_proof.shared_key</code> <strong>must</strong> be present if the block doesn't contain a <code>ChangeSetGroupState</code> action <em>and/or</em> a <code>ChangeSetSharedKey</code> action</li>
-</ul>
-<p>If <code>state_proof.group_state</code> is present, it must match the resulting group state after applying the block.<br>
-If <code>state_proof.shared_key</code> is present, it must match the resulting shared key state after applying the block.</p>
+<p>See <a href="#local-blockchain-state">here »</a> for a more detailed description of this field.</p>
 </li>
 <li>
 <p><code>signature_public_key</code>: The public key of the participant who created and signed the block.
-<strong>Note</strong>: For optimization purposes, the <code>signature_public_key</code> can be omitted if it matches the first participant's key in the group state (except for the block at height <code>0</code>).</p>
+<strong>Note</strong>: For optimization purposes, the <code>signature_public_key</code> can be omitted if it matches the first participant's key in the group state (except for the block at height <code>0</code>, where it <strong>must</strong> always be present).</p>
 </li>
 </ul>
-<p>Signature and Hash Generation:</p>
-<ul>
-<li><strong>Signature:</strong> Calculated over the TL-serialized block with the <code>signature</code> field itself zeroed out. The specific serialization format follows standard TL rules.</li>
-<li><strong>Block Hash:</strong> The SHA256 hash of the complete TL-serialized block.</li>
-</ul>
-<p>To apply blocks, use the following procedure.</p>
-<p>Blocks must be applied atomically (all changes succeed or none do) and sequentially. The validation process is as follows:</p>
-<ol>
-<li><strong>Height Check:</strong> The block's <code>height</code> must be exactly <code>current_height + 1</code>. If not, the block is invalid. It is currently impossible to apply a block with height larger than <code>2^31-1</code>.</li>
-<li><strong>Previous Hash Check:</strong> The block's <code>prev_block_hash</code> must match the hash of the last applied block. If not, the block is invalid.</li>
-<li><strong>Permission Check (Initial):</strong> Determine the permissions of the block creator (identified by <code>signature_public_key</code>). Permissions are sourced from the <em>previous</em> block's state or <code>external_permissions</code> if the creator wasn't already a participant.</li>
-<li><strong>Signature Verification:</strong> Verify the block's <code>signature</code> using the block creator's public key. If invalid, the block is rejected.</li>
-<li><strong>Apply Changes Sequentially:</strong> Iterate through the <code>changes</code> vector:
-<ul>
-<li>Verify the creator has sufficient permissions for the specific change, using their <em>current</em> permissions (which might have been updated by a previous change <em>within the same block</em>). If permissions are insufficient, the entire block is invalid.</li>
-<li>Apply the change to the state <a href="#change-types-for-group-calls">as specified above »</a>. If the change itself is malformed or invalid (e.g., invalid participant data), the entire block is invalid.</li>
-</ul>
-</li>
-<li><strong>State Proof Validation:</strong> After applying all changes, verify that the resulting state matches the information provided in the block's <code>state_proof</code>. If not, the block is invalid.</li>
-</ol>
-<p>If the block is invalid, all changes made by the block must be rolled back (or, the block application process can run on a copy of the local state which is mutated when iterating over the changes, and only applied if the block is fully validated).</p>
-<p>The blockchain starts with a conceptual "genesis" block at <code>height: -1</code> with a hash of <code>UInt256(0)</code>.</p>
-<h4><a class="anchor" href="#blockchain-state" id="blockchain-state" name="blockchain-state"><i class="anchor-icon"></i></a>Blockchain State</h4>
-<pre><code class="language-tlang"><a href='/constructor/e2e.chain.stateProof'>e2e.chain.stateProof</a>#d6b679e6 flags:<a href='/type/%23'>#</a> kv_hash:<a href='/type/int256'>int256</a> group_state:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a> shared_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a> = <a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a>;
-
-<a href='/constructor/e2e.chain.groupState'>e2e.chain.groupState</a>#1ddc7584 participants:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>&gt; external_permissions:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a>;
+<h4><a class="anchor" href="#participants-and-permissions" id="participants-and-permissions" name="participants-and-permissions"><i class="anchor-icon"></i></a>Participants and Permissions</h4>
+<pre><code class="language-tlang"><a href='/constructor/e2e.chain.groupState'>e2e.chain.groupState</a>#1ddc7584 participants:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>&gt; external_permissions:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a>;
 <a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
-
-<a href='/constructor/e2e.chain.sharedKey'>e2e.chain.sharedKey</a>#8a847e7f ek:<a href='/type/int256'>int256</a> encrypted_shared_key:<a href='/type/string'>string</a> dest_user_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; dest_header:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; = <a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a>;
 </code></pre>
-<p>Blockchain states consist of:</p>
-<ul>
-<li>
-<p><code>kv_hash</code> - <strong>Key Value Storage hash</strong>: Root hash of the key-value trie after applying the block. The full trie format is intentionally out of scope for this document, because the key-value trie is currently not used anywhere. The <code>kv_hash</code>, however, is still partially used during block verification, as described below.</p>
-</li>
-<li>
-<p><code>group_state</code> - <strong>Group State</strong>: List of group participants and their permissions.</p>
-<p>Participants are contained in the <a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>participants</code> field, and are identified by <code>user_id</code> or <code>public_key</code>.</p>
+<p>Participants are described by the <a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>participants</code> field inside the <a href="#local-blockchain-state">local state</a> and <a href="#block-structure">incoming blocks</a>, and are identified by <code>user_id</code> or <code>public_key</code>.</p>
 <p>Each participant is represented by a <a href="/constructor/e2e.chain.groupParticipant">e2e.chain.groupParticipant</a> object, containing the following fields:</p>
 <ul>
 <li><code>user_id</code>: Contains the participant's Telegram user ID</li>
@@ -295,28 +253,6 @@ If <code>state_proof.shared_key</code> is present, it must match the resulting s
 <p><a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>external_permissions</code> is used when the client needs to fetch permissions for a user that isn't present in the <code>participants</code> vector of the current (pre-block application) <a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.</p>
 <p><a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>external_permissions</code> can contain exactly the same bitflags that can be contained in <a href="/constructor/e2e.chain.groupParticipant">e2e.chain.groupParticipant</a>.<code>flags</code> (add_users, remove_users, set_value).</p>
 <p><a href="/constructor/e2e.chain.groupState">e2e.chain.groupState</a>.<code>external_permissions</code> is <strong>only</strong> used when applying changes of type <code>ChangeSetGroupState</code>.</p>
-</li>
-<li>
-<p><code>shared_key</code> - <strong>Shared Key</strong>: Shared group key encrypted for each group participant.</p>
-</li>
-</ul>
-<p>The client must keep all these fields stored locally, and use them to validate changes when applying blocks: if block application succeeds, the fields must be updated according to the changes contained in the block.</p>
-<p>The initial local value of these fields when at the conceptual <code>height=-1</code>, used when applying the first block of the blockchain with <code>height=0</code>, must be equal to:</p>
-<ul>
-<li><code>kv_hash=0</code></li>
-<li><code>group_state=e2e.chain.GroupState{participants: [], external_permissions: add_users | remove_users | set_value}</code></li>
-<li><code>shared_key=*empty*</code></li>
-</ul>
-<h4><a class="anchor" href="#versioning" id="versioning" name="versioning"><i class="anchor-icon"></i></a>Versioning</h4>
-<pre><code><a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
-</code></pre>
-<p>The E2E group call encryption protocol specified in this article may change in the future: to preserve backwards-compatibility with clients that do not support newer protocols yet, each participant must announce its maximum supported version in <a href="/constructor/e2e.chain.groupParticipant">e2e.chain.groupParticipant</a>.<code>version</code>.</p>
-<p>The protocol version used when generating and applying blocks must be equal to the smallest <code>version</code> contained in the participant list.</p>
-<p>Protocol changelog:</p>
-<ul>
-<li>Version <code>0</code>: Initial version.</li>
-<li>Version <code>1</code>: The shared group key now <strong>must</strong> be hashed via <code>HMAC-SHA512(raw_group_shared_key, block_hash)[0:32]</code> before use (step 5 in <a href="#shared-key-encryption">shared key encryption »</a>).</li>
-</ul>
 <h4><a class="anchor" href="#change-types-for-group-calls" id="change-types-for-group-calls" name="change-types-for-group-calls"><i class="anchor-icon"></i></a>Change Types for Group Calls</h4>
 <pre><code><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
 
@@ -428,7 +364,72 @@ A new key <strong>must</strong> be set by a subsequent <code>ChangeSetSharedKey<
 </code></pre>
 </li>
 </ol>
-<h5><a class="anchor" href="#implementation-notes" id="implementation-notes" name="implementation-notes"><i class="anchor-icon"></i></a>Implementation Notes</h5>
+<h4><a class="anchor" href="#local-blockchain-state" id="local-blockchain-state" name="local-blockchain-state"><i class="anchor-icon"></i></a>Local Blockchain State</h4>
+<pre><code class="language-tlang"><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
+
+<a href='/constructor/e2e.chain.stateProof'>e2e.chain.stateProof</a>#d6b679e6 flags:<a href='/type/%23'>#</a> kv_hash:<a href='/type/int256'>int256</a> group_state:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a> shared_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a> = <a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a>;
+
+<a href='/constructor/e2e.chain.groupState'>e2e.chain.groupState</a>#1ddc7584 participants:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>&gt; external_permissions:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupState'>e2e.chain.GroupState</a>;
+<a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
+
+<a href='/constructor/e2e.chain.sharedKey'>e2e.chain.sharedKey</a>#8a847e7f ek:<a href='/type/int256'>int256</a> encrypted_shared_key:<a href='/type/string'>string</a> dest_user_id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; dest_header:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; = <a href='/type/e2e.chain.SharedKey'>e2e.chain.SharedKey</a>;
+</code></pre>
+<p>Blockchain states must be stored locally and are used to verify incoming blocks.</p>
+<p>The state of a specific blockchain is composed of the following fields:</p>
+<ul>
+<li><code>current_height</code> - <strong>Height of the last block</strong>: The current height of the blockchain (equal to the height of the last applied block)</li>
+<li><code>current_hash</code> - <strong>Hash of the last block</strong>: The hash of the last applied block</li>
+<li><code>shared_key</code> - <strong>Shared Key</strong>: Shared group key encrypted for each group participant.</li>
+<li><code>group_state</code> - <strong>Group State</strong>: List of group participants and their permissions.</li>
+<li><code>kv_hash</code> - <strong>Key Value Storage hash</strong>: Root hash of the key-value trie after applying the block. The full trie format is intentionally out of scope for this document, because the key-value trie is currently not used anywhere. The <code>kv_hash</code>, however, is still partially used during block verification, as described below.</li>
+</ul>
+<p>The client must keep all these fields stored locally, and use them to validate changes when applying blocks: if block application succeeds, the fields must be updated according to the changes contained in the block.</p>
+<p>Application of incoming blocks where <code>group_state</code> and/or <code>shared_key</code> are not set according to the omission rules <a href="#block-structure-and-application-process">specified above</a> must NOT remove those fields from the local state.</p>
+<p>The initial local value of these fields when at the conceptual <code>height=-1</code>, used when applying the first block of the blockchain with <code>height=0</code>, must be equal to:</p>
+<ul>
+<li><code>current_height=-1</code></li>
+<li><code>current_hash=0</code></li>
+<li><code>shared_key=*empty*</code></li>
+<li><code>group_state=e2e.chain.GroupState{participants: [], external_permissions: add_users | remove_users | set_value}</code></li>
+<li><code>kv_hash=0</code></li>
+</ul>
+<h4><a class="anchor" href="#block-application-process" id="block-application-process" name="block-application-process"><i class="anchor-icon"></i></a>Block application process</h4>
+<pre><code class="language-tlang"><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
+</code></pre>
+<p>Blocks must be applied atomically (all changes succeed or none do) and sequentially.</p>
+<p>The validation process validates incoming blocks based on the current local value of the <a href="#local-blockchain-state">local blockchain state »</a>.</p>
+<ol>
+<li><strong>Height Check:</strong> The block's <code>height</code> must be exactly <code>local.current_height + 1</code>. If not, the block is invalid. It is currently impossible to apply a block with height larger than <code>2^31-1</code>.</li>
+<li><strong>Previous Hash Check:</strong> The block's <code>prev_block_hash</code> must match the hash of the last applied block (<code>local.current_hash</code>). If not, the block is invalid.</li>
+<li><strong>Find signer</strong>: If the <code>signature_public_key</code> field is populated, use it, otherwise:
+<ul>
+<li>If the block's <code>height</code> is equal to <code>0</code>, abort (the first block <strong>must</strong> have an attached <code>signature_public_key</code>)</li>
+<li>Otherwise, use <code>local.group_state.participants[0].public_key</code></li>
+</ul>
+</li>
+<li><strong>Permission Check (Initial):</strong> Determine the permissions of the block creator (identified by the <code>signature_public_key</code> extracted in the previous step). Permissions are sourced from the <em>previous</em> block's state or <code>external_permissions</code> if the creator wasn't already a participant.</li>
+<li><strong>Signature Verification:</strong> Verify the block's <code>signature</code> using the block creator's public key. If invalid, the block is rejected.</li>
+<li><strong>Apply Changes Sequentially:</strong> Iterate through the <code>changes</code> vector:
+<ul>
+<li>Verify the creator has sufficient permissions for the specific change, using their <em>current</em> permissions (which might have been updated by a previous change <em>within the same block</em>). If permissions are insufficient, the entire block is invalid.</li>
+<li>Apply the change to the state <a href="#change-types-for-group-calls">as specified above »</a>. If the change itself is malformed or invalid (e.g., invalid participant data), the entire block is invalid.</li>
+</ul>
+</li>
+<li><strong>State Proof Validation:</strong> After applying all changes, verify that the resulting state matches the information provided in the block's <code>state_proof</code>. If not, the block is invalid.</li>
+</ol>
+<p>If the block is invalid, all changes made by the block must be rolled back (or, the block application process can run on a copy of the local state which is mutated when iterating over the changes, and only applied if the block is fully validated).</p>
+<p>The blockchain starts with a conceptual "genesis" block at <code>height: -1</code> with a hash of <code>UInt256(0)</code> (the full local blockchain state at height <code>-1</code> is described <a href="#local-blockchain-state">here »</a>).</p>
+<h4><a class="anchor" href="#versioning" id="versioning" name="versioning"><i class="anchor-icon"></i></a>Versioning</h4>
+<pre><code><a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
+</code></pre>
+<p>The E2E group call encryption protocol specified in this article may change in the future: to preserve backwards-compatibility with clients that do not support newer protocols yet, each participant must announce its maximum supported version in <a href="/constructor/e2e.chain.groupParticipant">e2e.chain.groupParticipant</a>.<code>version</code>.</p>
+<p>The protocol version used when generating and applying blocks must be equal to the smallest <code>version</code> contained in the participant list.</p>
+<p>Protocol changelog:</p>
+<ul>
+<li>Version <code>0</code>: Initial version.</li>
+<li>Version <code>1</code>: The shared group key now <strong>must</strong> be hashed via <code>HMAC-SHA512(raw_group_shared_key, block_hash)[0:32]</code> before use (step 5 in <a href="#shared-key-encryption">shared key encryption »</a>).</li>
+</ul>
+<h4><a class="anchor" href="#implementation-notes" id="implementation-notes" name="implementation-notes"><i class="anchor-icon"></i></a>Implementation Notes</h4>
 <ul>
 <li><strong>Serialization:</strong> Blocks and their contents are serialized using the standard Telegram TL serialization methods before signing or hashing.</li>
 <li><strong>Concurrency:</strong> If multiple valid blocks for the same <code>height</code> are created concurrently, only the first one to be successfully applied will be appended. Subsequent blocks for that height will be rejected by participants due to the height mismatch, preventing forks and ensuring a linear history.</li>
