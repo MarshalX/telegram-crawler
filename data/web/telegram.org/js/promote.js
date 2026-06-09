@@ -3366,6 +3366,7 @@ var ReviewAds = {
     var owner_id = $ad.attr('data-owner-id');
     var ad_id    = $ad.attr('data-ad-id');
     var ad_hash  = $ad.attr('data-ad-hash');
+    var report_hash = $ad.attr('data-report-hash');
     var $buttons = $ad.find('.pr-btn');
 
     var method, params = {};
@@ -3385,6 +3386,9 @@ var ReviewAds = {
       params.owner_id = owner_id;
       params.ad_id = ad_id;
       params.ad_hash = ad_hash;
+      if (report_hash) {
+        params.report_hash = report_hash;
+      }
     }
 
     if ($buttons.prop('disabled')) {
@@ -3431,6 +3435,7 @@ var ReviewAds = {
     var owner_id  = $ad.attr('data-owner-id');
     var ad_id     = $ad.attr('data-ad-id');
     var ad_hash   = $ad.attr('data-ad-hash');
+    var report_hash = $ad.attr('data-report-hash');
     var $buttons  = $ad.find('.pr-btn');
     var reason_id = $(this).attr('data-reason-id');
 
@@ -3453,6 +3458,9 @@ var ReviewAds = {
       params.owner_id = owner_id;
       params.ad_id = ad_id;
       params.ad_hash = ad_hash;
+      if (report_hash) {
+        params.report_hash = report_hash;
+      }
     }
 
     if ($buttons.prop('disabled')) {

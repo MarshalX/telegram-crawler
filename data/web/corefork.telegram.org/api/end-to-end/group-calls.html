@@ -397,7 +397,7 @@ A new key <strong>must</strong> be set by a subsequent <code>ChangeSetSharedKey<
 <pre><code class="language-tlang"><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
 </code></pre>
 <p>Blocks must be applied atomically (all changes succeed or none do) and sequentially.</p>
-<p>The validation process validates incoming blocks based on the current local value of the <a href="#local-blockchain-state">local blockchain state »</a>.</p>
+<p>The validation process validates incoming blocks based on and modifying the current local value of the <a href="#local-blockchain-state">local blockchain state »</a>.</p>
 <ol>
 <li><strong>Height Check:</strong> The block's <code>height</code> must be exactly <code>local.current_height + 1</code>. If not, the block is invalid. It is currently impossible to apply a block with height larger than <code>2^31-1</code>.</li>
 <li><strong>Previous Hash Check:</strong> The block's <code>prev_block_hash</code> must match the hash of the last applied block (<code>local.current_hash</code>). If not, the block is invalid.</li>
@@ -417,7 +417,7 @@ A new key <strong>must</strong> be set by a subsequent <code>ChangeSetSharedKey<
 </li>
 <li><strong>State Proof Validation:</strong> After applying all changes, verify that the resulting state matches the information provided in the block's <code>state_proof</code>. If not, the block is invalid.</li>
 </ol>
-<p>If the block is invalid, all changes made by the block must be rolled back (or, the block application process can run on a copy of the local state which is mutated when iterating over the changes, and only applied if the block is fully validated).</p>
+<p>If the block is invalid, all changes made to the local state by the block must be rolled back (or, the block application process can run on a copy of the local state which is mutated when iterating over the changes, and only applied if the block is fully validated).</p>
 <p>The blockchain starts with a conceptual "genesis" block at <code>height: -1</code> with a hash of <code>UInt256(0)</code> (the full local blockchain state at height <code>-1</code> is described <a href="#local-blockchain-state">here »</a>).</p>
 <h4><a class="anchor" href="#versioning" id="versioning" name="versioning"><i class="anchor-icon"></i></a>Versioning</h4>
 <pre><code><a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
