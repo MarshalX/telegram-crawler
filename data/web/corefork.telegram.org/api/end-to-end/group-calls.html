@@ -133,15 +133,6 @@ Every time the client accepts a <a href="#subchains">main subchain</a> (<code>su
 </ol>
 <h5><a class="anchor" href="#forced-removal-kick" id="forced-removal-kick" name="forced-removal-kick"><i class="anchor-icon"></i></a>Forced Removal (<code>kick</code>)</h5>
 <p>An active participant may forcefully remove another <em>currently active</em> participant by invoking <a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a> with <code>kick=true</code> (instead of <code>only_left=true</code>), along with the same <code>ids</code> and <code>block</code> fields described above. As with stale pruning, the <code>remove_users</code> permission is required.</p>
-<h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
-<ul>
-<li>Clients <strong>must</strong> only apply blocks received from the server, even those they proposed themselves. The server enforces block ordering and prevents forks.</li>
-<li>All participants must verify that they see the same verification emojis, which are derived from the blockchain state using the commit-reveal protocol detailed later.</li>
-<li>If the server were to deliver different valid blocks to different participants (a fork), their blockchain hashes, and consequently their verification emojis, would permanently diverge. The reliance on the server prevents this under normal operation.</li>
-</ul>
-<hr>
-<h3><a class="anchor" href="#blockchain-state-management" id="blockchain-state-management" name="blockchain-state-management"><i class="anchor-icon"></i></a>Blockchain State Management</h3>
-<p>A dedicated blockchain provides a distributed, verifiable, and synchronized history of the group call's state.</p>
 <h4><a class="anchor" href="#subchains" id="subchains" name="subchains"><i class="anchor-icon"></i></a>Subchains</h4>
 <p>API schema:</p>
 <pre><code class="language-tlang">// Receive blocks from any chain
@@ -263,11 +254,22 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <p>As mentioned above, if the number of blocks returned by <em>any</em> call to <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> is equal to <code>limit</code>, <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> must be re-invoked immediately after processing the returned <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>, with the newly committed <code>offset</code> (usually equal to the returned <code>next_offset</code>), so the skipped block will be processed anyway once the client catches up to it during gap recovery.</p>
 </li>
 </ul>
-<p>Alternatively, instead of throwing away and re-downloading blocks that form a gap, they may be slotted into a queue, and <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> may be invoked with precisely the correct offset and limit to fill the missing queue slots; as a further improvement, the client could wait around a second before invoking <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a>, as an update that fills the gap may arrive by itself a bit later, out of order.</p>
+<p>Alternatively, instead of throwing away and re-downloading blocks that form a gap, they could be slotted into a queue, and the client could wait 0.5 seconds before invoking <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> if a gap is still present, as an update that fills the gap may arrive by itself a bit later, out of order.</p>
+<p>Regardless of the chosen approach, take care when invoking <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> to fill gaps: if the user is kicked from a conference while a gap is being filled, the method will return only the latest block, not the requested range, potentially creating another gap, recursively triggering the gap recovery logic: the <code>joined</code> flag must be set to <code>false</code> when the user is kicked from the conference by an <a href="/constructor/updateGroupCallParticipants">updateGroupCallParticipants</a>, but there may still be a race condition between <code>joined := false</code> and the polling logic, so ratelimit wakeups to the polling logic to avoid flooding the server.</p>
+<p>Also, to avoid recursion due to kicks, do not invoke <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> blockingly within the update handling thread/actor, instead simply schedule an early wakeup of the polling logic, which will naturally execute the method on a separate thread/actor (ratelimited as specified above).</p>
 </li>
 </ul>
 </li>
 </ul>
+<h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
+<ul>
+<li>Clients <strong>must</strong> only apply blocks received from the server, even those they proposed themselves. The server enforces block ordering and prevents forks.</li>
+<li>All participants must verify that they see the same verification emojis, which are derived from the blockchain state using the commit-reveal protocol detailed later.</li>
+<li>If the server were to deliver different valid blocks to different participants (a fork), their blockchain hashes, and consequently their verification emojis, would permanently diverge. The reliance on the server prevents this under normal operation.</li>
+</ul>
+<hr>
+<h3><a class="anchor" href="#blockchain-state-management" id="blockchain-state-management" name="blockchain-state-management"><i class="anchor-icon"></i></a>Blockchain State Management</h3>
+<p>A dedicated blockchain provides a distributed, verifiable, and synchronized history of the group call's state.</p>
 <h4><a class="anchor" href="#block-structure" id="block-structure" name="block-structure"><i class="anchor-icon"></i></a>Block Structure</h4>
 <p>Blocks form the chain, linking sequentially to maintain history. The structure is defined as follows:</p>
 <pre><code class="language-tlang"><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
