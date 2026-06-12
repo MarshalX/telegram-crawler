@@ -216,24 +216,58 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <p>Blocks are returned by the server inside of <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> updates, which must be additionally deduplicated by comparing the height of received blocks, similarly to the <a href="/api/updates">usual pts deduplication logic</a>, which still applies to these updates, just earlier in the handling process, together with all other update types.</p>
 <p>The <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>next_offset</code> field refers to the height/offset (within the <a href="#subchains">subchain</a> identified by <code>sub_chain_id</code>) of the block located <em>after</em> the last block in <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>blocks</code>.</p>
 <p>The height/offset of the first block in <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>blocks</code> is equal to <code>(next_offset - blocks.length) + 0</code>, the height of the second is <code>(next_offset - blocks.length) + 1</code>, and so on until <code>(next_offset - blocks.length) + (blocks.length - 1) == (next_offset - 1)</code> for the last block in <code>blocks</code>.</p>
-<p>While in practice, the height/offset of a main subchain block will match the value of the corresponding <a href="/constructor/e2e.chain.block">e2e.chain.block</a>.<code>height</code>, the API offset should not be confused with the block height: in particular, clients should <strong>not</strong> attempt to overwrite the value of <a href="/constructor/e2e.chain.block">e2e.chain.block</a>.<code>height</code> based on the computed offset, and call verification subchain <a href="/type/e2e.chain.GroupBroadcast">e2e.chain.GroupBroadcast</a> blocks don't even have an explicit <code>height</code> field anyway: clients must still associate the computed height to each block in <code>blocks</code> in order to deduplicate blocks, but without affecting the block contents, for example via a container <code>blockHeight{block: bytes, height: int}</code> object (or virtually via a simple counter when iterating over <code>blocks</code>).</p>
-<p>Clients must separately store the height of the last accepted block in both subchains i.e. in two <code>local_height</code> variables for the two subchains.</p>
-<p>When joining a conference call, initialize <code>local_height</code> with the height of the first block contained in the <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> returned by the join call (which will be our join block, validated and mirrored by the server).</p>
-<p>If the client leaves the call or is kicked from it, clear all local blockchain state, including <code>local_height</code>.</p>
-<p>If and only if <code>local_height</code> is initialized for <strong>both</strong> subchains of the  conference call and subchain, se the following logic to apply each individual block in <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>blocks</code>:</p>
+<p>While in practice, the height/offset of a main subchain block will match the value of the corresponding <a href="/constructor/e2e.chain.block">e2e.chain.block</a>.<code>height</code>, the API offset should not be confused with the block height: in particular, clients should <strong>not</strong> attempt to overwrite the value of <a href="/constructor/e2e.chain.block">e2e.chain.block</a>.<code>height</code> based on the computed offset, and call verification subchain <a href="/type/e2e.chain.GroupBroadcast">e2e.chain.GroupBroadcast</a> blocks don't even have an explicit <code>height</code> field anyway: clients must still associate the computed height to each block in <code>blocks</code> in order to deduplicate blocks, but without affecting the block contents, for example via a container <code>blockOffset{block: bytes, offset: int}</code> object (or virtually via a simple counter when iterating over <code>blocks</code>).</p>
+<p>Clients must separately store the offset+1 of the last accepted block in both subchains, i.e. in an <code>int next_offset[2]</code> variable for each conference.</p>
+<p>The initial value for <code>next_offset</code> when initializing the conference state <em>before</em> invoking <a href="/method/phone.createConferenceCall">phone.createConferenceCall</a>/<a href="/method/phone.joinGroupCall">phone.joinGroupCall</a> to join the call <strong>must</strong> be equal to <code>{-1, -1}</code>.</p>
+<p>Clients must also keep a <code>joined</code> boolean variable for each conference, initially <code>false</code>.</p>
+<p>If the client leaves the call or is kicked from it, clear all local blockchain state, including <code>next_offset</code> and <code>joined</code>.</p>
+<p>The <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> handling logic (triggered by the <a href="/api/updates">update system</a> both for passive updates and updates returned by any method) differs depending on whether we joined the call:</p>
 <ul>
 <li>
-<p>If <code>local_height + 1 == block.height</code>, apply the block: if block validation and application succeds, immediately set <code>local_height := block.height</code> before proceeding to the next block.</p>
+<p>If we haven't fully joined the call yet (<code>joined == false</code>):</p>
+<ul>
+<li>
+<p>If the <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> came from a <a href="/method/phone.createConferenceCall">phone.createConferenceCall</a>/<a href="/method/phone.joinGroupCall">phone.joinGroupCall</a>:</p>
+<p>For each individual block in <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>blocks</code>:</p>
+<ul>
+<li>Apply the block, ignoring the value of <code>block.offset</code>.</li>
+</ul>
+<p>If block validation and application succeds for all blocks, set <code>next_offset[updateGroupCallChainBlocks.sub_chain_id] := updateGroupCallChainBlocks.next_offset</code>.</p>
+<p>Then, if <code>next_offset[0] &gt;= 0 &amp;&amp; next_offset[1] &gt;= 0</code>, set <code>joined := true</code>.</p>
 </li>
 <li>
-<p>If <code>local_height + 1 &gt; block.height</code>, the block was already applied, and must be ignored.</p>
+<p>Otherwise, completely ignore the update.</p>
+<p>This logic means that i.e. the <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a><code>{offset=-1}</code> call used to fetch the last block when joining an existing call must <strong>not</strong> trigger any local state change, and the last block must be manually extracted by the caller in order to construct the self-add block.</p>
+<p>This also means that i.e. passive late <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> related to a left call we're trying to rejoin will be ignored, instead of triggering gap recovery logic that will not work anyway, because as mentioned above, if the client is not a member of the call, <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> will <strong>only</strong> return the last block regardless of the values of <code>offset</code> and <code>limit</code>, obviously breaking gap recovery logic.</p>
+</li>
+</ul>
 </li>
 <li>
-<p>If <code>local_height + 1 &lt; block.height</code>, there's a gap in the block update sequence: handle it by skipping this block, and properly filling the gap by invoking <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> with <code>offset=local_height+1</code> and <code>limit=50</code>; in other words, by early-triggering the <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> poll loop mentioned <a href="#subchains">above</a>.</p>
+<p>Otherwise, if <code>joined == true</code>:</p>
+<p>For each individual block in <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>blocks</code>:</p>
+<ul>
+<li>
+<p>If <code>next_offset == block.offset</code>, apply the block: if block validation and application succeds, immediately set <code>next_offset[updateGroupCallChainBlocks.sub_chain_id] := block.offset + 1</code> before proceeding to the next block.</p>
+</li>
+<li>
+<p>If <code>next_offset &gt; block.offset</code>, the block was already applied, and must be skipped.</p>
+</li>
+<li>
+<p>If <code>next_offset &lt; block.offset</code>, there's a gap in the block update sequence, handle it as follows:</p>
+<ul>
+<li>
+<p>Skip all remaining blocks in the update, starting from and including the current one, then:</p>
+</li>
+<li>
+<p>Fill the gap by invoking <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> with <code>offset=next_offset</code> and <code>limit=50</code>; in other words, by early-triggering the <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> poll loop mentioned <a href="#subchains">above</a>.</p>
 <p>As mentioned above, if the number of blocks returned by <em>any</em> call to <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> is equal to <code>limit</code>, <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> must be re-invoked immediately after processing the returned <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>, with the newly committed <code>offset</code> (usually equal to the returned <code>next_offset</code>), so the skipped block will be processed anyway once the client catches up to it during gap recovery.</p>
 </li>
 </ul>
-<p>Please note that if the client is not a member of the call, <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> will <strong>only</strong> return the last block regardless of the values of <code>offset</code> and <code>limit</code>: this will obviously break gap recovery logic, but this</p>
+<p>Alternatively, instead of throwing away and re-downloading blocks that form a gap, they may be slotted into a queue, and <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> may be invoked with precisely the correct offset and limit to fill the missing queue slots; as a further improvement, the client could wait around a second before invoking <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a>, as an update that fills the gap may arrive by itself a bit later, out of order.</p>
+</li>
+</ul>
+</li>
+</ul>
 <h4><a class="anchor" href="#block-structure" id="block-structure" name="block-structure"><i class="anchor-icon"></i></a>Block Structure</h4>
 <p>Blocks form the chain, linking sequentially to maintain history. The structure is defined as follows:</p>
 <pre><code class="language-tlang"><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
