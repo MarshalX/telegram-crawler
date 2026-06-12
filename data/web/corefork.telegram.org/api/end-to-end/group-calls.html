@@ -174,6 +174,7 @@ Every time the client accepts a <a href="#subchains">main subchain</a> (<code>su
 <li>
 <p>Subchain ID <code>0</code>: Main blockchain.<br>
 The main blockchain contains a sequence of <strong>only</strong> <code>e2e.chain.Block</code> objects, containing state changes for the call.</p>
+<p>Each block has its own height (aka offset within the subchain): the first block in the subchain has height <code>0</code>, then <code>1</code>, etc.</p>
 <p>Every block is linked to its previous block by the <code>prev_block_hash</code> parameter.</p>
 <p>To submit blocks to subchain <code>0</code>, only the following methods can be used:</p>
 <ul>
@@ -181,19 +182,25 @@ The main blockchain contains a sequence of <strong>only</strong> <code>e2e.chain
 <li><a href="/method/phone.joinGroupCall">phone.joinGroupCall</a> - Join a conference call</li>
 <li><a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a> - Remove a conference call participant</li>
 </ul>
+<p>All of these methods will return an <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> with the submitted blocks on success.</p>
+<p>All of these methods except for <a href="/method/phone.createConferenceCall">phone.createConferenceCall</a> can return an RPC error that starts with <code>CONF_WRITE_CHAIN_INVALID</code>, if the passed block is not based on the latest block of the subchain: in this case, the latest block must be re-fetched using <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a>, the new block must re-generated on top of it and re-submitted by re-invoking the method.</p>
 </li>
 <li>
 <p>Subchain ID <code>1</code>: Call verification blockchain.<br>
 The call verification blockchain contains a sequence of <strong>only</strong> objects of type <code>e2e.chain.GroupBroadcast</code>, containing messages used for the <a href="#commit-reveal-protocol-workflow">commit-reveal emoji verification protocol »</a>.</p>
-<p>All subchain <code>1</code> blocks are linked to a block from subchain <code>0</code> via <code>chain_height</code> and <code>chain_hash</code>, <strong>not</strong> to the previous block within subchain <code>1</code>, so they're not strictly a blockchain, but the API still uses the term <code>subchain</code> for simplicity.</p>
+<p>Each block has its own height (aka offset within the subchain): the first block in the subchain has height <code>0</code>, then <code>1</code>, etc.</p>
+<p>All subchain <code>1</code> blocks are linked to a block from subchain <code>0</code> via <code>chain_height</code> and <code>chain_hash</code>, both pointing to a block in subchain <code>0</code>, <strong>not</strong> to the previous block within subchain <code>1</code>, so they're not strictly a blockchain, but the API still uses the term <code>subchain</code> for simplicity.</p>
 <p>To submit blocks to subchain <code>1</code>, only the following methods can be used:</p>
 <ul>
 <li><a href="/method/phone.sendConferenceCallBroadcast">phone.sendConferenceCallBroadcast</a> - Submits a block to subchain <code>1</code>.</li>
 </ul>
 </li>
 </ul>
-<p>New blocks from both chains are automatically delivered by the API to call members using <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> updates.</p>
-<p>The full block history for a specific subchain of a specific call may be fetched using <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a>, which also returns <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> updates, inside an <a href="/type/Updates">Updates</a> object.</p>
+<p>Blocks are returned by the server inside of <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> updates, which are returned by all block submission methods and also delivered passively for group call members using the usual <a href="/api/updates">update delivery mechanism</a>, and must be handled as specified <a href="#handling-updates">here »</a>.</p>
+<p>Subchain blocks can also be fetched using <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a>, which will return a maximum of <code>limit</code> blocks from subchain <code>sub_chain_id</code> with height bigger than or equal to <code>offset</code>, as an <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> update; <code>offset</code> can also be <code>-1</code> to fetch the latest block on the specified subchain.</p>
+<p>If the client is not a member of the call, <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> will <strong>only</strong> return the last block regardless of the values of <code>offset</code> and <code>limit</code>.</p>
+<p>Please note that as long as the client is a member of the call, it <strong>must also</strong> manually poll for new chain blocks by invoking <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> with <code>limit=50</code> every 5 seconds in normal conditions, and every second when <a href="#key-verification-and-emoji-generation">key verification is in progress</a> (i.e. a new block was added to the main subchain, and an emoji fingerprint is currently being generated for that block via commit-reveal messages on the verification subchain), passing to <code>offset</code>, for each subchain, the height of the last accepted block plus <code>1</code>.</p>
+<p>If the number of blocks returned by <em>any</em> call to <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> is equal to <code>limit</code>, <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> must be re-invoked immediately after processing the returned <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>, with the newly committed <code>offset</code> (usually equal to the returned <code>next_offset</code>).</p>
 <p><strong>Note</strong>: the constructor IDs of all blocks <strong>returned by the server</strong> inside of <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> either passively or actively from <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> are <strong>modified</strong>, adding 1 to the constructor ID, so for example:</p>
 <ul>
 <li><a href="/constructor/e2e.chain.block">e2e.chain.block</a><code>#639a3db6</code> becomes <code>639a3db7</code></li>
@@ -203,6 +210,30 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <p><strong>Only</strong> accept blocks received from the server if their ID is the increased version (specifically, only accept <code>639a3db7</code> for the main subchain, and <code>d1512ae8</code>, <code>83f4f9d8</code> for the verification subchain).</p>
 <p>When <strong>submitting</strong> blocks to the server, use the canonical constructor IDs (<code>639a3db6</code>, <code>d1512ae7</code>, <code>83f4f9d8</code>).</p>
 <p>Clients must apply both main-chain blocks and verification messages only from the server: this includes blocks and verification messages created by the local client, apply only the blocks echoed back from the server.</p>
+<h4><a class="anchor" href="#handling-updates" id="handling-updates" name="handling-updates"><i class="anchor-icon"></i></a>Handling updates</h4>
+<pre><code><a href='/constructor/updateGroupCallChainBlocks'>updateGroupCallChainBlocks</a>#a477288f call:<a href='/type/InputGroupCall'>InputGroupCall</a> sub_chain_id:<a href='/type/int'>int</a> blocks:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/bytes'>bytes</a>&gt; next_offset:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+</code></pre>
+<p>Blocks are returned by the server inside of <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> updates, which must be additionally deduplicated by comparing the height of received blocks, similarly to the <a href="/api/updates">usual pts deduplication logic</a>, which still applies to these updates, just earlier in the handling process, together with all other update types.</p>
+<p>The <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>next_offset</code> field refers to the height/offset (within the <a href="#subchains">subchain</a> identified by <code>sub_chain_id</code>) of the block located <em>after</em> the last block in <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>blocks</code>.</p>
+<p>The height/offset of the first block in <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>blocks</code> is equal to <code>(next_offset - blocks.length) + 0</code>, the height of the second is <code>(next_offset - blocks.length) + 1</code>, and so on until <code>(next_offset - blocks.length) + (blocks.length - 1) == (next_offset - 1)</code> for the last block in <code>blocks</code>.</p>
+<p>While in practice, the height/offset of a main subchain block will match the value of the corresponding <a href="/constructor/e2e.chain.block">e2e.chain.block</a>.<code>height</code>, the API offset should not be confused with the block height: in particular, clients should <strong>not</strong> attempt to overwrite the value of <a href="/constructor/e2e.chain.block">e2e.chain.block</a>.<code>height</code> based on the computed offset, and call verification subchain <a href="/type/e2e.chain.GroupBroadcast">e2e.chain.GroupBroadcast</a> blocks don't even have an explicit <code>height</code> field anyway: clients must still associate the computed height to each block in <code>blocks</code> in order to deduplicate blocks, but without affecting the block contents, for example via a container <code>blockHeight{block: bytes, height: int}</code> object (or virtually via a simple counter when iterating over <code>blocks</code>).</p>
+<p>Clients must separately store the height of the last accepted block in both subchains i.e. in two <code>local_height</code> variables for the two subchains.</p>
+<p>When joining a conference call, initialize <code>local_height</code> with the height of the first block contained in the <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> returned by the join call (which will be our join block, validated and mirrored by the server).</p>
+<p>If the client leaves the call or is kicked from it, clear all local blockchain state, including <code>local_height</code>.</p>
+<p>If and only if <code>local_height</code> is initialized for <strong>both</strong> subchains of the  conference call and subchain, se the following logic to apply each individual block in <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>blocks</code>:</p>
+<ul>
+<li>
+<p>If <code>local_height + 1 == block.height</code>, apply the block: if block validation and application succeds, immediately set <code>local_height := block.height</code> before proceeding to the next block.</p>
+</li>
+<li>
+<p>If <code>local_height + 1 &gt; block.height</code>, the block was already applied, and must be ignored.</p>
+</li>
+<li>
+<p>If <code>local_height + 1 &lt; block.height</code>, there's a gap in the block update sequence: handle it by skipping this block, and properly filling the gap by invoking <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> with <code>offset=local_height+1</code> and <code>limit=50</code>; in other words, by early-triggering the <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> poll loop mentioned <a href="#subchains">above</a>.</p>
+<p>As mentioned above, if the number of blocks returned by <em>any</em> call to <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> is equal to <code>limit</code>, <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> must be re-invoked immediately after processing the returned <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>, with the newly committed <code>offset</code> (usually equal to the returned <code>next_offset</code>), so the skipped block will be processed anyway once the client catches up to it during gap recovery.</p>
+</li>
+</ul>
+<p>Please note that if the client is not a member of the call, <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> will <strong>only</strong> return the last block regardless of the values of <code>offset</code> and <code>limit</code>: this will obviously break gap recovery logic, but this</p>
 <h4><a class="anchor" href="#block-structure" id="block-structure" name="block-structure"><i class="anchor-icon"></i></a>Block Structure</h4>
 <p>Blocks form the chain, linking sequentially to maintain history. The structure is defined as follows:</p>
 <pre><code class="language-tlang"><a href='/constructor/e2e.chain.block'>e2e.chain.block</a>#639a3db6 signature:<a href='/type/int512'>int512</a> flags:<a href='/type/%23'>#</a> prev_block_hash:<a href='/type/int256'>int256</a> changes:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/e2e.chain.Change'>e2e.chain.Change</a>&gt; height:<a href='/type/int'>int</a> state_proof:<a href='/type/e2e.chain.StateProof'>e2e.chain.StateProof</a> signature_public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.Block'>e2e.chain.Block</a>;
@@ -537,8 +568,8 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 </li>
 </ol>
 <p>The final <code>unencrypted_prefix_size</code> is a 4-byte little-endian integer stored at the end of the packet. On decryption, receivers first remove this trailer, split off the unencrypted prefix, parse <code>header_a</code> and <code>header_b</code>, and then try the advertised epochs until one decrypts the one-time key successfully.</p>
-<p><code>magic1</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacket">e2e.callPacket</a><code>#40a6bee9 = e2e.CallPacket;</code>
-<code>magic2</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacketLargeMsgId">e2e.callPacketLargeMsgId</a><code>#1ce56c2d = e2e.CallPacketLargeMsgId;</code></p>
+<p><code>magic1</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacket">e2e.callPacket</a><code>#40a6bee9 = e2e.CallPacket;</code></p>
+<p><code>magic2</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacketLargeMsgId">e2e.callPacketLargeMsgId</a><code>#1ce56c2d = e2e.CallPacketLargeMsgId;</code></p>
 <h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li><strong>Replay Protection:</strong> The <code>seqno</code> must be unique and monotonically increasing for each <code>(public key, channel_id)</code> pair. In case of overflow, the client must leave the call. Receivers must track recently received <code>seqno</code> values and discard packets with old or duplicate numbers.</li>
