@@ -196,9 +196,9 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <ul>
 <li><a href="/constructor/e2e.chain.block">e2e.chain.block</a><code>#639a3db6</code> becomes <code>639a3db7</code></li>
 <li><a href="/constructor/e2e.chain.groupBroadcastNonceCommit">e2e.chain.groupBroadcastNonceCommit</a><code>#d1512ae7</code> becomes <code>d1512ae8</code></li>
-<li><a href="/constructor/e2e.chain.groupBroadcastNonceReveal">e2e.chain.groupBroadcastNonceReveal</a><code>#83f4f9d8</code> becomes <code>83f4f9d8</code></li>
+<li><a href="/constructor/e2e.chain.groupBroadcastNonceReveal">e2e.chain.groupBroadcastNonceReveal</a><code>#83f4f9d8</code> becomes <code>83f4f9d9</code></li>
 </ul>
-<p><strong>Only</strong> accept blocks received from the server if their ID is the increased version (specifically, only accept <code>639a3db7</code> for the main subchain, and <code>d1512ae8</code>, <code>83f4f9d8</code> for the verification subchain).</p>
+<p><strong>Only</strong> accept blocks received from the server if their ID is the increased version (specifically, only accept <code>639a3db7</code> for the main subchain, and <code>d1512ae8</code>, <code>83f4f9d9</code> for the verification subchain).</p>
 <p>When <strong>submitting</strong> blocks to the server, use the canonical constructor IDs (<code>639a3db6</code>, <code>d1512ae7</code>, <code>83f4f9d8</code>).</p>
 <p>Clients must apply both main-chain blocks and verification messages only from the server: this includes blocks and verification messages created by the local client, apply only the blocks echoed back from the server.</p>
 <h4><a class="anchor" href="#handling-updates" id="handling-updates" name="handling-updates"><i class="anchor-icon"></i></a>Handling updates</h4>
@@ -223,7 +223,7 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <ul>
 <li>Apply the block, ignoring the value of <code>block.offset</code>.</li>
 </ul>
-<p>If block validation and application succeds for all blocks, set <code>next_offset[updateGroupCallChainBlocks.sub_chain_id] := updateGroupCallChainBlocks.next_offset</code>.</p>
+<p>If block validation and application succeeds for all blocks, set <code>next_offset[updateGroupCallChainBlocks.sub_chain_id] := updateGroupCallChainBlocks.next_offset</code>.</p>
 <p>Then, if <code>next_offset[0] &gt;= 0 &amp;&amp; next_offset[1] &gt;= 0</code>, set <code>joined := true</code>.</p>
 </li>
 <li>
@@ -238,7 +238,7 @@ The call verification blockchain contains a sequence of <strong>only</strong> ob
 <p>For each individual block in <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>.<code>blocks</code>:</p>
 <ul>
 <li>
-<p>If <code>next_offset == block.offset</code>, apply the block: if block validation and application succeds, immediately set <code>next_offset[updateGroupCallChainBlocks.sub_chain_id] := block.offset + 1</code> before proceeding to the next block.</p>
+<p>If <code>next_offset == block.offset</code>, apply the block: if block validation and application succeeds, immediately set <code>next_offset[updateGroupCallChainBlocks.sub_chain_id] := block.offset + 1</code> before proceeding to the next block.</p>
 </li>
 <li>
 <p>If <code>next_offset &gt; block.offset</code>, the block was already applied, and must be skipped.</p>
@@ -374,7 +374,7 @@ In other words, <code>external_permissions</code> cannot be increased compared t
 <li>If at least one participant present in <code>local_group_state.participants</code> is <strong>not</strong> present in <code>incoming_group_state.participants</code>, validate that <code>local_permissions</code> contains <code>remove_users</code> (the block signer must have the <code>remove_users</code> permission to remove users)</li>
 <li>For all participants present in <code>incoming_group_state.participants</code> but <strong>not</strong> present in <code>local_group_state.participants</code>:
 <ul>
-<li>Validate that <code>local_permissions</code> contains <code>add_users</code> (the block signer must have the <code>add_users</code> permission to remove users, or <code>add_users</code> must be present in <code>local_group_state.external_permissions</code> for self-add blocks)</li>
+<li>Validate that <code>local_permissions</code> contains <code>add_users</code> (the block signer must have the <code>add_users</code> permission to add users, or <code>add_users</code> must be present in <code>local_group_state.external_permissions</code> for self-add blocks)</li>
 <li>Validate that <code>incoming_participant.flags</code> is equal to or is a subset of <code>local_permissions</code> (a newly added user cannot have more permissions than the adder, or more permissions than <code>local_group_state.external_permissions</code> for self-add blocks)</li>
 </ul>
 </li>
@@ -451,7 +451,7 @@ A new key <strong>must</strong> be set by a subsequent <code>ChangeSetSharedKey<
 <li><code>kv_hash</code> - <strong>Key Value Storage hash</strong>: Root hash of the key-value trie after applying the block. The full trie format is intentionally out of scope for this document, because the key-value trie is currently not used anywhere. The <code>kv_hash</code>, however, is still partially used during block verification, as described below.</li>
 </ul>
 <p>The client must keep all these fields stored locally, and use them to validate changes when applying blocks: if block application succeeds, the fields must be updated according to the changes contained in the block.</p>
-<p>Application of incoming blocks where <code>group_state</code> and/or <code>shared_key</code> are not set according to the omission rules <a href="#block-structure-and-application-process">specified above</a> must NOT remove those fields from the local state.</p>
+<p>Application of incoming blocks where <code>group_state</code> and/or <code>shared_key</code> are not set according to the omission rules <a href="#block-application-process">specified below</a> must NOT remove those fields from the local state.</p>
 <p>The initial local value of these fields when at the conceptual <code>height=-1</code>, only used when applying the first block of the blockchain with <code>height=0</code>, must be equal to:</p>
 <ul>
 <li><code>current_height=-1</code></li>
@@ -490,7 +490,7 @@ A new key <strong>must</strong> be set by a subsequent <code>ChangeSetSharedKey<
 <pre><code><a href='/constructor/e2e.chain.groupParticipant'>e2e.chain.groupParticipant</a>#28852f20 user_id:<a href='/type/long'>long</a> public_key:<a href='/type/int256'>int256</a> flags:<a href='/type/%23'>#</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> remove_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> set_value:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> version:<a href='/type/int'>int</a> = <a href='/type/e2e.chain.GroupParticipant'>e2e.chain.GroupParticipant</a>;
 </code></pre>
 <p>The E2E group call encryption protocol specified in this article may change in the future: to preserve backwards-compatibility with clients that do not support newer protocols yet, each participant must announce its maximum supported version in <a href="/constructor/e2e.chain.groupParticipant">e2e.chain.groupParticipant</a>.<code>version</code>.</p>
-<p>The protocol version used when generating and applying blocks must be equal to the smallest <code>version</code> contained in the participant list.</p>
+<p>The protocol version used when generating and applying blocks must be equal to the smallest <code>version</code> contained in the participant list, clamped to the inclusive range <code>0...255</code>.</p>
 <p>Protocol changelog:</p>
 <ul>
 <li>Version <code>0</code>: Initial version.</li>
@@ -609,7 +609,7 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 <h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li><strong>Replay Protection:</strong> The <code>seqno</code> must be unique and monotonically increasing for each <code>(public key, channel_id)</code> pair. In case of overflow, the client must leave the call. Receivers must track recently received <code>seqno</code> values and discard packets with old or duplicate numbers.</li>
-<li><strong>Signature Verification:</strong> During decryption, the receiver must use the <code>user_id</code> (provided out-of-band) to look up the sender's <code>public_key</code> in the relevant blockchain state (epoch specified in <code>header_a</code>). This public key is used to verify the <code>signature</code> within the decrypted <code>signed_payload</code>.</li>
+<li><strong>Signature Verification:</strong> During decryption, the receiver must use the <code>user_id</code> (provided out-of-band) to look up the sender's <code>public_key</code> in the relevant blockchain state (epoch specified in <code>header_a</code>). The signature is stored as the 64 bytes immediately following <code>encrypted_payload</code>, and this public key is used to verify it against <code>magic2 || large_msg_id</code> after recalculating <code>large_msg_id</code> while decrypting the payload.</li>
 <li><strong>Unique private keys:</strong> Clients <strong>must</strong> use unique private keys each time they add themselves to the blockchain. Otherwise, replay attacks could be possible.</li>
 </ul>
 <h4><a class="anchor" href="#shared-key-encryption" id="shared-key-encryption" name="shared-key-encryption"><i class="anchor-icon"></i></a>Shared Key Encryption</h4>
@@ -691,13 +691,35 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 <li>
 <p><strong>Final Hash Generation:</strong></p>
 <ul>
-<li>Concatenate all successfully revealed nonces sorted in lexicographic order. Let this be <code>concatenated_sorted_nonces</code>.</li>
+<li>Concatenate all successfully revealed raw 32-byte nonces sorted in lexicographic byte order. Let this be <code>concatenated_sorted_nonces</code>.</li>
 <li>Obtain the <code>blockchain_hash</code> (the hash of the latest block for which verification is being performed).</li>
-<li>Compute <code>emoji_hash = HMAC-SHA512(concatenated_sorted_nonces, blockchain_hash)</code>.</li>
-<li>This <code>emoji_hash</code> is then deterministically converted into a short sequence of emojis for display.</li>
+<li>Compute <code>emoji_hash = HMAC-SHA512(key=concatenated_sorted_nonces, message=blockchain_hash)</code>.</li>
+<li>Take the first 32 bytes of <code>emoji_hash</code>, ignoring the remaining 32 bytes.</li>
+<li>Convert this <code>emoji_hash_sliced</code> into the four-emoji fingerprint described below.</li>
 </ul>
 </li>
 </ol>
+<h4><a class="anchor" href="#emoji-fingerprint-generation" id="emoji-fingerprint-generation" name="emoji-fingerprint-generation"><i class="anchor-icon"></i></a>Emoji Fingerprint Generation</h4>
+<p>A 32-byte binary string (<code>emoji_hash_sliced</code> for group calls, <code>SHA256(key || g_a)</code> for <a href="/api/end-to-end/video-calls">one-on-one calls</a>) is converted into an ordered fingerprint of four emojis as follows:</p>
+<ol>
+<li>Divide these bytes into 4 consecutive 8-byte chunks.</li>
+<li>Clear the highest bit of the first byte of each chunk.</li>
+<li>Interpret each chunk as a big-endian unsigned 64-bit integer.</li>
+<li>Reduce each integer modulo the length of the fixed, ordered fingerprint emoji table used by Telegram clients (which has 333 elements).</li>
+<li>Use the 4 resulting values as indexes into the emoji table, preserving their order.</li>
+</ol>
+<p>In pseudocode:</p>
+<pre><code>fingerprint_hash = emoji_hash[0:32]
+
+for i in 0..3:
+    offset = i * 8
+    value = big_endian_uint64(fingerprint_hash[offset:offset + 8])
+    value &amp;= 0x7fffffffffffffff
+    fingerprint[i] = emoji_table[value % emoji_table.length]
+
+// fingerprint now contains the 4 emojis
+</code></pre>
+<p>See <a href="https://github.com/DrKLO/Telegram/blob/9fea7264725bbac16e5bd5f18fe22d7c6e8a3117/TMessagesProj/src/main/java/org/telegram/messenger/voip/EncryptionKeyEmojifier.java#L8">here »</a> for the exact contents of the emoji table (contains 333 emojis).</p>
 <h4><a class="anchor" href="#tl-schema-for-broadcasts" id="tl-schema-for-broadcasts" name="tl-schema-for-broadcasts"><i class="anchor-icon"></i></a>TL Schema for Broadcasts</h4>
 <pre><code class="language-tlang">// Phase 1: Commit
 <a href='/constructor/e2e.chain.groupBroadcastNonceCommit'>e2e.chain.groupBroadcastNonceCommit</a>#d1512ae7 signature:<a href='/type/int512'>int512</a> user_id:<a href='/type/int64'>int64</a> chain_height:<a href='/type/int32'>int32</a> chain_hash:<a href='/type/int256'>int256</a> nonce_hash:<a href='/type/int256'>int256</a> = <a href='/type/e2e.chain.GroupBroadcast'>e2e.chain.GroupBroadcast</a>;
