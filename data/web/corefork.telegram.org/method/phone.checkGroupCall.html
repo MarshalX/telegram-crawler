@@ -42,8 +42,9 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/methods" >All Methods</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/method/phone.checkGroupCall" >phone.checkGroupCall</a></li></ul></div>
   <h1 id="dev_page_title">phone.checkGroupCall</h1>
   
-  <div id="dev_page_content"><p>Check whether the <a href="/api/group-calls">group call</a> Server Forwarding Unit is currently receiving the streams with the specified WebRTC source IDs.<br>
-Returns an intersection of the source IDs specified in <code>sources</code>, and the source IDs currently being forwarded by the SFU.</p>
+  <div id="dev_page_content"><p>Check which of the specified source IDs the server still recognizes as joined to a group call. This method can be used with all group call types, see <a href="/api/group-calls#maintaining-group-call-connections">here »</a> for more info.</p>
+<p>After joining the main connection with <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a>, pass its non-zero SSRC/source ID to this method periodically. If a presentation connection is also active, include the separate source registered using <a href="/method/phone.joinGroupCallPresentation">phone.joinGroupCallPresentation</a>.</p>
+<p>The method returns the subset of the supplied sources that are still joined. A missing source means that the corresponding connection must be recreated and joined again; it does not indicate whether media packets are currently flowing. If the method returns <code>GROUPCALL_JOIN_MISSING</code>, the main connection must be rejoined.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -76,7 +77,7 @@ Returns an intersection of the source IDs specified in <code>sources</code>, and
 <tr>
 <td><strong>sources</strong></td>
 <td style="text-align: center;"><a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/int">int</a>&gt;</td>
-<td>Source IDs</td>
+<td>Non-zero SSRC/source IDs of the caller's main and presentation connections</td>
 </tr>
 </tbody>
 </table>
