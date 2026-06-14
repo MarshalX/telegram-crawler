@@ -42,7 +42,65 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/updateGroupCallConnection" >updateGroupCallConnection</a></li></ul></div>
   <h1 id="dev_page_title">updateGroupCallConnection</h1>
   
-  <div id="dev_page_content"><p>New WebRTC connection parameters for the currently joined <a href="/api/group-calls">group call</a>.</p>
+  <div id="dev_page_content"><p>Connection parameters returned after joining a <a href="/api/group-calls">group call</a>.</p>
+<p>If <code>presentation</code> is set, the parameters belong to the separate <a href="/api/group-calls#presentations">presentation connection</a>; otherwise they belong to the main connection.</p>
+<p>For a normal RTC connection, pass <code>params</code> to the local tgcalls group-call engine as its join response payload. It has the following shape:</p>
+<pre><code class="language-json">{
+  "transport": {
+    "ufrag": "...",
+    "pwd": "...",
+    "fingerprints": [{
+      "hash": "sha-256",
+      "fingerprint": "...",
+      "setup": "active"
+    }],
+    "candidates": [{
+      "port": "...",
+      "protocol": "...",
+      "network": "...",
+      "generation": "...",
+      "id": "...",
+      "component": "...",
+      "foundation": "...",
+      "priority": "...",
+      "ip": "...",
+      "type": "...",
+      "tcptype": "...",
+      "rel-addr": "...",
+      "rel-port": "..."
+    }]
+  },
+  "video": {
+    "endpoint": "...",
+    "server_sources": [123456789],
+    "payload-types": [{
+      "id": 100,
+      "name": "VP8",
+      "clockrate": 90000,
+      "channels": 1,
+      "parameters": {},
+      "rtcp-fbs": [{
+        "type": "nack",
+        "subtype": "pli"
+      }]
+    }],
+    "rtp-hdrexts": [{
+      "id": 1,
+      "uri": "..."
+    }]
+  }
+}
+</code></pre>
+<p><code>transport</code> contains the remote ICE and DTLS connection parameters. Each candidate may also contain the optional <code>tcptype</code>, <code>rel-addr</code> and <code>rel-port</code> fields. The optional <code>video</code> object describes the endpoint assigned to the client's published video, the server SSRC used for bandwidth probing, and the negotiated video codecs, RTCP feedback types and RTP header extensions.</p>
+<p>For a broadcast stream, including an <a href="/api/group-calls#rtmp-livestreams">RTMP-mode call</a>, <code>params</code> instead has the following shape:</p>
+<pre><code class="language-json">{
+  "stream": true,
+  "rtmp": true,
+  "rtmp_stream_url": "...",
+  "rtmp_stream_key": "..."
+}
+</code></pre>
+<p>If <code>stream</code> is set, initialize the local call engine in stream playback mode instead of passing the payload as an RTC join response. The <code>rtmp</code> field indicates RTMP playback mode. The optional <code>rtmp_stream_url</code> and <code>rtmp_stream_key</code> fields, available only to admins, contain publishing credentials and must be kept secret.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -74,12 +132,12 @@
 <tr>
 <td><strong>presentation</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/constructor/true">true</a></td>
-<td>Are these parameters related to the screen capture session currently in progress?</td>
+<td>Whether these parameters belong to the separate presentation connection instead of the main connection</td>
 </tr>
 <tr>
 <td><strong>params</strong></td>
 <td style="text-align: center;"><a href="/type/DataJSON">DataJSON</a></td>
-<td>WebRTC parameters</td>
+<td>RTC join response parameters or broadcast-stream metadata, as described above</td>
 </tr>
 </tbody>
 </table>
