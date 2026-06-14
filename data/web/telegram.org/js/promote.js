@@ -3411,6 +3411,9 @@ var ReviewAds = {
         if (result.buttons_html) {
           $ad.find('.js-review-buttons').html(result.buttons_html);
         }
+        if (result.rp_html !== undefined) {
+          $ad.eq(0).children('.pr-review-content-column').find('.js-rp-chip-wrap').html(result.rp_html);
+        }
         $ad.find('.js-review-similar-status').html('');
         if (result.similar_html) {
           ReviewAds.updateSimilarAds($ad, result.similar_html, result.similar_hash);
@@ -3482,6 +3485,9 @@ var ReviewAds = {
         }
         if (result.buttons_html) {
           $ad.find('.js-review-buttons').html(result.buttons_html);
+        }
+        if (result.rp_html !== undefined) {
+          $ad.eq(0).children('.pr-review-content-column').find('.js-rp-chip-wrap').html(result.rp_html);
         }
         $ad.find('.js-review-similar-status').html('');
         if (result.similar_html) {
