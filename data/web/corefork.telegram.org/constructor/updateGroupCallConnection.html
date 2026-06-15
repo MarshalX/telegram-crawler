@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>updateGroupCallConnection</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="New WebRTC parameters">
+    <meta property="description" content="Connection parameters returned after joining a group call.  If presentation is set, the parameters belong to the separate presentation connection; otherwise they belong to the main connection.  For a normal WebRTC connection, pass params to the local tgcalls group-call engine as its join response payload.  For RTMP-mode calls, params instead has the following shape:  {   &quot;stream&quot;: true,   &quot;rtmp&quot;: true,   &quot;rtmp_stream_url&quot;: &quot;...&quot;,   &quot;rtmp_stream_key&quot;: &quot;...&quot; }   The optional rtmp_stream_url and rtmp_stream_key fields, available only to admins in RTMP mode, contain publishing credentials and must be kept secret.">
     <meta property="og:title" content="updateGroupCallConnection">
     <meta property="og:image" content="">
-    <meta property="og:description" content="New WebRTC parameters">
+    <meta property="og:description" content="Connection parameters returned after joining a group call.  If presentation is set, the parameters belong to the separate presentation connection; otherwise they belong to the main connection.  For a normal WebRTC connection, pass params to the local tgcalls group-call engine as its join response payload.  For RTMP-mode calls, params instead has the following shape:  {   &quot;stream&quot;: true,   &quot;rtmp&quot;: true,   &quot;rtmp_stream_url&quot;: &quot;...&quot;,   &quot;rtmp_stream_key&quot;: &quot;...&quot; }   The optional rtmp_stream_url and rtmp_stream_key fields, available only to admins in RTMP mode, contain publishing credentials and must be kept secret.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -44,55 +44,8 @@
   
   <div id="dev_page_content"><p>Connection parameters returned after joining a <a href="/api/group-calls">group call</a>.</p>
 <p>If <code>presentation</code> is set, the parameters belong to the separate <a href="/api/group-calls#presentations">presentation connection</a>; otherwise they belong to the main connection.</p>
-<p>For a normal RTC connection, pass <code>params</code> to the local tgcalls group-call engine as its join response payload. It has the following shape:</p>
-<pre><code class="language-json">{
-  "transport": {
-    "ufrag": "...",
-    "pwd": "...",
-    "fingerprints": [{
-      "hash": "sha-256",
-      "fingerprint": "...",
-      "setup": "active"
-    }],
-    "candidates": [{
-      "port": "...",
-      "protocol": "...",
-      "network": "...",
-      "generation": "...",
-      "id": "...",
-      "component": "...",
-      "foundation": "...",
-      "priority": "...",
-      "ip": "...",
-      "type": "...",
-      "tcptype": "...",
-      "rel-addr": "...",
-      "rel-port": "..."
-    }]
-  },
-  "video": {
-    "endpoint": "...",
-    "server_sources": [123456789],
-    "payload-types": [{
-      "id": 100,
-      "name": "VP8",
-      "clockrate": 90000,
-      "channels": 1,
-      "parameters": {},
-      "rtcp-fbs": [{
-        "type": "nack",
-        "subtype": "pli"
-      }]
-    }],
-    "rtp-hdrexts": [{
-      "id": 1,
-      "uri": "..."
-    }]
-  }
-}
-</code></pre>
-<p><code>transport</code> contains the remote ICE and DTLS connection parameters. Each candidate may also contain the optional <code>tcptype</code>, <code>rel-addr</code> and <code>rel-port</code> fields. The optional <code>video</code> object describes the endpoint assigned to the client's published video, the server SSRC used for bandwidth probing, and the negotiated video codecs, RTCP feedback types and RTP header extensions.</p>
-<p>For a broadcast stream, including an <a href="/api/group-calls#rtmp-livestreams">RTMP-mode call</a>, <code>params</code> instead has the following shape:</p>
+<p>For a normal WebRTC connection, pass <code>params</code> to the local tgcalls group-call engine as its join response payload.</p>
+<p>For <a href="/api/group-calls#rtmp-livestreams">RTMP-mode calls</a>, <code>params</code> instead has the following shape:</p>
 <pre><code class="language-json">{
   "stream": true,
   "rtmp": true,
@@ -100,7 +53,7 @@
   "rtmp_stream_key": "..."
 }
 </code></pre>
-<p>If <code>stream</code> is set, initialize the local call engine in stream playback mode instead of passing the payload as an RTC join response. The <code>rtmp</code> field indicates RTMP playback mode. The optional <code>rtmp_stream_url</code> and <code>rtmp_stream_key</code> fields, available only to admins, contain publishing credentials and must be kept secret.</p>
+<p>The optional <code>rtmp_stream_url</code> and <code>rtmp_stream_key</code> fields, available only to admins in RTMP mode, contain publishing credentials and must be kept secret.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -143,6 +96,8 @@
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
 <p><a href="/type/Update">Update</a></p>
+<h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#group-calls" id="group-calls" name="group-calls"><i class="anchor-icon"></i></a><a href="/api/group-calls">Group calls</a></h4>
 </div>
   
 </div>

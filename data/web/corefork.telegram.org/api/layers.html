@@ -837,11 +837,11 @@
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/stories.startLive">stories.startLive</a> -</li>
-<li>Added <a href="/method/phone.deleteGroupCallMessages">phone.deleteGroupCallMessages</a> -</li>
-<li>Added <a href="/method/phone.deleteGroupCallParticipantMessages">phone.deleteGroupCallParticipantMessages</a> -</li>
-<li>Added <a href="/method/phone.getGroupCallStars">phone.getGroupCallStars</a> -</li>
-<li>Added <a href="/method/phone.saveDefaultSendAs">phone.saveDefaultSendAs</a> -</li>
+<li>Added <a href="/method/stories.startLive">stories.startLive</a> - Start a live story, optionally using RTMP livestream mode, see <a href="/api/group-calls#live-stories">here »</a> for the full flow.</li>
+<li>Added <a href="/method/phone.deleteGroupCallMessages">phone.deleteGroupCallMessages</a> - Delete specific messages from a <a href="/api/group-calls#in-call-messages">live story's in-call message overlay »</a>.</li>
+<li>Added <a href="/method/phone.deleteGroupCallParticipantMessages">phone.deleteGroupCallParticipantMessages</a> - As an admin, delete all messages from a specific participant in a <a href="/api/group-calls#in-call-messages">live story's in-call message overlay »</a>.</li>
+<li>Added <a href="/method/phone.getGroupCallStars">phone.getGroupCallStars</a> - Fetch the donor and paid-message leaderboard of a live story. This method can only be used with live stories, see <a href="/api/group-calls#live-stories">here »</a> for more info.</li>
+<li>Added <a href="/method/phone.saveDefaultSendAs">phone.saveDefaultSendAs</a> - Save the default peer to display as the author of comments and reactions in a live story. This method can only be used with live stories, see <a href="/api/group-calls#paid-live-story-comments">here »</a> for more info.</li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
@@ -860,7 +860,7 @@
 <ul>
 <li>Added <a href="/constructor/messageMediaVideoStream">messageMediaVideoStream</a> -</li>
 <li>Added <a href="/constructor/updateDeleteGroupCallMessages">updateDeleteGroupCallMessages</a> -</li>
-<li>Added <a href="/constructor/groupCallMessage">groupCallMessage</a> -</li>
+<li>Added <a href="/constructor/groupCallMessage">groupCallMessage</a> - Represents a transient in-call message, <a href="/api/group-calls#in-call-reactions">emoji reaction »</a>, paid live story comment or standalone paid live story donation.</li>
 <li>Added <a href="/constructor/inputPrivacyKeySavedMusic">inputPrivacyKeySavedMusic</a> - Whether the user can see the <a href="/api/profile#music">songs we pinned to our profile »</a>.</li>
 <li>Added <a href="/constructor/privacyKeySavedMusic">privacyKeySavedMusic</a> - Whether the user can see the <a href="/api/profile#music">songs we pinned to our profile »</a>.</li>
 <li>Added <a href="/constructor/groupCallDonor">groupCallDonor</a> -</li>
@@ -952,8 +952,8 @@
 <li>Added <a href="/method/messages.reorderPinnedForumTopics">messages.reorderPinnedForumTopics</a> - Reorder pinned forum topics</li>
 <li>Added <a href="/method/messages.createForumTopic">messages.createForumTopic</a> - Create a <a href="/api/forum">forum topic</a>.</li>
 <li>Added <a href="/method/messages.deleteTopicHistory">messages.deleteTopicHistory</a> - Delete message history of a <a href="/api/forum">forum topic</a></li>
-<li>Added <a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a> -</li>
-<li>Added <a href="/method/phone.sendGroupCallEncryptedMessage">phone.sendGroupCallEncryptedMessage</a> -</li>
+<li>Added <a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a> - Send a transient in-call message to all participants of a non-RTMP video chat/livestream or live story, see <a href="/api/group-calls#in-call-messages">here »</a> for more info.</li>
+<li>Added <a href="/method/phone.sendGroupCallEncryptedMessage">phone.sendGroupCallEncryptedMessage</a> - Send an E2E-encrypted message or emoji reaction to all participants of a conference call. This method can only be used with conferences; see <a href="/api/end-to-end/group-calls#conference-in-call-messages">here »</a> for the serialization and encryption process.</li>
 <li>Added <a href="/method/contacts.updateContactNote">contacts.updateContactNote</a> - Update the private note associated to a contact; see <a href="/api/contacts#private-notes-for-contacts">here »</a> for more info.</li>
 <li>Added <a href="/method/users.suggestBirthday">users.suggestBirthday</a> - Suggest a birthday to another user, see <a href="/api/profile#birthday">here »</a> for more info on birthdays in the API.</li>
 </ul>
@@ -977,8 +977,8 @@
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
 <li>Added <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> - Used by bots to implement <a href="/api/bots/ai#live-message-streaming">live message streaming »</a>.</li>
-<li>Added <a href="/constructor/updateGroupCallMessage">updateGroupCallMessage</a> -</li>
-<li>Added <a href="/constructor/updateGroupCallEncryptedMessage">updateGroupCallEncryptedMessage</a> -</li>
+<li>Added <a href="/constructor/updateGroupCallMessage">updateGroupCallMessage</a> - A new in-call message was received in a <a href="/api/group-calls">group call or livestream</a>, sent using <a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a>.</li>
+<li>Added <a href="/constructor/updateGroupCallEncryptedMessage">updateGroupCallEncryptedMessage</a> - A new E2E-encrypted message or emoji reaction was received in a conference call, see <a href="/api/end-to-end/group-calls#receiving-and-decrypting-a-message">here »</a> for the decryption process.</li>
 <li>Added <a href="/constructor/updatePinnedForumTopic">updatePinnedForumTopic</a> - A <a href="/api/forum#forum-topics">forum topic »</a> was pinned or unpinned.</li>
 <li>Added <a href="/constructor/updatePinnedForumTopics">updatePinnedForumTopics</a> - The <a href="/api/forum#forum-topics">pinned topics</a> of a forum have changed.</li>
 <li>Added <a href="/constructor/peerColorCollectible">peerColorCollectible</a> - Represents a <a href="/api/colors">color palette »</a> associated to a <a href="/api/gifts#collectible-gifts">collectible gift »</a>, see <a href="/api/colors#collectible-gift-palettes">here »</a> for more info.</li>
@@ -1061,7 +1061,7 @@
 <li>Added <a href="/constructor/jsonArray">jsonArray</a> - JSON array</li>
 <li>Added <a href="/constructor/jsonObject">jsonObject</a> - JSON object value</li>
 <li>Added <a href="/constructor/textWithEntities">textWithEntities</a> - Styled text with <a href="/api/entities">message entities</a></li>
-<li>Added <a href="/constructor/groupCallMessage">groupCallMessage</a> -</li>
+<li>Added <a href="/constructor/groupCallMessage">groupCallMessage</a> - Represents a transient in-call message, <a href="/api/group-calls#in-call-reactions">emoji reaction »</a>, paid live story comment or standalone paid live story donation.</li>
 </ul>
 <h4><a class="anchor" href="#end-to-end-schema" id="end-to-end-schema" name="end-to-end-schema"><i class="anchor-icon"></i></a>End-to-end schema</h4>
 <div><pre><code>===216===<br>
@@ -2568,11 +2568,11 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <ul>
 <li>Added <a href="/method/payments.canPurchaseStore">payments.canPurchaseStore</a> - Checks whether a purchase is possible. Must be called before in-store purchase, official apps only.</li>
 <li>Added <a href="/method/contacts.getSponsoredPeers">contacts.getSponsoredPeers</a> - Obtain a list of sponsored peer search results for a given query</li>
-<li>Added <a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a> - Remove participants from a conference call.</li>
+<li>Added <a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a> - Remove participants from a <a href="/api/group-calls#conference-calls">conference call</a>.</li>
 <li>Added <a href="/method/phone.sendConferenceCallBroadcast">phone.sendConferenceCallBroadcast</a> - Broadcast a blockchain block to all members of a conference call, see <a href="/api/end-to-end/group-calls">here »</a> for more info.</li>
-<li>Added <a href="/method/phone.inviteConferenceCallParticipant">phone.inviteConferenceCallParticipant</a> - Invite a user to a conference call.</li>
-<li>Added <a href="/method/phone.declineConferenceCallInvite">phone.declineConferenceCallInvite</a> - Declines a conference call invite.</li>
-<li>Added <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> - Fetch the blocks of a <a href="/api/end-to-end/group-calls">conference blockchain »</a>.</li>
+<li>Added <a href="/method/phone.inviteConferenceCallParticipant">phone.inviteConferenceCallParticipant</a> - Invite a user to a <a href="/api/group-calls#conference-calls">conference call</a>.</li>
+<li>Added <a href="/method/phone.declineConferenceCallInvite">phone.declineConferenceCallInvite</a> - Decline a <a href="/api/group-calls#conference-calls">conference call</a> invite.</li>
+<li>Added <a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a> - Fetch the blocks of a <a href="/api/end-to-end/group-calls">conference blockchain »</a>, returns an <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> to be handled as <a href="/api/end-to-end/group-calls#handling-updates">specifiede here »</a>.</li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
@@ -2602,7 +2602,7 @@ fileSourceDocumentByHash#0f151e0f sha256:bytes size:long mime_type:string = File
 <li>Added <a href="/constructor/contacts.sponsoredPeersEmpty">contacts.sponsoredPeersEmpty</a> - There are no sponsored peers for this query.</li>
 <li>Added <a href="/constructor/contacts.sponsoredPeers">contacts.sponsoredPeers</a> - Sponsored peers.</li>
 <li>Added <a href="/constructor/inputInvoiceBusinessBotTransferStars">inputInvoiceBusinessBotTransferStars</a> - Transfer stars from the balance of a user account <a href="/api/bots/connected-business-bots">connected to a business bot</a>, to the balance of the <a href="/api/bots/connected-business-bots">business bot</a>, see <a href="/api/stars#transferring-stars-from-a-business-account-to-the-business-bot">here »</a> for more info on the full flow.</li>
-<li>Added <a href="/constructor/inputGroupCallSlug">inputGroupCallSlug</a> - Join a conference call through an <a href="/api/links#conference-links">invitation link »</a>.</li>
+<li>Added <a href="/constructor/inputGroupCallSlug">inputGroupCallSlug</a> - Identify a <a href="/api/group-calls#conference-calls">conference call »</a> using the slug from its invitation link.</li>
 <li>Added <a href="/constructor/inputGroupCallInviteMessage">inputGroupCallInviteMessage</a> - Join a group call through a <a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a> invitation message.</li>
 <li>Added <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> - Contains updates to the blockchain of a conference call, see <a href="/api/end-to-end/group-calls">here »</a> for more info.</li>
 <li>Added <a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a> - Represents a <a href="/api/end-to-end/group-calls">conference call</a> (or an invitation to a conference call, if neither the <code>missed</code> nor <code>active</code> flags are set).</li>
