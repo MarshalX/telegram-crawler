@@ -42,7 +42,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/updateGroupCallChainBlocks" >updateGroupCallChainBlocks</a></li></ul></div>
   <h1 id="dev_page_title">updateGroupCallChainBlocks</h1>
   
-  <div id="dev_page_content"><p>Contains updates to the blockchain of a conference call, see <a href="/api/end-to-end/group-calls">here »</a> for more info.</p>
+  <div id="dev_page_content"><p>Contains conference call blockchain blocks, see <a href="/api/end-to-end/group-calls#handling-updates">handling E2E group call updates »</a>.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -69,22 +69,22 @@
 <tr>
 <td><strong>call</strong></td>
 <td style="text-align: center;"><a href="/type/InputGroupCall">InputGroupCall</a></td>
-<td>The conference call.</td>
+<td>Conference whose specified subchain received these blocks</td>
 </tr>
 <tr>
 <td><strong>sub_chain_id</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
-<td>Subchain ID.</td>
+<td><code>0</code> for the main state blockchain, <code>1</code> for the call verification subchain</td>
 </tr>
 <tr>
 <td><strong>blocks</strong></td>
 <td style="text-align: center;"><a href="/type/Vector%20t">Vector</a>&lt;<a href="/type/bytes">bytes</a>&gt;</td>
-<td>Blocks.</td>
+<td>Serialized subchain blocks with the server-adjusted constructor IDs described in the <a href="/api/end-to-end/group-calls#subchains">subchain documentation »</a></td>
 </tr>
 <tr>
 <td><strong>next_offset</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
-<td>Height of the block located <em>after</em> the last block in <code>blocks</code>.</td>
+<td>Height of the block located <em>after</em> the last block in <code>blocks</code>; the first returned block has height <code>next_offset - blocks.length</code></td>
 </tr>
 </tbody>
 </table>
