@@ -479,7 +479,7 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#working-with-e2e-conference-calls" id="working-with-e2e-conference-calls" name="working-with-e2e-conference-calls"><i class="anchor-icon"></i></a>Working with <a href="/api/calls#conference-calls">E2E conference calls</a></h3>
+<h3><a class="anchor" href="#working-with-e2e-conference-calls-" id="working-with-e2e-conference-calls-" name="working-with-e2e-conference-calls-"><i class="anchor-icon"></i></a>Working with <a href="/api/end-to-end/group-calls#overview">E2E conference calls »</a></h3>
 <table class="table">
 <thead>
 <tr>
@@ -490,15 +490,19 @@ Look for updates of telegram&#39;s terms of service…">
 <tbody>
 <tr>
 <td><a href="/method/phone.createConferenceCall">phone.createConferenceCall</a></td>
-<td>Create and optionally join a new <a href="/api/group-calls#conference-calls">conference call</a>.</td>
+<td>Create and optionally join a new <a href="/api/group-calls#conference-calls">conference call »</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a></td>
-<td>Remove participants from a <a href="/api/group-calls#conference-calls">conference call</a>.<br><br>Exactly one of the <code>only_left</code> and <code>kick</code> flags must be set.</td>
+<td>Remove participants from a <a href="/api/end-to-end/group-calls#removing-a-participant">conference call »</a>.<br><br>Exactly one of the <code>only_left</code> and <code>kick</code> flags must be set.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.sendConferenceCallBroadcast">phone.sendConferenceCallBroadcast</a></td>
-<td>Broadcast a blockchain block to all members of a conference call, see <a href="/api/end-to-end/group-calls">here »</a> for more info.</td>
+<td>Submit a verification message to conference call subchain <code>1</code>, see <a href="/api/end-to-end/group-calls#subchains">subchains »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.sendGroupCallEncryptedMessage">phone.sendGroupCallEncryptedMessage</a></td>
+<td>Send an E2E-encrypted message or emoji reaction to all participants of a conference call. This method can only be used with conferences; see <a href="/api/end-to-end/group-calls#conference-in-call-messages">here »</a> for the serialization and encryption process.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.inviteConferenceCallParticipant">phone.inviteConferenceCallParticipant</a></td>
@@ -510,7 +514,7 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 <tr>
 <td><a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a></td>
-<td>Fetch the blocks of a <a href="/api/end-to-end/group-calls">conference blockchain »</a>, returns an <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> to be handled as <a href="/api/end-to-end/group-calls#handling-updates">specifiede here »</a>.<br><br>If the number of blocks returned by <em>any</em> call to this method is equal to <code>limit</code>, this method must be re-invoked immediately after processing the returned <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>, with the newly committed <code>offset</code> (usually equal to the returned <code>next_offset</code>).</td>
+<td>Fetch blocks from a conference call <a href="/api/end-to-end/group-calls#subchains">subchain »</a>; handle the returned <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> as <a href="/api/end-to-end/group-calls#handling-updates">specified here »</a>.<br><br>If the number of blocks returned by <em>any</em> call to this method is equal to <code>limit</code>, this method must be re-invoked immediately after processing the returned <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>, with the newly committed <code>offset</code> (usually equal to the returned <code>next_offset</code>).</td>
 </tr>
 </tbody>
 </table>
@@ -2096,6 +2100,117 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-group-calls-" id="working-with-group-calls-" name="working-with-group-calls-"><i class="anchor-icon"></i></a>Working with <a href="/api/group-calls#group-call-types">group calls »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/phone.exportGroupCallInvite">phone.exportGroupCallInvite</a></td>
+<td>Get an invite link for a public <a href="/api/group-calls#video-chats-livestreams">video chat/livestream »</a>.<br><br>Non-admin members or subscribers may export a link with <code>can_self_unmute</code> omitted. Only group call admins may set <code>can_self_unmute</code> to export a link that allows users to speak.<br><br>Cannot be used for video chats/livestreams associated with private groups/channels, <a href="/api/group-calls#conference-calls">conference calls »</a> or <a href="/api/group-calls#live-stories">live stories »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.getGroupCallJoinAs">phone.getGroupCallJoinAs</a></td>
+<td>Get a list of peers that can be used to join a <a href="/api/group-calls#joining-a-group-call-on-behalf-of-owned-channels">video chat or livestream »</a>, presenting yourself as a specific user/channel.<br><br>This method cannot be used for live stories or conference calls. To comment or react in a live story as another peer, use <a href="/method/channels.getSendAs">channels.getSendAs</a> with <code>for_live_stories</code> set and pass one of the returned peers to <a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a>.<code>send_as</code>.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.editGroupCallParticipant">phone.editGroupCallParticipant</a></td>
+<td>Edit information about a participant of a non-RTMP video chat/livestream or conference. The <code>raise_hand</code> field is only supported in video chats/livestreams, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.<br><br>Note: <a href="/mtproto/TL-combinators#conditional-fields">flags</a>.N?<a href="/type/Bool">Bool</a> parameters can have three possible values:<br><br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is not set, the previous value will not be changed.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolTrue">boolTrue</a>, the previous value will be overwritten to <code>true</code>.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolFalse">boolFalse</a>, the previous value will be overwritten to <code>false</code>.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.toggleGroupCallRecord">phone.toggleGroupCallRecord</a></td>
+<td>Start or stop recording a video chat/livestream, see <a href="/api/group-calls#video-chats-livestreams">here »</a> for more info. The recorded audio and video streams will be automatically sent to Saved Messages (the chat with ourselves).</td>
+</tr>
+<tr>
+<td><a href="/method/phone.editGroupCallTitle">phone.editGroupCallTitle</a></td>
+<td>Edit the title of a video chat or livestream. This method cannot be used with live stories or conferences, see <a href="/api/group-calls#video-chats-livestreams">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a></td>
+<td>Get <a href="/api/group-calls#getting-info-about-a-group-call">group call</a> participants.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.checkGroupCall">phone.checkGroupCall</a></td>
+<td>Check which of the specified source IDs the server still recognizes as joined to a group call. This method can be used with all group call types, see <a href="/api/group-calls#maintaining-group-call-connections">here »</a> for more info.<br><br>After joining the main connection with <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a>, pass its non-zero SSRC/source ID to this method periodically. If a presentation connection is also active, include the separate source registered using <a href="/method/phone.joinGroupCallPresentation">phone.joinGroupCallPresentation</a>.<br><br>The method returns the subset of the supplied sources that are still joined. A missing source means that the corresponding connection must be recreated and joined again; it does not indicate whether media packets are currently flowing. If the method returns <code>GROUPCALL_JOIN_MISSING</code>, the main connection must be rejoined.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.createGroupCall">phone.createGroupCall</a></td>
+<td>Create a video chat or livestream, see <a href="/api/group-calls#video-chats-livestreams">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.toggleGroupCallStartSubscription">phone.toggleGroupCallStartSubscription</a></td>
+<td>Subscribe or unsubscribe to a scheduled <a href="/api/group-calls#video-chats-livestreams">group call</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a></td>
+<td>Leave a group call without ending it for other participants. This method can be used with all group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.toggleGroupCallSettings">phone.toggleGroupCallSettings</a></td>
+<td>Change group call settings. Each setting supports different group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.inviteToGroupCall">phone.inviteToGroupCall</a></td>
+<td>Invite a set of users to a <a href="/api/group-calls#video-chats-livestreams">video chat/livestream »</a>; cannot be used for <a href="/api/group-calls#live-stories">live stories »</a> or <a href="/api/group-calls#conference-calls">conference calls »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.getGroupCall">phone.getGroupCall</a></td>
+<td>Get info about a <a href="/api/group-calls#getting-info-about-a-group-call">group call</a> and its participants.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.joinGroupCall">phone.joinGroupCall</a></td>
+<td>Join any <a href="/api/group-calls#group-call-types">group call type »</a>. Conference calls additionally require the <a href="/api/end-to-end/group-calls#joining-a-call">E2E joining flow »</a>.<br><br>The <code>params</code> field must contain a join payload generated by the local tgcalls group-call engine. It contains a random non-zero audio <code>ssrc</code>, ICE <code>ufrag</code> and <code>pwd</code>, DTLS <code>fingerprints</code>, and, when publishing video, <code>ssrc-groups</code>.<br><br>For example, a join payload without published video has the following shape:<br><br><code>json&lt;br&gt;{&lt;br&gt;  "ssrc": 123456789,&lt;br&gt;  "ufrag": "...",&lt;br&gt;  "pwd": "...",&lt;br&gt;  "fingerprints": [{&lt;br&gt;    "hash": "sha-256",&lt;br&gt;    "fingerprint": "...",&lt;br&gt;    "setup": "passive"&lt;br&gt;  }]&lt;br&gt;}&lt;br&gt;</code><br><br>When joining an RTMP-mode call, generate the payload without published video source groups.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.leaveGroupCallPresentation">phone.leaveGroupCallPresentation</a></td>
+<td>Stop screen sharing in a non-RTMP video chat/livestream or conference. Presentations are not supported in live stories or RTMP-mode video chats/livestreams, see <a href="/api/group-calls#presentations">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.discardGroupCall">phone.discardGroupCall</a></td>
+<td>Terminate a group call, ending the room for all participants. This method can be used with all group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.joinGroupCallPresentation">phone.joinGroupCallPresentation</a></td>
+<td>Start screen sharing in a non-RTMP video chat/livestream or conference. Presentations are not supported in live stories or RTMP-mode video chats/livestreams, see <a href="/api/group-calls#presentations">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.startScheduledGroupCall">phone.startScheduledGroupCall</a></td>
+<td>Start a scheduled <a href="/api/group-calls#video-chats-livestreams">group call</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.saveDefaultGroupCallJoinAs">phone.saveDefaultGroupCallJoinAs</a></td>
+<td>Set the default peer used to join a <a href="/api/group-calls#joining-a-group-call-on-behalf-of-owned-channels">video chat/livestream »</a> associated with a specific dialog.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.getGroupCallStreamChannels">phone.getGroupCallStreamChannels</a></td>
+<td>Get the available stream channels and current playback timestamp of an RTMP-mode video chat, livestream or live story, see <a href="/api/group-calls#playing-an-rtmp-livestream">here »</a> for the full flow.  <br>The group call must be joined before invoking this method. Send the request to the media DC specified by <a href="/constructor/groupCall">groupCall</a>.<code>stream_dc_id</code>.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.getGroupCallStreamRtmpUrl">phone.getGroupCallStreamRtmpUrl</a></td>
+<td>Get the RTMP URL and stream key used by the single external streamer that publishes all audio and video for an RTMP-mode video chat, livestream or live story.<br><br>See <a href="/api/group-calls#creating-and-publishing-an-rtmp-livestream">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a></td>
+<td>Send an in-call message to all participants of a video chat/livestream or live story, including in RTMP mode, see <a href="/api/group-calls#in-call-messages">here »</a> for more info.<br><br>The <code>send_as</code> field can only be populated for live stories, where it optionally selects the displayed author. If omitted, the server automatically selects the appropriate author. Do not populate it for video chats/livestreams.<br><br>Video chats/livestreams and live stories support <a href="/api/group-calls#in-call-reactions">animated emoji reactions »</a>, encoded as messages containing only a standard available reaction emoji or a single custom emoji entity.<br><br>For a paid live story comment, pass the user-confirmed donation amount in <code>allow_paid_stars</code>. For commenters other than the live story owner, this amount must be at least the current <a href="/constructor/groupCall">groupCall</a>.<code>send_paid_messages_stars</code> minimum. A higher amount may be donated to highlight the comment. The live story owner may comment without populating <code>allow_paid_stars</code>. To send a standalone paid live story donation, pass a positive <code>allow_paid_stars</code> value and an empty <code>message</code>, see <a href="/api/group-calls#paid-live-story-donations">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.deleteGroupCallMessages">phone.deleteGroupCallMessages</a></td>
+<td>Delete specific messages from the <a href="/api/group-calls#in-call-messages">in-call message overlay »</a> of a video chat/livestream or live story, including in RTMP mode.<br><br>Non-admin participants may delete messages they sent; admins may delete any message.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.deleteGroupCallParticipantMessages">phone.deleteGroupCallParticipantMessages</a></td>
+<td>As an admin, delete all messages from a specific participant in the <a href="/api/group-calls#in-call-messages">in-call message overlay »</a> of a video chat/livestream or live story, including in RTMP mode.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.saveDefaultSendAs">phone.saveDefaultSendAs</a></td>
+<td>Save the default peer displayed as the author of live story comments and reactions, see <a href="/api/group-calls#in-call-messages">in-call messages »</a>.<br><br>It cannot be used for normal video chats/livestreams, where in-call messages are sent as the peer used to join the call (<code>join_as</code>).</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-instant-view-pages" id="working-with-instant-view-pages" name="working-with-instant-view-pages"><i class="anchor-icon"></i></a>Working with <a href="https://instantview.telegram.org">instant view pages</a></h3>
 <table class="table">
 <thead>
@@ -2112,6 +2227,25 @@ Look for updates of telegram&#39;s terms of service…">
 <tr>
 <td><a href="/method/messages.getWebPagePreview">messages.getWebPagePreview</a></td>
 <td>Get preview of webpage</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-live-stories-" id="working-with-live-stories-" name="working-with-live-stories-"><i class="anchor-icon"></i></a>Working with <a href="/api/group-calls#live-stories">live stories »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/stories.startLive">stories.startLive</a></td>
+<td>Start a live story, optionally using RTMP livestream mode, see <a href="/api/group-calls#live-stories">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.getGroupCallStars">phone.getGroupCallStars</a></td>
+<td>Fetch a live story's total donations and top donors, see <a href="/api/group-calls#paid-live-story-donations">paid live story donations »</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -3366,101 +3500,6 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#working-with-group-calls-amp-live-streaming" id="working-with-group-calls-amp-live-streaming" name="working-with-group-calls-amp-live-streaming"><i class="anchor-icon"></i></a>Working with group calls &amp; live streaming</h3>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="/method/phone.exportGroupCallInvite">phone.exportGroupCallInvite</a></td>
-<td>Get an invite link for a public <a href="/api/group-calls#video-chats-livestreams">video chat/livestream »</a>.<br><br>Non-admin members or subscribers may export a link with <code>can_self_unmute</code> omitted. Only group call admins may set <code>can_self_unmute</code> to export a link that allows users to speak.<br><br>Cannot be used for video chats/livestreams associated with private groups/channels, <a href="/api/group-calls#conference-calls">conference calls »</a> or <a href="/api/group-calls#live-stories">live stories »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.getGroupCallJoinAs">phone.getGroupCallJoinAs</a></td>
-<td>Get a list of peers that can be used to join a <a href="/api/group-calls#joining-a-group-call-on-behalf-of-owned-channels">video chat or livestream »</a>, presenting yourself as a specific user/channel.<br><br>This method cannot be used for live stories or conference calls. To comment or react in a live story as another peer, use <a href="/method/channels.getSendAs">channels.getSendAs</a> with <code>for_live_stories</code> set and pass one of the returned peers to <a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a>.<code>send_as</code>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.editGroupCallParticipant">phone.editGroupCallParticipant</a></td>
-<td>Edit information about a participant of a non-RTMP video chat/livestream or conference. The <code>raise_hand</code> field is only supported in video chats/livestreams, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.<br><br>Note: <a href="/mtproto/TL-combinators#conditional-fields">flags</a>.N?<a href="/type/Bool">Bool</a> parameters can have three possible values:<br><br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is not set, the previous value will not be changed.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolTrue">boolTrue</a>, the previous value will be overwritten to <code>true</code>.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolFalse">boolFalse</a>, the previous value will be overwritten to <code>false</code>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.toggleGroupCallRecord">phone.toggleGroupCallRecord</a></td>
-<td>Start or stop recording a video chat/livestream, see <a href="/api/group-calls#video-chats-livestreams">here »</a> for more info. The recorded audio and video streams will be automatically sent to Saved Messages (the chat with ourselves).</td>
-</tr>
-<tr>
-<td><a href="/method/phone.editGroupCallTitle">phone.editGroupCallTitle</a></td>
-<td>Edit the title of a video chat or livestream. This method cannot be used with live stories or conferences, see <a href="/api/group-calls#video-chats-livestreams">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a></td>
-<td>Get <a href="/api/group-calls#getting-info-about-a-group-call">group call</a> participants.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.checkGroupCall">phone.checkGroupCall</a></td>
-<td>Check which of the specified source IDs the server still recognizes as joined to a group call. This method can be used with all group call types, see <a href="/api/group-calls#maintaining-group-call-connections">here »</a> for more info.<br><br>After joining the main connection with <a href="/method/phone.joinGroupCall">phone.joinGroupCall</a>, pass its non-zero SSRC/source ID to this method periodically. If a presentation connection is also active, include the separate source registered using <a href="/method/phone.joinGroupCallPresentation">phone.joinGroupCallPresentation</a>.<br><br>The method returns the subset of the supplied sources that are still joined. A missing source means that the corresponding connection must be recreated and joined again; it does not indicate whether media packets are currently flowing. If the method returns <code>GROUPCALL_JOIN_MISSING</code>, the main connection must be rejoined.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.createGroupCall">phone.createGroupCall</a></td>
-<td>Create a video chat or livestream, see <a href="/api/group-calls#video-chats-livestreams">here »</a> for the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.toggleGroupCallStartSubscription">phone.toggleGroupCallStartSubscription</a></td>
-<td>Subscribe or unsubscribe to a scheduled <a href="/api/group-calls#video-chats-livestreams">group call</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a></td>
-<td>Leave a group call without ending it for other participants. This method can be used with all group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.toggleGroupCallSettings">phone.toggleGroupCallSettings</a></td>
-<td>Change group call settings. Each setting supports different group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.inviteToGroupCall">phone.inviteToGroupCall</a></td>
-<td>Invite a set of users to a <a href="/api/group-calls#video-chats-livestreams">video chat/livestream »</a>; cannot be used for <a href="/api/group-calls#live-stories">live stories »</a> or <a href="/api/group-calls#conference-calls">conference calls »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.getGroupCall">phone.getGroupCall</a></td>
-<td>Get info about a <a href="/api/group-calls#getting-info-about-a-group-call">group call</a> and its participants.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.joinGroupCall">phone.joinGroupCall</a></td>
-<td>Join a <a href="/api/group-calls">group call</a>, see <a href="/api/group-calls">here »</a> for the full flow.<br><br>The <code>params</code> field must contain a join payload generated by the local tgcalls group-call engine. It contains a random non-zero audio <code>ssrc</code>, ICE <code>ufrag</code> and <code>pwd</code>, DTLS <code>fingerprints</code>, and, when publishing video, <code>ssrc-groups</code>.<br><br>For example, a join payload without published video has the following shape:<br><br><code>json&lt;br&gt;{&lt;br&gt;  "ssrc": 123456789,&lt;br&gt;  "ufrag": "...",&lt;br&gt;  "pwd": "...",&lt;br&gt;  "fingerprints": [{&lt;br&gt;    "hash": "sha-256",&lt;br&gt;    "fingerprint": "...",&lt;br&gt;    "setup": "passive"&lt;br&gt;  }]&lt;br&gt;}&lt;br&gt;</code><br><br>When joining an RTMP-mode call, generate the payload without published video source groups.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.leaveGroupCallPresentation">phone.leaveGroupCallPresentation</a></td>
-<td>Stop screen sharing in a non-RTMP video chat/livestream or conference. Presentations are not supported in live stories or RTMP-mode video chats/livestreams, see <a href="/api/group-calls#presentations">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.discardGroupCall">phone.discardGroupCall</a></td>
-<td>Terminate a group call, ending the room for all participants. This method can be used with all group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.joinGroupCallPresentation">phone.joinGroupCallPresentation</a></td>
-<td>Start screen sharing in a non-RTMP video chat/livestream or conference. Presentations are not supported in live stories or RTMP-mode video chats/livestreams, see <a href="/api/group-calls#presentations">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.startScheduledGroupCall">phone.startScheduledGroupCall</a></td>
-<td>Start a scheduled <a href="/api/group-calls#video-chats-livestreams">group call</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.saveDefaultGroupCallJoinAs">phone.saveDefaultGroupCallJoinAs</a></td>
-<td>Set the default peer that will be used to join a <a href="/api/group-calls#creating-joining-a-group-call-on-behalf-of-owned-channels">group call</a> in a specific dialog.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.getGroupCallStreamChannels">phone.getGroupCallStreamChannels</a></td>
-<td>Get the available stream channels and current playback timestamp of an RTMP-mode video chat, livestream or live story, see <a href="/api/group-calls#playing-an-rtmp-livestream">here »</a> for the full flow.  <br>The group call must be joined before invoking this method. Send the request to the media DC specified by <a href="/constructor/groupCall">groupCall</a>.<code>stream_dc_id</code>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.getGroupCallStreamRtmpUrl">phone.getGroupCallStreamRtmpUrl</a></td>
-<td>Group call admins only: get the RTMP URL and stream key used by the single external streamer that publishes all audio and video for an RTMP-mode video chat, livestream or live story.<br><br>See <a href="/api/group-calls#creating-and-publishing-an-rtmp-livestream">here »</a> for the full flow.</td>
-</tr>
-</tbody>
-</table>
 <h3><a class="anchor" href="#working-with-imported-chats" id="working-with-imported-chats" name="working-with-imported-chats"><i class="anchor-icon"></i></a>Working with imported chats</h3>
 <table class="table">
 <thead>
@@ -3719,7 +3758,7 @@ Look for updates of telegram&#39;s terms of service…">
 </tr>
 <tr>
 <td><a href="/method/channels.getSendAs">channels.getSendAs</a></td>
-<td>Obtains a list of peers that can be displayed as the sender in a specific context.</td>
+<td>Obtains a list of peers that can be displayed as the sender in a specific context. With <code>for_live_stories</code>, returns peers that may author <a href="/api/group-calls#in-call-messages">live story in-call messages »</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -4331,36 +4370,8 @@ Look for updates of telegram&#39;s terms of service…">
 <td>Craft a new <a href="/api/gifts#collectible-gifts">collectible gift »</a> by combining 1 to 4 owned collectible gifts of the same base gift type.<br><br>The passed gifts must all have the same <a href="/constructor/starGiftUnique">starGiftUnique</a>.<code>gift_id</code>, must be usable for crafting, and must not be blocked by a future <code>can_craft_at</code> timestamp.<br><br>The first passed gift must not be located on the TON blockchain.</td>
 </tr>
 <tr>
-<td><a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a></td>
-<td>Send a transient in-call message to all participants of a non-RTMP video chat/livestream or live story, see <a href="/api/group-calls#in-call-messages">here »</a> for more info.<br><br>The <code>send_as</code> field can only be populated for live stories, where it optionally selects the displayed author. If omitted, the server automatically selects the appropriate author. Do not populate it for video chats/livestreams.<br><br>Video chats/livestreams and live stories support <a href="/api/group-calls#in-call-reactions">animated emoji reactions »</a>, encoded as messages containing only a standard available reaction emoji or a single custom emoji entity.<br><br>For a paid live story comment, pass the user-confirmed donation amount in <code>allow_paid_stars</code>. For commenters other than the live story owner, this amount must be at least the current <a href="/constructor/groupCall">groupCall</a>.<code>send_paid_messages_stars</code> minimum. A higher amount may be donated to highlight the comment. The live story owner may comment without populating <code>allow_paid_stars</code>. To send a standalone paid live story donation, pass a positive <code>allow_paid_stars</code> value and an empty <code>message</code>, see <a href="/api/group-calls#paid-live-story-donations">here »</a> for the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.sendGroupCallEncryptedMessage">phone.sendGroupCallEncryptedMessage</a></td>
-<td>Send an E2E-encrypted message or emoji reaction to all participants of a conference call. This method can only be used with conferences; see <a href="/api/end-to-end/group-calls#conference-in-call-messages">here »</a> for the serialization and encryption process.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.deleteGroupCallMessages">phone.deleteGroupCallMessages</a></td>
-<td>Delete specific messages from a <a href="/api/group-calls#in-call-messages">live story's in-call message overlay »</a>.<br><br>Non-admin participants may delete messages they sent; admins may delete any message.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.deleteGroupCallParticipantMessages">phone.deleteGroupCallParticipantMessages</a></td>
-<td>As an admin, delete all messages from a specific participant in a <a href="/api/group-calls#in-call-messages">live story's in-call message overlay »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.getGroupCallStars">phone.getGroupCallStars</a></td>
-<td>Fetch the donor and paid-message leaderboard of a live story. This method can only be used with live stories, see <a href="/api/group-calls#live-stories">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/phone.saveDefaultSendAs">phone.saveDefaultSendAs</a></td>
-<td>Save the default peer to display as the author of comments and reactions in a live story. This method can only be used with live stories, see <a href="/api/group-calls#paid-live-story-comments">here »</a> for more info.<br><br>It cannot be used for normal video chats/livestreams, where in-call messages are sent as the peer used to join the call (<code>join_as</code>).</td>
-</tr>
-<tr>
 <td><a href="/method/stats.getPollStats">stats.getPollStats</a></td>
 <td> </td>
-</tr>
-<tr>
-<td><a href="/method/stories.startLive">stories.startLive</a></td>
-<td>Start a live story, optionally using RTMP livestream mode, see <a href="/api/group-calls#live-stories">here »</a> for the full flow.</td>
 </tr>
 <tr>
 <td><a href="/method/aicompose.createTone">aicompose.createTone</a></td>
