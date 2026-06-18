@@ -5857,7 +5857,7 @@ To learn how to create…">
 <tr>
 <td>query_id</td>
 <td>String</td>
-<td><em>Optional</em>. Identifier of the join request query. If present, then the bot must call <a href="#sendchatjoinrequestwebapp">sendChatJoinRequestWebApp</a> or directly call <a href="#answerchatjoinrequestquery">answerChatJoinRequestQuery</a> within 10 seconds.</td>
+<td><em>Optional</em>. Identifier of the join request query; for bots assigned to process join request only. If present, then the bot must call <a href="#sendchatjoinrequestwebapp">sendChatJoinRequestWebApp</a> or directly call <a href="#answerchatjoinrequestquery">answerChatJoinRequestQuery</a> within 10 seconds.</td>
 </tr>
 </tbody>
 </table>
@@ -12355,7 +12355,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendchatjoinrequestwebapp" href="#sendchatjoinrequestwebapp"><i class="anchor-icon"></i></a>sendChatJoinRequestWebApp</h4>
-<p>Use this method to process a received chat join request query by showing a Mini App to the user before deciding the outcome. Returns <em>True</em> on success.</p>
+<p>Use this method to process a received chat join request query by showing a Mini App to the user before deciding the outcome. Call <a href="#answerchatjoinrequestquery">answerChatJoinRequestQuery</a> to resolve the join request query based on the user interaction with the Mini App. Returns <em>True</em> on success.</p>
 <table class="table">
 <thead>
 <tr>
@@ -16215,6 +16215,8 @@ Intro with &lt;u&gt;underlined text&lt;/u&gt;, ==marked text==, and $x^2 + y^2$.
 &lt;tg-map lat=&quot;41.9&quot; long=&quot;12.5&quot; zoom=&quot;14&quot;/&gt;
 &lt;tg-collage&gt;&lt;img src=&quot;https://telegram.org/example/photo.jpg&quot;/&gt;&lt;figcaption&gt;Caption&lt;cite&gt;The Author&lt;/cite&gt;&lt;/figcaption&gt;&lt;/tg-collage&gt;
 &lt;tg-slideshow&gt;&lt;img src=&quot;https://telegram.org/example/photo.jpg&quot;/&gt;&lt;video src=&quot;https://telegram.org/example/video.mp4&quot;/&gt;&lt;figcaption&gt;Slideshow caption&lt;cite&gt;The Author&lt;/cite&gt;&lt;/figcaption&gt;&lt;/tg-slideshow&gt;</code></pre>
+<p>Additionally, you can use the following tag in <a href="#sendrichmessagedraft">sendRichMessageDraft</a>:</p>
+<pre><code>&lt;tg-thinking&gt;Thinking...&lt;/tg-thinking&gt;</code></pre>
 <p>Please note:</p>
 <ul>
 <li>Rich Markdown is compatible with GitHub Flavored Markdown where possible and can contain arbitrary HTML. Supported rich message HTML tags are parsed as described in <a href="#rich-html-style">Rich HTML style</a>.</li>
@@ -16224,6 +16226,7 @@ Intro with &lt;u&gt;underlined text&lt;/u&gt;, ==marked text==, and $x^2 + y^2$.
 <li>In media syntax, the optional title after the URL is used as the caption; for example, <img class="icon" src="url" alt="" title="Photo caption"> displays “Photo caption” under the media.</li>
 <li>Table cells can contain only inline formatting.</li>
 <li>Formula source is treated as raw LaTeX.</li>
+<li>Markdown isn&#39;t parsed inside block HTML tags other than &lt;details&gt;, &lt;tg-collage&gt; and &lt;tg-slideshow&gt;, therefore only HTML tags can be used there.</li>
 <li>See <a href="#date-time-entity-formatting">date-time entity formatting</a> for more details about supported date-time formats.</li>
 </ul>
 <h6><a class="anchor" name="rich-html-style" href="#rich-html-style"><i class="anchor-icon"></i></a>Rich HTML style</h6>
@@ -16312,6 +16315,8 @@ all the text above was on the same line
 &lt;details&gt;&lt;summary&gt;Title&lt;/summary&gt;Content&lt;/details&gt;
 &lt;details open&gt;&lt;summary&gt;Title&lt;/summary&gt;Content&lt;/details&gt;
 &lt;tg-math-block&gt;E = mc^2&lt;/tg-math-block&gt;</code></pre>
+<p>Additionally, you can use the following tag in <a href="#sendrichmessagedraft">sendRichMessageDraft</a>:</p>
+<pre><code>&lt;tg-thinking&gt;Thinking...&lt;/tg-thinking&gt;</code></pre>
 <p>Please note:</p>
 <ul>
 <li>Only the tags mentioned above are currently supported.</li>
@@ -16401,7 +16406,7 @@ all the text above was on the same line
 <td>business_connection_id</td>
 <td>String</td>
 <td>Optional</td>
-<td>Unique identifier of the business connection on behalf of which the message will be sent</td>
+<td>Unique identifier of the business connection on behalf of which the message will be sent. Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.</td>
 </tr>
 <tr>
 <td>chat_id</td>
@@ -17799,7 +17804,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="richblockphoto" href="#richblockphoto"><i class="anchor-icon"></i></a>RichBlockPhoto</h4>
-<p>A block with a photo, corresponding to the HTML tag <code>&lt;photo&gt;</code>.</p>
+<p>A block with a photo, corresponding to the HTML tag <code>&lt;img&gt;</code>.</p>
 <table class="table">
 <thead>
 <tr>
