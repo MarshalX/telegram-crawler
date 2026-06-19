@@ -75,35 +75,56 @@
 <p>If the current user is a non-Premium account, upon reception of this error the client should invite the user to purchase a <a href="/api/premium">Premium subscription</a>; if the current user already has a Premium subscription, clients should offer to open <code>https://t.me/BotFather?start=deletebot</code> so the user can delete an owned bot.</p>
 </li>
 <li>
-<p><code>MANAGER_PERMISSION_MISSING</code> if the bot passed to <code>manager_id</code> does not have the <a href="/constructor/bot_can_manage_bots">user</a>.<code>bot_can_manage_bots</code> flag set (i.e. is not a <strong>manager bot</strong>).</p>
+<p><code>MANAGER_PERMISSION_MISSING</code> if the bot passed to <code>manager_id</code> does not have the <a href="/constructor/user">user</a>.<code>bot_can_manage_bots</code> flag set (i.e. is not a <strong>manager bot</strong>).</p>
 </li>
 <li>
 <p><code>USERNAME_OCCUPIED</code> if the username was occupied in the lapse of time between <a href="/method/bots.checkUsername">bots.checkUsername</a> and <a href="/method/bots.createBot">bots.createBot</a></p>
 </li>
 </ul>
+<p>Only users can invoke <a href="/method/bots.checkUsername">bots.checkUsername</a> and <a href="/method/bots.createBot">bots.createBot</a>: bots can request the creation of a managed bot <a href="#request-buttons">as specifiede below »</a>.</p>
+<h3><a class="anchor" href="#managing-a-managed-bot" id="managing-a-managed-bot" name="managing-a-managed-bot"><i class="anchor-icon"></i></a>Managing a managed bot</h3>
+<pre><code><a href='/constructor/updateManagedBot'>updateManagedBot</a>#4880ed9a user_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/bots.exportedBotToken'>bots.exportedBotToken</a>#3c60b621 token:<a href='/type/string'>string</a> = <a href='/type/bots.ExportedBotToken'>bots.ExportedBotToken</a>;
+
+<a href='/constructor/bots.accessSettings'>bots.accessSettings</a>#dd1fbf93 flags:<a href='/type/%23'>#</a> restricted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/bots.AccessSettings'>bots.AccessSettings</a>;
+
+---functions---
+
+<a href='/method/bots.exportBotToken'>bots.exportBotToken</a>#bd0d99eb bot:<a href='/type/InputUser'>InputUser</a> revoke:<a href='/type/Bool'>Bool</a> = <a href='/type/bots.ExportedBotToken'>bots.ExportedBotToken</a>;
+<a href='/method/bots.getAccessSettings'>bots.getAccessSettings</a>#213853a3 bot:<a href='/type/InputUser'>InputUser</a> = <a href='/type/bots.AccessSettings'>bots.AccessSettings</a>;
+<a href='/method/bots.editAccessSettings'>bots.editAccessSettings</a>#31813cd8 flags:<a href='/type/%23'>#</a> restricted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>When a managed bot is created or updated, (only) the manager bot will receive an <a href="/constructor/updateManagedBot">updateManagedBot</a>.</p>
+<p>The manager bot can then invoke <a href="/method/bots.exportBotToken">bots.exportBotToken</a> for <code>bot_id</code> to obtain the managed <a href="/api/bots">bot token</a>. Set <code>revoke</code> to replace the current token.</p>
+<p>Manager bots can also use <a href="/method/bots.getAccessSettings">bots.getAccessSettings</a> and <a href="/method/bots.editAccessSettings">bots.editAccessSettings</a> to view and edit access restriction settings of the managed bot.</p>
+<p>If <a href="/constructor/bots.accessSettings">bots.accessSettings</a>.<code>restricted</code> is set, only the owner of the managed bot will be able to access the managed bot.</p>
+<p>Optionally, only if <code>restricted</code> is set, <a href="/constructor/bots.accessSettings">bots.accessSettings</a>.<code>add_users</code> may be populated with an additional list of users (max 10 excluding the owner) who will be able to access the managed bot, in addition to the owner.</p>
 <h3><a class="anchor" href="#request-buttons" id="request-buttons" name="request-buttons"><i class="anchor-icon"></i></a>Request buttons</h3>
 <pre><code><a href='/constructor/requestPeerTypeCreateBot'>requestPeerTypeCreateBot</a>#3e81e078 flags:<a href='/type/%23'>#</a> bot_managed:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> suggested_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> suggested_username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> = <a href='/type/RequestPeerType'>RequestPeerType</a>;
+
 <a href='/constructor/inputKeyboardButtonRequestPeer'>inputKeyboardButtonRequestPeer</a>#02b78156 flags:<a href='/type/%23'>#</a> name_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> username_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> photo_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> style:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/KeyboardButtonStyle'>KeyboardButtonStyle</a> text:<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> peer_type:<a href='/type/RequestPeerType'>RequestPeerType</a> max_quantity:<a href='/type/int'>int</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
 <a href='/constructor/keyboardButtonRequestPeer'>keyboardButtonRequestPeer</a>#5b0f15f5 flags:<a href='/type/%23'>#</a> style:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/KeyboardButtonStyle'>KeyboardButtonStyle</a> text:<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> peer_type:<a href='/type/RequestPeerType'>RequestPeerType</a> max_quantity:<a href='/type/int'>int</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
 
 ---functions---
 
 <a href='/method/messages.sendBotRequestedPeer'>messages.sendBotRequestedPeer</a>#6c5cf2a7 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> webapp_req_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> requested_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;
 </code></pre>
-<p>A manager bot may ask a user to create a bot by sending an <a href="/constructor/inputKeyboardButtonRequestPeer">inputKeyboardButtonRequestPeer</a> button whose <a href="/type/RequestPeerType">RequestPeerType</a> is <a href="/constructor/requestPeerTypeCreateBot">requestPeerTypeCreateBot</a>. User clients receive it as <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>. Such buttons are available only in private chats.</p>
+<p>A manager bot may ask a user to create a managed bot by sending an <a href="/constructor/inputKeyboardButtonRequestPeer">inputKeyboardButtonRequestPeer</a> button whose <a href="/type/RequestPeerType">RequestPeerType</a> is <a href="/constructor/requestPeerTypeCreateBot">requestPeerTypeCreateBot</a>. User clients receive it as <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>. Such buttons are available only in private chats.</p>
 <p>When the user presses the button, show a creation prompt using:</p>
 <ul>
 <li><code>suggested_name</code>, if set, as the initial bot name.</li>
-<li><code>suggested_username</code>, if set, as the initial bot username. Clients may display the editable part without the trailing <code>bot</code>, but must pass the full username to <a href="/method/bots.checkUsername">bots.checkUsername</a> and <a href="/method/bots.createBot">bots.createBot</a>.</li>
+<li><code>suggested_username</code>, if set, as the initial bot username.</li>
 </ul>
 <p>After <a href="/method/bots.createBot">bots.createBot</a> succeeds, invoke <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a>:</p>
 <ul>
 <li><code>peer</code> is the manager bot.</li>
-<li><code>msg_id</code> is the message containing the <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.</li>
-<li><code>button_id</code> is the button's <code>button_id</code>.</li>
+<li><code>msg_id</code> is the ID of the message containing the <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.</li>
+<li><code>button_id</code> is the <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>'s <code>button_id</code>.</li>
 <li><code>requested_peers</code> contains the newly created bot.</li>
 </ul>
-<p>The manager bot receives a <a href="/constructor/messageActionRequestedPeer">messageActionRequestedPeer</a> service message as described in the <a href="/api/bots/buttons#pressing-buttons">button flow »</a>.</p>
+<p>The manager bot receives a <a href="/constructor/messageActionRequestedPeer">messageActionRequestedPeer</a> service message with the managed bot as described in the <a href="/api/bots/buttons#pressing-buttons">button flow »</a>.</p>
 <h3><a class="anchor" href="#deep-links" id="deep-links" name="deep-links"><i class="anchor-icon"></i></a>Deep links</h3>
 <p>Clients should parse the following links as managed bot creation links:</p>
 <ul>
@@ -142,25 +163,6 @@
 <li><code>requested_peers</code> containing the newly created bot.</li>
 </ul>
 <p>Notify the Mini App with <a href="/api/bots/webapps#requested-chat-sent"><code>requested_chat_sent</code> »</a> after <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a> succeeds, or <a href="/api/bots/webapps#requested-chat-failed"><code>requested_chat_failed</code> »</a> if the user cancels or the request fails.</p>
-<h3><a class="anchor" href="#manager-bot-updates" id="manager-bot-updates" name="manager-bot-updates"><i class="anchor-icon"></i></a>Manager bot updates</h3>
-<pre><code><a href='/constructor/messageActionManagedBotCreated'>messageActionManagedBotCreated</a>#16605e3e bot_id:<a href='/type/long'>long</a> = <a href='/type/MessageAction'>MessageAction</a>;
-
-<a href='/constructor/updateManagedBot'>updateManagedBot</a>#4880ed9a user_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
-
----functions---
-
-<a href='/method/bots.exportBotToken'>bots.exportBotToken</a>#bd0d99eb bot:<a href='/type/InputUser'>InputUser</a> revoke:<a href='/type/Bool'>Bool</a> = <a href='/type/bots.ExportedBotToken'>bots.ExportedBotToken</a>;
-<a href='/method/bots.getAccessSettings'>bots.getAccessSettings</a>#213853a3 bot:<a href='/type/InputUser'>InputUser</a> = <a href='/type/bots.AccessSettings'>bots.AccessSettings</a>;
-<a href='/method/bots.editAccessSettings'>bots.editAccessSettings</a>#31813cd8 flags:<a href='/type/%23'>#</a> restricted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Bool'>Bool</a>;
-</code></pre>
-<p>The manager bot receives <a href="/constructor/updateManagedBot">updateManagedBot</a> after a user creates a bot managed by it:</p>
-<ul>
-<li><code>user_id</code> is the user who created the managed bot.</li>
-<li><code>bot_id</code> is the managed bot.</li>
-</ul>
-<p>The manager bot can then invoke <a href="/method/bots.exportBotToken">bots.exportBotToken</a> for <code>bot_id</code> to obtain the managed bot token. Set <code>revoke</code> to replace the current token.</p>
-<p>Manager bots can use <a href="/method/bots.getAccessSettings">bots.getAccessSettings</a> and <a href="/method/bots.editAccessSettings">bots.editAccessSettings</a> to read and update <a href="/constructor/bots.accessSettings">bots.accessSettings</a>. If <code>restricted</code> is set, only the owner and the users listed in <code>add_users</code> can access the managed bot.</p>
-<p>The user's chat with the manager bot may contain a <a href="/constructor/messageActionManagedBotCreated">messageActionManagedBotCreated</a> service message; its <code>bot_id</code> is the newly created managed bot.</p>
 </div>
   
 </div>
