@@ -4,16 +4,10 @@
     <meta charset="utf-8">
     <title>Create</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="How to create bots using the MTProto API.
----functions---
-bots.checkUsername#87f2219b username:string = Bool;
-bots.createBot#e5b17f2b…">
+    <meta property="description" content="How to create bot accounts using the MTProto API.">
     <meta property="og:title" content="Create">
     <meta property="og:image" content="">
-    <meta property="og:description" content="How to create bots using the MTProto API.
----functions---
-bots.checkUsername#87f2219b username:string = Bool;
-bots.createBot#e5b17f2b…">
+    <meta property="og:description" content="How to create bot accounts using the MTProto API.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -50,16 +44,101 @@ bots.createBot#e5b17f2b…">
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>How to create bots using the MTProto API.</p>
-<pre><code>---functions---
+<p>How to create bot accounts using the MTProto API.</p>
+<pre><code><a href='/constructor/messageActionManagedBotCreated'>messageActionManagedBotCreated</a>#16605e3e bot_id:<a href='/type/long'>long</a> = <a href='/type/MessageAction'>MessageAction</a>;
+
+<a href='/constructor/updateManagedBot'>updateManagedBot</a>#4880ed9a user_id:<a href='/type/long'>long</a> bot_id:<a href='/type/long'>long</a> qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/requestPeerTypeCreateBot'>requestPeerTypeCreateBot</a>#3e81e078 flags:<a href='/type/%23'>#</a> bot_managed:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> suggested_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> suggested_username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> = <a href='/type/RequestPeerType'>RequestPeerType</a>;
+<a href='/constructor/inputKeyboardButtonRequestPeer'>inputKeyboardButtonRequestPeer</a>#02b78156 flags:<a href='/type/%23'>#</a> name_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> username_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> photo_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> style:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/KeyboardButtonStyle'>KeyboardButtonStyle</a> text:<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> peer_type:<a href='/type/RequestPeerType'>RequestPeerType</a> max_quantity:<a href='/type/int'>int</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+<a href='/constructor/keyboardButtonRequestPeer'>keyboardButtonRequestPeer</a>#5b0f15f5 flags:<a href='/type/%23'>#</a> style:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/KeyboardButtonStyle'>KeyboardButtonStyle</a> text:<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> peer_type:<a href='/type/RequestPeerType'>RequestPeerType</a> max_quantity:<a href='/type/int'>int</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
+<a href='/constructor/bots.requestedButton'>bots.requestedButton</a>#f13bbcd7 webapp_req_id:<a href='/type/string'>string</a> = <a href='/type/bots.RequestedButton'>bots.RequestedButton</a>;
+
+---functions---
 
 <a href='/method/bots.checkUsername'>bots.checkUsername</a>#87f2219b username:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
 <a href='/method/bots.createBot'>bots.createBot</a>#e5b17f2b flags:<a href='/type/%23'>#</a> via_deeplink:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> name:<a href='/type/string'>string</a> username:<a href='/type/string'>string</a> manager_id:<a href='/type/InputUser'>InputUser</a> = <a href='/type/User'>User</a>;
 <a href='/method/bots.exportBotToken'>bots.exportBotToken</a>#bd0d99eb bot:<a href='/type/InputUser'>InputUser</a> revoke:<a href='/type/Bool'>Bool</a> = <a href='/type/bots.ExportedBotToken'>bots.ExportedBotToken</a>;
+<a href='/method/bots.getAccessSettings'>bots.getAccessSettings</a>#213853a3 bot:<a href='/type/InputUser'>InputUser</a> = <a href='/type/bots.AccessSettings'>bots.AccessSettings</a>;
+<a href='/method/bots.editAccessSettings'>bots.editAccessSettings</a>#31813cd8 flags:<a href='/type/%23'>#</a> restricted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> bot:<a href='/type/InputUser'>InputUser</a> add_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputUser'>InputUser</a>&gt; = <a href='/type/Bool'>Bool</a>;
 <a href='/method/bots.requestWebViewButton'>bots.requestWebViewButton</a>#31a2a35e user_id:<a href='/type/InputUser'>InputUser</a> button:<a href='/type/KeyboardButton'>KeyboardButton</a> = <a href='/type/bots.RequestedButton'>bots.RequestedButton</a>;
 <a href='/method/bots.getRequestedWebViewButton'>bots.getRequestedWebViewButton</a>#bf25b7f3 bot:<a href='/type/InputUser'>InputUser</a> webapp_req_id:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+<a href='/method/messages.sendBotRequestedPeer'>messages.sendBotRequestedPeer</a>#6c5cf2a7 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> webapp_req_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> requested_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;
 </code></pre>
-<p>Bots can be created by users by interacting with <a href="https://t.me/botfather">@BotFather</a>: however, users can also directly create bots using the API; <a href="/api/bots/connected-business-bots">business bots</a> can also do the same, using a business connection.</p>
+<p>Users can create managed bots directly through the MTProto API, without interacting with <a href="https://t.me/botfather">@BotFather</a>.</p>
+<p>A managed bot has two related accounts:</p>
+<ul>
+<li>The user account that creates and owns the bot.</li>
+<li>The manager bot passed in <a href="/method/bots.createBot">bots.createBot</a>.<code>manager_id</code>. The manager bot must be a <a href="/constructor/user">user</a> with both the <code>bot</code> and <code>bot_can_manage_bots</code> flags set; <code>bot_can_manage_bots</code> means that the bot can manage bots created by users through this flow.</li>
+</ul>
+<h3><a class="anchor" href="#direct-creation" id="direct-creation" name="direct-creation"><i class="anchor-icon"></i></a>Direct creation</h3>
+<p>Before invoking <a href="/method/bots.createBot">bots.createBot</a>, call <a href="/method/bots.checkUsername">bots.checkUsername</a> with the full target username. The username must end in <code>bot</code>; clients may append this suffix in the UI, but the string passed to the API must already contain it.</p>
+<p>Then invoke <a href="/method/bots.createBot">bots.createBot</a>:</p>
+<ul>
+<li><code>name</code> is the bot display name, 1-64 characters.</li>
+<li><code>username</code> is the checked username, including the <code>bot</code> suffix.</li>
+<li><code>manager_id</code> is the manager bot.</li>
+<li>Set <code>via_deeplink</code> only if the creation prompt was opened from a <a href="#deep-links">managed bot deep link »</a>.</li>
+</ul>
+<p>The returned <a href="/constructor/user">user</a> is the created bot. Store it in the <a href="/api/peers">peer database »</a> like any other received <a href="/constructor/user">user</a>.</p>
+<p>If the current user already owns the maximum allowed number of bots, the server may return <code>BOT_CREATE_LIMIT_EXCEEDED</code>. The limit is exposed through the <a href="/api/config#bots-create-limit-default"><code>bots_create_limit_default</code> »</a> and <a href="/api/config#bots-create-limit-premium"><code>bots_create_limit_premium</code> »</a> config keys, and as the <a href="/api/premium#double-limits--bots-create"><code>double_limits__bots_create</code> »</a> Premium limit. Clients should offer to open <code>https://t.me/BotFather?start=deletebot</code> so the user can delete an owned bot.</p>
+<p>Other errors handled by Telegram clients include:</p>
+<ul>
+<li><code>MANAGER_PERMISSION_MISSING</code> if <code>manager_id</code> is not allowed to manage newly created bots.</li>
+<li><code>USERNAME_INVALID</code> or <code>USERNAME_OCCUPIED</code> if the username cannot be used.</li>
+<li><code>FLOOD_WAIT_%d</code> if bot creation is temporarily rate-limited.</li>
+</ul>
+<h3><a class="anchor" href="#request-buttons" id="request-buttons" name="request-buttons"><i class="anchor-icon"></i></a>Request buttons</h3>
+<p>A manager bot may ask a user to create a bot by sending an <a href="/constructor/inputKeyboardButtonRequestPeer">inputKeyboardButtonRequestPeer</a> button whose <a href="/type/RequestPeerType">RequestPeerType</a> is <a href="/constructor/requestPeerTypeCreateBot">requestPeerTypeCreateBot</a>. User clients receive it as <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>. Such buttons are available only in private chats.</p>
+<p>When the user presses the button, show a creation prompt using:</p>
+<ul>
+<li><code>suggested_name</code>, if set, as the initial bot name.</li>
+<li><code>suggested_username</code>, if set, as the initial bot username. Clients may display the editable part without the trailing <code>bot</code>, but must pass the full username to <a href="/method/bots.checkUsername">bots.checkUsername</a> and <a href="/method/bots.createBot">bots.createBot</a>.</li>
+</ul>
+<p>After <a href="/method/bots.createBot">bots.createBot</a> succeeds, invoke <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a>:</p>
+<ul>
+<li><code>peer</code> is the manager bot.</li>
+<li><code>msg_id</code> is the message containing the <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.</li>
+<li><code>button_id</code> is the button's <code>button_id</code>.</li>
+<li><code>requested_peers</code> contains the newly created bot.</li>
+</ul>
+<p>The manager bot receives a <a href="/constructor/messageActionRequestedPeer">messageActionRequestedPeer</a> service message as described in the <a href="/api/bots/buttons#pressing-buttons">button flow »</a>.</p>
+<h3><a class="anchor" href="#deep-links" id="deep-links" name="deep-links"><i class="anchor-icon"></i></a>Deep links</h3>
+<p>Clients should parse the following links as managed bot creation links:</p>
+<ul>
+<li><code>https://t.me/newbot/&lt;manager_bot_username&gt;/&lt;suggested_bot_username&gt;?name=&lt;suggested_bot_name&gt;</code></li>
+<li><code>https://t.me/newbot/&lt;manager_bot_username&gt;?name=&lt;suggested_bot_name&gt;</code></li>
+<li><code>tg://newbot?manager=&lt;manager_bot_username&gt;&amp;username=&lt;suggested_bot_username&gt;&amp;name=&lt;suggested_bot_name&gt;</code></li>
+</ul>
+<p>When opening such a link:</p>
+<ol>
+<li>Resolve <code>manager_bot_username</code>.</li>
+<li>Check that the resolved peer is a bot and that <a href="/constructor/user">user</a>.<code>bot_can_manage_bots</code> is set.</li>
+<li>Show the same creation prompt used for <a href="#request-buttons">request buttons »</a>.</li>
+<li>If the user confirms, invoke <a href="/method/bots.createBot">bots.createBot</a> with <code>via_deeplink</code> set.</li>
+</ol>
+<p>If <code>suggested_bot_username</code> does not end in <code>bot</code>, TDLib appends <code>bot</code> to the parsed suggestion before showing the prompt.</p>
+<h3><a class="anchor" href="#mini-apps" id="mini-apps" name="mini-apps"><i class="anchor-icon"></i></a>Mini Apps</h3>
+<p>A manager bot can prepare a request button for a <a href="/api/bots/webapps">Mini App »</a> by invoking <a href="/method/bots.requestWebViewButton">bots.requestWebViewButton</a> with a <a href="/type/KeyboardButton">KeyboardButton</a> containing <a href="/constructor/requestPeerTypeCreateBot">requestPeerTypeCreateBot</a>. The manager bot should pass the returned <a href="/constructor/bots.requestedButton">bots.requestedButton</a>.<code>webapp_req_id</code> to the Mini App.</p>
+<p>When the Mini App emits <a href="/api/web-events#web-app-request-chat"><code>web_app_request_chat</code> »</a>, the user client must invoke <a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a>, passing the manager bot and the event's <code>req_id</code> as <code>webapp_req_id</code>.</p>
+<p>If the returned button is a <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a> with <a href="/constructor/requestPeerTypeCreateBot">requestPeerTypeCreateBot</a>, show the creation prompt. After creating the bot, invoke <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a> with:</p>
+<ul>
+<li><code>peer</code> set to the manager bot.</li>
+<li><code>webapp_req_id</code> set to the Mini App request ID.</li>
+<li><code>button_id</code> set to the returned button's <code>button_id</code>.</li>
+<li><code>requested_peers</code> containing the newly created bot.</li>
+</ul>
+<p>Notify the Mini App with <a href="/api/bots/webapps#requested-chat-sent"><code>requested_chat_sent</code> »</a> after <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a> succeeds, or <a href="/api/bots/webapps#requested-chat-failed"><code>requested_chat_failed</code> »</a> if the user cancels or the request fails.</p>
+<h3><a class="anchor" href="#manager-bot-updates" id="manager-bot-updates" name="manager-bot-updates"><i class="anchor-icon"></i></a>Manager bot updates</h3>
+<p>The manager bot receives <a href="/constructor/updateManagedBot">updateManagedBot</a> after a user creates a bot managed by it:</p>
+<ul>
+<li><code>user_id</code> is the user who created the managed bot.</li>
+<li><code>bot_id</code> is the managed bot.</li>
+</ul>
+<p>The manager bot can then invoke <a href="/method/bots.exportBotToken">bots.exportBotToken</a> for <code>bot_id</code> to obtain the managed bot token. Set <code>revoke</code> to replace the current token.</p>
+<p>Manager bots can use <a href="/method/bots.getAccessSettings">bots.getAccessSettings</a> and <a href="/method/bots.editAccessSettings">bots.editAccessSettings</a> to read and update <a href="/constructor/bots.accessSettings">bots.accessSettings</a>. If <code>restricted</code> is set, only the owner and the users listed in <code>add_users</code> can access the managed bot.</p>
+<p>The user's chat with the manager bot may contain a <a href="/constructor/messageActionManagedBotCreated">messageActionManagedBotCreated</a> service message; its <code>bot_id</code> is the newly created managed bot.</p>
 </div>
   
 </div>
