@@ -571,7 +571,15 @@ Ignore further <code>web_app_request_file_download</code> events until step 3 is
 <p>Used to initiate the <a href="/api/url-authorization#oauth-authorization-for-mini-apps">OAuth login flow »</a> (if <code>url</code> is set), <strong>or</strong> to check if the current client supports OAuth login (if <code>url</code> is <strong>not</strong> set).</p>
 <p>Regardless of the contents of the event, the client should immediately reply with the <a href="/api/bots/webapps#oauth-supported"><code>oauth_supported</code> event</a> event.</p>
 <h4><a class="anchor" href="#web-app-request-chat" id="web-app-request-chat" name="web-app-request-chat"><i class="anchor-icon"></i></a><code>web_app_request_chat</code></h4>
-<p> </p>
+<p>Event payload: a JSON object with the following keys:</p>
+<ul>
+<li><code>req_id</code> - String, a <a href="/constructor/bots.requestedButton">bots.requestedButton</a>.<code>webapp_req_id</code> obtained by the bot from <a href="/method/bots.requestWebViewButton">bots.requestWebViewButton</a></li>
+</ul>
+<p>Used by <a href="/api/bots/webapps">Mini Apps</a> to ask the client to run a <a href="/api/bots/buttons#requesting-peers-via-mini-apps">peer request</a> prepared by the bot.</p>
+<p>Clients must invoke <a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a>, passing the Mini App bot and <code>req_id</code> as <a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a>.<code>webapp_req_id</code>.</p>
+<p><a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a> will return a <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a> that clients must handle as specified in <a href="/api/bots/buttons#requesting-peers-via-mini-apps">requesting peers via Mini Apps</a>.</p>
+<p>On success, emits a <a href="/api/bots/webapps#requested-chat-sent"><code>requested_chat_sent</code> event</a>.<br>
+On failure or cancellation, emits a <a href="/api/bots/webapps#requested-chat-failed"><code>requested_chat_failed</code> event</a>.</p>
 <!-- end events -->
 </div>
   

@@ -110,6 +110,7 @@ Each row can have a different number of columns, and user clients should properl
 <p>When pressed, clients prompt the user to select and share at most <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.<code>max_quantity</code> peers with the bot, according to the criteria specified in <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.<code>peer_type</code>, a <a href="/type/RequestPeerType">RequestPeerType</a> constructor.</p>
 <p>After peer selection, clients invoke <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a>, passing <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.<code>button_id</code> to <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a>.<code>button_id</code>.</p>
 <p>The bot receives the selected peer and <code>button_id</code> in a <a href="/constructor/messageActionRequestedPeer">messageActionRequestedPeer</a> service message.</p>
+<p>This flow may also be used by mini apps, as specified <a href="#requesting-peers-via-mini-apps">here »</a>.</p>
 <h4><a class="anchor" href="#requesting-a-managed-bot" id="requesting-a-managed-bot" name="requesting-a-managed-bot"><i class="anchor-icon"></i></a>Requesting a managed bot</h4>
 <pre><code><a href='/constructor/requestPeerTypeCreateBot'>requestPeerTypeCreateBot</a>#3e81e078 flags:<a href='/type/%23'>#</a> bot_managed:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> suggested_name:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> suggested_username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> = <a href='/type/RequestPeerType'>RequestPeerType</a>;
 
@@ -122,7 +123,7 @@ Each row can have a different number of columns, and user clients should properl
 
 <a href='/method/messages.sendBotRequestedPeer'>messages.sendBotRequestedPeer</a>#6c5cf2a7 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> webapp_req_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> requested_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;
 </code></pre>
-<p>A <a href="/api/bots/managed-bots#creating-a-managed-bot">manager bot</a> may ask a user to create a managed bot by sending an <a href="/constructor/inputKeyboardButtonRequestPeer">inputKeyboardButtonRequestPeer</a> whose <a href="/type/RequestPeerType">RequestPeerType</a> is <a href="/constructor/requestPeerTypeCreateBot">requestPeerTypeCreateBot</a>. User clients receive it as <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>. Such buttons are available only in private chats.</p>
+<p>A <a href="/api/bots/managed-bots#creating-a-managed-bot">manager bot</a> may ask a user to create a managed bot by sending an <a href="/constructor/inputKeyboardButtonRequestPeer">inputKeyboardButtonRequestPeer</a> whose <a href="/type/RequestPeerType">RequestPeerType</a> is <a href="/constructor/requestPeerTypeCreateBot">requestPeerTypeCreateBot</a>. User clients receive it as <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.</p>
 <p>When the user presses the button, show the <a href="/api/bots/managed-bots#creating-a-managed-bot">managed bot creation flow</a>, using:</p>
 <ul>
 <li><code>suggested_name</code>, if set, as the initial bot name.</li>
@@ -133,10 +134,37 @@ Each row can have a different number of columns, and user clients should properl
 <li><code>peer</code> is the manager bot.</li>
 <li><code>msg_id</code> is the ID of the message containing the <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.</li>
 <li><code>button_id</code> is the <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.<code>button_id</code>.</li>
-<li><code>requested_peers</code> contains the newly created bot.</li>
+<li><code>requested_peers</code> contains only the newly created bot.</li>
 </ul>
 <p>When <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a> points to a <a href="/constructor/requestPeerTypeCreateBot">requestPeerTypeCreateBot</a>, it generates a <a href="/constructor/messageActionManagedBotCreated">messageActionManagedBotCreated</a> service message, sent by the user to the manager bot, containing the ID of the newly created bot.</p>
 <p><a href="/constructor/messageActionManagedBotCreated">messageActionManagedBotCreated</a> is generated only when invoking <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a>, not when invoking <a href="/method/bots.createBot">bots.createBot</a>.</p>
+<p>This flow may also be used by mini apps, as specified <a href="#requesting-peers-via-mini-apps">here »</a>.</p>
+<h4><a class="anchor" href="#requesting-peers-via-mini-apps" id="requesting-peers-via-mini-apps" name="requesting-peers-via-mini-apps"><i class="anchor-icon"></i></a>Requesting peers via Mini Apps</h4>
+<pre><code><a href='/constructor/inputKeyboardButtonRequestPeer'>inputKeyboardButtonRequestPeer</a>#02b78156 flags:<a href='/type/%23'>#</a> name_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> username_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> photo_requested:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> style:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/KeyboardButtonStyle'>KeyboardButtonStyle</a> text:<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> peer_type:<a href='/type/RequestPeerType'>RequestPeerType</a> max_quantity:<a href='/type/int'>int</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+<a href='/constructor/keyboardButtonRequestPeer'>keyboardButtonRequestPeer</a>#5b0f15f5 flags:<a href='/type/%23'>#</a> style:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/KeyboardButtonStyle'>KeyboardButtonStyle</a> text:<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> peer_type:<a href='/type/RequestPeerType'>RequestPeerType</a> max_quantity:<a href='/type/int'>int</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
+<a href='/constructor/bots.requestedButton'>bots.requestedButton</a>#f13bbcd7 webapp_req_id:<a href='/type/string'>string</a> = <a href='/type/bots.RequestedButton'>bots.RequestedButton</a>;
+
+---functions---
+
+<a href='/method/bots.requestWebViewButton'>bots.requestWebViewButton</a>#31a2a35e user_id:<a href='/type/InputUser'>InputUser</a> button:<a href='/type/KeyboardButton'>KeyboardButton</a> = <a href='/type/bots.RequestedButton'>bots.RequestedButton</a>;
+
+<a href='/method/bots.getRequestedWebViewButton'>bots.getRequestedWebViewButton</a>#bf25b7f3 bot:<a href='/type/InputUser'>InputUser</a> webapp_req_id:<a href='/type/string'>string</a> = <a href='/type/KeyboardButton'>KeyboardButton</a>;
+
+<a href='/method/messages.sendBotRequestedPeer'>messages.sendBotRequestedPeer</a>#6c5cf2a7 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> webapp_req_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> button_id:<a href='/type/int'>int</a> requested_peers:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputPeer'>InputPeer</a>&gt; = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<p>A bot can prepare a peer request button for a <a href="/api/bots/webapps">Mini App</a> by invoking <a href="/method/bots.requestWebViewButton">bots.requestWebViewButton</a> with an <a href="/constructor/inputKeyboardButtonRequestPeer">inputKeyboardButtonRequestPeer</a> of any <a href="/type/RequestPeerType">RequestPeerType</a>, and the target user, that will use the specified button.</p>
+<p>The bot should then pass the returned <a href="/constructor/bots.requestedButton">bots.requestedButton</a>.<code>webapp_req_id</code> to the Mini App.</p>
+<p>When the Mini App emits <a href="/api/web-events#web-app-request-chat"><code>web_app_request_chat</code></a>, the user's client must invoke <a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a>, passing the bot and the event's <code>req_id</code> as <a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a>.<code>webapp_req_id</code>.</p>
+<p>If <a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a> returns a <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>, show the appropriate peer request flow specified by <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.<code>peer_type</code> (see <a href="#peer-requests">above &amp;raqo;</a> for the available flows).</p>
+<p>After the user chooses or creates the requested peer, invoke <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a>:</p>
+<ul>
+<li><code>peer</code> must contain the bot.</li>
+<li><code>webapp_req_id</code> must contain the Mini App request ID.</li>
+<li><code>button_id</code> must contain the returned <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a>.<code>button_id</code>.</li>
+<li><code>requested_peers</code> must contain the peers selected or created by the user.</li>
+</ul>
+<p>Notify the Mini App with <a href="/api/bots/webapps#requested-chat-sent"><code>requested_chat_sent</code> »</a> after <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a> succeeds, or <a href="/api/bots/webapps#requested-chat-failed"><code>requested_chat_failed</code> »</a> if the user cancels or the request fails.</p>
 <h3><a class="anchor" href="#callback-queries" id="callback-queries" name="callback-queries"><i class="anchor-icon"></i></a>Callback queries</h3>
 <p><a href="/constructor/keyboardButtonCallback">keyboardButtonCallback</a> buttons can be used to send the specified <code>data</code> payload back to the bot, when they are clicked.</p>
 <p>Additionally, a bot can verify a user's identity by requiring they verify their 2FA password with <a href="/api/srp">SRP</a>.</p>
