@@ -61,7 +61,7 @@ In order to…">
 </ul>
 <p>Note that the same Diffie-Hellman parameters <em>(p,g)</em> as for the initial Diffie-Hellman key exchange in this secret chat are used. They do not need to be re-transmitted explicitly.</p>
 <h5><a class="anchor" name="2-decryptedmessageactionacceptkey" href="#2-decryptedmessageactionacceptkey"><i class="anchor-icon"></i></a>2. decryptedMessageActionAcceptKey</h5>
-<p>Upon receipt of the above service message, B checks its content, and generates a response with same <em>exchange_id</em>, for a newly generated value of <em>b</em>:</p>
+<p>Upon receipt of the above service message, B checks its content, and generates a response with the same <em>exchange_id</em>, for a newly generated value of <em>b</em>:</p>
 <pre><code>decryptedMessageActionAcceptKey exchange_id:long g_b:string key_fingerprint:long = DecryptedMessageAction;</code></pre>
 <ul>
 <li><em>exchange_id</em> is the same as in the received <a href="/constructor/decryptedMessageActionRequestKey">decryptedMessageActionRequestKey</a></li>
@@ -95,7 +95,7 @@ In order to…">
 <p>Because of this possibility, we suggest that only the instance with the smaller <em>exchange_id</em> is aborted, with the option to re-use its <em>(a,g_a)</em> for the re-keying protocol instance with the larger <em>exchange_id</em> (when compared as a <code>long</code>, i.e. signed little-endian 64-bit integer).</p>
 <p>In other words, if a <code>decryptedMessageActionRequestKey</code> is received after A has sent its <code>decryptedMessageActionRequestKey</code>, but has not yet received <code>decryptedMessageActionAcceptKey</code>, the following is to be done:</p>
 <ul>
-<li>if <em>exchange_id</em> in the sent <code>decryptedMessageActionRequestKey</code> was larger than that in the <code>decryptionActionRequestKey</code> just received, abort the newly-suggested re-keying protocol instance without sending explicit <a href="/constructor/decryptedMessageActionAbortKey">decryptedMessageActionAbortKey</a> (the other side will do the same according to the next rule).</li>
+<li>if <em>exchange_id</em> in the sent <code>decryptedMessageActionRequestKey</code> was larger than that in the <code>decryptedMessageActionRequestKey</code> just received, abort the newly-suggested re-keying protocol instance without sending explicit <a href="/constructor/decryptedMessageActionAbortKey">decryptedMessageActionAbortKey</a> (the other side will do the same according to the next rule).</li>
 <li>if <em>exchange_id</em> in our <code>decryptedMessageActionRequestKey</code> was smaller, respond to the newly-received <code>decryptedMessageActionRequestKey</code> with a <code>decryptedMessageActionAcceptKey</code>, and participate only in the re-keying protocol instance initiated by the other side. It is possible to re-use at this stage the value of <em>g_a</em> (now called <em>g_b</em>) that was generated for the original <code>decryptedMessageActionRequestKey</code>, now abandoned, or totally new <em>(b,g_b)</em> can be generated. </li>
 <li>in the unlikely (2^{-64}) case both <em>exchange_id</em> are equal, abort both instances without sending an explicit <code>decryptedMessageActionAbortKey</code>. The other side will do the same.</li>
 </ul>

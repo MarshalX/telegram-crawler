@@ -71,9 +71,9 @@
 <li><code>revoting_disabled</code> - If set, users cannot change their vote after casting it</li>
 <li><code>shuffle_answers</code> - Whether answer options are displayed in a randomized order to each user</li>
 <li><code>hide_results_until_close</code> - Whether vote results are hidden from all participants until the poll is closed</li>
-<li><code>subscribers_only</code> - Whether only channel subscribers can vote</li>
-<li><code>countries_iso2</code> - If set, only users from the specified <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country codes may vote</li>
-<li><code>close_period</code> - Amount of time in seconds the poll will be active after creation, 5-600. Can't be used together with <code>close_date</code>.</li>
+<li><code>subscribers_only</code> - Whether only long-time channel/supergroup subscribers can vote, see <a href="#subscriber-only-polls">subscriber-only polls »</a></li>
+<li><code>countries_iso2</code> - If set, only users from the specified <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country codes may vote, up to a maximum of <a href="/api/config#poll-countries-max"><code>poll_countries_max</code> »</a> countries</li>
+<li><code>close_period</code> - Amount of time in seconds the poll will be active after creation, from 5 to <a href="/api/config#poll-close-period-max"><code>poll_close_period_max</code> »</a>. Can't be used together with <code>close_date</code>.</li>
 <li><code>close_date</code> - Point in time (Unix timestamp) when the poll will be automatically closed. Must be at least 5 and no more than 600 seconds in the future; can't be used together with <code>close_period</code>. <br>
 These last two parameters are exactly the same, except that one uses absolute, the other relative unixtime.</li>
 </ul>
@@ -112,7 +112,7 @@ These last two parameters are exactly the same, except that one uses absolute, t
 </code></pre>
 <p>When a poll is created with the <a href="/constructor/poll">poll</a>.<code>open_answers</code> flag set, users can add new answer options to the poll after it has been sent.</p>
 <p>To add a new answer, call <a href="/method/messages.addPollAnswer">messages.addPollAnswer</a>, providing an <a href="/constructor/inputPollAnswer">inputPollAnswer</a> with the new answer's <code>text</code> and an optional <code>media</code> attachment.</p>
-<p>To remove an answer option, call <a href="/method/messages.deletePollAnswer">messages.deletePollAnswer</a>, specifying the <code>option</code> identifier of the answer to delete. Only the user who added the answer or the poll creator can delete it.</p>
+<p>To remove an answer option, call <a href="/method/messages.deletePollAnswer">messages.deletePollAnswer</a>, specifying the <code>option</code> identifier of the answer to delete. Only the user who added the answer or the poll creator can delete it; a user that is not the poll creator may only delete an answer they added within <a href="/api/config#poll-answer-delete-period"><code>poll_answer_delete_period</code> »</a> seconds of adding it.</p>
 <p>When an answer is added or removed, all participants in the chat receive a service message: <a href="/constructor/messageActionPollAppendAnswer">messageActionPollAppendAnswer</a> when an answer is appended, or <a href="/constructor/messageActionPollDeleteAnswer">messageActionPollDeleteAnswer</a> when one is deleted.</p>
 <p>The <code>pollAnswer.added_by</code> and <code>pollAnswer.date</code> fields indicate which peer added a given answer and when. These fields are only populated for answers that were dynamically added to an open-answer poll; the original answers set when creating the poll do not carry these fields.</p>
 <h3><a class="anchor" href="#voting-in-polls" id="voting-in-polls" name="voting-in-polls"><i class="anchor-icon"></i></a>Voting in polls</h3>
@@ -139,6 +139,25 @@ These last two parameters are exactly the same, except that one uses absolute, t
 <li><code>can_view_stats</code> - Whether the current user can view detailed <a href="/api/stats#poll-statistics">poll statistics »</a></li>
 </ul>
 <p>The <a href="/constructor/updateMessagePoll">updateMessagePoll</a> now includes <code>peer</code>, <code>msg_id</code>, and <code>top_msg_id</code> to identify exactly which message the update pertains to (including for <a href="/api/file-references">file references</a>), in addition to the <code>poll_id</code>.</p>
+<h4><a class="anchor" href="#vote-restrictions" id="vote-restrictions" name="vote-restrictions"><i class="anchor-icon"></i></a>Vote restrictions</h4>
+<p>Before enabling the voting UI, clients should verify that the current user is actually allowed to vote. A user <strong>cannot</strong> vote in a poll if any of the following conditions apply:</p>
+<ul>
+<li>The poll is closed, i.e. <a href="/constructor/poll">poll</a>.<code>closed</code> is set (see <a href="#sending-a-poll">above</a>).</li>
+<li>The poll is <a href="#subscriber-only-polls">subscriber-only »</a> and the user is not an eligible subscriber.</li>
+<li>The poll is <a href="#country-restricted-polls">country-restricted »</a> and the user's country is not in the allowed list.</li>
+</ul>
+<h3><a class="anchor" href="#subscriber-only-polls" id="subscriber-only-polls" name="subscriber-only-polls"><i class="anchor-icon"></i></a>Subscriber-only polls</h3>
+<p>When a <a href="/constructor/poll">poll</a> is created with the <code>subscribers_only</code> flag set, only subscribers of the channel/supergroup where it was posted may vote in it.</p>
+<p>A user may vote only if <strong>both</strong> of the following are true:</p>
+<ul>
+<li>The user is currently a member of the channel/supergroup (i.e. they have <strong>not</strong> left it and have <strong>not</strong> been kicked/banned from it).</li>
+<li>The user joined the channel/supergroup at least <strong>24 hours</strong> (86400 seconds) before the poll message was posted (comparing the join date with the poll message's date, or with the forward date for forwarded polls).</li>
+</ul>
+<p>If either condition is not met, the user is not allowed to vote: clients should disable the voting UI and indicate that voting is restricted to long-time subscribers.</p>
+<h3><a class="anchor" href="#country-restricted-polls" id="country-restricted-polls" name="country-restricted-polls"><i class="anchor-icon"></i></a>Country-restricted polls</h3>
+<p>When a <a href="/constructor/poll">poll</a> is created with the <code>countries_iso2</code> field set (to at most <a href="/api/config#poll-countries-max"><code>poll_countries_max</code> »</a> <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country codes), only users located in one of the listed countries may vote in it.</p>
+<p>To determine whether the current user may vote, clients must compare the poll's <code>countries_iso2</code> list against the user's own country code, exposed by the <a href="/api/config#phone-country-iso2"><code>phone_country_iso2</code> »</a> configuration parameter (which the server derives from the user's phone number).</p>
+<p>If <code>phone_country_iso2</code> is <strong>not</strong> contained in the poll's <code>countries_iso2</code>, the user is not allowed to vote: clients should disable the voting UI and indicate that voting is restricted to the poll's allowed countries.</p>
 <h3><a class="anchor" href="#getting-poll-votes" id="getting-poll-votes" name="getting-poll-votes"><i class="anchor-icon"></i></a>Getting poll votes</h3>
 <pre><code><a href='/constructor/pollAnswerVoters'>pollAnswerVoters</a>#3645230a flags:<a href='/type/%23'>#</a> chosen:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> correct:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> option:<a href='/type/bytes'>bytes</a> voters:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> recent_voters:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Peer'>Peer</a>&gt; = <a href='/type/PollAnswerVoters'>PollAnswerVoters</a>;
 

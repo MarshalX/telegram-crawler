@@ -977,11 +977,34 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <h4><a class="anchor" href="#settings-display-passkeys" id="settings-display-passkeys" name="settings-display-passkeys"><i class="anchor-icon"></i></a><code>settings_display_passkeys</code></h4>
 <p><a href="/api/passkeys">Passkey support »</a> should only be enabled if this key is equal to true. (bool)</p>
 <h4><a class="anchor" href="#stars-groupcall-message-amount-max" id="stars-groupcall-message-amount-max" name="stars-groupcall-message-amount-max"><i class="anchor-icon"></i></a><code>stars_groupcall_message_amount_max</code></h4>
-<p> </p>
+<p>Maximum number of <a href="/api/stars">Telegram Stars</a> that can be paid to send a single text message during a <a href="/api/group-calls">group call or live video stream »</a>. (integer)</p>
 <h4><a class="anchor" href="#stars-groupcall-message-limits" id="stars-groupcall-message-limits" name="stars-groupcall-message-limits"><i class="anchor-icon"></i></a><code>stars_groupcall_message_limits</code></h4>
-<p> </p>
+<p>Defines the highlight tiers applied to <a href="/api/group-calls#paid-live-story-comments">paid messages/comments sent during a group call or live video stream »</a>, as a function of the number of <a href="/api/stars">Telegram Stars</a> donated with the message.</p>
+<p>This is a JSON array of objects, each describing one tier with the following keys:</p>
+<ul>
+<li><code>stars</code> (integer) - Minimum number of donated Stars required to reach this tier.</li>
+<li><code>pin_period</code> (integer) - For how many seconds a message in this tier stays pinned/highlighted.</li>
+<li><code>text_length_max</code> (integer) - Maximum number of UTF-8 characters allowed in a message in this tier.</li>
+<li><code>emoji_max</code> (integer) - Maximum number of <a href="/api/custom-emoji">custom emojis</a> allowed in a message in this tier.</li>
+<li><code>color1</code> (string) - Background color of the highlighted message in <strong>light</strong> themes, as a 6-digit hexadecimal RGB string (e.g. <code>955CDB</code>).</li>
+<li><code>color_bg</code> (string) - Background color of the highlighted message in <strong>dark</strong> themes, as a 6-digit hexadecimal RGB string.</li>
+</ul>
+<p>Tiers are sorted by ascending <code>stars</code>, and the tier with <code>stars</code> equal to <code>0</code> describes the appearance of free (non-paid) messages (clients should assume such a tier exists, falling back to a default if the array does not provide one).<br>
+To render a given message, clients select the tier with the highest <code>stars</code> threshold that is still less than or equal to the amount donated with the message (<a href="/constructor/groupCallMessage">groupCallMessage</a>.<code>paid_message_stars</code>).</p>
+<p>For reference, the default tiers used by official clients are equivalent to:</p>
+<pre><code class="language-json">[
+    {"stars": 0,     "pin_period": 30,   "text_length_max": 30,  "emoji_max": 0,  "color1": "955CDB", "color_bg": "49079B"},
+    {"stars": 10,    "pin_period": 60,   "text_length_max": 60,  "emoji_max": 1,  "color1": "955CDB", "color_bg": "49079B"},
+    {"stars": 50,    "pin_period": 120,  "text_length_max": 80,  "emoji_max": 2,  "color1": "46A3EB", "color_bg": "00508E"},
+    {"stars": 100,   "pin_period": 300,  "text_length_max": 110, "emoji_max": 3,  "color1": "40A920", "color_bg": "176200"},
+    {"stars": 250,   "pin_period": 600,  "text_length_max": 150, "emoji_max": 4,  "color1": "E29A09", "color_bg": "9A3E00"},
+    {"stars": 500,   "pin_period": 900,  "text_length_max": 200, "emoji_max": 7,  "color1": "ED771E", "color_bg": "9B3100"},
+    {"stars": 2000,  "pin_period": 1800, "text_length_max": 280, "emoji_max": 10, "color1": "E14542", "color_bg": "8B0503"},
+    {"stars": 10000, "pin_period": 3600, "text_length_max": 400, "emoji_max": 20, "color1": "596473", "color_bg": "252C36"}
+]
+</code></pre>
 <h4><a class="anchor" href="#whitelisted-bots" id="whitelisted-bots" name="whitelisted-bots"><i class="anchor-icon"></i></a><code>whitelisted_bots</code></h4>
-<p> </p>
+<p>Array of bot user IDs that are exempt from the <a href="/api/bots/webapps">bot web app confirmation/guard prompt »</a>, allowing their <a href="/api/bots/webapps">Mini Apps</a> to be opened without an extra confirmation.</p>
 <h4><a class="anchor" href="#stargifts-craft-attribute-permilles" id="stargifts-craft-attribute-permilles" name="stargifts-craft-attribute-permilles"><i class="anchor-icon"></i></a><code>stargifts_craft_attribute_permilles</code></h4>
 <p>Attribute persistence probabilities used when displaying the <a href="/api/gifts#crafting-collectible-gifts">collectible gift crafting UI »</a>.<br>
 This is an array of 4 arrays of integers; the array with index N has N+1 integers, each containing a probability in permille, see <a href="/api/gifts#crafting-collectible-gifts">here »</a> for more info.</p>
@@ -990,9 +1013,9 @@ This is an array of 4 arrays of integers; the array with index N has N+1 integer
 <h4><a class="anchor" href="#contact-note-length-limit" id="contact-note-length-limit" name="contact-note-length-limit"><i class="anchor-icon"></i></a><code>contact_note_length_limit</code></h4>
 <p>Maximum length of <a href="/api/contacts#private-notes-for-contacts">private contact notes »</a>. (integer)</p>
 <h4><a class="anchor" href="#group-call-message-length-limit" id="group-call-message-length-limit" name="group-call-message-length-limit"><i class="anchor-icon"></i></a><code>group_call_message_length_limit</code></h4>
-<p> </p>
+<p>Maximum length, in UTF-8 characters, of a text message sent during a <a href="/api/group-calls">group call or live video stream »</a>. (integer)</p>
 <h4><a class="anchor" href="#group-call-message-ttl" id="group-call-message-ttl" name="group-call-message-ttl"><i class="anchor-icon"></i></a><code>group_call_message_ttl</code></h4>
-<p> </p>
+<p>Number of seconds a text message sent during a <a href="/api/group-calls">group call or live video stream »</a> stays displayed before disappearing. (integer)</p>
 <h4><a class="anchor" href="#message-typing-draft-ttl" id="message-typing-draft-ttl" name="message-typing-draft-ttl"><i class="anchor-icon"></i></a><code>message_typing_draft_ttl</code></h4>
 <p><a href="/api/bots/ai#live-response-streaming">Live draft messages »</a> should be deleted automatically by graphical clients this many seconds after they're received, or when receiving a normal message within the same chat/bot forum topic, whichever comes first.  (integer)</p>
 <h4><a class="anchor" href="#bots-create-limit-default" id="bots-create-limit-default" name="bots-create-limit-default"><i class="anchor-icon"></i></a><code>bots_create_limit_default</code></h4>
@@ -1000,11 +1023,11 @@ This is an array of 4 arrays of integers; the array with index N has N+1 integer
 <h4><a class="anchor" href="#bots-create-limit-premium" id="bots-create-limit-premium" name="bots-create-limit-premium"><i class="anchor-icon"></i></a><code>bots_create_limit_premium</code></h4>
 <p>Maximum number of <a href="/api/bots">bots</a> that can be owned by <a href="/api/premium">Premium</a> users. (integer)</p>
 <h4><a class="anchor" href="#poll-answer-delete-period" id="poll-answer-delete-period" name="poll-answer-delete-period"><i class="anchor-icon"></i></a><code>poll_answer_delete_period</code></h4>
-<p> </p>
+<p>For <a href="/api/poll">polls</a> that allow users to add their own answer options, the time window (in seconds) during which the user that added an option may still delete it again. (integer)</p>
 <h4><a class="anchor" href="#poll-close-period-max" id="poll-close-period-max" name="poll-close-period-max"><i class="anchor-icon"></i></a><code>poll_close_period_max</code></h4>
-<p> </p>
+<p>Maximum allowed value, in seconds, for the auto-close timer of a <a href="/api/poll">poll</a>. (integer)</p>
 <h4><a class="anchor" href="#music-search-username" id="music-search-username" name="music-search-username"><i class="anchor-icon"></i></a><code>music_search_username</code></h4>
-<p> </p>
+<p>Username of the inline bot used to search for music. (string)</p>
 <h4><a class="anchor" href="#aicompose-tone-examples-num" id="aicompose-tone-examples-num" name="aicompose-tone-examples-num"><i class="anchor-icon"></i></a><code>aicompose_tone_examples_num</code></h4>
 <p>Number of preview examples available for each <a href="/api/ai#ai-compose-tones">custom AI composer tone »</a>, to be cycled through with <a href="/method/aicompose.getToneExample">aicompose.getToneExample</a>. (integer)</p>
 <h4><a class="anchor" href="#aicompose-tone-prompt-length-max" id="aicompose-tone-prompt-length-max" name="aicompose-tone-prompt-length-max"><i class="anchor-icon"></i></a><code>aicompose_tone_prompt_length_max</code></h4>
@@ -1012,13 +1035,13 @@ This is an array of 4 arrays of integers; the array with index N has N+1 integer
 <h4><a class="anchor" href="#aicompose-tone-title-length-max" id="aicompose-tone-title-length-max" name="aicompose-tone-title-length-max"><i class="anchor-icon"></i></a><code>aicompose_tone_title_length_max</code></h4>
 <p>Maximum UTF-8 length of the <code>title</code> of a <a href="/api/ai#ai-compose-tones">custom AI composer tone »</a>. (integer)</p>
 <h4><a class="anchor" href="#poll-countries-max" id="poll-countries-max" name="poll-countries-max"><i class="anchor-icon"></i></a><code>poll_countries_max</code></h4>
-<p> </p>
+<p>Maximum number of countries that can be selected when restricting a <a href="/api/poll">poll</a> by country. (integer)</p>
 <h4><a class="anchor" href="#aicompose-tone-saved-limit-default" id="aicompose-tone-saved-limit-default" name="aicompose-tone-saved-limit-default"><i class="anchor-icon"></i></a><code>aicompose_tone_saved_limit_default</code></h4>
 <p>Maximum number of <a href="/api/ai#ai-compose-tones">custom AI composer tones »</a> a non-<a href="/api/premium">Premium</a> user may install. (integer)</p>
 <h4><a class="anchor" href="#aicompose-tone-saved-limit-premium" id="aicompose-tone-saved-limit-premium" name="aicompose-tone-saved-limit-premium"><i class="anchor-icon"></i></a><code>aicompose_tone_saved_limit_premium</code></h4>
 <p>Maximum number of <a href="/api/ai#ai-compose-tones">custom AI composer tones »</a> a <a href="/api/premium">Premium</a> user may install. (integer)</p>
 <h4><a class="anchor" href="#phone-country-iso2" id="phone-country-iso2" name="phone-country-iso2"><i class="anchor-icon"></i></a><code>phone_country_iso2</code></h4>
-<p> </p>
+<p>Two-letter <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> country code of the current user, derived by the server from the user's phone number. Clients use it to enforce <a href="/api/poll#country-restricted-polls">country-restricted polls »</a>: the user may vote only if this code is contained in the poll's <a href="/constructor/poll"><code>countries_iso2</code></a> list. (string)</p>
 <!-- end config description -->
 <h3><a class="anchor" href="#suggestions" id="suggestions" name="suggestions"><i class="anchor-icon"></i></a>Suggestions</h3>
 <pre><code><a href='/constructor/help.promoData'>help.promoData</a>#08a4d87a flags:<a href='/type/%23'>#</a> proxy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> expires:<a href='/type/int'>int</a> peer:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Peer'>Peer</a> psa_type:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/string'>string</a> psa_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> pending_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; dismissed_suggestions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; custom_pending_suggestion:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/type/PendingSuggestion'>PendingSuggestion</a> chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/help.PromoData'>help.PromoData</a>;
