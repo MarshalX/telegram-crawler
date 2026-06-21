@@ -79,6 +79,7 @@ If the dropped main auth key is the main logged in auth key (the one used for lo
 <p>Once the temporary key expires, the client needs to generate a new temporary key using <strong>p_q_inner_data_temp</strong>. Then it needs to re-bind that new temporary key to the initial permanent key. A new key can also be generated in advance, so that the client has a new key ready by the time the old one has expired.</p>
 <p>For additional security, the client can store the temporary authorization key in RAM only and never save it in persistent storage.</p>
 <p>A temporary authorization key may expire at any moment before <strong>expires_at</strong>, since such keys are also stored only in the RAM on the server-side. Be prepared to handle resulting MTProto errors correctly (non-existent auth_key_id results in a 404 error).</p>
+<p>When the server permits <a href="/api/datacenter#parallel-sessions">multiple parallel main sessions</a> (by advertising <code>tmp_sessions</code> &gt; 1), the client <strong>must</strong> apply PFS to all of its sessions: each session generates and binds its own temporary authorization key, all bound to the same permanent key.</p>
 </div>
   
 </div>

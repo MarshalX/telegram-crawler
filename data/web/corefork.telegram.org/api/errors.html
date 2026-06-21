@@ -49,7 +49,7 @@ An error is characterized by several parameters:</p>
 <h4><a class="anchor" href="#error-type" id="error-type" name="error-type"><i class="anchor-icon"></i></a>Error Type</h4>
 <p>A string literal in the form of <code>/[A-Z_0-9]+/</code>, which summarizes the problem. For example, <code>AUTH_KEY_UNREGISTERED</code>. This is an optional parameter.</p>
 <h4><a class="anchor" href="#error-database" id="error-database" name="error-database"><i class="anchor-icon"></i></a>Error Database</h4>
-<p>A full human-readable JSON list of RPC errors that can be returned by all methods in the API can be found <a href="/file/400780400216/3/xT3k_F5O9X0.218894.json/e9a65ddf57a6c97c7c">here »</a>, what follows is a description of its fields:</p>
+<p>A full human-readable JSON list of RPC errors that can be returned by all methods in the API can be found <a href="/file/400780400088/2/Ta9Fe33esDA.218894.json/ff6d848697d36c5c49">here »</a>, what follows is a description of its fields:</p>
 <ul>
 <li><code>errors</code> - All error messages and codes for each method (object).
 <ul>
@@ -172,6 +172,9 @@ Basically, an <a href="/constructor/updateServiceNotification">updateServiceNoti
 <p>An exception to this is the <code>AUTH_KEY_DUPLICATED</code> error, which is only emitted if any of the non-media DC detects that an authorized session is sending requests in parallel from two separate TCP connections, from the same or different IP addresses.<br>
 Note that parallel connections are still allowed and actually recommended for media DCs.<br>
 Also note that by session we mean a logged-in session identified by an <a href="/constructor/authorization">authorization</a> constructor, fetchable using <a href="/method/account.getAuthorizations">account.getAuthorizations</a>, not an MTProto session.</p>
+<p>In other words, the <strong>main</strong> connection to a non-media DC normally permits only a <strong>single</strong> <a href="/api/datacenter#parallel-sessions">MTProto session</a>: opening additional parallel main sessions (i.e. multiple <a href="/mtproto/description#session">session_id</a>s over the same authorization key, or multiple TCP connections to the main DC) is what triggers this error.<br>
+The server may however explicitly grant permission to run several parallel main sessions, by advertising a <code>tmp_sessions</code> value greater than <code>1</code> in the <a href="/constructor/config">config</a>/<a href="/constructor/auth.authorization">auth.authorization</a> constructors (<a href="/api/datacenter#parallel-sessions">see parallel sessions »</a>); only up to that many parallel main sessions may then be opened without triggering <code>AUTH_KEY_DUPLICATED</code>. When <code>tmp_sessions</code> is absent or <code>≤ 1</code>, a single main session must be used.<br>
+Dedicated <a href="/api/files#general-considerations">file transfer sessions</a> on media DCs are exempt and may always be opened in parallel.</p>
 <p>If the client receives an <code>AUTH_KEY_DUPLICATED</code> error, the session was already invalidated by the server and the user must generate a new auth key and login again.</p>
 <h3><a class="anchor" href="#420-flood" id="420-flood" name="420-flood"><i class="anchor-icon"></i></a>420 FLOOD</h3>
 <p>The maximum allowed number of attempts to invoke the given method with the given input parameters has been exceeded. For example, in an attempt to request a large number of text messages (SMS) for the same phone number.</p>
