@@ -42,7 +42,9 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/methods" >All Methods</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/method/payments.getStarGiftActiveAuctions" >payments.getStarGiftActiveAuctions</a></li></ul></div>
   <h1 id="dev_page_title">payments.getStarGiftActiveAuctions</h1>
   
-  <div id="dev_page_content"><p>Fetches all currently active <a href="/api/auctions">gift auctions</a> <strong>where the user has placed a bid</strong>.</p>
+  <div id="dev_page_content"><p>Fetches all currently active <a href="/api/auctions">gift auctions</a> <strong>the user has ever bid on</strong> (including auctions where the user was outbid and their bid was returned), as long as the auction hasn't ended yet.</p>
+<p>This method is primarily used to display an auction badge in the chat list immediately on app startup, without waiting for real-time <a href="/constructor/updateStarGiftAuctionState">updateStarGiftAuctionState</a> updates to arrive: the client calls it to discover which auctions the user is participating in and show the badge proactively.</p>
+<p>To instead fetch the full state of a single auction, subscribe to its real-time updates and render the detailed auction UI (typically when the user opens a specific auction), use <a href="/method/payments.getStarGiftAuctionState">payments.getStarGiftAuctionState</a>.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">

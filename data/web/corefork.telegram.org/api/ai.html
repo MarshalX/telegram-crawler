@@ -121,9 +121,11 @@
 <a href='/method/messages.summarizeText'>messages.summarizeText</a>#abbbd346 flags:<a href='/type/%23'>#</a> peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/int'>int</a> to_lang:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/string'>string</a> tone:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> = <a href='/type/TextWithEntities'>TextWithEntities</a>;
 </code></pre>
 <p>Invoke <a href="/method/messages.summarizeText">messages.summarizeText</a> to summarize the contents of the message with AI, privately powered by <a href="https://cocoon.org">Cocoon</a>.</p>
+<p>Clients should offer a summarization button for messages with <a href="/constructor/message">message</a>.<code>summary_from_language</code> set.</p>
+<p>The <code>summary_from_language</code> field is a server-provided UI hint and contains the detected language of the message text to summarize; it is not a required argument or precondition to invoke <a href="/method/messages.summarizeText">messages.summarizeText</a>, which can be invoked regardless of the value of <code>summary_from_language</code> for the target message.</p>
 <p>Pass the message's ID in <code>id</code>, and the chat where the message is located in <code>peer</code>.</p>
 <p>You may choose a custom <a href="#ai-compose-tones">tone »</a> for the summary, passing the tone identifier to <code>tone</code>.</p>
-<p>The summary can additionally be translated by specifying a language code in the <code>to_lang</code> flag.</p>
+<p>If <code>to_lang</code> is set, the summary is generated in the specified target language; otherwise it is generated in the message's language.</p>
 <h3><a class="anchor" href="#chatbot-ai-features" id="chatbot-ai-features" name="chatbot-ai-features"><i class="anchor-icon"></i></a>Chatbot AI features</h3>
 <p>Telegram bots offer a number of features for AI chatbots:</p>
 <ul>
