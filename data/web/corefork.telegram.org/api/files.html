@@ -439,83 +439,23 @@ This error can only be received when the user has uploaded tens of gigabytes or 
 </code></pre>
 <p>Telegram attaches a vector of thumbnails with reduced resolution to all uploaded media.<br>
 The server also generates a trimmed and scaled down video preview for videos, GIFs and animated profile pictures.</p>
-<h4><a class="anchor" href="#image-thumbnail-types" id="image-thumbnail-types" name="image-thumbnail-types"><i class="anchor-icon"></i></a>Image thumbnail types</h4>
-<p>Each photo preview has a specific <code>type</code>, indicating the resolution and image transform that was applied server-side.</p>
-<table class="table">
-<thead>
-<tr>
-<th>Type</th>
-<th>Image filter</th>
-<th>Size</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>s</code></td>
-<td>box</td>
-<td>100x100</td>
-</tr>
-<tr>
-<td><code>m</code></td>
-<td>box</td>
-<td>320x320</td>
-</tr>
-<tr>
-<td><code>x</code></td>
-<td>box</td>
-<td>800x800</td>
-</tr>
-<tr>
-<td><code>y</code></td>
-<td>box</td>
-<td>1280x1280</td>
-</tr>
-<tr>
-<td><code>w</code></td>
-<td>box</td>
-<td>2560x2560</td>
-</tr>
-<tr>
-<td><code>a</code></td>
-<td>crop</td>
-<td>160x160</td>
-</tr>
-<tr>
-<td><code>b</code></td>
-<td>crop</td>
-<td>320x320</td>
-</tr>
-<tr>
-<td><code>c</code></td>
-<td>crop</td>
-<td>640x640</td>
-</tr>
-<tr>
-<td><code>d</code></td>
-<td>crop</td>
-<td>1280x1280</td>
-</tr>
-</tbody>
-</table>
-<p>Special types:</p>
-<table class="table">
-<thead>
-<tr>
-<th>Type</th>
-<th>Image filter</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>i</code></td>
-<td>strip</td>
-</tr>
-<tr>
-<td><code>j</code></td>
-<td>outline</td>
-</tr>
-</tbody>
-</table>
+<h4><a class="anchor" href="#photosizetype-values" id="photosizetype-values" name="photosizetype-values"><i class="anchor-icon"></i></a><code>PhotoSize.type</code> values</h4>
+<p>Each <a href="/type/PhotoSize">PhotoSize</a> constructor has a <code>type</code> field, indicating the resolution and image transform that was applied server-side.</p>
+<!-- start PhotoSize.type values -->
+<ul>
+<li><code>s</code> - Server-side resized image, bounded by 100x100 pixels.</li>
+<li><code>m</code> - Server-side resized image, bounded by 320x320 pixels.</li>
+<li><code>x</code> - Server-side resized image, bounded by 800x800 pixels.</li>
+<li><code>y</code> - Server-side resized image, bounded by 1280x1280 pixels.</li>
+<li><code>w</code> - Server-side resized image, bounded by 2560x2560 pixels.</li>
+<li><code>a</code> - Server-side cropped image, 160x160 pixels.</li>
+<li><code>b</code> - Server-side cropped image, 320x320 pixels.</li>
+<li><code>c</code> - Server-side cropped image, 640x640 pixels.</li>
+<li><code>d</code> - Server-side cropped image, 1280x1280 pixels.</li>
+<li><code>i</code> - Stripped thumbnail, see <a href="#stripped-thumbnails">stripped thumbnails »</a>.</li>
+<li><code>j</code> - Vector outline thumbnail, see <a href="#vector-thumbnails">vector thumbnails »</a>.</li>
+</ul>
+<!-- end PhotoSize.type values -->
 <h4><a class="anchor" href="#stripped-thumbnails" id="stripped-thumbnails" name="stripped-thumbnails"><i class="anchor-icon"></i></a>Stripped thumbnails</h4>
 <pre><code><a href='/constructor/photoStrippedSize'>photoStrippedSize</a>#e0b0bc2e type:<a href='/type/string'>string</a> bytes:<a href='/type/bytes'>bytes</a> = <a href='/type/PhotoSize'>PhotoSize</a>;
 </code></pre>
@@ -559,36 +499,18 @@ path += "z"
 &lt;path d="{$path}"/&gt;
 &lt;/svg&gt;
 </code></pre>
-<h4><a class="anchor" href="#video-types" id="video-types" name="video-types"><i class="anchor-icon"></i></a>Video types</h4>
+<h4><a class="anchor" href="#videosizetype-values" id="videosizetype-values" name="videosizetype-values"><i class="anchor-icon"></i></a><code>videoSize.type</code> values</h4>
 <pre><code><a href='/constructor/videoSize'>videoSize</a>#de33b094 flags:<a href='/type/%23'>#</a> type:<a href='/type/string'>string</a> w:<a href='/type/int'>int</a> h:<a href='/type/int'>int</a> size:<a href='/type/int'>int</a> video_start_ts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/double'>double</a> = <a href='/type/VideoSize'>VideoSize</a>;
 </code></pre>
 <p>A <a href="/constructor/videoSize">videoSize</a> constructor is typically used for <a href="#animated-profile-pictures">animated profile pictures</a>, video previews and <a href="/api/stickers#premium-animated-sticker-effects">premium sticker effects »</a>.</p>
-<table class="table">
-<thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-<th>Format</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>u</code></td>
-<td>Animated profile picture</td>
-<td>MPEG4</td>
-</tr>
-<tr>
-<td><code>v</code></td>
-<td>Video preview</td>
-<td>MPEG4</td>
-</tr>
-<tr>
-<td><code>f</code></td>
-<td><a href="/api/stickers#premium-animated-sticker-effects">Premium sticker effect »</a></td>
-<td><a href="/api/stickers#animated-stickers">TGS »</a></td>
-</tr>
-</tbody>
-</table>
+<!-- start videoSize.type values -->
+<ul>
+<li><code>p</code> - Small animated profile picture preview, in MPEG4 format.</li>
+<li><code>u</code> - Animated profile picture, in MPEG4 format.</li>
+<li><code>v</code> - Video preview, in MPEG4 format.</li>
+<li><code>f</code> - <a href="/api/stickers#premium-animated-sticker-effects">Premium sticker effect »</a>, in <a href="/api/stickers#animated-stickers">TGS »</a> format.</li>
+</ul>
+<!-- end videoSize.type values -->
 <h3><a class="anchor" href="#downloading-webfiles" id="downloading-webfiles" name="downloading-webfiles"><i class="anchor-icon"></i></a>Downloading webfiles</h3>
 <p>Remote HTTP files sent by inline bots <a href="/type/BotInlineResult">in response to inline queries</a> and in other places are represented by <a href="/type/WebDocument">WebDocument</a> constructors.
 When forwarding such remote HTTP files, they should be sent using <a href="/type/InputMedia">external InputMedia constructors</a>.

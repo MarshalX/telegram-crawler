@@ -493,6 +493,14 @@
 <li><a href="/api/gifts#crafting-collectible-gifts">Gift crafting »</a></li>
 <li><a href="/api/channel#leaving-groups-channels">A new flow to obtain info about the admin that will become the owner of a supergrup/channel if the original owner leaves »</a></li>
 </ul>
+<h4><a class="anchor" href="#api-constants" id="api-constants" name="api-constants"><i class="anchor-icon"></i></a>API constants</h4>
+<h5><a class="anchor" href="#post-story-content-types" id="post-story-content-types" name="post-story-content-types"><i class="anchor-icon"></i></a>Post story content types</h5>
+<p>Story content types accepted by <a href="/api/links#post-story-links">post story deep links »</a>.</p>
+<ul>
+<li>Added <code>photo</code></li>
+<li>Added <code>video</code></li>
+<li>Added <code>live</code></li>
+</ul>
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
@@ -965,7 +973,7 @@
 <li><a href="/api/profile#birthday">Suggested birthdays »</a></li>
 <li><a href="/api/colors#collectible-message-palettes">Collectible gifts can now have associated message color palettes »</a></li>
 <li><a href="/api/bots/ai#live-response-streaming">Live bot response streaming »</a>.</li>
-<li><a href="/api/colors#linking-a-collectible-gift-on-the-ton-blockchain-to-a-telegram-account">Linking a collectible gift on the TON blockchain to a Telegram account »</a></li>
+<li><a href="/api/gifts#hosted-collectible-gifts">Hosted collectible gifts: linking a collectible gift on the TON blockchain to a Telegram profile »</a></li>
 </ul>
 <h4><a class="anchor" href="#api-constants" id="api-constants" name="api-constants"><i class="anchor-icon"></i></a>API constants</h4>
 <h5><a class="anchor" href="#client-configs" id="client-configs" name="client-configs"><i class="anchor-icon"></i></a>Client configs</h5>
@@ -1267,7 +1275,7 @@ Clients should treat this as a <code>500</code> server error, and handle it by c
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/account.getUniqueGiftChatThemes">account.getUniqueGiftChatThemes</a> - Obtain all <a href="/api/themes#chat-themes">chat themes »</a> associated to owned <a href="/api/gifts#collectible-gifts">collectible gifts »</a>.</li>
+<li>Added <a href="/method/account.getUniqueGiftChatThemes">account.getUniqueGiftChatThemes</a> - Obtain all <a href="/api/themes#chat-themes">chat themes »</a> associated to owned or <a href="/api/gifts#hosted-collectible-gifts">hosted collectible gifts »</a>.</li>
 </ul>
 <h5><a class="anchor" href="#changed-methods" id="changed-methods" name="changed-methods"><i class="anchor-icon"></i></a>Changed Methods</h5>
 <ul>
@@ -1281,7 +1289,7 @@ Clients should treat this as a <code>500</code> server error, and handle it by c
 <li>Added <a href="/constructor/account.chatThemes">account.chatThemes</a> - Available <a href="/api/themes#chat-themes">chat themes</a></li>
 <li>Added <a href="/constructor/inputChatThemeEmpty">inputChatThemeEmpty</a> - Remove any currently configured theme.</li>
 <li>Added <a href="/constructor/inputChatTheme">inputChatTheme</a> - Set an emoji-based chat theme, returned by <a href="/method/account.getChatThemes">account.getChatThemes</a>.</li>
-<li>Added <a href="/constructor/inputChatThemeUniqueGift">inputChatThemeUniqueGift</a> - Set a theme based on an owned <a href="/api/gifts#collectible-gifts">collectible gift »</a>, returned by <a href="/method/account.getUniqueGiftChatThemes">account.getUniqueGiftChatThemes</a>.</li>
+<li>Added <a href="/constructor/inputChatThemeUniqueGift">inputChatThemeUniqueGift</a> - Set a theme based on an owned or <a href="/api/gifts#hosted-collectible-gifts">hosted collectible gift »</a>, returned by <a href="/method/account.getUniqueGiftChatThemes">account.getUniqueGiftChatThemes</a>.</li>
 </ul>
 <h5><a class="anchor" href="#changed-constructors" id="changed-constructors" name="changed-constructors"><i class="anchor-icon"></i></a>Changed Constructors</h5>
 <ul>
@@ -2831,8 +2839,8 @@ This change also simplifies the Telegram Premium gift flow, fully replacing the 
 <h4><a class="anchor" href="#schema-changes" id="schema-changes" name="schema-changes"><i class="anchor-icon"></i></a>Schema changes</h4>
 <h5><a class="anchor" href="#new-methods" id="new-methods" name="new-methods"><i class="anchor-icon"></i></a>New Methods</h5>
 <ul>
-<li>Added <a href="/method/account.getCollectibleEmojiStatuses">account.getCollectibleEmojiStatuses</a> - Obtain a list of <a href="/api/emoji-status">emoji statuses »</a> for owned <a href="/api/gifts#collectible-gifts">collectible gifts</a>.</li>
-<li>Added <a href="/method/payments.getSavedStarGifts">payments.getSavedStarGifts</a> - Fetch the full list of <a href="/api/gifts">gifts</a> owned by a peer.</li>
+<li>Added <a href="/method/account.getCollectibleEmojiStatuses">account.getCollectibleEmojiStatuses</a> - Obtain a list of <a href="/api/emoji-status">emoji statuses »</a> for owned or <a href="/api/gifts#hosted-collectible-gifts">hosted collectible gifts »</a>.</li>
+<li>Added <a href="/method/payments.getSavedStarGifts">payments.getSavedStarGifts</a> - Fetch the full list of <a href="/api/gifts#list-all-received-gifts">gifts »</a> owned, received or <a href="/api/gifts#hosted-collectible-gifts">hosted »</a> by a peer.</li>
 <li>Added <a href="/method/payments.getSavedStarGift">payments.getSavedStarGift</a> - Fetch info about specific <a href="/api/gifts">gifts</a> owned by a peer we control.</li>
 <li>Added <a href="/method/payments.getStarGiftWithdrawalUrl">payments.getStarGiftWithdrawalUrl</a> - Convert a <a href="/api/gifts">collectible gift »</a> to an NFT on the TON blockchain.</li>
 <li>Added <a href="/method/payments.toggleChatStarGiftNotifications">payments.toggleChatStarGiftNotifications</a> - Enables or disables the reception of notifications every time a <a href="/api/gifts">gift »</a> is received by the specified channel, can only be invoked by admins with <code>post_messages</code> <a href="/constructor/chatAdminRights">admin rights</a>.</li>
@@ -2852,8 +2860,8 @@ This change also simplifies the Telegram Premium gift flow, fully replacing the 
 </ul>
 <h5><a class="anchor" href="#new-constructors" id="new-constructors" name="new-constructors"><i class="anchor-icon"></i></a>New Constructors</h5>
 <ul>
-<li>Added <a href="/constructor/emojiStatusCollectible">emojiStatusCollectible</a> - An <a href="/api/gifts#collectible-gifts">owned collectible gift »</a> as emoji status.</li>
-<li>Added <a href="/constructor/inputEmojiStatusCollectible">inputEmojiStatusCollectible</a> - An <a href="/api/gifts#collectible-gifts">owned collectible gift »</a> as emoji status: can only be used in <a href="/method/account.updateEmojiStatus">account.updateEmojiStatus</a>, is never returned by the API.</li>
+<li>Added <a href="/constructor/emojiStatusCollectible">emojiStatusCollectible</a> - An owned or <a href="/api/gifts#hosted-collectible-gifts">hosted collectible gift »</a> as emoji status.</li>
+<li>Added <a href="/constructor/inputEmojiStatusCollectible">inputEmojiStatusCollectible</a> - An owned or <a href="/api/gifts#hosted-collectible-gifts">hosted collectible gift »</a> as emoji status: can only be used in <a href="/method/account.updateEmojiStatus">account.updateEmojiStatus</a>, is never returned by the API.</li>
 <li>Added <a href="/constructor/savedStarGift">savedStarGift</a> - Represents a <a href="/api/gifts">gift</a> owned by a peer.</li>
 <li>Added <a href="/constructor/payments.savedStarGifts">payments.savedStarGifts</a> - Represents a list of <a href="/api/gifts">gifts</a>.</li>
 <li>Added <a href="/constructor/inputSavedStarGiftUser">inputSavedStarGiftUser</a> - A gift received in a private chat with another user.</li>
