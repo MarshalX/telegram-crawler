@@ -59,11 +59,8 @@
 <li><code>tg://path?query</code></li>
 </ul>
 <p>The <code>#fragment</code> part is always ignored when parsing Telegram deep links.</p>
-<p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code>:</p>
-<ul>
-<li>Is not equal to any of:</li>
-</ul>
-<!-- start disallowed t.me subdomains 1 -->
+<p>Also note that whenever a <code>&lt;username&gt;.t.me</code> link is encountered and <code>&lt;username&gt;</code> is <strong>not</strong> a single letter AND is <strong>not</strong> equal to <code>www</code> AND is a valid username AND is <strong>not</strong> equal to any of:</p>
+<!-- start disallowed t.me subdomains -->
 <ul>
 <li><code>addemoji</code></li>
 <li><code>addlist</code></li>
@@ -92,10 +89,6 @@
 <li><code>z</code></li>
 </ul>
 <!-- end disallowed t.me subdomains -->
-<ul>
-<li>AND is not a single letter</li>
-<li>AND is a valid username</li>
-</ul>
 <p>...it should be treated exactly as a <code>t.me/&lt;username&gt;/</code> link (generate a <code>t.me/&lt;username&gt;/</code> link and append the rest of the path (if present) and the query string (if present)).</p>
 <p>Everywhere where link parameters contain a user, chat, channel or supergroup ID, it will be in MTProto format, see <a href="/api/bots/ids">here »</a> for info on how to convert it to bot API format.</p>
 <h3><a class="anchor" href="#ton-sites" id="ton-sites" name="ton-sites"><i class="anchor-icon"></i></a>TON Sites</h3>
@@ -306,18 +299,18 @@ These links can be generated even for profiles that don't have a username, and t
 <h3><a class="anchor" href="#message-links" id="message-links" name="message-links"><i class="anchor-icon"></i></a>Message links</h3>
 <p>Used to link to specific messages in public or private groups and channels.</p>
 <p><code>t.me</code> syntax (public links):</p>
-<pre><code>t.me/&lt;username&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;
-t.me/&lt;username&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;
+<pre><code>t.me/&lt;username&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;&amp;task=&lt;task_id&gt;&amp;option=&lt;option_id&gt;
+t.me/&lt;username&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;&amp;task=&lt;task_id&gt;&amp;option=&lt;option_id&gt;
 </code></pre>
 <p><code>t.me</code> syntax (private links):</p>
-<pre><code>t.me/c/&lt;channel&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;
-t.me/c/&lt;channel&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;
+<pre><code>t.me/c/&lt;channel&gt;/&lt;id&gt;?single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;&amp;task=&lt;task_id&gt;&amp;option=&lt;option_id&gt;
+t.me/c/&lt;channel&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;&amp;task=&lt;task_id&gt;&amp;option=&lt;option_id&gt;
 </code></pre>
 <p><code>tg:</code> syntax (public links):</p>
-<pre><code>tg://resolve?domain=&lt;username&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;
+<pre><code>tg://resolve?domain=&lt;username&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;&amp;task=&lt;task_id&gt;&amp;option=&lt;option_id&gt;
 </code></pre>
 <p><code>tg:</code> syntax (private links):</p>
-<pre><code>tg://privatepost?channel=&lt;channel&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;
+<pre><code>tg://privatepost?channel=&lt;channel&gt;&amp;post=&lt;id&gt;&amp;single&amp;thread=&lt;thread_id&gt;&amp;comment=&lt;comment&gt;&amp;t=&lt;media_timestamp&gt;&amp;task=&lt;task_id&gt;&amp;option=&lt;option_id&gt;
 </code></pre>
 <p>Parameters:</p>
 <table class="table">
@@ -364,6 +357,16 @@ t.me/c/&lt;channel&gt;/&lt;thread_id&gt;/&lt;id&gt;?single&amp;comment=&lt;comme
 <td style="text-align: center;">Optional</td>
 <td>Timestamp at which to start playing the media file present in the body or in the webpage preview of the message, in the following formats: <br>- Seconds: <code>123</code>, regex <code>^(\d+)$</code> <br>- Minutes and seconds: <code>10:23</code>, example regex <code>^(\d+):(\d{1,2})$</code> <br>- Hours, minutes and seconds: <code>1h23m10s</code>, example regex <code>^(?:(\d+)h)?(?:(\d{1,2})m)?(?:(\d{1,2})s)$</code></td>
 </tr>
+<tr>
+<td><code>task_id</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Positive integer ID of a specific task to highlight, when the linked message contains a <a href="/api/checklists">checklist »</a> (<a href="/constructor/todo">todo</a>), corresponding to a <a href="/constructor/todoItem">todoItem</a>.<code>id</code>. Invalid (non-positive or non-numeric) values should be treated as an error.</td>
+</tr>
+<tr>
+<td><code>option_id</code></td>
+<td style="text-align: center;">Optional</td>
+<td>base64url-encoded identifier of a specific <a href="/constructor/poll">poll »</a> option to highlight, when the linked message contains a poll, corresponding to a <a href="/constructor/pollAnswer">pollAnswer</a>.<code>option</code>. The decoded value must be valid UTF-8, otherwise it should be ignored.</td>
+</tr>
 </tbody>
 </table>
 <p>Note that since a <a href="/api/forum#forum-topics">forum topic</a> ID is actually the ID of the service message that created the topic, whenever the client resolves a <a href="#message-links">message link</a> that points to a <a href="/constructor/messageActionTopicCreate">messageActionTopicCreate</a> service message, it should open the topic, instead.<br>
@@ -385,6 +388,7 @@ These links should be handled as follows:</p>
 <pre><code>t.me/share?url=&lt;url&gt;&amp;text=&lt;text&gt;
 t.me/share/url?url=&lt;url&gt;&amp;text=&lt;text&gt;
 t.me/share/url/?url=&lt;url&gt;&amp;text=&lt;text&gt;
+t.me/msg/url?url=&lt;url&gt;&amp;text=&lt;text&gt;
 </code></pre>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://msg_url?url=&lt;url&gt;&amp;text=&lt;text&gt;
@@ -583,7 +587,32 @@ tg://addemoji?set=&lt;slug&gt;
 <tr>
 <td><code>story_id</code></td>
 <td style="text-align: center;">Required</td>
-<td>ID of the <a href="/api/stories#watching-stories">Telegram Story to be fetched and viewed as described here »</a>.</td>
+<td>ID of the <a href="/api/stories#watching-stories">Telegram Story to be fetched and viewed as described here »</a>.<br>If equal to <code>live</code>, this is a <a href="#live-story-links">live story link »</a>, instead.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" href="#live-story-links" id="live-story-links" name="live-story-links"><i class="anchor-icon"></i></a>Live story links</h4>
+<p>A special variant of <a href="#story-links">story links</a> used to open the currently ongoing live story posted by a user or channel (the literal <code>live</code> keyword is used in place of the story ID).</p>
+<p><code>t.me</code> syntax:</p>
+<pre><code>t.me/&lt;username&gt;/s/live
+</code></pre>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://resolve?domain=&lt;username&gt;&amp;story=live
+</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>username</code></td>
+<td style="text-align: center;">Required</td>
+<td>Username of the user or channel that posted the live story.</td>
 </tr>
 </tbody>
 </table>
@@ -615,6 +644,34 @@ t.me/&lt;username&gt;/a/&lt;album_id&gt;
 <td><code>album_id</code></td>
 <td style="text-align: center;">Required</td>
 <td>Integer ID of the <a href="/api/stories#story-albums">story album »</a>, from <a href="/constructor/storyAlbum">storyAlbum</a>.<code>album_id</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#post-story-links" id="post-story-links" name="post-story-links"><i class="anchor-icon"></i></a>Post story links</h3>
+<p>Used to bring the user to the <a href="/api/stories">story »</a> composer, optionally pre-selecting the type of story content to post.</p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://post
+tg://post/&lt;content_type&gt;
+</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>content_type</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Type of story content to compose; if absent, the composer is opened without pre-selecting a content type. Recognized values: <br><!-- start_table post story content types --> <br>- <code>photo</code> - Compose a photo story. \</td>
+</tr>
+<tr>
+<td>- <code>video</code> - Compose a video story. <br>- <code>live</code> - Compose a live story. <br><!-- end_table post story content types --><br>Any other non-empty value indicates a content type unsupported by the current client version, and should be handled by prompting the user to update the app.</td>
+<td style="text-align: center;"></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -1159,7 +1216,7 @@ tg://bg?slug=&lt;slug&gt;&amp;intensity=&lt;intensity&gt;&amp;bg_color=&lt;hex_c
 <tr>
 <td><code>parameter</code></td>
 <td style="text-align: center;">Optional</td>
-<td>Start parameter, up to 64 <a href="https://en.wikipedia.org/wiki/Base64#The_URL_applications">base64url</a> characters: if provided and the <code>bot_username</code> is indeed a bot, the text input bar should be replaced with a <code>Start</code> button (even if the user has already started the bot) that should invoke <a href="/method/messages.startBot">messages.startBot</a> with the appropriate <code>parameter</code> once clicked. Note that if the <code>bot_username</code> is equal to the <a href="/api/config#premium-bot-username"><code>premium_bot_username</code> configuration value »</a>, clicking on this link should immediately invoke <a href="/method/messages.startBot">messages.startBot</a> with the appropriate <code>parameter</code>.</td>
+<td>Start parameter, up to 64 base64url characters: if provided and the <code>bot_username</code> is indeed a bot, the text input bar should be replaced with a <code>Start</code> button (even if the user has already started the bot) that should invoke <a href="/method/messages.startBot">messages.startBot</a> with the appropriate <code>parameter</code> once clicked. Note that if the <code>bot_username</code> is equal to the <a href="/api/config#premium-bot-username"><code>premium_bot_username</code> configuration value »</a>, clicking on this link should immediately invoke <a href="/method/messages.startBot">messages.startBot</a> with the appropriate <code>parameter</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -1222,7 +1279,7 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 <tr>
 <td><code>parameter</code></td>
 <td style="text-align: center;">Optional for group links, absent in channel links</td>
-<td>Start parameter, only for group links, up to 64 <a href="https://en.wikipedia.org/wiki/Base64#The_URL_applications">base64url</a> characters: if provided and the <code>bot_username</code> is indeed a bot, <a href="/method/messages.startBot">messages.startBot</a> with the appropriate <code>parameter</code> should be invoked after adding the bot to the group.</td>
+<td>Start parameter, only for group links, up to 64 base64url characters: if provided and the <code>bot_username</code> is indeed a bot, <a href="/method/messages.startBot">messages.startBot</a> with the appropriate <code>parameter</code> should be invoked after adding the bot to the group.</td>
 </tr>
 <tr>
 <td><code>admin</code></td>
@@ -1268,70 +1325,482 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;startgroup&amp;admin=&lt;permission
 </tbody>
 </table>
 <h3><a class="anchor" href="#settings-links" id="settings-links" name="settings-links"><i class="anchor-icon"></i></a>Settings links</h3>
+<p>Used to bring the user to the app settings, optionally directly opening a specific settings page or subsection.</p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://settings
+tg://settings/&lt;path&gt;
+</code></pre>
+<p>If no <code>&lt;path&gt;</code> is specified, the top-level settings page is opened.</p>
+<p>Otherwise, <code>&lt;path&gt;</code> is a slash-separated identifier of the specific settings page or subsection to open. Clients should recognize the values listed below, gracefully falling back to the closest recognized parent page (or, failing that, the top-level settings page) for any unrecognized or only partially-recognized <code>&lt;path&gt;</code>.</p>
+<!-- start settings paths -->
+<ul>
+<li><code>appearance</code></li>
+<li><code>appearance/themes</code></li>
+<li><code>appearance/themes/edit</code></li>
+<li><code>appearance/themes/create</code></li>
+<li><code>appearance/wallpapers</code></li>
+<li><code>appearance/wallpapers/edit</code></li>
+<li><code>appearance/wallpapers/set</code></li>
+<li><code>appearance/wallpapers/choose-photo</code></li>
+<li><code>appearance/your-color/profile</code></li>
+<li><code>appearance/your-color/profile/add-icons</code></li>
+<li><code>appearance/your-color/profile/use-gift</code></li>
+<li><code>appearance/your-color/profile/reset</code></li>
+<li><code>appearance/your-color/name</code></li>
+<li><code>appearance/your-color/name/add-icons</code></li>
+<li><code>appearance/your-color/name/use-gift</code></li>
+<li><code>appearance/night-mode</code></li>
+<li><code>appearance/auto-night-mode</code></li>
+<li><code>appearance/text-size</code></li>
+<li><code>appearance/text-size/use-system</code></li>
+<li><code>appearance/message-corners</code></li>
+<li><code>appearance/animations</code></li>
+<li><code>appearance/stickers-and-emoji</code></li>
+<li><code>appearance/stickers-and-emoji/edit</code></li>
+<li><code>appearance/stickers-and-emoji/trending</code></li>
+<li><code>appearance/stickers-and-emoji/archived</code></li>
+<li><code>appearance/stickers-and-emoji/archived/edit</code></li>
+<li><code>appearance/stickers-and-emoji/emoji</code></li>
+<li><code>appearance/stickers-and-emoji/emoji/edit</code></li>
+<li><code>appearance/stickers-and-emoji/emoji/archived</code></li>
+<li><code>appearance/stickers-and-emoji/emoji/archived/edit</code></li>
+<li><code>appearance/stickers-and-emoji/emoji/suggest</code></li>
+<li><code>appearance/stickers-and-emoji/emoji/quick-reaction</code></li>
+<li><code>appearance/stickers-and-emoji/emoji/quick-reaction/choose</code></li>
+<li><code>appearance/stickers-and-emoji/suggest-by-emoji</code></li>
+<li><code>appearance/stickers-and-emoji/large-emoji</code></li>
+<li><code>appearance/stickers-and-emoji/dynamic-order</code></li>
+<li><code>appearance/stickers-and-emoji/emoji/show-more</code></li>
+<li><code>appearance/app-icon</code></li>
+<li><code>appearance/tap-for-next-media</code></li>
+<li><code>ask-question</code></li>
+<li><code>auto_delete</code></li>
+<li><code>business</code></li>
+<li><code>business/do-not-hide-ads</code></li>
+<li><code>change_number</code></li>
+<li><code>chat/browser</code></li>
+<li><code>chat/browser/enable-browser</code></li>
+<li><code>chat/browser/clear-cookies</code></li>
+<li><code>chat/browser/clear-cache</code></li>
+<li><code>chat/browser/history</code></li>
+<li><code>chat/browser/clear-history</code></li>
+<li><code>chat/browser/never-open</code></li>
+<li><code>chat/browser/clear-list</code></li>
+<li><code>chat/browser/search</code></li>
+<li><code>data</code></li>
+<li><code>data/storage</code></li>
+<li><code>data/storage/edit</code></li>
+<li><code>data/storage/auto-remove</code></li>
+<li><code>data/storage/clear-cache</code></li>
+<li><code>data/storage/max-cache</code></li>
+<li><code>data/usage</code></li>
+<li><code>data/usage/mobile</code></li>
+<li><code>data/usage/wifi</code></li>
+<li><code>data/usage/reset</code></li>
+<li><code>data/usage/roaming</code></li>
+<li><code>data/auto-download/mobile</code></li>
+<li><code>data/auto-download/mobile/enable</code></li>
+<li><code>data/auto-download/mobile/usage</code></li>
+<li><code>data/auto-download/mobile/photos</code></li>
+<li><code>data/auto-download/mobile/stories</code></li>
+<li><code>data/auto-download/mobile/videos</code></li>
+<li><code>data/auto-download/mobile/files</code></li>
+<li><code>data/auto-download/wifi</code></li>
+<li><code>data/auto-download/wifi/enable</code></li>
+<li><code>data/auto-download/wifi/usage</code></li>
+<li><code>data/auto-download/wifi/photos</code></li>
+<li><code>data/auto-download/wifi/stories</code></li>
+<li><code>data/auto-download/wifi/videos</code></li>
+<li><code>data/auto-download/wifi/files</code></li>
+<li><code>data/auto-download/roaming</code></li>
+<li><code>data/auto-download/roaming/enable</code></li>
+<li><code>data/auto-download/roaming/usage</code></li>
+<li><code>data/auto-download/roaming/photos</code></li>
+<li><code>data/auto-download/roaming/stories</code></li>
+<li><code>data/auto-download/roaming/videos</code></li>
+<li><code>data/auto-download/roaming/files</code></li>
+<li><code>data/auto-download/reset</code></li>
+<li><code>data/save-to-photos/chats</code></li>
+<li><code>data/save-to-photos/chats/max-video-size</code></li>
+<li><code>data/save-to-photos/chats/add-exception</code></li>
+<li><code>data/save-to-photos/chats/delete-all</code></li>
+<li><code>data/save-to-photos/groups</code></li>
+<li><code>data/save-to-photos/groups/max-video-size</code></li>
+<li><code>data/save-to-photos/groups/add-exception</code></li>
+<li><code>data/save-to-photos/groups/delete-all</code></li>
+<li><code>data/save-to-photos/channels</code></li>
+<li><code>data/save-to-photos/channels/max-video-size</code></li>
+<li><code>data/save-to-photos/channels/add-exception</code></li>
+<li><code>data/save-to-photos/channels/delete-all</code></li>
+<li><code>data/less-data-calls</code></li>
+<li><code>data/open-links</code></li>
+<li><code>data/share-sheet</code></li>
+<li><code>data/share-sheet/suggested-chats</code></li>
+<li><code>data/share-sheet/suggest-by</code></li>
+<li><code>data/share-sheet/reset</code></li>
+<li><code>data/saved-edited-photos</code></li>
+<li><code>data/pause-music</code></li>
+<li><code>data/raise-to-listen</code></li>
+<li><code>data/raise-to-speak</code></li>
+<li><code>data/show-18-content</code></li>
+<li><code>data/proxy</code></li>
+<li><code>data/proxy/edit</code></li>
+<li><code>data/proxy/use-proxy</code></li>
+<li><code>data/proxy/add-proxy</code></li>
+<li><code>data/proxy/share-list</code></li>
+<li><code>data/proxy/use-for-calls</code></li>
+<li><code>devices</code></li>
+<li><code>devices/edit</code></li>
+<li><code>devices/link-desktop</code></li>
+<li><code>devices/terminate-sessions</code></li>
+<li><code>devices/auto-terminate</code></li>
+<li><code>edit</code></li>
+<li><code>edit/set-photo</code></li>
+<li><code>edit/first-name</code></li>
+<li><code>edit/last-name</code></li>
+<li><code>edit/bio</code></li>
+<li><code>edit/birthday</code></li>
+<li><code>edit/change-number</code></li>
+<li><code>edit/username</code></li>
+<li><code>edit/your-color</code></li>
+<li><code>edit/channel</code></li>
+<li><code>edit/add-account</code></li>
+<li><code>edit/log-out</code></li>
+<li><code>edit_profile</code></li>
+<li><code>emoji-status</code></li>
+<li><code>profile-color/profile</code></li>
+<li><code>profile-color/profile/add-icons</code></li>
+<li><code>profile-color/profile/use-gift</code></li>
+<li><code>profile-color/name</code></li>
+<li><code>profile-color/name/add-icons</code></li>
+<li><code>profile-color/name/use-gift</code></li>
+<li><code>profile-photo/use-emoji</code></li>
+<li><code>faq</code></li>
+<li><code>features</code></li>
+<li><code>folders</code></li>
+<li><code>folders/edit</code></li>
+<li><code>folders/create</code></li>
+<li><code>folders/add-recommended</code></li>
+<li><code>folders/show-tags</code></li>
+<li><code>folders/tab-view</code></li>
+<li><code>language</code></li>
+<li><code>language/show-button</code></li>
+<li><code>language/translate-chats</code></li>
+<li><code>language/do-not-translate</code></li>
+<li><code>login_email</code></li>
+<li><code>notifications</code></li>
+<li><code>notifications/accounts</code></li>
+<li><code>notifications/private-chats</code></li>
+<li><code>notifications/private-chats/edit</code></li>
+<li><code>notifications/private-chats/show</code></li>
+<li><code>notifications/private-chats/preview</code></li>
+<li><code>notifications/private-chats/sound</code></li>
+<li><code>notifications/private-chats/add-exception</code></li>
+<li><code>notifications/private-chats/delete-exceptions</code></li>
+<li><code>notifications/private-chats/light-color</code></li>
+<li><code>notifications/private-chats/vibrate</code></li>
+<li><code>notifications/private-chats/priority</code></li>
+<li><code>notifications/groups</code></li>
+<li><code>notifications/groups/edit</code></li>
+<li><code>notifications/groups/show</code></li>
+<li><code>notifications/groups/preview</code></li>
+<li><code>notifications/groups/sound</code></li>
+<li><code>notifications/groups/add-exception</code></li>
+<li><code>notifications/groups/delete-exceptions</code></li>
+<li><code>notifications/groups/light-color</code></li>
+<li><code>notifications/groups/vibrate</code></li>
+<li><code>notifications/groups/priority</code></li>
+<li><code>notifications/channels</code></li>
+<li><code>notifications/channels/edit</code></li>
+<li><code>notifications/channels/show</code></li>
+<li><code>notifications/channels/preview</code></li>
+<li><code>notifications/channels/sound</code></li>
+<li><code>notifications/channels/add-exception</code></li>
+<li><code>notifications/channels/delete-exceptions</code></li>
+<li><code>notifications/channels/light-color</code></li>
+<li><code>notifications/channels/vibrate</code></li>
+<li><code>notifications/channels/priority</code></li>
+<li><code>notifications/stories</code></li>
+<li><code>notifications/stories/new</code></li>
+<li><code>notifications/stories/important</code></li>
+<li><code>notifications/stories/show-sender</code></li>
+<li><code>notifications/stories/sound</code></li>
+<li><code>notifications/stories/add-exception</code></li>
+<li><code>notifications/stories/delete-exceptions</code></li>
+<li><code>notifications/stories/light-color</code></li>
+<li><code>notifications/stories/vibrate</code></li>
+<li><code>notifications/stories/priority</code></li>
+<li><code>notifications/reactions</code></li>
+<li><code>notifications/reactions/messages</code></li>
+<li><code>notifications/reactions/stories</code></li>
+<li><code>notifications/reactions/show-sender</code></li>
+<li><code>notifications/reactions/sound</code></li>
+<li><code>notifications/reactions/light-color</code></li>
+<li><code>notifications/reactions/vibrate</code></li>
+<li><code>notifications/reactions/priority</code></li>
+<li><code>notifications/in-app-sounds</code></li>
+<li><code>notifications/in-app-vibrate</code></li>
+<li><code>notifications/in-app-preview</code></li>
+<li><code>notifications/in-chat-sounds</code></li>
+<li><code>notifications/in-app-popup</code></li>
+<li><code>notifications/lock-screen-names</code></li>
+<li><code>notifications/include-channels</code></li>
+<li><code>notifications/include-muted-chats</code></li>
+<li><code>notifications/count-unread-messages</code></li>
+<li><code>notifications/new-contacts</code></li>
+<li><code>notifications/pinned-messages</code></li>
+<li><code>notifications/reset</code></li>
+<li><code>notifications/web</code></li>
+<li><code>power-saving</code></li>
+<li><code>power-saving/videos</code></li>
+<li><code>power-saving/gifs</code></li>
+<li><code>power-saving/stickers</code></li>
+<li><code>power-saving/emoji</code></li>
+<li><code>power-saving/effects</code></li>
+<li><code>power-saving/preload</code></li>
+<li><code>power-saving/background</code></li>
+<li><code>power-saving/call-animations</code></li>
+<li><code>power-saving/particles</code></li>
+<li><code>power-saving/transitions</code></li>
+<li><code>password</code></li>
+<li><code>phone_privacy</code></li>
+<li><code>premium</code></li>
+<li><code>privacy</code></li>
+<li><code>privacy/blocked</code></li>
+<li><code>privacy/blocked/edit</code></li>
+<li><code>privacy/blocked/block-user</code></li>
+<li><code>privacy/blocked/block-user/chats</code></li>
+<li><code>privacy/blocked/block-user/contacts</code></li>
+<li><code>privacy/active-websites</code></li>
+<li><code>privacy/active-websites/edit</code></li>
+<li><code>privacy/active-websites/disconnect-all</code></li>
+<li><code>privacy/passcode</code></li>
+<li><code>privacy/passcode/disable</code></li>
+<li><code>privacy/passcode/change</code></li>
+<li><code>privacy/passcode/auto-lock</code></li>
+<li><code>privacy/passcode/face-id</code></li>
+<li><code>privacy/passcode/fingerprint</code></li>
+<li><code>privacy/2sv</code></li>
+<li><code>privacy/2sv/change</code></li>
+<li><code>privacy/2sv/disable</code></li>
+<li><code>privacy/2sv/change-email</code></li>
+<li><code>privacy/passkey</code></li>
+<li><code>privacy/passkey/create</code></li>
+<li><code>privacy/auto-delete</code></li>
+<li><code>privacy/auto-delete/set-custom</code></li>
+<li><code>privacy/login-email</code></li>
+<li><code>privacy/phone-number</code></li>
+<li><code>privacy/phone-number/never</code></li>
+<li><code>privacy/phone-number/always</code></li>
+<li><code>privacy/last-seen</code></li>
+<li><code>privacy/last-seen/never</code></li>
+<li><code>privacy/last-seen/always</code></li>
+<li><code>privacy/last-seen/hide-read-time</code></li>
+<li><code>privacy/profile-photos</code></li>
+<li><code>privacy/profile-photos/never</code></li>
+<li><code>privacy/profile-photos/always</code></li>
+<li><code>privacy/profile-photos/set-public</code></li>
+<li><code>privacy/profile-photos/update-public</code></li>
+<li><code>privacy/profile-photos/remove-public</code></li>
+<li><code>privacy/bio</code></li>
+<li><code>privacy/bio/never</code></li>
+<li><code>privacy/bio/always</code></li>
+<li><code>privacy/gifts</code></li>
+<li><code>privacy/gifts/show-icon</code></li>
+<li><code>privacy/gifts/never</code></li>
+<li><code>privacy/gifts/always</code></li>
+<li><code>privacy/gifts/accepted-types</code></li>
+<li><code>privacy/birthday</code></li>
+<li><code>privacy/birthday/add</code></li>
+<li><code>privacy/birthday/never</code></li>
+<li><code>privacy/birthday/always</code></li>
+<li><code>privacy/saved-music</code></li>
+<li><code>privacy/saved-music/never</code></li>
+<li><code>privacy/saved-music/always</code></li>
+<li><code>privacy/forwards</code></li>
+<li><code>privacy/forwards/never</code></li>
+<li><code>privacy/forwards/always</code></li>
+<li><code>privacy/calls</code></li>
+<li><code>privacy/calls/never</code></li>
+<li><code>privacy/calls/always</code></li>
+<li><code>privacy/calls/p2p</code></li>
+<li><code>privacy/calls/p2p/never</code></li>
+<li><code>privacy/calls/p2p/always</code></li>
+<li><code>privacy/calls/ios-integration</code></li>
+<li><code>privacy/voice</code></li>
+<li><code>privacy/voice/never</code></li>
+<li><code>privacy/voice/always</code></li>
+<li><code>privacy/messages</code></li>
+<li><code>privacy/messages/set-price</code></li>
+<li><code>privacy/messages/exceptions</code></li>
+<li><code>privacy/invites</code></li>
+<li><code>privacy/invites/never</code></li>
+<li><code>privacy/invites/always</code></li>
+<li><code>privacy/self-destruct</code></li>
+<li><code>privacy/data-settings</code></li>
+<li><code>privacy/data-settings/sync-contacts</code></li>
+<li><code>privacy/data-settings/delete-synced</code></li>
+<li><code>privacy/data-settings/suggest-contacts</code></li>
+<li><code>privacy/data-settings/delete-cloud-drafts</code></li>
+<li><code>privacy/data-settings/clear-payment-info</code></li>
+<li><code>privacy/data-settings/link-previews</code></li>
+<li><code>privacy/data-settings/bot-settings</code></li>
+<li><code>privacy/data-settings/map-provider</code></li>
+<li><code>privacy/archive-and-mute</code></li>
+<li><code>privacy-policy</code></li>
+<li><code>qr-code</code></li>
+<li><code>qr-code/share</code></li>
+<li><code>qr-code/scan</code></li>
+<li><code>search</code></li>
+<li><code>send-gift</code></li>
+<li><code>send-gift/self</code></li>
+<li><code>stars</code></li>
+<li><code>stars/top-up</code></li>
+<li><code>stars/stats</code></li>
+<li><code>stars/gift</code></li>
+<li><code>stars/earn</code></li>
+<li><code>themes</code></li>
+<li><code>ton</code></li>
+<li><code>saved-messages</code></li>
+<li><code>calls</code></li>
+<li><code>calls/all</code></li>
+<li><code>calls/missed</code></li>
+<li><code>calls/edit</code></li>
+<li><code>calls/show-tab</code></li>
+<li><code>calls/start-call</code></li>
+<li><code>my-profile</code></li>
+<li><code>my-profile/posts</code></li>
+<li><code>my-profile/posts/all-stories</code></li>
+<li><code>my-profile/posts/add-album</code></li>
+<li><code>my-profile/gifts</code></li>
+<li><code>my-profile/archived-posts</code></li>
+</ul>
+<!-- end settings paths -->
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Slash-separated identifier of the settings page or subsection to open; if absent, the top-level settings page is opened. Must be one of the values listed above.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#my-stars-links" id="my-stars-links" name="my-stars-links"><i class="anchor-icon"></i></a>My stars links</h3>
-<p>Used to bring the user to the My Stars page, containing the topup button, the Star transaction history, statistics, and <a href="/api/stars">much more »</a>.</p>
+<p>Used to bring the user to the My Stars page, containing the topup button, the Star transaction history, statistics, and <a href="/api/stars">much more »</a>.<br>
+This is equivalent to the <code>stars</code> <a href="#settings-links">settings link</a> (<code>tg://settings/stars</code>).</p>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://stars
 </code></pre>
-<h3><a class="anchor" href="#my-toncoins-links" id="my-toncoins-links" name="my-toncoins-links"><i class="anchor-icon"></i></a>My toncoins links</h3>
-<p>Used to bring the user to the TON balance page, containing the topup button, the TON transaction history and statistics.</p>
+<h3><a class="anchor" href="#my-grams-links" id="my-grams-links" name="my-grams-links"><i class="anchor-icon"></i></a>My Grams links</h3>
+<p>Used to bring the user to the TON balance page, containing the topup button, the TON transaction history and statistics.<br>
+This is equivalent to the <code>ton</code> <a href="#settings-links">settings link</a> (<code>tg://settings/ton</code>).</p>
 <p><code>tg:</code> syntax:</p>
 <pre><code>tg://ton
 </code></pre>
-<h4><a class="anchor" href="#settings-link" id="settings-link" name="settings-link"><i class="anchor-icon"></i></a>Settings link</h4>
-<p>Used to bring the user to the app settings.</p>
+<h3><a class="anchor" href="#contacts-links" id="contacts-links" name="contacts-links"><i class="anchor-icon"></i></a>Contacts links</h3>
+<p>Used to bring the user to the contact list, optionally directly opening a specific section or action.</p>
 <p><code>tg:</code> syntax:</p>
-<pre><code>tg://settings
+<pre><code>tg://contacts
+tg://contacts/&lt;section&gt;
 </code></pre>
-<p>No parameters.</p>
-<h4><a class="anchor" href="#change-phone-number-link" id="change-phone-number-link" name="change-phone-number-link"><i class="anchor-icon"></i></a>Change phone number link</h4>
-<p>Used to bring the user to the phone number modification page, invoking <a href="/method/account.sendChangePhoneCode">account.sendChangePhoneCode</a> and <a href="/method/account.changePhone">account.changePhone</a>.</p>
+<p>If no <code>&lt;section&gt;</code> is specified, the contact list is simply opened.<br>
+Otherwise, <code>&lt;section&gt;</code> must be one of the following values; any unrecognized value should fall back to simply opening the contact list:</p>
+<table class="table">
+<thead>
+<tr>
+<th><code>section</code></th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>search</code></td>
+<td>Focus the contact search field.</td>
+</tr>
+<tr>
+<td><code>sort</code></td>
+<td>Open the contact sorting options.</td>
+</tr>
+<tr>
+<td><code>new</code></td>
+<td>Start adding a new contact.</td>
+</tr>
+<tr>
+<td><code>invite</code></td>
+<td>Open the "invite friends" flow.</td>
+</tr>
+<tr>
+<td><code>manage</code></td>
+<td>Open the contact management screen.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#new-chat-links" id="new-chat-links" name="new-chat-links"><i class="anchor-icon"></i></a>New chat links</h3>
+<p>Used to bring the user to the chat creation flow.</p>
 <p><code>tg:</code> syntax:</p>
-<pre><code>tg://settings/change_number
+<pre><code>tg://new
+tg://new/channel
+tg://new/group
 </code></pre>
-<p>No parameters.</p>
-<h4><a class="anchor" href="#active-sessions-link" id="active-sessions-link" name="active-sessions-link"><i class="anchor-icon"></i></a>Active sessions link</h4>
-<p>Used to bring the user to the active sessions page, calling <a href="/method/account.getAuthorizations">account.getAuthorizations</a>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Link</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tg://new</code></td>
+<td>Start creating a new private chat (i.e. pick a contact to message).</td>
+</tr>
+<tr>
+<td><code>tg://new/channel</code></td>
+<td>Start creating a new channel.</td>
+</tr>
+<tr>
+<td><code>tg://new/group</code></td>
+<td>Start creating a new group.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#chat-list-links" id="chat-list-links" name="chat-list-links"><i class="anchor-icon"></i></a>Chat list links</h3>
+<p>Used to perform actions on the main chat list.</p>
 <p><code>tg:</code> syntax:</p>
-<pre><code>tg://settings/devices
+<pre><code>tg://chats/edit
+tg://chats/search
+tg://chats/emoji-status
 </code></pre>
-<p>No parameters.</p>
-<h4><a class="anchor" href="#folder-settings-link" id="folder-settings-link" name="folder-settings-link"><i class="anchor-icon"></i></a>Folder settings link</h4>
-<p>Used to bring the user to the <a href="/api/folders">folder settings</a>.</p>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://settings/folders
-</code></pre>
-<p>No parameters.</p>
-<h4><a class="anchor" href="#language-settings-link" id="language-settings-link" name="language-settings-link"><i class="anchor-icon"></i></a>Language settings link</h4>
-<p>Used to bring the user to the language settings.</p>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://settings/language
-</code></pre>
-<p>No parameters.</p>
-<h4><a class="anchor" href="#privacy-and-security-settings-link" id="privacy-and-security-settings-link" name="privacy-and-security-settings-link"><i class="anchor-icon"></i></a>Privacy and security settings link</h4>
-<p>Used to bring the user to the privacy and security settings.</p>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://settings/privacy
-</code></pre>
-<p>No parameters.</p>
-<h4><a class="anchor" href="#auto-delete-settings-link" id="auto-delete-settings-link" name="auto-delete-settings-link"><i class="anchor-icon"></i></a>Auto-delete settings link</h4>
-<p>Used to bring the user to the message auto-deletion settings.</p>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://settings/auto_delete
-</code></pre>
-<p>No parameters.</p>
-<h4><a class="anchor" href="#profile-settings-link" id="profile-settings-link" name="profile-settings-link"><i class="anchor-icon"></i></a>Profile settings link</h4>
-<p>Used to bring the user to the profile settings menu.</p>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://settings/edit_profile
-</code></pre>
-<p>No parameters.</p>
-<h4><a class="anchor" href="#theme-settings-link" id="theme-settings-link" name="theme-settings-link"><i class="anchor-icon"></i></a>Theme settings link</h4>
-<p>Used to bring the user to the theme settings section of the app.</p>
-<p><code>tg:</code> syntax:</p>
-<pre><code>tg://settings/theme
-</code></pre>
-<p>No parameters.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Link</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tg://chats/edit</code></td>
+<td>Open the chat list in selection/edit mode, allowing the user to select chats to perform bulk actions on.</td>
+</tr>
+<tr>
+<td><code>tg://chats/search</code></td>
+<td>Open global search.</td>
+</tr>
+<tr>
+<td><code>tg://chats/emoji-status</code></td>
+<td>Open the emoji status picker (equivalent to the <code>emoji-status</code> <a href="#settings-links">settings link</a>).</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#login-code-link" id="login-code-link" name="login-code-link"><i class="anchor-icon"></i></a>Login code link</h3>
 <p>Contains the phone number verification code to use during <a href="/api/auth">user authorization »</a>.</p>
 <p><code>t.me</code> syntax:</p>
@@ -1932,6 +2401,33 @@ tg://resolve?domain=&lt;bot_username&gt;&amp;start={prefix}&lt;referrer&gt;
 <td><code>id</code></td>
 <td style="text-align: center;">Required</td>
 <td><a href="/api/custom-emoji">Custom emoji ID</a></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#timestamp-links" id="timestamp-links" name="timestamp-links"><i class="anchor-icon"></i></a>Timestamp links</h3>
+<p>Timestamp links are merely an abstraction offered by the <a href="/bots/api">bot API</a> to simplify construction of <a href="/constructor/inputMessageEntityMentionName">messageEntityFormattedDate</a>, and should be ignored by normal clients.</p>
+<p><code>tg:</code> syntax:</p>
+<pre><code>tg://time?unix=&lt;unix&gt;&amp;format=&lt;format&gt;
+</code></pre>
+<p>Parameters:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: center;">Optional</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unix</code></td>
+<td style="text-align: center;">Required</td>
+<td>Positive Unix timestamp (in seconds) of the date to display.</td>
+</tr>
+<tr>
+<td><code>format</code></td>
+<td style="text-align: center;">Optional</td>
+<td>Format string indicating how the date should be displayed, see <a href="/bots/api#date-time-entity-formatting">here »</a> for more info.</td>
 </tr>
 </tbody>
 </table>

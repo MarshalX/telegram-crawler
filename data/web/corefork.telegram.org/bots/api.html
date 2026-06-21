@@ -157,7 +157,8 @@ To learn how to create and set up a bot, please consult our <a href="/bots"><str
 <p>Each bot is given a unique authentication token <a href="/bots/features#botfather">when it is created</a>. The token looks something like <code>123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11</code>, but we'll use simply <strong>&lt;token&gt;</strong> in this document instead. You can learn about obtaining tokens and generating new ones in <a href="/bots/features#botfather">this document</a>.</p>
 <h3><a class="anchor" href="#making-requests" id="making-requests" name="making-requests"><i class="anchor-icon"></i></a>Making requests</h3>
 <p>All queries to the Telegram Bot API must be served over HTTPS and need to be presented in this form: <code>https://api.telegram.org/bot&lt;token&gt;/METHOD_NAME</code>. Like this for example:</p>
-<pre><code>https://api.telegram.org/bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11/getMe</code></pre>
+<pre><code>https://api.telegram.org/bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11/getMe
+</code></pre>
 <p>We support <strong>GET</strong> and <strong>POST</strong> HTTP methods. We support four ways of passing parameters in Bot API requests:</p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Query_string">URL query string</a></li>
@@ -3697,12 +3698,12 @@ At most <strong>one</strong> of the optional parameters can be present in any gi
 <tr>
 <td>currency</td>
 <td>String</td>
-<td>Currency in which the payment was made. Currently, one of "XTR" for Telegram Stars or "TON" for toncoins</td>
+<td>Currency in which the payment was made. Currently, one of "XTR" for Telegram Stars or "TON" for Grams</td>
 </tr>
 <tr>
 <td>amount</td>
 <td>Integer</td>
-<td><em>Optional</em>. The amount of the currency that was received by the channel in nanotoncoins; for payments in toncoins only</td>
+<td><em>Optional</em>. The amount of the currency that was received by the channel in nanograms; for payments in Grams only</td>
 </tr>
 <tr>
 <td>star_amount</td>
@@ -3968,12 +3969,12 @@ At most <strong>one</strong> of the optional parameters can be present in any gi
 <tr>
 <td>currency</td>
 <td>String</td>
-<td>Currency in which the post will be paid. Currently, must be one of "XTR" for Telegram Stars or "TON" for toncoins</td>
+<td>Currency in which the post will be paid. Currently, must be one of "XTR" for Telegram Stars or "TON" for Grams</td>
 </tr>
 <tr>
 <td>amount</td>
 <td>Integer</td>
-<td>The amount of the currency that will be paid for the post in the <em>smallest units</em> of the currency, i.e. Telegram Stars or nanotoncoins. Currently, price in Telegram Stars must be between 5 and 100000, and price in nanotoncoins must be between 10000000 and 10000000000000.</td>
+<td>The amount of the currency that will be paid for the post in the <em>smallest units</em> of the currency, i.e. Telegram Stars or nanograms. Currently, price in Telegram Stars must be between 5 and 100000, and price in nanograms must be between 10000000 and 10000000000000.</td>
 </tr>
 </tbody>
 </table>
@@ -4682,12 +4683,14 @@ At most <strong>one</strong> of the optional parameters can be present in any gi
 </table>
 <blockquote>
 <p><strong>Example:</strong> A <a href="https://t.me/PollBot">poll bot</a> for groups runs in privacy mode (only receives commands, replies to its messages and mentions). There could be two ways to create a new poll:</p>
+</blockquote>
 <ul>
 <li>Explain the user how to send a command with parameters (e.g. /newpoll question answer1 answer2). May be appealing for hardcore users but lacks modern day polish.</li>
 <li>Guide the user through a step-by-step process. 'Please send me your question', 'Cool, now let's add the first answer option', 'Great. Keep adding answer options, then send /done when you're ready'.</li>
 </ul>
-<p>The last option is definitely more attractive. And if you use <a href="#forcereply">ForceReply</a> in your bot's questions, it will receive the user's answers even if it only receives replies, commands and mentions - without any extra work for the user.</p>
+<blockquote>
 </blockquote>
+<p>The last option is definitely more attractive. And if you use <a href="#forcereply">ForceReply</a> in your bot's questions, it will receive the user's answers even if it only receives replies, commands and mentions - without any extra work for the user.</p>
 <h4><a class="anchor" href="#chatphoto" id="chatphoto" name="chatphoto"><i class="anchor-icon"></i></a>ChatPhoto</h4>
 <p>This object represents a chat photo.</p>
 <table class="table">
@@ -6495,12 +6498,12 @@ At most <strong>one</strong> of the optional parameters can be present in any gi
 <tr>
 <td>last_resale_currency</td>
 <td>String</td>
-<td><em>Optional</em>. For gifts bought from other users, the currency in which the payment for the gift was done. Currently, one of "XTR" for Telegram Stars or "TON" for toncoins.</td>
+<td><em>Optional</em>. For gifts bought from other users, the currency in which the payment for the gift was done. Currently, one of "XTR" for Telegram Stars or "TON" for Grams.</td>
 </tr>
 <tr>
 <td>last_resale_amount</td>
 <td>Integer</td>
-<td><em>Optional</em>. For gifts bought from other users, the price paid for the gift in either Telegram Stars or nanotoncoins</td>
+<td><em>Optional</em>. For gifts bought from other users, the price paid for the gift in either Telegram Stars or nanograms</td>
 </tr>
 <tr>
 <td>owned_gift_id</td>
@@ -8261,12 +8264,13 @@ pre-formatted fixed-width code block written in the Python programming language
 &gt;Expandable block quotation continued
 &gt;Hidden by default part of the expandable block quotation started
 &gt;Expandable block quotation continued
-&gt;The last line of the expandable block quotation with the expandability mark||</code></pre>
+&gt;The last line of the expandable block quotation with the expandability mark||
+</code></pre>
 <p>Please note:</p>
 <ul>
-<li>Any character with code between 1 and 126 inclusively can be escaped anywhere with a preceding '\' character, in which case it is treated as an ordinary character and not a part of the markup. This implies that '\' character usually must be escaped with a preceding '\' character.</li>
-<li>Inside <code>pre</code> and <code>code</code> entities, all '`' and '\' characters must be escaped with a preceding '\' character.</li>
-<li>Inside the <code>(...)</code> part of the inline link and custom emoji definition, all ')' and '\' must be escaped with a preceding '\' character.</li>
+<li>Any character with code between 1 and 126 inclusively can be escaped anywhere with a preceding '' character, in which case it is treated as an ordinary character and not a part of the markup. This implies that '' character usually must be escaped with a preceding '' character.</li>
+<li>Inside <code>pre</code> and <code>code</code> entities, all '`' and '\' characters must be escaped with a preceding '' character.</li>
+<li>Inside the <code>(...)</code> part of the inline link and custom emoji definition, all ')' and '\' must be escaped with a preceding '' character.</li>
 <li>In all other places characters '_', '*', '[', ']', '(', ')', '~', '`', '&gt;', '#', '+', '-', '=', '|', '{', '}', '.', '!' must be escaped with the preceding character '\'.</li>
 <li>In case of ambiguity between <code>italic</code> and <code>underline</code> entities <code>__</code> is always greedily treated from left to right as beginning or end of an <code>underline</code> entity, so instead of <code>___italic underline___</code> use <code>___italic underline_**__</code>, adding an empty bold entity as a separator.</li>
 <li>A valid emoji must be provided as an alternative value for the custom emoji. The emoji will be shown instead of the custom emoji in places where a custom emoji cannot be displayed (e.g., system notifications) or if the message is forwarded by a non-premium user. It is recommended to use the emoji from the <strong>emoji</strong> field of the custom emoji <a href="#sticker">sticker</a>.</li>
@@ -8287,7 +8291,8 @@ pre-formatted fixed-width code block written in the Python programming language
 &lt;pre&gt;pre-formatted fixed-width code block&lt;/pre&gt;
 &lt;pre&gt;&lt;code class="language-python"&gt;pre-formatted fixed-width code block written in the Python programming language&lt;/code&gt;&lt;/pre&gt;
 &lt;blockquote&gt;Block quotation started\nBlock quotation continued\nThe last line of the block quotation&lt;/blockquote&gt;
-&lt;blockquote expandable&gt;Expandable block quotation started\nExpandable block quotation continued\nExpandable block quotation continued\nHidden by default part of the block quotation started\nExpandable block quotation continued\nThe last line of the block quotation&lt;/blockquote&gt;</code></pre>
+&lt;blockquote expandable&gt;Expandable block quotation started\nExpandable block quotation continued\nExpandable block quotation continued\nHidden by default part of the block quotation started\nExpandable block quotation continued\nThe last line of the block quotation&lt;/blockquote&gt;
+</code></pre>
 <p>Please note:</p>
 <ul>
 <li>Only the tags mentioned above are currently supported.</li>
@@ -8311,12 +8316,13 @@ pre-formatted fixed-width code block
 ```
 ```python
 pre-formatted fixed-width code block written in the Python programming language
-```</code></pre>
+```
+</code></pre>
 <p>Please note:</p>
 <ul>
 <li>Entities must not be nested, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
 <li>There is no way to specify "underline", "strikethrough", "spoiler", "blockquote", "expandable_blockquote" and "custom_emoji" entities, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead.</li>
-<li>To escape characters '_', '*', '`', '[' outside of an entity, prepend the character '\' before them.</li>
+<li>To escape characters '_', '*', '`', '[' outside of an entity, prepend the character '' before them.</li>
 <li>Escaping inside entities is not allowed, so entity must be closed first and reopened again: use <code>_snake_\__case_</code> for italic <code>snake_case</code> and <code>*2*\**2=4*</code> for bold <code>2*2=4</code>.</li>
 </ul>
 <h4><a class="anchor" href="#paid-broadcasts" id="paid-broadcasts" name="paid-broadcasts"><i class="anchor-icon"></i></a>Paid Broadcasts</h4>
@@ -18554,7 +18560,8 @@ No more than <strong>50</strong> results per query are allowed.</p>
 </table>
 <hr>
 <p>And that's about all we've got for now.
-If you've got any questions, please check out our <a href="/bots/faq"><strong>Bot FAQ »</strong></a></p></div>
+If you've got any questions, please check out our <a href="/bots/faq"><strong>Bot FAQ »</strong></a></p>
+</div>
   
 </div>
           
