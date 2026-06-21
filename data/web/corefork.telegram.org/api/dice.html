@@ -123,27 +123,6 @@ Please note that dice animated stickers should loop only once, right after being
 <li>If we're in a winning <code>value=64</code>, replace the background (<code>0</code>) with <code>1</code>.</li>
 </ul>
 <p>Example implementation: <a href="https://github.com/telegramdesktop/tdesktop/blob/dev/Telegram/SourceFiles/history/view/media/history_view_slot_machine.cpp">tdesktop</a>.</p>
-<h3><a class="anchor" href="#stake-dice" id="stake-dice" name="stake-dice"><i class="anchor-icon"></i></a>Stake dice</h3>
-<p>Users may stake <a href="/api/stars#toncoin">TON</a> on the outcome of a <img class="emoji" src="//telegram.org/img/emoji/40/F09F8EB2.png" width="20" height="20" alt="🎲" /> dice roll, in a provably-fair betting game.</p>
-<pre><code><a href='/constructor/inputMediaStakeDice'>inputMediaStakeDice</a>#f3a9244a game_hash:<a href='/type/string'>string</a> ton_amount:<a href='/type/long'>long</a> client_seed:<a href='/type/bytes'>bytes</a> = <a href='/type/InputMedia'>InputMedia</a>;
-<a href='/constructor/messageMediaDice'>messageMediaDice</a>#08cbec07 flags:<a href='/type/%23'>#</a> value:<a href='/type/int'>int</a> emoticon:<a href='/type/string'>string</a> game_outcome:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/messages.EmojiGameOutcome'>messages.EmojiGameOutcome</a> = <a href='/type/MessageMedia'>MessageMedia</a>;
-
-<a href='/constructor/messages.emojiGameUnavailable'>messages.emojiGameUnavailable</a>#59e65335 = <a href='/type/messages.EmojiGameInfo'>messages.EmojiGameInfo</a>;
-<a href='/constructor/messages.emojiGameDiceInfo'>messages.emojiGameDiceInfo</a>#44e56023 flags:<a href='/type/%23'>#</a> game_hash:<a href='/type/string'>string</a> prev_stake:<a href='/type/long'>long</a> current_streak:<a href='/type/int'>int</a> params:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; plays_left:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> = <a href='/type/messages.EmojiGameInfo'>messages.EmojiGameInfo</a>;
-
-<a href='/constructor/messages.emojiGameOutcome'>messages.emojiGameOutcome</a>#da2ad647 seed:<a href='/type/bytes'>bytes</a> stake_ton_amount:<a href='/type/long'>long</a> ton_amount:<a href='/type/long'>long</a> = <a href='/type/messages.EmojiGameOutcome'>messages.EmojiGameOutcome</a>;
-
-<a href='/constructor/updateEmojiGameInfo'>updateEmojiGameInfo</a>#fb9c547a info:<a href='/type/messages.EmojiGameInfo'>messages.EmojiGameInfo</a> = <a href='/type/Update'>Update</a>;
-
----functions---
-
-<a href='/method/messages.getEmojiGameInfo'>messages.getEmojiGameInfo</a>#fb7e8ca7 = <a href='/type/messages.EmojiGameInfo'>messages.EmojiGameInfo</a>;
-</code></pre>
-<p>To fetch the current state of the game, call <a href="/method/messages.getEmojiGameInfo">messages.getEmojiGameInfo</a>: if it returns <a href="/constructor/messages.emojiGameUnavailable">messages.emojiGameUnavailable</a> the game is not available, otherwise a <a href="/constructor/messages.emojiGameDiceInfo">messages.emojiGameDiceInfo</a> is returned, containing the reward multipliers (<code>params</code>), the previous stake, the current winning streak, and most importantly a <code>game_hash</code>, which is a hash committing the server to the secret seed of the next roll.</p>
-<p>To place a bet, send a dice using <a href="/method/messages.sendMedia">messages.sendMedia</a> with an <a href="/constructor/inputMediaStakeDice">inputMediaStakeDice</a>, passing the <code>game_hash</code> obtained above, the <code>ton_amount</code> to stake (in nanoTON, bounded by the <code>ton_stakedice_stake_amount_min</code> and <code>ton_stakedice_stake_amount_max</code> <a href="/api/config">configuration parameters</a>), and a randomly generated <code>client_seed</code>.</p>
-<p>The roll is received as a normal <a href="/constructor/messageMediaDice">messageMediaDice</a>, but its <code>game_outcome</code> field is populated with a <a href="/constructor/messages.emojiGameOutcome">messages.emojiGameOutcome</a>, containing the staked amount, the won amount (<code>0</code> if the bet was lost), and the secret server <code>seed</code>.<br>
-The fairness of the outcome can be verified by checking that hashing the revealed <code>seed</code> yields the <code>game_hash</code> that was committed to before the bet was placed, and that combining the server <code>seed</code> with the <code>client_seed</code> produces the displayed dice value.</p>
-<p>After each play, the updated game state is pushed to the client through an <a href="/constructor/updateEmojiGameInfo">updateEmojiGameInfo</a>.</p>
 </div>
   
 </div>

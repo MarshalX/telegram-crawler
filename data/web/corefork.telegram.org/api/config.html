@@ -416,7 +416,7 @@ Specifically, the relative value from the default object must be used if <a href
         },
         {
             "stars": 0,
-            "pin_period": 0,
+            "pin_period": 30,
             "text_length_max": 30,
             "emoji_max": 0,
             "color1": "955CDB",
@@ -982,29 +982,22 @@ Note that the stickerset can be fetched using <a href="/constructor/inputSticker
 <p>Defines the highlight tiers applied to <a href="/api/group-calls#paid-live-story-comments">paid messages/comments sent during a group call or live video stream »</a>, as a function of the number of <a href="/api/stars">Telegram Stars</a> donated with the message.</p>
 <p>This is a JSON array of objects, each describing one tier with the following keys:</p>
 <ul>
-<li><code>stars</code> (integer) - Minimum number of donated Stars required to reach this tier.</li>
+<li><code>stars</code> (long integer) - Minimum number of donated Stars required to reach this tier.</li>
 <li><code>pin_period</code> (integer) - For how many seconds a message in this tier stays pinned/highlighted.</li>
 <li><code>text_length_max</code> (integer) - Maximum number of UTF-8 characters allowed in a message in this tier.</li>
 <li><code>emoji_max</code> (integer) - Maximum number of <a href="/api/custom-emoji">custom emojis</a> allowed in a message in this tier.</li>
-<li><code>color1</code> (string) - Background color of the highlighted message in <strong>light</strong> themes, as a 6-digit hexadecimal RGB string (e.g. <code>955CDB</code>).</li>
-<li><code>color_bg</code> (string) - Background color of the highlighted message in <strong>dark</strong> themes, as a 6-digit hexadecimal RGB string.</li>
+<li><code>color1</code> (string) - The first color used to show the message text, as a 6-digit hexadecimal RGB string (e.g. <code>955CDB</code>).</li>
+<li><code>color2</code> (string) - The second color used to show the message text, as a 6-digit hexadecimal RGB string (e.g. <code>955CDB</code>).</li>
+<li><code>color2</code> (string) - Background color used to show the message text, as a 6-digit hexadecimal RGB string.</li>
 </ul>
 <p>Tiers are sorted by ascending <code>stars</code>, and the tier with <code>stars</code> equal to <code>0</code> describes the appearance of free (non-paid) messages (clients should assume such a tier exists, falling back to a default if the array does not provide one).<br>
 To render a given message, clients select the tier with the highest <code>stars</code> threshold that is still less than or equal to the amount donated with the message (<a href="/constructor/groupCallMessage">groupCallMessage</a>.<code>paid_message_stars</code>).</p>
-<p>For reference, the default tiers used by official clients are equivalent to:</p>
-<pre><code class="language-json">[
-    {"stars": 0,     "pin_period": 30,   "text_length_max": 30,  "emoji_max": 0,  "color1": "955CDB", "color_bg": "49079B"},
-    {"stars": 10,    "pin_period": 60,   "text_length_max": 60,  "emoji_max": 1,  "color1": "955CDB", "color_bg": "49079B"},
-    {"stars": 50,    "pin_period": 120,  "text_length_max": 80,  "emoji_max": 2,  "color1": "46A3EB", "color_bg": "00508E"},
-    {"stars": 100,   "pin_period": 300,  "text_length_max": 110, "emoji_max": 3,  "color1": "40A920", "color_bg": "176200"},
-    {"stars": 250,   "pin_period": 600,  "text_length_max": 150, "emoji_max": 4,  "color1": "E29A09", "color_bg": "9A3E00"},
-    {"stars": 500,   "pin_period": 900,  "text_length_max": 200, "emoji_max": 7,  "color1": "ED771E", "color_bg": "9B3100"},
-    {"stars": 2000,  "pin_period": 1800, "text_length_max": 280, "emoji_max": 10, "color1": "E14542", "color_bg": "8B0503"},
-    {"stars": 10000, "pin_period": 3600, "text_length_max": 400, "emoji_max": 20, "color1": "596473", "color_bg": "252C36"}
-]
-</code></pre>
 <h4><a class="anchor" href="#whitelisted-bots" id="whitelisted-bots" name="whitelisted-bots"><i class="anchor-icon"></i></a><code>whitelisted_bots</code></h4>
-<p>Array of bot user IDs that are exempt from the <a href="/api/bots/webapps">bot web app confirmation/guard prompt »</a>, allowing their <a href="/api/bots/webapps">Mini Apps</a> to be opened without an extra confirmation.</p>
+<p>Array of bot user IDs that official clients grant additional trust, treating them like bots the user has already explicitly opened or added to the <a href="/api/bots/attach">attachment menu</a>. Specifically, for a whitelisted bot:</p>
+<ul>
+<li>The <a href="/api/bots/webapps">bot launch confirmation prompt »</a> shown before opening one of its <a href="/api/bots/webapps">Mini Apps</a> is skipped, as if the user had already confirmed opening it.</li>
+<li>Its <a href="/api/bots/webapps">Mini Apps</a> are allowed to read the system clipboard through the <a href="/api/web-events#web-app-read-text-from-clipboard"><code>web_app_read_text_from_clipboard</code> »</a> event, just like the Mini Apps of <a href="/api/bots/attach">attachment menu</a> bots.</li>
+</ul>
 <h4><a class="anchor" href="#stargifts-craft-attribute-permilles" id="stargifts-craft-attribute-permilles" name="stargifts-craft-attribute-permilles"><i class="anchor-icon"></i></a><code>stargifts_craft_attribute_permilles</code></h4>
 <p>Attribute persistence probabilities used when displaying the <a href="/api/gifts#crafting-collectible-gifts">collectible gift crafting UI »</a>.<br>
 This is an array of 4 arrays of integers; the array with index N has N+1 integers, each containing a probability in permille, see <a href="/api/gifts#crafting-collectible-gifts">here »</a> for more info.</p>

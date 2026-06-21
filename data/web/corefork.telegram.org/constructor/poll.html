@@ -94,12 +94,12 @@
 <tr>
 <td><strong>quiz</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/constructor/true">true</a></td>
-<td>Whether this is a quiz (with wrong and correct answers, results shown in the return type)</td>
+<td>Whether this is a quiz (with wrong and correct answers, results shown in the return type). <br>When creating a poll, the correct answers are specified in <a href="/constructor/inputMediaPoll">inputMediaPoll</a>.<code>correct_answers</code>.</td>
 </tr>
 <tr>
 <td><strong>open_answers</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.6?<a href="/constructor/true">true</a></td>
-<td>Whether users can add new answer options after the poll is created, see <a href="/api/poll#open-answer-polls">polls »</a></td>
+<td>Whether users can add new answer options after the poll is created, see <a href="/api/poll#open-answer-polls">open-answer polls »</a></td>
 </tr>
 <tr>
 <td><strong>revoting_disabled</strong></td>
@@ -139,12 +139,12 @@
 <tr>
 <td><strong>close_period</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/type/int">int</a></td>
-<td>Amount of time in seconds the poll will be active after creation, 5-600. Can't be used together with close_date.</td>
+<td>Amount of time in seconds the poll will be active after creation, up to <a href="/api/config#poll-close-period-max"><code>poll_close_period_max</code> »</a> seconds. Can't be used together with close_date.</td>
 </tr>
 <tr>
 <td><strong>close_date</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/type/int">int</a></td>
-<td>Point in time (Unix timestamp) when the poll will be automatically closed. Must be at least 5 and no more than 600 seconds in the future; can't be used together with close_period.</td>
+<td>Point in time (Unix timestamp) when the poll will be automatically closed. Up to <a href="/api/config#poll-close-period-max"><code>poll_close_period_max</code> »</a> seconds in the future; can't be used together with close_period.</td>
 </tr>
 <tr>
 <td><strong>countries_iso2</strong></td>
@@ -172,6 +172,7 @@
 <h4><a class="anchor" href="#messagessendvote" id="messagessendvote" name="messagessendvote"><i class="anchor-icon"></i></a><a href="/method/messages.sendVote">messages.sendVote</a></h4>
 <p>Vote in a <a href="/constructor/poll">poll</a></p>
 <p>Starting from layer 159, the vote will be sent from the peer specified using <a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a>.</p>
+<p>Before voting, clients should check that the user is actually allowed to vote: voting is not possible if the poll is closed, if it is <a href="/api/poll#subscriber-only-polls">subscriber-only »</a> and the user is not an eligible subscriber, or if it is <a href="/api/poll#country-restricted-polls">country-restricted »</a> and the user's <a href="/api/config#phone-country-iso2"><code>phone_country_iso2</code> »</a> is not in the poll's allowed country list. See <a href="/api/poll#vote-restrictions">vote restrictions »</a> for the full list of conditions.</p>
 <h4><a class="anchor" href="#messagesgetpollresults" id="messagesgetpollresults" name="messagesgetpollresults"><i class="anchor-icon"></i></a><a href="/method/messages.getPollResults">messages.getPollResults</a></h4>
 <p>Get poll results</p>
 </div>

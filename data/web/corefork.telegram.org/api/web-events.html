@@ -174,14 +174,14 @@ Otherwise, if the user refuses or the <a href="/method/bots.allowSendMessage">bo
 <li><code>req_id</code> - A string with the ID of the current request</li>
 </ul>
 <p>Emitted by <a href="/api/bots/webapps">bot mini apps</a> to obtain the contents of the system clipboard.</p>
-<p>Only for Mini Apps owned by bots added to the <a href="/api/bots/attach">attachment menu</a>, regardless of how the Mini App itself was launched, this event should trigger a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the following payload:</p>
+<p>Only for Mini Apps owned by bots added to the <a href="/api/bots/attach">attachment menu</a> or contained in the <a href="/api/config#whitelisted-bots"><code>whitelisted_bots</code> »</a> configuration parameter, regardless of how the Mini App itself was launched, this event should trigger a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the following payload:</p>
 <ul>
 <li><code>req_id</code> - The <code>req_id</code> from the <code>web_app_read_text_from_clipboard</code> request</li>
 <li><code>data</code> - A string with the clipboard contents</li>
 </ul>
 <p>Note that this method can be called only in response to a user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main or settings button).<br>
 Note that user interactions must have a TTL of 10 seconds: events of this type must be ignored and a <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must be sent if the last Mini App user interaction (as described above) happened more than 10 seconds ago.</p>
-<p>A <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must also be sent if the bot is not installed in the <a href="/api/bots/attach">attachment menu</a>.</p>
+<p>A <a href="/api/bots/webapps#clipboard-text-received">clipboard_text_received event »</a> with the correct <code>req_id</code> and no <code>data</code> field must also be sent if the bot is neither installed in the <a href="/api/bots/attach">attachment menu</a> nor contained in the <a href="/api/config#whitelisted-bots"><code>whitelisted_bots</code> »</a> configuration parameter.</p>
 <h4><a class="anchor" href="#web-app-open-scan-qr-popup" id="web-app-open-scan-qr-popup" name="web-app-open-scan-qr-popup"><i class="anchor-icon"></i></a><code>web_app_open_scan_qr_popup</code></h4>
 <p>Event data: a JSON object with the following fields:</p>
 <ul>
