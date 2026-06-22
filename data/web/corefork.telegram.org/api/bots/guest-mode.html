@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>Guest mode for bots</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Guest bots can be queried by username from any non-secret chat, posting their results directly into the chat, even if they&#39;re not a member.">
+    <meta property="description" content="Guest bots can be queried by username from any non-secret private chat, group and supergroup (except for groups/supergroups with content protection &amp;raquo; enabled), posting their results directly into the chat, even if they&#39;re not a member.">
     <meta property="og:title" content="Guest mode for bots">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Guest bots can be queried by username from any non-secret chat, posting their results directly into the chat, even if they&#39;re not a member.">
+    <meta property="og:description" content="Guest bots can be queried by username from any non-secret private chat, group and supergroup (except for groups/supergroups with content protection &amp;raquo; enabled), posting their results directly into the chat, even if they&#39;re not a member.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -44,7 +44,7 @@
   
   <div id="dev_page_content"><!-- scroll_nav -->
 
-<p>Guest bots can be queried by username from <strong>any</strong> non-secret chat, posting their results directly into the chat, even if they're not a member.</p>
+<p>Guest bots can be queried by username from <strong>any</strong> non-secret private chat, group and supergroup (except for groups/supergroups with <a href="/api/content-protection#for-groups-and-channels">content protection »</a> enabled), posting their results directly into the chat, even if they're not a member.</p>
 <p>Guest mode is similar to <a href="/api/bots/inline">inline queries »</a>, except that the bot itself directly posts the resulting message as a guest in the chat.</p>
 <p>A bot supports guest mode if the <a href="/constructor/user">user</a>.<code>bot_guestchat</code> flag is set on its profile.</p>
 <h3><a class="anchor" href="#invoking-a-guest-bot" id="invoking-a-guest-bot" name="invoking-a-guest-bot"><i class="anchor-icon"></i></a>Invoking a guest bot</h3>
@@ -54,7 +54,7 @@
 
 <a href='/method/contacts.getTopPeers'>contacts.getTopPeers</a>#973478b6 flags:<a href='/type/%23'>#</a> correspondents:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> bots_pm:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> bots_inline:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> phone_calls:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> forward_users:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> forward_chats:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> groups:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/constructor/true'>true</a> channels:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> bots_app:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> bots_guestchat:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/constructor/true'>true</a> offset:<a href='/type/int'>int</a> limit:<a href='/type/int'>int</a> hash:<a href='/type/long'>long</a> = <a href='/type/contacts.TopPeers'>contacts.TopPeers</a>;
 </code></pre>
-<p>To invoke a guest bot, the user mentions its <code>@username</code> in a chat: the username must <a href="/method/contacts.resolveUsername">resolve</a> to a bot whose <a href="/constructor/user">user</a>.<code>bot_guestchat</code> flag is set.</p>
+<p>To invoke a guest bot, the user mentions its <code>@username</code> in a chat (the message must begin by mentioning the guest bot(s); up to 3 bots can be mentioned at the same time): the username must <a href="/method/contacts.resolveUsername">resolve</a> to a bot whose <a href="/constructor/user">user</a>.<code>bot_guestchat</code> flag is set.</p>
 <p>The list of frequently used guest bots is available via the <a href="/constructor/topPeerCategoryBotsGuestChat">topPeerCategoryBotsGuestChat</a> <a href="/api/top-rating">top peer rating »</a> category, fetched by setting the <code>bots_guestchat</code> flag when invoking <a href="/method/contacts.getTopPeers">contacts.getTopPeers</a>.</p>
 <h3><a class="anchor" href="#handling-guest-queries-bot-side" id="handling-guest-queries-bot-side" name="handling-guest-queries-bot-side"><i class="anchor-icon"></i></a>Handling guest queries (bot side)</h3>
 <pre><code><a href='/constructor/updateBotGuestChatQuery'>updateBotGuestChatQuery</a>#cdd4093d flags:<a href='/type/%23'>#</a> query_id:<a href='/type/long'>long</a> message:<a href='/type/Message'>Message</a> reference_messages:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Message'>Message</a>&gt; qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
