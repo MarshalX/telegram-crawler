@@ -43,6 +43,31 @@
   <h1 id="dev_page_title">groupCall</h1>
   
   <div id="dev_page_content"><p>Describes a <a href="/api/group-calls">group call</a>.</p>
+<p>If the <code>min</code> flag is set, this is a partial (<code>min</code>) constructor: only a subset of its fields contains up-to-date information, and it must be merged into a previously cached non-<code>min</code> constructor as described below. If no full (non-<code>min</code>) constructor for this call was cached previously, the <code>min</code> constructor must be discarded.</p>
+<p>When <code>min</code> is set, the following fields are always present and may always be used: <code>flags</code>, <code>id</code>, <code>access_hash</code>, <code>participants_count</code> and <code>version</code>. In addition, <strong>only</strong> the following fields may be used (subject to the usual <code>version</code> check):</p>
+<ul>
+<li><code>conference</code></li>
+<li><code>rtmp_stream</code></li>
+<li><code>listeners_hidden</code></li>
+<li><code>title</code></li>
+<li><code>messages_enabled</code></li>
+<li><code>record_start_date</code> and <code>record_video_active</code></li>
+<li><code>schedule_date</code></li>
+<li><code>send_paid_messages_stars</code></li>
+</ul>
+<p>When <code>min</code> is set, the following fields <strong>must be ignored</strong>, keeping the values from the previously cached non-<code>min</code> constructor:</p>
+<ul>
+<li><code>join_muted</code></li>
+<li><code>can_change_join_muted</code></li>
+<li><code>schedule_start_subscribed</code></li>
+<li><code>creator</code></li>
+<li><code>can_change_messages_enabled</code></li>
+<li><code>unmuted_video_count</code> and <code>unmuted_video_limit</code></li>
+<li><code>stream_dc_id</code></li>
+<li><code>invite_link</code></li>
+<li><code>default_send_as</code></li>
+</ul>
+<p>The <code>join_date_asc</code> flag is set only when the call is created and never changes afterwards, so it too is not applied from a <code>min</code> constructor.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -74,22 +99,22 @@
 <tr>
 <td><strong>join_muted</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/constructor/true">true</a></td>
-<td>Whether the user should be muted upon joining the call</td>
+<td>Whether the user should be muted upon joining the call. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>can_change_join_muted</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/constructor/true">true</a></td>
-<td>Whether the current user can change the value of the <code>join_muted</code> flag using <a href="/method/phone.toggleGroupCallSettings">phone.toggleGroupCallSettings</a></td>
+<td>Whether the current user can change the value of the <code>join_muted</code> flag using <a href="/method/phone.toggleGroupCallSettings">phone.toggleGroupCallSettings</a>. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>join_date_asc</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.6?<a href="/constructor/true">true</a></td>
-<td>Specifies the ordering to use when locally sorting by date and displaying in the UI group call participants.</td>
+<td>Specifies the ordering to use when locally sorting by date and displaying in the UI group call participants. Set only when the call is created and never changed afterwards, so it is not applied from a <code>min</code> constructor.</td>
 </tr>
 <tr>
 <td><strong>schedule_start_subscribed</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.8?<a href="/constructor/true">true</a></td>
-<td>Whether we subscribed to the scheduled call</td>
+<td>Whether we subscribed to the scheduled call. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>can_start_video</strong></td>
@@ -119,7 +144,7 @@
 <tr>
 <td><strong>creator</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.15?<a href="/constructor/true">true</a></td>
-<td>Whether the current user created this group call.</td>
+<td>Whether the current user created this group call. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>messages_enabled</strong></td>
@@ -129,12 +154,12 @@
 <tr>
 <td><strong>can_change_messages_enabled</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.18?<a href="/constructor/true">true</a></td>
-<td>Whether the current user may enable or disable the <a href="/api/group-calls#in-call-messages">in-call message overlay »</a></td>
+<td>Whether the current user may enable or disable the <a href="/api/group-calls#in-call-messages">in-call message overlay »</a>. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>min</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.19?<a href="/constructor/true">true</a></td>
-<td>Whether this is a partial constructor that must be applied using the <a href="/api/group-calls#applying-group-call-updates">group call update rules »</a></td>
+<td>Whether this is a partial constructor that must be merged into a previously cached non-<code>min</code> constructor, following the rules described above.</td>
 </tr>
 <tr>
 <td><strong>id</strong></td>
@@ -159,7 +184,7 @@
 <tr>
 <td><strong>stream_dc_id</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.4?<a href="/type/int">int</a></td>
-<td>Media DC ID to use for <a href="/api/group-calls#playing-an-rtmp-livestream">RTMP stream requests »</a></td>
+<td>Media DC ID to use for <a href="/api/group-calls#playing-an-rtmp-livestream">RTMP stream requests »</a>. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>record_start_date</strong></td>
@@ -174,12 +199,12 @@
 <tr>
 <td><strong>unmuted_video_count</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.10?<a href="/type/int">int</a></td>
-<td>Number of people currently streaming video into the call</td>
+<td>Number of people currently streaming video into the call. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>unmuted_video_limit</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
-<td>Maximum number of people allowed to stream video into the call</td>
+<td>Maximum number of people allowed to stream video into the call. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>version</strong></td>
@@ -189,7 +214,7 @@
 <tr>
 <td><strong>invite_link</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.16?<a href="/type/string">string</a></td>
-<td>Invitation link for a <a href="/api/group-calls#conference-calls">conference call »</a>.</td>
+<td>Invitation link for a <a href="/api/group-calls#conference-calls">conference call »</a>. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 <tr>
 <td><strong>send_paid_messages_stars</strong></td>
@@ -199,7 +224,7 @@
 <tr>
 <td><strong>default_send_as</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.21?<a href="/type/Peer">Peer</a></td>
-<td>Default peer displayed as the author of <a href="/api/group-calls#in-call-messages">live story comments and reactions »</a></td>
+<td>Default peer displayed as the author of <a href="/api/group-calls#in-call-messages">live story comments and reactions »</a>. Must be ignored if the <code>min</code> flag is set.</td>
 </tr>
 </tbody>
 </table>

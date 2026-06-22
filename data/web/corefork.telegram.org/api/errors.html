@@ -49,7 +49,7 @@ An error is characterized by several parameters:</p>
 <h4><a class="anchor" href="#error-type" id="error-type" name="error-type"><i class="anchor-icon"></i></a>Error Type</h4>
 <p>A string literal in the form of <code>/[A-Z_0-9]+/</code>, which summarizes the problem. For example, <code>AUTH_KEY_UNREGISTERED</code>. This is an optional parameter.</p>
 <h4><a class="anchor" href="#error-database" id="error-database" name="error-database"><i class="anchor-icon"></i></a>Error Database</h4>
-<p>A full human-readable JSON list of RPC errors that can be returned by all methods in the API can be found <a href="/file/400780400088/2/Ta9Fe33esDA.218894.json/ff6d848697d36c5c49">here »</a>, what follows is a description of its fields:</p>
+<p>A full human-readable JSON list of RPC errors that can be returned by all methods in the API can be found <a href="/file/400780400537/6/P0Cj7uGeDhE.218894.json/3b9411ebf58bcaf2c5">here »</a>, what follows is a description of its fields:</p>
 <ul>
 <li><code>errors</code> - All error messages and codes for each method (object).
 <ul>
@@ -111,6 +111,22 @@ An error is characterized by several parameters:</p>
     "layer": 224
 }
 </code></pre>
+<h3><a class="anchor" href="#quality-of-life-checks" id="quality-of-life-checks" name="quality-of-life-checks"><i class="anchor-icon"></i></a>Quality of life checks</h3>
+<p>Note the following: <a href="/api/peers">peer information</a> and other locally cached information is also used for quality-of-life improvements, i.e. to directly prevent the user from doing an operation that is denied by the peer information, instead of allowing the operation and then showing an error.</p>
+<p>These improvements should be implemented by all clients, however, the server will also always prevent the user from doing illegal operations, by emitting an appropriate <a href="/api/errors">RPC error</a>, as sometimes it is still possible to make an illegal operation, even if a local check <em>is</em> implemented (see below).</p>
+<p>Along with preventing users from doing illegal operations on the client side, clients should always provide localized versions of errors returned by the server (as listed in the JSON file downloadable from the <a href="/api/errors">RPC error page</a>), to inform the user as to why an attempted operation has failed.</p>
+<p>In other words, if the client didn't prevent the failed method call locally because:</p>
+<ul>
+<li>It does not implement a local check for simplicity or</li>
+<li>It <em>does</em> implement a local check, but:
+<ul>
+<li>Outdated peer info indicated that the action is legal, but actually it isn't legal anymore</li>
+<li>An update was sent by the server for the peer info, but it wasn't applied in time due to an (unavoidable!) race condition between the server sending the update and the client sending the query.</li>
+<li>Other unspecified reasons (a new check introduced in a future layer by a new feature, etc...)</li>
+</ul>
+</li>
+</ul>
+<p>...it should still let the user know <em>why</em> the query failed, based on the description of the RPC error (if available in the <a href="#error-database">JSON error database</a>, otherwise by showing the RPC error itself).</p>
 <hr>
 <h4><a class="anchor" href="#error-constructors" id="error-constructors" name="error-constructors"><i class="anchor-icon"></i></a>Error Constructors</h4>
 <p>There should be a way to handle errors that are returned in <a href="/mtproto/service_messages#rpc-error">rpc_error</a> constructors.</p>
