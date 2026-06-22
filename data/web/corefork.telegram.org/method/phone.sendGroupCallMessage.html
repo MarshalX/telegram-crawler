@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>phone.sendGroupCallMessage</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Send an in-call message to all participants of a video chat/livestream or live story, including in RTMP mode, see here » for more info.  The send_as field can only be populated for live stories, where it optionally selects the displayed author. If omitted, the server automatically selects the appropriate author. Do not populate it for video chats/livestreams.  Video chats/livestreams and live stories support animated emoji reactions », encoded as messages containing only a standard available reaction emoji or a single custom emoji entity.  For a paid live story comment, pass the user-confirmed donation amount in allow_paid_stars. For commenters other than the live story owner, this amount must be at least the current groupCall.send_paid_messages_stars minimum. A higher amount may be donated to highlight the comment. The live story owner may comment without populating allow_paid_stars. To send a standalone paid live story donation, pass a positive allow_paid_stars value and an empty message, see here » for the full flow.">
+    <meta property="description" content="Send an in-call message to all participants of a video chat/livestream or live story, including in RTMP mode, see here » for more info.">
     <meta property="og:title" content="phone.sendGroupCallMessage">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Send an in-call message to all participants of a video chat/livestream or live story, including in RTMP mode, see here » for more info.  The send_as field can only be populated for live stories, where it optionally selects the displayed author. If omitted, the server automatically selects the appropriate author. Do not populate it for video chats/livestreams.  Video chats/livestreams and live stories support animated emoji reactions », encoded as messages containing only a standard available reaction emoji or a single custom emoji entity.  For a paid live story comment, pass the user-confirmed donation amount in allow_paid_stars. For commenters other than the live story owner, this amount must be at least the current groupCall.send_paid_messages_stars minimum. A higher amount may be donated to highlight the comment. The live story owner may comment without populating allow_paid_stars. To send a standalone paid live story donation, pass a positive allow_paid_stars value and an empty message, see here » for the full flow.">
+    <meta property="og:description" content="Send an in-call message to all participants of a video chat/livestream or live story, including in RTMP mode, see here » for more info.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -138,6 +138,31 @@
 <h4><a class="anchor" href="#group-calls" id="group-calls" name="group-calls"><i class="anchor-icon"></i></a><a href="/api/group-calls">Group calls</a></h4>
 <h4><a class="anchor" href="#groupcall" id="groupcall" name="groupcall"><i class="anchor-icon"></i></a><a href="/constructor/groupCall">groupCall</a></h4>
 <p>Describes a <a href="/api/group-calls">group call</a>.</p>
+<p>If the <code>min</code> flag is set, this is a partial (<code>min</code>) constructor: only a subset of its fields contains up-to-date information, and it must be merged into a previously cached non-<code>min</code> constructor as described below. If no full (non-<code>min</code>) constructor for this call was cached previously, the <code>min</code> constructor must be discarded.</p>
+<p>When <code>min</code> is set, the following fields are always present and may always be used: <code>flags</code>, <code>id</code>, <code>access_hash</code>, <code>participants_count</code> and <code>version</code>. In addition, <strong>only</strong> the following fields may be used (subject to the usual <code>version</code> check):</p>
+<ul>
+<li><code>conference</code></li>
+<li><code>rtmp_stream</code></li>
+<li><code>listeners_hidden</code></li>
+<li><code>title</code></li>
+<li><code>messages_enabled</code></li>
+<li><code>record_start_date</code> and <code>record_video_active</code></li>
+<li><code>schedule_date</code></li>
+<li><code>send_paid_messages_stars</code></li>
+</ul>
+<p>When <code>min</code> is set, the following fields <strong>must be ignored</strong>, keeping the values from the previously cached non-<code>min</code> constructor:</p>
+<ul>
+<li><code>join_muted</code></li>
+<li><code>can_change_join_muted</code></li>
+<li><code>schedule_start_subscribed</code></li>
+<li><code>creator</code></li>
+<li><code>can_change_messages_enabled</code></li>
+<li><code>unmuted_video_count</code> and <code>unmuted_video_limit</code></li>
+<li><code>stream_dc_id</code></li>
+<li><code>invite_link</code></li>
+<li><code>default_send_as</code></li>
+</ul>
+<p>The <code>join_date_asc</code> flag is set only when the call is created and never changes afterwards, so it too is not applied from a <code>min</code> constructor.</p>
 </div>
   
 </div>
