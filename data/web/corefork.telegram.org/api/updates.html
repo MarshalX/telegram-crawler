@@ -246,7 +246,7 @@ Since <code>local_pts + pts_count &gt; pts</code> (<code>133 &gt; 132</code>), t
 <p>Now let's assume an <a href="/constructor/updateDeleteChannelMessages">updateDeleteChannelMessages</a> from channel <code>123456789</code> is received with <code>pts = 140</code> and <code>pts_count=5</code>.
 Since <code>local_pts + pts_count &lt; pts</code> (<code>137 &lt; 140</code>), this means that updates were missed, and the gap must be recovered.</p>
 <h5><a class="anchor" href="#secret-chats-amp-bots" id="secret-chats-amp-bots" name="secret-chats-amp-bots"><i class="anchor-icon"></i></a>Secret chats &amp; bots</h5>
-<p>The whole process is very similar for secret chats and certain bot updates, but there is a <code>qts</code> instead of <code>pts</code>, and events are never grouped, so it's assumed that <code>qts_count</code> is always equal to 1.</p>
+<p>The whole process is very similar for secret chats and certain bot updates, but there is a <code>qts</code> instead of <code>pts</code>, and events are never grouped, so <code>qts_count</code> is always equal to 1 (and for this reason, the redundant field is not present in updates).</p>
 <h4><a class="anchor" href="#seq-checking-and-applying" id="seq-checking-and-applying" name="seq-checking-and-applying"><i class="anchor-icon"></i></a><code>seq</code>: checking and applying</h4>
 <p>On the top level when handling received <a href="/constructor/updates">updates</a> and <a href="/constructor/updatesCombined">updatesCombined</a> there are four possible cases:</p>
 <ul>
