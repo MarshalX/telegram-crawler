@@ -297,8 +297,8 @@ The intermediate status, represented by the <strong>pts</strong>, must be saved 
 <li>
 <p>With the edge case gap filling logic with <a href="/method/channels.getMessages">channels.getMessages</a>/<a href="/method/messages.getMessages">messages.getMessages</a>, suddenly message ID gaps encountered in the local message database become a problem: are they legitimate gaps caused by deleted messages that should be ignored, or gaps caused by an unrecoverable getDifference hole that must be recovered using <a href="/method/channels.getMessages">channels.getMessages</a>/<a href="/method/messages.getMessages">messages.getMessages</a> because they may contain actual, non-deleted messages?</p>
 <p>One of the many ways to handle this is to keep track of known message ID ranges that do not contain gaps using a data structure like a segment tree, or any other data structure that allows to efficiently check if a message ID is contained by any range.</p>
-<p>All messages belonging to private chats and <a href="/api/channel#basic-groups">basic groups »</a> are stored in the one single instance of this datastructure (because they share the same <a href="#message-id-sequences">id sequence</a>).<br>
-Messages belonging to supergroup and channels are stored each in their own instance of the datastructure, one per channel/supergroup (as channels and supergroups each have their own independent <a href="#message-id-sequences">id sequence</a>).</p>
+<p>All messages belonging to private chats and <a href="/api/channel#basic-groups">basic groups »</a> are stored in one single instance of this data structure (because they share the same <a href="#message-id-sequences">id sequence</a>).<br>
+Messages belonging to supergroup and channels are stored each in their own instance of the data structure, one per channel/supergroup (as channels and supergroups each have their own independent <a href="#message-id-sequences">id sequence</a>).</p>
 <p>For example, a somewhat naïve and inefficient implementation could store <code>[start_msg_id, end_msg_id]</code> message IDs of valid ranges in a simple list structure:</p>
 <pre><code>struct {
   list: List&lt;Pair[int, int]&gt;,
