@@ -318,6 +318,7 @@ The mini app must also be expanded when the user swipes up on the webview.</p>
 <li><code>text_color</code> - Button text color in hex RGB format (string, defaults to the <a href="/api/bots/webapps#theme-parameters"><code>button_text_color</code> theme parameter</a>)</li>
 <li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean, false by default)</li>
 <li><code>has_shine_effect</code> - Whether the button should have a shine effect (boolean, false by default)</li>
+<li><code>icon_custom_emoji_id</code> - Optional long integer in string form, containing the ID of the <a href="/api/custom-emoji">custom emoji »</a> to show as the button icon.</li>
 </ul>
 <p>Configures the main button, located immediately below the webview: when the user presses it a <a href="/api/bots/webapps#main-button-pressed"><code>main_button_pressed</code> event should be emitted by the client</a>.</p>
 <p>Some clients implement a horizontal media type tab bar located at the bottom of the screen, opened when the user clicks on the attachment menu button: this tab bar contains a horizontal list of buttons used to attach media of a certain type and to open installed <a href="/api/bots/attach">attachment menu mini apps</a>.<br>
@@ -350,6 +351,7 @@ Note that on supported platforms, the OS back button can be used instead of a cu
 <li><code>is_progress_visible</code> - Indicates whether the button should display a loading indicator (boolean, false by default)</li>
 <li><code>has_shine_effect</code> - Whether the button should have a shine effect (boolean, false by default)</li>
 <li><code>position</code> - One of <code>left</code>, <code>right</code>, <code>top</code>, <code>bottom</code> (string, defaults to <code>left</code>)</li>
+<li><code>icon_custom_emoji_id</code> - Optional long integer in string form, containing the ID of the <a href="/api/custom-emoji">custom emoji »</a> to show as the button icon.</li>
 </ul>
 <p>Configures the secondary button, located immediately below the webview, either on the left, right, top or bottom of the main button (if it is visible, otherwise it is located where the main button is usually located).</p>
 <p>When the user presses it a <a href="/api/bots/webapps#secondary-button-pressed"><code>secondary_button_pressed</code> event should be emitted by the client</a>.</p>
@@ -371,9 +373,12 @@ In clients that implement a tab bar, if and only if the user opens a mini app th
 <p>Used by <a href="/api/bots/webapps">mini apps</a> to share a <a href="/api/stories">story on the user's profile »</a>, specifying an optional caption and <a href="/api/stories#urls">URL widget »</a>.</p>
 <p>This event should open the app's story editor with the specified media, caption and widget, letting the user tweak the story before posting it.</p>
 <h4><a class="anchor" href="#web-app-request-fullscreen" id="web-app-request-fullscreen" name="web-app-request-fullscreen"><i class="anchor-icon"></i></a><code>web_app_request_fullscreen</code></h4>
-<p>Event payload: <code>null</code></p>
+<p>Event payload: a JSON object with the following fields:</p>
+<ul>
+<li><code>blur</code> - Optional boolean, indicating whether background content should be blurred when the Mini App is in fullscreen mode (defaults to <code>true</code>).</li>
+</ul>
 <p>Emitted by <a href="/api/bots/webapps">mini web apps</a> to request expansion of the web app to fullscreen mode.</p>
-<p>On success, emits a <a href="/api/bots/webapps#fullscreen-changed">fullscreen_changed event</a> with <code>is_fullscreen=true</code>.<br>
+<p>On success, emits a <a href="/api/bots/webapps#fullscreen-changed">fullscreen_changed event »</a> with <code>is_fullscreen=true</code> and <code>blur_enabled</code> set to the effective <code>blur</code> value.<br>
 On failure, emits a <a href="/api/bots/webapps#fullscreen-failed">fullscreen_failed event</a> with <code>error</code> equal to <code>UNSUPPORTED</code> (Fullscreen mode is not supported on this device or platform) or <code>ALREADY_FULLSCREEN</code> (The Mini App is already in fullscreen mode).</p>
 <h4><a class="anchor" href="#web-app-exit-fullscreen" id="web-app-exit-fullscreen" name="web-app-exit-fullscreen"><i class="anchor-icon"></i></a><code>web_app_exit_fullscreen</code></h4>
 <p>Event payload: <code>null</code></p>
@@ -467,16 +472,16 @@ Absolute orientation data may also not be supported on some platforms, in which 
 <p>Used by <a href="/api/bots/webapps">mini apps</a> to request opening the geolocation settings page for bots, useful when the app needs to request permission to use the current geolocation from users who have previously denied it.</p>
 <p>Note that this event should only be handled in response to user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button within the last 10 seconds) and only if an event of the same type isn't already being handled.</p>
 <h4><a class="anchor" href="#web-app-request-file-download" id="web-app-request-file-download" name="web-app-request-file-download"><i class="anchor-icon"></i></a><code>web_app_request_file_download</code></h4>
-<p>Event data: a JSON object with <code>url</code> and <code>filename</code> string fields.</p>
+<p>Event data: a JSON object with <code>url</code> and <code>file_name</code> string fields.</p>
 <p>Used by <a href="/api/bots/webapps">bot web apps</a> to request the download of a file.</p>
 <p>Handle this event using the following steps:</p>
 <ol>
-<li>Invoke <a href="/method/bots.checkDownloadFileParams">bots.checkDownloadFileParams</a>, passing the <code>url</code>, <code>filename</code> and the ID of the bot.<br>
+<li>Invoke <a href="/method/bots.checkDownloadFileParams">bots.checkDownloadFileParams</a>, passing the <code>url</code>, <code>file_name</code> and the ID of the bot.<br>
 Ignore further <code>web_app_request_file_download</code> events until step 3 is reached (new <code>web_app_request_file_download</code> <em>can</em> be accepted while the previous file is being downloaded).<br>
 1.1) If the method doesn't return <a href="/constructor/boolTrue">boolTrue</a>, emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>cancelled</code> and abort the process.</li>
-<li>If <a href="/constructor/boolTrue">boolTrue</a> is returned, show a prompt to the user, notifying them that <code>$nameOfTheBot</code> is asking to download a file with name <code>filename</code>.<br>
+<li>If <a href="/constructor/boolTrue">boolTrue</a> is returned, show a prompt to the user, notifying them that <code>$nameOfTheBot</code> is asking to download a file with name <code>file_name</code>.<br>
 2.1) If the user refuses to download the file, emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>cancelled</code> and abort the process.</li>
-<li>If the user agrees, start downloading the file from <code>url</code> as <code>filename</code> and emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>downloading</code>.</li>
+<li>If the user agrees, start downloading the file from <code>url</code> as <code>file_name</code> and emit a <a href="/api/bots/webapps#file-download-requested">file_download_requested</a> event with status equal to <code>downloading</code>.</li>
 <li>When the download is finished, show a toast to the user, indicating that the file was downloaded successfully.</li>
 </ol>
 <h4><a class="anchor" href="#web-app-send-prepared-message" id="web-app-send-prepared-message" name="web-app-send-prepared-message"><i class="anchor-icon"></i></a><code>web_app_send_prepared_message</code></h4>
@@ -575,7 +580,7 @@ Ignore further <code>web_app_request_file_download</code> events until step 3 is
 <li><code>url</code> - Optional string, if set must contain an <a href="/api/links#oauth-links">oauth deep link »</a> to pass to the <a href="/api/url-authorization#oauth-authorization-for-mini-apps">OAuth login flow »</a>.</li>
 </ul>
 <p>Used to initiate the <a href="/api/url-authorization#oauth-authorization-for-mini-apps">OAuth login flow »</a> (if <code>url</code> is set), <strong>or</strong> to check if the current client supports OAuth login (if <code>url</code> is <strong>not</strong> set).</p>
-<p>Regardless of the contents of the event, the client should immediately reply with the <a href="/api/bots/webapps#oauth-supported"><code>oauth_supported</code> event</a> event.</p>
+<p>Regardless of the contents of the event, the client should immediately reply with the <a href="/api/bots/webapps#oauth-supported"><code>oauth_supported</code> event »</a>, with <code>version</code> equal to <code>1</code>.</p>
 <h4><a class="anchor" href="#web-app-request-chat" id="web-app-request-chat" name="web-app-request-chat"><i class="anchor-icon"></i></a><code>web_app_request_chat</code></h4>
 <p>Event payload: a JSON object with the following keys:</p>
 <ul>
