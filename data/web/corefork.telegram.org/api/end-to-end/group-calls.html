@@ -727,8 +727,8 @@ encrypted_header = aes_cbc(aes_key, aes_iv, header)
 </li>
 </ol>
 <p>The final <code>unencrypted_prefix_size</code> is a 4-byte little-endian integer stored at the end of the packet. On decryption, receivers first remove this trailer, split off the unencrypted prefix, parse <code>header_a</code> and <code>header_b</code>, and then try the advertised epochs until one decrypts the one-time key successfully.</p>
-<p><code>magic1</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacket">e2e.callPacket</a><code>#40a6bee9 = e2e.CallPacket;</code></p>
-<p><code>magic2</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacketLargeMsgId">e2e.callPacketLargeMsgId</a><code>#1ce56c2d = e2e.CallPacketLargeMsgId;</code></p>
+<p><code>magic1</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacket">e2e.callPacket</a>.</p>
+<p><code>magic2</code> is the CRC32 constructor magic (the part after <code>#</code>) for <a href="/constructor/e2e.callPacketLargeMsgId">e2e.callPacketLargeMsgId</a>.</p>
 <h4><a class="anchor" href="#security-considerations" id="security-considerations" name="security-considerations"><i class="anchor-icon"></i></a>Security Considerations</h4>
 <ul>
 <li><strong>Replay Protection:</strong> The <code>seqno</code> must be unique and monotonically increasing for each <code>(public key, channel_id)</code> pair. In case of overflow, the client must leave the call. Receivers must track recently received <code>seqno</code> values and discard packets with old or duplicate numbers.</li>
