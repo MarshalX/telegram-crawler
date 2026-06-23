@@ -81,7 +81,12 @@
 <li><code>auction</code>: an auctioned gift ID using <a href="/constructor/inputStarGiftAuction">inputStarGiftAuction</a>, or an <a href="/api/links#auction-links">auction deep link slug »</a> with <a href="/constructor/inputStarGiftAuctionSlug">inputStarGiftAuctionSlug</a>:</li>
 <li><code>version</code>: the locally cached <a href="/constructor/starGiftAuctionState">starGiftAuctionState</a>.<code>version</code> field; <code>0</code> if there's no locally cached <a href="/constructor/starGiftAuctionState">starGiftAuctionState</a> yet.</li>
 </ul>
-<p>Invoking this method will also subscribe the user to <a href="/constructor/updateStarGiftAuctionState">updateStarGiftAuctionState</a> and <a href="/constructor/updateStarGiftAuctionUserState">updateStarGiftAuctionUserState</a> updates from the specified auction, for <a href="/constructor/payments.starGiftAuctionState">payments.starGiftAuctionState</a>.<code>timeout</code> seconds; if the user is still on the auction state page, re-invoke the method after <code>timeout</code> seconds to keep receiving updates.</p>
+<p>Invoking this method will also subscribe the user to <a href="/constructor/updateStarGiftAuctionState">updateStarGiftAuctionState</a> updates from the specified auction, for <a href="/constructor/payments.starGiftAuctionState">payments.starGiftAuctionState</a>.<code>timeout</code> seconds; if the user is still on the auction state page, re-invoke the method after <code>timeout</code> seconds to keep receiving updates.</p>
+<p>The server will also send <a href="/constructor/updateStarGiftAuctionUserState">updateStarGiftAuctionUserState</a> by itself without the need to poll with <a href="/constructor/payments.starGiftAuctionState">payments.starGiftAuctionState</a> when:</p>
+<ul>
+<li>The user places a bid</li>
+<li>The user wins a gift</li>
+</ul>
 <p>If the passed <code>version</code> is equal to the remote <code>version</code>, auction information hasn't changed, thus a <a href="/constructor/starGiftAuctionStateNotModified">starGiftAuctionStateNotModified</a> will be returned: note that this <strong>will</strong> still renew the update subscription.</p>
 <p>Note that <a href="/constructor/starGiftAuctionStateNotModified">starGiftAuctionStateNotModified</a> can <strong>only</strong> be returned by this method, never by updates or other methods.</p>
 <p>Note that <a href="/constructor/updateStarGiftAuctionState">updateStarGiftAuctionState</a> and <a href="/constructor/updateStarGiftAuctionUserState">updateStarGiftAuctionUserState</a> do NOT contain the linked <a href="/constructor/starGift">starGift</a> object (which is mandatory to render some information in graphical clients), just the gift's ID.</p>
