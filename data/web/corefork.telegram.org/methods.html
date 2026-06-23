@@ -642,26 +642,7 @@
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" href="#working-with-public-service-announcements-mtproxy-channels-and-suggestions-" id="working-with-public-service-announcements-mtproxy-channels-and-suggestions-" name="working-with-public-service-announcements-mtproxy-channels-and-suggestions-"><i class="anchor-icon"></i></a>Working with <a href="/api/config#suggestions">Public Service Announcements, MTProxy channels and suggestions »</a></h3>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="/method/help.hidePromoData">help.hidePromoData</a></td>
-<td>Hide MTProxy/Public Service Announcement information</td>
-</tr>
-<tr>
-<td><a href="/method/help.getPromoData">help.getPromoData</a></td>
-<td>Returns a set of useful suggestions and PSA/MTProxy sponsored peers, see <a href="/api/config#suggestions">here »</a> for more info.</td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" href="#working-with-seamless-telegram-login" id="working-with-seamless-telegram-login" name="working-with-seamless-telegram-login"><i class="anchor-icon"></i></a>Working with <a href="/api/url-authorization">Seamless Telegram Login</a></h3>
+<h3><a class="anchor" href="#working-with-oauth-login" id="working-with-oauth-login" name="working-with-oauth-login"><i class="anchor-icon"></i></a>Working with <a href="/api/url-authorization">OAuth login</a></h3>
 <table class="table">
 <thead>
 <tr>
@@ -689,6 +670,33 @@
 <tr>
 <td><a href="/method/account.resetWebAuthorizations">account.resetWebAuthorizations</a></td>
 <td>Reset all active web <a href="/widgets/login">telegram login</a> sessions</td>
+</tr>
+<tr>
+<td><a href="/method/messages.declineUrlAuth">messages.declineUrlAuth</a></td>
+<td>Decline an incoming <a href="/api/url-authorization#oauth-authorization">OAuth authorization request »</a>, notifying the server that the user refused the login request.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a></td>
+<td>Validate the match code selected by the user against the code shown on the login page, as part of the <a href="/api/url-authorization#oauth-authorization">OAuth authorization flow »</a>.<br><br>Only usable when both <code>match_codes</code> and <code>match_codes_first</code> are set in the <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a> returned by <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a>.  <br>If <a href="/constructor/boolTrue">boolTrue</a> is returned, proceed with the login flow and pass the verified code to <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a>.<code>match_code</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-public-service-announcements-mtproxy-channels-and-suggestions-" id="working-with-public-service-announcements-mtproxy-channels-and-suggestions-" name="working-with-public-service-announcements-mtproxy-channels-and-suggestions-"><i class="anchor-icon"></i></a>Working with <a href="/api/config#suggestions">Public Service Announcements, MTProxy channels and suggestions »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/help.hidePromoData">help.hidePromoData</a></td>
+<td>Hide MTProxy/Public Service Announcement information</td>
+</tr>
+<tr>
+<td><a href="/method/help.getPromoData">help.getPromoData</a></td>
+<td>Returns a set of useful suggestions and PSA/MTProxy sponsored peers, see <a href="/api/config#suggestions">here »</a> for more info.</td>
 </tr>
 </tbody>
 </table>
@@ -908,6 +916,26 @@
 <td><a href="/method/payments.checkCanSendGift">payments.checkCanSendGift</a></td>
 <td>Check if the specified <a href="/api/gifts">gift »</a> can be sent.</td>
 </tr>
+<tr>
+<td><a href="/method/payments.resolveStarGiftOffer">payments.resolveStarGiftOffer</a></td>
+<td>Accept or decline a previously received <a href="/api/gifts#collectible-gift-purchase-offers">collectible gift purchase offer »</a>, see <a href="/api/gifts#collectible-gift-purchase-offers">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.sendStarGiftOffer">payments.sendStarGiftOffer</a></td>
+<td>Send an offer to purchase a <a href="/api/gifts#collectible-gift-purchase-offers">collectible gift »</a>, see <a href="/api/gifts#collectible-gift-purchase-offers">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.getStarGiftUpgradeAttributes">payments.getStarGiftUpgradeAttributes</a></td>
+<td>Obtains the <strong>full</strong> list of just the collectible attributes that may appear for a gift type once it's upgraded to a <a href="/api/gifts#collectible-gifts">collectible gift »</a>.<br><br>The result may also include <a href="/constructor/starGiftAttributeModel">starGiftAttributeModel</a> constructors with the <code>crafted</code> flag set: these models are reserved for <a href="/api/gifts#crafting-collectible-gifts">crafting »</a> and should be filtered out from regular upgrade previews (and vice versa).</td>
+</tr>
+<tr>
+<td><a href="/method/payments.getCraftStarGifts">payments.getCraftStarGifts</a></td>
+<td>Obtain owned <a href="/api/gifts#collectible-gifts">collectible gifts »</a> of a specific type that can be used for <a href="/api/gifts#crafting-collectible-gifts">crafting »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.craftStarGift">payments.craftStarGift</a></td>
+<td>Craft a new <a href="/api/gifts#collectible-gifts">collectible gift »</a> by combining 1 to 4 owned collectible gifts of the same base gift type.<br><br>The passed gifts must all have the same <a href="/constructor/starGiftUnique">starGiftUnique</a>.<code>gift_id</code>, must be usable for crafting, and must not be blocked by a future <code>can_craft_at</code> timestamp.<br><br>The first passed gift must not be <a href="/api/gifts#hosted-collectible-gifts">located on the TON blockchain</a>.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-telegram-star-subscriptions-" id="working-with-telegram-star-subscriptions-" name="working-with-telegram-star-subscriptions-"><i class="anchor-icon"></i></a>Working with <a href="/api/subscriptions">Telegram Star subscriptions »</a></h3>
@@ -1106,6 +1134,21 @@
 <tr>
 <td><a href="/method/bots.updateStarRefProgram">bots.updateStarRefProgram</a></td>
 <td>Create, edit or delete the <a href="/api/bots/referrals">affiliate program</a> of a bot we own</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-animated-dice-" id="working-with-animated-dice-" name="working-with-animated-dice-"><i class="anchor-icon"></i></a>Working with <a href="/api/dice">animated dice »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.getEmojiGameInfo">messages.getEmojiGameInfo</a></td>
+<td>Fetch dice game information.</td>
 </tr>
 </tbody>
 </table>
@@ -1452,6 +1495,14 @@
 <tr>
 <td><a href="/method/channels.setEmojiStickers">channels.setEmojiStickers</a></td>
 <td>Set a <a href="/api/custom-emoji">custom emoji stickerset</a> for supergroups. Only usable after reaching at least the <a href="/api/boost">boost level »</a> specified in the <a href="/api/config#group-emoji-stickers-level-min"><code>group_emoji_stickers_level_min</code> »</a> config parameter.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.editChatCreator">messages.editChatCreator</a></td>
+<td>Transfer the ownership of a basic group, supergroup or channel to another user, see <a href="/api/channel#transferring-ownership-of-a-group-channel">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getFutureChatCreatorAfterLeave">messages.getFutureChatCreatorAfterLeave</a></td>
+<td>Group/channel owners only: returns the ID of the user that will become the new owner of the group if we decide to leave the group, see <a href="/api/channel#leaving-groups-channels">here »</a> for more info on the full flow.</td>
 </tr>
 </tbody>
 </table>
@@ -2203,6 +2254,36 @@
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" href="#working-with-group-member-admin-tags-" id="working-with-group-member-admin-tags-" name="working-with-group-member-admin-tags-"><i class="anchor-icon"></i></a>Working with <a href="/api/rank">group member/admin tags »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.editChatParticipantRank">messages.editChatParticipantRank</a></td>
+<td>Edit a group participant's <a href="/api/rank">tag »</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-guest-mode-for-bots-" id="working-with-guest-mode-for-bots-" name="working-with-guest-mode-for-bots-"><i class="anchor-icon"></i></a>Working with <a href="/api/bots/guest-mode">guest mode for bots »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.setBotGuestChatResult">messages.setBotGuestChatResult</a></td>
+<td>Bots may use this method to answer a <a href="/api/bots/guest-mode">guest mode »</a> query received via an <a href="/constructor/updateBotGuestChatQuery">updateBotGuestChatQuery</a> update, providing the message to post into the chat as a guest, see <a href="/api/bots/guest-mode#handling-guest-queries-bot-side">here »</a> for more info.</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" href="#working-with-instant-view-pages" id="working-with-instant-view-pages" name="working-with-instant-view-pages"><i class="anchor-icon"></i></a>Working with <a href="https://instantview.telegram.org">instant view pages</a></h3>
 <table class="table">
 <thead>
@@ -2238,6 +2319,37 @@
 <tr>
 <td><a href="/method/phone.getGroupCallStars">phone.getGroupCallStars</a></td>
 <td>Fetch a live story's total donations and top donors, see <a href="/api/group-calls#paid-live-story-donations">paid live story donations »</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-managed-bots-" id="working-with-managed-bots-" name="working-with-managed-bots-"><i class="anchor-icon"></i></a>Working with <a href="/api/bots/managed-bots">managed bots »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/bots.checkUsername">bots.checkUsername</a></td>
+<td>Check whether a username is available and valid for use when <a href="/api/bots/managed-bots#creating-a-managed-bot">creating a managed bot »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.createBot">bots.createBot</a></td>
+<td>Create a <a href="/api/bots/managed-bots#creating-a-managed-bot">managed bot »</a> owned by the current user and controlled by the specified manager bot.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.exportBotToken">bots.exportBotToken</a></td>
+<td>Export the bot token of a <a href="/api/bots/managed-bots#managing-a-managed-bot">managed bot »</a>; can only be called by the manager bot.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.getAccessSettings">bots.getAccessSettings</a></td>
+<td>Get the <a href="/api/bots/managed-bots#managing-a-managed-bot">access restriction settings »</a> of a managed bot; can only be called by the manager bot.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.editAccessSettings">bots.editAccessSettings</a></td>
+<td>Edit the <a href="/api/bots/managed-bots#managing-a-managed-bot">access restriction settings »</a> of a managed bot; can only be called by the manager bot.</td>
 </tr>
 </tbody>
 </table>
@@ -2325,6 +2437,14 @@
 <td><a href="/method/messages.getPaidReactionPrivacy">messages.getPaidReactionPrivacy</a></td>
 <td>Fetches an <a href="/constructor/updatePaidReactionPrivacy">updatePaidReactionPrivacy</a> update with the current <a href="/api/reactions#paid-reactions">default paid reaction privacy, see here »</a> for more info.</td>
 </tr>
+<tr>
+<td><a href="/method/messages.deleteParticipantReactions">messages.deleteParticipantReactions</a></td>
+<td>As an admin, remove all of a specific participant's <a href="/api/reactions">reactions</a> from every message in a group or channel.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.deleteParticipantReaction">messages.deleteParticipantReaction</a></td>
+<td>As an admin, remove all of a specific participant's <a href="/api/reactions">reactions</a> from a single message.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-message-translation" id="working-with-message-translation" name="working-with-message-translation"><i class="anchor-icon"></i></a>Working with <a href="/api/translation">message translation</a></h3>
@@ -2347,6 +2467,25 @@
 <tr>
 <td><a href="/method/channels.toggleAutotranslation">channels.toggleAutotranslation</a></td>
 <td>Toggle autotranslation in a channel, for all users: see <a href="/api/translation#autotranslation-for-channels">here »</a> for more info.</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" href="#working-with-message-views-and-read-metrics-" id="working-with-message-views-and-read-metrics-" name="working-with-message-views-and-read-metrics-"><i class="anchor-icon"></i></a>Working with <a href="/api/views">message views and read metrics »</a></h3>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/method/messages.reportReadMetrics">messages.reportReadMetrics</a></td>
+<td>Report viewport read metrics for visible messages, indicating how long each message stayed in the chat viewport, see <a href="/api/views#read-metrics">here »</a> for more info on the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.reportMusicListen">messages.reportMusicListen</a></td>
+<td>Report the listening duration of a music track (audio document without the <code>voice</code> flag), see <a href="/api/views#music-listens">here »</a> for more info on the full flow.</td>
 </tr>
 </tbody>
 </table>
@@ -2657,6 +2796,10 @@
 <tr>
 <td><a href="/method/stats.getStoryPublicForwards">stats.getStoryPublicForwards</a></td>
 <td>Obtain forwards of a <a href="/api/stories">story</a> as a message to public chats and reposts by public channels.</td>
+</tr>
+<tr>
+<td><a href="/method/stats.getPollStats">stats.getPollStats</a></td>
+<td>Get <a href="/api/stats#poll-statistics">statistics</a> for a poll sent in a message.</td>
 </tr>
 </tbody>
 </table>
@@ -3150,6 +3293,14 @@
 <td><a href="/method/account.getSavedMusicIds">account.getSavedMusicIds</a></td>
 <td>Fetch the full list of only the IDs of <a href="/api/profile#music">songs currently added to the profile, see here »</a> for more info.</td>
 </tr>
+<tr>
+<td><a href="/method/users.suggestBirthday">users.suggestBirthday</a></td>
+<td>Suggest a birthday to another user, see <a href="/api/profile#birthday">here »</a> for more info on birthdays in the API.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.getPersonalChannelHistory">messages.getPersonalChannelHistory</a></td>
+<td>Fetch the message history of a user's <a href="/api/profile#personal-channel">personal channel »</a>.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-voice-message-transcription" id="working-with-voice-message-transcription" name="working-with-voice-message-transcription"><i class="anchor-icon"></i></a>Working with <a href="/api/transcribe">voice message transcription</a></h3>
@@ -3269,6 +3420,14 @@
 <tr>
 <td><a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a></td>
 <td>Send one or more chosen peers, as requested by a <a href="/constructor/keyboardButtonRequestPeer">keyboardButtonRequestPeer</a> button.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.requestWebViewButton">bots.requestWebViewButton</a></td>
+<td>Bots may use this method to prepare a peer request button for a <a href="/api/bots/webapps">Mini App</a>, see <a href="/api/bots/buttons#requesting-peers-via-mini-apps">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a></td>
+<td>Fetch the peer request button a bot prepared for a <a href="/api/bots/webapps">Mini App</a> with <a href="/method/bots.requestWebViewButton">bots.requestWebViewButton</a>, invoked when the Mini App emits a <a href="/api/web-events#web-app-request-chat"><code>web_app_request_chat</code></a> event, see <a href="/api/bots/buttons#requesting-peers-via-mini-apps">here »</a> for more info.</td>
 </tr>
 </tbody>
 </table>
@@ -3915,6 +4074,22 @@
 <td><a href="/method/messages.sendVote">messages.sendVote</a></td>
 <td>Vote in a <a href="/constructor/poll">poll</a><br><br>Starting from layer 159, the vote will be sent from the peer specified using <a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a>.<br><br>Before voting, clients should check that the user is actually allowed to vote: voting is not possible if the poll is closed, if it is <a href="/api/poll#subscriber-only-polls">subscriber-only »</a> and the user is not an eligible subscriber, or if it is <a href="/api/poll#country-restricted-polls">country-restricted »</a> and the user's <a href="/api/config#phone-country-iso2"><code>phone_country_iso2</code> »</a> is not in the poll's allowed country list. See <a href="/api/poll#vote-restrictions">vote restrictions »</a> for the full list of conditions.</td>
 </tr>
+<tr>
+<td><a href="/method/messages.addPollAnswer">messages.addPollAnswer</a></td>
+<td>Add an answer option to an <a href="/api/poll#open-answer-polls">open-answer poll »</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.deletePollAnswer">messages.deletePollAnswer</a></td>
+<td>Remove an answer option from an <a href="/api/poll#open-answer-polls">open-answer poll »</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.getUnreadPollVotes">messages.getUnreadPollVotes</a></td>
+<td>Get messages containing polls with <a href="/api/poll#unread-poll-votes">unread votes »</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.readPollVotes">messages.readPollVotes</a></td>
+<td>Mark all <a href="/api/poll#unread-poll-votes">unread poll votes »</a> in a chat as read</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#working-with-scheduled-messages" id="working-with-scheduled-messages" name="working-with-scheduled-messages"><i class="anchor-icon"></i></a>Working with scheduled messages</h3>
@@ -3979,6 +4154,34 @@
 <tr>
 <td><a href="/method/messages.summarizeText">messages.summarizeText</a></td>
 <td>Summarize the contents of a message with AI, see <a href="/api/ai#summarize-messages">here »</a> for more info.<br><br>Clients should use <a href="/constructor/message">message</a>.<code>summary_from_language</code> as a hint for showing a summarization button; its absence does not forbid invoking this method.</td>
+</tr>
+<tr>
+<td><a href="/method/aicompose.createTone">aicompose.createTone</a></td>
+<td>Create a new custom <a href="/api/ai#ai-compose-tones">AI composer tone »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/aicompose.updateTone">aicompose.updateTone</a></td>
+<td>Edit a custom <a href="/api/ai#ai-compose-tones">AI composer tone »</a> previously created by the current user. Only the fields whose flag is set will be modified.</td>
+</tr>
+<tr>
+<td><a href="/method/aicompose.saveTone">aicompose.saveTone</a></td>
+<td>Install or uninstall an <a href="/api/ai#ai-compose-tones">AI composer tone »</a>, adding it to or removing it from the list of saved tones of the current user.<br><br>Non-<a href="/api/premium">Premium</a> users may install up to <a href="/api/config#aicompose-tone-saved-limit-default">aicompose_tone_saved_limit_default »</a> tones, <a href="/api/premium">Premium</a> users up to <a href="/api/config#aicompose-tone-saved-limit-premium">aicompose_tone_saved_limit_premium »</a> tones.</td>
+</tr>
+<tr>
+<td><a href="/method/aicompose.deleteTone">aicompose.deleteTone</a></td>
+<td>Permanently delete a custom <a href="/api/ai#ai-compose-tones">AI composer tone »</a> created by the current user.</td>
+</tr>
+<tr>
+<td><a href="/method/aicompose.getTone">aicompose.getTone</a></td>
+<td>Fetch information about a single <a href="/api/ai#ai-compose-tones">AI composer tone »</a>, for example to resolve a shared tone deep link.</td>
+</tr>
+<tr>
+<td><a href="/method/aicompose.getTones">aicompose.getTones</a></td>
+<td>Fetch the list of saved <a href="/api/ai#ai-compose-tones">AI composer tones »</a> of the current user.</td>
+</tr>
+<tr>
+<td><a href="/method/aicompose.getToneExample">aicompose.getToneExample</a></td>
+<td>Fetch an example showing how an <a href="/api/ai#ai-compose-tones">AI composer tone »</a> rephrases a sample message, used as a preview in the tone picker.</td>
 </tr>
 </tbody>
 </table>
@@ -4233,165 +4436,6 @@
 <tr>
 <td><a href="/method/contacts.resolveUsername">contacts.resolveUsername</a></td>
 <td>Resolve a @username to get peer info</td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" href="#other" id="other" name="other"><i class="anchor-icon"></i></a>Other</h3>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="/method/users.suggestBirthday">users.suggestBirthday</a></td>
-<td>Suggest a birthday to another user, see <a href="/api/profile#birthday">here »</a> for more info on birthdays in the API.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getEmojiGameInfo">messages.getEmojiGameInfo</a></td>
-<td>Fetch dice game information.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.editChatCreator">messages.editChatCreator</a></td>
-<td>Transfer the ownership of a basic group, supergroup or channel to another user, see <a href="/api/channel#transferring-ownership-of-a-group-channel">here »</a> for the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getFutureChatCreatorAfterLeave">messages.getFutureChatCreatorAfterLeave</a></td>
-<td>Group/channel owners only: returns the ID of the user that will become the new owner of the group if we decide to leave the group, see <a href="/api/channel#leaving-groups-channels">here »</a> for more info on the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.editChatParticipantRank">messages.editChatParticipantRank</a></td>
-<td>Edit a group participant's <a href="/api/rank">tag »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.declineUrlAuth">messages.declineUrlAuth</a></td>
-<td>Decline an incoming <a href="/api/url-authorization#oauth-authorization">OAuth authorization request »</a>, notifying the server that the user refused the login request.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.checkUrlAuthMatchCode">messages.checkUrlAuthMatchCode</a></td>
-<td>Validate the match code selected by the user against the code shown on the login page, as part of the <a href="/api/url-authorization#oauth-authorization">OAuth authorization flow »</a>.<br><br>Only usable when both <code>match_codes</code> and <code>match_codes_first</code> are set in the <a href="/constructor/urlAuthResultRequest">urlAuthResultRequest</a> returned by <a href="/method/messages.requestUrlAuth">messages.requestUrlAuth</a>.  <br>If <a href="/constructor/boolTrue">boolTrue</a> is returned, proceed with the login flow and pass the verified code to <a href="/method/messages.acceptUrlAuth">messages.acceptUrlAuth</a>.<code>match_code</code>.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.reportReadMetrics">messages.reportReadMetrics</a></td>
-<td>Report viewport read metrics for visible messages, indicating how long each message stayed in the chat viewport, see <a href="/api/views#read-metrics">here »</a> for more info on the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.reportMusicListen">messages.reportMusicListen</a></td>
-<td>Report the listening duration of a music track (audio document without the <code>voice</code> flag), see <a href="/api/views#music-listens">here »</a> for more info on the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.addPollAnswer">messages.addPollAnswer</a></td>
-<td>Add an answer option to an <a href="/api/poll#open-answer-polls">open-answer poll »</a></td>
-</tr>
-<tr>
-<td><a href="/method/messages.deletePollAnswer">messages.deletePollAnswer</a></td>
-<td>Remove an answer option from an <a href="/api/poll#open-answer-polls">open-answer poll »</a></td>
-</tr>
-<tr>
-<td><a href="/method/messages.getUnreadPollVotes">messages.getUnreadPollVotes</a></td>
-<td>Get messages containing polls with <a href="/api/poll#unread-poll-votes">unread votes »</a></td>
-</tr>
-<tr>
-<td><a href="/method/messages.readPollVotes">messages.readPollVotes</a></td>
-<td>Mark all <a href="/api/poll#unread-poll-votes">unread poll votes »</a> in a chat as read</td>
-</tr>
-<tr>
-<td><a href="/method/messages.setBotGuestChatResult">messages.setBotGuestChatResult</a></td>
-<td>Bots may use this method to answer a <a href="/api/bots/guest-mode">guest mode »</a> query received via an <a href="/constructor/updateBotGuestChatQuery">updateBotGuestChatQuery</a> update, providing the message to post into the chat as a guest, see <a href="/api/bots/guest-mode#handling-guest-queries-bot-side">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.deleteParticipantReactions">messages.deleteParticipantReactions</a></td>
-<td>As an admin, remove all of a specific participant's <a href="/api/reactions">reactions</a> from every message in a group or channel.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.deleteParticipantReaction">messages.deleteParticipantReaction</a></td>
-<td>As an admin, remove all of a specific participant's <a href="/api/reactions">reactions</a> from a single message.</td>
-</tr>
-<tr>
-<td><a href="/method/messages.getPersonalChannelHistory">messages.getPersonalChannelHistory</a></td>
-<td>Fetch the message history of a user's <a href="/api/profile#personal-channel">personal channel »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/bots.checkUsername">bots.checkUsername</a></td>
-<td>Check whether a username is available and valid for use when <a href="/api/bots/managed-bots#creating-a-managed-bot">creating a managed bot »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/bots.createBot">bots.createBot</a></td>
-<td>Create a <a href="/api/bots/managed-bots#creating-a-managed-bot">managed bot »</a> owned by the current user and controlled by the specified manager bot.</td>
-</tr>
-<tr>
-<td><a href="/method/bots.exportBotToken">bots.exportBotToken</a></td>
-<td>Export the bot token of a <a href="/api/bots/managed-bots#managing-a-managed-bot">managed bot »</a>; can only be called by the manager bot.</td>
-</tr>
-<tr>
-<td><a href="/method/bots.requestWebViewButton">bots.requestWebViewButton</a></td>
-<td>Bots may use this method to prepare a peer request button for a <a href="/api/bots/webapps">Mini App</a>, see <a href="/api/bots/buttons#requesting-peers-via-mini-apps">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/bots.getRequestedWebViewButton">bots.getRequestedWebViewButton</a></td>
-<td>Fetch the peer request button a bot prepared for a <a href="/api/bots/webapps">Mini App</a> with <a href="/method/bots.requestWebViewButton">bots.requestWebViewButton</a>, invoked when the Mini App emits a <a href="/api/web-events#web-app-request-chat"><code>web_app_request_chat</code></a> event, see <a href="/api/bots/buttons#requesting-peers-via-mini-apps">here »</a> for more info.</td>
-</tr>
-<tr>
-<td><a href="/method/bots.getAccessSettings">bots.getAccessSettings</a></td>
-<td>Get the <a href="/api/bots/managed-bots#managing-a-managed-bot">access restriction settings »</a> of a managed bot; can only be called by the manager bot.</td>
-</tr>
-<tr>
-<td><a href="/method/bots.editAccessSettings">bots.editAccessSettings</a></td>
-<td>Edit the <a href="/api/bots/managed-bots#managing-a-managed-bot">access restriction settings »</a> of a managed bot; can only be called by the manager bot.</td>
-</tr>
-<tr>
-<td><a href="/method/payments.resolveStarGiftOffer">payments.resolveStarGiftOffer</a></td>
-<td>Accept or decline a previously received <a href="/api/gifts#collectible-gift-purchase-offers">collectible gift purchase offer »</a>, see <a href="/api/gifts#collectible-gift-purchase-offers">here »</a> for the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/payments.sendStarGiftOffer">payments.sendStarGiftOffer</a></td>
-<td>Send an offer to purchase a <a href="/api/gifts#collectible-gift-purchase-offers">collectible gift »</a>, see <a href="/api/gifts#collectible-gift-purchase-offers">here »</a> for the full flow.</td>
-</tr>
-<tr>
-<td><a href="/method/payments.getStarGiftUpgradeAttributes">payments.getStarGiftUpgradeAttributes</a></td>
-<td>Obtains the <strong>full</strong> list of just the collectible attributes that may appear for a gift type once it's upgraded to a <a href="/api/gifts#collectible-gifts">collectible gift »</a>.<br><br>The result may also include <a href="/constructor/starGiftAttributeModel">starGiftAttributeModel</a> constructors with the <code>crafted</code> flag set: these models are reserved for <a href="/api/gifts#crafting-collectible-gifts">crafting »</a> and should be filtered out from regular upgrade previews (and vice versa).</td>
-</tr>
-<tr>
-<td><a href="/method/payments.getCraftStarGifts">payments.getCraftStarGifts</a></td>
-<td>Obtain owned <a href="/api/gifts#collectible-gifts">collectible gifts »</a> of a specific type that can be used for <a href="/api/gifts#crafting-collectible-gifts">crafting »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/payments.craftStarGift">payments.craftStarGift</a></td>
-<td>Craft a new <a href="/api/gifts#collectible-gifts">collectible gift »</a> by combining 1 to 4 owned collectible gifts of the same base gift type.<br><br>The passed gifts must all have the same <a href="/constructor/starGiftUnique">starGiftUnique</a>.<code>gift_id</code>, must be usable for crafting, and must not be blocked by a future <code>can_craft_at</code> timestamp.<br><br>The first passed gift must not be <a href="/api/gifts#hosted-collectible-gifts">located on the TON blockchain</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/stats.getPollStats">stats.getPollStats</a></td>
-<td>Get <a href="/api/stats#poll-statistics">statistics</a> for a poll sent in a message.</td>
-</tr>
-<tr>
-<td><a href="/method/aicompose.createTone">aicompose.createTone</a></td>
-<td>Create a new custom <a href="/api/ai#ai-compose-tones">AI composer tone »</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/aicompose.updateTone">aicompose.updateTone</a></td>
-<td>Edit a custom <a href="/api/ai#ai-compose-tones">AI composer tone »</a> previously created by the current user. Only the fields whose flag is set will be modified.</td>
-</tr>
-<tr>
-<td><a href="/method/aicompose.saveTone">aicompose.saveTone</a></td>
-<td>Install or uninstall an <a href="/api/ai#ai-compose-tones">AI composer tone »</a>, adding it to or removing it from the list of saved tones of the current user.<br><br>Non-<a href="/api/premium">Premium</a> users may install up to <a href="/api/config#aicompose-tone-saved-limit-default">aicompose_tone_saved_limit_default »</a> tones, <a href="/api/premium">Premium</a> users up to <a href="/api/config#aicompose-tone-saved-limit-premium">aicompose_tone_saved_limit_premium »</a> tones.</td>
-</tr>
-<tr>
-<td><a href="/method/aicompose.deleteTone">aicompose.deleteTone</a></td>
-<td>Permanently delete a custom <a href="/api/ai#ai-compose-tones">AI composer tone »</a> created by the current user.</td>
-</tr>
-<tr>
-<td><a href="/method/aicompose.getTone">aicompose.getTone</a></td>
-<td>Fetch information about a single <a href="/api/ai#ai-compose-tones">AI composer tone »</a>, for example to resolve a shared tone deep link.</td>
-</tr>
-<tr>
-<td><a href="/method/aicompose.getTones">aicompose.getTones</a></td>
-<td>Fetch the list of saved <a href="/api/ai#ai-compose-tones">AI composer tones »</a> of the current user.</td>
-</tr>
-<tr>
-<td><a href="/method/aicompose.getToneExample">aicompose.getToneExample</a></td>
-<td>Fetch an example showing how an <a href="/api/ai#ai-compose-tones">AI composer tone »</a> rephrases a sample message, used as a preview in the tone picker.</td>
 </tr>
 </tbody>
 </table>
