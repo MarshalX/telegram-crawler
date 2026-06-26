@@ -370,18 +370,6 @@ window.initDevSideNavX = (function () {
     var from = 'circle(0% at ' + px + '% ' + py + '%)';
     var to   = 'circle(150% at ' + px + '% ' + py + '%)';
 
-    /* One-shot diagnostic for bug reports. */
-    var dbg = { ua: navigator.userAgent, dpr: window.devicePixelRatio,
-                vw: vw, vh: vh,
-                rect: { l: r.left, t: r.top, w: r.width, h: r.height },
-                vv: window.visualViewport
-                      ? { scale: visualViewport.scale, ox: visualViewport.offsetLeft, oy: visualViewport.offsetTop }
-                      : null,
-                cx: cx, cy: cy, end: end, from: from, to: to };
-    window.__ttDebug = dbg;
-    try { sessionStorage.setItem('ttDebug', JSON.stringify(dbg)); } catch (e) {}
-    console.log('[theme-toggle] reveal origin', dbg);
-
     var vt = document.startViewTransition(function () {
       setTheme(themeState);                 // latest intent (source of truth)
       if (applyInVT) applyInVT();           // icon's new snapshot = target frame
