@@ -452,6 +452,56 @@ var RLottie = (function () {
     destroyWorkers();
   }
 
+  rlottie.initWorkers = function(callback) {
+    initApi(callback);
+  }
+
+  /* A RawPlayer loads a single .tgs via the worker and hands each rendered
+     frame back to the caller as a Uint8ClampedArray of RGBA pixels. It does
+     not auto-play, register in rlottie.players, or own a canvas — the caller
+     decides what to do with each frame (recolour, draw to its own canvas, etc.). */
+  function RawPlayer(width, height, onReady, onFrame) {
+    this.reqId = ++reqId;
+    this.width = width;
+    this.height = height;
+    this.frameCount = 0;
+    this.fps = 0;
+    this.onReady = onReady;
+    this.onFrame = onFrame;
+    /* need_clamped=false below makes the worker allocate a fresh
+       Uint8ClampedArray per frame, so the caller may mutate it (e.g.
+       recolour) without affecting subsequent frames. */
+    this.proxy = QueryableWorkerProxy.create(
+      this.reqId,
+      this._onFrame.bind(this),
+      this._onLoaded.bind(this)
+    );
+  }
+  RawPlayer.prototype._onLoaded = function(playerId, frameCount, fps) {
+    this.frameCount = frameCount;
+    this.fps = fps;
+    if (this.onReady) this.onReady(frameCount, fps);
+  };
+  RawPlayer.prototype._onFrame = function(playerId, frameNo, frame) {
+    if (this.onFrame) this.onFrame(frameNo, frame);
+  };
+  RawPlayer.prototype.loadFromUrl = function(url) {
+    this.proxy.loadFromData([{url: url}], this.width, this.height);
+  };
+  RawPlayer.prototype.renderFrame = function(frameNo) {
+    this.proxy.renderFrame(frameNo, false);
+  };
+  RawPlayer.prototype.destroy = function() {
+    for (var i = 0; i < this.proxy.items.length; i++) {
+      this.proxy.items[i].worker.sendQuery('destroy', this.proxy.items[i].reqId);
+    }
+    this.proxy.items = [];
+  };
+
+  rlottie.createRawPlayer = function(width, height, onReady, onFrame) {
+    return new RawPlayer(width, height, onReady, onFrame);
+  }
+
   return rlottie;
 }());
 
