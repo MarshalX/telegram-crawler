@@ -366,9 +366,11 @@ window.initDevSideNavX = (function () {
 
     /* Use percentages for origin — "at <length> <length>" form is silently
        dropped by some Chrome builds when animated via WAAPI. */
+    var ref  = Math.hypot(vw, vh) / Math.SQRT2; // circle() 100% reference (logical px)
     var px = vw ? (cx / vw) * 100 : 95, py = vh ? (cy / vh) * 100 : 2;
+    var rpct = ref ? (end / ref) * 100 + 1 : 145; // minimal radius that still covers, as %
     var from = 'circle(0% at ' + px + '% ' + py + '%)';
-    var to   = 'circle(150% at ' + px + '% ' + py + '%)';
+    var to   = 'circle(' + rpct + '% at ' + px + '% ' + py + '%)';
 
     var vt = document.startViewTransition(function () {
       setTheme(themeState);                 // latest intent (source of truth)

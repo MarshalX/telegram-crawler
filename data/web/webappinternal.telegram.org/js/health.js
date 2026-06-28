@@ -88,7 +88,16 @@ function renderGraph(id, json, initial) {
 
   json = prepareGraphJson(json);
   var chart = Graph.render(domEl, json);
+  domEl.style.setProperty('transition-duration', '0s', 'important');
   domEl.classList.add('chart_wrap_rendered');
+  domEl.offsetTop; // force reflow
+  domEl.style.removeProperty('transition-duration');
+
+  var outerWrap = domEl.closest('.chart_wrap_outer');
+  if (outerWrap) {
+    outerWrap.classList.add('chart_wrap_rendered');
+  }
+
   window.charts = window.charts || {};
   window.charts[id] = chart;
 
