@@ -288,7 +288,7 @@ window.initDevSideNavX = (function () {
 
   var btn = document.querySelector('.theme-toggle');
   if (!btn) return;
-  var head = document.querySelector('.dev_page_head, .tl_page_head');
+  var head = document.querySelector('.dev_page_head, .tl_page_head, .tlb_page_head');
   if (head) btn.style.height = head.offsetHeight + 'px';   // align to header height
 
   /* JS is source of truth so rapid clicks stay correct during transitions. */
