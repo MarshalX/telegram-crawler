@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <title>Phone calls</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Telegram supports end-to-end-encrypted one-to-one voice and video calls.">
+    <meta property="og:title" content="Phone calls">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Telegram supports end-to-end-encrypted one-to-one voice and video calls.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?252" rel="stylesheet" media="screen">
+    <link href="/css/telegram-theme.css?5" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <button class="theme-toggle theme-toggle--static" type="button" title="Toggle theme" aria-label="Toggle light/dark theme"></button>
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter hidden-xs"><a href="https://x.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i> Follow on X</a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/calls" >Phone calls</a></li></ul></div>
+  <h1 id="dev_page_title">Phone calls</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram supports E2E-encrypted one-to-one calls.</p>
+<p>This page describes the API methods used to work with calls.</p>
+<pre><code><a href='/constructor/phoneCallProtocol'>phoneCallProtocol</a>#fc878fc8 flags:<a href='/type/%23'>#</a> udp_p2p:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> udp_reflector:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> min_layer:<a href='/type/int'>int</a> max_layer:<a href='/type/int'>int</a> library_versions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/PhoneCallProtocol'>PhoneCallProtocol</a>;
+
+<a href='/constructor/phoneConnectionWebrtc'>phoneConnectionWebrtc</a>#635fe375 flags:<a href='/type/%23'>#</a> turn:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> stun:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> ip:<a href='/type/string'>string</a> ipv6:<a href='/type/string'>string</a> port:<a href='/type/int'>int</a> username:<a href='/type/string'>string</a> password:<a href='/type/string'>string</a> = <a href='/type/PhoneConnection'>PhoneConnection</a>;
+
+<a href='/constructor/phoneCallWaiting'>phoneCallWaiting</a>#c5226f17 flags:<a href='/type/%23'>#</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> date:<a href='/type/int'>int</a> admin_id:<a href='/type/long'>long</a> participant_id:<a href='/type/long'>long</a> protocol:<a href='/type/PhoneCallProtocol'>PhoneCallProtocol</a> receive_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> = <a href='/type/PhoneCall'>PhoneCall</a>;
+<a href='/constructor/phoneCallRequested'>phoneCallRequested</a>#14b0ed0c flags:<a href='/type/%23'>#</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> date:<a href='/type/int'>int</a> admin_id:<a href='/type/long'>long</a> participant_id:<a href='/type/long'>long</a> g_a_hash:<a href='/type/bytes'>bytes</a> protocol:<a href='/type/PhoneCallProtocol'>PhoneCallProtocol</a> = <a href='/type/PhoneCall'>PhoneCall</a>;
+<a href='/constructor/phoneCallAccepted'>phoneCallAccepted</a>#3660c311 flags:<a href='/type/%23'>#</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> date:<a href='/type/int'>int</a> admin_id:<a href='/type/long'>long</a> participant_id:<a href='/type/long'>long</a> g_b:<a href='/type/bytes'>bytes</a> protocol:<a href='/type/PhoneCallProtocol'>PhoneCallProtocol</a> = <a href='/type/PhoneCall'>PhoneCall</a>;
+<a href='/constructor/phoneCall'>phoneCall</a>#30535af5 flags:<a href='/type/%23'>#</a> p2p_allowed:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> conference_supported:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> access_hash:<a href='/type/long'>long</a> date:<a href='/type/int'>int</a> admin_id:<a href='/type/long'>long</a> participant_id:<a href='/type/long'>long</a> g_a_or_b:<a href='/type/bytes'>bytes</a> key_fingerprint:<a href='/type/long'>long</a> protocol:<a href='/type/PhoneCallProtocol'>PhoneCallProtocol</a> connections:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/PhoneConnection'>PhoneConnection</a>&gt; start_date:<a href='/type/int'>int</a> custom_parameters:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/PhoneCall'>PhoneCall</a>;
+<a href='/constructor/phoneCallDiscarded'>phoneCallDiscarded</a>#50ca4de1 flags:<a href='/type/%23'>#</a> need_rating:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> need_debug:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> id:<a href='/type/long'>long</a> reason:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/PhoneCallDiscardReason'>PhoneCallDiscardReason</a> duration:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> = <a href='/type/PhoneCall'>PhoneCall</a>;
+
+<a href='/constructor/phone.phoneCall'>phone.phoneCall</a>#ec82e140 phone_call:<a href='/type/PhoneCall'>PhoneCall</a> users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/phone.PhoneCall'>phone.PhoneCall</a>;
+<a href='/constructor/updatePhoneCall'>updatePhoneCall</a>#ab0f6b1e phone_call:<a href='/type/PhoneCall'>PhoneCall</a> = <a href='/type/Update'>Update</a>;
+
+<a href='/constructor/phoneCallDiscardReasonMissed'>phoneCallDiscardReasonMissed</a>#85e42301 = <a href='/type/PhoneCallDiscardReason'>PhoneCallDiscardReason</a>;
+<a href='/constructor/phoneCallDiscardReasonDisconnect'>phoneCallDiscardReasonDisconnect</a>#e095c1a0 = <a href='/type/PhoneCallDiscardReason'>PhoneCallDiscardReason</a>;
+<a href='/constructor/phoneCallDiscardReasonHangup'>phoneCallDiscardReasonHangup</a>#57adc690 = <a href='/type/PhoneCallDiscardReason'>PhoneCallDiscardReason</a>;
+<a href='/constructor/phoneCallDiscardReasonBusy'>phoneCallDiscardReasonBusy</a>#faf7e8c9 = <a href='/type/PhoneCallDiscardReason'>PhoneCallDiscardReason</a>;
+<a href='/constructor/phoneCallDiscardReasonMigrateConferenceCall'>phoneCallDiscardReasonMigrateConferenceCall</a>#9fbbf1f7 slug:<a href='/type/string'>string</a> = <a href='/type/PhoneCallDiscardReason'>PhoneCallDiscardReason</a>;
+
+---functions---
+
+<a href='/method/phone.requestCall'>phone.requestCall</a>#42ff96ed flags:<a href='/type/%23'>#</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> user_id:<a href='/type/InputUser'>InputUser</a> random_id:<a href='/type/int'>int</a> g_a_hash:<a href='/type/bytes'>bytes</a> protocol:<a href='/type/PhoneCallProtocol'>PhoneCallProtocol</a> = <a href='/type/phone.PhoneCall'>phone.PhoneCall</a>;
+<a href='/method/phone.acceptCall'>phone.acceptCall</a>#3bd2b4a0 peer:<a href='/type/InputPhoneCall'>InputPhoneCall</a> g_b:<a href='/type/bytes'>bytes</a> protocol:<a href='/type/PhoneCallProtocol'>PhoneCallProtocol</a> = <a href='/type/phone.PhoneCall'>phone.PhoneCall</a>;
+<a href='/method/phone.confirmCall'>phone.confirmCall</a>#2efe1722 peer:<a href='/type/InputPhoneCall'>InputPhoneCall</a> g_a:<a href='/type/bytes'>bytes</a> key_fingerprint:<a href='/type/long'>long</a> protocol:<a href='/type/PhoneCallProtocol'>PhoneCallProtocol</a> = <a href='/type/phone.PhoneCall'>phone.PhoneCall</a>;
+
+<a href='/method/phone.receivedCall'>phone.receivedCall</a>#17d54f61 peer:<a href='/type/InputPhoneCall'>InputPhoneCall</a> = <a href='/type/Bool'>Bool</a>;
+
+<a href='/method/phone.discardCall'>phone.discardCall</a>#b2cbc1c0 flags:<a href='/type/%23'>#</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPhoneCall'>InputPhoneCall</a> duration:<a href='/type/int'>int</a> reason:<a href='/type/PhoneCallDiscardReason'>PhoneCallDiscardReason</a> connection_id:<a href='/type/long'>long</a> = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<h3><a class="anchor" href="#one-to-one-calls" id="one-to-one-calls" name="one-to-one-calls"><i class="anchor-icon"></i></a>One-to-one calls</h3>
+<p>See <a href="/api/end-to-end/video-calls">here »</a> for a detailed description of the end-to-end encryption used for one-to-one calls, briefly re-explained below with some additional, API-level details:</p>
+<ol>
+<li>User <em>A</em> invokes <a href="/method/phone.requestCall">phone.requestCall</a> to call user <em>B</em>, passing the initial DH parameters and <a href="#populating-phonecallprotocol">phone call protocol information »</a>. Set the <code>video</code> flag to request a video call, otherwise an audio call is requested.<br>
+The method will return a <a href="/constructor/phone.phoneCall">phone.phoneCall</a> with a <a href="/constructor/phoneCallWaiting">phoneCallWaiting</a></li>
+<li>The Server <em>S</em> performs privacy checks and sends an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> update with a <a href="/constructor/phoneCallRequested">phoneCallRequested</a> constructor to all of <em>B</em>'s active devices.</li>
+<li>Optionally, when <em>B</em> receives the <a href="/constructor/phoneCallRequested">phoneCallRequested</a>, <em>B</em> may choose to invoke <a href="/method/phone.receivedCall">phone.receivedCall</a>: this will prevent other users from calling <em>B</em> until the current call is discarded (either refused, or accepted, confirmed and then discarded), as the server will immediately reject incoming calls with a <code>reason</code> equal to <a href="/constructor/phoneCallDiscardReasonBusy">phoneCallDiscardReasonBusy</a>.<br>
+This step is not strictly necessary, and may be omitted for example by userbot webradios: this will allow multiple users to establish multiple parallel calls with the same user.</li>
+<li>User <em>B</em> accepts the call on one of their devices,  performs all the required security checks, and invokes the <a href="/method/phone.acceptCall">phone.acceptCall</a> method passing DH parameters and <a href="#populating-phonecallprotocol">phone call protocol information »</a>: this method will return a <a href="/constructor/phone.phoneCall">phone.phoneCall</a> with a <a href="/constructor/phoneCallAccepted">phoneCallAccepted</a>.<br>
+User <em>B</em> may also choose to refuse the call instead, using <a href="/method/phone.discardCall">phone.discardCall</a> with <a href="/constructor/phoneCallDiscardReasonMissed">phoneCallDiscardReasonMissed</a> (user <em>A</em> can do the same as well).</li>
+<li>The Server <em>S</em> sends an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> with the <a href="/constructor/phoneCallDiscarded">phoneCallDiscarded</a> constructor to all other devices <em>B</em> has authorized, to prevent accepting the same call on any of the other devices. From this point on, the server <em>S</em> works only with the specific device owned by <em>B</em> that invoked <a href="/method/phone.acceptCall">phone.acceptCall</a> first.</li>
+<li>The Server <em>S</em> sends to <em>A</em> an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> update with a <a href="/constructor/phoneCallAccepted">phoneCallAccepted</a> constructor: <em>A</em> performs all the usual security checks, then invokes the <a href="/method/phone.confirmCall">phone.confirmCall</a> method passing DH parameters and <a href="#populating-phonecallprotocol">phone call protocol information »</a>: the method will return a <a href="/constructor/phone.phoneCall">phone.phoneCall</a> with a <a href="/constructor/phoneCall">phoneCall</a>.<br>
+Then, <em>A</em> hands off the call to the tgcalls library using the <a href="/constructor/phoneCallProtocol">phoneCallProtocol</a> and <a href="/constructor/phoneConnectionWebrtc">phoneConnectionWebrtc</a> constructors contained in the <a href="/constructor/phoneCall">phoneCall</a> constructor.</li>
+<li>The Server <em>S</em> sends to <em>B</em> an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> update with the <a href="/constructor/phoneCall">phoneCall</a> constructor: at this point <em>B</em> performs all the required security checks, and hands off the call to the tgcalls library as above.</li>
+<li>To hang up the call, invoke <a href="/method/phone.discardCall">phone.discardCall</a>, which will emit an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> with a <a href="/constructor/phoneCallDiscarded">phoneCallDiscarded</a> for both users.<br>
+Set the <code>video</code> flag if at least one of the two sides of the discarded call has a video stream enabled (regardless of whether initially the call was a video call or a voice call), or when migrating to a <a href="#migrating-to-a-conference-call">conference call »</a>.<br>
+If the <a href="/constructor/phoneCallDiscarded">phoneCallDiscarded</a>.<code>need_rating</code> flag is set, the client must invite the user to <a href="#call-rating">rate the call »</a> when it ends.<br>
+The user may still rate the call manually by right-clicking on the call service message: in this case, the <code>user_initiative</code> flag must be set when invoking <a href="/method/phone.setCallRating">phone.setCallRating</a>.</li>
+</ol>
+<h3><a class="anchor" href="#migrating-to-a-conference-call" id="migrating-to-a-conference-call" name="migrating-to-a-conference-call"><i class="anchor-icon"></i></a>Migrating to a conference call</h3>
+<pre><code><a href='/constructor/phoneCallDiscardReasonMigrateConferenceCall'>phoneCallDiscardReasonMigrateConferenceCall</a>#9fbbf1f7 slug:<a href='/type/string'>string</a> = <a href='/type/PhoneCallDiscardReason'>PhoneCallDiscardReason</a>;
+
+---functions---
+
+<a href='/method/phone.createConferenceCall'>phone.createConferenceCall</a>#7d0444bb flags:<a href='/type/%23'>#</a> muted:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> video_stopped:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> join:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> random_id:<a href='/type/int'>int</a> public_key:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/int256'>int256</a> block:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/bytes'>bytes</a> params:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/Updates'>Updates</a>;
+<a href='/method/phone.discardCall'>phone.discardCall</a>#b2cbc1c0 flags:<a href='/type/%23'>#</a> video:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPhoneCall'>InputPhoneCall</a> duration:<a href='/type/int'>int</a> reason:<a href='/type/PhoneCallDiscardReason'>PhoneCallDiscardReason</a> connection_id:<a href='/type/long'>long</a> = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<p>An ongoing one-to-one call may be upgraded ("migrated") to an E2E-encrypted <a href="/api/group-calls#conference-calls">conference call »</a>, for example in order to add more participants.</p>
+<p>Migration is only possible if the other party's client supports conference calls, as indicated by the <a href="/constructor/phoneCall">phoneCall</a>.<code>conference_supported</code> flag (set by the server in the final <a href="/constructor/phoneCall">phoneCall</a> constructor): clients should only offer the migrate/"Add participants" option in the call UI when this flag is set.</p>
+<p>To migrate the call, the initiating client:</p>
+<ol>
+<li>Creates a new conference call by invoking <a href="/method/phone.createConferenceCall">phone.createConferenceCall</a> with the <code>join</code> flag set, joining the freshly created conference itself as described <a href="/api/group-calls#conference-calls">here »</a>; the current call's media state (mute and camera/video status) is carried over to the new conference.</li>
+<li>Extracts the <a href="/api/links#conference-links">conference deep link »</a> slug from the returned <a href="/constructor/groupCall">groupCall</a>.<code>invite_link</code>.</li>
+<li>Discards the one-to-one call by invoking <a href="/method/phone.discardCall">phone.discardCall</a> with a <a href="/constructor/phoneCallDiscardReasonMigrateConferenceCall">phoneCallDiscardReasonMigrateConferenceCall</a> <code>reason</code>, passing the conference slug in its <code>slug</code> field (as for any discarded call, also set the <code>video</code> flag if either side had a video stream enabled).</li>
+</ol>
+<p>The other party then receives an <a href="/constructor/updatePhoneCall">updatePhoneCall</a> with a <a href="/constructor/phoneCallDiscarded">phoneCallDiscarded</a> whose <code>reason</code> is a <a href="/constructor/phoneCallDiscardReasonMigrateConferenceCall">phoneCallDiscardReasonMigrateConferenceCall</a>: it must extract the <code>slug</code>, fetch the newly created conference call by invoking <a href="/method/phone.getGroupCall">phone.getGroupCall</a> with an <a href="/constructor/inputGroupCallSlug">inputGroupCallSlug</a> generated from the slug, and automatically join it as described <a href="/api/group-calls#conference-calls">here »</a>, again carrying over the previous call's media state.</p>
+<p>This effectively moves both users from the one-to-one call into the new conference call, where additional users can then be <a href="/api/group-calls#conference-calls">invited »</a>.</p>
+<h3><a class="anchor" href="#populating-phonecallprotocol" id="populating-phonecallprotocol" name="populating-phonecallprotocol"><i class="anchor-icon"></i></a>Populating <code>phoneCallProtocol</code></h3>
+<pre><code><a href='/constructor/phoneCallProtocol'>phoneCallProtocol</a>#fc878fc8 flags:<a href='/type/%23'>#</a> udp_p2p:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> udp_reflector:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> min_layer:<a href='/type/int'>int</a> max_layer:<a href='/type/int'>int</a> library_versions:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/string'>string</a>&gt; = <a href='/type/PhoneCallProtocol'>PhoneCallProtocol</a>;
+</code></pre>
+<p><a href="/constructor/phoneCallProtocol">phoneCallProtocol</a> describes the tgcalls protocol versions supported by the local build of tgcalls, populated as follows:</p>
+<ul>
+<li>fill <code>library_versions</code> with the ordered list of supported tgcalls protocol versions (order matters, the preferred tgcalls protocol version must come first)</li>
+<li>set both <code>udp_p2p</code> and <code>udp_reflector</code> to true (deprecated, previously used to allow or disallow the use of direct peer-to-peer networking for libtgvoip calls)</li>
+<li>set <code>min_layer</code> to <code>65</code> (deprecated, was previously used to describe the oldest supported libtgvoip protocol)</li>
+<li>set <code>max_layer</code> to <code>92</code> (deprecated, was previously used to describe the newest supported libtgvoip protocol)</li>
+</ul>
+<p><code>udp_p2p</code>, <code>udp_reflector</code>, <code>min_layer</code> and <code>max_layer</code> were previously used by the deprecated libtgvoip library, and should not be passed to tgcalls: the values listed here are hardcoded and immutable, fixed to the last values supported by libtgvoip and are only used if the other end still uses libtgvoip.</p>
+<p>The use of peer-to-peer networking is now controlled by the <a href="/constructor/privacyKeyPhoneP2P">privacyKeyPhoneP2P</a> <a href="/api/privacy">privacy setting »</a>, which is used by the server to choose whether to also return P2P STUN <a href="/constructor/phoneConnectionWebrtc">phoneConnectionWebrtc</a> connection options, along with the usual reflector TURN <a href="/constructor/phoneConnectionWebrtc">phoneConnectionWebrtc</a> connection options.</p>
+<p>The same local capability set is re-sent in all three outbound handshake methods: the <code>protocol</code> embedded in <a href="/constructor/phoneCallWaiting">phoneCallWaiting</a>, <a href="/constructor/phoneCallRequested">phoneCallRequested</a> and <a href="/constructor/phoneCallAccepted">phoneCallAccepted</a> does not stop either client from advertising its own local capabilities again in the next outgoing RPC.</p>
+<h3><a class="anchor" href="#signaling-data" id="signaling-data" name="signaling-data"><i class="anchor-icon"></i></a>Signaling data</h3>
+<pre><code><a href='/constructor/updatePhoneCallSignalingData'>updatePhoneCallSignalingData</a>#2661bf09 phone_call_id:<a href='/type/long'>long</a> data:<a href='/type/bytes'>bytes</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/phone.sendSignalingData'>phone.sendSignalingData</a>#ff7a9383 peer:<a href='/type/InputPhoneCall'>InputPhoneCall</a> data:<a href='/type/bytes'>bytes</a> = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p><a href="/method/phone.sendSignalingData">phone.sendSignalingData</a> is only used after the DH handshake is over and both sides have the final <a href="/constructor/phoneCall">phoneCall</a> with verified key material and connection info: at this point, tgcalls should be initialized from the final <a href="/constructor/phoneCall">phoneCall</a> constructor's <code>protocol</code> and <code>connections</code> fields, and only then tgcalls's signaling callback can be wired to invoke <a href="/method/phone.sendSignalingData">phone.sendSignalingData</a>.</p>
+<p>Invoke this method whenever the tgcalls emits an opaque signaling packet that must be delivered to the peer: this will emit an <a href="/constructor/updatePhoneCallSignalingData">updatePhoneCallSignalingData</a> for the other peer in the call, who should then pass <a href="/constructor/updatePhoneCallSignalingData">updatePhoneCallSignalingData</a>.<code>data</code> to their own instance of tgcalls.</p>
+<h3><a class="anchor" href="#call-rating" id="call-rating" name="call-rating"><i class="anchor-icon"></i></a>Call rating</h3>
+<pre><code>---functions---
+
+<a href='/method/phone.setCallRating'>phone.setCallRating</a>#59ead627 flags:<a href='/type/%23'>#</a> user_initiative:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPhoneCall'>InputPhoneCall</a> rating:<a href='/type/int'>int</a> comment:<a href='/type/string'>string</a> = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<p>Invoke <a href="/method/phone.setCallRating">phone.setCallRating</a> after the call ends to rate the call (sending a message to the official VoIP rating bot), passing the following parameters:</p>
+<ul>
+<li>
+<p><code>peer</code>: The <a href="/constructor/inputPhoneCall">inputPhoneCall</a> generated from the <a href="/constructor/phoneCallDiscarded">phoneCallDiscarded</a></p>
+</li>
+<li>
+<p><code>user_initiative</code>: Set this flag if the rating was initiated by the user by right-clicking on the call service message; must NOT be set if rating was requested by the server with <a href="/constructor/phoneCallDiscarded">phoneCallDiscarded</a>.<code>need_rating</code>.</p>
+</li>
+<li>
+<p><code>rating</code>: A score from 1 to 5, chosen by the user.</p>
+</li>
+<li>
+<p><code>comment</code>: A user-specified comment (only for ratings not equal to 5).</p>
+<p>The user may also choose to report additional problems from the following fixed list, in the form of <code>#hashtags</code> appended to the comment.</p>
+<p>These hashtags may be appended even for ratings equal to 5, using this algorithm:</p>
+<ul>
+<li>If the accumulated comment is not empty, append a whitespace</li>
+<li>Append the ID of the chosen problem as a hashtag (i.e. <code>#echo</code>)</li>
+<li>Repeat for all problems chosen by the user, from the following available options:</li>
+</ul>
+</li>
+</ul>
+<h4><a class="anchor" href="#call-rating-problem-types" id="call-rating-problem-types" name="call-rating-problem-types"><i class="anchor-icon"></i></a>Call rating problem types</h4>
+<!-- start call rating comment types 5 -->
+<h5><a class="anchor" href="#echo" id="echo" name="echo"><i class="anchor-icon"></i></a><code>echo</code></h5>
+<p>The user heard their own voice (echo).</p>
+<h5><a class="anchor" href="#noise" id="noise" name="noise"><i class="anchor-icon"></i></a><code>noise</code></h5>
+<p>The user heard background noise.</p>
+<h5><a class="anchor" href="#interruptions" id="interruptions" name="interruptions"><i class="anchor-icon"></i></a><code>interruptions</code></h5>
+<p>The other side kept disappearing.</p>
+<h5><a class="anchor" href="#distorted-speech" id="distorted-speech" name="distorted-speech"><i class="anchor-icon"></i></a><code>distorted_speech</code></h5>
+<p>The speech was distorted.</p>
+<h5><a class="anchor" href="#silent-local" id="silent-local" name="silent-local"><i class="anchor-icon"></i></a><code>silent_local</code></h5>
+<p>The user couldn't hear the other side.</p>
+<h5><a class="anchor" href="#silent-remote" id="silent-remote" name="silent-remote"><i class="anchor-icon"></i></a><code>silent_remote</code></h5>
+<p>The other side couldn't hear the user.</p>
+<h5><a class="anchor" href="#dropped" id="dropped" name="dropped"><i class="anchor-icon"></i></a><code>dropped</code></h5>
+<p>The call ended unexpectedly.</p>
+<h5><a class="anchor" href="#distorted-video" id="distorted-video" name="distorted-video"><i class="anchor-icon"></i></a><code>distorted_video</code></h5>
+<p>The video was distorted.</p>
+<h5><a class="anchor" href="#pixelated-video" id="pixelated-video" name="pixelated-video"><i class="anchor-icon"></i></a><code>pixelated_video</code></h5>
+<p>The video was pixelated.</p>
+<!-- end call rating comment types -->
+<h3><a class="anchor" href="#call-debug" id="call-debug" name="call-debug"><i class="anchor-icon"></i></a>Call debug</h3>
+<pre><code>---functions---
+
+<a href='/method/phone.saveCallDebug'>phone.saveCallDebug</a>#277add7e peer:<a href='/type/InputPhoneCall'>InputPhoneCall</a> debug:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>If the final <a href="/constructor/phoneCallDiscarded">phoneCallDiscarded</a>.<code>need_debug</code> flag is set, the client should upload implementation-specific debug information for the finished call, by calling <a href="/method/phone.saveCallDebug">phone.saveCallDebug</a> with the JSON string returned by the active tgcalls instance.</p>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/safety">Safety</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?49"></script>
+    <script src="/js/tgsticker.js?32"></script>
+<script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script src="/js/main-theme.js?6"></script>
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

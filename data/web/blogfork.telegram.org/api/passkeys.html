@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <title>Passkey login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Log in to Telegram instantly with a passkey using a PIN or biometrics instead of an SMS code.">
+    <meta property="og:title" content="Passkey login">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Log in to Telegram instantly with a passkey using a PIN or biometrics instead of an SMS code.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?252" rel="stylesheet" media="screen">
+    <link href="/css/telegram-theme.css?5" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <button class="theme-toggle theme-toggle--static" type="button" title="Toggle theme" aria-label="Toggle light/dark theme"></button>
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter hidden-xs"><a href="https://x.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i> Follow on X</a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/passkeys" >Passkey login</a></li></ul></div>
+  <h1 id="dev_page_title">Passkey login</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Telegram allows creating a passkey on your device to instantly log in to Telegram with a PIN or biometric data like Face ID and fingerprints — instead of an SMS code.</p>
+<h3><a class="anchor" href="#introduction" id="introduction" name="introduction"><i class="anchor-icon"></i></a>Introduction</h3>
+<p>Telegram passkey login implements the <a href="https://w3c.github.io/webauthn/">Web Authentication standard »</a> (webauthn), make sure to familiarize yourself with webauthn by reading the <a href="https://w3c.github.io/webauthn/">standard »</a>, first.</p>
+<p>A simpler overview of the standard is available on <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API">MDN »</a>.</p>
+<p>Put plainly, passkeys are composed of a public-private keypair: the private key is stored safely on the device (for example in a TEE enclave), the public key is sent to Telegram's servers.</p>
+<p>When logging in, Telegram sends a challenge, which is signed using the local private key associated to the account: this signature is then verified by Telegram against the public key counterpart; if verification succeeds, the user is logged in.</p>
+<p>Note that if the user configured a <a href="/api/srp">2FA password</a>, they will still have to enter it when <a href="#logging-in-with-a-passkey">logging in with a passkey »</a>.</p>
+<p>Passkeys can be used on all major browsers and all major platforms (and even outside of a browser).</p>
+<p>The server may invite the user to create a passkey using the <a href="/api/config#basic-suggestions">SETUP_PASSKEY suggestion »</a>.</p>
+<p>Passkey support should only be enabled if the <a href="/api/config#settings-display-passkeys">settings_display_passkeys client configuration key »</a> is equal to true.</p>
+<h4><a class="anchor" href="#passkeys-in-unofficial-telegram-apps" id="passkeys-in-unofficial-telegram-apps" name="passkeys-in-unofficial-telegram-apps"><i class="anchor-icon"></i></a>Passkeys in unofficial Telegram apps</h4>
+<p>Note that official Telegram apps all use telegram.org as RP ID when generating and requesting passkeys.</p>
+<p>This means that unofficial Telegram apps won't be able to use passkeys at all, because currently the server forbids the creation of passkeys with RP IDs different than <code>telegram.org</code>.</p>
+<h3><a class="anchor" href="#creating-a-passkey" id="creating-a-passkey" name="creating-a-passkey"><i class="anchor-icon"></i></a>Creating a passkey</h3>
+<pre><code><a href='/constructor/account.passkeyRegistrationOptions'>account.passkeyRegistrationOptions</a>#e16b5ce1 options:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/account.PasskeyRegistrationOptions'>account.PasskeyRegistrationOptions</a>;
+
+<a href='/constructor/inputPasskeyResponseRegister'>inputPasskeyResponseRegister</a>#3e63935c client_data:<a href='/type/DataJSON'>DataJSON</a> attestation_data:<a href='/type/bytes'>bytes</a> = <a href='/type/InputPasskeyResponse'>InputPasskeyResponse</a>;
+<a href='/constructor/inputPasskeyCredentialPublicKey'>inputPasskeyCredentialPublicKey</a>#3c27b78f id:<a href='/type/string'>string</a> raw_id:<a href='/type/string'>string</a> response:<a href='/type/InputPasskeyResponse'>InputPasskeyResponse</a> = <a href='/type/InputPasskeyCredential'>InputPasskeyCredential</a>;
+
+<a href='/constructor/passkey'>passkey</a>#98613ebf flags:<a href='/type/%23'>#</a> id:<a href='/type/string'>string</a> name:<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> software_emoji_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> last_usage_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> = <a href='/type/Passkey'>Passkey</a>;
+
+---functions---
+
+<a href='/method/account.initPasskeyRegistration'>account.initPasskeyRegistration</a>#429547e8 = <a href='/type/account.PasskeyRegistrationOptions'>account.PasskeyRegistrationOptions</a>;
+
+<a href='/method/account.registerPasskey'>account.registerPasskey</a>#55b41fd6 credential:<a href='/type/InputPasskeyCredential'>InputPasskeyCredential</a> = <a href='/type/Passkey'>Passkey</a>;
+</code></pre>
+<p>To create a passkey linked to the currently logged in account, start by invoking <a href="/method/account.initPasskeyRegistration">account.initPasskeyRegistration</a>.</p>
+<p>This method will return a JSON object in <a href="/constructor/account.passkeyRegistrationOptions">account.passkeyRegistrationOptions</a>.<code>options</code>, containing a single key:</p>
+<ul>
+<li><code>publicKey</code> - Contains a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions">PublicKeyCredentialCreationOptions »</a> JSON object (with base64url-encoded strings used in place of binary properties)</li>
+</ul>
+<p>Parse the JSON payload, base64url-decoding binary fields for example using <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/parseCreationOptionsFromJSON_static">PublicKeyCredential.parseCreationOptionsFromJSON</a>.</p>
+<p>Then, pass the <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions">PublicKeyCredentialCreationOptions »</a> to <a href="https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/create">navigator.credentials.create</a> inside browsers (or equivalent APIs on other platforms): on success, this will generate a new passkey, returning a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> object.</p>
+<p>Some platforms (like Android) may instead return the canonical JSON representation of <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>, which has the same overall structure, with the difference that fields marked as <strong>binary</strong> below are base64url-encoded and should in some cases be base64url-decoded before being used inside TL constructors.</p>
+<p>For simplicity, the documentation will <strong>always refer to the JSON representation of the object</strong>, which in browsers can be obtained by simply invoking <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/toJSON">PublicKeyCredential.toJSON</a>.</p>
+<p>Take the <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> and transform it into an <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> as follows:</p>
+<ol>
+<li>
+<p>Extract the <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a> object contained in <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>response</code>.<br>
+Use it to generate an <a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a> with the following fields:</p>
+<ul>
+<li>
+<p><a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a>.<code>client_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>clientDataJSON</code>, <strong>binary field</strong>: base64url-decode, then pass the value directly into <a href="/constructor/dataJSON">dataJSON</a>.<code>data</code>, then pass the <a href="/constructor/dataJSON">dataJSON</a> into <code>client_data</code>.</p>
+<p>Even if it's treated as a binary field by the webauthn standard, <code>clientDataJSON</code> contains a valid, UTF-8 JSON payload that is additionally base64url-encoded.</p>
+</li>
+<li>
+<p><a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a>.<code>attestation_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAttestationResponse">AuthenticatorAttestationResponse</a>.<code>attestationObject</code>, <strong>binary field</strong>: base64url-decode, then pass into <code>attestation_data</code>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Then, generate an <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> with the following fields:</p>
+<ul>
+<li><code>response</code> - The <a href="/constructor/inputPasskeyResponseRegister">inputPasskeyResponseRegister</a> generated at step 1</li>
+<li><code>id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>id</code>, <strong>binary field</strong>: pass directly into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a>.<code>id</code> <strong>without</strong> base64url-decoding.</li>
+<li><code>raw_id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>rawId</code>, <strong>binary field</strong>: pass directly into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a>.<code>raw_id</code> <strong>without</strong> base64url-decoding.</li>
+</ul>
+</li>
+</ol>
+<p>Finally, pass the generated <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> to <a href="/method/account.registerPasskey">account.registerPasskey</a>.</p>
+<p>On success, the method will associate the passkey to the current account and it will return a <a href="/constructor/passkey">passkey</a> constructor, containing human-readable information about the added passkey.</p>
+<p>From this moment, the passkey can be used to <a href="#logging-in-with-a-passkey">safely log into the account without using a verification code »</a>, by using the private key safely and locally stored in the passkey to authenticate the user.</p>
+<p>Note that if the user configured a <a href="/api/srp">2FA password</a>, they will still have to enter it even when logging in with a passkey.</p>
+<p>The <a href="/api/config#passkeys-account-passkeys-max">passkeys_account_passkeys_max client configuration key »</a> specifies the maximum number of passkeys that can be associated to an account.</p>
+<h3><a class="anchor" href="#list-passkeys" id="list-passkeys" name="list-passkeys"><i class="anchor-icon"></i></a>List passkeys</h3>
+<pre><code><a href='/constructor/passkey'>passkey</a>#98613ebf flags:<a href='/type/%23'>#</a> id:<a href='/type/string'>string</a> name:<a href='/type/string'>string</a> date:<a href='/type/int'>int</a> software_emoji_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> last_usage_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> = <a href='/type/Passkey'>Passkey</a>;
+
+<a href='/constructor/account.passkeys'>account.passkeys</a>#f8e0aa1c passkeys:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Passkey'>Passkey</a>&gt; = <a href='/type/account.Passkeys'>account.Passkeys</a>;
+
+---functions---
+
+<a href='/method/account.getPasskeys'>account.getPasskeys</a>#ea1f0c52 = <a href='/type/account.Passkeys'>account.Passkeys</a>;
+</code></pre>
+<p>Use <a href="/method/account.getPasskeys">account.getPasskeys</a> to list the passkeys that can be used to log into the current account.</p>
+<p>Passkeys are represented by <a href="/constructor/passkey">passkey</a> constructors, containing info like the passkey name, its ID, a <a href="/api/custom-emoji">custom emoji »</a> used as icon (usually coincides with the password manager's icon), its creation date and the date when it was last used.</p>
+<h3><a class="anchor" href="#delete-passkeys" id="delete-passkeys" name="delete-passkeys"><i class="anchor-icon"></i></a>Delete passkeys</h3>
+<pre><code>---functions---
+
+<a href='/method/account.deletePasskey'>account.deletePasskey</a>#f5b5563f id:<a href='/type/string'>string</a> = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>To delete a passkey associated to the current account, use <a href="/method/account.deletePasskey">account.deletePasskey</a>, passing the passkey's ID (usually obtained using <a href="/method/account.getPasskeys">account.getPasskeys</a> as described <a href="#list-passkeys">above »</a>).</p>
+<h3><a class="anchor" href="#logging-in-with-a-passkey" id="logging-in-with-a-passkey" name="logging-in-with-a-passkey"><i class="anchor-icon"></i></a>Logging in with a passkey</h3>
+<pre><code><a href='/constructor/auth.passkeyLoginOptions'>auth.passkeyLoginOptions</a>#e2037789 options:<a href='/type/DataJSON'>DataJSON</a> = <a href='/type/auth.PasskeyLoginOptions'>auth.PasskeyLoginOptions</a>;
+
+<a href='/constructor/inputPasskeyResponseLogin'>inputPasskeyResponseLogin</a>#c31fc14a client_data:<a href='/type/DataJSON'>DataJSON</a> authenticator_data:<a href='/type/bytes'>bytes</a> signature:<a href='/type/bytes'>bytes</a> user_handle:<a href='/type/string'>string</a> = <a href='/type/InputPasskeyResponse'>InputPasskeyResponse</a>;
+<a href='/constructor/inputPasskeyCredentialPublicKey'>inputPasskeyCredentialPublicKey</a>#3c27b78f id:<a href='/type/string'>string</a> raw_id:<a href='/type/string'>string</a> response:<a href='/type/InputPasskeyResponse'>InputPasskeyResponse</a> = <a href='/type/InputPasskeyCredential'>InputPasskeyCredential</a>;
+
+<a href='/constructor/auth.authorization'>auth.authorization</a>#2ea2c0d4 flags:<a href='/type/%23'>#</a> setup_password_required:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> otherwise_relogin_days:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> tmp_sessions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> future_auth_token:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/bytes'>bytes</a> user:<a href='/type/User'>User</a> = <a href='/type/auth.Authorization'>auth.Authorization</a>;
+
+---functions---
+
+<a href='/method/auth.initPasskeyLogin'>auth.initPasskeyLogin</a>#518ad0b7 api_id:<a href='/type/int'>int</a> api_hash:<a href='/type/string'>string</a> = <a href='/type/auth.PasskeyLoginOptions'>auth.PasskeyLoginOptions</a>;
+
+<a href='/method/auth.finishPasskeyLogin'>auth.finishPasskeyLogin</a>#9857ad07 flags:<a href='/type/%23'>#</a> credential:<a href='/type/InputPasskeyCredential'>InputPasskeyCredential</a> from_dc_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> from_auth_key_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/long'>long</a> = <a href='/type/auth.Authorization'>auth.Authorization</a>;
+</code></pre>
+<p>To login with a passkey, start by invoking <a href="/method/auth.initPasskeyLogin">auth.initPasskeyLogin</a>.</p>
+<p>Store the DC ID that was used to make the query into a <code>initDcId</code> variable, to be used later.</p>
+<p>This method will return a JSON object in <a href="/constructor/auth.passkeyLoginOptions">auth.passkeyLoginOptions</a>.<code>options</code>, containing a single key:</p>
+<ul>
+<li><code>publicKey</code> - Contains a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialRequestOptions">PublicKeyCredentialRequestOptions »</a> JSON object (with base64url-encoded strings used in place of buffer properties)</li>
+</ul>
+<p>Parse the JSON payload, base64url-decoding binary fields for example using <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/parseRequestOptionsFromJSON_static">PublicKeyCredential.parseRequestOptionsFromJSON</a>.</p>
+<p>Then, pass the <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialRequestOptions">PublicKeyCredentialRequestOptions »</a> to <a href="https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get">navigator.credentials.get</a> inside browsers (or equivalent APIs on other platforms).</p>
+<p>This will prompt the user to choose a Telegram passkey (choosing the account to log into), and will return it as a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> object.</p>
+<p>Some platforms (like Android) may instead return the canonical JSON representation of <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>, which has the same overall structure, with the difference that fields marked as <strong>binary</strong> below are base64url-encoded and should in some cases be base64url-decoded before being used inside TL constructors.</p>
+<p>Take the <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a> and transform it into an <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> using the following steps:</p>
+<ol>
+<li>
+<p>Extract the <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAssertionResponse">AuthenticatorAssertionResponse</a> object contained in <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>response</code>.<br>
+Use it to generate an <a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a> with the following fields:</p>
+<ul>
+<li>
+<p><a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a>.<code>client_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAssertionResponse">AuthenticatorAssertionResponse</a>.<code>clientDataJSON</code>, <strong>binary field</strong>: base64url-decode, then pass the value directly into <a href="/constructor/dataJSON">dataJSON</a>.<code>data</code>, then pass the <a href="/constructor/dataJSON">dataJSON</a> into <code>client_data</code>.</p>
+<p>Even if it's treated as a binary field by the webauthn standard, <code>clientDataJSON</code> contains a valid, UTF-8 JSON payload that is additionally base64url-encoded.</p>
+</li>
+<li>
+<p><a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a>.<code>authenticator_data</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAssertionResponse">AuthenticatorAssertionResponse</a>.<code>authenticatorData</code>, <strong>binary field</strong>: base64url-decode, then pass into <code>authenticator_data</code>.</p>
+</li>
+<li>
+<p><a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a>.<code>signature</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAssertionResponse">AuthenticatorAssertionResponse</a>.<code>signature</code>, <strong>binary field</strong>: base64url-decode, then pass into <code>signature</code>.</p>
+</li>
+<li>
+<p><a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a>.<code>user_handle</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/AuthenticatorAssertionResponse">AuthenticatorAssertionResponse</a>.<code>userHandle</code>, <strong>binary field</strong>: base64url-decode, then pass into <code>user_handle</code>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Then, generate an <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> with the following fields:</p>
+<ul>
+<li><code>response</code> - The <a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a> generated at step 1</li>
+<li><code>id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>id</code>, <strong>binary field</strong>: pass directly into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a>.<code>id</code> <strong>without</strong> base64url-decoding.</li>
+<li><code>raw_id</code> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential">PublicKeyCredential</a>.<code>rawId</code>, <strong>binary field</strong>: pass directly into <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a>.<code>raw_id</code> <strong>without</strong> base64url-decoding.</li>
+</ul>
+</li>
+<li>
+<p>Take the <code>user_handle</code> stored in the generated <a href="/constructor/inputPasskeyResponseLogin">inputPasskeyResponseLogin</a> (<a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a>.<code>response</code>.<code>user_handle</code>) and parse it using the following printf/scanf format string: <code>%d:%lld</code>.</p>
+<p>The user handle is composed by the DC ID (a 32-bit integer) and the user ID (a 64-bit long), separated by a colon (<code>:</code>): store these values in separate variables (<code>userDcId</code> and <code>userId</code>) to be used later.</p>
+</li>
+</ol>
+<p>If the current client is already logged into an account with user ID equal to <code>userId</code>, ask the user to choose a different passkey (if any) and restart the passkey login process.</p>
+<p>Otherwise, send a <a href="/method/auth.finishPasskeyLogin">auth.finishPasskeyLogin</a> query to DC <code>userDcId</code>, passing the following arguments:</p>
+<ul>
+<li><code>credential</code> - The <a href="/constructor/inputPasskeyCredentialPublicKey">inputPasskeyCredentialPublicKey</a> generated above.</li>
+<li><code>from_dc_id</code> - If and only if <code>userDcId != initDcId</code> (i.e. <code>userDcId</code> is <strong>not</strong> equal to the DC ID that was used to invoke <a href="/method/auth.initPasskeyLogin">auth.initPasskeyLogin</a>), populate this field with <code>initDcId</code></li>
+<li><code>from_auth_key_id</code> - If and only if <code>userDcId != initDcId</code> (i.e. <code>userDcId</code> is <strong>not</strong> equal to the DC ID that was used to invoke <a href="/method/auth.initPasskeyLogin">auth.initPasskeyLogin</a>), populate this field with the auth key ID of the connection to <code>initDcId</code> (if <a href="/api/pfs">PFS</a> is in use, use the permanent auth key ID).</li>
+</ul>
+<p><a href="/method/auth.finishPasskeyLogin">auth.finishPasskeyLogin</a> can throw the following RPC errors:</p>
+<ul>
+<li><code>SESSION_PASSWORD_NEEDED</code> - If the user configured a <a href="/api/srp">2FA password</a>, they will still have to enter it even when logging in with a passkey: simply proceed with the <a href="/api/auth#2fa">usual 2FA auth flow »</a> to login.</li>
+<li><code>PASSKEY_CREDENTIAL_NOT_FOUND</code> - The specified passkey cannot be found on the server (for example, it could've been <a href="#delete-passkeys">removed »</a> by the user).</li>
+</ul>
+<p>On success (except for the 2FA case), the user is logged in, and the method directly returns an <a href="/constructor/auth.authorization">auth.authorization</a> constructor.</p>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/safety">Safety</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?49"></script>
+    <script src="/js/tgsticker.js?32"></script>
+<script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script src="/js/main-theme.js?6"></script>
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+

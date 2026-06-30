@@ -323,7 +323,8 @@ window.initDevSideNavX = (function () {
     frozenDemos = [];
   }
 
-  var WIPE_MS = 500;
+  var WIPE_DARK_MS = 800;
+  var WIPE_LIGHT_MS = 500;
   var activeVT = null;
 
   /* doToggle: radial-wipe view transition. applyInVT/applyInstant are
@@ -368,20 +369,41 @@ window.initDevSideNavX = (function () {
        dropped by some Chrome builds when animated via WAAPI. */
     var ref  = Math.hypot(vw, vh) / Math.SQRT2; // circle() 100% reference (logical px)
     var px = vw ? (cx / vw) * 100 : 95, py = vh ? (cy / vh) * 100 : 2;
-    var rpct = ref ? (end / ref) * 100 + 1 : 145; // minimal radius that still covers, as %
-    var from = 'circle(0% at ' + px + '% ' + py + '%)';
-    var to   = 'circle(' + rpct + '% at ' + px + '% ' + py + '%)';
+    var from, to;
+    if (t === 'dark') {
+      var s  = window.devicePixelRatio || 1;
+      var cxp = cx * s, cyp = cy * s; // hole centre = toggle, physical px
+      var maxR = end * s * 1.02; // radius that covers the far corner (+2% AA)
+      var rectRight = vw * s + 1, rectBottom = vh * s + 1; // outer rect = whole snapshot
+      var holePath = function (r) {
+        var rect = 'M-1 -1H' + rectRight + 'V' + rectBottom + 'H-1Z';
+        var hole = 'M' + (cxp - r) + ' ' + cyp +
+                   'A' + r + ' ' + r + ' 0 1 0 ' + (cxp + r) + ' ' + cyp +
+                   'A' + r + ' ' + r + ' 0 1 0 ' + (cxp - r) + ' ' + cyp + 'Z';
+        return "path(evenodd, '" + rect + hole + "')";
+      };
+      from = holePath(0.01); // ~no hole → old fully covers (tiny r, not 0, keeps the arcs for WAAPI)
+      to   = holePath(maxR); // hole spans the viewport → old fully drained
+    } else {
+      var ref  = Math.hypot(vw, vh) / Math.SQRT2; // circle() 100% reference
+      var rpct = ref ? (end / ref) * 100 + 1 : 145; // covering radius as % (+1% guards AA)
+      from = 'circle(' + rpct + '% at ' + px + '% ' + py + '%)'; // old fully covers
+      to   = 'circle(0% at ' + px + '% ' + py + '%)'; // old collapsed into the toggle
+    }
 
     var vt = document.startViewTransition(function () {
-      setTheme(themeState);                 // latest intent (source of truth)
-      if (applyInVT) applyInVT();           // icon's new snapshot = target frame
+      setTheme(themeState); // latest intent (source of truth)
+      if (applyInVT) applyInVT(); // icon's new snapshot = target frame
     });
     activeVT = vt;
     vt.ready.then(function () {
       document.documentElement.animate(
         { clipPath: [from, to] },
-        { duration: WIPE_MS, easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-          pseudoElement: '::view-transition-new(root)' }
+        { duration: t === 'dark' ? WIPE_DARK_MS : WIPE_LIGHT_MS,
+          easing: 'cubic-bezier(0.23, 1, 0.32, 1)', // Telegram EASE_OUT_QUINT
+          fill: 'forwards', // hold circle(0%) through VT teardown — else the
+                            // clip reverts for a frame and the old theme flashes back
+          pseudoElement: '::view-transition-old(root)' }
       );
     });
     var clear = function () { if (activeVT === vt) activeVT = null; thawDemoVideos(); };

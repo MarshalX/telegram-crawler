@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <title>Views and read metrics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Clients should report read state, message views and music listens using a specific set of methods.">
+    <meta property="og:title" content="Views and read metrics">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Clients should report read state, message views and music listens using a specific set of methods.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?252" rel="stylesheet" media="screen">
+    <link href="/css/telegram-theme.css?5" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <button class="theme-toggle theme-toggle--static" type="button" title="Toggle theme" aria-label="Toggle light/dark theme"></button>
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter hidden-xs"><a href="https://x.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i> Follow on X</a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/views" >Views and read metrics</a></li></ul></div>
+  <h1 id="dev_page_title">Views and read metrics</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Clients should report read state, message views and music listens using a specific set of methods.</p>
+<h3><a class="anchor" href="#read-state" id="read-state" name="read-state"><i class="anchor-icon"></i></a>Read state</h3>
+<pre><code>---functions---
+
+<a href='/method/messages.readHistory'>messages.readHistory</a>#0e306d3a peer:<a href='/type/InputPeer'>InputPeer</a> max_id:<a href='/type/int'>int</a> = <a href='/type/messages.AffectedMessages'>messages.AffectedMessages</a>;
+<a href='/method/channels.readHistory'>channels.readHistory</a>#cc104937 channel:<a href='/type/InputChannel'>InputChannel</a> max_id:<a href='/type/int'>int</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/messages.readSavedHistory'>messages.readSavedHistory</a>#ba4a3b5b parent_peer:<a href='/type/InputPeer'>InputPeer</a> peer:<a href='/type/InputPeer'>InputPeer</a> max_id:<a href='/type/int'>int</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/messages.readDiscussion'>messages.readDiscussion</a>#f731a9f4 peer:<a href='/type/InputPeer'>InputPeer</a> msg_id:<a href='/type/int'>int</a> read_max_id:<a href='/type/int'>int</a> = <a href='/type/Bool'>Bool</a>;
+<a href='/method/messages.readEncryptedHistory'>messages.readEncryptedHistory</a>#7f4b690a peer:<a href='/type/InputEncryptedChat'>InputEncryptedChat</a> max_date:<a href='/type/int'>int</a> = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>Use one of the following methods, according to the type of the dialog where the messages were marked as read:</p>
+<ul>
+<li><a href="/method/messages.readHistory">messages.readHistory</a> marks messages as read in a user dialog or <a href="/api/channel#basic-groups">basic group</a>.</li>
+<li><a href="/method/channels.readHistory">channels.readHistory</a> marks messages as read in a <a href="/api/channel">channel, supergroup or gigagroup</a>.</li>
+<li><a href="/method/messages.readSavedHistory">messages.readSavedHistory</a> marks messages as read in a <a href="/api/monoforum">monoforum</a> topic.</li>
+<li><a href="/method/messages.readDiscussion">messages.readDiscussion</a> marks messages as read in a <a href="/api/threads">thread</a>.</li>
+<li><a href="/method/messages.readEncryptedHistory">messages.readEncryptedHistory</a> marks messages as read in a <a href="/api/end-to-end">secret chat</a>.</li>
+</ul>
+<p>Batch calls to these methods as follows:</p>
+<ul>
+<li>Locally keep track of the latest read message for all currently open chats (i.e. the ID of the latest read message can only increase, never decrease).
+<ul>
+<li>Since secret chats don't have a monotonically increasing message ID (and it <strong>must not</strong> be shared outside of secret chats anyway), use the seqno instead of the message ID to identify newer messages, but only send the <strong>reception date</strong> of the latest read message when the time comes, <strong>not</strong> the seqno.</li>
+</ul>
+</li>
+<li>If the last message pointer of a specific peer hasn't changed in the last 3 seconds and a view wasn't already reported to the server, invoke the appropriate readHistory method for the peer type.</li>
+<li>If the user closes or suspends the client, invoke all pending readHistory calls immediately.</li>
+</ul>
+<p>These methods only update the server-side unread state: they do not <a href="#read-message-contents">increment channel post view counters</a> and <a href="#read-metrics">do not send viewport metrics</a>.</p>
+<h3><a class="anchor" href="#read-message-contents" id="read-message-contents" name="read-message-contents"><i class="anchor-icon"></i></a>Read message contents</h3>
+<pre><code><a href='/constructor/message'>message</a>#95ef6f2b flags:<a href='/type/%23'>#</a> out:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> mentioned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> media_unread:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> post:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> from_scheduled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/constructor/true'>true</a> legacy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> edit_hide:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/constructor/true'>true</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.26?<a href='/constructor/true'>true</a> invert_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.27?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> offline:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.1?<a href='/constructor/true'>true</a> video_processing_pending:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.4?<a href='/constructor/true'>true</a> paid_suggested_post_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.8?<a href='/constructor/true'>true</a> paid_suggested_post_ton:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.9?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Peer'>Peer</a> from_boosts_applied:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.29?<a href='/type/int'>int</a> from_rank:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.12?<a href='/type/string'>string</a> peer_id:<a href='/type/Peer'>Peer</a> saved_peer_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/type/Peer'>Peer</a> fwd_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/MessageFwdHeader'>MessageFwdHeader</a> via_bot_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/long'>long</a> via_business_bot_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.0?<a href='/type/long'>long</a> guestchat_via_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.19?<a href='/type/Peer'>Peer</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/MessageReplyHeader'>MessageReplyHeader</a> date:<a href='/type/int'>int</a> message:<a href='/type/string'>string</a> media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/type/MessageMedia'>MessageMedia</a> reply_markup:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; views:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> forwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> replies:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.23?<a href='/type/MessageReplies'>MessageReplies</a> edit_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/int'>int</a> post_author:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/string'>string</a> grouped_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/long'>long</a> reactions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/type/MessageReactions'>MessageReactions</a> restriction_reason:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; ttl_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.25?<a href='/type/int'>int</a> quick_reply_shortcut_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.30?<a href='/type/int'>int</a> effect:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.2?<a href='/type/long'>long</a> factcheck:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.3?<a href='/type/FactCheck'>FactCheck</a> report_delivery_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.5?<a href='/type/int'>int</a> paid_message_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.6?<a href='/type/long'>long</a> suggested_post:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.7?<a href='/type/SuggestedPost'>SuggestedPost</a> schedule_repeat_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.10?<a href='/type/int'>int</a> summary_from_language:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.11?<a href='/type/string'>string</a> = <a href='/type/Message'>Message</a>;
+
+<a href='/constructor/decryptedMessageActionReadMessages'>decryptedMessageActionReadMessages</a>#0c4f40be random_ids:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/long'>long</a>&gt; = <a href='/type/DecryptedMessageAction'>DecryptedMessageAction</a>;
+<a href='/constructor/decryptedMessageService'>decryptedMessageService</a>#aa48327d random_id:<a href='/type/long'>long</a> random_bytes:<a href='/type/bytes'>bytes</a> action:<a href='/type/DecryptedMessageAction'>DecryptedMessageAction</a> = <a href='/type/DecryptedMessage'>DecryptedMessage</a>;
+
+---functions---
+
+<a href='/method/messages.readMessageContents'>messages.readMessageContents</a>#36a73f77 id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/messages.AffectedMessages'>messages.AffectedMessages</a>;
+<a href='/method/channels.readMessageContents'>channels.readMessageContents</a>#eab5dc38 channel:<a href='/type/InputChannel'>InputChannel</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; = <a href='/type/Bool'>Bool</a>;
+<a href='/method/messages.sendEncryptedService'>messages.sendEncryptedService</a>#32d439a4 peer:<a href='/type/InputEncryptedChat'>InputEncryptedChat</a> random_id:<a href='/type/long'>long</a> data:<a href='/type/bytes'>bytes</a> = <a href='/type/messages.SentEncryptedMessage'>messages.SentEncryptedMessage</a>;
+</code></pre>
+<p>The <a href="#read-state">readHistory methods »</a> should still always be invoked in batched mode when reading incoming messages: however, the following methods should also be used <em>in addition</em> to <code>readHistory</code>, to mark certain types of individual media messages as read, mark <a href="/api/live-location">live locations</a> as read, and start deletion timers for expiring media files:</p>
+<ul>
+<li><a href="/method/messages.readMessageContents">messages.readMessageContents</a> for messages in user dialogs or <a href="/api/channel#basic-groups">basic groups</a>.</li>
+<li><a href="/method/channels.readMessageContents">channels.readMessageContents</a> for messages in <a href="/api/channel">channels, supergroups and gigagroups</a>.</li>
+<li><a href="/method/messages.sendEncryptedService">messages.sendEncryptedService</a> with a <a href="/constructor/decryptedMessageService">decryptedMessageService</a> containing a <a href="/constructor/decryptedMessageActionReadMessages">decryptedMessageActionReadMessages</a> for messages in <a href="/api/end-to-end">secret chats</a>.</li>
+</ul>
+<p>Unlike the readHistory methods, these methods take a <strong>list of specific message IDs</strong> rather than a <code>max_id</code> range.</p>
+<p>To avoid re-fetching the updated <a href="/constructor/message">message</a> constructors when marking non-secret chat messages as read, clients should locally clear the following unread state after successfully sending the readMessageContents request:</p>
+<ul>
+<li>The <a href="/constructor/message">message</a>.<code>media_unread</code> flag.</li>
+<li>The <a href="/constructor/message">message</a>.<code>mentioned</code> flag.</li>
+<li>Unread <a href="/api/reactions">reactions</a>.</li>
+<li>Unread poll votes.</li>
+</ul>
+<p>Invoke these methods only for incoming messages, in the cases described below.</p>
+<h4><a class="anchor" href="#unread-media-mentions" id="unread-media-mentions" name="unread-media-mentions"><i class="anchor-icon"></i></a>Unread media mentions</h4>
+<p>For an incoming non-secret chat message with an unread media mention, invoke <a href="/method/messages.readMessageContents">messages.readMessageContents</a> or <a href="/method/channels.readMessageContents">channels.readMessageContents</a> when the message becomes visible in the chat.</p>
+<p>Condition: <code>message.mentioned &amp;&amp; message.media_unread &amp;&amp; !message.isVoice() &amp;&amp; !message.isRoundVideo()</code></p>
+<p>An unread media mention is represented by the <a href="/constructor/message">message</a>.<code>mentioned</code> and <a href="/constructor/message">message</a>.<code>media_unread</code> flags both being set.</p>
+<p>Do not use <a href="/constructor/message">message</a>.<code>media_unread</code> alone as a visibility trigger. Without <a href="/constructor/message">message</a>.<code>mentioned</code>, unread playable media is marked as read only when playback starts or, for expiring media, when the media is opened.</p>
+<p>Voice messages have a <a href="/constructor/messageMediaDocument">messageMediaDocument</a> with a <a href="/constructor/documentAttributeAudio">documentAttributeAudio</a> with the <code>voice</code> flag set.</p>
+<p>Round videos have a <a href="/constructor/messageMediaDocument">messageMediaDocument</a> with a <a href="/constructor/documentAttributeVideo">documentAttributeVideo</a> with the <code>round_message</code> flag set.</p>
+<p>Voice messages and round videos are excluded from this condition because they are marked as read when played.</p>
+<p>Secret chat messages are excluded from this condition because <a href="/constructor/decryptedMessage">decryptedMessage</a> does not contain <code>mentioned</code> or <code>media_unread</code> flags.</p>
+<h4><a class="anchor" href="#unread-playable-media" id="unread-playable-media" name="unread-playable-media"><i class="anchor-icon"></i></a>Unread playable media</h4>
+<p>For an incoming non-secret chat message with unread playable media, invoke <a href="/method/messages.readMessageContents">messages.readMessageContents</a> or <a href="/method/channels.readMessageContents">channels.readMessageContents</a> when playback starts.</p>
+<p>Condition: <a href="/constructor/message">message</a>.<code>media_unread</code> is set, and the user starts playback of the media.</p>
+<p>For secret chat voice messages and round videos, <a href="/constructor/decryptedMessage">decryptedMessage</a> does not contain a <code>media_unread</code> flag. Clients should keep a local content-unread flag, initialized to true when receiving a voice message or round video, and clear it when the media is played.</p>
+<p>Condition for secret chats: <code>local_content_unread &amp;&amp; (decryptedMessage.isVoice() || decryptedMessage.isRoundVideo())</code> when playback starts.</p>
+<p>For secret chats, invoke <a href="/method/messages.sendEncryptedService">messages.sendEncryptedService</a> with a <a href="/constructor/decryptedMessageActionReadMessages">decryptedMessageActionReadMessages</a> containing the <a href="/constructor/decryptedMessage">decryptedMessage</a>.<code>random_id</code>.</p>
+<h4><a class="anchor" href="#non-secret-expiring-media" id="non-secret-expiring-media" name="non-secret-expiring-media"><i class="anchor-icon"></i></a>Non-secret expiring media</h4>
+<p>For incoming non-secret chat messages with expiring media, invoke <a href="/method/messages.readMessageContents">messages.readMessageContents</a> or <a href="/method/channels.readMessageContents">channels.readMessageContents</a> and start the deletion timer when the user opens the media or starts playback.</p>
+<p>Expiring media has a non-zero <a href="/constructor/messageMediaPhoto">messageMediaPhoto</a>.<code>ttl_seconds</code> or <a href="/constructor/messageMediaDocument">messageMediaDocument</a>.<code>ttl_seconds</code>.</p>
+<p>Condition: <code>0 &lt; media.ttl_seconds &lt; 0x7FFFFFFF &amp;&amp; local_destroy_timer_not_started &amp;&amp; user_opens_or_starts_playback</code>.</p>
+<h4><a class="anchor" href="#non-secret-view-once-media" id="non-secret-view-once-media" name="non-secret-view-once-media"><i class="anchor-icon"></i></a>Non-secret view-once media</h4>
+<p>For incoming non-secret chat media with <code>media.ttl_seconds == 0x7FFFFFFF</code>, invoke <a href="/method/messages.readMessageContents">messages.readMessageContents</a> or <a href="/method/channels.readMessageContents">channels.readMessageContents</a> when the user opens the media or starts playback.</p>
+<p>Condition: <code>media.ttl_seconds == 0x7FFFFFFF &amp;&amp; local_destroy_timer_not_started &amp;&amp; user_opens_or_starts_playback</code>.</p>
+<p>Do not start a time-based deletion timer. Locally delete the media after the media viewer or voice message player is closed.</p>
+<h4><a class="anchor" href="#secret-chat-expiring-media" id="secret-chat-expiring-media" name="secret-chat-expiring-media"><i class="anchor-icon"></i></a>Secret chat expiring media</h4>
+<p>Secret chat messages use <a href="/constructor/decryptedMessage">decryptedMessage</a>.<code>ttl</code>.</p>
+<p>For <code>0 &lt; ttl &lt; 0x7FFFFFFF</code>, invoke <a href="/method/messages.sendEncryptedService">messages.sendEncryptedService</a> with a <a href="/constructor/decryptedMessageActionReadMessages">decryptedMessageActionReadMessages</a> containing the <a href="/constructor/decryptedMessage">decryptedMessage</a>.<code>random_id</code> when the user opens the media or starts playback, and start the local deletion timer at the same time.</p>
+<p>Condition: <code>0 &lt; decryptedMessage.ttl &lt; 0x7FFFFFFF &amp;&amp; local_destroy_timer_not_started &amp;&amp; user_opens_or_starts_playback</code>.</p>
+<p>For secret chat media with <code>decryptedMessage.ttl == 0x7FFFFFFF</code>, do not send <a href="/constructor/decryptedMessageActionReadMessages">decryptedMessageActionReadMessages</a>. Treat the media as view-once: show it only after an explicit open action, and locally delete the media after it is closed.</p>
+<h4><a class="anchor" href="#live-locations" id="live-locations" name="live-locations"><i class="anchor-icon"></i></a>Live locations</h4>
+<p>For a non-secret chat message containing a <a href="/api/live-location">live location</a>, invoke <a href="/method/messages.readMessageContents">messages.readMessageContents</a> or <a href="/method/channels.readMessageContents">channels.readMessageContents</a> when the live location map is open.</p>
+<p>Messages containing live locations contain a <a href="/constructor/messageMediaGeoLive">messageMediaGeoLive</a>.</p>
+<p>Condition: <code>message.media instanceof messageMediaGeoLive</code></p>
+<p>Re-invoke the method on all known live location messages in the chat, usually the ones returned by <a href="/method/messages.getRecentLocations">messages.getRecentLocations</a>, every 60 seconds until the live location map is closed.</p>
+<h3><a class="anchor" href="#view-counters" id="view-counters" name="view-counters"><i class="anchor-icon"></i></a>View counters</h3>
+<pre><code><a href='/constructor/message'>message</a>#95ef6f2b flags:<a href='/type/%23'>#</a> out:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> mentioned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> media_unread:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/constructor/true'>true</a> post:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> from_scheduled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/constructor/true'>true</a> legacy:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> edit_hide:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/constructor/true'>true</a> pinned:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.26?<a href='/constructor/true'>true</a> invert_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.27?<a href='/constructor/true'>true</a> flags2:<a href='/type/%23'>#</a> offline:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.1?<a href='/constructor/true'>true</a> video_processing_pending:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.4?<a href='/constructor/true'>true</a> paid_suggested_post_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.8?<a href='/constructor/true'>true</a> paid_suggested_post_ton:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.9?<a href='/constructor/true'>true</a> id:<a href='/type/int'>int</a> from_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/type/Peer'>Peer</a> from_boosts_applied:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.29?<a href='/type/int'>int</a> from_rank:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.12?<a href='/type/string'>string</a> peer_id:<a href='/type/Peer'>Peer</a> saved_peer_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.28?<a href='/type/Peer'>Peer</a> fwd_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/MessageFwdHeader'>MessageFwdHeader</a> via_bot_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/long'>long</a> via_business_bot_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.0?<a href='/type/long'>long</a> guestchat_via_from:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.19?<a href='/type/Peer'>Peer</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/MessageReplyHeader'>MessageReplyHeader</a> date:<a href='/type/int'>int</a> message:<a href='/type/string'>string</a> media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/type/MessageMedia'>MessageMedia</a> reply_markup:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; views:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> forwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> replies:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.23?<a href='/type/MessageReplies'>MessageReplies</a> edit_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/int'>int</a> post_author:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/string'>string</a> grouped_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/long'>long</a> reactions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.20?<a href='/type/MessageReactions'>MessageReactions</a> restriction_reason:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/RestrictionReason'>RestrictionReason</a>&gt; ttl_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.25?<a href='/type/int'>int</a> quick_reply_shortcut_id:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.30?<a href='/type/int'>int</a> effect:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.2?<a href='/type/long'>long</a> factcheck:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.3?<a href='/type/FactCheck'>FactCheck</a> report_delivery_until_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.5?<a href='/type/int'>int</a> paid_message_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.6?<a href='/type/long'>long</a> suggested_post:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.7?<a href='/type/SuggestedPost'>SuggestedPost</a> schedule_repeat_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.10?<a href='/type/int'>int</a> summary_from_language:<a href='/mtproto/TL-combinators#conditional-fields'>flags2</a>.11?<a href='/type/string'>string</a> = <a href='/type/Message'>Message</a>;
+
+<a href='/constructor/messageViews'>messageViews</a>#455b853d flags:<a href='/type/%23'>#</a> views:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> forwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/type/int'>int</a> replies:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/MessageReplies'>MessageReplies</a> = <a href='/type/MessageViews'>MessageViews</a>;
+<a href='/constructor/messages.messageViews'>messages.messageViews</a>#b6c4f543 views:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageViews'>MessageViews</a>&gt; chats:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/Chat'>Chat</a>&gt; users:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/User'>User</a>&gt; = <a href='/type/messages.MessageViews'>messages.MessageViews</a>;
+
+---functions---
+
+<a href='/method/messages.getMessagesViews'>messages.getMessagesViews</a>#5784d3e1 peer:<a href='/type/InputPeer'>InputPeer</a> id:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/int'>int</a>&gt; increment:<a href='/type/Bool'>Bool</a> = <a href='/type/messages.MessageViews'>messages.MessageViews</a>;
+</code></pre>
+<p>Messages sent to and forwarded from channels have a view counter in the <a href="/constructor/message">message</a>.<code>views</code> field: to increment the view counter and fetch the updated view counter, forward counter and thread information, invoke the <a href="/method/messages.getMessagesViews">messages.getMessagesViews</a> method with <code>increment</code> set to <a href="/constructor/boolTrue">boolTrue</a>.</p>
+<p>Calls to <a href="/method/messages.getMessagesViews">messages.getMessagesViews</a> should be batched as follows:</p>
+<ul>
+<li>Add the IDs of all <a href="/constructor/message">message</a> constructors with a <code>views</code> field that are visible in the chat viewport to a local per-peer queue.</li>
+<li>Do not add the same message ID to the increment queue twice for the same peer (the queue should be a set).</li>
+<li>Flush the queue no later than 5 seconds after the first ID is queued, by invoking <a href="/method/messages.getMessagesViews">messages.getMessagesViews</a> with <code>increment</code> set to <a href="/constructor/boolTrue">boolTrue</a>, one request per peer, with at most 100 message IDs per request.</li>
+</ul>
+<p>For unread messages, queue the view counter when the bottom edge of the message becomes visible.<br>
+For already read messages with a <code>views</code> field, queue it when the vertical center of the message becomes visible.</p>
+<h3><a class="anchor" href="#read-metrics" id="read-metrics" name="read-metrics"><i class="anchor-icon"></i></a>Read metrics</h3>
+<pre><code><a href='/constructor/inputMessageReadMetric'>inputMessageReadMetric</a>#402b4495 msg_id:<a href='/type/int'>int</a> view_id:<a href='/type/long'>long</a> time_in_view_ms:<a href='/type/int'>int</a> active_time_in_view_ms:<a href='/type/int'>int</a> height_to_viewport_ratio_permille:<a href='/type/int'>int</a> seen_range_ratio_permille:<a href='/type/int'>int</a> = <a href='/type/InputMessageReadMetric'>InputMessageReadMetric</a>;
+
+---functions---
+
+<a href='/method/messages.reportReadMetrics'>messages.reportReadMetrics</a>#4067c5e6 peer:<a href='/type/InputPeer'>InputPeer</a> metrics:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/InputMessageReadMetric'>InputMessageReadMetric</a>&gt; = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>Use <a href="/method/messages.reportReadMetrics">messages.reportReadMetrics</a> to report how long visible messages stayed in the chat viewport.</p>
+<p>The viewport is the visible rectangle of the chat history list after excluding in-chat UI that covers messages.</p>
+<p>Track one exposure while a message remains in the viewport:</p>
+<ul>
+<li>Ignore an exposure that lasts less than 300 milliseconds.</li>
+<li>Start a new <code>view_id</code> for every accepted exposure.</li>
+<li>Finalize (i.e. append to the send queue) the exposure when the message leaves the viewport for at least 300 milliseconds.</li>
+<li>Finalize (i.e. append to the send queue) and restart tracking after 5 minutes of continuous exposure.</li>
+<li>Pause time accumulation while the app or chat screen is inactive.</li>
+<li>Count active time only while the user is active; official clients consider the user active for 15 seconds after a user action.</li>
+<li>Batch finalized metrics per peer and flush them with <a href="/method/messages.reportReadMetrics">messages.reportReadMetrics</a>. Official clients use a 5 second flush delay.</li>
+</ul>
+<p>Each <a href="/constructor/inputMessageReadMetric">inputMessageReadMetric</a> is computed as follows:</p>
+<ul>
+<li><code>msg_id</code> is the server <a href="/api/updates#message-id-sequences">message ID</a> in <code>peer</code>.</li>
+<li><code>view_id</code> is a random non-zero 64-bit ID generated for this exposure.</li>
+<li><code>time_in_view_ms</code> is the total exposure time in milliseconds of at least one pixel of the message after the 300 millisecond entry grace period.</li>
+<li><code>active_time_in_view_ms</code> is the part of <code>time_in_view_ms</code> accumulated while the user is active.</li>
+<li><code>height_to_viewport_ratio_permille</code> is <code>round(max_message_height * 1000 / max_viewport_height)</code>. It can be greater than <code>1000</code> when the message is taller than the viewport.</li>
+<li><code>seen_range_ratio_permille</code> is <code>round(max_seen_vertical_range * 1000 / max_message_height)</code>, clamped to the <code>0...1000</code> range.</li>
+</ul>
+<p>If a grouped media album is rendered as one visual block, use the album block rectangle consistently when computing <code>height_to_viewport_ratio_permille</code> and <code>seen_range_ratio_permille</code> for the messages in that block.</p>
+<h3><a class="anchor" href="#music-listens" id="music-listens" name="music-listens"><i class="anchor-icon"></i></a>Music listens</h3>
+<pre><code>---functions---
+
+<a href='/method/messages.reportMusicListen'>messages.reportMusicListen</a>#ddbcd819 id:<a href='/type/InputDocument'>InputDocument</a> listened_duration:<a href='/type/int'>int</a> = <a href='/type/Bool'>Bool</a>;
+</code></pre>
+<p>Use <a href="/method/messages.reportMusicListen">messages.reportMusicListen</a> to report listening time for a <a href="/constructor/document">document</a> that represents a song, i.e. an audio document described by <a href="/constructor/documentAttributeAudio">documentAttributeAudio</a> without the <code>voice</code> flag.</p>
+<p>Accumulate only the time during which the song is playing. Do not include paused, pausing or stopped time.<br>
+Invoke <a href="/method/messages.reportMusicListen">messages.reportMusicListen</a> when playback stops, when another track starts, when the player is closed, or after a pause lasts at least 60 seconds.</p>
+<p>Invoke <a href="/method/messages.reportMusicListen">messages.reportMusicListen</a> only if the accumulated duration is at least 3 seconds:</p>
+<ul>
+<li><code>id</code> is the <a href="/type/InputDocument">InputDocument</a> of the listened song.</li>
+<li><code>listened_duration</code> is the accumulated playing time in whole seconds.</li>
+</ul>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="/">Platform</a></h5>
+      <ul>
+        <li><a href="/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/safety">Safety</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?49"></script>
+    <script src="/js/tgsticker.js?32"></script>
+<script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script src="/js/main-theme.js?6"></script>
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
