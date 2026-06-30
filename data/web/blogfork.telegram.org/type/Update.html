@@ -233,7 +233,7 @@
 </tr>
 <tr>
 <td><a href="/constructor/updateChatParticipants">updateChatParticipants</a></td>
-<td>Composition of chat participants changed.</td>
+<td>The participants of a <a href="/api/channel#basic-groups">basic group »</a> changed.</td>
 </tr>
 <tr>
 <td><a href="/constructor/updateUserStatus">updateUserStatus</a></td>
@@ -269,7 +269,7 @@
 </tr>
 <tr>
 <td><a href="/constructor/updateChatParticipantDelete">updateChatParticipantDelete</a></td>
-<td>A member has left the group.</td>
+<td>A member has left the <a href="/api/channel#basic-groups">basic group</a>.</td>
 </tr>
 <tr>
 <td><a href="/constructor/updateDcOptions">updateDcOptions</a></td>
@@ -309,7 +309,7 @@
 </tr>
 <tr>
 <td><a href="/constructor/updateChannelTooLong">updateChannelTooLong</a></td>
-<td>There are new updates in the specified channel, the client must fetch them.  <br>If the difference is too long or if the channel isn't currently in the states, start fetching from the specified pts.</td>
+<td>There are new updates in the specified channel, the client must fetch them manually by invoking <a href="/method/updates.getChannelDifference">updates.getChannelDifference</a> as specified in the <a href="/api/updates">documentation »</a>.<br><br>If the channel's PTS isn't currently stored in the database (i.e. we joined this channel on another client while the current client was offline), start fetching from the specified pts.<br><br>Does <strong>not</strong> necessarily indicate the <a href="/api/updates#recovering-gaps-for-very-old-messages">channel message box size limit was reached</a>, it simply indicates that the number of queued updates in a message box is too large to be delivered passively through the socket.</td>
 </tr>
 <tr>
 <td><a href="/constructor/updateChannel">updateChannel</a></td>
@@ -465,7 +465,7 @@
 </tr>
 <tr>
 <td><a href="/constructor/updateChatDefaultBannedRights">updateChatDefaultBannedRights</a></td>
-<td>Default banned rights in a <a href="/api/channel">normal chat</a> were updated</td>
+<td>Default banned rights in a <a href="/api/channel#basic-groups">basic group</a> were updated</td>
 </tr>
 <tr>
 <td><a href="/constructor/updateFolderPeers">updateFolderPeers</a></td>
@@ -553,11 +553,11 @@
 </tr>
 <tr>
 <td><a href="/constructor/updateGroupCallParticipants">updateGroupCallParticipants</a></td>
-<td>The participant list of a certain group call has changed</td>
+<td>The participant list of a <a href="/api/group-calls#applying-group-call-updates">group call</a> has changed.</td>
 </tr>
 <tr>
 <td><a href="/constructor/updateGroupCall">updateGroupCall</a></td>
-<td>A new groupcall was started</td>
+<td>Indicates that group call information changed, see <a href="/api/group-calls#applying-group-call-updates">applying group call updates »</a>.</td>
 </tr>
 <tr>
 <td><a href="/constructor/updatePeerHistoryTTL">updatePeerHistoryTTL</a></td>
@@ -565,7 +565,7 @@
 </tr>
 <tr>
 <td><a href="/constructor/updateChatParticipant">updateChatParticipant</a></td>
-<td>A user has joined or left a specific chat</td>
+<td>A user has joined or left a specific <a href="/api/channel#basic-groups">basic group »</a>: this update can only be received by bots, see <a href="/api/peers#basic-group-updates">here »</a> for the user version of this update.</td>
 </tr>
 <tr>
 <td><a href="/constructor/updateChannelParticipant">updateChannelParticipant</a></td>
@@ -577,7 +577,7 @@
 </tr>
 <tr>
 <td><a href="/constructor/updateGroupCallConnection">updateGroupCallConnection</a></td>
-<td>New WebRTC parameters</td>
+<td>Connection parameters returned after joining a group call, see <a href="/api/group-calls#presentations">presentations »</a> and <a href="/api/group-calls#rtmp-livestreams">RTMP livestreams »</a>.<br><br>If <code>presentation</code> is set, the parameters belong to the separate <a href="/api/group-calls#presentations">presentation connection</a>; otherwise they belong to the main connection.<br><br>For a normal WebRTC connection, pass <code>params</code> to the local tgcalls group-call engine as its join response payload.<br><br>For <a href="/api/group-calls#rtmp-livestreams">RTMP-mode calls</a>, <code>params</code> instead has the following shape:<br><br><code>json&lt;br&gt;{&lt;br&gt;  "stream": true,&lt;br&gt;  "rtmp": true&lt;br&gt;}&lt;br&gt;</code></td>
 </tr>
 <tr>
 <td><a href="/constructor/updateBotCommands">updateBotCommands</a></td>
@@ -638,14 +638,6 @@
 <tr>
 <td><a href="/constructor/updateMessageExtendedMedia">updateMessageExtendedMedia</a></td>
 <td>You <a href="/api/paid-media">bought a paid media »</a>: this update contains the revealed media.</td>
-</tr>
-<tr>
-<td><a href="/constructor/updateChannelPinnedTopic">updateChannelPinnedTopic</a></td>
-<td>A <a href="/api/forum#forum-topics">forum topic »</a> was pinned or unpinned.</td>
-</tr>
-<tr>
-<td><a href="/constructor/updateChannelPinnedTopics">updateChannelPinnedTopics</a></td>
-<td>The <a href="/api/forum#forum-topics">pinned topics</a> of a forum have changed.</td>
 </tr>
 <tr>
 <td><a href="/constructor/updateUser">updateUser</a></td>
@@ -777,7 +769,7 @@
 </tr>
 <tr>
 <td><a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a></td>
-<td>Contains updates to the blockchain of a conference call, see <a href="/api/end-to-end/group-calls">here »</a> for more info.</td>
+<td>Contains conference call blockchain blocks, see <a href="/api/end-to-end/group-calls#handling-updates">handling E2E group call updates »</a>.</td>
 </tr>
 <tr>
 <td><a href="/constructor/updateReadMonoForumInbox">updateReadMonoForumInbox</a></td>
@@ -791,8 +783,61 @@
 <td><a href="/constructor/updateMonoForumNoPaidException">updateMonoForumNoPaidException</a></td>
 <td>An admin has (un)exempted this <a href="/api/monoforum">monoforum topic »</a> from payment to send messages using <a href="/method/account.toggleNoPaidMessagesException">account.toggleNoPaidMessagesException</a>.</td>
 </tr>
+<tr>
+<td><a href="/constructor/updateGroupCallMessage">updateGroupCallMessage</a></td>
+<td>A new message, reaction, paid comment or donation was received through the <a href="/api/group-calls#in-call-messages">in-call message overlay »</a>.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateGroupCallEncryptedMessage">updateGroupCallEncryptedMessage</a></td>
+<td>A new E2E-encrypted message or emoji reaction was received in a conference call, see <a href="/api/end-to-end/group-calls#receiving-and-decrypting-a-message">here »</a> for the decryption process.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updatePinnedForumTopic">updatePinnedForumTopic</a></td>
+<td>A <a href="/api/forum#forum-topics">forum topic »</a> was pinned or unpinned.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updatePinnedForumTopics">updatePinnedForumTopics</a></td>
+<td>The <a href="/api/forum#forum-topics">pinned topics</a> of a forum have changed.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateDeleteGroupCallMessages">updateDeleteGroupCallMessages</a></td>
+<td>Indicates that messages were deleted from the <a href="/api/group-calls#in-call-messages">in-call message overlay »</a> of a video chat/livestream or live story, including in RTMP mode.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateStarGiftAuctionState">updateStarGiftAuctionState</a></td>
+<td>Contains updates to <a href="/api/auctions">auction state, see here »</a> for more info on how to enable these updates.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateStarGiftAuctionUserState">updateStarGiftAuctionUserState</a></td>
+<td>Contains updates to <a href="/api/auctions">auction state related to the current user, see here »</a> for more info on how to enable these updates.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateEmojiGameInfo">updateEmojiGameInfo</a></td>
+<td>Dice game update.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateStarGiftCraftFail">updateStarGiftCraftFail</a></td>
+<td>Indicates that a <a href="/api/gifts#crafting-collectible-gifts">crafting »</a> attempt did not produce a new collectible gift.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateChatParticipantRank">updateChatParticipantRank</a></td>
+<td>The <a href="/api/rank">tag »</a> of a participant of a <a href="/api/channel#basic-groups">basic group »</a> has changed.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateManagedBot">updateManagedBot</a></td>
+<td><a href="/api/bots/managed-bots">Manager bots</a> only: a bot managed by the currently logged in bot was created or updated.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateBotGuestChatQuery">updateBotGuestChatQuery</a></td>
+<td>Sent to <a href="/api/bots/guest-mode">guest bots »</a> when a user invokes the bot as a guest in a chat. The bot should reply by invoking <a href="/method/messages.setBotGuestChatResult">messages.setBotGuestChatResult</a>, see <a href="/api/bots/guest-mode#handling-guest-queries-bot-side">here »</a> for more info.</td>
+</tr>
+<tr>
+<td><a href="/constructor/updateAiComposeTones">updateAiComposeTones</a></td>
+<td>The list of saved <a href="/api/ai#ai-compose-tones">AI composer tones »</a> of the current user has changed, and should be refetched using <a href="/method/aicompose.getTones">aicompose.getTones</a>.</td>
+</tr>
 </tbody>
-</table></div>
+</table>
+</div>
   
 </div>
           

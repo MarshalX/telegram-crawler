@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>channels.getSendAs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Obtains a list of peers that can be used to send messages in a specific group">
+    <meta property="description" content="Obtains a list of peers that can be displayed as the sender in a specific context. With for_live_stories, returns peers that may author live story in-call messages ».">
     <meta property="og:title" content="channels.getSendAs">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Obtains a list of peers that can be used to send messages in a specific group">
+    <meta property="og:description" content="Obtains a list of peers that can be displayed as the sender in a specific context. With for_live_stories, returns peers that may author live story in-call messages ».">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -44,7 +44,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/methods" >All Methods</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/method/channels.getSendAs" >channels.getSendAs</a></li></ul></div>
   <h1 id="dev_page_title">channels.getSendAs</h1>
   
-  <div id="dev_page_content"><p>Obtains a list of peers that can be used to send messages in a specific group</p>
+  <div id="dev_page_content"><p>Obtains a list of peers that can be displayed as the sender in a specific context. With <code>for_live_stories</code>, returns peers that may author <a href="/api/group-calls#in-call-messages">live story in-call messages »</a>.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -81,9 +81,14 @@
 <td>If set, fetches the list of peers that can be used to send <a href="/api/reactions#paid-reactions">paid reactions</a> to messages of a specific peer.</td>
 </tr>
 <tr>
+<td><strong>for_live_stories</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/constructor/true">true</a></td>
+<td>Fetch the peers that may be passed to <a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a>.<code>send_as</code> to comment or react in a <a href="/api/group-calls#in-call-messages">live story »</a>.</td>
+</tr>
+<tr>
 <td><strong>peer</strong></td>
 <td style="text-align: center;"><a href="/type/InputPeer">InputPeer</a></td>
-<td>The group where we intend to send messages</td>
+<td>The target peer; when <code>for_live_stories</code> is set, the peer that owns the live story.</td>
 </tr>
 </tbody>
 </table>
@@ -124,7 +129,15 @@
 </table>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#message-reactions" id="message-reactions" name="message-reactions"><i class="anchor-icon"></i></a><a href="/api/reactions">Message reactions</a></h4>
-<p>Telegram allows users to react on any message using specific emojis, triggering cute lottie animations.</p></div>
+<p>Telegram allows users to react on any message using specific emojis, triggering cute lottie animations.</p>
+<h4><a class="anchor" href="#phonesendgroupcallmessage" id="phonesendgroupcallmessage" name="phonesendgroupcallmessage"><i class="anchor-icon"></i></a><a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a></h4>
+<p>Send an in-call message to all participants of a video chat/livestream or live story, including in RTMP mode, see <a href="/api/group-calls#in-call-messages">here »</a> for more info.</p>
+<p>The <code>send_as</code> field can only be populated for live stories, where it optionally selects the displayed author. If omitted, the server automatically selects the appropriate author. Do not populate it for video chats/livestreams.</p>
+<p>Video chats/livestreams and live stories support <a href="/api/group-calls#in-call-reactions">animated emoji reactions »</a>, encoded as messages containing only a standard available reaction emoji or a single custom emoji entity.</p>
+<p>For a paid live story comment, pass the user-confirmed donation amount in <code>allow_paid_stars</code>. For commenters other than the live story owner, this amount must be at least the current <a href="/constructor/groupCall">groupCall</a>.<code>send_paid_messages_stars</code> minimum. A higher amount may be donated to highlight the comment. The live story owner may comment without populating <code>allow_paid_stars</code>. To send a standalone paid live story donation, pass a positive <code>allow_paid_stars</code> value and an empty <code>message</code>, see <a href="/api/group-calls#paid-live-story-donations">here »</a> for the full flow.</p>
+<h4><a class="anchor" href="#group-calls" id="group-calls" name="group-calls"><i class="anchor-icon"></i></a><a href="/api/group-calls">Group calls</a></h4>
+<p>How to start, join and manage group calls and video chats.</p>
+</div>
   
 </div>
           

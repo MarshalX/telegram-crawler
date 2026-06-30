@@ -221,11 +221,11 @@
 </tr>
 <tr>
 <td><a href="/constructor/messageActionGroupCall">messageActionGroupCall</a></td>
-<td>The group call has ended</td>
+<td>A <a href="/api/group-calls#video-chats-livestreams">video chat/livestream</a> was started or terminated.</td>
 </tr>
 <tr>
 <td><a href="/constructor/messageActionInviteToGroupCall">messageActionInviteToGroupCall</a></td>
-<td>A set of users was invited to the group call</td>
+<td>A set of users was invited to a <a href="/api/group-calls#video-chats-livestreams">video chat/livestream »</a>.</td>
 </tr>
 <tr>
 <td><a href="/constructor/messageActionSetMessagesTTL">messageActionSetMessagesTTL</a></td>
@@ -233,7 +233,7 @@
 </tr>
 <tr>
 <td><a href="/constructor/messageActionGroupCallScheduled">messageActionGroupCallScheduled</a></td>
-<td>A group call was scheduled</td>
+<td>A <a href="/api/group-calls#video-chats-livestreams">video chat/livestream</a> was scheduled.</td>
 </tr>
 <tr>
 <td><a href="/constructor/messageActionSetChatTheme">messageActionSetChatTheme</a></td>
@@ -325,7 +325,7 @@
 </tr>
 <tr>
 <td><a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a></td>
-<td>Represents a <a href="/api/end-to-end/group-calls">conference call</a> (or an invitation to a conference call, if neither the <code>missed</code> nor <code>active</code> flags are set).<br><br>If <a href="/api/config#call-requests-disabled">call_requests_disabled</a> is not set or false, an incoming <a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a> with the <code>missed</code> and <code>active</code> flags <strong>not</strong> set should trigger ringing and an incoming call screen, just like for one-on-one calls.</td>
+<td>Represents a <a href="/api/group-calls#conference-calls">conference call »</a>, or an invitation to one if neither the <code>missed</code> nor <code>active</code> flags are set.<br><br>If <a href="/api/config#call-requests-disabled">call_requests_disabled</a> is not set or false, an incoming <a href="/constructor/messageActionConferenceCall">messageActionConferenceCall</a> with the <code>missed</code> and <code>active</code> flags <strong>not</strong> set should trigger ringing and an incoming call screen, just like for one-on-one calls.</td>
 </tr>
 <tr>
 <td><a href="/constructor/messageActionTodoCompletions">messageActionTodoCompletions</a></td>
@@ -349,10 +349,51 @@
 </tr>
 <tr>
 <td><a href="/constructor/messageActionGiftTon">messageActionGiftTon</a></td>
-<td>You were gifted some toncoins.<br><br>This service message should be displayed below the appropriate sticker from the <a href="/constructor/inputStickerSetTonGifts">inputStickerSetTonGifts »</a> <a href="/api/stickers#stickersets">stickerset »</a>:<br><br>- If <code>crypto_amount &lt;= 10_000_000_000</code>, choose the sticker with emoji equal to "<img class="emoji" src="//telegram.org/img/emoji/40/32E283A3.png" width="20" height="20" alt="2️⃣" />"<br>- If <code>crypto_amount &lt;= 50_000_000_000</code>, choose the sticker with emoji equal to "<img class="emoji" src="//telegram.org/img/emoji/40/31E283A3.png" width="20" height="20" alt="1️⃣" />"<br>- Otherwise, choose the sticker with emoji equal to "<img class="emoji" src="//telegram.org/img/emoji/40/33E283A3.png" width="20" height="20" alt="3️⃣" />"</td>
+<td>You were gifted some Grams.<br><br>This service message should be displayed below the appropriate sticker from the <a href="/constructor/inputStickerSetTonGifts">inputStickerSetTonGifts »</a> <a href="/api/stickers#stickersets">stickerset »</a>:<br><br>- If <code>crypto_amount &lt;= 10_000_000_000</code>, choose the sticker with emoji equal to "<img class="emoji" src="//telegram.org/img/emoji/40/32E283A3.png" width="20" height="20" alt="2️⃣" />"<br>- If <code>crypto_amount &lt;= 50_000_000_000</code>, choose the sticker with emoji equal to "<img class="emoji" src="//telegram.org/img/emoji/40/31E283A3.png" width="20" height="20" alt="1️⃣" />"<br>- Otherwise, choose the sticker with emoji equal to "<img class="emoji" src="//telegram.org/img/emoji/40/33E283A3.png" width="20" height="20" alt="3️⃣" />"</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionSuggestBirthday">messageActionSuggestBirthday</a></td>
+<td>A new birthday was suggested using <a href="/method/users.suggestBirthday">users.suggestBirthday</a>, see <a href="/api/profile#birthday">here »</a> for more info on birthdays in the API.</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionStarGiftPurchaseOffer">messageActionStarGiftPurchaseOffer</a></td>
+<td>Contains an offer to purchase a <a href="/api/gifts#collectible-gift-purchase-offers">collectible gift »</a>, see <a href="/api/gifts#collectible-gift-purchase-offers">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionStarGiftPurchaseOfferDeclined">messageActionStarGiftPurchaseOfferDeclined</a></td>
+<td>A <a href="/api/gifts#collectible-gift-purchase-offers">collectible gift purchase offer »</a> was declined, or the offer expired, see <a href="/api/gifts#collectible-gift-purchase-offers">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionNewCreatorPending">messageActionNewCreatorPending</a></td>
+<td>Service message: emitted to a supergroup when the <a href="/api/channel#leaving-groups-channels">group/channel creator leaves the group »</a>, indicating that ownership transfer is pending. The <code>new_creator_id</code> user will become the new owner after 7 days if the old owner does not rejoin.<br><br>Sent from the user ID of the old owner.</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionChangeCreator">messageActionChangeCreator</a></td>
+<td>Service message: emitted to a supergroup when <a href="/api/channel#leaving-groups-channels">ownership transfer completes after the old owner left the group »</a> (7 days after the old owner left without rejoining), indicating that ownership has been transferred to a new owner.<br><br>Sent from the user ID of the old owner.</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionNoForwardsToggle">messageActionNoForwardsToggle</a></td>
+<td>Emitted only in private chats when enabling or disabling <a href="/api/content-protection#for-users">content protection »</a>.</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionNoForwardsRequest">messageActionNoForwardsRequest</a></td>
+<td>Emitted only in private chats if the other side requested to disable <a href="/api/content-protection#for-users">content protection »</a>.</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionPollAppendAnswer">messageActionPollAppendAnswer</a></td>
+<td>A new answer option was added to an <a href="/api/poll#open-answer-polls">open-answer poll »</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionPollDeleteAnswer">messageActionPollDeleteAnswer</a></td>
+<td>An answer option was removed from an <a href="/api/poll#open-answer-polls">open-answer poll »</a></td>
+</tr>
+<tr>
+<td><a href="/constructor/messageActionManagedBotCreated">messageActionManagedBotCreated</a></td>
+<td>Service message sent by a user to a manager bot when a new <a href="/api/bots/managed-bots">managed bot »</a> is created through it, by invoking <a href="/method/messages.sendBotRequestedPeer">messages.sendBotRequestedPeer</a> with a <a href="/constructor/requestPeerTypeCreateBot">requestPeerTypeCreateBot</a>, see <a href="/api/bots/buttons#requesting-a-managed-bot">here »</a> for more info.</td>
 </tr>
 </tbody>
-</table></div>
+</table>
+</div>
   
 </div>
           

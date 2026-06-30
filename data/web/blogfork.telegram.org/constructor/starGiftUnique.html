@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>starGiftUnique</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Represents a collectible star gift, see here » for more info.  The sticker that represents the gift is contained in a starGiftAttributeModel object in attributes.">
+    <meta property="description" content="Represents a collectible star gift, see here » for more info.">
     <meta property="og:title" content="starGiftUnique">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Represents a collectible star gift, see here » for more info.  The sticker that represents the gift is contained in a starGiftAttributeModel object in attributes.">
+    <meta property="og:description" content="Represents a collectible star gift, see here » for more info.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -82,7 +82,7 @@
 <tr>
 <td><strong>resale_ton_only</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.7?<a href="/constructor/true">true</a></td>
-<td>Whether the gift can be bought only using Toncoins.</td>
+<td>Whether the gift can be bought only using Grams.</td>
 </tr>
 <tr>
 <td><strong>theme_available</strong></td>
@@ -90,14 +90,24 @@
 <td>A chat theme associated to this gift is available, <a href="/api/themes#chat-themes">see here »</a> for more info on how to use it.</td>
 </tr>
 <tr>
+<td><strong>burned</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/constructor/true">true</a></td>
+<td>This gift was already used as an ingredient for <a href="/api/gifts#crafting-collectible-gifts">crafting another collectible gift »</a>.</td>
+</tr>
+<tr>
+<td><strong>crafted</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.15?<a href="/constructor/true">true</a></td>
+<td>This collectible gift was obtained by <a href="/api/gifts#crafting-collectible-gifts">crafting »</a>, not by upgrading a regular gift.</td>
+</tr>
+<tr>
 <td><strong>id</strong></td>
 <td style="text-align: center;"><a href="/type/long">long</a></td>
-<td>Identifier of the collectible gift.</td>
+<td>Unique identifier of this collectible gift.</td>
 </tr>
 <tr>
 <td><strong>gift_id</strong></td>
 <td style="text-align: center;"><a href="/type/long">long</a></td>
-<td>Unique ID of the gift.</td>
+<td>ID of the regular gift from which this gift was upgraded (all collectible gifts upgraded from the same gift will have the same <code>gift_id</code>, with different attributes).</td>
 </tr>
 <tr>
 <td><strong>title</strong></td>
@@ -162,17 +172,42 @@
 <tr>
 <td><strong>value_amount</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.8?<a href="/type/long">long</a></td>
-<td>Price of the gift.</td>
+<td>Estimated price of the gift.</td>
 </tr>
 <tr>
 <td><strong>value_currency</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.8?<a href="/type/string">string</a></td>
-<td>Currency for the gift's price.</td>
+<td>Currency for the gift's estimated price.</td>
+</tr>
+<tr>
+<td><strong>value_usd_amount</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.8?<a href="/type/long">long</a></td>
+<td>Estimated price of the gift in USD cents.</td>
 </tr>
 <tr>
 <td><strong>theme_peer</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.10?<a href="/type/Peer">Peer</a></td>
 <td>The current chat where the associated <a href="/api/themes#chat-themes">chat theme</a> is installed, if any (gift-based themes can only be installed in one chat at a time).</td>
+</tr>
+<tr>
+<td><strong>peer_color</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.11?<a href="/type/PeerColor">PeerColor</a></td>
+<td>Can contain a <a href="/api/colors#collectible-message-palettes">collectible message palette »</a>.</td>
+</tr>
+<tr>
+<td><strong>host_id</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.12?<a href="/type/Peer">Peer</a></td>
+<td>If set, the gift is currently <a href="/api/gifts#hosted-collectible-gifts">hosted on the specified user or channel profile »</a>, while ownership remains with the TON wallet in <code>owner_address</code>.</td>
+</tr>
+<tr>
+<td><strong>offer_min_stars</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.13?<a href="/type/int">int</a></td>
+<td>If set, you can <a href="/api/gifts#collectible-gift-purchase-offers">send a purchase offer for this gift »</a>: the minimum offer price is specified in this flag.</td>
+</tr>
+<tr>
+<td><strong>craft_chance_permille</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.16?<a href="/type/int">int</a></td>
+<td>Success probability, per 1000, contributed by this gift when it is used for <a href="/api/gifts#crafting-collectible-gifts">crafting »</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -181,16 +216,19 @@
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#telegram-premium" id="telegram-premium" name="telegram-premium"><i class="anchor-icon"></i></a><a href="/api/premium">Telegram Premium</a></h4>
 <p>Telegram Premium is an optional subscription service that unlocks additional exclusive client-side and API-side features, while helping support the development of the app.</p>
-<h4><a class="anchor" href="#themes" id="themes" name="themes"><i class="anchor-icon"></i></a><a href="/api/themes">Themes</a></h4>
+<h4><a class="anchor" href="#telegram-themes" id="telegram-themes" name="telegram-themes"><i class="anchor-icon"></i></a><a href="/api/themes">Telegram themes</a></h4>
 <p>Telegram apps support generating, sharing and synchronizing app themes.</p>
-<h4><a class="anchor" href="#deep-links" id="deep-links" name="deep-links"><i class="anchor-icon"></i></a><a href="/api/links">Deep links</a></h4>
-<p>Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps by registering OS handlers.</p>
 <h4><a class="anchor" href="#telegram-gifts" id="telegram-gifts" name="telegram-gifts"><i class="anchor-icon"></i></a><a href="/api/gifts">Telegram Gifts</a></h4>
 <p>Users can send Gifts to their friends. The recipients of gifts can display them on their profile pages or turn them into Telegram Stars ». Telegram Stars can be used for many things, including supporting creators and buying services in mini apps.</p>
+<h4><a class="anchor" href="#deep-links" id="deep-links" name="deep-links"><i class="anchor-icon"></i></a><a href="/api/links">Deep links</a></h4>
+<p>Telegram clients must handle special tg:// and t.me deep links encountered in messages, link entities and in other apps by registering OS handlers.</p>
 <h4><a class="anchor" href="#client-configuration" id="client-configuration" name="client-configuration"><i class="anchor-icon"></i></a><a href="/api/config">Client configuration</a></h4>
 <p>The MTProto API has multiple configuration parameters that can be fetched with the appropriate methods.</p>
+<h4><a class="anchor" href="#accent-colors" id="accent-colors" name="accent-colors"><i class="anchor-icon"></i></a><a href="/api/colors">Accent colors</a></h4>
+<p>Telegram users and channels can change the accent color and background pattern of their profile page and their messages!</p>
 <h4><a class="anchor" href="#stargiftattributemodel" id="stargiftattributemodel" name="stargiftattributemodel"><i class="anchor-icon"></i></a><a href="/constructor/starGiftAttributeModel">starGiftAttributeModel</a></h4>
-<p>The model of a <a href="/api/gifts#collectible-gifts">collectible gift »</a>.</p></div>
+<p>The model of a <a href="/api/gifts#collectible-gifts">collectible gift »</a>.</p>
+</div>
   
 </div>
           

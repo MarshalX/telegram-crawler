@@ -91,12 +91,17 @@
 <tr>
 <td><strong>short</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/constructor/true">true</a></td>
-<td>Whether this constructor is a reduced version of the full topic information. <br>If set, only the <code>my</code>, <code>closed</code>, <code>id</code>, <code>date</code>, <code>title</code>, <code>icon_color</code>, <code>icon_emoji_id</code> and <code>from_id</code> parameters will contain valid information. <br>Reduced info is usually only returned in topic-related <a href="/api/recent-actions">admin log events »</a> and in the <a href="/constructor/messages.channelMessages">messages.channelMessages</a> constructor: if needed, full information can be fetched using <a href="/method/channels.getForumTopicsByID">channels.getForumTopicsByID</a>.</td>
+<td>Whether this constructor is a reduced version of the full topic information. <br>If set, only the <code>my</code>, <code>closed</code>, <code>id</code>, <code>date</code>, <code>title</code>, <code>icon_color</code>, <code>icon_emoji_id</code> and <code>from_id</code> parameters will contain valid information. <br>Reduced info is usually only returned in topic-related <a href="/api/recent-actions">admin log events »</a> and in the <a href="/constructor/messages.channelMessages">messages.channelMessages</a> constructor: if needed, full information can be fetched using <a href="/method/messages.getForumTopicsByID">messages.getForumTopicsByID</a>.</td>
 </tr>
 <tr>
 <td><strong>hidden</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.6?<a href="/constructor/true">true</a></td>
 <td>Whether the topic is hidden (only valid for the "General" topic, <code>id=1</code>)</td>
+</tr>
+<tr>
+<td><strong>title_missing</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.7?<a href="/constructor/true">true</a></td>
+<td>If set, the topic has no user-defined title, can only be set for the per-user topics of <a href="/api/forum#bot-forums">bot forums</a>; if this field is set, the topic title likely needs to be changed by the bot.</td>
 </tr>
 <tr>
 <td><strong>id</strong></td>
@@ -107,6 +112,11 @@
 <td><strong>date</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
 <td>Topic creation date</td>
+</tr>
+<tr>
+<td><strong>peer</strong></td>
+<td style="text-align: center;"><a href="/type/Peer">Peer</a></td>
+<td>Contains the supergroup/private chat where the topic is located.  <br>This field is useful especially when this object is returned by methods like <a href="/method/messages.getMessages">messages.getMessages</a>, which can return messages and forum topics belonging to different (private chat) peers in the same method call, making it impossible to tell the topic's peer based on the method call parameters or surrounding context.</td>
 </tr>
 <tr>
 <td><strong>title</strong></td>
@@ -154,6 +164,11 @@
 <td>Number of unread reactions to messages you sent</td>
 </tr>
 <tr>
+<td><strong>unread_poll_votes_count</strong></td>
+<td style="text-align: center;"><a href="/type/int">int</a></td>
+<td>Number of <a href="/api/poll#unread-poll-votes">unread votes cast in non-anonymous polls »</a> owned by the user in this forum topic.</td>
+</tr>
+<tr>
 <td><strong>from_id</strong></td>
 <td style="text-align: center;"><a href="/type/Peer">Peer</a></td>
 <td>ID of the peer that created the topic</td>
@@ -177,16 +192,21 @@
 <p>Both supergroups and channels offer a so-called admin log, a log of recent relevant supergroup and channel actions, like the modification of group/channel settings or information on behalf of an admin, user kicks and bans, and more.</p>
 <h4><a class="anchor" href="#messageschannelmessages" id="messageschannelmessages" name="messageschannelmessages"><i class="anchor-icon"></i></a><a href="/constructor/messages.channelMessages">messages.channelMessages</a></h4>
 <p>Channel messages</p>
-<h4><a class="anchor" href="#channelsgetforumtopicsbyid" id="channelsgetforumtopicsbyid" name="channelsgetforumtopicsbyid"><i class="anchor-icon"></i></a><a href="/method/channels.getForumTopicsByID">channels.getForumTopicsByID</a></h4>
+<h4><a class="anchor" href="#messagesgetforumtopicsbyid" id="messagesgetforumtopicsbyid" name="messagesgetforumtopicsbyid"><i class="anchor-icon"></i></a><a href="/method/messages.getForumTopicsByID">messages.getForumTopicsByID</a></h4>
 <p>Get forum topics by their ID</p>
-<h4><a class="anchor" href="#forums" id="forums" name="forums"><i class="anchor-icon"></i></a><a href="/api/forum">Forums</a></h4>
+<h4><a class="anchor" href="#forum-topics" id="forum-topics" name="forum-topics"><i class="anchor-icon"></i></a><a href="/api/forum">Forum topics</a></h4>
 <p>Telegram allows creating forums with multiple distinct topics.</p>
+<h4><a class="anchor" href="#messagesgetmessages" id="messagesgetmessages" name="messagesgetmessages"><i class="anchor-icon"></i></a><a href="/method/messages.getMessages">messages.getMessages</a></h4>
+<p>Returns the list of messages by their IDs.</p>
 <h4><a class="anchor" href="#custom-emojis" id="custom-emojis" name="custom-emojis"><i class="anchor-icon"></i></a><a href="/api/custom-emoji">Custom emojis</a></h4>
 <p>Telegram allows including animated and static custom emojis inside of messages.</p>
-<h4><a class="anchor" href="#mentions" id="mentions" name="mentions"><i class="anchor-icon"></i></a><a href="/api/mentions">Mentions</a></h4>
+<h4><a class="anchor" href="#mentions-and-replies" id="mentions-and-replies" name="mentions-and-replies"><i class="anchor-icon"></i></a><a href="/api/mentions">Mentions and replies</a></h4>
 <p>Telegram allows mentioning other users in case of urgent duckling matters, and quickly navigating to those mentions in order to read them as swiftly as possible.</p>
+<h4><a class="anchor" href="#polls-and-quizzes" id="polls-and-quizzes" name="polls-and-quizzes"><i class="anchor-icon"></i></a><a href="/api/poll">Polls and quizzes</a></h4>
+<p>Telegram allows sending polls and quizzes, that can be voted on by thousands, if not millions of users in chats and channels.</p>
 <h4><a class="anchor" href="#message-drafts" id="message-drafts" name="message-drafts"><i class="anchor-icon"></i></a><a href="/api/drafts">Message drafts</a></h4>
-<p>How to handle message drafts</p></div>
+<p>How to handle message drafts</p>
+</div>
   
 </div>
           

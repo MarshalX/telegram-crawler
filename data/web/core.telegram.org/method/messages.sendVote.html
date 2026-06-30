@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>messages.sendVote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Vote in a poll  Starting from layer 159, the vote will be sent from the peer specified using messages.saveDefaultSendAs.">
+    <meta property="description" content="Vote in a poll">
     <meta property="og:title" content="messages.sendVote">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Vote in a poll  Starting from layer 159, the vote will be sent from the peer specified using messages.saveDefaultSendAs.">
+    <meta property="og:description" content="Vote in a poll">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -46,6 +46,7 @@
   
   <div id="dev_page_content"><p>Vote in a <a href="/constructor/poll">poll</a></p>
 <p>Starting from layer 159, the vote will be sent from the peer specified using <a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a>.</p>
+<p>Before voting, clients should check that the user is actually allowed to vote: voting is not possible if the poll is closed, if it is <a href="/api/poll#subscriber-only-polls">subscriber-only »</a> and the user is not an eligible subscriber, or if it is <a href="/api/poll#country-restricted-polls">country-restricted »</a> and the user's <a href="/api/config#phone-country-iso2"><code>phone_country_iso2</code> »</a> is not in the poll's allowed country list. See <a href="/api/poll#vote-restrictions">vote restrictions »</a> for the full list of conditions.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -148,6 +149,11 @@
 <td>The provided peer id is invalid.</td>
 </tr>
 <tr>
+<td>406</td>
+<td>POLL_MEMBER_RESTRICTED</td>
+<td>Only channel subscribers can vote in this poll.</td>
+</tr>
+<tr>
 <td>400</td>
 <td>REVOTE_NOT_ALLOWED</td>
 <td>You cannot change your vote.</td>
@@ -158,7 +164,12 @@
 <h4><a class="anchor" href="#poll" id="poll" name="poll"><i class="anchor-icon"></i></a><a href="/constructor/poll">poll</a></h4>
 <p>Poll</p>
 <h4><a class="anchor" href="#messagessavedefaultsendas" id="messagessavedefaultsendas" name="messagessavedefaultsendas"><i class="anchor-icon"></i></a><a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a></h4>
-<p>Change the default peer that should be used when sending messages, reactions, poll votes to a specific group</p></div>
+<p>Change the default peer that should be used when sending messages, reactions, poll votes to a specific group</p>
+<h4><a class="anchor" href="#polls-and-quizzes" id="polls-and-quizzes" name="polls-and-quizzes"><i class="anchor-icon"></i></a><a href="/api/poll">Polls and quizzes</a></h4>
+<p>Telegram allows sending polls and quizzes, that can be voted on by thousands, if not millions of users in chats and channels.</p>
+<h4><a class="anchor" href="#client-configuration" id="client-configuration" name="client-configuration"><i class="anchor-icon"></i></a><a href="/api/config">Client configuration</a></h4>
+<p>The MTProto API has multiple configuration parameters that can be fetched with the appropriate methods.</p>
+</div>
   
 </div>
           

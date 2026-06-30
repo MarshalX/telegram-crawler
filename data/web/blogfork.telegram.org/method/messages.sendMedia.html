@@ -99,7 +99,7 @@
 <tr>
 <td><strong>noforwards</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/constructor/true">true</a></td>
-<td>Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more">content protection</a> enabled</td>
+<td>Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have <a href="https://telegram.org/blog/content-protection-delete-by-date-and-more">content protection</a> enabled</td>
 </tr>
 <tr>
 <td><strong>update_stickersets_order</strong></td>
@@ -155,6 +155,11 @@
 <td><strong>schedule_date</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.10?<a href="/type/int">int</a></td>
 <td>Scheduled message date for <a href="/api/scheduled-messages">scheduled messages</a></td>
+</tr>
+<tr>
+<td><strong>schedule_repeat_period</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.24?<a href="/type/int">int</a></td>
+<td>Once sent, this message will be automatically re-scheduled to be re-sent again this many seconds in the future, see <a href="/api/scheduled-messages#repeating-scheduled-messages">here »</a> for more info on repeating scheduled messages.</td>
 </tr>
 <tr>
 <td><strong>send_as</strong></td>
@@ -231,6 +236,11 @@
 <td>400</td>
 <td>BUSINESS_PEER_INVALID</td>
 <td>Messages can't be set to the specified peer through the current <a href="/api/business#connected-bots">business connection</a>.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>BUSINESS_PEER_USAGE_MISSING</td>
+<td>You cannot send a message to a user through a <a href="/api/business#connected-bots">business connection</a> if the user hasn't recently contacted us.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -364,6 +374,11 @@
 </tr>
 <tr>
 <td>400</td>
+<td>EFFECT_CHAT_INVALID</td>
+<td> </td>
+</tr>
+<tr>
+<td>400</td>
 <td>EFFECT_ID_INVALID</td>
 <td>The specified effect ID is invalid.</td>
 </tr>
@@ -384,8 +399,18 @@
 </tr>
 <tr>
 <td>400</td>
+<td>EXTENDED_MEDIA_EMPTY</td>
+<td>The specified extended media is empty.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>EXTENDED_MEDIA_INVALID</td>
 <td>The specified paid media is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>EXTENDED_MEDIA_PEER_INVALID</td>
+<td> </td>
 </tr>
 <tr>
 <td>400</td>
@@ -461,6 +486,11 @@
 <td>400</td>
 <td>MESSAGE_EMPTY</td>
 <td>The provided message is empty.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>MESSAGE_TOO_LONG</td>
+<td>The provided message is too long.</td>
 </tr>
 <tr>
 <td>400</td>
@@ -594,6 +624,11 @@
 </tr>
 <tr>
 <td>400</td>
+<td>REPLY_TO_MONOFORUM_PEER_INVALID</td>
+<td>The specified inputReplyToMonoForum.monoforum_peer_id is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>SCHEDULE_BOT_NOT_ALLOWED</td>
 <td>Bots cannot schedule messages.</td>
 </tr>
@@ -649,6 +684,11 @@
 </tr>
 <tr>
 <td>400</td>
+<td>TODO_ITEMS_TOO_MUCH</td>
+<td>You specified too many todo list items.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>TODO_ITEM_DUPLICATE</td>
 <td>Duplicate <a href="/api/todo">checklist items</a> detected.</td>
 </tr>
@@ -671,6 +711,11 @@
 <td>400</td>
 <td>USER_BANNED_IN_CHANNEL</td>
 <td>You're banned from sending messages in supergroups/channels.</td>
+</tr>
+<tr>
+<td>400</td>
+<td>USER_BOT_TO_BOT_DISABLED</td>
+<td> </td>
 </tr>
 <tr>
 <td>403</td>
@@ -725,14 +770,14 @@
 </tbody>
 </table>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
-<h4><a class="anchor" href="#stickers" id="stickers" name="stickers"><i class="anchor-icon"></i></a><a href="/api/stickers">Stickers</a></h4>
+<h4><a class="anchor" href="#stickers-and-masks" id="stickers-and-masks" name="stickers-and-masks"><i class="anchor-icon"></i></a><a href="/api/stickers">Stickers and masks</a></h4>
 <p>Telegram clients support displaying static and animated stickers.</p>
 <h4><a class="anchor" href="#bots-faq" id="bots-faq" name="bots-faq"><i class="anchor-icon"></i></a><a href="/bots/faq">Bots FAQ</a></h4>
 <h4><a class="anchor" href="#styled-text-with-message-entities" id="styled-text-with-message-entities" name="styled-text-with-message-entities"><i class="anchor-icon"></i></a><a href="/api/entities">Styled text with message entities</a></h4>
 <p>How to create styled text with message entities</p>
 <h4><a class="anchor" href="#scheduled-messages" id="scheduled-messages" name="scheduled-messages"><i class="anchor-icon"></i></a><a href="/api/scheduled-messages">Scheduled messages</a></h4>
 <p>Telegram allows scheduling messages</p>
-<h4><a class="anchor" href="#business" id="business" name="business"><i class="anchor-icon"></i></a><a href="/api/business">Business</a></h4>
+<h4><a class="anchor" href="#telegram-business" id="telegram-business" name="telegram-business"><i class="anchor-icon"></i></a><a href="/api/business">Telegram Business</a></h4>
 <p>Users can turn their Telegram account into a business account, gaining access to business features such as opening hours, location, quick replies, automated messages, custom start pages, chatbot support, and more.</p>
 <h4><a class="anchor" href="#animated-message-effects" id="animated-message-effects" name="animated-message-effects"><i class="anchor-icon"></i></a><a href="/api/effects">Animated message effects</a></h4>
 <p>Telegram allows adding spectacular animated effects to messages you send.</p>
@@ -743,9 +788,12 @@
 <h4><a class="anchor" href="#suggested-posts" id="suggested-posts" name="suggested-posts"><i class="anchor-icon"></i></a><a href="/api/suggested-posts">Suggested posts</a></h4>
 <p>Telegram offers a powerful monetization feature to channel administrators: suggested posts.</p>
 <h4><a class="anchor" href="#keyboardbuttoncopy" id="keyboardbuttoncopy" name="keyboardbuttoncopy"><i class="anchor-icon"></i></a><a href="/constructor/keyboardButtonCopy">keyboardButtonCopy</a></h4>
-<p>Clipboard button: when clicked, the attached text must be copied to the clipboard.</p>
+<p>Clipboard button</p>
+<p>Available only in <a href="/constructor/replyInlineMarkup">inline keyboards</a>.</p>
+<p>When pressed, clients must copy <code>copy_text</code> to the clipboard.</p>
 <h4><a class="anchor" href="#inputkeyboardbuttonuserprofile" id="inputkeyboardbuttonuserprofile" name="inputkeyboardbuttonuserprofile"><i class="anchor-icon"></i></a><a href="/constructor/inputKeyboardButtonUserProfile">inputKeyboardButtonUserProfile</a></h4>
 <p>Button that links directly to a user profile</p>
+<p>Use this constructor to send a <a href="/constructor/keyboardButtonUserProfile">keyboardButtonUserProfile</a> button in an <a href="/bots/features#inline-keyboards">inline keyboard</a>.</p>
 <h4><a class="anchor" href="#discussion-groups" id="discussion-groups" name="discussion-groups"><i class="anchor-icon"></i></a><a href="/api/discussion">Discussion groups</a></h4>
 <p>Groups can be associated to a channel as a discussion group, to allow users to discuss about posts.</p>
 <h4><a class="anchor" href="#inputmediapaidmedia" id="inputmediapaidmedia" name="inputmediapaidmedia"><i class="anchor-icon"></i></a><a href="/constructor/inputMediaPaidMedia">inputMediaPaidMedia</a></h4>
@@ -762,12 +810,13 @@
 <p>Bots and channels may create subscriptions, periodically charging users a certain amount of Telegram Stars in exchange for content and services.</p>
 <h4><a class="anchor" href="#paymentsexportinvoice" id="paymentsexportinvoice" name="paymentsexportinvoice"><i class="anchor-icon"></i></a><a href="/method/payments.exportInvoice">payments.exportInvoice</a></h4>
 <p>Generate an <a href="/api/links#invoice-links">invoice deep link</a></p>
-<h4><a class="anchor" href="#monoforum" id="monoforum" name="monoforum"><i class="anchor-icon"></i></a><a href="/api/monoforum">Monoforum</a></h4>
+<h4><a class="anchor" href="#direct-messages-to-channels" id="direct-messages-to-channels" name="direct-messages-to-channels"><i class="anchor-icon"></i></a><a href="/api/monoforum">Direct messages to channels</a></h4>
 <p>Telegram supports direct messages to channels, which can also be used to suggest (even paid) channel posts.</p>
 <h4><a class="anchor" href="#invoice" id="invoice" name="invoice"><i class="anchor-icon"></i></a><a href="/constructor/invoice">invoice</a></h4>
 <p>Invoice</p>
-<h4><a class="anchor" href="#todo" id="todo" name="todo"><i class="anchor-icon"></i></a><a href="/api/todo">Todo</a></h4>
-<p>Premium users can now create collaborative checklists in any chat to track tasks and coordinate teams — or manage shopping and to-do lists.</p></div>
+<h4><a class="anchor" href="#checklists-and-to-do-lists" id="checklists-and-to-do-lists" name="checklists-and-to-do-lists"><i class="anchor-icon"></i></a><a href="/api/todo">Checklists and to-do lists</a></h4>
+<p>Premium users can now create collaborative checklists in any chat to track tasks and coordinate teams — or manage shopping and to-do lists.</p>
+</div>
   
 </div>
           

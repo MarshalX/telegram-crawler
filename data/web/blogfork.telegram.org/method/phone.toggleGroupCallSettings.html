@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>phone.toggleGroupCallSettings</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Change group call settings">
+    <meta property="description" content="Change group call settings. Each setting supports different group call types, see here » for more info.">
     <meta property="og:title" content="phone.toggleGroupCallSettings">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Change group call settings">
+    <meta property="og:description" content="Change group call settings. Each setting supports different group call types, see here » for more info.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -44,7 +44,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/methods" >All Methods</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/method/phone.toggleGroupCallSettings" >phone.toggleGroupCallSettings</a></li></ul></div>
   <h1 id="dev_page_title">phone.toggleGroupCallSettings</h1>
   
-  <div id="dev_page_content"><p>Change group call settings</p>
+  <div id="dev_page_content"><p>Change group call settings. Each setting supports different group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -84,17 +84,27 @@
 <tr>
 <td><strong>reset_invite_hash</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/constructor/true">true</a></td>
-<td>Invalidate existing invite links</td>
+<td>Invalidate existing invite links for video chats, livestreams and conferences</td>
 </tr>
 <tr>
 <td><strong>call</strong></td>
 <td style="text-align: center;"><a href="/type/InputGroupCall">InputGroupCall</a></td>
-<td>Group call</td>
+<td>Group call whose settings should be changed</td>
 </tr>
 <tr>
 <td><strong>join_muted</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.0?<a href="/type/Bool">Bool</a></td>
-<td>Whether all users will that join this group call are muted by default upon joining the group call</td>
+<td>Whether users joining a non-RTMP video chat/livestream should be muted by default</td>
+</tr>
+<tr>
+<td><strong>messages_enabled</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.2?<a href="/type/Bool">Bool</a></td>
+<td>Enable or disable the in-call message overlay in video chats/livestreams, conferences and live stories, including in RTMP mode</td>
+</tr>
+<tr>
+<td><strong>send_paid_messages_stars</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.3?<a href="/type/long">long</a></td>
+<td>Set the minimum Telegram Stars donation required from users other than the live story owner for each comment; the owner may always comment without donating, and <code>0</code> allows free comments for everyone</td>
 </tr>
 </tbody>
 </table>
@@ -112,6 +122,16 @@
 </thead>
 <tbody>
 <tr>
+<td>403</td>
+<td>GROUPCALL_CHANGE_FORBIDDEN</td>
+<td>You cannot change this group call setting.</td>
+</tr>
+<tr>
+<td>403</td>
+<td>GROUPCALL_FORBIDDEN</td>
+<td>The group call has already ended.</td>
+</tr>
+<tr>
 <td>400</td>
 <td>GROUPCALL_INVALID</td>
 <td>The specified group call is invalid.</td>
@@ -122,7 +142,11 @@
 <td>Group call settings weren't modified.</td>
 </tr>
 </tbody>
-</table></div>
+</table>
+<h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
+<h4><a class="anchor" href="#group-calls" id="group-calls" name="group-calls"><i class="anchor-icon"></i></a><a href="/api/group-calls">Group calls</a></h4>
+<p>How to start, join and manage group calls and video chats.</p>
+</div>
   
 </div>
           

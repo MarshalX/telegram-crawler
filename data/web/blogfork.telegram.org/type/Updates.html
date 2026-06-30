@@ -206,7 +206,7 @@
 <tbody>
 <tr>
 <td><a href="/constructor/updatesTooLong">updatesTooLong</a></td>
-<td>Too many updates, it is necessary to execute <a href="/method/updates.getDifference">updates.getDifference</a>.</td>
+<td>The number of queued updates in the common message box is too large to be delivered passively through the socket, invoke <a href="/method/updates.getDifference">updates.getDifference</a> to fetch the difference as specified in the <a href="/api/updates">documentation »</a>.<br><br>Does <strong>not</strong> necessarily indicate the <a href="/api/updates#recovering-gaps-for-very-old-messages">message box size limit was reached</a>, it simply indicates that the number of queued updates in a message box is too large to be delivered passively through the socket.</td>
 </tr>
 <tr>
 <td><a href="/constructor/updateShortMessage">updateShortMessage</a></td>
@@ -254,6 +254,10 @@
 <tr>
 <td><a href="/method/account.getBotBusinessConnection">account.getBotBusinessConnection</a></td>
 <td>Bots may invoke this method to re-fetch the <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> constructor associated with a specific <a href="/api/bots/connected-business-bots">business <code>connection_id</code>, see here »</a> for more info on connected business bots.  <br>This is needed for example for freshly logged in bots that are receiving some <a href="/constructor/updateBotNewBusinessMessage">updateBotNewBusinessMessage</a>, etc. updates because some users have already connected to the bot before it could login.  <br>In this case, the bot is receiving messages from the business connection, but it hasn't cached the associated <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> with info about the connection (can it reply to messages? etc.) yet, and cannot receive the old ones because they were sent when the bot wasn't logged into the session yet.  <br>This method can be used to fetch info about a not-yet-cached business connection, and should not be invoked if the info is already cached or to fetch changes, as eventual changes will automatically be sent as new <a href="/constructor/updateBotBusinessConnect">updateBotBusinessConnect</a> updates to the bot using the usual <a href="/api/updates">update delivery methods »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/users.suggestBirthday">users.suggestBirthday</a></td>
+<td>Suggest a birthday to another user, see <a href="/api/profile#birthday">here »</a> for more info on birthdays in the API.</td>
 </tr>
 <tr>
 <td><a href="/method/contacts.deleteContacts">contacts.deleteContacts</a></td>
@@ -341,7 +345,7 @@
 </tr>
 <tr>
 <td><a href="/method/messages.sendVote">messages.sendVote</a></td>
-<td>Vote in a <a href="/constructor/poll">poll</a><br><br>Starting from layer 159, the vote will be sent from the peer specified using <a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a>.</td>
+<td>Vote in a <a href="/constructor/poll">poll</a><br><br>Starting from layer 159, the vote will be sent from the peer specified using <a href="/method/messages.saveDefaultSendAs">messages.saveDefaultSendAs</a>.<br><br>Before voting, clients should check that the user is actually allowed to vote: voting is not possible if the poll is closed, if it is <a href="/api/poll#subscriber-only-polls">subscriber-only »</a> and the user is not an eligible subscriber, or if it is <a href="/api/poll#country-restricted-polls">country-restricted »</a> and the user's <a href="/api/config#phone-country-iso2"><code>phone_country_iso2</code> »</a> is not in the poll's allowed country list. See <a href="/api/poll#vote-restrictions">vote restrictions »</a> for the full list of conditions.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.getPollResults">messages.getPollResults</a></td>
@@ -377,7 +381,7 @@
 </tr>
 <tr>
 <td><a href="/method/messages.toggleNoForwards">messages.toggleNoForwards</a></td>
-<td>Enable or disable <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more">content protection</a> on a channel or chat</td>
+<td>Enable or disable <a href="/api/content-protection">content protection</a> on a channel, group or private chat.</td>
 </tr>
 <tr>
 <td><a href="/method/messages.sendReaction">messages.sendReaction</a></td>
@@ -444,6 +448,42 @@
 <td>Approve or reject a <a href="/api/suggested-posts">suggested post »</a>.</td>
 </tr>
 <tr>
+<td><a href="/method/messages.editForumTopic">messages.editForumTopic</a></td>
+<td>Edit <a href="/api/forum">forum topic</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.updatePinnedForumTopic">messages.updatePinnedForumTopic</a></td>
+<td>Pin or unpin <a href="/api/forum">forum topics</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.reorderPinnedForumTopics">messages.reorderPinnedForumTopics</a></td>
+<td>Reorder pinned forum topics</td>
+</tr>
+<tr>
+<td><a href="/method/messages.createForumTopic">messages.createForumTopic</a></td>
+<td>Create a <a href="/api/forum">forum topic</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.editChatCreator">messages.editChatCreator</a></td>
+<td>Transfer the ownership of a basic group, supergroup or channel to another user, see <a href="/api/channel#transferring-ownership-of-a-group-channel">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.editChatParticipantRank">messages.editChatParticipantRank</a></td>
+<td>Edit a group participant's <a href="/api/rank">tag »</a>.</td>
+</tr>
+<tr>
+<td><a href="/method/messages.addPollAnswer">messages.addPollAnswer</a></td>
+<td>Add an answer option to an <a href="/api/poll#open-answer-polls">open-answer poll »</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.deletePollAnswer">messages.deletePollAnswer</a></td>
+<td>Remove an answer option from an <a href="/api/poll#open-answer-polls">open-answer poll »</a></td>
+</tr>
+<tr>
+<td><a href="/method/messages.deleteParticipantReaction">messages.deleteParticipantReaction</a></td>
+<td>As an admin, remove all of a specific participant's <a href="/api/reactions">reactions</a> from a single message.</td>
+</tr>
+<tr>
 <td><a href="/method/channels.createChannel">channels.createChannel</a></td>
 <td>Create a <a href="/api/channel">supergroup/channel</a>.</td>
 </tr>
@@ -488,10 +528,6 @@
 <td>Hide/unhide message history for new channel/supergroup users</td>
 </tr>
 <tr>
-<td><a href="/method/channels.editCreator">channels.editCreator</a></td>
-<td>Transfer channel ownership</td>
-</tr>
-<tr>
 <td><a href="/method/channels.toggleSlowMode">channels.toggleSlowMode</a></td>
 <td>Toggle supergroup slow mode: if enabled, users will only be able to send one message every <code>seconds</code> seconds</td>
 </tr>
@@ -510,22 +546,6 @@
 <tr>
 <td><a href="/method/channels.toggleForum">channels.toggleForum</a></td>
 <td>Enable or disable <a href="/api/forum">forum functionality</a> in a supergroup.</td>
-</tr>
-<tr>
-<td><a href="/method/channels.createForumTopic">channels.createForumTopic</a></td>
-<td>Create a <a href="/api/forum">forum topic</a>; requires <a href="/api/rights"><code>manage_topics</code> rights</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/channels.editForumTopic">channels.editForumTopic</a></td>
-<td>Edit <a href="/api/forum">forum topic</a>; requires <a href="/api/rights"><code>manage_topics</code> rights</a>.</td>
-</tr>
-<tr>
-<td><a href="/method/channels.updatePinnedForumTopic">channels.updatePinnedForumTopic</a></td>
-<td>Pin or unpin <a href="/api/forum">forum topics</a></td>
-</tr>
-<tr>
-<td><a href="/method/channels.reorderPinnedForumTopics">channels.reorderPinnedForumTopics</a></td>
-<td>Reorder pinned forum topics</td>
 </tr>
 <tr>
 <td><a href="/method/channels.toggleAntiSpam">channels.toggleAntiSpam</a></td>
@@ -600,88 +620,112 @@
 <td>A <a href="/api/gifts#collectible-gifts">collectible gift we own »</a> can be put up for sale on the <a href="https://telegram.org/blog/gift-marketplace-and-more">gift marketplace »</a> with this method, see <a href="/api/gifts#reselling-collectible-gifts">here »</a> for more info.</td>
 </tr>
 <tr>
+<td><a href="/method/payments.resolveStarGiftOffer">payments.resolveStarGiftOffer</a></td>
+<td>Accept or decline a previously received <a href="/api/gifts#collectible-gift-purchase-offers">collectible gift purchase offer »</a>, see <a href="/api/gifts#collectible-gift-purchase-offers">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.sendStarGiftOffer">payments.sendStarGiftOffer</a></td>
+<td>Send an offer to purchase a <a href="/api/gifts#collectible-gift-purchase-offers">collectible gift »</a>, see <a href="/api/gifts#collectible-gift-purchase-offers">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/payments.craftStarGift">payments.craftStarGift</a></td>
+<td>Craft a new <a href="/api/gifts#collectible-gifts">collectible gift »</a> by combining 1 to 4 owned collectible gifts of the same base gift type.<br><br>The passed gifts must all have the same <a href="/constructor/starGiftUnique">starGiftUnique</a>.<code>gift_id</code>, must be usable for crafting, and must not be blocked by a future <code>can_craft_at</code> timestamp.<br><br>The first passed gift must not be <a href="/api/gifts#hosted-collectible-gifts">located on the TON blockchain</a>.</td>
+</tr>
+<tr>
 <td><a href="/method/phone.discardCall">phone.discardCall</a></td>
-<td>Refuse or end running call</td>
+<td>Refuse or end running call, see <a href="/api/calls#one-to-one-calls">here »</a> for more info on the full flow.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.setCallRating">phone.setCallRating</a></td>
-<td>Rate a call, returns info about the rating message sent to the official VoIP bot.</td>
+<td>Rate a call, returns info about the rating message sent to the official VoIP bot, see <a href="/api/calls#call-rating">here »</a> for more info on the full flow.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.createGroupCall">phone.createGroupCall</a></td>
-<td>Create a group call or livestream</td>
+<td>Create a video chat or livestream, see <a href="/api/group-calls#video-chats-livestreams">here »</a> for the full flow.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.joinGroupCall">phone.joinGroupCall</a></td>
-<td>Join a group call</td>
+<td>Join any <a href="/api/group-calls#group-call-types">group call type »</a>. Conference calls additionally require the <a href="/api/end-to-end/group-calls#joining-a-call">E2E joining flow »</a>.<br><br>The <code>params</code> field must contain a join payload generated by the local tgcalls group-call engine. It contains a random non-zero audio <code>ssrc</code>, ICE <code>ufrag</code> and <code>pwd</code>, DTLS <code>fingerprints</code>, and, when publishing video, <code>ssrc-groups</code>.<br><br>For example, a join payload without published video has the following shape:<br><br><code>json&lt;br&gt;{&lt;br&gt;  "ssrc": 123456789,&lt;br&gt;  "ufrag": "...",&lt;br&gt;  "pwd": "...",&lt;br&gt;  "fingerprints": [{&lt;br&gt;    "hash": "sha-256",&lt;br&gt;    "fingerprint": "...",&lt;br&gt;    "setup": "passive"&lt;br&gt;  }]&lt;br&gt;}&lt;br&gt;</code><br><br>When joining an RTMP-mode call, generate the payload without published video source groups.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.leaveGroupCall">phone.leaveGroupCall</a></td>
-<td>Leave a group call</td>
+<td>Leave a group call without ending it for other participants. This method can be used with all group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.inviteToGroupCall">phone.inviteToGroupCall</a></td>
-<td>Invite a set of users to a group call.</td>
+<td>Invite a set of users to a <a href="/api/group-calls#video-chats-livestreams">video chat/livestream »</a>; cannot be used for <a href="/api/group-calls#live-stories">live stories »</a> or <a href="/api/group-calls#conference-calls">conference calls »</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.discardGroupCall">phone.discardGroupCall</a></td>
-<td>Terminate a group call</td>
+<td>Terminate a group call, ending the room for all participants. This method can be used with all group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.toggleGroupCallSettings">phone.toggleGroupCallSettings</a></td>
-<td>Change group call settings</td>
+<td>Change group call settings. Each setting supports different group call types, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.toggleGroupCallRecord">phone.toggleGroupCallRecord</a></td>
-<td>Start or stop recording a group call: the recorded audio and video streams will be automatically sent to <code>Saved messages</code> (the chat with ourselves).</td>
+<td>Start or stop recording a video chat/livestream, see <a href="/api/group-calls#video-chats-livestreams">here »</a> for more info. The recorded audio and video streams will be automatically sent to Saved Messages (the chat with ourselves).</td>
 </tr>
 <tr>
 <td><a href="/method/phone.editGroupCallParticipant">phone.editGroupCallParticipant</a></td>
-<td>Edit information about a given group call participant<br><br>Note: <a href="/mtproto/TL-combinators#conditional-fields">flags</a>.N?<a href="/type/Bool">Bool</a> parameters can have three possible values:<br><br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is not set, the previous value will not be changed.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolTrue">boolTrue</a>, the previous value will be overwritten to <code>true</code>.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolFalse">boolFalse</a>, the previous value will be overwritten to <code>false</code>.</td>
+<td>Edit information about a participant of a non-RTMP video chat/livestream or conference. The <code>raise_hand</code> field is only supported in video chats/livestreams, see <a href="/api/group-calls#managing-an-active-group-call">here »</a> for more info.<br><br>Note: <a href="/mtproto/TL-combinators#conditional-fields">flags</a>.N?<a href="/type/Bool">Bool</a> parameters can have three possible values:<br><br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is not set, the previous value will not be changed.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolTrue">boolTrue</a>, the previous value will be overwritten to <code>true</code>.<br>- If the <a href="/mtproto/TL-combinators#conditional-fields">TL flag</a> is set and contains a <a href="/constructor/boolFalse">boolFalse</a>, the previous value will be overwritten to <code>false</code>.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.editGroupCallTitle">phone.editGroupCallTitle</a></td>
-<td>Edit the title of a group call or livestream</td>
+<td>Edit the title of a video chat or livestream. This method cannot be used with live stories or conferences, see <a href="/api/group-calls#video-chats-livestreams">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.toggleGroupCallStartSubscription">phone.toggleGroupCallStartSubscription</a></td>
-<td>Subscribe or unsubscribe to a scheduled group call</td>
+<td>Subscribe or unsubscribe to a scheduled <a href="/api/group-calls#video-chats-livestreams">group call</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.startScheduledGroupCall">phone.startScheduledGroupCall</a></td>
-<td>Start a scheduled group call.</td>
+<td>Start a scheduled <a href="/api/group-calls#video-chats-livestreams">group call</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.joinGroupCallPresentation">phone.joinGroupCallPresentation</a></td>
-<td>Start screen sharing in a call</td>
+<td>Start screen sharing in a non-RTMP video chat/livestream or conference. Presentations are not supported in live stories or RTMP-mode video chats/livestreams, see <a href="/api/group-calls#presentations">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.leaveGroupCallPresentation">phone.leaveGroupCallPresentation</a></td>
-<td>Stop screen sharing in a group call</td>
+<td>Stop screen sharing in a non-RTMP video chat/livestream or conference. Presentations are not supported in live stories or RTMP-mode video chats/livestreams, see <a href="/api/group-calls#presentations">here »</a> for more info.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.createConferenceCall">phone.createConferenceCall</a></td>
-<td>Create and optionally join a new conference call.</td>
+<td>Create and optionally join a new <a href="/api/group-calls#conference-calls">conference call »</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.deleteConferenceCallParticipants">phone.deleteConferenceCallParticipants</a></td>
-<td>Remove participants from a conference call.<br><br>Exactly one of the <code>only_left</code> and <code>kick</code> flags must be set.</td>
+<td>Remove participants from a <a href="/api/end-to-end/group-calls#removing-a-participant">conference call »</a>.<br><br>Exactly one of the <code>only_left</code> and <code>kick</code> flags must be set.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.sendConferenceCallBroadcast">phone.sendConferenceCallBroadcast</a></td>
-<td>Broadcast a blockchain block to all members of a conference call, see <a href="/api/end-to-end/group-calls">here »</a> for more info.</td>
+<td>Submit a verification message to conference call subchain <code>1</code>, see <a href="/api/end-to-end/group-calls#subchains">subchains »</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.inviteConferenceCallParticipant">phone.inviteConferenceCallParticipant</a></td>
-<td>Invite a user to a conference call.</td>
+<td>Invite a user to a <a href="/api/group-calls#conference-calls">conference call</a>.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.declineConferenceCallInvite">phone.declineConferenceCallInvite</a></td>
-<td>Declines a conference call invite.</td>
+<td>Decline a <a href="/api/group-calls#conference-calls">conference call</a> invite.</td>
 </tr>
 <tr>
 <td><a href="/method/phone.getGroupCallChainBlocks">phone.getGroupCallChainBlocks</a></td>
-<td>Fetch the blocks of a <a href="/api/end-to-end/group-calls">conference blockchain »</a>.</td>
+<td>Fetch blocks from a conference call <a href="/api/end-to-end/group-calls#subchains">subchain »</a>; handle the returned <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a> as <a href="/api/end-to-end/group-calls#handling-updates">specified here »</a>.<br><br>If the number of blocks returned by <em>any</em> call to this method is equal to <code>limit</code>, this method must be re-invoked immediately after processing the returned <a href="/constructor/updateGroupCallChainBlocks">updateGroupCallChainBlocks</a>, with the newly committed <code>offset</code> (usually equal to the returned <code>next_offset</code>).</td>
+</tr>
+<tr>
+<td><a href="/method/phone.sendGroupCallMessage">phone.sendGroupCallMessage</a></td>
+<td>Send an in-call message to all participants of a video chat/livestream or live story, including in RTMP mode, see <a href="/api/group-calls#in-call-messages">here »</a> for more info.<br><br>The <code>send_as</code> field can only be populated for live stories, where it optionally selects the displayed author. If omitted, the server automatically selects the appropriate author. Do not populate it for video chats/livestreams.<br><br>Video chats/livestreams and live stories support <a href="/api/group-calls#in-call-reactions">animated emoji reactions »</a>, encoded as messages containing only a standard available reaction emoji or a single custom emoji entity.<br><br>For a paid live story comment, pass the user-confirmed donation amount in <code>allow_paid_stars</code>. For commenters other than the live story owner, this amount must be at least the current <a href="/constructor/groupCall">groupCall</a>.<code>send_paid_messages_stars</code> minimum. A higher amount may be donated to highlight the comment. The live story owner may comment without populating <code>allow_paid_stars</code>. To send a standalone paid live story donation, pass a positive <code>allow_paid_stars</code> value and an empty <code>message</code>, see <a href="/api/group-calls#paid-live-story-donations">here »</a> for the full flow.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.deleteGroupCallMessages">phone.deleteGroupCallMessages</a></td>
+<td>Delete specific messages from the <a href="/api/group-calls#in-call-messages">in-call message overlay »</a> of a video chat/livestream or live story, including in RTMP mode.<br><br>Non-admin participants may delete messages they sent; admins may delete any message.</td>
+</tr>
+<tr>
+<td><a href="/method/phone.deleteGroupCallParticipantMessages">phone.deleteGroupCallParticipantMessages</a></td>
+<td>As an admin, delete all messages from a specific participant in the <a href="/api/group-calls#in-call-messages">in-call message overlay »</a> of a video chat/livestream or live story, including in RTMP mode.</td>
 </tr>
 <tr>
 <td><a href="/method/folders.editPeerFolders">folders.editPeerFolders</a></td>
@@ -719,8 +763,13 @@
 <td><a href="/method/stories.getAllReadPeerStories">stories.getAllReadPeerStories</a></td>
 <td>Obtain the latest read story ID for all peers when first logging in, returned as a list of <a href="/constructor/updateReadStories">updateReadStories</a> updates, see <a href="/api/stories#watching-stories">here »</a> for more info.</td>
 </tr>
+<tr>
+<td><a href="/method/stories.startLive">stories.startLive</a></td>
+<td>Start a live story, optionally using RTMP livestream mode, see <a href="/api/group-calls#live-stories">here »</a> for the full flow.</td>
+</tr>
 </tbody>
-</table></div>
+</table>
+</div>
   
 </div>
           

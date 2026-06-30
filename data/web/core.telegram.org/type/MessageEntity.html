@@ -45,6 +45,32 @@
   <h1 id="dev_page_title">MessageEntity</h1>
   
   <div id="dev_page_content"><p>Message entities, representing styled text in a message</p>
+<!-- schema-blocks -->
+<h4><a class="anchor" href="#end-to-end-schema" id="end-to-end-schema" name="end-to-end-schema"><i class="anchor-icon"></i></a>End-to-end schema</h4>
+<pre><code>===45===
+messageEntityBold#bd610bc9 offset:int length:int = MessageEntity;
+messageEntityBotCommand#6cef8ac7 offset:int length:int = MessageEntity;
+messageEntityCode#28a20571 offset:int length:int = MessageEntity;
+messageEntityEmail#64e475c2 offset:int length:int = MessageEntity;
+messageEntityHashtag#6f635b0d offset:int length:int = MessageEntity;
+messageEntityItalic#826f8b60 offset:int length:int = MessageEntity;
+messageEntityMention#fa04579d offset:int length:int = MessageEntity;
+messageEntityPre#73924be0 offset:int length:int language:string = MessageEntity;
+messageEntityTextUrl#76a6d327 offset:int length:int url:string = MessageEntity;
+messageEntityUnknown#bb92ba95 offset:int length:int = MessageEntity;
+messageEntityUrl#6ed02538 offset:int length:int = MessageEntity;
+
+===101===
+messageEntityBlockquote#020df5d0 offset:int length:int = MessageEntity;
+messageEntityStrike#bf0693d4 offset:int length:int = MessageEntity;
+messageEntityUnderline#9c4e7e8b offset:int length:int = MessageEntity;
+
+===144===
+messageEntityCustomEmoji#c8cf05f8 offset:int length:int document_id:long = MessageEntity;
+messageEntitySpoiler#32ca960f offset:int length:int = MessageEntity;
+</code></pre>
+<p>API schema:</p>
+<!-- /schema-blocks -->
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -171,8 +197,25 @@
 <td><a href="/constructor/messageEntityBankCard">messageEntityBankCard</a></td>
 <td>Indicates a credit card number</td>
 </tr>
+<tr>
+<td><a href="/constructor/messageEntityFormattedDate">messageEntityFormattedDate</a></td>
+<td>Represents a specific point in time, rendered as specified <a href="/api/entities#date-entities">here »</a><br><br>All flags are optional, with the following limitations:<br><br>- <code>relative</code> cannot combined with any other flag<br>- <code>short_time</code> and <code>long_time</code> cannot be combined with each other<br>- <code>short_date</code> and <code>long_date</code> cannot be combined with each other<br><br>If any of the flags are combined, their rendering order in the text is the following:<br><br>- <code>day_of_week</code><br>- <code>short_time</code>/<code>long_time</code><br>- <code>short_date</code>/<code>long_date</code></td>
+</tr>
+<tr>
+<td><a href="/constructor/messageEntityDiffInsert">messageEntityDiffInsert</a></td>
+<td>Represents an diff addition: render it by simply <u>underlining</u> the specified section and coloring it in green, see <a href="/api/entities#diff-entities">here »</a> for more info on how to render diff entities.</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageEntityDiffReplace">messageEntityDiffReplace</a></td>
+<td>Represents an diff replacement, render it as follows:<br><br>- Insert <code>old_text</code> into the text at offset <code>offset</code>, <u>underline</u> it and color it in red: note that this insertion does not affect the offsets of entities that come after it.<br>- <u>underline</u> the section delimited by <code>offset</code> and <code>limit</code> and color it in green.<br><br>See <a href="/api/entities#diff-entities">here »</a> for more info on how to render diff entities.</td>
+</tr>
+<tr>
+<td><a href="/constructor/messageEntityDiffDelete">messageEntityDiffDelete</a></td>
+<td>Represents an diff deletion: render it by simply <u>underlining</u> the specified section and coloring it in red, see <a href="/api/entities#diff-entities">here »</a> for more info on how to render diff entities.</td>
+</tr>
 </tbody>
-</table></div>
+</table>
+</div>
   
 </div>
           

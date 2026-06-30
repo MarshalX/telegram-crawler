@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>Android SDK</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="The Android SDK helps you easily integrate Telegram Passport requests into your Android-based apps. Check out our GitHub…">
+    <meta property="description" content="The Telegram Passport SDK for integrating Passport requests into Android apps.">
     <meta property="og:title" content="Android SDK">
     <meta property="og:image" content="">
-    <meta property="og:description" content="The Android SDK helps you easily integrate Telegram Passport requests into your Android-based apps. Check out our GitHub…">
+    <meta property="og:description" content="The Telegram Passport SDK for integrating Passport requests into Android apps.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -51,14 +51,17 @@
 <h4><a class="anchor" href="#installing-from-maven" id="installing-from-maven" name="installing-from-maven"><i class="anchor-icon"></i></a>Installing from Maven</h4>
 <p>Telegram Passport SDK is available from the Maven repository.
 Add this line to the dependencies section in your build.gradle:</p>
-<pre><code>compile 'org.telegram:passport:1.1'</code></pre>
+<pre><code>compile 'org.telegram:passport:1.1'
+</code></pre>
 <p>and sync your project.</p>
 <h4><a class="anchor" href="#adding-as-a-module" id="adding-as-a-module" name="adding-as-a-module"><i class="anchor-icon"></i></a>Adding as a module</h4>
 <p>Download the library, unzip it and copy the library project to the root of your project directory (the one with settings.gradle and gradle.properties). Then, make the following changes to your Gradle scripts.</p>
 <p>In settings.gradle, add <code>':telegrampassport'</code> to includes:</p>
-<pre><code>include ':app', ':telegrampassport'</code></pre>
+<pre><code>include ':app', ':telegrampassport'
+</code></pre>
 <p>In the build.gradle file for your app, add this line to the dependencies section:</p>
-<pre><code>compile ':telegrampassport'</code></pre>
+<pre><code>compile ':telegrampassport'
+</code></pre>
 <p>and sync your project.</p>
 <h3><a class="anchor" href="#usage" id="usage" name="usage"><i class="anchor-icon"></i></a>Usage</h3>
 <h4><a class="anchor" href="#adding-the-button" id="adding-the-button" name="adding-the-button"><i class="anchor-icon"></i></a>Adding the button</h4>
@@ -69,12 +72,14 @@ telegramButton=new TelegramLoginButton(this);
 // Optionally you can change the roundness of the button corners
 // to better fit your design.
 telegramButton.setCornerRoundness(1f);
-viewGroupOfSomeSort.addView(telegramButton, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);</code></pre>
+viewGroupOfSomeSort.addView(telegramButton, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+</code></pre>
 <p>Or from XML:</p>
 <pre><code> &lt;org.telegram.passport.TelegramLoginButton
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             app:cornerRoundness="0.5"/&gt;</code></pre>
+		     android:layout_width="wrap_content"
+		     android:layout_height="wrap_content"
+		     app:cornerRoundness="0.5"/&gt;
+</code></pre>
 <h4><a class="anchor" href="#requesting-authorization" id="requesting-authorization" name="requesting-authorization"><i class="anchor-icon"></i></a>Requesting authorization</h4>
 <p>The button doesn't do anything by itself; you need to set an OnClickListener on it to start the authorization flow (replace the comments with actual parameters):</p>
 <pre><code>private static final int TG_PASSPORT_RESULT=352; // this can be any integer less than 0xFFFF
@@ -99,14 +104,16 @@ public void onClick(View view){
         PassportScope.PHONE_NUMBER
     );
     TelegramPassport.request(MyActivity.this, req, TG_PASSPORT_RESULT);
-}});</code></pre>
+}});
+</code></pre>
 <p>If you need more control over the process, the <code>TelegramPassport</code> class contains several more methods:</p>
 <ul>
 <li><code>getAuthIntent(AuthParams)</code> returns an <code>Intent</code> for you to use in <code>startActivityForResult</code> if you need to do that in some special way. Be sure to check that an app is present that can handle this intent before starting it by using <code>PackageManager</code> or <code>intent.resolveActivity</code>.</li>
 <li><code>showAppInstallAlert(Activity)</code> shows an alert that the user needs to install Telegram in order to continue. This is intended to be used together with the previous method for the cases when the app isn't installed.</li>
 </ul>
 <h4><a class="anchor" href="#handling-the-result" id="handling-the-result" name="handling-the-result"><i class="anchor-icon"></i></a>Handling the result</h4>
-<p>The result is delivered via the <code>onActivityResult</code> method in your activity with the request code you passed to <code>TelegramPassport.request</code>. Currently, the only meaningful parameter is <code>resultCode</code>, which is <code>RESULT_OK</code> if the authorization was successful and <code>RESULT_CANCELED</code> otherwise.</p></div>
+<p>The result is delivered via the <code>onActivityResult</code> method in your activity with the request code you passed to <code>TelegramPassport.request</code>. Currently, the only meaningful parameter is <code>resultCode</code>, which is <code>RESULT_OK</code> if the authorization was successful and <code>RESULT_CANCELED</code> otherwise.</p>
+</div>
   
 </div>
           

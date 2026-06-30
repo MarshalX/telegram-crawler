@@ -114,6 +114,11 @@
 <td>This service message is the notification of a <a href="/api/gifts#prepaying-for-someone-elses-upgrade">separate pre-payment for the upgrade of a gift we own</a>.</td>
 </tr>
 <tr>
+<td><strong>auction_acquired</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.17?<a href="/constructor/true">true</a></td>
+<td>If set, this gift was acquired in a <a href="/api/auctions">collectible gifts auction »</a>.</td>
+</tr>
+<tr>
 <td><strong>gift</strong></td>
 <td style="text-align: center;"><a href="/type/StarGift">StarGift</a></td>
 <td>Info about the gift</td>
@@ -163,24 +168,37 @@
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.15?<a href="/type/int">int</a></td>
 <td>For <a href="/api/gifts#prepaying-for-someone-elses-upgrade">separate upgrades</a>, the identifier of the message with the gift whose upgrade was prepaid (only valid for the receiver of the service message).</td>
 </tr>
+<tr>
+<td><strong>to_id</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.18?<a href="/type/Peer">Peer</a></td>
+<td>For gifts acquired in an <a href="/api/auctions">auction »</a> (i.e. when <code>auction_acquired</code> is set), the peer the gift was assigned to; only present if the target peer is different from the bidder, in which case it will only be present to the messageActionStarGift sent to the bidder, not to the messageActionStarGift sent to the target peer.</td>
+</tr>
+<tr>
+<td><strong>gift_num</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.19?<a href="/type/int">int</a></td>
+<td>For gifts acquired in an <a href="/api/auctions">auction »</a>, the collectible number of the won <a href="/api/gifts#collectible-gifts">collectible gift »</a>; this field is disjoint from <code>auction_acquired</code> because <strong>only</strong> auction collectibles won before this field was introduced in the API will not have this flag set.</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
 <p><a href="/type/MessageAction">MessageAction</a></p>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#paymentssavestargift" id="paymentssavestargift" name="paymentssavestargift"><i class="anchor-icon"></i></a><a href="/method/payments.saveStarGift">payments.saveStarGift</a></h4>
-<p>Display or remove a <a href="/api/gifts">received gift »</a> from our profile.</p>
+<p>Display or remove a <a href="/api/gifts#hosted-collectible-gifts">received or hosted gift »</a> from our profile.</p>
 <h4><a class="anchor" href="#paymentsgetsavedstargifts" id="paymentsgetsavedstargifts" name="paymentsgetsavedstargifts"><i class="anchor-icon"></i></a><a href="/method/payments.getSavedStarGifts">payments.getSavedStarGifts</a></h4>
-<p>Fetch the full list of <a href="/api/gifts">gifts</a> owned by a peer.</p>
+<p>Fetch the full list of <a href="/api/gifts#list-all-received-gifts">gifts »</a> owned, received or <a href="/api/gifts#hosted-collectible-gifts">hosted »</a> by a peer.</p>
 <p>Note that unlike what the name suggests, the method can be used to fetch both "saved" and "unsaved" gifts (aka gifts both pinned and not pinned) to the profile, depending on the passed flags.</p>
 <h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
 <p>Telegram Stars are virtual items that allow users to purchase digital goods and services from bots and mini apps inside the Telegram ecosystem, send gifts to content creators on the Telegram platform, and more.</p>
 <h4><a class="anchor" href="#telegram-gifts" id="telegram-gifts" name="telegram-gifts"><i class="anchor-icon"></i></a><a href="/api/gifts">Telegram Gifts</a></h4>
 <p>Users can send Gifts to their friends. The recipients of gifts can display them on their profile pages or turn them into Telegram Stars ». Telegram Stars can be used for many things, including supporting creators and buying services in mini apps.</p>
+<h4><a class="anchor" href="#collectible-gift-auctions" id="collectible-gift-auctions" name="collectible-gift-auctions"><i class="anchor-icon"></i></a><a href="/api/auctions">Collectible gift auctions</a></h4>
+<p>New collectible gift releases are distributed through Stars auctions held over several rounds.</p>
 <h4><a class="anchor" href="#messageactionstargiftunique" id="messageactionstargiftunique" name="messageactionstargiftunique"><i class="anchor-icon"></i></a><a href="/constructor/messageActionStarGiftUnique">messageActionStarGiftUnique</a></h4>
 <p>A <a href="/api/gifts">gift »</a> was upgraded to a <a href="/api/gifts#collectible-gifts">collectible gift »</a>.</p>
 <h4><a class="anchor" href="#inputsavedstargiftchat" id="inputsavedstargiftchat" name="inputsavedstargiftchat"><i class="anchor-icon"></i></a><a href="/constructor/inputSavedStarGiftChat">inputSavedStarGiftChat</a></h4>
-<p>A gift received by a channel we own.</p></div>
+<p>A gift received by a channel we own.</p>
+</div>
   
 </div>
           

@@ -47,7 +47,7 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Telegram uses the <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">Secure Remote Password protocol</a> version 6a to implement 2FA.</p>
-<p>Example implementation: <a href="https://github.com/tdlib/td/blob/56163c2460a65afc4db2c57ece576b8c38ea194b/td/telegram/PasswordManager.cpp">tdlib</a>.</p>
+<p>Example implementation: <a href="https://github.com/tdlib/td/blob/4d06d1ba3a1978476fe2b6575de8388439f6baa3/td/telegram/PasswordManager.cpp">tdlib</a>.</p>
 <h3><a class="anchor" href="#checking-the-password-with-srp" id="checking-the-password-with-srp" name="checking-the-password-with-srp"><i class="anchor-icon"></i></a>Checking the password with SRP</h3>
 <p>To login to an account protected by a 2FA password or to perform some other actions (like changing channel owner), you will need to verify the user's knowledge of the current 2FA account password.</p>
 <p>To do this, first the client needs to obtain SRP parameters and the KDF algorithm to use to check the validity of the password via <a href="/method/account.getPassword">account.getPassword</a> method. For now, only the <a href="/constructor/passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow">passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow</a> algorithm is supported, so we'll only explain that.</p>
@@ -126,13 +126,13 @@ The client is expected to check whether <strong>p</strong> is a safe 2048-bit pr
 <li><code>g_b := (k_v + (pow(g, b) mod p)) mod p</code></li>
 </ul>
 <p>Finally, the <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol#Protocol">SRP session keys</a> are generated:</p>
-<p>Client side: </p>
+<p>Client side:</p>
 <ul>
-<li><code>t := (g_b - k_v) mod p</code> (positive modulo, if the result is negative increment by <code>p</code>) </li>
+<li><code>t := (g_b - k_v) mod p</code> (positive modulo, if the result is negative increment by <code>p</code>)</li>
 <li><code>s_a := pow(t, a + u * x) mod p</code></li>
 <li><code>k_a := H(s_a)</code></li>
 </ul>
-<p>Server side: </p>
+<p>Server side:</p>
 <ul>
 <li><code>s_b := pow(g_a * (pow(v, u) mod p), b) mod p</code></li>
 <li><code>k_b := H(s_b)</code></li>
@@ -215,14 +215,14 @@ Use <a href="/method/account.resendPasswordEmail">account.resendPasswordEmail</a
 Use <a href="/method/account.cancelPasswordEmail">account.cancelPasswordEmail</a> to cancel the verification code.</p>
 <p>To get the current recovery email, use <a href="/method/account.getPasswordSettings">account.getPasswordSettings</a>.</p>
 <h3><a class="anchor" href="#password-recovery" id="password-recovery" name="password-recovery"><i class="anchor-icon"></i></a>Password recovery</h3>
-<p>If the user has forgotten their 2FA password, the following recovery options are available:  </p>
+<p>If the user has forgotten their 2FA password, the following recovery options are available:</p>
 <ul>
 <li>Logged-in sessions only: <a href="#password-reset">password reset »</a></li>
 <li>Logged-in and not logged-in sessions: <a href="#email-recovery">email recovery »</a></li>
 <li>Not logged-in sessions: <a href="#account-deletion">account deletion »</a></li>
 </ul>
 <h4><a class="anchor" href="#password-reset" id="password-reset" name="password-reset"><i class="anchor-icon"></i></a>Password reset</h4>
-<p>Password reset can be requested from logged-in sessions only.  </p>
+<p>Password reset can be requested from logged-in sessions only.</p>
 <p>The following procedure can be used to reset the password without deleting the account:</p>
 <pre><code><a href='/constructor/account.resetPasswordFailedWait'>account.resetPasswordFailedWait</a>#e3779861 retry_date:<a href='/type/int'>int</a> = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
 <a href='/constructor/account.resetPasswordRequestedWait'>account.resetPasswordRequestedWait</a>#e9effc7d until_date:<a href='/type/int'>int</a> = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
@@ -231,28 +231,29 @@ Use <a href="/method/account.cancelPasswordEmail">account.cancelPasswordEmail</a
 ---functions---
 
 <a href='/method/account.resetPassword'>account.resetPassword</a>#9308ce1b = <a href='/type/account.ResetPasswordResult'>account.ResetPasswordResult</a>;
-<a href='/method/account.declinePasswordReset'>account.declinePasswordReset</a>#4c9409f6 = <a href='/type/Bool'>Bool</a>;</code></pre>
+<a href='/method/account.declinePasswordReset'>account.declinePasswordReset</a>#4c9409f6 = <a href='/type/Bool'>Bool</a>;
+</code></pre>
 <p>If the user is already logged in and has forgotten their 2FA password, <a href="/method/account.resetPassword">account.resetPassword</a> can be used to initiate a password reset.<br>
-On success, the call will initially return a <a href="/constructor/account.resetPasswordRequestedWait">account.resetPasswordRequestedWait</a> constructor and start a 7-day server-side timer, during which the user can abort the reset process using a button sent by the Telegram service account or directly in-UI using <a href="/method/account.declinePasswordReset">account.declinePasswordReset</a>.  </p>
-<p>When the time comes, <a href="/method/account.resetPassword">account.resetPassword</a> is invoked once more, returning a <a href="/constructor/account.resetPasswordOk">account.resetPasswordOk</a> to indicate that the password was successfully reset.  </p>
-<p>If the user recently requested a password reset that was canceled, <a href="/constructor/account.resetPasswordFailedWait">account.resetPasswordFailedWait</a> will be returned by the initial <a href="/method/account.resetPassword">account.resetPassword</a> call, and they must wait until the specified date before requesting another reset.  </p>
+On success, the call will initially return a <a href="/constructor/account.resetPasswordRequestedWait">account.resetPasswordRequestedWait</a> constructor and start a 7-day server-side timer, during which the user can abort the reset process using a button sent by the Telegram service account or directly in-UI using <a href="/method/account.declinePasswordReset">account.declinePasswordReset</a>.</p>
+<p>When the time comes, <a href="/method/account.resetPassword">account.resetPassword</a> is invoked once more, returning a <a href="/constructor/account.resetPasswordOk">account.resetPasswordOk</a> to indicate that the password was successfully reset.</p>
+<p>If the user recently requested a password reset that was canceled, <a href="/constructor/account.resetPasswordFailedWait">account.resetPasswordFailedWait</a> will be returned by the initial <a href="/method/account.resetPassword">account.resetPassword</a> call, and they must wait until the specified date before requesting another reset.</p>
 <p>Note that if the user already knows their 2FA password and simply wants to disable 2FA, <a href="#setting-a-new-2fa-password">the same process used to enable the password must also be used to disable it »</a>.</p>
 <h4><a class="anchor" href="#email-recovery" id="email-recovery" name="email-recovery"><i class="anchor-icon"></i></a>Email recovery</h4>
 <p>Email recovery can be requested from logged in sessions, and from non-logged in sessions if the user has successfully provided the login code.<br>
-In both cases, the account must have an associated <a href="#email-verification">recovery email »</a>.  </p>
+In both cases, the account must have an associated <a href="#email-verification">recovery email »</a>.</p>
 <p>In order to recover a forgotten 2FA password, an email must be sent to the <a href="#email-verification">previously specified address</a> using the <a href="/method/auth.requestPasswordRecovery">auth.requestPasswordRecovery</a> method.<br>
 Use <a href="/method/auth.checkRecoveryPassword">auth.checkRecoveryPassword</a> to make sure that the user provided a valid code.<br>
 Then use <a href="/method/auth.recoverPassword">auth.recoverPassword</a> with the received code to delete the current 2FA password, to set a new one follow <a href="/api/srp">these instructions »</a>.</p>
 <h4><a class="anchor" href="#account-deletion" id="account-deletion" name="account-deletion"><i class="anchor-icon"></i></a>Account deletion</h4>
-<p>If the user has successfully provided the login code, but they forgot their <a href="/api/srp">2FA</a> password and they don't have access to any other logged-in session, the account can be deleted following <a href="/api/account-deletion">these instructions »</a>.  </p>
+<p>If the user has successfully provided the login code, but they forgot their <a href="/api/srp">2FA</a> password and they don't have access to any other logged-in session, the account can be deleted following <a href="/api/account-deletion">these instructions »</a>.</p>
 <h3><a class="anchor" href="#using-the-2fa-password" id="using-the-2fa-password" name="using-the-2fa-password"><i class="anchor-icon"></i></a>Using the 2FA password</h3>
-<p>Multiple methods in the API such as those used to make <a href="/api/payments">payments</a>, <a href="/method/channels.editCreator">transfer channel ownership</a> and others require the user to authenticate using the 2FA password passed as an <a href="/type/InputCheckPasswordSRP">InputCheckPasswordSRP</a> constructor, generated as specified <a href="#checking-the-password-with-srp">above</a>.  </p>
-<p>All such methods where a password verification is required <em>after login</em> may emit the following RPC errors:  </p>
+<p>Multiple methods in the API such as those used to make <a href="/api/payments">payments</a>, <a href="/api/channel#transferring-ownership-of-a-group-channel">transfer group/channel ownership</a> and others require the user to authenticate using the 2FA password passed as an <a href="/type/InputCheckPasswordSRP">InputCheckPasswordSRP</a> constructor, generated as specified <a href="#checking-the-password-with-srp">above</a>.</p>
+<p>All such methods where a password verification is required <em>after login</em> may emit the following RPC errors:</p>
 <ul>
 <li><code>PASSWORD_MISSING</code> - No 2FA password is configured, but one is <strong>required</strong> in order to invoke the method. <a href="#setting-a-new-2fa-password">Set a 2FA password</a> and then repeat the method call.</li>
 <li><code>PASSWORD_TOO_FRESH_%d</code> - The 2FA password was modified less than 24 hours ago, try again in <code>%d</code> seconds.</li>
 <li><code>SESSION_TOO_FRESH_%d</code> - This session was created less than 24 hours ago, try again in <code>%d</code> seconds.</li>
-<li><code>PASSWORD_HASH_INVALID</code> - The specified password is invalid (or an <a href="/constructor/inputCheckPasswordEmpty">inputCheckPasswordEmpty</a> was provided, but a 2FA password is required).  </li>
+<li><code>PASSWORD_HASH_INVALID</code> - The specified password is invalid (or an <a href="/constructor/inputCheckPasswordEmpty">inputCheckPasswordEmpty</a> was provided, but a 2FA password is required).</li>
 </ul>
 <p>The usual flow for invoking such methods is to first invoke the method passing an <a href="/constructor/inputCheckPasswordEmpty">inputCheckPasswordEmpty</a> (as if no password is configured, even if one is actually configured); then, according to the returned RPC error, proceed to:</p>
 <ul>
@@ -260,9 +261,10 @@ Then use <a href="/method/auth.recoverPassword">auth.recoverPassword</a> with th
 <li><code>PASSWORD_MISSING</code> - The 2FA password setup flow, then re-invoke the method with the newly provided password</li>
 <li>All other RPC errors - Show an error message with a description of the error</li>
 </ul>
-<p>This flow is useful to avoid race conditions with other currently logged-in sessions that may change the password.  </p>
+<p>This flow is useful to avoid race conditions with other currently logged-in sessions that may change the password.</p>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
-<h4><a class="anchor" href="#srp-design" id="srp-design" name="srp-design"><i class="anchor-icon"></i></a><a href="http://srp.stanford.edu/design.html">SRP design</a></h4></div>
+<h4><a class="anchor" href="#srp-design" id="srp-design" name="srp-design"><i class="anchor-icon"></i></a><a href="http://srp.stanford.edu/design.html">SRP design</a></h4>
+</div>
   
 </div>
           

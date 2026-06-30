@@ -47,26 +47,26 @@
   <div id="dev_page_content"><!-- scroll_nav -->
 
 <p>Telegram supports styled text using <a href="/type/MessageEntity">message entities</a>.</p>
-<p>A client that wants to send styled messages would simply have to integrate a <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>/<a href="https://en.wikipedia.org/wiki/HTML">HTML</a> parser, and generate an array of message entities by iterating through the parsed tags.  </p>
+<p>A client that wants to send styled messages would simply have to integrate a <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>/<a href="https://en.wikipedia.org/wiki/HTML">HTML</a> parser, and generate an array of message entities by iterating through the parsed tags.</p>
 <p>Nested entities are supported.</p>
 <h3><a class="anchor" href="#entity-length" id="entity-length" name="entity-length"><i class="anchor-icon"></i></a>Entity length</h3>
-<p>Special care must be taken to consider the length of strings when generating message entities as the number of <a href="https://en.wikipedia.org/wiki/UTF-16">UTF-16</a> code units, even if the message itself must be encoded using UTF-8.  </p>
+<p>Special care must be taken to consider the length of strings when generating message entities as the number of <a href="https://en.wikipedia.org/wiki/UTF-16">UTF-16</a> code units, even if the message itself must be encoded using UTF-8.</p>
 <p>Example implementations: <a href="https://github.com/tdlib/td/tree/master/td/telegram/MessageEntity.cpp">tdlib</a>, <a href="https://github.com/danog/telegram-entities/blob/master/src/Entities.php">MadelineProto</a>.</p>
 <h4><a class="anchor" href="#unicode-codepoints-and-encoding" id="unicode-codepoints-and-encoding" name="unicode-codepoints-and-encoding"><i class="anchor-icon"></i></a>Unicode codepoints and encoding</h4>
 <p>A <a href="https://en.wikipedia.org/wiki/Unicode">Unicode</a> <a href="https://en.wikipedia.org/wiki/Code_point">code point</a> is a number ranging from <code>0x0</code> to <code>0x10FFFF</code>, usually represented using <code>U+0000</code> to <code>U+10FFFF</code> syntax.<br>
 Unicode defines a codespace of 1,112,064 assignable code points within the <code>U+0000</code> to <code>U+10FFFF</code> range.<br>
-Each of the assignable codepoints, once assigned by the Unicode consortium, maps to a specific character, emoji or control symbol.  </p>
+Each of the assignable codepoints, once assigned by the Unicode consortium, maps to a specific character, emoji or control symbol.</p>
 <p>The Unicode codespace is further subdivided into 17 planes:</p>
 <ul>
 <li>Plane 1: <code>U+0000</code> to <code>U+FFFF</code>: Basic Multilingual Plane (BMP)</li>
 <li>Planes 2-17: <code>U+00000</code> to <code>U+10FFFF</code>: Multiple supplementary planes as specified <a href="https://en.wikipedia.org/wiki/Plane_(Unicode)">by the Unicode standard</a></li>
 </ul>
-<p>Since storing a 21-bit number for each letter would result in a waste of space, the Unicode consortium defines multiple encodings that allow storing a code point into a smaller <em>code unit</em>:  </p>
+<p>Since storing a 21-bit number for each letter would result in a waste of space, the Unicode consortium defines multiple encodings that allow storing a code point into a smaller <em>code unit</em>:</p>
 <h4><a class="anchor" href="#utf-8" id="utf-8" name="utf-8"><i class="anchor-icon"></i></a>UTF-8</h4>
 <p><a href="https://en.wikipedia.org/wiki/UTF-8">UTF-8 »</a> is a Unicode encoding that allows storing a 21-bit Unicode code point into <em>code units</em> as small as 8 bits.<br>
-UTF-8 is used by the MTProto and Bot API when transmitting and receiving fields of type <a href="/type/string">string</a>.  </p>
+UTF-8 is used by the MTProto and Bot API when transmitting and receiving fields of type <a href="/type/string">string</a>.</p>
 <h4><a class="anchor" href="#utf-16" id="utf-16" name="utf-16"><i class="anchor-icon"></i></a>UTF-16</h4>
-<p><a href="https://en.wikipedia.org/wiki/UTF-16">UTF-16 »</a> is a Unicode encoding that allows storing a 21-bit Unicode code point into one or two 16-bit <em>code units</em>.  </p>
+<p><a href="https://en.wikipedia.org/wiki/UTF-16">UTF-16 »</a> is a Unicode encoding that allows storing a 21-bit Unicode code point into one or two 16-bit <em>code units</em>.</p>
 <p>UTF-16 is used when computing the length and offsets of entities in the MTProto and bot APIs, by counting the number of UTF-16 code units (<strong>not</strong> code points).</p>
 <h4><a class="anchor" href="#computing-entity-length" id="computing-entity-length" name="computing-entity-length"><i class="anchor-icon"></i></a>Computing entity length</h4>
 <ul>
@@ -74,42 +74,208 @@ UTF-8 is used by the MTProto and Bot API when transmitting and receiving fields 
 <li>Code points in all other planes count as 2, because they are encoded into two UTF-16 code units (also called surrogate pairs)</li>
 </ul>
 <p>A simple, but not very efficient way of computing the entity length is converting the text to UTF-16, and then taking the byte length divided by 2 (=number of UTF-16 code units).</p>
-<p>However, since UTF-8 encodes codepoints in non-BMP planes as a 32-bit code unit starting with <code>0b11110</code>, a more efficient way to compute the entity length without converting the message to UTF-16 is the following:  </p>
+<p>However, since UTF-8 encodes codepoints in non-BMP planes as a 32-bit code unit starting with <code>0b11110</code>, a more efficient way to compute the entity length without converting the message to UTF-16 is the following:</p>
 <ul>
 <li>If the byte marks the beginning of a 32-bit UTF-8 code unit (all bytes starting with <code>0b11110</code>) increment the count by 2, otherwise</li>
 <li>If the byte marks the beginning of a UTF-8 code unit (all bytes not starting with <code>0b10</code>) increment the count by 1.</li>
 </ul>
-<p>Example:  </p>
+<p>Example:</p>
 <pre><code>length := 0
 for byte in text {
     if (byte &amp; 0xc0) != 0x80 {
         length += (byte &gt;= 0xf0 ? 2 : 1)
     }
-}</code></pre>
-<p><strong>Note</strong>: the <em>length</em> of an entity <strong>must not</strong> include the length of trailing newlines or whitespaces, <code>rtrim</code> entities before computing their length: however, the next <em>offset</em> <strong>must</strong> include the length of newlines or whitespaces that precede it.  </p>
+}
+</code></pre>
+<p><strong>Note</strong>: the <em>length</em> of an entity <strong>must not</strong> include the length of trailing newlines or whitespaces, <code>rtrim</code> entities before computing their length: however, the next <em>offset</em> <strong>must</strong> include the length of newlines or whitespaces that precede it.</p>
 <p>Example implementations: <a href="https://github.com/tdlib/td/tree/master/td/telegram/MessageEntity.cpp">tdlib</a>, <a href="https://github.com/danog/telegram-entities/blob/master/src/Entities.php">MadelineProto</a>.</p>
 <h3><a class="anchor" href="#allowed-entities" id="allowed-entities" name="allowed-entities"><i class="anchor-icon"></i></a>Allowed entities</h3>
-<p>For example the following HTML/Markdown aliases for message entities can be used:</p>
+<h4><a class="anchor" href="#manual-entities" id="manual-entities" name="manual-entities"><i class="anchor-icon"></i></a>Manual entities</h4>
+<p>The following entities need to be manually specified by the user through formatting options.</p>
 <ul>
-<li><a href="https://core.telegram.org/constructor/messageEntityBold"><strong>messageEntityBold</strong></a> =&gt; <code>&lt;b&gt;bold&lt;/b&gt;</code>, <code>&lt;strong&gt;bold&lt;/strong&gt;</code>, <code>**bold**</code></li>
-<li><a href="https://core.telegram.org/constructor/messageEntityItalic"><em>messageEntityItalic</em></a> =&gt; <code>&lt;i&gt;italic&lt;/i&gt;</code>, <code>&lt;em&gt;italic&lt;/em&gt;</code> <code>*italic*</code></li>
-<li><a href="https://core.telegram.org/constructor/messageEntityCode"><code>messageEntityCode</code> »</a> =&gt; <code>&lt;code&gt;code&lt;/code&gt;</code>, <code>`code`</code></li>
-<li><a href="https://core.telegram.org/constructor/messageEntityStrike"><del>messageEntityStrike</del></a> =&gt; <code>&lt;s&gt;strike&lt;/s&gt;</code>, <code>&lt;strike&gt;strike&lt;/strike&gt;</code>, <code>&lt;del&gt;strike&lt;/del&gt;</code>, <code>~~strike~~</code></li>
-<li><a href="https://core.telegram.org/constructor/messageEntityUnderline"><u>messageEntityUnderline</u></a> =&gt; <code>&lt;u&gt;underline&lt;/u&gt;</code></li>
-<li><a href="https://core.telegram.org/constructor/messageEntityPre"><code>messageEntityPre</code> »</a> =&gt; <code>&lt;pre language="c++"&gt;code&lt;/pre&gt;</code>, </li>
+<li>
+<p><a href="https://core.telegram.org/constructor/messageEntityBold"><strong>messageEntityBold</strong></a> =&gt; <code>&lt;b&gt;bold&lt;/b&gt;</code>, <code>&lt;strong&gt;bold&lt;/strong&gt;</code>, <code>**bold**</code></p>
+</li>
+<li>
+<p><a href="https://core.telegram.org/constructor/messageEntityItalic"><em>messageEntityItalic</em></a> =&gt; <code>&lt;i&gt;italic&lt;/i&gt;</code>, <code>&lt;em&gt;italic&lt;/em&gt;</code> <code>*italic*</code></p>
+</li>
+<li>
+<p><a href="https://core.telegram.org/constructor/messageEntityCode"><code>messageEntityCode</code> »</a> =&gt; <code>&lt;code&gt;code&lt;/code&gt;</code>, <code>`code`</code></p>
+</li>
+<li>
+<p><a href="https://core.telegram.org/constructor/messageEntityStrike"><del>messageEntityStrike</del></a> =&gt; <code>&lt;s&gt;strike&lt;/s&gt;</code>, <code>&lt;strike&gt;strike&lt;/strike&gt;</code>, <code>&lt;del&gt;strike&lt;/del&gt;</code>, <code>~~strike~~</code></p>
+</li>
+<li>
+<p><a href="https://core.telegram.org/constructor/messageEntityUnderline"><u>messageEntityUnderline</u></a> =&gt; <code>&lt;u&gt;underline&lt;/u&gt;</code></p>
+</li>
+<li>
+<p><a href="/constructor/messageEntityBlockquote">messageEntityBlockquote</a> =&gt;</p>
+<blockquote>
+<p>Block quote</p>
+</blockquote>
+</li>
+<li>
+<p><a href="https://core.telegram.org/constructor/messageEntityPre"><code>messageEntityPre</code> »</a> =&gt; <code>&lt;pre language="c++"&gt;code&lt;/pre&gt;</code>,</p>
+  <pre>
+  ```c++
+  code
+  ```
+  </pre>
+<p>Cannot be nested inside other entities.</p>
+</li>
+<li>
+<p><a href="/constructor/messageEntitySpoiler">messageEntitySpoiler</a> =&gt; Used to hide certain parts of a message behind an animated spoiler: the underlying text is revealed only by a manual click</p>
+</li>
+<li>
+<p><a href="/constructor/inputMessageEntityMentionName">inputMessageEntityMentionName</a>/<a href="/constructor/messageEntityMentionName">messageEntityMentionName</a> =&gt; <a href="https://t.me/botfather">Mention a user by ID/username</a></p>
+</li>
+<li>
+<p><a href="/constructor/messageEntityCustomEmoji">messageEntityCustomEmoji</a> =&gt; used for <a href="/api/custom-emoji">custom emojis »</a></p>
+</li>
+<li>
+<p><a href="/constructor/messageEntityFormattedDate">messageEntityFormattedDate</a> =&gt; used to point at a specific point in time, rendered as specified <a href="/constructor/messageEntityFormattedDate">here »</a>; cannot be nested inside other entities.</p>
+</li>
 </ul>
-<pre>
-```c++
-code
-```
-</pre>
-<p>The following entities can also be used to <a href="/api/mentions">mention</a> users:</p>
+<h5><a class="anchor" href="#date-entities" id="date-entities" name="date-entities"><i class="anchor-icon"></i></a>Date entities</h5>
+<pre><code><a href='/constructor/messageEntityFormattedDate'>messageEntityFormattedDate</a>#904ac7c7 flags:<a href='/type/%23'>#</a> relative:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/constructor/true'>true</a> short_time:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> long_time:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/constructor/true'>true</a> short_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> long_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> day_of_week:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> offset:<a href='/type/int'>int</a> length:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> = <a href='/type/MessageEntity'>MessageEntity</a>;
+</code></pre>
+<p>The <a href="/constructor/messageEntityFormattedDate">messageEntityFormattedDate</a> entity represents a specific point in time.</p>
+<p>The <code>date</code> field must be populated with a UNIX timestamp, that can range from <code>0</code> to the current date plus 1098 days (<code>time()+1098*86400</code>).</p>
+<p>Clicking on this entity should bring up a context menu with three options:</p>
 <ul>
-<li><a href="/constructor/inputMessageEntityMentionName">inputMessageEntityMentionName</a> =&gt; <a href="https://t.me/botfather">Mention a user</a></li>
-<li><a href="/constructor/inputMessageEntityMentionName">messageEntityMention</a> =&gt; <a href="https://t.me/botfather">@botfather</a> (this mention is generated automatically server-side for @usernames in messages)</li>
+<li>Copy the date (formatted using the <code>long_date</code> + <code>long_time</code> format, regardless of the value of the flags) to the clipboard</li>
+<li>Add the date to the system calendar</li>
+<li>Schedule a reminder, by scheduling the message to saved messages, invoking <a href="/method/messages.forwardMessages">messages.forwardMessages</a> with the ID of the current message, <code>schedule_date</code> set to the date specified in this entity and <code>to_peer</code>=<a href="/constructor/inputPeerSelf">inputPeerSelf</a></li>
 </ul>
-<p>Also, <a href="/constructor/messageEntityCustomEmoji">messageEntityCustomEmoji</a> entities are used for <a href="/api/custom-emoji">custom emojis »</a>.</p>
-<p>A number of other entities are also available, see the <a href="/type/MessageEntity">type page for the full list »</a>.</p></div>
+<p>If none of the optional flags are set, the selected text should be rendered as a link, without changes to the text itself.</p>
+<p>Otherwise, it should be rendered as a link, replacing the text with the date rendered using the current user's timezone and the format specified by the provided flags:</p>
+<ul>
+<li>
+<p><code>relative</code>: if set, render a relative date, i.e. <code>In 1 second/minute/hour/day/week/month/year</code> or <code>1 second/minute/hour/day/week/month/year ago</code>.<br>
+Round down to the closest unit only, for example, depending on the value passed to <code>date</code>:</p>
+<ul>
+<li><code>time()+10</code> - <code>in 10 seconds</code></li>
+<li><code>time()+60+10</code> - <code>in 1 minute</code></li>
+<li><code>time()+3600+60+10</code> - <code>in 1 hour</code></li>
+<li><code>time()+86400+60+10</code> - <code>in 1 day</code></li>
+<li><code>time()+31*86400+86400+60+10</code> - <code>in 1 month</code></li>
+<li><code>time()+365*86400+31*86400+86400+60+10</code> - <code>in 1 year</code></li>
+</ul>
+<p>And the same for dates in the past:</p>
+<ul>
+<li><code>time()-10</code> - <code>10 seconds ago</code></li>
+<li><code>time()-60-10</code> - <code>1 minute ago</code></li>
+<li><code>time()-3600-60-10</code> - <code>1 hour ago</code></li>
+<li><code>time()-86400-60-10</code> - <code>1 day ago</code></li>
+<li><code>time()-31*86400-86400-60-10</code> - <code>1 month ago</code></li>
+<li><code>time()-365*86400-31*86400-86400-60-10</code> - <code>1 year ago</code></li>
+</ul>
+<p>The date must be updated in realtime by the client when the message is visible by the user, according to the current date.</p>
+</li>
+<li>
+<p><code>short_time</code>: renders the time in short format: hours and minutes, according to the user's locale settings</p>
+</li>
+<li>
+<p><code>long_time</code>: renders the time in long format: hours, minutes, seconds and maybe timezone, according to the user's locale settings</p>
+</li>
+<li>
+<p><code>short_date</code>: renders the time in short format: month, date, (and year, if different from the current one), all according the user's locale settings.</p>
+</li>
+<li>
+<p><code>long_date</code>: renders the time in long format: always month, date and year, all according the user's locale settings.</p>
+</li>
+<li>
+<p><code>day_of_week</code>: renders the day of the week according to the user's locale settings.</p>
+</li>
+</ul>
+<p>All flags are optional, with the following limitations:</p>
+<ul>
+<li><code>relative</code> cannot combined with any other flag</li>
+<li><code>short_time</code> and <code>long_time</code> cannot be combined with each other</li>
+<li><code>short_date</code> and <code>long_date</code> cannot be combined with each other</li>
+</ul>
+<p>If any of the flags are combined, their rendering order in the text is the following:</p>
+<ul>
+<li><code>day_of_week</code></li>
+<li><code>short_time</code>/<code>long_time</code></li>
+<li><code>short_date</code>/<code>long_date</code></li>
+</ul>
+<h4><a class="anchor" href="#autogenerated-entities" id="autogenerated-entities" name="autogenerated-entities"><i class="anchor-icon"></i></a>Autogenerated entities</h4>
+<p>The following entities are automatically generated by the server for URLs, hashtags, emails, bot commands, etc, simplifying the message rendering logic for clients (so they don't have to implement autolinking for URLs and other common clickable sections).</p>
+<p>These entities turn certain sections of the message blue and make them clickable, triggering a specific action:</p>
+<ul>
+<li><a href="/constructor/messageEntityMention">messageEntityMention</a> =&gt; Used to mention a user/channel/supergroup by @username, generated automatically server-side for @usernames in messages: when pressed, should bring up the target's profile.</li>
+</ul>
+<ul>
+<li><a href="/constructor/messageEntityHashtag">messageEntityHashtag</a> =&gt; For <code>#hashtags</code>: when clicked, the client should <a href="/api/search#hashtag-search">search for all messages with the specified hashtag in the current chat »</a></li>
+<li><a href="/constructor/messageEntityCashtag">messageEntityCashtag</a> =&gt; For <code>$cashtags</code>: when clicked, the client should <a href="/api/search#hashtag-search">search for all messages with the specified cashtag in the current chat »</a></li>
+<li><a href="/constructor/messageEntityBotCommand">messageEntityBotCommand</a> =&gt; For bot <code>/commands</code>: when clicked in a group or private chat, the client should send the same command within the chat</li>
+<li><a href="/constructor/messageEntityUrl">messageEntityUrl</a> =&gt; For plain text URLs and <a href="/api/links">deep links</a>: when clicked, the client should open the link in the in-app browser.</li>
+<li><a href="/constructor/messageEntityEmail">messageEntityEmail</a> =&gt; For emails: when clicked, the client should invoke the default intent used to send emails, opening the preferred email client.</li>
+<li><a href="/constructor/messageEntityBankCard">messageEntityBankCard</a> =&gt; For bank card numbers: when long-pressed, should invoke <a href="/method/payments.getBankCardData">payments.getBankCardData</a>, passing the card number to <code>number</code></li>
+</ul>
+<p>Note that clients still have to manually add the entities specified above to messages when sending messages to <a href="/api/end-to-end">E2E secret chats »</a>, since the server cannot inspect and modify messages sent to E2E-encrypted secret chats.</p>
+<h4><a class="anchor" href="#diff-entities" id="diff-entities" name="diff-entities"><i class="anchor-icon"></i></a>Diff entities</h4>
+<pre><code><a href='/constructor/messageEntityDiffInsert'>messageEntityDiffInsert</a>#71777116 offset:<a href='/type/int'>int</a> length:<a href='/type/int'>int</a> = <a href='/type/MessageEntity'>MessageEntity</a>;
+<a href='/constructor/messageEntityDiffDelete'>messageEntityDiffDelete</a>#652c1c5 offset:<a href='/type/int'>int</a> length:<a href='/type/int'>int</a> = <a href='/type/MessageEntity'>MessageEntity</a>;
+<a href='/constructor/messageEntityDiffReplace'>messageEntityDiffReplace</a>#c6c1e5a7 offset:<a href='/type/int'>int</a> length:<a href='/type/int'>int</a> old_text:<a href='/type/string'>string</a> = <a href='/type/MessageEntity'>MessageEntity</a>;
+
+<a href='/constructor/textWithEntities'>textWithEntities</a>#751f3146 text:<a href='/type/string'>string</a> entities:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; = <a href='/type/TextWithEntities'>TextWithEntities</a>;
+</code></pre>
+<p>Diff entities are currently only returned by the <a href="/api/ai">AI composer »</a>, and cannot be used in normal messages.</p>
+<p>Diff entities simplify the client-side logic, by letting the server pre-generate the diff between two texts.</p>
+<p>These entities are rendered only within the context of the containing <a href="/constructor/textWithEntities">textWithEntities</a>: no other information apart from <code>text</code> and <code>entities</code> is needed (i.e. no need to do any diffing manually).</p>
+<ul>
+<li><a href="/constructor/messageEntityDiffInsert">messageEntityDiffInsert</a> - Represents an addition: render it by simply <u>underlining</u> the section delimited by <code>offset</code> and <code>limit</code> and coloring it in green.</li>
+<li><a href="/constructor/messageEntityDiffInsert">messageEntityDiffInsert</a> - Represents a deletion: render it by simply <u>underlining</u> the section delimited by <code>offset</code> and <code>limit</code> and coloring it in red.</li>
+<li><a href="/constructor/messageEntityDiffReplace">messageEntityDiffReplace</a> - Represents a replacement, render it by:
+<ul>
+<li>Inserting <a href="/constructor/messageEntityDiffReplace">messageEntityDiffReplace</a>.<code>old_text</code> into the text at offset <code>offset</code>, <u>underlining</u> it and coloring it in red: note that this insertion does not affect the offsets of entities that come after it.</li>
+<li><u>underlining</u> the section delimited by <code>offset</code> and <code>limit</code> and coloring it in green.</li>
+</ul>
+</li>
+</ul>
+<p>For example the following diff:</p>
+<pre><code class="language-json">{
+    "_": "textWithEntities",
+    "text": "Hi,\n\nCould you please please proofread this message and correct any mistakes?\n\nThanks thanks.",
+    "entities": [
+        {
+            "_": "messageEntityDiffReplace",
+            "offset": 5,
+            "length": 1,
+            "old_text": "c"
+        },
+        {
+            "_": "messageEntityDiffDelete",
+            "offset": 22,
+            "length": 7
+        },
+        {
+            "_": "messageEntityDiffInsert",
+            "offset": 42,
+            "length": 1
+        },
+        {
+            "_": "messageEntityDiffReplace",
+            "offset": 66,
+            "length": 1,
+            "old_text": "uuu"
+        },
+        {
+            "_": "messageEntityDiffDelete",
+            "offset": 85,
+            "length": 7
+        }
+    ]
+}
+</code></pre>
+<p>Is rendered like this:</p>
+<div>
+  <a href="/file/400780400224/3/mT5D09bwVMk.26923.png/17ab4a219f971e78b0" target="_blank"><img src="/file/400780400224/3/mT5D09bwVMk.26923.png/17ab4a219f971e78b0" title="Diff entity render example" class="dev_page_image"></a>
+</div>
+<p>Note how the final <a href="/constructor/messageEntityDiffDelete">messageEntityDiffDelete</a>'s offset is not changed by the <code>uuu</code> inserted by the preceding <a href="/constructor/messageEntityDiffReplace">messageEntityDiffReplace</a>.</p>
+</div>
   
 </div>
           

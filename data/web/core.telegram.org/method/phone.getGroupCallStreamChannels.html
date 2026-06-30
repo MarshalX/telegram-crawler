@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>phone.getGroupCallStreamChannels</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Get info about RTMP streams in a group call or livestream.   This method should be invoked to the same group/channel-related DC used for downloading livestream chunks.   As usual, the media DC is preferred, if available.">
+    <meta property="description" content="Get the available stream channels and current playback timestamp of an RTMP-mode video chat, livestream or live story, see here » for the full flow.">
     <meta property="og:title" content="phone.getGroupCallStreamChannels">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Get info about RTMP streams in a group call or livestream.   This method should be invoked to the same group/channel-related DC used for downloading livestream chunks.   As usual, the media DC is preferred, if available.">
+    <meta property="og:description" content="Get the available stream channels and current playback timestamp of an RTMP-mode video chat, livestream or live story, see here » for the full flow.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -44,9 +44,8 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/methods" >All Methods</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/method/phone.getGroupCallStreamChannels" >phone.getGroupCallStreamChannels</a></li></ul></div>
   <h1 id="dev_page_title">phone.getGroupCallStreamChannels</h1>
   
-  <div id="dev_page_content"><p>Get info about RTMP streams in a group call or livestream.<br>
-This method should be invoked to the same group/channel-related DC used for <a href="/api/files#downloading-files">downloading livestream chunks</a>.<br>
-As usual, the media DC is preferred, if available.</p>
+  <div id="dev_page_content"><p>Get the available stream channels and current playback timestamp of an RTMP-mode video chat, livestream or live story, see <a href="/api/group-calls#playing-an-rtmp-livestream">here »</a> for the full flow.<br>
+The group call must be joined before invoking this method. Send the request to the media DC specified by <a href="/constructor/groupCall">groupCall</a>.<code>stream_dc_id</code>.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -75,7 +74,7 @@ As usual, the media DC is preferred, if available.</p>
 <tr>
 <td><strong>call</strong></td>
 <td style="text-align: center;"><a href="/type/InputGroupCall">InputGroupCall</a></td>
-<td>Group call or livestream</td>
+<td>RTMP-mode video chat, livestream or live story</td>
 </tr>
 </tbody>
 </table>
@@ -105,8 +104,38 @@ As usual, the media DC is preferred, if available.</p>
 </tbody>
 </table>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
-<h4><a class="anchor" href="#uploading-and-downloading-files" id="uploading-and-downloading-files" name="uploading-and-downloading-files"><i class="anchor-icon"></i></a><a href="/api/files">Uploading and Downloading Files</a></h4>
-<p>How to transfer large data batches correctly.</p></div>
+<h4><a class="anchor" href="#group-calls" id="group-calls" name="group-calls"><i class="anchor-icon"></i></a><a href="/api/group-calls">Group calls</a></h4>
+<p>How to start, join and manage group calls and video chats.</p>
+<h4><a class="anchor" href="#groupcall" id="groupcall" name="groupcall"><i class="anchor-icon"></i></a><a href="/constructor/groupCall">groupCall</a></h4>
+<p>Describes a <a href="/api/group-calls">group call</a>.</p>
+<p>If the <code>min</code> flag is set, this is a partial (<code>min</code>) constructor: only a subset of its fields contains up-to-date information, and it must be merged into a previously cached non-<code>min</code> constructor as described below. If no full (non-<code>min</code>) constructor for this call was cached previously, the <code>min</code> constructor must be discarded.</p>
+<p>When <code>min</code> is set, the following mandatory fields may be used: <code>id</code>, <code>access_hash</code>, <code>participants_count</code> and <code>version</code>. In addition, <strong>only</strong> the following conditional fields may be used if present, subject to the usual <code>version</code> check:</p>
+<ul>
+<li><code>conference</code></li>
+<li><code>rtmp_stream</code></li>
+<li><code>listeners_hidden</code></li>
+<li><code>title</code></li>
+<li><code>messages_enabled</code></li>
+<li><code>record_start_date</code> and <code>record_video_active</code></li>
+<li><code>schedule_date</code></li>
+<li><code>send_paid_messages_stars</code></li>
+</ul>
+<p>When <code>min</code> is set, the following fields <strong>must be ignored</strong>, keeping the values from the previously cached non-<code>min</code> constructor:</p>
+<ul>
+<li><code>join_muted</code></li>
+<li><code>can_change_join_muted</code></li>
+<li><code>schedule_start_subscribed</code></li>
+<li><code>can_start_video</code></li>
+<li><code>creator</code></li>
+<li><code>can_change_messages_enabled</code></li>
+<li><code>unmuted_video_count</code></li>
+<li><code>unmuted_video_limit</code></li>
+<li><code>stream_dc_id</code></li>
+<li><code>invite_link</code></li>
+<li><code>default_send_as</code></li>
+</ul>
+<p>The <code>join_date_asc</code> flag is set only when the call is created and never changes afterwards, so it too is not applied from a <code>min</code> constructor.</p>
+</div>
   
 </div>
           

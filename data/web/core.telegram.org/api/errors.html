@@ -51,18 +51,21 @@ An error is characterized by several parameters:</p>
 <h4><a class="anchor" href="#error-type" id="error-type" name="error-type"><i class="anchor-icon"></i></a>Error Type</h4>
 <p>A string literal in the form of <code>/[A-Z_0-9]+/</code>, which summarizes the problem. For example, <code>AUTH_KEY_UNREGISTERED</code>. This is an optional parameter.</p>
 <h4><a class="anchor" href="#error-database" id="error-database" name="error-database"><i class="anchor-icon"></i></a>Error Database</h4>
-<p>A full human-readable JSON list of RPC errors that can be returned by all methods in the API can be found <a href="/file/400780400111/3/RF-b0LDHWpc.202549.json/9b83afb26f1ba2f8aa">here »</a>, what follows is a description of its fields:  </p>
+<p>A full human-readable JSON list of RPC errors that can be returned by all methods in the API can be found <a href="/file/400780400487/4/Wo7FXRrqGa8.221127.json/130d86ee3019eef186">here »</a>, what follows is a description of its fields:</p>
 <ul>
-<li><code>errors</code> - All error messages and codes for each method (object).<ul>
+<li><code>errors</code> - All error messages and codes for each method (object).
+<ul>
 <li>Keys: Error codes as strings (numeric strings)</li>
-<li>Values: All error messages for each method (object)<ul>
+<li>Values: All error messages for each method (object)
+<ul>
 <li>Keys: Error messages (string)</li>
 <li>Values: An array of methods which may emit this error (array of strings, may be empty for errors that can be emitted by any method)</li>
 </ul>
 </li>
 </ul>
 </li>
-<li><code>descriptions</code> - Descriptions for every error mentioned in <code>errors</code> (and a few other errors not related to a specific method)<ul>
+<li><code>descriptions</code> - Descriptions for every error mentioned in <code>errors</code> (and a few other errors not related to a specific method)
+<ul>
 <li>Keys: Error messages</li>
 <li>Values: Error descriptions</li>
 </ul>
@@ -71,6 +74,7 @@ An error is characterized by several parameters:</p>
 <li><code>bot_only</code> - The full list of methods that can only be used by bots, <strong>not</strong> users.</li>
 <li><code>business_supported</code> - The full list of methods that can be used by bots over a <a href="/api/bots/connected-business-bots">business connection with invokeWithBusinessConnection</a>.</li>
 <li><code>unauthed_allowed</code> - The full list of methods that can be used by not yet logged in connections.</li>
+<li><code>layer</code> - Layer number (integer).</li>
 </ul>
 <p>Error messages and error descriptions may contain <code>printf</code> placeholders in key positions, for now only <code>%d</code> is used to map durations contained in error messages to error descriptions.</p>
 <p>Example:</p>
@@ -105,8 +109,26 @@ An error is characterized by several parameters:</p>
     ],
     "unauthed_allowed": [
         "auth.sendCode"
-    ]
-}</code></pre>
+    ],
+    "layer": 224
+}
+</code></pre>
+<h3><a class="anchor" href="#quality-of-life-checks" id="quality-of-life-checks" name="quality-of-life-checks"><i class="anchor-icon"></i></a>Quality of life checks</h3>
+<p>Note the following: <a href="/api/peers">peer information</a> and other locally cached information is also used for quality-of-life improvements, i.e. to directly prevent the user from doing an operation that is denied by the peer information, instead of allowing the operation and then showing an error.</p>
+<p>These improvements should be implemented by all clients, however, the server will also always prevent the user from doing illegal operations, by emitting an appropriate <a href="/api/errors">RPC error</a>, as sometimes it is still possible to make an illegal operation, even if a local check <em>is</em> implemented (see below).</p>
+<p>Along with preventing users from doing illegal operations on the client side, clients should always provide localized versions of errors returned by the server (as listed in the JSON file downloadable from the <a href="/api/errors">RPC error page</a>), to inform the user as to why an attempted operation has failed.</p>
+<p>In other words, if the client didn't prevent the failed method call locally because:</p>
+<ul>
+<li>It does not implement a local check for simplicity or</li>
+<li>It <em>does</em> implement a local check, but:
+<ul>
+<li>Outdated peer info indicated that the action is legal, but actually it isn't legal anymore</li>
+<li>An update was sent by the server for the peer info, but it wasn't applied in time due to an (unavoidable!) race condition between the server sending the update and the client sending the query.</li>
+<li>Other unspecified reasons (a new check introduced in a future layer by a new feature, etc...)</li>
+</ul>
+</li>
+</ul>
+<p>...it should still let the user know <em>why</em> the query failed, based on the description of the RPC error (if available in the <a href="#error-database">JSON error database</a>, otherwise by showing the RPC error itself).</p>
 <hr>
 <h4><a class="anchor" href="#error-constructors" id="error-constructors" name="error-constructors"><i class="anchor-icon"></i></a>Error Constructors</h4>
 <p>There should be a way to handle errors that are returned in <a href="/mtproto/service_messages#rpc-error">rpc_error</a> constructors.</p>
@@ -164,24 +186,28 @@ An error is characterized by several parameters:</p>
 <h3><a class="anchor" href="#406-not-acceptable" id="406-not-acceptable" name="406-not-acceptable"><i class="anchor-icon"></i></a>406 NOT_ACCEPTABLE</h3>
 <p>Similar to <a href="#400-bad-request">400 BAD_REQUEST</a>, but the app must display the error to the user a bit differently.<br>
 Do not display any visible error to the user when receiving the <code>rpc_error</code> constructor: instead, wait for an <a href="/constructor/updateServiceNotification">updateServiceNotification</a> update, and handle it as usual.<br>
-Basically, an <a href="/constructor/updateServiceNotification">updateServiceNotification</a> <code>popup</code> update will be emitted independently (ie NOT as an <a href="/type/Updates">Updates</a> constructor inside <code>rpc_result</code> but as a normal update) immediately after emission of a 406 <code>rpc_error</code>: the update will contain the actual localized error message to show to the user with a UI popup.  </p>
+Basically, an <a href="/constructor/updateServiceNotification">updateServiceNotification</a> <code>popup</code> update will be emitted independently (ie NOT as an <a href="/type/Updates">Updates</a> constructor inside <code>rpc_result</code> but as a normal update) immediately after emission of a 406 <code>rpc_error</code>: the update will contain the actual localized error message to show to the user with a UI popup.</p>
 <p>An exception to this is the <code>AUTH_KEY_DUPLICATED</code> error, which is only emitted if any of the non-media DC detects that an authorized session is sending requests in parallel from two separate TCP connections, from the same or different IP addresses.<br>
 Note that parallel connections are still allowed and actually recommended for media DCs.<br>
-Also note that by session we mean a logged-in session identified by an <a href="/constructor/authorization">authorization</a> constructor, fetchable using <a href="/method/account.getAuthorizations">account.getAuthorizations</a>, not an MTProto session.  </p>
-<p>If the client receives an <code>AUTH_KEY_DUPLICATED</code> error, the session was already invalidated by the server and the user must generate a new auth key and login again.  </p>
+Also note that by session we mean a logged-in session identified by an <a href="/constructor/authorization">authorization</a> constructor, fetchable using <a href="/method/account.getAuthorizations">account.getAuthorizations</a>, not an MTProto session.</p>
+<p>In other words, the <strong>main</strong> connection to a non-media DC normally permits only a <strong>single</strong> <a href="/api/datacenter#parallel-sessions">MTProto session</a>: opening additional parallel main sessions (i.e. multiple <a href="/mtproto/description#session">session_id</a>s over the same authorization key, or multiple TCP connections to the main DC) is what triggers this error.<br>
+The server may however explicitly grant permission to run several parallel main sessions, by advertising a <code>tmp_sessions</code> value greater than <code>1</code> in the <a href="/constructor/config">config</a>/<a href="/constructor/auth.authorization">auth.authorization</a> constructors (<a href="/api/datacenter#parallel-sessions">see parallel sessions »</a>); only up to that many parallel main sessions may then be opened without triggering <code>AUTH_KEY_DUPLICATED</code>. When <code>tmp_sessions</code> is absent or <code>≤ 1</code>, a single main session must be used.<br>
+Dedicated <a href="/api/files#general-considerations">file transfer sessions</a> on media DCs are exempt and may always be opened in parallel.</p>
+<p>If the client receives an <code>AUTH_KEY_DUPLICATED</code> error, the session was already invalidated by the server and the user must generate a new auth key and login again.</p>
 <h3><a class="anchor" href="#420-flood" id="420-flood" name="420-flood"><i class="anchor-icon"></i></a>420 FLOOD</h3>
 <p>The maximum allowed number of attempts to invoke the given method with the given input parameters has been exceeded. For example, in an attempt to request a large number of text messages (SMS) for the same phone number.</p>
 <h4><a class="anchor" href="#error-example" id="error-example" name="error-example"><i class="anchor-icon"></i></a>Error Example:</h4>
 <ul>
 <li>FLOOD_WAIT_X: A wait of X seconds is required (where X is a number)</li>
-<li>FLOOD_PREMIUM_WAIT_X: A wait of X seconds is required (where X is a number); the user may also purchase a <a href="/api/premium">Telegram Premium subscription</a> to remove this limitation. See <a href="/api/files">here »</a> for more info on how to handle this error.  </li>
+<li>FLOOD_PREMIUM_WAIT_X: A wait of X seconds is required (where X is a number); the user may also purchase a <a href="/api/premium">Telegram Premium subscription</a> to remove this limitation. See <a href="/api/files">here »</a> for more info on how to handle this error.</li>
 </ul>
 <h3><a class="anchor" href="#500-internal" id="500-internal" name="500-internal"><i class="anchor-icon"></i></a>500 INTERNAL</h3>
 <p>An internal server error occurred while a request was being processed; for example, there was a disruption while accessing a database or file storage.</p>
 <p>If a client receives a 500 error, or you believe this error should not have occurred, please collect as much information as possible about the query and error and send it to the developers.</p>
 <h3><a class="anchor" href="#other-error-codes" id="other-error-codes" name="other-error-codes"><i class="anchor-icon"></i></a>Other Error Codes</h3>
 <p>If a server returns an error with a code other than the ones listed above, it may be considered the same as a 500 error and treated as an <a href="#500-internal">internal server error</a>.</p>
-<!-- updated 2f290600106ba8766361638947bd6dd52c45cf8046f16f2e2eca9f3c64971315 --></div>
+<!-- updated 38d502d5aa0d34641f64063127be846b25d964fa8ab1136f9bb8196a0721b9ab -->
+</div>
   
 </div>
           

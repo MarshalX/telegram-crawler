@@ -109,7 +109,7 @@
 <tr>
 <td><strong>noforwards</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/constructor/true">true</a></td>
-<td>Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn't have <a href="https://telegram.org/blog/protected-content-delete-by-date-and-more">content protection</a> enabled</td>
+<td>Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn't have <a href="https://telegram.org/blog/content-protection-delete-by-date-and-more">content protection</a> enabled</td>
 </tr>
 <tr>
 <td><strong>allow_paid_floodskip</strong></td>
@@ -152,6 +152,11 @@
 <td>Scheduled message date for scheduled messages</td>
 </tr>
 <tr>
+<td><strong>schedule_repeat_period</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.24?<a href="/type/int">int</a></td>
+<td>Once sent, this message will be automatically re-scheduled to be re-sent again this many seconds in the future, see <a href="/api/scheduled-messages#repeating-scheduled-messages">here »</a> for more info on repeating scheduled messages.</td>
+</tr>
+<tr>
 <td><strong>send_as</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.13?<a href="/type/InputPeer">InputPeer</a></td>
 <td>Forward the messages as the specified peer</td>
@@ -160,6 +165,11 @@
 <td><strong>quick_reply_shortcut</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.17?<a href="/type/InputQuickReplyShortcut">InputQuickReplyShortcut</a></td>
 <td>Add the messages to the specified <a href="/api/business#quick-reply-shortcuts">quick reply shortcut »</a>, instead.</td>
+</tr>
+<tr>
+<td><strong>effect</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.18?<a href="/type/long">long</a></td>
+<td>Specifies a <a href="/api/effects">message effect »</a> to use for the message.</td>
 </tr>
 <tr>
 <td><strong>video_timestamp</strong></td>
@@ -328,6 +338,11 @@
 </tr>
 <tr>
 <td>400</td>
+<td>MEDIA_FILE_INVALID</td>
+<td>The specified media file is invalid.</td>
+</tr>
+<tr>
+<td>400</td>
 <td>MESSAGE_IDS_EMPTY</td>
 <td>No message ids were provided.</td>
 </tr>
@@ -340,6 +355,11 @@
 <td>400</td>
 <td>MSG_ID_INVALID</td>
 <td>Invalid message ID provided.</td>
+</tr>
+<tr>
+<td>500</td>
+<td>NEED_DOC_INVALID</td>
+<td> </td>
 </tr>
 <tr>
 <td>406</td>
@@ -357,7 +377,7 @@
 <td>A premium account is required to execute this action.</td>
 </tr>
 <tr>
-<td>403</td>
+<td>406</td>
 <td>PRIVACY_PREMIUM_REQUIRED</td>
 <td>You need a <a href="/api/premium">Telegram Premium subscription</a> to send a message to this user.</td>
 </tr>
@@ -447,6 +467,11 @@
 <td>You're banned from sending messages in supergroups/channels.</td>
 </tr>
 <tr>
+<td>400</td>
+<td>USER_BOT_TO_BOT_DISABLED</td>
+<td> </td>
+</tr>
+<tr>
 <td>403</td>
 <td>USER_IS_BLOCKED</td>
 <td>You were blocked by this user.</td>
@@ -470,14 +495,18 @@
 </table>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
 <h4><a class="anchor" href="#bots-faq" id="bots-faq" name="bots-faq"><i class="anchor-icon"></i></a><a href="/bots/faq">Bots FAQ</a></h4>
-<h4><a class="anchor" href="#forums" id="forums" name="forums"><i class="anchor-icon"></i></a><a href="/api/forum">Forums</a></h4>
+<h4><a class="anchor" href="#forum-topics" id="forum-topics" name="forum-topics"><i class="anchor-icon"></i></a><a href="/api/forum">Forum topics</a></h4>
 <p>Telegram allows creating forums with multiple distinct topics.</p>
 <h4><a class="anchor" href="#inputreplytomonoforum" id="inputreplytomonoforum" name="inputreplytomonoforum"><i class="anchor-icon"></i></a><a href="/constructor/inputReplyToMonoForum">inputReplyToMonoForum</a></h4>
 <p>Used to send messages to a <a href="/api/monoforum">monoforum topic</a>.</p>
-<h4><a class="anchor" href="#monoforum" id="monoforum" name="monoforum"><i class="anchor-icon"></i></a><a href="/api/monoforum">Monoforum</a></h4>
+<h4><a class="anchor" href="#direct-messages-to-channels" id="direct-messages-to-channels" name="direct-messages-to-channels"><i class="anchor-icon"></i></a><a href="/api/monoforum">Direct messages to channels</a></h4>
 <p>Telegram supports direct messages to channels, which can also be used to suggest (even paid) channel posts.</p>
-<h4><a class="anchor" href="#business" id="business" name="business"><i class="anchor-icon"></i></a><a href="/api/business">Business</a></h4>
+<h4><a class="anchor" href="#scheduled-messages" id="scheduled-messages" name="scheduled-messages"><i class="anchor-icon"></i></a><a href="/api/scheduled-messages">Scheduled messages</a></h4>
+<p>Telegram allows scheduling messages</p>
+<h4><a class="anchor" href="#telegram-business" id="telegram-business" name="telegram-business"><i class="anchor-icon"></i></a><a href="/api/business">Telegram Business</a></h4>
 <p>Users can turn their Telegram account into a business account, gaining access to business features such as opening hours, location, quick replies, automated messages, custom start pages, chatbot support, and more.</p>
+<h4><a class="anchor" href="#animated-message-effects" id="animated-message-effects" name="animated-message-effects"><i class="anchor-icon"></i></a><a href="/api/effects">Animated message effects</a></h4>
+<p>Telegram allows adding spectacular animated effects to messages you send.</p>
 <h4><a class="anchor" href="#paid-messages" id="paid-messages" name="paid-messages"><i class="anchor-icon"></i></a><a href="/api/paid-messages">Paid messages</a></h4>
 <p>Telegram Stars can be used to pay for sending messages to users, supergroups and channels that have configured paid messages, requiring a payment for every message sent to them.</p>
 <h4><a class="anchor" href="#telegram-stars" id="telegram-stars" name="telegram-stars"><i class="anchor-icon"></i></a><a href="/api/stars">Telegram Stars</a></h4>
@@ -491,7 +520,8 @@
 <h4><a class="anchor" href="#telegram-premium" id="telegram-premium" name="telegram-premium"><i class="anchor-icon"></i></a><a href="/api/premium">Telegram Premium</a></h4>
 <p>Telegram Premium is an optional subscription service that unlocks additional exclusive client-side and API-side features, while helping support the development of the app.</p>
 <h4><a class="anchor" href="#client-configuration" id="client-configuration" name="client-configuration"><i class="anchor-icon"></i></a><a href="/api/config">Client configuration</a></h4>
-<p>The MTProto API has multiple configuration parameters that can be fetched with the appropriate methods.</p></div>
+<p>The MTProto API has multiple configuration parameters that can be fetched with the appropriate methods.</p>
+</div>
   
 </div>
           

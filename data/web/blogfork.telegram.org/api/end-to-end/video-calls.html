@@ -4,14 +4,10 @@
     <meta charset="utf-8">
     <title>End-to-End Encrypted Voice and Video Calls</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="This article describes the end-to-end encryption used for Telegram voice and video calls.
-Related Articles
-End-to-End Encryption…">
+    <meta property="description" content="The end-to-end encryption used for Telegram voice and video calls.">
     <meta property="og:title" content="End-to-End Encrypted Voice and Video Calls">
     <meta property="og:image" content="">
-    <meta property="og:description" content="This article describes the end-to-end encryption used for Telegram voice and video calls.
-Related Articles
-End-to-End Encryption…">
+    <meta property="og:description" content="The end-to-end encryption used for Telegram voice and video calls.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -53,6 +49,7 @@ End-to-End Encryption…">
 <p><div class="dev_page_nav_wrap"></p>
 <ul>
 <li><a href="/api/end-to-end">End-to-End Encryption in Secret Chats</a></li>
+<li><a href="/api/end-to-end/group-calls#emoji-fingerprint-generation">Emoji fingerprint generation »</a></li>
 <li><a href="/mtproto/security_guidelines">Security Guidelines for Client Developers</a>
 </div></li>
 </ul>
@@ -125,7 +122,7 @@ End-to-End Encryption…">
 <p>Each of the peers maintains its own 32-bit monotonically increasing counter for outgoing messages, <code>seq</code>, starting with <code>1</code>. This <code>seq</code> counter is prepended to each sent message and increased by <code>1</code> for each new message. No two <code>seq</code> numbers of the first message in a packet can be the same. If only old messages need to be re-sent, an <em>empty</em> message with a new unique <code>seq</code> is added to the packet first. When the <code>seq</code> counter reaches <code>2^30</code>, the call must be aborted. Each peer stores <code>seq</code> values of all the messages it has received (and processed) which are larger than <code>max_received_seq - 64</code>, where <code>max_received_seq</code> is the largest <code>seq</code> number received so far.</p>
 <p>If a packet is received, the first message of which has a <code>seq</code> that is smaller or equal to <code>max_received_seq - 64</code> or its <code>seq</code> had already been received, the message is discarded. Otherwise, the <code>seq</code> values of all incoming messages are memorized and <code>max_received_seq</code> is adjusted. This guarantees that no two packets will be processed twice.</p>
 <h2><a class="anchor" href="#key-verification" id="key-verification" name="key-verification"><i class="anchor-icon"></i></a>Key Verification</h2>
-<p>To verify the key, and ensure that no MITM attack is taking place, both parties concatenate the secret key <em>key</em> with the value <em>g_a</em> of the Caller ( <em>A</em> ), compute SHA256 and use it to generate a sequence of emoticons. More precisely, the SHA256 hash is split into four 64-bit integers; each of them is divided by the total number of emoticons used (currently 333), and the remainder is used to select specific emoticons. The specifics of the protocol guarantee that comparing four emoticons out of a set of 333 is sufficient to prevent eavesdropping (MiTM attack on DH) with a probability of <strong>0.9999999999</strong>.</p>
+<p>To verify the key, and ensure that no MITM attack is taking place, both parties concatenate the secret key <em>key</em> with the value <em>g_a</em> of the Caller (<em>A</em>) and compute <code>fingerprint_hash = SHA256(key || g_a)</code>. This 32-byte hash is converted into four emojis using the same <a href="/api/end-to-end/group-calls#emoji-fingerprint-generation">emoji fingerprint generation algorithm used by end-to-end encrypted group calls »</a>. The specifics of the protocol guarantee that comparing four emoticons out of the fingerprint emoji table (which contains 333 emojis) is sufficient to prevent eavesdropping (MiTM attack on DH) with a probability of <strong>0.9999999999</strong>.</p>
 <p>This is because instead of the standard Diffie-Hellman key exchange which requires only two messages between the parties:</p>
 <ul>
 <li>A-&gt;B : (generates a and) sends g_a := g^a</li>
@@ -144,7 +141,8 @@ End-to-End Encryption…">
 <p>The use of hash commitment in the DH exchange constrains the attacker to only <strong>one guess</strong> to generate the correct visualization in their attack, which means that using just over 33 bits of entropy represented by four emoji in the visualization is enough to make a successful attack highly improbable.</p>
 <blockquote>
 <p>For a slightly more user-friendly explanation of the above see: <a href="https://core.telegram.org/techfaq#q-how-are-voice-calls-authenticated">How are calls authenticated?</a></p>
-</blockquote></div>
+</blockquote>
+</div>
   
 </div>
           

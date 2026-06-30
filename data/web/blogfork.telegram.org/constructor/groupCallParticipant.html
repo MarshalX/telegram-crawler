@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>groupCallParticipant</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="Info about a group call participant">
+    <meta property="description" content="Describes a group call participant and their current state, see applying group call updates ».">
     <meta property="og:title" content="groupCallParticipant">
     <meta property="og:image" content="">
-    <meta property="og:description" content="Info about a group call participant">
+    <meta property="og:description" content="Describes a group call participant and their current state, see applying group call updates ».">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -44,7 +44,7 @@
   <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/schema" >TL-schema</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/constructor/groupCallParticipant" >groupCallParticipant</a></li></ul></div>
   <h1 id="dev_page_title">groupCallParticipant</h1>
   
-  <div id="dev_page_content"><p>Info about a group call participant</p>
+  <div id="dev_page_content"><p>Describes a group call participant and their current state, see <a href="/api/group-calls#applying-group-call-updates">applying group call updates »</a>.</p>
 <p><div class="clearfix">
   <ul class="dev_layer_select slightly-pull-right nav nav-pills">
     <li class="dropdown">
@@ -81,7 +81,7 @@
 <tr>
 <td><strong>left</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.1?<a href="/constructor/true">true</a></td>
-<td>Whether the participant has left</td>
+<td>Whether the participant left the media layer; in conferences, another participant must then prune them from the E2E blockchain</td>
 </tr>
 <tr>
 <td><strong>can_self_unmute</strong></td>
@@ -96,7 +96,7 @@
 <tr>
 <td><strong>versioned</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.5?<a href="/constructor/true">true</a></td>
-<td>If set, and <a href="/constructor/updateGroupCallParticipants">updateGroupCallParticipants</a>.version &lt; locally stored call.version, info about this participant should be ignored. If (...), and <a href="/constructor/updateGroupCallParticipants">updateGroupCallParticipants</a>.version &gt; call.version+1, the participant list should be refetched using <a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a>.</td>
+<td>If set, the application logic for this update is slightly different, see <a href="/api/group-calls#applying-group-call-updates">here »</a> for more info on the full flow.</td>
 </tr>
 <tr>
 <td><strong>min</strong></td>
@@ -126,7 +126,7 @@
 <tr>
 <td><strong>peer</strong></td>
 <td style="text-align: center;"><a href="/type/Peer">Peer</a></td>
-<td>Peer information</td>
+<td>Peer represented by this participant</td>
 </tr>
 <tr>
 <td><strong>date</strong></td>
@@ -141,12 +141,12 @@
 <tr>
 <td><strong>source</strong></td>
 <td style="text-align: center;"><a href="/type/int">int</a></td>
-<td>Source ID</td>
+<td>Source ID of the participant's main audio stream</td>
 </tr>
 <tr>
 <td><strong>volume</strong></td>
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.7?<a href="/type/int">int</a></td>
-<td>Volume, if not set the volume is set to 100%.</td>
+<td>Volume, between <code>1</code> and <code>20000</code>; <code>10000</code> represents 100% volume. If not set, the volume is set to 100%.</td>
 </tr>
 <tr>
 <td><strong>about</strong></td>
@@ -168,15 +168,19 @@
 <td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.14?<a href="/type/GroupCallParticipantVideo">GroupCallParticipantVideo</a></td>
 <td>Info about the screen sharing stream the participant is currently broadcasting</td>
 </tr>
+<tr>
+<td><strong>paid_stars_total</strong></td>
+<td style="text-align: center;"><a href="/mtproto/TL-combinators#conditional-fields">flags</a>.16?<a href="/type/long">long</a></td>
+<td>Total Stars donated by this participant in a live story</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" href="#type" id="type" name="type"><i class="anchor-icon"></i></a>Type</h3>
 <p><a href="/type/GroupCallParticipant">GroupCallParticipant</a></p>
 <h3><a class="anchor" href="#related-pages" id="related-pages" name="related-pages"><i class="anchor-icon"></i></a>Related pages</h3>
-<h4><a class="anchor" href="#updategroupcallparticipants" id="updategroupcallparticipants" name="updategroupcallparticipants"><i class="anchor-icon"></i></a><a href="/constructor/updateGroupCallParticipants">updateGroupCallParticipants</a></h4>
-<p>The participant list of a certain group call has changed</p>
-<h4><a class="anchor" href="#phonegetgroupparticipants" id="phonegetgroupparticipants" name="phonegetgroupparticipants"><i class="anchor-icon"></i></a><a href="/method/phone.getGroupParticipants">phone.getGroupParticipants</a></h4>
-<p>Get group call participants</p></div>
+<h4><a class="anchor" href="#group-calls" id="group-calls" name="group-calls"><i class="anchor-icon"></i></a><a href="/api/group-calls">Group calls</a></h4>
+<p>How to start, join and manage group calls and video chats.</p>
+</div>
   
 </div>
           

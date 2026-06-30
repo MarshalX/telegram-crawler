@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>Optional combinator parameters and their values</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="description" content="TL Language makes it possible to declare a combinator&#39;s first few parameters optional. Subsequently, they are almost never…">
+    <meta property="description" content="Optional arguments of TL combinators.">
     <meta property="og:title" content="Optional combinator parameters and their values">
     <meta property="og:image" content="">
-    <meta property="og:description" content="TL Language makes it possible to declare a combinator&#39;s first few parameters optional. Subsequently, they are almost never…">
+    <meta property="og:description" content="Optional arguments of TL combinators.">
     <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -58,7 +58,8 @@
 <p>We will assume that the functional combinator only differs from the constructor in that before its result type the <code>!</code> modifier is implicitly added, and the (remote or local) computation of a functional expression may be presented as the execution of some polymorphic function <code>eval : !X -&gt; X</code>.</p>
 <p>Moreover, the unknown result type is obviously usually (but not always) bound to the serialization of an expression whose type has been modified by <code>!</code>.</p>
 <p>We can formulate the following rules. Let there be some constructor</p>
-<pre><code>C {a1:T1} ... {am:Tm} b1:U1 ... bn:Un = T;</code></pre>
+<pre><code>C {a1:T1} ... {am:Tm} b1:U1 ... bn:Un = T;
+</code></pre>
 <p>Some of its arguments or its result may be marked with the <code>!</code> modifier (We consider a functional combinator to be a constructor whose result type has been modified by an implicit <code>!</code>).</p>
 <p>The following conditions must hold:</p>
 <ul>
@@ -72,7 +73,7 @@
 <p>Only implicit parameters of type <code>Type</code> or <code>#</code> are allowed. In other words, <em>Ti</em> is either a <code>Type</code> or a <code>#</code>. (Unlike the previous rule, this rule may be relaxed in the future.)</p>
 </li>
 <li>
-<p>Each implicit parameter <em>a1</em>, ..., <em>am</em> must be used at least once -- either within one of the <em>Ui</em> types that have a <code>!</code>, or in the result type <em>T</em>, <em>if it does not have an explicit or implicit <code>!</code></em>. </p>
+<p>Each implicit parameter <em>a1</em>, ..., <em>am</em> must be used at least once -- either within one of the <em>Ui</em> types that have a <code>!</code>, or in the result type <em>T</em>, <em>if it does not have an explicit or implicit <code>!</code></em>.</p>
 </li>
 <li>
 <p>If an implicit parameter <em>ai</em> is not used in the result type, or if the result type has a <code>!</code>, then its first (leftmost) usage must be within a type <em>Uj</em> that is modified by <code>!</code>.</p>
@@ -80,7 +81,8 @@
 </ul>
 <p>The idea is this: we assume that during (de)serialization of a value of a type modified by <code>!</code> that we do not know this type in advance and we will find out what it is only based on the result of the (de)serialization; Conversely, we assume that during (de)serialization of a value of a type that is not modified by <code>!</code> that we know this type in advance. In this case, complying with the rules stated above lets us always compute the values of all implicit parameters -- either from the (previously known) result type or from the type of one of the <code>bj:!Uj</code> parameters (which was obtained during the serialization process).</p>
 <p>In fact, <code>!</code> denotes the direction in which type information is flowing. By default, the result type is the source of information about types (and their parameters), while argument types are the recipients of that information. The use of <code>!</code> reverses the direction of information flow, making the result type the recipient and the argument type the source of type information.</p>
-<p>See also <a href="TL-abstract-types">Binary serialization and abstract TL types</a> and <a href="TL-polymorph">Polymorphism in TL</a>.</p></div>
+<p>See also <a href="TL-abstract-types">Binary serialization and abstract TL types</a> and <a href="TL-polymorph">Polymorphism in TL</a>.</p>
+</div>
   
 </div>
           
