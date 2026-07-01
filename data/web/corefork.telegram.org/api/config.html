@@ -51,31 +51,40 @@
 <p>Unlike the client-side and MTProto configuration parameters described below (which are fetched at runtime with <a href="/method/help.getAppConfig">help.getAppConfig</a> and <a href="/method/help.getConfig">help.getConfig</a>), the API also relies on a number of <strong>API constants</strong>: sets of identifiers and enumerated values that are <strong>not</strong> returned by <a href="/method/help.getAppConfig">help.getAppConfig</a> or <a href="/method/help.getConfig">help.getConfig</a>, but are instead hardcoded into official clients and change from layer to layer.</p>
 <p>Examples include client configuration key names, <a href="/api/premium">Premium features and limits</a>, <a href="/api/business">business features</a>, suggested actions, <a href="/api/web-events">incoming web events</a>, <a href="/constructor/webPage">webPage</a> type values and more. Because these constants are tied to the schema, any change to them is documented in the per-layer changelogs on the <a href="/api/layers">layers page »</a>.</p>
 <p>For programmatic access, an aggregated machine-readable index of all of these API constants is published at the permalink <a href="/api/config.json">/api/config.json</a>.</p>
-<p>The endpoint is a single JSON object with the following schema:</p>
+<p>The endpoint is a single JSON object, keyed by a <strong>globally-unique section name</strong> – a human-readable identifier for each list of API constants (for example <code>premium features</code>, <code>basic suggestions</code> or <code>webpage type</code>).</p>
+<p>Each value is an object describing that section, with three keys:</p>
 <ul>
-<li>The top-level object is keyed by a <strong>globally-unique section name</strong> – a human-readable identifier for each list of API constants (for example <code>premium features</code>, <code>basic suggestions</code> or <code>webpage type</code>).
+<li><code>description</code> – the <strong>human-readable description</strong> of the section as a whole.</li>
+<li><code>type</code> – either <code>map</code> or <code>list</code>, indicating the shape of <code>entries</code> below, so consumers can distinguish the two shapes without inspecting the JSON type of <code>entries</code>.</li>
+<li><code>entries</code> – the list of API constants in the section, whose shape matches <code>type</code>:
 <ul>
-<li>Each value is an object representing that list, keyed by the <strong>entry identifier</strong> (a plain string, with any markdown formatting stripped, e.g. <code>message_length_max</code>, <code>telegram_nft</code>, <code>double_limits__channels</code>).
-<ul>
-<li>Each value is the <strong>human-readable description</strong> of that entry (a string), or an empty string <code>""</code> when the entry is not yet documented.</li>
+<li>when <code>type</code> is <code>map</code>, an <strong>object</strong> keyed by the <strong>entry identifier</strong> (the string constant, e.g. <code>message_length_max</code>, <code>telegram_nft</code>, <code>double_limits__channels</code>), whose value is the <strong>human-readable description</strong> of that entry (a markdown string).</li>
+<li>when <code>type</code> is <code>list</code>, an <strong>array</strong> of the bare entry identifiers (plain strings), for sections whose entries don't carry individual descriptions.</li>
 </ul>
 </li>
 </ul>
-</li>
-</ul>
-<p>The <a href="/api/file-references">file reference database</a> is <strong>not</strong> included here, as it has its own dedicated schema and permalinks.</p>
 <p>For example:</p>
 <pre><code class="language-json">{
-    "premium limits": {
-        "double_limits__channels": "Maximum number of channels/supergroups a non-Premium user may join.",
-        "double_limits__saved_gifs": ""
-    },
     "webpage type": {
-        "telegram_nft": "Preview of a collectible gift link.",
-        "video": "Preview of an external video."
+        "description": "Web page type values from the [webPage](https://core.telegram.org/constructor/webPage) constructor.",
+        "type": "map",
+        "entries": {
+            "telegram_nft": "Preview of a collectible gift link.",
+            "video": "Preview of an external video."
+        }
+    },
+    "settings paths": {
+        "description": "In-app settings deep link paths openable via [settings deep links »](https://core.telegram.org/api/links#settings-links).",
+        "type": "list",
+        "entries": [
+            "appearance",
+            "appearance/themes",
+            "appearance/wallpapers"
+        ]
     }
 }
 </code></pre>
+<p>The <a href="/api/file-references">file reference database</a> is <strong>not</strong> included here, as it has its own dedicated schema and permalinks.</p>
 <p>The full RPC error database is similarly available as a machine-readable permalink at <a href="/api/errors.json">/api/errors.json</a>, documented <a href="/api/errors#error-database">here »</a>.</p>
 <h3><a class="anchor" href="#mtproto-configuration" id="mtproto-configuration" name="mtproto-configuration"><i class="anchor-icon"></i></a>MTProto configuration</h3>
 <pre><code><a href='/constructor/config'>config</a>#cc1a241e flags:<a href='/type/%23'>#</a> default_p2p_contacts:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/constructor/true'>true</a> preload_featured_stickers:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.4?<a href='/constructor/true'>true</a> revoke_pm_inbox:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> blocked_mode:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.8?<a href='/constructor/true'>true</a> force_try_ipv6:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> date:<a href='/type/int'>int</a> expires:<a href='/type/int'>int</a> test_mode:<a href='/type/Bool'>Bool</a> this_dc:<a href='/type/int'>int</a> dc_options:<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/DcOption'>DcOption</a>&gt; dc_txt_domain_name:<a href='/type/string'>string</a> chat_size_max:<a href='/type/int'>int</a> megagroup_size_max:<a href='/type/int'>int</a> forwarded_count_max:<a href='/type/int'>int</a> online_update_period_ms:<a href='/type/int'>int</a> offline_blur_timeout_ms:<a href='/type/int'>int</a> offline_idle_timeout_ms:<a href='/type/int'>int</a> online_cloud_timeout_ms:<a href='/type/int'>int</a> notify_cloud_delay_ms:<a href='/type/int'>int</a> notify_default_delay_ms:<a href='/type/int'>int</a> push_chat_period_ms:<a href='/type/int'>int</a> push_chat_limit:<a href='/type/int'>int</a> edit_time_limit:<a href='/type/int'>int</a> revoke_time_limit:<a href='/type/int'>int</a> revoke_pm_time_limit:<a href='/type/int'>int</a> rating_e_decay:<a href='/type/int'>int</a> stickers_recent_limit:<a href='/type/int'>int</a> channels_read_media_period:<a href='/type/int'>int</a> tmp_sessions:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/int'>int</a> call_receive_timeout_ms:<a href='/type/int'>int</a> call_ring_timeout_ms:<a href='/type/int'>int</a> call_connect_timeout_ms:<a href='/type/int'>int</a> call_packet_timeout_ms:<a href='/type/int'>int</a> me_url_prefix:<a href='/type/string'>string</a> autoupdate_url_prefix:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/type/string'>string</a> gif_search_username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.9?<a href='/type/string'>string</a> venue_search_username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/string'>string</a> img_search_username:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.11?<a href='/type/string'>string</a> static_maps_provider:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.12?<a href='/type/string'>string</a> caption_length_max:<a href='/type/int'>int</a> message_length_max:<a href='/type/int'>int</a> webfile_dc_id:<a href='/type/int'>int</a> suggested_lang_code:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/string'>string</a> lang_pack_version:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> base_lang_pack_version:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/int'>int</a> reactions_default:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/type/Reaction'>Reaction</a> autologin_token:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/type/string'>string</a> = <a href='/type/Config'>Config</a>;
