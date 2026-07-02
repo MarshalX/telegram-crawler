@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html class="" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <title>Bot-to-bot communication</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Bots may receive and send messages to and from other bots in groups, private chats and chats, if Bot-to-Bot Communication Mode is enabled.">
+    <meta property="og:title" content="Bot-to-bot communication">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Bots may receive and send messages to and from other bots in groups, private chats and chats, if Bot-to-Bot Communication Mode is enabled.">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    
+    <link href="/css/telegram.css?252" rel="stylesheet" media="screen">
+    <link href="/css/telegram-theme.css?5" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <button class="theme-toggle theme-toggle--static" type="button" title="Toggle theme" aria-label="Toggle light/dark theme"></button>
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter hidden-xs"><a href="https://x.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i> Follow on X</a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class="active"><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/api" >API</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/api/bots%2Fbot-to-bot" >Bot-to-bot communication</a></li></ul></div>
+  <h1 id="dev_page_title">Bot-to-bot communication</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Bot-to-bot communication allows bots to receive messages from other bots in the contexts described below. Outside of these contexts, bots normally do not receive messages from other bots.</p>
+<p>Enable <strong>Bot-to-Bot Communication Mode</strong> for every bot that should participate in this feature in <a href="https://t.me/BotFather">@BotFather »</a>.</p>
+<p>For a simplified Bot API description, see <a href="/bots/features#bot-to-bot-communication">Bot-to-Bot Communication »</a>.</p>
+<h3><a class="anchor" href="#communication-in-group-chats" id="communication-in-group-chats" name="communication-in-group-chats"><i class="anchor-icon"></i></a>Communication in group chats</h3>
+<pre><code><a href='/constructor/updateNewMessage'>updateNewMessage</a>#1f2b0afd message:<a href='/type/Message'>Message</a> pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+<a href='/constructor/updateNewChannelMessage'>updateNewChannelMessage</a>#62ba04d9 message:<a href='/type/Message'>Message</a> pts:<a href='/type/int'>int</a> pts_count:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+</code></pre>
+<p>Bots in the same <a href="/api/channel">group or supergroup »</a> may communicate through ordinary group messages.</p>
+<p>A bot receives a message from another bot if the message:</p>
+<ul>
+<li>Contains a command mention addressed to it, such as <code>/command@TargetBot</code>.</li>
+<li>Is a direct reply to one of its messages.</li>
+</ul>
+<p>At least one of the two bots must have Bot-to-Bot Communication Mode enabled.</p>
+<p>A bot with Bot-to-Bot Communication Mode enabled can also receive messages from other bots in groups without a command mention or direct reply, if the receiving bot:</p>
+<ul>
+<li>Is an admin in the group.</li>
+<li>Has Group Privacy Mode disabled in <a href="https://t.me/BotFather">@BotFather »</a>.</li>
+</ul>
+<p>Group Privacy Mode is the <a href="/bots/features#privacy-mode">bot privacy setting »</a> that limits ordinary group updates to messages explicitly relevant to the bot.</p>
+<p>Incoming bot messages are delivered through the usual <a href="/api/updates">update handling flow »</a>: <a href="/constructor/updateNewMessage">updateNewMessage</a> in basic groups, and <a href="/constructor/updateNewChannelMessage">updateNewChannelMessage</a> in supergroups.</p>
+<h3><a class="anchor" href="#communication-in-private-chats" id="communication-in-private-chats" name="communication-in-private-chats"><i class="anchor-icon"></i></a>Communication in Private Chats</h3>
+<pre><code>---functions---
+
+<a href='/method/messages.sendMessage'>messages.sendMessage</a>#545cd15a flags:<a href='/type/%23'>#</a> no_webpage:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> background:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> clear_draft:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> update_stickersets_order:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> invert_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> allow_paid_floodskip:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputReplyTo'>InputReplyTo</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> schedule_repeat_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/type/int'>int</a> send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/InputPeer'>InputPeer</a> quick_reply_shortcut:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/InputQuickReplyShortcut'>InputQuickReplyShortcut</a> effect:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/long'>long</a> allow_paid_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/type/long'>long</a> suggested_post:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/SuggestedPost'>SuggestedPost</a> = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<p>A bot can send a private message to another bot using <a href="/method/messages.sendMessage">messages.sendMessage</a> and other message sending methods, passing the recipient bot in <code>peer</code>.</p>
+<p>Bot-to-Bot Communication Mode must be enabled for both the sender bot and the recipient bot. If either bot has not enabled the setting, the methods will return <a href="/method/messages.sendMessage#possible-errors"><code>USER_BOT_TO_BOT_DISABLED</code></a>.</p>
+<p>The <code>USER_BOT_TO_BOT_DISABLED</code> RPC error only applies to Communication in Private Chats.</p>
+<h3><a class="anchor" href="#communication-via-business-accounts" id="communication-via-business-accounts" name="communication-via-business-accounts"><i class="anchor-icon"></i></a>Communication via Business Accounts</h3>
+<pre><code><a href='/constructor/botBusinessConnection'>botBusinessConnection</a>#8f34b2f5 flags:<a href='/type/%23'>#</a> disabled:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> connection_id:<a href='/type/string'>string</a> user_id:<a href='/type/long'>long</a> dc_id:<a href='/type/int'>int</a> date:<a href='/type/int'>int</a> rights:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/BusinessBotRights'>BusinessBotRights</a> = <a href='/type/BotBusinessConnection'>BotBusinessConnection</a>;
+
+<a href='/constructor/updateBotNewBusinessMessage'>updateBotNewBusinessMessage</a>#9ddb347c flags:<a href='/type/%23'>#</a> connection_id:<a href='/type/string'>string</a> message:<a href='/type/Message'>Message</a> reply_to_message:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/Message'>Message</a> qts:<a href='/type/int'>int</a> = <a href='/type/Update'>Update</a>;
+
+---functions---
+
+<a href='/method/invokeWithBusinessConnection'>invokeWithBusinessConnection</a>#dd289f8e {X:Type} connection_id:<a href='/type/string'>string</a> query:!X = X;
+<a href='/method/messages.sendMessage'>messages.sendMessage</a>#545cd15a flags:<a href='/type/%23'>#</a> no_webpage:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.1?<a href='/constructor/true'>true</a> silent:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.5?<a href='/constructor/true'>true</a> background:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.6?<a href='/constructor/true'>true</a> clear_draft:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.7?<a href='/constructor/true'>true</a> noforwards:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.14?<a href='/constructor/true'>true</a> update_stickersets_order:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.15?<a href='/constructor/true'>true</a> invert_media:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.16?<a href='/constructor/true'>true</a> allow_paid_floodskip:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.19?<a href='/constructor/true'>true</a> peer:<a href='/type/InputPeer'>InputPeer</a> reply_to:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.0?<a href='/type/InputReplyTo'>InputReplyTo</a> message:<a href='/type/string'>string</a> random_id:<a href='/type/long'>long</a> reply_markup:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.2?<a href='/type/ReplyMarkup'>ReplyMarkup</a> entities:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.3?<a href='/type/Vector%20t'>Vector</a>&lt;<a href='/type/MessageEntity'>MessageEntity</a>&gt; schedule_date:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.10?<a href='/type/int'>int</a> schedule_repeat_period:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.24?<a href='/type/int'>int</a> send_as:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.13?<a href='/type/InputPeer'>InputPeer</a> quick_reply_shortcut:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.17?<a href='/type/InputQuickReplyShortcut'>InputQuickReplyShortcut</a> effect:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.18?<a href='/type/long'>long</a> allow_paid_stars:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.21?<a href='/type/long'>long</a> suggested_post:<a href='/mtproto/TL-combinators#conditional-fields'>flags</a>.22?<a href='/type/SuggestedPost'>SuggestedPost</a> = <a href='/type/Updates'>Updates</a>;
+</code></pre>
+<p>Chat Access Mode lets a bot receive and send messages through chats available to a <code>connection_id</code>, as described in the <a href="/api/bots/connected-business-bots">connected bot »</a> flow. In this mode, the bot can send messages to other bots in those chats.</p>
+<p>Only the sending bot needs to enable Bot-to-Bot Communication Mode.</p>
+<p>Obtain the <code>connection_id</code> from <a href="/constructor/botBusinessConnection">botBusinessConnection</a>, then invoke <a href="/method/messages.sendMessage">messages.sendMessage</a> through <a href="/method/invokeWithBusinessConnection">invokeWithBusinessConnection</a>. The available operations still depend on the <a href="/constructor/businessBotRights">businessBotRights</a> granted for that connection.</p>
+<p>Messages received through the connection are delivered as <a href="/constructor/updateBotNewBusinessMessage">updateBotNewBusinessMessage</a> updates, using the <code>qts</code> <a href="/api/updates#qts-secret-chats-amp-bots">update sequence »</a>.</p>
+<h3><a class="anchor" href="#loop-prevention" id="loop-prevention" name="loop-prevention"><i class="anchor-icon"></i></a>Loop prevention</h3>
+<p>Bot-to-bot communication can create infinite reply loops. Bots using this feature must make bot-message handling terminate predictably.</p>
+<p>Recommended safeguards:</p>
+<ul>
+<li>Deduplicate repeated messages.</li>
+<li>Apply per-chat and per-bot rate limits.</li>
+<li>Enforce maximum interaction depth and timeouts, both globally and per sender/receiver pair.</li>
+</ul>
+<p>The bot must remain stable if another bot replies immediately and repeatedly.</p>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/safety">Safety</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?49"></script>
+    <script src="/js/tgsticker.js?32"></script>
+<script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script src="/js/main-theme.js?6"></script>
+    <script>window.initDevPageNav&&initDevPageNav();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
