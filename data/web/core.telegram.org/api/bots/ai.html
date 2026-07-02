@@ -73,7 +73,17 @@ Both bots and normal users can send live drafts to other users.</p>
 <p>To update a live draft, simply send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with the same <code>random_id</code> to the same chat and topic: graphical clients should render this by updating the live draft message, fading in (or otherwise animating) the added characters (the number of chars to fade in is equal to <code>max(0, strlen(new) - strlen(prev))</code>).</p>
 <p>To create a new live draft, send a new <a href="/constructor/sendMessageTextDraftAction">sendMessageTextDraftAction</a> with a different <code>random_id</code> to the same chat and topic: this will add a new live draft along with existing ones, and graphical clients should render this by appending a new live draft message to the chat, fading in (or otherwise animating) all characters (the number of chars to fade in is equal to <code>strlen(new)</code>).</p>
 <p>To recap, each chat (or each bot forum topic, for <a href="#bot-forums">bot forums »</a>) can have a variable number of live drafts, with each new draft replacing the previous one only if it has the same <code>random_id</code> and is sent to the same topic and peer.</p>
-<p>The exact batching of live draft updates is up to the bot: live drafts can be sent, for example, every N generated UTF-8 chars or every M seconds, whichever comes first.</p>
+<p>The exact batching of live draft updates is up to the bot: live drafts can be sent, for example, every <code>N</code> generated UTF-8 chars or every <code>M</code> seconds, whichever comes first.</p>
+<p>However, take care to pick appropriate values of <code>N</code> and <code>M</code> to avoid hitting the rate limits of <a href="/method/messages.setTyping">messages.setTyping</a>, documented below:</p>
+<ul>
+<li>Max 20 calls in 5 seconds</li>
+<li>Max 40 calls in 30 seconds</li>
+</ul>
+<p>These ratelimits apply per <code>peer</code> (i.e. you can send 80 calls in 30 seconds if 40 are sent to peer A and 40 to peer B).</p>
+<p>If the bot/user exceeds a ratelimit, a <a href="/api/errors#420-flood"><code>FLOOD_WAIT_%d</code> error »</a> will be returned, preventing further method calls until the ratelimit expires (i.e. making 20 calls at second 0 and then 1 more call at second 1 will return <code>FLOOD_WAIT_3</code>).</p>
+<p>If the bot developer picks wrong N/M values (and/or depending on the output token generation speed of the LLM being used), the bot might regularly hit the ratelimits, leading to janky updates in the live draft: to avoid this, pick sensible N/M values (possibly tiered, matching the two ratelimit tiers), and locally ratelimiting calls to avoid exceeding the chosen limits if the LLM generates too much text too quickly, triggering the <code>N</code> limit too frequently.</p>
+<p>Please note that even if sensible local ratelimits are picked, the server may still send short cool-down FLOOD_WAITs (at most <code>3</code> seconds) if the client makes too many queries in a very short period of time, even if no ratelimit was hit: make sure to respect them.</p>
+<p>The same ratelimits apply to the bot API counterparts of <a href="/method/messages.setTyping">messages.setTyping</a>, like <a href="/bots/api#sendmessagedraft">sendMessageDraft</a>, <a href="/bots/api#sendchataction">sendChatAction</a>, and so on.</p>
 <blockquote>
 <p>Please note that not all Telegram clients currently support rendering multiple live drafts with different <code>random_id</code>s in the same topic concurrently, some clients may treat all drafts sent to the same topic as having the same <code>random_id</code>.</p>
 </blockquote>
