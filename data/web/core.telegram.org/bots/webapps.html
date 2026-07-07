@@ -2294,8 +2294,136 @@ if (Ed25519_verify(public_key, data_check_string, signature)) {
 <ul>
 <li>Download and launch the <a href="https://telegram.org/dl/macos/beta">Beta Version</a> of Telegram macOS.</li>
 <li>Quickly click 5 times on the Settings icon to open the debug menu and enable “Debug Mini Apps”.</li>
-<li>Right click in the Mini App and choose <em>Inspect Element</em>.<br>4 telegram-login  Telegram offers app and website developers <strong>a free and open platform</strong> that lets over <strong>1 billion</strong> users seamlessly <strong>sign up and log in</strong> with their Telegram accounts.</li>
+<li>Right click in the Mini App and choose <em>Inspect Element</em>.<br>faq &gt; If you are new to Telegram bots, we recommend checking out our <a href="/bots"><strong>Introduction to Bots</strong></a> first.<br>You may also find the <strong><a href="/bots/api">Bot API Manual</a></strong> useful.</li>
 </ul>
+<p><div class="dev_page_nav_wrap"></p>
+<p><a href="#general-questions"><strong>General</strong></a></p>
+<ul>
+<li><a href="#how-do-i-create-a-bot">How do I create a bot?</a></li>
+<li><a href="#i-39m-a-developer-where-can-i-find-some-examples">Where can I get some code examples?</a></li>
+<li><a href="#will-you-add-x-to-the-bot-api">I have a feature request!</a></li>
+<li><a href="#what-messages-will-my-bot-get">What messages will my bot get?</a></li>
+<li><a href="#why-doesn-39t-my-bot-see-messages-from-other-bots">Why doesn&#39;t my bot see messages from other bots?</a></li>
+</ul>
+<p><a href="#getting-updates"><strong>Getting Updates</strong></a></p>
+<ul>
+<li><a href="#how-do-i-get-updates">How do I get updates?</a></li>
+<li><a href="#long-polling-gives-me-the-same-updates-again-and-again">Long polling problems</a></li>
+<li><a href="#i-39m-having-problems-with-webhooks">Webhook problems</a></li>
+<li><a href="#i-39m-having-trouble-with-my-self-signed-certificate">Using self-signed certificates</a></li>
+<li><a href="#how-can-i-make-sure-that-webhook-requests-are-coming-from-telegr">How can I make sure webhook requests come from Telegram?</a></li>
+</ul>
+<p><a href="#handling-media"><strong>Handling Media</strong></a></p>
+<ul>
+<li><a href="#how-do-i-download-files">Downloading files</a></li>
+<li><a href="#how-do-i-upload-a-large-file">Uploading large files</a></li>
+<li><a href="#can-i-count-on-file-ids-to-be-persistent">Can I count of file_ids to be persistent?</a></li>
+</ul>
+<p><a href="#broadcasting-to-users"><strong>Broadcasting to Users</strong></a></p>
+<ul>
+<li><a href="#my-bot-is-hitting-limits-how-do-i-avoid-this">How do I avoid hitting limits?</a></li>
+<li><a href="#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">How do I message all my subscribers?</a><br></div></li>
+</ul>
+<hr>
+<h3><a class="anchor" name="general-questions" href="#general-questions"><i class="anchor-icon"></i></a>General Questions</h3>
+<h4><a class="anchor" name="how-do-i-create-a-bot" href="#how-do-i-create-a-bot"><i class="anchor-icon"></i></a>How do I create a bot?</h4>
+<p>Creating Telegram bots is super-easy, but you will need at least some skills at computer programming. In order for a bot to work, set up a bot account with <a href="https://telegram.me/botfather">@BotFather</a>, then connect it to your backend server via our <a href="/bots/api">API</a>.</p>
+<p>Unfortunately, there are no out-of-the-box ways to create a working bot if you are not a developer. But we&#39;re sure you&#39;ll soon find plenty of bots created by other people to play with.</p>
+<h4><a class="anchor" name="i-39m-a-developer-where-can-i-find-some-examples" href="#i-39m-a-developer-where-can-i-find-some-examples"><i class="anchor-icon"></i></a>I&#39;m a developer. Where can I find some examples?</h4>
+<p>Here are two sample bots, both written in PHP:</p>
+<ul>
+<li><a href="/bots/samples/hellobot">Hello Bot</a> demonstrates the basics of the Telegram bot API.</li>
+<li><a href="https://github.com/kolar/telegram-poll-bot">Simple Poll bot</a> is a more complete example, it supports both long-polling and Webhooks for updates.</li>
+</ul>
+<blockquote>
+<p>Many members of our community are building bots and publishing sources.<br>We&#39;re collecting them on <a href="/bots/samples"><strong>this page »</strong></a></p>
+</blockquote>
+<p>Ping us on <a href="https://telegram.me/botsupport">@BotSupport</a> if you&#39;ve built a bot and would like to share it with others.</p>
+<h4><a class="anchor" name="will-you-add-x-to-the-bot-api" href="#will-you-add-x-to-the-bot-api"><i class="anchor-icon"></i></a>Will you add X to the Bot API?</h4>
+<p>The bot API is still pretty young. There are many potential features to consider and implement. We&#39;ll be studying what people do with their bots for a while to see which directions will be most important for the platform.</p>
+<p>All bot developers are welcome to share ideas for our Bot API with our <a href="https://telegram.me/botsupport"><strong>@BotSupport</strong></a> account.</p>
+<h4><a class="anchor" name="what-messages-will-my-bot-get" href="#what-messages-will-my-bot-get"><i class="anchor-icon"></i></a>What messages will my bot get?</h4>
+<p><strong>1.</strong> <strong>All bots</strong>, regardless of settings, will receive:</p>
+<ul>
+<li>All service messages.</li>
+<li>All messages from private chats with users.</li>
+<li>All messages from channels where they are a member.</li>
+</ul>
+<p><strong>2.</strong> <strong>Bot admins</strong> and bots with <a href="/bots#privacy-mode">privacy mode</a> <strong>disabled</strong> will receive all messages except messages sent by other bots.</p>
+<p><strong>3.</strong> Bots with <a href="/bots#privacy-mode">privacy mode</a> <strong>enabled</strong> will receive:</p>
+<ul>
+<li>Commands explicitly meant for them (e.g., /command@this_bot).</li>
+<li>General commands from users (e.g. /start) <strong>if</strong> the bot was the last bot to send a message to the group.</li>
+<li>Messages sent <a href="/bots/api#inline-mode">via</a> this bot.</li>
+<li>Replies to any messages implicitly or explicitly meant for this bot.</li>
+</ul>
+<p><strong>Note</strong> that each particular message can only be available to <strong>one</strong> privacy-enabled bot at a time, i.e., a reply to bot A containing an explicit command for bot B or sent via bot C will only be available to bot A. Replies have the highest priority.</p>
+<h4><a class="anchor" name="why-doesn-39t-my-bot-see-messages-from-other-bots" href="#why-doesn-39t-my-bot-see-messages-from-other-bots"><i class="anchor-icon"></i></a>Why doesn&#39;t my bot see messages from other bots?</h4>
+<p>Bots talking to each other could potentially get stuck in unwelcome loops. To avoid this, we decided that bots will not be able to see messages from other bots regardless of mode.</p>
+<h3><a class="anchor" name="getting-updates" href="#getting-updates"><i class="anchor-icon"></i></a>Getting Updates</h3>
+<h4><a class="anchor" name="how-do-i-get-updates" href="#how-do-i-get-updates"><i class="anchor-icon"></i></a>How do I get updates?</h4>
+<p>There are currently two ways of getting updates. You can either use <a href="https://core.telegram.org/bots/api#getupdates">long polling</a> or <a href="https://core.telegram.org/bots/api#setwebhook">Webhooks</a>. Please note that it&#39;s <strong>not</strong> possible to get updates via long polling while an outgoing Webhook is set.</p>
+<h4><a class="anchor" name="long-polling-gives-me-the-same-updates-again-and-again" href="#long-polling-gives-me-the-same-updates-again-and-again"><i class="anchor-icon"></i></a>Long polling gives me the same updates again and again!</h4>
+<p>The <a href="/bots/api#getupdates">getUpdates</a> method returns the earliest 100 unconfirmed updates. To confirm an update, use the <em>offset</em> parameter when calling getUpdates like this:</p>
+<p>  offset = update_id of last processed update + 1</p>
+<p>All updates with <em>update_id</em> less than or equal to <em>offset</em> will be marked as confirmed on the server and will no longer be returned.</p>
+<h4><a class="anchor" name="i-39m-having-problems-with-webhooks" href="#i-39m-having-problems-with-webhooks"><i class="anchor-icon"></i></a>I&#39;m having problems with Webhooks.</h4>
+<p>If you&#39;ve set up your webhook successfully, but are not getting any updates, please remember:</p>
+<ul>
+<li>You need a valid SSL certificate for webhooks to work.</li>
+<li>To use a self-signed certificate, you need to upload your public key certificate using the <em>certificate</em> parameter in <a href="/bots/api#setwebhook">setWebhook</a>. Please upload as InputFile, sending a String will not work.</li>
+<li>Ports currently supported for Webhooks: <strong>443</strong>, <strong>80</strong>, <strong>88</strong>, <strong>8443</strong>.</li>
+<li>Wildcard certificates may not be supported.</li>
+<li>Redirects are not supported.</li>
+<li>CN must exactly match your domain.</li>
+</ul>
+<blockquote>
+<p>Please check out this new <a href="/bots/webhooks"><strong>WEBHOOK GUIDE</strong></a> to learn all there is to know about webhooks!</p>
+</blockquote>
+<h4><a class="anchor" name="i-39m-having-trouble-with-my-self-signed-certificate" href="#i-39m-having-trouble-with-my-self-signed-certificate"><i class="anchor-icon"></i></a>I&#39;m having trouble with my self-signed certificate!</h4>
+<p>Please take a look at this <a href="/bots/self-signed">self-signed certificate guide</a> we made just for you. If you&#39;ve read it and still have a question, ping us on botsupport.</p>
+<h4><a class="anchor" name="how-can-i-make-sure-that-webhook-requests-are-coming-from-telegr" href="#how-can-i-make-sure-that-webhook-requests-are-coming-from-telegr"><i class="anchor-icon"></i></a>How can I make sure that Webhook requests are coming from Telegram?</h4>
+<p>If you&#39;d like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the URL you give us, e.g. www.example.com/your_token. Since nobody else knows your bot&#39;s token, you can be pretty sure it&#39;s us.</p>
+<h4><a class="anchor" name="how-can-i-make-requests-in-response-to-updates" href="#how-can-i-make-requests-in-response-to-updates"><i class="anchor-icon"></i></a>How can I make requests in response to updates?</h4>
+<p>This is possible if you&#39;re using webhooks. The upside is that you need less requests, the downside — that in this case it&#39;s not possible to know that such a request was successful or get its result. </p>
+<p>Whenever you receive a webhook update, you have two options:</p>
+<p><strong>1. Issue POST to https://api.telegram.org/bot&lt;token&gt;/method</strong></p>
+<div>
+<a href="/file/811140979/3/5p52TWl9X2o/5c6d684ee0d6a4399d" target="_blank"><img src="/file/811140979/3/5p52TWl9X2o/5c6d684ee0d6a4399d" title="Confirm and request"  class="dev_page_image" style="width:500px;" /></a>
+</div>
+
+<p><strong>2. Reply directly and give method as JSON payload in the reply</strong></p>
+<div>
+  <a href="/file/811140266/2/vGxiVmENAos/6cffad00cbe72be7f2" target="_blank"><img src="/file/811140266/2/vGxiVmENAos/6cffad00cbe72be7f2" title="Reply with payload"  class="dev_page_image" style="width:500px;" /></a></div>
+
+<blockquote>
+<p>You may also want to look at our sample <a href="/bots/samples/hellobot">HelloBot</a>, it offers a PHP implementation of this.</p>
+</blockquote>
+<h3><a class="anchor" name="handling-media" href="#handling-media"><i class="anchor-icon"></i></a>Handling Media</h3>
+<h4><a class="anchor" name="how-do-i-download-files" href="#how-do-i-download-files"><i class="anchor-icon"></i></a>How do I download files?</h4>
+<p>Use the <a href="/bots/api#getfile">getFile</a> method. Please note that this will only work with files of up to 20 MB in size.</p>
+<h4><a class="anchor" name="how-do-i-upload-a-large-file" href="#how-do-i-upload-a-large-file"><i class="anchor-icon"></i></a>How do I upload a large file?</h4>
+<p>Bots can currently send files of any type of up to 50 MB in size, so yes, very large files won&#39;t work for now. Sorry. This limit may be changed in the future.</p>
+<h4><a class="anchor" name="can-i-count-on-file-ids-to-be-persistent" href="#can-i-count-on-file-ids-to-be-persistent"><i class="anchor-icon"></i></a>Can I count on file_ids to be persistent?</h4>
+<p>Yes, file_ids can be treated as persistent.</p>
+<h3><a class="anchor" name="broadcasting-to-users" href="#broadcasting-to-users"><i class="anchor-icon"></i></a>Broadcasting to Users</h3>
+<h4><a class="anchor" name="my-bot-is-hitting-limits-how-do-i-avoid-this" href="#my-bot-is-hitting-limits-how-do-i-avoid-this"><i class="anchor-icon"></i></a>My bot is hitting limits, how do I avoid this?</h4>
+<p>By default, bots are able to message their users <strong>at no cost</strong> – but have limitations on the number of messages they can broadcast in a single interval:</p>
+<ul>
+<li>In a single chat, avoid sending more than one message per second. We may allow short bursts that go over this limit, but eventually you&#39;ll begin receiving 429 errors.</li>
+<li>In a group, bots are not be able to send more than 20 messages per minute.</li>
+<li>For bulk notifications, bots are not able to broadcast more than about 30 messages per second, unless they enable <a href="https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once">paid broadcasts</a> to increase the limit.</li>
+</ul>
+<h4><a class="anchor" name="how-can-i-message-all-of-my-bot-39s-subscribers-at-once" href="#how-can-i-message-all-of-my-bot-39s-subscribers-at-once"><i class="anchor-icon"></i></a>How can I message all of my bot&#39;s subscribers at once?</h4>
+<p>Enabling <a href="/bots/api-changelog#october-31-2024">paid broadcasts</a> in <a href="https://t.me/botfather">@BotFather</a> allows a bot to broadcast up to <strong>1000 messages per second</strong>. Each message broadcasted over the free amount of 30 per second incurs a cost of <strong>0.1 Stars per message</strong>, paid with <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> from the bot&#39;s balance. In order to enable this feature, a bot must have at least <strong>10,000 Stars</strong> on its balance and at least <strong>10,000</strong> monthly active users.</p>
+<blockquote>
+<p>Bots with increased limits are only charged for messages that are broadcasted successfully.</p>
+</blockquote>
+<p>If you do not wish to enable paid broadcasts, consider spreading them over longer intervals (e.g. 8-12 hours) to avoid hitting the limit. The API will not allow bulk notifications to more than ~30 users per second – if you go over that, you&#39;ll start getting 429 errors.</p>
+<hr>
+<blockquote>
+<p>If you&#39;ve got questions that are not answered on this page, ping us at <a href="https://telegram.me/botsupport">@BotSupport</a> in Telegram.<br>We welcome any suggestions for the Bot Platform and API.<br>telegram-login  Telegram offers app and website developers <strong>a free and open platform</strong> that lets over <strong>1 billion</strong> users seamlessly <strong>sign up and log in</strong> with their Telegram accounts.</p>
+</blockquote>
 <div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
  <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400046/6/lzgRh3Hn0Ec.49953.jpg/d6bd5793f35f463749" style="max-width: 600px;" alt="Telegram Login">
   <source src="/file/400780400885/2/Qc3SOZNZOLA.3171201.mp4/da53cf9e54f1eeab73" type="video/mp4">
@@ -2600,351 +2728,6 @@ if (Ed25519_verify(public_key, data_check_string, signature)) {
   &quot;preferred_username&quot;: &quot;johndoe&quot;,
   &quot;picture&quot;: &quot;https://cdn4.telesco.pe/file...&quot;,
   &quot;phone_number&quot;: &quot;971577777777&quot;
-}</code></pre>
-<blockquote>
-<p>Note that Telegram does not currently provide a separate <code>UserInfo</code> endpoint. However, some OIDC libraries may expect this endpoint by default, and you may need to <strong>configure them</strong> to skip a separate <code>userinfo</code> request.</p>
-</blockquote>
-<hr>
-<h3><a class="anchor" name="manual-implementation" href="#manual-implementation"><i class="anchor-icon"></i></a>Manual Implementation</h3>
-<p>If you are integrating the OIDC flow manually without a library, use the endpoints and flow details below.</p>
-<h4><a class="anchor" name="endpoints" href="#endpoints"><i class="anchor-icon"></i></a>Endpoints</h4>
-<ul>
-<li><strong>Authorization:</strong> <code>https://oauth.telegram.org/auth</code></li>
-<li><strong>Token:</strong> <code>https://oauth.telegram.org/token</code></li>
-<li><strong>Keys (JWKS):</strong> <code>https://oauth.telegram.org/.well-known/jwks.json</code></li>
-</ul>
-<h4><a class="anchor" name="initiate-authorization" href="#initiate-authorization"><i class="anchor-icon"></i></a>Initiate Authorization</h4>
-<p>Direct the user to the authorization endpoint with the following parameters. This URL must be opened in the user&#39;s browser.</p>
-<pre><code class="lang-http">GET https://oauth.telegram.org/auth?
-    client_id=&lt;YOUR_BOT_ID&gt;&amp;
-    redirect_uri=&lt;YOUR_CALLBACK_URL&gt;&amp;
-    response_type=code&amp;
-    scope=openid%20profile%20phone&amp;
-    state=&lt;RANDOM_STRING&gt;&amp;
-    code_challenge=&lt;PKCE_CHALLENGE&gt;&amp;
-    code_challenge_method=S256</code></pre>
-<ul>
-<li><strong>client_id</strong>: Client ID provided by BotFather.</li>
-<li><strong>state</strong>: A random string generated by your backend to prevent CSRF.</li>
-<li><strong>code_challenge</strong>: Base64URL-encoded SHA256 hash of your code verifier (PKCE).</li>
-</ul>
-<h4><a class="anchor" name="exchange-code-for-tokens" href="#exchange-code-for-tokens"><i class="anchor-icon"></i></a>Exchange Code for Tokens</h4>
-<p>If the user approves the login, they will be redirected to your <code>redirect_uri</code> with a <code>code</code> parameter. Exchange this code for an access token and ID token by making a server-side POST request.</p>
-<p>This request requires <strong>Basic Authorization</strong> using your Client ID and Client Secret (<code>base64(client_id:client_secret)</code>).</p>
-<pre><code class="lang-http">POST https://oauth.telegram.org/token
-Content-Type: application/x-www-form-urlencoded
-Authorization: Basic &lt;BASE64_CREDENTIALS&gt;
-
-grant_type=authorization_code&amp;
-code=&lt;AUTHORIZATION_CODE&gt;&amp;
-redirect_uri=&lt;YOUR_CALLBACK_URL&gt;&amp;
-client_id=&lt;YOUR_BOT_ID&gt;&amp;
-code_verifier=&lt;PKCE_VERIFIER&gt;</code></pre>
-<p><strong>Response:</strong></p>
-<pre><code class="lang-json">{
-  &quot;access_token&quot;: &quot;...&quot;,
-  &quot;token_type&quot;: &quot;Bearer&quot;,
-  &quot;expires_in&quot;: 3600,
-  &quot;id_token&quot;: &quot;eyJhbGciOiJ...&quot;
-}</code></pre>
-<h4><a class="anchor" name="validating-id-tokens" href="#validating-id-tokens"><i class="anchor-icon"></i></a>Validating ID Tokens</h4>
-<p>The <code>id_token</code> is a signed JSON Web Token (JWT). Before trusting the user data inside, you <strong>must</strong> validate the signature:</p>
-<ol>
-<li><strong>Fetch Keys:</strong> specific public keys from the <a href="https://oauth.telegram.org/.well-known/jwks.json">JWKS endpoint</a>.</li>
-<li><strong>Verify Signature:</strong> Ensure the token was signed by Telegram.</li>
-<li><strong>Verify Claims:</strong> Check that <code>iss</code> is <code>https://oauth.telegram.org</code>, <code>aud</code> matches your Bot ID, and the token has not expired (<code>exp</code>).</li>
-</ol>
-<hr>
-<blockquote>
-<p>Once you have established a connection with the user, you can optionally use your <strong>linked bot</strong> to provide services <strong>directly in the chat interface</strong> via the <a href="https://core.telegram.org/bots">Bot API</a>, or seamlessly offer your <strong>entire web application inside Telegram</strong> using <a href="https://core.telegram.org/bots/webapps">Mini Apps</a>.<br>4 sandbox-1842093-4809-238-049231-809243-8029314-281034 Telegram offers app and website developers <strong>a free and open platform</strong> that lets over <strong>1 billion</strong> users seamlessly <strong>sign up and log in</strong> with their Telegram accounts.</p>
-</blockquote>
-<div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400046/6/lzgRh3Hn0Ec.49953.jpg/d6bd5793f35f463749" style="max-width: 600px;" alt="Telegram Login">
-  <source src="/file/400780400885/2/Qc3SOZNZOLA.3171201.mp4/da53cf9e54f1eeab73" type="video/mp4">
- </video></div>
-</div>
-
-<h4><a class="anchor" name="benefits-of-telegram-login" href="#benefits-of-telegram-login"><i class="anchor-icon"></i></a>Benefits of Telegram Login</h4>
-<ul>
-<li><p><strong>Higher conversion</strong><br>Users sign in with a few taps, boosting conversion and retention.</p>
-</li>
-<li><p><strong>Lower verification costs</strong><br>Users can share their <strong>verified phone number</strong>, removing the need for expensive codes.</p>
-</li>
-<li><p><strong>Direct communication channels</strong><br>You can reach your users within Telegram, with built-in push notification support.</p>
-</li>
-<li><p><strong>Further integration</strong><br>You can deliver more services directly via the <a href="https://core.telegram.org/bots">Bot API</a> and <a href="https://core.telegram.org/bots/webapps">Mini Apps</a>.</p>
-</li>
-</ul>
-<blockquote>
-<p><strong>Note:</strong> This document describes the new <a href="https://en.wikipedia.org/wiki/OpenID#OpenID_Connect_(OIDC%29">OpenID Connect</a> login flow and the Telegram Login library.<br>The legacy iframe-based JavaScript widget documentation is archived <a href="/widgets/login">here</a>.</p>
-</blockquote>
-<hr>
-<h3><a class="anchor" name="getting-started" href="#getting-started"><i class="anchor-icon"></i></a>Getting Started</h3>
-<p>Telegram offers a <a href="#using-the-telegram-login-library">compact tool</a> to quickly add Telegram login buttons to your interface. You can also directly access our library&#39;s <a href="#available-methods">JS API</a>. </p>
-<p>Alternatively, Telegram supports the standard <a href="https://en.wikipedia.org/wiki/OpenID#OpenID_Connect_(OIDC%29">OpenID Connect</a> protocol. This allows you to integrate Telegram authentication into your application using any OIDC-compatible library or authentication platform (e.g.,  Keycloak, Authentik, Auth0 etc.).</p>
-<p>Our implementation follows the standard <a href="https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth">Authorization Code Flow</a> with <strong>PKCE</strong> support.</p>
-<blockquote>
-<p>For an in-depth understanding of the general OIDC flow, please refer to the <a href="https://openid.net/developers/how-connect-works">OpenID Foundation&#39;s Developer Guide</a>.</p>
-</blockquote>
-<h4><a class="anchor" name="tldr" href="#tldr"><i class="anchor-icon"></i></a>TL;DR</h4>
-<ul>
-<li><strong><a href="#setting-up-a-bot">Set up a bot</a></strong> to represent your application.</li>
-<li><strong><a href="#registering-your-allowed-urls">Register your Allowed URLs</a></strong> via <a href="https://t.me/botfather">@BotFather</a> and obtain your Client ID and Secret.</li>
-<li><strong><a href="#using-the-telegram-login-library">Add the Telegram Login library</a></strong> to your page</li>
-<li><strong><a href="#validating-id-tokens">Validate ID tokens</a></strong> to cryptographically verify incoming requests.</li>
-</ul>
-<p>Alternatively, you can <a href="#openid-connect">use an OpenID integration</a>.</p>
-<blockquote>
-<p>Having trouble with any of the steps above? Feel free to reach out to us at <a href="https://t.me/botsupport">@BotSupport</a>, making sure to include the hashtag #oidc in your message.</p>
-</blockquote>
-<h4><a class="anchor" name="setting-up-a-bot" href="#setting-up-a-bot"><i class="anchor-icon"></i></a>Setting up a bot</h4>
-<p>To use OpenID Connect, you&#39;ll need a <a href="/bots#how-do-i-create-a-bot"><strong>Telegram bot</strong></a> to represent your application.</p>
-<p>We strongly recommend that the <strong>profile picture</strong> of the bot corresponds with your website&#39;s logo, and that the bot&#39;s <strong>name</strong> reflects that connection. Users will see a confirmation box similar to the one below when logging in:</p>
-<div class="blog_image_wrap">
-  <a href="/file/400780400680/1/LQAYyWKJXy0.260963.png/8fe2cdf47d8a182740" target="_blank"><img src="/file/400780400680/1/LQAYyWKJXy0.260963.png/8fe2cdf47d8a182740" title="Login confirmation box" /></a>
-</div>
-
-<blockquote>
-<p>Users are much more likely to authorize your app if the bot has a name and logo they recognize and expect. Official services can also <a href="https://telegram.org/verify">apply for verification</a> from Telegram or <a href="https://telegram.org/verify#third-party-verification">third parties</a> for greater transparency. </p>
-</blockquote>
-<h4><a class="anchor" name="registering-your-allowed-urls" href="#registering-your-allowed-urls"><i class="anchor-icon"></i></a>Registering your Allowed URLs</h4>
-<p>Once you have chosen a bot, open the <a href="https://t.me/botfather?startapp"><strong>@BotFather</strong></a> mini app and navigate to <strong>Bot Settings &gt; Web Login</strong>.</p>
-<p>Add all <strong>Allowed URLs</strong> for your application. This includes the website origins where you embed the login widget (e.g., <code>https://example.com</code>) and specific redirect URIs for your OIDC flow (e.g., <code>https://example.com/auth/callback</code>). You can register multiple URLs to support different domains or endpoints.</p>
-<p>In this section, <a href="https://t.me/botfather">@BotFather</a> will also display your <strong>Client ID</strong> and <strong>Client Secret</strong>. Save these values securely – you will need them to configure your OIDC client.</p>
-<blockquote>
-<p><strong>Important:</strong> For security reasons, Telegram will only process logins or redirect users using your pre-registered URLs.</p>
-</blockquote>
-<h3><a class="anchor" name="using-the-telegram-login-library" href="#using-the-telegram-login-library"><i class="anchor-icon"></i></a>Using the Telegram Login library</h3>
-<p>Use the tool below to customize your button and get the HTML snippet for your website.</p>
-<p><style>.tg-auth-button { margin: 24px auto; }</style>
-<form class="form-horizontal form-telegram row" id="login_widget_config" style="min-height: 290px;">
-<div class="clearfix col-md-6">
-  <div class="form-group">
-    <label class="control-label">Client ID:</label>
-    <div style="max-width: 320px;">
-      <div class="textfield-item">
-        <input id="client_id" name="client_id" type="text" class="form-control" placeholder="Enter Client ID from BotFather" value="" onchange="updateWidget()" onblur="updateWidget()">
-        <div class="textfield-item-underline"></div>
-        <span class="textfield-item-error" id="client_id_error"></span>
-      </div>
-    </div>
-  </div>
-
-  <div style="display: flex;">
-      <div class="form-group" style="flex-grow: 1;">
-    <label class="control-label">Button Style:</label>
-    <div class="">
-      <label class="checkbox-item checkbox-item-block">
-        <input type="checkbox" class="checkbox" name="rounded" value="1" onchange="updateWidget(true)" checked />
-        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Rounded</span>
-      </label>
-      <label class="checkbox-item checkbox-item-block">
-        <input type="checkbox" class="checkbox" name="outlined" value="1" onchange="updateWidget(true)" />
-        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Outlined</span>
-      </label>
-      <label class="checkbox-item checkbox-item-block">
-        <input type="checkbox" class="checkbox" name="icon" value="1" onchange="updateWidget(true)" />
-        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Icon</span>
-      </label>
-      <label class="checkbox-item checkbox-item-block">
-        <input type="checkbox" class="checkbox" name="shine" value="1" onchange="updateWidget(true)" />
-        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Shine</span>
-      </label>
-    </div>
-  </div>
-
-  <div class="form-group" style="flex-grow: 1;">
-    <label class="control-label">Scopes:</label>
-    <div class="">
-      <label class="checkbox-item checkbox-item-block">
-        <input type="checkbox" class="checkbox" name="request_write" value="1" onchange="updateWidget(true)" checked />
-        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Request Direct Messages</span>
-      </label>
-      <label class="checkbox-item checkbox-item-block">
-        <input type="checkbox" class="checkbox" name="request_phone" value="1" onchange="updateWidget(true)" />
-        <span class="checkbox-input ripple-handler"><span class="ripple-mask"><span class="ripple"></span></span><span class="checkbox-input-icon"></span></span><span class="checkbox-label">Request Phone Number</span>
-      </label>
-    </div>
-  </div>
-</div>
-</div>
-<div class="clearfix col-md-6">
-  <div class="form-group">
-    <label for="embed_code" class="control-label">Embed Code:</label>
-    <div>
-      <textarea id="embed_code" class="form-control embed_code" rows="14" style="max-height: 240px;" readonly onclick="embedSelect(this)"></textarea>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <div class="col-md-12">
-      <div class="widget_container" id="widget_container"></div>
-    </div>
-  </div>
-</div>
-</form></p>
-<p>Alternatively, you can interact with the library using the following JS methods:</p>
-<h4><a class="anchor" name="available-methods" href="#available-methods"><i class="anchor-icon"></i></a>Available Methods</h4>
-<table class="table">
-<thead>
-<tr>
-<th align="left">Method</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>Telegram.Login.init(InitOptions, callback)</code></td>
-<td align="left">Initialize the SDK and register an auth callback.</td>
-</tr>
-<tr>
-<td align="left"><code>Telegram.Login.open([callback])</code></td>
-<td align="left">Open the login popup using the initialized options.</td>
-</tr>
-<tr>
-<td align="left"><code>Telegram.Login.auth(InitOptions, callback)</code></td>
-<td align="left">Open the login popup with explicit options.</td>
-</tr>
-</tbody>
-</table>
-<h4><a class="anchor" name="initoptions" href="#initoptions"><i class="anchor-icon"></i></a>InitOptions</h4>
-<table class="table">
-<thead>
-<tr>
-<th align="left">Option</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>client_id</code></td>
-<td align="left">number</td>
-<td align="left">Your bot’s Client ID provided by <a href="https://t.me/botfather">@BotFather</a>.</td>
-</tr>
-<tr>
-<td align="left"><code>request_access</code></td>
-<td align="left">array(<code>phone</code> | <code>write</code>)</td>
-<td align="left"><em>Optional.</em> Ask for a phone number / permission to message the user.</td>
-</tr>
-<tr>
-<td align="left"><code>lang</code></td>
-<td align="left">string</td>
-<td align="left"><em>Optional.</em> UI language code (e.g., <code>en</code>, <code>es</code>).</td>
-</tr>
-<tr>
-<td align="left"><code>nonce</code></td>
-<td align="left">string</td>
-<td align="left"><em>Optional.</em> Server-generated random string to be included in the resulting <code>id_token</code> to prevent replay attacks.</td>
-</tr>
-</tbody>
-</table>
-<h4><a class="anchor" name="callback-data" href="#callback-data"><i class="anchor-icon"></i></a>Callback Data</h4>
-<p>When the login flow completes, the callback may receive either a success payload (user data) or an error.</p>
-<table class="table">
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>id_token</code></td>
-<td align="left">string</td>
-<td align="left">An OIDC JWT token containing user claims. <strong>Important: <a href="#validating-id-tokens">Verify the validity of ID token server-side</a></strong></td>
-</tr>
-<tr>
-<td align="left"><code>user</code></td>
-<td align="left"><a href="#user-data-structure">UserData</a></td>
-<td align="left">Decoded <code>id_token</code>, containing the requested user info.</td>
-</tr>
-<tr>
-<td align="left"><code>error</code></td>
-<td align="left">string</td>
-<td align="left">Error description.</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<h3><a class="anchor" name="openid-connect" href="#openid-connect"><i class="anchor-icon"></i></a>OpenID Connect</h3>
-<p>If you are using an OIDC-compatible library or identity broker, you can use the standard configuration values below.</p>
-<p><strong>Discovery Document URL</strong></p>
-<pre><code>https://oauth.telegram.org/.well-known/openid-configuration</code></pre>
-<p><strong>Client Configuration</strong></p>
-<table class="table">
-<thead>
-<tr>
-<th align="left">Parameter</th>
-<th align="left">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><strong>Client ID</strong></td>
-<td align="left">The Client ID provided by BotFather</td>
-</tr>
-<tr>
-<td align="left"><strong>Client Secret</strong></td>
-<td align="left">The Client Secret provided by BotFather</td>
-</tr>
-<tr>
-<td align="left"><strong>Response Type</strong></td>
-<td align="left"><code>code</code></td>
-</tr>
-<tr>
-<td align="left"><strong>PKCE</strong></td>
-<td align="left">Recommended (S256)</td>
-</tr>
-</tbody>
-</table>
-<h4><a class="anchor" name="available-scopes" href="#available-scopes"><i class="anchor-icon"></i></a>Available Scopes</h4>
-<p>You can request specific permissions when initiating authorization. The <code>openid</code> scope is required.</p>
-<table class="table">
-<thead>
-<tr>
-<th align="left">Scope</th>
-<th align="left">Description</th>
-<th align="left">Claims Returned</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>openid</code></td>
-<td align="left"><strong>Required.</strong> Returns the user&#39;s unique identifier and auth timestamp.</td>
-<td align="left"><code>sub</code>, <code>iss</code>, <code>iat</code>, <code>exp</code></td>
-</tr>
-<tr>
-<td align="left"><code>profile</code></td>
-<td align="left">User&#39;s basic info: name, username, and profile photo URL.</td>
-<td align="left"><code>name</code>, <code>preferred_username</code>, <code>picture</code></td>
-</tr>
-<tr>
-<td align="left"><code>phone</code></td>
-<td align="left">User&#39;s verified <strong>phone number</strong>. Requires user consent.</td>
-<td align="left"><code>phone_number</code></td>
-</tr>
-<tr>
-<td align="left"><code>telegram:bot_access</code></td>
-<td align="left">Allows your bot to send direct messages to the user after login.</td>
-<td align="left">—</td>
-</tr>
-</tbody>
-</table>
-<h4><a class="anchor" name="user-data-structure" href="#user-data-structure"><i class="anchor-icon"></i></a>User Data Structure</h4>
-<p>All requested user information is returned directly in the <strong>ID token</strong>. After successful authentication, the decoded ID token will look like this:</p>
-<pre><code class="lang-json">{
-  &quot;iss&quot;: &quot;https://oauth.telegram.org&quot;,
-  &quot;aud&quot;: &quot;123456789&quot;,
-  &quot;sub&quot;: &quot;6472836472346575634234&quot;,
-  &quot;iat&quot;: 1700000000,
-  &quot;exp&quot;: 1700003600,
-  &quot;id&quot;: 987654321,
-  &quot;name&quot;: &quot;John Doe&quot;,
-  &quot;preferred_username&quot;: &quot;johndoe&quot;,
-  &quot;picture&quot;: &quot;https://cdn4.telesco.pe/file...&quot;,
-  &quot;phone_number&quot;: &quot;9715222333222&quot;
 }</code></pre>
 <blockquote>
 <p>Note that Telegram does not currently provide a separate <code>UserInfo</code> endpoint. However, some OIDC libraries may expect this endpoint by default, and you may need to <strong>configure them</strong> to skip a separate <code>userinfo</code> request.</p>

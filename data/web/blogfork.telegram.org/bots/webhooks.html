@@ -225,10 +225,11 @@ A challenge password []:
 An optional company name []:
 ---</code></pre>
 <ul>
-<li>Another example:</li>
-</ul>
+<li><p>Another example:</p>
 <ul>
 <li>Using Java keytool:<br><code>keytool -genkey -alias yourbotdomainname -keyalg RSA -keystore yourkeystore.jks -keysize 2048</code></li>
+</ul>
+</li>
 </ul>
 <pre><code>---
 Enter keystore password:  
@@ -254,8 +255,7 @@ Enter keystore password:
 <p>Create your CSR and supply the contents of the file to your CA. Most CA’s are kind enough to give you an example command of the input format they expect.</p>
 <p><code>cat yoursigningrequest.csr</code> <strong>or</strong> <code>cat yourbotdomainname.csr</code><br>Lets you have a look at the CSR we just generated:</p>
 <div>
-
-<a href="/file/811140281/1/5le8eVE7mPk.261973/25ba8c07609aef2310" target="_blank"><img src="/file/811140281/1/5le8eVE7mPk.261973/25ba8c07609aef2310" title="csrexample.jpg, 255.83Kb" height="60%" width="60%" class="dev_page_image" /></a>
+  <a href="/file/811140281/1/5le8eVE7mPk.261973/25ba8c07609aef2310" target="_blank"><img src="/file/811140281/1/5le8eVE7mPk.261973/25ba8c07609aef2310" title="csrexample.jpg, 255.83Kb" height="60%" width="60%" class="dev_page_image" /></a>
 </div>
 
 <p>That doesn’t seem to informative, but we can deduce that the file is in PEM format (ASCII base64 encoded) and contains a certificate signing request. Luckily it is possible to look at the human readable contents of the CSR. Use the following commands to double check if all fields are set correctly.</p>
@@ -268,20 +268,17 @@ Enter keystore password:
 <p>Verify your CSR and supply it to your CA to get a certificate. We’ll use StartSSL as an example here. StartSSL allows you to set up to 5 names (SAN), Their intermediate certificate is also needed for a webhook to work, which makes for a nice complete example. </p>
 <p>Go to the certificates wizard, enter the required hostname(s) for your SSL certificate (this is the CN you’ve also set in the CSR and an optional SAN).</p>
 <div>
-
-<a href="/file/811140045/1/wtVcG_IghfI.78937/51e72042b1df5f28b5" target="_blank"><img src="/file/811140045/1/wtVcG_IghfI.78937/51e72042b1df5f28b5" title="sslcertwiz.jpg, 77.09Kb" height="75%" width="75%" class="dev_page_image" /></a>
+  <a href="/file/811140045/1/wtVcG_IghfI.78937/51e72042b1df5f28b5" target="_blank"><img src="/file/811140045/1/wtVcG_IghfI.78937/51e72042b1df5f28b5" title="sslcertwiz.jpg, 77.09Kb" height="75%" width="75%" class="dev_page_image" /></a>
 </div>
 
 <p>In the example above we’ve chosen to set a CN <code>(test.telegram.org)</code>, but also a SAN <code>(sanexample.telegram.org)</code> The CN given has to match the CN used for generating the CSR.<br>Set your CN (and optional SAN) and copy the contents of the yoursigningrequest.csr file.</p>
 <div>
-
-<a href="/file/811140068/1/5qVIwLYnqd8.116971/87a6da7b70e377f899" target="_blank"><img src="/file/811140068/1/5qVIwLYnqd8.116971/87a6da7b70e377f899" title="sslcertwiz1.jpg, 114.23Kb" height="75%" width="75%" class="dev_page_image" /></a>
+  <a href="/file/811140068/1/5qVIwLYnqd8.116971/87a6da7b70e377f899" target="_blank"><img src="/file/811140068/1/5qVIwLYnqd8.116971/87a6da7b70e377f899" title="sslcertwiz1.jpg, 114.23Kb" height="75%" width="75%" class="dev_page_image" /></a>
 </div>
 
 <p>Paste the contents, submit and you’re done.</p>
 <div>
-
-<a href="/file/811140069/2/MVKz66N9t4o.53664/7130b06124c18c9e94" target="_blank"><img src="/file/811140069/2/MVKz66N9t4o.53664/7130b06124c18c9e94" title="sslcertwiz2.jpg, 52.41Kb" height="75%" width="75%" class="dev_page_image" /></a>
+  <a href="/file/811140069/2/MVKz66N9t4o.53664/7130b06124c18c9e94" target="_blank"><img src="/file/811140069/2/MVKz66N9t4o.53664/7130b06124c18c9e94" title="sslcertwiz2.jpg, 52.41Kb" height="75%" width="75%" class="dev_page_image" /></a>
 </div>
 
 <p>Now you can download the created certificate directly. In the example used above you’ll receive a zip file with several PEM certificates. The root, intermediate and yourdomain certificate.<br>You need the <code>intermediate</code> and <code>yourdomain</code> to set a webhook with a StartSSL certificate.</p>
@@ -299,8 +296,7 @@ Enter keystore password:
 </li>
 </ul>
 <div>
-
-<a href="/file/811140010/2/omTlwQW_Wpk.133258/5db0b29d43f5558413" target="_blank"><img src="/file/811140010/2/omTlwQW_Wpk.133258/5db0b29d43f5558413" title="wincert.jpg, 130.13Kb" height="50%" width="50%" class="dev_page_image" /></a>
+  <a href="/file/811140010/2/omTlwQW_Wpk.133258/5db0b29d43f5558413" target="_blank"><img src="/file/811140010/2/omTlwQW_Wpk.133258/5db0b29d43f5558413" title="wincert.jpg, 130.13Kb" height="50%" width="50%" class="dev_page_image" /></a>
 </div>
 
 <p>With your fresh certificates at hand, you can now continue setting your webhook.</p>
@@ -352,16 +348,16 @@ Exportable = true ;makes the private key exportable with the PFX</code></pre>
 </ul>
 <p>A self-signed certificate is generated and installed, to use the certificate for a self-signed webhook you&#39;ll have to export it in PEM format.</p>
 <ul>
-<li>Windows continued:</li>
-</ul>
+<li><p>Windows continued:</p>
 <ul>
-<li>You can have a look at the certificates in your store with:<br><code>certutil -store -user my</code></li>
+<li><p>You can have a look at the certificates in your store with:<br><code>certutil -store -user my</code></p>
+</li>
+<li><p>To export the installed certificate in DER format (intermediate step for conversion to PEM):<br><code>certutil -user -store -split my SERIALNUMBER YOURDER.der</code></p>
+</li>
+<li><p>Now you can convert the certificate to PEM:<br><code>certutil -encode YOURDER.der YOURPEM.pem</code><br>Remember that only the public certificate is needed as input for the self-signed webhook certificate parameter.<br><code>certmgr.msc</code> can also be used as a GUI to export the public part of self-signed certificate to PEM.</p>
+</li>
 </ul>
-<ul>
-<li>To export the installed certificate in DER format (intermediate step for conversion to PEM):<br><code>certutil -user -store -split my SERIALNUMBER YOURDER.der</code></li>
-</ul>
-<ul>
-<li>Now you can convert the certificate to PEM:<br><code>certutil -encode YOURDER.der YOURPEM.pem</code><br>Remember that only the public certificate is needed as input for the self-signed webhook certificate parameter.<br><code>certmgr.msc</code> can also be used as a GUI to export the public part of self-signed certificate to PEM.</li>
+</li>
 </ul>
 <p>After following the above you&#39;ll end up with a nice self-signed certificate. You’ll still have to set the webhook, and handle SSL correctly.</p>
 <h5><a class="anchor" name="how-do-i-set-a-webhook-for-either-type" href="#how-do-i-set-a-webhook-for-either-type"><i class="anchor-icon"></i></a>How do I set a webhook for either type?</h5>
@@ -406,8 +402,7 @@ Both supply tools to verify your setup.</code></pre>
 </ul>
 <p>Here’s an example of a complete chain, note that in this case 2 intermediate certificates have been supplied.</p>
 <div>
-
-<a href="/file/811140157/1/FsbXbc0yPJA.49297/5812f355ecfcda764a" target="_blank"><img src="/file/811140157/1/FsbXbc0yPJA.49297/5812f355ecfcda764a" title="startsslexample.jpg, 48.14Kb" height="75%" width="75%" class="dev_page_image" /></a>
+  <a href="/file/811140157/1/FsbXbc0yPJA.49297/5812f355ecfcda764a" target="_blank"><img src="/file/811140157/1/FsbXbc0yPJA.49297/5812f355ecfcda764a" title="startsslexample.jpg, 48.14Kb" height="75%" width="75%" class="dev_page_image" /></a>
 </div>
 
 <p>Even though your browser might not complain when visiting your page, an incomplete chain will not work for your webhook. If your chain is incomplete we have some tips to add them to your current setup:</p>
@@ -424,355 +419,342 @@ Both supply tools to verify your setup.</code></pre>
 <p>The end result of all this is a complete certificate chain, backed by either a root certificate we trust or, in the case of an untrusted root, a root certificate you&#39;re supplying to us. Make sure to verify your setup again after adding the intermediate, once done, you&#39;re good to go!</p>
 <h5><a class="anchor" name="testing-your-bot-with-updates" href="#testing-your-bot-with-updates"><i class="anchor-icon"></i></a>Testing your bot with updates</h5>
 <ul>
-<li>Update examples<br>A set of example updates, which comes in handy for testing your bot.</li>
-</ul>
+<li><p>Update examples<br>A set of example updates, which comes in handy for testing your bot.</p>
 <ul>
-<li>Message with text using curl:<pre><code>  curl --tlsv1.2 -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test&quot;,
-         &quot;username&quot;:&quot;Test&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test&quot;,
-         &quot;username&quot;:&quot;Test&quot;
-      },
-      &quot;text&quot;:&quot;/start&quot;
-  }
+<li><p>Message with text using curl:</p>
+<pre><code>curl --tlsv1.2 -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test&quot;,
+       &quot;username&quot;:&quot;Test&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test&quot;,
+       &quot;username&quot;:&quot;Test&quot;
+    },
+    &quot;text&quot;:&quot;/start&quot;
+}
 }&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-<code>--tlsv1.2</code> will force using TLS1.2.</li>
-</ul>
-<ul>
+<p><code>--tlsv1.2</code> will force using TLS1.2.</p>
+</li>
 <li><p>Message with text using Postman:</p>
-  <div>
-
+<div>
+<a href="/file/811140789/2/DmiZPh1t6z0.269328/98525b6835f0a91432" target="_blank"><img src="/file/811140789/2/DmiZPh1t6z0.269328/98525b6835f0a91432" title="postmanfakeupdate.jpg, 263.02Kb" class="dev_page_image" /></a>
+</div>
 </li>
 </ul>
-<p>&lt;a href=&quot;/file/811140789/2/DmiZPh1t6z0.269328/98525b6835f0a91432&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/file/811140789/2/DmiZPh1t6z0.269328/98525b6835f0a91432&quot; title=&quot;postmanfakeupdate.jpg, 263.02Kb&quot; class=&quot;dev_page_image&quot; /&gt;&lt;/a&gt;<br>&lt;/div&gt;</p>
+</li>
+<li><p>More examples in curl:</p>
 <ul>
-<li>More examples in curl:</li>
+<li>Message with text:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;text&quot;:&quot;/start&quot;
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Forwarded message:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;forward_from&quot;: {
+       &quot;last_name&quot;:&quot;Forward Lastname&quot;,
+       &quot;id&quot;: 222222,
+       &quot;first_name&quot;:&quot;Forward Firstname&quot;
+    },
+    &quot;forward_date&quot;:1441645550,
+    &quot;text&quot;:&quot;/start&quot;
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Forwarded channel message:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;forward_from&quot;: {
+       &quot;id&quot;: -10000000000,
+       &quot;type&quot;: &quot;channel&quot;,
+       &quot;title&quot;: &quot;Test channel&quot;
+    },
+    &quot;forward_date&quot;:1441645550,
+    &quot;text&quot;:&quot;/start&quot;
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Message with a reply:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;text&quot;:&quot;/start&quot;,
+    &quot;reply_to_message&quot;:{
+        &quot;date&quot;:1441645000,
+        &quot;chat&quot;:{
+            &quot;last_name&quot;:&quot;Reply Lastname&quot;,
+            &quot;type&quot;: &quot;private&quot;,
+            &quot;id&quot;:1111112,
+            &quot;first_name&quot;:&quot;Reply Firstname&quot;,
+            &quot;username&quot;:&quot;Testusername&quot;
+        },
+        &quot;message_id&quot;:1334,
+        &quot;text&quot;:&quot;Original&quot;
+    }
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Edited message:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;edited_message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;text&quot;:&quot;Edited text&quot;,
+    &quot;edit_date&quot;: 1441646600
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Message with entities:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;text&quot;:&quot;Bold and italics&quot;,
+    &quot;entities&quot;: [
+        {
+            &quot;type&quot;: &quot;italic&quot;,
+            &quot;offset&quot;: 9,
+            &quot;length&quot;: 7
+        },
+        {
+            &quot;type&quot;: &quot;bold&quot;,
+            &quot;offset&quot;: 0,
+            &quot;length&quot;: 4
+        }
+        ]
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Message with audio:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;audio&quot;: {
+        &quot;file_id&quot;: &quot;AwADBAADbXXXXXXXXXXXGBdhD2l6_XX&quot;,
+        &quot;duration&quot;: 243,
+        &quot;mime_type&quot;: &quot;audio/mpeg&quot;,
+        &quot;file_size&quot;: 3897500,
+        &quot;title&quot;: &quot;Test music file&quot;
+    }
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Voice message:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;voice&quot;: {
+        &quot;file_id&quot;: &quot;AwADBAADbXXXXXXXXXXXGBdhD2l6_XX&quot;,
+        &quot;duration&quot;: 5,
+        &quot;mime_type&quot;: &quot;audio/ogg&quot;,
+        &quot;file_size&quot;: 23000
+    }
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Message with a document:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;message&quot;:{
+    &quot;date&quot;:1441645532,
+    &quot;chat&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;message_id&quot;:1365,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;document&quot;: {
+        &quot;file_id&quot;: &quot;AwADBAADbXXXXXXXXXXXGBdhD2l6_XX&quot;,
+        &quot;file_name&quot;: &quot;Testfile.pdf&quot;,
+        &quot;mime_type&quot;: &quot;application/pdf&quot;,
+        &quot;file_size&quot;: 536392
+    }
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Inline query:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;inline_query&quot;:{
+    &quot;id&quot;: 134567890097,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;query&quot;: &quot;inline query&quot;,
+    &quot;offset&quot;: &quot;&quot;
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Chosen inline query:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;chosen_inline_result&quot;:{
+    &quot;result_id&quot;: &quot;12&quot;,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;query&quot;: &quot;inline query&quot;,
+    &quot;inline_message_id&quot;: &quot;1234csdbsk4839&quot;
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+</li>
+<li>Callback query:<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
+&quot;update_id&quot;:10000,
+&quot;callback_query&quot;:{
+    &quot;id&quot;: &quot;4382bfdwdsb323b2d9&quot;,
+    &quot;from&quot;:{
+       &quot;last_name&quot;:&quot;Test Lastname&quot;,
+       &quot;type&quot;: &quot;private&quot;,
+       &quot;id&quot;:1111111,
+       &quot;first_name&quot;:&quot;Test Firstname&quot;,
+       &quot;username&quot;:&quot;Testusername&quot;
+    },
+    &quot;data&quot;: &quot;Data from button callback&quot;,
+    &quot;inline_message_id&quot;: &quot;1234csdbsk4839&quot;
+}
+}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
+That&#39;s all we have for now!</li>
 </ul>
-<ul>
-<li><p>Message with text:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;text&quot;:&quot;/start&quot;
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Forwarded message:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;forward_from&quot;: {
-         &quot;last_name&quot;:&quot;Forward Lastname&quot;,
-         &quot;id&quot;: 222222,
-         &quot;first_name&quot;:&quot;Forward Firstname&quot;
-      },
-      &quot;forward_date&quot;:1441645550,
-      &quot;text&quot;:&quot;/start&quot;
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Forwarded channel message:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;forward_from&quot;: {
-         &quot;id&quot;: -10000000000,
-         &quot;type&quot;: &quot;channel&quot;,
-         &quot;title&quot;: &quot;Test channel&quot;
-      },
-      &quot;forward_date&quot;:1441645550,
-      &quot;text&quot;:&quot;/start&quot;
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Message with a reply:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;text&quot;:&quot;/start&quot;,
-      &quot;reply_to_message&quot;:{
-          &quot;date&quot;:1441645000,
-          &quot;chat&quot;:{
-              &quot;last_name&quot;:&quot;Reply Lastname&quot;,
-              &quot;type&quot;: &quot;private&quot;,
-              &quot;id&quot;:1111112,
-              &quot;first_name&quot;:&quot;Reply Firstname&quot;,
-              &quot;username&quot;:&quot;Testusername&quot;
-          },
-          &quot;message_id&quot;:1334,
-          &quot;text&quot;:&quot;Original&quot;
-      }
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Edited message:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;edited_message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;text&quot;:&quot;Edited text&quot;,
-      &quot;edit_date&quot;: 1441646600
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Message with entities:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;text&quot;:&quot;Bold and italics&quot;,
-      &quot;entities&quot;: [
-          {
-              &quot;type&quot;: &quot;italic&quot;,
-              &quot;offset&quot;: 9,
-              &quot;length&quot;: 7
-          },
-          {
-              &quot;type&quot;: &quot;bold&quot;,
-              &quot;offset&quot;: 0,
-              &quot;length&quot;: 4
-          }
-          ]
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Message with audio:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;audio&quot;: {
-          &quot;file_id&quot;: &quot;AwADBAADbXXXXXXXXXXXGBdhD2l6_XX&quot;,
-          &quot;duration&quot;: 243,
-          &quot;mime_type&quot;: &quot;audio/mpeg&quot;,
-          &quot;file_size&quot;: 3897500,
-          &quot;title&quot;: &quot;Test music file&quot;
-      }
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Voice message:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;voice&quot;: {
-          &quot;file_id&quot;: &quot;AwADBAADbXXXXXXXXXXXGBdhD2l6_XX&quot;,
-          &quot;duration&quot;: 5,
-          &quot;mime_type&quot;: &quot;audio/ogg&quot;,
-          &quot;file_size&quot;: 23000
-      }
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Message with a document:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;message&quot;:{
-      &quot;date&quot;:1441645532,
-      &quot;chat&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;message_id&quot;:1365,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;document&quot;: {
-          &quot;file_id&quot;: &quot;AwADBAADbXXXXXXXXXXXGBdhD2l6_XX&quot;,
-          &quot;file_name&quot;: &quot;Testfile.pdf&quot;,
-          &quot;mime_type&quot;: &quot;application/pdf&quot;,
-          &quot;file_size&quot;: 536392
-      }
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Inline query:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;inline_query&quot;:{
-      &quot;id&quot;: 134567890097,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;query&quot;: &quot;inline query&quot;,
-      &quot;offset&quot;: &quot;&quot;
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Chosen inline query:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;chosen_inline_result&quot;:{
-      &quot;result_id&quot;: &quot;12&quot;,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;query&quot;: &quot;inline query&quot;,
-      &quot;inline_message_id&quot;: &quot;1234csdbsk4839&quot;
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
-</li>
-<li><p>Callback query:</p>
-<pre><code>curl -v -k -X POST -H &quot;Content-Type: application/json&quot; -H &quot;Cache-Control: no-cache&quot;  -d &#39;{
-  &quot;update_id&quot;:10000,
-  &quot;callback_query&quot;:{
-      &quot;id&quot;: &quot;4382bfdwdsb323b2d9&quot;,
-      &quot;from&quot;:{
-         &quot;last_name&quot;:&quot;Test Lastname&quot;,
-         &quot;type&quot;: &quot;private&quot;,
-         &quot;id&quot;:1111111,
-         &quot;first_name&quot;:&quot;Test Firstname&quot;,
-         &quot;username&quot;:&quot;Testusername&quot;
-      },
-      &quot;data&quot;: &quot;Data from button callback&quot;,
-      &quot;inline_message_id&quot;: &quot;1234csdbsk4839&quot;
-  }
-}&#39; &quot;https://YOUR.BOT.URL:YOURPORT/&quot;</code></pre>
 </li>
 </ul>
-<p>That&#39;s all we have for now!</p>
 </div>
   
 </div>
