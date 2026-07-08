@@ -108,6 +108,10 @@ var Main = {
     Main.showToast(text || 'Error.', { class: 'tm-toast-error' });
     WebApp.HapticFeedback.notificationOccurred('error');
   },
+  showWarningToast(text) {
+    Main.showToast(text || 'Warning.', { class: 'tm-toast-warning' });
+    WebApp.HapticFeedback.notificationOccurred('warning');
+  },
   showSuccessToast(text) {
     Main.showToast(text || 'Success.', { class: 'tm-toast-success' });
     WebApp.HapticFeedback.notificationOccurred('success');
@@ -274,7 +278,7 @@ var BotProfile = {
 
     Aj.onBeforeUnload(() => {
       if (BotProfile.hasChanges()) {
-        return 'Changes that you made may not be saved.';
+        return uncleanHTML(l('WEB_UNSAVED_CHANGES'));
       }
     });
 
@@ -345,7 +349,6 @@ var BotProfile = {
       }, 
       {
         onSelected(file) {
-          debugger;
           if (!file) return;
           var src = URL.createObjectURL(file);
           bg = src;
@@ -613,15 +616,15 @@ var BotGeneral = {
   },
   askRevoke() {
     WebApp.showPopup({
-      title: l('WEB_API_TOKEN_REVOKE_TITLE'),
-      message: l('WEB_API_TOKEN_REVOKE_TEXT'),
+      title: uncleanHTML(l('WEB_API_TOKEN_REVOKE_TITLE')),
+      message: uncleanHTML(l('WEB_API_TOKEN_REVOKE_TEXT')),
       buttons: [
         {
           type: 'cancel',
         },
         {
           id: 'revoke',
-          text: l('WEB_API_TOKEN_REVOKE_BTN'),
+          text: uncleanHTML(l('WEB_API_TOKEN_REVOKE_BTN')),
           type: 'destructive',
         }
       ]
@@ -962,7 +965,7 @@ var BotSettings = {
     var field2Placeholder = platform == 'android' ? l('WEB_NATIVE_APP_SHA256_FINGERPRINT') : l('WEB_NATIVE_APP_BUNDLE_ID');
 
     var html = `<div class="tm-native-app-entry js-native-app-entry" data-platform="${platform}">
-      <div class="tm-row tm-row-no-highlight" style="gap: 8px; padding: 8px 16px;">
+      <div class="tm-row" style="gap: 8px; padding: 8px 16px;">
         <span class="tm-native-app-chip ${platformClass}">${platformLabel}<span class="js-delete-native-app"></span></span>
       </div>
       <div class="tm-field" style="margin-bottom: 1px;">
@@ -971,7 +974,7 @@ var BotSettings = {
       <div class="tm-field" style="margin-bottom: 1px;">
         <input type="text" class="form-control tm-input js-native-app-field2" value="" placeholder="${field2Placeholder}" autocomplete="off" spellcheck="false" />
       </div>
-      <div class="tm-row tm-row-no-highlight js-native-app-url-row" style="align-items: stretch; flex-direction: column; display:none;">
+      <div class="tm-row js-native-app-url-row" style="align-items: stretch; flex-direction: column; display:none;">
         <span class="tm-table-header">${l('WEB_NATIVE_APP_URL')}</span>
         <div class="tm-api-token tm-api-token-client-secret">
           <span class="js-native-app-url-value" style="flex-grow: 1; word-break: break-all;"></span>
@@ -1057,12 +1060,12 @@ var BotSettings = {
 
   askMigrateOauth() {
     WebApp.showPopup({
-      title: l('WEB_LOGIN_MIGRATE_TITLE'),
-      message: l('WEB_LOGIN_MIGRATE_TEXT'),
+      title: uncleanHTML(l('WEB_LOGIN_MIGRATE_TITLE')),
+      message: uncleanHTML(l('WEB_LOGIN_MIGRATE_TEXT')),
       buttons: [
         {
           id: 'confirm',
-          text: l('WEB_LOGIN_MIGRATE_CONFIRM_BTN'),
+          text: uncleanHTML(l('WEB_LOGIN_MIGRATE_CONFIRM_BTN')),
           type: 'default',
         },
         {
@@ -1087,15 +1090,15 @@ var BotSettings = {
 
   askRevokeClientSecret() {
     WebApp.showPopup({
-      title: l('WEB_CLIENT_SECRET_REVOKE_TITLE'),
-      message: l('WEB_CLIENT_SECRET_REVOKE_TEXT'),
+      title: uncleanHTML(l('WEB_CLIENT_SECRET_REVOKE_TITLE')),
+      message: uncleanHTML(l('WEB_CLIENT_SECRET_REVOKE_TEXT')),
       buttons: [
         {
           type: 'cancel',
         },
         {
           id: 'revoke',
-          text: l('WEB_API_TOKEN_REVOKE_BTN'),
+          text: uncleanHTML(l('WEB_API_TOKEN_REVOKE_BTN')),
           type: 'destructive',
         }
       ]
@@ -1182,12 +1185,12 @@ var BotGames = {
       // e.stopPropagation();
       var gameId = this.dataset.id;
       WebApp.showPopup({
-        title: l('WEB_GAMES_DELETE_CONFIRM_TITLE'),
-        message: l('WEB_GAMES_DELETE_CONFIRM_BODY'),
+        title: uncleanHTML(l('WEB_GAMES_DELETE_CONFIRM_TITLE')),
+        message: uncleanHTML(l('WEB_GAMES_DELETE_CONFIRM_BODY')),
         buttons: [
           {
             id: 'delete',
-            text: l('WEB_GAMES_DELETE'),
+            text: uncleanHTML(l('WEB_GAMES_DELETE')),
             type: 'destructive',
           },
           {
@@ -1490,12 +1493,12 @@ var BotApps = {
     $('.js-game-delete').on('click', function (e) {
       var gameId = this.dataset.id;
       WebApp.showPopup({
-        title: l('WEB_GAMES_DELETE_CONFIRM_TITLE'),
-        message: l('WEB_GAMES_DELETE_APP_CONFIRM_BODY'),
+        title: uncleanHTML(l('WEB_GAMES_DELETE_CONFIRM_TITLE')),
+        message: uncleanHTML(l('WEB_GAMES_DELETE_APP_CONFIRM_BODY')),
         buttons: [
           {
             id: 'delete',
-            text: l('WEB_GAMES_DELETE'),
+            text: uncleanHTML(l('WEB_GAMES_DELETE')),
             type: 'destructive',
           },
           {
@@ -1546,12 +1549,12 @@ var BotMainApp = {
 
     $('.js-delete-mainapp-button').on('click', function () {
       WebApp.showPopup({
-        title: l('WEB_MENUBTN_DISABLE_TITLE'),
-        message: l('WEB_MAINAPP_DISABLE_CONFIRM'),
+        title: uncleanHTML(l('WEB_MENUBTN_DISABLE_TITLE')),
+        message: uncleanHTML(l('WEB_MAINAPP_DISABLE_CONFIRM')),
         buttons: [
           {
             id: 'delete',
-            text: l('WEB_MENUBTN_POPUP_DISABLE'),
+            text: uncleanHTML(l('WEB_MENUBTN_POPUP_DISABLE')),
             type: 'destructive',
           },
           {
@@ -1616,12 +1619,12 @@ var BotMenuApp = {
 
     $('.js-delete-menu-button').on('click', function () {
       WebApp.showPopup({
-        title: l('WEB_MENUBTN_DISABLE_TITLE'),
-        message: l('WEB_MENUBTN_DISABLE_CONFIRM'),
+        title: uncleanHTML(l('WEB_MENUBTN_DISABLE_TITLE')),
+        message: uncleanHTML(l('WEB_MENUBTN_DISABLE_CONFIRM')),
         buttons: [
           {
             id: 'delete',
-            text: l('WEB_MENUBTN_POPUP_DISABLE'),
+            text: uncleanHTML(l('WEB_MENUBTN_POPUP_DISABLE')),
             type: 'destructive',
           },
           {
@@ -2273,9 +2276,9 @@ var SimpleSpoiler = {
   }
 };
 
-var BotCloud = {
+var BotServerless = {
   init() {
-    $('.js-cloud-toggle').on('click', function () {
+    $('.js-serverless-toggle').on('click', function () {
       var toggleEl = this.querySelector('.tm-toggle');
       var isOn = toggleEl.classList.contains('tm-toggle-on');
       if (isOn) {
@@ -2312,56 +2315,728 @@ var BotCloud = {
         });
       }
     });
+  },
+};
 
+var BotCliAccess = {
+  init() {
     $('.js-spoiler').each(function () {
       SimpleSpoiler.init(this);
     });
-    $('body').on('click', '.js-spoiler', BotCloud.eClickSpoiler);
+    $('body').on('click', '.js-spoiler', BotCliAccess.eClickSpoiler);
 
-    $('.tm-api-token-actions .tm-active-button').on('click', BotCloud.copyToken);
-    $('.tm-api-token-actions .tm-revoke-button').on('click', BotCloud.askRevoke);
+    $(document).on('click.cli', '.copy-btn', function () {
+      navigator.clipboard.writeText(this.dataset.value);
+      Main.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
+    });
+
+    $('.js-revoke-cli-token').on('click', BotCliAccess.askRevoke);
 
     Aj.onUnload(() => {
-      $('body').off('click', '.js-spoiler', BotCloud.eClickSpoiler);
+      $('body').off('click', '.js-spoiler', BotCliAccess.eClickSpoiler);
+      $(document).off('click.cli', '.copy-btn');
     });
   },
   eClickSpoiler() {
-    if (this.classList.contains('js-spoiler-revealed')) {
-      return BotCloud.copyToken();
-    }
     SimpleSpoiler.destroy(this);
     this.classList.add('js-spoiler-revealed');
   },
-  copyToken() {
-    var token = $('.tm-api-token').text().trim();
-    navigator.clipboard.writeText(token);
-    Main.showSuccessToast(l('WEB_CLOUD_TOKEN_COPY_SUCCESS'));
-  },
   askRevoke() {
     WebApp.showPopup({
-      title: l('WEB_CLOUD_TOKEN_REVOKE_TITLE'),
-      message: l('WEB_CLOUD_TOKEN_REVOKE_TEXT'),
+      title: uncleanHTML(l('WEB_CLI_TOKEN_REVOKE_TITLE')),
+      message: uncleanHTML(l('WEB_CLI_TOKEN_REVOKE_TEXT')),
       buttons: [
         { type: 'cancel' },
-        { id: 'revoke', text: l('WEB_CLOUD_TOKEN_REVOKE_BTN'), type: 'destructive' },
+        { id: 'revoke', text: uncleanHTML(l('WEB_CLI_TOKEN_REVOKE_BTN')), type: 'destructive' },
       ]
     }, (result) => {
-      if (result === 'revoke') {
-        Aj.apiRequest('revokeCloudToken', {
-          bid: Aj.state.botId,
-        }, (response) => {
-          if (response.error) {
-            Main.showErrorToast(response.error);
+      if (result !== 'revoke') return;
+      Aj.apiRequest('revokeCloudToken', { bid: Aj.state.botId }, (response) => {
+        if (response.error) {
+          Main.showErrorToast(response.error);
+        }
+        if (response.ok) {
+          $('.js-spoiler.js-cli-token').html(response.token);
+          $('.copy-btn.js-cli-token').data('value', response.token);
+          $('.js-spoiler.js-cli-token').each(function () {
+            SimpleSpoiler.init(this);
+          });
+          Main.showSuccessToast(l('WEB_CLI_TOKEN_REVOKE_SUCCESS'));
+        }
+      });
+    });
+  },
+};
+
+var BotCodeEditor = {
+  savedCode: '',
+  cm: null,
+  apiMethod: '',
+  apiParams: {},
+  savedLangKey: '',
+  saveErrorLangKey: '',
+
+  init(elementId, opts) {
+    var editorEl = document.getElementById(elementId);
+    if (!editorEl) return;
+
+    BotCodeEditor.savedCode = Aj.state.editorCode;
+    BotCodeEditor.apiMethod = opts.apiMethod;
+    BotCodeEditor.apiParams = opts.apiParams || {};
+    BotCodeEditor.savedLangKey = opts.savedLangKey;
+    BotCodeEditor.saveErrorLangKey = opts.saveErrorLangKey;
+    BotCodeEditor.onSaveSuccess = opts.onSaveSuccess || null;
+
+    var isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+    var hintConfig = Aj.state.hintConfig;
+
+    var cmOpts = {
+      value: BotCodeEditor.savedCode,
+      mode: 'javascript',
+      theme: 'custom',
+      lineNumbers: true,
+      matchBrackets: true,
+      autoCloseBrackets: true,
+      indentUnit: 2,
+      tabSize: 2,
+      lineWrapping: false,
+      json: false,
+      placeholder: opts.placeholder || '',
+      extraKeys: $.extend({
+        [(isMac ? 'Cmd' : 'Ctrl') + '-/']: 'toggleComment',
+        [(isMac ? 'Cmd' : 'Ctrl') + '-Space']: function(cm) {
+          if (hintConfig && hintConfig.custom) {
+            cm.showHint({ hint: CodeMirror.hint.cloudjs, hintConfig: hintConfig });
           }
-          if (response.ok) {
-            $('.tm-api-token').html('<span class="js-spoiler">' + response.token + '</span>');
-            $('.tm-api-token .js-spoiler').each(function () {
-              SimpleSpoiler.init(this);
-            });
-            Main.showSuccessToast(l('WEB_CLOUD_TOKEN_REVOKE_SUCCESS'));
-          }
-        });
+        },
+        'Ctrl-`': function() {
+          if (BotConsole.cm) BotConsole.cm.focus();
+        },
+      }, opts.extraKeys || {}),
+    };
+
+    BotCodeEditor.cm = CodeMirror(editorEl, cmOpts);
+
+    BotCodeEditor.cm.on('inputRead', opts.inputRead || function(cm, event) {
+      if (event.text[0] && /[\w.]/.test(event.text[0])) {
+        if (hintConfig && hintConfig.custom) {
+          cm.showHint({ hint: CodeMirror.hint.cloudjs, completeSingle: false, hintConfig: hintConfig });
+        }
+      }
+    });
+
+    BotCodeEditor.cm.on('change', BotCodeEditor.onEditorChange);
+
+    WebApp.MainButton.setText(uncleanHTML(l('WEB_EDITOR_SAVE')));
+    WebApp.MainButton.show();
+    WebApp.MainButton.onClick(BotCodeEditor.onSave);
+
+    Aj.onUnload(function() {
+      WebApp.MainButton.hide();
+      WebApp.MainButton.offClick(BotCodeEditor.onSave);
+    });
+
+    Aj.onBeforeUnload(function() {
+      if (BotCodeEditor.cm && BotCodeEditor.cm.getValue() !== BotCodeEditor.savedCode) {
+        return uncleanHTML(l('WEB_UNSAVED_CHANGES'));
+      }
+    });
+  },
+
+  onEditorChange() {
+  },
+
+  onSave() {
+    var code = BotCodeEditor.cm.getValue();
+    WebApp.MainButton.showProgress();
+    var params = $.extend({ bid: Aj.state.botId, code: code }, BotCodeEditor.apiParams);
+    Aj.apiRequest(BotCodeEditor.apiMethod, params, function(res) {
+      WebApp.MainButton.hideProgress();
+      if (res.ok) {
+        if (BotCodeEditor.onSaveSuccess) {
+          BotCodeEditor.savedCode = code;
+          BotCodeEditor.onSaveSuccess(res);
+        } else {
+          BotCodeEditor.savedCode = code;
+          Aj.onUnload(function() { Main.showSuccessToast(l(BotCodeEditor.savedLangKey)); });
+          _backButton();
+        }
+      } else {
+        Main.showErrorToast(res.error || l(BotCodeEditor.saveErrorLangKey));
       }
     });
   },
 };
+
+var BotLibrary = {
+  init() {
+    var isNew = Aj.state.isLibraryNew;
+    var $input = $('#library-name');
+
+    if (isNew) {
+      $input.on('input', function() {
+        var filtered = $input.val().replace(/[^a-zA-Z0-9_\/-]/g, '');
+        if (filtered.indexOf('//') !== -1) {
+          filtered = filtered.replace(/\/+/g, '/');
+        }
+        $input.val(filtered);
+      });
+    }
+
+    BotCodeEditor.init('library-editor', {
+      apiMethod: 'saveCloudLibraryFile',
+      apiParams: isNew ? {} : { name: Aj.state.libraryPath },
+      savedLangKey: 'WEB_LIBRARY_FILE_SAVED',
+      saveErrorLangKey: 'WEB_LIBRARY_FILE_SAVE_ERROR',
+      placeholder: l('WEB_LIBRARY_CODE_PLACEHOLDER'),
+    });
+
+    if (isNew) {
+      WebApp.MainButton.offClick(BotCodeEditor.onSave);
+      WebApp.MainButton.onClick(BotLibrary.onSave);
+      Aj.onUnload(function() { WebApp.MainButton.offClick(BotLibrary.onSave); });
+    }
+
+    if (!isNew) {
+      $(document).on('click.libcopy', '.js-copy-lib-path', function() {
+        navigator.clipboard.writeText(this.dataset.value);
+        Main.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
+      });
+      $(document).on('click.curPage', '.js-editor-delete', function() {
+        WebApp.showPopup({
+          title: uncleanHTML(l('WEB_LIBRARY_DELETE_CONFIRM_TITLE')),
+          message: uncleanHTML(l('WEB_LIBRARY_DELETE_CONFIRM_BODY')),
+          buttons: [
+            { id: 'delete', text: uncleanHTML(l('WEB_EDITOR_DELETE')), type: 'destructive' },
+            { type: 'cancel' },
+          ]
+        }, function(result) {
+          if (result !== 'delete') return;
+          Aj.apiRequest('deleteCloudLibraryFile', { bid: Aj.state.botId, name: Aj.state.libraryPath }, function(res) {
+            if (res.ok) {
+              Aj.onUnload(function() { Main.showSuccessToast(l('WEB_LIBRARY_FILE_DELETED')); });
+              _backButton();
+            } else {
+              Main.showErrorToast(res.error);
+            }
+          });
+        });
+      });
+    }
+  },
+  onSave() {
+    var name = $('#library-name').val().trim();
+    if (!name || !/^(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+$/.test(name)) {
+      Main.showErrorToast(l('WEB_LIBRARY_FILE_PLACEHOLDER'));
+      $('#library-name').focus();
+      return;
+    }
+    var existing = Aj.state.existingLibraries || [];
+    if (existing.indexOf(name) !== -1) {
+      Main.showErrorToast(l('WEB_FUNCTION_NAME_EXISTS'));
+      $('#library-name').focus();
+      return;
+    }
+
+    var code = BotCodeEditor.cm.getValue();
+    WebApp.MainButton.showProgress();
+    Aj.apiRequest('saveCloudLibraryFile', {
+      bid: Aj.state.botId,
+      name: name,
+      code: code,
+    }, function(res) {
+      WebApp.MainButton.hideProgress();
+      if (res.ok) {
+        BotCodeEditor.savedCode = code;
+        Aj.onUnload(function() { Main.showSuccessToast(l('WEB_LIBRARY_FILE_SAVED')); });
+        _backButton();
+      } else {
+        Main.showErrorToast(res.error || l('WEB_LIBRARY_FILE_SAVE_ERROR'));
+      }
+    });
+  },
+};
+
+var BotDatabase = {
+  init() {
+    BotCodeEditor.init('database-editor', {
+      apiMethod: 'saveCloudDatabase',
+      savedLangKey: 'WEB_DATABASE_SAVED',
+      saveErrorLangKey: 'WEB_DATABASE_SAVE_ERROR',
+      onSaveSuccess: function(res) {
+        if (res.error) {
+          Main.showErrorToast(res.error || l('WEB_DATABASE_SAVE_ERROR'));
+        } else {
+          Main.showSuccessToast(l('WEB_DATABASE_SAVED'));
+          $('#js-database-status').html(res.status_html);
+        }
+      },
+    });
+  },
+};
+
+var BotMigration = {
+  currentStep: 0,
+  totalSteps: 0,
+  appliedIds: {},
+  skippedIds: {},
+
+  init() {
+    BotMigration.totalSteps = Aj.state.migrationSteps ? Aj.state.migrationSteps.length : 0;
+    BotMigration.currentStep = 0;
+
+    WebApp.MainButton.onClick(BotMigration.onMainButton);
+    WebApp.SecondaryButton.onClick(BotMigration.onSkip);
+    Aj.onUnload(function() {
+      WebApp.MainButton.hide();
+      WebApp.MainButton.offClick(BotMigration.onMainButton);
+      WebApp.SecondaryButton.hide();
+      WebApp.SecondaryButton.offClick(BotMigration.onSkip);
+    });
+
+    BotMigration.updateButtons();
+  },
+
+  showScreen(screenId) {
+    $('.migration-screen').hide();
+    $('#' + screenId).show();
+  },
+
+  updateProgress() {
+    $('#migration-step-label').text(l('WEB_MIGRATION_STEP').replace('{current}', BotMigration.currentStep).replace('{total}', BotMigration.totalSteps));
+    var pct = (BotMigration.currentStep / BotMigration.totalSteps * 100);
+    $('#migration-progress-bar').css('width', pct + '%');
+  },
+
+  updateButtons() {
+    WebApp.MainButton.hideProgress();
+
+    if (BotMigration.currentStep == 0) {
+      WebApp.MainButton.setText(uncleanHTML(l('WEB_MIGRATION_START')));
+      WebApp.MainButton.show();
+      WebApp.SecondaryButton.hide();
+      return;
+    }
+
+    if (BotMigration.currentStep <= BotMigration.totalSteps) {
+      var stepInfo = Aj.state.migrationSteps[BotMigration.currentStep - 1];
+      if (stepInfo.type == 'safe') {
+        WebApp.MainButton.setText(uncleanHTML(l('WEB_MIGRATION_APPLY_CHANGES', {count: stepInfo.changeIds.length})));
+        WebApp.MainButton.show();
+        WebApp.SecondaryButton.setText(uncleanHTML(l('WEB_MIGRATION_SKIP')));
+        WebApp.SecondaryButton.setParams({ position: 'bottom' });
+        WebApp.SecondaryButton.show();
+      } else if (stepInfo.type == 'warning') {
+        WebApp.MainButton.setText(uncleanHTML(l('WEB_MIGRATION_APPLY')));
+        WebApp.MainButton.show();
+        WebApp.SecondaryButton.setText(uncleanHTML(l('WEB_MIGRATION_SKIP')));
+        WebApp.SecondaryButton.setParams({ position: 'bottom' });
+        WebApp.SecondaryButton.show();
+      } else {
+        WebApp.MainButton.setText(uncleanHTML(l('WEB_MIGRATION_CONTINUE')));
+        WebApp.MainButton.show();
+        WebApp.SecondaryButton.hide();
+      }
+    }
+  },
+
+  onMainButton() {
+    if (BotMigration.currentStep == 0) {
+      if (BotMigration.totalSteps == 0) {
+        BotMigration.finishMigration();
+      } else {
+        BotMigration.currentStep = 1;
+        $('#migration-header').show();
+        BotMigration.showScreen('migration-step-1');
+        BotMigration.updateProgress();
+        BotMigration.updateButtons();
+      }
+    } else if (BotMigration.currentStep <= BotMigration.totalSteps) {
+      var stepInfo = Aj.state.migrationSteps[BotMigration.currentStep - 1];
+      if (stepInfo.type == 'manual' || stepInfo.type == 'undocumented') {
+        BotMigration.hideStepError();
+        BotMigration.advanceStep();
+      } else if (stepInfo.type == 'warning') {
+        var msg = l('WEB_MIGRATION_APPLY_CONFIRM');
+        if (stepInfo.warningText) {
+          msg = stepInfo.warningText + '\n\n' + msg;
+        }
+        showConfirm(msg, function() {
+          BotMigration.onApply();
+        }, l('WEB_MIGRATION_APPLY'));
+      } else {
+        BotMigration.onApply();
+      }
+    }
+  },
+
+  onSkip() {
+    var stepInfo = Aj.state.migrationSteps[BotMigration.currentStep - 1];
+    if (!stepInfo) return;
+    for (var i = 0; i < stepInfo.changeIds.length; i++) {
+      BotMigration.skippedIds[stepInfo.changeIds[i]] = true;
+    }
+    BotMigration.hideStepError();
+    BotMigration.advanceStep();
+  },
+
+  onApply() {
+    var stepInfo = Aj.state.migrationSteps[BotMigration.currentStep - 1];
+    if (!stepInfo) return;
+    WebApp.MainButton.showProgress();
+    Aj.apiRequest('migrateCloudDatabase', {
+      bid: Aj.state.botId,
+      apply: stepInfo.changeIds,
+    }, function(res) {
+      WebApp.MainButton.hideProgress();
+      if (res.ok) {
+        for (var i = 0; i < stepInfo.changeIds.length; i++) {
+          BotMigration.appliedIds[stepInfo.changeIds[i]] = true;
+        }
+        BotMigration.hideStepError();
+        BotMigration.advanceStep();
+      } else {
+        BotMigration.showStepError(res.error || 'Unknown error');
+        WebApp.MainButton.setText(uncleanHTML(l('WEB_MIGRATION_RETRY')));
+        WebApp.SecondaryButton.setText(uncleanHTML(l('WEB_MIGRATION_SKIP')));
+        WebApp.SecondaryButton.setParams({ position: 'bottom' });
+        WebApp.SecondaryButton.show();
+      }
+    });
+  },
+
+  advanceStep() {
+    BotMigration.currentStep++;
+    if (BotMigration.currentStep <= BotMigration.totalSteps) {
+      BotMigration.showScreen('migration-step-' + BotMigration.currentStep);
+      BotMigration.updateProgress();
+      BotMigration.updateButtons();
+    } else {
+      BotMigration.finishMigration();
+    }
+  },
+
+  finishMigration() {
+    var skippedCount = 0;
+    for (var i = 0; i < Aj.state.migrationSteps.length; i++) {
+      var stepInfo = Aj.state.migrationSteps[i];
+      for (var j = 0; j < stepInfo.changeIds.length; j++) {
+        if (!BotMigration.appliedIds[stepInfo.changeIds[j]]) {
+          skippedCount++;
+        }
+      }
+    }
+    var dbUrl = '/botfather/bot/' + Aj.state.botId + '/serverless/database';
+    Aj.onUnload(function() {
+      if (skippedCount > 0) {
+        Main.showWarningToast(l('WEB_MIGRATION_INCOMPLETED'));
+      } else {
+        Main.showSuccessToast(l('WEB_MIGRATION_COMPLETED'));
+      }
+    });
+    Aj.location(dbUrl);
+  },
+
+  showStepError(error) {
+    var stepNum = BotMigration.currentStep;
+    var errorText = uncleanHTML(l('WEB_MIGRATION_APPLY_ERROR')).replace('{error}', error);
+    $('#migration-step-' + stepNum + '-error-text').text(errorText);
+    $('#migration-step-' + stepNum + '-error').show();
+  },
+
+  hideStepError() {
+    var stepNum = BotMigration.currentStep;
+    $('#migration-step-' + stepNum + '-error').hide();
+  },
+};
+
+var BotHandler = {
+  init() {
+    BotCodeEditor.init('handler-editor', {
+      apiMethod: 'saveCloudHandler',
+      apiParams: { type: Aj.state.handlerType },
+      savedLangKey: 'WEB_HANDLER_SAVED',
+      saveErrorLangKey: 'WEB_HANDLER_SAVE_ERROR',
+    });
+
+    BotConsole.init(Aj.state.handlerType);
+
+    if (!Aj.state.isHandlerNew) {
+      $(document).on('click.curPage', '.js-editor-delete', function() {
+        WebApp.showPopup({
+          title: uncleanHTML(l('WEB_HANDLER_DELETE_CONFIRM_TITLE')),
+          message: uncleanHTML(l('WEB_HANDLER_DELETE_CONFIRM_BODY')),
+          buttons: [
+            { id: 'delete', text: uncleanHTML(l('WEB_EDITOR_DELETE')), type: 'destructive' },
+            { type: 'cancel' },
+          ]
+        }, function(result) {
+          if (result !== 'delete') return;
+          Aj.apiRequest('deleteCloudHandler', { bid: Aj.state.botId, type: Aj.state.handlerType }, function(res) {
+            if (res.ok) {
+              Aj.onUnload(function() { Main.showSuccessToast(l('WEB_HANDLER_DELETED')); });
+              _backButton();
+            } else {
+              Main.showErrorToast(res.error);
+            }
+          });
+        });
+      });
+    }
+  },
+};
+
+var BotConsole = {
+  cm: null,
+  guarded: null,
+  history: [],
+  historyIndex: 0,
+  draft: '',
+  isRunning: false,
+
+  init(functionName) {
+    var isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+    var el = document.getElementById('console-editor');
+    if (!el) return;
+
+    BotConsole.cm = CodeMirror(el, {
+      mode: 'javascript',
+      theme: 'custom',
+      lineNumbers: false,
+      matchBrackets: true,
+      autoCloseBrackets: true,
+      indentUnit: 2,
+      tabSize: 2,
+      lineWrapping: true,
+      guardedRegion: {
+        prefix: BotConsole.getPrefix(functionName),
+        suffix: '});',
+        placeholder: l('WEB_CONSOLE_PLACEHOLDER'),
+        prefixClassName: functionName ? '' : 'cm-guarded-default',
+      },
+      extraKeys: {
+        'Up': BotConsole.onUp,
+        'Down': BotConsole.onDown,
+        'Ctrl-`': function() {
+          if (BotCodeEditor.cm) BotCodeEditor.cm.focus();
+        },
+      },
+    });
+    BotConsole.cm.addKeyMap({
+      'Enter': BotConsole.onSubmit,
+      'Shift-Enter': BotConsole.onShiftEnter,
+    });
+
+    BotConsole.guarded = BotConsole.cm.getGuardedRegion();
+  },
+
+  getPrefix(name) {
+    return (name || l('WEB_FUNCTION_NAME_PLACEHOLDER')) + '({';
+  },
+
+  updatePrefix(name) {
+    if (!BotConsole.cm || !BotConsole.guarded) return;
+    BotConsole.guarded.setPrefix(BotConsole.getPrefix(name));
+    BotConsole.guarded.setPrefixClassName(name ? '' : 'cm-guarded-default');
+  },
+
+  onShiftEnter(cm) {
+    const explodeIfBetweenPair = function(cm) {
+      var conf = cm.state.closeBrackets;
+      var explode = (typeof conf === 'object' && conf && conf.explode) || '[]{}';
+      if (!explode || cm.getOption('disableInput')) return CodeMirror.Pass;
+
+      var ranges = cm.listSelections();
+      for (var i = 0; i < ranges.length; i++) {
+        if (!ranges[i].empty()) return CodeMirror.Pass;
+        var h = ranges[i].head;
+        var around = cm.getRange(
+          { line: h.line, ch: h.ch - 1 },
+          { line: h.line, ch: h.ch + 1 }
+        );
+        if (around.length !== 2 || explode.indexOf(around) % 2 !== 0) {
+          return CodeMirror.Pass;
+        }
+      }
+      cm.operation(function () {
+        var sep = cm.lineSeparator() || '\n';
+        cm.replaceSelection(sep + sep, null);
+        cm.execCommand('goCharLeft');
+        var rs = cm.listSelections();
+        for (var i = 0; i < rs.length; i++) {
+          cm.indentLine(rs[i].head.line, null, true);
+          cm.indentLine(rs[i].head.line + 1, null, true);
+        }
+      });
+      return true;
+    };
+    if (explodeIfBetweenPair(cm) !== CodeMirror.Pass) return;
+    cm.execCommand('newlineAndIndent');
+  },
+
+  onSubmit() {
+    if (BotConsole.isRunning) return CodeMirror.Pass;
+
+    var editable = BotConsole.guarded.getEditable();
+    var isHandler = Aj.state.consoleMethod === 'runCloudHandler';
+    var moduleName = '';
+    if (isHandler) {
+      moduleName = Aj.state.handlerType;
+    } else if (Aj.state.isFunctionNew) {
+      moduleName = ($('#function-name').val() || '').trim();
+    } else {
+      moduleName = Aj.state.functionName;
+    }
+
+    $('#console .tm-console-line').remove();
+
+    if (BotConsole.history.length === 0 || BotConsole.history[BotConsole.history.length - 1] !== editable) {
+      BotConsole.history.push(editable);
+    }
+    BotConsole.historyIndex = BotConsole.history.length;
+    BotConsole.draft = '';
+
+    BotConsole.addHistoryLine();
+    BotConsole.guarded.setEditable('');
+
+    var argsObj = null;
+    if (editable) {
+      try {
+        argsObj = JSON5.parse('{' + editable + '}');
+      } catch (e) {
+        BotConsole.addLine('error', 'Cannot parse arguments');
+        BotConsole.cm.refresh();
+        BotConsole.cm.focus();
+        return;
+      }
+    }
+
+    var code = BotCodeEditor.cm.getValue();
+    BotConsole.isRunning = true;
+    $('#console-input-line').hide();
+
+    var params = {
+      bid: Aj.state.botId,
+      code: code,
+      args: argsObj ? JSON.stringify(argsObj) : '{}',
+    };
+    if (isHandler) {
+      params.type = moduleName;
+    } else {
+      params.name = moduleName;
+    }
+
+    Aj.apiRequest(Aj.state.consoleMethod, params, function(res) {
+      BotConsole.isRunning = false;
+      if (res.log && res.log.length) {
+        let prev_t = 0;
+        for (var i = 0; i < res.log.length; i++) {
+          var entry = res.log[i], str;
+          if (entry.M) {
+            str = entry.M + ' [...]';
+          } else {
+            str = entry.m || '';
+          }
+          var delta = entry.t - prev_t;
+          prev_t = entry.t;
+          BotConsole.addLine(entry._, str, '+' + BotConsole.formatDuration(delta));
+        }
+      }
+      if (res.error) {
+        BotConsole.addLine('error', res.error, BotConsole.formatDuration(res.time));
+      } else {
+        let content = res.result;
+        try { content = JSON5.stringify(content); } catch(e) {}
+        BotConsole.addLine('output', content, BotConsole.formatDuration(res.time));
+      }
+      $('#console-input-line').show();
+      BotConsole.cm.refresh();
+      BotConsole.cm.focus();
+    });
+  },
+
+  addHistoryLine() {
+    var $inputLine = $('#console-input-line');
+    var $line = $('<div class="tm-console-line">');
+    $line.append($('<div class="tm-console-gutter tm-console-gutter--in">').text('>'));
+    var $body = $('<div class="tm-console-body">');
+    var $pre = $('<pre class="cm-s-custom">');
+    CodeMirror.runMode(BotConsole.cm.getValue(), 'javascript', $pre[0]);
+    $body.append($pre);
+    $line.append($body);
+    $line.insertBefore($inputLine);
+  },
+
+  formatDuration(dur) {
+    let ms = Math.round(dur * 1000);
+    if (ms < 1000) return `${ms}ms`;
+    if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+    return `${(ms / 60000).toFixed(1)}m`;
+  },
+
+  addLine(type, content, time) {
+    var $inputLine = $('#console-input-line');
+    var $line = $('<div class="tm-console-line tm-console-line--' + BotConsole.lineClass(type) + '">');
+    $line.append($('<div class="tm-console-gutter">').text(BotConsole.gutterChar(type)));
+    var $body = $('<div class="tm-console-body">');
+    $body.append($('<pre>').text(String(content)));
+    if (time) {
+      $body.append($('<span class="tm-console-time">').text(time));
+    }
+    $line.append($body);
+    $line.insertBefore($inputLine);
+  },
+
+  onUp() {
+    var cursor = BotConsole.cm.getCursor();
+    var startPos = BotConsole.cm.posFromIndex(BotConsole.guarded.prefix.length);
+    if (cursor.line > startPos.line) {
+      return CodeMirror.Pass;
+    }
+    if (BotConsole.historyIndex <= 0) return CodeMirror.Pass;
+    if (BotConsole.historyIndex === BotConsole.history.length) {
+      BotConsole.draft = BotConsole.guarded.getEditable();
+    }
+    BotConsole.historyIndex--;
+    BotConsole.guarded.setEditable(BotConsole.history[BotConsole.historyIndex]);
+    return false;
+  },
+
+  onDown() {
+    var cursor = BotConsole.cm.getCursor();
+    var endPos = BotConsole.cm.posFromIndex(BotConsole.cm.getValue().length - BotConsole.guarded.suffix.length);
+    if (cursor.line < endPos.line) {
+      return CodeMirror.Pass;
+    }
+    if (BotConsole.historyIndex >= BotConsole.history.length) return CodeMirror.Pass;
+    BotConsole.historyIndex++;
+    if (BotConsole.historyIndex === BotConsole.history.length) {
+      BotConsole.guarded.setEditable(BotConsole.draft);
+    } else {
+      BotConsole.guarded.setEditable(BotConsole.history[BotConsole.historyIndex]);
+    }
+    return false;
+  },
+
+  lineClass(type) {
+    if (type === 'input') return 'in';
+    if (type === 'output') return 'out';
+    if (type === 'error' || type === 'err') return 'err';
+    if (type === 'wrn') return 'wrn';
+    if (type === 'inf') return 'inf';
+    if (type === 'log' || type === 'dbg') return 'log';
+    return 'in';
+  },
+
+  gutterChar(type) {
+    if (type === 'input') return '>';
+    if (type === 'output') return '<';
+    if (type === 'error' || type === 'err') return 'x';
+    if (type === 'wrn') return '!';
+    if (type === 'dbg') return '·';
+    if (type === 'inf') return 'i';
+    if (type === 'log' || type === 'dbg') return '';
+    return '>';
+  },
+};
+
