@@ -101,7 +101,7 @@ var Main = {
             $toast.remove();
             window.$toast = null;
         }, 300);
-      }, options.duration || 2000);
+      }, options.duration || 3000);
     }
   },
   showErrorToast(text) {
@@ -2399,7 +2399,7 @@ var BotCodeEditor = {
       autoCloseBrackets: true,
       indentUnit: 2,
       tabSize: 2,
-      lineWrapping: false,
+      lineWrapping: true,
       json: false,
       placeholder: opts.placeholder || '',
       extraKeys: $.extend({
@@ -2627,7 +2627,7 @@ var BotMigration = {
         WebApp.SecondaryButton.setParams({ position: 'bottom' });
         WebApp.SecondaryButton.show();
       } else if (stepInfo.type == 'warning') {
-        WebApp.MainButton.setText(uncleanHTML(l('WEB_MIGRATION_APPLY')));
+        WebApp.MainButton.setText(l('WEB_MIGRATION_APPLY_CHANGES', {count: 1}));
         WebApp.MainButton.show();
         WebApp.SecondaryButton.setText(uncleanHTML(l('WEB_MIGRATION_SKIP')));
         WebApp.SecondaryButton.setParams({ position: 'bottom' });
@@ -2654,16 +2654,19 @@ var BotMigration = {
     } else if (BotMigration.currentStep <= BotMigration.totalSteps) {
       var stepInfo = Aj.state.migrationSteps[BotMigration.currentStep - 1];
       if (stepInfo.type == 'manual' || stepInfo.type == 'undocumented') {
-        BotMigration.hideStepError();
         BotMigration.advanceStep();
       } else if (stepInfo.type == 'warning') {
-        var msg = l('WEB_MIGRATION_APPLY_CONFIRM');
-        if (stepInfo.warningText) {
-          msg = stepInfo.warningText + '\n\n' + msg;
-        }
-        showConfirm(msg, function() {
+        WebApp.showPopup({
+          title: uncleanHTML(l('WEB_MIGRATION_APPLY_CONFIRM')),
+          message: uncleanHTML(stepInfo.warningText || l('WEB_MIGRATION_APPLY_CONFIRM_TEXT')),
+          buttons: [
+            { id: 'delete', text: uncleanHTML(l('WEB_MIGRATION_APPLY')), type: 'destructive' },
+            { type: 'cancel' },
+          ]
+        }, function(result) {
+          if (result !== 'delete') return;
           BotMigration.onApply();
-        }, l('WEB_MIGRATION_APPLY'));
+        });
       } else {
         BotMigration.onApply();
       }
@@ -2676,7 +2679,6 @@ var BotMigration = {
     for (var i = 0; i < stepInfo.changeIds.length; i++) {
       BotMigration.skippedIds[stepInfo.changeIds[i]] = true;
     }
-    BotMigration.hideStepError();
     BotMigration.advanceStep();
   },
 
@@ -2689,14 +2691,19 @@ var BotMigration = {
       apply: stepInfo.changeIds,
     }, function(res) {
       WebApp.MainButton.hideProgress();
+      if (res.toast) {
+        Main.showSuccessToast(res.toast);
+      }
       if (res.ok) {
         for (var i = 0; i < stepInfo.changeIds.length; i++) {
           BotMigration.appliedIds[stepInfo.changeIds[i]] = true;
         }
-        BotMigration.hideStepError();
         BotMigration.advanceStep();
       } else {
-        BotMigration.showStepError(res.error || 'Unknown error');
+        WebApp.showPopup({
+          title: uncleanHTML(l('WEB_MIGRATION_APPLY_ERROR')),
+          message: uncleanHTML(res.error || 'Unknown error')
+        });
         WebApp.MainButton.setText(uncleanHTML(l('WEB_MIGRATION_RETRY')));
         WebApp.SecondaryButton.setText(uncleanHTML(l('WEB_MIGRATION_SKIP')));
         WebApp.SecondaryButton.setParams({ position: 'bottom' });
@@ -2737,17 +2744,6 @@ var BotMigration = {
     Aj.location(dbUrl);
   },
 
-  showStepError(error) {
-    var stepNum = BotMigration.currentStep;
-    var errorText = uncleanHTML(l('WEB_MIGRATION_APPLY_ERROR')).replace('{error}', error);
-    $('#migration-step-' + stepNum + '-error-text').text(errorText);
-    $('#migration-step-' + stepNum + '-error').show();
-  },
-
-  hideStepError() {
-    var stepNum = BotMigration.currentStep;
-    $('#migration-step-' + stepNum + '-error').hide();
-  },
 };
 
 var BotHandler = {
