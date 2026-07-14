@@ -124,7 +124,7 @@ var TWebApp = {
             var basePath = window.basePath || '';
             var startParam = WebApp.initDataUnsafe.start_param;
             var query = startParam ? '?tgWebAppStartParam=' + startParam : '';
-            Aj.location(basePath + query || '/');
+            Aj.location((basePath || '/') + query);
           } else {
             Aj.location(loc.href);
           }
