@@ -413,7 +413,7 @@
     if (el.tagName == 'A' &&
         el.target != '_blank' &&
         (el.protocol == 'http:' || el.protocol == 'https:') &&
-        el.hostname == 't.me') {
+        isTmeHostname(el.hostname)) {
       WebApp.openTelegramLink(el.href);
       e.preventDefault();
     }
@@ -421,6 +421,11 @@
 
   function strTrim(str) {
     return str.toString().replace(/^\s+|\s+$/g, '');
+  }
+
+  function isTmeHostname(hostname) {
+    hostname = hostname.toString().toLowerCase();
+    return hostname == 't.me' || hostname == 'telegram.me';
   }
 
   function receiveWebViewEvent(eventType) {
@@ -2942,7 +2947,7 @@
       console.error('[Telegram.WebApp] Url protocol is not supported', url);
       throw Error('WebAppTgUrlInvalid');
     }
-    if (a.hostname != 't.me') {
+    if (!isTmeHostname(a.hostname)) {
       console.error('[Telegram.WebApp] Url host is not supported', url);
       throw Error('WebAppTgUrlInvalid');
     }
@@ -2963,7 +2968,7 @@
     a.href = url;
     if (a.protocol != 'http:' &&
         a.protocol != 'https:' ||
-        a.hostname != 't.me' ||
+        !isTmeHostname(a.hostname) ||
         !(match = a.pathname.match(/^\/(\$|invoice\/)([A-Za-z0-9\-_=]+)$/)) ||
         !(slug = match[2])) {
       console.error('[Telegram.WebApp] Invoice url is invalid', url);
