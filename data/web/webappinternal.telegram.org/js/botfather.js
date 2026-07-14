@@ -2965,6 +2965,9 @@ var BotConsole = {
         BotConsole.addLine('error', res.error, BotConsole.formatDuration(res.time));
       } else {
         let content = res.result;
+        if (res.format == 'json') {
+          content = JSON.parse(content);
+        }
         try { content = JSON5.stringify(content); } catch(e) {}
         BotConsole.addLine('output', content, BotConsole.formatDuration(res.time));
       }
