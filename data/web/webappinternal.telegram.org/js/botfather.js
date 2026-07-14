@@ -2917,6 +2917,7 @@ var BotConsole = {
 
     BotConsole.addHistoryLine();
     BotConsole.guarded.setEditable('');
+    $('#console-spin-line').removeClass('hide');
 
     var argsObj = null;
     if (editable) {
@@ -2932,7 +2933,7 @@ var BotConsole = {
 
     var code = BotCodeEditor.cm.getValue();
     BotConsole.isRunning = true;
-    $('#console-input-line').hide();
+    $('#console-input-line').addClass('hide');
 
     var params = {
       bid: Aj.state.botId,
@@ -2961,6 +2962,7 @@ var BotConsole = {
           BotConsole.addLine(entry._, str, '+' + BotConsole.formatDuration(delta));
         }
       }
+      $('#console-spin-line').addClass('hide');
       if (res.error) {
         BotConsole.addLine('error', res.error, BotConsole.formatDuration(res.time));
       } else {
@@ -2971,7 +2973,7 @@ var BotConsole = {
         try { content = JSON5.stringify(content); } catch(e) {}
         BotConsole.addLine('output', content, BotConsole.formatDuration(res.time));
       }
-      $('#console-input-line').show();
+      $('#console-input-line').removeClass('hide');
       BotConsole.cm.refresh();
       BotConsole.cm.focus();
     });
