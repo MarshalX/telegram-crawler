@@ -1,147 +1,3 @@
-var Main = {
-  init(api_hash = null) {
-    if (api_hash) {
-      Aj.apiUrl = '/botfather/api?hash=' + api_hash;
-    }
-    Main.initOnce();
-    Aj.viewTransition = true;
-
-    $('form').on('submit', e => e.preventDefault());
-    setBackButton(Aj.state.backButton);
-    Aj.state.files = Aj.state.files || {};
-
-    function adjustTextArea () {
-      this.style.height = 'auto';
-      this.style.height = this.scrollHeight + 'px';
-    }
-
-    $('textarea[expandable]').each(adjustTextArea).on('input focus', adjustTextArea);
-
-    WebApp.MainButton.enable();
-  },
-  initOnce() {
-    if (window._initOnce) {
-      return;
-    }
-    window._initOnce = true;
-
-    Main.checkAuth();
-
-    window.showConfirm = (message, onConfirm, confirm_btn, onCancel) => {
-      WebApp.showPopup({
-        message: message,
-        buttons: [
-          {type: 'destructive', id: 'ok', text: confirm_btn || 'Leave'},
-          {type: 'cancel'}
-        ]
-      }, button_id => button_id == 'ok' ? onConfirm?.() : onCancel?.());
-    };
-
-    WebApp.ready();
-    WebApp.setHeaderColor('#212a33');
-    WebApp.setBackgroundColor('#1a2026');
-    WebApp.setBottomBarColor('#212a33');
-    WebApp.MainButton.setParams({ color: '#248BDA' });
-    WebApp.disableVerticalSwipes();
-
-    if (['android', 'ios'].includes(WebApp.platform)) {
-      $('body').addClass('mobile');
-      $('body').addClass('platform-'+WebApp.platform);
-      WebApp.requestFullscreen();
-      initBackSwipe();
-    }
-
-    $(document).on('click', '.tm-bot-anchor', () => {
-      WebApp.HapticFeedback.impactOccurred('soft');
-    });
-
-    $(document).on('shown.bs.dropdown', (event) => {
-      WebApp.HapticFeedback.impactOccurred('soft');
-      var $menu = $('.dropdown-menu', event.target);
-      var rect = $menu[0].getBoundingClientRect();
-      var needsInvert = document.body.clientHeight - rect.bottom < -4;
-      $menu.toggleClass('dropdown-menu-top', needsInvert);
-    });
-
-    $(document).on('hidden.bs.dropdown', (event) => {
-      var $menu = $('.dropdown-menu', event.target);
-      $menu.toggleClass('dropdown-menu-top', false);
-    });
-
-    $(document).on('change', 'input[type=checkbox]', () => {
-      WebApp.HapticFeedback.selectionChanged();
-    })
-  },
-  checkAuth() {
-    var authPage = Aj.state.authPage === true;
-    Aj.apiRequest('auth', {_auth: WebApp.initData}, res => {
-      if (!res.ok) {
-        if (!authPage) {
-          window.location = '/botfather/auth';          
-        } else {
-          AuthPage.showExpired();          
-        }
-      } else if (authPage) {
-        window.location = '/botfather';
-      }
-    });
-  },
-  showToast(text, options = {}) {
-    if (!window.$_toastContainer) {
-      window.$_toastContainer = $('<div class="tm-toast-container">').appendTo('body');
-    }
-    if (!window.$toast) {
-      window.$toast = $(`<div class="tm-toast ${options.class}">${text}</div>`);
-      $_toastContainer.html($toast);
-
-      setTimeout(() => $toast.addClass('tm-toast-show'), 10);
-      setTimeout(() => {
-        $toast.removeClass('tm-toast-show');
-        setTimeout(() => {
-            $toast.remove();
-            window.$toast = null;
-        }, 300);
-      }, options.duration || 3000);
-    }
-  },
-  showErrorToast(text) {
-    Main.showToast(text || 'Error.', { class: 'tm-toast-error' });
-    WebApp.HapticFeedback.notificationOccurred('error');
-  },
-  showWarningToast(text) {
-    Main.showToast(text || 'Warning.', { class: 'tm-toast-warning' });
-    WebApp.HapticFeedback.notificationOccurred('warning');
-  },
-  showSuccessToast(text) {
-    Main.showToast(text || 'Success.', { class: 'tm-toast-success' });
-    WebApp.HapticFeedback.notificationOccurred('success');
-  },
-  iosChatFix() {
-    if (WebApp.platform != 'ios') return;
-    if (WebApp.isVersionAtLeast('8.0')) {
-      setTimeout(() => {
-        if (WebApp.isActive) {
-          WebApp.close();
-        }
-      }, 500);
-    } else {
-      WebApp.close();
-    }
-  }
-}
-
-var AuthPage = {
-  init () {},
-  showExpired() {
-    $('.tm-auth-expired').toggle(true);
-    WebApp.MainButton.setText('Close');
-    WebApp.MainButton.onClick(() => {
-      WebApp.close();
-    });
-    WebApp.MainButton.show();
-  }
-}
-
 var BotList = {
   init() {
     $('input[name=query]').on('input', BotList.eSearchInput);
@@ -230,13 +86,13 @@ var CreateBot = {
     var title = $('input[name="title"]').val()?.trim();
 
     if (!title) {
-      Main.showErrorToast('Name is required.');
+      TWebApp.showErrorToast('Name is required.');
       var title = $('input[name="title"]').focus();
       return;
     }
 
     if (!Aj.state.username_valid) {
-      Main.showErrorToast('Username is required.');
+      TWebApp.showErrorToast('Username is required.');
       var title = $('input[name="username"]').focus();
       return;
     }
@@ -251,10 +107,10 @@ var CreateBot = {
         WebApp.MainButton.hideProgress();
         if (res.ok) {
           Aj.location(`/botfather/bot/${res.bot_id}`);
-          Aj.onUnload(() => Main.showSuccessToast(res.msg));
+          Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
         }
         if (res.error) {
-          Main.showErrorToast(res.error);
+          TWebApp.showErrorToast(res.error);
         }
     });
   }
@@ -409,13 +265,13 @@ var BotProfile = {
       WebApp.MainButton.hideProgress();
       if (res.ok) {
         Aj.state.savedModel = model;
-        Aj.onUnload(() => Main.showSuccessToast(res.msg));
+        Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
         if (redirect) {
           Aj.location(redirect);          
         }
       }
       if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     })
   }
@@ -479,7 +335,7 @@ var BotCommandsList = {
       commands: commands,
     }, (res) => {
       if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     })
   }
@@ -488,7 +344,7 @@ var BotCommandsList = {
 function botChangeSettings(key, value, callback = false) {
   Aj.apiRequest('changeSettings', { settings: { [key]: value }, bid: Aj.state.botId }, res => {
       if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
       if (callback) callback(res);
     });
@@ -526,12 +382,12 @@ var BotCommandEdit = {
     var desc  = $('#desc').val().trim();
 
     if (!value) {
-      Main.showErrorToast('Command is required');
+      TWebApp.showErrorToast('Command is required');
       $('#command').focus();
       return;
     }
     if (!desc) {
-      Main.showErrorToast('Description is required');
+      TWebApp.showErrorToast('Description is required');
       $('#desc').focus();
       return;
     }
@@ -558,13 +414,13 @@ var BotCommandEdit = {
     }, (res) => {
       if (res.error) {
         WebApp.MainButton.hideProgress();
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
       if (res.ok) {
-        Aj.onUnload(() => Main.showSuccessToast(res.msg));
+        Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
         setTimeout(() => {
           WebApp.MainButton.hideProgress();
-          _backButton();
+          TBackButton.onClick();
         }, 1000); // temp hack
       }
     });
@@ -598,7 +454,7 @@ var BotGeneral = {
   copyToken() {
     var token = $('.tm-api-token').text().trim();
     navigator.clipboard.writeText(token);
-    Main.showSuccessToast(l('WEB_TOKEN_COPY_SUCCESS'));
+    TWebApp.showSuccessToast(l('WEB_TOKEN_COPY_SUCCESS'));
   },
   eUsernameClick() {
     WebApp.openTelegramLink(this.dataset.href);
@@ -608,7 +464,7 @@ var BotGeneral = {
       Aj.apiRequest('requestDeleteBot', { bid: Aj.state.botId }, res => {
         if (res.ok) {
           WebApp.openTelegramLink(res.open);
-          Main.iosChatFix();
+          TWebApp.iosChatFix();
           Aj.location('/botfather');
         }
       });
@@ -634,14 +490,14 @@ var BotGeneral = {
           bid: Aj.state.botId,
         }, (response) => {
           if (response.error) {
-            Main.showErrorToast(response.error);
+            TWebApp.showErrorToast(response.error);
           } 
           if (response.ok) {
             $('.tm-api-token').html(`<span class="js-spoiler">${response.token}</span>`);
             $('.tm-api-token .js-spoiler').each(function () {
               SimpleSpoiler.init(this);
             });
-            Main.showSuccessToast(l('WEB_TOKEN_REVOKE_SUCCESS'));
+            TWebApp.showSuccessToast(l('WEB_TOKEN_REVOKE_SUCCESS'));
           }
         });
       }
@@ -731,7 +587,7 @@ var BotSettings = {
       }
       Aj.apiRequest('requestBotAccessUsers', { bid: Aj.state.botId }, function(res) {
         if (res.error) {
-          Main.showErrorToast(res.error);
+          TWebApp.showErrorToast(res.error);
           return;
         }
         WebApp.requestChat(res.webapp_req_id, function(sent) {
@@ -912,7 +768,7 @@ var BotSettings = {
 
     $(cont).on('click.curPage', '.copy-btn', function () {
       navigator.clipboard.writeText(this.dataset.value);
-      Main.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
+      TWebApp.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
     })
 
     $('.js-revoke-client-secret').on('click', function () {
@@ -934,7 +790,7 @@ var BotSettings = {
       if (hash) {
         Aj.apiRequest('removeNativeApp', { bid: Aj.state.botId, app_hash: hash }, res => {
           if (res.error) {
-            Main.showErrorToast(res.error);
+            TWebApp.showErrorToast(res.error);
             return;
           }
           $entry.remove();
@@ -1008,7 +864,7 @@ var BotSettings = {
 
     Aj.apiRequest('addNativeApp', params, res => {
       if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
         if (res.field == 'field1') $entry.find('.js-native-app-field1').addClass('error');
         if (res.field == 'field2') $entry.find('.js-native-app-field2').addClass('error');
         return;
@@ -1020,7 +876,7 @@ var BotSettings = {
         $urlRow.show();
         $urlRow.find('.js-native-app-url-value').text(res.native_app_url);
         $urlRow.find('.copy-btn').attr('data-value', res.native_app_url);
-        Main.showSuccessToast(l('WEB_NATIVE_APP_REGISTERED'));
+        TWebApp.showSuccessToast(l('WEB_NATIVE_APP_REGISTERED'));
       }
     });
   },
@@ -1078,7 +934,7 @@ var BotSettings = {
           bid: Aj.state.botId,
         }, (response) => {
           if (response.error) {
-            Main.showErrorToast(response.error);
+            TWebApp.showErrorToast(response.error);
           } 
           if (response.ok) {
             location.reload();
@@ -1108,7 +964,7 @@ var BotSettings = {
           bid: Aj.state.botId,
         }, (response) => {
           if (response.error) {
-            Main.showErrorToast(response.error);
+            TWebApp.showErrorToast(response.error);
           } 
           if (response.ok) {
             $('.js-spoiler.js-secret-val').html(response.token);
@@ -1117,7 +973,7 @@ var BotSettings = {
             $('.js-spoiler.js-secret-val').each(function () {
               SimpleSpoiler.init(this);
             });
-            Main.showSuccessToast(l('WEB_CLIENT_SECRET_REVOKE_SUCCESS'));
+            TWebApp.showSuccessToast(l('WEB_CLIENT_SECRET_REVOKE_SUCCESS'));
           }
         });
       }
@@ -1177,7 +1033,7 @@ var BotGames = {
     $('.js-game-copy').on('click', function (e) {
       // e.stopPropagation();
       navigator.clipboard.writeText(this.dataset.value);
-      Main.showToast(l('WEB_LINK_COPIED'), { class: 'success' });
+      TWebApp.showToast(l('WEB_LINK_COPIED'), { class: 'success' });
       WebApp.HapticFeedback.notificationOccurred('success');
     })
 
@@ -1206,9 +1062,9 @@ var BotGames = {
           delete: true,
         }, res => {
           if (res.error) {
-            Main.showErrorToast(res.error);
+            TWebApp.showErrorToast(res.error);
           } else {
-            Main.showSuccessToast(res.msg);
+            TWebApp.showSuccessToast(res.msg);
             this.closest('.tm-row').remove();
           }
         });
@@ -1293,17 +1149,17 @@ var BotGameEdit = {
     var game_pic = Aj.state.files['game_pic']?.photo_id || '';
 
     if (!short_name || short_name.length < 3) {
-      Main.showErrorToast('Short name must be at least 3 characters long.');
+      TWebApp.showErrorToast('Short name must be at least 3 characters long.');
       $('input[name=short_name]').focus();
       return;
     }
     if (!title) {
-      Main.showErrorToast('Title is required.');
+      TWebApp.showErrorToast('Title is required.');
       $('input[name=title]').focus();
       return;
     }
     if (!game_pic) {
-      Main.showErrorToast('Picture is required.');
+      TWebApp.showErrorToast('Picture is required.');
       return;
     }
     WebApp.MainButton.showProgress();
@@ -1318,10 +1174,10 @@ var BotGameEdit = {
     }, res => {
       WebApp.MainButton.hideProgress();
       if (res.ok) {
-        Aj.onUnload(() => Main.showSuccessToast(res.msg));
+        Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
         Aj.location(`/botfather/bot/${Aj.state.botId}/games`);
       } else if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     });
   }
@@ -1403,26 +1259,26 @@ var BotAppEdit = {
 
     if (!webview_url) {
       $('input[name=url]').focus();
-      Main.showErrorToast('URL is required.');
+      TWebApp.showErrorToast('URL is required.');
       return;
     }
     if (!title) {
       $('input[name=title]').focus();
-      Main.showErrorToast('Title is required.');
+      TWebApp.showErrorToast('Title is required.');
       return;
     }
     if (!description) {
       var description = $('textarea[name=description]').focus();
-      Main.showErrorToast('Description is required.');
+      TWebApp.showErrorToast('Description is required.');
       return;
     }
     if (short_name.length < 3 && !Aj.state.editingGame) {
       $('input[name=short_name]').focus();
-      Main.showErrorToast('App Link is required.');
+      TWebApp.showErrorToast('App Link is required.');
       return;
     }
     if (!game_pic) {
-      Main.showErrorToast('Picture is required.');
+      TWebApp.showErrorToast('Picture is required.');
       return;
     }
     WebApp.MainButton.showProgress();
@@ -1438,10 +1294,10 @@ var BotAppEdit = {
     }, res => {
       WebApp.MainButton.hideProgress();
       if (res.ok) {
-        Aj.onUnload(() => Main.showSuccessToast(res.msg));
+        Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
         Aj.location(`/botfather/bot/${Aj.state.botId}/apps`);
       } else if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     });
   }
@@ -1486,7 +1342,7 @@ var BotApps = {
 
     $('.js-game-copy').on('click', function (e) {
       navigator.clipboard.writeText(this.dataset.value);
-      Main.showToast(l('WEB_LINK_COPIED'), { class: 'success' });
+      TWebApp.showToast(l('WEB_LINK_COPIED'), { class: 'success' });
       WebApp.HapticFeedback.notificationOccurred('success');
     });
 
@@ -1514,9 +1370,9 @@ var BotApps = {
           delete: true,
         }, res => {
           if (res.error) {
-            Main.showErrorToast(res.error)
+            TWebApp.showErrorToast(res.error)
           } else {
-            Main.showSuccessToast(res.msg);
+            TWebApp.showSuccessToast(res.msg);
             this.closest('.tm-row').remove();
           }
         });
@@ -1568,9 +1424,9 @@ var BotMainApp = {
           webview_url: '',
         }, res => {
           if (res.error) {
-            Main.showErrorToast(res.error)
+            TWebApp.showErrorToast(res.error)
           } else {
-            Aj.onUnload(() => Main.showSuccessToast(res.msg));
+            Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
             Aj.location('/botfather/bot/' + Aj.state.botId + '/apps')
           }
         });
@@ -1581,7 +1437,7 @@ var BotMainApp = {
     var url = $('input[name=url]').val()?.trim();
 
     if (!url) {
-      Main.showErrorToast('All fields are required.');
+      TWebApp.showErrorToast('All fields are required.');
       return;
     }
     WebApp.MainButton.showProgress();
@@ -1592,9 +1448,9 @@ var BotMainApp = {
     }, res => {
       WebApp.MainButton.hideProgress();
       if (res.error) {
-        Main.showErrorToast(res.error)
+        TWebApp.showErrorToast(res.error)
       } else {
-        Aj.onUnload(() => Main.showSuccessToast(res.msg));
+        Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
         Aj.location('/botfather/bot/' + Aj.state.botId + '/apps')
       }
     })
@@ -1640,10 +1496,10 @@ var BotMenuApp = {
           bid: Aj.state.botId,
         }, res => {
           if (res.ok) {
-            Aj.onUnload(() => Main.showSuccessToast(res.msg));
+            Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
             Aj.location(`/botfather/bot/${Aj.state.botId}/apps`);
           } else if (res.error) {
-            Main.showErrorToast(res.error);
+            TWebApp.showErrorToast(res.error);
           }
         });
       });
@@ -1659,12 +1515,12 @@ var BotMenuApp = {
     var url = $('input[name=url]').val()?.trim();
 
     if (!title) {
-      Main.showErrorToast('Title is required.');
+      TWebApp.showErrorToast('Title is required.');
       $('input[name=title]').focus();
       return;
     }
     if (!url) {
-      Main.showErrorToast('URL is required.');
+      TWebApp.showErrorToast('URL is required.');
       $('input[name=url]').focus();
       return;
     }
@@ -1680,10 +1536,10 @@ var BotMenuApp = {
     }, res => {
       WebApp.MainButton.hideProgress();
       if (res.ok) {
-        Aj.onUnload(() => Main.showSuccessToast(res.msg));
+        Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
         Aj.location(`/botfather/bot/${Aj.state.botId}/apps`);
       } else if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     });
   }
@@ -1754,11 +1610,11 @@ var BotLaunchScreen = {
       var type = file.type;
       if (type !== 'image/svg+xml' && type !== 'image/webp')
       if (size > 1024 * 100 && type == 'image/svg+xml') {
-        Main.showErrorToast('SVG file is too big');
+        TWebApp.showErrorToast('SVG file is too big');
         return;
       }
       if (size > 1024 * 1024) {
-        Main.showErrorToast('File is too big');
+        TWebApp.showErrorToast('File is too big');
         return;
       }
       Aj.uploadRequest('uploadIcon', file, {}, res => {
@@ -1766,7 +1622,7 @@ var BotLaunchScreen = {
           $('.js-icon-preview').html(res.svg);
           Aj.state.placeholder_path = res.path;
         } else {
-          Main.showErrorToast(res.error);
+          TWebApp.showErrorToast(res.error);
         }
       });
     });
@@ -1821,10 +1677,10 @@ var BotLaunchScreen = {
     }, res => {
       WebApp.MainButton.hideProgress();
       if (res.ok) {
-        Aj.onUnload(() => Main.showSuccessToast(res.msg));
+        Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
         Aj.location(`/botfather/bot/${Aj.state.botId}/apps`);
       } else if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     });
   }
@@ -1859,7 +1715,7 @@ var TransferBot = {
         WebApp.showErrorToast(res.error);
       } else {
         WebApp.openTelegramLink(res.open);
-        Main.iosChatFix();
+        TWebApp.iosChatFix();
         Aj.location('/botfather');
       }
     });
@@ -1925,52 +1781,9 @@ var BotPayments = {
   init() {
     $('.js-copy-token').click(function() {
       navigator.clipboard.writeText(this.dataset.token);
-      Main.showSuccessToast(l('WEB_PAYMENTS_TOKEN_COPY_SUCCESS'));
+      TWebApp.showSuccessToast(l('WEB_PAYMENTS_TOKEN_COPY_SUCCESS'));
     });
   }
-}
-
-window.WebApp = window.Telegram && window.Telegram.WebApp || null;
-
-function debounce() {
-  let timer;
-  return function (callback, delay = 300) {
-    clearTimeout(timer);
-    timer = setTimeout(callback, delay);
-  };
-}
-
-var _backButton = null;
-function setBackButton(url) {
-  if (_backButton) {
-    WebApp.BackButton.offClick(_backButton);      
-  }
-  if (url) {
-    _backButton = () => {
-      if ((closePopup() === false)) Aj.location(url)
-    };
-    WebApp.BackButton.onClick(_backButton);
-        WebApp.BackButton.show();
-  } else {
-    _backButton = null;
-        WebApp.BackButton.hide();
-  }
-}
-
-$('body').on('keydown', function(e) {
-    if (e.key === 'Enter' && e.target.matches('input[enterkeyhint=next]')) {
-        e.preventDefault();
-        focusNextInput();
-    }
-});
-
-function focusNextInput() {
-    const inputs = document.querySelectorAll('input:not([type=submit]):not([type=button]), textarea, select');
-    const currentIndex = Array.from(inputs).indexOf(document.activeElement);
-    
-    if (currentIndex < inputs.length - 1) {
-        inputs[currentIndex + 1].focus();
-    }
 }
 
 function requestUpload(target, callback = null, options = {}) {
@@ -1993,7 +1806,7 @@ function requestUpload(target, callback = null, options = {}) {
         Aj.state.files[target] = res.media;
       }
       if (res.error && !options.preventError) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
       if (callback) {
         callback(res);        
@@ -2079,82 +1892,6 @@ function fuzzyMatch(needle, haystack) {
     }
   }
   return false;
-}
-
-function initBackSwipe() {
-  if ($('.tm-swipe-back').length) {
-    return;
-  }
-  $('<div class="tm-swipe-back"></div>').appendTo('body');
-
-  const threshold = 120;
-
-  var touchstartX = 0;
-  var touchstartY = 0;
-  var touchendX = 0;
-  var touchendY = 0;
-
-  var zone = document;
-  var type = null;
-  var notified = false;
-  var feedbackDelay = false;
-
-  zone.addEventListener('touchstart', function(event) {
-      touchstartX = event.touches[0].screenX;
-      touchstartY = event.touches[0].screenY;
-  });
-
-  zone.addEventListener('touchmove', function(event) {
-      touchendX = event.changedTouches[0].screenX;
-      touchendY = event.changedTouches[0].screenY;
-
-      if (!_backButton) return;
-
-      deltaX = touchendX - touchstartX;
-      deltaY = touchendY - touchstartY;
-
-      const isHorizontal = Math.abs(deltaX) > 30 && 
-                                     Math.abs(deltaY) < 30;
-
-      if (type === 'h') {
-          event.preventDefault();
-      } else if (!event.cancelable) {
-        return
-      }           
-      if (isHorizontal && !type && event.cancelable) {
-          type = 'h';
-          event.preventDefault();
-      }
-      if (deltaX > threshold && !notified) {
-        notified = true;
-        feedbackDelay = true;
-        setTimeout(() => feedbackDelay = false, 80);
-        WebApp.HapticFeedback.impactOccurred('soft');;
-      }
-      var translateX = (touchendX - touchstartX) / 1.2;
-      translateX = asymptoticInterp((touchendX - touchstartX) / 1.2 / 120, 0, 130, 1);
-      translateX -= 40;
-      $('.tm-swipe-back')[0].style.left = translateX - 52 + 'px';
-  }, {passive: false})
-
-  zone.addEventListener('touchend', function(event) {
-    if (type == 'h' && touchendX - touchstartX > threshold) {
-      if (!feedbackDelay) {
-        WebApp.HapticFeedback.impactOccurred('light');
-      }
-      _backButton?.();
-    }
-    notified = false;
-    type = null;
-    touchendX = event.changedTouches[0].screenX;
-    touchendY = event.changedTouches[0].screenY;
-    $('.tm-swipe-back')[0].style.left = '-52px';
-  }, false);
-
-  function asymptoticInterp(t, start, end, rate = 5) {
-    if (t <= 0) return start;
-    return start + (end - start) * (t / (t + 0.5));
-  }
 }
 
 var SimpleSpoiler = {
@@ -2295,9 +2032,9 @@ var BotServerless = {
           Aj.apiRequest('disableCloud', { bid: Aj.state.botId }, (res) => {
             if (res.error) {
               toggleEl.classList.add('tm-toggle-on');
-              Main.showErrorToast(res.error);
+              TWebApp.showErrorToast(res.error);
             } else {
-              Aj.onUnload(() => Main.showSuccessToast(l('WEB_CLOUD_DISABLED')));
+              Aj.onUnload(() => TWebApp.showSuccessToast(l('WEB_CLOUD_DISABLED')));
               Aj.location('/botfather/bot/' + Aj.state.botId + '/cloud');
             }
           });
@@ -2307,9 +2044,9 @@ var BotServerless = {
         Aj.apiRequest('enableCloud', { bid: Aj.state.botId }, (res) => {
           if (res.error) {
             toggleEl.classList.remove('tm-toggle-on');
-            Main.showErrorToast(res.error);
+            TWebApp.showErrorToast(res.error);
           } else {
-            Aj.onUnload(() => Main.showSuccessToast(l('WEB_CLOUD_ENABLED')));
+            Aj.onUnload(() => TWebApp.showSuccessToast(l('WEB_CLOUD_ENABLED')));
             Aj.location('/botfather/bot/' + Aj.state.botId + '/cloud');
           }
         });
@@ -2327,7 +2064,7 @@ var BotCliAccess = {
 
     $(document).on('click.cli', '.copy-btn', function () {
       navigator.clipboard.writeText(this.dataset.value);
-      Main.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
+      TWebApp.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
     });
 
     $('.js-revoke-cli-token').on('click', BotCliAccess.askRevoke);
@@ -2353,7 +2090,7 @@ var BotCliAccess = {
       if (result !== 'revoke') return;
       Aj.apiRequest('revokeCloudToken', { bid: Aj.state.botId }, (response) => {
         if (response.error) {
-          Main.showErrorToast(response.error);
+          TWebApp.showErrorToast(response.error);
         }
         if (response.ok) {
           $('.js-spoiler.js-cli-token').html(response.token);
@@ -2361,7 +2098,7 @@ var BotCliAccess = {
           $('.js-spoiler.js-cli-token').each(function () {
             SimpleSpoiler.init(this);
           }).removeClass('js-spoiler-revealed');
-          Main.showSuccessToast(l('WEB_CLI_TOKEN_REVOKE_SUCCESS'));
+          TWebApp.showSuccessToast(l('WEB_CLI_TOKEN_REVOKE_SUCCESS'));
         }
       });
     });
@@ -2458,11 +2195,11 @@ var BotCodeEditor = {
           BotCodeEditor.onSaveSuccess(res);
         } else {
           BotCodeEditor.savedCode = code;
-          Aj.onUnload(function() { Main.showSuccessToast(l(BotCodeEditor.savedLangKey)); });
-          _backButton();
+          Aj.onUnload(function() { TWebApp.showSuccessToast(l(BotCodeEditor.savedLangKey)); });
+          TBackButton.onClick();
         }
       } else {
-        Main.showErrorToast(res.error || l(BotCodeEditor.saveErrorLangKey));
+        TWebApp.showErrorToast(res.error || l(BotCodeEditor.saveErrorLangKey));
       }
     });
   },
@@ -2500,7 +2237,7 @@ var BotLibrary = {
     if (!isNew) {
       $(document).on('click.libcopy', '.js-copy-lib-path', function() {
         navigator.clipboard.writeText(this.dataset.value);
-        Main.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
+        TWebApp.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
       });
       $(document).on('click.curPage', '.js-editor-delete', function() {
         WebApp.showPopup({
@@ -2514,10 +2251,10 @@ var BotLibrary = {
           if (result !== 'delete') return;
           Aj.apiRequest('deleteCloudLibraryFile', { bid: Aj.state.botId, name: Aj.state.libraryPath }, function(res) {
             if (res.ok) {
-              Aj.onUnload(function() { Main.showSuccessToast(l('WEB_LIBRARY_FILE_DELETED')); });
-              _backButton();
+              Aj.onUnload(function() { TWebApp.showSuccessToast(l('WEB_LIBRARY_FILE_DELETED')); });
+              TBackButton.onClick();
             } else {
-              Main.showErrorToast(res.error);
+              TWebApp.showErrorToast(res.error);
             }
           });
         });
@@ -2527,13 +2264,13 @@ var BotLibrary = {
   onSave() {
     var name = $('#library-name').val().trim();
     if (!name || !/^(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+$/.test(name)) {
-      Main.showErrorToast(l('WEB_LIBRARY_FILE_PLACEHOLDER'));
+      TWebApp.showErrorToast(l('WEB_LIBRARY_FILE_PLACEHOLDER'));
       $('#library-name').focus();
       return;
     }
     var existing = Aj.state.existingLibraries || [];
     if (existing.indexOf(name) !== -1) {
-      Main.showErrorToast(l('WEB_LIBRARY_FILE_EXISTS'));
+      TWebApp.showErrorToast(l('WEB_LIBRARY_FILE_EXISTS'));
       $('#library-name').focus();
       return;
     }
@@ -2548,10 +2285,10 @@ var BotLibrary = {
       WebApp.MainButton.hideProgress();
       if (res.ok) {
         BotCodeEditor.savedCode = code;
-        Aj.onUnload(function() { Main.showSuccessToast(l('WEB_LIBRARY_FILE_SAVED')); });
-        _backButton();
+        Aj.onUnload(function() { TWebApp.showSuccessToast(l('WEB_LIBRARY_FILE_SAVED')); });
+        TBackButton.onClick();
       } else {
-        Main.showErrorToast(res.error || l('WEB_LIBRARY_FILE_SAVE_ERROR'));
+        TWebApp.showErrorToast(res.error || l('WEB_LIBRARY_FILE_SAVE_ERROR'));
       }
     });
   },
@@ -2565,9 +2302,9 @@ var BotDatabase = {
       saveErrorLangKey: 'WEB_DATABASE_SAVE_ERROR',
       onSaveSuccess: function(res) {
         if (res.error) {
-          Main.showErrorToast(res.error || l('WEB_DATABASE_SAVE_ERROR'));
+          TWebApp.showErrorToast(res.error || l('WEB_DATABASE_SAVE_ERROR'));
         } else {
-          Main.showSuccessToast(l('WEB_DATABASE_SAVED'));
+          TWebApp.showSuccessToast(l('WEB_DATABASE_SAVED'));
           $('#js-database-status').html(res.status_html);
         }
       },
@@ -2692,7 +2429,7 @@ var BotMigration = {
     }, function(res) {
       WebApp.MainButton.hideProgress();
       if (res.toast) {
-        Main.showSuccessToast(res.toast);
+        TWebApp.showSuccessToast(res.toast);
       }
       if (res.ok) {
         for (var i = 0; i < stepInfo.changeIds.length; i++) {
@@ -2736,9 +2473,9 @@ var BotMigration = {
     var dbUrl = '/botfather/bot/' + Aj.state.botId + '/serverless/database';
     Aj.onUnload(function() {
       if (skippedCount > 0) {
-        Main.showWarningToast(l('WEB_MIGRATION_INCOMPLETED'));
+        TWebApp.showWarningToast(l('WEB_MIGRATION_INCOMPLETED'));
       } else {
-        Main.showSuccessToast(l('WEB_MIGRATION_COMPLETED'));
+        TWebApp.showSuccessToast(l('WEB_MIGRATION_COMPLETED'));
       }
     });
     Aj.location(dbUrl);
@@ -2770,10 +2507,10 @@ var BotHandler = {
           if (result !== 'delete') return;
           Aj.apiRequest('deleteCloudHandler', { bid: Aj.state.botId, type: Aj.state.handlerType }, function(res) {
             if (res.ok) {
-              Aj.onUnload(function() { Main.showSuccessToast(l('WEB_HANDLER_DELETED')); });
-              _backButton();
+              Aj.onUnload(function() { TWebApp.showSuccessToast(l('WEB_HANDLER_DELETED')); });
+              TBackButton.onClick();
             } else {
-              Main.showErrorToast(res.error);
+              TWebApp.showErrorToast(res.error);
             }
           });
         });
@@ -2795,11 +2532,11 @@ var BotHandlers = {
     Aj.apiRequest('syncCloudWebhook', { bid: Aj.state.botId }, function(res) {
       if (res.ok) {
         $('#js-webhook-status').html(res.status_html);
-        Main.showSuccessToast(l('WEB_WEBHOOK_SYNCED'));
+        TWebApp.showSuccessToast(l('WEB_WEBHOOK_SYNCED'));
       } else {
         $row.removeClass('js-webhook-syncing');
         $row.find('.js-status-action').html(l('WEB_WEBHOOK_SYNC'));
-        Main.showErrorToast(res.error || l('WEB_WEBHOOK_SYNC_ERROR'));
+        TWebApp.showErrorToast(res.error || l('WEB_WEBHOOK_SYNC_ERROR'));
       }
     });
   },

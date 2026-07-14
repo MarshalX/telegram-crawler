@@ -1,3 +1,5 @@
+var WebApp = window.Telegram && window.Telegram.WebApp || null;
+
 (function($) {
   $.fn.redraw = function() {
     return this.map(function(){ this.offsetTop; return this; });
@@ -51,8 +53,6 @@ l.add = function(lang_values) {
 function px(str) {
   return new Number(str.slice(0, -2));
 }
-
-var WebApp = window.Telegram && window.Telegram.WebApp || null;
 
 var MaskPosition = {
   state: {},
@@ -305,212 +305,6 @@ var StickersReorder = {
   }
 };
 
-var Main = {
-  init(api_hash = null) {
-    if (api_hash) {
-      Aj.apiUrl = '/stickers/api?hash=' + api_hash;
-    }
-    Main.initOnce();
-    Aj.viewTransition = true;
-    window.basePath = '/stickers'
-
-    setBackButton(Aj.state.backButton);
-    Aj.state.files = Aj.state.files || {};
-
-    function adjustTextArea () {
-      this.style.height = 'auto';
-      this.style.height = this.scrollHeight + 'px';
-    }
-
-    $('textarea[expandable]').each(adjustTextArea).on('input focus', adjustTextArea);
-
-    $('.js-drop-area').on('dragenter', function () {
-      $(this).toggleClass('drag-over', true);
-    });
-
-    $('.js-drop-area').on('dragover', function (e) {
-      e.preventDefault();
-    });
-
-    $('.js-drop-area').on('dragleave drop', function (e) {
-      $(this).toggleClass('drag-over', false);
-    });
-
-    $('img').on('error', function (e) {
-      var src = this.src;
-      setTimeout(() => {
-        var url = document.createElement('a');
-        url.href = src;
-        if (!url.search.includes('retry')) {
-          url.search += '&retry=1';
-          this.src = url.href;
-        }
-      }, 300);
-    });
-
-    $('.js-lottie-thumb').each(function () {
-      RLottie.init(this, {noAutoPlay: $(this).hasClass('static')});
-    });
-
-    $('.js-dropdown-wrapper').on('click', function (e) {
-      if (e.target.closest('.tm-dropdown')) return;
-      if (!this.contains(e.target)) return;
-      $('.dropdown-toggle', this).dropdown('toggle');
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-    });
-
-    WebApp.MainButton.enable();
-    WebApp.MainButton.hide();
-  },
-  eMainButton() {
-    if (Aj.layerState.onMainButton) {
-      return Aj.layerState.onMainButton();
-    }
-    Aj.state.onMainButton && Aj.state.onMainButton();
-  },
-  initOnce() {
-    if (window._initOnce) {
-      return;
-    }
-    window._initOnce = true;
-
-    Main.checkAuth();
-
-    window.showConfirm = (message, onConfirm, confirm_btn, onCancel) => {
-      WebApp.showPopup({
-        message: message,
-        buttons: [
-          {type: 'destructive', id: 'ok', text: confirm_btn || 'Leave'},
-          {type: 'cancel'}
-        ]
-      }, button_id => button_id == 'ok' ? onConfirm?.() : onCancel?.());
-    };
-
-    WebApp.ready();
-    WebApp.setHeaderColor('#212a33');
-    WebApp.setBackgroundColor('#1a2026');
-    WebApp.setBottomBarColor('#212a33');
-    WebApp.MainButton.setParams({ color: '#248BDA' });
-    WebApp.MainButton.onClick(Main.eMainButton);
-    WebApp.disableVerticalSwipes();
-
-    if (['android', 'ios'].includes(WebApp.platform)) {
-      $('body').addClass('mobile');
-      $('body').addClass('platform-'+WebApp.platform);
-      WebApp.requestFullscreen();
-      initBackSwipe();
-      window._mobileApp = true;
-    }
-
-    var ua = navigator.userAgent.toLowerCase();
-    window.isSafari = (!(/chrome/i.test(ua)) && /webkit|safari|khtml/i.test(ua));
-
-    window._localCache = {};
-
-    $(document).on('submit', 'form', e => e.preventDefault());
-
-    $(document).on('click', '.tm-bot-anchor', () => {
-      WebApp.HapticFeedback.impactOccurred('soft');
-    });
-
-    $(document).on('shown.bs.dropdown', (event) => {
-      WebApp.HapticFeedback.impactOccurred('soft');
-      var $menu = $('.dropdown-menu', event.target);
-      var rect = $menu[0].getBoundingClientRect();
-      var needsInvert = document.body.clientHeight - rect.bottom < -4;
-      var needsInvertHorizontal = rect.left < 2;
-      $menu.toggleClass('dropdown-menu-top', needsInvert);
-      $menu.toggleClass('dropdown-menu-right', needsInvertHorizontal);
-    });
-
-    $(document).on('hidden.bs.dropdown', (event) => {
-      var $menu = $('.dropdown-menu', event.target);
-      $menu.removeClass('dropdown-menu-top dropdown-menu-right');
-    });
-
-    $(document).on('change', 'input[type=checkbox]', () => {
-      WebApp.HapticFeedback.selectionChanged();
-    });
-
-    $(document).on('sortchange', () => {
-      WebApp.HapticFeedback.selectionChanged();
-    });
-
-    $(document).on('sortstart', () => {
-      window._sortInProgress = true;
-    });
-
-    $(document).on('sortstop', () => {
-      window._sortInProgress = false;
-    });
-
-    $(document).on('click', '.js-form-clear', function () {
-      $('input', this.closest('.tm-field')).val('').trigger('input');
-    });
-  },
-  scrollToEl(elem, offset = 0, smooth = false) {
-   window.scrollTo({
-    top: $(elem).offset().top - WebApp.safeAreaInset.top - WebApp.contentSafeAreaInset.top + offset,
-    left: 0,
-    behaviour: smooth ? 'smooth' : 'auto',
-   });
-  },
-  checkAuth() {
-    var authPage = Aj.state.authPage === true;
-    Aj.apiRequest('auth', {_auth: WebApp.initData}, res => {
-      if (!res.ok) {
-        if (!authPage) {
-          window.location = '/stickers/auth';
-        } else {
-          AuthPage.showExpired();          
-        }
-      } else if (authPage) {
-        var start_param = WebApp.initDataUnsafe.start_param;
-        window.location = '/stickers?' + (start_param ? 'tgWebAppStartParam=' + start_param : '');
-      }
-    });
-  },
-  showToast(text, options = {}) {
-    if (!window.$_toastContainer) {
-      window.$_toastContainer = $('<div class="tm-toast-container">').appendTo('body');
-    }
-    if (!window.$toast) {
-      window.$toast = $(`<div class="tm-toast ${options.class}">${text}</div>`);
-      $_toastContainer.html($toast);
-
-      setTimeout(() => $toast.addClass('tm-toast-show'), 10);
-      setTimeout(() => {
-        $toast.removeClass('tm-toast-show');
-        setTimeout(() => {
-            $toast.remove();
-            window.$toast = null;
-        }, 300);
-      }, options.duration || 2000);
-    }
-  },
-  showErrorToast(text) {
-    Main.showToast(text || 'Error.', { class: 'tm-toast-error' });
-    WebApp.HapticFeedback.notificationOccurred('error');
-  },
-  showSuccessToast(text) {
-    Main.showToast('<div>' + (text || 'Success.') + '</div>', { class: 'tm-toast-success' });
-    WebApp.HapticFeedback.notificationOccurred('success');
-  },
-  iosChatFix() {
-    if (WebApp.platform != 'ios') return;
-    if (WebApp.isVersionAtLeast('8.0')) {
-      setTimeout(() => {
-        if (WebApp.isActive) {
-          WebApp.close();
-        }
-      }, 500);
-    } else {
-      WebApp.close();
-    }
-  },
-}
-
 var StickerChart = {
   init() {
     StickerChart.initChartDate();
@@ -548,38 +342,27 @@ var StickerUpload = {
         video.addEventListener("loadedmetadata", function () {
             if (isEmojis) {
               if (this.videoWidth !== 100 || this.videoHeight !== 100) {
-                return Main.showErrorToast(l('WEB_UPLOAD_BAD_DIMENSIONS'));
+                return TWebApp.showErrorToast(l('WEB_UPLOAD_BAD_DIMENSIONS'));
               }
             } else {
               if (Math.max(this.videoWidth, this.videoHeight) !== 512 || Math.min(this.videoWidth, this.videoHeight) < 1) {
-                return Main.showErrorToast(l('WEB_UPLOAD_BAD_DIMENSIONS'));
+                return TWebApp.showErrorToast(l('WEB_UPLOAD_BAD_DIMENSIONS'));
               }
             }
             if (this.duration > 3) {
-              return Main.showErrorToast(l('WEB_UPLOAD_LONG_VIDEO'));
+              return TWebApp.showErrorToast(l('WEB_UPLOAD_LONG_VIDEO'));
             }
             callback(file);
         }, false);
         video.src = URL.createObjectURL(file);
       } else {
-        Main.showErrorToast(l('WEB_UPLOAD_UNSUPPORTED_FORMAT'));
+        TWebApp.showErrorToast(l('WEB_UPLOAD_UNSUPPORTED_FORMAT'));
       }
     } else {
       var mimeFile = new File([file], file.name, {type: 'application/x-tgsticker'});
       callback(mimeFile);
     }
   },
-}
-
-var AuthPage = {
-  init () {},
-  showExpired() {
-    $('.tm-auth-expired').toggle(true);
-
-    Aj.state.onMainButton = WebApp.close;
-    WebApp.MainButton.setText('Close');
-    WebApp.MainButton.show();
-  }
 }
 
 var NewPack = {
@@ -707,7 +490,7 @@ var NewPack = {
         // $('img', $item).attr('src', res.thumb);
       } else {
         $item.remove();
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     });
     $item.appendTo($grid);
@@ -717,7 +500,7 @@ var NewPack = {
     var title = $('input[name=title]').val();
     if (!title.trim()) {
       $('input[name=title]').focus();
-      Main.showErrorToast(l('WEB_NEWPACK_NAME_REQUIRED'));
+      TWebApp.showErrorToast(l('WEB_NEWPACK_NAME_REQUIRED'));
       return;
     }
     var shortName = Aj.state.shortName;
@@ -726,7 +509,7 @@ var NewPack = {
       return;
     }
     if (!stickers.length) {
-      Main.showErrorToast(l('WEB_NEWPACK_STICKERS_REQUIRED'));
+      TWebApp.showErrorToast(l('WEB_NEWPACK_STICKERS_REQUIRED'));
       return;
     }
 
@@ -743,7 +526,7 @@ var NewPack = {
         Aj.location(res.redirect);
       }
       if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     });
   }
@@ -793,7 +576,7 @@ var PublishPack = {
     var title = $('input[name=title]').val();
     if (!title.trim()) {
       $('input[name=title]').focus();
-      Main.showErrorToast('Name is required');
+      TWebApp.showErrorToast('Name is required');
       return;
     }
     var shortName = Aj.state.shortName;
@@ -811,12 +594,12 @@ var PublishPack = {
       WebApp.MainButton.hideProgress();
       if (res.ok) {
         Aj.onUnload(() => {
-          Main.showSuccessToast(res.msg);
+          TWebApp.showSuccessToast(res.msg);
         });
         Aj.location(res.redirect);
       }
       if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     });
   }
@@ -1066,7 +849,7 @@ var EditPack = {
         $item.attr('id', 'i' + res.doc);
       } else {
         $item.remove();
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
     });
     $item.prependTo($grid);
@@ -1116,15 +899,15 @@ var EditPack = {
     }, (res) => {
       WebApp.MainButton.hideProgress();
       if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
         if (res.field) {
           EditPack.focusSticker('#'+res.field, true);
         }
       } else {
         Aj.onUnload(() => {
-          Main.showSuccessToast(res.msg);          
+          TWebApp.showSuccessToast(res.msg);          
         });
-        _backButton();  
+        TBackButton.onClick();  
       }
     });
   },
@@ -1136,7 +919,7 @@ var EditPack = {
         $(hash).removeClass('tm-sticker-row-error');
       }, 5000);
     }
-    Main.scrollToEl(hash, -12);
+    TWebApp.scrollToEl(hash, -12);
     $('input', hash).focus();
   }
 }
@@ -1293,13 +1076,13 @@ var PackPage = {
       thumb: Aj.state.thumb || '' 
     }, (res) => {
       if (res.error) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
       if (res.ok) {
         if (onSuccess) {
           onSuccess();
         } else {
-          Main.showSuccessToast(res.msg);
+          TWebApp.showSuccessToast(res.msg);
         }
         if (Aj.state.PackPage) {
           Aj.state.thumb = false;
@@ -1351,10 +1134,10 @@ var PackPage = {
         pack_id: Aj.state.packId,
       }, res => {
         if (res.error) {
-          Main.showErrorToast(res.error);
+          TWebApp.showErrorToast(res.error);
         } else {
           Aj.onUnload(() => {
-            Main.showSuccessToast(res.msg);            
+            TWebApp.showSuccessToast(res.msg);            
           });
           Aj.location('/stickers');
         }
@@ -1435,7 +1218,7 @@ var StickerPicker = {
       }, res => {
         if (res.error) {
           Aj.state._stickerPickerLoading = false;
-          Main.showErrorToast(res.error);
+          TWebApp.showErrorToast(res.error);
         }
         window._localCache[cacheKey] = $(res.html);
         openEl(window._localCache[cacheKey]);
@@ -1602,7 +1385,7 @@ var MainPage = {
   eClickCopy() {
     var value = $(this).data('value');
     navigator.clipboard.writeText(value);
-    Main.showSuccessToast(l('WEB_LINK_COPIED'));
+    TWebApp.showSuccessToast(l('WEB_LINK_COPIED'));
   },
   eClickDelete() {
     var pack_id = $(this).data('id');
@@ -1627,10 +1410,10 @@ var MainPage = {
         pack_id: pack_id,
       }, res => {
         if (res.error) {
-          Main.showErrorToast(res.error);
+          TWebApp.showErrorToast(res.error);
         } else {
           Aj.onUnload(() => {
-            Main.showSuccessToast(res.msg);            
+            TWebApp.showSuccessToast(res.msg);            
           });
           $item.remove();
         }
@@ -1659,7 +1442,7 @@ function requestUpload(target, callback = null, options = {}) {
         Aj.state.files[target] = res.media;
       }
       if (res.error && !options.preventError) {
-        Main.showErrorToast(res.error);
+        TWebApp.showErrorToast(res.error);
       }
       if (callback) {
         callback(res);        
@@ -1741,31 +1524,6 @@ function cleanRE(value) {
   return value.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&");
 }
 
-function debounce() {
-  let timer;
-  return function (callback, delay = 300) {
-    clearTimeout(timer);
-    timer = setTimeout(callback, delay);
-  };
-}
-
-var _backButton = null;
-function setBackButton(url) {
-  if (_backButton) {
-    WebApp.BackButton.offClick(_backButton);      
-  }
-  if (url) {
-    _backButton = () => {
-      if ((closePopup() === false)) Aj.location(url)
-    };
-    WebApp.BackButton.onClick(_backButton);
-    WebApp.BackButton.show();
-  } else {
-    _backButton = null;
-    WebApp.BackButton.hide();
-  }
-}
-
 function fuzzyMatch(needle, haystack) {
   var needle = needle.toLowerCase();
   var haystack = haystack.toLowerCase();
@@ -1779,89 +1537,3 @@ function fuzzyMatch(needle, haystack) {
   }
   return false;
 }
-
-function initBackSwipe() {
-  if ($('.tm-swipe-back').length) {
-    return;
-  }
-  $('<div class="tm-swipe-back"></div>').appendTo('body');
-
-  const threshold = 120;
-
-  var touchstartX = 0;
-  var touchstartY = 0;
-  var touchendX = 0;
-  var touchendY = 0;
-
-  var zone = document;
-  var type = null;
-  var notified = false;
-  var feedbackDelay = false;
-
-  var isRtl = document.documentElement.classList.contains('lang_rtl');
-
-  zone.addEventListener('touchstart', function(event) {
-      touchstartX = event.touches[0].screenX;
-      touchstartY = event.touches[0].screenY;
-      window._canvasInteraction = (event.target.tagName == 'CANVAS');
-  });
-
-  zone.addEventListener('touchmove', function(event) {
-      touchendX = event.changedTouches[0].screenX;
-      touchendY = event.changedTouches[0].screenY;
-
-      if (window._sortInProgress) return;
-      if (window._canvasInteraction) return;
-
-      deltaX = (touchendX - touchstartX) * (isRtl ? -1 : 1);
-      deltaY = touchendY - touchstartY;
-
-      const isHorizontal = Math.abs(deltaX) > 30 && 
-                                     Math.abs(deltaY) < 30;
-
-      if (type === 'h') {
-          event.preventDefault();
-      } else if (!event.cancelable) {
-        return
-      }           
-      if (isHorizontal && !type && event.cancelable) {
-          type = 'h';
-          event.preventDefault();
-      }
-      if (deltaX > threshold && !notified) {
-        notified = true;
-        feedbackDelay = true;
-        setTimeout(() => feedbackDelay = false, 80);
-        WebApp.HapticFeedback.impactOccurred('soft');;
-      }
-      var translateX = deltaX / 1.2;
-      translateX = asymptoticInterp(deltaX / 1.2 / 120, 0, 130, 1);
-      translateX -= 40;
-      $('.tm-swipe-back')[0].style.insetInlineStart = translateX - 52 + 'px';
-  }, {passive: false})
-
-  zone.addEventListener('touchend', function(event) {
-    var finalDeltaX = (touchendX - touchstartX) * (isRtl ? -1 : 1);
-    if (type == 'h' && finalDeltaX > threshold) {
-      if (!feedbackDelay) {
-        WebApp.HapticFeedback.impactOccurred('light');
-      }
-      if (_backButton) {
-        _backButton();        
-      } else {
-        WebApp.close();
-      }
-    }
-    notified = false;
-    type = null;
-    touchendX = event.changedTouches[0].screenX;
-    touchendY = event.changedTouches[0].screenY;
-    $('.tm-swipe-back')[0].style.insetInlineStart = '-92px';
-  }, false);
-
-  function asymptoticInterp(t, start, end, rate = 5) {
-    if (t <= 0) return start;
-    return start + (end - start) * (t / (t + 0.5));
-  }
-}
-
