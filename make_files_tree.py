@@ -35,14 +35,14 @@ CRAWL_STATUS_CODE_EXCLUSIONS = {
 DYNAMIC_PART_MOCK = 'telegram-crawler'
 
 INPUT_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_links.txt')
-INPUT_RES_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_res_links.txt')
-INPUT_TR_FILENAME = os.environ.get('INPUT_FILENAME', 'tracked_tr_links.txt')
+INPUT_RES_FILENAME = os.environ.get('INPUT_RES_FILENAME', 'tracked_res_links.txt')
+INPUT_TR_FILENAME = os.environ.get('INPUT_TR_FILENAME', 'tracked_tr_links.txt')
 OUTPUT_FOLDER = os.environ.get('OUTPUT_FOLDER', 'data/')
 OUTPUT_MTPROTO_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_MTPROTO_FOLDER', 'server/'))
 OUTPUT_SITES_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_SITES_FOLDER', 'web/'))
 OUTPUT_CLIENTS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_CLIENTS_FOLDER', 'client/'))
 OUTPUT_RESOURCES_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_RESOURCES_FOLDER', 'web_res/'))
-OUTPUT_TRANSLATIONS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_RESOURCES_FOLDER', 'web_tr/'))
+OUTPUT_TRANSLATIONS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_TRANSLATIONS_FOLDER', 'web_tr/'))
 OUTPUT_MINI_APPS_FOLDER = os.path.join(OUTPUT_FOLDER, os.environ.get('OUTPUT_MINI_APPS_FOLDER', 'mini_app/'))
 
 TRANSLATIONS_EN_CATEGORY_URL_REGEX = r'/en/[a-z_]+/[a-z_]+$'

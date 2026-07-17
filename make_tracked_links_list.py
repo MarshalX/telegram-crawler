@@ -1,8 +1,8 @@
 import asyncio
-import codecs
 import logging
 import os
 import re
+import sys
 from functools import cache
 from html import unescape
 from time import time
@@ -181,6 +181,14 @@ OUTPUT_FILENAME = os.environ.get('OUTPUT_FILENAME', 'tracked_links.txt')
 OUTPUT_RESOURCES_FILENAME = os.environ.get('OUTPUT_RESOURCES_FILENAME', 'tracked_res_links.txt')
 OUTPUT_TRANSLATIONS_FILENAME = os.environ.get('OUTPUT_TRANSLATIONS_FILENAME', 'tracked_tr_links.txt')
 
+# in CI the output filenames differ from the committed ones, so the baseline to diff against is separate
+BASELINE_FILENAME = os.environ.get('BASELINE_FILENAME', 'tracked_links.txt')
+BASELINE_RESOURCES_FILENAME = os.environ.get('BASELINE_RESOURCES_FILENAME', 'tracked_res_links.txt')
+BASELINE_TRANSLATIONS_FILENAME = os.environ.get('BASELINE_TRANSLATIONS_FILENAME', 'tracked_tr_links.txt')
+
+ALLOWED_SHRINK_RATIO = float(os.environ.get('ALLOWED_SHRINK_RATIO', '0.95'))
+ALLOWED_SHRINK_MIN_COUNT = 10   # ignore small shrinks on small files
+
 STEL_DEV_LAYER = 290
 
 TIMEOUT_CONFIGS = [
@@ -213,9 +221,6 @@ TRACKING_SETS_LOCK = asyncio.Lock()
 
 WORKERS_COUNT = 50
 WORKERS_TASK_QUEUE = asyncio.Queue()
-WORKERS_NEW_TASK_TIMEOUT = 1.0  # seconds
-
-TEXT_DECODER = codecs.getincrementaldecoder('UTF-8')(errors='strict')
 
 
 @cache
@@ -389,12 +394,10 @@ class ServerSideError(Exception):
 
 
 async def crawl_worker(client: httpx.AsyncClient):
+    # workers live until cancelled by start(). this keeps the full pool alive for the tail
+    # of the crawl instead of workers dying off while one slow request holds new sub links
     while True:
-        try:
-            url = await asyncio.wait_for(WORKERS_TASK_QUEUE.get(), timeout=WORKERS_NEW_TASK_TIMEOUT)
-        except asyncio.TimeoutError:
-            logger.debug(f'Worker exiting - no tasks for {WORKERS_NEW_TASK_TIMEOUT} seconds')
-            break
+        url = await WORKERS_TASK_QUEUE.get()
 
         try:
             async with RETRY_LOCK:
@@ -491,7 +494,7 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict = Non
         raw_content = response.content
 
         try:
-            content = TEXT_DECODER.decode(raw_content)
+            content = raw_content.decode('utf-8')
         except UnicodeDecodeError:
             if raw_content.startswith(b'GIF'):
                 async with TRACKING_SETS_LOCK:
@@ -538,10 +541,14 @@ async def start(url_list: Set[str]):
 
     transport = httpx.AsyncHTTPTransport(verify=False, retries=3)
     async with httpx.AsyncClient(transport=transport) as client:
-        workers = [crawl_worker(client) for _ in range(WORKERS_COUNT)]
-        await asyncio.gather(*workers)
+        workers = [asyncio.create_task(crawl_worker(client)) for _ in range(WORKERS_COUNT)]
 
-    await WORKERS_TASK_QUEUE.join()
+        # retries put urls back before task_done, so join() returns only when everything is crawled
+        await WORKERS_TASK_QUEUE.join()
+
+        for worker in workers:
+            worker.cancel()
+        await asyncio.gather(*workers, return_exceptions=True)
 
 
 def unified_links(links_set: Set[str]) -> Set[str]:
@@ -561,25 +568,37 @@ if __name__ == '__main__':
     LINKS_TO_TRACKABLE_RESOURCES = unified_links(LINKS_TO_TRACKABLE_RESOURCES)
     LINKS_TO_TRANSLATIONS = unified_links(LINKS_TO_TRANSLATIONS)
 
-    try:
-        OLD_URL_LIST = set()
-        for filename in (OUTPUT_FILENAME, OUTPUT_RESOURCES_FILENAME, OUTPUT_TRANSLATIONS_FILENAME):
-            with open(filename, 'r') as f:
-                OLD_URL_LIST |= set([l.replace('\n', '') for l in f.readlines()])
+    OUTPUTS = (
+        (OUTPUT_FILENAME, BASELINE_FILENAME, LINKS_TO_TRACK),
+        (OUTPUT_RESOURCES_FILENAME, BASELINE_RESOURCES_FILENAME, LINKS_TO_TRACKABLE_RESOURCES),
+        (OUTPUT_TRANSLATIONS_FILENAME, BASELINE_TRANSLATIONS_FILENAME, LINKS_TO_TRANSLATIONS),
+    )
 
-        CURRENT_URL_LIST = LINKS_TO_TRACK | LINKS_TO_TRACKABLE_RESOURCES | LINKS_TO_TRANSLATIONS
+    OLD_URL_LIST = set()
+    for _, baseline_filename, links in OUTPUTS:
+        try:
+            with open(baseline_filename, 'r') as f:
+                old_links = set([l.replace('\n', '') for l in f.readlines()])
+        except IOError:
+            continue
 
-        logger.info(f'Is equal: {OLD_URL_LIST == CURRENT_URL_LIST}')
-        logger.info(f'Deleted ({len(OLD_URL_LIST - CURRENT_URL_LIST)}): {OLD_URL_LIST - CURRENT_URL_LIST}')
-        logger.info(f'Added ({len(CURRENT_URL_LIST - OLD_URL_LIST)}): {CURRENT_URL_LIST - OLD_URL_LIST}')
-    except IOError:
-        pass
+        OLD_URL_LIST |= old_links
 
-    with open(OUTPUT_FILENAME, 'w') as f:
-        f.write('\n'.join(sorted(unified_links(LINKS_TO_TRACK))))
+        shrink = len(old_links) - len(links)
+        if shrink > ALLOWED_SHRINK_MIN_COUNT and len(links) < len(old_links) * ALLOWED_SHRINK_RATIO:
+            logger.error(
+                f'Shrink guard: {baseline_filename} would shrink from {len(old_links)} to {len(links)} links. '
+                f'Looks like a partial crawl. Exit without writing output. '
+                f'Set ALLOWED_SHRINK_RATIO=0 if the shrink is intentional'
+            )
+            sys.exit(1)
 
-    with open(OUTPUT_RESOURCES_FILENAME, 'w') as f:
-        f.write('\n'.join(sorted(unified_links(LINKS_TO_TRACKABLE_RESOURCES))))
+    CURRENT_URL_LIST = LINKS_TO_TRACK | LINKS_TO_TRACKABLE_RESOURCES | LINKS_TO_TRANSLATIONS
 
-    with open(OUTPUT_TRANSLATIONS_FILENAME, 'w') as f:
-        f.write('\n'.join(sorted(unified_links(LINKS_TO_TRANSLATIONS))))
+    logger.info(f'Is equal: {OLD_URL_LIST == CURRENT_URL_LIST}')
+    logger.info(f'Deleted ({len(OLD_URL_LIST - CURRENT_URL_LIST)}): {OLD_URL_LIST - CURRENT_URL_LIST}')
+    logger.info(f'Added ({len(CURRENT_URL_LIST - OLD_URL_LIST)}): {CURRENT_URL_LIST - OLD_URL_LIST}')
+
+    for output_filename, _, links in OUTPUTS:
+        with open(output_filename, 'w') as f:
+            f.write('\n'.join(sorted(links)))
