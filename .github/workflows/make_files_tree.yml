@@ -9,6 +9,11 @@ on:
     branches:
       - main
 
+# one running + one queued run; overlapping runs crawl the same content and race to push
+concurrency:
+  group: make-files-tree
+  cancel-in-progress: false
+
 jobs:
   fetch_new_content:
     name: Make files tree
@@ -49,6 +54,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.13
+          cache: pip
 
       - name: Install dependencies.
         run: |
@@ -68,100 +74,22 @@ jobs:
           rm -rf __pycache__
 
       - name: Prepare data.
-        if: matrix.mode == 'web'
         run: |
-          git checkout data
-          git pull
-
-          mv data/web_res data_ci/web_res
-          mv data/web_tr data_ci/web_tr
-          mv data/client data_ci/client
-          mv data/server data_ci/server
-          mv data/mini_app data_ci/mini_app
-
-          rm -rf data
-          mv data_ci data
-
-      - name: Prepare data.
-        if: matrix.mode == 'web_res'
-        run: |
-          git checkout data
-          git pull
-
-          mv data/web data_ci/web
-          mv data/web_tr data_ci/web_tr
-          mv data/client data_ci/client
-          mv data/server data_ci/server
-          mv data/mini_app data_ci/mini_app
-
-          rm -rf data
-          mv data_ci data
-
-      - name: Prepare data.
-        if: matrix.mode == 'web_tr'
-        run: |
-          git checkout data
-          git pull
-
-          mv data/web data_ci/web
-          mv data/web_res data_ci/web_res
-          mv data/server data_ci/server
-          mv data/client data_ci/client
-          mv data/mini_app data_ci/mini_app
-
-          rm -rf data
-          mv data_ci data
-
-      - name: Prepare data.
-        if: matrix.mode == 'server'
-        run: |
-          git checkout data
-          git pull
-
-          mv data/web data_ci/web
-          mv data/web_res data_ci/web_res
-          mv data/web_tr data_ci/web_tr
-          mv data/client data_ci/client
-          mv data/mini_app data_ci/mini_app
-
-          rm -rf data
-          mv data_ci data
-
-      - name: Prepare data.
-        if: matrix.mode == 'client'
-        run: |
-          git checkout data
-          git pull
-
-          mv data/web data_ci/web
-          mv data/web_res data_ci/web_res
-          mv data/web_tr data_ci/web_tr
-          mv data/server data_ci/server
-          mv data/mini_app data_ci/mini_app
-
-          rm -rf data
-          mv data_ci data
-
-      - name: Prepare data.
-        if: matrix.mode == 'mini_app'
-        run: |
-          git checkout data
-          git pull
-
-          mv data/web data_ci/web
-          mv data/web_res data_ci/web_res
-          mv data/web_tr data_ci/web_tr
-          mv data/server data_ci/server
-          mv data/client data_ci/client
-
-          rm -rf data
-          mv data_ci data
+          # every mode owns exactly one folder in data/ named after the mode
+          rm -rf data/${{ matrix.mode }}
+          mv data_ci/${{ matrix.mode }} data/${{ matrix.mode }}
 
       - name: Commit and push changes.
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add .
-          git commit -m "Update content of files"
-          git push
+          git add data/${{ matrix.mode }}
+          git commit -m "Update content of files" || exit 0
+
+          # matrix jobs race to push; rebase is always clean cuz every mode commits only its own folder
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            git pull --rebase
+          done
+          exit 1
