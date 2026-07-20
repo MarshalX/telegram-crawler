@@ -75,6 +75,10 @@ jobs:
 
       - name: Prepare data.
         run: |
+          # crawled content lives in the data branch; main has no data/ folder
+          git checkout data
+          git pull
+
           # every mode owns exactly one folder in data/ named after the mode
           rm -rf data/${{ matrix.mode }}
           mv data_ci/${{ matrix.mode }} data/${{ matrix.mode }}
@@ -87,7 +91,7 @@ jobs:
           git add data/${{ matrix.mode }}
           git commit -m "Update content of files" || exit 0
 
-          # matrix jobs race to push; rebase is always clean cuz every mode commits only its own folder
+          # matrix jobs race to push the data branch; rebase is always clean cuz every mode commits only its own folder
           for i in 1 2 3 4 5; do
             git push && exit 0
             git pull --rebase
