@@ -149,6 +149,7 @@ CRAWL_RULES = {
             r'/privacy$',  # geolocation depended
             r'/tos$',  # geolocation depended
             r'/moderation$',  # dynamic graphs
+            r'/safety$',  # dynamic graphs
             r'/dsa-report$',  # EU only
             r'/tos/eu-dsa/transparency-2025$',  # EU only
             r'/tos/eu/transparency-tco$',  # EU only
