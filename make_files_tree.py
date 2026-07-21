@@ -8,19 +8,16 @@ import platform
 import random
 import re
 import shutil
-import socket
 import uuid
 import zipfile
-from asyncio.exceptions import TimeoutError
 from string import punctuation, whitespace
 from time import time
 from typing import List, Optional
 from xml.etree import ElementTree
 
 import aiofiles
-import aiohttp
+import httpx
 import uvloop
-from aiohttp import ClientConnectorError, ServerDisconnectedError
 
 import ccl_bplist
 
@@ -68,12 +65,12 @@ SPARKLE_SE_TEMPLATE = f';se={DYNAMIC_PART_MOCK};'
 
 STEL_DEV_LAYER = 190
 
-TIMEOUT = aiohttp.ClientTimeout(  # mediumly sized from link collector
-    total=60,
-    connect=60,
-    sock_connect=30,
-    sock_read=60,
+TIMEOUT = httpx.Timeout(  # mediumly sized from link collector
+    60,
+    connect=30,
 )
+# same retryable set as the link collector; ProtocolError covers truncated bodies (RemoteProtocolError)
+RETRYABLE_HTTPX_ERRORS = (httpx.ProtocolError, httpx.TimeoutException, httpx.NetworkError)
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -91,7 +88,8 @@ HEADERS = {
     'TE': 'trailers',
 }
 
-logging.basicConfig(format='%(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s %(levelname)s - %(message)s', level=logging.INFO)
+logging.getLogger('httpx').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
@@ -99,13 +97,34 @@ def get_hash(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-async def download_file(url: str, path: str, session: aiohttp.ClientSession):
+async def download_file(url: str, path: str, session: httpx.AsyncClient):
     params = {'tgcrawlNoCache': uuid.uuid4().hex}
-    async with session.get(url, params=params) as response:
-        if response.status != 200:
+    start_time = time()
+
+    async with session.stream('GET', url, params=params) as response:
+        # str(response.url) is the final URL after redirects: for tg APKs it exposes the CDN host
+        # (cdnX.telesco.pe) that actually served us
+        final_url = str(response.url).split('?')[0]
+        expected_size = response.headers.get('Content-Length', 'unknown')
+
+        if response.status_code != 200:
+            logger.warning(f'[download] {url} -> {final_url}: skip cuz status {response.status_code}')
             return
 
-        content = await response.read()
+        logger.info(f'[download] {url} -> {final_url}: {expected_size} bytes expected')
+
+        content = bytearray()
+        try:
+            async for chunk in response.aiter_bytes():
+                content.extend(chunk)
+        except httpx.HTTPError as e:
+            logger.error(
+                f'[download] {url} -> {final_url}: {e.__class__.__name__}: {e}. '
+                f'Got {len(content)} of {expected_size} bytes in {time() - start_time:.1f} sec'
+            )
+            raise
+
+    logger.info(f'[download] {url}: OK, {len(content)} bytes in {time() - start_time:.1f} sec')
 
     async with aiofiles.open(path, mode='wb') as f:
         await f.write(content)
@@ -134,17 +153,17 @@ async def track_additional_files(
             await w_file.write(content)
 
 
-async def get_download_link_of_latest_macos_release(remote_updates_manifest_url: str, session: aiohttp.ClientSession) -> Optional[str]:
-    async with session.get(remote_updates_manifest_url) as response:
-        if response.status != 200:
-            logger.error(f'Error {response.status} while fetching {remote_updates_manifest_url}')
-            return None
+async def get_download_link_of_latest_macos_release(remote_updates_manifest_url: str, session: httpx.AsyncClient) -> Optional[str]:
+    response = await session.get(remote_updates_manifest_url)
+    if response.status_code != 200:
+        logger.error(f'Error {response.status_code} while fetching {remote_updates_manifest_url}')
+        return None
 
-        try:
-            response = await response.text()  # we do expect XML here
-        except Exception as e:
-            logger.error(f'Error processing response: {e}')
-            return None
+    try:
+        response = response.text  # we do expect XML here
+    except Exception as e:
+        logger.error(f'Error processing response: {e}')
+        return None
 
     if not isinstance(response, str) and not response.lstrip().startswith('<rss'):
         logger.error('Response is not a valid XML string')
@@ -160,7 +179,7 @@ async def get_download_link_of_latest_macos_release(remote_updates_manifest_url:
     return None
 
 
-async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.ClientSession):
+async def download_telegram_macos_beta_and_extract_resources(session: httpx.AsyncClient):
     remote_updates_manifest_url = 'https://mac-updates.telegram.org/beta/versions.xml'
     download_url = await get_download_link_of_latest_macos_release(remote_updates_manifest_url, session)
 
@@ -219,6 +238,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
         os.remove(assets_extractor)
 
     if process.returncode != 0:
+        logger.error(f'[macos-beta] acextract failed with code {process.returncode}')
         cleanup2()
         return
 
@@ -268,7 +288,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: aiohttp.Cl
     cleanup2()
 
 
-async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.ClientSession):
+async def download_telegram_ios_beta_and_extract_resources(session: httpx.AsyncClient):
     # TODO fetch version automatically
     # ref: https://docs.github.com/en/rest/releases/releases#get-the-latest-release
     version = '9.0.24102'
@@ -347,6 +367,7 @@ async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.Clie
         os.remove(assets_extractor)
 
     if process.returncode != 0:
+        logger.error(f'[ios-beta] acextract failed with code {process.returncode}')
         cleanup2()
         return
 
@@ -362,31 +383,32 @@ async def download_telegram_ios_beta_and_extract_resources(session: aiohttp.Clie
     cleanup2()
 
 
-async def download_telegram_android_and_extract_resources(session: aiohttp.ClientSession) -> None:
+async def download_telegram_android_and_extract_resources(session: httpx.AsyncClient) -> None:
     await download_telegram_android_stable_dl_and_extract_resources(session)
     await download_telegram_android_beta_and_extract_resources(session)
 
 
-async def download_telegram_android_stable_dl_and_extract_resources(session: aiohttp.ClientSession):
+async def download_telegram_android_stable_dl_and_extract_resources(session: httpx.AsyncClient):
     download_url = 'https://telegram.org/dl/android/apk'
 
     await _download_telegram_android_and_extract_resources(session, download_url, 'android-stable-dl')
 
 
-async def download_telegram_android_beta_and_extract_resources(session: aiohttp.ClientSession):
+async def download_telegram_android_beta_and_extract_resources(session: httpx.AsyncClient):
     download_url = 'https://telegram.org/dl/android/apk-public-beta'
 
     await _download_telegram_android_and_extract_resources(session, download_url, 'android-beta')
 
 
 async def _download_telegram_android_and_extract_resources(
-        session: aiohttp.ClientSession, download_url: str, folder_name: str
+        session: httpx.AsyncClient, download_url: str, folder_name: str
 ):
     crawled_data_folder = os.path.join(OUTPUT_CLIENTS_FOLDER, folder_name)
 
     if not download_url:
         return
 
+    logger.info(f'[{folder_name}] Downloading apktool and {download_url}')
     await asyncio.gather(
         download_file('https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.9.0.jar', 'tool.apk', session),
         download_file(download_url, 'android.apk', session),
@@ -402,9 +424,10 @@ async def _download_telegram_android_and_extract_resources(
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT
     )
-    await process.communicate()
+    stdout, _ = await process.communicate()
 
     if process.returncode != 0:
+        logger.error(f'[{folder_name}] apktool failed with code {process.returncode}: {stdout[-1000:]}')
         cleanup()
         return
 
@@ -474,7 +497,7 @@ async def crawl_mini_app_wallet():
     cleanup()
 
 
-async def collect_translations_paginated_content(url: str, session: aiohttp.ClientSession) -> str:
+async def collect_translations_paginated_content(url: str, session: httpx.AsyncClient) -> str:
     import cssutils
     from bs4 import BeautifulSoup
 
@@ -489,50 +512,50 @@ async def collect_translations_paginated_content(url: str, session: aiohttp.Clie
 
         try:
             new_offset = None
-            async with session.post(
-                    f'{PROTOCOL}{url}', data=data, headers=headers, allow_redirects=False, timeout=TIMEOUT
-            ) as response:
-                if (499 < response.status < 600) or (response.status != 200):
-                    logger.debug(f'Resend cuz {response.status}')
-                    new_offset = offset
-                else:
-                    res_json = await response.json(encoding='UTF-8')
-                    if 'more_html' in res_json and res_json['more_html']:
-                        res_json['more_html'] = re.sub(TRANSLATE_SUGGESTION_REGEX, '', res_json['more_html'])
+            response = await session.post(
+                f'{PROTOCOL}{url}', data=data, headers=headers, follow_redirects=False, timeout=TIMEOUT
+            )
+            if (499 < response.status_code < 600) or (response.status_code != 200):
+                logger.debug(f'Resend cuz {response.status_code}')
+                new_offset = offset
+            else:
+                res_json = response.json()
+                if 'more_html' in res_json and res_json['more_html']:
+                    res_json['more_html'] = re.sub(TRANSLATE_SUGGESTION_REGEX, '', res_json['more_html'])
 
-                        soup = BeautifulSoup(res_json['more_html'], 'html.parser')
-                        tr_items = soup.find_all('div', {'class': 'tr-key-row-wrap'})
-                        for tr_item in tr_items:
-                            tr_key = tr_item.find('div', {'class': 'tr-value-key'}).text
+                    soup = BeautifulSoup(res_json['more_html'], 'html.parser')
+                    tr_items = soup.find_all('div', {'class': 'tr-key-row-wrap'})
+                    for tr_item in tr_items:
+                        tr_key = tr_item.find('div', {'class': 'tr-value-key'}).text
 
-                            tr_url = tr_item.find('div', {'class': 'tr-key-row'})['data-href']
-                            tr_url = f'https://translations.telegram.org{tr_url}'
+                        tr_url = tr_item.find('div', {'class': 'tr-key-row'})['data-href']
+                        tr_url = f'https://translations.telegram.org{tr_url}'
 
-                            tr_photo = tr_item.find('a', {'class': 'tr-value-photo'})
-                            if tr_photo:
-                                tr_photo = css_parser.parseStyle(tr_photo['style']).backgroundImage[5:-2]
+                        tr_photo = tr_item.find('a', {'class': 'tr-value-photo'})
+                        if tr_photo:
+                            tr_photo = css_parser.parseStyle(tr_photo['style']).backgroundImage[5:-2]
 
-                            tr_has_binding = tr_item.find('span', {'class': 'has-binding binding'})
-                            tr_has_binding = tr_has_binding is not None
+                        tr_has_binding = tr_item.find('span', {'class': 'has-binding binding'})
+                        tr_has_binding = tr_has_binding is not None
 
-                            tr_values = tr_item.find_all('span', {'class': 'value'})
-                            tr_value_singular, *tr_value_plural = [tr_value.decode_contents() for tr_value in tr_values]
-                            tr_values = {'singular': tr_value_singular}
-                            if tr_value_plural:
-                                tr_values['plural'] = tr_value_plural[0]
+                        tr_values = tr_item.find_all('span', {'class': 'value'})
+                        tr_value_singular, *tr_value_plural = [tr_value.decode_contents() for tr_value in tr_values]
+                        tr_values = {'singular': tr_value_singular}
+                        if tr_value_plural:
+                            tr_values['plural'] = tr_value_plural[0]
 
-                            content[tr_key] = {
-                                'url': tr_url,
-                                'photo_url': tr_photo,
-                                'has_binding': tr_has_binding,
-                                'values': tr_values,
-                            }
+                        content[tr_key] = {
+                            'url': tr_url,
+                            'photo_url': tr_photo,
+                            'has_binding': tr_has_binding,
+                            'values': tr_values,
+                        }
 
-                        new_offset = offset + 200
+                    new_offset = offset + 200
 
             new_offset and await _get_page(new_offset)
-        except (ServerDisconnectedError, TimeoutError, ClientConnectorError):
-            logger.warning(f'Client or timeout error. Retrying {url}; offset {offset}')
+        except RETRYABLE_HTTPX_ERRORS as e:
+            logger.warning(f'{e.__class__.__name__} ({e}). Retrying {url}; offset {offset}')
             await _get_page(offset)
 
     await _get_page(0)
@@ -719,14 +742,14 @@ class RetryError(Exception):
         self.new_url = new_url
 
 
-async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
+async def crawl(url: str, session: httpx.AsyncClient, output_dir: str):
     while True:
         try:
             await _crawl(url, session, output_dir)
-        except (RetryError, ServerDisconnectedError, TimeoutError, ClientConnectorError) as e:
+        except (RetryError, *RETRYABLE_HTTPX_ERRORS) as e:
             if isinstance(e, RetryError) and e.new_url is not None:
                 url = e.new_url
-            logger.warning(f'Client or timeout error ({e}). Retrying {url}')
+            logger.warning(f'{e.__class__.__name__} ({e}). Retrying {url}')
         else:
             break
 
@@ -734,123 +757,125 @@ async def crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
 SLASH_RETRY_ATTEMPTED = set()
 
 
-async def _crawl(url: str, session: aiohttp.ClientSession, output_dir: str):
+async def _crawl(url: str, session: httpx.AsyncClient, output_dir: str):
     truncated_url = (url[:100] + '...') if len(url) > 100 else url
 
     logger.debug(f'Process {truncated_url}')
-    async with session.get(f'{PROTOCOL}{url}', allow_redirects=False, timeout=TIMEOUT, headers=HEADERS) as response:
-        code = response.status
-        if 499 < code < 600:
-            msg = f'Error 5XX. Retrying {truncated_url}'
-            logger.warning(msg)
-            raise RetryError(msg)
+    response = await session.get(f'{PROTOCOL}{url}', follow_redirects=False, timeout=TIMEOUT, headers=HEADERS)
+    code = response.status_code
+    if 499 < code < 600:
+        msg = f'Error 5XX. Retrying {truncated_url}'
+        logger.warning(msg)
+        raise RetryError(msg)
 
-        if code not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
-            if code in {301, 302, 404}:
-                base_url = url.rstrip('/')
-                if base_url not in SLASH_RETRY_ATTEMPTED:
-                    if url.endswith('/'):
-                        flipped_url = base_url
-                        logger.warning(f'{code} slash removal retry for {truncated_url}')
-                    else:
-                        flipped_url = f'{url}/'
-                        logger.warning(f'{code} slash addition retry for {truncated_url}')
+    if code not in {200, 304} and url not in CRAWL_STATUS_CODE_EXCLUSIONS:
+        if code in {301, 302, 404}:
+            base_url = url.rstrip('/')
+            if base_url not in SLASH_RETRY_ATTEMPTED:
+                if url.endswith('/'):
+                    flipped_url = base_url
+                    logger.warning(f'{code} slash removal retry for {truncated_url}')
+                else:
+                    flipped_url = f'{url}/'
+                    logger.warning(f'{code} slash addition retry for {truncated_url}')
 
-                    SLASH_RETRY_ATTEMPTED.add(base_url)
-                    raise RetryError(f'{code} slash retry for {truncated_url}', new_url=flipped_url)
+                SLASH_RETRY_ATTEMPTED.add(base_url)
+                raise RetryError(f'{code} slash retry for {truncated_url}', new_url=flipped_url)
 
-            content = await response.text()
-            clean_content = content.replace('\n', ' ').replace('\r', ' ')
-            truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
-            logger.warning(f'Skip [{code}] {truncated_url}: {truncated_content}')
+        content = response.text
+        clean_content = content.replace('\n', ' ').replace('\r', ' ')
+        truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
+        logger.warning(f'Skip [{code}] {truncated_url}: {truncated_content}')
 
-            return
+        return
 
-        # bypass external slashes and so on
-        url_parts = [p for p in url.split('/') if p not in ILLEGAL_PATH_CHARS]
+    # bypass external slashes and so on
+    url_parts = [p for p in url.split('/') if p not in ILLEGAL_PATH_CHARS]
 
-        content_type = response.content_type
+    # aiohttp's response.content_type defaulted to octet-stream when the header is missing;
+    # keep that cuz missing type must stay hashable-only ('stream' matches it)
+    content_type = response.headers.get('content-type', 'application/octet-stream').split(';')[0].strip()
 
-        # handle pure domains and html pages without ext in url as html do enable syntax highlighting
-        page_type, _ = mimetypes.guess_type(url)
+    # handle pure domains and html pages without ext in url as html do enable syntax highlighting
+    page_type, _ = mimetypes.guess_type(url)
 
-        ext = ''
-        if page_type:
-            ext = mimetypes.guess_extension(page_type) or ''
-            if ext != '' and url.endswith(ext):
-                ext = ''
+    ext = ''
+    if page_type:
+        ext = mimetypes.guess_extension(page_type) or ''
+        if ext != '' and url.endswith(ext):
+            ext = ''
 
-        if url.endswith('.tl'):
-            page_type = 'text/plain'
+    if url.endswith('.tl'):
+        page_type = 'text/plain'
 
-        if page_type is None or len(url_parts) == 1:
-            ext = '.html'
-            content_type = 'text/html'
+    if page_type is None or len(url_parts) == 1:
+        ext = '.html'
+        content_type = 'text/html'
 
-        if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url) or 'td.telegram.org/current' in url:
-            ext = '.json'
-            content_type = 'application/json'
+    if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url) or 'td.telegram.org/current' in url:
+        ext = '.json'
+        content_type = 'application/json'
 
-        is_hashable_only = is_hashable_only_content_type(content_type)
-        # amazing dirt for media files like
-        # telegram.org/file/811140591/1/q7zZHjgES6s/9d121a89ffb0015837
-        # with response content type HTML instead of image.
-        # shame on you.
-        # sometimes it returns a correct type.
-        # noice load balancing
-        is_sucking_file = '/file/' in url and 'text' in content_type
+    is_hashable_only = is_hashable_only_content_type(content_type)
+    # amazing dirt for media files like
+    # telegram.org/file/811140591/1/q7zZHjgES6s/9d121a89ffb0015837
+    # with response content type HTML instead of image.
+    # shame on you.
+    # sometimes it returns a correct type.
+    # noice load balancing
+    is_sucking_file = '/file/' in url and 'text' in content_type
 
-        # I don't add ext by content type for images, and so on cuz TG servers suck.
-        # Some servers do not return a correct content type.
-        # Some servers do...
-        if is_hashable_only or is_sucking_file:
-            ext = '.sha256'
+    # I don't add ext by content type for images, and so on cuz TG servers suck.
+    # Some servers do not return a correct content type.
+    # Some servers do...
+    if is_hashable_only or is_sucking_file:
+        ext = '.sha256'
 
-        filename = os.path.join(output_dir, *url_parts) + ext
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
+    filename = os.path.join(output_dir, *url_parts) + ext
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-        if is_sucking_file or is_hashable_only:
-            content = await response.read()
-            async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
-                await f.write(get_hash(content))
-            return
-
-        content = await response.text(encoding='UTF-8')
-        if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
-            content = await collect_translations_paginated_content(url, session)
-
-        content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
-        content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
-        content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
-        content = re.sub(NONCE_REGEX, NONCE_TEMPLATE, content)
-        content = re.sub(PROXY_CONFIG_SUB_NET_REGEX, PROXY_CONFIG_SUB_NET_TEMPLATE, content)
-        content = re.sub(SPARKLE_SIG_REGEX, SPARKLE_SIG_TEMPLATE, content)
-        content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
-        content = re.sub(TON_RATE_REGEX, TON_RATE_TEMPLATE, content)
-        content = re.sub(APK_BETA_TOKEN_REGEX, APK_BETA_TOKEN_TEMPLATE, content)
-
-        # there is a problem with the files with the same name (in the same path) but different case
-        # the content is random because of the async
-        # there is only one page with this problem, for now:
-        # - corefork.telegram.org/constructor/Updates
-        # - corefork.telegram.org/constructor/updates
+    if is_sucking_file or is_hashable_only:
+        content = response.content
         async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
-            logger.debug(f'Write to {filename}')
-            await f.write(content)
+            await f.write(get_hash(content))
+        return
+
+    content = response.content.decode('UTF-8')
+    if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
+        content = await collect_translations_paginated_content(url, session)
+
+    content = re.sub(PAGE_GENERATION_TIME_REGEX, '', content)
+    content = re.sub(PAGE_API_HASH_REGEX, PAGE_API_HASH_TEMPLATE, content)
+    content = re.sub(PASSPORT_SSID_REGEX, PASSPORT_SSID_TEMPLATE, content)
+    content = re.sub(NONCE_REGEX, NONCE_TEMPLATE, content)
+    content = re.sub(PROXY_CONFIG_SUB_NET_REGEX, PROXY_CONFIG_SUB_NET_TEMPLATE, content)
+    content = re.sub(SPARKLE_SIG_REGEX, SPARKLE_SIG_TEMPLATE, content)
+    content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
+    content = re.sub(TON_RATE_REGEX, TON_RATE_TEMPLATE, content)
+    content = re.sub(APK_BETA_TOKEN_REGEX, APK_BETA_TOKEN_TEMPLATE, content)
+
+    # there is a problem with the files with the same name (in the same path) but different case
+    # the content is random because of the async
+    # there is only one page with this problem, for now:
+    # - corefork.telegram.org/constructor/Updates
+    # - corefork.telegram.org/constructor/updates
+    async with aiofiles.open(filename, 'w', encoding='utf-8') as f:
+        logger.debug(f'Write to {filename}')
+        await f.write(content)
 
 
-async def _crawl_web(session: aiohttp.ClientSession, input_filename: str, output_folder=None):
+async def _crawl_web(session: httpx.AsyncClient, input_filename: str, output_folder=None):
     with open(input_filename, 'r') as f:
         tracked_urls = set([l.replace('\n', '') for l in f.readlines()])
 
     await asyncio.gather(*[crawl(url, session, output_folder) for url in tracked_urls])
 
 
-async def crawl_web(session: aiohttp.ClientSession):
+async def crawl_web(session: httpx.AsyncClient):
     await _crawl_web(session, INPUT_FILENAME, OUTPUT_SITES_FOLDER)
 
 
-async def crawl_web_res(session: aiohttp.ClientSession):
+async def crawl_web_res(session: httpx.AsyncClient):
     await _crawl_web(session, INPUT_RES_FILENAME, OUTPUT_RESOURCES_FOLDER)
 
 
@@ -884,21 +909,19 @@ async def _collect_and_track_all_translation_keys():
         await f.write(json.dumps(translations, indent=4))
 
 
-async def crawl_web_tr(session: aiohttp.ClientSession):
+async def crawl_web_tr(session: httpx.AsyncClient):
     await _crawl_web(session, INPUT_TR_FILENAME, OUTPUT_TRANSLATIONS_FOLDER)
     await _collect_and_track_all_translation_keys()
 
 
 async def start(mode: str):
-    # Optimized TCP connector for web crawling
-    tcp_connector = aiohttp.TCPConnector(
-        ssl=False,             # Disable SSL verification for crawling
-        use_dns_cache=False,          # Disable DNS caching
-        force_close=True,             # Force close connections after use
-        family=socket.AF_INET,        # Use IPv4 only to avoid potential IPv6 issues
-    )
+    # same transport config as the link collector; retries cover connect errors only,
+    # read/protocol errors are retried by the callers via RETRYABLE_HTTPX_ERRORS
+    transport = httpx.AsyncHTTPTransport(verify=False, retries=3)
 
-    async with aiohttp.ClientSession(connector=tcp_connector, trust_env=True) as session:
+    async with httpx.AsyncClient(
+            transport=transport, trust_env=True, timeout=TIMEOUT, follow_redirects=True
+    ) as session:
         mode == 'all' and await asyncio.gather(
             crawl_web(session),
             crawl_web_res(session),

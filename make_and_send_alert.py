@@ -4,7 +4,7 @@ import os
 import re
 from typing import Tuple
 
-import aiohttp
+import httpx
 
 COMMIT_SHA = os.environ['COMMIT_SHA']
 
@@ -93,7 +93,7 @@ ROW_PER_STATUS = 5
 LAST_PAGE_NUMBER_REGEX = r'page=(\d+)>; rel="last"'
 
 
-async def send_req_until_success(session: aiohttp.ClientSession, **kwargs) -> Tuple[dict, int]:
+async def send_req_until_success(session: httpx.AsyncClient, **kwargs) -> Tuple[dict, int]:
     delay = 5  # in sec
     count_of_retries = int(GITHUB_API_LIMIT_PER_HOUR / COUNT_OF_RUNNING_WORKFLOW_AT_SAME_TIME / delay)
 
@@ -103,11 +103,11 @@ async def send_req_until_success(session: aiohttp.ClientSession, **kwargs) -> Tu
         retry_number += 1
 
         res = await session.get(**kwargs)
-        if res.status != 200:
+        if res.status_code != 200:
             await asyncio.sleep(delay)
             continue
 
-        json = await res.json()
+        json = res.json()
 
         pagination_data = res.headers.get('Link', '')
         matches = re.findall(LAST_PAGE_NUMBER_REGEX, pagination_data)
@@ -119,7 +119,7 @@ async def send_req_until_success(session: aiohttp.ClientSession, **kwargs) -> Tu
     raise RuntimeError('Surprise. Time is over')
 
 
-async def send_telegram_alert(session: aiohttp.ClientSession, text: str, thread_id=None) -> aiohttp.ClientResponse:
+async def send_telegram_alert(session: httpx.AsyncClient, text: str, thread_id=None) -> httpx.Response:
     params = {
         'chat_id': CHAT_ID,
         'parse_mode': 'HTML',
@@ -136,8 +136,8 @@ async def send_telegram_alert(session: aiohttp.ClientSession, text: str, thread_
 
 
 async def send_discord_alert(
-        session: aiohttp.ClientSession, commit_hash: str, commit_url: str, fields: list, hashtags: str
-) -> aiohttp.ClientResponse:
+        session: httpx.AsyncClient, commit_hash: str, commit_url: str, fields: list, hashtags: str
+) -> httpx.Response:
     url = f'https://discord.com/api/channels/{DISCORD_CHANNEL_ID}/messages'
 
     headers = {
@@ -167,7 +167,7 @@ async def send_discord_alert(
 
 
 async def main() -> None:
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient(timeout=60, follow_redirects=True) as session:
         commit_data, last_page = await send_req_until_success(
             session=session,
             url=f'{BASE_GITHUB_API}{GITHUB_LAST_COMMITS}'.format(repo=REPOSITORY, sha=COMMIT_SHA),
@@ -259,17 +259,17 @@ async def main() -> None:
             if hashtag in alert_hashtags:
                 logger.info(f'Sending alert to the forum. Topic: {topic_thread_id}')
                 telegram_response = await send_telegram_alert(session, alert_text, topic_thread_id)
-                logger.debug(await telegram_response.read())
+                logger.debug(telegram_response.content)
 
         hashtags = ' '.join([f'#{hashtag}' for hashtag in sorted(alert_hashtags)])
         if alert_hashtags:
             alert_text += '\n\n' + hashtags
 
         telegram_response = await send_telegram_alert(session, alert_text)
-        logger.debug(await telegram_response.read())
+        logger.debug(telegram_response.content)
 
         discord_response = await send_discord_alert(session, commit_hash, html_url, discord_embed_fields, hashtags)
-        logger.debug(await discord_response.read())
+        logger.debug(discord_response.content)
 
 
 if __name__ == '__main__':
