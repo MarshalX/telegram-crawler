@@ -436,7 +436,7 @@ async def crawl_worker(client: httpx.AsyncClient):
             WORKERS_TASK_QUEUE.task_done()
 
 
-async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict = None):
+async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict[str, int] | None = None):
     truncated_url = (url[:100] + '...') if len(url) > 100 else url
 
     async with VISITED_LINKS_LOCK:
@@ -558,32 +558,32 @@ def unified_links(links_set: Set[str]) -> Set[str]:
 
 if __name__ == '__main__':
     HIDDEN_URLS.add(BASE_URL)
-    LINKS_TO_TRACK = LINKS_TO_TRACK | ADDITIONAL_URLS
+    LINKS_TO_TRACK.update(ADDITIONAL_URLS)
 
     logger.info('Start crawling links...')
     start_time = time()
     uvloop.run(start(HIDDEN_URLS))
     logger.info(f'Stop crawling links. {time() - start_time} sec.')
 
-    LINKS_TO_TRACK = unified_links(LINKS_TO_TRACK)
-    LINKS_TO_TRACKABLE_RESOURCES = unified_links(LINKS_TO_TRACKABLE_RESOURCES)
-    LINKS_TO_TRANSLATIONS = unified_links(LINKS_TO_TRANSLATIONS)
+    links_to_track = unified_links(LINKS_TO_TRACK)
+    links_to_trackable_resources = unified_links(LINKS_TO_TRACKABLE_RESOURCES)
+    links_to_translations = unified_links(LINKS_TO_TRANSLATIONS)
 
-    OUTPUTS = (
-        (OUTPUT_FILENAME, BASELINE_FILENAME, LINKS_TO_TRACK),
-        (OUTPUT_RESOURCES_FILENAME, BASELINE_RESOURCES_FILENAME, LINKS_TO_TRACKABLE_RESOURCES),
-        (OUTPUT_TRANSLATIONS_FILENAME, BASELINE_TRANSLATIONS_FILENAME, LINKS_TO_TRANSLATIONS),
+    outputs = (
+        (OUTPUT_FILENAME, BASELINE_FILENAME, links_to_track),
+        (OUTPUT_RESOURCES_FILENAME, BASELINE_RESOURCES_FILENAME, links_to_trackable_resources),
+        (OUTPUT_TRANSLATIONS_FILENAME, BASELINE_TRANSLATIONS_FILENAME, links_to_translations),
     )
 
-    OLD_URL_LIST = set()
-    for _, baseline_filename, links in OUTPUTS:
+    old_url_list = set()
+    for _, baseline_filename, links in outputs:
         try:
             with open(baseline_filename, 'r') as f:
-                old_links = set([l.replace('\n', '') for l in f.readlines()])
+                old_links = set([line.replace('\n', '') for line in f.readlines()])
         except IOError:
             continue
 
-        OLD_URL_LIST |= old_links
+        old_url_list |= old_links
 
         shrink = len(old_links) - len(links)
         if shrink > ALLOWED_SHRINK_MIN_COUNT and len(links) < len(old_links) * ALLOWED_SHRINK_RATIO:
@@ -594,12 +594,12 @@ if __name__ == '__main__':
             )
             sys.exit(1)
 
-    CURRENT_URL_LIST = LINKS_TO_TRACK | LINKS_TO_TRACKABLE_RESOURCES | LINKS_TO_TRANSLATIONS
+    current_url_list = links_to_track | links_to_trackable_resources | links_to_translations
 
-    logger.info(f'Is equal: {OLD_URL_LIST == CURRENT_URL_LIST}')
-    logger.info(f'Deleted ({len(OLD_URL_LIST - CURRENT_URL_LIST)}): {OLD_URL_LIST - CURRENT_URL_LIST}')
-    logger.info(f'Added ({len(CURRENT_URL_LIST - OLD_URL_LIST)}): {CURRENT_URL_LIST - OLD_URL_LIST}')
+    logger.info(f'Is equal: {old_url_list == current_url_list}')
+    logger.info(f'Deleted ({len(old_url_list - current_url_list)}): {old_url_list - current_url_list}')
+    logger.info(f'Added ({len(current_url_list - old_url_list)}): {current_url_list - old_url_list}')
 
-    for output_filename, _, links in OUTPUTS:
+    for output_filename, _, links in outputs:
         with open(output_filename, 'w') as f:
             f.write('\n'.join(sorted(links)))

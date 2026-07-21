@@ -12,7 +12,7 @@ import uuid
 import zipfile
 from string import punctuation, whitespace
 from time import time
-from typing import List, Optional
+from typing import Any, List, Optional
 from xml.etree import ElementTree
 
 import aiofiles
@@ -133,19 +133,14 @@ async def download_file(url: str, path: str, session: httpx.AsyncClient):
 async def track_additional_files(
         files_to_track: List[str], input_dir_name: str, output_dir_name: str, encoding='utf-8', save_hash_only=False
 ):
-    kwargs = {'mode': 'r', 'encoding': encoding}
-    if save_hash_only:
-        kwargs['mode'] = 'rb'
-        del kwargs['encoding']
-
     for file in files_to_track:
-        async with aiofiles.open(os.path.join(input_dir_name, file), **kwargs) as r_file:
-            content = await r_file.read()
-
+        input_path = os.path.join(input_dir_name, file)
         if save_hash_only:
-            content = get_hash(content)
+            async with aiofiles.open(input_path, mode='rb') as rb_file:
+                content = get_hash(await rb_file.read())
         else:
-            content = re.sub(r'id=".*"', 'id="tgcrawl"', content)
+            async with aiofiles.open(input_path, mode='r', encoding=encoding) as r_file:
+                content = re.sub(r'id=".*"', 'id="tgcrawl"', await r_file.read())
 
         filename = os.path.join(output_dir_name, file)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -256,7 +251,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: httpx.Asyn
 
     executable_path = os.path.join(client_folder_name, 'Telegram.app/Contents/MacOS/Telegram')
     process = await asyncio.create_subprocess_exec(
-        f'strings', '-n', '7', '-arch', 'x86_64', '--', executable_path, stdout=asyncio.subprocess.PIPE
+        'strings', '-n', '7', '-arch', 'x86_64', '--', executable_path, stdout=asyncio.subprocess.PIPE
     )
 
     stdout = b''
@@ -275,11 +270,11 @@ async def download_telegram_macos_beta_and_extract_resources(session: httpx.Asyn
     binary_strings = stdout.decode('utf-8').split('\n')
     special_chars = list(string.punctuation)
     valid_strings = []
-    for string in binary_strings:
-        if sum([1 for char in string if char in special_chars]) > 5:
+    for binary_string in binary_strings:
+        if sum([1 for char in binary_string if char in special_chars]) > 5:
             continue
 
-        valid_strings.append(string.strip())
+        valid_strings.append(binary_string.strip())
 
     valid_strings = sorted(list(set(valid_strings)))
     with open(os.path.join(crawled_data_folder, 'strings.txt'), 'w', encoding='utf-8') as f:
@@ -440,12 +435,12 @@ async def _download_telegram_android_and_extract_resources(
     cleanup()
 
 
-def parse_string_with_possible_json(input_string) -> dict:
+def parse_string_with_possible_json(input_string: str) -> dict[str, Any]:
     # chat gtp powered code:
     try:
         # Attempt to parse the entire input string as JSON
         json_object = json.loads(input_string)
-    except json.JSONDecodeError as e:
+    except json.JSONDecodeError:
         # Regular expression to find JSON objects within the string
         json_regex = r'{[^{}]*}'
         matches = re.findall(json_regex, input_string)
@@ -526,9 +521,13 @@ async def collect_translations_paginated_content(url: str, session: httpx.AsyncC
                     soup = BeautifulSoup(res_json['more_html'], 'html.parser')
                     tr_items = soup.find_all('div', {'class': 'tr-key-row-wrap'})
                     for tr_item in tr_items:
-                        tr_key = tr_item.find('div', {'class': 'tr-value-key'}).text
+                        tr_key_el = tr_item.find('div', {'class': 'tr-value-key'})
+                        assert tr_key_el is not None  # let it crash: no partial commits, see shrink guard
+                        tr_key = tr_key_el.text
 
-                        tr_url = tr_item.find('div', {'class': 'tr-key-row'})['data-href']
+                        tr_key_row = tr_item.find('div', {'class': 'tr-key-row'})
+                        assert tr_key_row is not None
+                        tr_url = tr_key_row['data-href']
                         tr_url = f'https://translations.telegram.org{tr_url}'
 
                         tr_photo = tr_item.find('a', {'class': 'tr-value-photo'})
@@ -567,9 +566,11 @@ async def collect_translations_paginated_content(url: str, session: httpx.AsyncC
 async def track_mtproto_methods():
     #####################
     # PATH BROKEN PYROGRAM
-    import pkgutil
+    import importlib.util
     from pathlib import Path
-    pyrogram_path = Path(pkgutil.get_loader('pyrogram').path).parent
+    pyrogram_spec = importlib.util.find_spec('pyrogram')
+    assert pyrogram_spec is not None and pyrogram_spec.origin is not None
+    pyrogram_path = Path(pyrogram_spec.origin).parent
     broken_class_path = os.path.join(pyrogram_path, 'raw', 'types', 'story_fwd_header.py')
     with open(broken_class_path, 'w', encoding='UTF-8') as f:
         # I rly don't want to fix bug in pyrogram about using reserved words as argument names
@@ -578,7 +579,7 @@ async def track_mtproto_methods():
 
     from pyrogram import Client
 
-    kw = {
+    kw: dict[str, Any] = {
         'api_id': int(os.environ['TELEGRAM_API_ID']),
         'api_hash': os.environ['TELEGRAM_API_HASH'],
         'app_version': '@tgcrawl',
@@ -640,7 +641,7 @@ async def _fetch_and_track_mtproto(app, output_dir):
 
     for short_name in sticker_set_short_names:
         sticker_set = await app.invoke(functions.messages.GetStickerSet(
-            stickerset=InputStickerSetShortName(short_name=short_name), hash=0
+            stickerset=InputStickerSetShortName(short_name=short_name), hash=0  # pyright: ignore[reportArgumentType]
         ))
         configs[f'sticker_set/{short_name}'] = sticker_set
 
@@ -864,9 +865,9 @@ async def _crawl(url: str, session: httpx.AsyncClient, output_dir: str):
         await f.write(content)
 
 
-async def _crawl_web(session: httpx.AsyncClient, input_filename: str, output_folder=None):
+async def _crawl_web(session: httpx.AsyncClient, input_filename: str, output_folder: str):
     with open(input_filename, 'r') as f:
-        tracked_urls = set([l.replace('\n', '') for l in f.readlines()])
+        tracked_urls = set([line.replace('\n', '') for line in f.readlines()])
 
     await asyncio.gather(*[crawl(url, session, output_folder) for url in tracked_urls])
 
@@ -960,6 +961,6 @@ if __name__ == '__main__':
         run_mode = os.environ['MODE']
 
     start_time = time()
-    logger.info(f'Start crawling content of tracked urls...')
+    logger.info('Start crawling content of tracked urls...')
     uvloop.run(start(run_mode))
     logger.info(f'Stop crawling content in mode {run_mode}. {time() - start_time} sec.')

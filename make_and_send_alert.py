@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 import re
-from typing import Tuple
+from typing import Any, Tuple
 
 import httpx
 
@@ -93,7 +93,7 @@ ROW_PER_STATUS = 5
 LAST_PAGE_NUMBER_REGEX = r'page=(\d+)>; rel="last"'
 
 
-async def send_req_until_success(session: httpx.AsyncClient, **kwargs) -> Tuple[dict, int]:
+async def send_req_until_success(session: httpx.AsyncClient, **kwargs) -> Tuple[dict[str, Any], int]:
     delay = 5  # in sec
     count_of_retries = int(GITHUB_API_LIMIT_PER_HOUR / COUNT_OF_RUNNING_WORKFLOW_AT_SAME_TIME / delay)
 
@@ -136,7 +136,7 @@ async def send_telegram_alert(session: httpx.AsyncClient, text: str, thread_id=N
 
 
 async def send_discord_alert(
-        session: httpx.AsyncClient, commit_hash: str, commit_url: str, fields: list, hashtags: str
+        session: httpx.AsyncClient, commit_hash: str, commit_url: str, fields: list[dict[str, Any]], hashtags: str
 ) -> httpx.Response:
     url = f'https://discord.com/api/channels/{DISCORD_CHANNEL_ID}/messages'
 
@@ -200,7 +200,7 @@ async def main() -> None:
         commit_hash = commit_data['sha'][:7]
         html_url = commit_data['html_url']
 
-        alert_text = f'<b>New changes of Telegram</b>\n\n'
+        alert_text = '<b>New changes of Telegram</b>\n\n'
         alert_hashtags = set()
 
         global AVAILABLE_HASHTAGS
