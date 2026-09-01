@@ -68,7 +68,11 @@ STEL_DEV_LAYER = 190
 TIMEOUT = httpx.Timeout(  # mediumly sized from link collector
     60,
     connect=30,
+    pool=None,
 )
+CRAWL_CONCURRENCY = 50
+TRANSPORT_LIMITS = httpx.Limits(max_connections=CRAWL_CONCURRENCY, max_keepalive_connections=0)
+TRANSPORT_LOCAL_ADDRESS = '0.0.0.0'
 # same retryable set as the link collector; ProtocolError covers truncated bodies (RemoteProtocolError)
 RETRYABLE_HTTPX_ERRORS = (httpx.ProtocolError, httpx.TimeoutException, httpx.NetworkError)
 HEADERS = {
@@ -869,7 +873,13 @@ async def _crawl_web(session: httpx.AsyncClient, input_filename: str, output_fol
     with open(input_filename, 'r') as f:
         tracked_urls = set([line.replace('\n', '') for line in f.readlines()])
 
-    await asyncio.gather(*[crawl(url, session, output_folder) for url in tracked_urls])
+    semaphore = asyncio.Semaphore(CRAWL_CONCURRENCY)
+
+    async def _bounded_crawl(url: str):
+        async with semaphore:
+            await crawl(url, session, output_folder)
+
+    await asyncio.gather(*[_bounded_crawl(url) for url in tracked_urls])
 
 
 async def crawl_web(session: httpx.AsyncClient):
@@ -916,9 +926,11 @@ async def crawl_web_tr(session: httpx.AsyncClient):
 
 
 async def start(mode: str):
-    # same transport config as the link collector; retries cover connect errors only,
+    # same verify/retries as the link collector; retries cover connect errors only,
     # read/protocol errors are retried by the callers via RETRYABLE_HTTPX_ERRORS
-    transport = httpx.AsyncHTTPTransport(verify=False, retries=3)
+    transport = httpx.AsyncHTTPTransport(
+        verify=False, retries=3, limits=TRANSPORT_LIMITS, local_address=TRANSPORT_LOCAL_ADDRESS
+    )
 
     async with httpx.AsyncClient(
             transport=transport, trust_env=True, timeout=TIMEOUT, follow_redirects=True
