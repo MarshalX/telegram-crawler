@@ -505,63 +505,62 @@ async def collect_translations_paginated_content(url: str, session: httpx.AsyncC
     headers = {'X-Requested-With': 'XMLHttpRequest'}
     content = dict()
 
-    async def _get_page(offset: int):
+    offset = 0
+    while True:
         logger.info(f'Url: {url}, offset: {offset}')
         data = {'offset': offset, 'more': 1}
 
         try:
-            new_offset = None
             response = await session.post(
                 f'{PROTOCOL}{url}', data=data, headers=headers, follow_redirects=False, timeout=TIMEOUT
             )
-            if (499 < response.status_code < 600) or (response.status_code != 200):
-                logger.debug(f'Resend cuz {response.status_code}')
-                new_offset = offset
-            else:
-                res_json = response.json()
-                if 'more_html' in res_json and res_json['more_html']:
-                    res_json['more_html'] = re.sub(TRANSLATE_SUGGESTION_REGEX, '', res_json['more_html'])
-
-                    soup = BeautifulSoup(res_json['more_html'], 'html.parser')
-                    tr_items = soup.find_all('div', {'class': 'tr-key-row-wrap'})
-                    for tr_item in tr_items:
-                        tr_key_el = tr_item.find('div', {'class': 'tr-value-key'})
-                        assert tr_key_el is not None  # let it crash: no partial commits, see shrink guard
-                        tr_key = tr_key_el.text
-
-                        tr_key_row = tr_item.find('div', {'class': 'tr-key-row'})
-                        assert tr_key_row is not None
-                        tr_url = tr_key_row['data-href']
-                        tr_url = f'https://translations.telegram.org{tr_url}'
-
-                        tr_photo = tr_item.find('a', {'class': 'tr-value-photo'})
-                        if tr_photo:
-                            tr_photo = css_parser.parseStyle(tr_photo['style']).backgroundImage[5:-2]
-
-                        tr_has_binding = tr_item.find('span', {'class': 'has-binding binding'})
-                        tr_has_binding = tr_has_binding is not None
-
-                        tr_values = tr_item.find_all('span', {'class': 'value'})
-                        tr_value_singular, *tr_value_plural = [tr_value.decode_contents() for tr_value in tr_values]
-                        tr_values = {'singular': tr_value_singular}
-                        if tr_value_plural:
-                            tr_values['plural'] = tr_value_plural[0]
-
-                        content[tr_key] = {
-                            'url': tr_url,
-                            'photo_url': tr_photo,
-                            'has_binding': tr_has_binding,
-                            'values': tr_values,
-                        }
-
-                    new_offset = offset + 200
-
-            new_offset and await _get_page(new_offset)
         except RETRYABLE_HTTPX_ERRORS as e:
             logger.warning(f'{e.__class__.__name__} ({e}). Retrying {url}; offset {offset}')
-            await _get_page(offset)
+            continue
 
-    await _get_page(0)
+        if response.status_code != 200:
+            logger.debug(f'Resend cuz {response.status_code}')
+            continue
+
+        res_json = response.json()
+        if not res_json.get('more_html'):
+            break
+
+        more_html = re.sub(TRANSLATE_SUGGESTION_REGEX, '', res_json['more_html'])
+
+        soup = BeautifulSoup(more_html, 'html.parser')
+        tr_items = soup.find_all('div', {'class': 'tr-key-row-wrap'})
+        for tr_item in tr_items:
+            tr_key_el = tr_item.find('div', {'class': 'tr-value-key'})
+            assert tr_key_el is not None  # let it crash: no partial commits, see shrink guard
+            tr_key = tr_key_el.text
+
+            tr_key_row = tr_item.find('div', {'class': 'tr-key-row'})
+            assert tr_key_row is not None
+            tr_url = tr_key_row['data-href']
+            tr_url = f'https://translations.telegram.org{tr_url}'
+
+            tr_photo = tr_item.find('a', {'class': 'tr-value-photo'})
+            if tr_photo:
+                tr_photo = css_parser.parseStyle(tr_photo['style']).backgroundImage[5:-2]
+
+            tr_has_binding = tr_item.find('span', {'class': 'has-binding binding'})
+            tr_has_binding = tr_has_binding is not None
+
+            tr_values = tr_item.find_all('span', {'class': 'value'})
+            tr_value_singular, *tr_value_plural = [tr_value.decode_contents() for tr_value in tr_values]
+            tr_values = {'singular': tr_value_singular}
+            if tr_value_plural:
+                tr_values['plural'] = tr_value_plural[0]
+
+            content[tr_key] = {
+                'url': tr_url,
+                'photo_url': tr_photo,
+                'has_binding': tr_has_binding,
+                'values': tr_values,
+            }
+
+        offset += 200
 
     content = dict(sorted(content.items()))
     return json.dumps(content, indent=4, ensure_ascii=False)
@@ -845,7 +844,10 @@ async def _crawl(url: str, session: httpx.AsyncClient, output_dir: str):
             await f.write(get_hash(content))
         return
 
-    content = response.content.decode('UTF-8')
+    try:
+        content = response.content.decode('UTF-8')
+    except UnicodeDecodeError as e:
+        raise RetryError(f'UnicodeDecodeError ({e.reason}) for {truncated_url}')
     if re.search(TRANSLATIONS_EN_CATEGORY_URL_REGEX, url):
         content = await collect_translations_paginated_content(url, session)
 

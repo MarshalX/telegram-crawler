@@ -189,6 +189,7 @@ BASELINE_TRANSLATIONS_FILENAME = os.environ.get('BASELINE_TRANSLATIONS_FILENAME'
 
 ALLOWED_SHRINK_RATIO = float(os.environ.get('ALLOWED_SHRINK_RATIO', '0.95'))
 ALLOWED_SHRINK_MIN_COUNT = 10   # ignore small shrinks on small files
+ALLOWED_DELETED_MAX_COUNT = int(os.environ.get('ALLOWED_DELETED_MAX_COUNT', '100'))
 
 STEL_DEV_LAYER = 290
 
@@ -222,6 +223,7 @@ TRACKING_SETS_LOCK = asyncio.Lock()
 
 WORKERS_COUNT = 50
 WORKERS_TASK_QUEUE = asyncio.Queue()
+UNEXPECTED_ERRORS: List[str] = []
 
 
 @cache
@@ -427,12 +429,14 @@ async def crawl_worker(client: httpx.AsyncClient):
 
             logger.warning(f'Crawl error {exc_name}: {exc_msg}. Retrying {url} with {next_timeout_config["total"]}s total timeout')
 
-            await WORKERS_TASK_QUEUE.put(url)
-
             async with VISITED_LINKS_LOCK:
-                if url in VISITED_LINKS:
-                    VISITED_LINKS.remove(url)
+                VISITED_LINKS.discard(url)
 
+            await WORKERS_TASK_QUEUE.put(url)
+            WORKERS_TASK_QUEUE.task_done()
+        except Exception:
+            logger.exception(f'Unexpected error while crawling {url}')
+            UNEXPECTED_ERRORS.append(url)
             WORKERS_TASK_QUEUE.task_done()
 
 
@@ -490,7 +494,7 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict[str, 
 
         return
 
-    content_type = response.headers.get('content-type')
+    content_type = response.headers.get('content-type', '')
     if is_textable_content_type(content_type):
         raw_content = response.content
 
@@ -565,6 +569,13 @@ if __name__ == '__main__':
     uvloop.run(start(HIDDEN_URLS))
     logger.info(f'Stop crawling links. {time() - start_time} sec.')
 
+    if UNEXPECTED_ERRORS:
+        logger.error(
+            f'{len(UNEXPECTED_ERRORS)} urls failed with unexpected errors (tracebacks above): {UNEXPECTED_ERRORS}. '
+            f'Exit without writing output.'
+        )
+        sys.exit(1)
+
     links_to_track = unified_links(LINKS_TO_TRACK)
     links_to_trackable_resources = unified_links(LINKS_TO_TRACKABLE_RESOURCES)
     links_to_translations = unified_links(LINKS_TO_TRANSLATIONS)
@@ -574,6 +585,7 @@ if __name__ == '__main__':
         (OUTPUT_RESOURCES_FILENAME, BASELINE_RESOURCES_FILENAME, links_to_trackable_resources),
         (OUTPUT_TRANSLATIONS_FILENAME, BASELINE_TRANSLATIONS_FILENAME, links_to_translations),
     )
+    current_url_list = links_to_track | links_to_trackable_resources | links_to_translations
 
     old_url_list = set()
     for _, baseline_filename, links in outputs:
@@ -594,7 +606,15 @@ if __name__ == '__main__':
             )
             sys.exit(1)
 
-    current_url_list = links_to_track | links_to_trackable_resources | links_to_translations
+        deleted = old_links - current_url_list
+        if ALLOWED_DELETED_MAX_COUNT and len(deleted) > ALLOWED_DELETED_MAX_COUNT:
+            logger.error(
+                f'Shrink guard: {len(deleted)} links would disappear from {baseline_filename} '
+                f'(cap {ALLOWED_DELETED_MAX_COUNT}): {sorted(deleted)}. '
+                f'Looks like transient drops. Exit without writing output. '
+                f'Set ALLOWED_DELETED_MAX_COUNT=0 if the deletion is intentional'
+            )
+            sys.exit(1)
 
     logger.info(f'Is equal: {old_url_list == current_url_list}')
     logger.info(f'Deleted ({len(old_url_list - current_url_list)}): {old_url_list - current_url_list}')
