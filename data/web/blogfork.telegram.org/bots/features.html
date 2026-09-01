@@ -16,7 +16,7 @@
     <link href="/css/bootstrap.min.css?3" rel="stylesheet">
     
     <link href="/css/telegram.css?254" rel="stylesheet" media="screen">
-    <link href="/css/telegram-theme.css?7" rel="stylesheet" media="screen">
+    <link href="/css/telegram-theme.css?8" rel="stylesheet" media="screen">
     <style>
     </style>
   </head>
@@ -54,9 +54,11 @@
 <h3><a class="anchor" name="what-features-do-bots-have" href="#what-features-do-bots-have"><i class="anchor-icon"></i></a>What features do bots have?</h3>
 <ul>
 <li><a href="#inputs"><strong>Inputs</strong></a><ul>
-<li><a href="#inputs">Text</a></li>
 <li><a href="#commands">Commands</a></li>
-<li><a href="#keyboards">Buttons</a>  </li>
+<li><a href="#keyboards">Keyboards</a></li>
+<li><a href="#inline-keyboards">Inline Keyboards</a></li>
+<li><a href="#menu-button">Menu Button</a></li>
+<li><a href="#global-commands">Global Commands</a></li>
 <li><a href="#chat-and-user-selection">Chat and User Selection</a></li>
 </ul>
 </li>
@@ -65,14 +67,25 @@
 <li><a href="#deep-linking">Deep Linking</a></li>
 <li><a href="#attachment-menu">Attachment Menu</a></li>
 <li><a href="#ephemeral-messages">Ephemeral Messages</a></li>
+<li><a href="#streaming-replies">Streaming Replies</a></li>
+<li><a href="#topics-in-private-chats">Topics in Private Chats</a></li>
+</ul>
+</li>
+<li><a href="#ai-agents"><strong>AI Agents</strong></a></li>
+<li><a href="#media-and-messaging"><strong>Media and Messaging</strong></a><ul>
+<li><a href="#polls-and-quizzes">Polls and Quizzes</a></li>
+<li><a href="#checklists">Checklists</a></li>
+<li><a href="#live-photos">Live Photos</a></li>
 </ul>
 </li>
 <li><a href="#integration"><strong>Integration</strong></a><ul>
 <li><a href="#mini-apps">Mini Apps</a></li>
-<li><a href="#secretary-bots">Secretary Bots</a></li>
+<li><a href="#business-bots">Business Bots</a></li>
 <li><a href="#managed-bots">Managed Bots</a></li>
 <li><a href="#bot-to-bot-communication">Bot-to-Bot Communication</a></li>
 <li><a href="#guest-bots">Guest Bots</a></li>
+<li><a href="#communities">Communities</a></li>
+<li><a href="#channel-direct-messages-and-suggested-posts">Channel Direct Messages</a></li>
 <li><a href="#payments">Payments</a></li>
 <li><a href="#web-login">Web Login</a></li>
 <li><a href="#html5-games">HTML5 Games</a></li>
@@ -80,7 +93,11 @@
 </ul>
 </li>
 <li><a href="#monetization"><strong>Monetization</strong></a></li>
-<li><a href="#advanced-formatting-options"><strong>Advanced Formatting</strong></a></li>
+<li><a href="#messages-and-formatting"><strong>Messages and Formatting</strong></a><ul>
+<li><a href="#rich-messages">Rich Messages</a></li>
+<li><a href="#regular-messages">Regular Messages</a></li>
+</ul>
+</li>
 <li><a href="#language-support"><strong>Language Support</strong></a></li>
 <li><a href="#bot-management"><strong>Bot Management</strong></a><ul>
 <li><a href="#privacy-mode">Privacy Mode</a></li>
@@ -99,9 +116,9 @@
 <li><a href="#keyboards">Keyboards</a> that replace the user&#39;s keyboard with predefined answer options.</li>
 <li><a href="#inline-keyboards">Buttons</a> that are shown next to messages from the bot.</li>
 </ul>
-<p>For even more flexibility, <a href="#web-apps">Web Apps</a> support 100% custom interfaces with JavaScript. </p>
+<p>For even more flexibility, <a href="#mini-apps">Mini Apps</a> support custom interfaces with JavaScript that launch directly inside Telegram.</p>
 <div>
-  <a href="/file/464001858/11318/ahAJjwERIX8.164875/ce1372cbf73e3ea94e" target="_blank"><img src="/file/464001858/11318/ahAJjwERIX8.164875/ce1372cbf73e3ea94e" title=""  class="dev_page_image" width=70% /></a>
+  <a href="/file/464001858/11318/ahAJjwERIX8.164875/ce1372cbf73e3ea94e" target="_blank"><img src="/file/464001858/11318/ahAJjwERIX8.164875/ce1372cbf73e3ea94e" title="Bot Features" alt="Bot interface features" class="dev_page_image" width=70% /></a>
 </div>
 
 <blockquote>
@@ -124,7 +141,7 @@
 </ul>
 <p>Commands should be <strong>as specific as possible</strong> – for example <code>/newlocation</code> or <code>/newrule</code> <strong>is better</strong> than a <code>/new</code> command that then requires an additional parameter from the user like &quot;<em>location</em>“ or ”<em>rule</em>&quot;.</p>
 <div>
-  <a href="/file/464001775/10227/HCr0XgSUHrg.119089/c17ff5d34fe528361e" target="_blank"><img  src="/file/464001775/10227/HCr0XgSUHrg.119089/c17ff5d34fe528361e" title="" class="dev_page_image"
+  <a href="/file/464001775/10227/HCr0XgSUHrg.119089/c17ff5d34fe528361e" target="_blank"><img  src="/file/464001775/10227/HCr0XgSUHrg.119089/c17ff5d34fe528361e" title="Bot Commands" alt="Bot commands shown in a list" class="dev_page_image"
 width=44% /></a>
 </div>
 
@@ -139,9 +156,9 @@ width=44% /></a>
 </blockquote>
 <h4><a class="anchor" name="keyboards" href="#keyboards"><i class="anchor-icon"></i></a>Keyboards</h4>
 <p>Bots are able to interpret free text input from users, but offering <strong>specific suggestions</strong> is often more intuitive – this is where <strong>custom keyboards</strong> can be extremely useful.</p>
-<p>Whenever your bot sends a message, it can <strong>display a special keyboard</strong> with predefined reply options (see <a href="/bots/api#replykeyboardmarkup">ReplyKeyboardMarkup</a>). Telegram apps that receive the message will display your keyboard to the user. Using any of the buttons will immediately send the respective text. This way you can drastically <strong>simplify</strong> and <strong>streamline</strong> user interaction with your bot.</p>
+<p>Whenever your bot sends a message, it can <strong>display a special keyboard</strong> with predefined reply options (see <a href="/bots/api#replykeyboardmarkup">ReplyKeyboardMarkup</a>). Telegram apps that receive the message will display your keyboard to the user. Simple text buttons will immediately send the respective text, while other buttons can request a user, chat, location, contact or poll, or open a Mini App. This way you can drastically <strong>simplify</strong> and <strong>streamline</strong> user interaction with your bot.</p>
 <div>
-  <a href="/file/464001950/1191a/2RwpmgU-swU.123554/b50478c124d5914c23"  target="_blank"><img src="/file/464001950/1191a/2RwpmgU-swU.123554/b50478c124d5914c23" title=""  class="dev_page_image" width=44% /></a>
+  <a href="/file/464001950/1191a/2RwpmgU-swU.123554/b50478c124d5914c23"  target="_blank"><img src="/file/464001950/1191a/2RwpmgU-swU.123554/b50478c124d5914c23" title="Custom Keyboards" alt="Custom keyboard with predefined reply options" class="dev_page_image" width=44% /></a>
 </div>
 
 <blockquote>
@@ -150,9 +167,9 @@ width=44% /></a>
 <p>You can also <strong>customize the text placeholder</strong> in the input field by setting the <code>input_field_placeholder</code> parameter.</p>
 <h4><a class="anchor" name="inline-keyboards" href="#inline-keyboards"><i class="anchor-icon"></i></a>Inline Keyboards</h4>
 <p>There are times when you&#39;d prefer to do things <strong>without sending any messages</strong> to the chat – like when a user is changing settings, toggling options or navigating search results. In such cases, you can use <a href="/bots/api#inlinekeyboardmarkup">Inline Keyboards</a> that are shown directly below their relevant messages.</p>
-<p>Unlike with custom reply keyboards, pressing buttons on inline keyboards <strong>doesn&#39;t send messages to the chat</strong>. Instead, inline keyboards support buttons that can work behind the scenes or open different interfaces: <a href="/bots/api#inlinekeyboardbutton">callback buttons</a>, <a href="/bots/api#inlinekeyboardbutton">URL buttons</a>, <a href="/bots/api#inlinekeyboardbutton">switch-to-inline buttons</a>, <a href="/bots/api#inlinekeyboardbutton">game buttons</a> and <a href="/bots/api#inlinekeyboardbutton">payment buttons</a>. </p>
+<p>Unlike with custom reply keyboards, pressing buttons on inline keyboards <strong>doesn&#39;t send messages to the chat</strong>. Instead, inline keyboards support buttons that can work behind the scenes or open different interfaces: <a href="/bots/api#inlinekeyboardbutton">callback buttons</a>, <a href="/bots/api#inlinekeyboardbutton">URL buttons</a>, <a href="/bots/api#inlinekeyboardbutton">switch-to-inline buttons</a>, <a href="/bots/api#inlinekeyboardbutton">game buttons</a>, <a href="/bots/api#inlinekeyboardbutton">payment buttons</a>, as well as buttons with custom styles, copyable text or disabled states.</p>
 <div>
-  <a href="/file/464001863/110f3/I47qTXAD9Z4.120010/e0ea04f66357b640ec" target="_blank"><img src="/file/464001863/110f3/I47qTXAD9Z4.120010/e0ea04f66357b640ec" title=""  class="dev_page_image" width=44% /></a>
+  <a href="/file/464001863/110f3/I47qTXAD9Z4.120010/e0ea04f66357b640ec" target="_blank"><img src="/file/464001863/110f3/I47qTXAD9Z4.120010/e0ea04f66357b640ec" title="Inline Keyboards" alt="Inline keyboard shown below a bot message" class="dev_page_image" width=44% /></a>
 </div>
 
 <blockquote>
@@ -162,12 +179,12 @@ width=44% /></a>
 <p>In all bot chats, a menu button appears near the message field. By default, tapping this button <strong>opens a menu</strong> that can hold some or all of a bot&#39;s commands, including a short description for each. Users can then <strong>select a command from the menu</strong> without needing to type it out.</p>
 <p>You can set different texts of the menu button and its command descriptions for various <strong>individual users</strong> or <strong>groups of users</strong> – for example, showing translated text based on the user’s language, as explained <a href="#commands">here</a>.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/464001581/11d85/f42u9c5Wncg.133752/b5a95b7f1221032d7d" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/464001581/11d85/f42u9c5Wncg.133752/b5a95b7f1221032d7d" style="max-width: 400px;" title="Menu Button" aria-label="Menu Button" alt="Menu button shown beside the message field">
   <source src="/file/464001555/10fbd/jvTuV2Ke7WQ.1916669.mp4/a056de323645db409d" type="video/mp4">
  </video>
 </div>
 
-<p>The <strong>menu button</strong> can alternatively be used to launch a <a href="#web-apps">Web App</a>.</p>
+<p>The <strong>menu button</strong> can alternatively be used to launch a <a href="#mini-apps">Mini App</a>.</p>
 <h4><a class="anchor" name="global-commands" href="#global-commands"><i class="anchor-icon"></i></a>Global Commands</h4>
 <p>To make basic interactions more uniform, we ask all developers to support a few <strong>basic commands</strong>. Telegram apps will have interface shortcuts for these commands.</p>
 <ul>
@@ -181,13 +198,13 @@ width=44% /></a>
 <p>A group management bot is the <strong>perfect example</strong>: an admin could select a chat the bot should manage, and then select a user it should promote – this would happen without ever typing any text.</p>
 <p>Here is a <strong>quick start guide</strong> to use this feature:</p>
 <ul>
-<li>Pick a set of criteria and store them in a <a href="https://core.telegram.org/bots/api#keyboardbuttonrequestchat">KeyboardButtonRequestChat</a> object (or <a href="https://core.telegram.org/bots/api#keyboardbuttonrequestuser">KeyboardButtonRequestUser</a> for users).</li>
-<li>Create a <a href="https://core.telegram.org/bots/api#keyboardbutton">KeyboardButton</a> and store the criteria under <code>request_chat</code> or <code>request_user</code> respectively.</li>
+<li>Pick a set of criteria and store them in a <a href="https://core.telegram.org/bots/api#keyboardbuttonrequestchat">KeyboardButtonRequestChat</a> object (or <a href="https://core.telegram.org/bots/api#keyboardbuttonrequestusers">KeyboardButtonRequestUsers</a> for users).</li>
+<li>Create a <a href="https://core.telegram.org/bots/api#keyboardbutton">KeyboardButton</a> and store the criteria under <code>request_chat</code> or <code>request_users</code> respectively.</li>
 <li>Send a <a href="https://core.telegram.org/bots/api#replykeyboardmarkup">ReplyKeyboardMarkup</a> that contains the button you just created.</li>
-<li>When the user selects a chat, you&#39;ll receive its identifier in a <code>chat_shared</code> or <code>user_shared</code> service message.</li>
+<li>When the user selects a chat or users, your bot will receive a <code>chat_shared</code> or <code>users_shared</code> service message containing the selection.</li>
 </ul>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted="" poster="/file/464001277/1132d/dAINJNWL9jw.34909/08eaf646c24be49a87" style="max-width: 400px;" title="" alt="" vindex="1" preload="auto">link
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted="" poster="/file/464001277/1132d/dAINJNWL9jw.34909/08eaf646c24be49a87" style="max-width: 400px;" title="Chat and User Selection" aria-label="Chat and User Selection" alt="Chat and User Selection" vindex="1" preload="auto">
   <source src="/file/464001095/11121/M6HpBwtivTE.1913043.mp4/0514a29affa78a6dca" type="video/mp4">
  </video>
 </div>
@@ -202,17 +219,19 @@ width=44% /></a>
 <li><a href="#inline-requests"><strong>Inline mode</strong></a> allows sending requests to bots right from the input field – from any chat on Telegram.</li>
 <li><a href="#deep-linking"><strong>Deep linking</strong></a> allows special links that send certain parameters to the bot when opened.</li>
 <li><a href="#attachment-menu"><strong>Attachment menu</strong></a> integration makes it possible to use bots from the attachment menu in chats.</li>
+<li><a href="#streaming-replies"><strong>Streaming replies</strong></a> let bots show progress while generating a response.</li>
+<li><a href="#topics-in-private-chats"><strong>Topics in private chats</strong></a> help organize long-running conversations with a bot.</li>
 </ul>
 <h4><a class="anchor" name="inline-requests" href="#inline-requests"><i class="anchor-icon"></i></a>Inline Requests</h4>
 <p>Users can interact with your bot via <strong>inline queries</strong> straight from the message field <strong>in any chat</strong>. All they need to do is start a message with your bot&#39;s <em>@username</em> and enter a keyword.</p>
 <p>Having received the query, your bot can return some results. As soon as the user selects one, it is sent to the <strong>relevant chat</strong>. This way, people can request and send content from your bot in any of their chats, groups or channels.</p>
 <p>Remember that inline functionality has to be enabled via <a href="https://t.me/botfather">@BotFather</a>, or your bot will not receive inline <a href="/bots/api#update">Updates</a>.</p>
 <div>
-  <a href="/file/464001466/10e4a/r4FKyQ7gw5g.134366/f2606a53d683374703" target="_blank"><img src="/file/464001466/10e4a/r4FKyQ7gw5g.134366/f2606a53d683374703" title=""  class="dev_page_image" width=51%/></a>
+  <a href="/file/464001466/10e4a/r4FKyQ7gw5g.134366/f2606a53d683374703" target="_blank"><img src="/file/464001466/10e4a/r4FKyQ7gw5g.134366/f2606a53d683374703" title="Inline Requests" alt="Inline query results from a bot" class="dev_page_image" width=51%/></a>
 </div>
 
 <blockquote>
-<p>Examples of inline bots include <a href="https://gif.t.me">@gif</a>, <a href="https://bing.t.me">@bing</a> and <a href="https://wiki.t.me">@wiki</a>. <a href="#web-apps">Web App</a> bots can also be used inline – try typing <a href="https://durgerkingbot.t.me">@durgerkingbot</a> in any chat.</p>
+<p>Examples of inline bots include <a href="https://gif.t.me">@gif</a>, <a href="https://bing.t.me">@bing</a> and <a href="https://wiki.t.me">@wiki</a>. <a href="#mini-apps">Mini App</a> bots can also be used inline – try typing <a href="https://durgerkingbot.t.me">@durgerkingbot</a> in any chat.</p>
 </blockquote>
 <h4><a class="anchor" name="deep-linking" href="#deep-linking"><i class="anchor-icon"></i></a>Deep Linking</h4>
 <p>Telegram bots have a deep linking mechanism that allows <strong>additional parameters</strong> to be passed to the bot on startup. It could be a command that launches the bot – or an authentication token to connect the user&#39;s Telegram account to their account on another platform.</p>
@@ -229,12 +248,12 @@ width=44% /></a>
 <p>Following a link with this parameter prompts the user to select a group to add the bot to – the resulting update will contain text in the form:</p>
 <pre><code>/start@your_bot spaceship</code></pre>
 <blockquote>
-<p><a href="#web-apps">Web Apps</a> also support deep linking, for more information check out our <a href="/bots/webapps#adding-bots-to-the-attachment-menu">dedicated guide</a>.</p>
+<p><a href="#mini-apps">Mini Apps</a> also support deep linking, for more information check out our <a href="/bots/webapps#adding-bots-to-the-attachment-menu">dedicated guide</a>.</p>
 </blockquote>
 <h4><a class="anchor" name="attachment-menu" href="#attachment-menu"><i class="anchor-icon"></i></a>Attachment Menu</h4>
-<p>Certain bots can be added directly to a user’s <strong>attachment menu</strong> – giving them easy access to the bot in any chat. Currently, this option is restricted to certain <a href="/bots/webapps#launching-web-apps-from-the-attachment-menu">approved bots</a>, but may be expanded later.</p>
+<p>Certain bots can be added directly to a user’s <strong>attachment menu</strong> – giving them easy access to the bot in any chat. Currently, this option is restricted to certain <a href="/bots/webapps#adding-bots-to-the-attachment-menu">approved bots</a>, but may be expanded later.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/464001491/11651/uwMWNdO29NE.215169/1b37285bbd8fc81244" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/464001491/11651/uwMWNdO29NE.215169/1b37285bbd8fc81244" style="max-width: 400px;" title="Attachment Menu" aria-label="Attachment Menu" alt="Bot available from the attachment menu">
   <source src="/file/464001177/11b03/ruSbBLQiLJ8.928268.mp4/d9ad95048d23f3cc3f" type="video/mp4">
  </video>
 </div>
@@ -244,8 +263,15 @@ width=44% /></a>
 </blockquote>
 <h4><a class="anchor" name="ephemeral-messages" href="#ephemeral-messages"><i class="anchor-icon"></i></a>Ephemeral Messages</h4>
 <p><a href="/bots/api#ephemeral-messages-and-commands">Ephemeral messages</a> let bots send <strong>private responses</strong> inside group chats – visible only to a specific user and the bot. They are ideal for welcome messages, whispers, personalized summaries, contextual hints and other interactions that <strong>shouldn&#39;t clutter</strong> the conversation for others.</p>
+<p>When a user taps an inline button, bots can also <a href="/bots/api#ephemeralmessageparameters">show an ephemeral response</a> in place of the message containing that button – creating a private overlay for that user without changing what anyone else sees. </p>
+<p>Bots can also easily <a href="https://core.telegram.org/bots/api#replyparameters">reply</a> to ephemeral messages or <a href="https://core.telegram.org/bots/api#deleteephemeralmessage">delete</a> them before they expire. </p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+  <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted="" poster="/file/400780400707/6/59tqj-7zkUI.67925.jpg/8f9328dc5077455151" style="max-width: 400px;" title="Ephemeral Messages" aria-label="Ephemeral Messages" alt="Inline buttons in an ephemeral message overlay" vindex="1" preload="auto"> <source src="/file/400780400139/7/vJgWIvqqzxA.3710126.mp4/718db1a1f9ad8f5cdf" type="video/mp4">
+  </video>
+</div>
+
 <blockquote>
-<p>Bots can also <a href="https://core.telegram.org/bots/api#replyparameters">reply</a> to ephemeral messages or <a href="https://core.telegram.org/bots/api#deleteephemeralmessage">delete</a> them before they expire. </p>
+<p>Check out <a href="#rich-messages">rich messages</a> to learn how to combine ephemeral personalized views with complex <a href="/bots/api#inputrichmessage">structured content</a> and embedded <a href="/bots/api#richmessagebutton">buttons</a>.</p>
 </blockquote>
 <p><strong>Rich Media Support</strong><br>Ephemeral responses are not limited to plain text. Bots can send a wide variety of content privately within a group, including:</p>
 <ul>
@@ -254,87 +280,216 @@ width=44% /></a>
 </ul>
 <p><strong>Two-Way Privacy with Ephemeral Commands</strong><br>In addition to bots sending private messages, users can send <strong>ephemeral commands</strong> to bots. When a command is configured as ephemeral, the user&#39;s initial message remains completely invisible to other group members and other bots, allowing for discreet interactions in public spaces.</p>
 <div>
-  <a href="/file/400780400146/2/NCkBKEh9JJ0.148639.jpg/abe830e0723e38a4f9" target="_blank"><img src="/file/400780400146/2/NCkBKEh9JJ0.148639.jpg/abe830e0723e38a4f9" title=""  class="dev_page_image" width=44% /></a>
+  <a href="/file/400780400146/2/NCkBKEh9JJ0.148639.jpg/abe830e0723e38a4f9" target="_blank"><img src="/file/400780400146/2/NCkBKEh9JJ0.148639.jpg/abe830e0723e38a4f9" title="Ephemeral Messages" alt="Private ephemeral message shown to one user" class="dev_page_image" width=44% /></a>
 </div>
 
 <blockquote>
 <p>Telegram clients visually distinguish ephemeral bot <a href="https://core.telegram.org/bots/api#botcommand">commands</a>.</p>
 </blockquote>
+<h4><a class="anchor" name="streaming-replies" href="#streaming-replies"><i class="anchor-icon"></i></a>Streaming Replies</h4>
+<p>In private chats, bots can show a <strong>draft response</strong> while it is being generated, instead of making the user wait for the complete message. This is useful for AI assistants, long-running searches, document generation and other tasks where showing progress makes the interaction more responsive.</p>
+<p>You can update a draft with regular text or <a href="#rich-messages">richly formatted content</a>, then send the final result with <a href="/bots/api#sendmessage">sendMessage</a> or <a href="/bots/api#sendrichmessage">sendRichMessage</a> when it is ready. Drafts are temporary previews – if the result should remain in the chat, make sure to send the completed message.</p>
+<p>The user can also stop a draft while it is being generated. When the stop option is enabled, your bot will receive an update when the user presses the <strong>Stop</strong> button, allowing your application to cancel the model or other work behind the scenes.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400085/4/bZ4p-Av_XQs.62528.jpg/a9eeb0b97a640f2ea7" style="max-width: 400px;" title="Streaming Text for Bots" aria-label="Streaming Text for Bots" alt="Bot response streaming as it is generated">
+  <source src="/file/400780400434/3/2Ju3ell42to.5230079.mp4/856bd9fde86a4f24ac" type="video/mp4">
+ </video>
+</div>
+
+<p>An empty <a href="/bots/api#sendmessagedraft"><code>sendMessageDraft</code></a> displays a <strong>Thinking…</strong> placeholder. Rich drafts can also use the <a href="/bots/api#rich-html-style"><code>&lt;tg-thinking&gt;</code></a> tag or the <a href="/bots/api#inputrichblockthinking"><code>InputRichBlockThinking</code></a> type to show a visible placeholder. This is a presentation element, not a transcript of the model&#39;s reasoning.</p>
+<blockquote>
+<p>See <a href="/bots/api#sendmessagedraft">sendMessageDraft</a>, <a href="/bots/api#sendrichmessagedraft">sendRichMessageDraft</a> and <a href="/bots/api#messagegenerationstopped">MessageGenerationStopped</a> for the complete workflow.</p>
+</blockquote>
+<h4><a class="anchor" name="topics-in-private-chats" href="#topics-in-private-chats"><i class="anchor-icon"></i></a>Topics in Private Chats</h4>
+<p>Bots and users can organize long-running private conversations into <strong>separate topics</strong> – for example, one topic for an order, another for technical support and a third for a recurring task. This makes it easier to keep several conversations with the same bot neatly separated without opening multiple chats.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400227/2/btvhtJcqT_A.76194.jpg/b56e1d38cc2e92e2aa" style="max-width: 400px;" title="Threads and Streaming Responses for AI Bots" aria-label="Threads and Streaming Responses for AI Bots" alt="AI bot topics and streamed responses">
+  <source src="/file/400780400658/2/zyAsgGtzdvg.5107918.mp4/413b3825ef972abc2a" type="video/mp4">
+ </video>
+</div>
+
+<blockquote>
+<p>Private-chat topics need to be enabled for the bot via <a href="https://t.me/botfather">@BotFather</a>. See <a href="/bots/api#createforumtopic">createForumTopic</a>, <a href="/bots/api#editforumtopic">editForumTopic</a> and <a href="/bots/api#deleteforumtopic">deleteForumTopic</a> for more information.</p>
+</blockquote>
+<hr>
+<h3><a class="anchor" name="ai-agents" href="#ai-agents"><i class="anchor-icon"></i></a>AI Agents</h3>
+<p>Telegram is the only platform where all <strong>AI models</strong> can <a href="https://telegram.org/blog/ai-bot-revolution-11-new-features">compete</a> freely – while users remain in control of their experience. Third-party <a href="/bots/features#ai-agents">AI bots</a> are welcome to communicate with users and <a href="/bots/features#bot-to-bot-communication">each other</a> (as long as they stick to the <a href="https://telegram.org/tos/bot-developers#4-3-data-scraping">rules</a>).</p>
+<p>Telegram apps natively support <strong>AI interfaces</strong> such as <a href="#topics-in-private-chats">threaded conversations</a> and <a href="/bots/features#streaming-replies">real-time streaming for responses</a>. Users can quickly <a href="/bots/features#guest-bots">summon specialized assistants</a> into the same conversation, bring several agents together around one task or instruct them to <a href="/bots/features#business-bots">manage their account</a>.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400227/2/btvhtJcqT_A.76194.jpg/b56e1d38cc2e92e2aa" style="max-width: 400px;" title="Threads and Streaming Responses for AI Bots" aria-label="Threads and Streaming Responses for AI Bots" alt="AI bot topics and streamed responses">
+  <source src="/file/400780400658/2/zyAsgGtzdvg.5107918.mp4/413b3825ef972abc2a" type="video/mp4">
+ </video>
+</div>
+
+<blockquote>
+<p>The Bot API provides the messaging, multi-platform presentation, access and lifecycle features – the model, memory and bot logic are flexible and entirely up to you.</p>
+</blockquote>
+<p>Here are a few examples of what you can build:</p>
+<ul>
+<li>A <strong>research assistant</strong> that streams a comparison of several sources and then presents the result as a structured report with links and follow-up buttons.</li>
+<li>A <strong>group helper</strong> that can be mentioned for translation, fact-checking, image generation or another context-specific task without being added to the group.</li>
+<li>A <strong>multi-agent workflow</strong> where a coordinator bot asks specialist bots to review, translate, schedule or process an order before combining the results.</li>
+<li>A <strong>business secretary</strong> that processes incoming business messages and performs only the actions allowed by the account owner.</li>
+</ul>
+<p>The individual building blocks are described in more detail throughout this page:</p>
+<ul>
+<li><a href="#topics-in-private-chats">Topics in Private Chats</a> keep separate projects or support cases organized – improving on established web-based AI chat UIs.</li>
+<li><a href="#streaming-replies">Streaming Replies</a> show progress while the agent works and allow users to stop a draft at any point.</li>
+<li><a href="#rich-messages">Rich Messages</a> turn the final result into a structured report, checklist, comparison, explanation or interactive flow.</li>
+<li><a href="#guest-bots">Guest Bots</a> and <a href="#inline-requests">Inline Mode</a> make specialized agents available where they are needed.</li>
+<li><a href="#bot-to-bot-communication">Bot-to-Bot Communication</a> and <a href="#managed-bots">Managed Bots</a> enable delegation, coordination and complex multi-agent setups.</li>
+<li><a href="#business-bots">Business Bots</a> allow account automation with explicit rights, while <a href="#mini-apps">Mini Apps</a> provide a richer workspace for configuration, approvals and dashboards.</li>
+</ul>
+<blockquote>
+<p>This page and the full <a href="/bots/api">Bot API documentation</a> document itself are AI-friendly! If you&#39;d like to build a bot but have limited coding experience, simply direct your favorite AI tool to read our documentation and help you get started.</p>
+</blockquote>
+<hr>
+<h3><a class="anchor" name="media-and-messaging" href="#media-and-messaging"><i class="anchor-icon"></i></a>Media and Messaging</h3>
+<p>Bots can create <strong>polls and quizzes</strong>, manage collaborative <strong>checklists</strong> and send rich media such as <strong>Live Photos</strong> – giving users more ways to interact with your service.</p>
+<h4><a class="anchor" name="polls-and-quizzes" href="#polls-and-quizzes"><i class="anchor-icon"></i></a>Polls and Quizzes</h4>
+<p>Polls are useful for collecting feedback, running surveys, testing knowledge or letting users choose what happens next. In addition to regular polls, bots can create quizzes and control how users participate.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400259/3/6devMXGy5_4.64419.jpg/daf64674e5523b9426" style="max-width: 400px;" title="10+ New Features for Polls" aria-label="10+ New Features for Polls" alt="Polls with media and additional participation options">
+  <source src="/file/400780400118/1/j6mkunphO2E.7657802.mp4/b669e7300f659bd00a" type="video/mp4">
+ </video>
+</div>
+
+<blockquote>
+<p>Bots can also add poll media or links, restrict participation and let users suggest new options. See <a href="/bots/api#poll">Poll</a> and <a href="/bots/api#sendpoll">sendPoll</a> for the full list of available options.</p>
+</blockquote>
+<h4><a class="anchor" name="checklists" href="#checklists"><i class="anchor-icon"></i></a>Checklists</h4>
+<p>With <strong>checklists</strong>, bots can help teams and individuals track tasks without leaving Telegram. They are useful for project handoffs, event preparation, moderation queues, shopping lists and other shared activities.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400269/3/sxD0KDicJWk.51274.jpg/7084e243a25b46704f" style="max-width: 400px;" title="Checklists" aria-label="Checklists" alt="Collaborative checklist with tasks and permissions">
+  <source src="/file/400780400317/2/QZU-sxLjJoo.3068919.mp4/e44f8b16684e7f8bff" type="video/mp4">
+ </video>
+</div>
+
+<blockquote>
+<p>You can check (pun intended) the <a href="/bots/api#checklist">Checklist</a> documentation for all available features.</p>
+</blockquote>
+<h4><a class="anchor" name="live-photos" href="#live-photos"><i class="anchor-icon"></i></a>Live Photos</h4>
+<p>Bots can send <strong>Live Photos</strong> – a photo paired with a short video – and use them in albums and paid media. This is useful for eventful moments, product previews, interactive albums and other content where a still image does not do the shot justice.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400645/2/KJSuP7na3nY.63428.jpg/5bee0074b97571feb1" style="max-width: 400px;" title="Live and Motion Photos" aria-label="Live and Motion Photos" alt="Live and Motion Photos with paired movement">
+  <source src="/file/400780400607/3/DyZaAN7_tWw.6352123.mp4/17bd9b603a88ed1e08" type="video/mp4">
+ </video>
+</div>
+
+<blockquote>
+<p>See <a href="/bots/api#livephoto">LivePhoto</a>, <a href="/bots/api#sendlivephoto">sendLivePhoto</a> and <a href="/bots/api#sendmediagroup">sendMediaGroup</a> to get started.</p>
+</blockquote>
 <hr>
 <h3><a class="anchor" name="integration" href="#integration"><i class="anchor-icon"></i></a>Integration</h3>
 <p>There are various ways of further integrating bots with Telegram and other services.</p>
 <ul>
-<li>Use <a href="#web-apps">Web Apps</a> to replace any website.</li>
-<li>Build tools and integrate <a href="#bots-for-business">business services</a>.</li>
+<li>Use <a href="#mini-apps">Mini Apps</a> to bring complete services into Telegram.</li>
+<li>Build tools and integrate <a href="#business-bots">business services</a>.</li>
 <li>Accept <a href="#payments">Payments</a> via third-party payment providers that support integration with Bots and Mini Apps.</li>
 <li>Connect to Telegram using the <a href="#web-login">Web Login</a> functionality.</li>
 <li>Create gaming bots by integrating <a href="#html5-games">HTML5 Games</a>.</li>
 <li>Help users create and manage <a href="#stickers-and-custom-emoji">Telegram Stickers</a>.</li>
 </ul>
+<h3><a class="anchor" name="communities" href="#communities"><i class="anchor-icon"></i></a>Communities</h3>
+<p>Telegram&#39;s <a href="https://telegram.org/blog/communities-editor-invisible-messages">Communities</a> feature connects several groups, channels and bots around a shared topic or audience.</p>
+<p>Bot have extensive, granual chat management capabilities that can be useful for cross-chat onboarding, shared moderation workflows and community-wide notifications.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400627/2/m0_w0ABzq9E.64892.jpg/dd79c8957289c99b38" style="max-width: 400px;" title="Telegram Communities" aria-label="Telegram Communities" alt="Several Telegram chats linked in a Community">
+  <source src="/file/400780400937/7/7FrlfQ3X9TA.9490984.mp4/905d7975740c1999ae" type="video/mp4">
+ </video>
+</div>
+
+<blockquote>
+<p>See <a href="/bots/api#community">Community</a>, <a href="/bots/api#communitychatadded">CommunityChatAdded</a>, <a href="/bots/api#communitychatjoined">CommunityChatJoined</a>, <a href="/bots/api#communitychatremoved">CommunityChatRemoved</a> and <a href="/bots/api#chatfullinfo">ChatFullInfo</a> for the relevant objects and updates.</p>
+</blockquote>
+<h3><a class="anchor" name="channel-direct-messages-and-suggested-posts" href="#channel-direct-messages-and-suggested-posts"><i class="anchor-icon"></i></a>Channel Direct Messages and Suggested Posts</h3>
+<p>Channels can have a dedicated forum-like directory for direct messages where users can privately <strong>contact the channel</strong> staff in a chat topic. Bots with the appropriate channel access can send messages to a specific such topic, identify the parent channel and respond to incoming messages.</p>
+<p>Creators can also receive <strong>suggested posts</strong> from users in these chats. A bot can help prepare and review them, and can approve or decline incoming posts when it has <code>can_post_messages</code> or <code>can_manage_direct_messages</code>, respectively. </p>
+<blockquote>
+<p>Bots can also send suggested posts to these topics, including a proposed price and send date.</p>
+</blockquote>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; width: 100%;">
+  <div class="blog_video_player_wrap" style="min-width: 0; margin: 20px 0;">
+    <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400084/2/_hQwpV3CVP8.73487.jpg/9792f429add8851940" style="display: block; width: 100%; max-width: 400px;" title="Send Direct Messages to Channels" aria-label="Send Direct Messages to Channels" alt="Direct message conversation with a channel">
+      <source src="/file/400780400969/4/8oSVHSECr78.2425074.mp4/8ee458c757ef489fa9" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="blog_video_player_wrap" style="min-width: 0; margin: 20px 0;">
+    <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400950/4/YLPM09EO_4o.55471.jpg/fc5293959b524391a4" style="display: block; width: 100%; max-width: 400px;" title="Suggest Posts in Channels" aria-label="Suggest Posts in Channels" alt="Suggested post submitted to a channel">
+      <source src="/file/400780400903/2/skvhS_XFJZk.2036621.mp4/73e913ba3d6f37bd45" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+<blockquote>
+<p>See <a href="/bots/api#directmessagestopic">DirectMessagesTopic</a>, <a href="/bots/api#suggestedpostinfo">SuggestedPostInfo</a>, <a href="/bots/api#suggestedpostparameters">SuggestedPostParameters</a>, <a href="/bots/api#approvesuggestedpost">approveSuggestedPost</a> and <a href="/bots/api#declinesuggestedpost">declineSuggestedPost</a> for the relevant API objects and methods.</p>
+</blockquote>
 <h3><a class="anchor" name="monetization" href="#monetization"><i class="anchor-icon"></i></a>Monetization</h3>
 <p>Telegram offers a <strong>robust ecosystem</strong> of monetization features, allowing any bot to support its development with <strong>multiple revenue streams</strong>.</p>
 <h4><a class="anchor" name="telegram-stars" href="#telegram-stars"><i class="anchor-icon"></i></a>Telegram Stars</h4>
 <p>Telegram Stars power all digital transactions between bots and users. Users can acquire Stars through in-app purchases via Apple and Google or via <a href="https://t.me/premiumbot">@PremiumBot</a>.</p>
 <p>Bots can use the Stars they receive to <a href="https://telegram.org/blog/dynamic-video-quality-and-more#increased-message-limits-for-bots">increase message limits</a>, <a href="https://core.telegram.org/bots/api#sendgift">send gifts</a> to users or <a href="https://telegram.org/blog/monetization-for-channels">accept rewards</a> in Toncoin.</p>
 <div>
-  <a href="/file/400780400296/3/gxdJYNSAgsg.335683/d6be0165da6f79d605" target="_blank"><img src="/file/400780400296/3/gxdJYNSAgsg.335683/d6be0165da6f79d605" title=""  width=50% class="dev_page_image" /></a>
+  <a href="/file/400780400296/3/gxdJYNSAgsg.335683/d6be0165da6f79d605" target="_blank"><img src="/file/400780400296/3/gxdJYNSAgsg.335683/d6be0165da6f79d605" title="Telegram Stars" alt="Telegram Stars used for bot transactions" width=50% class="dev_page_image" /></a>
 </div>
 
 <h4><a class="anchor" name="digital-products" href="#digital-products"><i class="anchor-icon"></i></a>Digital Products</h4>
 <p>Services can use their bot to sell <strong>digital goods</strong> and <strong>services</strong> – like online courses, commissioned artwork and <strong>items in games</strong>.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400936/3/oM0NSZq-c-U.70843/aabc7c9f3196368434" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400936/3/oM0NSZq-c-U.70843/aabc7c9f3196368434" style="max-width: 400px;" title="Digital Products" aria-label="Digital Products" alt="Digital Products">
   <source src="/file/400780400194/6/alSNP8Zj18E.7354629.mp4/96b4d26b22e610c8bd" type="video/mp4">
  </video>
 </div>
 
 <h4><a class="anchor" name="paid-media" href="#paid-media"><i class="anchor-icon"></i></a>Paid Media</h4>
-<p>Bots can post <strong>paid photos</strong> and <strong>videos</strong> – and users are only allowed to view the media after paying to unlock it. This functionality is available to <strong>all bots</strong> – including <strong>bot admins</strong> in channels and bots managing <a href="https://core.telegram.org/bots/features#bots-for-business">Telegram Business</a> accounts.</p>
- <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400191/2/d1Up_PAMRtA.54872/9d7869171e596471c0" style="max-width: 400px;" title="" alt="">
+<p>Bots can post <strong>paid photos</strong> and <strong>videos</strong> – users can view the media only after paying to unlock it. This functionality is available where the bot can send messages in the target chat, including channel chats where it has the relevant paid-media permission and chats managed through a Business Connection.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400191/2/d1Up_PAMRtA.54872/9d7869171e596471c0" style="max-width: 400px;" title="Paid Media" aria-label="Paid Media" alt="Paid Media">
   <source src="/file/400780400689/3/O_choNcIqzQ.3512508.mp4/70ade9ae08c6c523d7" type="video/mp4">
  </video>
 </div>
 
-
 <h4><a class="anchor" name="subscription-plans" href="#subscription-plans"><i class="anchor-icon"></i></a>Subscription Plans</h4>
 <p>Developers are able to <strong>offer paid subscriptions</strong> to their bot – adding <strong>multiple tiers</strong> of content and features tailored to their audience.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400439/3/fsIQBVDv8iM.42498/fb93eac0593624c6ff" style="max-width: 400px;" alt="Subscription Plans for Mini Apps">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400439/3/fsIQBVDv8iM.42498/fb93eac0593624c6ff" style="max-width: 400px;" title="Subscription Plans" aria-label="Subscription Plans" alt="Subscription Plans for Bots">
   <source src="/file/400780400502/3/yVyvz2IBzwk.3397983.mp4/b34526a4a87a0e18cc" type="video/mp4">
  </video></div>
-   <!--<p>TITLE</p>-->
 </div>
 
 <h4><a class="anchor" name="revenue-sharing-from-telegram-ads" href="#revenue-sharing-from-telegram-ads"><i class="anchor-icon"></i></a>Revenue Sharing from Telegram Ads</h4>
 <p>Developers can participate in <a href="https://telegram.org/blog/monetization-for-channels">revenue sharing</a> from <a href="https://telegram.org/blog/monetization-for-channels#ton-based-ads">Telegram Ads</a> – receiving <strong>50%</strong> of the revenue from ads that appear in the chat with their bot.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400621/3/IdLKAeBBUUo.76649/09cee49e7c6f27dc54" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400621/3/IdLKAeBBUUo.76649/09cee49e7c6f27dc54" style="max-width: 400px;" title="Revenue Sharing from Telegram Ads" aria-label="Revenue Sharing from Telegram Ads" alt="Revenue Sharing from Telegram Ads">
   <source src="/file/400780400184/3/rErQ9dD6_gk.1672517.mp4/5dd26de5a94919d747" type="video/mp4">
  </video>
 </div>
 
 
 <h3><a class="anchor" name="mini-apps" href="#mini-apps"><i class="anchor-icon"></i></a>Mini Apps</h3>
-<p><a href="webapps">Mini Apps</a> allow developers to create infinitely flexible interfaces that can be launched right inside Telegram – integrating seamlessly with the app and replacing <strong>any website</strong>.</p>
+<p><a href="webapps">Mini Apps</a> allow developers to create flexible interfaces that can be launched right inside Telegram – integrating seamlessly with the app and bringing complete services into the chat.</p>
 <p>If your bot is a mini app, you can add a prominent <strong>Launch app</strong> button as well as demo videos and screenshots to the bot’s profile. To do this, go to <a href="https://t.me/botfather">@BotFather</a> and set up your bot&#39;s <a href="webapps#launching-the-main-mini-app">Main Mini App</a>.</p>
 <blockquote>
 <p>Mini apps are covered in detail in our <a href="webapps">dedicated guide</a> – you should read it carefully to learn the wide variety of features they can offer.</p>
 </blockquote>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/464001434/100bf/eWprjdgzEbE.100386/644bbea83084f44c8f" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/464001434/100bf/eWprjdgzEbE.100386/644bbea83084f44c8f" style="max-width: 400px;" title="Mini Apps" aria-label="Mini Apps" alt="Mini Apps">
   <source src="/file/464001679/11aa9/KQx_BlPVXRo.4922145.mp4/c65433c8ac11a347a8" type="video/mp4">
  </video>
 </div>
 
 <p>If you develop a <strong>mini app</strong>, be sure to follow our <a href="webapps#design-guidelines">design guidelines</a> – you&#39;ll want your custom interface to <strong>seamlessly integrate</strong> into the app to provide users the best possible experience.</p>
+<blockquote>
+<p><strong>Note:</strong> “Mini Apps” were originally introduced as “Web Apps”. For backward compatibility, certain Bot API types, parameter names (such as <code>web_app</code> or <code>WebAppInfo</code>), and documentation anchors may still use the legacy “web app” terminology. Both terms refer to the same feature.</p>
+</blockquote>
 <h4><a class="anchor" name="seamless-integration-with-telegram" href="#seamless-integration-with-telegram"><i class="anchor-icon"></i></a>Seamless Integration With Telegram</h4>
 <p>Mini apps integrate <strong>seamlessly</strong> with Telegram – from receiving detailed <a href="webapps#themeparams">theme settings</a> to using native dialogs for reading <a href="webapps#initializing-mini-apps">QR codes</a>, controlling <a href="webapps#biometricmanager">biometrics</a>, sharing media <a href="webapps#initializing-mini-apps">directly to stories</a> and more.</p>
-<p>When opened from a <a href="webapps#direct-link-mini-apps">direct link</a> in a group, mini apps can also use the <code>chat_instance</code> parameter to track of the current context, supporting <strong>shared usage</strong> by multiple chat members – to create live whiteboards, group orders, multiplayer games and much more.</p>
+<p>When opened from a <a href="webapps#direct-link-mini-apps">direct link</a> in a group, mini apps can also use the <code>chat_instance</code> parameter to track the current context, supporting <strong>shared usage</strong> by multiple chat members – to create live whiteboards, group orders, multiplayer games and much more.</p>
 <h4><a class="anchor" name="mini-app-previews" href="#mini-app-previews"><i class="anchor-icon"></i></a>Mini App Previews</h4>
 <p>Developers can <strong>upload screenshots</strong> and <strong>video demos</strong> of their mini app right from the bot&#39;s <strong>profile page</strong> – giving users an overview of the app&#39;s features and functionality. These media previews will be shown to any user who <strong>views your app</strong> – like in the <a href="#mini-app-store">Mini App Store</a> or via Search.</p>
 <div>
-  <a href="/file/400780400954/6/9rSb8AM77Ss.158225/1c635ef877be7a6747" target="_blank"><img src="/file/400780400954/6/9rSb8AM77Ss.158225/1c635ef877be7a6747" title=""  width=50% class="dev_page_image" /></a>
+  <a href="/file/400780400954/6/9rSb8AM77Ss.158225/1c635ef877be7a6747" target="_blank"><img src="/file/400780400954/6/9rSb8AM77Ss.158225/1c635ef877be7a6747" title="Mini App Previews" alt="Mini App screenshots and video previews" width=50% class="dev_page_image" /></a>
 </div>
 
 <blockquote>
@@ -344,7 +499,7 @@ width=44% /></a>
 <p>More than <strong>500 million</strong> out of Telegram&#39;s <a href="https://t.me/durov/337">950</a> million users interact with mini apps every month. Successful mini apps have the chance to be <strong>highlighted</strong> in the Telegram Mini App Store – appearing for all users in the <em>&#39;Apps&#39;</em> tab of Search.</p>
 <p>Featured mini apps are chosen based on how they <strong>enrich the Telegram ecosystem</strong>. To increase the chances of being featured, you must <strong>enable</strong> the <a href="https://core.telegram.org/bots/webapps#launching-the-main-mini-app">Main Mini App</a> in <a href="https://t.me/botfather">@BotFather</a>, <strong>upload</strong> high-quality media demos showcasing your app to your bot&#39;s profile and <strong>accept payments</strong> in <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a>.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/400780400572/1/KDOL4LVn0qU.46714/87e3de3384c284a00d" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/400780400572/1/KDOL4LVn0qU.46714/87e3de3384c284a00d" style="max-width: 400px;" title="Main Mini Apps" aria-label="Main Mini Apps" alt="Main Mini Apps">
   <source src="/file/400780400928/1/bb7CeIf11Es.6604686.mp4/ea45ba121b84766f1d" type="video/mp4">
  </video>
 </div>
@@ -355,19 +510,17 @@ width=44% /></a>
 <h4><a class="anchor" name="home-screen-shortcuts" href="#home-screen-shortcuts"><i class="anchor-icon"></i></a>Home Screen Shortcuts</h4>
 <p>Users can place <strong>direct shortcuts</strong> to specific mini apps on the <strong>home screen</strong> of their devices – accessing their favorite games and services in <strong>one tap</strong>.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400665/3/ZuHweGNPf7A.70269/25510c5b11eae9f59c" style="max-width: 400px;" alt="Home Screen Shortcuts">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400665/3/ZuHweGNPf7A.70269/25510c5b11eae9f59c" style="max-width: 400px;" title="Home Screen Shortcuts" aria-label="Home Screen Shortcuts" alt="Home Screen Shortcuts">
   <source src="/file/400780400367/2/-_xiH7WxmNQ.4594686.mp4/5cd62ffa43c2e738cf" type="video/mp4">
  </video></div>
-   <!--<p>TITLE</p>-->
 </div>
 
 <h4><a class="anchor" name="customizable-loading-screens" href="#customizable-loading-screens"><i class="anchor-icon"></i></a>Customizable Loading Screens</h4>
 <p>The loading screen of mini apps can be <strong>customized</strong> in <a href="https://t.me/botfather">@Botfather</a> – where developers can add <strong>their own icon</strong> and set <strong>specific colors</strong> for both light and dark themes.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400835/2/aRhKl3FcZ3E.36465/301b9f47850fd6a489" style="max-width: 400px;" alt="">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400835/2/aRhKl3FcZ3E.36465/301b9f47850fd6a489" style="max-width: 400px;" title="Customizable Loading Screens" aria-label="Customizable Loading Screens" alt="Customizable Loading Screens">
   <source src="/file/400780400886/3/bjpTPLexlrk.1338212.mp4/77874dd70d1c0099e1" type="video/mp4">
  </video></div>
-   <!--<p>TITLE</p>-->
 </div>
 
 <blockquote>
@@ -376,17 +529,16 @@ width=44% /></a>
 <h4><a class="anchor" name="full-screen-mode" href="#full-screen-mode"><i class="anchor-icon"></i></a>Full-Screen Mode</h4>
 <p>Mini apps are able to use the <strong>entire screen</strong> in portrait or <strong>landscape orientation</strong> – allowing for <strong>immersive games</strong> and media with <strong>expanded gestures</strong> and interfaces.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400978/2/DBP3J35bdpk.40489/3d98524f7a0706a481" style="max-width: 400px;" alt="">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400978/2/DBP3J35bdpk.40489/3d98524f7a0706a481" style="max-width: 400px;" title="Full-Screen Mode" aria-label="Full-Screen Mode" alt="Full-Screen Mode">
   <source src="/file/400780400987/2/iCXS7IFB7Xs.8013492.mp4/c495193d239ce08990" type="video/mp4">
  </video></div>
-   <!--<p>TITLE</p>-->
 </div>
 
 <h4><a class="anchor" name="setting-emoji-status" href="#setting-emoji-status"><i class="anchor-icon"></i></a>Setting Emoji Status</h4>
 <p>Users can <strong>set an emoji status</strong> inside mini apps or give an app permission to <strong>update it automatically</strong>.</p>
 <p>Developers can also integrate APIs from <strong>other services</strong> or request <a href="https://core.telegram.org/bots/features#geolocation-access">geolocation access</a> – instantly changing a user&#39;s status when they start a game <img class="emoji" src="//telegram.org/img/emoji/40/F09F8EAE.png" width="20" height="20" alt="🎮" /> or leave the office <img class="emoji" src="//telegram.org/img/emoji/40/F09F92BC.png" width="20" height="20" alt="💼" />. </p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400471/4/NxjzOa07Eyc.38651/62c7f445e0e06a4452" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400471/4/NxjzOa07Eyc.38651/62c7f445e0e06a4452" style="max-width: 400px;" title="Setting Emoji Status" aria-label="Setting Emoji Status" alt="Setting Emoji Status">
   <source src="/file/400780400995/4/5X1SreBoHEY.1731682.mp4/0e2f79c91e61b21b58" type="video/mp4">
  </video>
 </div>
@@ -394,7 +546,7 @@ width=44% /></a>
 <h4><a class="anchor" name="sharing-media" href="#sharing-media"><i class="anchor-icon"></i></a>Sharing Media</h4>
 <p>Media generated in mini apps can be shared in <strong>any chat</strong> – letting users effortlessly send <strong>referral codes</strong> and <strong>custom images</strong> to contacts, groups and channels. Alternatively, users can <a href="https://core.telegram.org/bots/webapps#downloadfileparams">download it</a> with a native popup.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400834/4/CMJLT3B0KV0.120338/ed91037a804d009c3b" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400834/4/CMJLT3B0KV0.120338/ed91037a804d009c3b" style="max-width: 400px;" title="Sharing Media" aria-label="Sharing Media" alt="Sharing Media from Mini Apps">
   <source src="/file/400780400757/2/6oKoxK9dEqs.3807035.mp4/3fd29e918d7d3cb7fe" type="video/mp4">
  </video>
 </div>
@@ -402,7 +554,7 @@ width=44% /></a>
 <h4><a class="anchor" name="sharing-from-mini-apps-to-stories" href="#sharing-from-mini-apps-to-stories"><i class="anchor-icon"></i></a>Sharing from Mini Apps to Stories</h4>
 <p>Any media created by the mini app, like whiteboard snapshots, leaderboards and AI-generated videos can be opened with the native story editor via the <a href="webapps#initializing-mini-apps">shareToStory</a> method – for users to share as a <a href="https://telegram.org/tour/stories">Telegram Story</a> right from the mini app.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/400780400371/4/l5lIymX0jZo.24285/0fe2981522348dce64" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/400780400371/4/l5lIymX0jZo.24285/0fe2981522348dce64" style="max-width: 400px;" title="Sharing from Mini Apps to Stories" aria-label="Sharing from Mini Apps to Stories" alt="Sharing media from mini apps to stories">
   <source src="/file/400780400676/1/yDZoLCZ9bKQ.3403169.mp4/6e2b8eca9d3a23cc64" type="video/mp4">
  </video>
 </div>
@@ -413,28 +565,27 @@ width=44% /></a>
 <h4><a class="anchor" name="geolocation-access" href="#geolocation-access"><i class="anchor-icon"></i></a>Geolocation Access</h4>
 <p>Mini apps are able to receive <strong>location permissions</strong> from users – giving developers the ability to make <strong>location-based games</strong> and <strong>interactive maps</strong> for events.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400471/4/NxjzOa07Eyc.38651/62c7f445e0e06a4452" style="max-width: 400px;" alt="Geolocation Access">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400471/4/NxjzOa07Eyc.38651/62c7f445e0e06a4452" style="max-width: 400px;" title="Geolocation Access" aria-label="Geolocation Access" alt="Geolocation Access">
   <source src="/file/400780400995/4/5X1SreBoHEY.1731682.mp4/0e2f79c91e61b21b58" type="video/mp4">
  </video></div>
-   <!--<p>TITLE</p>-->
 </div>
 
 <h4><a class="anchor" name="device-motion-tracking" href="#device-motion-tracking"><i class="anchor-icon"></i></a>Device Motion Tracking</h4>
 <p>Mini Apps can request <a href="https://core.telegram.org/bots/webapps#accelerometer">acceleration</a>, <a href="https://core.telegram.org/bots/webapps#deviceorientation">orientation</a> and <a href="https://core.telegram.org/bots/webapps#gyroscope">rotation</a> data from devices in real time – unlocking support for <strong>motion controls</strong> and <strong>VR experiences</strong>.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400417/2/RaXcGRNXC0g.97571/e112d0d114f083f9b7" style="max-width: 400px;" alt="">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400417/2/RaXcGRNXC0g.97571/e112d0d114f083f9b7" style="max-width: 400px;" title="Device Motion Tracking" aria-label="Device Motion Tracking" alt="Device Motion Tracking">
   <source src="/file/400780400950/2/822tco9D7ig.4744195.mp4/7581b18200d67c56a6" type="video/mp4">
  </video></div>
-   <!--<p>TITLE</p>-->
 </div>
 
 <h4><a class="anchor" name="device-hardware-info" href="#device-hardware-info"><i class="anchor-icon"></i></a>Device Hardware Info</h4>
 <p>A user&#39;s device can send <a href="https://core.telegram.org/bots/webapps#additional-data-in-user-agent">basic hardware info</a> to mini apps, such as its processing power and memory capacity. Mini apps can then use this to <strong>optimize graphics</strong> and automatically <strong>adjust settings</strong> for the smoothest experience.</p>
-<h3><a class="anchor" name="secretary-bots" href="#secretary-bots"><i class="anchor-icon"></i></a>Secretary Bots</h3>
-<p>Bots can enable <strong>Secretary Mode</strong>, allowing users to connect them to their account and allow it to <strong>process incoming messages</strong> and even <strong>respond</strong> on their behalf.</p>
-<p>The <strong>account owner</strong> can specify which chats your bot can access – within those chats, the bot will receive all updates normally supported by the <a href="https://core.telegram.org/bots/api">Bot API</a>, except messages sent by itself and other bots. Depending on the connection settings, your bot may also be able to <strong>send messages</strong> and do other actions on behalf of the account owner in chats that were active in the last 24h.</p>
+<p>&lt;a name=&quot;secretary-bots&quot;&gt;&lt;/a&gt;</p>
+<h3><a class="anchor" name="business-bots" href="#business-bots"><i class="anchor-icon"></i></a>Business Bots</h3>
+<p>Bots can enable <strong>Secretary Mode</strong>, allowing users to connect the bot to their account so it can <strong>process incoming messages</strong> and, where permitted, <strong>respond</strong> on their behalf.</p>
+<p>The <strong>account owner</strong> can specify which chats your bot can access. The <a href="/bots/api#businessbotrights">Business Bot rights</a> control actions such as replying (<code>can_reply</code>), marking messages as read (<code>can_read_messages</code>) and deleting messages. Some actions are limited to eligible private chats with recent incoming messages and require a <code>business_connection_id</code>.</p>
 <div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400639/5/dNX9ECFkOLs.2619159.png/cbaa22f22167d1451b" style="max-width: 600px;" alt="TITLE">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400639/5/dNX9ECFkOLs.2619159.png/cbaa22f22167d1451b" style="max-width: 600px;" title="Business Bots" aria-label="Business Bots" alt="Business Bot connection and permissions">
   <source src="/file/400780400052/3/jE-Kv05jrbA.2162030.mp4/fd1fd73a18777a5503" type="video/mp4">
  </video></div>
 </div>
@@ -444,31 +595,23 @@ width=44% /></a>
 <li>Enable <strong>Secretary Mode</strong> for your bot in <a href="https://t.me/botfather">@BotFather</a>.</li>
 <li>Handle incoming <a href="https://core.telegram.org/bots/api#businessconnection">BusinessConnection</a> updates, signaling that a user has <em>established</em>, <em>edited</em> or <em>ended</em> a Business Connection with your bot. </li>
 <li>Process business messages by handling <code>business_message</code>, <code>edited_business_message</code> and <code>deleted_business_messages</code> updates. </li>
-<li>Check your bot’s write permissions via <code>can_reply</code> in the latest <a href="https://core.telegram.org/bots#businessconnection">BusinessConnection</a> update.</li>
+<li>Check your bot&#39;s permissions in the <code>rights</code> field of the latest <a href="https://core.telegram.org/bots/api#businessconnection">BusinessConnection</a> update, including <code>can_reply</code> for sending and editing messages in private chats with incoming messages in the last 24 hours.</li>
 <li>If allowed to, use the <code>business_connection_id</code> field in <a href="https://core.telegram.org/bots/api#sendmessage">sendMessage</a>, <a href="https://core.telegram.org/bots/api#sendchataction">sendChatAction</a> and other send methods to communicate on behalf of the Business user.</li>
 </ul>
 <p>Users who <strong>connect your bot</strong> to their account will see a <strong>quick action bar</strong> at the top of each managed chat – tapping on “Manage Bot” will redirect them to your bot, which will receive a deep link message in the format <code>/start bizChat&lt;user_chat_id&gt;</code>.</p>
-<!--
-<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400238/1/x875tPT245w.58064/1b426d3eda0a923c03" style="max-width: 400px;" title="" alt="">
-  <source src="/file/400780400382/1/BVN6m4W5a6w.4289566.mp4/9dc47caab261eaade4" type="video/mp4">
- </video>
-</div>
--->
-
 <blockquote>
 <p>Please keep in mind that operating bots on Telegram is subject to the <a href="https://telegram.org/tos/bot-developers">Telegram Bot Developer Terms of Service</a>. Specifically, for Telegram Business, make sure you have read and understood <a href="https://telegram.org/tos/bot-developers#5-4-telegram-business">Section 5.4</a>.</p>
 </blockquote>
 <h3><a class="anchor" name="managed-bots" href="#managed-bots"><i class="anchor-icon"></i></a>Managed Bots</h3>
 <p>Telegram allows bots to create and <strong>manage other bots</strong> on behalf of their owners. You can choose an existing third-party bot as a manager or create your own.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted style="max-width: 400px;" alt="AI Managed Bot">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted style="max-width: 400px;" title="Managed Bots" aria-label="Managed Bots" alt="AI Managed Bot">
   <source src="/file/400780400324/6/GkwTVCnGHaw.2913685.mp4/b5e8e586657ac3e204" type="video/mp4">
  </video></div>
 </div>
 
 <blockquote>
-<p>Your bot manager can allow users to seamlessly spin up their own personal <strong>AI agents</strong>, <a href="#bots-for-business">business bots</a>, games, custom productivity tools and more.</p>
+<p>Your bot manager can allow users to seamlessly spin up their own personal <strong>AI agents</strong>, <a href="#business-bots">business bots</a>, games, custom productivity tools and more.</p>
 </blockquote>
 <h4><a class="anchor" name="creating-your-own-management-bot" href="#creating-your-own-management-bot"><i class="anchor-icon"></i></a>Creating Your Own Management Bot</h4>
 <p>To make your own management bot, simply do the following:</p>
@@ -491,6 +634,8 @@ width=44% /></a>
 <li>Your <strong>@ManagerBot</strong> receives a <code>managed_bot</code> update with a <a href="/bots/api#managedbotupdated">ManagedBotUpdated</a> object.</li>
 <li>This object includes basic information on the new bot and its creator.</li>
 <li>You can use the Bot API method <a href="/bots/api#getmanagedbottoken">getManagedBotToken</a> to fetch the bot&#39;s access token.</li>
+<li>You can use <a href="/bots/api#replacemanagedbottoken">replaceManagedBotToken</a> to revoke the current token and generate a new one when needed.</li>
+<li>You can use <a href="/bots/api#getmanagedbotaccesssettings">getManagedBotAccessSettings</a> and <a href="/bots/api#setmanagedbotaccesssettings">setManagedBotAccessSettings</a> to view and update the managed bot&#39;s access settings.</li>
 <li>You can then control the new bot via the Bot API, receive and respond to messages, change its <a href="/bots/api#setmyprofilephoto">profile</a>, <a href="https://core.telegram.org/bots/api#setmycommands">settings</a> and more.</li>
 </ul>
 <h3><a class="anchor" name="bot-to-bot-communication" href="#bot-to-bot-communication"><i class="anchor-icon"></i></a>Bot-to-Bot Communication</h3>
@@ -504,7 +649,7 @@ width=44% /></a>
 <li>Mentioning it in a command: <code>/command@OtherBot</code>.</li>
 <li>Replying directly to a message from the bot.</li>
 </ul>
-<p>If at least one of the bots has <em>Bot-to-Bot Communication Mode</em> enabled, the receiving bot will get the message and will be able to respond.</p>
+<p>If at least one bot has <em>Bot-to-Bot Communication Mode</em> enabled, the receiving bot can receive and respond to the message.</p>
 <p>Additionally, bots with <em>Bot-to-Bot Communication Mode</em> enabled will receive <strong>all</strong> messages from other bots in groups without explicit mentions or replies if they:</p>
 <ul>
 <li>Have admin rights in the group, or</li>
@@ -539,7 +684,7 @@ width=44% /></a>
 <h3><a class="anchor" name="guest-bots" href="#guest-bots"><i class="anchor-icon"></i></a>Guest Bots</h3>
 <p>Telegram bots can enable <strong>Guest Mode</strong> to easily interact with users in any <strong>group</strong> or <strong>private chat</strong> on Telegram. This allows for seamless utility integration without the overhead of chat management or access to message history.</p>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted style="max-width: 400px;" alt="Guest Bots" poster="/file/400780400097/2/Cfjt6tSE0UE.75990.jpg/e408f7a9eb1ff93736">
+ <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted style="max-width: 400px;" title="Guest Bots" aria-label="Guest Bots" alt="Guest Bots" poster="/file/400780400097/2/Cfjt6tSE0UE.75990.jpg/e408f7a9eb1ff93736">
   <source src="/file/400780400507/2/HA9w0y-JaJA.4068142.mp4/72dbc63ed44ef9fe89" type="video/mp4">
  </video></div>
 </div>
@@ -596,7 +741,7 @@ width=44% /></a>
 <li><a href="/bots/payments">Guide for physical goods and services</a></li>
 </ul>
 <div>
-  <a href="/file/464001393/101fc/SB_bFCLR0tg.130549/7ecf91aaa44737e8cb" target="_blank"><img src="/file/464001393/101fc/SB_bFCLR0tg.130549/7ecf91aaa44737e8cb" title=""  class="dev_page_image" width=50% /></a>
+  <a href="/file/464001393/101fc/SB_bFCLR0tg.130549/7ecf91aaa44737e8cb" target="_blank"><img src="/file/464001393/101fc/SB_bFCLR0tg.130549/7ecf91aaa44737e8cb" title="Bot Payments" alt="Bot payment interface" class="dev_page_image" width=50% /></a>
 </div>
 
 <blockquote>
@@ -614,7 +759,7 @@ width=44% /></a>
 <h4><a class="anchor" name="inline-login" href="#inline-login"><i class="anchor-icon"></i></a>Inline Login</h4>
 <p>When users open your website via an <strong>inline button</strong>, you can use the <a href="/bots/api#loginurl">login_url</a> parameter as an alternative to login widgets. This way, you&#39;ll be able to <a href="https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots">seamlessly authorize</a> them on your website or app before the page even loads.</p>
 <div>
-  <a href="/file/464001287/105ea/23bO4ntH4tc.43741/c9624e36c3462b6540" target="_blank"><img src="/file/464001287/105ea/23bO4ntH4tc.43741/c9624e36c3462b6540" width=50% title=""  class="dev_page_image" /></a>
+  <a href="/file/464001287/105ea/23bO4ntH4tc.43741/c9624e36c3462b6540" target="_blank"><img src="/file/464001287/105ea/23bO4ntH4tc.43741/c9624e36c3462b6540" width=50% title="Inline Login" alt="Inline login interface" class="dev_page_image" /></a>
 </div>
 
 <blockquote>
@@ -641,7 +786,7 @@ width=44% /></a>
 <li><a href="/bots/api#games">HTML5 Games Bot API Docs</a></li>
 </ul>
 <div>
-  <a href="/file/464001558/11b92/y_Fu9QQWtj0.141959/dc9db48f66800bf271" target="_blank"><img src="/file/464001558/11b92/y_Fu9QQWtj0.141959/dc9db48f66800bf271" title="Games"  width=50% class="dev_page_image" /></a>
+  <a href="/file/464001558/11b92/y_Fu9QQWtj0.141959/dc9db48f66800bf271" target="_blank"><img src="/file/464001558/11b92/y_Fu9QQWtj0.141959/dc9db48f66800bf271" title="Games" alt="HTML5 game interface" width=50% class="dev_page_image" /></a>
 </div>
 
 <blockquote>
@@ -653,24 +798,25 @@ width=44% /></a>
 <p><strong>Creating a new pack</strong><br>To create a <strong>new pack</strong>, simply:</p>
 <ul>
 <li><strong>Prepare</strong> your artwork following our <a href="https://core.telegram.org/stickers">technical requirements</a>.</li>
-<li><strong>Create</strong> a new sticker pack via <a href="api#createnewstickerset">createStickerSet</a>. Set <code>sticker_type</code> to <em>regular</em> to create a sticker pack or to <em>custom emoji</em> to create a pack of custom emoji. Attach the <a href="api#file">files</a> you wish to include in the pack as an array of <a href="https://core.telegram.org/bots#inputsticker">InputSticker</a></li>
+<li><strong>Create</strong> a new sticker pack via <a href="api#createnewstickerset">createNewStickerSet</a>. Set <code>sticker_type</code> to <em>regular</em> to create a sticker pack or to <em>custom emoji</em> to create a pack of custom emoji. Attach the <a href="api#file">files</a> you wish to include in the pack as an array of <a href="https://core.telegram.org/bots/api#inputsticker">InputSticker</a></li>
 <li>You can use <a href="api#addstickertoset">addStickerToSet</a> to add stickers or emoji later on.</li>
 </ul>
-<p><strong>Additional features</strong><br>Regular stickers and custom emoji support <strong>keywords</strong> that users can type to quickly find the respective artwork – this can be useful when a sticker doesn&#39;t have obvious ties to a specific emoji. You can use the <code>keywords</code> parameter in <a href="https://core.telegram.org/bots#inputsticker">InputSticker</a> to specify them.</p>
-<p>Custom emoji additionally support <strong>adaptive colors</strong> – they will always match the current context (e.g., white on photos, accent color when used as status, etc.); to enable this feature, use the <code>needs_repainting</code> parameter in <a href="api#createnewstickerset">createStickerSet</a>.</p>
-<p>Once you&#39;re done creating and sharing your artwork, don&#39;t forget to check out our <a href="api#stickers">remaining sticker methods</a> to find out how to <a href="api#setstickersetthumb">edit</a>, <a href="api#deletestickerfromset">delete</a> and even <a href="api#setstickerpositioninset">reorder</a> your pack. </p>
+<p><strong>Additional features</strong><br>Regular stickers and custom emoji support <strong>keywords</strong> that users can type to quickly find the respective artwork – this can be useful when a sticker doesn&#39;t have obvious ties to a specific emoji. You can use the <code>keywords</code> parameter in <a href="https://core.telegram.org/bots/api#inputsticker">InputSticker</a> to specify them.</p>
+<p>Custom emoji additionally support <strong>adaptive colors</strong> – they will always match the current context (e.g., white on photos, accent color when used as status, etc.); to enable this feature, use the <code>needs_repainting</code> parameter in <a href="api#createnewstickerset">createNewStickerSet</a>.</p>
+<p>Once you&#39;re done creating and sharing your artwork, don&#39;t forget to check out our <a href="api#stickers">remaining sticker methods</a> to find out how to <a href="api#setstickersetthumbnail">edit</a>, <a href="api#deletestickerfromset">delete</a> and even <a href="api#setstickerpositioninset">reorder</a> your pack.</p>
 <blockquote>
 <p>Note that these methods will only work on packs <strong>created by the bot that is calling them</strong>.</p>
 </blockquote>
-<h4><a class="anchor" name="advanced-formatting-options" href="#advanced-formatting-options"><i class="anchor-icon"></i></a>Advanced Formatting Options</h4>
-<p>Telegram bots can use a broad set of native text styling tools to send <strong>richly formatted messages</strong> in any chat. Supported formats include complex nested emphasis, code, structured documents, customizable tables, mathematical formulas and nearly <strong>one hundred</strong> other options.</p>
-<p>Formatting is available on two levels – both render natively in <strong>all Telegram apps</strong>:</p>
+<p>&lt;a name=&quot;advanced-formatting-options&quot;&gt;&lt;/a&gt;</p>
+<h3><a class="anchor" name="messages-and-formatting" href="#messages-and-formatting"><i class="anchor-icon"></i></a>Messages and Formatting</h3>
+<p>Telegram bots can use a broad set of native text styling tools to send <strong>richly formatted messages</strong> in supported Telegram clients. Depending on the task, you can choose between lightweight regular messages and structured rich messages with headings, tables, media, documents, mathematical expressions and interactive controls.</p>
+<p>Formatting is available on two levels:</p>
 <ul>
 <li><a href="/bots/api#inputrichmessage"><strong>Rich Messages</strong></a> for advanced structured content</li>
-<li><a href="/bots/api#sendMessage"><strong>Regular Messages</strong></a> for lightweight formatted text. </li>
+<li><a href="/bots/api#sendmessage"><strong>Regular Messages</strong></a> for lightweight formatted text. </li>
 </ul>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted="" poster="/file/400780400485/5/ZlL9lRtV5dg.45747.jpg/c564788bd371f0ac48" style="max-width: 400px;" title="" alt="Rich Text Formatting for Bots" vindex="1" preload="auto"> <source src="/file/400780400478/5/5rtLzULtA5E.3640041.mp4/a641a5c9d3290e2b78" type="video/mp4">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted="" poster="/file/400780400485/5/ZlL9lRtV5dg.45747.jpg/c564788bd371f0ac48" style="max-width: 400px;" title="Rich Text Formatting for Bots" aria-label="Rich Text Formatting for Bots" alt="Richly formatted bot message" vindex="1" preload="auto"> <source src="/file/400780400478/5/5rtLzULtA5E.3640041.mp4/a641a5c9d3290e2b78" type="video/mp4">
  </video>
 </div>
 
@@ -684,15 +830,24 @@ width=44% /></a>
 <ul>
 <li>Headings, paragraphs, dividers, lists and task lists.</li>
 <li>Deeply nested inline formatting, including bold, italic, underline, strikethrough, spoiler, code, subscript and superscript.</li>
-<li>Tables with alignment, captions, borders, striped styling, column spans and row spans.</li>
-<li>Media blocks for photos, videos and audio files, with captions and credits.</li>
+<li>Tables with alignment, captions, borders, striped styling, column/row spans and more.</li>
+<li>Media blocks for photos, videos, docs and audio files – with captions and credits.</li>
 <li>Block quotes, pull quotes, collapsible details blocks, anchors and in-document links</li>
 <li>Footnotes and referenced text.</li>
-<li>Full LaTeX support, including both inline and block formulas.</li>
+<li>Extensive LaTeX support, including both inline and as block formulas.</li>
 <li>Maps with custom coordinates, collages, slideshows and more.</li>
 </ul>
 <blockquote>
 <p>See <a href="/bots/api#rich-message-formatting-options">here</a> for the full syntax grammar with examples.</p>
+</blockquote>
+<p>Rich messages also support <strong>multiple embedded buttons</strong>. This lets bots create <strong>interactive flows</strong> for anything from surveys, games, and horoscopes to viewing and ordering products – all in a single message.</p>
+<div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted="" poster="/file/400780400707/6/59tqj-7zkUI.67925.jpg/8f9328dc5077455151" style="max-width: 400px;" title="Inline Buttons" aria-label="Inline Buttons" alt="Inline Buttons" vindex="1" preload="auto"> <source src="/file/400780400139/7/vJgWIvqqzxA.3710126.mp4/718db1a1f9ad8f5cdf" type="video/mp4">
+ </video>
+</div>
+
+<blockquote>
+<p>Rich and <a href="#ephemeral-messages">ephemeral</a> messages can be combined to build <strong>personalized</strong> and <strong>interactive</strong> flows within a single group or channel message.</p>
 </blockquote>
 <h4><a class="anchor" name="regular-messages" href="#regular-messages"><i class="anchor-icon"></i></a>Regular Messages</h4>
 <p>Regular <a href="/bots/api#sendmessage">messages</a> are simpler and more lightweight versions of their rich counterparts. They support <a href="/bots/api#markdownv2-style"><strong>MarkdownV2</strong></a> and <a href="/bots/api#html-style"><strong>HTML</strong></a> formatting – concise styles that are the best choice for short text, confirmations, simple chat flows and other content that does not require complex structure.</p>
@@ -711,7 +866,7 @@ width=44% /></a>
 <li>Command lists can also be specified for individual languages – more on this <a href="#commands">here</a>.</li>
 </ul>
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
- <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/464001822/10cd0/EvtvjnhA-kA.132475/e285952b505535d85a" style="max-width: 400px;" title="" alt="">
+ <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/464001822/10cd0/EvtvjnhA-kA.132475/e285952b505535d85a" style="max-width: 400px;" title="Language Support" aria-label="Language Support" alt="Language Support">
   <source src="/file/464001083/105cd/NF4ViAHfTJc.3601652.mp4/0fd787953c11a6371d" type="video/mp4">
  </video>
 </div>
@@ -737,7 +892,7 @@ width=44% /></a>
 </ul>
 <p>Privacy mode is <strong>enabled by default</strong> for all bots, except bots that were added to a group as admins (bot admins always receive <strong>all messages</strong>). It can be disabled so that the bot receives all messages like an ordinary user (the bot will need to be re-added to the group for this change to take effect). We only recommend doing this in cases where it is <strong>absolutely necessary</strong> for your bot to work. In most cases, using the force reply option for the bot&#39;s messages should be more than enough.</p>
 <div>
-  <a href="/file/464001338/107af/JdbERa0BATg.62371/28977e9a96aed3860a" target="_blank"><img src="/file/464001338/107af/JdbERa0BATg.62371/28977e9a96aed3860a" title="Privacy Mode"  class="dev_page_image" width=50%/></a>
+  <a href="/file/464001338/107af/JdbERa0BATg.62371/28977e9a96aed3860a" target="_blank"><img src="/file/464001338/107af/JdbERa0BATg.62371/28977e9a96aed3860a" title="Privacy Mode" alt="Bot privacy mode in a group" class="dev_page_image" width=50%/></a>
 </div>
 
 <blockquote>
@@ -752,7 +907,7 @@ width=44% /></a>
 <h4><a class="anchor" name="dedicated-test-environment" href="#dedicated-test-environment"><i class="anchor-icon"></i></a>Dedicated test environment</h4>
 <p>Telegram also offers a dedicated <strong>test environment</strong> suitable for more advanced testing. Bots and users in this environment generally have more flexible restrictions – for example:</p>
 <ul>
-<li>When working with the test environment, you may use HTTP links without TLS to test your <a href="https://core.telegram.org/bots/features#web-apps">Web Apps</a> or <a href="https://core.telegram.org/bots/features#web-login">Web Login</a>.</li>
+<li>When working with the test environment, you may use HTTP links without TLS for testing your <a href="https://core.telegram.org/bots/features#mini-apps">Web Apps</a> or <a href="https://core.telegram.org/bots/features#web-login">Web Login</a>. Production links should use HTTPS.</li>
 </ul>
 <blockquote>
 <p><strong>Flood limits</strong> are not raised in the test environment, and may at times be stricter. To minimize how this impacts your bot, you should make sure that it handles errors with retry policies and does not depend on hardcoded limit values.</p>
@@ -784,26 +939,26 @@ width=44% /></a>
 <h5><a class="anchor" name="monitored-issues" href="#monitored-issues"><i class="anchor-icon"></i></a>Monitored issues</h5>
 <p>We currently notify you about the following issues:</p>
 <ul>
-<li><p><strong>Too few private messages are sent.</strong> Value: <strong>{value}</strong> - Your bot is sending far fewer messages than it did in previous weeks. This is useful for newsletter-style bots that send messages without prompts from users. The larger the value, the more significant the difference.</p>
+<li><p><strong>Too few private messages are sent.</strong> - Your bot is sending far fewer messages than it did in previous weeks. This is useful for newsletter-style bots that send messages without prompts from users. The larger the value, the more significant the difference.</p>
 </li>
-<li><p><strong>Too few replies to incoming private messages</strong>. Conversion rate: <strong>{value}</strong> - Your bot is not replying to all messages that are being sent to it (the request/response conversion rate for your bot was too low for at least two of the last three 5-minute periods). </p>
+<li><p><strong>Too few replies to incoming private messages</strong>. - Your bot is not replying to all messages that are being sent to it (the request/response conversion rate for your bot was too low for at least two of the last three 5-minute periods). </p>
 </li>
 </ul>
 <blockquote>
 <p>To provide a good user experience, please respond to all messages that are sent to your bot. Respond to message updates by calling send… methods (e.g. <a href="/bots/api#sendmessage">sendMessage</a>).</p>
 </blockquote>
 <ul>
-<li><strong>Too few answers to inline queries</strong>. Conversion rate: <strong>{value}</strong> - Your bot is not replying to all inline queries that are being sent to it, calculated in the same way as above. Respond to <code>inline_query</code> updates by calling <a href="/bots/api#answerinlinequery">answerInlineQuery</a>.</li>
-</ul>
-<ul>
-<li><strong>Too few answers to callback queries</strong>. Conversion rate: <strong>{value}</strong></li>
-<li><strong>Too few answers to callback game queries</strong>. Conversion rate: <strong>{value}</strong> - Your bot is not replying to all callback queries that are being sent to it (with or without games), calculated in the same way as above. Respond to <code>callback_query</code> updates by calling <a href="/bots/api#answercallbackquery">answerCallbackQuery</a>.</li>
+<li><p><strong>Too few answers to inline queries</strong>. - Your bot is not replying to all inline queries that are being sent to it, calculated in the same way as above. Respond to <code>inline_query</code> updates by calling <a href="/bots/api#answerinlinequery">answerInlineQuery</a>.</p>
+</li>
+<li><p><strong>Too few answers to callback queries</strong>.</p>
+</li>
+<li><strong>Too few answers to callback game queries</strong>. - Your bot is not replying to all callback queries that are being sent to it (with or without games), calculated in the same way as above. Respond to <code>callback_query</code> updates by calling <a href="/bots/api#answercallbackquery">answerCallbackQuery</a>.</li>
 </ul>
 <h4><a class="anchor" name="local-bot-api" href="#local-bot-api"><i class="anchor-icon"></i></a>Local Bot API</h4>
 <p>You can host and work with <strong>your own instance</strong> of our open-source <a href="/bots/api">Bot API</a>.<br>The <strong>source code</strong> is available <a href="https://github.com/tdlib/telegram-bot-api">here</a>, along with a quick <a href="https://github.com/tdlib/telegram-bot-api#installation">installation guide</a>.</p>
 <p>After <strong>installing the server</strong>, remember to use the <a href="/bots/api#logout">logOut</a> method before <strong>redirecting requests</strong> to your new local API URL.</p>
 <blockquote>
-<p>Your local instance runs on port <code>8081</code> by default and will only accept HTTP requests, so a TLS termination proxy has to be used to handle remote HTTPS requests.</p>
+<p>Your local instance accepts HTTP requests, so a TLS termination proxy has to be used to handle remote HTTPS requests. See the installation guide for the port and other server settings.</p>
 </blockquote>
 <p>By hosting our API locally you&#39;ll gain access to <strong>some upgrades</strong>, including:</p>
 <table class="table">
@@ -842,6 +997,9 @@ width=44% /></a>
 <hr>
 <h3><a class="anchor" name="botfather" href="#botfather"><i class="anchor-icon"></i></a>BotFather</h3>
 <p>Below is a detailed guide to using <a href="https://t.me/botfather">@BotFather</a>, Telegram’s tool for <strong>creating</strong> and <strong>managing</strong> bots.</p>
+<blockquote>
+<p>In addition to the instructions below, consider using the <a href="https://t.me/botfather?startapp">@BotFather Mini App</a>. It provides equivalent functionalities with a more modern and streamlined UI.</p>
+</blockquote>
 <h4><a class="anchor" name="creating-a-new-bot" href="#creating-a-new-bot"><i class="anchor-icon"></i></a>Creating a new bot</h4>
 <p>Use the <code>/newbot</code> command to create a new bot. <a href="https://t.me/botfather">@BotFather</a> will ask you for a name and username, then generate an authentication token for your new bot.</p>
 <ul>
@@ -867,7 +1025,7 @@ width=44% /></a>
 </blockquote>
 <p>Bots can also have a <strong>profile picture</strong> – you should pick something unique and original so that users can find it in their chat list at a glance.</p>
 <blockquote>
-<p>Starting from April 21, 2023 (<a href="https://telegram.org/blog/shareable-folders-custom-wallpapers">Telegram 9.6</a>), you can edit your bot directly from its profile page – including setting a custom <strong>profile video</strong>.</p>
+<p>You can also edit your bot directly from its profile page – including setting a custom <strong>profile video</strong>.</p>
 </blockquote>
 <h4><a class="anchor" name="generating-an-authentication-token" href="#generating-an-authentication-token"><i class="anchor-icon"></i></a>Generating an authentication token</h4>
 <p>If your existing token is <strong>compromised</strong> or <strong>you lost it</strong> for some reason, use the <code>/token</code> command to generate a new one.</p>
@@ -876,12 +1034,6 @@ width=44% /></a>
 <blockquote>
 <p>Transferring ownership will give full control of the bot to another user – they will be able to access the bot’s messages and even delete it. The transfer is permanent, so please consider it carefully.</p>
 </blockquote>
-<h4><a class="anchor" name="botfather-commands" href="#botfather-commands"><i class="anchor-icon"></i></a>BotFather commands</h4>
-<p>The remaining commands are pretty self-explanatory:</p>
-<ul>
-<li>/mybots – returns a list of your bots with handy controls to edit their settings.</li>
-<li>/mygames – does the same for your games.</li>
-</ul>
 <h4><a class="anchor" name="edit-bots" href="#edit-bots"><i class="anchor-icon"></i></a>Edit bots</h4>
 <p>To edit your bot, you have two options.</p>
 <p>You can use the available commands:</p>
@@ -891,12 +1043,15 @@ width=44% /></a>
 <li>/setabouttext – change the bot&#39;s <strong>about info</strong>, a shorter text up to 120 characters. Users will see this text on the bot&#39;s profile page. When they share your bot with someone, this text is sent together with the link.</li>
 <li>/setuserpic – change the bot&#39;s <strong>profile picture</strong>. </li>
 <li>/setcommands – change the list of <strong>commands</strong> supported by your bot. Users will see these commands as suggestions when they type <code>/</code> in the chat with your bot. See <a href="#commands">commands</a> for more info.</li>
-<li>/setdomain – link a <strong>website domain</strong> to your bot. See the <a href="#login-widget">login widget</a> section.</li>
+<li>/setdomain – link a <strong>website domain</strong> to your bot. See the <a href="#widgets">login widget</a> section.</li>
 <li>/deletebot – delete your bot and <strong>free its username</strong>. Cannot be undone.</li>
 </ul>
-<p>Or you can use the <code>/mybots</code> command, tap on your bot and use the modern inline interface to edit it.</p>
 <blockquote>
-<p>Starting from April 21, 2023 (<a href="https://telegram.org/blog/shareable-folders-custom-wallpapers">Telegram 9.6</a>), you can edit your bot&#39;s public-facing info directly from its profile page – including setting a custom <strong>profile video</strong>.</p>
+<p>Note that new commands for editing your bot may be added at any time. The latest reference for the full list of available commands is <a href="https://t.me/botfather">@BotFather</a> itself (simply type <code>/</code> in the input field to see the full list).</p>
+</blockquote>
+<p>These settings can also be edited via an interactive inline interface accessed via the <code>/mybots</code> command. Alternatively, you can edit your bot&#39;s public-facing information directly from its profile page – including setting a custom <strong>profile video</strong>. </p>
+<blockquote>
+<p>Alternatively, you can use the <a href="https://t.me/botfather?startapp">@BotFather Mini App</a>. It provides equivalent functionalities with a modern and streamlined UI.</p>
 </blockquote>
 <h4><a class="anchor" name="edit-settings" href="#edit-settings"><i class="anchor-icon"></i></a>Edit settings</h4>
 <ul>
@@ -906,6 +1061,9 @@ width=44% /></a>
 <li>/setinlinefeedback – toggle whether the API should <strong>send updates about the results</strong> chosen by users. See an in-depth explanation <a href="/bots/inline#collecting-feedback">here</a>.</li>
 <li>/setprivacy – set which messages your bot will receive when added to a group. See <a href="#privacy-mode">privacy-mode</a> for more info.</li>
 </ul>
+<blockquote>
+<p>Note that new commands for editing advanced bot settings may be added at any time. The latest reference for the full list of available commands is <a href="https://t.me/botfather">@BotFather</a> itself (simply type <code>/</code> in the input field to see the full list).</p>
+</blockquote>
 <h4><a class="anchor" name="manage-games" href="#manage-games"><i class="anchor-icon"></i></a>Manage games</h4>
 <ul>
 <li>/newgame    – create a new game.</li>
@@ -920,7 +1078,7 @@ width=44% /></a>
 <p>With this information, you are ready to proceed to our <a href="/bots/api">Full API Reference for Developers</a>.</p>
 <ul>
 <li>If you have any questions, check out our <a href="/bots/faq">Bot FAQ</a>.</li>
-<li>If you&#39;re experiencing issues with our API, please contact <a href="https://t.me/botsupport">@BotSupport</a> on Telegram.</li>
+<li>If you&#39;re experiencing issues with our Bot API, please contact <a href="https://t.me/botsupport">@BotSupport</a> on Telegram.</li>
 </ul>
 </div>
   

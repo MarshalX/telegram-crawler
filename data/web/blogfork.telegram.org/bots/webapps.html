@@ -18,7 +18,7 @@
 <link href="/css/highlight.min.css?1" rel="stylesheet">
 
     <link href="/css/telegram.css?254" rel="stylesheet" media="screen">
-    <link href="/css/telegram-theme.css?7" rel="stylesheet" media="screen">
+    <link href="/css/telegram-theme.css?8" rel="stylesheet" media="screen">
     <style>
     </style>
   </head>
@@ -61,6 +61,11 @@
 </blockquote>
 <hr>
 <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+<h4><a class="anchor" name="june-11-2026" href="#june-11-2026"><i class="anchor-icon"></i></a>June 11, 2026</h4>
+<p><strong>Bot API 10.1</strong></p>
+<ul>
+<li>Added the field <em>chat_join_request_query_id</em> to the class <a href="#webappinitdata">WebAppInitData</a>.</li>
+</ul>
 <h4><a class="anchor" name="april-3-2026" href="#april-3-2026"><i class="anchor-icon"></i></a>April 3, 2026</h4>
 <p><strong>Bot API 9.6</strong></p>
 <ul>
@@ -354,6 +359,13 @@
 <li>Cooperative, multiplayer or teamwork-oriented services within a chat context.</li>
 <li>The use cases are effectively <strong>unlimited</strong>.</li>
 </ul>
+<h4><a class="anchor" name="launching-mini-apps-on-chat-join-requests" href="#launching-mini-apps-on-chat-join-requests"><i class="anchor-icon"></i></a>Launching Mini Apps on chat join requests</h4>
+<blockquote>
+<p><strong>TL;DR:</strong> Mini Apps can be launched when the bot is set up as a guard bot of a chat and a user sends join request to the chat. This offers a way to handle join requests using a Mini App.</p>
+</blockquote>
+<p>When a user joins a chat in which the bot was set up as a guard bot, the bot receives an <a href="/bots/api#update">Update</a> “chat_join_request” with the field <em>query_id</em>. The bot may call the method <a href="/bots/api#sendchatjoinrequestwebapp">sendChatJoinRequestWebApp</a> to show the Mini App to the user before deciding the outcome of the request.</p>
+<p>In addition to the user&#39;s <a href="#color-schemes">theme settings</a>, the bot will receive basic user information (<code>ID</code>, <code>name</code>, <code>username</code>, <code>language_code</code>, <code>photo</code>), the chat info (<code>ID</code>, <code>type</code>, <code>title</code>, <code>username</code>, <code>photo</code>) and a unique identifier for the join request query <strong>chat_join_request_query_id</strong>, which allows to process the query.</p>
+<p>The bot can call the Bot API method <a href="/bots/api#answerchatjoinrequestquery">answerChatJoinRequestQuery</a> to complete processing of the join request.</p>
 <h4><a class="anchor" name="launching-mini-apps-from-the-attachment-menu" href="#launching-mini-apps-from-the-attachment-menu"><i class="anchor-icon"></i></a>Launching Mini Apps from the Attachment Menu</h4>
 <blockquote>
 <p><strong>TL;DR:</strong> Mini App Bots can request to be added directly to a user&#39;s attachment menu, allowing them to be quickly launched from any chat. To try this mode, open this <a href="https://t.me/durgerkingbot?startattach">attachment menu link</a> for <em>@DurgerKingBot</em>, then use the <img class="icon" src="/file/464001085/2/E4hNXSNQimQ.2503/bf6ffcab3cb3afd43d" alt="Attach"> menu in <strong>any type of chat</strong>.</p>
@@ -1850,6 +1862,11 @@
 <td><em>Optional.</em> A unique identifier for the Mini App session, required for sending messages via the <a href="/bots/api#answerwebappquery">answerWebAppQuery</a> method.</td>
 </tr>
 <tr>
+<td>chat_join_request_query_id</td>
+<td>String</td>
+<td><em>Optional.</em> A unique identifier for the chat join request query, required for processing the query via the method <a href="/bots/api#answerchatjoinrequestquery">answerChatJoinRequestQuery</a>.</td>
+</tr>
+<tr>
 <td>user</td>
 <td><a href="#webappuser">WebAppUser</a></td>
 <td><em>Optional.</em> An object containing data about the current user.</td>
@@ -1862,7 +1879,7 @@
 <tr>
 <td>chat</td>
 <td><a href="#webappchat">WebAppChat</a></td>
-<td><em>Optional.</em> An object containing data about the chat where the bot was launched via the attachment menu. Returned for supergroups, channels and group chats – only for Mini Apps launched via the attachment menu.</td>
+<td><em>Optional.</em> An object containing data about the chat where the bot was launched via the attachment menu or the chat to which the join request query was sent. Returned for supergroups, channels and group chats – only for Mini Apps launched via the attachment menu and chat join requests.</td>
 </tr>
 <tr>
 <td>chat_type</td>
@@ -2854,7 +2871,7 @@ code_verifier=&lt;PKCE_VERIFIER&gt;</code></pre>
     <script src="/js/jquery.min.js?1"></script>
 <script src="/js/jquery-ui.min.js?1"></script>
 <script src="/js/bootstrap.min.js?1"></script>
-<script src="https://oauth.telegram.org/js/telegram-login.js?5"></script>
+<script src="https://oauth.telegram.org/js/telegram-login.js?6"></script>
 <script src="/js/highlight.min.js?1"></script>
 <script src="/js/tgsticker.js?32"></script>
 
@@ -2913,7 +2930,7 @@ function updateWidget(widget_update, init) {
   }
   var req_access_str = request_access.join(' ');
 
-  var code = '<script async src="https://oauth.telegram.org/js/telegram-login.js?5" data-client-id="' + client_id + '" data-onauth="console.log(data)"' + (req_access_str ? ' data-request-access="' + req_access_str + '"' : '') + '><\/script>';
+  var code = '<script async src="https://oauth.telegram.org/js/telegram-login.js?6" data-client-id="' + client_id + '" data-onauth="console.log(data)"' + (req_access_str ? ' data-request-access="' + req_access_str + '"' : '') + '><\/script>';
   code += `
 
 <button class="tg-auth-button"${classes ? ' data-style="' + classes + '"' : ''}>${sign_in_label}</button>`;

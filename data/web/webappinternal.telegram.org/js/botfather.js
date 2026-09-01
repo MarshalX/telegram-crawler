@@ -563,6 +563,14 @@ var BotSettings = {
       }
     });
 
+    $('.js-cbm-dd-item').on('click', function () {
+      var value = this.dataset.value;
+      $('.js-cbm-value').text(this.text);
+      $('li.selected:has(.js-cbm-dd-item)').toggleClass('selected');
+      $(this).parent().toggleClass('selected');
+      botChangeSettings('cbm', value);
+    });
+
     function updateAccessUsersUI(label, plusLabel, clearVisible) {
       var $status = $('.js-access-users-status');
       var $pill = $('.js-access-users-pill');
@@ -2015,6 +2023,17 @@ var SimpleSpoiler = {
 
 var BotServerless = {
   init() {
+    $('.js-serverless-get-access').on('click', function () {
+      var bid = Aj.state.botId;
+      Aj.apiRequest('requestServerlessAccess', { bid: bid }, (res) => {
+        if (res.error) {
+          TWebApp.showErrorToast(res.error);
+        } else {
+          Aj.onUnload(() => TWebApp.showSuccessToast(l('WEB_SERVERLESS_REQUEST_SENT')));
+          Aj.location('/botfather/bot/' + Aj.state.botId + '/cloud');
+        }
+      });
+    });
     $('.js-serverless-toggle').on('click', function () {
       var toggleEl = this.querySelector('.tm-toggle');
       var isOn = toggleEl.classList.contains('tm-toggle-on');

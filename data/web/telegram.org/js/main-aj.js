@@ -413,6 +413,13 @@ function ajInit(options) {
         $.extend(Aj.state, result.s);
       }
       document.documentElement.className = result.rc || '';
+      if (result.ra) {
+        for (var attr_name in result.ra) {
+          if (result.ra.hasOwnProperty(attr_name)) {
+            document.documentElement.setAttribute(attr_name, result.ra[attr_name]);
+          }
+        }
+      }
       if (result._dlog) {
         $('#dlog').html(result._dlog);
       }

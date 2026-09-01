@@ -18,7 +18,7 @@ To learn how to create…">
     <link href="/css/bootstrap.min.css?3" rel="stylesheet">
     
     <link href="/css/telegram.css?254" rel="stylesheet" media="screen">
-    <link href="/css/telegram-theme.css?7" rel="stylesheet" media="screen">
+    <link href="/css/telegram-theme.css?8" rel="stylesheet" media="screen">
     <style>
     </style>
   </head>
@@ -55,6 +55,41 @@ To learn how to create…">
 <blockquote>
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
+<h4><a class="anchor" name="august-24-2026" href="#august-24-2026"><i class="anchor-icon"></i></a>August 24, 2026</h4>
+<p><strong>Bot API 10.3</strong></p>
+<p><strong>Rich Messages</strong></p>
+<ul>
+<li>Added the class <a href="#richmessagebutton">RichMessageButton</a> representing a button in a <a href="#richmessage">RichMessage</a>.</li>
+<li>Added the class <a href="#richtextbutton">RichTextButton</a>.</li>
+<li>Added the classes <a href="#richblockbuttons">RichBlockButtons</a> and <a href="#inputrichblockbuttons">InputRichBlockButtons</a>.</li>
+<li>Added the field <em>is_compact</em> to the classes <a href="#richblocktable">RichBlockTable</a> and <a href="#inputrichblocktable">InputRichBlockTable</a>.</li>
+<li>Added the classes <a href="#richblockexpandableblockquotation">RichBlockExpandableBlockQuotation</a> and <a href="#inputrichblockexpandableblockquotation">InputRichBlockExpandableBlockQuotation</a> representing a block quotation, which can be expanded or collapsed back.</li>
+<li>Added the classes <a href="#richblockdocument">RichBlockDocument</a> and <a href="#inputrichblockdocument">InputRichBlockDocument</a>, containing a file.</li>
+<li>Added support for links of the form <code>tg://document?id=</code> for general file uploads in rich messages.</li>
+</ul>
+<p><strong>Ephemeral messages</strong></p>
+<ul>
+<li>Added the class <a href="#ephemeralmessageparameters">EphemeralMessageParameters</a> and replaced the parameters <em>receiver_user_id</em> and <em>callback_query_id</em> in the methods <a href="#sendmessage">sendMessage</a>, <a href="#sendanimation">sendAnimation</a>, <a href="#sendaudio">sendAudio</a>, <a href="#senddocument">sendDocument</a>, <a href="#sendlivephoto">sendLivePhoto</a>, <a href="#sendphoto">sendPhoto</a>, <a href="#sendsticker">sendSticker</a>, <a href="#sendvideo">sendVideo</a>, <a href="#sendvideonote">sendVideoNote</a>, <a href="#sendvoice">sendVoice</a>, <a href="#sendcontact">sendContact</a>, <a href="#sendlocation">sendLocation</a> and <a href="#sendvenue">sendVenue</a> with the parameter <em>ephemeral_message_parameters</em>.</li>
+<li>Added the parameter <em>ephemeral_message_parameters</em> to the method <a href="#sendrichmessage">sendRichMessage</a>.</li>
+<li>Added the field <em>replace_callback_query_message</em> to the class <a href="#ephemeralmessageparameters">EphemeralMessageParameters</a>, which allows bots to show an ephemeral message in place of the original message.</li>
+<li>Supported upload of new files in <a href="#editephemeralmessagemedia">editEphemeralMessageMedia</a>.</li>
+<li>Added the parameter <em>show_caption_above_media</em> to the method <a href="#editephemeralmessagecaption">editEphemeralMessageCaption</a>.</li>
+<li>Added the parameter <em>rich_message</em> to the method <a href="#editephemeralmessagetext">editEphemeralMessageText</a>.</li>
+<li>Added the field <em>can_send_welcome_messages</em> to the classes <a href="#chatadministratorrights">ChatAdministratorRights</a> and <a href="#chatmemberadministrator">ChatMemberAdministrator</a>.</li>
+<li>Added the parameter <em>can_send_welcome_messages</em> to the method <a href="#promotechatmember">promoteChatMember</a>.</li>
+</ul>
+<p><strong>Reply markup</strong></p>
+<ul>
+<li>Added the class <a href="#disabledbutton">DisabledButton</a> and the field <em>disabled</em> to the class <a href="#inlinekeyboardbutton">InlineKeyboardButton</a>.</li>
+<li>Added the field <em>force_reply</em> to the classes <a href="#inlinekeyboardmarkup">InlineKeyboardMarkup</a> and <a href="#replykeyboardmarkup">ReplyKeyboardMarkup</a>.</li>
+</ul>
+<p><strong>General</strong></p>
+<ul>
+<li>Added the parameters <em>can_stop</em> and <em>keep_on_stop</em> to the methods <a href="#sendmessagedraft">sendMessageDraft</a> and <a href="#sendrichmessagedraft">sendRichMessageDraft</a>.</li>
+<li>Added updates about user stopping message generation, represented by the class <a href="#messagegenerationstopped">MessageGenerationStopped</a> and the field <em>stopped_message_generation</em> in the class <a href="#update">Update</a>.</li>
+<li>Added the class <a href="#communitychatjoined">CommunityChatJoined</a> and the field <em>community_chat_joined</em> to the class <a href="#message">Message</a> for service messages about join of a chat from a community.</li>
+<li>Added the fields <em>text</em>, <em>entities</em> and <em>is_private</em> to the class <a href="#uniquegiftinfo">UniqueGiftInfo</a>.</li>
+</ul>
 <h4><a class="anchor" name="july-14-2026" href="#july-14-2026"><i class="anchor-icon"></i></a>July 14, 2026</h4>
 <p><strong>Bot API 10.2</strong></p>
 <p><strong>Rich Messages</strong></p>
@@ -362,6 +397,11 @@ To learn how to create…">
 <td>subscription</td>
 <td><a href="#botsubscriptionupdated">BotSubscriptionUpdated</a></td>
 <td><em>Optional</em>. User payment subscription has changed</td>
+</tr>
+<tr>
+<td>stopped_message_generation</td>
+<td><a href="#messagegenerationstopped">MessageGenerationStopped</a></td>
+<td><em>Optional</em>. A user asked the bot to stop the generation of a message</td>
 </tr>
 </tbody>
 </table>
@@ -1456,12 +1496,17 @@ To learn how to create…">
 <tr>
 <td>community_chat_added</td>
 <td><a href="#communitychatadded">CommunityChatAdded</a></td>
-<td><em>Optional</em>. Service message: chat added to a <a href="#community">Community</a></td>
+<td><em>Optional</em>. Service message: chat or bot added to a <a href="#community">Community</a></td>
+</tr>
+<tr>
+<td>community_chat_joined</td>
+<td><a href="#communitychatjoined">CommunityChatJoined</a></td>
+<td><em>Optional</em>. Service message: chat was joined by a user from a <a href="#community">Community</a></td>
 </tr>
 <tr>
 <td>community_chat_removed</td>
 <td><a href="#communitychatremoved">CommunityChatRemoved</a></td>
-<td><em>Optional</em>. Service message: chat removed from a <a href="#community">Community</a></td>
+<td><em>Optional</em>. Service message: chat or bot removed from a <a href="#community">Community</a></td>
 </tr>
 <tr>
 <td>direct_message_price_changed</td>
@@ -1941,6 +1986,33 @@ To learn how to create…">
 <td>poll_option_id</td>
 <td>String</td>
 <td><em>Optional</em>. Persistent identifier of the specific poll option to be replied to</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="ephemeralmessageparameters" href="#ephemeralmessageparameters"><i class="anchor-icon"></i></a>EphemeralMessageParameters</h4>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>receiver_user_id</td>
+<td>Integer</td>
+<td>Identifier of the user who will receive the message. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">here</a> for more details.</td>
+</tr>
+<tr>
+<td>callback_query_id</td>
+<td>String</td>
+<td><em>Optional</em>. Identifier of the callback query which triggered the message, if any</td>
+</tr>
+<tr>
+<td>replace_callback_query_message</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> if the ephemeral message must be shown in place of the original message. Must be <em>False</em> for callback queries from ephemeral messages, which must be edited using regular <em>editEphemeralMessage…</em> methods.</td>
 </tr>
 </tbody>
 </table>
@@ -2469,7 +2541,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="videonote" href="#videonote"><i class="anchor-icon"></i></a>VideoNote</h4>
-<p>This object represents a <a href="https://telegram.org/blog/video-messages-and-telescope">video message</a> (available in Telegram apps as of <a href="https://telegram.org/blog/video-messages-and-telescope">v.4.0</a>).</p>
+<p>This object represents a <a href="https://telegram.org/blog/video-messages-and-telescope">video message</a>.</p>
 <table class="table">
 <thead>
 <tr>
@@ -3476,6 +3548,34 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="messagegenerationstopped" href="#messagegenerationstopped"><i class="anchor-icon"></i></a>MessageGenerationStopped</h4>
+<p>This object describes an update about a user stopping message generation.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>chat</td>
+<td><a href="#chat">Chat</a></td>
+<td>Chat in which the message is generated</td>
+</tr>
+<tr>
+<td>message_thread_id</td>
+<td>Integer</td>
+<td><em>Optional</em>. Unique identifier of the message thread in which the message is generated</td>
+</tr>
+<tr>
+<td>draft_id</td>
+<td>Integer</td>
+<td>Unique identifier of the message draft which was stopped</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="polloptionadded" href="#polloptionadded"><i class="anchor-icon"></i></a>PollOptionAdded</h4>
 <p>Describes a service message about an option added to a poll.</p>
 <table class="table">
@@ -3856,7 +3956,7 @@ To learn how to create…">
 </tbody>
 </table>
 <h4><a class="anchor" name="communitychatadded" href="#communitychatadded"><i class="anchor-icon"></i></a>CommunityChatAdded</h4>
-<p>Describes a service message about a chat being added to a community.</p>
+<p>Describes a service message about a chat or a bot being added to a community.</p>
 <table class="table">
 <thead>
 <tr>
@@ -3869,12 +3969,30 @@ To learn how to create…">
 <tr>
 <td>community</td>
 <td><a href="#community">Community</a></td>
-<td>The new community to which the chat belongs</td>
+<td>The new community to which the chat or the bot belongs</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="communitychatjoined" href="#communitychatjoined"><i class="anchor-icon"></i></a>CommunityChatJoined</h4>
+<p>Describes a service message about a chat being joined by a user from a community.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>community</td>
+<td><a href="#community">Community</a></td>
+<td>The community from which the chat was joined</td>
 </tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="communitychatremoved" href="#communitychatremoved"><i class="anchor-icon"></i></a>CommunityChatRemoved</h4>
-<p>Describes a service message about a chat being removed from a community. Currently holds no information.</p>
+<p>Describes a service message about a chat or a bot being removed from a community. Currently holds no information.</p>
 <h4><a class="anchor" name="forumtopiccreated" href="#forumtopiccreated"><i class="anchor-icon"></i></a>ForumTopicCreated</h4>
 <p>This object represents a service message about a new forum topic created in the chat.</p>
 <table class="table">
@@ -4751,6 +4869,11 @@ To learn how to create…">
 <td>Boolean</td>
 <td><em>Optional</em>. Use this parameter if you want to show the keyboard to specific users only. Targets: 1) users that are @mentioned in the <em>text</em> of the <a href="#message">Message</a> object; 2) if the bot&#39;s message is a reply to a message in the same chat and forum topic, sender of the original message.<br><br><em>Example:</em> A user requests to change the bot&#39;s language, bot replies to the request with a keyboard to select the new language. Other users in the group don&#39;t see the keyboard.</td>
 </tr>
+<tr>
+<td>force_reply</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> if the reply interface must be shown to the user, as if they had manually selected the bot&#39;s message and tapped &#39;Reply&#39;</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="keyboardbutton" href="#keyboardbutton"><i class="anchor-icon"></i></a>KeyboardButton</h4>
@@ -5017,6 +5140,11 @@ To learn how to create…">
 <td>Array of Array of <a href="#inlinekeyboardbutton">InlineKeyboardButton</a></td>
 <td>Array of button rows, each represented by an Array of <a href="#inlinekeyboardbutton">InlineKeyboardButton</a> objects</td>
 </tr>
+<tr>
+<td>force_reply</td>
+<td>Boolean</td>
+<td><em>Optional</em>. Pass <em>True</em> if the reply interface must be shown to the user, as if they had manually selected the bot&#39;s message and tapped &#39;Reply&#39;. The value of the field can&#39;t be changed when the inline keyboard is edited.</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="inlinekeyboardbutton" href="#inlinekeyboardbutton"><i class="anchor-icon"></i></a>InlineKeyboardButton</h4>
@@ -5063,7 +5191,7 @@ To learn how to create…">
 <tr>
 <td>login_url</td>
 <td><a href="#loginurl">LoginUrl</a></td>
-<td><em>Optional</em>. An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the <a href="/widgets/login">Telegram Login Widget</a>.</td>
+<td><em>Optional</em>. An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the <a href="/widgets/login">Telegram Login Widget</a>. Not supported for ephemeral messages.</td>
 </tr>
 <tr>
 <td>switch_inline_query</td>
@@ -5095,17 +5223,21 @@ To learn how to create…">
 <td>Boolean</td>
 <td><em>Optional</em>. Specify <em>True</em>, to send a <a href="#payments">Pay button</a>. Substrings “<img class="emoji" src="//telegram.org/img/emoji/40/E2AD90.png" width="20" height="20" alt="⭐" />” and “XTR” in the buttons&#39;s text will be replaced with a Telegram Star icon.<br><br><strong>NOTE:</strong> This type of button <strong>must</strong> always be the first button in the first row and can only be used in invoice messages.</td>
 </tr>
+<tr>
+<td>disabled</td>
+<td><a href="#disabledbutton">DisabledButton</a></td>
+<td><em>Optional</em>. If set, then the button is disabled and does nothing</td>
+</tr>
 </tbody>
 </table>
 <h4><a class="anchor" name="loginurl" href="#loginurl"><i class="anchor-icon"></i></a>LoginUrl</h4>
-<p>This object represents a parameter of the inline keyboard button used to automatically authorize a user. Serves as a great replacement for the <a href="/widgets/login">Telegram Login Widget</a> when the user is coming from Telegram. All the user needs to do is tap/click a button and confirm that they want to log in:</p>
+<p>This object represents a parameter of the inline keyboard button used to automatically authorize a user. It serves as a great replacement for the <a href="/widgets/login">Telegram Login Widget</a> when the user is coming from Telegram. All the user needs to do is tap/click a button and confirm that they want to log in:</p>
 <div class="blog_image_wrap">
   <a href="/file/811140015/1734/8VZFkwWXalM.97872/6127fa62d8a0bf2b3c" target="_blank"><img src="/file/811140909/1631/20k1Z53eiyY.23995/c541e89b74253623d9" title="TITLE" alt="TITLE" srcset="/file/811140015/1734/8VZFkwWXalM.97872/6127fa62d8a0bf2b3c , 2x" /></a>
 </div>
 
-<p>Telegram apps support these buttons as of <a href="https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots">version 5.7</a>.</p>
 <blockquote>
-<p>Sample bot: <a href="https://t.me/discussbot">@discussbot</a></p>
+<p>Sample bot: <a href="https://t.me/discussbot">@DiscussBot</a></p>
 </blockquote>
 <table class="table">
 <thead>
@@ -5129,7 +5261,7 @@ To learn how to create…">
 <tr>
 <td>bot_username</td>
 <td>String</td>
-<td><em>Optional</em>. Username of a bot, which will be used for user authorization. See <a href="/widgets/login#setting-up-a-bot">Setting up a bot</a> for more details. If not specified, the current bot&#39;s username will be assumed. The <em>url</em>&#39;s domain must be the same as the domain linked with the bot. See <a href="/widgets/login#linking-your-domain-to-the-bot">Linking your domain to the bot</a> for more details.</td>
+<td><em>Optional</em>. Username of a bot, which will be used for user authorization; not supported in <a href="#richmessagebutton">RichMessageButton</a>. See <a href="/widgets/login#setting-up-a-bot">Setting up a bot</a> for more details. If not specified, the current bot&#39;s username will be assumed. The <em>url</em>&#39;s domain must be the same as the domain linked with the bot. See <a href="/widgets/login#linking-your-domain-to-the-bot">Linking your domain to the bot</a> for more details.</td>
 </tr>
 <tr>
 <td>request_write_access</td>
@@ -5194,6 +5326,8 @@ To learn how to create…">
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="disabledbutton" href="#disabledbutton"><i class="anchor-icon"></i></a>DisabledButton</h4>
+<p>This object represents a disabled button which does nothing. Currently holds no information.</p>
 <h4><a class="anchor" name="callbackquery" href="#callbackquery"><i class="anchor-icon"></i></a>CallbackQuery</h4>
 <p>This object represents an incoming callback query from a callback button in an <a href="/bots/features#inline-keyboards">inline keyboard</a>. If the button that originated the query was attached to a message sent by the bot, the field <em>message</em> will be present. If the button was attached to a message sent via the bot (in <a href="#inline-mode">inline mode</a>), the field <em>inline_message_id</em> will be present. Exactly one of the fields <em>data</em> or <em>game_short_name</em> will be present.</p>
 <table class="table">
@@ -5238,7 +5372,7 @@ To learn how to create…">
 <tr>
 <td>game_short_name</td>
 <td>String</td>
-<td><em>Optional</em>. Short name of a <a href="#games">Game</a> to be returned, serves as the unique identifier for the game</td>
+<td><em>Optional</em>. Short name of a <a href="#game">Game</a> to be returned, serves as the unique identifier for the game</td>
 </tr>
 </tbody>
 </table>
@@ -5259,7 +5393,7 @@ To learn how to create…">
 <tr>
 <td>force_reply</td>
 <td>True</td>
-<td>Shows reply interface to the user, as if they manually selected the bot&#39;s message and tapped &#39;Reply&#39;</td>
+<td>Shows reply interface to the user, as if they had manually selected the bot&#39;s message and tapped &#39;Reply&#39;</td>
 </tr>
 <tr>
 <td>input_field_placeholder</td>
@@ -5499,7 +5633,12 @@ To learn how to create…">
 <tr>
 <td>can_manage_tags</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the administrator can edit the tags of regular members; for groups and supergroups only. If omitted, defaults to the value of can_pin_messages.</td>
+<td><em>Optional</em>. <em>True</em>, if the administrator can edit the tags of regular members; for groups and supergroups only</td>
+</tr>
+<tr>
+<td>can_send_welcome_messages</td>
+<td>Boolean</td>
+<td><em>True</em>, if the administrator can manage chat welcome messages or directly send them in the case of bots</td>
 </tr>
 </tbody>
 </table>
@@ -5708,7 +5847,12 @@ To learn how to create…">
 <tr>
 <td>can_manage_tags</td>
 <td>Boolean</td>
-<td><em>Optional</em>. <em>True</em>, if the administrator can edit the tags of regular members; for groups and supergroups only. If omitted, defaults to the value of can_pin_messages.</td>
+<td><em>Optional</em>. <em>True</em>, if the administrator can edit the tags of regular members; for groups and supergroups only</td>
+</tr>
+<tr>
+<td>can_send_welcome_messages</td>
+<td>Boolean</td>
+<td><em>True</em>, if the administrator can manage chat welcome messages or directly send them in the case of bots</td>
 </tr>
 <tr>
 <td>custom_title</td>
@@ -7152,6 +7296,21 @@ To learn how to create…">
 <td>origin</td>
 <td>String</td>
 <td>Origin of the gift. Currently, either “upgrade” for gifts upgraded from regular gifts, “transfer” for gifts transferred from other users or channels, “resale” for gifts bought from other users, “gifted_upgrade” for upgrades purchased after the gift was sent, or “offer” for gifts bought or sold through gift purchase offers.</td>
+</tr>
+<tr>
+<td>text</td>
+<td>String</td>
+<td><em>Optional</em>. Text of the message that was added to the gift</td>
+</tr>
+<tr>
+<td>entities</td>
+<td>Array of <a href="#messageentity">MessageEntity</a></td>
+<td><em>Optional</em>. Special entities that appear in the text</td>
+</tr>
+<tr>
+<td>is_private</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if the sender and gift text are shown only to the gift receiver; otherwise, everyone will be able to see them</td>
 </tr>
 <tr>
 <td>last_resale_currency</td>
@@ -9183,16 +9342,10 @@ To learn how to create…">
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>text</td>
@@ -9755,16 +9908,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>photo</td>
@@ -9883,16 +10030,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>live_photo</td>
@@ -10018,16 +10159,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>audio</td>
@@ -10158,16 +10293,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>document</td>
@@ -10286,16 +10415,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>video</td>
@@ -10456,16 +10579,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>animation</td>
@@ -10608,16 +10725,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>voice</td>
@@ -10694,7 +10805,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="sendvideonote" href="#sendvideonote"><i class="anchor-icon"></i></a>sendVideoNote</h4>
-<p>As of <a href="https://telegram.org/blog/video-messages-and-telescope">v.4.0</a>, Telegram clients support rounded square MPEG4 videos of up to 1 minute long. Use this method to send video messages. On success, the sent <a href="#message">Message</a> is returned.</p>
+<p>Use this method to send a rounded square MPEG4 video of up to 1 minute long. On success, the sent <a href="#message">Message</a> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -10730,16 +10841,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>video_note</td>
@@ -11036,16 +11141,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>latitude</td>
@@ -11164,16 +11263,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>latitude</td>
@@ -11304,16 +11397,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>phone_number</td>
@@ -11777,7 +11864,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>draft_id</td>
 <td>Integer</td>
 <td>Yes</td>
-<td>Unique identifier of the message draft; must be non-zero. Changes to drafts with the same identifier are animated.</td>
+<td>Unique identifier of the message draft; must be non-zero. Changes to drafts with the same identifier are animated. Otherwise, the draft is replaced without animation.</td>
 </tr>
 <tr>
 <td>text</td>
@@ -11796,6 +11883,18 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td>Optional</td>
 <td>A JSON-serialized list of special entities that appear in message text, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>can_stop</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> to show the user a button to stop further drafts. The bot will receive an <a href="#update">Update</a> “stopped_message_generation” if the user presses the button.</td>
+</tr>
+<tr>
+<td>keep_on_stop</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> to keep the draft in the chat when the button is pressed. The draft will still disappear after a short time or if the bot sends a message. To fully preserve the partial draft, the bot should send it as a new message.</td>
 </tr>
 </tbody>
 </table>
@@ -12235,6 +12334,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Boolean</td>
 <td>Optional</td>
 <td>Pass <em>True</em> if the administrator can edit the tags of regular members; for groups and supergroups only</td>
+</tr>
+<tr>
+<td>can_send_welcome_messages</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the administrator can manage chat welcome messages or directly send them in the case of bots</td>
 </tr>
 </tbody>
 </table>
@@ -13426,7 +13531,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>cache_time</td>
 <td>Integer</td>
 <td>Optional</td>
-<td>The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram apps will support caching starting in version 3.14. Defaults to 0.</td>
+<td>The maximum amount of time in seconds that the result of the callback query may be cached client-side. Defaults to 0.</td>
 </tr>
 </tbody>
 </table>
@@ -15109,7 +15214,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>rich_message</td>
 <td><a href="#inputrichmessage">InputRichMessage</a></td>
 <td>Optional</td>
-<td>New rich content of the message; required if <em>text</em> isn&#39;t specified. Direct upload of new files isn&#39;t supported when an inline message is edited.</td>
+<td>New rich content of the message; required if <em>text</em> isn&#39;t specified. Direct upload of new files and explicit upload of files by a URL isn&#39;t supported when an inline message is edited.</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -15488,7 +15593,7 @@ pre-formatted fixed-width code block written in the Python programming language
 </tbody>
 </table>
 <h4><a class="anchor" name="editephemeralmessagetext" href="#editephemeralmessagetext"><i class="anchor-icon"></i></a>editEphemeralMessageText</h4>
-<p>Use this method to edit an ephemeral text message. Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline. On success, <em>True</em> is returned.</p>
+<p>Use this method to edit an ephemeral text or rich message. Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline. On success, <em>True</em> is returned.</p>
 <table class="table">
 <thead>
 <tr>
@@ -15520,8 +15625,8 @@ pre-formatted fixed-width code block written in the Python programming language
 <tr>
 <td>text</td>
 <td>String</td>
-<td>Yes</td>
-<td>New text of the message, 1-4096 characters after entity parsing</td>
+<td>Optional</td>
+<td>New text of the message, 1-4096 characters after entity parsing; required if <em>rich_message</em> isn&#39;t specified</td>
 </tr>
 <tr>
 <td>parse_mode</td>
@@ -15534,6 +15639,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td>Optional</td>
 <td>A JSON-serialized list of special entities that appear in message text, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>rich_message</td>
+<td><a href="#inputrichmessage">InputRichMessage</a></td>
+<td>Optional</td>
+<td>New rich content of the message; required if <em>text</em> isn&#39;t specified</td>
 </tr>
 <tr>
 <td>link_preview_options</td>
@@ -15583,7 +15694,7 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>media</td>
 <td><a href="#inputmedia">InputMedia</a></td>
 <td>Yes</td>
-<td>A JSON-serialized object for the new media content of the message. A new file can&#39;t be uploaded; use a previously uploaded file via its file_id or specify a URL.</td>
+<td>A JSON-serialized object for the new media content of the message</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -15640,6 +15751,12 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Array of <a href="#messageentity">MessageEntity</a></td>
 <td>Optional</td>
 <td>A JSON-serialized list of special entities that appear in the caption, which can be specified instead of <em>parse_mode</em></td>
+</tr>
+<tr>
+<td>show_caption_above_media</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> if the caption must be shown above the message media. Supported only for animation, photo and video messages.</td>
 </tr>
 <tr>
 <td>reply_markup</td>
@@ -16141,16 +16258,10 @@ pre-formatted fixed-width code block written in the Python programming language
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
 </tr>
 <tr>
-<td>receiver_user_id</td>
-<td>Integer</td>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
 <td>Optional</td>
-<td>For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only. It is not guaranteed that the user will receive the message, especially if they are offline. See <a href="#ephemeral-messages-and-commands">ephemeral message sending</a> for more details.</td>
-</tr>
-<tr>
-<td>callback_query_id</td>
-<td>String</td>
-<td>Optional</td>
-<td>For outgoing ephemeral messages, identifier of the callback query which triggered the message if any</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>sticker</td>
@@ -16639,14 +16750,14 @@ pre-formatted fixed-width code block written in the Python programming language
 <h4><a class="anchor" name="rich-message-formatting-options" href="#rich-message-formatting-options"><i class="anchor-icon"></i></a>Rich Message Formatting Options</h4>
 <p><a href="#inputrichmessage">Rich messages</a> support advanced structured formatting options like headings, lists, tables, media, block quotations, collapsible blocks, footnotes, and formulas. Telegram clients will render them accordingly. You can specify rich message content using <a href="#rich-markdown-style">Markdown-style</a> or <a href="#rich-html-style">HTML-style</a> formatting, or explicit <a href="#inputrichblock">blocks</a>.</p>
 <p>Plain URLs, e-mail addresses, username mentions, hashtags, cashtags, bot commands, phone numbers, and bank card numbers are detected automatically. To disable automatic entity detection, pass <em>True</em> in the <em>skip_entity_detection</em> field. Note that Telegram clients will display an alert to the user before opening an inline link (&#39;Open this link?&#39; together with the full URL).</p>
-<p>When <a href="#rich-markdown-style">Markdown-style</a> or <a href="#rich-html-style">HTML-style</a> formatting is used, you can use links in the form <code>tg://photo?id=...</code>, <code>tg://video?id=...</code>, and <code>tg://audio?id=...</code> instead of an HTTP URL to reuse previously uploaded files or upload a new file.</p>
+<p>When <a href="#rich-markdown-style">Markdown-style</a> or <a href="#rich-html-style">HTML-style</a> formatting is used, you can use links in the form <code>tg://photo?id=...</code>, <code>tg://video?id=...</code>, <code>tg://document?id=...</code>, and <code>tg://audio?id=...</code> instead of an HTTP URL to reuse previously uploaded files or upload a new file.</p>
 <h6><a class="anchor" name="rich-message-limits" href="#rich-message-limits"><i class="anchor-icon"></i></a>Rich Message Limits</h6>
 <p>Rich messages are subject to the following limits:</p>
 <ul>
 <li>Up to <strong>32768 UTF-8 characters</strong> in the rich message text, including custom emoji alternative text and formula source.</li>
 <li>Up to <strong>500 blocks</strong>, including nested blocks, list items, ordered list items, table rows, quotation blocks, and details blocks.</li>
 <li>Up to <strong>16 levels</strong> of nested formatting and blocks.</li>
-<li>Up to <strong>50 media attachments</strong> in total, including photos, videos, and audio files.</li>
+<li>Up to <strong>50 media attachments</strong> in total.</li>
 <li>Up to <strong>20 columns</strong> in a table.</li>
 </ul>
 <h6><a class="anchor" name="rich-markdown-style" href="#rich-markdown-style"><i class="anchor-icon"></i></a>Rich Markdown style</h6>
@@ -16707,12 +16818,14 @@ Paragraph text
 ![](https://telegram.org/example/audio.mp3)
 ![](https://telegram.org/example/audio.ogg)
 ![](https://telegram.org/example/animation.gif)
+![](https://telegram.org/example/document.zip)
 
 ![](https://telegram.org/example/photo.jpg &quot;Photo caption&quot;)
 ![](https://telegram.org/example/video.mp4 &quot;Video caption&quot;)
 ![](https://telegram.org/example/audio.mp3 &quot;Audio caption&quot;)
 ![](https://telegram.org/example/audio.ogg &quot;Voice note caption&quot;)
 ![](https://telegram.org/example/animation.gif &quot;Animation caption&quot;)
+![](https://telegram.org/example/document.zip &quot;Document caption&quot;)
 
 | Header 1 | Header 2 |
 |:---------|:--------:|
@@ -16782,7 +16895,39 @@ Intro with &lt;u&gt;underlined text&lt;/u&gt;, ==marked text==, and $x^2 + y^2$.
 &lt;details open&gt;&lt;summary&gt;Title&lt;/summary&gt;Content&lt;/details&gt;
 &lt;tg-map lat=&quot;41.9&quot; long=&quot;12.5&quot; zoom=&quot;14&quot;/&gt;
 &lt;tg-collage&gt;&lt;img src=&quot;https://telegram.org/example/photo.jpg&quot;/&gt;&lt;figcaption&gt;Caption&lt;cite&gt;The Author&lt;/cite&gt;&lt;/figcaption&gt;&lt;/tg-collage&gt;
-&lt;tg-slideshow&gt;&lt;img src=&quot;https://telegram.org/example/photo.jpg&quot;/&gt;&lt;video src=&quot;https://telegram.org/example/video.mp4&quot;/&gt;&lt;figcaption&gt;Slideshow caption&lt;cite&gt;The Author&lt;/cite&gt;&lt;/figcaption&gt;&lt;/tg-slideshow&gt;</code></pre>
+&lt;tg-slideshow&gt;&lt;img src=&quot;https://telegram.org/example/photo.jpg&quot;/&gt;&lt;video src=&quot;https://telegram.org/example/video.mp4&quot;/&gt;&lt;figcaption&gt;Slideshow caption&lt;cite&gt;The Author&lt;/cite&gt;&lt;/figcaption&gt;&lt;/tg-slideshow&gt;
+&lt;p&gt;Inline buttons:
+  &lt;tg-button type=&quot;url&quot; style=&quot;success&quot; url=&quot;https://t.me&quot;&gt;url&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;url&quot; url=&quot;tg://user?id=777000&quot;&gt;user&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;callback_data&quot; style=&quot;link&quot; data=&quot;callback&quot;&gt;callback with the date &lt;tg-time unix=&quot;1647531900&quot; format=&quot;wDT&quot;&gt;22:45 tomorrow&lt;/tg-time&gt; and the custom emoji &lt;tg-emoji emoji-id=&quot;5368324170671202286&quot;&gt;<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍" />&lt;/tg-emoji&gt;&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;web_app&quot; style=&quot;danger&quot; url=&quot;https://telegram.org&quot;&gt;Mini App (private chats only)&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;login_url&quot; url=&quot;https://t.me&quot; forward-text=&quot;forward text&quot; request-write-access&gt;login (requires domain set up via @BotFather)&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query&quot; style=&quot;primary&quot; query=&quot;inline&quot;&gt;inline&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query_current_chat&quot; query=&quot;inline 2&quot;&gt;inline 2&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query_chosen_chat&quot; query=&quot;inline 3&quot; allow-user-chats allow-bot-chats allow-group-chats allow-channel-chats&gt;inline 3&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;copy_text&quot; text=&quot;...copy&quot;&gt;Copy&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;disabled&quot;&gt;Disabled&lt;/tg-button&gt;
+&lt;/p&gt;
+&lt;tg-button-row align=&quot;left&quot;&gt;
+  &lt;tg-button type=&quot;url&quot; url=&quot;https://t.me&quot;&gt;url&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;url&quot; style=&quot;success&quot; url=&quot;tg://user?id=777000&quot;&gt;user&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;callback_data&quot; style=&quot;link&quot; data=&quot;callback&quot;&gt;callback&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;
+&lt;tg-button-row align=&quot;center&quot;&gt;
+  &lt;tg-button type=&quot;web_app&quot; url=&quot;https://telegram.org&quot;&gt;Mini App (private chats only)&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;
+&lt;tg-button-row align=&quot;center&quot;&gt;
+  &lt;tg-button type=&quot;login_url&quot; style=&quot;danger&quot; url=&quot;https://t.me&quot; forward-text=&quot;forward text&quot; request-write-access&gt;login (requires domain set up via @BotFather)&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;
+&lt;tg-button-row align=&quot;right&quot;&gt;
+  &lt;tg-button type=&quot;switch_inline_query&quot; query=&quot;inline&quot;&gt;inline&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query_current_chat&quot; query=&quot;inline 2&quot;&gt;inline 2&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query_chosen_chat&quot; query=&quot;inline 3&quot; allow-user-chats allow-group-chats allow-channel-chats&gt;inline 3&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;
+&lt;tg-button-row&gt;
+  &lt;tg-button type=&quot;copy_text&quot; text=&quot;...copy&quot;&gt;Copy&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;disabled&quot; style=&quot;primary&quot;&gt;Disabled&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;</code></pre>
 <p>Additionally, you can use the following tag in <a href="#sendrichmessagedraft">sendRichMessageDraft</a>:</p>
 <pre><code>&lt;tg-thinking&gt;Thinking...&lt;/tg-thinking&gt;</code></pre>
 <p>Please note:</p>
@@ -16852,6 +16997,7 @@ all the text above was on the same line
 &lt;/ul&gt;
 
 &lt;blockquote&gt;Block quotation started&lt;br&gt;Block quotation continued&lt;br&gt;The last line of the block quotation&lt;cite&gt;The Author&lt;/cite&gt;&lt;/blockquote&gt;
+&lt;blockquote expandable&gt;Expandable block quotation started&lt;br&gt;Expandable block quotation continued&lt;br&gt;Expandable block quotation continued&lt;br&gt;Expandable block quotation continued&lt;br&gt;The last line of the expandable block quotation&lt;cite&gt;The Author&lt;/cite&gt;&lt;/blockquote&gt;
 &lt;aside&gt;Pull quote&lt;cite&gt;The Author&lt;/cite&gt;&lt;/aside&gt;
 
 &lt;img src=&quot;https://telegram.org/example/photo.jpg&quot;/&gt;
@@ -16859,12 +17005,14 @@ all the text above was on the same line
 &lt;audio src=&quot;https://telegram.org/example/audio.mp3&quot;&gt;&lt;/audio&gt;
 &lt;audio src=&quot;https://telegram.org/example/audio.ogg&quot;&gt;&lt;/audio&gt;
 &lt;video src=&quot;https://telegram.org/example/animation.gif&quot;&gt;&lt;/video&gt;
+&lt;tg-document src=&quot;https://telegram.org/example/document.zip&quot;&gt;&lt;/tg-document&gt;
 
 &lt;figure&gt;&lt;img src=&quot;https://telegram.org/example/photo.jpg&quot; tg-spoiler/&gt;&lt;figcaption&gt;Photo caption&lt;cite&gt;Photo credit&lt;/cite&gt;&lt;/figcaption&gt;&lt;/figure&gt;
 &lt;figure&gt;&lt;video src=&quot;https://telegram.org/example/video.mp4&quot; tg-spoiler&gt;&lt;/video&gt;&lt;figcaption&gt;Video caption&lt;/figcaption&gt;&lt;/figure&gt;
 &lt;figure&gt;&lt;audio src=&quot;https://telegram.org/example/audio.mp3&quot;&gt;&lt;/audio&gt;&lt;figcaption&gt;Audio caption&lt;/figcaption&gt;&lt;/figure&gt;
 &lt;figure&gt;&lt;audio src=&quot;https://telegram.org/example/audio.ogg&quot;&gt;&lt;/audio&gt;&lt;figcaption&gt;Voice note caption&lt;/figcaption&gt;&lt;/figure&gt;
 &lt;figure&gt;&lt;video src=&quot;https://telegram.org/example/animation.gif&quot; tg-spoiler&gt;&lt;/video&gt;&lt;figcaption&gt;Animation caption&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;figure&gt;&lt;tg-document src=&quot;https://telegram.org/example/document.zip&quot;&gt;&lt;/tg-document&gt;&lt;figcaption&gt;Document caption&lt;/figcaption&gt;&lt;/figure&gt;
 
 &lt;tg-map lat=&quot;41.9&quot; long=&quot;12.5&quot; zoom=&quot;14&quot;/&gt;
 &lt;figure&gt;&lt;tg-map lat=&quot;41.9&quot; long=&quot;12.5&quot; zoom=&quot;14&quot;/&gt;&lt;figcaption&gt;Map caption&lt;/figcaption&gt;&lt;/figure&gt;
@@ -16875,14 +17023,46 @@ all the text above was on the same line
 &lt;tg-slideshow&gt;&lt;video src=&quot;https://telegram.org/example/video.mp4&quot;/&gt;&lt;img src=&quot;https://telegram.org/example/photo.jpg&quot;/&gt;&lt;figcaption&gt;Slideshow caption&lt;/figcaption&gt;&lt;/tg-slideshow&gt;
 
 &lt;table&gt;&lt;tr&gt;&lt;th&gt;Header 1&lt;/th&gt;&lt;th&gt;Header 2&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Value 1&lt;/td&gt;&lt;td&gt;Value 2&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;table bordered striped&gt;&lt;caption&gt;Table caption&lt;/caption&gt;
+&lt;table bordered striped compact&gt;&lt;caption&gt;Table caption&lt;/caption&gt;
 &lt;tr&gt;&lt;td colspan=&quot;2&quot; rowspan=&quot;2&quot; align=&quot;left&quot;&gt;Value&lt;/td&gt;&lt;td align=&quot;center&quot;&gt;Value2&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;Value3&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td valign=&quot;top&quot;&gt;Value4&lt;/td&gt;&lt;td valign=&quot;middle&quot;&gt;Value5&lt;/td&gt;&lt;td valign=&quot;bottom&quot;&gt;Value6&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;Value7&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 
 &lt;details&gt;&lt;summary&gt;Title&lt;/summary&gt;Content&lt;/details&gt;
 &lt;details open&gt;&lt;summary&gt;Title&lt;/summary&gt;Content&lt;/details&gt;
-&lt;tg-math-block&gt;E = mc^2&lt;/tg-math-block&gt;</code></pre>
+&lt;tg-math-block&gt;E = mc^2&lt;/tg-math-block&gt;
+&lt;p&gt;Inline buttons:
+  &lt;tg-button type=&quot;url&quot; style=&quot;success&quot; url=&quot;https://t.me&quot;&gt;url&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;url&quot; url=&quot;tg://user?id=777000&quot;&gt;user&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;callback_data&quot; style=&quot;link&quot; data=&quot;callback&quot;&gt;callback with the date &lt;tg-time unix=&quot;1647531900&quot; format=&quot;wDT&quot;&gt;22:45 tomorrow&lt;/tg-time&gt; and the custom emoji &lt;tg-emoji emoji-id=&quot;5368324170671202286&quot;&gt;<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍" />&lt;/tg-emoji&gt;&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;web_app&quot; style=&quot;danger&quot; url=&quot;https://telegram.org&quot;&gt;Mini App (private chats only)&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;login_url&quot; url=&quot;https://t.me&quot; forward-text=&quot;forward text&quot; request-write-access&gt;login (requires domain set up via @BotFather)&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query&quot; style=&quot;primary&quot; query=&quot;inline&quot;&gt;inline&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query_current_chat&quot; query=&quot;inline 2&quot;&gt;inline 2&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query_chosen_chat&quot; query=&quot;inline 3&quot; allow-user-chats allow-bot-chats allow-group-chats allow-channel-chats&gt;inline 3&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;copy_text&quot; text=&quot;...copy&quot;&gt;Copy&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;disabled&quot;&gt;Disabled&lt;/tg-button&gt;
+&lt;/p&gt;
+&lt;tg-button-row align=&quot;left&quot;&gt;
+  &lt;tg-button type=&quot;url&quot; url=&quot;https://t.me&quot;&gt;url&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;url&quot; style=&quot;success&quot; url=&quot;tg://user?id=777000&quot;&gt;user&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;callback_data&quot; style=&quot;link&quot; data=&quot;callback&quot;&gt;callback&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;
+&lt;tg-button-row align=&quot;center&quot;&gt;
+  &lt;tg-button type=&quot;web_app&quot; url=&quot;https://telegram.org&quot;&gt;Mini App (private chats only)&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;
+&lt;tg-button-row align=&quot;center&quot;&gt;
+  &lt;tg-button type=&quot;login_url&quot; style=&quot;danger&quot; url=&quot;https://t.me&quot; forward-text=&quot;forward text&quot; request-write-access&gt;login (requires domain set up via @BotFather)&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;
+&lt;tg-button-row align=&quot;right&quot;&gt;
+  &lt;tg-button type=&quot;switch_inline_query&quot; query=&quot;inline&quot;&gt;inline&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query_current_chat&quot; query=&quot;inline 2&quot;&gt;inline 2&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;switch_inline_query_chosen_chat&quot; query=&quot;inline 3&quot; allow-user-chats allow-group-chats allow-channel-chats&gt;inline 3&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;
+&lt;tg-button-row&gt;
+  &lt;tg-button type=&quot;copy_text&quot; text=&quot;...copy&quot;&gt;Copy&lt;/tg-button&gt;
+  &lt;tg-button type=&quot;disabled&quot; style=&quot;primary&quot;&gt;Disabled&lt;/tg-button&gt;
+&lt;/tg-button-row&gt;</code></pre>
 <p>Additionally, you can use the following tag in <a href="#sendrichmessagedraft">sendRichMessageDraft</a>:</p>
 <pre><code>&lt;tg-thinking&gt;Thinking...&lt;/tg-thinking&gt;</code></pre>
 <p>Please note:</p>
@@ -16954,7 +17134,7 @@ all the text above was on the same line
 <tr>
 <td>media</td>
 <td>Array of <a href="#inputrichmessagemedia">InputRichMessageMedia</a></td>
-<td><em>Optional</em>. List of media that are specified in the <em>markdown</em> or <em>html</em> fields using <code>tg://photo?id=</code>, <code>tg://video?id=</code>, and <code>tg://audio?id=</code> links</td>
+<td><em>Optional</em>. List of media that are specified in the <em>markdown</em> or <em>html</em> fields using <code>tg://photo?id=</code>, <code>tg://video?id=</code>, <code>tg://document?id=</code>, and <code>tg://audio?id=</code> links</td>
 </tr>
 <tr>
 <td>is_rtl</td>
@@ -16982,11 +17162,11 @@ all the text above was on the same line
 <tr>
 <td>id</td>
 <td>String</td>
-<td>Unique identifier of the media used in a <code>tg://photo?id=</code>, <code>tg://video?id=</code>, or <code>tg://audio?id=</code> link. 1-64 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed.</td>
+<td>Unique identifier of the media used in a <code>tg://photo?id=</code>, <code>tg://video?id=</code>, <code>tg://document?id=</code>, or <code>tg://audio?id=</code> link. 1-64 characters, only <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and <code>-</code> are allowed.</td>
 </tr>
 <tr>
 <td>media</td>
-<td><a href="#inputmediaanimation">InputMediaAnimation</a> or <a href="#inputmediaaudio">InputMediaAudio</a> or <a href="#inputmediaphoto">InputMediaPhoto</a> or <a href="#inputmediavideo">InputMediaVideo</a> or <a href="#inputmediavoicenote">InputMediaVoiceNote</a></td>
+<td><a href="#inputmediaanimation">InputMediaAnimation</a> or <a href="#inputmediaaudio">InputMediaAudio</a> or <a href="#inputmediadocument">InputMediaDocument</a> or <a href="#inputmediaphoto">InputMediaPhoto</a> or <a href="#inputmediavideo">InputMediaVideo</a> or <a href="#inputmediavoicenote">InputMediaVoiceNote</a></td>
 <td>The media to be sent. Everything except the media itself and its properties is ignored.</td>
 </tr>
 </tbody>
@@ -17026,6 +17206,12 @@ all the text above was on the same line
 <td>Integer</td>
 <td>Optional</td>
 <td>Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat</td>
+</tr>
+<tr>
+<td>ephemeral_message_parameters</td>
+<td><a href="#ephemeralmessageparameters">EphemeralMessageParameters</a></td>
+<td>Optional</td>
+<td>A JSON-serialized object containing the parameters of the ephemeral message to send</td>
 </tr>
 <tr>
 <td>rich_message</td>
@@ -17105,13 +17291,93 @@ all the text above was on the same line
 <td>draft_id</td>
 <td>Integer</td>
 <td>Yes</td>
-<td>Unique identifier of the message draft; must be non-zero. Changes to drafts with the same identifier are animated.</td>
+<td>Unique identifier of the message draft; must be non-zero. Changes to drafts with the same identifier are animated. Otherwise, the draft is replaced without animation.</td>
 </tr>
 <tr>
 <td>rich_message</td>
 <td><a href="#inputrichmessage">InputRichMessage</a></td>
 <td>Yes</td>
-<td>The partial message to be streamed. Direct upload of new files isn&#39;t supported.</td>
+<td>The partial message to be streamed. Direct upload of new files and explicit upload of files by a URL isn&#39;t supported.</td>
+</tr>
+<tr>
+<td>can_stop</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> to show the user a button to stop further drafts. The bot will receive an <a href="#update">Update</a> “stopped_message_generation” if the user presses the button.</td>
+</tr>
+<tr>
+<td>keep_on_stop</td>
+<td>Boolean</td>
+<td>Optional</td>
+<td>Pass <em>True</em> to keep the draft in the chat when the button is pressed. The draft will still disappear after a short time or if the bot sends a message. To fully preserve the partial draft, the bot should send it as a new message.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="richmessagebutton" href="#richmessagebutton"><i class="anchor-icon"></i></a>RichMessageButton</h4>
+<p>This object represents a button in a <a href="#richmessage">RichMessage</a>. Exactly one of the fields other than <em>text</em> and <em>style</em> must be used to specify the type of the button.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text</td>
+<td><a href="#richtext">RichText</a></td>
+<td>Text of the button. May contain only plain text, <a href="#richtextcustomemoji">RichTextCustomEmoji</a> and <a href="#richtextdatetime">RichTextDateTime</a> entities.</td>
+</tr>
+<tr>
+<td>style</td>
+<td>String</td>
+<td><em>Optional</em>. Style of the button. Must be one of “danger”, “success”, “primary”, or “link” (the button is shown as a regular link without borders). Apps may use theme-specific colors for the button background and text based on the style. The style “link” is allowed only for callback buttons.</td>
+</tr>
+<tr>
+<td>url</td>
+<td>String</td>
+<td><em>Optional</em>. HTTP or tg:// URL to be opened when the button is pressed. Links <code>tg://user?id=&lt;user_id&gt;</code> can be used to mention a user by their identifier without using a username, if this is allowed by their privacy settings.</td>
+</tr>
+<tr>
+<td>callback_data</td>
+<td>String</td>
+<td><em>Optional</em>. Data to be sent in a <a href="#callbackquery">callback query</a> to the bot when the button is pressed, 1-64 bytes</td>
+</tr>
+<tr>
+<td>web_app</td>
+<td><a href="#webappinfo">WebAppInfo</a></td>
+<td><em>Optional</em>. Description of the <a href="/bots/webapps">Web App</a> that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method <a href="#answerwebappquery">answerWebAppQuery</a>. Available only in private chats between a user and the bot. Not supported for messages sent on behalf of a business account.</td>
+</tr>
+<tr>
+<td>login_url</td>
+<td><a href="#loginurl">LoginUrl</a></td>
+<td><em>Optional</em>. An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the <a href="/widgets/login">Telegram Login Widget</a>. Not supported for ephemeral messages.</td>
+</tr>
+<tr>
+<td>switch_inline_query</td>
+<td>String</td>
+<td><em>Optional</em>. If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot&#39;s username and the specified inline query in the input field. May be empty, in which case just the bot&#39;s username will be inserted. Not supported for messages sent in channel direct messages chats and on behalf of a business account.</td>
+</tr>
+<tr>
+<td>switch_inline_query_current_chat</td>
+<td>String</td>
+<td><em>Optional</em>. If set, pressing the button will insert the bot&#39;s username and the specified inline query in the current chat&#39;s input field. May be empty, in which case only the bot&#39;s username will be inserted. Not supported in channels and for messages sent in channel direct messages chats and on behalf of a business account.</td>
+</tr>
+<tr>
+<td>switch_inline_query_chosen_chat</td>
+<td><a href="#switchinlinequerychosenchat">SwitchInlineQueryChosenChat</a></td>
+<td><em>Optional</em>. If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot&#39;s username and the specified inline query in the input field. Not supported for messages sent in channel direct messages chats and on behalf of a business account.</td>
+</tr>
+<tr>
+<td>copy_text</td>
+<td><a href="#copytextbutton">CopyTextButton</a></td>
+<td><em>Optional</em>. A button that copies the specified text to the clipboard</td>
+</tr>
+<tr>
+<td>disabled</td>
+<td><a href="#disabledbutton">DisabledButton</a></td>
+<td><em>Optional</em>. If set, then the button is disabled and does nothing</td>
 </tr>
 </tbody>
 </table>
@@ -17139,6 +17405,7 @@ all the text above was on the same line
 <li><a href="#richtexthashtag">RichTextHashtag</a></li>
 <li><a href="#richtextcashtag">RichTextCashtag</a></li>
 <li><a href="#richtextbotcommand">RichTextBotCommand</a></li>
+<li><a href="#richtextbutton">RichTextButton</a></li>
 <li><a href="#richtextanchor">RichTextAnchor</a></li>
 <li><a href="#richtextanchorlink">RichTextAnchorLink</a></li>
 <li><a href="#richtextreference">RichTextReference</a></li>
@@ -17687,6 +17954,29 @@ all the text above was on the same line
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="richtextbutton" href="#richtextbutton"><i class="anchor-icon"></i></a>RichTextButton</h4>
+<p>A button.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the rich text, always “button”</td>
+</tr>
+<tr>
+<td>button</td>
+<td><a href="#richmessagebutton">RichMessageButton</a></td>
+<td>The button</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="richtextanchor" href="#richtextanchor"><i class="anchor-icon"></i></a>RichTextAnchor</h4>
 <p>An anchor.</p>
 <table class="table">
@@ -17915,14 +18205,17 @@ all the text above was on the same line
 <li><a href="#richblockanchor">RichBlockAnchor</a></li>
 <li><a href="#richblocklist">RichBlockList</a></li>
 <li><a href="#richblockblockquotation">RichBlockBlockQuotation</a></li>
+<li><a href="#richblockexpandableblockquotation">RichBlockExpandableBlockQuotation</a></li>
 <li><a href="#richblockpullquotation">RichBlockPullQuotation</a></li>
 <li><a href="#richblockcollage">RichBlockCollage</a></li>
 <li><a href="#richblockslideshow">RichBlockSlideshow</a></li>
 <li><a href="#richblocktable">RichBlockTable</a></li>
 <li><a href="#richblockdetails">RichBlockDetails</a></li>
 <li><a href="#richblockmap">RichBlockMap</a></li>
+<li><a href="#richblockbuttons">RichBlockButtons</a></li>
 <li><a href="#richblockanimation">RichBlockAnimation</a></li>
 <li><a href="#richblockaudio">RichBlockAudio</a></li>
+<li><a href="#richblockdocument">RichBlockDocument</a></li>
 <li><a href="#richblockphoto">RichBlockPhoto</a></li>
 <li><a href="#richblockvideo">RichBlockVideo</a></li>
 <li><a href="#richblockvoicenote">RichBlockVoiceNote</a></li>
@@ -18145,6 +18438,34 @@ all the text above was on the same line
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="richblockexpandableblockquotation" href="#richblockexpandableblockquotation"><i class="anchor-icon"></i></a>RichBlockExpandableBlockQuotation</h4>
+<p>A block quotation, corresponding to the HTML tag <code>&lt;blockquote&gt;</code> with custom attribute <code>&quot;expandable&quot;</code>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the block, always “expandable_blockquote”</td>
+</tr>
+<tr>
+<td>text</td>
+<td><a href="#richtext">RichText</a></td>
+<td>Content of the block</td>
+</tr>
+<tr>
+<td>credit</td>
+<td><a href="#richtext">RichText</a></td>
+<td><em>Optional</em>. Credit of the block</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="richblockpullquotation" href="#richblockpullquotation"><i class="anchor-icon"></i></a>RichBlockPullQuotation</h4>
 <p>A quotation with centered text, loosely corresponding to the HTML tag <code>&lt;aside&gt;</code>.</p>
 <table class="table">
@@ -18261,6 +18582,11 @@ all the text above was on the same line
 <td><em>Optional</em>. <em>True</em>, if the table is striped</td>
 </tr>
 <tr>
+<td>is_compact</td>
+<td>True</td>
+<td><em>Optional</em>. <em>True</em>, if table cells have smaller indents</td>
+</tr>
+<tr>
 <td>caption</td>
 <td><a href="#richtext">RichText</a></td>
 <td><em>Optional</em>. Caption of the table</td>
@@ -18324,7 +18650,7 @@ all the text above was on the same line
 <tr>
 <td>zoom</td>
 <td>Integer</td>
-<td>Map zoom level; 13-20</td>
+<td>Map zoom level</td>
 </tr>
 <tr>
 <td>width</td>
@@ -18340,6 +18666,34 @@ all the text above was on the same line
 <td>caption</td>
 <td><a href="#richblockcaption">RichBlockCaption</a></td>
 <td><em>Optional</em>. Caption of the block</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="richblockbuttons" href="#richblockbuttons"><i class="anchor-icon"></i></a>RichBlockButtons</h4>
+<p>A block containing a list of buttons that are shown in one row, corresponding to the custom HTML tag <code>&lt;tg-button-row&gt;</code>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the block, always “buttons”</td>
+</tr>
+<tr>
+<td>buttons</td>
+<td>Array of <a href="#richmessagebutton">RichMessageButton</a></td>
+<td>The buttons</td>
+</tr>
+<tr>
+<td>align</td>
+<td>String</td>
+<td><em>Optional</em>. Horizontal alignment of the buttons. Currently, must be one of “left”, “center”, or “right”.</td>
 </tr>
 </tbody>
 </table>
@@ -18396,6 +18750,34 @@ all the text above was on the same line
 <td>audio</td>
 <td><a href="#audio">Audio</a></td>
 <td>The audio</td>
+</tr>
+<tr>
+<td>caption</td>
+<td><a href="#richblockcaption">RichBlockCaption</a></td>
+<td><em>Optional</em>. Caption of the block</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="richblockdocument" href="#richblockdocument"><i class="anchor-icon"></i></a>RichBlockDocument</h4>
+<p>A block with a general file, corresponding to the custom HTML tag <code>&lt;tg-document&gt;</code>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the block, always “document”</td>
+</tr>
+<tr>
+<td>document</td>
+<td><a href="#document">Document</a></td>
+<td>The document</td>
 </tr>
 <tr>
 <td>caption</td>
@@ -18571,14 +18953,17 @@ all the text above was on the same line
 <li><a href="#inputrichblockanchor">InputRichBlockAnchor</a></li>
 <li><a href="#inputrichblocklist">InputRichBlockList</a></li>
 <li><a href="#inputrichblockblockquotation">InputRichBlockBlockQuotation</a></li>
+<li><a href="#inputrichblockexpandableblockquotation">InputRichBlockExpandableBlockQuotation</a></li>
 <li><a href="#inputrichblockpullquotation">InputRichBlockPullQuotation</a></li>
 <li><a href="#inputrichblockcollage">InputRichBlockCollage</a></li>
 <li><a href="#inputrichblockslideshow">InputRichBlockSlideshow</a></li>
 <li><a href="#inputrichblocktable">InputRichBlockTable</a></li>
 <li><a href="#inputrichblockdetails">InputRichBlockDetails</a></li>
 <li><a href="#inputrichblockmap">InputRichBlockMap</a></li>
+<li><a href="#inputrichblockbuttons">InputRichBlockButtons</a></li>
 <li><a href="#inputrichblockanimation">InputRichBlockAnimation</a></li>
 <li><a href="#inputrichblockaudio">InputRichBlockAudio</a></li>
+<li><a href="#inputrichblockdocument">InputRichBlockDocument</a></li>
 <li><a href="#inputrichblockphoto">InputRichBlockPhoto</a></li>
 <li><a href="#inputrichblockvideo">InputRichBlockVideo</a></li>
 <li><a href="#inputrichblockvoicenote">InputRichBlockVoiceNote</a></li>
@@ -18801,6 +19186,34 @@ all the text above was on the same line
 </tr>
 </tbody>
 </table>
+<h4><a class="anchor" name="inputrichblockexpandableblockquotation" href="#inputrichblockexpandableblockquotation"><i class="anchor-icon"></i></a>InputRichBlockExpandableBlockQuotation</h4>
+<p>A block quotation, corresponding to the HTML tag <code>&lt;blockquote&gt;</code> with custom attribute <code>&quot;expandable&quot;</code>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the block, always “expandable_blockquote”</td>
+</tr>
+<tr>
+<td>text</td>
+<td><a href="#richtext">RichText</a></td>
+<td>Content of the block</td>
+</tr>
+<tr>
+<td>credit</td>
+<td><a href="#richtext">RichText</a></td>
+<td><em>Optional</em>. Credit of the block</td>
+</tr>
+</tbody>
+</table>
 <h4><a class="anchor" name="inputrichblockpullquotation" href="#inputrichblockpullquotation"><i class="anchor-icon"></i></a>InputRichBlockPullQuotation</h4>
 <p>A quotation with centered text, loosely corresponding to the HTML tag <code>&lt;aside&gt;</code>.</p>
 <table class="table">
@@ -18917,6 +19330,11 @@ all the text above was on the same line
 <td><em>Optional</em>. Pass <em>True</em> if the table is striped</td>
 </tr>
 <tr>
+<td>is_compact</td>
+<td>True</td>
+<td><em>Optional</em>. Pass <em>True</em> if table cells must have smaller indents</td>
+</tr>
+<tr>
 <td>caption</td>
 <td><a href="#richtext">RichText</a></td>
 <td><em>Optional</em>. Caption of the table</td>
@@ -18980,22 +19398,50 @@ all the text above was on the same line
 <tr>
 <td>zoom</td>
 <td>Integer</td>
-<td>Map zoom level; 0-24</td>
+<td><em>Optional</em>. Map zoom level; 0-24</td>
 </tr>
 <tr>
 <td>width</td>
 <td>Integer</td>
-<td>Map width; 0-10000</td>
+<td><em>Optional</em>. Map width; 0-10000</td>
 </tr>
 <tr>
 <td>height</td>
 <td>Integer</td>
-<td>Map height; 0-10000</td>
+<td><em>Optional</em>. Map height; 0-10000</td>
 </tr>
 <tr>
 <td>caption</td>
 <td><a href="#richblockcaption">RichBlockCaption</a></td>
 <td><em>Optional</em>. Caption of the block</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="inputrichblockbuttons" href="#inputrichblockbuttons"><i class="anchor-icon"></i></a>InputRichBlockButtons</h4>
+<p>A block containing a list of buttons that are shown in one row, corresponding to the custom HTML tag <code>&lt;tg-button-row&gt;</code>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the block, always “buttons”</td>
+</tr>
+<tr>
+<td>buttons</td>
+<td>Array of <a href="#richmessagebutton">RichMessageButton</a></td>
+<td>List of 1-8 buttons to send</td>
+</tr>
+<tr>
+<td>align</td>
+<td>String</td>
+<td><em>Optional</em>. Horizontal alignment of the buttons. Currently, must be one of “left”, “center”, or “right”.</td>
 </tr>
 </tbody>
 </table>
@@ -19047,6 +19493,34 @@ all the text above was on the same line
 <td>audio</td>
 <td><a href="#inputmediaaudio">InputMediaAudio</a></td>
 <td>The audio. Caption is ignored.</td>
+</tr>
+<tr>
+<td>caption</td>
+<td><a href="#richblockcaption">RichBlockCaption</a></td>
+<td><em>Optional</em>. Caption of the block</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="inputrichblockdocument" href="#inputrichblockdocument"><i class="anchor-icon"></i></a>InputRichBlockDocument</h4>
+<p>A block with a general file, corresponding to the custom HTML tag <code>&lt;tg-document&gt;</code>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Type of the block, always “document”</td>
+</tr>
+<tr>
+<td>document</td>
+<td><a href="#inputmediadocument">InputMediaDocument</a></td>
+<td>The document. Caption is ignored.</td>
 </tr>
 <tr>
 <td>caption</td>
@@ -20183,7 +20657,7 @@ all the text above was on the same line
 </tbody>
 </table>
 <h4><a class="anchor" name="inlinequeryresultgame" href="#inlinequeryresultgame"><i class="anchor-icon"></i></a>InlineQueryResultGame</h4>
-<p>Represents a <a href="#games">Game</a>.</p>
+<p>Represents a <a href="#game">Game</a>.</p>
 <table class="table">
 <thead>
 <tr>
@@ -20746,7 +21220,7 @@ all the text above was on the same line
 <tr>
 <td>rich_message</td>
 <td><a href="#inputrichmessage">InputRichMessage</a></td>
-<td>The message to be sent</td>
+<td>The message to be sent. Only previously uploaded files may be used in the message.</td>
 </tr>
 </tbody>
 </table>

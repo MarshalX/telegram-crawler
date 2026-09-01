@@ -1,0 +1,538 @@
+:root {
+  --pr-dark-bg-color: #1A2026;
+  --pr-dark-surface: #212A33;
+  --pr-dark-surface-hover: #293440;
+  --pr-dark-text-primary: #fff;
+  --pr-dark-text-secondary: #8794A1;
+  --pr-dark-text-accent: #4CB2FF;
+  --pr-dark-accent: #2392e7;
+  --pr-dark-accent-hover: #0b9dec;
+  --pr-dark-border: #293440;
+  --pr-dark-border-light: #3a4756;
+  --pr-dark-danger: #ef658f;
+  --pr-dark-warning: #f28c48;
+  --pr-dark-success: #5bad57;
+  --pr-dark-input-bg: #1A2026;
+  --pr-dark-input-shadow: #3a4756;
+  --pr-dark-input-focus: #35a3f6;
+  --pr-dark-overlay: rgba(0, 0, 0, 0.55);
+}
+
+@property --pr-theme-hole-radius {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+/* Floating toggle button (top-right, above header). */
+.pr-theme-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #8a939d;
+  cursor: pointer;
+  display: flex;
+  height: 50px;
+  justify-content: center;
+  opacity: 0.7;
+  padding: 0 16px;
+  position: fixed;
+  right: 77px;
+  top: 0;
+  transition: opacity 0.15s ease;
+  view-transition-name: pr-theme-toggle;
+  z-index: 1001;
+}
+.pr-theme-toggle:hover {
+  opacity: 1;
+}
+.pr-theme-toggle canvas,
+.pr-theme-toggle--static:before {
+  display: block;
+  height: 22px;
+  width: 22px;
+}
+.pr-theme-toggle--static canvas {
+  display: none;
+}
+.pr-theme-toggle--static:before {
+  content: '';
+  background-size: contain;
+  background-image: url('/img/themeMoon.webp');
+}
+@media (min-width: 768px) {
+  .pr-theme-toggle {
+    right: 0;
+  }
+}
+
+html.pr-theme-switching body,
+html.pr-theme-switching body * {
+  transition: none !important;
+}
+
+::view-transition-group(root) {
+  isolation: isolate;
+  overflow: hidden;
+}
+::view-transition-image-pair(root) {
+  isolation: auto;
+  overflow: hidden;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 9999;
+  will-change: clip-path;
+  transform: translateZ(0);
+}
+::view-transition-new(root) { z-index: 1; }
+
+:root.pr-theme-reveal::view-transition-old(root) {
+  z-index: 9999;
+  transform: none;
+  will-change: auto;
+  -webkit-mask-image: radial-gradient(
+    circle at var(--pr-theme-origin-x) var(--pr-theme-origin-y),
+    transparent 0,
+    transparent var(--pr-theme-hole-radius),
+    #000 calc(var(--pr-theme-hole-radius) + 1px)
+  );
+  mask-image: radial-gradient(
+    circle at var(--pr-theme-origin-x) var(--pr-theme-origin-y),
+    transparent 0,
+    transparent var(--pr-theme-hole-radius),
+    #000 calc(var(--pr-theme-hole-radius) + 1px)
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  mask-mode: alpha;
+}
+:root.pr-theme-reveal::view-transition-new(root) { z-index: 1; }
+
+/* Theme toggle icon morph animation. */
+@keyframes pr-icon-out {
+  to { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+}
+@keyframes pr-icon-in {
+  from { opacity: 0; transform: rotate(90deg) scale(0.5); }
+}
+::view-transition-old(pr-theme-toggle) {
+  animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) both pr-icon-out;
+}
+::view-transition-new(pr-theme-toggle) {
+  animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) both pr-icon-in;
+}
+
+/* ============ Core dark overrides ============ */
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  background: var(--pr-dark-bg-color);
+  --tchart-bg-color: var(--pr-dark-bg-color);
+  --tchart-fade-color: var(--pr-dark-bg-color);
+}
+html[data-theme="dark"] body {
+  color: var(--pr-dark-text-primary);
+  background: var(--pr-dark-bg-color);
+  -webkit-font-smoothing: antialiased;
+  --bg-color: var(--pr-dark-bg-color);
+  --alt-bg-color: var(--pr-dark-surface);
+  --surface-color: var(--pr-dark-surface);
+  --photo-bg-color: var(--pr-dark-surface-hover);
+  --divider-color: var(--pr-dark-input-shadow);
+  --text-color: var(--pr-dark-text-primary);
+  --text-secondary-color: var(--pr-dark-text-secondary);
+  --text-muted-color: var(--pr-dark-text-secondary);
+  --link-color: var(--pr-dark-text-accent);
+  --link-bghover: rgba(76, 178, 255, .12);
+  --link-bgactive: rgba(76, 178, 255, .18);
+  --accent-color: var(--pr-dark-text-accent);
+  --accent-bghover: #5fbbff;
+  --accent-bgactive: #5fbbff;
+  --def-btn-color: #293440;
+  --input-border-color: var(--pr-dark-input-shadow);
+  --input-focus-color: var(--pr-dark-input-focus);
+  --danger-color: #ff5863;
+  --success-color: var(--pr-dark-success);
+  --warning-color: var(--pr-dark-warning);
+  --success-bg-color: rgba(91, 173, 87, .15);
+  --warning-bg-color: rgba(242, 140, 72, .15);
+  --danger-bg-color: rgba(239, 101, 143, .15);
+  --link-bg-color: rgba(76, 178, 255, .15);
+  --tooltip-bg-color: var(--pr-dark-surface-hover);
+  --fade-color: var(--pr-dark-surface);
+}
+html[data-theme="dark"] .pr-container {
+  background: var(--pr-dark-bg-color);
+}
+
+html[data-theme="dark"] .pr-theme-toggle--static:before {
+  background-image: url('/img/themeSun.webp');
+}
+html[data-theme="dark"] .pr-theme-toggle {
+  color: #c2cbd4;
+}
+
+/* ============ Header ============ */
+
+html[data-theme="dark"] .pr-header {
+  border-bottom: 1px solid var(--pr-dark-border);
+  background: var(--pr-dark-bg-color);
+}
+html[data-theme="dark"] .has-search-header .pr-header {
+  border-bottom: none;
+}
+html[data-theme="dark"] .pr-header-auth .pr-header-text:after {
+  background-color: var(--pr-dark-text-secondary);
+}
+
+/* ============ Dropdowns ============ */
+
+html[data-theme="dark"] .pr-dropdown-wrap span.dropdown-menu,
+html[data-theme="dark"] .dropdown-menu {
+  background: var(--pr-dark-surface);
+  border: 1px solid var(--pr-dark-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+html[data-theme="dark"] .pr-dropdown-wrap ul.dropdown-menu > li > a.pr-dropdown-item:hover,
+html[data-theme="dark"] .pr-dropdown-wrap ul.dropdown-menu > li > a.pr-dropdown-item:focus,
+html[data-theme="dark"] .pr-dropdown-wrap ul.dropdown-menu > li > a.pr-dropdown-remove-item:hover,
+html[data-theme="dark"] .pr-dropdown-wrap ul.dropdown-menu > li > a.pr-dropdown-remove-item:focus {
+  background: var(--pr-dark-surface-hover);
+}
+html[data-theme="dark"] .pr-dropdown-wrap ul.dropdown-menu > li.selected > .pr-dropdown-item:after {
+  background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 15 12" width="15" height="12" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M 2 6 L 5.5 9.5 L 13 3" stroke="%23fff" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/%3E%3C/svg%3E');
+}
+html[data-theme="dark"] .pr-dropdown-wrap ul.dropdown-menu > li.divider,
+html[data-theme="dark"] .dropdown-menu .divider {
+  background: var(--pr-dark-border);
+}
+
+html[data-theme="dark"] .pr-sort-marker:before,
+html[data-theme="dark"] .pr-sort-marker:after {
+  background-image: url('data:image/svg+xml,%3Csvg%20height%3D%224%22%20viewBox%3D%220%200%207%204%22%20width%3D%227%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m3.71%203.29%202.78-2.78c.12-.12.12-.3%200-.42-.06-.06-.13-.09-.21-.09h-5.56c-.16%200-.3.13-.3.3%200%20.08.04.16.09.21l2.78%202.78c.12.12.3.12.42%200z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E');
+}
+
+/* ============ Owner balance / auth photo ============ */
+
+html[data-theme="dark"] .pr-auth-photo img,
+html[data-theme="dark"] .pr-owner-balance-photo img,
+html[data-theme="dark"] .pr-dropdown-item-photo img,
+html[data-theme="dark"] .pr-popup-account-photo img {
+  background: var(--pr-dark-surface-hover);
+}
+
+/* ============ Buttons ============ */
+
+html[data-theme="dark"] .btn-primary {
+  background-color: var(--pr-dark-accent);
+  color: #fff;
+}
+html[data-theme="dark"] .btn-primary:hover,
+html[data-theme="dark"] .btn-primary:focus,
+html[data-theme="dark"] .btn-primary:active {
+  background-color: var(--pr-dark-accent-hover);
+}
+html[data-theme="dark"] .btn-default {
+  background-color: transparent;
+  color: var(--pr-dark-text-accent);
+}
+html[data-theme="dark"] .btn-default:hover,
+html[data-theme="dark"] .btn-default:focus,
+html[data-theme="dark"] .btn-default:active,
+html[data-theme="dark"] .open > .dropdown-toggle.btn-default {
+  color: var(--pr-dark-text-accent);
+  background-color: rgba(76, 178, 255, .12);
+  box-shadow: none;
+}
+html[data-theme="dark"] .btn-default.btn-danger {
+  color: var(--pr-dark-danger);
+  background-color: transparent;
+}
+html[data-theme="dark"] .btn-default.btn-danger:hover,
+html[data-theme="dark"] .btn-default.btn-danger:focus,
+html[data-theme="dark"] .btn-default.btn-danger:active {
+  color: var(--pr-dark-danger);
+  background-color: rgba(239, 101, 143, .15);
+}
+html[data-theme="dark"] .btn-link {
+  color: var(--pr-dark-text-accent);
+}
+
+/* ============ Forms ============ */
+
+html[data-theme="dark"] .pr-form-control,
+html[data-theme="dark"] input.pr-form-control,
+html[data-theme="dark"] textarea.pr-form-control,
+html[data-theme="dark"] .pr-form-select .select {
+  background: var(--pr-dark-input-bg);
+}
+html[data-theme="dark"] .pr-form-select .select .selected-item {
+  background: var(--pr-dark-surface-hover);
+}
+
+/* ============ Generic inputs / bootstrap ============ */
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select,
+html[data-theme="dark"] .form-control {
+  background-color: var(--pr-dark-input-bg);
+  border-color: var(--pr-dark-input-shadow);
+}
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] textarea:focus,
+html[data-theme="dark"] select:focus,
+html[data-theme="dark"] .form-control:focus {
+  border-color: var(--pr-dark-input-focus);
+}
+
+html[data-theme="dark"] .radio-input-icon,
+html[data-theme="dark"] .checkbox-input-icon {
+  background: transparent;
+  border-color: var(--pr-dark-input-shadow);
+}
+
+
+html[data-theme="dark"] .pr-form-control-wrap .pr-form-control,
+html[data-theme="dark"] .pr-form-control-wrap input.pr-form-control,
+html[data-theme="dark"] .pr-form-control-wrap .select,
+html[data-theme="dark"] .field-focused .pr-form-control-wrap .pr-form-control,
+html[data-theme="dark"] .field-focused .pr-form-control-wrap input.pr-form-control,
+html[data-theme="dark"] .field-focused .pr-form-control-wrap .select {
+  background: none;
+  box-shadow: none;
+}
+
+/* ============ Search field (wrapper-based border) ============ */
+
+html[data-theme="dark"] .pr-search-input {
+  background: transparent;
+}
+
+/* ============ Tables ============ */
+
+html[data-theme="dark"] .pr-table > tbody > tr:hover > td,
+html[data-theme="dark"] .pr-table > tbody > tr:hover > th {
+  background: var(--pr-dark-surface-hover);
+}
+html[data-theme="dark"] .table > thead > tr > th,
+html[data-theme="dark"] .table > thead > tr > td {
+  border-color: var(--pr-dark-border);
+  color: #fff;
+}
+html[data-theme="dark"] .table-bordered,
+html[data-theme="dark"] .table > tbody > tr > td,
+html[data-theme="dark"] .table > tbody > tr > th,
+html[data-theme="dark"] .table > tfoot > tr > td,
+html[data-theme="dark"] .table > tfoot > tr > th {
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] .table > tbody + tbody {
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+  background: var(--pr-dark-surface);
+}
+
+html[data-theme="dark"] .pr-trg-type-channel:before {
+  background-image: url('data:image/svg+xml,%3Csvg%20height%3D%2218%22%20viewBox%3D%220%200%2018%2018%22%20width%3D%2218%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%3E%3Cpath%20d%3D%22M%209.09%2011.52%20C%209.27%2011.65%209.37%2011.75%209.38%2011.81%20C%209.55%2012.59%209.67%2013.18%209.76%2013.58%20C%209.83%2014.3%209.62%2014.95%209.04%2015.04%20C%209.02%2015.04%209%2015.04%208.98%2015.05%20L%208.86%2015.05%20C%208.26%2015.1%207.69%2014.68%207.44%2014%20C%206.81%2013%206.4%2012.25%206.22%2011.76%20C%206.2%2011.7%206.26%2011.62%206.41%2011.52%20Z%20M%205.14%206.17%20H%208.7%20C%209.03%206.17%209.3%206.43%209.3%206.76%20V%2010.15%20C%209.3%2010.48%209.03%2010.75%208.7%2010.75%20H%206.65%20H%205.14%20C%204.21%2010.75%203.46%209.99%203.46%209.07%20V%207.85%20C%203.46%206.92%204.21%206.17%205.14%206.17%20Z%20M%2010.54%205.77%20L%2012.91%204.19%20C%2013.39%203.87%2014.04%204%2014.37%204.48%20C%2014.48%204.65%2014.54%204.85%2014.54%205.06%20V%2011.47%20C%2014.54%2012.05%2014.07%2012.52%2013.49%2012.52%20C%2013.31%2012.52%2013.12%2012.47%2012.96%2012.38%20L%2010.58%2010.98%20C%2010.32%2010.83%2010.16%2010.56%2010.16%2010.26%20V%206.47%20C%2010.16%206.19%2010.3%205.92%2010.54%205.77%20Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+}
+html[data-theme="dark"] .pr-trg-type-search:before {
+  background-image: url('data:image/svg+xml,%3Csvg%20height%3D%2218%22%20viewBox%3D%220%200%2018%2018%22%20width%3D%2218%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222%22%3E%3Ccircle%20cx%3D%2210%22%20cy%3D%228%22%20r%3D%224%22%2F%3E%3Cpath%20d%3D%22m7%2011-3%203%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+}
+html[data-theme="dark"] .pr-trg-type-user:before {
+  background-image: url('data:image/svg+xml,%3Csvg%20height%3D%2218%22%20viewBox%3D%220%200%2018%2018%22%20width%3D%2218%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22%23fff%22%3E%3Cpath%20d%3D%22M%2012.1%209.45%20C%2013.12%209.45%2013.94%208.71%2013.94%207.8%20C%2013.94%206.88%2013.12%206.15%2012.1%206.15%20C%2011.07%206.15%2010.25%206.88%2010.25%207.8%20C%2010.25%208.71%2011.07%209.45%2012.1%209.45%20Z%20M%206.79%209.25%20C%208.02%209.25%209%208.3%209%207.12%20S%208.02%205%206.79%205%20S%204.57%205.95%204.57%207.12%20S%205.56%209.25%206.79%209.25%20Z%20M%206.68%2010.16%20C%205.12%2010.16%202%2010.89%202%2012.36%20V%2013.08%20C%202%2013.43%202.53%2013.93%202.9%2013.93%20H%2010.68%20C%2011.05%2013.93%2011.35%2013.65%2011.35%2013.3%20V%2012.36%20C%2011.35%2010.89%208.23%2010.16%206.68%2010.16%20Z%20M%2011.89%2010.46%20C%2011.72%2010.46%2011.53%2010.47%2011.32%2010.49%20C%2011.34%2010.5%2011.34%2010.51%2011.35%2010.51%20C%2012.02%2011%2012.73%2011.66%2012.73%2012.53%20V%2013.41%20C%2012.73%2013.62%2012.69%2013.82%2012.62%2014%20H%2015.19%20C%2015.51%2014%2016%2013.51%2016%2013.19%20V%2012.53%20C%2016%2011.15%2013.26%2010.46%2011.89%2010.46%20Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+}
+html[data-theme="dark"] .pr-trg-type-bot:before {
+  background-image: url('data:image/svg+xml,%3Csvg%20height%3D%2218%22%20viewBox%3D%220%200%2018%2018%22%20width%3D%2218%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%3E%3Cpath%20d%3D%22m9%203.33c2.34%200%204.24%201.9%204.24%204.25v4.4c0%201.1-.89%202-2%202h-4.48c-1.11%200-2-.9-2-2v-4.4c0-2.35%201.9-4.25%204.24-4.25zm0%201c-1.79%200-3.23%201.42-3.23%203.18v.39c0%20.66.54%201.2%201.21%201.2h4.04c.67%200%201.21-.54%201.21-1.2v-.39c0-1.76-1.44-3.18-3.23-3.18z%22%2F%3E%3Crect%20height%3D%224.37%22%20rx%3D%22.81%22%20width%3D%221.62%22%20x%3D%2214.05%22%20y%3D%227.71%22%2F%3E%3Crect%20height%3D%224.37%22%20rx%3D%22.81%22%20width%3D%221.62%22%20x%3D%222.33%22%20y%3D%227.71%22%2F%3E%3Cellipse%20cx%3D%2210.41%22%20cy%3D%227.11%22%20rx%3D%221%22%20ry%3D%221%22%2F%3E%3Cellipse%20cx%3D%227.59%22%20cy%3D%227.11%22%20rx%3D%221%22%20ry%3D%221%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+}
+html[data-theme="dark"] .pr-table-settings {
+  background-image: url('data:image/svg+xml,%3Csvg%20height%3D%2218%22%20viewBox%3D%220%200%2018%2018%22%20width%3D%2218%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m9.43%204c.47%200%20.86.36.93.84.03.25.07.46.11.64.01.04.08.09.2.16l.05.03.06.03.07.04.07.03.08.03.08.04.09.04c.02%200%20.03.01.05.02.13-.05.27-.1.43-.16l.14-.06c.43-.18.93%200%201.16.42l.42.77c.23.41.15.92-.19%201.23l-.11.11-.25.23-.09.08-.12.11c-.01.01-.02.03-.03.04v.05l-.01.08c-.01.07-.02.14-.02.19v.07c0%20.14.01.23.05.26l.34.33.25.26c.31.3.39.78.19%201.17l-.02.04-.43.79-.02.03c-.24.4-.72.57-1.15.39l-.06-.02-.13-.06-.11-.04-.11-.04-.11-.04-.1-.04c-.01%200-.03-.01-.04-.01s-.01%200-.02%200l-.08.04-.07.03c-.03.02-.05.03-.07.04l-.06.04c-.17.09-.26.18-.28.24l-.04.19-.15.6c-.1.42-.46.72-.87.74h-.04-.83c-.41%200-.77-.27-.9-.68l-.04-.14-.04-.14-.02-.07-.04-.13-.03-.12-.03-.11c-.01-.04-.02-.08-.03-.11%200-.01%200-.01%200-.02l-.08-.05-.06-.05-.07-.05-.06-.04-.05-.03-.03-.02-.05-.03-.04-.02c-.01-.01-.02-.01-.03-.01l-.03-.02-.04-.02c-.04-.01-.07-.02-.1-.01l-.1.04-.12.04-.12.04-.14.05-.14.06c-.41.16-.88-.01-1.12-.4l-.02-.04-.43-.78c-.23-.41-.15-.92.19-1.23l.21-.2.09-.09.1-.09.12-.12c.01-.01.02-.02.04-.04.03-.03.04-.1.04-.21v-.06c0-.03-.01-.08-.01-.12l-.01-.07-.01-.08-.01-.08-.02-.09-.02-.1c-.13-.12-.28-.26-.47-.42-.36-.29-.47-.81-.26-1.23l.02-.03.44-.79c.21-.39.66-.58%201.08-.45l.32.1.28.09c.02.01.04.01.07.02.01.01.03.01.05.01.13-.06.24-.11.33-.15.07-.05.16-.13.26-.21l.18-.75c.1-.44.48-.75.91-.75zm-.43%203.2c-.93%200-1.69.81-1.69%201.8s.76%201.8%201.69%201.8%201.69-.81%201.69-1.8-.76-1.8-1.69-1.8z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E');
+}
+html[data-theme="dark"] .pr-table-actions {
+  background-image: url('data:image/svg+xml,%3Csvg%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2216.7%22%20r%3D%221.6%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.6%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%227.3%22%20r%3D%221.6%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+}
+
+html[data-theme="dark"] .pr-schedule-table {
+  background-image: url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%20240%2070%22%20preserveAspectRatio%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M0%2010%20240%2010ZM0%2020%20240%2020ZM0%2030%20240%2030ZM0%2040%20240%2040ZM0%2050%20240%2050ZM0%2060%20240%2060ZM10%200%2010%2070ZM20%200%2020%2070ZM30%200%2030%2070ZM40%200%2040%2070ZM50%200%2050%2070ZM60%200%2060%2070ZM70%200%2070%2070ZM80%200%2080%2070ZM90%200%2090%2070ZM100%200%20100%2070ZM110%200%20110%2070ZM120%200%20120%2070ZM130%200%20130%2070ZM140%200%20140%2070ZM150%200%20150%2070ZM160%200%20160%2070ZM170%200%20170%2070ZM180%200%20180%2070ZM190%200%20190%2070ZM200%200%20200%2070ZM210%200%20210%2070ZM220%200%20220%2070ZM230%200%20230%2070Z%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke%3D%22rgba%2858%2C71%2C86%2C.4%29%22%20stroke-width%3D%220.5%22%20fill%3D%22none%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E');
+}
+
+/* ============ Page header block / tabs ============ */
+
+html[data-theme="dark"] .pr-page-header-block,
+html[data-theme="dark"] .pr-page-header-wrap {
+  border-color: var(--pr-dark-border);
+}
+
+/* ============ Modal / popup / layer ============ */
+
+html[data-theme="dark"] .pr-layer-popup,
+html[data-theme="dark"] .popup-container .popup {
+  background: var(--pr-dark-surface);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="dark"] .pr-layer-popup {
+  --bg-color: var(--pr-dark-surface);
+  --alt-bg-color: var(--pr-dark-surface-hover);
+  --fade-color: var(--pr-dark-surface);
+}
+html[data-theme="dark"] .date-picker-header {
+  background: var(--pr-dark-surface-hover);
+}
+html[data-theme="dark"] .modal-header,
+html[data-theme="dark"] .modal-footer {
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] .modal-backdrop,
+html[data-theme="dark"] .popup-container:not(.hide):before {
+  background: var(--pr-dark-overlay);
+}
+html[data-theme="dark"] .pr-popup-edit-status-form .form-group {
+  border-color: var(--pr-dark-border);
+}
+
+/* ============ Login popup / login link ============ */
+
+html[data-theme="dark"] .login-link,
+html[data-theme="dark"] .header-auth-link {
+  color: var(--pr-dark-text-accent);
+}
+
+/* ============ Landing page / main ============ */
+
+html[data-theme="dark"] .pr-main-features:before {
+  background: var(--pr-dark-border);
+}
+html[data-theme="dark"] .pr-main-feature {
+  background: var(--pr-dark-surface);
+  border-color: var(--pr-dark-border);
+}
+
+/* ============ Ad / dashboard cards ============ */
+
+html[data-theme="dark"] .pr-ad-preview-dropdown-item .pr-ad-preview-link a {
+  color: var(--pr-dark-text-accent);
+}
+
+/* ============ Misc surfaces ============ */
+
+html[data-theme="dark"] .pr-box,
+html[data-theme="dark"] .pr-card,
+html[data-theme="dark"] .pr-panel {
+  background: var(--pr-dark-surface);
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] hr,
+html[data-theme="dark"] .divider {
+  border-color: var(--pr-dark-border);
+  background: var(--pr-dark-border);
+}
+
+/* ============ Bootstrap alerts / labels ============ */
+
+html[data-theme="dark"] .alert {
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] .alert-info {
+  background: rgba(76, 178, 255, .12);
+  color: var(--pr-dark-text-accent);
+}
+html[data-theme="dark"] .alert-warning {
+  background: rgba(242, 140, 72, .15);
+  color: var(--pr-dark-warning);
+}
+html[data-theme="dark"] .alert-danger {
+  background: rgba(239, 101, 143, .15);
+  color: var(--pr-dark-danger);
+}
+html[data-theme="dark"] .alert-success {
+  background: rgba(91, 173, 87, .15);
+  color: var(--pr-dark-success);
+}
+html[data-theme="dark"] .label-default {
+  background: var(--pr-dark-surface-hover);
+}
+html[data-theme="dark"] .label-primary {
+  background: var(--pr-dark-accent);
+  color: #fff;
+}
+
+/* ============ Well / code / pre ============ */
+
+html[data-theme="dark"] .well {
+  background: var(--pr-dark-surface);
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] pre,
+html[data-theme="dark"] code,
+html[data-theme="dark"] .pr-form-control.code-sample {
+  background: var(--pr-dark-bg-color);
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] pre {
+  border: 1px solid var(--pr-dark-border);
+}
+
+/* ============ Progress bar ============ */
+
+html[data-theme="dark"] .progress-bar {
+  background: var(--pr-dark-surface-hover);
+}
+
+/* ============ Datepicker / jquery-ui ============ */
+
+html[data-theme="dark"] .ui-datepicker {
+  background: var(--pr-dark-surface);
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] .ui-datepicker-header {
+  background: var(--pr-dark-surface-hover);
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] .ui-datepicker td a,
+html[data-theme="dark"] .ui-datepicker td span {
+  background: var(--pr-dark-surface);
+  border-color: var(--pr-dark-border);
+}
+html[data-theme="dark"] .ui-datepicker td a:hover {
+  background: var(--pr-dark-surface-hover);
+}
+html[data-theme="dark"] .ui-datepicker .ui-state-active {
+  background: var(--pr-dark-accent);
+  color: #fff;
+}
+
+
+/* ============ Rewrite color ============ */
+
+html[data-theme="dark"] .pr-dropdown-wrap ul.dropdown-menu > li > .pr-dropdown-remove-item {
+  color: #ff5863;
+}
+html[data-theme="dark"] .ad-rp-chip {
+  background-color: var(--pr-dark-surface-hover);
+}
+
+
+/* ============ Icons ============ */
+
+html[data-theme="dark"] .pr-dd-icon:before,
+html[data-theme="dark"] .pr-dropdown-label:after {
+  background: none;
+  background-color: currentColor;
+  -webkit-mask: var(--icon) no-repeat;
+  mask: var(--icon) no-repeat;
+}
+
+html[data-theme="dark"] .pr-cell-hint-tooltip > .bubble:after,
+html[data-theme="dark"] .pr-form-label-hint-tooltip > .bubble:after,
+html[data-theme="dark"] .pr-form-control-hint-tooltip > .bubble:after {
+  background: none;
+  background-color: var(--tooltip-bg-color);
+  -webkit-mask: var(--icon) no-repeat;
+  mask: var(--icon) no-repeat;
+}
