@@ -1,0 +1,408 @@
+:root {
+  --tr-dark-bg-color: #1A2026;
+  --tr-dark-surface: #212A33;
+  --tr-dark-surface-hover: #293440;
+  --tr-dark-text-primary: #fff;
+  --tr-dark-text-secondary: #8794A1;
+  --tr-dark-text-accent: #4CB2FF;
+  --tr-dark-accent: #2392e7;
+  --tr-dark-accent-hover: #0b9dec;
+  --tr-dark-border: #293440;
+  --tr-dark-border-light: #3a4756;
+  --tr-dark-danger: #ef658f;
+  --tr-dark-warning: #f28c48;
+  --tr-dark-success: #5bad57;
+  --tr-dark-input-bg: #1A2026;
+  --tr-dark-input-shadow: #3a4756;
+  --tr-dark-input-focus: #35a3f6;
+  --tr-dark-overlay: rgba(0, 0, 0, 0.55);
+}
+
+@property --tr-theme-hole-radius {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+/* Floating toggle button (top-right corner, above the fixed header). */
+.tr-theme-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #8a939d;
+  cursor: pointer;
+  display: flex;
+  height: 56px;
+  justify-content: center;
+  opacity: 0.7;
+  padding: 0 16px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  transition: opacity 0.15s ease;
+  view-transition-name: tr-theme-toggle;
+  z-index: 1001;
+}
+.tr-theme-toggle:hover {
+  opacity: 1;
+}
+.tr-theme-toggle canvas,
+.tr-theme-toggle--static:before {
+  display: block;
+  height: 22px;
+  width: 22px;
+}
+.tr-theme-toggle--static canvas {
+  display: none;
+}
+.tr-theme-toggle--static:before {
+  content: '';
+  background-size: contain;
+  background-image: url('/img/themeMoon.webp');
+}
+
+/* Keep the header contents clear of the fixed toggle. */
+.header-panel {
+  padding-right: 69px;
+}
+
+/* Mobile view hides the header altogether — the floating button would
+   sit on top of raw content (and the emoji page search field). */
+@media (max-width: 639px) {
+  .tr-theme-toggle {
+    display: none;
+  }
+}
+
+html.tr-theme-switching body,
+html.tr-theme-switching body * {
+  transition: none !important;
+}
+
+::view-transition-group(root) {
+  isolation: isolate;
+  overflow: hidden;
+}
+::view-transition-image-pair(root) {
+  isolation: auto;
+  overflow: hidden;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 9999;
+  will-change: clip-path;
+  transform: translateZ(0);
+}
+::view-transition-new(root) { z-index: 1; }
+
+:root.tr-theme-reveal::view-transition-old(root) {
+  z-index: 9999;
+  transform: none;
+  will-change: auto;
+  -webkit-mask-image: radial-gradient(
+    circle at var(--tr-theme-origin-x) var(--tr-theme-origin-y),
+    transparent 0,
+    transparent var(--tr-theme-hole-radius),
+    #000 calc(var(--tr-theme-hole-radius) + 1px)
+  );
+  mask-image: radial-gradient(
+    circle at var(--tr-theme-origin-x) var(--tr-theme-origin-y),
+    transparent 0,
+    transparent var(--tr-theme-hole-radius),
+    #000 calc(var(--tr-theme-hole-radius) + 1px)
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  mask-mode: alpha;
+}
+:root.tr-theme-reveal::view-transition-new(root) { z-index: 1; }
+
+/* Theme toggle icon morph animation. */
+@keyframes tr-icon-out {
+  to { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+}
+@keyframes tr-icon-in {
+  from { opacity: 0; transform: rotate(90deg) scale(0.5); }
+}
+::view-transition-old(tr-theme-toggle) {
+  animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) both tr-icon-out;
+}
+::view-transition-new(tr-theme-toggle) {
+  animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) both tr-icon-in;
+}
+
+/* ============ Core dark overrides ============ */
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  background: var(--tr-dark-bg-color);
+  --tchart-bg-color: var(--tr-dark-bg-color);
+  --tchart-fade-color: var(--tr-dark-bg-color);
+}
+html[data-theme="dark"] body {
+  color: var(--tr-dark-text-primary);
+  background: var(--tr-dark-bg-color);
+  -webkit-font-smoothing: antialiased;
+  --bg-color: var(--tr-dark-bg-color);
+  --alt-bg-color: var(--tr-dark-surface);
+  --surface-color: var(--tr-dark-surface);
+  --photo-bg-color: var(--tr-dark-surface-hover);
+  --divider-color: var(--tr-dark-input-shadow);
+  --input-border-color: var(--tr-dark-input-shadow);
+  --input-focus-color: var(--tr-dark-input-focus);
+  --text-color: var(--tr-dark-text-primary);
+  --text-secondary-color: var(--tr-dark-text-secondary);
+  --text-muted-color: var(--tr-dark-text-secondary);
+  --link-color: var(--tr-dark-text-accent);
+  --link-bghover: rgba(76, 178, 255, .12);
+  --link-bgactive: rgba(76, 178, 255, .18);
+  --accent-color: var(--tr-dark-text-accent);
+  --accent-bghover: #5fbbff;
+  --accent-bgactive: #5fbbff;
+  --danger-color: #ff5863;
+  --danger-bg-color: rgba(239, 101, 143, .15);
+  --success-color: var(--tr-dark-success);
+  --warning-color: var(--tr-dark-warning);
+  --tooltip-bg-color: var(--tr-dark-surface-hover);
+  --fade-color: var(--tr-dark-surface);
+}
+html[data-theme="dark"] .tr-container {
+  background: var(--tr-dark-bg-color);
+}
+
+html[data-theme="dark"] .tr-theme-toggle--static:before {
+  background-image: url('/img/themeSun.webp');
+}
+html[data-theme="dark"] .tr-theme-toggle {
+  color: #c2cbd4;
+}
+
+/* ============ Header ============ */
+
+html[data-theme="dark"] header .header-wrap {
+  box-shadow: inset 0 -1px 0 var(--tr-dark-border-light);
+}
+html[data-theme="dark"] .header-auth-photo img {
+  background: var(--tr-dark-surface-hover);
+}
+
+/* ============ Dropdowns ============ */
+
+html[data-theme="dark"] .tr-dropdown span.dropdown-menu > ul.dropdown-menu,
+html[data-theme="dark"] .tr-search-filters span.dropdown-menu > ul.dropdown-menu,
+html[data-theme="dark"] .dropdown-menu {
+  background: var(--tr-dark-surface);
+  border: 1px solid var(--tr-dark-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+html[data-theme="dark"] .tr-dropdown .dropdown-menu,
+html[data-theme="dark"] .tr-search-filters span.dropdown-menu {
+  border: 1px solid var(--tr-dark-border);
+}
+html[data-theme="dark"] .tr-search-results {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+html[data-theme="dark"] .tr-dropdown .dropdown-menu > li > a:hover,
+html[data-theme="dark"] .tr-dropdown .dropdown-menu > li > a:focus,
+html[data-theme="dark"] .tr-search-filters ul.dropdown-menu > li > a:hover,
+html[data-theme="dark"] .tr-search-filters ul.dropdown-menu > li > a:focus {
+  background: var(--tr-dark-surface-hover);
+}
+html[data-theme="dark"] .tr-dropdown .dropdown-menu > li.selected > a:before {
+  background-color: var(--tr-dark-text-secondary);
+}
+
+/* ============ Buttons ============ */
+
+html[data-theme="dark"] .btn-primary {
+  background-color: var(--tr-dark-accent);
+  color: #fff;
+}
+html[data-theme="dark"] .btn-primary:hover,
+html[data-theme="dark"] .btn-primary:focus,
+html[data-theme="dark"] .btn-primary:active {
+  background-color: var(--tr-dark-accent-hover);
+}
+html[data-theme="dark"] .btn-default {
+  background-color: transparent;
+  color: var(--tr-dark-text-accent);
+}
+html[data-theme="dark"] .btn-default:hover,
+html[data-theme="dark"] .btn-default:focus,
+html[data-theme="dark"] .btn-default:active,
+html[data-theme="dark"] .open > .dropdown-toggle.btn-default {
+  color: var(--tr-dark-text-accent);
+  background-color: rgba(76, 178, 255, .12);
+  box-shadow: none;
+}
+html[data-theme="dark"] .btn-default.btn-danger {
+  color: var(--tr-dark-danger);
+  background-color: transparent;
+}
+html[data-theme="dark"] .btn-default.btn-danger:hover,
+html[data-theme="dark"] .btn-default.btn-danger:focus,
+html[data-theme="dark"] .btn-default.btn-danger:active {
+  color: var(--tr-dark-danger);
+  background-color: rgba(239, 101, 143, .15);
+}
+html[data-theme="dark"] .btn-muted {
+  color: var(--tr-dark-text-primary);
+  background-color: var(--tr-dark-surface-hover);
+}
+html[data-theme="dark"] .btn-link {
+  color: var(--tr-dark-text-accent);
+}
+
+/* ============ Forms ============ */
+
+html[data-theme="dark"] input.form-control,
+html[data-theme="dark"] textarea.form-control,
+html[data-theme="dark"] select,
+html[data-theme="dark"] .form-control {
+  background-color: var(--tr-dark-input-bg);
+  border-color: var(--tr-dark-input-shadow);
+}
+html[data-theme="dark"] input.form-control:focus,
+html[data-theme="dark"] textarea.form-control:focus,
+html[data-theme="dark"] .form-control:focus {
+  border-color: var(--tr-dark-input-focus);
+}
+html[data-theme="dark"] input.tr-form-control,
+html[data-theme="dark"] textarea.tr-form-control,
+html[data-theme="dark"] .input.tr-form-control {
+  color: var(--tr-dark-text-primary);
+  caret-color: var(--tr-dark-text-primary);
+}
+html[data-theme="dark"] input.tr-form-control[disabled],
+html[data-theme="dark"] textarea.tr-form-control[disabled],
+html[data-theme="dark"] .input.tr-form-control[disabled],
+html[data-theme="dark"] input.form-control[disabled],
+html[data-theme="dark"] textarea.form-control[disabled] {
+  color: var(--tr-dark-text-secondary);
+}
+
+/* ============ Popups / layers ============ */
+
+html[data-theme="dark"] .popup {
+  background: var(--tr-dark-surface);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="dark"] .popup-container {
+  background: var(--tr-dark-overlay);
+}
+html[data-theme="dark"] .tr-popup-search-results.topscroll {
+  border-top: 1px solid var(--tr-dark-border-light);
+}
+html[data-theme="dark"] .screenshot-key-edit-results {
+  background: var(--tr-dark-surface);
+}
+
+/* ============ Search ============ */
+
+html[data-theme="dark"] .tr-search-field-wrap {
+  box-shadow: 0 0 0 1px var(--tr-dark-border), 0 1px 3px rgba(0, 0, 0, .35);
+}
+
+/* ============ Diff ============ */
+
+html[data-theme="dark"] .show-diff del,
+html[data-theme="dark"] .show-diff-full del {
+  background: rgba(239, 101, 143, .22);
+  box-shadow: 0 0 0 1px rgba(239, 101, 143, .22);
+}
+html[data-theme="dark"] .show-diff ins,
+html[data-theme="dark"] .show-diff-full ins {
+  background: rgba(91, 173, 87, .22);
+  box-shadow: 0 0 0 1px rgba(91, 173, 87, .22);
+}
+html[data-theme="dark"] .diff-btn {
+  background: var(--tr-dark-surface-hover);
+  color: #fff;
+}
+
+/* ============ Marks / highlights ============ */
+
+html[data-theme="dark"] mark,
+html[data-theme="dark"] mark.token {
+  background: rgba(242, 140, 72, .4);
+  color: var(--tr-dark-text-primary);
+}
+html[data-theme="dark"] .field-ins-btn.used {
+  background-color: rgba(242, 140, 72, .3);
+  color: var(--tr-dark-warning);
+}
+html[data-theme="dark"] .value .br:after {
+  color: var(--tr-dark-text-secondary);
+}
+
+/* ============ Badges ============ */
+
+html[data-theme="dark"] .tr-badges .tr-badge.outdated,
+html[data-theme="dark"] .tr-badges a.tr-badge.outdated:hover,
+html[data-theme="dark"] .tr-badges .tr-badge.unused,
+html[data-theme="dark"] .tr-badges a.tr-badge.unused:hover {
+  color: #fff;
+}
+
+/* ============ Screenshot areas ============ */
+
+html[data-theme="dark"] .screenshot-key-row.modified {
+  background-color: rgba(239, 101, 143, .12);
+}
+html[data-theme="dark"] .screenshot-key-row.modified.hover,
+html[data-theme="dark"] .screenshot-key-row.modified.active {
+  background-color: rgba(239, 101, 143, .2);
+}
+
+/* ============ Feedback / stats ============ */
+
+html[data-theme="dark"] .tr-graphs .rickshaw_legend {
+  background: rgba(33, 42, 51, .85);
+}
+html[data-theme="dark"] .tr-upload-row-progress {
+  background: rgba(255, 255, 255, .12);
+}
+
+/* ============ Languages table ============ */
+
+html[data-theme="dark"] .tr-languages-table tr td.ready {
+  background-color: rgba(91, 173, 87, .25);
+}
+html[data-theme="dark"] .tr-languages-table tr td.prepare {
+  background-color: rgba(91, 173, 87, .12);
+}
+html[data-theme="dark"] .tr-languages-table tr td.attention {
+  background-color: rgba(239, 101, 143, .25);
+}
+
+/* ============ Misc ============ */
+
+html[data-theme="dark"] .help-label a,
+html[data-theme="dark"] .tr-command-wrap pre {
+  color: var(--tr-dark-text-secondary);
+}
+
+/* ============ Sprite icons ============ */
+
+html[data-theme="dark"] .tr-back:before,
+html[data-theme="dark"] .header-search-btn,
+html[data-theme="dark"] .tr-search-emoji-icon,
+html[data-theme="dark"] .key-default:after,
+html[data-theme="dark"] .key-history:before,
+html[data-theme="dark"] .key-status-applied:before,
+html[data-theme="dark"] .key-suggestion-actions a.ibtn:before,
+html[data-theme="dark"] .tr-languages-filters-btn:before,
+html[data-theme="dark"] .tr-file-button:before {
+  filter: invert(1) opacity(.72);
+}
+html[data-theme="dark"] .tr-action-item:before,
+html[data-theme="dark"] .arrow-link:after,
+html[data-theme="dark"] .key-default-value:after,
+html[data-theme="dark"] .header-auth-name:after,
+html[data-theme="dark"] .header-feedback-btn:after {
+  filter: invert(1) hue-rotate(180deg);
+}
