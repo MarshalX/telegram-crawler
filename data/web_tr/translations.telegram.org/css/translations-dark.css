@@ -19,9 +19,10 @@
 }
 
 @property --tr-theme-hole-radius {
-  syntax: '<length>';
+  /* Percentages avoid zoom-scaled pixel interpolation. */
+  syntax: '<percentage>';
   inherits: false;
-  initial-value: 0px;
+  initial-value: 0%;
 }
 
 /* Floating toggle button (top-right corner, above the fixed header). */
@@ -120,6 +121,29 @@ html.tr-theme-switching body * {
   mask-mode: alpha;
 }
 :root.tr-theme-reveal::view-transition-new(root) { z-index: 1; }
+
+/* Shrink the dark snapshot into the toggle. */
+:root.tr-theme-collapse::view-transition-old(root) {
+  z-index: 9999;
+  transform: none;
+  will-change: auto;
+  -webkit-mask-image: radial-gradient(
+    circle at var(--tr-theme-origin-x) var(--tr-theme-origin-y),
+    #000 0,
+    #000 var(--tr-theme-hole-radius),
+    transparent calc(var(--tr-theme-hole-radius) + 1px)
+  );
+  mask-image: radial-gradient(
+    circle at var(--tr-theme-origin-x) var(--tr-theme-origin-y),
+    #000 0,
+    #000 var(--tr-theme-hole-radius),
+    transparent calc(var(--tr-theme-hole-radius) + 1px)
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  mask-mode: alpha;
+}
+:root.tr-theme-collapse::view-transition-new(root) { z-index: 1; }
 
 /* Theme toggle icon morph animation. */
 @keyframes tr-icon-out {
