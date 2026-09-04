@@ -190,7 +190,12 @@ html[data-theme="dark"] body {
   --danger-color: #ff5863;
   --danger-bg-color: rgba(239, 101, 143, .15);
   --success-color: var(--tr-dark-success);
+  --success-bg-color: rgba(91, 173, 87, .18);
   --warning-color: var(--tr-dark-warning);
+  --warning-bg-color: rgba(242, 140, 72, .18);
+  --diff-removed-bg: rgba(239, 120, 151, .24);
+  --diff-added-bg: rgba(110, 196, 111, .22);
+  --diff-token-bg: rgba(234, 175, 84, .24);
   --tooltip-bg-color: var(--tr-dark-surface-hover);
   --fade-color: var(--tr-dark-surface);
 }
@@ -236,8 +241,27 @@ html[data-theme="dark"] .tr-search-filters ul.dropdown-menu > li > a:hover,
 html[data-theme="dark"] .tr-search-filters ul.dropdown-menu > li > a:focus {
   background: var(--tr-dark-surface-hover);
 }
-html[data-theme="dark"] .tr-dropdown .dropdown-menu > li.selected > a:before {
-  background-color: var(--tr-dark-text-secondary);
+html[data-theme="dark"] .tr-dropdown .dropdown-menu > li.selected > a:before,
+html[data-theme="dark"] .tr-search-filters ul.dropdown-menu > li.selected > a:before,
+html[data-theme="dark"] .tr-languages-filters-wrap .dropdown-menu > li.selected > a:before,
+html[data-theme="dark"] .tr-header-section-selector .dropdown-menu > li.selected > a:before {
+  background-color: var(--tr-dark-text-accent);
+}
+html[data-theme="dark"] .tr-dropdown .dropdown-menu > li.selected > a:after,
+html[data-theme="dark"] .tr-search-filters ul.dropdown-menu > li.selected > a:after,
+html[data-theme="dark"] .tr-languages-filters-wrap .dropdown-menu > li.selected > a:after,
+html[data-theme="dark"] .tr-header-section-selector .dropdown-menu > li.selected > a:after {
+  background-color: var(--tr-dark-surface);
+}
+html[data-theme="dark"] .tr-dropdown .dropdown-menu > li.selected > a:hover:after,
+html[data-theme="dark"] .tr-dropdown .dropdown-menu > li.selected > a:focus:after,
+html[data-theme="dark"] .tr-search-filters ul.dropdown-menu > li.selected > a:hover:after,
+html[data-theme="dark"] .tr-search-filters ul.dropdown-menu > li.selected > a:focus:after,
+html[data-theme="dark"] .tr-languages-filters-wrap .dropdown-menu > li.selected > a:hover:after,
+html[data-theme="dark"] .tr-languages-filters-wrap .dropdown-menu > li.selected > a:focus:after,
+html[data-theme="dark"] .tr-header-section-selector .dropdown-menu > li.selected > a:hover:after,
+html[data-theme="dark"] .tr-header-section-selector .dropdown-menu > li.selected > a:focus:after {
+  background-color: var(--tr-dark-surface-hover);
 }
 
 /* ============ Buttons ============ */
@@ -289,11 +313,27 @@ html[data-theme="dark"] select,
 html[data-theme="dark"] .form-control {
   background-color: var(--tr-dark-input-bg);
   border-color: var(--tr-dark-input-shadow);
+  color: var(--tr-dark-text-primary);
+  caret-color: var(--tr-dark-text-primary);
+}
+html[data-theme="dark"] select option {
+  background-color: var(--tr-dark-surface);
+  color: var(--tr-dark-text-primary);
 }
 html[data-theme="dark"] input.form-control:focus,
 html[data-theme="dark"] textarea.form-control:focus,
 html[data-theme="dark"] .form-control:focus {
   border-color: var(--tr-dark-input-focus);
+}
+html[data-theme="dark"] .textfield-item input.form-control::-webkit-input-placeholder {
+  color: var(--tr-dark-text-secondary);
+}
+html[data-theme="dark"] .textfield-item input.form-control::-moz-placeholder {
+  color: var(--tr-dark-text-secondary);
+  opacity: 1;
+}
+html[data-theme="dark"] .textfield-item input.form-control:-ms-input-placeholder {
+  color: var(--tr-dark-text-secondary);
 }
 html[data-theme="dark"] input.tr-form-control,
 html[data-theme="dark"] textarea.tr-form-control,
@@ -305,7 +345,90 @@ html[data-theme="dark"] input.tr-form-control[disabled],
 html[data-theme="dark"] textarea.tr-form-control[disabled],
 html[data-theme="dark"] .input.tr-form-control[disabled],
 html[data-theme="dark"] input.form-control[disabled],
-html[data-theme="dark"] textarea.form-control[disabled] {
+html[data-theme="dark"] textarea.form-control[disabled],
+html[data-theme="dark"] select[disabled],
+html[data-theme="dark"] .form-control[disabled] {
+  color: var(--tr-dark-text-secondary);
+}
+html[data-theme="dark"] .textfield-item-underline {
+  background-color: var(--tr-dark-input-focus);
+}
+html[data-theme="dark"] .textfield-item-placeholder,
+html[data-theme="dark"] .form-telegram .help-block,
+html[data-theme="dark"] .help-block-item {
+  color: var(--tr-dark-text-secondary);
+}
+html[data-theme="dark"] .textfield-item-error {
+  color: var(--tr-dark-danger);
+  background-color: var(--tr-dark-surface);
+}
+html[data-theme="dark"] .textfield-item.is-invalid input.form-control {
+  border-bottom-color: var(--tr-dark-danger);
+}
+html[data-theme="dark"] .textfield-item.is-invalid .textfield-item-underline {
+  background-color: var(--tr-dark-danger);
+}
+html[data-theme="dark"] .form-telegram .form-control[readonly] {
+  background-color: var(--tr-dark-input-bg);
+}
+
+/* The custom dropdown does not inherit the normal form-control fill. */
+html[data-theme="dark"] .language-popup .form-control-dropdown-select {
+  background-color: var(--tr-dark-input-bg);
+}
+html[data-theme="dark"] .language-popup .form-control-dropdown.has-items:before {
+  pointer-events: none;
+  z-index: 1;
+}
+html[data-theme="dark"] .language-popup .form-control-dropdown-button {
+  z-index: 1;
+}
+
+/* The language picker is a custom dropdown rather than a native select. */
+html[data-theme="dark"] .form-control-dropdown-select {
+  color: var(--tr-dark-text-secondary);
+}
+html[data-theme="dark"] .form-control-dropdown-select.is-dirty {
+  color: var(--tr-dark-text-primary);
+}
+html[data-theme="dark"] .form-control-dropdown-list {
+  background-color: var(--tr-dark-surface);
+  color: var(--tr-dark-text-primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .4);
+}
+html[data-theme="dark"] .form-control-dropdown-search .form-control-dropdown-list-item.selected,
+html[data-theme="dark"] .form-control-dropdown-list-item:hover {
+  background-color: var(--tr-dark-surface-hover);
+}
+html[data-theme="dark"] .form-control-static-item .small,
+html[data-theme="dark"] .form-control-dropdown-select .small,
+html[data-theme="dark"] .form-control-dropdown-list-item .small,
+html[data-theme="dark"] .form-control-dropdown-list-no-results {
+  color: var(--tr-dark-text-secondary);
+}
+
+/* Shared checkbox/radio markup otherwise keeps its light white fill. */
+html[data-theme="dark"] .checkbox-item .checkbox-input-icon,
+html[data-theme="dark"] .radio-item .radio-input-icon {
+  background-color: var(--tr-dark-input-bg);
+  border-color: var(--tr-dark-text-secondary);
+}
+html[data-theme="dark"] .checkbox-item .checkbox-input-icon:before,
+html[data-theme="dark"] .radio-item .radio-input-icon:before {
+  border-color: var(--tr-dark-text-accent);
+}
+html[data-theme="dark"] .checkbox-item .checkbox-input-icon:before {
+  background-color: var(--tr-dark-text-accent);
+}
+html[data-theme="dark"] .radio-item .radio-input-icon:after {
+  background-color: var(--tr-dark-text-accent);
+}
+html[data-theme="dark"] .checkbox-item .checkbox-label,
+html[data-theme="dark"] .radio-item .radio-label {
+  color: var(--tr-dark-text-primary);
+}
+html[data-theme="dark"] .checkbox-item input.checkbox:disabled ~ .checkbox-label,
+html[data-theme="dark"] .radio-item input.radio:disabled ~ .radio-label {
   color: var(--tr-dark-text-secondary);
 }
 
@@ -335,13 +458,13 @@ html[data-theme="dark"] .tr-search-field-wrap {
 
 html[data-theme="dark"] .show-diff del,
 html[data-theme="dark"] .show-diff-full del {
-  background: rgba(239, 101, 143, .22);
-  box-shadow: 0 0 0 1px rgba(239, 101, 143, .22);
+  background: var(--diff-removed-bg);
+  box-shadow: none;
 }
 html[data-theme="dark"] .show-diff ins,
 html[data-theme="dark"] .show-diff-full ins {
-  background: rgba(91, 173, 87, .22);
-  box-shadow: 0 0 0 1px rgba(91, 173, 87, .22);
+  background: var(--diff-added-bg);
+  box-shadow: none;
 }
 html[data-theme="dark"] .diff-btn {
   background: var(--tr-dark-surface-hover);
@@ -352,12 +475,22 @@ html[data-theme="dark"] .diff-btn {
 
 html[data-theme="dark"] mark,
 html[data-theme="dark"] mark.token {
-  background: rgba(242, 140, 72, .4);
+  background: var(--diff-token-bg);
+  box-shadow: none;
   color: var(--tr-dark-text-primary);
 }
 html[data-theme="dark"] .field-ins-btn.used {
   background-color: rgba(242, 140, 72, .3);
   color: var(--tr-dark-warning);
+}
+html[data-theme="dark"] .field-ins-btn:before {
+  background-color: rgba(242, 140, 72, .3);
+  color: var(--tr-dark-warning);
+}
+html[data-theme="dark"] .field-ins-btn:hover:before,
+html[data-theme="dark"] .field-ins-btn:focus:before,
+html[data-theme="dark"] .field-ins-btn:active:before {
+  background-color: rgba(242, 140, 72, .45);
 }
 html[data-theme="dark"] .value .br:after {
   color: var(--tr-dark-text-secondary);
@@ -408,25 +541,4 @@ html[data-theme="dark"] .tr-languages-table tr td.attention {
 html[data-theme="dark"] .help-label a,
 html[data-theme="dark"] .tr-command-wrap pre {
   color: var(--tr-dark-text-secondary);
-}
-
-/* ============ Sprite icons ============ */
-
-html[data-theme="dark"] .tr-back:before,
-html[data-theme="dark"] .header-search-btn,
-html[data-theme="dark"] .tr-search-emoji-icon,
-html[data-theme="dark"] .key-default:after,
-html[data-theme="dark"] .key-history:before,
-html[data-theme="dark"] .key-status-applied:before,
-html[data-theme="dark"] .key-suggestion-actions a.ibtn:before,
-html[data-theme="dark"] .tr-languages-filters-btn:before,
-html[data-theme="dark"] .tr-file-button:before {
-  filter: invert(1) opacity(.72);
-}
-html[data-theme="dark"] .tr-action-item:before,
-html[data-theme="dark"] .arrow-link:after,
-html[data-theme="dark"] .key-default-value:after,
-html[data-theme="dark"] .header-auth-name:after,
-html[data-theme="dark"] .header-feedback-btn:after {
-  filter: invert(1) hue-rotate(180deg);
 }

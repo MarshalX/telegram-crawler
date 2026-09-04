@@ -31,6 +31,11 @@ body {
   --success-bg-color: #d9edd9;
   --warning-color: #de8833;
   --warning-bg-color: #ffeeb8;
+  --diff-removed-bg: #fde8eb;
+  --diff-removed-outline: rgba(203, 73, 92, .24);
+  --diff-added-bg: #e3f3e7;
+  --diff-added-outline: rgba(52, 138, 75, .24);
+  --diff-token-bg: #fff2cc;
   --tooltip-bg-color: rgba(0, 0, 0, .75);
   --fade-color: #fff;
 }
@@ -1630,7 +1635,9 @@ a.tr-menu-item:hover,
 
 del, ins {
   text-decoration: none;
-  border-radius: 1px;
+  border-radius: 3px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 del > span {
   color: #f77;
@@ -1639,17 +1646,13 @@ del > span {
 }
 .show-diff del,
 .show-diff-full del {
-  background: #ffd9d9;
-  background: rgba(255, 0, 0, 0.15);
-  box-shadow: 0 0 0 1px #ffd9d9;
-  box-shadow: 0 0 0 1px rgba(255, 0, 0, 0.15);
+  background: var(--diff-removed-bg);
+  box-shadow: 0 0 0 1px var(--diff-removed-outline);
 }
 .show-diff ins,
 .show-diff-full ins {
-  background: #d9edd9;
-  background: rgba(0, 128, 0, 0.15);
-  box-shadow: 0 0 0 1px #d9edd9;
-  box-shadow: 0 0 0 1px rgba(0, 128, 0, 0.15);
+  background: var(--diff-added-bg);
+  box-shadow: 0 0 0 1px var(--diff-added-outline);
 }
 del:before,
 ins:before {
@@ -1724,11 +1727,13 @@ mark {
   color: inherit;
   padding: 0;
 }
+mark,
 mark.token {
-  background: #ffeeb8;
-  box-shadow: 0 0 0 1px #ffeeb8;
+  background: var(--diff-token-bg);
+  box-shadow: none;
   color: inherit;
-  border-radius: 1px;
+  border-radius: 3px;
+  padding: 0 2px;
   position: relative;
   z-index: -1;
 }
@@ -6129,6 +6134,27 @@ a.outdated {
 }
 .language-popup {
   min-width: 290px;
+}
+/* Keep the new-language controls geometrically identical in both themes. */
+.language-popup .textfield-item input.form-control,
+.language-popup .form-control-dropdown-select {
+  box-sizing: border-box;
+  border: 1px solid var(--input-border-color);
+  border-radius: 4px;
+  padding: 10px 12px 9px;
+}
+.language-popup .form-control-dropdown-select {
+  padding-right: 40px;
+}
+.language-popup .textfield-item input.form-control:focus,
+.language-popup .form-control-dropdown-select:focus {
+  border-color: var(--input-focus-color);
+}
+.language-popup .textfield-item-underline {
+  display: none;
+}
+.language-popup .textfield-item.is-invalid input.form-control {
+  border-color: var(--danger-color);
 }
 .language-popup form {
   margin: 30px 0 -20px;
