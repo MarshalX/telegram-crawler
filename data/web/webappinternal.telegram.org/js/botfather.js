@@ -48,7 +48,7 @@ var CreateBot = {
     $('input[name=username]').on('input', (ev) => {
       var $hint = $('.hint-text[data-for=username]');
       $hint.attr('class', 'hint-text hint-text-loading');
-      $hint.text('Checking username');
+      $hint.text(l('WEB_USERNAME_CHECKING'));
       usernameDebounce(CreateBot.checkUsername, 400);
     })
 
@@ -58,13 +58,13 @@ var CreateBot = {
     var $input = $('input[name=username]');
     var value = $input.val();
     $hint.attr('class', 'hint-text hint-text-loading');
-    $hint.text('Checking username');
+    $hint.text(l('WEB_USERNAME_CHECKING'));
     Aj.apiRequest('checkBotUsername', { username: value }, res => {
       if ($input.val() !== value) return;
       if (res.ok) {
         Aj.state.username_valid = true;
         $hint.attr('class', 'hint-text hint-text-success');
-        $hint.text(value + ' is available.');
+        $hint.text(l('WEB_USERNAME_AVAILABLE', {username: value}));
       } else {
         Aj.state.username_valid = false;
         $hint.attr('class', 'hint-text hint-text-error');
@@ -112,6 +112,174 @@ var CreateBot = {
         if (res.error) {
           TWebApp.showErrorToast(res.error);
         }
+    });
+  }
+}
+
+var BotUsernames = {
+  init() {
+    $('.js-usernames-list').sortable({items: '.js-sortable'}).on('sortchange', function ( event, ui ) {
+      WebApp.HapticFeedback.selectionChanged();
+    });
+
+    Aj.state.edit = false;
+    $('.js-usernames-list').sortable('disable');
+
+    Aj.state.$editBtn = $('.js-usernames-edit').on('click', BotUsernames.toggleEdit);
+
+    $('.js-usernames-list').on('click', '.js-username-row', function () {
+      if (Aj.state.edit) return;
+      var row = this;
+      var username = row.dataset.username;
+      var type = row.dataset.type;
+
+      if (type == 'none') {
+        return;
+      }
+      if (type == 'additional' || type == 'plain') {
+        BotUsernames.askRemove(username);
+        return;
+      }
+
+      var isActive = row.dataset.active == '1';
+      var buttons = [
+        {type: 'cancel'},
+        {
+          id: 'toggle',
+          text: uncleanHTML(l(isActive ? 'WEB_USERNAMES_HIDE' : 'WEB_USERNAMES_SHOW_BTN')),
+          type: 'default',
+        },
+      ];
+
+      WebApp.showPopup({
+        title: uncleanHTML(l(isActive ? 'WEB_USERNAMES_DEACTIVATE_TITLE' : 'WEB_USERNAMES_ACTIVATE_TITLE')),
+        message: uncleanHTML(l(isActive ? 'WEB_USERNAMES_DEACTIVATE_MSG' : 'WEB_USERNAMES_ACTIVATE_MSG')),
+        buttons: buttons
+      }, (result) => {
+        if (result == 'toggle') {
+          var active = !isActive;
+          Aj.apiRequest('toggleBotUsername', { bid: Aj.state.botId, username: username, active: active ? 1 : 0 }, res => {
+            if (res.error) {
+              TWebApp.showErrorToast(res.error);
+              return;
+            }
+            Aj.location(window.location.pathname);
+          });
+        }
+      });
+    });
+  },
+  askRemove(username) {
+    WebApp.showPopup({
+      title: uncleanHTML(l('WEB_USERNAMES_REMOVE_TITLE')),
+      message: uncleanHTML(l('WEB_USERNAMES_REMOVE_CONFIRM')),
+      buttons: [
+        {type: 'cancel'},
+        {id: 'remove', text: uncleanHTML(l('WEB_USERNAMES_REMOVE_BTN')), type: 'destructive'}
+      ]
+    }, (result) => {
+      if (result == 'remove') {
+        Aj.apiRequest('removeBotUsername', { bid: Aj.state.botId, username: username }, res => {
+          if (res.error) {
+            TWebApp.showErrorToast(res.error);
+            return;
+          }
+          if (res.msg) {
+            Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
+          }
+          Aj.location(window.location.pathname);
+        });
+      }
+    });
+  },
+  toggleEdit(value) {
+    var edit = value !== undefined ? !Aj.state.edit : value;
+    Aj.state.edit = edit;
+    if (!edit) {
+      BotUsernames.submit();
+    }
+    $('.js-usernames-list').toggleClass('list-prevent-edit', !edit);
+    $('.js-usernames-list').sortable(edit ? 'enable' : 'disable');
+    Aj.state.$editBtn.text(edit ? l('WEB_COMMANDS_DONE_BTN') : l('WEB_COMMANDS_EDIT_BTN'));
+  },
+  submit() {
+    var order = $('.js-usernames-list .js-sortable').toArray().map(el => {
+      return el.dataset.username;
+    });
+    Aj.apiRequest('reorderBotUsernames', {
+      bid: Aj.state.botId,
+      order: order,
+    }, (res) => {
+      if (res.error) {
+        TWebApp.showErrorToast(res.error);
+        return;
+      }
+      Aj.location(window.location.pathname);
+    });
+  }
+}
+
+var BotUsernameCreate = {
+  init() {
+    var usernameDebounce = Aj.state.usernameDebounce = debounce();
+
+    $('input[name=username]').on('input', (ev) => {
+      var $hint = $('.hint-text[data-for=username]');
+      $hint.attr('class', 'hint-text hint-text-loading');
+      $hint.text(l('WEB_USERNAME_CHECKING'));
+      Aj.state.username_valid = false;
+      usernameDebounce(BotUsernameCreate.checkUsername, 400);
+    });
+
+    WebApp.MainButton.setText(l('WEB_USERNAMES_ADD'));
+    WebApp.MainButton.onClick(BotUsernameCreate.submit);
+    WebApp.MainButton.show();
+
+    Aj.onUnload(() => {
+      WebApp.MainButton.offClick(BotUsernameCreate.submit);
+      WebApp.MainButton.hide();
+    });
+  },
+  checkUsername() {
+    var $hint = $('.hint-text[data-for=username]');
+    var $input = $('input[name=username]');
+    var value = $input.val();
+    $hint.attr('class', 'hint-text hint-text-loading');
+    $hint.text(l('WEB_USERNAME_CHECKING'));
+    if (!value) {
+      $hint.attr('class', 'hint-text');
+      $hint.text('');
+      return;
+    }
+    Aj.apiRequest('checkBotAdditionalUsername', { bid: Aj.state.botId, username: value }, res => {
+      if ($input.val() !== value) return;
+      if (res.ok) {
+        Aj.state.username_valid = true;
+        $hint.attr('class', 'hint-text hint-text-success');
+        $hint.text(l('WEB_USERNAME_AVAILABLE', {username: value}));
+      } else {
+        Aj.state.username_valid = false;
+        $hint.attr('class', 'hint-text hint-text-error');
+        $hint.html(res.error);
+      }
+    });
+  },
+  submit() {
+    var value = $('input[name=username]').val()?.trim();
+    if (!value || !Aj.state.username_valid) {
+      TWebApp.showErrorToast(l('WEB_USERNAME_REQUIRED'));
+      $('input[name=username]').focus();
+      return;
+    }
+    WebApp.MainButton.showProgress();
+    Aj.apiRequest('addBotUsername', { bid: Aj.state.botId, username: value }, res => {
+      WebApp.MainButton.hideProgress();
+      if (res.error) {
+        TWebApp.showErrorToast(res.error);
+        return;
+      }
+      Aj.location('/botfather/bot/' + Aj.state.botId + '/usernames');
+      Aj.onUnload(() => TWebApp.showSuccessToast(res.msg));
     });
   }
 }
