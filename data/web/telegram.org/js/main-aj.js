@@ -59,6 +59,7 @@ function ajInit(options) {
     onBeforeLayerUnload: onBeforeLayerUnload,
     linkHandler: linkHandler,
     location: _location,
+    locationWithTransition: locationWithTransition,
     layerLocation: layerLocation,
     setLocation: setLocation,
     setLayerLocation: setLayerLocation,
@@ -73,8 +74,8 @@ function ajInit(options) {
     layer: false
   };
 
-  delete options.state; 
-  
+  delete options.state;
+
   if (options.layer) {
     Aj.layer = $('#layer-popup-container');
     Aj.layerState = options.layerState || {};
@@ -479,7 +480,7 @@ function ajInit(options) {
     return changeLocation(url, push_state);
   }
 
-  function loadPage(link, push_state, state_go) {
+  function loadPage(link, push_state, state_go, transition) {
     var url = link.href;
     var cur_url = curLocation.href;
     var cur_ref = curLocation.origin + curLocation.pathname + curLocation.search;
@@ -513,6 +514,12 @@ function ajInit(options) {
         xhrFields: {withCredentials: true},
         headers: {'X-Aj-Referer': cur_ref},
         success: function(result, t, xhr) {
+          if (transition && xhr.status == 200 && result && result.v == Aj.version && result.h && !result.r && !result.l) {
+            transition(function() {
+              onResult(url, xhr.status, result, push_state);
+            });
+            return;
+          }
           if (Aj.viewTransition && document.startViewTransition) {
             document.startViewTransition(() => {
               onResult(url, xhr.status, result, push_state);
@@ -542,6 +549,14 @@ function ajInit(options) {
       }
     } else {
       return loc(curLocation.href);
+    }
+  }
+
+  function locationWithTransition(href, replace, transition) {
+    var url = loc(href);
+    var push_state = !replace;
+    if (!loadPage(url, push_state, undefined, transition)) {
+      changeLocation(url, push_state);
     }
   }
 
