@@ -3050,6 +3050,7 @@ var OwnerAds = {
       state.$tableColumnsForm = $('.js-table-columns-form');
       state.$tableColumnsForm.on('change.curPage', 'input.checkbox', OwnerAds.eColumnChange);
       state.$tableColumnsForm.on('submit.curPage', preventDefault);
+      cont.on('click.curPage', '.js-submit-review-ad', OwnerAds.eSubmitAdForReview);
 
       state.$searchField.initSearch({
         $results: state.$searchResults,
@@ -3229,6 +3230,35 @@ var OwnerAds = {
     } else {
       OwnerAds.loadAdsList({offset: 0});
     }
+    return false;
+  },
+  eSubmitAdForReview: function(e) {
+    e.preventDefault();
+    var $button = $(this);
+    if ($button.prop('disabled')) {
+      return false;
+    }
+    var ad_id = $(this).attr('data-ad-id');
+    if (!ad_id) {
+      return false;
+    }
+    var params = {
+      owner_id: Aj.state.ownerId,
+      ad_id: ad_id
+    };
+    $button.prop('disabled', true);
+    Aj.apiRequest('submitAdForReview', params, function(result) {
+      $button.prop('disabled', false);
+      if (result.error) {
+        return showAlert(result.error);
+      }
+      if (result.toast) {
+        showToast(result.toast);
+      }
+      if (result.ad) {
+        OwnerAds.updateAd(result.ad);
+      }
+    });
     return false;
   },
   updateAd: function(ad) {
