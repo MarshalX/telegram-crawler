@@ -2622,7 +2622,8 @@ chatJoinRequestResultQueued = ChatJoinRequestResult;
 //@expired_member_count Number of chat members, which joined the chat using the link, but have already left because of expired subscription; for subscription links only
 //@pending_join_request_count Number of pending join requests created using this link
 //@creates_join_request True, if the link only creates join request. If true, total number of joining members will be unlimited
-//@is_primary True, if the link is primary. Primary invite link can't have name, expiration date, or usage limit. There is exactly one primary invite link for each administrator with can_invite_users right at a given time
+//@is_primary True, if the link is primary. Primary invite link can't have name, expiration date, or usage limit. Primary link can create join requests only if this is set up using toggleSupergroupJoinByRequest.
+//-There is exactly one primary invite link for each administrator with can_invite_users right at a given time
 //@is_revoked True, if the link was revoked
 chatInviteLink invite_link:string name:string creator_user_id:int53 date:int32 edit_date:int32 expiration_date:int32 subscription_pricing:starSubscriptionPricing member_limit:int32 member_count:int32 expired_member_count:int32 pending_join_request_count:int32 creates_join_request:Bool is_primary:Bool is_revoked:Bool = ChatInviteLink;
 
@@ -7861,7 +7862,7 @@ chatEventAccentColorChanged old_accent_color_id:int32 old_background_custom_emoj
 //@new_profile_background_custom_emoji_id New identifier of the custom emoji; 0 if none
 chatEventProfileAccentColorChanged old_profile_accent_color_id:int32 old_profile_background_custom_emoji_id:int64 new_profile_accent_color_id:int32 new_profile_background_custom_emoji_id:int64 = ChatEventAction;
 
-//@description The has_protected_content setting of a channel was toggled @has_protected_content New value of has_protected_content
+//@description The has_protected_content setting of a chat was toggled @has_protected_content New value of has_protected_content
 chatEventHasProtectedContentToggled has_protected_content:Bool = ChatEventAction;
 
 //@description The can_invite_users permission of a supergroup chat was toggled @can_invite_users New value of can_invite_users permission
@@ -7906,7 +7907,7 @@ chatEventVideoChatParticipantIsMutedToggled participant_id:MessageSender is_mute
 //@description A video chat participant volume level was changed @participant_id Identifier of the affected group call participant @volume_level New value of volume_level; 1-20000 in hundreds of percents
 chatEventVideoChatParticipantVolumeLevelChanged participant_id:MessageSender volume_level:int32 = ChatEventAction;
 
-//@description The is_forum setting of a channel was toggled @is_forum New value of is_forum
+//@description The is_forum setting of a supergroup was toggled @is_forum New value of is_forum
 chatEventIsForumToggled is_forum:Bool = ChatEventAction;
 
 //@description A new forum topic was created @topic_info Information about the topic
