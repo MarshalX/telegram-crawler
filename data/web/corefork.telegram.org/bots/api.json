@@ -8260,7 +8260,7 @@
                 "type": "object",
                 "description": "This object represents a disabled button which does nothing. Currently holds no information."
             },
-            "SwitchInlineQueryChosenChatInput": {
+            "InputSwitchInlineQueryChosenChat": {
                 "type": "object",
                 "description": "This object represents an inline button that switches the current user to inline mode in a chosen chat, with an optional default inline query.",
                 "properties": {
@@ -8286,7 +8286,7 @@
                     }
                 }
             },
-            "SwitchInlineQueryChosenChatOutput": {
+            "SwitchInlineQueryChosenChat": {
                 "type": "object",
                 "description": "This object represents an inline button that switches the current user to inline mode in a chosen chat, with an optional default inline query.",
                 "required": [
@@ -8319,7 +8319,7 @@
                     }
                 }
             },
-            "InlineKeyboardButtonInput": {
+            "InputInlineKeyboardButton": {
                 "type": "object",
                 "description": "This object represents one button of an inline keyboard. Exactly one of the fields other than *text*, *icon_custom_emoji_id*, and *style* must be used to specify the type of the button.",
                 "required": [
@@ -8332,8 +8332,8 @@
                     },
                     "icon_custom_emoji_id": {
                         "description": "Unique identifier of the custom emoji shown before the text of the button. Can only be used by bots that purchased additional usernames on [Fragment](https://fragment.com) or in the messages directly sent by the bot to private, group and supergroup chats if the owner of the bot has a Telegram Premium subscription.",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "style": {
                         "description": "Style of the button. Must be one of \"danger\" (red), \"success\" (green) or \"primary\" (blue). If omitted, then an app-specific style is used.",
@@ -8371,7 +8371,7 @@
                     },
                     "switch_inline_query_chosen_chat": {
                         "description": "If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field. Not supported for messages sent in channel direct messages chats and on behalf of a business account.",
-                        "$ref": "#/components/schemas/SwitchInlineQueryChosenChatInput"
+                        "$ref": "#/components/schemas/InputSwitchInlineQueryChosenChat"
                     },
                     "pay": {
                         "description": "Specify *True*, to send a [Pay button](https://core.telegram.org/bots/api#payments). Substrings \"⭐\" and \"XTR\" in the buttons's text will be replaced with a Telegram Star icon. \n\n**NOTE:** This type of button **must** always be the first button in the first row and can only be used in invoice messages.",
@@ -8387,6 +8387,7 @@
                         "$ref": "#/components/schemas/DisabledButton"
                     },
                     "login_url": {
+                        "description": "An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the [Telegram Login Widget](https://core.telegram.org/widgets/login). Not supported for ephemeral messages.",
                         "$ref": "#/components/schemas/LoginUrl"
                     }
                 },
@@ -8462,7 +8463,7 @@
                     }
                 ]
             },
-            "InlineKeyboardButtonOutput": {
+            "InlineKeyboardButton": {
                 "type": "object",
                 "description": "This object represents one button of an inline keyboard. Exactly one of the fields other than *text*, *icon_custom_emoji_id*, and *style* must be used to specify the type of the button.",
                 "required": [
@@ -8513,7 +8514,7 @@
                     },
                     "switch_inline_query_chosen_chat": {
                         "description": "If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field. Not supported for messages sent in channel direct messages chats and on behalf of a business account.",
-                        "$ref": "#/components/schemas/SwitchInlineQueryChosenChatOutput"
+                        "$ref": "#/components/schemas/SwitchInlineQueryChosenChat"
                     },
                     "pay": {
                         "description": "Specify *True*, to send a [Pay button](https://core.telegram.org/bots/api#payments). Substrings \"⭐\" and \"XTR\" in the buttons's text will be replaced with a Telegram Star icon. \n\n**NOTE:** This type of button **must** always be the first button in the first row and can only be used in invoice messages.",
@@ -9223,24 +9224,37 @@
                     }
                 }
             },
-            "PaidMediaPhoto": {
+            "PaidMediaLivePhoto": {
                 "type": "object",
-                "description": "The paid media is a photo.",
+                "description": "The paid media is a [live photo](https://core.telegram.org/bots/api#livephoto).",
                 "required": [
-                    "type"
+                    "type",
+                    "live_photo"
                 ],
                 "properties": {
                     "type": {
-                        "description": "Type of the paid media, \"photo\", or \"live_photo\" for a live photo with its *live_photo* field",
+                        "description": "Type of the paid media, always \"live_photo\"",
                         "type": "string",
-                        "enum": [
-                            "live_photo",
-                            "photo"
-                        ]
+                        "const": "live_photo"
                     },
                     "live_photo": {
                         "description": "The photo",
                         "$ref": "#/components/schemas/LivePhoto"
+                    }
+                }
+            },
+            "PaidMediaPhoto": {
+                "type": "object",
+                "description": "The paid media is a photo.",
+                "required": [
+                    "type",
+                    "photo"
+                ],
+                "properties": {
+                    "type": {
+                        "description": "Type of the paid media, always \"photo\"",
+                        "type": "string",
+                        "const": "photo"
                     },
                     "photo": {
                         "description": "The photo",
@@ -9454,7 +9468,7 @@
                     }
                 }
             },
-            "LocationInput": {
+            "InputLocation": {
                 "type": "object",
                 "description": "This object represents a point on the map.",
                 "required": [
@@ -9481,7 +9495,7 @@
                     }
                 }
             },
-            "LocationOutput": {
+            "Location": {
                 "type": "object",
                 "description": "This object represents a point on the map.",
                 "required": [
@@ -9674,7 +9688,7 @@
                 "properties": {
                     "location": {
                         "description": "Venue location. Can't be a live location.",
-                        "$ref": "#/components/schemas/LocationOutput"
+                        "$ref": "#/components/schemas/Location"
                     },
                     "title": {
                         "description": "Name of the venue",
@@ -9773,7 +9787,7 @@
                         "description": "Special entities that appear in *text*, such as usernames, URLs, bot commands, etc.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "description": {
@@ -9816,7 +9830,7 @@
                         "description": "Special entities that appear in the option *text*. Currently, only custom emoji entities are allowed in poll option texts",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "media": {
@@ -9873,7 +9887,7 @@
                         "description": "Special entities that appear in the *question*. Currently, only custom emoji entities are allowed in poll questions",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "options": {
@@ -9956,7 +9970,7 @@
                         "description": "Special entities like usernames, URLs, bot commands, etc. that appear in the *explanation*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "explanation_media": {
@@ -9971,7 +9985,7 @@
                         "description": "Special entities like usernames, URLs, bot commands, etc. that appear in the description",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "media": {
@@ -10004,7 +10018,7 @@
                         "description": "Special entities that appear in the option_text",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     }
                 }
@@ -10033,7 +10047,7 @@
                         "description": "Special entities that appear in the option_text",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     }
                 }
@@ -10059,7 +10073,7 @@
                         "description": "Special entities that appear in the task text",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "completed_by_user": {
@@ -10093,7 +10107,7 @@
                         "description": "Special entities that appear in the checklist title",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "tasks": {
@@ -10896,7 +10910,7 @@
                     },
                     "link_preview_options": {
                         "description": "Options used for link preview generation for the original message, if it is a text message",
-                        "$ref": "#/components/schemas/LinkPreviewOptionsOutput"
+                        "$ref": "#/components/schemas/LinkPreviewOptions"
                     },
                     "animation": {
                         "description": "Message is an animation, information about the animation",
@@ -10948,7 +10962,7 @@
                     },
                     "location": {
                         "description": "Message is a shared location, information about the location",
-                        "$ref": "#/components/schemas/LocationOutput"
+                        "$ref": "#/components/schemas/Location"
                     },
                     "venue": {
                         "description": "Message is a venue, information about the venue",
@@ -11104,12 +11118,12 @@
                         "description": "For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "link_preview_options": {
                         "description": "Options used for link preview generation for the message, if it is a text message and link preview options were changed",
-                        "$ref": "#/components/schemas/LinkPreviewOptionsOutput"
+                        "$ref": "#/components/schemas/LinkPreviewOptions"
                     },
                     "rich_message": {
                         "description": "Message is a rich formatted message",
@@ -11131,7 +11145,7 @@
                         "description": "For messages with a caption, special entities like usernames, URLs, bot commands, etc. that appear in the caption",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -11181,7 +11195,7 @@
                     },
                     "location": {
                         "description": "Message is a shared location, information about the location",
-                        "$ref": "#/components/schemas/LocationOutput"
+                        "$ref": "#/components/schemas/Location"
                     },
                     "venue": {
                         "description": "Message is a venue, information about the venue. For backward compatibility, when this field is set, the *location* field will also be set.",
@@ -11457,7 +11471,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message. `login_url` buttons are represented as ordinary `url` buttons.",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupOutput"
+                        "$ref": "#/components/schemas/InlineKeyboardMarkup"
                     },
                     "via_bot": {
                         "description": "Bot through which the message was sent",
@@ -12263,7 +12277,7 @@
                         "description": "Special entities that appear in the text",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "is_private": {
@@ -12343,7 +12357,7 @@
                         "description": "Special entities that appear in the text",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "is_private": {
@@ -12643,7 +12657,7 @@
                         "description": "Special entities that appear in the text",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "is_private": {
@@ -12746,7 +12760,7 @@
                         "description": "Special entities that appear in the text",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "is_private": {
@@ -12848,7 +12862,7 @@
                     }
                 }
             },
-            "AcceptedGiftTypesInput": {
+            "InputAcceptedGiftTypes": {
                 "type": "object",
                 "description": "This object describes the types of gifts that can be gifted to a user or a chat.",
                 "required": [
@@ -12881,7 +12895,7 @@
                     }
                 }
             },
-            "AcceptedGiftTypesOutput": {
+            "AcceptedGiftTypes": {
                 "type": "object",
                 "description": "This object describes the types of gifts that can be gifted to a user or a chat.",
                 "required": [
@@ -12915,7 +12929,7 @@
                     }
                 }
             },
-            "MessageEntityInput": {
+            "InputMessageEntity": {
                 "type": "object",
                 "description": "This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.",
                 "required": [
@@ -12974,8 +12988,8 @@
                     },
                     "custom_emoji_id": {
                         "description": "For \"custom_emoji\" only, unique identifier of the custom emoji. Use [getCustomEmojiStickers](https://core.telegram.org/bots/api#getcustomemojistickers) to get full information about the sticker.",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "unix_time": {
                         "description": "For \"date_time\" only, the Unix time associated with the entity",
@@ -12989,7 +13003,7 @@
                     }
                 }
             },
-            "MessageEntityOutput": {
+            "MessageEntity": {
                 "type": "object",
                 "description": "This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.",
                 "required": [
@@ -13077,7 +13091,7 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "size": {
                         "description": "Relative size of the text font; 1-6, 1 is the largest, 6 is the smallest",
@@ -13101,7 +13115,7 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
@@ -13120,7 +13134,7 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "language": {
                         "description": "The programming language of the text",
@@ -13143,7 +13157,7 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
@@ -13243,7 +13257,7 @@
                     },
                     "credit": {
                         "description": "Credit of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
@@ -13262,11 +13276,11 @@
                     },
                     "text": {
                         "description": "Content of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "credit": {
                         "description": "Credit of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
@@ -13285,11 +13299,11 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "credit": {
                         "description": "Credit of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
@@ -13315,7 +13329,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionOutput"
+                        "$ref": "#/components/schemas/RichBlockCaption"
                     }
                 }
             },
@@ -13341,7 +13355,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionOutput"
+                        "$ref": "#/components/schemas/RichBlockCaption"
                     }
                 }
             },
@@ -13364,13 +13378,13 @@
                         "items": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/RichBlockTableCellOutput"
+                                "$ref": "#/components/schemas/RichBlockTableCell"
                             }
                         }
                     },
                     "caption": {
                         "description": "Caption of the table",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "is_bordered": {
                         "description": "*True*, if the table has borders",
@@ -13405,7 +13419,7 @@
                     },
                     "summary": {
                         "description": "Always shown summary of the block",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "blocks": {
                         "description": "Content of the block",
@@ -13439,7 +13453,7 @@
                     },
                     "location": {
                         "description": "Location of the center of the map",
-                        "$ref": "#/components/schemas/LocationOutput"
+                        "$ref": "#/components/schemas/Location"
                     },
                     "zoom": {
                         "description": "Map zoom level",
@@ -13458,7 +13472,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionOutput"
+                        "$ref": "#/components/schemas/RichBlockCaption"
                     }
                 }
             },
@@ -13479,7 +13493,7 @@
                         "description": "The buttons",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RichMessageButtonOutput"
+                            "$ref": "#/components/schemas/RichMessageButton"
                         }
                     },
                     "align": {
@@ -13502,12 +13516,9 @@
                 ],
                 "properties": {
                     "type": {
-                        "description": "Type of the block, currently can be \"animation\" or \"unknown\"",
+                        "description": "Type of the block, always \"animation\"",
                         "type": "string",
-                        "enum": [
-                            "animation",
-                            "unknown"
-                        ]
+                        "const": "animation"
                     },
                     "animation": {
                         "description": "The animation",
@@ -13515,7 +13526,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionOutput"
+                        "$ref": "#/components/schemas/RichBlockCaption"
                     },
                     "has_spoiler": {
                         "description": "*True*, if the media preview is covered by a spoiler animation",
@@ -13543,7 +13554,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionOutput"
+                        "$ref": "#/components/schemas/RichBlockCaption"
                     }
                 }
             },
@@ -13566,7 +13577,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionOutput"
+                        "$ref": "#/components/schemas/RichBlockCaption"
                     }
                 }
             },
@@ -13579,12 +13590,9 @@
                 ],
                 "properties": {
                     "type": {
-                        "description": "Type of the block, currently can be \"photo\" or \"unknown\"",
+                        "description": "Type of the block, always \"photo\"",
                         "type": "string",
-                        "enum": [
-                            "photo",
-                            "unknown"
-                        ]
+                        "const": "photo"
                     },
                     "photo": {
                         "description": "Available sizes of the photo",
@@ -13595,7 +13603,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionOutput"
+                        "$ref": "#/components/schemas/RichBlockCaption"
                     },
                     "has_spoiler": {
                         "description": "*True*, if the media preview is covered by a spoiler animation",
@@ -13613,12 +13621,9 @@
                 ],
                 "properties": {
                     "type": {
-                        "description": "Type of the block, currently can be \"video\" or \"unknown\"",
+                        "description": "Type of the block, always \"video\"",
                         "type": "string",
-                        "enum": [
-                            "video",
-                            "unknown"
-                        ]
+                        "const": "video"
                     },
                     "video": {
                         "description": "The video",
@@ -13626,7 +13631,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionOutput"
+                        "$ref": "#/components/schemas/RichBlockCaption"
                     },
                     "has_spoiler": {
                         "description": "*True*, if the media preview is covered by a spoiler animation",
@@ -13654,11 +13659,11 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionOutput"
+                        "$ref": "#/components/schemas/RichBlockCaption"
                     }
                 }
             },
-            "RichTextBoldInput": {
+            "InputRichTextBold": {
                 "type": "object",
                 "description": "A bold text.",
                 "required": [
@@ -13673,11 +13678,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichTextBoldOutput": {
+            "RichTextBold": {
                 "type": "object",
                 "description": "A bold text.",
                 "required": [
@@ -13692,11 +13697,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
-            "RichTextItalicInput": {
+            "InputRichTextItalic": {
                 "type": "object",
                 "description": "An italicized text.",
                 "required": [
@@ -13711,11 +13716,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichTextItalicOutput": {
+            "RichTextItalic": {
                 "type": "object",
                 "description": "An italicized text.",
                 "required": [
@@ -13730,11 +13735,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
-            "RichTextUnderlineInput": {
+            "InputRichTextUnderline": {
                 "type": "object",
                 "description": "An underlined text.",
                 "required": [
@@ -13749,11 +13754,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichTextUnderlineOutput": {
+            "RichTextUnderline": {
                 "type": "object",
                 "description": "An underlined text.",
                 "required": [
@@ -13768,11 +13773,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
-            "RichTextStrikethroughInput": {
+            "InputRichTextStrikethrough": {
                 "type": "object",
                 "description": "A strikethrough text.",
                 "required": [
@@ -13787,11 +13792,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichTextStrikethroughOutput": {
+            "RichTextStrikethrough": {
                 "type": "object",
                 "description": "A strikethrough text.",
                 "required": [
@@ -13806,11 +13811,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
-            "RichTextSpoilerInput": {
+            "InputRichTextSpoiler": {
                 "type": "object",
                 "description": "A text covered by a spoiler.",
                 "required": [
@@ -13825,11 +13830,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichTextSpoilerOutput": {
+            "RichTextSpoiler": {
                 "type": "object",
                 "description": "A text covered by a spoiler.",
                 "required": [
@@ -13844,11 +13849,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
-            "RichTextSubscriptInput": {
+            "InputRichTextSubscript": {
                 "type": "object",
                 "description": "A subscript text.",
                 "required": [
@@ -13863,11 +13868,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichTextSubscriptOutput": {
+            "RichTextSubscript": {
                 "type": "object",
                 "description": "A subscript text.",
                 "required": [
@@ -13882,11 +13887,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
-            "RichTextSuperscriptInput": {
+            "InputRichTextSuperscript": {
                 "type": "object",
                 "description": "A superscript text.",
                 "required": [
@@ -13901,11 +13906,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichTextSuperscriptOutput": {
+            "RichTextSuperscript": {
                 "type": "object",
                 "description": "A superscript text.",
                 "required": [
@@ -13920,11 +13925,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
-            "RichTextMarkedInput": {
+            "InputRichTextMarked": {
                 "type": "object",
                 "description": "A marked text.",
                 "required": [
@@ -13939,11 +13944,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichTextMarkedOutput": {
+            "RichTextMarked": {
                 "type": "object",
                 "description": "A marked text.",
                 "required": [
@@ -13958,11 +13963,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
-            "RichTextDateTimeInput": {
+            "InputRichTextDateTime": {
                 "type": "object",
                 "description": "Formatted date and time.",
                 "required": [
@@ -13979,7 +13984,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "unix_time": {
                         "description": "The Unix time associated with the entity",
@@ -13993,7 +13998,7 @@
                     }
                 }
             },
-            "RichTextDateTimeOutput": {
+            "RichTextDateTime": {
                 "type": "object",
                 "description": "Formatted date and time.",
                 "required": [
@@ -14010,7 +14015,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "unix_time": {
                         "description": "The Unix time associated with the entity",
@@ -14023,7 +14028,7 @@
                     }
                 }
             },
-            "RichTextMentionInput": {
+            "InputRichTextMention": {
                 "type": "object",
                 "description": "A mention by a username.",
                 "required": [
@@ -14039,7 +14044,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "username": {
                         "description": "The username",
@@ -14047,7 +14052,7 @@
                     }
                 }
             },
-            "RichTextMentionOutput": {
+            "RichTextMention": {
                 "type": "object",
                 "description": "A mention by a username.",
                 "required": [
@@ -14063,7 +14068,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "username": {
                         "description": "The username",
@@ -14071,7 +14076,7 @@
                     }
                 }
             },
-            "RichTextHashtagInput": {
+            "InputRichTextHashtag": {
                 "type": "object",
                 "description": "A hashtag.",
                 "required": [
@@ -14087,7 +14092,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "hashtag": {
                         "description": "The hashtag",
@@ -14095,7 +14100,7 @@
                     }
                 }
             },
-            "RichTextHashtagOutput": {
+            "RichTextHashtag": {
                 "type": "object",
                 "description": "A hashtag.",
                 "required": [
@@ -14111,7 +14116,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "hashtag": {
                         "description": "The hashtag",
@@ -14119,7 +14124,7 @@
                     }
                 }
             },
-            "RichTextCashtagInput": {
+            "InputRichTextCashtag": {
                 "type": "object",
                 "description": "A cashtag.",
                 "required": [
@@ -14135,7 +14140,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "cashtag": {
                         "description": "The cashtag",
@@ -14143,7 +14148,7 @@
                     }
                 }
             },
-            "RichTextCashtagOutput": {
+            "RichTextCashtag": {
                 "type": "object",
                 "description": "A cashtag.",
                 "required": [
@@ -14159,7 +14164,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "cashtag": {
                         "description": "The cashtag",
@@ -14167,7 +14172,7 @@
                     }
                 }
             },
-            "RichTextBankCardNumberInput": {
+            "InputRichTextBankCardNumber": {
                 "type": "object",
                 "description": "A text with a bank card number.",
                 "required": [
@@ -14183,7 +14188,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "bank_card_number": {
                         "description": "The bank card number",
@@ -14191,7 +14196,7 @@
                     }
                 }
             },
-            "RichTextBankCardNumberOutput": {
+            "RichTextBankCardNumber": {
                 "type": "object",
                 "description": "A text with a bank card number.",
                 "required": [
@@ -14207,7 +14212,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "bank_card_number": {
                         "description": "The bank card number",
@@ -14215,7 +14220,7 @@
                     }
                 }
             },
-            "RichTextBotCommandInput": {
+            "InputRichTextBotCommand": {
                 "type": "object",
                 "description": "A bot command.",
                 "required": [
@@ -14231,7 +14236,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "bot_command": {
                         "description": "The bot command",
@@ -14239,7 +14244,7 @@
                     }
                 }
             },
-            "RichTextBotCommandOutput": {
+            "RichTextBotCommand": {
                 "type": "object",
                 "description": "A bot command.",
                 "required": [
@@ -14255,7 +14260,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "bot_command": {
                         "description": "The bot command",
@@ -14263,7 +14268,7 @@
                     }
                 }
             },
-            "RichTextCodeInput": {
+            "InputRichTextCode": {
                 "type": "object",
                 "description": "A monowidth text.",
                 "required": [
@@ -14278,11 +14283,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichTextCodeOutput": {
+            "RichTextCode": {
                 "type": "object",
                 "description": "A monowidth text.",
                 "required": [
@@ -14297,11 +14302,11 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
-            "RichTextTextMentionInput": {
+            "InputRichTextTextMention": {
                 "type": "object",
                 "description": "A mention of a Telegram user by their identifier.",
                 "required": [
@@ -14317,7 +14322,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "user": {
                         "description": "The mentioned user",
@@ -14325,7 +14330,7 @@
                     }
                 }
             },
-            "RichTextTextMentionOutput": {
+            "RichTextTextMention": {
                 "type": "object",
                 "description": "A mention of a Telegram user by their identifier.",
                 "required": [
@@ -14341,7 +14346,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "user": {
                         "description": "The mentioned user",
@@ -14349,7 +14354,7 @@
                     }
                 }
             },
-            "RichTextUrlInput": {
+            "InputRichTextUrl": {
                 "type": "object",
                 "description": "A text with a link.",
                 "required": [
@@ -14365,7 +14370,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "url": {
                         "description": "URL of the link",
@@ -14373,7 +14378,7 @@
                     }
                 }
             },
-            "RichTextUrlOutput": {
+            "RichTextUrl": {
                 "type": "object",
                 "description": "A text with a link.",
                 "required": [
@@ -14389,7 +14394,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "url": {
                         "description": "URL of the link",
@@ -14397,7 +14402,7 @@
                     }
                 }
             },
-            "RichTextEmailAddressInput": {
+            "InputRichTextEmailAddress": {
                 "type": "object",
                 "description": "A text with an email address.",
                 "required": [
@@ -14413,7 +14418,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "email_address": {
                         "description": "The email address",
@@ -14421,7 +14426,7 @@
                     }
                 }
             },
-            "RichTextEmailAddressOutput": {
+            "RichTextEmailAddress": {
                 "type": "object",
                 "description": "A text with an email address.",
                 "required": [
@@ -14437,7 +14442,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "email_address": {
                         "description": "The email address",
@@ -14445,7 +14450,7 @@
                     }
                 }
             },
-            "RichTextPhoneNumberInput": {
+            "InputRichTextPhoneNumber": {
                 "type": "object",
                 "description": "A text with a phone number.",
                 "required": [
@@ -14461,7 +14466,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "phone_number": {
                         "description": "The phone number",
@@ -14469,7 +14474,7 @@
                     }
                 }
             },
-            "RichTextPhoneNumberOutput": {
+            "RichTextPhoneNumber": {
                 "type": "object",
                 "description": "A text with a phone number.",
                 "required": [
@@ -14485,7 +14490,7 @@
                     },
                     "text": {
                         "description": "The text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "phone_number": {
                         "description": "The phone number",
@@ -14493,7 +14498,7 @@
                     }
                 }
             },
-            "RichTextReferenceInput": {
+            "InputRichTextReference": {
                 "type": "object",
                 "description": "A reference.",
                 "required": [
@@ -14509,7 +14514,7 @@
                     },
                     "text": {
                         "description": "Text of the reference",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "name": {
                         "description": "The name of the reference",
@@ -14517,7 +14522,7 @@
                     }
                 }
             },
-            "RichTextReferenceOutput": {
+            "RichTextReference": {
                 "type": "object",
                 "description": "A reference.",
                 "required": [
@@ -14533,7 +14538,7 @@
                     },
                     "text": {
                         "description": "Text of the reference",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "name": {
                         "description": "The name of the reference",
@@ -14541,7 +14546,7 @@
                     }
                 }
             },
-            "RichTextReferenceLinkInput": {
+            "InputRichTextReferenceLink": {
                 "type": "object",
                 "description": "A link to a reference.",
                 "required": [
@@ -14557,7 +14562,7 @@
                     },
                     "text": {
                         "description": "The link text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "reference_name": {
                         "description": "The name of the reference",
@@ -14565,7 +14570,7 @@
                     }
                 }
             },
-            "RichTextReferenceLinkOutput": {
+            "RichTextReferenceLink": {
                 "type": "object",
                 "description": "A link to a reference.",
                 "required": [
@@ -14581,7 +14586,7 @@
                     },
                     "text": {
                         "description": "The link text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "reference_name": {
                         "description": "The name of the reference",
@@ -14589,7 +14594,7 @@
                     }
                 }
             },
-            "RichTextAnchorLinkInput": {
+            "InputRichTextAnchorLink": {
                 "type": "object",
                 "description": "A link to an anchor.",
                 "required": [
@@ -14605,7 +14610,7 @@
                     },
                     "text": {
                         "description": "The link text",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "anchor_name": {
                         "description": "The name of the anchor. If the name is empty, then the link brings back to the top of the message.",
@@ -14613,7 +14618,7 @@
                     }
                 }
             },
-            "RichTextAnchorLinkOutput": {
+            "RichTextAnchorLink": {
                 "type": "object",
                 "description": "A link to an anchor.",
                 "required": [
@@ -14629,7 +14634,7 @@
                     },
                     "text": {
                         "description": "The link text",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "anchor_name": {
                         "description": "The name of the anchor. If the name is empty, then the link brings back to the top of the message.",
@@ -14680,7 +14685,7 @@
                     }
                 }
             },
-            "RichTextButtonInput": {
+            "InputRichTextButton": {
                 "type": "object",
                 "description": "A button.",
                 "required": [
@@ -14695,11 +14700,11 @@
                     },
                     "button": {
                         "description": "The button",
-                        "$ref": "#/components/schemas/RichMessageButtonInput"
+                        "$ref": "#/components/schemas/InputRichMessageButton"
                     }
                 }
             },
-            "RichTextButtonOutput": {
+            "RichTextButton": {
                 "type": "object",
                 "description": "A button.",
                 "required": [
@@ -14714,7 +14719,7 @@
                     },
                     "button": {
                         "description": "The button",
-                        "$ref": "#/components/schemas/RichMessageButtonOutput"
+                        "$ref": "#/components/schemas/RichMessageButton"
                     }
                 }
             },
@@ -14737,7 +14742,7 @@
                     }
                 }
             },
-            "RichMessageButtonInput": {
+            "InputRichMessageButton": {
                 "type": "object",
                 "description": "This object represents a button in a [RichMessage](https://core.telegram.org/bots/api#richmessage). Exactly one of the fields other than *text* and *style* must be used to specify the type of the button.",
                 "required": [
@@ -14745,8 +14750,8 @@
                 ],
                 "properties": {
                     "text": {
-                        "description": "Text of the button. May contain only plain text, [RichTextCustomEmoji](https://core.telegram.org/bots/api#richtextcustomemoji) and [RichTextDateTime](https://core.telegram.org/bots/api#richtextdatetime) entities.",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "description": "Text of the button. May contain only plain text, [RichTextCustomEmoji](https://core.telegram.org/bots/api#richtextcustomemoji) and [InputRichTextDateTime](https://core.telegram.org/bots/api#inputrichtextdatetime) entities.",
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "style": {
                         "description": "Style of the button. Must be one of \"danger\", \"success\", \"primary\", or \"link\" (the button is shown as a regular link without borders). Apps may use theme-specific colors for the button background and text based on the style. The style \"link\" is allowed only for callback buttons.",
@@ -14781,7 +14786,7 @@
                     },
                     "switch_inline_query_chosen_chat": {
                         "description": "If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field. Not supported for messages sent in channel direct messages chats and on behalf of a business account.",
-                        "$ref": "#/components/schemas/SwitchInlineQueryChosenChatInput"
+                        "$ref": "#/components/schemas/InputSwitchInlineQueryChosenChat"
                     },
                     "copy_text": {
                         "description": "Description of the button that copies the specified text to the clipboard",
@@ -14792,6 +14797,7 @@
                         "$ref": "#/components/schemas/DisabledButton"
                     },
                     "login_url": {
+                        "description": "An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the [Telegram Login Widget](https://core.telegram.org/widgets/login). Not supported for ephemeral messages.",
                         "$ref": "#/components/schemas/LoginUrl"
                     }
                 },
@@ -14857,7 +14863,7 @@
                     }
                 ]
             },
-            "RichMessageButtonOutput": {
+            "RichMessageButton": {
                 "type": "object",
                 "description": "This object represents a button in a [RichMessage](https://core.telegram.org/bots/api#richmessage). Exactly one of the fields other than *text* and *style* must be used to specify the type of the button.",
                 "required": [
@@ -14866,7 +14872,7 @@
                 "properties": {
                     "text": {
                         "description": "Text of the button. May contain only plain text, [RichTextCustomEmoji](https://core.telegram.org/bots/api#richtextcustomemoji) and [RichTextDateTime](https://core.telegram.org/bots/api#richtextdatetime) entities.",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "style": {
                         "description": "Style of the button. Must be one of \"danger\", \"success\", \"primary\", or \"link\" (the button is shown as a regular link without borders). Apps may use theme-specific colors for the button background and text based on the style. The style \"link\" is allowed only for callback buttons.",
@@ -14901,7 +14907,7 @@
                     },
                     "switch_inline_query_chosen_chat": {
                         "description": "If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field. Not supported for messages sent in channel direct messages chats and on behalf of a business account.",
-                        "$ref": "#/components/schemas/SwitchInlineQueryChosenChatOutput"
+                        "$ref": "#/components/schemas/SwitchInlineQueryChosenChat"
                     },
                     "copy_text": {
                         "description": "Description of the button that copies the specified text to the clipboard",
@@ -14913,13 +14919,13 @@
                     }
                 }
             },
-            "RichBlockTableCellInput": {
+            "InputRichBlockTableCell": {
                 "type": "object",
                 "description": "Cell in a table.",
                 "properties": {
                     "text": {
                         "description": "Text in the cell. If omitted, then the cell is invisible.",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "is_header": {
                         "description": "*True*, if the cell is a header cell",
@@ -14956,7 +14962,7 @@
                     }
                 }
             },
-            "RichBlockTableCellOutput": {
+            "RichBlockTableCell": {
                 "type": "object",
                 "description": "Cell in a table.",
                 "required": [
@@ -14966,7 +14972,7 @@
                 "properties": {
                     "text": {
                         "description": "Text in the cell. If omitted, then the cell is invisible.",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "is_header": {
                         "description": "*True*, if the cell is a header cell",
@@ -15004,7 +15010,7 @@
                     }
                 }
             },
-            "RichBlockCaptionInput": {
+            "InputRichBlockCaption": {
                 "type": "object",
                 "description": "Caption of a rich formatted block.",
                 "required": [
@@ -15013,15 +15019,15 @@
                 "properties": {
                     "text": {
                         "description": "Block caption",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "credit": {
                         "description": "Block credit which corresponds to the HTML tag &lt;cite&gt;",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
-            "RichBlockCaptionOutput": {
+            "RichBlockCaption": {
                 "type": "object",
                 "description": "Caption of a rich formatted block.",
                 "required": [
@@ -15030,11 +15036,11 @@
                 "properties": {
                     "text": {
                         "description": "Block caption",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     },
                     "credit": {
                         "description": "Block credit which corresponds to the HTML tag &lt;cite&gt;",
-                        "$ref": "#/components/schemas/RichTextOutput"
+                        "$ref": "#/components/schemas/RichText"
                     }
                 }
             },
@@ -15099,7 +15105,7 @@
                     }
                 }
             },
-            "LinkPreviewOptionsInput": {
+            "InputLinkPreviewOptions": {
                 "type": "object",
                 "description": "Describes the options used for link preview generation.",
                 "properties": {
@@ -15125,7 +15131,7 @@
                     }
                 }
             },
-            "LinkPreviewOptionsOutput": {
+            "LinkPreviewOptions": {
                 "type": "object",
                 "description": "Describes the options used for link preview generation.",
                 "properties": {
@@ -15171,7 +15177,7 @@
                         "description": "Special entities that appear in the quote. Currently, only *bold*, *italic*, *underline*, *strikethrough*, *spoiler*, *custom_emoji*, and *date_time* entities are kept in quotes.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityOutput"
+                            "$ref": "#/components/schemas/MessageEntity"
                         }
                     },
                     "position": {
@@ -15206,7 +15212,7 @@
                     },
                     "location": {
                         "description": "Sender location, only for bots that request user location",
-                        "$ref": "#/components/schemas/LocationOutput"
+                        "$ref": "#/components/schemas/Location"
                     },
                     "chat_type": {
                         "description": "Type of the chat from which the inline query was sent. Can be either \"sender\" for a private chat with the inline query sender, \"private\", \"group\", \"supergroup\", or \"channel\". The chat type should be always known for requests sent from official clients and most third-party clients, unless the request was sent from a secret chat.",
@@ -15245,7 +15251,7 @@
                     },
                     "location": {
                         "description": "Sender location, only for bots that require user location",
-                        "$ref": "#/components/schemas/LocationOutput"
+                        "$ref": "#/components/schemas/Location"
                     },
                     "inline_message_id": {
                         "description": "Identifier of the sent inline message. Available only if there is an [inline keyboard](https://core.telegram.org/bots/api#inlinekeyboardmarkup) attached to the message. Will be also received in [callback queries](https://core.telegram.org/bots/api#callbackquery) and can be used to [edit](https://core.telegram.org/bots/api#updating-messages) the message.",
@@ -15261,7 +15267,7 @@
                     }
                 }
             },
-            "BotCommandInput": {
+            "InputBotCommand": {
                 "type": "object",
                 "description": "This object represents a bot command.",
                 "required": [
@@ -15287,7 +15293,7 @@
                     }
                 }
             },
-            "BotCommandOutput": {
+            "BotCommand": {
                 "type": "object",
                 "description": "This object represents a bot command.",
                 "required": [
@@ -15936,7 +15942,7 @@
                 "properties": {
                     "location": {
                         "description": "Location of the business",
-                        "$ref": "#/components/schemas/LocationOutput"
+                        "$ref": "#/components/schemas/Location"
                     },
                     "address": {
                         "description": "Address of the business",
@@ -15985,7 +15991,7 @@
                     }
                 }
             },
-            "ChatPermissionsInput": {
+            "InputChatPermissions": {
                 "type": "object",
                 "description": "Describes actions that a non-administrator user is allowed to take in a chat.",
                 "properties": {
@@ -16058,7 +16064,7 @@
                     }
                 }
             },
-            "ChatPermissionsOutput": {
+            "ChatPermissions": {
                 "type": "object",
                 "description": "Describes actions that a non-administrator user is allowed to take in a chat.",
                 "required": [
@@ -16156,7 +16162,7 @@
                 "properties": {
                     "location": {
                         "description": "The location to which the supergroup is connected. Can't be a live location.",
-                        "$ref": "#/components/schemas/LocationOutput"
+                        "$ref": "#/components/schemas/Location"
                     },
                     "address": {
                         "description": "Location address, 1-64 characters, as defined by the chat owner",
@@ -16695,7 +16701,7 @@
                     }
                 }
             },
-            "ChatAdministratorRightsInput": {
+            "InputChatAdministratorRights": {
                 "type": "object",
                 "description": "Represents the rights of an administrator in a chat.",
                 "properties": {
@@ -16773,7 +16779,7 @@
                     }
                 }
             },
-            "ChatAdministratorRightsOutput": {
+            "ChatAdministratorRights": {
                 "type": "object",
                 "description": "Represents the rights of an administrator in a chat.",
                 "required": [
@@ -17508,7 +17514,7 @@
                     },
                     "accepted_gift_types": {
                         "description": "Information about types of gifts that are accepted by the chat or by the corresponding user for private chats",
-                        "$ref": "#/components/schemas/AcceptedGiftTypesOutput"
+                        "$ref": "#/components/schemas/AcceptedGiftTypes"
                     },
                     "birthdate": {
                         "description": "For private chats, the date of birth of the user",
@@ -17545,7 +17551,7 @@
                     },
                     "permissions": {
                         "description": "Default chat member permissions, for groups and supergroups",
-                        "$ref": "#/components/schemas/ChatPermissionsOutput"
+                        "$ref": "#/components/schemas/ChatPermissions"
                     },
                     "sticker_set_name": {
                         "description": "For supergroups, name of the group sticker set",
@@ -17683,17 +17689,29 @@
             "PaidMedia": {
                 "type": "object",
                 "description": "This object describes paid media.",
-                "anyOf": [
+                "oneOf": [
                     {
-                        "$ref": "#/components/schemas/PaidMediaPreview"
+                        "$ref": "#/components/schemas/PaidMediaLivePhoto"
                     },
                     {
                         "$ref": "#/components/schemas/PaidMediaPhoto"
                     },
                     {
+                        "$ref": "#/components/schemas/PaidMediaPreview"
+                    },
+                    {
                         "$ref": "#/components/schemas/PaidMediaVideo"
                     }
-                ]
+                ],
+                "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                        "live_photo": "#/components/schemas/PaidMediaLivePhoto",
+                        "photo": "#/components/schemas/PaidMediaPhoto",
+                        "preview": "#/components/schemas/PaidMediaPreview",
+                        "video": "#/components/schemas/PaidMediaVideo"
+                    }
+                }
             },
             "PollMedia": {
                 "type": "object",
@@ -17717,7 +17735,7 @@
                     },
                     "location": {
                         "description": "Media is a shared location, information about the location",
-                        "$ref": "#/components/schemas/LocationOutput"
+                        "$ref": "#/components/schemas/Location"
                     },
                     "live_photo": {
                         "description": "Media is a live photo, information about the live photo",
@@ -17813,68 +17831,41 @@
                     }
                 }
             },
-            "RichTextInput": {
-                "description": "This object represents a rich formatted text.\n\nIt can also be a String for plain text, or an Array of [RichText](https://core.telegram.org/bots/api#richtext).",
+            "InputRichText": {
+                "description": "This object represents a rich formatted text.\n\nIt can also be a String for plain text, or an Array of [InputRichText](https://core.telegram.org/bots/api#inputrichtext).",
                 "anyOf": [
                     {
-                        "type": "string"
+                        "$ref": "#/components/schemas/InputRichTextBold"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextBoldInput"
+                        "$ref": "#/components/schemas/InputRichTextItalic"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextItalicInput"
+                        "$ref": "#/components/schemas/InputRichTextUnderline"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextUnderlineInput"
+                        "$ref": "#/components/schemas/InputRichTextStrikethrough"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextStrikethroughInput"
+                        "$ref": "#/components/schemas/InputRichTextSpoiler"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextSpoilerInput"
+                        "$ref": "#/components/schemas/InputRichTextDateTime"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextSubscriptInput"
+                        "$ref": "#/components/schemas/InputRichTextTextMention"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextSuperscriptInput"
+                        "$ref": "#/components/schemas/InputRichTextSubscript"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextMarkedInput"
+                        "$ref": "#/components/schemas/InputRichTextSuperscript"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextDateTimeInput"
+                        "$ref": "#/components/schemas/InputRichTextMarked"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextMentionInput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextHashtagInput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextCashtagInput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextBankCardNumberInput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextBotCommandInput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextCodeInput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextTextMentionInput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextUrlInput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextEmailAddressInput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextPhoneNumberInput"
+                        "$ref": "#/components/schemas/InputRichTextCode"
                     },
                     {
                         "$ref": "#/components/schemas/RichTextCustomEmoji"
@@ -17883,90 +17874,90 @@
                         "$ref": "#/components/schemas/RichTextMathematicalExpression"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextButtonInput"
+                        "$ref": "#/components/schemas/InputRichTextUrl"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextReferenceInput"
+                        "$ref": "#/components/schemas/InputRichTextEmailAddress"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextReferenceLinkInput"
+                        "$ref": "#/components/schemas/InputRichTextPhoneNumber"
+                    },
+                    {
+                        "$ref": "#/components/schemas/InputRichTextBankCardNumber"
+                    },
+                    {
+                        "$ref": "#/components/schemas/InputRichTextMention"
+                    },
+                    {
+                        "$ref": "#/components/schemas/InputRichTextHashtag"
+                    },
+                    {
+                        "$ref": "#/components/schemas/InputRichTextCashtag"
+                    },
+                    {
+                        "$ref": "#/components/schemas/InputRichTextBotCommand"
+                    },
+                    {
+                        "$ref": "#/components/schemas/InputRichTextButton"
                     },
                     {
                         "$ref": "#/components/schemas/RichTextAnchor"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextAnchorLinkInput"
+                        "$ref": "#/components/schemas/InputRichTextAnchorLink"
+                    },
+                    {
+                        "$ref": "#/components/schemas/InputRichTextReference"
+                    },
+                    {
+                        "$ref": "#/components/schemas/InputRichTextReferenceLink"
+                    },
+                    {
+                        "type": "string"
                     },
                     {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RichTextInput"
+                            "$ref": "#/components/schemas/InputRichText"
                         }
                     }
                 ]
             },
-            "RichTextOutput": {
+            "RichText": {
                 "description": "This object represents a rich formatted text.\n\nIt can also be a String for plain text, or an Array of [RichText](https://core.telegram.org/bots/api#richtext).",
                 "anyOf": [
                     {
-                        "type": "string"
+                        "$ref": "#/components/schemas/RichTextBold"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextBoldOutput"
+                        "$ref": "#/components/schemas/RichTextItalic"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextItalicOutput"
+                        "$ref": "#/components/schemas/RichTextUnderline"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextUnderlineOutput"
+                        "$ref": "#/components/schemas/RichTextStrikethrough"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextStrikethroughOutput"
+                        "$ref": "#/components/schemas/RichTextSpoiler"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextSpoilerOutput"
+                        "$ref": "#/components/schemas/RichTextDateTime"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextSubscriptOutput"
+                        "$ref": "#/components/schemas/RichTextTextMention"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextSuperscriptOutput"
+                        "$ref": "#/components/schemas/RichTextSubscript"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextMarkedOutput"
+                        "$ref": "#/components/schemas/RichTextSuperscript"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextDateTimeOutput"
+                        "$ref": "#/components/schemas/RichTextMarked"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextMentionOutput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextHashtagOutput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextCashtagOutput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextBankCardNumberOutput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextBotCommandOutput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextCodeOutput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextTextMentionOutput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextUrlOutput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextEmailAddressOutput"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichTextPhoneNumberOutput"
+                        "$ref": "#/components/schemas/RichTextCode"
                     },
                     {
                         "$ref": "#/components/schemas/RichTextCustomEmoji"
@@ -17975,24 +17966,51 @@
                         "$ref": "#/components/schemas/RichTextMathematicalExpression"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextButtonOutput"
+                        "$ref": "#/components/schemas/RichTextUrl"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextReferenceOutput"
+                        "$ref": "#/components/schemas/RichTextEmailAddress"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextReferenceLinkOutput"
+                        "$ref": "#/components/schemas/RichTextPhoneNumber"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichTextBankCardNumber"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichTextMention"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichTextHashtag"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichTextCashtag"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichTextBotCommand"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichTextButton"
                     },
                     {
                         "$ref": "#/components/schemas/RichTextAnchor"
                     },
                     {
-                        "$ref": "#/components/schemas/RichTextAnchorLinkOutput"
+                        "$ref": "#/components/schemas/RichTextAnchorLink"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichTextReference"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichTextReferenceLink"
+                    },
+                    {
+                        "type": "string"
                     },
                     {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RichTextOutput"
+                            "$ref": "#/components/schemas/RichText"
                         }
                     }
                 ]
@@ -18000,12 +18018,12 @@
             "RichBlock": {
                 "type": "object",
                 "description": "This object represents a block in a rich formatted message.",
-                "anyOf": [
-                    {
-                        "$ref": "#/components/schemas/RichBlockSectionHeading"
-                    },
+                "oneOf": [
                     {
                         "$ref": "#/components/schemas/RichBlockParagraph"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichBlockSectionHeading"
                     },
                     {
                         "$ref": "#/components/schemas/RichBlockPreformatted"
@@ -18035,24 +18053,6 @@
                         "$ref": "#/components/schemas/RichBlockPullQuotation"
                     },
                     {
-                        "$ref": "#/components/schemas/RichBlockAnimation"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichBlockAudio"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichBlockDocument"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichBlockPhoto"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichBlockVideo"
-                    },
-                    {
-                        "$ref": "#/components/schemas/RichBlockVoiceNote"
-                    },
-                    {
                         "$ref": "#/components/schemas/RichBlockCollage"
                     },
                     {
@@ -18069,29 +18069,75 @@
                     },
                     {
                         "$ref": "#/components/schemas/RichBlockButtons"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichBlockAnimation"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichBlockAudio"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichBlockDocument"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichBlockPhoto"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichBlockVideo"
+                    },
+                    {
+                        "$ref": "#/components/schemas/RichBlockVoiceNote"
                     }
-                ]
+                ],
+                "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                        "paragraph": "#/components/schemas/RichBlockParagraph",
+                        "heading": "#/components/schemas/RichBlockSectionHeading",
+                        "pre": "#/components/schemas/RichBlockPreformatted",
+                        "footer": "#/components/schemas/RichBlockFooter",
+                        "divider": "#/components/schemas/RichBlockDivider",
+                        "mathematical_expression": "#/components/schemas/RichBlockMathematicalExpression",
+                        "anchor": "#/components/schemas/RichBlockAnchor",
+                        "list": "#/components/schemas/RichBlockList",
+                        "blockquote": "#/components/schemas/RichBlockBlockQuotation",
+                        "expandable_blockquote": "#/components/schemas/RichBlockExpandableBlockQuotation",
+                        "pullquote": "#/components/schemas/RichBlockPullQuotation",
+                        "collage": "#/components/schemas/RichBlockCollage",
+                        "slideshow": "#/components/schemas/RichBlockSlideshow",
+                        "table": "#/components/schemas/RichBlockTable",
+                        "details": "#/components/schemas/RichBlockDetails",
+                        "map": "#/components/schemas/RichBlockMap",
+                        "buttons": "#/components/schemas/RichBlockButtons",
+                        "animation": "#/components/schemas/RichBlockAnimation",
+                        "audio": "#/components/schemas/RichBlockAudio",
+                        "document": "#/components/schemas/RichBlockDocument",
+                        "photo": "#/components/schemas/RichBlockPhoto",
+                        "video": "#/components/schemas/RichBlockVideo",
+                        "voice_note": "#/components/schemas/RichBlockVoiceNote"
+                    }
+                }
             },
             "ChatBoostSource": {
                 "type": "object",
                 "description": "This object describes the source of a chat boost.",
                 "oneOf": [
                     {
+                        "$ref": "#/components/schemas/ChatBoostSourcePremium"
+                    },
+                    {
                         "$ref": "#/components/schemas/ChatBoostSourceGiftCode"
                     },
                     {
                         "$ref": "#/components/schemas/ChatBoostSourceGiveaway"
-                    },
-                    {
-                        "$ref": "#/components/schemas/ChatBoostSourcePremium"
                     }
                 ],
                 "discriminator": {
                     "propertyName": "source",
                     "mapping": {
+                        "premium": "#/components/schemas/ChatBoostSourcePremium",
                         "gift_code": "#/components/schemas/ChatBoostSourceGiftCode",
-                        "giveaway": "#/components/schemas/ChatBoostSourceGiveaway",
-                        "premium": "#/components/schemas/ChatBoostSourcePremium"
+                        "giveaway": "#/components/schemas/ChatBoostSourceGiveaway"
                     }
                 }
             },
@@ -18528,7 +18574,7 @@
                         "type": "string"
                     },
                     "start_parameter": {
-                        "description": "[Deep-linking](https://core.telegram.org/bots/features#deep-linking) parameter for the /start message sent to the bot when a user presses the button. 1-64 characters, only `A-Z`, `a-z`, `0-9`, `_` and `-` are allowed.\n\n*Example:* An inline bot that sends YouTube videos can ask the user to connect the bot to their YouTube account to adapt search results accordingly. To do this, it displays a 'Connect your YouTube account' button above the results, or even before showing any. The user presses the button, switches to a private chat with the bot and, in doing so, passes a start parameter that instructs the bot to return an OAuth link. Once done, the bot can offer a [*switch_inline*](https://core.telegram.org/bots/api#inlinekeyboardmarkup) button so that the user can easily return to the chat where they wanted to use the bot's inline capabilities.",
+                        "description": "[Deep-linking](https://core.telegram.org/bots/features#deep-linking) parameter for the /start message sent to the bot when a user presses the button. 1-64 characters, only `A-Z`, `a-z`, `0-9`, `_` and `-` are allowed.\n\n*Example:* An inline bot that sends YouTube videos can ask the user to connect the bot to their YouTube account to adapt search results accordingly. To do this, it displays a 'Connect your YouTube account' button above the results, or even before showing any. The user presses the button, switches to a private chat with the bot and, in doing so, passes a start parameter that instructs the bot to return an OAuth link. Once done, the bot can offer a [*switch_inline*](https://core.telegram.org/bots/api#inputinlinekeyboardmarkup) button so that the user can easily return to the chat where they wanted to use the bot's inline capabilities.",
                         "type": "string"
                     },
                     "web_app": {
@@ -18578,7 +18624,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "thumbnail_url": {
                         "description": "Url of the thumbnail for the result",
@@ -18648,12 +18694,12 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "audio_url": {
                         "description": "A valid URL for the audio file",
@@ -18713,12 +18759,12 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "audio_file_id": {
                         "description": "A valid file identifier for the audio file",
@@ -18751,7 +18797,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "thumbnail_url": {
                         "description": "Url of the thumbnail for the result",
@@ -18826,12 +18872,12 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "thumbnail_url": {
                         "description": "URL of the thumbnail (JPEG only) for the file",
@@ -18905,12 +18951,12 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "title": {
                         "description": "Title for the result",
@@ -18946,7 +18992,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "game_short_name": {
                         "description": "Short name of the game",
@@ -18994,7 +19040,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -19003,7 +19049,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "thumbnail_url": {
                         "description": "URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result",
@@ -19077,7 +19123,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -19086,7 +19132,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "title": {
                         "description": "Title for the result",
@@ -19124,7 +19170,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "thumbnail_url": {
                         "description": "Url of the thumbnail for the result",
@@ -19216,7 +19262,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -19225,7 +19271,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "thumbnail_url": {
                         "description": "URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result",
@@ -19299,7 +19345,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -19308,7 +19354,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "title": {
                         "description": "Title for the result",
@@ -19360,7 +19406,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -19369,7 +19415,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "thumbnail_url": {
                         "description": "URL of the thumbnail for the photo",
@@ -19438,7 +19484,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -19447,7 +19493,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "title": {
                         "description": "Title for the result",
@@ -19487,7 +19533,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "sticker_file_id": {
                         "description": "A valid file identifier of the sticker",
@@ -19522,7 +19568,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "thumbnail_url": {
                         "description": "Url of the thumbnail for the result",
@@ -19616,7 +19662,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -19625,7 +19671,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "thumbnail_url": {
                         "description": "URL of the thumbnail (JPEG only) for the video",
@@ -19704,7 +19750,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -19713,7 +19759,7 @@
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "title": {
                         "description": "Title for the result",
@@ -19769,12 +19815,12 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "title": {
                         "description": "Recording title",
@@ -19831,12 +19877,12 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "title": {
                         "description": "Voice message title",
@@ -19995,11 +20041,11 @@
                     },
                     "user_administrator_rights": {
                         "description": "A JSON-serialized object listing the required administrator rights of the user in the chat. The rights must be a superset of *bot_administrator_rights*. If not specified, no additional restrictions are applied.",
-                        "$ref": "#/components/schemas/ChatAdministratorRightsInput"
+                        "$ref": "#/components/schemas/InputChatAdministratorRights"
                     },
                     "bot_administrator_rights": {
                         "description": "A JSON-serialized object listing the required administrator rights of the bot in the chat. The rights must be a subset of *user_administrator_rights*. If not specified, no additional restrictions are applied.",
-                        "$ref": "#/components/schemas/ChatAdministratorRightsInput"
+                        "$ref": "#/components/schemas/InputChatAdministratorRights"
                     },
                     "bot_is_member": {
                         "description": "Pass *True* to request a chat with the bot as a member. Otherwise, no additional restrictions are applied.",
@@ -20054,8 +20100,8 @@
                     },
                     "icon_custom_emoji_id": {
                         "description": "Unique identifier of the custom emoji shown before the text of the button. Can only be used by bots that purchased additional usernames on [Fragment](https://fragment.com) or in the messages directly sent by the bot to private, group and supergroup chats if the owner of the bot has a Telegram Premium subscription.",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "style": {
                         "description": "Style of the button. Must be one of \"danger\" (red), \"success\" (green) or \"primary\" (blue). If omitted, then an app-specific style is used.",
@@ -20108,7 +20154,7 @@
                         "type": "string"
                     },
                     "bot_username": {
-                        "description": "Username of a bot, which will be used for user authorization; not supported in [RichMessageButton](https://core.telegram.org/bots/api#richmessagebutton). See [Setting up a bot](https://core.telegram.org/widgets/login#setting-up-a-bot) for more details. If not specified, the current bot's username will be assumed. The *url*'s domain must be the same as the domain linked with the bot. See [Linking your domain to the bot](https://core.telegram.org/widgets/login#linking-your-domain-to-the-bot) for more details.",
+                        "description": "Username of a bot, which will be used for user authorization; not supported in [InputRichMessageButton](https://core.telegram.org/bots/api#inputrichmessagebutton). See [Setting up a bot](https://core.telegram.org/widgets/login#setting-up-a-bot) for more details. If not specified, the current bot's username will be assumed. The *url*'s domain must be the same as the domain linked with the bot. See [Linking your domain to the bot](https://core.telegram.org/widgets/login#linking-your-domain-to-the-bot) for more details.",
                         "type": "string",
                         "pattern": "^@?[A-Za-z0-9_]+$"
                     },
@@ -20192,7 +20238,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -20241,7 +20287,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -20294,7 +20340,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -20375,7 +20421,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -20442,7 +20488,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "media": {
@@ -20499,7 +20545,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "media": {
@@ -21052,7 +21098,7 @@
                         "description": "List of special entities that appear in the text, which can be specified instead of parse_mode. Currently, only *bold*, *italic*, *underline*, *strikethrough*, *spoiler*, *custom_emoji*, and *date_time* entities are allowed.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     }
                 }
@@ -21082,7 +21128,7 @@
                         "description": "List of special entities that appear in the title, which can be specified instead of parse_mode. Currently, only *bold*, *italic*, *underline*, *strikethrough*, *spoiler*, *custom_emoji*, and *date_time* entities are allowed.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "others_can_add_tasks": {
@@ -21325,7 +21371,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the poll option text. It can be specified instead of *text_parse_mode*.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "media": {
@@ -21361,7 +21407,7 @@
                     },
                     "link_preview_options": {
                         "description": "Link preview generation options for the message",
-                        "$ref": "#/components/schemas/LinkPreviewOptionsInput"
+                        "$ref": "#/components/schemas/InputLinkPreviewOptions"
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the message text. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -21376,7 +21422,7 @@
                         "description": "List of special entities that appear in message text, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     }
                 }
@@ -21655,7 +21701,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the quote. It can be specified instead of *quote_parse_mode*.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "quote_position": {
@@ -21693,8 +21739,8 @@
                     },
                     "callback_query_id": {
                         "description": "Identifier of the callback query which triggered the message, if any",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "replace_callback_query_message": {
                         "description": "Pass *True* if the ephemeral message must be shown in place of the original message. Must be *False* for callback queries from ephemeral messages, which must be edited using regular *editEphemeralMessage...* methods.",
@@ -22273,7 +22319,7 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "size": {
                         "description": "Relative size of the text font; 1-6, 1 is the largest, 6 is the smallest",
@@ -22297,7 +22343,7 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
@@ -22316,7 +22362,7 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "language": {
                         "description": "The programming language of the text",
@@ -22339,7 +22385,7 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
@@ -22358,7 +22404,7 @@
                     },
                     "text": {
                         "description": "Text of the block. See [https://t.me/addemoji/AIActions](https://t.me/addemoji/AIActions) for examples of custom emoji that are recommended for usage in the block.",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
@@ -22458,7 +22504,7 @@
                     },
                     "credit": {
                         "description": "Credit of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
@@ -22477,11 +22523,11 @@
                     },
                     "text": {
                         "description": "Content of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "credit": {
                         "description": "Credit of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
@@ -22500,11 +22546,11 @@
                     },
                     "text": {
                         "description": "Text of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "credit": {
                         "description": "Credit of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     }
                 }
             },
@@ -22530,7 +22576,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionInput"
+                        "$ref": "#/components/schemas/InputRichBlockCaption"
                     }
                 }
             },
@@ -22556,7 +22602,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionInput"
+                        "$ref": "#/components/schemas/InputRichBlockCaption"
                     }
                 }
             },
@@ -22579,13 +22625,13 @@
                         "items": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/RichBlockTableCellInput"
+                                "$ref": "#/components/schemas/InputRichBlockTableCell"
                             }
                         }
                     },
                     "caption": {
                         "description": "Caption of the table",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "is_bordered": {
                         "description": "Pass *True* if the table has borders",
@@ -22620,7 +22666,7 @@
                     },
                     "summary": {
                         "description": "Always shown summary of the block",
-                        "$ref": "#/components/schemas/RichTextInput"
+                        "$ref": "#/components/schemas/InputRichText"
                     },
                     "blocks": {
                         "description": "Content of the block",
@@ -22651,7 +22697,7 @@
                     },
                     "location": {
                         "description": "Location of the center of the map",
-                        "$ref": "#/components/schemas/LocationInput"
+                        "$ref": "#/components/schemas/InputLocation"
                     },
                     "zoom": {
                         "description": "Map zoom level; 0-24",
@@ -22670,7 +22716,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionInput"
+                        "$ref": "#/components/schemas/InputRichBlockCaption"
                     }
                 }
             },
@@ -22691,7 +22737,7 @@
                         "description": "List of 1-8 buttons to send",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/RichMessageButtonInput"
+                            "$ref": "#/components/schemas/InputRichMessageButton"
                         }
                     },
                     "align": {
@@ -22724,7 +22770,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionInput"
+                        "$ref": "#/components/schemas/InputRichBlockCaption"
                     }
                 }
             },
@@ -22747,7 +22793,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionInput"
+                        "$ref": "#/components/schemas/InputRichBlockCaption"
                     }
                 }
             },
@@ -22770,7 +22816,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionInput"
+                        "$ref": "#/components/schemas/InputRichBlockCaption"
                     }
                 }
             },
@@ -22793,7 +22839,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionInput"
+                        "$ref": "#/components/schemas/InputRichBlockCaption"
                     }
                 }
             },
@@ -22816,7 +22862,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionInput"
+                        "$ref": "#/components/schemas/InputRichBlockCaption"
                     }
                 }
             },
@@ -22839,7 +22885,7 @@
                     },
                     "caption": {
                         "description": "Caption of the block",
-                        "$ref": "#/components/schemas/RichBlockCaptionInput"
+                        "$ref": "#/components/schemas/InputRichBlockCaption"
                     }
                 }
             },
@@ -23373,7 +23419,7 @@
                     }
                 }
             },
-            "InlineKeyboardMarkupInput": {
+            "InputInlineKeyboardMarkup": {
                 "type": "object",
                 "description": "This object represents an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) that appears right next to the message it belongs to.",
                 "required": [
@@ -23381,12 +23427,12 @@
                 ],
                 "properties": {
                     "inline_keyboard": {
-                        "description": "Array of button rows, each represented by an Array of [InlineKeyboardButton](https://core.telegram.org/bots/api#inlinekeyboardbutton) objects",
+                        "description": "Array of button rows, each represented by an Array of [InputInlineKeyboardButton](https://core.telegram.org/bots/api#inputinlinekeyboardbutton) objects",
                         "type": "array",
                         "items": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/InlineKeyboardButtonInput"
+                                "$ref": "#/components/schemas/InputInlineKeyboardButton"
                             }
                         }
                     },
@@ -23396,7 +23442,7 @@
                     }
                 }
             },
-            "InlineKeyboardMarkupOutput": {
+            "InlineKeyboardMarkup": {
                 "type": "object",
                 "description": "This object represents an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) that appears right next to the message it belongs to.",
                 "required": [
@@ -23409,7 +23455,7 @@
                         "items": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/InlineKeyboardButtonOutput"
+                                "$ref": "#/components/schemas/InlineKeyboardButton"
                             }
                         }
                     },
@@ -23484,7 +23530,7 @@
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "media": {
@@ -23557,7 +23603,7 @@
                         "description": "A JSON-serialized list of bot commands to be set as the list of the bot's commands. Must have at most 100 elements.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/BotCommandInput"
+                            "$ref": "#/components/schemas/InputBotCommand"
                         },
                         "maxItems": 100
                     }
@@ -23597,7 +23643,7 @@
                     },
                     "rights": {
                         "description": "A JSON-serialized object describing new default administrator rights. If not specified, the default administrator rights will be cleared.",
-                        "$ref": "#/components/schemas/ChatAdministratorRightsInput"
+                        "$ref": "#/components/schemas/InputChatAdministratorRights"
                     }
                 }
             },
@@ -23841,7 +23887,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -23964,7 +24010,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     }
@@ -24172,7 +24218,7 @@
                     },
                     "accepted_gift_types": {
                         "description": "Types of gifts accepted by the business account",
-                        "$ref": "#/components/schemas/AcceptedGiftTypesInput"
+                        "$ref": "#/components/schemas/InputAcceptedGiftTypes"
                     }
                 }
             },
@@ -24475,7 +24521,7 @@
                     },
                     "permissions": {
                         "description": "A JSON-serialized object for new user permissions",
-                        "$ref": "#/components/schemas/ChatPermissionsInput"
+                        "$ref": "#/components/schemas/InputChatPermissions"
                     }
                 }
             },
@@ -24591,7 +24637,7 @@
                 "properties": {
                     "reply_markup": {
                         "description": "A JSON-serialized object for a new message [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "business_connection_id": {
                         "description": "Unique identifier of the business connection on behalf of which the message to be edited was sent",
@@ -24641,7 +24687,7 @@
                     },
                     "link_preview_options": {
                         "description": "Link preview generation options for the message",
-                        "$ref": "#/components/schemas/LinkPreviewOptionsInput"
+                        "$ref": "#/components/schemas/InputLinkPreviewOptions"
                     },
                     "text": {
                         "description": "New text of the message, 1-4096 characters after entities parsing; required if *rich_message* isn't specified",
@@ -24665,13 +24711,13 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "inline_message_id": {
                         "description": "Required if *chat_id* and *message_id* are not specified. Identifier of the inline message.",
@@ -24704,7 +24750,10 @@
                         "then": {
                             "required": [
                                 "inline_message_id"
-                            ]
+                            ],
+                            "properties": {
+                                "business_connection_id": false
+                            }
                         },
                         "else": {
                             "if": {
@@ -24719,9 +24768,11 @@
                             },
                             "then": {
                                 "required": [
-                                    "chat_id"
+                                    "chat_id",
+                                    "message_id"
                                 ],
                                 "properties": {
+                                    "inline_message_id": false,
                                     "chat_id": {
                                         "type": "integer",
                                         "format": "int64"
@@ -24732,7 +24783,10 @@
                                 "required": [
                                     "chat_id",
                                     "message_id"
-                                ]
+                                ],
+                                "properties": {
+                                    "inline_message_id": false
+                                }
                             }
                         }
                     }
@@ -24784,7 +24838,7 @@
                     },
                     "reply_markup": {
                         "description": "A JSON-serialized object for a new [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "inline_message_id": {
                         "description": "Required if *chat_id* and *message_id* are not specified. Identifier of the inline message.",
@@ -24817,7 +24871,10 @@
                         "then": {
                             "required": [
                                 "inline_message_id"
-                            ]
+                            ],
+                            "properties": {
+                                "business_connection_id": false
+                            }
                         },
                         "else": {
                             "if": {
@@ -24832,9 +24889,11 @@
                             },
                             "then": {
                                 "required": [
-                                    "chat_id"
+                                    "chat_id",
+                                    "message_id"
                                 ],
                                 "properties": {
+                                    "inline_message_id": false,
                                     "chat_id": {
                                         "type": "integer",
                                         "format": "int64"
@@ -24845,7 +24904,10 @@
                                 "required": [
                                     "chat_id",
                                     "message_id"
-                                ]
+                                ],
+                                "properties": {
+                                    "inline_message_id": false
+                                }
                             }
                         }
                     }
@@ -24857,7 +24919,7 @@
                 "properties": {
                     "reply_markup": {
                         "description": "A JSON-serialized object for a new [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "inline_message_id": {
                         "description": "Required if *chat_id* and *message_id* are not specified. Identifier of the inline message.",
@@ -24890,7 +24952,10 @@
                         "then": {
                             "required": [
                                 "inline_message_id"
-                            ]
+                            ],
+                            "properties": {
+                                "business_connection_id": false
+                            }
                         },
                         "else": {
                             "if": {
@@ -24905,9 +24970,11 @@
                             },
                             "then": {
                                 "required": [
-                                    "chat_id"
+                                    "chat_id",
+                                    "message_id"
                                 ],
                                 "properties": {
+                                    "inline_message_id": false,
                                     "chat_id": {
                                         "type": "integer",
                                         "format": "int64"
@@ -24918,7 +24985,10 @@
                                 "required": [
                                     "chat_id",
                                     "message_id"
-                                ]
+                                ],
+                                "properties": {
+                                    "inline_message_id": false
+                                }
                             }
                         }
                     }
@@ -24933,7 +25003,7 @@
                 "properties": {
                     "reply_markup": {
                         "description": "A JSON-serialized object for a new [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "media": {
                         "description": "A JSON-serialized object for the new media content of the message",
@@ -24970,7 +25040,10 @@
                         "then": {
                             "required": [
                                 "inline_message_id"
-                            ]
+                            ],
+                            "properties": {
+                                "business_connection_id": false
+                            }
                         },
                         "else": {
                             "if": {
@@ -24985,9 +25058,11 @@
                             },
                             "then": {
                                 "required": [
-                                    "chat_id"
+                                    "chat_id",
+                                    "message_id"
                                 ],
                                 "properties": {
+                                    "inline_message_id": false,
                                     "chat_id": {
                                         "type": "integer",
                                         "format": "int64"
@@ -24998,7 +25073,10 @@
                                 "required": [
                                     "chat_id",
                                     "message_id"
-                                ]
+                                ],
+                                "properties": {
+                                    "inline_message_id": false
+                                }
                             }
                         }
                     }
@@ -25010,7 +25088,7 @@
                 "properties": {
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "caption": {
                         "description": "New caption of the message, 0-1024 characters after entities parsing",
@@ -25030,7 +25108,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -25068,7 +25146,10 @@
                         "then": {
                             "required": [
                                 "inline_message_id"
-                            ]
+                            ],
+                            "properties": {
+                                "business_connection_id": false
+                            }
                         },
                         "else": {
                             "if": {
@@ -25083,9 +25164,11 @@
                             },
                             "then": {
                                 "required": [
-                                    "chat_id"
+                                    "chat_id",
+                                    "message_id"
                                 ],
                                 "properties": {
+                                    "inline_message_id": false,
                                     "chat_id": {
                                         "type": "integer",
                                         "format": "int64"
@@ -25096,7 +25179,10 @@
                                 "required": [
                                     "chat_id",
                                     "message_id"
-                                ]
+                                ],
+                                "properties": {
+                                    "inline_message_id": false
+                                }
                             }
                         }
                     }
@@ -25114,7 +25200,7 @@
                 "properties": {
                     "reply_markup": {
                         "description": "A JSON-serialized object for the new [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) for the message",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "checklist": {
                         "description": "A JSON-serialized object for the new checklist",
@@ -25164,7 +25250,7 @@
                 "properties": {
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     "inline_message_id": {
                         "description": "Required if *chat_id* and *message_id* are not specified. Identifier of the inline message.",
@@ -25197,7 +25283,10 @@
                         "then": {
                             "required": [
                                 "inline_message_id"
-                            ]
+                            ],
+                            "properties": {
+                                "business_connection_id": false
+                            }
                         },
                         "else": {
                             "if": {
@@ -25212,9 +25301,11 @@
                             },
                             "then": {
                                 "required": [
-                                    "chat_id"
+                                    "chat_id",
+                                    "message_id"
                                 ],
                                 "properties": {
+                                    "inline_message_id": false,
                                     "chat_id": {
                                         "type": "integer",
                                         "format": "int64"
@@ -25225,7 +25316,10 @@
                                 "required": [
                                     "chat_id",
                                     "message_id"
-                                ]
+                                ],
+                                "properties": {
+                                    "inline_message_id": false
+                                }
                             }
                         }
                     }
@@ -25246,7 +25340,7 @@
                     },
                     "link_preview_options": {
                         "description": "Link preview generation options for the message",
-                        "$ref": "#/components/schemas/LinkPreviewOptionsInput"
+                        "$ref": "#/components/schemas/InputLinkPreviewOptions"
                     },
                     "text": {
                         "description": "New text of the message, 1-4096 characters after entities parsing; required if *rich_message* isn't specified",
@@ -25270,7 +25364,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -25291,7 +25385,7 @@
                     },
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     }
                 }
             },
@@ -25326,7 +25420,7 @@
                     },
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     }
                 }
             },
@@ -25357,7 +25451,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -25381,7 +25475,7 @@
                     },
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     }
                 }
             },
@@ -25411,7 +25505,7 @@
                     },
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     }
                 }
             },
@@ -25523,6 +25617,11 @@
                                 "user_id"
                             ]
                         },
+                        "then": {
+                            "properties": {
+                                "actor_chat_id": false
+                            }
+                        },
                         "else": {
                             "required": [
                                 "actor_chat_id"
@@ -25560,6 +25659,11 @@
                             "required": [
                                 "user_id"
                             ]
+                        },
+                        "then": {
+                            "properties": {
+                                "actor_chat_id": false
+                            }
                         },
                         "else": {
                             "required": [
@@ -25656,7 +25760,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the caption, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "show_caption_above_media": {
@@ -26001,7 +26105,7 @@
                     },
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards). If empty, one 'Play game_title' button will be shown. If not empty, the first button must launch the game.",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     }
                 },
                 "allOf": [
@@ -26087,7 +26191,10 @@
                             "required": [
                                 "chat_id",
                                 "message_id"
-                            ]
+                            ],
+                            "properties": {
+                                "inline_message_id": false
+                            }
                         }
                     }
                 ]
@@ -26138,7 +26245,10 @@
                             "required": [
                                 "chat_id",
                                 "message_id"
-                            ]
+                            ],
+                            "properties": {
+                                "inline_message_id": false
+                            }
                         }
                     }
                 ]
@@ -26152,8 +26262,8 @@
                 "properties": {
                     "gift_id": {
                         "description": "Identifier of the gift; limited gifts can't be sent to channel chats",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "pay_for_upgrade": {
                         "description": "Pass *True* to pay for the gift upgrade from the bot's balance, thereby making the upgrade free for the receiver",
@@ -26177,7 +26287,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the text, which can be specified instead of *text_parse_mode*. Entities other than \"bold\", \"italic\", \"underline\", \"strikethrough\", \"spoiler\", \"custom_emoji\", and \"date_time\" are ignored.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "chat_id": {
@@ -26197,6 +26307,11 @@
                             "required": [
                                 "chat_id"
                             ]
+                        },
+                        "then": {
+                            "properties": {
+                                "user_id": false
+                            }
                         },
                         "else": {
                             "required": [
@@ -26254,7 +26369,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the text, which can be specified instead of *text_parse_mode*. Entities other than \"bold\", \"italic\", \"underline\", \"strikethrough\", \"spoiler\", \"custom_emoji\", and \"date_time\" are ignored.",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     }
                 }
@@ -26526,8 +26641,8 @@
                 "properties": {
                     "guest_query_id": {
                         "description": "Unique identifier for the query to be answered",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "result": {
                         "description": "A JSON-serialized object describing the message to be sent",
@@ -26545,8 +26660,8 @@
                 "properties": {
                     "inline_query_id": {
                         "description": "Unique identifier for the answered query",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "is_personal": {
                         "description": "Pass *True* if results may be cached on the server side only for the user that sent the query. By default, results may be returned to any user who sends the same query.",
@@ -26589,8 +26704,8 @@
                 "properties": {
                     "chat_join_request_query_id": {
                         "description": "Unique identifier of the join request query",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "result": {
                         "description": "Result of the query. Must be either \"approve\" to allow the user to join the chat, \"decline\" to disallow the user to join the chat, or \"queue\" to leave the decision to other administrators.",
@@ -26613,8 +26728,8 @@
                 "properties": {
                     "chat_join_request_query_id": {
                         "description": "Unique identifier of the join request query",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "web_app_url": {
                         "description": "An HTTPS URL of a Web App to be opened with additional data as specified in [Initializing Web Apps](https://core.telegram.org/bots/webapps#initializing-mini-apps)",
@@ -26688,8 +26803,8 @@
                 "properties": {
                     "callback_query_id": {
                         "description": "Unique identifier for the query to be answered",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "text": {
                         "description": "Text of the notification. If not specified, nothing will be shown to the user, 0-200 characters.",
@@ -26764,7 +26879,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -26900,7 +27015,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -27019,7 +27134,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -27135,7 +27250,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -27254,7 +27369,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -27405,7 +27520,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -27629,7 +27744,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -27760,7 +27875,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -27965,7 +28080,7 @@
                 "properties": {
                     "link_preview_options": {
                         "description": "Link preview generation options for the message",
-                        "$ref": "#/components/schemas/LinkPreviewOptionsInput"
+                        "$ref": "#/components/schemas/InputLinkPreviewOptions"
                     },
                     "text": {
                         "description": "Text of the message to be sent, 1-4096 characters after entities parsing",
@@ -27986,7 +28101,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the text, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "chat_id": {
@@ -28660,7 +28775,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -28698,7 +28813,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -28741,7 +28856,7 @@
                         "contentSchema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/MessageEntityInput"
+                                "$ref": "#/components/schemas/InputMessageEntity"
                             }
                         }
                     },
@@ -28948,7 +29063,7 @@
                     },
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     }
                 },
                 "allOf": [
@@ -29031,6 +29146,7 @@
                         },
                         "then": {
                             "properties": {
+                                "message_thread_id": false,
                                 "chat_id": {
                                     "type": "integer",
                                     "format": "int64"
@@ -29059,8 +29175,8 @@
                     },
                     "draft_id": {
                         "description": "Unique identifier of the message draft; must be non-zero. Changes to drafts with the same identifier are animated. Otherwise, the draft is replaced without animation.",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "can_stop": {
                         "description": "Pass *True* to show the user a button to stop further drafts. The bot will receive an [Update](https://core.telegram.org/bots/api#update) \"stopped_message_generation\" if the user presses the button.",
@@ -29088,7 +29204,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the text, which can be specified instead of *parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     }
                 }
@@ -29113,8 +29229,8 @@
                     },
                     "draft_id": {
                         "description": "Unique identifier of the message draft; must be non-zero. Changes to drafts with the same identifier are animated. Otherwise, the draft is replaced without animation.",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "can_stop": {
                         "description": "Pass *True* to show the user a button to stop further drafts. The bot will receive an [Update](https://core.telegram.org/bots/api#update) \"stopped_message_generation\" if the user presses the button.",
@@ -29344,7 +29460,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the paid media caption, which can be specified instead of *paid_media_caption_parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "chat_id": {
@@ -29395,7 +29511,7 @@
                     },
                     "reply_markup": {
                         "description": "A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards). If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.",
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     }
                 },
                 "allOf": [
@@ -29557,7 +29673,7 @@
                         "description": "A JSON-serialized list of special entities that appear in the paid media caption, which can be specified instead of *paid_media_caption_parse_mode*",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/MessageEntityInput"
+                            "$ref": "#/components/schemas/InputMessageEntity"
                         }
                     },
                     "business_connection_id": {
@@ -29641,8 +29757,8 @@
                 "properties": {
                     "shipping_query_id": {
                         "description": "Unique identifier for the query to be answered",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "ok": {
                         "description": "Pass *True* if delivery to the specified address is possible and *False* if there are any problems (for example, if delivery to the specified address is not possible)",
@@ -29705,8 +29821,8 @@
                 "properties": {
                     "pre_checkout_query_id": {
                         "description": "Unique identifier for the query to be answered",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "ok": {
                         "description": "Specify *True* if everything is alright (goods are available, etc.) and the bot is ready to proceed with the order. Use *False* if there are any problems.",
@@ -30063,8 +30179,8 @@
                     },
                     "custom_emoji_id": {
                         "description": "Custom emoji identifier of a sticker from the sticker set; pass an empty string to drop the thumbnail and use the first sticker as the thumbnail",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     }
                 }
             },
@@ -30390,7 +30506,7 @@
                 ],
                 "properties": {
                     "chat_id": {
-                        "description": "Unique identifier for the target chat or username of the target bot or channel in the format `@username`",
+                        "description": "Unique identifier for the target chat",
                         "type": "integer",
                         "format": "int64"
                     }
@@ -30571,8 +30687,8 @@
                     },
                     "emoji_status_custom_emoji_id": {
                         "description": "Custom emoji identifier of the emoji status to set. Pass an empty string to remove the status.",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     },
                     "emoji_status_expiration_date": {
                         "description": "Expiration date of the emoji status, if any",
@@ -30663,7 +30779,7 @@
                     },
                     "permissions": {
                         "description": "A JSON-serialized object for new default chat permissions",
-                        "$ref": "#/components/schemas/ChatPermissionsInput"
+                        "$ref": "#/components/schemas/InputChatPermissions"
                     }
                 }
             },
@@ -30726,6 +30842,7 @@
                         },
                         "then": {
                             "properties": {
+                                "disable_notification": false,
                                 "chat_id": {
                                     "type": "integer",
                                     "format": "int64"
@@ -30858,8 +30975,8 @@
                     },
                     "icon_custom_emoji_id": {
                         "description": "Unique identifier of the custom emoji shown as the topic icon. Use [getForumTopicIconStickers](https://core.telegram.org/bots/api#getforumtopiciconstickers) to get all allowed custom emoji identifiers.",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     }
                 }
             },
@@ -30887,8 +31004,8 @@
                     },
                     "icon_custom_emoji_id": {
                         "description": "New unique identifier of the custom emoji shown as the topic icon. Use [getForumTopicIconStickers](https://core.telegram.org/bots/api#getforumtopiciconstickers) to get all allowed custom emoji identifiers. Pass an empty string to remove the icon. If not specified, the current icon will be kept.",
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "string",
+                        "pattern": "^-?[0-9]+$"
                     }
                 }
             },
@@ -31319,7 +31436,7 @@
                 "type": "object",
                 "anyOf": [
                     {
-                        "$ref": "#/components/schemas/InlineKeyboardMarkupInput"
+                        "$ref": "#/components/schemas/InputInlineKeyboardMarkup"
                     },
                     {
                         "$ref": "#/components/schemas/ReplyKeyboardMarkup"
@@ -31559,7 +31676,7 @@
                         "result": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/components/schemas/BotCommandOutput"
+                                "$ref": "#/components/schemas/BotCommand"
                             }
                         }
                     }
@@ -31597,7 +31714,7 @@
                             "const": true
                         },
                         "result": {
-                            "$ref": "#/components/schemas/ChatAdministratorRightsOutput"
+                            "$ref": "#/components/schemas/ChatAdministratorRights"
                         }
                     }
                 }
