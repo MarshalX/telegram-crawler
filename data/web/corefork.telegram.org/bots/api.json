@@ -8379,7 +8379,7 @@
                         "const": true
                     },
                     "copy_text": {
-                        "description": "Description of the button that copies the specified text to the clipboard",
+                        "description": "A button that copies the specified text to the clipboard",
                         "$ref": "#/components/schemas/CopyTextButton"
                     },
                     "disabled": {
@@ -8522,7 +8522,7 @@
                         "const": true
                     },
                     "copy_text": {
-                        "description": "Description of the button that copies the specified text to the clipboard",
+                        "description": "A button that copies the specified text to the clipboard",
                         "$ref": "#/components/schemas/CopyTextButton"
                     },
                     "disabled": {
@@ -9477,12 +9477,12 @@
                 ],
                 "properties": {
                     "latitude": {
-                        "description": "Latitude as defined by the sender",
+                        "description": "Latitude of the location",
                         "type": "number",
                         "format": "double"
                     },
                     "longitude": {
-                        "description": "Longitude as defined by the sender",
+                        "description": "Longitude of the location",
                         "type": "number",
                         "format": "double"
                     },
@@ -9526,9 +9526,11 @@
                         "format": "int32"
                     },
                     "heading": {
-                        "description": "The direction in which user is moving, in degrees; 1-360. For active live locations only.",
+                        "description": "The direction in which user is moving, in degrees, 1-360. For active live locations only.",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 1,
+                        "maximum": 360
                     },
                     "proximity_alert_radius": {
                         "description": "The maximum distance for proximity alerts about approaching another chat member, in meters. For sent live locations only.",
@@ -9948,9 +9950,10 @@
                         ]
                     },
                     "correct_option_id": {
-                        "description": "The 0-based identifier of the correct answer option",
+                        "description": "*Deprecated*, use *correct_option_ids* instead. The 0-based identifier of the correct answer option. Available only for polls in quiz mode with exactly one correct answer option which are closed or were sent (not forwarded) by the bot or to the private chat with the bot.",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "deprecated": true
                     },
                     "correct_option_ids": {
                         "description": "Array of 0-based identifiers of the correct answer options. Available only for polls in quiz mode which are closed or were sent (not forwarded) by the bot or to the private chat with the bot.",
@@ -10420,7 +10423,7 @@
                 ],
                 "properties": {
                     "traveler": {
-                        "description": "User that triggered the alert",
+                        "description": "User or chat that triggered the alert",
                         "anyOf": [
                             {
                                 "$ref": "#/components/schemas/User"
@@ -10431,7 +10434,7 @@
                         ]
                     },
                     "watcher": {
-                        "description": "User that set the alert",
+                        "description": "User or chat that set the alert",
                         "anyOf": [
                             {
                                 "$ref": "#/components/schemas/User"
@@ -10883,7 +10886,7 @@
                         "format": "int64"
                     },
                     "user": {
-                        "description": "Information about the user that created the topic. Currently, it is always present.",
+                        "description": "Information about the user that created the topic",
                         "$ref": "#/components/schemas/User"
                     }
                 }
@@ -10997,7 +11000,7 @@
                         "$ref": "#/components/schemas/Invoice"
                     },
                     "giveaway": {
-                        "description": "Message is a scheduled giveaway, information about the giveaway",
+                        "description": "The message is a scheduled giveaway message",
                         "$ref": "#/components/schemas/Giveaway"
                     },
                     "giveaway_winners": {
@@ -11382,7 +11385,7 @@
                         "$ref": "#/components/schemas/GiveawayCreated"
                     },
                     "giveaway": {
-                        "description": "Message is a scheduled giveaway, information about the giveaway",
+                        "description": "The message is a scheduled giveaway message",
                         "$ref": "#/components/schemas/Giveaway"
                     },
                     "giveaway_completed": {
@@ -12632,6 +12635,16 @@
                         "description": "Information about the regular gift",
                         "$ref": "#/components/schemas/Gift"
                     },
+                    "can_be_upgraded": {
+                        "description": "*True*, if the gift can be upgraded to a unique gift; for gifts received on behalf of business accounts only",
+                        "type": "boolean",
+                        "const": true
+                    },
+                    "convert_star_count": {
+                        "description": "Number of Telegram Stars that can be claimed by the receiver instead of the gift; omitted if the gift cannot be converted to Telegram Stars; for gifts received on behalf of business accounts only",
+                        "type": "integer",
+                        "format": "int64"
+                    },
                     "owned_gift_id": {
                         "description": "Unique identifier of the gift for the bot; for gifts received on behalf of business accounts only",
                         "type": "string"
@@ -12670,33 +12683,13 @@
                         "type": "boolean",
                         "const": true
                     },
-                    "can_be_upgraded": {
-                        "description": "*True*, if the gift can be upgraded to a unique gift; for gifts received on behalf of business accounts only",
-                        "type": "boolean",
-                        "const": true
-                    },
-                    "can_be_transferred": {
-                        "description": "*True*, if the gift can be transferred to another owner; for gifts received on behalf of business accounts only",
-                        "type": "boolean",
-                        "const": true
-                    },
                     "was_refunded": {
                         "description": "*True*, if the gift was refunded and isn't available anymore",
                         "type": "boolean",
                         "const": true
                     },
-                    "convert_star_count": {
-                        "description": "Number of Telegram Stars that can be claimed by the receiver instead of the gift; omitted if the gift cannot be converted to Telegram Stars; for gifts received on behalf of business accounts only",
-                        "type": "integer",
-                        "format": "int64"
-                    },
                     "prepaid_upgrade_star_count": {
                         "description": "Number of Telegram Stars that were paid for the ability to upgrade the gift",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "transfer_star_count": {
-                        "description": "Number of Telegram Stars that must be paid to transfer the gift; omitted if the bot cannot transfer the gift",
                         "type": "integer",
                         "format": "int64"
                     },
@@ -12735,6 +12728,16 @@
                         "description": "Information about the unique gift",
                         "$ref": "#/components/schemas/UniqueGift"
                     },
+                    "can_be_transferred": {
+                        "description": "*True*, if the gift can be transferred to another owner; for gifts received on behalf of business accounts only",
+                        "type": "boolean",
+                        "const": true
+                    },
+                    "transfer_star_count": {
+                        "description": "Number of Telegram Stars that must be paid to transfer the gift; omitted if the bot cannot transfer the gift",
+                        "type": "integer",
+                        "format": "int64"
+                    },
                     "owned_gift_id": {
                         "description": "Unique identifier of the gift for the bot; for gifts received on behalf of business accounts only",
                         "type": "string"
@@ -12773,33 +12776,13 @@
                         "type": "boolean",
                         "const": true
                     },
-                    "can_be_upgraded": {
-                        "description": "*True*, if the gift can be upgraded to a unique gift; for gifts received on behalf of business accounts only",
-                        "type": "boolean",
-                        "const": true
-                    },
-                    "can_be_transferred": {
-                        "description": "*True*, if the gift can be transferred to another owner; for gifts received on behalf of business accounts only",
-                        "type": "boolean",
-                        "const": true
-                    },
                     "was_refunded": {
                         "description": "*True*, if the gift was refunded and isn't available anymore",
                         "type": "boolean",
                         "const": true
                     },
-                    "convert_star_count": {
-                        "description": "Number of Telegram Stars that can be claimed by the receiver instead of the gift; omitted if the gift cannot be converted to Telegram Stars; for gifts received on behalf of business accounts only",
-                        "type": "integer",
-                        "format": "int64"
-                    },
                     "prepaid_upgrade_star_count": {
                         "description": "Number of Telegram Stars that were paid for the ability to upgrade the gift",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "transfer_star_count": {
-                        "description": "Number of Telegram Stars that must be paid to transfer the gift; omitted if the bot cannot transfer the gift",
                         "type": "integer",
                         "format": "int64"
                     },
@@ -12923,9 +12906,8 @@
                         "type": "boolean"
                     },
                     "gifts_from_channels": {
-                        "description": "*True*, if transfers of unique gifts from channels are accepted, defaults to *True*",
-                        "type": "boolean",
-                        "default": true
+                        "description": "*True*, if transfers of unique gifts from channels are accepted",
+                        "type": "boolean"
                     }
                 }
             },
@@ -13094,9 +13076,11 @@
                         "$ref": "#/components/schemas/RichText"
                     },
                     "size": {
-                        "description": "Relative size of the text font; 1-6, 1 is the largest, 6 is the smallest",
+                        "description": "Relative size of the text font, 1-6; 1 is the largest, 6 is the smallest",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 1,
+                        "maximum": 6
                     }
                 }
             },
@@ -13497,7 +13481,7 @@
                         }
                     },
                     "align": {
-                        "description": "Horizontal alignment of the buttons. Currently, must be one of \"left\", \"center\", or \"right\".",
+                        "description": "Horizontal alignment of the buttons, currently can be \"left\", \"center\", or \"right\"",
                         "type": "string",
                         "enum": [
                             "left",
@@ -14789,7 +14773,7 @@
                         "$ref": "#/components/schemas/InputSwitchInlineQueryChosenChat"
                     },
                     "copy_text": {
-                        "description": "Description of the button that copies the specified text to the clipboard",
+                        "description": "A button that copies the specified text to the clipboard",
                         "$ref": "#/components/schemas/CopyTextButton"
                     },
                     "disabled": {
@@ -14910,7 +14894,7 @@
                         "$ref": "#/components/schemas/SwitchInlineQueryChosenChat"
                     },
                     "copy_text": {
-                        "description": "Description of the button that copies the specified text to the clipboard",
+                        "description": "A button that copies the specified text to the clipboard",
                         "$ref": "#/components/schemas/CopyTextButton"
                     },
                     "disabled": {
@@ -14990,7 +14974,7 @@
                         "format": "int32"
                     },
                     "align": {
-                        "description": "Horizontal cell content alignment, currently can be \"left\", \"center\", or \"right\", defaults to \"left\", or \"center\" if *is_header* is *True*",
+                        "description": "Horizontal cell content alignment, currently can be \"left\", \"center\", or \"right\"",
                         "type": "string",
                         "enum": [
                             "left",
@@ -14999,14 +14983,13 @@
                         ]
                     },
                     "valign": {
-                        "description": "Vertical cell content alignment, currently can be \"top\", \"middle\", or \"bottom\", defaults to \"middle\"",
+                        "description": "Vertical cell content alignment, currently can be \"top\", \"middle\", or \"bottom\"",
                         "type": "string",
                         "enum": [
                             "top",
                             "middle",
                             "bottom"
-                        ],
-                        "default": "middle"
+                        ]
                     }
                 }
             },
@@ -15809,7 +15792,7 @@
                         "const": "emoji"
                     },
                     "emoji": {
-                        "description": "Reaction emoji. Currently, it can be one of {emoji_reactions}.",
+                        "description": "Reaction emoji.",
                         "type": "string"
                     }
                 }
@@ -16413,7 +16396,7 @@
                         "const": "wallpaper"
                     },
                     "document": {
-                        "description": "Document with the wallpaper or pattern",
+                        "description": "Document with the background image",
                         "$ref": "#/components/schemas/Document"
                     },
                     "dark_theme_dimming": {
@@ -16451,7 +16434,7 @@
                         "const": "pattern"
                     },
                     "document": {
-                        "description": "Document with the wallpaper or pattern",
+                        "description": "Document with the background image",
                         "$ref": "#/components/schemas/Document"
                     },
                     "fill": {
@@ -18280,7 +18263,7 @@
                         "format": "int32"
                     },
                     "gift": {
-                        "description": "The gift sent by the bot; for \"gift_purchase\" transactions only",
+                        "description": "The gift that the bot bought and sent; for \"gift_purchase\" transactions only",
                         "$ref": "#/components/schemas/Gift"
                     },
                     "premium_subscription_duration": {
@@ -18309,7 +18292,7 @@
                         "$ref": "#/components/schemas/Chat"
                     },
                     "gift": {
-                        "description": "The gift sent by the bot; for \"gift_purchase\" transactions only",
+                        "description": "The gift that the bot bought and sent; for \"gift_purchase\" transactions only",
                         "$ref": "#/components/schemas/Gift"
                     }
                 }
@@ -18615,8 +18598,9 @@
                         "const": "article"
                     },
                     "id": {
-                        "description": "Unique identifier for this result, 1-64 Bytes",
-                        "type": "string"
+                        "description": "Unique identifier for this result, 1-64 bytes",
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent",
@@ -18671,7 +18655,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the audio",
@@ -18688,7 +18673,9 @@
                     },
                     "caption": {
                         "description": "Caption, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -18736,7 +18723,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the audio",
@@ -18753,7 +18741,9 @@
                     },
                     "caption": {
                         "description": "Caption, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -18788,8 +18778,9 @@
                         "const": "contact"
                     },
                     "id": {
-                        "description": "Unique identifier for this result, 1-64 Bytes",
-                        "type": "string"
+                        "description": "Unique identifier for this result, 1-64 bytes",
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the contact",
@@ -18827,7 +18818,8 @@
                     },
                     "vcard": {
                         "description": "Additional data about the contact in the form of a [vCard](https://en.wikipedia.org/wiki/VCard), 0-2048 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0
                     }
                 }
             },
@@ -18849,7 +18841,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the file",
@@ -18866,7 +18859,9 @@
                     },
                     "caption": {
                         "description": "Caption of the document to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -18928,7 +18923,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the file",
@@ -18945,7 +18941,9 @@
                     },
                     "caption": {
                         "description": "Caption of the document to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -18988,7 +18986,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "reply_markup": {
                         "description": "[Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message",
@@ -19017,7 +19016,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the GIF animation",
@@ -19034,7 +19034,9 @@
                     },
                     "caption": {
                         "description": "Caption of the GIF file to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19100,7 +19102,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the GIF animation",
@@ -19117,7 +19120,9 @@
                     },
                     "caption": {
                         "description": "Caption of the GIF file to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19161,8 +19166,9 @@
                         "const": "location"
                     },
                     "id": {
-                        "description": "Unique identifier for this result, 1-64 Bytes",
-                        "type": "string"
+                        "description": "Unique identifier for this result, 1-64 bytes",
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the location",
@@ -19197,9 +19203,11 @@
                         "format": "double"
                     },
                     "horizontal_accuracy": {
-                        "description": "The radius of uncertainty for the location, measured in meters; 0-1500",
+                        "description": "The radius of uncertainty for the location, measured in meters, 0-1500",
                         "type": "number",
-                        "format": "double"
+                        "format": "double",
+                        "minimum": 0,
+                        "maximum": 1500
                     },
                     "live_period": {
                         "description": "Period in seconds during which the location can be updated, must be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely",
@@ -19207,14 +19215,18 @@
                         "format": "int32"
                     },
                     "heading": {
-                        "description": "For live locations, a direction in which the user is moving, in degrees. Must be between 1 and 360 if specified.",
+                        "description": "For live locations, a direction in which the user is moving, in degrees. Values between 1-360 are accepted.",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 1,
+                        "maximum": 360
                     },
                     "proximity_alert_radius": {
-                        "description": "For live locations, a maximum distance for proximity alerts about approaching another chat member, in meters. Must be between 1 and 100000 if specified.",
+                        "description": "For live locations, a maximum distance for proximity alerts about approaching another chat member, in meters. Values between 1-100000 are accepted.",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 1,
+                        "maximum": 100000
                     },
                     "title": {
                         "description": "Location title",
@@ -19239,7 +19251,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the video animation",
@@ -19256,7 +19269,9 @@
                     },
                     "caption": {
                         "description": "Caption of the MPEG-4 file to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19322,7 +19337,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the video animation",
@@ -19339,7 +19355,9 @@
                     },
                     "caption": {
                         "description": "Caption of the MPEG-4 file to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19383,7 +19401,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the photo",
@@ -19400,7 +19419,9 @@
                     },
                     "caption": {
                         "description": "Caption of the photo to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19461,7 +19482,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the photo",
@@ -19478,7 +19500,9 @@
                     },
                     "caption": {
                         "description": "Caption of the photo to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19525,7 +19549,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the sticker",
@@ -19559,8 +19584,9 @@
                         "const": "venue"
                     },
                     "id": {
-                        "description": "Unique identifier for this result, 1-64 Bytes",
-                        "type": "string"
+                        "description": "Unique identifier for this result, 1-64 bytes",
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the venue",
@@ -19639,7 +19665,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the video. This field is **required** if InlineQueryResultVideo is used to send an HTML-page as a result (e.g., a YouTube video).",
@@ -19656,7 +19683,9 @@
                     },
                     "caption": {
                         "description": "Caption of the video to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19727,7 +19756,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the video",
@@ -19744,7 +19774,9 @@
                     },
                     "caption": {
                         "description": "Caption of the video to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19792,7 +19824,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the voice recording",
@@ -19809,7 +19842,9 @@
                     },
                     "caption": {
                         "description": "Caption, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19854,7 +19889,8 @@
                     },
                     "id": {
                         "description": "Unique identifier for this result, 1-64 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "input_message_content": {
                         "description": "Content of the message to be sent instead of the voice message",
@@ -19871,7 +19907,9 @@
                     },
                     "caption": {
                         "description": "Caption, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "caption_entities": {
                         "description": "List of special entities that appear in the caption, which can be specified instead of *parse_mode*",
@@ -19991,9 +20029,11 @@
                         "type": "boolean"
                     },
                     "max_quantity": {
-                        "description": "The maximum number of users to be selected; 1-10. Defaults to 1.",
+                        "description": "The maximum number of users to be selected, 1-10, defaults to 1",
                         "type": "integer",
                         "format": "int32",
+                        "minimum": 1,
+                        "maximum": 10,
                         "default": 1
                     },
                     "request_name": {
@@ -20205,11 +20245,12 @@
                         "$ref": "#/components/schemas/MaskPosition"
                     },
                     "keywords": {
-                        "description": "List of 0-20 search keywords for the sticker with total length of up to 64 characters. For \"regular\" and \"custom_emoji\" stickers only.",
+                        "description": "List of search keywords for the sticker with total length of up to 64 characters, at most 20 elements. For \"regular\" and \"custom_emoji\" stickers only.",
                         "type": "array",
                         "items": {
                             "type": "string"
-                        }
+                        },
+                        "maxItems": 20
                     }
                 }
             },
@@ -20223,7 +20264,9 @@
                 "properties": {
                     "caption": {
                         "description": "Caption of the photo to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the caption. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -20272,7 +20315,9 @@
                 "properties": {
                     "caption": {
                         "description": "Caption of the live photo to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the caption. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -20325,7 +20370,9 @@
                 "properties": {
                     "caption": {
                         "description": "Caption of the video to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the caption. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -20406,7 +20453,9 @@
                 "properties": {
                     "caption": {
                         "description": "Caption of the animation to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the caption. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -20473,7 +20522,9 @@
                 "properties": {
                     "caption": {
                         "description": "Caption of the audio to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the caption. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -20530,7 +20581,9 @@
                 "properties": {
                     "caption": {
                         "description": "Caption of the document to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the caption. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -20628,9 +20681,11 @@
                         "format": "double"
                     },
                     "horizontal_accuracy": {
-                        "description": "The radius of uncertainty for the location, measured in meters; 0-1500",
+                        "description": "The radius of uncertainty for the location, measured in meters, 0-1500",
                         "type": "number",
-                        "format": "double"
+                        "format": "double",
+                        "minimum": 0,
+                        "maximum": 1500
                     }
                 }
             },
@@ -20972,9 +21027,11 @@
                         "pattern": "^attach://."
                     },
                     "duration": {
-                        "description": "Precise duration of the video in seconds; 0-60",
+                        "description": "Precise duration of the video in seconds, 0-60",
                         "type": "number",
-                        "format": "double"
+                        "format": "double",
+                        "minimum": 0,
+                        "maximum": 60
                     },
                     "cover_frame_timestamp": {
                         "description": "Timestamp in seconds of the frame that will be used as the static cover for the story. Defaults to 0.0.",
@@ -21039,9 +21096,11 @@
                         "format": "double"
                     },
                     "rotation_angle": {
-                        "description": "The clockwise rotation angle of the rectangle, in degrees; 0-360",
+                        "description": "The clockwise rotation angle of the rectangle, in degrees, 0-360",
                         "type": "number",
-                        "format": "double"
+                        "format": "double",
+                        "minimum": 0,
+                        "maximum": 360
                     },
                     "corner_radius_percentage": {
                         "description": "The radius of the rectangle corner rounding, as a percentage of the media width",
@@ -21082,8 +21141,10 @@
                         "format": "int32"
                     },
                     "text": {
-                        "description": "Text of the task; 1-100 characters after entities parsing",
-                        "type": "string"
+                        "description": "Text of the task, 1-100 characters after entities parsing",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the text. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -21112,8 +21173,10 @@
                 ],
                 "properties": {
                     "title": {
-                        "description": "Title of the checklist; 1-255 characters after entities parsing",
-                        "type": "string"
+                        "description": "Title of the checklist, 1-255 characters after entities parsing",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the title. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -21140,11 +21203,13 @@
                         "type": "boolean"
                     },
                     "tasks": {
-                        "description": "List of 1-30 tasks in the checklist",
+                        "description": "List of tasks in the checklist, 1-30 elements",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/InputChecklistTask"
-                        }
+                        },
+                        "minItems": 1,
+                        "maxItems": 30
                     }
                 }
             },
@@ -21356,7 +21421,9 @@
                 "properties": {
                     "text": {
                         "description": "Option text, 1-100 characters",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
                     },
                     "text_parse_mode": {
                         "description": "Mode for parsing entities in the text. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details. Currently, only custom emoji entities are allowed.",
@@ -21403,7 +21470,8 @@
                     "message_text": {
                         "description": "Text of the message to be sent, 1-4096 characters",
                         "type": "string",
-                        "minLength": 1
+                        "minLength": 1,
+                        "maxLength": 4096
                     },
                     "link_preview_options": {
                         "description": "Link preview generation options for the message",
@@ -21495,7 +21563,8 @@
                     },
                     "vcard": {
                         "description": "Additional data about the contact in the form of a [vCard](https://en.wikipedia.org/wiki/VCard), 0-2048 bytes",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0
                     }
                 }
             },
@@ -21512,15 +21581,20 @@
                 "properties": {
                     "title": {
                         "description": "Product name, 1-32 characters",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 32
                     },
                     "description": {
                         "description": "Product description, 1-255 characters",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
                     },
                     "payload": {
                         "description": "Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use it for your internal processes.",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                     },
                     "provider_token": {
                         "description": "Payment provider token, obtained via [@BotFather](https://t.me/botfather). Pass an empty string for payments in [Telegram Stars](https://t.me/BotNews/90).",
@@ -21547,12 +21621,13 @@
                         "format": "int64"
                     },
                     "suggested_tip_amounts": {
-                        "description": "A JSON-serialized Array of suggested amounts of tip in the *smallest units* of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed *max_tip_amount*.",
+                        "description": "A JSON-serialized Array of suggested amounts of tip in the *smallest units* of the currency (integer, **not** float/double). Must have at most 4 elements. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed *max_tip_amount*.",
                         "type": "array",
                         "items": {
                             "type": "integer",
                             "format": "int64"
-                        }
+                        },
+                        "maxItems": 4
                     },
                     "photo_url": {
                         "description": "URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service.",
@@ -21646,9 +21721,11 @@
                         "format": "double"
                     },
                     "horizontal_accuracy": {
-                        "description": "The radius of uncertainty for the location, measured in meters; 0-1500",
+                        "description": "The radius of uncertainty for the location, measured in meters, 0-1500",
                         "type": "number",
-                        "format": "double"
+                        "format": "double",
+                        "minimum": 0,
+                        "maximum": 1500
                     },
                     "live_period": {
                         "description": "Period in seconds during which the location can be updated, must be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely",
@@ -21656,14 +21733,18 @@
                         "format": "int32"
                     },
                     "heading": {
-                        "description": "For live locations, a direction in which the user is moving, in degrees. Must be between 1 and 360 if specified.",
+                        "description": "For live locations, a direction in which the user is moving, in degrees. Values between 1-360 are accepted.",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 1,
+                        "maximum": 360
                     },
                     "proximity_alert_radius": {
-                        "description": "For live locations, a maximum distance for proximity alerts about approaching another chat member, in meters. Must be between 1 and 100000 if specified.",
+                        "description": "For live locations, a maximum distance for proximity alerts about approaching another chat member, in meters. Values between 1-100000 are accepted.",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 1,
+                        "maximum": 100000
                     }
                 }
             },
@@ -21685,8 +21766,10 @@
                         "type": "boolean"
                     },
                     "quote": {
-                        "description": "Quoted part of the message to be replied to; 0-1024 characters after entities parsing. The quote must be an exact substring of the message to be replied to, including *bold*, *italic*, *underline*, *strikethrough*, *spoiler*, *custom_emoji*, and *date_time* entities. The message will fail to send if the quote isn't found in the original message. Ignored for ephemeral messages.",
-                        "type": "string"
+                        "description": "Quoted part of the message to be replied to, 0-1024 characters after entities parsing. The quote must be an exact substring of the message to be replied to, including *bold*, *italic*, *underline*, *strikethrough*, *spoiler*, *custom_emoji*, and *date_time* entities. The message will fail to send if the quote isn't found in the original message. Ignored for ephemeral messages.",
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "quote_parse_mode": {
                         "description": "Mode for parsing entities in the quote. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -21727,7 +21810,7 @@
             },
             "EphemeralMessageParameters": {
                 "type": "object",
-                "description": "",
+                "description": "Describes the parameters of an ephemeral message that is being sent.",
                 "required": [
                     "receiver_user_id"
                 ],
@@ -22322,9 +22405,11 @@
                         "$ref": "#/components/schemas/InputRichText"
                     },
                     "size": {
-                        "description": "Relative size of the text font; 1-6, 1 is the largest, 6 is the smallest",
+                        "description": "Relative size of the text font, 1-6; 1 is the largest, 6 is the smallest",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 1,
+                        "maximum": 6
                     }
                 }
             },
@@ -22700,19 +22785,25 @@
                         "$ref": "#/components/schemas/InputLocation"
                     },
                     "zoom": {
-                        "description": "Map zoom level; 0-24",
+                        "description": "Map zoom level, 0-24",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 0,
+                        "maximum": 24
                     },
                     "width": {
-                        "description": "Map width; 0-10000",
+                        "description": "Map width, 0-10000",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 0,
+                        "maximum": 10000
                     },
                     "height": {
-                        "description": "Map height; 0-10000",
+                        "description": "Map height, 0-10000",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "minimum": 0,
+                        "maximum": 10000
                     },
                     "caption": {
                         "description": "Caption of the block",
@@ -22734,14 +22825,16 @@
                         "const": "buttons"
                     },
                     "buttons": {
-                        "description": "List of 1-8 buttons to send",
+                        "description": "List of buttons to send, 1-8 elements",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/InputRichMessageButton"
-                        }
+                        },
+                        "minItems": 1,
+                        "maxItems": 8
                     },
                     "align": {
-                        "description": "Horizontal alignment of the buttons. Currently, must be one of \"left\", \"center\", or \"right\".",
+                        "description": "Horizontal alignment of the buttons, must be one of \"left\", \"center\", or \"right\"",
                         "type": "string",
                         "enum": [
                             "left",
@@ -23402,8 +23495,10 @@
                         "type": "boolean"
                     },
                     "input_field_placeholder": {
-                        "description": "The placeholder to be shown in the input field when the keyboard is active; 1-64 characters",
-                        "type": "string"
+                        "description": "The placeholder to be shown in the input field when the keyboard is active, 1-64 characters",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
                     },
                     "resize_keyboard": {
                         "description": "Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to *False*, in which case the custom keyboard is always of the same height as the app's standard keyboard.",
@@ -23500,8 +23595,10 @@
                         "const": true
                     },
                     "input_field_placeholder": {
-                        "description": "The placeholder to be shown in the input field when the reply is active; 1-64 characters",
-                        "type": "string"
+                        "description": "The placeholder to be shown in the input field when the reply is active, 1-64 characters",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
                     }
                 }
             },
@@ -23515,7 +23612,9 @@
                 "properties": {
                     "caption": {
                         "description": "Caption of the voice message to be sent, 0-1024 characters after entities parsing",
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 1024
                     },
                     "parse_mode": {
                         "description": "Mode for parsing entities in the caption. See [formatting options](https://core.telegram.org/bots/api#formatting-options) for more details.",
@@ -23927,7 +24026,7 @@
                         "type": "string"
                     },
                     "from_chat_id": {
-                        "description": "Unique identifier of the chat which posted the story that should be reposted",
+                        "description": "Unique identifier of the chat which posted the story that should be reposted or username of the channel in the format `@username`",
                         "$ref": "#/components/schemas/ChatId"
                     },
                     "story_id": {
@@ -26066,11 +26165,6 @@
                         "type": "integer",
                         "format": "int32"
                     },
-                    "direct_messages_topic_id": {
-                        "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat",
-                        "type": "integer",
-                        "format": "int64"
-                    },
                     "business_connection_id": {
                         "description": "Unique identifier of the business connection on behalf of which the message will be sent",
                         "type": "string"
@@ -26082,10 +26176,6 @@
                     "reply_parameters": {
                         "description": "Description of the message to reply to",
                         "$ref": "#/components/schemas/ReplyParameters"
-                    },
-                    "suggested_post_parameters": {
-                        "description": "A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.",
-                        "$ref": "#/components/schemas/SuggestedPostParameters"
                     },
                     "disable_notification": {
                         "description": "Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.",
@@ -26164,7 +26254,7 @@
                         "minLength": 1
                     },
                     "chat_id": {
-                        "description": "Required if *inline_message_id* is not specified. Unique identifier for the target chat.",
+                        "description": "Required if *inline_message_id* is not specified. Unique identifier for the target chat or username of the target bot in the format `@username`.",
                         "$ref": "#/components/schemas/ChatId"
                     },
                     "message_id": {
@@ -26218,7 +26308,7 @@
                         "minLength": 1
                     },
                     "chat_id": {
-                        "description": "Required if *inline_message_id* is not specified. Unique identifier for the target chat.",
+                        "description": "Required if *inline_message_id* is not specified. Unique identifier for the target chat or username of the target bot in the format `@username`.",
                         "$ref": "#/components/schemas/ChatId"
                     },
                     "message_id": {
@@ -28937,11 +29027,6 @@
                         "type": "integer",
                         "format": "int32"
                     },
-                    "direct_messages_topic_id": {
-                        "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat",
-                        "type": "integer",
-                        "format": "int64"
-                    },
                     "business_connection_id": {
                         "description": "Unique identifier of the business connection on behalf of which the message will be sent",
                         "type": "string"
@@ -28953,10 +29038,6 @@
                     "reply_parameters": {
                         "description": "Description of the message to reply to",
                         "$ref": "#/components/schemas/ReplyParameters"
-                    },
-                    "suggested_post_parameters": {
-                        "description": "A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.",
-                        "$ref": "#/components/schemas/SuggestedPostParameters"
                     },
                     "disable_notification": {
                         "description": "Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.",
@@ -29019,31 +29100,13 @@
                         "description": "Unique identifier for the target chat or username of the target bot in the format `@username`",
                         "$ref": "#/components/schemas/ChatId"
                     },
-                    "message_thread_id": {
-                        "description": "Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only",
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "direct_messages_topic_id": {
-                        "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat",
-                        "type": "integer",
-                        "format": "int64"
-                    },
                     "business_connection_id": {
                         "description": "Unique identifier of the business connection on behalf of which the message will be sent",
                         "type": "string"
                     },
-                    "ephemeral_message_parameters": {
-                        "description": "A JSON-serialized object containing the parameters of the ephemeral message to send",
-                        "$ref": "#/components/schemas/EphemeralMessageParameters"
-                    },
                     "reply_parameters": {
                         "description": "Description of the message to reply to",
                         "$ref": "#/components/schemas/ReplyParameters"
-                    },
-                    "suggested_post_parameters": {
-                        "description": "A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only. If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.",
-                        "$ref": "#/components/schemas/SuggestedPostParameters"
                     },
                     "disable_notification": {
                         "description": "Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.",
@@ -29051,10 +29114,6 @@
                     },
                     "protect_content": {
                         "description": "Protects the contents of the sent message from forwarding and saving",
-                        "type": "boolean"
-                    },
-                    "allow_paid_broadcast": {
-                        "description": "Pass *True* to allow up to 1000 messages per second, ignoring [broadcasting limits](https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once) for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance.",
                         "type": "boolean"
                     },
                     "message_effect_id": {
@@ -29165,7 +29224,7 @@
                 ],
                 "properties": {
                     "chat_id": {
-                        "description": "Unique identifier for the target private chat",
+                        "description": "Unique identifier for the target private chat or username of the target bot in the format `@username`",
                         "$ref": "#/components/schemas/ChatId"
                     },
                     "message_thread_id": {
@@ -29219,7 +29278,7 @@
                 ],
                 "properties": {
                     "chat_id": {
-                        "description": "Unique identifier for the target private chat",
+                        "description": "Unique identifier for the target private chat or username of the target bot in the format `@username`",
                         "$ref": "#/components/schemas/ChatId"
                     },
                     "message_thread_id": {
@@ -29391,9 +29450,10 @@
                         "maxItems": 4
                     },
                     "subscription_period": {
-                        "description": "The number of seconds the subscription will be active for before the next payment. The currency must be set to \"XTR\" (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user. Subscription price must no exceed 10000 Telegram Stars.",
+                        "description": "The number of seconds the subscription will be active for before the next payment, which is currently always 30 days. Must be 2592000. The currency must be set to \"XTR\" (Telegram Stars) if the parameter is used. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user. Subscription price must no exceed 10000 Telegram Stars.",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "const": 2592000
                     },
                     "need_name": {
                         "description": "Pass *True* if you require the user's full name to complete the order. Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).",
@@ -29573,10 +29633,6 @@
                         "description": "JSON-serialized data about the invoice, which will be shared with the payment provider. A detailed description of required fields should be provided by the payment provider.",
                         "type": "string"
                     },
-                    "start_parameter": {
-                        "description": "Unique deep-linking parameter. If left empty, **forwarded copies** of the sent message will have a *Pay* button, allowing multiple users to pay directly from the forwarded message, using the same invoice. If non-empty, forwarded copies of the sent message will have a *URL* button with a deep link to the bot (instead of a *Pay* button), with the value used as the start parameter.",
-                        "type": "string"
-                    },
                     "currency": {
                         "description": "Three-letter ISO 4217 currency code, see [more on currencies](https://core.telegram.org/bots/payments#supported-currencies). Pass \"XTR\" for payments in [Telegram Stars](https://t.me/BotNews/90).",
                         "type": "string",
@@ -29604,9 +29660,10 @@
                         "maxItems": 4
                     },
                     "subscription_period": {
-                        "description": "The number of seconds the subscription will be active for before the next payment. The currency must be set to \"XTR\" (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user. Subscription price must no exceed 10000 Telegram Stars.",
+                        "description": "The number of seconds the subscription will be active for before the next payment, which is currently always 30 days. Must be 2592000. The currency must be set to \"XTR\" (Telegram Stars) if the parameter is used. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user. Subscription price must no exceed 10000 Telegram Stars.",
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int32",
+                        "const": 2592000
                     },
                     "need_name": {
                         "description": "Pass *True* if you require the user's full name to complete the order. Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).",
@@ -30578,7 +30635,7 @@
                         "maxLength": 32
                     },
                     "subscription_period": {
-                        "description": "The number of seconds the subscription will be active for before the next payment. Must be 2592000. That is 30 days, the only period currently allowed.",
+                        "description": "The number of seconds the subscription will be active for before the next payment, which is currently always 30 days. Must be 2592000.",
                         "type": "integer",
                         "format": "int32",
                         "const": 2592000
