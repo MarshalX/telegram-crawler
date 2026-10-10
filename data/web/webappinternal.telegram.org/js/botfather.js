@@ -2993,3 +2993,111 @@ var BotConsole = {
   },
 };
 
+var BotEndpointCreate = {
+  init() {
+    var $input = $('#endpoint-name');
+
+    $input.on('input', function() {
+      var filtered = $input.val().replace(/[^a-zA-Z0-9_]/g, '');
+      if (filtered && !/^[a-zA-Z]/.test(filtered)) {
+        filtered = filtered.substring(1);
+      }
+      $input.val(filtered);
+    });
+
+    WebApp.MainButton.setText(uncleanHTML(l('WEB_GENERIC_CONTINUE')));
+    WebApp.MainButton.show();
+    WebApp.MainButton.onClick(BotEndpointCreate.onContinue);
+    Aj.onUnload(function() {
+      WebApp.MainButton.hide();
+      WebApp.MainButton.offClick(BotEndpointCreate.onContinue);
+    });
+  },
+
+  onContinue() {
+    var name = $('#endpoint-name').val().trim();
+    if (!name || !/^[a-z][a-z0-9_]{0,62}[a-z0-9]$/i.test(name)) {
+      TWebApp.showErrorToast(l('WEB_ENDPOINT_NAME_INVALID'));
+      $('#endpoint-name').focus();
+      return;
+    }
+    WebApp.MainButton.showProgress();
+    Aj.apiRequest('checkCloudModuleName', { bid: Aj.state.botId, module: 'endpoints/' + name }, function(res) {
+      WebApp.MainButton.hideProgress();
+      if (res.error) {
+        TWebApp.showErrorToast(res.error);
+        return;
+      }
+      if (!res.exists) {
+        Aj.location('/botfather/bot/' + Aj.state.botId + '/serverless/endpoint/' + name);
+        return;
+      }
+      WebApp.showPopup({
+        title: uncleanHTML(l('WEB_ENDPOINT_EXISTS_TITLE')),
+        message: uncleanHTML(l('WEB_ENDPOINT_EXISTS_BODY')),
+        buttons: [
+          { id: 'edit', text: uncleanHTML(l('WEB_ENDPOINT_EXISTS_EDIT')) },
+          { type: 'cancel' },
+        ],
+      }, function(result) {
+        if (result === 'edit') {
+          Aj.location('/botfather/bot/' + Aj.state.botId + '/serverless/endpoint/' + name);
+        } else {
+          $('#endpoint-name').focus();
+        }
+      });
+    });
+  },
+};
+
+var BotEndpoint = {
+  init() {
+    var isNew = Aj.state.isEndpointNew;
+
+    BotCodeEditor.init('endpoint-editor', {
+      apiMethod: 'saveCloudEndpoint',
+      apiParams: { name: Aj.state.endpointName, new: isNew ? 1 : 0 },
+      savedLangKey: 'WEB_ENDPOINT_SAVED',
+      saveErrorLangKey: 'WEB_ENDPOINT_SAVE_ERROR',
+    });
+
+    BotConsole.init(Aj.state.endpointName);
+
+    if (!isNew) {
+      $(document).on('click.curPage', '.js-editor-delete', function() {
+        WebApp.showPopup({
+          title: uncleanHTML(l('WEB_ENDPOINT_DELETE_CONFIRM_TITLE')),
+          message: uncleanHTML(l('WEB_ENDPOINT_DELETE_CONFIRM_BODY')),
+          buttons: [
+            { id: 'delete', text: uncleanHTML(l('WEB_EDITOR_DELETE')), type: 'destructive' },
+            { type: 'cancel' },
+          ]
+        }, function(result) {
+          if (result !== 'delete') return;
+          Aj.apiRequest('deleteCloudEndpoint', { bid: Aj.state.botId, name: Aj.state.endpointName }, function(res) {
+            if (res.ok) {
+              Aj.onUnload(function() { TWebApp.showSuccessToast(l('WEB_ENDPOINT_DELETED')); });
+              TBackButton.onClick();
+            } else {
+              TWebApp.showErrorToast(res.error);
+            }
+          });
+        });
+      });
+    }
+  },
+};
+
+var BotStatic = {
+  init() {
+    $(document).on('click.static', '.copy-btn', function () {
+      navigator.clipboard.writeText(this.dataset.value);
+      TWebApp.showSuccessToast(l('WEB_GENERIC_COPY_SUCCESS'));
+    });
+
+    Aj.onUnload(() => {
+      $(document).off('click.static', '.copy-btn');
+    });
+  },
+};
+
