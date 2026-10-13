@@ -1,6 +1,6 @@
 # Bot API Library Examples
 
-> A **full tutorial** covering everything from [configuring your environment](/bots/tutorial#getting-ready) to [deploying](/bots/tutorial#hosting) your finished bot is available [here](/bots/tutorial).
+> A **full tutorial** covering everything from [configuring your environment](/bots/tutorial.md#getting-ready) to [deploying](/bots/tutorial.md#hosting) your finished bot is available [here](/bots/tutorial.md).
 
 This page lists some libraries and frameworks **developed by the Telegram community** – you should take care to report any bugs you may find to the respective developers, as these projects are not maintained by Telegram.
 

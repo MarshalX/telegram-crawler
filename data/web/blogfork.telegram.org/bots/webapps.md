@@ -3,7 +3,7 @@
 
 With **Mini Apps** developers can use *JavaScript* to create **infinitely flexible interfaces** that can be launched right inside Telegram — and can completely replace **any website**.
 
-Like bots, **Mini Apps** support [seamless authorization](https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots), payments via third-party [payment providers](/bots/payments) (with *Google Pay* and *Apple Pay* out of the box), delivering tailored push notifications to users, and [much more](/bots).
+Like bots, **Mini Apps** support [seamless authorization](https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots), payments via third-party [payment providers](/bots/payments.md) (with *Google Pay* and *Apple Pay* out of the box), delivering tailored push notifications to users, and [much more](/bots.md).
 
 <div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
  <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/464001434/100bf/eWprjdgzEbE.100386/644bbea83084f44c8f" style="max-width: 600px;" title="console.log('Vive la révolution')" alt="Bot Revolution">
@@ -73,13 +73,13 @@ Like bots, **Mini Apps** support [seamless authorization](https://telegram.org/b
 
 - Mini Apps can now prompt users to set their [emoji status](https://telegram.org/blog/fullscreen-miniapps-and-more#emoji-statuses-from-apps) – or request access to later sync it automatically with in-game badges, third-party APIs and more.
 - Added the method *setEmojiStatus* to let users manually confirm a custom emoji as their new status via a native dialog.
-- Added the method *requestEmojiStatusAccess* for obtaining permission to later update a user's emoji status via the Bot API method [setUserEmojiStatus](/bots/api#setuseremojistatus).
+- Added the method *requestEmojiStatusAccess* for obtaining permission to later update a user's emoji status via the Bot API method [setUserEmojiStatus](/bots/api/methods/setuseremojistatus.md).
 - Added the [events](#events-available-for-mini-apps) *emojiStatusSet*, *emojiStatusFailed* and *emojiStatusAccessRequested*.
 
 **Media Sharing and File Downloads**
 
 - Users can now [share media](https://telegram.org/blog/fullscreen-miniapps-and-more#media-sharing) directly from Mini Apps – sending **referral codes**, custom memes, artwork and more to **any chat** or posting them [as a story](https://telegram.org/blog/w3-browser-mini-app-store#sharing-from-mini-apps-to-stories).
-- Added the method *shareMessage* to share media from Mini Apps to Telegram chats. Also see [PreparedInlineMessage](/bots/api#preparedinlinemessage).
+- Added the method *shareMessage* to share media from Mini Apps to Telegram chats. Also see [PreparedInlineMessage](/bots/api/types/preparedinlinemessage.md).
 - Added the method *downloadFile*, introducing support for a **native popup** that prompts users to download files from the Mini App.
 - Added the [events](#events-available-for-mini-apps) *shareMessageSent*, *shareMessageFailed* and *fileDownloadRequested*.
 
@@ -100,7 +100,7 @@ Like bots, **Mini Apps** support [seamless authorization](https://telegram.org/b
 
 - Mini Apps now support **paid subscriptions** powered by [Telegram Stars](https://telegram.org/blog/telegram-stars) – **monetizing their efforts** with multiple tiers of content and features.
 - Mini Apps can use their balance of [Telegram Stars](https://telegram.org/blog/telegram-stars) to **send gifts** to their users.
-- You can read more on implementing Paid Subscriptions and Gifts in our [Bot API documentation](/bots/api-changelog#november-17-2024).
+- You can read more on implementing Paid Subscriptions and Gifts in our [Bot API documentation](/bots/api-changelog.md#november-17-2024).
 
 **Loading Screen Customization**
 
@@ -115,7 +115,7 @@ Like bots, **Mini Apps** support [seamless authorization](https://telegram.org/b
 ** General **
 
 - The field *photo_url* in the class [WebAppUser](#webappuser) is now available to all Mini Apps, allowing them to access a user's profile photo if their privacy settings allow for it.
-- Third parties (e.g., Mini App builders, external SDKs etc.) that receive or process data on behalf of Mini Apps are now able to [validate it](#validating-data-for-third-party-use) without knowing the App's [bot token](/bots/tutorial#obtain-your-bot-token).
+- Third parties (e.g., Mini App builders, external SDKs etc.) that receive or process data on behalf of Mini Apps are now able to [validate it](#validating-data-for-third-party-use) without knowing the App's [bot token](/bots/tutorial.md#obtain-your-bot-token).
 - Debugging [options](#debug-mode-for-mini-apps) have been expanded to include full support for **iOS devices**. You can use these tools to find app-specific issues in your Mini App.
 
 #### September 6, 2024
@@ -247,11 +247,11 @@ Telegram currently supports seven different ways of launching Mini Apps: the mai
 
 #### Keyboard Button Mini Apps
 
->**TL;DR:** Mini Apps launched from a **web_app** type [keyboard button](/bots/api#keyboardbutton) can send data back to the bot in a *service message* using [Telegram.WebApp.sendData](#initializing-mini-apps). This makes it possible for the bot to produce a response without communicating with any external servers.
+>**TL;DR:** Mini Apps launched from a **web_app** type [keyboard button](/bots/api/types/keyboardbutton.md) can send data back to the bot in a *service message* using [Telegram.WebApp.sendData](#initializing-mini-apps). This makes it possible for the bot to produce a response without communicating with any external servers.
 
-Users can interact with bots using [custom keyboards](/bots#keyboards), [buttons under bot messages](/bots#inline-keyboards-and-on-the-fly-updating), as well as by sending freeform **text messages** or any of the **attachment types** supported by Telegram: photos and videos, files, locations, contacts and polls. For even more flexibility, bots can utilize the full power of **HTML5** to create user-friendly input interfaces.
+Users can interact with bots using [custom keyboards](/bots.md#keyboards), [buttons under bot messages](/bots.md#inline-keyboards-and-on-the-fly-updating), as well as by sending freeform **text messages** or any of the **attachment types** supported by Telegram: photos and videos, files, locations, contacts and polls. For even more flexibility, bots can utilize the full power of **HTML5** to create user-friendly input interfaces.
 
-You can send a **web_app** type [KeyboardButton](/bots/api#keyboardbutton) that opens a Mini App from the specified URL.
+You can send a **web_app** type [KeyboardButton](/bots/api/types/keyboardbutton.md) that opens a Mini App from the specified URL.
 
 To transmit data from the user back to the bot, the Mini App can call the [Telegram.WebApp.sendData](#initializing-mini-apps) method. Data will be transmitted to the bot as a String in a service message. The bot can continue communicating with the user after receiving it.
 
@@ -262,13 +262,13 @@ To transmit data from the user back to the bot, the Mini App can call the [Teleg
 
 #### Inline Button Mini Apps
 
-> **TL;DR:** For more interactive Mini Apps like [@DurgerKingBot](https://t.me/durgerkingbot), use a **web_app** type [Inline KeyboardButton](/bots/api#inlinekeyboardbutton), which gets basic user information and can be used to send a message on behalf of the user to the chat with the bot.
+> **TL;DR:** For more interactive Mini Apps like [@DurgerKingBot](https://t.me/durgerkingbot), use a **web_app** type [Inline KeyboardButton](/bots/api/types/inlinekeyboardbutton.md), which gets basic user information and can be used to send a message on behalf of the user to the chat with the bot.
 
-If receiving text data alone is insufficient or you need a more advanced and personalized interface, you can open a Mini App using a **web_app** type [Inline KeyboardButton](/bots/api#inlinekeyboardbutton).
+If receiving text data alone is insufficient or you need a more advanced and personalized interface, you can open a Mini App using a **web_app** type [Inline KeyboardButton](/bots/api/types/inlinekeyboardbutton.md).
 
 From the button, a Mini App will open with the URL specified in the button. In addition to the user's [theme settings](#color-schemes), it will receive basic user information (`ID`, `name`, `username`, `language_code`) and a unique identifier for the session, **query_id**, which allows messages on behalf of the user to be sent back to the bot.
 
-The bot can call the Bot API method [answerWebAppQuery](/bots/api#answerwebappquery) to send an inline message from the user back to the bot and close the Mini App. After receiving the message, the bot can continue communicating with the user.
+The bot can call the Bot API method [answerWebAppQuery](/bots/api/methods/answerwebappquery.md) to send an inline message from the user back to the bot and close the Mini App. After receiving the message, the bot can continue communicating with the user.
 
 **Good for:**
 
@@ -279,7 +279,7 @@ The bot can call the Bot API method [answerWebAppQuery](/bots/api#answerwebappqu
 
 >**TL;DR:** Mini Apps can be launched from a customized menu button. This simply offers a quicker way to access the app and is otherwise **identical** to [launching a mini app from an inline button](#inline-button-mini-apps).
 
-By default, chats with bots always show a convenient **menu button** that provides quick access to all listed [commands](/bots#commands). With [Bot API 6.0](/bots/api-changelog#april-16-2022), this button can be used to **launch a Mini App** instead.
+By default, chats with bots always show a convenient **menu button** that provides quick access to all listed [commands](/bots.md#commands). With [Bot API 6.0](/bots/api-changelog.md#april-16-2022), this button can be used to **launch a Mini App** instead.
 
 <div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
  <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/464001829/12247/e6LoU12o4Ng.109921/1226afb8f18f8ea8c4
@@ -291,7 +291,7 @@ By default, chats with bots always show a convenient **menu button** that provid
 To configure the menu button, you must specify the text it should show and the Mini App URL. There are two ways to set these parameters:
 
 - To customize the button for **all users**, use [@BotFather](https://t.me/botfather) (the `/setmenubutton` command or *Bot Settings > Menu Button*).
-- To customize the button for both **all users** and **specific users**, use the [setChatMenuButton](/bots/api#setchatmenubutton) method in the Bot API. For example, change the button text according to the user's language, or show links to different Mini Apps based on a user's settings in your bot.
+- To customize the button for both **all users** and **specific users**, use the [setChatMenuButton](/bots/api/methods/setchatmenubutton.md) method in the Bot API. For example, change the button text according to the user's language, or show links to different Mini Apps based on a user's settings in your bot.
 
 Apart from this, Mini Apps opened via the menu button work in the exact same way as when [using inline buttons](#inline-button-mini-apps).
 
@@ -305,7 +305,7 @@ If your bot is a mini app, you can unlock a number of features that streamline a
 
 After setting a main mini app, you'll be able to upload detailed **media preview demos** to publicly highlight your app's key features on its profile. A **Launch app** button will also appear, allowing users to open your app directly from its profile. Bots that enabled a main mini app will be displayed in the *Apps* tab of the search for users who have launched them.
 
-> Media previews support [multiple languages](/bots/features#mini-app-previews) – so you can upload **translated versions** of your previews that will be shown to users based on their **app language**.
+> Media previews support [multiple languages](/bots/features.md#mini-app-previews) – so you can upload **translated versions** of your previews that will be shown to users based on their **app language**.
 
 A bot's **main Mini App** can also be opened in the current chat by direct link in the format `https://t.me/botusername?startapp`. If a non-empty *startapp* parameter is included in the link, it will be passed to the Mini App in the *start_param* field and in the GET parameter *tgWebAppStartParam*. 
 
@@ -325,13 +325,13 @@ By default, the main Mini App opens to full-screen height, and users cannot redu
 - Cooperative, multiplayer or teamwork-oriented services within a chat context.
 - The use cases are effectively **unlimited**.
 
-> Successful bots which **enable** a main Mini App and **accept payments** in [Telegram Stars](/bots/payments-stars) may be featured in the Telegram [Mini App Store](https://t.me/BotNews/99). To increase the chances of being featured, we recommend uploading high-quality media showcasing your app on your bot's profile and following our [design guidelines](#design-guidelines).
+> Successful bots which **enable** a main Mini App and **accept payments** in [Telegram Stars](/bots/payments-stars.md) may be featured in the Telegram [Mini App Store](https://t.me/BotNews/99). To increase the chances of being featured, we recommend uploading high-quality media showcasing your app on your bot's profile and following our [design guidelines](#design-guidelines).
 
 #### Inline Mode Mini Apps
 
->**TL;DR:** Mini Apps launched via **web_app** type [InlineQueryResultsButton](/bots/api#inlinequeryresultsbutton) can be used anywhere in inline mode. Users can create content in a web interface and then seamlessly send it to the current chat via inline mode.
+>**TL;DR:** Mini Apps launched via **web_app** type [InlineQueryResultsButton](/bots/api/types/inlinequeryresultsbutton.md) can be used anywhere in inline mode. Users can create content in a web interface and then seamlessly send it to the current chat via inline mode.
 
-You can use the *button* parameter in the [answerInlineQuery](/bots/api#answerinlinequery) method to display a special 'Switch to Mini App' button either above or in place of the inline results. This button will **open a Mini App** from the specified URL. Once done, you can call the [Telegram.WebApp.switchInlineQuery](#initializing-mini-apps) method to send the user back to inline mode.
+You can use the *button* parameter in the [answerInlineQuery](/bots/api/methods/answerinlinequery.md) method to display a special 'Switch to Mini App' button either above or in place of the inline results. This button will **open a Mini App** from the specified URL. Once done, you can call the [Telegram.WebApp.switchInlineQuery](#initializing-mini-apps) method to send the user back to inline mode.
 
 Inline Mini Apps have **no access** to the chat – they can't read messages or send new ones on behalf of the user. To send messages, the user must be redirected to **inline mode** and actively pick a result.
 
@@ -367,11 +367,11 @@ Starting from ==Bot API 7.6==, by default, Mini Apps of this type open to full-s
 
 >**TL;DR:** Mini Apps can be launched when the bot is set up as a guard bot of a chat and a user sends join request to the chat. This offers a way to handle join requests using a Mini App.
 
-When a user joins a chat in which the bot was set up as a guard bot, the bot receives an [Update](/bots/api#update) "chat_join_request" with the field *query_id*. The bot may call the method [sendChatJoinRequestWebApp](/bots/api#sendchatjoinrequestwebapp) to show the Mini App to the user before deciding the outcome of the request.
+When a user joins a chat in which the bot was set up as a guard bot, the bot receives an [Update](/bots/api/types/update.md) "chat_join_request" with the field *query_id*. The bot may call the method [sendChatJoinRequestWebApp](/bots/api/methods/sendchatjoinrequestwebapp.md) to show the Mini App to the user before deciding the outcome of the request.
 
 In addition to the user's [theme settings](#color-schemes), the bot will receive basic user information (`ID`, `name`, `username`, `language_code`, `photo`), the chat info (`ID`, `type`, `title`, `username`, `photo`) and a unique identifier for the join request query **chat_join_request_query_id**, which allows to process the query.
 
-The bot can call the Bot API method [answerChatJoinRequestQuery](/bots/api#answerchatjoinrequestquery) to complete processing of the join request.
+The bot can call the Bot API method [answerChatJoinRequestQuery](/bots/api/methods/answerchatjoinrequestquery.md) to complete processing of the join request.
 
 #### Launching Mini Apps from the Attachment Menu
 
@@ -387,7 +387,7 @@ You can add a 'Settings' item to the context menu of your Mini App using [@BotFa
 
 In addition to the user's [theme settings](#color-schemes), the bot will receive basic user information (`ID`, `name`, `username`, `language_code`, `photo`), as well as public info about the chat partner (`ID`, `name`, `username`, `photo`) or the chat info (`ID`, `type`, `title`, `username`, `photo`) and a unique identifier for the web view session **query_id**, which allows messages of any type to be sent to the chat on behalf of the user that opened the bot.
 
-The bot can call the Bot API method [answerWebAppQuery](/bots/api#answerwebappquery), which sends an inline message from the user via the bot to the chat where it was launched and closes the Mini App.
+The bot can call the Bot API method [answerWebAppQuery](/bots/api/methods/answerwebappquery.md), which sends an inline message from the user via the bot to the chat where it was launched and closes the Mini App.
 
 > You can read more about adding bots to the attachment menu [here](#adding-bots-to-the-attachment-menu).
 
@@ -448,7 +448,7 @@ The application can display just the top part of the Mini App, with its lower pa
 | LocationManager |[LocationManager](#locationmanager)|An object for controlling location on the device. |
 | DeviceStorage |[DeviceStorage](#devicestorage)|An object for storing and retrieving data from the device's local storage. |
 | SecureStorage |[SecureStorage](#securestorage)|An object for storing and retrieving data from the device's secure storage. |
-| Serverless ^==NEW==^ |[Serverless](#serverless)|An object for calling the endpoints of the bot's [Serverless](/bots/serverless) project. |
+| Serverless ^==NEW==^ |[Serverless](#serverless)|An object for calling the endpoints of the bot's [Serverless](/bots/serverless.md) project. |
 | isVersionAtLeast(version) |Function|Returns true if the user's app supports a version of the Bot API that is equal to or higher than the version passed as the parameter. |
 | setHeaderColor(color) |Function|==Bot API 6.1+== A method that sets the app header color in the `#RRGGBB` format. You can also use keywords *bg_color* and *secondary_bg_color*. \
 \
@@ -471,7 +471,7 @@ Up to ==Bot API 6.9== You can only pass *Telegram.WebApp.themeParams.bg_color* o
 - **missed** – the icon has not been added to the home screen. |
 | onEvent(eventType, eventHandler) |Function|A method that sets the app event handler. Check [the list of available events](#events-available-for-mini-apps).|
 | offEvent(eventType, eventHandler) |Function|A method that deletes a previously set event handler. |
-| sendData(data) |Function|A method used to send data to the bot. When this method is called, a service message is sent to the bot containing the data *data* of the length up to 4096 bytes, and the Mini App is closed. See the field *web_app_data* in the class [Message](/bots/api#message).\
+| sendData(data) |Function|A method used to send data to the bot. When this method is called, a service message is sent to the bot containing the data *data* of the length up to 4096 bytes, and the Mini App is closed. See the field *web_app_data* in the class [Message](/bots/api/types/message.md).\
 \
 *This method is only available for Mini Apps launched via a [Keyboard button](#keyboard-button-mini-apps).*|
 | switchInlineQuery(query\[, choose_chat_types]) |Function|==Bot API 6.7+== A method that inserts the bot's username and the specified inline *query* in the current chat's input field. Query may be empty, in which case only the bot's username will be inserted. If an optional *choose_chat_types* parameter was passed, the client prompts the user to choose a specific chat, then opens that chat and inserts the bot's username and the specified inline query in the input field. You can specify which types of chats the user will be able to choose from. It can be one or more of the following types: *users*, *bots*, *groups*, *channels*. |
@@ -484,10 +484,10 @@ Up to ==Bot API 6.9== You can only pass *Telegram.WebApp.themeParams.bg_color* o
 Up to ==Bot API 7.0== The Mini App *will* be closed after this method is called.|
 | openInvoice(url\[, callback]) |Function|==Bot API 6.1+== A method that opens an invoice using the link *url*. The Mini App will receive the [event](#events-available-for-mini-apps) *invoiceClosed* when the invoice is closed. If an optional *callback* parameter was passed, the *callback* function will be called and the invoice status will be passed as the first argument. |
 | shareToStory(media_url\[, params]) |Function|==Bot API 7.8+== A method that opens the native story editor with the media specified in the *media_url* parameter as an HTTPS URL. An optional *params* argument of the type [StoryShareParams](#storyshareparams) describes additional sharing settings.|
-| shareMessage(msg_id\[, callback]) |Function|==Bot API 8.0+== A method that opens a dialog allowing the user to share a message provided by the bot. If an optional *callback* parameter is provided, the *callback* function will be called with a boolean as the first argument, indicating whether the message was successfully sent. The message id passed to this method must belong to a [PreparedInlineMessage](/bots/api#preparedinlinemessage) previously obtained via the Bot API method [savePreparedInlineMessage](/bots/api#savepreparedinlinemessage).|
+| shareMessage(msg_id\[, callback]) |Function|==Bot API 8.0+== A method that opens a dialog allowing the user to share a message provided by the bot. If an optional *callback* parameter is provided, the *callback* function will be called with a boolean as the first argument, indicating whether the message was successfully sent. The message id passed to this method must belong to a [PreparedInlineMessage](/bots/api/types/preparedinlinemessage.md) previously obtained via the Bot API method [savePreparedInlineMessage](/bots/api/methods/savepreparedinlinemessage.md).|
 | setEmojiStatus(custom_emoji_id\[, params, callback]) | Function | ==Bot API 8.0+== A method that opens a dialog allowing the user to set the specified custom emoji as their status. An optional *params* argument of type [EmojiStatusParams](#emojistatusparams) specifies additional settings, such as duration. If an optional *callback* parameter is provided, the *callback* function will be called with a boolean as the first argument, indicating whether the status was set.\
 \
-*Note: this method opens a native dialog and cannot be used to set the emoji status without manual user interaction. For fully programmatic changes, you should instead use the Bot API method [setUserEmojiStatus](/bots/api#setuseremojistatus) after obtaining authorization to do so via the Mini App method requestEmojiStatusAccess.*  |
+*Note: this method opens a native dialog and cannot be used to set the emoji status without manual user interaction. For fully programmatic changes, you should instead use the Bot API method [setUserEmojiStatus](/bots/api/methods/setuseremojistatus.md) after obtaining authorization to do so via the Mini App method requestEmojiStatusAccess.*  |
 | requestEmojiStatusAccess([callback]) |Function|==Bot API 8.0+== A method that shows a native popup requesting permission for the bot to manage user's emoji status. If an optional *callback* parameter was passed, the *callback* function will be called when the popup is closed and the first argument will be a boolean indicating whether the user granted this access. |
 | downloadFile(params\[, callback]) | Function | ==Bot API 8.0+== A method that displays a native popup prompting the user to download a file specified by the *params* argument of type [DownloadFileParams](#downloadfileparams). If an optional *callback* parameter is provided, the *callback* function will be called when the popup is closed, with the first argument as a boolean indicating whether the user accepted the download request. |
 | hideKeyboard() | Function | ==Bot API 9.1+== A method that hides the on-screen keyboard, if it is currently visible. Does nothing if the keyboard is not active. |
@@ -501,7 +501,7 @@ Up to ==Bot API 7.0== The Mini App *will* be closed after this method is called.
 *Note: this method can be called only for Mini Apps launched from the attachment menu and only in response to a user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button).* |
 | requestWriteAccess([callback]) |Function|==Bot API 6.9+== A method that shows a native popup requesting permission for the bot to send messages to the user. If an optional *callback* parameter was passed, the *callback* function will be called when the popup is closed and the first argument will be a boolean indicating whether the user granted this access. |
 | requestContact([callback]) |Function|==Bot API 6.9+== A method that shows a native popup prompting the user for their phone number. If an optional *callback* parameter was passed, the *callback* function will be called when the popup is closed and the first argument will be a boolean indicating whether the user shared its phone number. |
-| requestChat(req_id\[, callback]) |Function|==Bot API 9.6+== A method that opens a dialog allowing the user to select an existing chat or create a new one. If an optional *callback* parameter is provided, the *callback* function will be called with a boolean as the first argument, indicating whether the message was successfully sent. The request id passed to this method must belong to a [PreparedKeyboardButton](/bots/api#preparedkeyboardbutton) previously obtained via the Bot API method [savePreparedKeyboardButton](/bots/api#savepreparedkeyboardbutton).|
+| requestChat(req_id\[, callback]) |Function|==Bot API 9.6+== A method that opens a dialog allowing the user to select an existing chat or create a new one. If an optional *callback* parameter is provided, the *callback* function will be called with a boolean as the first argument, indicating whether the message was successfully sent. The request id passed to this method must belong to a [PreparedKeyboardButton](/bots/api/types/preparedkeyboardbutton.md) previously obtained via the Bot API method [savePreparedKeyboardButton](/bots/api/methods/savepreparedkeyboardbutton.md).|
 | ready() |Function|A method that informs the Telegram app that the Mini App is ready to be displayed. \
 It is recommended to call this method as early as possible, as soon as all essential interface elements are loaded. Once this method is called, the loading placeholder is hidden and the Mini App is shown. \
 If the method is not called, the placeholder will be hidden only when the page is fully loaded.|
@@ -952,7 +952,7 @@ All these methods return the [SecureStorage](#securestorage) object, so they can
 
 #### Serverless
 
-This object lets a Mini App hosted on [Telegram Serverless](/bots/serverless) call the bot's [endpoints](/bots/serverless#endpoints) – the server-side functions of the Mini App. Each call is sent together with the Mini App's *initData*, which the platform validates before running the endpoint, so the endpoint always knows which user is calling it.
+This object lets a Mini App hosted on [Telegram Serverless](/bots/serverless.md) call the bot's [endpoints](/bots/serverless.md#endpoints) – the server-side functions of the Mini App. Each call is sent together with the Mini App's *initData*, which the platform validates before running the endpoint, so the endpoint always knows which user is calling it.
 
 | Field | Type | Description |
 |-----------|
@@ -983,8 +983,8 @@ This object contains data that is transferred to the Mini App when it is opened.
 
 | Field        | Type        | Description     |
 |--------------|-------------|-----------------|
-| query_id     | String      | _Optional._ A unique identifier for the Mini App session, required for sending messages via the [answerWebAppQuery](/bots/api#answerwebappquery) method. |
-| chat_join_request_query_id | String | _Optional._ A unique identifier for the chat join request query, required for processing the query via the method [answerChatJoinRequestQuery](/bots/api#answerchatjoinrequestquery). |
+| query_id     | String      | _Optional._ A unique identifier for the Mini App session, required for sending messages via the [answerWebAppQuery](/bots/api/methods/answerwebappquery.md) method. |
+| chat_join_request_query_id | String | _Optional._ A unique identifier for the chat join request query, required for processing the query via the method [answerChatJoinRequestQuery](/bots/api/methods/answerchatjoinrequestquery.md). |
 | user         | [WebAppUser](#webappuser) | _Optional._ An object containing data about the current user. |
 | receiver     | [WebAppUser](#webappuser) | _Optional._ An object containing data about the chat partner of the current user in the chat where the bot was launched via the attachment menu. Returned only for private chats and only for Mini Apps launched via the attachment menu. |
 | chat         | [WebAppChat](#webappchat) | _Optional._ An object containing data about the chat where the bot was launched via the attachment menu or the chat to which the join request query was sent. Returned for supergroups, channels and group chats – only for Mini Apps launched via the attachment menu and chat join requests. |
@@ -993,7 +993,7 @@ This object contains data that is transferred to the Mini App when it is opened.
 | start_param  | String      | _Optional._ The value of the *startattach* parameter, passed [via link](#adding-bots-to-the-attachment-menu). Only returned for Mini Apps when launched from the attachment menu via link. \
 \
 The value of the `start_param` parameter will also be passed in the GET-parameter `tgWebAppStartParam`, so the Mini App can load the correct interface right away. |
-| can_send_after | Integer  | _Optional._ Time in seconds, after which a message can be sent via the [answerWebAppQuery](/bots/api#answerwebappquery) method.  |
+| can_send_after | Integer  | _Optional._ Time in seconds, after which a message can be sent via the [answerWebAppQuery](/bots/api/methods/answerwebappquery.md) method.  |
 | auth_date    | Integer     | Unix time when the form was opened. |
 | hash         | String      | A hash of all passed parameters, which the bot server can use to [check their validity](#validating-data-received-via-the-mini-app). |
 | signature    | String      | A signature of all passed parameters (except *hash*), which the third party can use to [check their validity](#validating-data-for-third-party-use). |
@@ -1031,7 +1031,7 @@ This object represents a chat.
 
 To validate data received via the Mini App, one should send the data from the *Telegram.WebApp.initData* field to the bot's backend. The data is a query string, which is composed of a series of field-value pairs.
 
-You can verify the integrity of the data received by comparing the received *hash* parameter with the hexadecimal representation of the [HMAC-SHA-256](https://en.wikipedia.org/wiki/Hash-based_message_authentication_code) signature of the **data-check-string** with the secret key, which is the [HMAC-SHA-256](https://en.wikipedia.org/wiki/Hash-based_message_authentication_code) signature of the [bot's token](/bots/tutorial#obtain-your-bot-token) with the constant string `WebAppData` used as a key.
+You can verify the integrity of the data received by comparing the received *hash* parameter with the hexadecimal representation of the [HMAC-SHA-256](https://en.wikipedia.org/wiki/Hash-based_message_authentication_code) signature of the **data-check-string** with the secret key, which is the [HMAC-SHA-256](https://en.wikipedia.org/wiki/Hash-based_message_authentication_code) signature of the [bot's token](/bots/tutorial.md#obtain-your-bot-token) with the constant string `WebAppData` used as a key.
 
 **Data-check-string** is a chain of all received fields, sorted alphabetically, in the format `key=<value>` with a [line feed](https://en.wikipedia.org/wiki/Newline) character ('
 ', 0x0A) used as separator – e.g., `'auth_date=<auth_date>
@@ -1052,7 +1052,7 @@ Once validated, the data may be used on your server. Complex data types are repr
 
 #### Validating data for Third-Party Use
 
-If you need to share the data with a third party, they can validate the data without requiring access to your [bot's token](/bots/tutorial#obtain-your-bot-token). Simply provide them with the data from the *Telegram.WebApp.initData* field and your *bot_id*.
+If you need to share the data with a third party, they can validate the data without requiring access to your [bot's token](/bots/tutorial.md#obtain-your-bot-token). Simply provide them with the data from the *Telegram.WebApp.initData* field and your *bot_id*.
 
 The integrity of the data can be verified by validating the received *signature* parameter, which is the base64url-encoded representation of the [Ed25519](https://en.wikipedia.org/wiki/EdDSA) signature of the **data-check-string**. The verification is performed using the public key provided by Telegram.
 
@@ -1118,7 +1118,7 @@ The Mini App can receive events from the Telegram app, onto which a handler can 
 - **paid** – invoice was paid successfully, \
 - **cancelled** – user closed this invoice without paying, \
 - **failed** – user tried to pay, but the payment was failed, \
-- **pending** – the payment is still processing. The bot will receive a service message about a [successful payment](/bots/api#successfulpayment) when the payment is successfully paid. |
+- **pending** – the payment is still processing. The bot will receive a service message about a [successful payment](/bots/api/types/successfulpayment.md) when the payment is successfully paid. |
 | `popupClosed` | ==Bot API 6.2+== Occurrs when the opened popup is closed. \
 *eventHandler* receives an object with the single field *button_id* – the value of the field *id* of the pressed button. If no buttons were pressed, the field *button_id* will be *null*. |
 | `qrTextReceived` | ==Bot API 6.4+== Occurs when the QR code scanner catches a code with text data. \

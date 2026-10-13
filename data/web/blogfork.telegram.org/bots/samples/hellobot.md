@@ -1,7 +1,7 @@
 # Hellobot
 
->This sample PHP bot demonstrates the basics of the [Telegram Bot API](/bots/api).
-If you have questions, try our [FAQ](/bots/faq) or check out [this page](/bots/samples) for more examples.
+>This sample PHP bot demonstrates the basics of the [Telegram Bot API](/bots/api.md).
+If you have questions, try our [FAQ](/bots/faq.md) or check out [this page](/bots/samples.md) for more examples.
 
 <div><br></div>
 

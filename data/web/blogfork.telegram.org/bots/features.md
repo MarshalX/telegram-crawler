@@ -3,8 +3,8 @@
 
 This page describes individual **bot elements** and **features** in detail. See also:
 
-- [A General Bot Platform Overview](/bots)
-- [Full API Reference for Developers](/bots/api)
+- [A General Bot Platform Overview](/bots.md)
+- [Full API Reference for Developers](/bots/api.md)
 
 ### What features do bots have?
 
@@ -54,7 +54,7 @@ This page describes individual **bot elements** and **features** in detail. See 
 -------
 
 ### Inputs
-Users can send **messages of all types** to bots, including text, files, locations, stickers, voice messages and even [dice](/bots/api#dice) if they're feeling lucky. However, Telegram bots offer many other tools for building flexible interfaces tailored to your specific needs:
+Users can send **messages of all types** to bots, including text, files, locations, stickers, voice messages and even [dice](/bots/api/types/dice.md) if they're feeling lucky. However, Telegram bots offer many other tools for building flexible interfaces tailored to your specific needs:
 
 - [Commands](#commands) that are highlighted in messages and can be selected from a list after typing `/`.
 - [Keyboards](#keyboards) that replace the user's keyboard with predefined answer options.
@@ -72,7 +72,7 @@ For even more flexibility, [Mini Apps](#mini-apps) support custom interfaces wit
 A command is a simple `/keyword` that tells the bot what to do. Telegram apps will:
 
 - **Highlight** commands in messages. When the user taps a highlighted command, that command is immediately sent again.
-- Suggest a **list of supported commands** with descriptions when the user enters a `/` (for this to work, you need to have provided a list of commands to [@BotFather](https://t.me/botfather) or via the [appropriate API method](/bots/api#setmycommands)). Selecting a command from the list immediately sends it.
+- Suggest a **list of supported commands** with descriptions when the user enters a `/` (for this to work, you need to have provided a list of commands to [@BotFather](https://t.me/botfather) or via the [appropriate API method](/bots/api/methods/setmycommands.md)). Selecting a command from the list immediately sends it.
 - Show a [menu button](#menu-button) containing all or some of a bot’s commands (which you set via [@BotFather](https://t.me/botfather)).
 
 Commands must always start with the `/` symbol and contain **up to 32 characters**. They can use **Latin letters**, **numbers** and **underscores**, though simple lowercase text is recommended for a cleaner look. 
@@ -95,35 +95,35 @@ width=44% /></a>
 
 ##### Command Scopes
 
-Your bot is able to **show different commands** to different users and groups – you can control this using [scopes](/bots/api#botcommandscope). For example, your bot could show additional commands to group admins or translate the list based on the user’s [language_code](/bots/api#user).
+Your bot is able to **show different commands** to different users and groups – you can control this using [scopes](/bots/api/types/botcommandscope.md). For example, your bot could show additional commands to group admins or translate the list based on the user’s [language_code](/bots/api/types/user.md).
 
-> Keep in mind that Bot API [updates](/bots/api#update) **will not contain any information** about the scope of a command sent by the user – in fact, they may contain commands that don’t exist at all in your bot. Your backend should **always** verify that received commands are valid and that the user was authorized to use them regardless of scope.
+> Keep in mind that Bot API [updates](/bots/api/types/update.md) **will not contain any information** about the scope of a command sent by the user – in fact, they may contain commands that don’t exist at all in your bot. Your backend should **always** verify that received commands are valid and that the user was authorized to use them regardless of scope.
 
 > Bots with privacy mode enabled will only receive commands in groups under special conditions, [see here](#privacy-mode).
 
 #### Keyboards
 Bots are able to interpret free text input from users, but offering **specific suggestions** is often more intuitive – this is where **custom keyboards** can be extremely useful.
 
-Whenever your bot sends a message, it can **display a special keyboard** with predefined reply options (see [ReplyKeyboardMarkup](/bots/api#replykeyboardmarkup)). Telegram apps that receive the message will display your keyboard to the user. Simple text buttons will immediately send the respective text, while other buttons can request a user, chat, location, contact or poll, or open a Mini App. This way you can drastically **simplify** and **streamline** user interaction with your bot.
+Whenever your bot sends a message, it can **display a special keyboard** with predefined reply options (see [ReplyKeyboardMarkup](/bots/api/types/replykeyboardmarkup.md)). Telegram apps that receive the message will display your keyboard to the user. Simple text buttons will immediately send the respective text, while other buttons can request a user, chat, location, contact or poll, or open a Mini App. This way you can drastically **simplify** and **streamline** user interaction with your bot.
 
 <div>
   <a href="/file/464001950/1191a/2RwpmgU-swU.123554/b50478c124d5914c23"  target="_blank"><img src="/file/464001950/1191a/2RwpmgU-swU.123554/b50478c124d5914c23" title="Custom Keyboards" alt="Custom keyboard with predefined reply options" class="dev_page_image" width=44% /></a>
 </div>
 
-> Check out the [one_time_keyboard](/bots/api#replykeyboardmarkup) parameter to automatically hide your bot's keyboard as soon as it's been used.
+> Check out the [one_time_keyboard](/bots/api/types/replykeyboardmarkup.md) parameter to automatically hide your bot's keyboard as soon as it's been used.
 
 You can also **customize the text placeholder** in the input field by setting the `input_field_placeholder` parameter.
 
 #### Inline Keyboards
-There are times when you'd prefer to do things **without sending any messages** to the chat – like when a user is changing settings, toggling options or navigating search results. In such cases, you can use [Inline Keyboards](/bots/api#inlinekeyboardmarkup) that are shown directly below their relevant messages.
+There are times when you'd prefer to do things **without sending any messages** to the chat – like when a user is changing settings, toggling options or navigating search results. In such cases, you can use [Inline Keyboards](/bots/api/types/inlinekeyboardmarkup.md) that are shown directly below their relevant messages.
 
-Unlike with custom reply keyboards, pressing buttons on inline keyboards **doesn't send messages to the chat**. Instead, inline keyboards support buttons that can work behind the scenes or open different interfaces: [callback buttons](/bots/api#inlinekeyboardbutton), [URL buttons](/bots/api#inlinekeyboardbutton), [switch-to-inline buttons](/bots/api#inlinekeyboardbutton), [game buttons](/bots/api#inlinekeyboardbutton), [payment buttons](/bots/api#inlinekeyboardbutton), as well as buttons with custom styles, copyable text or disabled states.
+Unlike with custom reply keyboards, pressing buttons on inline keyboards **doesn't send messages to the chat**. Instead, inline keyboards support buttons that can work behind the scenes or open different interfaces: [callback buttons](/bots/api/types/inlinekeyboardbutton.md), [URL buttons](/bots/api/types/inlinekeyboardbutton.md), [switch-to-inline buttons](/bots/api/types/inlinekeyboardbutton.md), [game buttons](/bots/api/types/inlinekeyboardbutton.md), [payment buttons](/bots/api/types/inlinekeyboardbutton.md), as well as buttons with custom styles, copyable text or disabled states.
 
 <div>
   <a href="/file/464001863/110f3/I47qTXAD9Z4.120010/e0ea04f66357b640ec" target="_blank"><img src="/file/464001863/110f3/I47qTXAD9Z4.120010/e0ea04f66357b640ec" title="Inline Keyboards" alt="Inline keyboard shown below a bot message" class="dev_page_image" width=44% /></a>
 </div>
 
-> To provide a **better user experience**, consider [editing your keyboard](/bots/api#editmessagereplymarkup) when the user toggles a setting button or navigates to a new page – this is both **faster** and **smoother** than sending a whole new message and deleting the previous one.
+> To provide a **better user experience**, consider [editing your keyboard](/bots/api/methods/editmessagereplymarkup.md) when the user toggles a setting button or navigates to a new page – this is both **faster** and **smoother** than sending a whole new message and deleting the previous one.
 
 #### Menu Button
 In all bot chats, a menu button appears near the message field. By default, tapping this button **opens a menu** that can hold some or all of a bot's commands, including a short description for each. Users can then **select a command from the menu** without needing to type it out.
@@ -155,9 +155,9 @@ A group management bot is the **perfect example**: an admin could select a chat 
 
 Here is a **quick start guide** to use this feature:
 
-- Pick a set of criteria and store them in a [KeyboardButtonRequestChat](https://core.telegram.org/bots/api#keyboardbuttonrequestchat) object (or [KeyboardButtonRequestUsers](https://core.telegram.org/bots/api#keyboardbuttonrequestusers) for users).
-- Create a [KeyboardButton](https://core.telegram.org/bots/api#keyboardbutton) and store the criteria under `request_chat` or `request_users` respectively.
-- Send a [ReplyKeyboardMarkup](https://core.telegram.org/bots/api#replykeyboardmarkup) that contains the button you just created.
+- Pick a set of criteria and store them in a [KeyboardButtonRequestChat](/bots/api/types/keyboardbuttonrequestchat.md) object (or [KeyboardButtonRequestUsers](/bots/api/types/keyboardbuttonrequestusers.md) for users).
+- Create a [KeyboardButton](/bots/api/types/keyboardbutton.md) and store the criteria under `request_chat` or `request_users` respectively.
+- Send a [ReplyKeyboardMarkup](/bots/api/types/replykeyboardmarkup.md) that contains the button you just created.
 - When the user selects a chat or users, your bot will receive a `chat_shared` or `users_shared` service message containing the selection.
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
@@ -184,7 +184,7 @@ Users can interact with your bot via **inline queries** straight from the messag
 
 Having received the query, your bot can return some results. As soon as the user selects one, it is sent to the **relevant chat**. This way, people can request and send content from your bot in any of their chats, groups or channels.
 
-Remember that inline functionality has to be enabled via [@BotFather](https://t.me/botfather), or your bot will not receive inline [Updates](/bots/api#update).
+Remember that inline functionality has to be enabled via [@BotFather](https://t.me/botfather), or your bot will not receive inline [Updates](/bots/api/types/update.md).
 
 <div>
   <a href="/file/464001466/10e4a/r4FKyQ7gw5g.134366/f2606a53d683374703" target="_blank"><img src="/file/464001466/10e4a/r4FKyQ7gw5g.134366/f2606a53d683374703" title="Inline Requests" alt="Inline query results from a bot" class="dev_page_image" width=51%/></a>
@@ -217,10 +217,10 @@ Following a link with this parameter prompts the user to select a group to add t
 
     /start@your_bot spaceship
 
-> [Mini Apps](#mini-apps) also support deep linking, for more information check out our [dedicated guide](/bots/webapps#adding-bots-to-the-attachment-menu).
+> [Mini Apps](#mini-apps) also support deep linking, for more information check out our [dedicated guide](/bots/webapps.md#adding-bots-to-the-attachment-menu).
 
 #### Attachment Menu
-Certain bots can be added directly to a user’s **attachment menu** – giving them easy access to the bot in any chat. Currently, this option is restricted to certain [approved bots](/bots/webapps#adding-bots-to-the-attachment-menu), but may be expanded later.
+Certain bots can be added directly to a user’s **attachment menu** – giving them easy access to the bot in any chat. Currently, this option is restricted to certain [approved bots](/bots/webapps.md#adding-bots-to-the-attachment-menu), but may be expanded later.
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
  <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/464001491/11651/uwMWNdO29NE.215169/1b37285bbd8fc81244" style="max-width: 400px;" title="Attachment Menu" aria-label="Attachment Menu" alt="Bot available from the attachment menu">
@@ -232,18 +232,18 @@ Certain bots can be added directly to a user’s **attachment menu** – giving 
 
 #### Ephemeral Messages
 
-[Ephemeral messages](/bots/api#ephemeral-messages-and-commands) let bots send **private responses** inside group chats – visible only to a specific user and the bot. They are ideal for welcome messages, whispers, personalized summaries, contextual hints and other interactions that **shouldn't clutter** the conversation for others.
+[Ephemeral messages](/bots/api.md#ephemeral-messages-and-commands) let bots send **private responses** inside group chats – visible only to a specific user and the bot. They are ideal for welcome messages, whispers, personalized summaries, contextual hints and other interactions that **shouldn't clutter** the conversation for others.
 
-When a user taps an inline button, bots can also [show an ephemeral response](/bots/api#ephemeralmessageparameters) in place of the message containing that button – creating a private overlay for that user without changing what anyone else sees. 
+When a user taps an inline button, bots can also [show an ephemeral response](/bots/api/types/ephemeralmessageparameters.md) in place of the message containing that button – creating a private overlay for that user without changing what anyone else sees. 
 
-Bots can also easily [reply](https://core.telegram.org/bots/api#replyparameters) to ephemeral messages or [delete](https://core.telegram.org/bots/api#deleteephemeralmessage) them before they expire. 
+Bots can also easily [reply](/bots/api/types/replyparameters.md) to ephemeral messages or [delete](/bots/api/methods/deleteephemeralmessage.md) them before they expire. 
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
   <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted="" poster="/file/400780400707/6/59tqj-7zkUI.67925.jpg/8f9328dc5077455151" style="max-width: 400px;" title="Ephemeral Messages" aria-label="Ephemeral Messages" alt="Inline buttons in an ephemeral message overlay" vindex="1" preload="auto"> <source src="/file/400780400139/7/vJgWIvqqzxA.3710126.mp4/718db1a1f9ad8f5cdf" type="video/mp4">
   </video>
 </div>
 
-> Check out [rich messages](#rich-messages) to learn how to combine ephemeral personalized views with complex [structured content](/bots/api#inputrichmessage) and embedded [buttons](/bots/api#richmessagebutton).
+> Check out [rich messages](#rich-messages) to learn how to combine ephemeral personalized views with complex [structured content](/bots/api/types/inputrichmessage.md) and embedded [buttons](/bots/api/types/richmessagebutton.md).
 
 **Rich Media Support**
 Ephemeral responses are not limited to plain text. Bots can send a wide variety of content privately within a group, including:
@@ -258,13 +258,13 @@ In addition to bots sending private messages, users can send **ephemeral command
   <a href="/file/400780400146/2/NCkBKEh9JJ0.148639.jpg/abe830e0723e38a4f9" target="_blank"><img src="/file/400780400146/2/NCkBKEh9JJ0.148639.jpg/abe830e0723e38a4f9" title="Ephemeral Messages" alt="Private ephemeral message shown to one user" class="dev_page_image" width=44% /></a>
 </div>
 
-> Telegram clients visually distinguish ephemeral bot [commands](https://core.telegram.org/bots/api#botcommand).
+> Telegram clients visually distinguish ephemeral bot [commands](/bots/api/types/botcommand.md).
 
 #### Streaming Replies
 
 In private chats, bots can show a **draft response** while it is being generated, instead of making the user wait for the complete message. This is useful for AI assistants, long-running searches, document generation and other tasks where showing progress makes the interaction more responsive.
 
-You can update a draft with regular text or [richly formatted content](#rich-messages), then send the final result with [sendMessage](/bots/api#sendmessage) or [sendRichMessage](/bots/api#sendrichmessage) when it is ready. Drafts are temporary previews – if the result should remain in the chat, make sure to send the completed message.
+You can update a draft with regular text or [richly formatted content](#rich-messages), then send the final result with [sendMessage](/bots/api/methods/sendmessage.md) or [sendRichMessage](/bots/api/methods/sendrichmessage.md) when it is ready. Drafts are temporary previews – if the result should remain in the chat, make sure to send the completed message.
 
 The user can also stop a draft while it is being generated. When the stop option is enabled, your bot will receive an update when the user presses the **Stop** button, allowing your application to cancel the model or other work behind the scenes.
 
@@ -274,9 +274,9 @@ The user can also stop a draft while it is being generated. When the stop option
  </video>
 </div>
 
-An empty [`sendMessageDraft`](/bots/api#sendmessagedraft) displays a **Thinking...** placeholder. Rich drafts can also use the [`<tg-thinking>`](/bots/api#rich-html-style) tag or the [`InputRichBlockThinking`](/bots/api#inputrichblockthinking) type to show a visible placeholder. This is a presentation element, not a transcript of the model's reasoning.
+An empty [`sendMessageDraft`](/bots/api/methods/sendmessagedraft.md) displays a **Thinking...** placeholder. Rich drafts can also use the [`<tg-thinking>`](/bots/api/rich-messages.md#rich-html-style) tag or the [`InputRichBlockThinking`](/bots/api/types/inputrichblockthinking.md) type to show a visible placeholder. This is a presentation element, not a transcript of the model's reasoning.
 
-> See [sendMessageDraft](/bots/api#sendmessagedraft), [sendRichMessageDraft](/bots/api#sendrichmessagedraft) and [MessageGenerationStopped](/bots/api#messagegenerationstopped) for the complete workflow.
+> See [sendMessageDraft](/bots/api/methods/sendmessagedraft.md), [sendRichMessageDraft](/bots/api/methods/sendrichmessagedraft.md) and [MessageGenerationStopped](/bots/api/types/messagegenerationstopped.md) for the complete workflow.
 
 #### Topics in Private Chats
 
@@ -288,15 +288,15 @@ Bots and users can organize long-running private conversations into **separate t
  </video>
 </div>
 
-> Private-chat topics need to be enabled for the bot via [@BotFather](https://t.me/botfather). See [createForumTopic](/bots/api#createforumtopic), [editForumTopic](/bots/api#editforumtopic) and [deleteForumTopic](/bots/api#deleteforumtopic) for more information.
+> Private-chat topics need to be enabled for the bot via [@BotFather](https://t.me/botfather). See [createForumTopic](/bots/api/methods/createforumtopic.md), [editForumTopic](/bots/api/methods/editforumtopic.md) and [deleteForumTopic](/bots/api/methods/deleteforumtopic.md) for more information.
 
 -----
 
 ### AI Agents
 
-Telegram is the only platform where all **AI models** can [compete](https://telegram.org/blog/ai-bot-revolution-11-new-features) freely – while users remain in control of their experience. Third-party [AI bots](/bots/features#ai-agents) are welcome to communicate with users and [each other](/bots/features#bot-to-bot-communication) (as long as they stick to the [rules](https://telegram.org/tos/bot-developers#4-3-data-scraping)).
+Telegram is the only platform where all **AI models** can [compete](https://telegram.org/blog/ai-bot-revolution-11-new-features) freely – while users remain in control of their experience. Third-party [AI bots](/bots/features.md#ai-agents) are welcome to communicate with users and [each other](/bots/features.md#bot-to-bot-communication) (as long as they stick to the [rules](https://telegram.org/tos/bot-developers#4-3-data-scraping)).
 
-Telegram apps natively support **AI interfaces** such as [threaded conversations](#topics-in-private-chats) and [real-time streaming for responses](/bots/features#streaming-replies). Users can quickly [summon specialized assistants](/bots/features#guest-bots) into the same conversation, bring several agents together around one task or instruct them to [manage their account](/bots/features#business-bots).
+Telegram apps natively support **AI interfaces** such as [threaded conversations](#topics-in-private-chats) and [real-time streaming for responses](/bots/features.md#streaming-replies). Users can quickly [summon specialized assistants](/bots/features.md#guest-bots) into the same conversation, bring several agents together around one task or instruct them to [manage their account](/bots/features.md#business-bots).
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
  <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400227/2/btvhtJcqT_A.76194.jpg/b56e1d38cc2e92e2aa" style="max-width: 400px;" title="Threads and Streaming Responses for AI Bots" aria-label="Threads and Streaming Responses for AI Bots" alt="AI bot topics and streamed responses">
@@ -322,7 +322,7 @@ The individual building blocks are described in more detail throughout this page
 - [Bot-to-Bot Communication](#bot-to-bot-communication) and [Managed Bots](#managed-bots) enable delegation, coordination and complex multi-agent setups.
 - [Business Bots](#business-bots) allow account automation with explicit rights, while [Mini Apps](#mini-apps) provide a richer workspace for configuration, approvals and dashboards.
 
-> This page and the full [Bot API documentation](/bots/api) document itself are AI-friendly! If you'd like to build a bot but have limited coding experience, simply direct your favorite AI tool to read our documentation and help you get started.
+> This page and the full [Bot API documentation](/bots/api.md) document itself are AI-friendly! If you'd like to build a bot but have limited coding experience, simply direct your favorite AI tool to read our documentation and help you get started.
 
 -----
 
@@ -340,7 +340,7 @@ Polls are useful for collecting feedback, running surveys, testing knowledge or 
  </video>
 </div>
 
-> Bots can also add poll media or links, restrict participation and let users suggest new options. See [Poll](/bots/api#poll) and [sendPoll](/bots/api#sendpoll) for the full list of available options.
+> Bots can also add poll media or links, restrict participation and let users suggest new options. See [Poll](/bots/api/types/poll.md) and [sendPoll](/bots/api/methods/sendpoll.md) for the full list of available options.
 
 #### Checklists
 
@@ -352,7 +352,7 @@ With **checklists**, bots can help teams and individuals track tasks without lea
  </video>
 </div>
 
-> You can check (pun intended) the [Checklist](/bots/api#checklist) documentation for all available features.
+> You can check (pun intended) the [Checklist](/bots/api/types/checklist.md) documentation for all available features.
 
 #### Live Photos
 
@@ -364,7 +364,7 @@ Bots can send **Live Photos** – a photo paired with a short video – and use 
  </video>
 </div>
 
-> See [LivePhoto](/bots/api#livephoto), [sendLivePhoto](/bots/api#sendlivephoto) and [sendMediaGroup](/bots/api#sendmediagroup) to get started.
+> See [LivePhoto](/bots/api/types/livephoto.md), [sendLivePhoto](/bots/api/methods/sendlivephoto.md) and [sendMediaGroup](/bots/api/methods/sendmediagroup.md) to get started.
 
 -----
 
@@ -391,7 +391,7 @@ Bot have extensive, granual chat management capabilities that can be useful for 
  </video>
 </div>
 
-> See [Community](/bots/api#community), [CommunityChatAdded](/bots/api#communitychatadded), [CommunityChatJoined](/bots/api#communitychatjoined), [CommunityChatRemoved](/bots/api#communitychatremoved) and [ChatFullInfo](/bots/api#chatfullinfo) for the relevant objects and updates.
+> See [Community](/bots/api/types/community.md), [CommunityChatAdded](/bots/api/types/communitychatadded.md), [CommunityChatJoined](/bots/api/types/communitychatjoined.md), [CommunityChatRemoved](/bots/api/types/communitychatremoved.md) and [ChatFullInfo](/bots/api/types/chatfullinfo.md) for the relevant objects and updates.
 
 ### Channel Direct Messages and Suggested Posts
 
@@ -415,7 +415,7 @@ Creators can also receive **suggested posts** from users in these chats. A bot c
   </div>
 </div>
 
-> See [DirectMessagesTopic](/bots/api#directmessagestopic), [SuggestedPostInfo](/bots/api#suggestedpostinfo), [SuggestedPostParameters](/bots/api#suggestedpostparameters), [approveSuggestedPost](/bots/api#approvesuggestedpost) and [declineSuggestedPost](/bots/api#declinesuggestedpost) for the relevant API objects and methods.
+> See [DirectMessagesTopic](/bots/api/types/directmessagestopic.md), [SuggestedPostInfo](/bots/api/types/suggestedpostinfo.md), [SuggestedPostParameters](/bots/api/types/suggestedpostparameters.md), [approveSuggestedPost](/bots/api/methods/approvesuggestedpost.md) and [declineSuggestedPost](/bots/api/methods/declinesuggestedpost.md) for the relevant API objects and methods.
 
 ### Monetization
 Telegram offers a **robust ecosystem** of monetization features, allowing any bot to support its development with **multiple revenue streams**.
@@ -423,7 +423,7 @@ Telegram offers a **robust ecosystem** of monetization features, allowing any bo
 #### Telegram Stars
 Telegram Stars power all digital transactions between bots and users. Users can acquire Stars through in-app purchases via Apple and Google or via [@PremiumBot](https://t.me/premiumbot).
 
-Bots can use the Stars they receive to [increase message limits](https://telegram.org/blog/dynamic-video-quality-and-more#increased-message-limits-for-bots), [send gifts](https://core.telegram.org/bots/api#sendgift) to users or [accept rewards](https://telegram.org/blog/monetization-for-channels) in Toncoin.
+Bots can use the Stars they receive to [increase message limits](https://telegram.org/blog/dynamic-video-quality-and-more#increased-message-limits-for-bots), [send gifts](/bots/api/methods/sendgift.md) to users or [accept rewards](https://telegram.org/blog/monetization-for-channels) in Toncoin.
   
 <div>
   <a href="/file/400780400296/3/gxdJYNSAgsg.335683/d6be0165da6f79d605" target="_blank"><img src="/file/400780400296/3/gxdJYNSAgsg.335683/d6be0165da6f79d605" title="Telegram Stars" alt="Telegram Stars used for bot transactions" width=50% class="dev_page_image" /></a>
@@ -499,7 +499,7 @@ Developers can **upload screenshots** and **video demos** of their mini app righ
 #### Mini App Store
 More than **500 million** out of Telegram's [950](https://t.me/durov/337) million users interact with mini apps every month. Successful mini apps have the chance to be **highlighted** in the Telegram Mini App Store – appearing for all users in the *'Apps'* tab of Search.
 
-Featured mini apps are chosen based on how they **enrich the Telegram ecosystem**. To increase the chances of being featured, you must **enable** the [Main Mini App](https://core.telegram.org/bots/webapps#launching-the-main-mini-app) in [@BotFather](https://t.me/botfather), **upload** high-quality media demos showcasing your app to your bot's profile and **accept payments** in [Telegram Stars](https://telegram.org/blog/telegram-stars).
+Featured mini apps are chosen based on how they **enrich the Telegram ecosystem**. To increase the chances of being featured, you must **enable** the [Main Mini App](/bots/webapps.md#launching-the-main-mini-app) in [@BotFather](https://t.me/botfather), **upload** high-quality media demos showcasing your app to your bot's profile and **accept payments** in [Telegram Stars](https://telegram.org/blog/telegram-stars).
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
  <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay="" loop="" controls="" muted="" poster="/file/400780400572/1/KDOL4LVn0qU.46714/87e3de3384c284a00d" style="max-width: 400px;" title="Main Mini Apps" aria-label="Main Mini Apps" alt="Main Mini Apps">
@@ -507,7 +507,7 @@ Featured mini apps are chosen based on how they **enrich the Telegram ecosystem*
  </video>
 </div>
 
-> Check out our documentation to learn more about [enabling Main Mini Apps](https://core.telegram.org/bots/webapps#launching-the-main-mini-app) and [accepting payments](https://core.telegram.org/bots/payments-stars) in Stars.
+> Check out our documentation to learn more about [enabling Main Mini Apps](/bots/webapps.md#launching-the-main-mini-app) and [accepting payments](/bots/payments-stars.md) in Stars.
 
 #### Home Screen Shortcuts
 Users can place **direct shortcuts** to specific mini apps on the **home screen** of their devices – accessing their favorite games and services in **one tap**.
@@ -541,7 +541,7 @@ Mini apps are able to use the **entire screen** in portrait or **landscape orien
 #### Setting Emoji Status
 Users can **set an emoji status** inside mini apps or give an app permission to **update it automatically**.
 
-Developers can also integrate APIs from **other services** or request [geolocation access](https://core.telegram.org/bots/features#geolocation-access) – instantly changing a user's status when they start a game 🎮 or leave the office 💼. 
+Developers can also integrate APIs from **other services** or request [geolocation access](/bots/features.md#geolocation-access) – instantly changing a user's status when they start a game 🎮 or leave the office 💼. 
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
  <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400471/4/NxjzOa07Eyc.38651/62c7f445e0e06a4452" style="max-width: 400px;" title="Setting Emoji Status" aria-label="Setting Emoji Status" alt="Setting Emoji Status">
@@ -550,7 +550,7 @@ Developers can also integrate APIs from **other services** or request [geolocati
 </div>
 
 #### Sharing Media
-Media generated in mini apps can be shared in **any chat** – letting users effortlessly send **referral codes** and **custom images** to contacts, groups and channels. Alternatively, users can [download it](https://core.telegram.org/bots/webapps#downloadfileparams) with a native popup.
+Media generated in mini apps can be shared in **any chat** – letting users effortlessly send **referral codes** and **custom images** to contacts, groups and channels. Alternatively, users can [download it](/bots/webapps.md#downloadfileparams) with a native popup.
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
  <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400834/4/CMJLT3B0KV0.120338/ed91037a804d009c3b" style="max-width: 400px;" title="Sharing Media" aria-label="Sharing Media" alt="Sharing Media from Mini Apps">
@@ -579,7 +579,7 @@ Mini apps are able to receive **location permissions** from users – giving dev
 </div>
 
 #### Device Motion Tracking
-Mini Apps can request [acceleration](https://core.telegram.org/bots/webapps#accelerometer), [orientation](https://core.telegram.org/bots/webapps#deviceorientation) and [rotation](https://core.telegram.org/bots/webapps#gyroscope) data from devices in real time – unlocking support for **motion controls** and **VR experiences**.
+Mini Apps can request [acceleration](/bots/webapps.md#accelerometer), [orientation](/bots/webapps.md#deviceorientation) and [rotation](/bots/webapps.md#gyroscope) data from devices in real time – unlocking support for **motion controls** and **VR experiences**.
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
  <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400417/2/RaXcGRNXC0g.97571/e112d0d114f083f9b7" style="max-width: 400px;" title="Device Motion Tracking" aria-label="Device Motion Tracking" alt="Device Motion Tracking">
@@ -588,14 +588,14 @@ Mini Apps can request [acceleration](https://core.telegram.org/bots/webapps#acce
 </div>
 
 #### Device Hardware Info
-A user's device can send [basic hardware info](https://core.telegram.org/bots/webapps#additional-data-in-user-agent) to mini apps, such as its processing power and memory capacity. Mini apps can then use this to **optimize graphics** and automatically **adjust settings** for the smoothest experience.
+A user's device can send [basic hardware info](/bots/webapps.md#additional-data-in-user-agent) to mini apps, such as its processing power and memory capacity. Mini apps can then use this to **optimize graphics** and automatically **adjust settings** for the smoothest experience.
 
 <div id="secretary-bots"></div>
 
 ### Business Bots
 Bots can enable **Secretary Mode**, allowing users to connect the bot to their account so it can **process incoming messages** and, where permitted, **respond** on their behalf.
 
-The **account owner** can specify which chats your bot can access. The [Business Bot rights](/bots/api#businessbotrights) control actions such as replying (`can_reply`), marking messages as read (`can_read_messages`) and deleting messages. Some actions are limited to eligible private chats with recent incoming messages and require a `business_connection_id`.
+The **account owner** can specify which chats your bot can access. The [Business Bot rights](/bots/api/types/businessbotrights.md) control actions such as replying (`can_reply`), marking messages as read (`can_read_messages`) and deleting messages. Some actions are limited to eligible private chats with recent incoming messages and require a `business_connection_id`.
 
 <div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
  <div><video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400639/5/dNX9ECFkOLs.2619159.png/cbaa22f22167d1451b" style="max-width: 600px;" title="Business Bots" aria-label="Business Bots" alt="Business Bot connection and permissions">
@@ -606,10 +606,10 @@ The **account owner** can specify which chats your bot can access. The [Business
 Here is a quick start guide for allowing users to connect your bot to their accounts:
 
 * Enable **Secretary Mode** for your bot in [@BotFather](https://t.me/botfather).
-* Handle incoming [BusinessConnection](https://core.telegram.org/bots/api#businessconnection) updates, signaling that a user has *established*, *edited* or *ended* a Business Connection with your bot. 
+* Handle incoming [BusinessConnection](/bots/api/types/businessconnection.md) updates, signaling that a user has *established*, *edited* or *ended* a Business Connection with your bot. 
 * Process business messages by handling ```business_message```, ```edited_business_message``` and ```deleted_business_messages``` updates. 
-* Check your bot's permissions in the ```rights``` field of the latest [BusinessConnection](https://core.telegram.org/bots/api#businessconnection) update, including ```can_reply``` for sending and editing messages in private chats with incoming messages in the last 24 hours.
-* If allowed to, use the ```business_connection_id``` field in [sendMessage](https://core.telegram.org/bots/api#sendmessage), [sendChatAction](https://core.telegram.org/bots/api#sendchataction) and other send methods to communicate on behalf of the Business user.
+* Check your bot's permissions in the ```rights``` field of the latest [BusinessConnection](/bots/api/types/businessconnection.md) update, including ```can_reply``` for sending and editing messages in private chats with incoming messages in the last 24 hours.
+* If allowed to, use the ```business_connection_id``` field in [sendMessage](/bots/api/methods/sendmessage.md), [sendChatAction](/bots/api/methods/sendchataction.md) and other send methods to communicate on behalf of the Business user.
 
 Users who **connect your bot** to their account will see a **quick action bar** at the top of each managed chat – tapping on "Manage Bot" will redirect them to your bot, which will receive a deep link message in the format ```/start bizChat<user_chat_id>```.
 
@@ -630,7 +630,7 @@ Telegram allows bots to create and **manage other bots** on behalf of their owne
 #### Creating Your Own Management Bot
 To make your own management bot, simply do the following:
 
-1. Choose one of your existing bots or [create a new bot](https://core.telegram.org/bots/features#creating-a-new-bot) via [@BotFather](https://t.me/botfather).
+1. Choose one of your existing bots or [create a new bot](/bots/features.md#creating-a-new-bot) via [@BotFather](https://t.me/botfather).
 2. Open the bot's settings in BotFather’s [MiniApp](https://t.me/Botfather?startapp) and enable *'Bot Management Mode'*. 
 
 #### Sharing Your Management Bot
@@ -652,12 +652,12 @@ When the user opens the link, they will see a window to finish creating their bo
 #### Using Your Management Bot
 Once the user confirms the information, the bot is created:
 
-- Your **@ManagerBot** receives a `managed_bot` update with a [ManagedBotUpdated](/bots/api#managedbotupdated) object.
+- Your **@ManagerBot** receives a `managed_bot` update with a [ManagedBotUpdated](/bots/api/types/managedbotupdated.md) object.
 - This object includes basic information on the new bot and its creator.
-- You can use the Bot API method [getManagedBotToken](/bots/api#getmanagedbottoken) to fetch the bot's access token.
-- You can use [replaceManagedBotToken](/bots/api#replacemanagedbottoken) to revoke the current token and generate a new one when needed.
-- You can use [getManagedBotAccessSettings](/bots/api#getmanagedbotaccesssettings) and [setManagedBotAccessSettings](/bots/api#setmanagedbotaccesssettings) to view and update the managed bot's access settings.
-- You can then control the new bot via the Bot API, receive and respond to messages, change its [profile](/bots/api#setmyprofilephoto), [settings](https://core.telegram.org/bots/api#setmycommands) and more.
+- You can use the Bot API method [getManagedBotToken](/bots/api/methods/getmanagedbottoken.md) to fetch the bot's access token.
+- You can use [replaceManagedBotToken](/bots/api/methods/replacemanagedbottoken.md) to revoke the current token and generate a new one when needed.
+- You can use [getManagedBotAccessSettings](/bots/api/methods/getmanagedbotaccesssettings.md) and [setManagedBotAccessSettings](/bots/api/methods/setmanagedbotaccesssettings.md) to view and update the managed bot's access settings.
+- You can then control the new bot via the Bot API, receive and respond to messages, change its [profile](/bots/api/methods/setmyprofilephoto.md), [settings](/bots/api/methods/setmycommands.md) and more.
 
 ### Bot-to-Bot Communication
 
@@ -682,7 +682,7 @@ Additionally, bots with *Bot-to-Bot Communication Mode* enabled will receive **a
 >A contributor bot may request a code review from a reviewer bot and processes feedback directly in the group – optionally with human supervision.
 
 ##### Communication in Private Chats
-Bots can send private messages to other bots by passing their `@username` to the [sendMessage](/bots/api#sendmessage) method.
+Bots can send private messages to other bots by passing their `@username` to the [sendMessage](/bots/api/methods/sendmessage.md) method.
 
 This requires *Bot-to-Bot Communication Mode* to be enabled for both the sender and the recipient of the message.
 
@@ -761,20 +761,20 @@ Telegram bots can accept payments with a sleek, streamlined interface that colle
 Here is a **quick start guide** to implement payments:
 
 - Pick a [provider](payments) and obtain the [proper token](payments#getting-a-token) as well as a **test token** from the "**Stripe TEST MODE**" provider.
-- Implement payments via the [appropriate API methods](/bots/api#payments).
+- Implement payments via the [appropriate API methods](/bots/api.md#payments).
 - Test your implementation by using your **test token** along with a [test credit card](https://stripe.com/docs/testing#cards).
 
 Then, to issue an **invoice** and process the order flow:
 
-- [Send an invoice](/bots/api#sendinvoice) to the user for the goods or services you are offering.
-- Validate the order and accept the checkout via [answerPreCheckoutQuery](/bots/api#answerprecheckoutquery).
-- Confirm the payment by checking for a [successful payment service message](/bots/api#successfulpayment).
+- [Send an invoice](/bots/api/methods/sendinvoice.md) to the user for the goods or services you are offering.
+- Validate the order and accept the checkout via [answerPreCheckoutQuery](/bots/api/methods/answerprecheckoutquery.md).
+- Confirm the payment by checking for a [successful payment service message](/bots/api/types/successfulpayment.md).
 - Ship the goods or provide the services.
 
 For more details, feel free to check out our full exhaustive **guides** for selling goods and services on Telegram – they include live checklists, parameters and in-depth method descriptions:
 
-- [Guide for digital goods and services](/bots/payments-stars)
-- [Guide for physical goods and services](/bots/payments)
+- [Guide for digital goods and services](/bots/payments-stars.md)
+- [Guide for physical goods and services](/bots/payments.md)
 
 <div>
   <a href="/file/464001393/101fc/SB_bFCLR0tg.130549/7ecf91aaa44737e8cb" target="_blank"><img src="/file/464001393/101fc/SB_bFCLR0tg.130549/7ecf91aaa44737e8cb" title="Bot Payments" alt="Bot payment interface" class="dev_page_image" width=50% /></a>
@@ -794,7 +794,7 @@ The Telegram login widget is a **simple and secure way to authorize users** on y
 3. Configure your widget using [our dedicated tool](/widgets/login#widget-configuration) and embed it on your website.
 
 #### Inline Login
-When users open your website via an **inline button**, you can use the [login_url](/bots/api#loginurl) parameter as an alternative to login widgets. This way, you'll be able to [seamlessly authorize](https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots) them on your website or app before the page even loads.
+When users open your website via an **inline button**, you can use the [login_url](/bots/api/types/loginurl.md) parameter as an alternative to login widgets. This way, you'll be able to [seamlessly authorize](https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots) them on your website or app before the page even loads.
 
 <div>
   <a href="/file/464001287/105ea/23bO4ntH4tc.43741/c9624e36c3462b6540" target="_blank"><img src="/file/464001287/105ea/23bO4ntH4tc.43741/c9624e36c3462b6540" width=50% title="Inline Login" alt="Inline login interface" class="dev_page_image" /></a>
@@ -803,25 +803,25 @@ When users open your website via an **inline button**, you can use the [login_ur
 > Make sure to review our [guide](/widgets/login#checking-authorization) on authenticating the received data as well as our [sample code](https://gist.github.com/anonymous/6516521b1fb3b464534fbc30ea3573c2).
 
 ### HTML5 Games
-Bots can serve as **standalone gaming platforms** – with our [HTML5 Gaming API](/bots/api#games) you can develop multiplayer or single-player games and let your users have fun comparing **ranks**, **scores** and much more.
+Bots can serve as **standalone gaming platforms** – with our [HTML5 Gaming API](/bots/api.md#games) you can develop multiplayer or single-player games and let your users have fun comparing **ranks**, **scores** and much more.
 
 To get started, follow these simple steps:
 
 - Send the `/newgame` command to [@BotFather](https://t.me/botfather)
 - Provide a **description text**, an **image** or an **optional gif** to showcase its gameplay
-- Send the game to users via the [sendGame](/bots/api#sendgame) method or via an [inline query](/bots/api#inlinequeryresultgame)
-- When someone wants to play, you'll receive the appropriate `game_short_name` in a [CallbackQuery](/bots/api#callbackquery)
-- To launch the game, provide the **HTML5 Game URL** as the `url` param of [answerCallbackQuery](/bots/api#answercallbackquery)
+- Send the game to users via the [sendGame](/bots/api/methods/sendgame.md) method or via an [inline query](/bots/api/types/inlinequeryresultgame.md)
+- When someone wants to play, you'll receive the appropriate `game_short_name` in a [CallbackQuery](/bots/api/types/callbackquery.md)
+- To launch the game, provide the **HTML5 Game URL** as the `url` param of [answerCallbackQuery](/bots/api/methods/answercallbackquery.md)
 
 Then, to handle **highscores**:
 
-- Use [setGameScore](/bots/api#setgamescore) to post high scores in the chat with the game
-- Use [getGameHighScores](/bots/api#getgamehighscores) to get in-game high score tables
+- Use [setGameScore](/bots/api/methods/setgamescore.md) to post high scores in the chat with the game
+- Use [getGameHighScores](/bots/api/methods/getgamehighscores.md) to get in-game high score tables
 
 You can also **embed a share button** within your game, play around with **custom inline buttons**, **URL parameters** and much more. To get a better idea, make sure to check out:
 
-- [HTML5 Games Manual](/bots/games)
-- [HTML5 Games Bot API Docs](/bots/api#games)
+- [HTML5 Games Manual](/bots/games.md)
+- [HTML5 Games Bot API Docs](/bots/api.md#games)
 
 <div>
   <a href="/file/464001558/11b92/y_Fu9QQWtj0.141959/dc9db48f66800bf271" target="_blank"><img src="/file/464001558/11b92/y_Fu9QQWtj0.141959/dc9db48f66800bf271" title="Games" alt="HTML5 game interface" width=50% class="dev_page_image" /></a>
@@ -839,11 +839,11 @@ All these formats are supported by our [Bot API](api#stickers), which allows bot
 To create a **new pack**, simply:
 
 - **Prepare** your artwork following our [technical requirements](https://core.telegram.org/stickers).
-- **Create** a new sticker pack via [createNewStickerSet](api#createnewstickerset). Set `sticker_type` to *regular* to create a sticker pack or to *custom emoji* to create a pack of custom emoji. Attach the [files](api#file) you wish to include in the pack as an array of [InputSticker](https://core.telegram.org/bots/api#inputsticker)
+- **Create** a new sticker pack via [createNewStickerSet](api#createnewstickerset). Set `sticker_type` to *regular* to create a sticker pack or to *custom emoji* to create a pack of custom emoji. Attach the [files](api#file) you wish to include in the pack as an array of [InputSticker](/bots/api/types/inputsticker.md)
 - You can use [addStickerToSet](api#addstickertoset) to add stickers or emoji later on.
 
 **Additional features**
-Regular stickers and custom emoji support **keywords** that users can type to quickly find the respective artwork – this can be useful when a sticker doesn't have obvious ties to a specific emoji. You can use the `keywords` parameter in [InputSticker](https://core.telegram.org/bots/api#inputsticker) to specify them.
+Regular stickers and custom emoji support **keywords** that users can type to quickly find the respective artwork – this can be useful when a sticker doesn't have obvious ties to a specific emoji. You can use the `keywords` parameter in [InputSticker](/bots/api/types/inputsticker.md) to specify them.
 
 Custom emoji additionally support **adaptive colors** – they will always match the current context (e.g., white on photos, accent color when used as status, etc.); to enable this feature, use the `needs_repainting` parameter in [createNewStickerSet](api#createnewstickerset).
 
@@ -859,8 +859,8 @@ Telegram bots can use a broad set of native text styling tools to send **richly 
 
 Formatting is available on two levels:
 
-- [**Rich Messages**](/bots/api#inputrichmessage) for advanced structured content
-- [**Regular Messages**](/bots/api#sendmessage) for lightweight formatted text. 
+- [**Rich Messages**](/bots/api/types/inputrichmessage.md) for advanced structured content
+- [**Regular Messages**](/bots/api/methods/sendmessage.md) for lightweight formatted text. 
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
  <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted="" poster="/file/400780400485/5/ZlL9lRtV5dg.45747.jpg/c564788bd371f0ac48" style="max-width: 400px;" title="Rich Text Formatting for Bots" aria-label="Rich Text Formatting for Bots" alt="Richly formatted bot message" vindex="1" preload="auto"> <source src="/file/400780400478/5/5rtLzULtA5E.3640041.mp4/a641a5c9d3290e2b78" type="video/mp4">
@@ -873,9 +873,9 @@ Formatting is available on two levels:
 
 Rich messages are designed for highly structured responses: reports, AI-streamed answers, documentation snippets, technical papers and similarly complex content.
 
-These messages support both [**Rich Markdown**](/bots/api#rich-markdown-style) and [**Rich HTML**](/bots/api#rich-html-style). Rich Markdown follows GitHub Flavored Markdown where possible and can include supported HTML tags directly in the same message. Rich HTML gives bots granular control over even more formatting features with dedicated tags.
+These messages support both [**Rich Markdown**](/bots/api/rich-messages.md#rich-markdown-style) and [**Rich HTML**](/bots/api/rich-messages.md#rich-html-style). Rich Markdown follows GitHub Flavored Markdown where possible and can include supported HTML tags directly in the same message. Rich HTML gives bots granular control over even more formatting features with dedicated tags.
 
-[Supported styles](/bots/api#rich-markdown-style) include:
+[Supported styles](/bots/api/rich-messages.md#rich-markdown-style) include:
 
 - Headings, paragraphs, dividers, lists and task lists.
 - Deeply nested inline formatting, including bold, italic, underline, strikethrough, spoiler, code, subscript and superscript.
@@ -886,7 +886,7 @@ These messages support both [**Rich Markdown**](/bots/api#rich-markdown-style) a
 - Extensive LaTeX support, including both inline and as block formulas.
 - Maps with custom coordinates, collages, slideshows and more.
 
-> See [here](/bots/api#rich-message-formatting-options) for the full syntax grammar with examples.
+> See [here](/bots/api/rich-messages.md#rich-message-formatting-options) for the full syntax grammar with examples.
 
 Rich messages also support **multiple embedded buttons**. This lets bots create **interactive flows** for anything from surveys, games, and horoscopes to viewing and ordering products – all in a single message.
 
@@ -899,21 +899,21 @@ Rich messages also support **multiple embedded buttons**. This lets bots create 
 
 #### Regular Messages
 
-Regular [messages](/bots/api#sendmessage) are simpler and more lightweight versions of their rich counterparts. They support [**MarkdownV2**](/bots/api#markdownv2-style) and [**HTML**](/bots/api#html-style) formatting – concise styles that are the best choice for short text, confirmations, simple chat flows and other content that does not require complex structure.
+Regular [messages](/bots/api/methods/sendmessage.md) are simpler and more lightweight versions of their rich counterparts. They support [**MarkdownV2**](/bots/api/formatting.md#markdownv2-style) and [**HTML**](/bots/api/formatting.md#html-style) formatting – concise styles that are the best choice for short text, confirmations, simple chat flows and other content that does not require complex structure.
 
 Regular messages are simpler to work with for basic use cases and support exclusive interactions like [partial quotes](https://telegram.org/blog/reply-revolution#reply-revolution) and **quoting messages to other chats**.
 
-> See [here](/bots/api#formatting-options) for the full syntax grammar with examples.
+> See [here](/bots/api/formatting.md) for the full syntax grammar with examples.
 
 ### Language Support
-Bots can tailor their interfaces to **support multiple languages** – updating inputs and information on the fly. A user’s [language_code](/bots/api#user) is included in every relevant [update](/bots/api#update) as an [IETF language tag](https://en.wikipedia.org/wiki/IETF_language_tag), allowing bots to adapt accordingly. 
+Bots can tailor their interfaces to **support multiple languages** – updating inputs and information on the fly. A user’s [language_code](/bots/api/types/user.md) is included in every relevant [update](/bots/api/types/update.md) as an [IETF language tag](https://en.wikipedia.org/wiki/IETF_language_tag), allowing bots to adapt accordingly. 
 
 We recommend that you follow our guidelines to provide **the best user experience**.
 
-- Your interfaces, texts and [inline results](/bots/api#answerinlinequery) should adapt seamlessly to the *language_code*, without user intervention.
-- Connected [WebApps](/bots/webapps) will receive the user's *language_code* – your HTML page should account for it.
-- [HTML5 Games](/bots/games) can obtain language information if you specify it as a [URL parameter](/bots/games#using-url-parameters). You can generate this parameter from the *language_code* field in the [User](/bots/api#user) object served with the initial game [CallbackQuery](/bots/api#callbackquery).
-- The bot's **Name**, **Description** and **About text** can be natively localized with the respective [methods](https://core.telegram.org/bots/api#setmydescription).
+- Your interfaces, texts and [inline results](/bots/api/methods/answerinlinequery.md) should adapt seamlessly to the *language_code*, without user intervention.
+- Connected [WebApps](/bots/webapps.md) will receive the user's *language_code* – your HTML page should account for it.
+- [HTML5 Games](/bots/games.md) can obtain language information if you specify it as a [URL parameter](/bots/games.md#using-url-parameters). You can generate this parameter from the *language_code* field in the [User](/bots/api/types/user.md) object served with the initial game [CallbackQuery](/bots/api/types/callbackquery.md).
+- The bot's **Name**, **Description** and **About text** can be natively localized with the respective [methods](/bots/api/methods/setmydescription.md).
 - Command lists can also be specified for individual languages – more on this [here](#commands).
 
 <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
@@ -934,7 +934,7 @@ Bots are frequently added to groups to perform basic tasks or assist moderators 
 
 - Commands explicitly meant for them (e.g., `/command@this_bot`).
 - General commands (e.g. `/start`) if the bot was the last bot to send a message to the group.
-- Inline messages sent [via](/bots/api#inline-mode) the bot.
+- Inline messages sent [via](/bots/api.md#inline-mode) the bot.
 - Replies to any messages implicitly or explicitly meant for this bot.
 
 All bots will also receive, **regardless of privacy mode**:
@@ -963,7 +963,7 @@ All further testing and debugging can happen privately on the new bot, without a
 
 Telegram also offers a dedicated **test environment** suitable for more advanced testing. Bots and users in this environment generally have more flexible restrictions – for example:
 
-* When working with the test environment, you may use HTTP links without TLS for testing your [Web Apps](https://core.telegram.org/bots/features#mini-apps) or [Web Login](https://core.telegram.org/bots/features#web-login). Production links should use HTTPS.
+* When working with the test environment, you may use HTTP links without TLS for testing your [Web Apps](/bots/features.md#mini-apps) or [Web Login](/bots/features.md#web-login). Production links should use HTTPS.
 
 > **Flood limits** are not raised in the test environment, and may at times be stricter. To minimize how this impacts your bot, you should make sure that it handles errors with retry policies and does not depend on hardcoded limit values.
 
@@ -981,7 +981,7 @@ After logging in, simply [create a new bot](#creating-a-new-bot) following the s
 
     https://api.telegram.org/bot<token>/test/METHOD_NAME
     
-> When working with the test environment, you may use HTTP links without TLS in the `url` field of both [LoginUrl](/bots/api#loginurl) and [WebAppInfo](/bots/api#webappinfo).
+> When working with the test environment, you may use HTTP links without TLS in the `url` field of both [LoginUrl](/bots/api/types/loginurl.md) and [WebAppInfo](/bots/api/types/webappinfo.md).
 
 #### Status alerts
 Millions choose Telegram for its speed. To best benefit users, your bot also **needs to be responsive**. In order to help developers keep their bots in shape, [@BotFather](https://t.me/botfather) will send **status alerts** if it sees something is wrong.
@@ -1004,18 +1004,18 @@ We currently notify you about the following issues:
 
 - **Too few replies to incoming private messages**. - Your bot is not replying to all messages that are being sent to it (the request/response conversion rate for your bot was too low for at least two of the last three 5-minute periods). 
 
-> To provide a good user experience, please respond to all messages that are sent to your bot. Respond to message updates by calling send… methods (e.g. [sendMessage](/bots/api#sendmessage)).
+> To provide a good user experience, please respond to all messages that are sent to your bot. Respond to message updates by calling send… methods (e.g. [sendMessage](/bots/api/methods/sendmessage.md)).
 
-- **Too few answers to inline queries**. - Your bot is not replying to all inline queries that are being sent to it, calculated in the same way as above. Respond to `inline_query` updates by calling [answerInlineQuery](/bots/api#answerinlinequery).
+- **Too few answers to inline queries**. - Your bot is not replying to all inline queries that are being sent to it, calculated in the same way as above. Respond to `inline_query` updates by calling [answerInlineQuery](/bots/api/methods/answerinlinequery.md).
 
 - **Too few answers to callback queries**.
-- **Too few answers to callback game queries**. - Your bot is not replying to all callback queries that are being sent to it (with or without games), calculated in the same way as above. Respond to `callback_query` updates by calling [answerCallbackQuery](/bots/api#answercallbackquery).
+- **Too few answers to callback game queries**. - Your bot is not replying to all callback queries that are being sent to it (with or without games), calculated in the same way as above. Respond to `callback_query` updates by calling [answerCallbackQuery](/bots/api/methods/answercallbackquery.md).
 
 #### Local Bot API
-You can host and work with **your own instance** of our open-source [Bot API](/bots/api).
+You can host and work with **your own instance** of our open-source [Bot API](/bots/api.md).
 The **source code** is available [here](https://github.com/tdlib/telegram-bot-api), along with a quick [installation guide](https://github.com/tdlib/telegram-bot-api#installation).
 
-After **installing the server**, remember to use the [logOut](/bots/api#logout) method before **redirecting requests** to your new local API URL.
+After **installing the server**, remember to use the [logOut](/bots/api/methods/logout.md) method before **redirecting requests** to your new local API URL.
 
 > Your local instance accepts HTTP requests, so a TLS termination proxy has to be used to handle remote HTTPS requests. See the installation guide for the port and other server settings.
 
@@ -1023,10 +1023,10 @@ By hosting our API locally you'll gain access to **some upgrades**, including:
 
 |API|Max File Download|Max File Upload|WHook URL|WHook Port|WHook Max Connections|
 |-----|
-|[Official](/bots/api#making-requests)|20MB|50MB|HTTPS|443,80,88,8443|1-100|
-|[Local](/bots/api#using-a-local-bot-api-server)|Unlimited|2000MB|HTTP|Any port|1-100000|
+|[Official](/bots/api.md#making-requests)|20MB|50MB|HTTPS|443,80,88,8443|1-100|
+|[Local](/bots/api.md#using-a-local-bot-api-server)|Unlimited|2000MB|HTTP|Any port|1-100000|
 
-> You can find an exhaustive list [here](/bots/api#using-a-local-bot-api-server).
+> You can find an exhaustive list [here](/bots/api.md#using-a-local-bot-api-server).
 All limits may be subject to change in the future, so make sure to follow [@BotNews](https://t.me/botnews).
 
 -----
@@ -1056,7 +1056,7 @@ Properly [setting this field](#edit-bots) in [@BotFather](https://t.me/botfather
 
 Additionally, just like normal users, bots also come with a **short bio** available on their profile. If you didn't specify this field while first creating your bot, you can set it at any time with the `/setabouttext` command in [@BotFather](https://t.me/botfather). Users can interact with many bots and they won't have access to their description after starting them – having a quick reminder of the bot's purpose can be very useful.
 
->Note that both the **Description** and the **About text** can be [natively localized](https://core.telegram.org/bots/api#setmydescription) – each user will automatically see the correct translation for their language.
+>Note that both the **Description** and the **About text** can be [natively localized](/bots/api/methods/setmydescription.md) – each user will automatically see the correct translation for their language.
 
 Bots can also have a **profile picture** – you should pick something unique and original so that users can find it in their chat list at a glance.
 
@@ -1096,7 +1096,7 @@ These settings can also be edited via an interactive inline interface accessed v
 - /setinline    – toggle **inline mode** for your bot.
 - /setinlinegeo – request **location data** to provide location-based inline results.
 - /setjoingroups – toggle whether your bot can be **added to groups** or not. All bots must be able to process direct messages, but if your bot was not designed to work in groups, you can disable this.
-- /setinlinefeedback – toggle whether the API should **send updates about the results** chosen by users. See an in-depth explanation [here](/bots/inline#collecting-feedback).
+- /setinlinefeedback – toggle whether the API should **send updates about the results** chosen by users. See an in-depth explanation [here](/bots/inline.md#collecting-feedback).
 - /setprivacy – set which messages your bot will receive when added to a group. See [privacy-mode](#privacy-mode) for more info.
 
 > Note that new commands for editing advanced bot settings may be added at any time. The latest reference for the full list of available commands is [@BotFather](https://t.me/botfather) itself (simply type `/` in the input field to see the full list).
@@ -1112,7 +1112,7 @@ These settings can also be edited via an interactive inline interface accessed v
 
 -----
 
-With this information, you are ready to proceed to our [Full API Reference for Developers](/bots/api).
+With this information, you are ready to proceed to our [Full API Reference for Developers](/bots/api.md).
 
-- If you have any questions, check out our [Bot FAQ](/bots/faq).
+- If you have any questions, check out our [Bot FAQ](/bots/faq.md).
 - If you're experiencing issues with our Bot API, please contact [@BotSupport](https://t.me/botsupport) on Telegram.

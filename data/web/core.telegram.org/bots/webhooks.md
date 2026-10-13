@@ -1,7 +1,7 @@
 # Marvin&#39;s Marvellous Guide to All Things Webhook
 
 
-We currently support two ways of processing bot updates, [**getUpdates**](https://core.telegram.org/bots/api#getting-updates) and [**setWebhook**](/bots/api#setwebhook). **getUpdates** is a pull mechanism, **setwebhook** is push. Although the concept of a webhook is fairly simple, the setup of the individual components has proven to be tricky for many. This guide provides some extra information for those of you brave enough to venture into the art of the webhook.
+We currently support two ways of processing bot updates, [**getUpdates**](/bots/api.md#getting-updates) and [**setWebhook**](/bots/api/methods/setwebhook.md). **getUpdates** is a pull mechanism, **setwebhook** is push. Although the concept of a webhook is fairly simple, the setup of the individual components has proven to be tricky for many. This guide provides some extra information for those of you brave enough to venture into the art of the webhook.
 
 There are some advantages of using a webhook over getUpdates. As soon as an update arrives, we’ll kindly deliver it to your bot for processing.
 
@@ -37,7 +37,7 @@ If you decide to limit traffic to our specific range of addresses, keep an eye o
 * #### A domain name
 Setting a webhook needs a URL for us to post to. For that you'll need a server with a domain name. If you don't have one, you'll need to obtain one first. Telegram currently doesn't offer hosting or domain name services. There are quite a few VPS/Web hosting providers around the internet, feel free to pick one to your liking.
 If you're using a self-signed certificate, you may use the IP as a CN, instead of the domain name.
-[How do I get a server with a domain name?](https://core.telegram.org/bots/webhooks#how-do-i-get-a-server-with-a-domain-name)
+[How do I get a server with a domain name?](/bots/webhooks.md#how-do-i-get-a-server-with-a-domain-name)
 
 * #### An open port
 A webhook needs an open port on your server. We currently support the following ports: **443, 80, 88** and **8443**. Other ports are not supported and will not work. Make sure your bot is running on one of those supported ports, and that the bot is reachable via its public address.
@@ -46,42 +46,42 @@ If you want to limit access to Telegram only, please allow traffic from 149.154.
 Whenever something stops working in the future, please check this document again as 
 the range might expand or change.
 ```
-[How do I check for open ports or limit access to my bot?](https://core.telegram.org/bots/webhooks#how-do-i-check-for-open-ports-or-limit-access-to-my-bot)
+[How do I check for open ports or limit access to my bot?](/bots/webhooks.md#how-do-i-check-for-open-ports-or-limit-access-to-my-bot)
 
 * #### Always SSL/TLS
 A webhook requires SSL/TLS encryption, no matter which port is used. It's not possible to use a plain-text HTTP webhook. You shouldn't want to either, for the sake of your bot and users.
-[SSL/TLS, why do I have to handle this for a webhook?](https://core.telegram.org/bots/webhooks#ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhoo)
+[SSL/TLS, why do I have to handle this for a webhook?](/bots/webhooks.md#ssl-tls-what-is-it-and-why-do-i-have-to-handle-this-for-a-webhoo)
 
 * #### Not all SSL/TLS is equal
 We support any SSL/TLS version TLS1.2 and up for your webhook. This means that **SSLV2/3/TLS1.0/TSL1.1 are NOT supported**, due to security issues associated with those older versions.
-[How do I check that I’m handling the right version?](https://core.telegram.org/bots/webhooks#how-do-i-check-that-im-handling-the-right-version)
+[How do I check that I’m handling the right version?](/bots/webhooks.md#how-do-i-check-that-im-handling-the-right-version)
 
 * #### SSL needs a certificate
 The common name (CN) of your certificate (self-signed or verified) has to match the domain name where your bot is hosted. You may also use a subject alternative name (SAN), that matches the domain for your webhook. Server Name Indication (SNI)-routing is supported. If you're using a self-signed certificate, you may use the IP as a CN, instead of the domain name.
-[A certificate, where do I get one, and how?](https://core.telegram.org/bots/webhooks#a-certificate-where-do-i-get-one-and-how)
+[A certificate, where do I get one, and how?](/bots/webhooks.md#a-certificate-where-do-i-get-one-and-how)
 
 * #### Verified or self-signed
 A certificate can either be verified or self-signed. Setting a webhook with a self-signed certificate differs a little from setting a webhook with a verified certificate. Ensure you're using the correct setup for the type of certificate you've chosen for your webhook.
-[How do I set a webhook for either type?](https://core.telegram.org/bots/webhooks#how-do-i-set-a-webhook-for-either-type)
+[How do I set a webhook for either type?](/bots/webhooks.md#how-do-i-set-a-webhook-for-either-type)
 
 * #### Supported certificates
 Not all verified certificates are supported. Certificates are based on a network of trust and come in a chain. Trusting your verified certificate means we have to trust the provider of that certificate, the Certificate Authority (and hence its root certificate). Before you pick a certificate provider, Check [this list](https://packages.ubuntu.com/jammy/all/ca-certificates/filelist) to make sure that we actually trust their root certificate.
-[What if my root certificate isn’t on that list?](https://core.telegram.org/bots/webhooks#an-untrusted-root)
+[What if my root certificate isn’t on that list?](/bots/webhooks.md#an-untrusted-root)
 
 * #### An Untrusted root
 Ok, so you already had a certificate installed and just discovered it’s not on our list.
 Start by ignoring it, and just try to set it. We occasionally add extra root certificates to keep up with popular demand, so the list isn't always exhaustive. Unlucky after all? We'll allow you to supply an unsupported root certificate when setting the webhook. This method is nearly identical to setting a self-signed certificate webhook. Instead of your self-signed certificate you'll be sending us the root certificate as inputFile.
-[Setting a verified webhook with an untrusted root](https://core.telegram.org/bots/webhooks#setting-a-verified-webhook-with-an-untrusted-root)
+[Setting a verified webhook with an untrusted root](/bots/webhooks.md#setting-a-verified-webhook-with-an-untrusted-root)
 
 * #### Intermediate certificates
 Some verified certificates require an intermediate certificate. In this construction the provider of your verified certificate has used their root certificate to sign an intermediate certificate. This intermediate certificate is then used to sign your verified certificate. You'll need to provide the intermediate certificate for us to be able to verify the chain of trust. CA's that use this type of chain supply an intermediate certificate.
-[Supplying an intermediate certificate](https://core.telegram.org/bots/webhooks#supplying-an-intermediate-certificate)
+[Supplying an intermediate certificate](/bots/webhooks.md#supplying-an-intermediate-certificate)
 
 * #### More information
 Since we know webhooks can be a tad overwhelming, we’re working on a little digital assistant that’ll try and help you with the most common problems, it's not nearly perfect, but you may try using @CanOfWormsBot to check if your chain of certificates is installed correctly before contacting support.
 
 * #### Testing your bot
-We took the liberty of adding a [set of example updates](https://core.telegram.org/bots/webhooks#testing-your-bot-with-updates). They come in handy when testing your bot, no matter which method of getting updates you might be using.
+We took the liberty of adding a [set of example updates](/bots/webhooks.md#testing-your-bot-with-updates). They come in handy when testing your bot, no matter which method of getting updates you might be using.
 
 * #### Don't panic.
 If by now you're looking for your fishing gear because we've mentioned ports and hooks or you're about to Google what kind of bait URL and TLS exactly are, this guide might not be completely for you. You’re quite likely still a brilliant bot programmer, don’t worry. Perhaps this whole webhook thing is just new to you, not all is lost. If you currently have a working getUpdates situation, it's a good idea to pick up this guide again on a rainy Sunday afternoon and take your time to read up on some subjects around the internet. This [guide](http://www.douglasadams.com/creations/hhgg.html) can only contain a finite amount of information after all.
@@ -166,7 +166,7 @@ You’re already familiar with it in some form or another. Whenever you see that
 
 The main difference between getUpdates and a webhook is the way the connection takes place. getUpdates means you'll connect to our server, a webhook means we'll be connecting to your server instead. Connecting to your server has to be done secure, we have to know for sure it's you we're talking to after all. This means you'll have to handle all that server side encryption stuff, virtually presenting us with a green lock. If you use a web server for us to post to, you need to support SSL/TLS handling on the port/virtual host of your choice. An online search for "YOURWEBSERVER enable HTTPS" will help you.
 
-Not using a regular web server? Have a look at our [example page](https://core.telegram.org/bots/samples), most examples there include code for handling SSL/TLS in a webhook setup.
+Not using a regular web server? Have a look at our [example page](/bots/samples.md), most examples there include code for handling SSL/TLS in a webhook setup.
 
 ##### How do I check that I’m handling the right version?
 
@@ -208,8 +208,8 @@ You can add `-tls1_2` to force OpenSSL into using TLS1.2 when trying to connect.
 
 You need a certificate, pick on of these types;
 
-* [A verified, supported certificate](https://core.telegram.org/bots/webhooks#a-verified-supported-certificate)
-* [A self-signed certificate](https://core.telegram.org/bots/webhooks#a-self-signed-certificate)
+* [A verified, supported certificate](/bots/webhooks.md#a-verified-supported-certificate)
+* [A self-signed certificate](/bots/webhooks.md#a-self-signed-certificate)
 
 * ##### A verified, supported certificate
 Using a verified certificate means you already have, or will obtain, a certificate backed by a trusted certificate authority (CA). There are many ways to acquire a verified certificate, paid or free. Two popular examples of free suppliers are **StartSSL** and **Let’s Encrypt**. You’re welcome to pick another. Just make sure first the supplier is likely to be supported.
@@ -423,7 +423,7 @@ For a self-signed certificate an extra parameter is needed, `certificate`, with 
 * A curl example for a self-signed certificate:
 `curl -F "url=https://<YOURDOMAIN.EXAMPLE>/<WEBHOOKLOCATION>" -F "certificate=@<YOURCERTIFICATE>.pem" https://api.telegram.org/bot<YOURTOKEN>/setWebhook`
 
-The `-F` means we’re using the `multipart/form-data`-type to supply the certificate, the type of the certificate parameter is [inputFile](https://core.telegram.org/bots/api#inputfile). Make sure that you’re supplying the correct type.
+The `-F` means we’re using the `multipart/form-data`-type to supply the certificate, the type of the certificate parameter is [inputFile](/bots/api/types/inputfile.md). Make sure that you’re supplying the correct type.
 
 Both parameters for the setWebhook method are classed as optional. Calling the method with an empty URL parameter can be used to clear a previously set webhook.
 
@@ -453,7 +453,7 @@ You can use these commands to quickly convert a DER formatted root certificate t
 The root certificate needs to be imported in your keystore first:
 `keytool -exportcert -alias Root -file <YOURROOTPEMFILE.PEM> -rfc -keystore YOURKEYSTORE.JKS`
 
-Once done, set your webhook with the root-pem-file and you’ll be good to go. If you need more pointers, have a look at the [self-signed](https://core.telegram.org/bots/webhooks#a-self-signed-certificate) part of this guide.
+Once done, set your webhook with the root-pem-file and you’ll be good to go. If you need more pointers, have a look at the [self-signed](/bots/webhooks.md#a-self-signed-certificate) part of this guide.
  
 
 ##### Supplying an intermediate certificate

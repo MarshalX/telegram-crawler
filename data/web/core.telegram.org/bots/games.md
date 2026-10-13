@@ -15,9 +15,9 @@ Bots can offer their users **HTML5 games** to play solo or to compete against ea
 
 ### Web Apps
 
-Since [April 2022](https://telegram.org/blog/notifications-bots#bot-revolution), you can also use [Web Apps](https://core.telegram.org/bots/webapps) to create powerful games using *JavaScript*.
+Since [April 2022](https://telegram.org/blog/notifications-bots#bot-revolution), you can also use [Web Apps](/bots/webapps.md) to create powerful games using *JavaScript*.
 
-> Check out the [Web App Manual](https://core.telegram.org/bots/webapps) for details. 
+> Check out the [Web App Manual](/bots/webapps.md) for details. 
 
 ### Creating a Game
 
@@ -25,7 +25,7 @@ To get started, send the `/newgame` command to [@BotFather](https://telegram.me/
 
 ### Launching the Game
 
-Once the game is created, your bot can send it to chats as regular messages, or offer them via [inline mode](/bots/inline). The game message will always have an [inline](/bots/api#inlinekeyboardmarkup) **Play button**.
+Once the game is created, your bot can send it to chats as regular messages, or offer them via [inline mode](/bots/inline.md). The game message will always have an [inline](/bots/api/types/inlinekeyboardmarkup.md) **Play button**.
 
 When this button is pressed, your bot gets a callback query that indicates the requested game. You provide the correct URL for this particular user and the app automatically opens the game in the in-app browser.
 
@@ -86,4 +86,4 @@ If your URL is using a fragment identifier, please note that Telegram Apps could
 
 Please make sure that your HTML5 page is responsive and works well on all Telegram apps and supported platforms. If you find it impossible to support certain conditions or platforms, don't leave your users hanging and at least provide a notification.
 
-> See the [Bot API Manual](/bots/api#games) for the relevant methods and objects.
+> See the [Bot API Manual](/bots/api.md#games) for the relevant methods and objects.

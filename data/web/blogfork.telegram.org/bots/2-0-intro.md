@@ -2,11 +2,11 @@
 
 
 > Howdy! This text assumes that you're familiar with Telegram's bot platform.
-If this is not the case, kindly check out our [**Introduction to Bots**](/bots).
+If this is not the case, kindly check out our [**Introduction to Bots**](/bots.md).
 
 Today we're introducing the biggest change to Telegram's Bot Platform since June 2015. These new tools will help you create fluid and intuitive interfaces for your bots. And bots  are becoming a lot more capable. They can now send any type of content supported on Telegram, provide location-based services and integrate with other services deeply based on users' phone numbers.
 
-If you'd like a more concise changelog, you can find one in the [**Bot API Manual**](/bots/api#recent-changes).
+If you'd like a more concise changelog, you can find one in the [**Bot API Manual**](/bots/api.md#recent-changes).
 
 ###New Inline Keyboards
 To begin with, we're adding a new type of keyboard that is integrated directly into the message it belongs to. Inline keyboards are available for messages sent both in chat mode and inline mode.
@@ -23,10 +23,10 @@ To begin with, we're adding a new type of keyboard that is integrated directly i
 
 Unlike with custom reply keyboards, pressing buttons on inline keyboards doesn't result in messages sent to the chat. Instead, inline keyboards support buttons that work behind the scenes: [callback buttons](#callback-buttons), [URL buttons](#url-buttons) and [switch to inline buttons](#switch-to-inline-buttons).
 
-> [Manual: Inline keyboards »](/bots/api#inlinekeyboardmarkup)
+> [Manual: Inline keyboards »](/bots/api/types/inlinekeyboardmarkup.md)
 
 ####Callback buttons
-When a user presses a **callback button**, no messages are sent to the chat. Instead, your bot simply receives the relevant query. Upon receiving the query, your bot can display some [result in a notification](/bots/api#answercallbackquery) at the top of the chat screen or in an alert.
+When a user presses a **callback button**, no messages are sent to the chat. Instead, your bot simply receives the relevant query. Upon receiving the query, your bot can display some [result in a notification](/bots/api/methods/answercallbackquery.md) at the top of the chat screen or in an alert.
 
 <div><center>
   <a href="/file/811140423/1/6BVlO7dWPeo/64d0d842ff73ff3dc8" target="_blank"><img src="/file/811140423/1/6BVlO7dWPeo/64d0d842ff73ff3dc8" title="Notification at the top" style="width:295px; padding:10px 20px"/></a></center><br>
@@ -69,7 +69,7 @@ Since inline keyboards don't send additional messages to the chat, it made sense
 **Sample bot**
 [@music](https://telegram.me/music) – Watch how the music bot updates its messages with search results when you press the navigation buttons.
 
-> [Manual: Updating messages »](/bots/api#updating-messages)
+> [Manual: Updating messages »](/bots/api.md#updating-messages)
 
 ###Locations and Numbers
 
@@ -83,7 +83,7 @@ We've added an easy way for bots to ask the user for their **location** and **ph
 
 When these buttons are pressed, Telegram clients will display a confirmation alert that tells the user what's about to happen.
 
-> [Manual: Number and location buttons »](/bots/api#keyboardbutton)
+> [Manual: Number and location buttons »](/bots/api/types/keyboardbutton.md)
 
 Inline bots can also request location data from their users. Use the `/setinlinegeo` command with [@BotFather](https://telegram.me/botfather) to enable this. Your bot will ask the user for permission to access their location whenever they send an inline request.
 
@@ -104,7 +104,7 @@ Inline bots now support **all types of content** available in Telegram (19 in al
 [@sticker](https://telegram.me/sticker) – This sticker bot will accept one or more emoji and search for relevant stickers.
 [@music](https://telegram.me/music) – The music bot allows users to send mp3 tracks from a database of public domain classical music.
 
-> [Manual: Types of inline content »](/bots/api#inlinequeryresult)
+> [Manual: Types of inline content »](/bots/api/types/inlinequeryresult.md)
 
 ####Switching between inline mode and private chat
 Some inline bots can benefit from an initial setup process, like connecting them to an account on an external service (e.g., YouTube). We've added an easy way of switching between the private chat with a bot and whatever chat the user wants to share inline results in.
@@ -113,12 +113,12 @@ Some inline bots can benefit from an initial setup process, like connecting them
 <a href="/file/811140951/1/FD93gAgDVDI/8d8bdd16e6a7b40c12" target="_blank"><img src="/file/811140951/1/FD93gAgDVDI/8d8bdd16e6a7b40c12" title="Switch to PM button"  style="width: 295px; padding: 10px 20px;" /></a></center><br>
 </div>
 
-You can now display a special 'Switch to PM' button above the inline results (or instead of them). This button will open a private chat with the bot and pass a parameter of your choosing, so that you can prompt the user for the relevant setup actions. Once done, you can use an inline keyboard with a [*switch_inline_query*](/bots/api#inlinekeyboardmarkup) button to send the user back to the original chat. 
+You can now display a special 'Switch to PM' button above the inline results (or instead of them). This button will open a private chat with the bot and pass a parameter of your choosing, so that you can prompt the user for the relevant setup actions. Once done, you can use an inline keyboard with a [*switch_inline_query*](/bots/api/types/inlinekeyboardmarkup.md) button to send the user back to the original chat. 
 
 **Sample bots**
 [@youtube](https://telegram.me/youtube) – Shows a 'Sign in to YouTube' button, then suggests personalized results.
 
-> [Manual: Switch to PM](/bots/api#answerinlinequery)
+> [Manual: Switch to PM](/bots/api/methods/answerinlinequery.md)
 
 ####Better inline UI
 
@@ -133,8 +133,8 @@ Tapping on the cross icon once will clear the query, tapping twice will give the
 ###Group Admins
 As a dessert, we're beginning to roll out tools that will allow you to create bot solutions for group admins. As the first step, we've added methods to remove members from groups and supergroups.
 
->[Manual: Group management »](/bots/api#kickchatmember)
+>[Manual: Group management »](/bots/api.md#kickchatmember)
 
 And that's about it for now. Stay tuned for more updates and subscribe to our official [@Botnews](https://telegram.me/botnews) channel on Telegram.
 
->[Read the full changelog for this update »](/bots/api#recent-changes)
+>[Read the full changelog for this update »](/bots/api.md#recent-changes)

@@ -1,6 +1,6 @@
 # Using self-signed certificates
 
-Upload your certificate using the *certificate* parameter in the [setWebhook](/bots/api#setwebhook) method. The certificate supplied should be **PEM encoded** (ASCII BASE64), the pem file should only contain the **public key** (including BEGIN and END portions). When converting from a bundle format, please split the file to only include the public key.
+Upload your certificate using the *certificate* parameter in the [setWebhook](/bots/api/methods/setwebhook.md) method. The certificate supplied should be **PEM encoded** (ASCII BASE64), the pem file should only contain the **public key** (including BEGIN and END portions). When converting from a bundle format, please split the file to only include the public key.
 
 ###Generating a self-signed certificate pair (PEM):
 

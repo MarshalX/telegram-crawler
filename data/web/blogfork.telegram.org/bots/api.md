@@ -431,7 +431,7 @@ Types of this section are listed at [Bot API types](/bots/api/types.md#payments)
 
 ### Telegram Passport
 
-**Telegram Passport** is a unified authorization method for services that require personal identification. Users can upload their documents once, then instantly share their data with services that require real-world ID (finance, ICOs, etc.). Please see the [manual](/passport) for details.
+**Telegram Passport** is a unified authorization method for services that require personal identification. Users can upload their documents once, then instantly share their data with services that require real-world ID (finance, ICOs, etc.). Please see the [manual](/passport.md) for details.
 
 Types of this section are listed at [Bot API types](/bots/api/types.md#telegram-passport).
 

@@ -20,7 +20,7 @@ Users can share their **verified phone number**, removing the need for expensive
 You can reach your users within Telegram, with built-in push notification support.
 
 - **Further integration**
-You can deliver more services directly via the [Bot API](https://core.telegram.org/bots) and [Mini Apps](https://core.telegram.org/bots/webapps).
+You can deliver more services directly via the [Bot API](/bots.md) and [Mini Apps](/bots/webapps.md).
 
 > **Note:** This document describes the Telegram Login library and the new [OpenID Connect](https://en.wikipedia.org/wiki/OpenID) login flow.
 The legacy iframe-based JavaScript widget documentation is archived [here](/widgets/login-legacy).
@@ -51,7 +51,7 @@ Alternatively, you can [use an OpenID integration](#openid-connect).
 > Having trouble with any of the steps above? Feel free to reach out to us at [@BotSupport](https://t.me/botsupport), making sure to include the hashtag #oidc in your message.
 
 #### Setting up a bot
-To use Telegram Login, you'll need a [**Telegram bot**](/bots#how-do-i-create-a-bot) to represent your application.
+To use Telegram Login, you'll need a [**Telegram bot**](/bots.md#how-do-i-create-a-bot) to represent your application.
 
 We strongly recommend that the **profile picture** of the bot corresponds with your website's logo, and that the bot's **name** reflects that connection. Users will see a confirmation box similar to the one below when logging in:
 
@@ -257,4 +257,4 @@ Telegram signs ID tokens with `RS256` by default, which works with all OIDC libr
 
 ---
 
-> Once you have established a connection with the user, you can optionally use your **linked bot** to provide services **directly in the chat interface** via the [Bot API](https://core.telegram.org/bots), or seamlessly offer your **entire web application inside Telegram** using [Mini Apps](https://core.telegram.org/bots/webapps).
+> Once you have established a connection with the user, you can optionally use your **linked bot** to provide services **directly in the chat interface** via the [Bot API](/bots.md), or seamlessly offer your **entire web application inside Telegram** using [Mini Apps](/bots/webapps.md).

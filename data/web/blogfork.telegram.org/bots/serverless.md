@@ -21,7 +21,7 @@ If you have ever wired a bot to a VPS, a cloud function, or a hosting panel just
 #### October 6, 2026
 
 - Added [Mini App hosting](#mini-app-front-end). The build output of your Mini App's front‑end is deployed together with the bot and served at `https://app<app_id>.tgcloud.ai/`.
-- Added [endpoints](#endpoints), the functions your Mini App calls with [Telegram.WebApp.Serverless.call](/bots/webapps#serverless).
+- Added [endpoints](#endpoints), the functions your Mini App calls with [Telegram.WebApp.Serverless.call](/bots/webapps.md#serverless).
 - Updated the [CLI](#command-line-interface) to version 0.2.0.
 - Added the project config file [tgcloud.jsonc](#mini-app-front-end).
 - Project modules can now be imported by [relative path](#the-module-system), with the `.js` extension.
@@ -164,7 +164,7 @@ You can also install it globally — `npm install -g @tgcloud/cli` — if you'd 
 
 #### 2. Link your bot
 
-Every project is tied to one bot. Connect them with `login`, which asks for your CLI access token ([@BotFather](https://t.me/BotFather) → your bot → Serverless → CLI Access → Access token — a separate token from your [bot's API token](/bots/api#authorizing-your-bot)) and stores it locally:
+Every project is tied to one bot. Connect them with `login`, which asks for your CLI access token ([@BotFather](https://t.me/BotFather) → your bot → Serverless → CLI Access → Access token — a separate token from your [bot's API token](/bots/api.md#authorizing-your-bot)) and stores it locally:
 
 ```bash
 npx tgcloud login
@@ -254,7 +254,7 @@ You don't have to deploy to try a change. `npx tgcloud run` executes a handler o
 npx tgcloud run handlers/message '{ chat: { id: 1 }, text: "hello" }'
 ```
 
-The argument is the payload your handler receives — for `handlers/message`, a [Message](/bots/api#message) — written in [JSON5](https://json5.org) (so you can skip quoting keys). The command prints anything the handler logged with `console.*`, the return value, and how long it took. This is the tightest loop for iterating on logic — no deploy, no waiting for a real message.
+The argument is the payload your handler receives — for `handlers/message`, a [Message](/bots/api/types/message.md) — written in [JSON5](https://json5.org) (so you can skip quoting keys). The command prints anything the handler logged with `console.*`, the return value, and how long it took. This is the tightest loop for iterating on logic — no deploy, no waiting for a real message.
 
 #### 8. Keep in sync
 
@@ -329,7 +329,7 @@ Only `.js` files inside `tgcloud/` — `schema.js`, `lib/`, `handlers/`, `endpoi
 | File | Handles |
 |---|---|
 | `handlers/message.js` | New incoming messages |
-| `handlers/inline_query.js` | New incoming [inline](/bots/api#inline-mode) queries |
+| `handlers/inline_query.js` | New incoming [inline](/bots/api.md#inline-mode) queries |
 | `handlers/callback_query.js` | New incoming callback queries |
 | … | _any other Bot API update type_ |
 
@@ -391,7 +391,7 @@ export default async function (message) {
 }
 ```
 
-A handler receives the update's **payload** as its argument — the platform unwraps the Telegram [Update](/bots/api#update) for you. `handlers/message.js` gets the [Message](/bots/api#message) (i.e. `update.message`); `handlers/callback_query.js` gets the [CallbackQuery](/bots/api#callbackquery); and so on. The handler's **second argument** is a per‑invocation context object, `ctx`. It carries the raw `Update` as `ctx.update` — reach for it when you need something outside the payload, like `update_id`.
+A handler receives the update's **payload** as its argument — the platform unwraps the Telegram [Update](/bots/api/types/update.md) for you. `handlers/message.js` gets the [Message](/bots/api/types/message.md) (i.e. `update.message`); `handlers/callback_query.js` gets the [CallbackQuery](/bots/api/types/callbackquery.md); and so on. The handler's **second argument** is a per‑invocation context object, `ctx`. It carries the raw `Update` as `ctx.update` — reach for it when you need something outside the payload, like `update_id`.
 
 A handler can be `async` (usually is) and may return a value. It reaches the Bot API, the database, and outbound HTTP through the SDK.
 
@@ -421,13 +421,13 @@ export default async function (input, ctx) {
 }
 ```
 
-The first argument, `input`, is the JSON object the Mini App sent. The second, `ctx`, carries **`ctx.initData`** — the Mini App's [init data](/bots/webapps#webappinitdata) (`user`, `chat`, `start_param`, `auth_date`, …), already **verified by the platform**. It has the same shape as `Telegram.WebApp.initDataUnsafe` on the client, but here you can trust it. A call without valid init data is rejected with `401` before your code runs, so `ctx.initData.user` really is the person who opened your Mini App. Endpoints can only be called this way — from your bot's Mini App, by a Telegram user — so there is no public API to protect and no login to build.
+The first argument, `input`, is the JSON object the Mini App sent. The second, `ctx`, carries **`ctx.initData`** — the Mini App's [init data](/bots/webapps.md#webappinitdata) (`user`, `chat`, `start_param`, `auth_date`, …), already **verified by the platform**. It has the same shape as `Telegram.WebApp.initDataUnsafe` on the client, but here you can trust it. A call without valid init data is rejected with `401` before your code runs, so `ctx.initData.user` really is the person who opened your Mini App. Endpoints can only be called this way — from your bot's Mini App, by a Telegram user — so there is no public API to protect and no login to build.
 
 Whatever the endpoint returns is sent back as JSON. To refuse a call, `throw new EndpointError(description, parameters?)`. The Mini App gets the description and the `parameters` object as they are. If you need to branch on the kind of error in the front‑end, put a code in `parameters` — `{ code: 'OUT_OF_STOCK' }`. Any other exception is reported as a generic internal error, and the real message goes only to your logs, so internals never leak to the client.
 
 ##### Calling an endpoint from the Mini App
 
-The Mini App calls an endpoint by name with `Telegram.WebApp.Serverless.call` from the official [Mini Apps SDK](/bots/webapps#serverless), `telegram-web-app.js` — the script your Mini App already includes. It sends the init data for you and calls back with an error or the endpoint's result:
+The Mini App calls an endpoint by name with `Telegram.WebApp.Serverless.call` from the official [Mini Apps SDK](/bots/webapps.md#serverless), `telegram-web-app.js` — the script your Mini App already includes. It sends the init data for you and calls back with an error or the endpoint's result:
 
 ```js
 Telegram.WebApp.Serverless.call('getProfile', { lang: 'en' }, function (err, profile) {
@@ -759,7 +759,7 @@ Import your own project modules by relative path with the `.js` extension (`from
 
 #### The Bot API
 
-`api` gives you the entire [Telegram Bot API](/bots/api). Call any method as `api.<method>(params)`. Every current — and future — Bot API method works with **no SDK update** required.
+`api` gives you the entire [Telegram Bot API](/bots/api.md). Call any method as `api.<method>(params)`. Every current — and future — Bot API method works with **no SDK update** required.
 
 ```js
 import { api } from 'sdk';
@@ -967,7 +967,7 @@ The generated file has a live `export default`, so the handler is active as soon
 npx tgcloud login
 ```
 
-Prompts for your CLI access token — from [@BotFather](https://t.me/BotFather) → your bot → Serverless → CLI Access → Access token, a separate token from your [bot's API token](/bots/api#authorizing-your-bot) — validates it against the platform, and saves it to `.tgcloud/credentials`. 
+Prompts for your CLI access token — from [@BotFather](https://t.me/BotFather) → your bot → Serverless → CLI Access → Access token, a separate token from your [bot's API token](/bots/api.md#authorizing-your-bot) — validates it against the platform, and saves it to `.tgcloud/credentials`. 
 
 > `login` is the **only** command that asks for a token, and it requires an interactive terminal. In CI, set `TGCLOUD_TOKEN` instead.
 

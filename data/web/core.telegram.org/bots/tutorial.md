@@ -36,7 +36,7 @@ ___
 ### Introduction
 At its core, you can think of the Telegram [Bot API](api) as software that provides [JSON-encoded](https://en.wikipedia.org/wiki/JSON) responses to your queries.
 
-A bot, on the other hand, is essentially a routine, software or script that queries the API by means of an [HTTPS request](https://core.telegram.org/bots/api#making-requests) and waits for a response. There are several types of [requests](api#available-methods) you can make, as well as many different [objects](api#available-types) that you can use and receive as responses.
+A bot, on the other hand, is essentially a routine, software or script that queries the API by means of an [HTTPS request](/bots/api.md#making-requests) and waits for a response. There are several types of [requests](api#available-methods) you can make, as well as many different [objects](api#available-types) that you can use and receive as responses.
 
 Since **your browser** is capable of sending HTTPS requests, you can use it to quickly try out the API. After [obtaining your token](#obtain-your-bot-token), try pasting this string into your browser:
 
@@ -287,7 +287,7 @@ For this example, we'll assume your User ID is `1234`.
 If you did everything correctly, your bot should text you *Hello World!* every time you launch your code. Sending messages to groups or channels – assuming you have the relevant permissions – is as simple as replacing `1234` with the ID of the respective chat.
 
 >Try experimenting with other types of messages, like SendPhoto, SendSticker, SendDice...
-A full list is available starting [here](https://core.telegram.org/bots/api#sendmessage).
+A full list is available starting [here](/bots/api/methods/sendmessage.md).
 
 ### Echo Bot
 
@@ -597,8 +597,8 @@ If you followed along in one of the equivalent examples ([C#](https://gitlab.com
 
 If you got this far, you might be interested in these additional guides and docs:
 
-- [General Bot Platform Overview](/bots)
-- [Detailed List of Bot Features](/bots/features)
-- [Full API Reference](/bots/api)
+- [General Bot Platform Overview](/bots.md)
+- [Detailed List of Bot Features](/bots/features.md)
+- [Full API Reference](/bots/api.md)
 
 If you encounter any issues while following this guide, you can contact us on Telegram at [@BotSupport](https://t.me/botsupport).

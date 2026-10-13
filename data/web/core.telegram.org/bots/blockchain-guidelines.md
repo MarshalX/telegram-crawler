@@ -15,7 +15,7 @@ The [Terms of Service for Bot Developers](https://telegram.org/tos/bot-developer
 
 #### Bots Without Mini Apps
 
-For clarity, these rules **only apply** to [Mini Apps](https://core.telegram.org/bots/webapps) and their bots on the Telegram platform. Regular Telegram bots that **do not** have a Mini App component are exempt.
+For clarity, these rules **only apply** to [Mini Apps](/bots/webapps.md) and their bots on the Telegram platform. Regular Telegram bots that **do not** have a Mini App component are exempt.
 
 ### Mini App Guidelines
 To assist developers in modifying their apps, the following examples illustrate mini-app functionalities that are permitted or prohibited under [section 7](https://telegram.org/tos/bot-developers#7-blockchain-integration) of the [Terms of Service](https://telegram.org/tos/bot-developers), provided they also comply with all other sections, including [section 9](https://telegram.org/tos/bot-developers#9-compliance-with-laws).

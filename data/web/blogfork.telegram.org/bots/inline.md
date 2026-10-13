@@ -5,7 +5,7 @@
   <a href="/file/811140221/1/fW9vnLya4Fg/e2b5c530c7b0e019c4" target="_blank"><img src="/file/811140530/1/h-eMmPp2vp4/cd4a109f75e6561305" title="Inline bots. Click for hi-res picture">
 </a></div>
 
-Beyond sending commands in private messages or groups, users can interact with your bot via [**inline queries**](/bots/api#inline-mode). If inline queries are enabled, users can call your bot by typing its username and a query in the **text input field** in **any** chat. The query is sent to your bot in an update. This way, people can request content from your bot in **any** of their chats, groups, or channels without sending any messages at all.
+Beyond sending commands in private messages or groups, users can interact with your bot via [**inline queries**](/bots/api.md#inline-mode). If inline queries are enabled, users can call your bot by typing its username and a query in the **text input field** in **any** chat. The query is sent to your bot in an update. This way, people can request content from your bot in **any** of their chats, groups, or channels without sending any messages at all.
 
 <div><center>
     <a href="/file/811140995/1/I-wubuXAnzk/2e39739d0ac6bd5458" target="_blank"><img src="/file/811140995/1/I-wubuXAnzk/2e39739d0ac6bd5458" title="Users can type the bot’s username in any chat, then type a query without sending any messages" style="width:300px; padding:10px 0px 10px"/></a></center>
@@ -14,7 +14,7 @@ Beyond sending commands in private messages or groups, users can interact with y
 
 To enable this option, send the `/setinline` command to [@BotFather](https://telegram.me/botfather) and provide the placeholder text that the user will see in the input field after typing your bot’s name.
 
->See the [Bot API Manual](/bots/api#inline-mode) for the relevant methods and objects.
+>See the [Bot API Manual](/bots/api.md#inline-mode) for the relevant methods and objects.
 
 ###Inline results
 
@@ -49,12 +49,12 @@ Some inline bots can benefit from an initial setup process, like connecting them
 
 </div>
 
-You can display a special 'Switch to PM' button above the inline results (or instead of them). This button will open a private chat with the bot and pass a parameter of your choosing, so that you can prompt the user for the relevant setup actions. Once done, you can use an inline keyboard with a [*switch_inline_query*](/bots/api#inlinekeyboardmarkup) button to send the user back to the original chat. 
+You can display a special 'Switch to PM' button above the inline results (or instead of them). This button will open a private chat with the bot and pass a parameter of your choosing, so that you can prompt the user for the relevant setup actions. Once done, you can use an inline keyboard with a [*switch_inline_query*](/bots/api/types/inlinekeyboardmarkup.md) button to send the user back to the original chat. 
 
 **Sample bots**
 [@youtube](https://telegram.me/youtube) – Shows a 'Sign in to YouTube' button, then suggests personalized results.
 
-> [Manual: Switch to PM](/bots/api#answerinlinequery)
+> [Manual: Switch to PM](/bots/api/methods/answerinlinequery.md)
 
 ###Location-based results
 
@@ -80,7 +80,7 @@ When a user taps on the bot username in the message header, the mention is autom
 ####Collecting feedback
 To know which of the provided results your users are sending to their chat partners, send [@Botfather](https://telegram.me/botfather) the `/setinlinefeedback` command. With this enabled, you will receive updates on the results chosen by your users.
 
-Please note that this can create load issues for popular bots –  you may receive more results than actual requests due to caching (see the *cache_time* parameter in [answerInlineQuery](/bots/api#answerinlinequery)). For these cases, we recommend adjusting the probability setting to receive 1/10, 1/100 or 1/1000 of the results.
+Please note that this can create load issues for popular bots –  you may receive more results than actual requests due to caching (see the *cache_time* parameter in [answerInlineQuery](/bots/api/methods/answerinlinequery.md)). For these cases, we recommend adjusting the probability setting to receive 1/10, 1/100 or 1/1000 of the results.
 
 ###Inline bot samples
 
