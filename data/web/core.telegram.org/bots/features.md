@@ -791,7 +791,7 @@ The Telegram login widget is a **simple and secure way to authorize users** on y
 
 1. Choose a bot – ideally its name and profile pic **should match** the website title and logo.
 2. Use the `/setdomain` command in [@BotFather](https://t.me/botfather) to pair the bot with your website domain. 
-3. Configure your widget using [our dedicated tool](/widgets/login#widget-configuration) and embed it on your website.
+3. Configure your widget using [our dedicated tool](/widgets/login.md#widget-configuration) and embed it on your website.
 
 #### Inline Login
 When users open your website via an **inline button**, you can use the [login_url](/bots/api/types/loginurl.md) parameter as an alternative to login widgets. This way, you'll be able to [seamlessly authorize](https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots) them on your website or app before the page even loads.
@@ -800,7 +800,7 @@ When users open your website via an **inline button**, you can use the [login_ur
   <a href="/file/464001287/105ea/23bO4ntH4tc.43741/c9624e36c3462b6540" target="_blank"><img src="/file/464001287/105ea/23bO4ntH4tc.43741/c9624e36c3462b6540" width=50% title="Inline Login" alt="Inline login interface" class="dev_page_image" /></a>
 </div>
 
-> Make sure to review our [guide](/widgets/login#checking-authorization) on authenticating the received data as well as our [sample code](https://gist.github.com/anonymous/6516521b1fb3b464534fbc30ea3573c2).
+> Make sure to review our [guide](/widgets/login.md#checking-authorization) on authenticating the received data as well as our [sample code](https://gist.github.com/anonymous/6516521b1fb3b464534fbc30ea3573c2).
 
 ### HTML5 Games
 Bots can serve as **standalone gaming platforms** – with our [HTML5 Gaming API](/bots/api.md#games) you can develop multiplayer or single-player games and let your users have fun comparing **ranks**, **scores** and much more.
@@ -831,14 +831,14 @@ You can also **embed a share button** within your game, play around with **custo
 
 ### Stickers and Custom Emoji
 
-[Stickers](https://core.telegram.org/stickers) and [Custom Emoji](https://telegram.org/blog/custom-emoji) are a distinctive Telegram feature used by millions of users to share artwork every day. Stickers and custom emoji take many forms – ranging from **basic images** to smooth **vector animations** and high-detail **.WEBM videos**.
+[Stickers](/stickers.md) and [Custom Emoji](https://telegram.org/blog/custom-emoji) are a distinctive Telegram feature used by millions of users to share artwork every day. Stickers and custom emoji take many forms – ranging from **basic images** to smooth **vector animations** and high-detail **.WEBM videos**.
 
-All these formats are supported by our [Bot API](api#stickers), which allows bots to **create**, **edit**, **delete** and **share** new artwork packs on the fly. Telegram's [Import API](https://core.telegram.org/import-stickers) lets users **migrate packs** from other platforms and sticker apps.
+All these formats are supported by our [Bot API](api#stickers), which allows bots to **create**, **edit**, **delete** and **share** new artwork packs on the fly. Telegram's [Import API](/import-stickers.md) lets users **migrate packs** from other platforms and sticker apps.
 
 **Creating a new pack**
 To create a **new pack**, simply:
 
-- **Prepare** your artwork following our [technical requirements](https://core.telegram.org/stickers).
+- **Prepare** your artwork following our [technical requirements](/stickers.md).
 - **Create** a new sticker pack via [createNewStickerSet](api#createnewstickerset). Set `sticker_type` to *regular* to create a sticker pack or to *custom emoji* to create a pack of custom emoji. Attach the [files](api#file) you wish to include in the pack as an array of [InputSticker](/bots/api/types/inputsticker.md)
 - You can use [addStickerToSet](api#addstickertoset) to add stickers or emoji later on.
 

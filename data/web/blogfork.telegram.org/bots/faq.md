@@ -3,35 +3,7 @@
 > If you are new to Telegram bots, we recommend checking out our [**Introduction to Bots**](/bots.md) first.
 You may also find the **[Bot API Manual](/bots/api.md)** useful.
 
-{contents_nav}
 
-[**General**](#general-questions)
-
-- [How do I create a bot?](#how-do-i-create-a-bot)
-- [Where can I get some code examples?](#i-39m-a-developer-where-can-i-find-some-examples)
-- [I have a feature request!](#will-you-add-x-to-the-bot-api)
-- [What messages will my bot get?](#what-messages-will-my-bot-get)
-- [Why doesn't my bot see messages from other bots?](#why-doesn-39t-my-bot-see-messages-from-other-bots)
-
-[**Getting Updates**](#getting-updates)
-
-- [How do I get updates?](#how-do-i-get-updates)
-- [Long polling problems](#long-polling-gives-me-the-same-updates-again-and-again)
-- [Webhook problems](#i-39m-having-problems-with-webhooks)
-- [Using self-signed certificates](#i-39m-having-trouble-with-my-self-signed-certificate)
-- [How can I make sure webhook requests come from Telegram?](#how-can-i-make-sure-that-webhook-requests-are-coming-from-telegr)
-
-[**Handling Media**](#handling-media)
-
-- [Downloading files](#how-do-i-download-files)
-- [Uploading large files](#how-do-i-upload-a-large-file)
-- [Can I count of file_ids to be persistent?](#can-i-count-on-file-ids-to-be-persistent)
-
-[**Broadcasting to Users**](#broadcasting-to-users)
-
-- [How do I avoid hitting limits?](#my-bot-is-hitting-limits-how-do-i-avoid-this)
-- [How do I message all my subscribers?](#how-can-i-message-all-of-my-bot-39s-subscribers-at-once)
-{/contents_nav}
 
 _______________
 

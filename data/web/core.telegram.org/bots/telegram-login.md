@@ -23,7 +23,7 @@ You can reach your users within Telegram, with built-in push notification suppor
 You can deliver more services directly via the [Bot API](/bots.md) and [Mini Apps](/bots/webapps.md).
 
 > **Note:** This document describes the Telegram Login library and the new [OpenID Connect](https://en.wikipedia.org/wiki/OpenID) login flow.
-The legacy iframe-based JavaScript widget documentation is archived [here](/widgets/login-legacy).
+The legacy iframe-based JavaScript widget documentation is archived [here](/widgets/login-legacy.md).
 
 ---
 

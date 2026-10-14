@@ -1359,7 +1359,7 @@ Introducing **Bot API 5.0**
 
 - Supported [text formatting](/bots/api/formatting.md) in media captions. Specify the desired *parse_mode* ([Markdown](/bots/api/formatting.md#markdown-style) or [HTML](/bots/api/formatting.md#html-style)) when you provide a caption.
 - In supergroups, if the bot receives a message that is a reply, it will also receive the message to which that message is replying - even if the original message is inaccessible due to the bot's privacy settings. (In other words, replying to any message in a supergroup with a message that mentions the bot or features a command for it acts as forwarding the original message to the bot). 
-- Added the new field *connected_website* to [Message](/bots/api/types/message.md). The bot will receive a message with this field in a private chat when a user logs in on the bot's connected website using the [Login Widget](https://core.telegram.org/widgets/login) and allows sending messages from your bot.
+- Added the new field *connected_website* to [Message](/bots/api/types/message.md). The bot will receive a message with this field in a private chat when a user logs in on the bot's connected website using the [Login Widget](/widgets/login.md) and allows sending messages from your bot.
 - Added the new parameter *supports_streaming* to the [sendVideo](/bots/api/methods/sendvideo.md) method and a field with the same name to the [InputMediaVideo](/bots/api/types/inputmediavideo.md) object.
 
 ### 2017
@@ -1455,14 +1455,14 @@ Introducing **Bot API 2.3.1**, a nifty little update that will give you more con
 **Bot API 2.3**
 
 - Modified [**bot privacy mode**](/bots/faq.md#what-messages-will-my-bot-get) for the sake of consistency. 
-- Your bot can now get **updates about posts in channels**. Added new fields *channel_post* and *edited_channel_post* to [Update](/bots.md#update).
+- Your bot can now get **updates about posts in channels**. Added new fields *channel_post* and *edited_channel_post* to [Update](/bots/#update).
 
-- You can now update high scores to a lower value by using the new *force* parameter in [setGameScore](/bots.md#setgamescore). Handy for punishing **cheaters** or fixing errors in your game's High Score table.
-- Starting today, messages with high scores will be updated with new high scores by default. Use *disable_edit_message* in [setGameScore](/bots.md#setgamescore) if you don't want this.
-- The *edit_message* parameter from [setGameScore](/bots.md#setgamescore) is no longer in use. For backward compatibility, it will be taken into account for a while, unless *disable_edit_message* is passed explicitly.
-- Added the new field *forward_from_message_id* to [Message](/bots.md#message).
-- Added the new parameter *cache_time* to [answerCallbackQuery](/bots.md#answercallbackquery). Will eventually work in Telegram apps - somewhere after version 3.14, maybe 3.15.
-- Renamed *hide_keyboard* to *remove_keyboard* in [ReplyKeyboardRemove](/bots.md#replykeyboardremove) for clarity. *hide_keyboard* will still work for a while for backward compatibility.
+- You can now update high scores to a lower value by using the new *force* parameter in [setGameScore](/bots/#setgamescore). Handy for punishing **cheaters** or fixing errors in your game's High Score table.
+- Starting today, messages with high scores will be updated with new high scores by default. Use *disable_edit_message* in [setGameScore](/bots/#setgamescore) if you don't want this.
+- The *edit_message* parameter from [setGameScore](/bots/#setgamescore) is no longer in use. For backward compatibility, it will be taken into account for a while, unless *disable_edit_message* is passed explicitly.
+- Added the new field *forward_from_message_id* to [Message](/bots/#message).
+- Added the new parameter *cache_time* to [answerCallbackQuery](/bots/#answercallbackquery). Will eventually work in Telegram apps - somewhere after version 3.14, maybe 3.15.
+- Renamed *hide_keyboard* to *remove_keyboard* in [ReplyKeyboardRemove](/bots/#replykeyboardremove) for clarity. *hide_keyboard* will still work for a while for backward compatibility.
 
 #### October 3, 2016
 
