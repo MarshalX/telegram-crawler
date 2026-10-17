@@ -169,6 +169,9 @@ https://github.com/fmeef/botapi-rs
 * **rustigram**, Comprehensive async Rust framework for the Telegram Bot API.
 https://github.com/meh7an/rustigram
 
+* **telers**. An asynchronous framework for Telegram Bot API written in Rust.
+https://github.com/Desiders/telers
+
 * **carapax**. A Telegram Bot API framework.
 https://github.com/tg-rs/carapax
 
