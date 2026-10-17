@@ -185,7 +185,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: httpx.Asyn
     download_url = await get_download_link_of_latest_macos_release(remote_updates_manifest_url, session)
 
     if not download_url:
-        return
+        raise RuntimeError(f'[macos-beta] no download link in {remote_updates_manifest_url}')
 
     crawled_data_folder = os.path.join(OUTPUT_CLIENTS_FOLDER, 'macos-beta')
     client_folder_name = 'macos'
@@ -241,7 +241,7 @@ async def download_telegram_macos_beta_and_extract_resources(session: httpx.Asyn
     if process.returncode != 0:
         logger.error(f'[macos-beta] acextract failed with code {process.returncode}')
         cleanup2()
-        return
+        raise RuntimeError('[macos-beta] acextract failed')
 
     _, _, hash_of_files_to_track = next(os.walk(assets_output_dir))
     await track_additional_files(
@@ -370,7 +370,7 @@ async def download_telegram_ios_beta_and_extract_resources(session: httpx.AsyncC
     if process.returncode != 0:
         logger.error(f'[ios-beta] acextract failed with code {process.returncode}')
         cleanup2()
-        return
+        raise RuntimeError('[ios-beta] acextract failed')
 
     for dir_path, _, hash_of_files_to_track in os.walk(assets_output_dir):
         await track_additional_files(
@@ -430,7 +430,7 @@ async def _download_telegram_android_and_extract_resources(
     if process.returncode != 0:
         logger.error(f'[{folder_name}] apktool failed with code {process.returncode}: {stdout[-1000:]}')
         cleanup()
-        return
+        raise RuntimeError(f'[{folder_name}] apktool failed')
 
     files_to_track = [
         'res/values/strings.xml',
