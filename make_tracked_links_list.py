@@ -82,6 +82,7 @@ CRAWL_GLOBAL_RULES = {
     'allow': set(),
     'deny': {
         r'.org/auth$',
+        r'\.md\.',
     },
 }
 # disable crawling sub links for specific domains and url patterns
