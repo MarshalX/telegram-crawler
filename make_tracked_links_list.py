@@ -461,7 +461,12 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict[str, 
         pool=None
     )
     logger.debug('[%s] Process %s (total timeout: %ds)', len(VISITED_LINKS), truncated_url, timeout_config['total'])
-    response = await client.get(f'{PROTOCOL}{url}', timeout=timeout)
+    # streamed cuz binary resources are tracked by content type alone
+    async with client.stream('GET', f'{PROTOCOL}{url}', timeout=timeout) as response:
+        await _handle_response(url, truncated_url, response)
+
+
+async def _handle_response(url: str, truncated_url: str, response: httpx.Response):
     code = response.status_code
 
     if 499 < code < 600:
@@ -490,6 +495,7 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict[str, 
                     logger.warning(f'Skip [{code}] {truncated_url}: already tried flipping slash state for {base_url}')
                     return
 
+        await response.aread()
         clean_content = response.text.replace('\n', ' ').replace('\r', ' ')
         truncated_content = (clean_content[:200] + '...') if len(clean_content) > 200 else clean_content
         logger.warning(f'Skip [{code}] {truncated_url}: {truncated_content}')
@@ -498,7 +504,7 @@ async def _crawl(url: str, client: httpx.AsyncClient, timeout_config: dict[str, 
 
     content_type = response.headers.get('content-type', '')
     if is_textable_content_type(content_type):
-        raw_content = response.content
+        raw_content = await response.aread()
 
         try:
             content = raw_content.decode('utf-8')
