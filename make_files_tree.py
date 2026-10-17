@@ -51,6 +51,8 @@ TON_RATE_REGEX = r'"tonRate":"[.0-9]+"'
 TON_RATE_TEMPLATE = f'"tonRate":"{DYNAMIC_PART_MOCK}"'
 APK_BETA_TOKEN_REGEX = r'apk\?token=.*?"'
 APK_BETA_TOKEN_TEMPLATE = f'apk?token={DYNAMIC_PART_MOCK}"'
+TURNSTILE_CDATA_REGEX = r'data-cdata="[^"]+"'
+TURNSTILE_CDATA_TEMPLATE = f'data-cdata="{DYNAMIC_PART_MOCK}"'
 PASSPORT_SSID_REGEX = r'passport_ssid=[a-z0-9]+_[a-z0-9]+_[a-z0-9]+'
 PASSPORT_SSID_TEMPLATE = f'passport_ssid={DYNAMIC_PART_MOCK}'
 NONCE_REGEX = r'"nonce":"[a-z0-9]+_[a-z0-9]+_[a-z0-9]+'
@@ -860,6 +862,7 @@ async def _crawl(url: str, session: httpx.AsyncClient, output_dir: str):
     content = re.sub(SPARKLE_SE_REGEX, SPARKLE_SE_TEMPLATE, content)
     content = re.sub(TON_RATE_REGEX, TON_RATE_TEMPLATE, content)
     content = re.sub(APK_BETA_TOKEN_REGEX, APK_BETA_TOKEN_TEMPLATE, content)
+    content = re.sub(TURNSTILE_CDATA_REGEX, TURNSTILE_CDATA_TEMPLATE, content)
 
     # there is a problem with the files with the same name (in the same path) but different case
     # the content is random because of the async
