@@ -458,6 +458,8 @@ When you `npx tgcloud push`, the CLI gathers every `.js` file under `schema.js`,
 
 The project root is yours, and it is the natural place for your Mini App's front‑end — built with React, Vue, Svelte or plain HTML, by Vite or any other bundler. Serverless hosts its **build output** next to your bot. One `push` deploys the code and the static files together, and the app is served at `https://app<app_id>.tgcloud.ai/` (`push` prints the exact address — use it as your Mini App's URL in [@BotFather](https://t.me/BotFather)).
 
+> **Reporting abuse.** Mini Apps on tgcloud.ai are published by independent developers. To report illegal content or abuse on an `app<app_id>.tgcloud.ai` subdomain, email [abuse@telegram.org](mailto:abuse@telegram.org).
+
 To start, create the front‑end first, with whatever tool you like, then add Serverless on top of it:
 
 ```bash
