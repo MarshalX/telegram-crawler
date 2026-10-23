@@ -68,6 +68,7 @@ Options not mentioned in this list may be safely ignored.
 |can_set_new_chat_privacy_settings|Boolean|No|*Since TDLib 1.8.28*. If true, then the current user can change privacy settings for new chats|
 |can_use_login_passkey|Boolean|No|*Since TDLib 1.8.59*. If true, then passkey can be used to log in and new passkeys can be added|
 |can_use_text_entities_in_story_caption|Boolean|No|*Since TDLib 1.8.24*. If true, then the current user can use text entities in story captions|
+|can_use_ton_wallet|Boolean|No|*Since TDLib 1.8.68*. If true, then the current user can use TON Wallet|
 |can_withdraw_chat_revenue|Boolean|No|*Since TDLib 1.8.28*. If true, then revenue from sponsored messages in chats can be withdrawn|
 |channel_bot_user_id|Integer|No|Identifier of the bot which is shown as the sender of messages sent on behalf of channels when viewed from an outdated client|
 |chat_available_reaction_count_max|Integer|No|*Since TDLib 1.8.24*. The maximum number of manually chosen reactions for a chat|
@@ -153,9 +154,11 @@ Options not mentioned in this list may be safely ignored.
 |rich_message_media_count_max|Integer|No|*Since TDLib 1.8.65*. The maximum number of media files in a rich message|
 |rich_message_table_column_count_max|Integer|No|*Since TDLib 1.8.65*. The maximum number of columns in a table of a rich message|
 |rich_message_text_length_max|Integer|No|*Since TDLib 1.8.65*. The maximum length of a rich message text|
+|secondary_bot_username_count_max|Integer|No|*Since TDLib 1.8.68*. The maximum number of bots with a secondary username that can be owned by a Premium user|
 |show_message_edit_date_by_default|Boolean|No|If true, then message edit date must be shown along the message instead of the message send date|
 |stake_dice_stake_amount_max|Integer|No|*Since TDLib 1.8.60*. The maximum amount of TON Grams that can be staked for a roll in nanograms|
 |stake_dice_stake_amount_min|Integer|No|*Since TDLib 1.8.60*. The minimum amount of TON Grams that can be staked for a roll in nanograms|
+|star_top_up_disabled|Boolean|No|*Since TDLib 1.8.68*. If true, then direct purchase of Telegram Stars for payments towards specific bots or chats isn't allowed|
 |star_withdrawal_count_max|Integer|No|*Since TDLib 1.8.52*. The maximum number of Telegram Stars that can be withdrawn|
 |star_withdrawal_count_min|Integer|No|*Since TDLib 1.8.31*. The minimum number of Telegram Stars that can be withdrawn|
 |story_album_count_max|Integer|No|*Since TDLib 1.8.53*. The maximum number of story albums|
@@ -193,6 +196,9 @@ Options not mentioned in this list may be safely ignored.
 |text_composition_style_title_length_max|Integer|No|*Since TDLib 1.8.64*. The maximum allowed length of the text composition style title|
 |thousand_star_to_usd_rate|Integer|No|*Since TDLib 1.8.35*. The number of US dollars that can be received by withdrawing 1000 Telegram Stars|
 |ton_blockchain_explorer_url|String|No|*Since TDLib 1.8.45*. A prefix of the URL that can be used to get information about a TON blockchain address|
+|ton_wallet_gasless_transfer_amount_min|Integer|No|*Since TDLib 1.8.68*. The minimum amount of TON Grams that can be transfered in a gasless transfer in nanograms|
+|ton_wallet_gasless_transfer_daily_count_max|Integer|No|*Since TDLib 1.8.68*. The maximum number of allowed gasless transfers per day|
+|ton_wallet_transfer_amount_min|Integer|No|*Since TDLib 1.8.68*. The minimum amount of TON Grams that can be transfered in a regular transfer in nanograms|
 |toncoin_top_up_url|String|No|*TDLib 1.8.52-1.8.64*. The URL that can be used to top up TON Gram balance of the current user|
 |unix_time|Integer|No|An estimation of the current Unix timestamp. The option will not be updated automatically unless the difference between the previous estimation and the locally available monotonic clocks changes significantly|
 |usd_to_thousand_star_rate|Integer|No|*Since TDLib 1.8.35*. The number of US dollars needed to buy 1000 Telegram Stars|
