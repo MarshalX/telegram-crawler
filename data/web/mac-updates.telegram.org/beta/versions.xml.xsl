@@ -6,6 +6,20 @@
 <item>
 <title>Telegram macOS</title>
 <description>• Bug fixes, minor improvements, and more.</description>
+<pubDate>2026-29-10 23:54:34</pubDate>
+<enclosure sparkle:version="283417" sparkle:shortVersionString="13.1.0" sparkle:dsaSignature="MCwCFCFG7bnq63NSrOgjmKyrRSyxTpy/AhQhci3d2g9NslCeRRHGqKEa4+bhWQ==" url="https://mac-updates.telegram.org/beta/Telegram-13.1.0.283417.app.zip" length="165333549" forbidden="false" critical="false" environment="beta" fileName="Telegram-13.1.0.283417.app.zip" internalUrl="https://t.me/macos_beta_updates_files/303" dmgName="Telegram-13.1.0.283417.dmg" type="application/octet-stream"/>
+<sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+</item>
+<item>
+<title>Telegram macOS</title>
+<description>• Bug fixes, minor improvements, and more.</description>
+<pubDate>2026-29-10 21:58:14</pubDate>
+<enclosure sparkle:version="283415" sparkle:shortVersionString="13.1.0" sparkle:dsaSignature="MCwCFHh5akexrDmCYtcOVyNBZ66ooB5BAhQ6fzUI3m3ggXf8oQzg+ON1AJBtzw==" url="https://mac-updates.telegram.org/beta/Telegram-13.1.0.283415.app.zip" length="165317283" forbidden="false" critical="false" environment="beta" fileName="Telegram-13.1.0.283415.app.zip" internalUrl="https://t.me/macos_beta_updates_files/302" dmgName="Telegram-13.1.0.283415.dmg" type="application/octet-stream"/>
+<sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+</item>
+<item>
+<title>Telegram macOS</title>
+<description>• Bug fixes, minor improvements, and more.</description>
 <pubDate>2026-29-10 18:47:23</pubDate>
 <enclosure sparkle:version="283414" sparkle:shortVersionString="13.1.0" sparkle:dsaSignature="MC4CFQCVfJapDBRYVurAVFn8EUN1piXLlQIVAICXfx3aYNGbXGUd1wLAST43lu9t" url="https://mac-updates.telegram.org/beta/Telegram-13.1.0.283414.app.zip" length="165324570" forbidden="false" critical="false" environment="beta" fileName="Telegram-13.1.0.283414.app.zip" internalUrl="https://t.me/macos_beta_updates_files/301" dmgName="Telegram-13.1.0.283414.dmg" type="application/octet-stream"/>
 <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
@@ -127,20 +141,6 @@
 <description>• Bug fixes, minor improvements, and more.</description>
 <pubDate>2026-27-10 14:19:37</pubDate>
 <enclosure sparkle:version="283393" sparkle:shortVersionString="13.1.0" sparkle:dsaSignature="MCwCFFUADLGf/pke4poNv1emM7xAyHETAhQzBCngeAoZAJwxFCexeXuuW02xEA==" url="https://mac-updates.telegram.org/beta/Telegram-13.1.0.283393.app.zip" length="165256099" forbidden="false" critical="false" environment="beta" fileName="Telegram-13.1.0.283393.app.zip" internalUrl="https://t.me/macos_beta_updates_files/284" dmgName="Telegram-13.1.0.283393.dmg" type="application/octet-stream"/>
-<sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
-</item>
-<item>
-<title>Telegram macOS</title>
-<description>• Bug fixes, minor improvements, and more.</description>
-<pubDate>2026-27-10 13:18:28</pubDate>
-<enclosure sparkle:version="283392" sparkle:shortVersionString="13.1.0" sparkle:dsaSignature="MC0CFQCTuVkS1i8ul37LSeDeLdntqbuHkAIUNOBCEBBUrbLKMY6AO0rbA1ZgBD8=" url="https://mac-updates.telegram.org/beta/Telegram-13.1.0.283392.app.zip" length="165239915" forbidden="false" critical="false" environment="beta" fileName="Telegram-13.1.0.283392.app.zip" internalUrl="https://t.me/macos_beta_updates_files/283" dmgName="Telegram-13.1.0.283392.dmg" type="application/octet-stream"/>
-<sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
-</item>
-<item>
-<title>Telegram macOS</title>
-<description>• Bug fixes, minor improvements, and more.</description>
-<pubDate>2026-26-10 23:31:34</pubDate>
-<enclosure sparkle:version="283391" sparkle:shortVersionString="13.1.0" sparkle:dsaSignature="MCwCFGHF4fVLUxnMZ5QzF5TigKQBpH/NAhQQmkcstAZEC2YiFLXrXqXATy3Tiw==" url="https://mac-updates.telegram.org/beta/Telegram-13.1.0.283391.app.zip" length="165079680" forbidden="false" critical="false" environment="beta" fileName="Telegram-13.1.0.283391.app.zip" internalUrl="https://t.me/macos_beta_updates_files/282" dmgName="Telegram-13.1.0.283391.dmg" type="application/octet-stream"/>
 <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
 </item>
 </channel>
