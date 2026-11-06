@@ -104,6 +104,17 @@ def get_hash(data: bytes) -> str:
 
 
 async def download_file(url: str, path: str, session: httpx.AsyncClient):
+    while True:
+        try:
+            await _download_file(url, path, session)
+        except RETRYABLE_HTTPX_ERRORS:
+            logger.warning(f'[download] Retrying {url}')
+            await asyncio.sleep(1)
+        else:
+            break
+
+
+async def _download_file(url: str, path: str, session: httpx.AsyncClient):
     params = {'tgcrawlNoCache': uuid.uuid4().hex}
     start_time = time()
 
