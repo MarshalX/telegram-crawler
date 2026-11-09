@@ -48,6 +48,7 @@ Options not mentioned in this list may be safely ignored.
 |affiliate_program_commission_per_mille_min|Integer|No|*Since TDLib 1.8.41*. The minimum commission that can be used for an affiliate program|
 |animation_search_bot_username|String|No|Username of a bot which can be used in inline mode for animations search|
 |anti_spam_bot_user_id|Integer|No|*Since TDLib 1.8.24*. User identifier of the Telegram Anti-Spam bot|
+|audio_search_bot_username|String|No|*Since TDLib 1.8.70*. Username of a bot which can be used in inline mode for audios search|
 |authentication_token|String|No|An authentication token to be used on subsequent authorizations|
 |authorization_date|Integer|No|Point in time (Unix timestamp) when authorization was received|
 |basic_group_size_max|Integer|No|The maximum number of members in a basic group|
@@ -203,7 +204,6 @@ Options not mentioned in this list may be safely ignored.
 |unix_time|Integer|No|An estimation of the current Unix timestamp. The option will not be updated automatically unless the difference between the previous estimation and the locally available monotonic clocks changes significantly|
 |usd_to_thousand_star_rate|Integer|No|*Since TDLib 1.8.35*. The number of US dollars needed to buy 1000 Telegram Stars|
 |user_note_text_length_max|Integer|No|*Since TDLib 1.8.56*. The maximum length of text of a user note|
-|venue_search_bot_username|String|No|Username of a bot which can be used in inline mode for venues search|
 |verification_codes_bot_chat_id|Integer|No|*Since TDLib 1.8.37*. Identifier of the Verification Codes chat with codes from Telegram Gateway|
 |version|String|No|TDLib version. This options is guaranteed to come before all other updates. Can be received synchronously.|
 |web_app_allowed_protocols|String|No|*Since TDLib 1.8.32*. A space-separated list of URL protocols that are allowed to be open by the call to `web_app_open_link` from Web Apps.|

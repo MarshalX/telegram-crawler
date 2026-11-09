@@ -59,6 +59,60 @@ To learn how to create…">
 <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
 </blockquote>
 <h3><a class="anchor" name="2026" href="#2026"><i class="anchor-icon"></i></a>2026</h3>
+<h4><a class="anchor" name="november-9-2026" href="#november-9-2026"><i class="anchor-icon"></i></a>November 9, 2026</h4>
+<p><strong>Bot API 10.4</strong></p>
+<p><strong>Widgets</strong></p>
+<ul>
+<li>Added the class <a href="/bots/api#widget">Widget</a> and the field <em>widget</em> to the classes <a href="/bots/api#message">Message</a> and <a href="/bots/api#externalreplyinfo">ExternalReplyInfo</a> for messages with <a href="/bots/widgets">HTML widgets</a>.</li>
+<li>Added the method <a href="/bots/api#sendwidget">sendWidget</a>, allowing bots to send messages with HTML widgets. Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can&#39;t be forwarded.</li>
+<li>Added the method <a href="/bots/api#sendsharedwidget">sendSharedWidget</a>, allowing bots to send again shared widgets created by the bot.</li>
+<li>Added the class <a href="/bots/api#widgetquery">WidgetQuery</a> and the field <em>widget_query</em> to the class <a href="/bots/api#update">Update</a> for queries sent to the bot by widgets in messages sent by the bot or via the bot.</li>
+<li>Added the class <a href="/bots/api#sharedwidgetquery">SharedWidgetQuery</a> and the field <em>shared_widget_query</em> to the class <a href="/bots/api#update">Update</a> for queries sent to the bot from forwarded messages with shared widgets.</li>
+<li>Added the classes <a href="/bots/api#widgetquerytype">WidgetQueryType</a>, <a href="/bots/api#widgetquerytypedata">WidgetQueryTypeData</a>, <a href="/bots/api#widgetquerytypesigndata">WidgetQueryTypeSignData</a>, <a href="/bots/api#widgetquerytypesenttransaction">WidgetQueryTypeSentTransaction</a> and <a href="/bots/api#widgetquerywallet">WidgetQueryWallet</a>, describing the type of a query from a widget. A query can contain data for the bot together with the TON wallet card of the user, data signed by a TON wallet of the user, or a notification about a transaction sent from a TON wallet of the user.</li>
+<li>Added the method <a href="/bots/api#answerwidgetquery">answerWidgetQuery</a>, allowing bots to answer queries from widgets.</li>
+<li>Added the method <a href="/bots/api#editmessagewidgetdata">editMessageWidgetData</a>, allowing bots to change data of a widget in a message.</li>
+<li>Added the method <a href="/bots/api#editsharedwidgetdata">editSharedWidgetData</a>, allowing bots to change public data of a shared widget.</li>
+<li>Added the classes <a href="/bots/api#inputwidgetmessagecontent">InputWidgetMessageContent</a> and <a href="/bots/api#inputsharedwidgetmessagecontent">InputSharedWidgetMessageContent</a>, allowing bots to send widgets in response to inline queries. Currently, widgets can&#39;t be sent in response to inline queries in the production environment.</li>
+<li>Widget messages can&#39;t be copied using the methods <a href="/bots/api#copymessage">copyMessage</a> and <a href="/bots/api#copymessages">copyMessages</a>.</li>
+<li>The right <em>can_send_other_messages</em> in the classes <a href="/bots/api#chatpermissions">ChatPermissions</a> and <a href="/bots/api#chatmemberrestricted">ChatMemberRestricted</a> now also allows sending widgets.</li>
+</ul>
+<p><strong>Ephemeral messages</strong></p>
+<ul>
+<li>Allowed bots to send ephemeral replies to callback queries in any chat except channel direct messages chats by specifying <em>callback_query_id</em> without <em>receiver_user_id</em> in the parameter <em>ephemeral_message_parameters</em> of the methods <a href="/bots/api#sendmessage">sendMessage</a>, <a href="/bots/api#sendrichmessage">sendRichMessage</a>, <a href="/bots/api#sendanimation">sendAnimation</a>, <a href="/bots/api#sendaudio">sendAudio</a>, <a href="/bots/api#sendcontact">sendContact</a>, <a href="/bots/api#senddocument">sendDocument</a>, <a href="/bots/api#sendlivephoto">sendLivePhoto</a>, <a href="/bots/api#sendlocation">sendLocation</a>, <a href="/bots/api#sendphoto">sendPhoto</a>, <a href="/bots/api#sendsticker">sendSticker</a>, <a href="/bots/api#sendvenue">sendVenue</a>, <a href="/bots/api#sendvideo">sendVideo</a>, <a href="/bots/api#sendvideonote">sendVideoNote</a> and <a href="/bots/api#sendvoice">sendVoice</a>.</li>
+<li>The field <em>receiver_user_id</em> of the class <a href="/bots/api#ephemeralmessageparameters">EphemeralMessageParameters</a> and the parameter <em>chat_id</em> of the mentioned methods are optional now.</li>
+</ul>
+<p><strong>Quotes from rich messages</strong></p>
+<ul>
+<li>Added the field <em>rich_texts</em> to the class <a href="/bots/api#textquote">TextQuote</a> for quotes chosen from a <a href="/bots/api#richmessage">RichMessage</a>.</li>
+<li>Added the field <em>quote_rich_texts</em> to the class <a href="/bots/api#replyparameters">ReplyParameters</a>, allowing bots to quote rich messages.</li>
+</ul>
+<p><strong>TON wallet</strong></p>
+<ul>
+<li>Added the classes <a href="/bots/api#tonwalletcard">TonWalletCard</a>, <a href="/bots/api#tonwalletcardsticker">TonWalletCardSticker</a>, <a href="/bots/api#tonnft">TonNft</a> and <a href="/bots/api#tonnftattribute">TonNftAttribute</a>, and the field <em>ton_wallet_card</em> to the class <a href="/bots/api#chatfullinfo">ChatFullInfo</a>.</li>
+<li>Added the class <a href="/bots/api#tonwallettransfer">TonWalletTransfer</a> and the field <em>ton_wallet_transfer</em> to the class <a href="/bots/api#message">Message</a> for service messages about transfers with a TON wallet.</li>
+<li>Renamed the class StoryAreaPosition to <a href="/bots/api#areaposition">AreaPosition</a>, because it is now also used to describe the position of stickers on TON wallet cards.</li>
+</ul>
+<p><strong>Chat share themes</strong></p>
+<ul>
+<li>Added the classes <a href="/bots/api#chatsharetheme">ChatShareTheme</a>, <a href="/bots/api#chatsharethemeemoji">ChatShareThemeEmoji</a> and <a href="/bots/api#chatsharethemeuniquegift">ChatShareThemeUniqueGift</a>, and the field <em>share_theme</em> to the class <a href="/bots/api#chatfullinfo">ChatFullInfo</a>, describing the theme of the screen for sharing a link to a user or a chat.</li>
+<li>Added the classes <a href="/bots/api#emojitype">EmojiType</a>, <a href="/bots/api#emojitypeemoji">EmojiTypeEmoji</a> and <a href="/bots/api#emojitypecustomemoji">EmojiTypeCustomEmoji</a>.</li>
+<li>Added the classes <a href="/bots/api#chatsharethemebackdrop">ChatShareThemeBackdrop</a> and <a href="/bots/api#chatsharethemebackdrops">ChatShareThemeBackdrops</a> and the method <a href="/bots/api#getchatsharethemebackdrops">getChatShareThemeBackdrops</a>.</li>
+</ul>
+<p><strong>Gifts</strong></p>
+<ul>
+<li>Added the method <a href="/bots/api#getuniquegift">getUniqueGift</a>, allowing bots to get information about a unique gift by its name.</li>
+<li>Added the method <a href="/bots/api#deletebusinessaccountgift">deleteBusinessAccountGift</a>, allowing bots to delete regular gifts owned by a managed business account without receiving Telegram Stars for them.</li>
+</ul>
+<p><strong>General</strong></p>
+<ul>
+<li>Allowed users with a Telegram Premium subscription to assign secondary usernames ending with “agent”, “ai”, “app”, “game”, or “gay” to up to 2 owned bots. Such usernames can be suggested in the field <em>suggested_username</em> of the class <a href="/bots/api#keyboardbuttonrequestmanagedbot">KeyboardButtonRequestManagedBot</a>.</li>
+<li>Added the class <a href="/bots/api#richtexttonaddress">RichTextTonAddress</a> representing an address in the TON blockchain in a <a href="/bots/api#richmessage">RichMessage</a>.</li>
+<li>Added the type “ton_address” to the class <a href="/bots/api#messageentity">MessageEntity</a> for addresses in the TON blockchain.</li>
+<li>Added the type “bank_card_number” to the class <a href="/bots/api#messageentity">MessageEntity</a> for bank card numbers.</li>
+<li>Added the parameters <em>custom_description_parse_mode</em> and <em>custom_description_entities</em> to the methods <a href="/bots/api#verifyuser">verifyUser</a> and <a href="/bots/api#verifychat">verifyChat</a>.</li>
+<li>Added the class <a href="/bots/api#paidmessageswaived">PaidMessagesWaived</a> and the field <em>paid_messages_waived</em> to the class <a href="/bots/api#message">Message</a> for service messages about the sender using a link which allows sending messages without paying Telegram Stars.</li>
+<li>Added the ability to create links to topics in private chats with the bot in the format <code>https://t.me/&lt;bot_username&gt;/&lt;message_thread_id&gt;</code>. Such a link opens the topic only for the user in the private chat with whom the topic exists.</li>
+</ul>
 <h4><a class="anchor" name="august-24-2026" href="#august-24-2026"><i class="anchor-icon"></i></a>August 24, 2026</h4>
 <p><strong>Bot API 10.3</strong></p>
 <p><strong>Rich Messages</strong></p>

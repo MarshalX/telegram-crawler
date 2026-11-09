@@ -12,6 +12,62 @@ You will find all changes to our [**Bot API**](/bots/api.md) on this page.
 
 ### 2026
 
+#### November 9, 2026
+
+**Bot API 10.4**
+
+**Widgets**
+
+- Added the class [Widget](/bots/api/types/widget.md) and the field *widget* to the classes [Message](/bots/api/types/message.md) and [ExternalReplyInfo](/bots/api/types/externalreplyinfo.md) for messages with [HTML widgets](/bots/widgets.md).
+- Added the method [sendWidget](/bots/api/methods/sendwidget.md), allowing bots to send messages with HTML widgets. Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded.
+- Added the method [sendSharedWidget](/bots/api/methods/sendsharedwidget.md), allowing bots to send again shared widgets created by the bot.
+- Added the class [WidgetQuery](/bots/api/types/widgetquery.md) and the field *widget_query* to the class [Update](/bots/api/types/update.md) for queries sent to the bot by widgets in messages sent by the bot or via the bot.
+- Added the class [SharedWidgetQuery](/bots/api/types/sharedwidgetquery.md) and the field *shared_widget_query* to the class [Update](/bots/api/types/update.md) for queries sent to the bot from forwarded messages with shared widgets.
+- Added the classes [WidgetQueryType](/bots/api/types/widgetquerytype.md), [WidgetQueryTypeData](/bots/api/types/widgetquerytypedata.md), [WidgetQueryTypeSignData](/bots/api/types/widgetquerytypesigndata.md), [WidgetQueryTypeSentTransaction](/bots/api/types/widgetquerytypesenttransaction.md) and [WidgetQueryWallet](/bots/api/types/widgetquerywallet.md), describing the type of a query from a widget. A query can contain data for the bot together with the TON wallet card of the user, data signed by a TON wallet of the user, or a notification about a transaction sent from a TON wallet of the user.
+- Added the method [answerWidgetQuery](/bots/api/methods/answerwidgetquery.md), allowing bots to answer queries from widgets.
+- Added the method [editMessageWidgetData](/bots/api/methods/editmessagewidgetdata.md), allowing bots to change data of a widget in a message.
+- Added the method [editSharedWidgetData](/bots/api/methods/editsharedwidgetdata.md), allowing bots to change public data of a shared widget.
+- Added the classes [InputWidgetMessageContent](/bots/api/types/inputwidgetmessagecontent.md) and [InputSharedWidgetMessageContent](/bots/api/types/inputsharedwidgetmessagecontent.md), allowing bots to send widgets in response to inline queries. Currently, widgets can't be sent in response to inline queries in the production environment.
+- Widget messages can't be copied using the methods [copyMessage](/bots/api/methods/copymessage.md) and [copyMessages](/bots/api/methods/copymessages.md).
+- The right *can_send_other_messages* in the classes [ChatPermissions](/bots/api/types/chatpermissions.md) and [ChatMemberRestricted](/bots/api/types/chatmemberrestricted.md) now also allows sending widgets.
+
+**Ephemeral messages**
+
+- Allowed bots to send ephemeral replies to callback queries in any chat except channel direct messages chats by specifying *callback_query_id* without *receiver_user_id* in the parameter *ephemeral_message_parameters* of the methods [sendMessage](/bots/api/methods/sendmessage.md), [sendRichMessage](/bots/api/methods/sendrichmessage.md), [sendAnimation](/bots/api/methods/sendanimation.md), [sendAudio](/bots/api/methods/sendaudio.md), [sendContact](/bots/api/methods/sendcontact.md), [sendDocument](/bots/api/methods/senddocument.md), [sendLivePhoto](/bots/api/methods/sendlivephoto.md), [sendLocation](/bots/api/methods/sendlocation.md), [sendPhoto](/bots/api/methods/sendphoto.md), [sendSticker](/bots/api/methods/sendsticker.md), [sendVenue](/bots/api/methods/sendvenue.md), [sendVideo](/bots/api/methods/sendvideo.md), [sendVideoNote](/bots/api/methods/sendvideonote.md) and [sendVoice](/bots/api/methods/sendvoice.md).
+- The field *receiver_user_id* of the class [EphemeralMessageParameters](/bots/api/types/ephemeralmessageparameters.md) and the parameter *chat_id* of the mentioned methods are optional now.
+
+**Quotes from rich messages**
+
+- Added the field *rich_texts* to the class [TextQuote](/bots/api/types/textquote.md) for quotes chosen from a [RichMessage](/bots/api/types/richmessage.md).
+- Added the field *quote_rich_texts* to the class [ReplyParameters](/bots/api/types/replyparameters.md), allowing bots to quote rich messages.
+
+**TON wallet**
+
+- Added the classes [TonWalletCard](/bots/api/types/tonwalletcard.md), [TonWalletCardSticker](/bots/api/types/tonwalletcardsticker.md), [TonNft](/bots/api/types/tonnft.md) and [TonNftAttribute](/bots/api/types/tonnftattribute.md), and the field *ton_wallet_card* to the class [ChatFullInfo](/bots/api/types/chatfullinfo.md).
+- Added the class [TonWalletTransfer](/bots/api/types/tonwallettransfer.md) and the field *ton_wallet_transfer* to the class [Message](/bots/api/types/message.md) for service messages about transfers with a TON wallet.
+- Renamed the class StoryAreaPosition to [AreaPosition](/bots/api/types/areaposition.md), because it is now also used to describe the position of stickers on TON wallet cards.
+
+**Chat share themes**
+
+- Added the classes [ChatShareTheme](/bots/api/types/chatsharetheme.md), [ChatShareThemeEmoji](/bots/api/types/chatsharethemeemoji.md) and [ChatShareThemeUniqueGift](/bots/api/types/chatsharethemeuniquegift.md), and the field *share_theme* to the class [ChatFullInfo](/bots/api/types/chatfullinfo.md), describing the theme of the screen for sharing a link to a user or a chat.
+- Added the classes [EmojiType](/bots/api/types/emojitype.md), [EmojiTypeEmoji](/bots/api/types/emojitypeemoji.md) and [EmojiTypeCustomEmoji](/bots/api/types/emojitypecustomemoji.md).
+- Added the classes [ChatShareThemeBackdrop](/bots/api/types/chatsharethemebackdrop.md) and [ChatShareThemeBackdrops](/bots/api/types/chatsharethemebackdrops.md) and the method [getChatShareThemeBackdrops](/bots/api/methods/getchatsharethemebackdrops.md).
+
+**Gifts**
+
+- Added the method [getUniqueGift](/bots/api/methods/getuniquegift.md), allowing bots to get information about a unique gift by its name.
+- Added the method [deleteBusinessAccountGift](/bots/api/methods/deletebusinessaccountgift.md), allowing bots to delete regular gifts owned by a managed business account without receiving Telegram Stars for them.
+
+**General**
+
+- Allowed users with a Telegram Premium subscription to assign secondary usernames ending with "agent", "ai", "app", "game", or "gay" to up to 2 owned bots. Such usernames can be suggested in the field *suggested_username* of the class [KeyboardButtonRequestManagedBot](/bots/api/types/keyboardbuttonrequestmanagedbot.md).
+- Added the class [RichTextTonAddress](/bots/api/types/richtexttonaddress.md) representing an address in the TON blockchain in a [RichMessage](/bots/api/types/richmessage.md).
+- Added the type "ton_address" to the class [MessageEntity](/bots/api/types/messageentity.md) for addresses in the TON blockchain.
+- Added the type "bank_card_number" to the class [MessageEntity](/bots/api/types/messageentity.md) for bank card numbers.
+- Added the parameters *custom_description_parse_mode* and *custom_description_entities* to the methods [verifyUser](/bots/api/methods/verifyuser.md) and [verifyChat](/bots/api/methods/verifychat.md).
+- Added the class [PaidMessagesWaived](/bots/api/types/paidmessageswaived.md) and the field *paid_messages_waived* to the class [Message](/bots/api/types/message.md) for service messages about the sender using a link which allows sending messages without paying Telegram Stars.
+- Added the ability to create links to topics in private chats with the bot in the format `https://t.me/<bot_username>/<message_thread_id>`. Such a link opens the topic only for the user in the private chat with whom the topic exists.
+
 #### August 24, 2026
 
 **Bot API 10.3**
@@ -386,7 +442,7 @@ You will find all changes to our [**Bot API**](/bots/api.md) on this page.
 - Added the method [upgradeGift](/bots/api/methods/upgradegift.md), allowing bots to upgrade regular gifts received by a managed business account to unique gifts.
 - Added the method [transferGift](/bots/api/methods/transfergift.md), allowing bots to transfer unique gifts owned by a managed business account.
 - Added the classes [InputStoryContentPhoto](/bots/api/types/inputstorycontentphoto.md) and [InputStoryContentVideo](/bots/api/types/inputstorycontentvideo.md) representing the content of a story to post.
-- Added the classes [StoryArea](/bots/api/types/storyarea.md), [StoryAreaPosition](/bots/api/types/storyareaposition.md), [LocationAddress](/bots/api/types/locationaddress.md), [StoryAreaTypeLocation](/bots/api/types/storyareatypelocation.md), [StoryAreaTypeSuggestedReaction](/bots/api/types/storyareatypesuggestedreaction.md), [StoryAreaTypeLink](/bots/api/types/storyareatypelink.md), [StoryAreaTypeWeather](/bots/api/types/storyareatypeweather.md) and [StoryAreaTypeUniqueGift](/bots/api/types/storyareatypeuniquegift.md), describing clickable active areas on stories.
+- Added the classes [StoryArea](/bots/api/types/storyarea.md), [StoryAreaPosition](/bots/api.md#storyareaposition), [LocationAddress](/bots/api/types/locationaddress.md), [StoryAreaTypeLocation](/bots/api/types/storyareatypelocation.md), [StoryAreaTypeSuggestedReaction](/bots/api/types/storyareatypesuggestedreaction.md), [StoryAreaTypeLink](/bots/api/types/storyareatypelink.md), [StoryAreaTypeWeather](/bots/api/types/storyareatypeweather.md) and [StoryAreaTypeUniqueGift](/bots/api/types/storyareatypeuniquegift.md), describing clickable active areas on stories.
 - Added the method [postStory](/bots/api/methods/poststory.md), allowing bots to post a story on behalf of a managed business account.
 - Added the method [editStory](/bots/api/methods/editstory.md), allowing bots to edit stories they had previously posted on behalf of a managed business account.
 - Added the method [deleteStory](/bots/api/methods/deletestory.md), allowing bots to delete stories they had previously posted on behalf of a managed business account.

@@ -230,6 +230,8 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [sendAnimation](/bots/api/methods/sendanimation.md): send animation files (GIF or H.264/MPEG-4 AVC video without sound).
 - [sendVoice](/bots/api/methods/sendvoice.md): send audio files, if you want Telegram clients to display the file as a playable voice message.
 - [sendVideoNote](/bots/api/methods/sendvideonote.md): send a rounded square MPEG4 video of up to 1 minute long.
+- [sendWidget](/bots/api/methods/sendwidget.md): send a message with an HTML widget.
+- [sendSharedWidget](/bots/api/methods/sendsharedwidget.md): send again a shared widget created by the bot.
 - [sendPaidMedia](/bots/api/methods/sendpaidmedia.md): send paid media.
 - [sendMediaGroup](/bots/api/methods/sendmediagroup.md): send a group of photos, live photos, videos, documents or audios as an album.
 - [sendLocation](/bots/api/methods/sendlocation.md): send point on the map.
@@ -276,6 +278,7 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [getChatAdministrators](/bots/api/methods/getchatadministrators.md): get a list of administrators in a chat.
 - [getChatMemberCount](/bots/api/methods/getchatmembercount.md): get the number of members in a chat.
 - [getChatMember](/bots/api/methods/getchatmember.md): get information about a member of a chat.
+- [getChatShareThemeBackdrops](/bots/api/methods/getchatsharethemebackdrops.md): get the list of backdrops, which can be used as the background of a theme of the screen for sharing a link to a user or a chat.
 - [getUserPersonalChatMessages](/bots/api/methods/getuserpersonalchatmessages.md): get the last messages from the personal chat (i.e., the chat currently added to their profile) of a given user.
 - [setChatStickerSet](/bots/api/methods/setchatstickerset.md): set a new group sticker set for a supergroup.
 - [deleteChatStickerSet](/bots/api/methods/deletechatstickerset.md): delete a group sticker set from a supergroup.
@@ -293,6 +296,7 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [unhideGeneralForumTopic](/bots/api/methods/unhidegeneralforumtopic.md): unhide the 'General' topic in a forum supergroup chat.
 - [unpinAllGeneralForumTopicMessages](/bots/api/methods/unpinallgeneralforumtopicmessages.md): clear the list of pinned messages in a General forum topic.
 - [answerCallbackQuery](/bots/api/methods/answercallbackquery.md): send answers to callback queries sent from inline keyboards.
+- [answerWidgetQuery](/bots/api/methods/answerwidgetquery.md): send an answer to a query from a widget.
 - [answerGuestQuery](/bots/api/methods/answerguestquery.md): reply to a received guest message.
 - [getUserChatBoosts](/bots/api/methods/getuserchatboosts.md): get the list of boosts added to a chat by a user.
 - [getBusinessConnection](/bots/api/methods/getbusinessconnection.md): get information about the connection of the bot with a business account.
@@ -335,9 +339,11 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [getBusinessAccountGifts](/bots/api/methods/getbusinessaccountgifts.md): Returns the gifts received and owned by a managed business account.
 - [getUserGifts](/bots/api/methods/getusergifts.md): Returns the gifts owned and hosted by a user.
 - [getChatGifts](/bots/api/methods/getchatgifts.md): Returns the gifts owned by a chat.
+- [getUniqueGift](/bots/api/methods/getuniquegift.md): get information about a unique gift by its name.
 - [convertGiftToStars](/bots/api/methods/convertgifttostars.md): Converts a given regular gift to Telegram Stars.
 - [upgradeGift](/bots/api/methods/upgradegift.md): Upgrades a given regular gift to a unique gift.
 - [transferGift](/bots/api/methods/transfergift.md): Transfers an owned unique gift to another user.
+- [deleteBusinessAccountGift](/bots/api/methods/deletebusinessaccountgift.md): Deletes a regular gift owned by a managed business account without receiving Telegram Stars for it.
 - [postStory](/bots/api/methods/poststory.md): Posts a story on behalf of a managed business account.
 - [repostStory](/bots/api/methods/repoststory.md): Reposts a story on behalf of a business account from another business account.
 - [editStory](/bots/api/methods/editstory.md): Edits a story previously posted by the bot on behalf of a managed business account.
@@ -362,6 +368,8 @@ Please note, that it is currently only possible to edit messages without *reply_
 - [editMessageLiveLocation](/bots/api/methods/editmessagelivelocation.md): edit live location messages.
 - [stopMessageLiveLocation](/bots/api/methods/stopmessagelivelocation.md): stop updating a live location message before *live_period* expires.
 - [editMessageChecklist](/bots/api/methods/editmessagechecklist.md): edit a checklist on behalf of a connected business account.
+- [editMessageWidgetData](/bots/api/methods/editmessagewidgetdata.md): edit data of a widget in a message sent by the bot or via the bot (for inline bots).
+- [editSharedWidgetData](/bots/api/methods/editsharedwidgetdata.md): edit public data of a shared widget created by the bot.
 - [editMessageReplyMarkup](/bots/api/methods/editmessagereplymarkup.md): edit only the reply markup of messages.
 - [stopPoll](/bots/api/methods/stoppoll.md): stop a poll which was sent by the bot.
 - [editEphemeralMessageText](/bots/api/methods/editephemeralmessagetext.md): edit an ephemeral text or rich message.
