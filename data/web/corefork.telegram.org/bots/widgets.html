@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html class="" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <title>Telegram Widgets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="description" content="Bots can send widgets: small interactive blocks drawn right inside a message. A widget is one self-contained HTML document…">
+    <meta property="og:title" content="Telegram Widgets">
+    <meta property="og:image" content="">
+    <meta property="og:description" content="Bots can send widgets: small interactive blocks drawn right inside a message. A widget is one self-contained HTML document…">
+    <link rel="alternate" type="text/markdown" href="//core.telegram.org/bots/widgets.md">
+    <link rel="icon" type="image/svg+xml" href="/img/website_icon.svg?4">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="alternate icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link href="/css/bootstrap.min.css?3" rel="stylesheet">
+    <link href="/css/highlight.min.css?1" rel="stylesheet">
+
+    <link href="/css/telegram.css?256" rel="stylesheet" media="screen">
+    <link href="/css/telegram-theme.css?9" rel="stylesheet" media="screen">
+    <style>
+    </style>
+  </head>
+  <body class="preload">
+    <button class="theme-toggle theme-toggle--static" type="button" title="Toggle theme" aria-label="Toggle light/dark theme"></button>
+    <div class="dev_page_wrap">
+      <div class="dev_page_head navbar navbar-static-top navbar-tg">
+        <div class="navbar-inner">
+          <div class="container clearfix">
+            <ul class="nav navbar-nav navbar-right hidden-xs"><li class="navbar-twitter hidden-xs"><a href="https://x.com/telegram" target="_blank" data-track="Follow/Twitter" onclick="trackDlClick(this, event)"><i class="icon icon-twitter"></i> Follow on X</a></li></ul>
+            <ul class="nav navbar-nav">
+              <li><a href="//telegram.org/">Home</a></li>
+<li class="hidden-xs"><a href="//telegram.org/faq">FAQ</a></li>
+<li class="hidden-xs"><a href="//telegram.org/apps">Apps</a></li>
+<li class=""><a href="/api">API</a></li>
+<li class=""><a href="/mtproto">Protocol</a></li>
+<li class=""><a href="/schema">Schema</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container clearfix">
+        <div class="dev_page">
+          <p class="llm-hint">Machine-readable version of this page: //core.telegram.org/bots/widgets.md.</p>
+          <div id="dev_page_content_wrap" class=" ">
+  <div class="dev_page_bread_crumbs"><ul class="breadcrumb clearfix"><li><a  href="/bots" >Bots</a></li><i class="icon icon-breadcrumb-divider"></i><li><a  href="/bots/widgets" >Telegram Widgets</a></li></ul></div>
+  <h1 id="dev_page_title">Telegram Widgets</h1>
+  
+  <div id="dev_page_content"><!-- scroll_nav -->
+
+<p>Bots can send <strong>widgets</strong>: small interactive blocks drawn right inside a message. A widget is one self-contained HTML document with inline CSS and JavaScript, at most 32 KB of HTML and 4 KB after compression. Telegram apps run it on the user&#39;s device in a sandbox with <strong>no network access at all</strong>, draw it in the style of the chat, and keep it running while it is on screen: a poll whose bars move as people vote, a price ticker, a board game for two in a group, a promo code that copies on a tap.</p>
+<p>A widget is <strong>fixed code plus changeable state</strong>. The code, its HTML, is set when the widget is sent and never changes. What changes is the widget&#39;s state, and only the bot writes it: the <strong>chat state</strong>, tied to one message and seen only in that chat, and the <strong>shared state</strong>, seen wherever the widget is shown. The widget reads its state and redraws when it changes. It cannot change the state itself, but it can ask the bot with small requests, the way a callback button does. Widgets live in the private chat with the bot, in groups, in messages sent via the bot in inline mode, and in forwards to any chat. Currently, in the production environment, widgets work only in the private chat with the bot. The rest works on the <a href="#availability">test server</a>. A widget can also be a <strong>shared widget</strong>: one widget on the server, like a poll, that any number of messages show, with one shared state for all of them.</p>
+<p>This page is a guide to designing and implementing widgets, followed by the reference of the widget&#39;s JavaScript object <code>TelegramWidget</code>. The Bot API methods and types for widgets are in the <a href="/bots/api">Bot API reference</a>.</p>
+<hr>
+<h3><a class="anchor" name="introducing-widgets" href="#introducing-widgets"><i class="anchor-icon"></i></a>Introducing widgets</h3>
+<h4><a class="anchor" name="code-and-state" href="#code-and-state"><i class="anchor-icon"></i></a>Code and state</h4>
+<p>A widget is fixed code plus changeable state.</p>
+<ul>
+<li><strong>The code</strong> (the HTML with its CSS and JavaScript) is set when the widget is sent and never changes, in a message or in a shared widget. No method replaces it. For a new layout, send a new widget, and old messages keep the old one. As with any media, the caption can be edited.</li>
+<li><strong>The state</strong> is what changes, and only the bot writes it. There are two kinds:<ul>
+<li><strong>chat state</strong> (<code>chat_data</code>): tied to one message, seen only in that chat (shared by all members in a group), never carried by a forward. A game in progress, whose turn it is.</li>
+<li><strong>shared state</strong> (<code>public_data</code>): seen wherever the widget is shown. A static widget keeps it in the message, and a forward gets a copy as of the moment of forwarding. A <a href="#static-and-shared-widgets">shared widget</a> (one object with an identifier, like a poll) has one shared state for all its messages and forwards. Poll results, a price.</li>
+</ul>
+</li>
+<li><strong>The widget</strong> reads its state, learns about changes through the <code>chatDataChanged</code> and <code>publicDataChanged</code> events, and cannot change its state itself: it can only ask the bot, with a <a href="#requests-to-the-bot">request</a>.</li>
+</ul>
+<p>Details: <a href="#the-widgets-state">The widget&#39;s state</a>.</p>
+<h4><a class="anchor" name="what-a-widget-is" href="#what-a-widget-is"><i class="anchor-icon"></i></a>What a widget is</h4>
+<ul>
+<li><strong>One HTML document.</strong> Inline <code>&lt;style&gt;</code> and <code>&lt;script&gt;</code>, images only as <code>data:</code> URLs or inline SVG. At most <strong>32768 bytes</strong> of UTF-8 HTML and at most <strong>4096 bytes</strong> after the server compresses it with zlib at level 9. The bot sends plain HTML, and the server checks and packs it. A bare fragment without <code>&lt;html&gt;</code> and <code>&lt;body&gt;</code> works too.</li>
+<li><strong>Static or shared.</strong> A static widget keeps its code and state in the message, and a forward copies them as they are at that moment. A <a href="#static-and-shared-widgets">shared widget</a> is one object on the server holding the code, the size, the shared state, the refresh period and the request flag. Any number of messages show it by its identifier, and a change of its shared state reaches all of them.</li>
+<li><strong>Sandboxed.</strong> The widget&#39;s JavaScript runs in QuickJS, a small JavaScript engine, never in a WebView or browser context. The client checks every change the widget makes to its page against the <a href="#what-widgets-support">widget profile</a> and draws only what passes. The same widget looks the same on iOS, Android, macOS, Telegram Desktop and the web.</li>
+<li><strong>Offline.</strong> <code>fetch</code>, <code>XMLHttpRequest</code>, <code>WebSocket</code> and every other network API throw <code>NetworkDisabledError</code>. External scripts, stylesheets, fonts and images are never loaded, and the widget cannot navigate. No library is bundled.</li>
+<li><strong>Native.</strong> The chat&#39;s palette is available as CSS variables, and the client&#39;s own default styles make a widget without any CSS look like an ordinary message, with buttons in the client&#39;s style.</li>
+<li><strong>Connected through the bot only.</strong> The widget&#39;s one way out is a request to the bot of up to 64 bytes, which arrives as a <a href="/bots/api#widgetquery">widget_query</a> update. The bot&#39;s answer goes back to the widget that asked, and only the bot changes the widget&#39;s state. The messenger, not the sandbox, carries the traffic.</li>
+</ul>
+<h4><a class="anchor" name="where-widgets-live" href="#where-widgets-live"><i class="anchor-icon"></i></a>Where widgets live</h4>
+<table class="table">
+<thead>
+<tr>
+<th>Where</th>
+<th>How it gets there</th>
+<th>Requests (for a widget sent with <code>allow_queries</code>)</th>
+<th>Chat state</th>
+<th>In production</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The private chat with the bot</td>
+<td><a href="/bots/api#sendwidget">sendWidget</a></td>
+<td>on a tap, and in the background</td>
+<td>the user&#39;s</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>A basic group or supergroup the bot is a member of</td>
+<td><a href="/bots/api#sendwidget">sendWidget</a></td>
+<td>on a tap</td>
+<td>one for all members</td>
+<td>Test server only</td>
+</tr>
+<tr>
+<td>Any chat except channels, sent via the bot</td>
+<td><a href="#inline-mode-widgets">inline mode</a></td>
+<td>on a tap</td>
+<td>per sent message</td>
+<td>Test server only</td>
+</tr>
+<tr>
+<td>A forward, in any chat (channels included)</td>
+<td>forwarded by users</td>
+<td>on a tap, only for a <a href="#static-and-shared-widgets">shared widget</a></td>
+<td>never</td>
+<td>Test server only</td>
+</tr>
+</tbody>
+</table>
+<p>Widgets cannot be posted in channels, directly or via the bot, but users can forward widgets there. Apps that do not support widgets show the message as unsupported media with its caption.</p>
+<h4><a class="anchor" name="availability" href="#availability"><i class="anchor-icon"></i></a>Availability</h4>
+<p>Widgets are rolling out in steps. Everything on this page works on the <a href="/bots/webapps#using-bots-in-the-test-environment">test server</a>. Currently, in the production environment, widgets work only in the private chat with the bot.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Feature</th>
+<th align="center">Test server</th>
+<th align="center">Production</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Widgets in the private chat with the bot, with requests and the wallet</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td>Forwarding widget messages</td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td>Widgets in groups</td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td>Widgets in inline mode</td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>On the <a href="/bots/webapps#using-bots-in-the-test-environment">test server</a></strong> every bot can build and test the full set: groups, inline mode and forwards.</li>
+<li><strong>In the production environment</strong>, a bot sends widgets only to private chats with users, and users cannot forward its widget messages. A widget in a private chat that cannot be forwarded has no forwarded copies: design it for that chat alone.</li>
+</ul>
+<p>The sections below describe the full set. Each section that is not yet in production says so.</p>
+<h4><a class="anchor" name="widgets-and-mini-apps" href="#widgets-and-mini-apps"><i class="anchor-icon"></i></a>Widgets and Mini Apps</h4>
+<p>Widgets are not small Mini Apps. A Mini App is a web page you host, opened on demand. A widget is part of the message, always visible as the chat scrolls, and has no network access.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Feature</th>
+<th>Mini Apps</th>
+<th>Widgets</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Where</td>
+<td>a web view opened from a button, the menu or a link</td>
+<td>inside the message bubble</td>
+</tr>
+<tr>
+<td>Code</td>
+<td>a web page on your server, loaded at launch</td>
+<td>at most 32 KB of HTML inside the message, fixed once created</td>
+</tr>
+<tr>
+<td>Engine</td>
+<td>the platform&#39;s WebView</td>
+<td>the QuickJS sandbox, with the page changes checked and drawn by the Telegram app</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>the web</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Talking to the bot</td>
+<td>your own backend, with signed <code>initData</code></td>
+<td><code>TelegramWidget.request()</code>, delivered by Telegram as a <code>widget_query</code> or <code>shared_widget_query</code> update</td>
+</tr>
+<tr>
+<td>State</td>
+<td>your backend, <code>CloudStorage</code>, <code>DeviceStorage</code></td>
+<td>the chat state and the shared state, written by the bot, and Web Storage per message on the device</td>
+</tr>
+<tr>
+<td>Who is looking</td>
+<td><code>initData.user</code></td>
+<td><code>TelegramWidget.viewer</code> (id, name, username, Premium), only where the widget may send requests</td>
+</tr>
+<tr>
+<td>Input</td>
+<td>everything, keyboard included</td>
+<td>taps, pointer events, horizontal drags and holds, but no keyboard</td>
+</tr>
+</tbody>
+</table>
+<p>Where the two APIs overlap, <code>TelegramWidget</code> uses the names of <code>Telegram.WebApp</code> (<code>themeParams</code>, <code>colorScheme</code>, <code>onEvent</code>, <code>openLink</code>, <code>openTelegramLink</code>, <code>HapticFeedback</code>, <code>ready</code>, and <code>viewer</code> shaped like <code>WebAppUser</code>), so code and habits carry over. For anything larger than a widget, link to your bot or Mini App with <code>openTelegramLink</code>.</p>
+<hr>
+<h3><a class="anchor" name="designing-widgets" href="#designing-widgets"><i class="anchor-icon"></i></a>Designing widgets</h3>
+<h4><a class="anchor" name="native-look" href="#native-look"><i class="anchor-icon"></i></a>Native look</h4>
+<p>Widgets are drawn on the message bubble, in the chat&#39;s colors and text style. Use them instead of your own:</p>
+<ul>
+<li><strong>The bubble is the canvas.</strong> The widget fills the bubble with no padding of its own, and the bubble clips it at its rounded corners. The root element has no background: the bubble&#39;s color (<code>--tg-theme-bg-color</code>) shows through. A background you set on <code>html</code> or <code>body</code> paints the whole bubble, up to the rounded edges.</li>
+<li><strong>Default styles.</strong> The app inserts its own default stylesheet beneath yours. Text gets the chat&#39;s message color, size and line height. The <code>body</code> margin equals the app&#39;s text padding (about <code>8px 12px</code>), so text starts where a message&#39;s text starts. Headings, paragraphs, lists, tables (with separator lines), <code>pre</code>, <code>code</code>, quotes, links and figure captions get native sizes and margins. Any rule of yours wins over these defaults, whatever its specificity. <code>body { margin: 0 }</code> goes edge to edge.</li>
+<li><strong>Buttons.</strong> A <code>&lt;button&gt;</code> you do not style is drawn as the client&#39;s own button, with a pressed state (<code>:active</code>) and a disabled state (<code>[disabled]</code>). Your CSS overrides it. It is the only form control: inputs, selects and text areas are removed.</li>
+<li><strong>The palette is the bubble&#39;s.</strong> A widget sent by the bot sits in an incoming bubble. A widget the user sent via the bot or forwarded sits in their outgoing bubble, with that bubble&#39;s colors. Never hard-code colors that must contrast with the bubble, use the variables instead.</li>
+<li><strong>The time sits on the widget</strong> when the message has no caption below it: see <a href="#the-time-in-the-corner">The time in the corner</a>.</li>
+</ul>
+<p>A widget without a single line of CSS already looks native:</p>
+<pre><code class="lang-html">&lt;h3&gt;Order #1042&lt;/h3&gt;
+&lt;p&gt;2 × Margherita, 1 × Lemonade&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Total: $23.50&lt;/strong&gt;&lt;/p&gt;
+&lt;button onclick=&quot;TelegramWidget.openLink(&#39;https://example.com/orders/1042&#39;)&quot;&gt;Track the order&lt;/button&gt;</code></pre>
+<p>The palette is on the root element as CSS variables and in JavaScript as <a href="#themeparams"><code>TelegramWidget.themeParams</code></a>:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Variable</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--tg-theme-bg-color</code></td>
+<td>the bubble&#39;s color, behind the widget</td>
+</tr>
+<tr>
+<td><code>--tg-theme-text-color</code></td>
+<td>message text</td>
+</tr>
+<tr>
+<td><code>--tg-theme-hint-color</code></td>
+<td>secondary text: time, meta</td>
+</tr>
+<tr>
+<td><code>--tg-theme-link-color</code></td>
+<td>links</td>
+</tr>
+<tr>
+<td><code>--tg-theme-button-color</code>, <code>--tg-theme-button-text-color</code></td>
+<td>the client&#39;s primary button</td>
+</tr>
+<tr>
+<td><code>--tg-theme-secondary-bg-color</code></td>
+<td>a second surface on the bubble (quotes, inline buttons)</td>
+</tr>
+<tr>
+<td><code>--tg-theme-accent-text-color</code>, <code>--tg-theme-subtitle-text-color</code>, <code>--tg-theme-destructive-text-color</code></td>
+<td>accent text, subtitles, destructive actions</td>
+</tr>
+<tr>
+<td><code>--tg-theme-section-separator-color</code></td>
+<td>separator lines (the defaults draw table lines and <code>&lt;hr&gt;</code> with it)</td>
+</tr>
+</tbody>
+</table>
+<p>The full list, with the text and button tokens, is in <a href="#css-variables">CSS variables</a>.</p>
+<h4><a class="anchor" name="color-schemes" href="#color-schemes"><i class="anchor-icon"></i></a>Color schemes</h4>
+<p>The chat&#39;s color scheme drives everything that depends on light or dark: <code>@media (prefers-color-scheme: dark)</code>, <code>light-dark()</code> and <code>color-scheme: light dark</code> follow the <strong>chat</strong> theme, not the system, and switch live. In JavaScript, read <code>TelegramWidget.colorScheme</code> and listen for <code>themeChanged</code>. The variables change at the same moment. Test every widget in both schemes and in an outgoing bubble.</p>
+<h4><a class="anchor" name="sizes" href="#sizes"><i class="anchor-icon"></i></a>Sizes</h4>
+<ul>
+<li><strong>Width.</strong> A bubble is 200-600 px wide, and phones lay it out at about 320-430 px. Lay out with <code>%</code>, flex or grid. <code>@media (min-width / max-width)</code> and <code>vw</code> refer to the bubble&#39;s width. Height-relative units (<code>vh</code> and the like) are not supported.</li>
+<li><strong>Height.</strong> With an automatic height the bubble takes the widget&#39;s content height, from 50 to 600 px. Content beyond the bubble&#39;s height is <strong>clipped</strong>: nothing scrolls inside a widget, and there is no fullscreen. Keep widgets comfortably below the cap: under about 560 px at a 320 px width.</li>
+<li><strong>Size anchors.</strong> <code>width</code> and <code>height</code> in <a href="/bots/api#sendwidget">sendWidget</a> tell the app the size before the widget has loaded, in logical pixels (CSS px, points, dp). <code>0</code> means automatic, for each axis separately. A shared widget gets them when it is created, the same in every message that shows it.</li>
+</ul>
+<table class="table">
+<thead>
+<tr>
+<th><code>width</code></th>
+<th><code>height</code></th>
+<th>Before the widget loads</th>
+<th>After its first render</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>a placeholder at the bubble&#39;s width</td>
+<td>the content height, 50-600 px, remembered per message</td>
+</tr>
+<tr>
+<td>0</td>
+<td>H</td>
+<td>the bubble&#39;s width, height clamp(H, 50, 600)</td>
+<td>unchanged</td>
+</tr>
+<tr>
+<td>W</td>
+<td>0</td>
+<td>width clamp(W, 200, the bubble&#39;s maximum), a placeholder height</td>
+<td>the content height, 50-600 px</td>
+</tr>
+<tr>
+<td>W</td>
+<td>H</td>
+<td>a fixed widget: clamp(W, 200, max) × clamp(H, 50, 600)</td>
+<td>unchanged</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="resize-anchor" href="#resize-anchor"><i class="anchor-icon"></i></a>Resize anchor</h4>
+<p>When a widget&#39;s height changes, the app keeps one edge of the bubble in place on screen. By default the top stays and the bubble grows downward. This is right for an FAQ whose answers expand, “show more” or an order summary that opens. A widget that grows at its bottom, such as a chat log or a support thread with quick replies under the last message, calls <code>TelegramWidget.setResizeAnchor(&#39;bottom&#39;)</code>: the bottom edge stays and the content above moves. Call it before the change, or at the start of the script for a widget that always grows one way. It applies until called again. Apps whose framework predates it lack the method:</p>
+<pre><code class="lang-js">if (typeof TelegramWidget.setResizeAnchor === &#39;function&#39;) TelegramWidget.setResizeAnchor(&#39;bottom&#39;);</code></pre>
+<h4><a class="anchor" name="the-time-in-the-corner" href="#the-time-in-the-corner"><i class="anchor-icon"></i></a>The time in the corner</h4>
+<p>A widget message with <strong>no caption below the widget</strong> (no caption, or a caption shown above it with <code>show_caption_above_media</code>) gets its time and status (the ticks, “edited”) drawn by the app <strong>over the widget&#39;s bottom corner</strong>, on a backing, as over a photo: the right corner, or the left one in a right-to-left interface. Taps on the time are the app&#39;s: put nothing a user taps under it. With a caption below the widget, the time is in the caption&#39;s line and nothing covers the widget.</p>
+<p>The widget gets the band the way a web page gets a phone&#39;s notch:</p>
+<pre><code class="lang-css">/* the band the time is drawn in: keep it clear at the bottom */
+.footer { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+/* only the corner of the band is covered: content may run into the band on the other side */
+.footer { padding-right: max(12px, var(--tg-content-safe-area-corner-right));
+          padding-left: max(12px, var(--tg-content-safe-area-corner-left)); }</code></pre>
+<ul>
+<li><code>env(safe-area-inset-bottom)</code> (also <code>var(--tg-content-safe-area-inset-bottom)</code>, the Mini Apps name) is the height of the band, 0 with a caption below. The other insets are 0. <code>--tg-content-safe-area-corner-right</code> and <code>-left</code> are the width of the covered corner on that side, and the other one is 0.</li>
+<li>The default styles add the band to the body&#39;s bottom padding, so a widget without CSS, or one that sets only <code>body { margin: 0 }</code>, stays clear of the time. A widget that pads for the band itself sets <code>body { padding: 0 }</code> too, or it gets two bands.</li>
+<li>In JavaScript: <a href="#telegramwidget"><code>TelegramWidget.contentSafeAreaInset</code></a> has the same numbers (a canvas widget lays out its own controls with them), and <code>contentSafeAreaChanged</code> fires when they change: when an edit adds, removes or moves the caption, or the “edited” mark widens the time. They never change from frame to frame.</li>
+</ul>
+<h4><a class="anchor" name="gestures" href="#gestures"><i class="anchor-icon"></i></a>Gestures</h4>
+<p>A widget shares its bubble with the chat&#39;s own gestures: the message menu on a hold, swipe-to-reply, the list&#39;s scroll. One rule, the same in every Telegram app, decides who gets a press:</p>
+<ul>
+<li><strong>Taps and double taps over the widget are always the widget&#39;s</strong>, on every element. A double tap arrives as two <code>click</code>s and then a <code>dblclick</code>.</li>
+<li><strong>Vertical drags are always the chat&#39;s</strong>: the chat scrolls over every widget. The widget gets <code>pointercancel</code>.</li>
+<li><strong>Holds and horizontal drags</strong> are claimed per element, when the finger goes down, by CSS <code>touch-action</code> on the element or any ancestor:</li>
+</ul>
+<table class="table">
+<thead>
+<tr>
+<th>Over an element with</th>
+<th>Hold</th>
+<th>Horizontal drag</th>
+<th>Vertical drag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>touch-action: auto</code> (the default)</td>
+<td>the chat: message menu</td>
+<td>the chat: swipe-to-reply</td>
+<td>the chat scrolls</td>
+</tr>
+<tr>
+<td><code>touch-action: pan-y</code></td>
+<td>the chat: message menu</td>
+<td><strong>the widget</strong></td>
+<td>the chat scrolls</td>
+</tr>
+<tr>
+<td><code>touch-action: none</code></td>
+<td><strong>the widget</strong> (<code>contextmenu</code>)</td>
+<td><strong>the widget</strong></td>
+<td>the chat scrolls</td>
+</tr>
+</tbody>
+</table>
+<p><code>pan-x</code> claims nothing. The first move past 10 px decides for the whole press. A drag that starts sideways on a claimed element stays the widget&#39;s on both axes until the finger lifts, and one that starts up or down belongs to the chat. When the chat takes a press, the widget gets <code>pointercancel</code> and no <code>click</code>, so undo whatever <code>pointerdown</code> started. A hold is 500 ms within 10 px. A double tap is two taps within 300 ms and 40 px. The leading 20 px of the widget (the right edge in right-to-left interfaces) never take a claim, so the system&#39;s back gesture keeps working there. Keep controls away from that edge. With a mouse, a right click follows the same claim, and clicks, holds and drags are the widget&#39;s.</p>
+<p><strong>Rule of thumb:</strong> a button you hold, a game control or a canvas: <code>touch-action: none</code> on it. A horizontal slider, carousel or paddle: <code>touch-action: pan-y</code>. Everything else stays <code>auto</code>, so people keep the menu and reply over the rest of the widget. Nothing can be dragged vertically: no vertical sliders, wheel pickers, up/down swipes, two-axis joysticks, drawing or map panning. Turn such controls horizontal or use buttons.</p>
+<h4><a class="anchor" name="text-selection" href="#text-selection"><i class="anchor-icon"></i></a>Text selection</h4>
+<p>Text in a widget is not selectable unless you allow it. Add <code>user-select: text</code> (and <code>-webkit-user-select: text</code>) to what a user may want to copy, such as an address or a code. Children inherit it, and <code>user-select: none</code> turns it off again below. Selection starts the way it does in an ordinary message (on touch, from the message menu), and copying uses the app&#39;s own command. The widget cannot read the selection. For a one-tap copy, use <a href="#storage-links-and-haptics"><code>copyText</code></a>.</p>
+<h4><a class="anchor" name="design-guidelines" href="#design-guidelines"><i class="anchor-icon"></i></a>Design guidelines</h4>
+<ul>
+<li><strong>Draw the first state at once.</strong> Render synchronously from the state the widget already has. There is nothing to load.</li>
+<li><strong>Always send a caption.</strong> It is the text in the chat list, notifications and search, and what apps without widget support show instead of the widget.</li>
+<li><strong>Use the theme.</strong> Variables instead of colors, <code>em</code> instead of fixed text sizes, system fonts only (<code>system-ui</code>, <code>sans-serif</code>, <code>serif</code>, <code>monospace</code>, <code>ui-*</code>).</li>
+<li><strong>Stay small.</strong> The limit is 4096 bytes compressed, <a href="#counting-the-size">counted as the server counts</a>. <code>data:</code> images barely compress, so prefer SVG and CSS.</li>
+<li><strong>Design for every place the message can go.</strong> A forward has no chat state and may not be able to ask the bot, and a preview in the inline results takes no taps. Show something useful in each. A forward of a static widget never changes, so draw it as a snapshot (“Cooking, as of 19:40”), not as progress the reader would wait for.</li>
+<li><strong>Mute with color, not transparency.</strong> Up to 16 elements at once may have a blurred shadow, a <code>filter</code>, a <code>backdrop-filter</code> or <code>opacity</code> below 1 (<a href="#limits">Limits</a>). Grey text and small details with <code>--tg-theme-hint-color</code>, <code>rgba()</code> or <code>fill-opacity</code> in SVG: it looks the same and costs nothing.</li>
+<li><strong>Show progress and every outcome</strong> of a request: “Sending…”, the bot&#39;s answer, and each <a href="#widgetrequesterror">error code</a>.</li>
+<li><strong>Treat the code and the shared state as public.</strong> Forwards carry them to any chat. In a group, the chat state is visible to every member. Never put secrets in a widget.</li>
+<li><strong>Respect motion settings.</strong> <code>prefers-reduced-motion</code> is supported. Animate with transitions, keyframes or <code>requestAnimationFrame</code>, and never read layout in every frame.</li>
+<li><strong>Do not rely on hover</strong> (<code>:hover</code> exists only with a mouse) or on the keyboard (there is none).</li>
+<li>Widgets have no accessibility semantics in this version (<code>aria-*</code> attributes are kept but do nothing): put what matters in the caption too.</li>
+</ul>
+<hr>
+<h3><a class="anchor" name="implementing-widgets" href="#implementing-widgets"><i class="anchor-icon"></i></a>Implementing widgets</h3>
+<h4><a class="anchor" name="sending-a-widget" href="#sending-a-widget"><i class="anchor-icon"></i></a>Sending a widget</h4>
+<p>Use <a href="/bots/api#sendwidget">sendWidget</a> to send a new widget. <code>html</code> is its source as a string of UTF-8 text. It must not contain the NUL character (U+0000), or the server refuses it with <code>INPUT_MEDIA_WIDGET_HTML_INVALID</code>. The server compresses the HTML and refuses anything over the limits (<code>INPUT_MEDIA_WIDGET_TOO_LARGE</code>). Use <a href="/bots/api#sendsharedwidget">sendSharedWidget</a> to send an existing <a href="#static-and-shared-widgets">shared widget</a> again by its identifier, the way a photo is sent again by its <code>file_id</code>.</p>
+<pre><code class="lang-json">POST https://api.telegram.org/bot&lt;token&gt;/sendWidget
+{
+  &quot;chat_id&quot;: 111111111,
+  &quot;html&quot;: &quot;&lt;h3&gt;Order #1042&lt;/h3&gt;&lt;p&gt;2 × Margherita, 1 × Lemonade&lt;/p&gt;…&quot;,
+  &quot;caption&quot;: &quot;Order #1042: $23.50&quot;
+}</code></pre>
+<p>On success the sent <a href="/bots/api#message">Message</a> is returned, with its <a href="/bots/api#widget">widget</a>: the HTML, the size anchors, the current state and, for a shared widget, its <code>id</code>.</p>
+<p>With <code>sendWidget</code>, the bot makes two choices, kept with the widget and carried by its forwards:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>allow_queries</code></td>
+<td>The widget may send <a href="#requests-to-the-bot">requests</a> to the bot. Without it, every request to this widget is refused, everywhere. Allow requests only if the widget needs to talk to the bot: a ticker or a widget that only shows its state needs none.</td>
+</tr>
+<tr>
+<td><code>is_shared</code></td>
+<td>Creates a shared widget: one object for the original, all its forwards and every message later sent with <code>sendSharedWidget</code>. Its forwards follow its shared state, and with <code>allow_queries</code> they may send requests too, on a tap (forwards: <a href="#availability">test server only</a>). A ticker without requests is <code>is_shared</code> without <code>allow_queries</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Without <code>is_shared</code> the widget is <strong>static</strong>: everything stays in the message. Also pass the widget&#39;s initial <a href="#the-widgets-state">state</a>, <code>public_data</code> and <code>chat_data</code>, and the size anchors <code>width</code> and <code>height</code> (<a href="#sizes">Sizes</a>) when you know them. The usual message parameters work as for a photo: a caption with its entities (and <code>show_caption_above_media</code>, which leaves <a href="#the-time-in-the-corner">the time on the widget</a>), an inline keyboard under the widget, a reply, a forum topic, <code>protect_content</code>.</p>
+<p>The caption can be changed later with <a href="/bots/api#editmessagecaption">editMessageCaption</a>, as for any media. The widget itself cannot be replaced: no method changes the HTML of a sent widget.</p>
+<h4><a class="anchor" name="the-widget-39s-state" href="#the-widget-39s-state"><i class="anchor-icon"></i></a>The widget&#39;s state</h4>
+<p>A widget is fixed code plus changeable state. The code never changes after sending, and the state is what the bot changes. Only the bot writes the state: when it sends the widget, and later with the <a href="#changing-the-state">methods that change it</a>, never inside an answer to a request. The widget reads its state as <code>TelegramWidget.chatData</code> and <code>TelegramWidget.publicData</code> and cannot change it itself. It can only ask the bot.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Property</th>
+<th>Chat state (<code>chat_data</code>)</th>
+<th>Shared state (<code>public_data</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tied to</td>
+<td>one original message: in the bot&#39;s private chat with the user, in a group (shared by all its members), or sent via the bot</td>
+<td>a static widget&#39;s message, or a shared widget (every message and forward that shows it)</td>
+</tr>
+<tr>
+<td>Seen</td>
+<td>only in that chat</td>
+<td>wherever the widget is shown</td>
+</tr>
+<tr>
+<td>In a forward</td>
+<td>never</td>
+<td>a copy as of the moment of forwarding for a static widget, the one current shared state for a shared widget</td>
+</tr>
+<tr>
+<td>Examples</td>
+<td>a game in progress, whose turn it is, a code this user redeemed</td>
+<td>poll results, a price, a score</td>
+</tr>
+<tr>
+<td>Changed by</td>
+<td><a href="/bots/api#editmessagewidgetdata">editMessageWidgetData</a> on the original</td>
+<td><a href="/bots/api#editmessagewidgetdata">editMessageWidgetData</a> on an original, or <a href="/bots/api#editsharedwidgetdata">editSharedWidgetData</a> by the shared widget&#39;s identifier</td>
+</tr>
+<tr>
+<td>Reaches open widgets</td>
+<td>at once, pushed by the server</td>
+<td>pushed with the message for a static widget. For a shared widget, polled at its refresh period while a widget that called <code>watchPublicData()</code> is on screen, otherwise with the message</td>
+</tr>
+<tr>
+<td>In the widget</td>
+<td><code>chatData</code>, event <code>chatDataChanged</code></td>
+<td><code>publicData</code>, event <code>publicDataChanged</code></td>
+</tr>
+</tbody>
+</table>
+<p>The format is the same everywhere (sending, inline results, changes):</p>
+<ul>
+<li>The chat state and the shared state are each a text of up to <strong>1024 bytes</strong> (bytes of UTF-8, not characters: 512 Cyrillic letters fill it), often JSON. The server does not interpret it.</li>
+<li>At sending, a field not passed means no state. In a change, a field not passed stays as it is, and an empty text clears it. The widget never sees an empty text: a cleared or absent state is <code>null</code>.</li>
+</ul>
+<p>When the bot changes the state, a running widget gets <code>chatDataChanged</code> or <code>publicDataChanged</code> with the new state already in place (for a shared widget&#39;s shared state, only if the widget called <code>watchPublicData()</code>). Nothing restarts and the page keeps what it has drawn, so redraw from the state. A change that touches both fires both, <code>chatDataChanged</code> first. A change that leaves one of them as it was fires nothing for it.</p>
+<pre><code class="lang-js">const W = window.TelegramWidget;
+function render() {
+  let game = null;
+  try { game = JSON.parse(W.chatData); } catch (e) {}
+  // … draw from the chat state (null: no state yet)
+}
+W.onEvent(&#39;chatDataChanged&#39;, render);
+render();</code></pre>
+<h4><a class="anchor" name="static-and-shared-widgets" href="#static-and-shared-widgets"><i class="anchor-icon"></i></a>Static and shared widgets</h4>
+<table class="table">
+<thead>
+<tr>
+<th>Property</th>
+<th>Static widget</th>
+<th>Shared widget</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Created by</td>
+<td><code>sendWidget</code> without <code>is_shared</code></td>
+<td>the first <code>sendWidget</code> (or inline send) with <code>is_shared</code></td>
+</tr>
+<tr>
+<td>Code, size, request flag</td>
+<td>in the message</td>
+<td>in the shared widget, the same in every message that shows it</td>
+</tr>
+<tr>
+<td>Shared state (<code>public_data</code>)</td>
+<td>in the message. A forward gets a copy as of the moment of forwarding, and a change reaches only the original</td>
+<td>in the shared widget: one shared state for every message and forward, changed for all of them at once</td>
+</tr>
+<tr>
+<td>Chat state (<code>chat_data</code>)</td>
+<td>per message</td>
+<td>per message, set at each send</td>
+</tr>
+<tr>
+<td>Shown again elsewhere</td>
+<td>by forwarding (a frozen copy)</td>
+<td>by forwarding, or with <a href="/bots/api#sendsharedwidget">sendSharedWidget</a> / an <a href="#inline-mode-widgets">inline result</a> by its identifier</td>
+</tr>
+<tr>
+<td>Requests from forwards</td>
+<td>never</td>
+<td>on a tap, if it was sent with <code>allow_queries</code>. They arrive as <a href="/bots/api#sharedwidgetquery">shared_widget_query</a></td>
+</tr>
+<tr>
+<td>Identifier</td>
+<td>none</td>
+<td><code>widget.id</code> in every message that shows it, for everyone including the bot, and <code>widget_id</code> in the methods and updates</td>
+</tr>
+</tbody>
+</table>
+<p>A shared widget is like a poll: one object that any number of messages refer to. There is no separate method to create one: <strong>the first send creates it.</strong> To get its identifier in advance, to send the widget to many chats or to offer it in inline mode, send it once with <code>is_shared</code> to any chat (for example your own chat with the bot) and read <code>widget.id</code> from the returned message.</p>
+<ul>
+<li><strong>One widget, one behavior.</strong> Every message showing a shared widget has the same HTML, size and request flag, as one poll cannot be anonymous in one message and public in another. Only the chat state belongs to each message.</li>
+<li><strong>Permanent.</strong> A shared widget outlives every message that shows it: its shared state stays, <a href="/bots/api#editsharedwidgetdata">editSharedWidgetData</a> edits it by its identifier after every carrier is deleted, and requests from live forwards keep arriving.</li>
+<li><strong>Immutable code.</strong> For a new layout, send a new widget with <code>sendWidget</code>, which makes a new shared widget. Messages that show the old one keep it.</li>
+</ul>
+<table class="table">
+<thead>
+<tr>
+<th>Send</th>
+<th>Use case</th>
+<th>Shared state</th>
+<th>Forwards may ask the bot</th>
+<th>Change the shared state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sendWidget</code></td>
+<td>a widget with state</td>
+<td>in the message, forwards get a copy</td>
+<td>No</td>
+<td>by the original&#39;s coordinates, only the original changes</td>
+</tr>
+<tr>
+<td><code>sendWidget</code> + <code>is_shared</code></td>
+<td>a ticker</td>
+<td>a new shared widget</td>
+<td>No, forwards follow it</td>
+<td>by <code>widget_id</code> or by any original&#39;s coordinates</td>
+</tr>
+<tr>
+<td><code>sendWidget</code> + <code>is_shared</code> + <code>allow_queries</code></td>
+<td>live forwards (a poll)</td>
+<td>a new shared widget</td>
+<td>Yes, on a tap</td>
+<td>by <code>widget_id</code> or by any original&#39;s coordinates</td>
+</tr>
+<tr>
+<td><code>sendSharedWidget</code></td>
+<td>send an existing shared widget again</td>
+<td>the shared widget&#39;s, unchanged by the send</td>
+<td>per the shared widget&#39;s flag</td>
+<td>by <code>widget_id</code> or by any original&#39;s coordinates</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Freshness.</strong> An edit of a shared widget is visible at once to every read: opening the chat or scrolling to the message gives the current shared state. A widget already on screen gets a new shared state only if it asks for it with <code>TelegramWidget.watchPublicData()</code>. While at least one widget that called it is on screen, the app polls that shared widget (one poll per shared widget, whatever the number of messages showing it) at the shared widget&#39;s refresh period, and every widget on screen showing it gets <code>publicDataChanged</code>. A widget that does not watch gets its shared state only with the message. <code>unwatchPublicData()</code> stops asking. Both are synchronous, need no tap, can be called at any time and may be repeated. On a static widget they do nothing (its shared state, like every chat state, is pushed anyway), and a preview never watches.</p>
+<p>The refresh period is a property of the shared widget: 30 seconds when created, changed only with <code>cache_time</code> in <a href="/bots/api#editsharedwidgetdata">editSharedWidgetData</a> (5-3600 seconds: less than 5 is refused, more than 3600 is clamped). Choose it for how often the shared state changes: about 10 seconds for a price, minutes or an hour for something that changes slowly.</p>
+<p><strong>Keep the newest state.</strong> A poll can bring a shared state older than one the widget already drew from a request&#39;s answer or an earlier poll, and counts would jump back and forth. Put a revision in the shared state (<code>&quot;r&quot;: 41</code>, raised on every edit, and in the answer too) and have the widget ignore anything older than the newest it has seen.</p>
+<h4><a class="anchor" name="widgets-in-groups" href="#widgets-in-groups"><i class="anchor-icon"></i></a>Widgets in groups</h4>
+<p>Bots can send widgets to basic groups and supergroups they are members of, forum topics included (<a href="#availability">test server only</a>). The bot needs the right to send other messages (<code>can_send_other_messages</code> in <a href="/bots/api#chatpermissions">ChatPermissions</a>: animations, games, stickers and inline bots). Widgets are checked like messages sent via an inline bot, so a group that does not give the bot this right refuses the widget too. Channels refuse widgets, sent directly or via the bot.</p>
+<p>In a group:</p>
+<ul>
+<li><strong>The chat state is shared by all members.</strong> Everyone sees the same chat state. Draw it per user with <code>TelegramWidget.viewer.id</code> (chess for two is one widget and one chat state).</li>
+<li><strong>Requests run on a tap only</strong>, never in the background.</li>
+<li><strong>The bot addresses the message as usual</strong>: the <code>chat</code> and <code>message_id</code> of a <a href="/bots/api#widgetquery">widget_query</a> are the ones it uses for its other messages in that group, and <a href="/bots/api#editmessagewidgetdata">editMessageWidgetData</a> takes the same pair.</li>
+</ul>
+<h4><a class="anchor" name="inline-mode-widgets" href="#inline-mode-widgets"><i class="anchor-icon"></i></a>Inline mode widgets</h4>
+<p>A bot with inline mode enabled can return widgets as inline results (<a href="#availability">test server only</a>): an <a href="/bots/api#inlinequeryresultarticle">InlineQueryResultArticle</a> whose <code>input_message_content</code> is a widget, in <a href="/bots/api#answerinlinequery">answerInlineQuery</a>. A widget result cannot be sent in a channel. The content has the same two forms as sending:</p>
+<ul>
+<li><a href="/bots/api#inputwidgetmessagecontent">InputWidgetMessageContent</a>: a new widget, with the fields of <code>sendWidget</code> (<code>html</code>, <code>width</code>, <code>height</code>, <code>public_data</code>, <code>chat_data</code>, the caption, <code>allow_queries</code>, <code>is_shared</code>). The server checks the code and the state when it saves the results (same limits, same errors). <strong>Each send</strong> of a result with <code>is_shared</code> creates <strong>its own new shared widget</strong>.</li>
+<li><a href="/bots/api#inputsharedwidgetmessagecontent">InputSharedWidgetMessageContent</a>: an existing shared widget, by <code>widget_id</code>, with this message&#39;s <code>chat_data</code> and caption. Every send shows that shared widget.</li>
+</ul>
+<pre><code class="lang-json">POST https://api.telegram.org/bot&lt;token&gt;/answerInlineQuery
+{
+  &quot;inline_query_id&quot;: &quot;&lt;inline_query_id&gt;&quot;,
+  &quot;results&quot;: [{
+    &quot;type&quot;: &quot;article&quot;,
+    &quot;id&quot;: &quot;ton&quot;,
+    &quot;title&quot;: &quot;TON price&quot;,
+    &quot;description&quot;: &quot;A live quote&quot;,
+    &quot;input_message_content&quot;: { &quot;widget_id&quot;: &quot;7770011223344556677&quot;, &quot;caption&quot;: &quot;TON price&quot; }
+  }]
+}</code></pre>
+<ul>
+<li><strong>The list of results shows the widget itself</strong>, running as a <a href="#previews">preview</a> with the result&#39;s state (for a shared widget, its code and shared state): it takes no taps (a tap selects the result) and knows nothing about the user.</li>
+<li><strong>Every send becomes its own message</strong> via the bot, with its own chat state.</li>
+<li><strong>Requests from a message sent via the bot run on a tap only.</strong> The bot gets them as a <a href="/bots/api#widgetquery">widget_query</a> with <code>inline_message_id</code> instead of <code>chat</code> and <code>message_id</code>, together with the <code>chat_instance</code> and <code>chat_type</code> of the chat where the user tapped, and changes the message&#39;s state with <a href="/bots/api#editmessagewidgetdata">editMessageWidgetData</a> and that <code>inline_message_id</code>.</li>
+<li>Only apps that support widgets receive widget results.</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> A bot does not receive the messages users send via it. To show one live shared state through inline mode, create the shared widget once with <code>sendWidget</code> and offer results by its identifier. A result with <code>html</code> and <code>is_shared</code> makes a new shared widget per send, and the bot sees its identifier only in a later request.</p>
+</blockquote>
+<h4><a class="anchor" name="requests-to-the-bot" href="#requests-to-the-bot"><i class="anchor-icon"></i></a>Requests to the bot</h4>
+<p>A request is a callback button inside the widget. The widget calls <code>TelegramWidget.request(data)</code> with 1-64 bytes of data. The bot receives a <a href="/bots/api#widgetquery">widget_query</a> update (or a <a href="/bots/api#sharedwidgetquery">shared_widget_query</a> from a forward) with who tapped, the request&#39;s data and the context. It answers with <a href="/bots/api#answerwidgetquery">answerWidgetQuery</a> and optional <code>data</code> of up to 1024 bytes, which only the widget that asked receives, as its <code>result</code>.</p>
+<p><strong>In the widget:</strong></p>
+<pre><code class="lang-js">button.addEventListener(&#39;click&#39;, () =&gt; {
+  TelegramWidget.request(&#39;vote:2&#39;).then(
+    (answer) =&gt; show(answer.result),   // { result: string | null }
+    (error) =&gt; showError(error.code),  // error.name === &#39;WidgetRequestError&#39;
+  );
+});</code></pre>
+<ul>
+<li><strong>One tap, one call.</strong> A request on a tap must be made in the tap&#39;s handler, synchronously, on the visible widget, and not from a timer, a promise callback or a later frame. One tap unlocks one call, shared with <code>openLink</code>, <code>openTelegramLink</code> and <code>copyText</code>.</li>
+<li><strong>One at a time.</strong> A second call while a request waits for its answer rejects with <code>BUSY</code>.</li>
+<li>The promise resolves with <code>{ result }</code>: the bot&#39;s <code>data</code>, or <code>null</code> if it answered without any. It rejects with a <a href="#widgetrequesterror">WidgetRequestError</a> whose <code>code</code> says why: <code>NOT_ALLOWED</code>, <code>BUSY</code>, <code>RATE_LIMITED</code>, <code>TIMEOUT</code>, <code>FAILED</code>, <code>INVALID_ANSWER</code>.</li>
+</ul>
+<p><strong>Where a widget may ask</strong> is decided by the server for each message, from the widget&#39;s flags (a static widget&#39;s message, or the shared widget), and passed to the widget by the app:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Message</th>
+<th align="center">On a tap</th>
+<th align="center">In the background</th>
+<th><code>viewer</code></th>
+<th><code>chatType</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the original in the private chat with the bot</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td>the user</td>
+<td><code>&#39;private&#39;</code></td>
+</tr>
+<tr>
+<td>an original in a group</td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+<td>the user</td>
+<td><code>&#39;group&#39;</code>, <code>&#39;supergroup&#39;</code></td>
+</tr>
+<tr>
+<td>an original sent via the bot</td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+<td>the user</td>
+<td>the chat&#39;s type</td>
+</tr>
+<tr>
+<td>a forward of a shared widget</td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+<td>the user</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td>a forward of a static widget</td>
+<td align="center">No</td>
+<td align="center">No</td>
+<td><code>null</code></td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table>
+<p>This is for a widget sent with <code>allow_queries</code>. A widget without it asks nowhere, its originals included, and has no <code>viewer</code>. Elsewhere <code>request()</code> rejects with <code>NOT_ALLOWED</code>.</p>
+<p><strong>Background requests.</strong> Only the original in the private chat with the bot may ask without a tap, and only while it is visible: one request when the widget appears on screen (scrolled into view, the app back in front), then at most one every 5 seconds while it stays visible. Apps create a widget before they show it, so a request the script makes in its first lines waits and goes out as soon as the widget appears. Ask for fresh state right at the start. Use background requests to refresh what this user sees while the chat is open. For what is the same for everyone, a <a href="#static-and-shared-widgets">shared widget</a>&#39;s shared state needs no requests at all. Neither the server nor the bot can tell a background request from a tap.</p>
+<p><strong>In the bot.</strong> A request from an original arrives in the field <code>widget_query</code> of <a href="/bots/api#update">Update</a>, and one from a forwarded copy of a shared widget in the field <code>shared_widget_query</code>. If you pass <code>allowed_updates</code>, include both. Their fields depend on where the user tapped:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th align="center">Original (private chat or group)</th>
+<th align="center">Original sent via the bot</th>
+<th align="center">Forward of a shared widget</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>update</td>
+<td align="center"><code>widget_query</code></td>
+<td align="center"><code>widget_query</code></td>
+<td align="center"><code>shared_widget_query</code></td>
+</tr>
+<tr>
+<td><code>id</code>, <code>from</code>, <code>data</code></td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td><code>chat</code>, <code>message_id</code></td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td><code>inline_message_id</code></td>
+<td align="center">No</td>
+<td align="center">Yes</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td><code>chat_instance</code></td>
+<td align="center">Yes</td>
+<td align="center">Yes, the chat of the tap</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td><code>chat_type</code></td>
+<td align="center">No, see <code>chat.type</code></td>
+<td align="center">Yes, the chat of the tap</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td><code>widget_id</code></td>
+<td align="center">for a shared widget</td>
+<td align="center">for a shared widget</td>
+<td align="center">always</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="lang-json">{
+  &quot;update_id&quot;: 100000001,
+  &quot;widget_query&quot;: {
+    &quot;id&quot;: &quot;8123456789012345678&quot;,
+    &quot;from&quot;: { &quot;id&quot;: 111111111, &quot;is_bot&quot;: false, &quot;first_name&quot;: &quot;Alice&quot;, &quot;language_code&quot;: &quot;en&quot; },
+    &quot;chat&quot;: { &quot;id&quot;: 111111111, &quot;type&quot;: &quot;private&quot;, &quot;first_name&quot;: &quot;Alice&quot; },
+    &quot;message_id&quot;: 4242,
+    &quot;chat_instance&quot;: &quot;901234567890123456&quot;,
+    &quot;widget_id&quot;: &quot;7770011223344556677&quot;,
+    &quot;data&quot;: &quot;refresh&quot;
+  }
+}</code></pre>
+<p>The query does not carry the widget&#39;s state: keep the authoritative state on your side, keyed by the message (or by <code>widget_id</code>), and check every request against it.</p>
+<p><strong>Answering.</strong> Call <a href="/bots/api#answerwidgetquery">answerWidgetQuery</a> for <strong>every</strong> query, with or without <code>data</code>, within 15 seconds. Otherwise the widget&#39;s promise rejects with <code>TIMEOUT</code>. <code>data</code> is the only thing an answer carries: no change of state, no notification, no alert, no URL. The app shows nothing for an answer, and the widget shows the result itself.</p>
+<pre><code class="lang-json">POST https://api.telegram.org/bot&lt;token&gt;/answerWidgetQuery
+{ &quot;widget_query_id&quot;: &quot;8123456789012345678&quot;, &quot;data&quot;: &quot;{\&quot;p\&quot;:5.47}&quot; }</code></pre>
+<ul>
+<li><strong>The answer does not change the state.</strong> To change the chat state or the shared state, call the <a href="#changing-the-state">methods that change it</a>, before or after answering. The widget gets <code>chatDataChanged</code> / <code>publicDataChanged</code> when the new state arrives, which can be before or after the answer. A widget that needs the new state at once (the user&#39;s own vote, the new board) gets it from the bot in the answer.</li>
+<li><strong>Answer also when something failed</strong>, with a short text the widget can show: an unanswered request ends in the widget as <code>TIMEOUT</code>.</li>
+<li><strong><code>from</code> and <code>widget_id</code> cannot be forged.</strong> <code>from</code> is the user who tapped, authenticated by Telegram: no signature to check. <code>widget_id</code> is computed by the server from the tapped message, so a request cannot claim to come from another of your shared widgets. A forward&#39;s request carries nothing else about its place, so key “one vote per user” and paid actions on the pair <strong>(<code>widget_id</code>, <code>from.id</code>)</strong>.</li>
+<li><strong>Treat <code>data</code> as untrusted input</strong>, like <code>callback_data</code>: check it against the state you keep.</li>
+<li>Do slow work after answering, then change the state.</li>
+<li>Requests are limited to 5 per 5 seconds per user and bot, background requests included.</li>
+</ul>
+<table class="table">
+<thead>
+<tr>
+<th>Cause</th>
+<th>The widget gets</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the widget was sent without <code>allow_queries</code>, a forward of a static widget, no tap where background requests are off, or a preview</td>
+<td><code>NOT_ALLOWED</code>, before anything is sent</td>
+</tr>
+<tr>
+<td><code>data</code> empty or over 64 bytes</td>
+<td><code>TypeError</code>, before anything is sent</td>
+</tr>
+<tr>
+<td>the bot did not answer in 15 seconds</td>
+<td><code>TIMEOUT</code></td>
+</tr>
+<tr>
+<td>over 5 requests per 5 seconds per user and bot</td>
+<td><code>RATE_LIMITED</code></td>
+</tr>
+<tr>
+<td>an answer the app cannot accept (it never reaches the widget&#39;s code)</td>
+<td><code>INVALID_ANSWER</code></td>
+</tr>
+<tr>
+<td>the message is gone, the bot is blocked or deleted, the network failed</td>
+<td><code>FAILED</code></td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="changing-the-state" href="#changing-the-state"><i class="anchor-icon"></i></a>Changing the state</h4>
+<p>Only the bot that sent the widget changes its state. Every edit is <strong>silent</strong>: no “edited” mark, no notification, the chat does not move up in the chat list.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Message</th>
+<th>Chat state</th>
+<th>Shared state of a static widget</th>
+<th>Shared state of a shared widget</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>original (private chat, group)</td>
+<td><a href="/bots/api#editmessagewidgetdata">editMessageWidgetData</a> with <code>chat_id</code> + <code>message_id</code></td>
+<td>same</td>
+<td><a href="/bots/api#editsharedwidgetdata">editSharedWidgetData</a> by <code>widget_id</code></td>
+</tr>
+<tr>
+<td>original sent via the bot</td>
+<td><a href="/bots/api#editmessagewidgetdata">editMessageWidgetData</a> with <code>inline_message_id</code></td>
+<td>same</td>
+<td><a href="/bots/api#editsharedwidgetdata">editSharedWidgetData</a> by <code>widget_id</code></td>
+</tr>
+<tr>
+<td>forward</td>
+<td>none</td>
+<td>none: a copy</td>
+<td><a href="/bots/api#editsharedwidgetdata">editSharedWidgetData</a> by <code>widget_id</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="lang-json">POST https://api.telegram.org/bot&lt;token&gt;/editMessageWidgetData
+{ &quot;chat_id&quot;: -1001234567890, &quot;message_id&quot;: 77, &quot;chat_data&quot;: &quot;{\&quot;b\&quot;:\&quot;x---o----\&quot;,\&quot;t\&quot;:\&quot;x\&quot;}&quot; }
+
+POST https://api.telegram.org/bot&lt;token&gt;/editSharedWidgetData
+{ &quot;widget_id&quot;: &quot;7770011223344556677&quot;, &quot;public_data&quot;: &quot;{\&quot;p\&quot;:5.47}&quot;, &quot;cache_time&quot;: 10 }</code></pre>
+<ul>
+<li><strong>An edit that changes nothing</strong> fails with <code>Bad Request: message is not modified</code>, as <code>editMessageText</code> does: take it as done (and still answer the request that led to it).</li>
+<li><strong>Commit after the edit.</strong> Put a user&#39;s move into your own state only once the edit went through, so a failed edit does not take a turn away.</li>
+<li><strong>Rate limits.</strong> An <code>editMessageWidgetData</code> call counts as one sent message against your bot&#39;s limits for sending messages. A shared widget takes at most one edit per second. Above them the method fails with a flood wait. When many users act at once (votes), coalesce your edits: keep the state on your side and write it at most once a second.</li>
+<li><strong>A deleted original&#39;s</strong> chat state can no longer be changed, but a shared widget lives on: change its shared state by <code>widget_id</code>.</li>
+<li><code>editSharedWidgetData</code> is the only way to set a shared widget&#39;s refresh period (<code>cache_time</code>).</li>
+</ul>
+<h4><a class="anchor" name="forwards" href="#forwards"><i class="anchor-icon"></i></a>Forwards</h4>
+<p>Users can forward a widget to any chat, groups and channels included (<a href="#availability">test server only</a>). The forward runs the same code in the same sandbox:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Property</th>
+<th>Original</th>
+<th>Forward</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code, size anchors, shared state of a static widget</td>
+<td>as sent</td>
+<td>copies as of the moment of forwarding, never updated</td>
+</tr>
+<tr>
+<td>Code, size anchors, shared state of a shared widget</td>
+<td>the shared widget&#39;s</td>
+<td>the same shared widget&#39;s</td>
+</tr>
+<tr>
+<td>Chat state</td>
+<td>the current one</td>
+<td><strong>none</strong>, ever</td>
+</tr>
+<tr>
+<td><code>TelegramWidget.isForward</code></td>
+<td><code>false</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>TelegramWidget.chatType</code></td>
+<td>the chat&#39;s type</td>
+<td><code>null</code>: a forward is told nothing about the chat it is in</td>
+</tr>
+<tr>
+<td>Requests</td>
+<td>per <a href="#requests-to-the-bot">the table above</a></td>
+<td>on a tap, only for a shared widget sent with <code>allow_queries</code>, never in the background</td>
+</tr>
+<tr>
+<td><code>TelegramWidget.viewer</code></td>
+<td>where it may ask</td>
+<td>only if it may ask</td>
+</tr>
+<tr>
+<td>Web Storage</td>
+<td>this message&#39;s</td>
+<td>its own, starts empty</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>A widget is never forwarded without its author.</strong> The forward header stays even when the user chooses to hide the sender, so a widget always shows which bot it comes from.</li>
+<li><strong>A request from a forward tells the bot nothing about where it is</strong>: it arrives as a <a href="/bots/api#sharedwidgetquery">shared_widget_query</a> with only <code>id</code>, <code>from</code>, <code>data</code> and <code>widget_id</code>: no chat, no message, no <code>chat_instance</code>. The bot answers by the query&#39;s id and changes the shared state by <code>widget_id</code>, even if the original was deleted.</li>
+<li><strong>Live forwards need a shared widget sent with <code>allow_queries</code>.</strong> A forward of a static widget shows the shared state as it was and cannot ask. Point its readers to the bot with <code>openTelegramLink(&#39;https://t.me/&lt;bot_username&gt;?start=…&#39;)</code>.</li>
+<li><strong>Widgets cannot be copied</strong>: <a href="/bots/api#copymessage">copyMessage</a> and <a href="/bots/api#copymessages">copyMessages</a> refuse them. A widget sent with <code>protect_content</code> cannot be forwarded.</li>
+</ul>
+<h4><a class="anchor" name="previews" href="#previews"><i class="anchor-icon"></i></a>Previews</h4>
+<p>In the list of inline results, before the user sends one, the app shows a widget result as a <strong>preview</strong>: <code>TelegramWidget.isPreview</code> is <code>true</code>. A preview runs with the result&#39;s state (for a shared widget, its code and shared state), with timers, animations and the theme as usual, but it is not a message yet and not the user&#39;s:</p>
+<ul>
+<li>It gets no taps or pointer events (a tap selects the result).</li>
+<li><code>request()</code> rejects with <code>NOT_ALLOWED</code>. <code>openLink</code>, <code>openTelegramLink</code>, <code>copyText</code> and haptics do nothing (<code>ready</code> and <code>setResizeAnchor</code> work), and <code>watchPublicData()</code> has no effect.</li>
+<li><code>chatType</code>, <code>viewer</code> and <code>wallet</code> are <code>null</code>, and <code>isForward</code> is <code>false</code>.</li>
+<li>Web Storage starts empty and nothing is kept.</li>
+</ul>
+<p>Draw the first state a sent widget would draw: the preview is what the user is about to send.</p>
+<h4><a class="anchor" name="privacy" href="#privacy"><i class="anchor-icon"></i></a>Privacy</h4>
+<p><strong>What the bot learns</strong>, only from requests:</p>
+<ul>
+<li>Who tapped (<code>from</code>, a full <a href="/bots/api#user">User</a>, as in a callback query) and the <code>data</code> the widget sent.</li>
+<li>For an original: the chat and the message (or <code>inline_message_id</code>), <code>chat_instance</code> and, via the bot, the chat type.</li>
+<li>For a forward: only the shared widget&#39;s <code>widget_id</code>.</li>
+<li>Whatever the widget&#39;s code puts into the 64 bytes of <code>data</code>: its language, theme, text size, bubble width, time zone, what it keeps in Web Storage.</li>
+<li>In the private chat, background requests show when the user has the chat open with the widget on screen.</li>
+</ul>
+<p><strong>What the bot never learns:</strong> anything about a user who does not tap a widget (outside the private chat&#39;s background requests), where a widget was forwarded (no chat, chat type or chat instance), whether a link was opened, or anything about a preview.</p>
+<p><strong>What the widget knows:</strong> its state, the theme, the language, and whether it is a forward or a preview. It knows <code>chatType</code> in originals only, and the <code>viewer</code> (id, first and last name, username, Premium flag) only where it may send requests. These are the same fields the bot gets as <code>from</code> with a tap. A widget that may not send requests does not know who is looking and cannot pass that out through a link either. In its private chat, a bot that wants the widget to know the user can put the id into the chat state itself.</p>
+<h4><a class="anchor" name="storage-links-and-haptics" href="#storage-links-and-haptics"><i class="anchor-icon"></i></a>Storage, links and haptics</h4>
+<p><strong>Web Storage.</strong> <code>localStorage</code> is kept for this message on this device. It is in place from the first line of script, survives the widget being destroyed and re-created and app restarts, and is deleted with the message, the chat, the account and on “Clear cache”. It is never sent to the bot or the server and is not synced between devices: what must follow the user belongs in the chat state, which the bot writes. Each area holds 4 KB (keys and values in UTF-8). A <code>setItem</code> beyond that throws <code>QuotaExceededError</code> and stores nothing, so catch it. Keep this user&#39;s own choices there (a best score, “voted”). <code>sessionStorage</code> follows the same rules and lives until the app restarts. A forward, or another message showing the same shared widget, is another message, and its storage starts empty.</p>
+<p><strong>Links.</strong> <code>openLink(url)</code> opens an <code>https:</code> URL of at most 256 characters (no user name or password, not a <code>t.me</code>, <code>telegram.me</code> or <code>telegram.dog</code> host) after the user confirms it, shown in full. <code>openTelegramLink(url)</code> opens a <code>https://t.me/…</code> link inside Telegram without a confirmation of its own, as a tapped <code>t.me</code> link in a message does (Telegram&#39;s own handling still confirms what it always does, such as joining a chat or a proxy). Both work only in the handler of a real tap, once per tap. A tapped <code>&lt;a href=&quot;https://…&quot;&gt;</code> and <code>window.open(url)</code> do the same, through <code>openTelegramLink</code> for Telegram hosts and <code>openLink</code> otherwise. A URL these methods do not accept (not <code>https:</code>, too long, with a user name or password, a host of the other method, <code>tg:</code> links) throws <code>TypeError</code>. A tapped link or <code>window.open</code> with another scheme (<code>http:</code>, <code>javascript:</code>) is ignored. The widget is not told whether the user opened the link.</p>
+<p><strong>Haptics.</strong> <code>HapticFeedback.impactOccurred</code>, <code>notificationOccurred</code> and <code>selectionChanged</code> work as in Mini Apps, only while the widget is visible, at most 5 in a burst and 10 per second. They are free while a finger is down on the widget and for 5 seconds after it is lifted. Without a touch, the first call opens a one-second series and later ones are dropped. The next series may start after a touch or 10 seconds later. So a timer cannot keep buzzing the phone, while a tap, and a bot&#39;s answer that arrives a few seconds after it, can play feedback. Desktop and web apps play nothing.</p>
+<p><strong>copyText.</strong> <code>TelegramWidget.copyText(text)</code> copies 1-256 characters to the clipboard on a tap, like an inline button&#39;s <code>copy_text</code>. The app shows a toast with the copied text, so a widget cannot show one text and copy another unnoticed. <code>navigator.clipboard</code> is not available.</p>
+<h4><a class="anchor" name="payments-with-the-wallet" href="#payments-with-the-wallet"><i class="anchor-icon"></i></a>Payments with the wallet</h4>
+<p>A widget can ask the user to pay or to sign through Telegram&#39;s built-in wallet. The widget is the front of a dApp and the bot is its back end, as a site and its server are with TON Connect. The formats are TON Connect&#39;s, so a bot reuses its TON Connect code, but there is no connection, manifest or bridge: who asks is the bot that sent the message, and the app&#39;s own wallet window, outside the bubble, says so.</p>
+<pre><code class="lang-js">// A tap asks the bot with the user&#39;s wallet; the bot answers with a fresh transaction; the widget passes it on.
+TelegramWidget.request(&#39;pay:42&#39;, { wallet: true })
+  .then((a) =&gt; TelegramWidget.wallet.sendTransaction(JSON.parse(a.result), &#39;paid:42&#39;))
+  .then((a) =&gt; show(a.result), (e) =&gt; showError(e.code));</code></pre>
+<ol>
+<li><strong>Check <code>TelegramWidget.wallet</code>.</strong> It is <code>null</code> where the user has no wallet in this app (an older app, a country where the wallet is unavailable), where the widget may not send requests, and in a preview. Draw a pay button only when it is there.</li>
+<li><strong>On a tap, ask the bot with the wallet:</strong> <code>request(data, { wallet: true })</code>. The bot&#39;s query has <code>type</code> <code>{ &quot;type&quot;: &quot;data&quot;, &quot;wallet_card&quot;: … }</code>: the <a href="/bots/api#tonwalletcard">TonWalletCard</a> of the user&#39;s profile, its address and balance. A user without a wallet gets one created then. Never in the background.</li>
+<li><strong>The bot answers with a fresh transaction</strong>, TON Connect&#39;s <code>sendTransaction</code> request: <code>{ valid_until, messages: [{ address, amount, payload?, stateInit? }] }</code>, 1-255 messages, each <code>address</code> user-friendly, each <code>amount</code> in nanotons as a decimal string. Leave out <code>from</code>: the wallet that pays is the one on the user&#39;s device, which can differ from the profile&#39;s card (with the wallet&#39;s backup off, a device keeps its own key and wallet).</li>
+<li><strong>In the answer&#39;s handler, the widget calls <code>wallet.sendTransaction(transaction, data)</code>.</strong> The answer to a call made on a tap allows one wallet call within 10 seconds, so no second tap is needed. The app&#39;s window shows the bot, the amounts and the destinations, and the user confirms.</li>
+<li><strong>The bot gets the outcome</strong> as a query whose <code>type</code> is <code>{ &quot;type&quot;: &quot;sent_transaction&quot;, &quot;wallet&quot;: …, &quot;msg_hash&quot;: … }</code>, with the call&#39;s <code>data</code>: the hash of the sent message and the device&#39;s wallet that sent it (<a href="/bots/api#widgetquerywallet">WidgetQueryWallet</a>). It checks the transaction on the chain (the sender, the recipients, the amounts, the outcome), not by the hash alone, and answers. The widget&#39;s promise resolves with that answer.</li>
+</ol>
+<pre><code class="lang-json">{
+  &quot;update_id&quot;: 100000004,
+  &quot;widget_query&quot;: {
+    &quot;id&quot;: &quot;8123456789012340002&quot;,
+    &quot;from&quot;: { &quot;id&quot;: 111111111, &quot;is_bot&quot;: false, &quot;first_name&quot;: &quot;Alice&quot; },
+    &quot;chat&quot;: { &quot;id&quot;: 111111111, &quot;type&quot;: &quot;private&quot;, &quot;first_name&quot;: &quot;Alice&quot; },
+    &quot;message_id&quot;: 4243,
+    &quot;chat_instance&quot;: &quot;901234567890123456&quot;,
+    &quot;type&quot;: {
+      &quot;type&quot;: &quot;sent_transaction&quot;,
+      &quot;wallet&quot;: { &quot;address&quot;: &quot;UQ…&quot;, &quot;amount&quot;: &quot;1250000000&quot;, &quot;public_key&quot;: &quot;a3f1…&quot; },
+      &quot;msg_hash&quot;: &quot;…&quot;
+    },
+    &quot;data&quot;: &quot;paid:42&quot;
+  }
+}</code></pre>
+<p><code>wallet.signData(payload, data)</code> asks for a signature the same way: <code>payload</code> is TON Connect&#39;s <code>{ type: &#39;text&#39;, text }</code>, <code>{ type: &#39;binary&#39;, bytes }</code> or <code>{ type: &#39;cell&#39;, schema, cell }</code>. The bot gets a query whose <code>type</code> is <code>{ &quot;type&quot;: &quot;sign_data&quot;, &quot;wallet&quot;: …, &quot;sign_data&quot;: … }</code>: TON Connect&#39;s <code>signData</code> result as JSON, with the wallet that signed. The domain signed for is <code>bot&lt;bot_id&gt;</code>. Check the signature with the wallet&#39;s <code>public_key</code>, and tie the key to the wallet&#39;s address on the chain.</p>
+<p>One wallet call per tap or per answer, and one call in flight together with requests. Besides the request codes, the promise rejects with <code>REJECTED</code> (the user declined) or <code>BAD_REQUEST</code> (the wallet refused the transaction or payload). A malformed transaction throws <code>TypeError</code>. After <code>TIMEOUT</code> the payment may have gone out, so ask the bot about the order and never pay again blindly.</p>
+<h4><a class="anchor" name="lifecycle" href="#lifecycle"><i class="anchor-icon"></i></a>Lifecycle</h4>
+<ul>
+<li><strong>Off screen</strong> (scrolled away, the app in the background) a widget is paused: <code>document.hidden</code> is <code>true</code>, <code>visibilitychange</code> fires, <code>TelegramWidget.isActive</code> turns <code>false</code> with the <code>deactivated</code> event, animation frames stop and timers fire at most once per second. It resumes with <code>activated</code>.</li>
+<li><strong>A widget can be destroyed and re-created at any time</strong> (scrolled far away, memory pressure, app restart). Only the widget&#39;s state and Web Storage survive: redraw from them when the script starts.</li>
+<li><code>TelegramWidget.ready()</code> tells the app the first state is drawn. It is optional.</li>
+<li>A widget that goes past one of its <a href="#limits">limits</a> (CPU, memory, nodes, text, operations, canvas, paint) or crashes is stopped: its last frame stays with a “Widget stopped” badge. The app rebuilds it when it is shown again. After two crashes in a row it stays stopped until the app restarts.</li>
+</ul>
+<hr>
+<h3><a class="anchor" name="what-widgets-support" href="#what-widgets-support"><i class="anchor-icon"></i></a>What widgets support</h3>
+<p>The <strong>widget profile</strong> is the contract between widgets and Telegram apps: a feature is in when every app draws it the same way, and every app removes what is out before drawing. Something out of the profile never fails the widget: the declaration, selector, element or event is removed and the rest works. This page describes <strong>profile 1</strong>. A later profile only adds features.</p>
+<h4><a class="anchor" name="html" href="#html"><i class="anchor-icon"></i></a>HTML</h4>
+<p><strong>In:</strong></p>
+<ul>
+<li>Text and structure: <code>div</code>, <code>span</code>, <code>p</code>, <code>br</code>, <code>hr</code>, headings <code>h1</code>–<code>h6</code>, <code>header</code>, <code>footer</code>, <code>main</code>, <code>nav</code>, <code>section</code>, <code>article</code>, <code>aside</code>, <code>pre</code>, <code>blockquote</code>, <code>figure</code>, <code>figcaption</code>.</li>
+<li>Inline text elements: <code>b</code>, <code>i</code>, <code>u</code>, <code>s</code>, <code>em</code>, <code>strong</code>, <code>small</code>, <code>mark</code>, <code>code</code>, <code>kbd</code>, <code>sub</code>, <code>sup</code>, <code>abbr</code>, <code>cite</code>, <code>q</code>, <code>del</code>, <code>ins</code>, <code>time</code>, ….</li>
+<li>Lists (<code>ul</code>, <code>ol</code>, <code>li</code>, <code>dl</code>, <code>dt</code>, <code>dd</code>, <code>menu</code>), tables with <code>colspan</code> and <code>rowspan</code>, <code>details</code> and <code>summary</code>.</li>
+<li><code>&lt;img&gt;</code> with a <code>data:</code> PNG, JPEG, GIF or WebP, <code>&lt;canvas&gt;</code>, <code>&lt;button&gt;</code>.</li>
+<li>Links: <code>&lt;a href=&quot;#id&quot;&gt;</code> (no navigation) and <code>&lt;a href=&quot;https://…&quot;&gt;</code> (opens through <code>openLink</code> on a tap).</li>
+<li>Attributes: <code>class</code>, <code>id</code>, <code>style</code>, <code>title</code>, <code>hidden</code>, <code>lang</code>, <code>dir</code>, <code>data-*</code>, <code>aria-*</code>, and inline <code>on*</code> handlers (they run in the sandbox).</li>
+</ul>
+<p>Unknown elements render as inline boxes.</p>
+<p><strong>Out:</strong></p>
+<ul>
+<li>Form controls: <code>input</code>, <code>select</code>, <code>textarea</code>, <code>option</code>, <code>fieldset</code>, … are removed with their content. <code>&lt;form&gt;</code> becomes a block and <code>&lt;label&gt;</code> an inline box.</li>
+<li><code>progress</code>, <code>meter</code>, <code>dialog</code> and popovers, <code>audio</code>, <code>video</code>, <code>iframe</code>, <code>object</code>, <code>embed</code>, external <code>&lt;script src&gt;</code>, <code>link</code>, <code>meta</code>, <code>template</code>, <code>math</code>, <code>ruby</code>.</li>
+<li>Images from anything but a <code>data:</code> URL (shown as a placeholder, never requested), and <code>data:</code> SVG, AVIF, BMP or ICO images.</li>
+<li>Legacy presentational elements and attributes (<code>center</code>, <code>font</code>, <code>align</code>, <code>bgcolor</code>, …).</li>
+<li><code>contenteditable</code>, <code>draggable</code>, <code>tabindex</code>, <code>autofocus</code>, <code>accesskey</code>.</li>
+</ul>
+<h4><a class="anchor" name="inline-svg" href="#inline-svg"><i class="anchor-icon"></i></a>Inline SVG</h4>
+<p><strong>In:</strong> shapes and paths, <code>g</code>, <code>defs</code>, <code>symbol</code>, <code>use</code> (fragment links), <code>transform</code>, <code>viewBox</code>, <code>text</code> and <code>tspan</code>, linear and radial gradients, CSS on SVG (fills and strokes from stylesheets, CSS animation of SVG properties).</p>
+<p><strong>Out:</strong> <code>clipPath</code>, <code>mask</code>, <code>pattern</code>, <code>marker</code>, filter primitives, SMIL animation (<code>animate</code>, <code>animateTransform</code>, <code>animateMotion</code>), <code>foreignObject</code>, <code>&lt;image&gt;</code>.</p>
+<h4><a class="anchor" name="css" href="#css"><i class="anchor-icon"></i></a>CSS</h4>
+<p><strong>In:</strong></p>
+<ul>
+<li>Layout: block, inline, inline-block, flexbox (with <code>gap</code>), grid, tables, <code>position: relative / absolute / fixed</code> (fixed is relative to the bubble), <code>z-index</code>, <code>float</code>, <code>aspect-ratio</code>, <code>box-sizing</code>, <code>object-fit</code>, <code>overflow: hidden / clip</code>.</li>
+<li>Box and paint: margins, padding, borders (solid, dashed, dotted, double), <code>border-radius</code>, <code>outline</code>, <code>box-shadow</code>, <code>opacity</code>, <code>visibility</code>, backgrounds with <code>data:</code> images, linear, radial and conic gradients, 2D transforms (and the <code>translate</code>, <code>rotate</code>, <code>scale</code> properties).</li>
+<li>Filters, if every app draws them: <code>filter</code> with <code>blur()</code>, <code>brightness()</code>, <code>drop-shadow()</code>, and <code>backdrop-filter</code> with <code>blur()</code>, <code>brightness()</code>.</li>
+<li>Text: <code>font-size</code>, <code>font-weight</code>, <code>font-style</code>, <code>line-height</code>, the <code>font</code> shorthand, generic families only (<code>system-ui</code>, <code>sans-serif</code>, <code>serif</code>, <code>monospace</code>, <code>ui-sans-serif</code>, <code>ui-serif</code>, <code>ui-monospace</code>, <code>ui-rounded</code>, with <code>-apple-system</code> turned into <code>system-ui</code> and other names removed), <code>font-variant-numeric: tabular-nums</code>, <code>text-align</code>, <code>text-decoration</code>, <code>text-transform</code>, <code>letter-spacing</code>, <code>white-space</code>, <code>overflow-wrap</code>, <code>word-break</code>, <code>text-overflow: ellipsis</code>, <code>vertical-align</code>, list styles, right-to-left text, color emoji, <code>user-select: none / text / auto</code>.</li>
+<li>Colors: named, hex, <code>rgb()</code>, <code>hsl()</code>, <code>transparent</code>, <code>currentColor</code>, <code>light-dark()</code> and <code>color-scheme</code> (resolved to the chat theme).</li>
+<li>Motion: transitions, <code>@keyframes</code> animations, timing functions (<code>cubic-bezier()</code>, <code>steps()</code>, <code>linear()</code>), <code>animation-play-state</code>, the animation and transition events.</li>
+<li>Values: <code>px</code>, <code>em</code>, <code>rem</code>, <code>%</code>, <code>ch</code>, <code>ex</code>, <code>vw</code> / <code>vmin</code> / <code>vmax</code> (the bubble&#39;s width), <code>calc()</code>, <code>min()</code>, <code>max()</code>, <code>clamp()</code>, custom properties and <code>var()</code>, <code>env(safe-area-inset-*)</code> (<a href="#the-time-in-the-corner">the time in the corner</a>), <code>content</code> with strings, <code>attr(data-*)</code> and counters.</li>
+<li>Selectors: type, class, id, attribute, combinators, structural pseudo-classes (<code>:first-child</code>, <code>:nth-child()</code>, <code>:not()</code>, …), <code>:is()</code>, <code>:where()</code>, <code>:root</code>, <code>::before</code>, <code>::after</code>, <code>:active</code>, <code>:hover</code> (with a mouse only).</li>
+<li>At-rules: <code>@supports</code>, <code>@keyframes</code>, and <code>@media</code> on the width, the orientation, <code>prefers-color-scheme</code> and <code>prefers-reduced-motion</code>.</li>
+<li><code>touch-action: auto / pan-y / none</code>, <code>pointer-events</code>, <code>cursor</code>.</li>
+</ul>
+<p><strong>Out:</strong></p>
+<ul>
+<li><code>vh</code> and other height-relative units.</li>
+<li><code>overflow: auto / scroll</code> (becomes <code>hidden</code>) and <code>position: sticky</code> (becomes <code>relative</code>).</li>
+<li>Logical properties (<code>margin-inline</code>, …), multi-column layout, <code>display: contents / flow-root / list-item</code>.</li>
+<li>3D transforms and <code>perspective</code>, other filter functions (<code>grayscale()</code>, <code>saturate()</code>, …), <code>clip-path</code>, masks, blend modes.</li>
+<li><code>text-shadow</code>, <code>-webkit-line-clamp</code>, <code>background-clip: text</code>, <code>writing-mode</code>.</li>
+<li>Modern color functions (<code>oklch()</code>, <code>color-mix()</code>, …).</li>
+<li><code>env()</code> names other than the safe-area insets, and <code>url()</code> with anything but a <code>data:</code> image or a <code>#fragment</code>.</li>
+<li><code>@font-face</code> and named fonts, <code>@import</code>, <code>@container</code>, <code>@layer</code>, <code>@property</code>, CSS nesting.</li>
+<li><code>:has()</code>, <code>:focus*</code>, <code>::first-letter</code>, <code>::first-line</code>, <code>::marker</code>, <code>:target</code>, and form-state selectors (<code>:checked</code>, …). <code>:disabled</code> and <code>:enabled</code> work for <code>&lt;button&gt;</code>.</li>
+<li><code>@media</code> on hover, pointer, resolution or print.</li>
+</ul>
+<h4><a class="anchor" name="javascript" href="#javascript"><i class="anchor-icon"></i></a>JavaScript</h4>
+<p><strong>In:</strong></p>
+<ul>
+<li>ES2023 (QuickJS), Promises and <code>async</code> / <code>await</code>, timers, <code>requestAnimationFrame</code>.</li>
+<li>The DOM: <code>createElement</code>, <code>querySelector</code>, <code>innerHTML</code> parsed in the sandbox, <code>classList</code>, <code>dataset</code>, <code>style</code>, <code>addEventListener</code>, <code>CustomEvent</code>, <code>MutationObserver</code>.</li>
+<li>Layout reads answered by the app: <code>getBoundingClientRect</code>, <code>offsetWidth</code>, <code>getComputedStyle</code>, <code>matchMedia</code>, <code>elementFromPoint</code>, <code>ResizeObserver</code>. <code>IntersectionObserver</code> always reports visible.</li>
+<li>Canvas 2D: paths, <code>Path2D</code>, gradients, text and <code>measureText</code>, <code>drawImage</code> from <code>data:</code> images and canvases, transforms, clipping, <code>isPointInPath</code>.</li>
+<li>Web Animations (<code>element.animate</code>, <code>getAnimations</code>), if every app draws them.</li>
+<li><code>Intl</code> in the user&#39;s language (<code>navigator.language</code>).</li>
+<li><code>crypto.getRandomValues</code>, <code>crypto.randomUUID</code>, <code>TextEncoder</code>, <code>TextDecoder</code>, <code>URL</code>, <code>URLSearchParams</code>, <code>structuredClone</code>, <code>AbortController</code>, <code>atob</code>, <code>btoa</code>.</li>
+<li><code>localStorage</code> and <code>sessionStorage</code>, <code>document.hidden</code> and <code>visibilitychange</code>.</li>
+<li><code>eval</code> and <code>new Function</code> (inside the sandbox).</li>
+</ul>
+<p><strong>Out:</strong></p>
+<ul>
+<li>Every network API: <code>fetch</code>, <code>XMLHttpRequest</code>, <code>WebSocket</code>, <code>EventSource</code>, <code>RTCPeerConnection</code>, <code>sendBeacon</code>, <code>importScripts</code>, <code>Worker</code> and <code>BroadcastChannel</code> throw <code>NetworkDisabledError</code>.</li>
+<li>Navigation: <code>location</code>, <code>history</code>. <code>window.open</code> goes through <code>openLink</code>.</li>
+<li><code>alert</code>, <code>confirm</code>, <code>prompt</code>, <code>print</code>. No dialog is shown, <code>confirm</code> returns <code>false</code> and <code>prompt</code> returns <code>null</code>.</li>
+<li><code>navigator.clipboard</code>, <code>share</code>, <code>vibrate</code>, geolocation, media devices, notifications.</li>
+<li><code>attachShadow</code>, custom elements, <code>Blob</code>, <code>FileReader</code>, <code>URL.createObjectURL</code>, <code>requestFullscreen</code>.</li>
+<li><code>focus()</code> and <code>blur()</code>, which do nothing.</li>
+<li>In canvas: <code>getImageData</code> / <code>putImageData</code>, <code>toDataURL</code>, <code>createPattern</code>, <code>createConicGradient</code>, shadows, <code>globalCompositeOperation</code>, <code>ctx.filter</code>.</li>
+<li>WebGL and <code>OffscreenCanvas</code>.</li>
+</ul>
+<p>Libraries are not bundled: a <code>&lt;script src&gt;</code> naming a CDN library is an external script like any other and does not run.</p>
+<h4><a class="anchor" name="input" href="#input"><i class="anchor-icon"></i></a>Input</h4>
+<p><strong>In:</strong></p>
+<ul>
+<li><code>click</code>.</li>
+<li>Pointer events (<code>pointerdown</code>, <code>pointermove</code>, <code>pointerup</code>, <code>pointercancel</code>, enter, leave, over, out) with coordinates, <code>pointerType</code> and <code>setPointerCapture</code>, and the mouse compatibility events.</li>
+<li><code>dblclick</code> (always the widget&#39;s) and <code>contextmenu</code> on a hold over <code>touch-action: none</code>.</li>
+<li><code>preventDefault</code> on <code>pointerdown</code>.</li>
+<li>Animation and transition events, <code>toggle</code> of <code>&lt;details&gt;</code>.</li>
+</ul>
+<p>Who gets each press is described in <a href="#gestures">Gestures</a>.</p>
+<p><strong>Out:</strong></p>
+<ul>
+<li>Touch events (use pointer events).</li>
+<li>Keyboard events and keyboard focus. There is no text input of any kind, and a key press never counts as a tap.</li>
+<li>Wheel and scroll events.</li>
+</ul>
+<h4><a class="anchor" name="detecting-features" href="#detecting-features"><i class="anchor-icon"></i></a>Detecting features</h4>
+<ul>
+<li><code>TelegramWidget.profile</code> is the profile the app enforces (<code>1</code>), and <code>TelegramWidget.isProfileAtLeast(n)</code> returns <code>profile &gt;= n</code>.</li>
+<li><code>CSS.supports(property, value)</code>, <code>CSS.supports(condition)</code> and <code>@supports</code> answer from the profile: <code>true</code> only when the app keeps that declaration.</li>
+<li>Methods added within a profile are detected with <code>typeof</code>, for example <code>typeof TelegramWidget.setResizeAnchor === &#39;function&#39;</code>.</li>
+<li>Outside Telegram (a plain browser) <code>window.TelegramWidget</code> is <code>undefined</code>.</li>
+</ul>
+<hr>
+<h3><a class="anchor" name="limits" href="#limits"><i class="anchor-icon"></i></a>Limits</h3>
+<table class="table">
+<thead>
+<tr>
+<th>Limit</th>
+<th>Value</th>
+<th>Beyond it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTML</td>
+<td>32768 bytes of UTF-8</td>
+<td><code>INPUT_MEDIA_WIDGET_TOO_LARGE</code></td>
+</tr>
+<tr>
+<td>Compressed HTML</td>
+<td>4096 bytes after zlib at level 9 (<a href="#counting-the-size">Counting the size</a>)</td>
+<td><code>INPUT_MEDIA_WIDGET_TOO_LARGE</code></td>
+</tr>
+<tr>
+<td>HTML text</td>
+<td>valid UTF-8 without the NUL character (U+0000)</td>
+<td><code>INPUT_MEDIA_WIDGET_HTML_INVALID</code></td>
+</tr>
+<tr>
+<td>Chat state, shared state (<code>chat_data</code>, <code>public_data</code>)</td>
+<td>a text of up to 1024 bytes each (bytes of UTF-8, not characters)</td>
+<td><code>INPUT_MEDIA_WIDGET_DATA_TOO_LARGE</code>, at sending and in edits</td>
+</tr>
+<tr>
+<td>Chat state, shared state text</td>
+<td>valid UTF-8 without the NUL character (U+0000)</td>
+<td><code>INPUT_MEDIA_WIDGET_DATA_INVALID</code> at sending, <code>WIDGET_DATA_INVALID</code> in edits</td>
+</tr>
+<tr>
+<td>Request <code>data</code></td>
+<td>1-64 bytes of UTF-8</td>
+<td><code>TypeError</code> in the widget</td>
+</tr>
+<tr>
+<td>Answer <code>data</code></td>
+<td>1024 bytes of UTF-8</td>
+<td><code>WIDGET_RESULT_TOO_LARGE</code></td>
+</tr>
+<tr>
+<td>Time to answer</td>
+<td>15 seconds, which is also how long a query&#39;s id is valid</td>
+<td><code>TIMEOUT</code> in the widget, and a late answer is refused (<code>query is too old</code>)</td>
+</tr>
+<tr>
+<td>Requests per user and bot</td>
+<td>5 per 5 seconds</td>
+<td><code>RATE_LIMITED</code> in the widget</td>
+</tr>
+<tr>
+<td>Requests per widget</td>
+<td>one in flight, one per tap (shared with links and <code>copyText</code>)</td>
+<td><code>BUSY</code> or <code>NOT_ALLOWED</code></td>
+</tr>
+<tr>
+<td>Background requests</td>
+<td>private chat with the bot only, while visible: one when it appears, then one per 5 seconds</td>
+<td><code>NOT_ALLOWED</code> or <code>RATE_LIMITED</code></td>
+</tr>
+<tr>
+<td><code>editMessageWidgetData</code></td>
+<td>counts as one sent message against the bot&#39;s sending limits</td>
+<td>flood wait</td>
+</tr>
+<tr>
+<td>Edits of a shared widget</td>
+<td>1 per second</td>
+<td>flood wait</td>
+</tr>
+<tr>
+<td>Refresh period of a shared widget</td>
+<td>30 seconds when created. <code>cache_time</code> sets it to 5-3600 seconds (more is clamped). Apps poll only while a widget that called <code>watchPublicData()</code> is on screen</td>
+<td><code>invalid cache time specified</code> below 5</td>
+</tr>
+<tr>
+<td>Bubble</td>
+<td>200 px to the bubble&#39;s maximum wide, 50-600 px tall</td>
+<td>clipped</td>
+</tr>
+<tr>
+<td><code>localStorage</code>, <code>sessionStorage</code></td>
+<td>4 KB per area per message (keys and values in UTF-8)</td>
+<td><code>QuotaExceededError</code></td>
+</tr>
+<tr>
+<td><code>copyText</code></td>
+<td>1-256 UTF-16 code units, on a tap</td>
+<td><code>TypeError</code>, or dropped without a tap</td>
+</tr>
+<tr>
+<td>URLs for <code>openLink</code>, <code>openTelegramLink</code></td>
+<td>256 characters</td>
+<td><code>TypeError</code></td>
+</tr>
+<tr>
+<td>Handlers per event type</td>
+<td>16</td>
+<td>further handlers are ignored</td>
+</tr>
+<tr>
+<td>Haptics</td>
+<td>visible widgets only, 5 in a burst, refilled at 10 per second. Free during a touch and 5 seconds after it, otherwise one 1-second series, the next one after a touch or 10 seconds later</td>
+<td>dropped</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>300 ms of JavaScript per second</td>
+<td>timers and frames wait, and a task that runs past the quota makes the next ones wait longer</td>
+</tr>
+<tr>
+<td>CPU in one task</td>
+<td>500 ms of continuous JavaScript, the first run of the script included</td>
+<td>the widget is stopped</td>
+</tr>
+<tr>
+<td>Layout reads</td>
+<td>128 blocking queries (<code>getBoundingClientRect</code>, <code>offsetWidth</code>, <code>getComputedStyle</code>, …) in one task, taking at most 1000 ms together</td>
+<td>the widget is stopped</td>
+</tr>
+<tr>
+<td>The app&#39;s main thread</td>
+<td>the widget&#39;s layout reads plus about 25 µs per DOM change and 2 µs per canvas command: 100 ms per second</td>
+<td>timers and frames wait</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>8 MB</td>
+<td>the widget is stopped</td>
+</tr>
+<tr>
+<td>Timers</td>
+<td>64 live timers</td>
+<td><code>RangeError</code></td>
+</tr>
+<tr>
+<td>Nodes</td>
+<td>2000 in the document: elements, text, comments</td>
+<td>the widget is stopped</td>
+</tr>
+<tr>
+<td>DOM changes</td>
+<td>10000 in one task: changes and element method calls such as <code>scrollTo</code></td>
+<td>the widget is stopped</td>
+</tr>
+<tr>
+<td>Text</td>
+<td>32 K UTF-16 units per text value and 48 K in the document (text, visible, <code>data-*</code> and <code>aria-*</code> attributes, CSS strings)</td>
+<td>the widget is stopped</td>
+</tr>
+<tr>
+<td>Complex-script text</td>
+<td>8192 units</td>
+<td>the text is refused</td>
+</tr>
+<tr>
+<td>Attributes</td>
+<td>8 K UTF-16 units per attribute or inline style</td>
+<td>the widget is stopped</td>
+</tr>
+<tr>
+<td>CSS</td>
+<td>400 rules and 32 <code>@keyframes</code></td>
+<td>the widget is stopped</td>
+</tr>
+<tr>
+<td>Canvas commands</td>
+<td>4000 per canvas in one task</td>
+<td><code>RangeError</code></td>
+</tr>
+<tr>
+<td>Canvas pixels</td>
+<td>2048 × 2048 for all the widget&#39;s canvases together (a canvas is 300 × 150 until sized)</td>
+<td>the widget is stopped</td>
+</tr>
+<tr>
+<td><code>data:</code> images</td>
+<td>1024 × 1024 pixels</td>
+<td>a placeholder</td>
+</tr>
+<tr>
+<td>Script animations</td>
+<td>64 running (<code>element.animate</code>)</td>
+<td>further ones are not drawn</td>
+</tr>
+<tr>
+<td>Heavy elements</td>
+<td>16 at once with a blurred <code>box-shadow</code>, a <code>filter</code>, a <code>backdrop-filter</code> or <code>opacity</code> below 1, or a running animation of one of them (a <code>::before</code> / <code>::after</code> counts as an element), at most 2 of them with <code>backdrop-filter</code>. A shadow without blur, an element under <code>display: none</code> and the dimming of a disabled or pressed <code>&lt;button&gt;</code> do not count</td>
+<td>the widget is stopped, and its last frame is drawn without these effects</td>
+</tr>
+<tr>
+<td>Crashes</td>
+<td>2 in a row</td>
+<td>the widget stays stopped until the app restarts</td>
+</tr>
+</tbody>
+</table>
+<p>The counted limits (nodes, DOM changes, text, attributes, CSS, canvas, heavy elements) are the same in every app and stop the same widget on a slow phone and on a fast computer. The time quotas only slow a heavy widget down. Of the time limits, only one task running past 500 ms, or layout reads past 1000 ms in one task, stops the widget. Keep well inside the limits and measure on an older phone.</p>
+<hr>
+<h3><a class="anchor" name="initializing-widgets" href="#initializing-widgets"><i class="anchor-icon"></i></a>Initializing widgets</h3>
+<p>Widgets need no script tag. Inside Telegram, <code>window.TelegramWidget</code> exists before the widget&#39;s first script runs, with the state, the theme and the context already in place. Outside Telegram it is <code>undefined</code>: check for it if you open a widget in a browser.</p>
+<h4><a class="anchor" name="telegramwidget" href="#telegramwidget"><i class="anchor-icon"></i></a>TelegramWidget</h4>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>profile</td>
+<td>Integer</td>
+<td>The widget profile the app enforces: <code>1</code> in this version.</td>
+</tr>
+<tr>
+<td>isProfileAtLeast(n)</td>
+<td>Function</td>
+<td>Returns <em>true</em> if <code>profile</code> is at least <code>n</code>, and <em>false</em> for anything but a number.</td>
+</tr>
+<tr>
+<td>colorScheme</td>
+<td>String</td>
+<td>The chat&#39;s color scheme: <code>light</code> or <code>dark</code>. Also the <code>--tg-color-scheme</code> variable.</td>
+</tr>
+<tr>
+<td>themeParams</td>
+<td><a href="#themeparams">ThemeParams</a></td>
+<td>The bubble&#39;s palette, a new frozen object after every change.</td>
+</tr>
+<tr>
+<td>isActive</td>
+<td>Boolean</td>
+<td><em>True</em>, if the widget is visible (<code>!document.hidden</code>).</td>
+</tr>
+<tr>
+<td>isPreview</td>
+<td>Boolean</td>
+<td><em>True</em>, if this is an inline result shown in the list of results before it is sent. See <a href="#previews">Previews</a>.</td>
+</tr>
+<tr>
+<td>isForward</td>
+<td>Boolean</td>
+<td><em>True</em>, if this is a forwarded copy.</td>
+</tr>
+<tr>
+<td>chatType</td>
+<td>String</td>
+<td>The kind of chat the message is in: <code>private</code>, <code>group</code>, <code>supergroup</code> or <code>channel</code>. <code>null</code> in a forward, in a preview, and when the app does not say.</td>
+</tr>
+<tr>
+<td>viewer</td>
+<td><a href="#widgetviewer">WidgetViewer</a></td>
+<td>The user looking at the widget, only where the widget may send requests, otherwise <code>null</code>. Frozen.</td>
+</tr>
+<tr>
+<td>publicData</td>
+<td>String</td>
+<td>The widget&#39;s shared state: a text of up to 1024 bytes, or <code>null</code>. Seen wherever the widget is shown: a forward has a static widget&#39;s copy as of the forward, or a shared widget&#39;s current shared state. Read-only.</td>
+</tr>
+<tr>
+<td>chatData</td>
+<td>String</td>
+<td>The widget&#39;s chat state: a text of up to 1024 bytes, or <code>null</code>. Tied to this message, and in a group one for all members. Always <code>null</code> in a forward. Read-only.</td>
+</tr>
+<tr>
+<td>watchPublicData()</td>
+<td>Function</td>
+<td>Asks for the live shared state: while this widget is on screen, the app polls its shared widget&#39;s shared state at the server&#39;s refresh period (one poll per <code>widget_id</code> for all widgets showing it) and fires <code>publicDataChanged</code> on a new shared state. Without it, a shared widget&#39;s shared state arrives only with the message. Synchronous, needs no tap, may be called at any time and repeated. Does nothing for a static widget, whose state is pushed anyway, and in a preview.</td>
+</tr>
+<tr>
+<td>unwatchPublicData()</td>
+<td>Function</td>
+<td>Stops asking for the live shared state (see <code>watchPublicData</code>). Synchronous, may be repeated.</td>
+</tr>
+<tr>
+<td>request(data[, options])</td>
+<td>Function</td>
+<td>Sends a request to the bot with <code>data</code>, a string of 1-64 bytes in UTF-8 (anything else throws <code>TypeError</code>). Returns a Promise that resolves with a <a href="#widgetrequestanswer">WidgetRequestAnswer</a> or rejects with a <a href="#widgetrequesterror">WidgetRequestError</a>. Only in the handler of a tap, or in the background where the message allows it. One request at a time. <code>options</code> may be <code>{ wallet: true }</code>, on a tap only: the bot gets the user&#39;s wallet with the request (<a href="#payments-with-the-wallet">Payments with the wallet</a>). See <a href="#requests-to-the-bot">Requests to the bot</a>.</td>
+</tr>
+<tr>
+<td>copyText(text)</td>
+<td>Function</td>
+<td>Copies <code>text</code>, 1-256 UTF-16 code units, to the clipboard, and the app shows a toast with it. Only in the handler of a tap, once per tap.</td>
+</tr>
+<tr>
+<td>openLink(url)</td>
+<td>Function</td>
+<td>Opens an external <code>https:</code> link (at most 256 characters, not a <code>t.me</code>, <code>telegram.me</code> or <code>telegram.dog</code> host) after the user confirms it, shown in full. Only in the handler of a tap, once per tap. An invalid URL throws <code>TypeError</code>.</td>
+</tr>
+<tr>
+<td>openTelegramLink(url)</td>
+<td>Function</td>
+<td>Opens a <code>https://t.me/…</code> link (at most 256 characters) inside Telegram, without a confirmation of its own, as a tapped link in a message. Same rules as <code>openLink</code>.</td>
+</tr>
+<tr>
+<td>HapticFeedback</td>
+<td><a href="#hapticfeedback">HapticFeedback</a></td>
+<td>Haptic feedback.</td>
+</tr>
+<tr>
+<td>contentSafeAreaInset</td>
+<td><a href="#contentsafeareainset">ContentSafeAreaInset</a></td>
+<td>The part of the widget the app&#39;s time covers, in CSS pixels. A new frozen object after every change, with the <code>contentSafeAreaChanged</code> event. See <a href="#the-time-in-the-corner">The time in the corner</a>.</td>
+</tr>
+<tr>
+<td>wallet</td>
+<td><a href="#widgetwallet">WidgetWallet</a></td>
+<td>Telegram&#39;s wallet, or <code>null</code> where the user has no wallet in this app, where the widget may not send requests, and in a preview. See <a href="#payments-with-the-wallet">Payments with the wallet</a>.</td>
+</tr>
+<tr>
+<td>setResizeAnchor(edge)</td>
+<td>Function</td>
+<td>Which edge of the bubble stays in place when the widget&#39;s height changes: <code>top</code> (the default) or <code>bottom</code>. Applies to the changes that follow and needs no tap. Anything else throws <code>TypeError</code>. The earliest apps with widgets lack it, so check <code>typeof TelegramWidget.setResizeAnchor === &#39;function&#39;</code>.</td>
+</tr>
+<tr>
+<td>ready()</td>
+<td>Function</td>
+<td>Tells the app the first state is drawn. Optional: the app also notices the first content itself.</td>
+</tr>
+<tr>
+<td>onEvent(eventType, eventHandler)</td>
+<td>Function</td>
+<td>Sets the handler for an <a href="#events-available-for-widgets">event</a>. The handler is called with <code>this</code> bound to <code>TelegramWidget</code> and no arguments. At most 16 handlers per event type. Unknown types are ignored.</td>
+</tr>
+<tr>
+<td>offEvent(eventType, eventHandler)</td>
+<td>Function</td>
+<td>Removes a handler set with <code>onEvent</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>All methods are synchronous and return nothing, except <code>isProfileAtLeast</code>, <code>request</code> and the wallet&#39;s methods (a Promise) and the haptic methods (they return <code>HapticFeedback</code> for chaining). The deprecated aliases <code>theme</code> (= <code>colorScheme</code>) and <code>onTheme(callback)</code> still work. <code>sendMessage</code> does not exist: nothing is ever sent to the chat on the user&#39;s behalf. The widget is not told its <code>widget_id</code>.</p>
+<h4><a class="anchor" name="themeparams" href="#themeparams"><i class="anchor-icon"></i></a>ThemeParams</h4>
+<p>The colors of the bubble the widget sits in, as <code>#rrggbb</code> strings (lowercase), with the keys of Mini Apps&#39; <code>themeParams</code>. Every key is always present.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bg_color</td>
+<td>String</td>
+<td>The bubble&#39;s color, behind the widget: an incoming bubble&#39;s, or the user&#39;s outgoing bubble&#39;s for a widget they sent via the bot or forwarded.</td>
+</tr>
+<tr>
+<td>text_color</td>
+<td>String</td>
+<td>Message text.</td>
+</tr>
+<tr>
+<td>hint_color</td>
+<td>String</td>
+<td>Secondary text: time, meta.</td>
+</tr>
+<tr>
+<td>link_color</td>
+<td>String</td>
+<td>Links.</td>
+</tr>
+<tr>
+<td>button_color</td>
+<td>String</td>
+<td>The app&#39;s primary button.</td>
+</tr>
+<tr>
+<td>button_text_color</td>
+<td>String</td>
+<td>Text on the primary button.</td>
+</tr>
+<tr>
+<td>secondary_bg_color</td>
+<td>String</td>
+<td>A second surface on the bubble (quote, inline button background).</td>
+</tr>
+<tr>
+<td>accent_text_color</td>
+<td>String</td>
+<td>Accent text.</td>
+</tr>
+<tr>
+<td>subtitle_text_color</td>
+<td>String</td>
+<td>Subtitles.</td>
+</tr>
+<tr>
+<td>destructive_text_color</td>
+<td>String</td>
+<td>Destructive actions.</td>
+</tr>
+<tr>
+<td>section_bg_color, section_header_text_color, section_separator_color, header_bg_color, bottom_bar_bg_color</td>
+<td>String</td>
+<td>No bubble counterpart. Filled with the closest color so that Mini Apps code works. <code>section_separator_color</code> draws table lines and <code>&lt;hr&gt;</code>.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="css-variables" href="#css-variables"><i class="anchor-icon"></i></a>CSS variables</h4>
+<p>The app sets these on the widget&#39;s root element, inline and <code>!important</code>: a widget cannot override them on the root, only redefine them on its own elements.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--tg-theme-&lt;key&gt;</code></td>
+<td>Every <a href="#themeparams">ThemeParams</a> key with <code>_</code> turned into <code>-</code>: <code>--tg-theme-bg-color</code>, <code>--tg-theme-text-color</code>, <code>--tg-theme-hint-color</code>, …</td>
+</tr>
+<tr>
+<td><code>--tg-color-scheme</code></td>
+<td><code>light</code> or <code>dark</code>.</td>
+</tr>
+<tr>
+<td><code>--tg-text-font-size</code></td>
+<td>The chat&#39;s message text size, which follows the user&#39;s text size setting (about <code>15px</code>).</td>
+</tr>
+<tr>
+<td><code>--tg-text-line-height</code></td>
+<td>The message text&#39;s line height, unitless (about <code>1.35</code>).</td>
+</tr>
+<tr>
+<td><code>--tg-text-padding</code></td>
+<td>The text inset of a message bubble, the <code>body</code> margin (about <code>8px 12px</code>).</td>
+</tr>
+<tr>
+<td><code>--tg-button-bg</code>, <code>--tg-button-text</code>, <code>--tg-button-radius</code>, <code>--tg-button-font</code>, <code>--tg-button-padding</code>, <code>--tg-button-height</code>, <code>--tg-button-pressed-opacity</code>, <code>--tg-button-disabled-opacity</code></td>
+<td>The app&#39;s button style, used by the default <code>&lt;button&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>--tg-content-safe-area-inset-top</code>, <code>-right</code>, <code>-bottom</code>, <code>-left</code></td>
+<td>The band the app&#39;s time is drawn in: <code>bottom</code> is its height, the rest are 0. All are 0 with a caption below the widget. <code>env(safe-area-inset-*)</code> gives the same values.</td>
+</tr>
+<tr>
+<td><code>--tg-content-safe-area-corner-left</code>, <code>--tg-content-safe-area-corner-right</code></td>
+<td>The width the time takes in that band, on its side (<code>right</code> in a left-to-right interface). The other one is 0.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="hapticfeedback" href="#hapticfeedback"><i class="anchor-icon"></i></a>HapticFeedback</h4>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>impactOccurred(style)</td>
+<td>Function</td>
+<td>An impact: <code>light</code>, <code>medium</code>, <code>heavy</code>, <code>rigid</code> or <code>soft</code>.</td>
+</tr>
+<tr>
+<td>notificationOccurred(type)</td>
+<td>Function</td>
+<td>A notification: <code>error</code>, <code>success</code> or <code>warning</code>.</td>
+</tr>
+<tr>
+<td>selectionChanged()</td>
+<td>Function</td>
+<td>A selection change.</td>
+</tr>
+</tbody>
+</table>
+<p>An unknown style or type throws <code>TypeError</code>. Calls play only while the widget is visible, at most 5 in a burst and 10 per second. They are free during a touch on the widget and for 5 seconds after it. Without a touch the first call opens a one-second series, and the next series may start after a touch or 10 seconds later. Other calls are dropped. Desktop and web apps play nothing.</p>
+<h4><a class="anchor" name="contentsafeareainset" href="#contentsafeareainset"><i class="anchor-icon"></i></a>ContentSafeAreaInset</h4>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>top, right, left</td>
+<td>Number</td>
+<td>0 in this version.</td>
+</tr>
+<tr>
+<td>bottom</td>
+<td>Number</td>
+<td>The height of the band the app&#39;s time is drawn in at the bottom. 0 when the message has a caption below the widget.</td>
+</tr>
+<tr>
+<td>cornerRight</td>
+<td>Number</td>
+<td>The width the time takes at the right end of the band (a left-to-right interface), otherwise 0.</td>
+</tr>
+<tr>
+<td>cornerLeft</td>
+<td>Number</td>
+<td>The width the time takes at the left end of the band (a right-to-left interface), otherwise 0.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="widgetviewer" href="#widgetviewer"><i class="anchor-icon"></i></a>WidgetViewer</h4>
+<p>The account looking at the widget, shaped like Mini Apps&#39; <code>WebAppUser</code>, with the same fields the bot gets in <code>from</code> when this user taps. A field the app does not have, or that breaks its rule, is absent.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Integer</td>
+<td>The Telegram user id: the same id the bot gets as <code>from.id</code> with a request.</td>
+</tr>
+<tr>
+<td>first_name</td>
+<td>String</td>
+<td><em>Optional</em>. First name, 1-64 characters.</td>
+</tr>
+<tr>
+<td>last_name</td>
+<td>String</td>
+<td><em>Optional</em>. Last name, 1-64 characters.</td>
+</tr>
+<tr>
+<td>username</td>
+<td>String</td>
+<td><em>Optional</em>. Username, 5-32 characters of <code>A–Z</code>, <code>a–z</code>, <code>0–9</code> and <code>_</code>.</td>
+</tr>
+<tr>
+<td>is_premium</td>
+<td>Boolean</td>
+<td><em>Optional</em>. <em>True</em>, if the user has Telegram Premium.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="widgetrequestanswer" href="#widgetrequestanswer"><i class="anchor-icon"></i></a>WidgetRequestAnswer</h4>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>result</td>
+<td>String</td>
+<td>The bot&#39;s answer for this widget (the <code>data</code> of <a href="/bots/api#answerwidgetquery">answerWidgetQuery</a>), text of at most 1024 bytes, or <code>null</code> if the bot answered without one. Frozen.</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="widgetwallet" href="#widgetwallet"><i class="anchor-icon"></i></a>WidgetWallet</h4>
+<p>See <a href="#payments-with-the-wallet">Payments with the wallet</a>.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sendTransaction(transaction, data)</td>
+<td>Function</td>
+<td>Asks the user to send <code>transaction</code>, TON Connect&#39;s <code>sendTransaction</code> request (<code>{ valid_until?, network?, from?, messages: [{ address, amount, payload?, stateInit? }] }</code>, 1-255 messages, a user-friendly <code>address</code>, <code>amount</code> in nanotons as a decimal string, <code>payload</code> and <code>stateInit</code> in base64), in the app&#39;s wallet window. <code>data</code>, 1-64 bytes, is the label the bot gets with the outcome. Returns a Promise that resolves with the bot&#39;s answer to the outcome, a <a href="#widgetrequestanswer">WidgetRequestAnswer</a>. A malformed transaction or a field outside TON Connect&#39;s set throws <code>TypeError</code>.</td>
+</tr>
+<tr>
+<td>signData(payload, data)</td>
+<td>Function</td>
+<td>Asks the user to sign <code>payload</code>, TON Connect&#39;s <code>signData</code> payload: <code>{ type: &#39;text&#39;, text }</code>, <code>{ type: &#39;binary&#39;, bytes }</code> or <code>{ type: &#39;cell&#39;, schema, cell }</code>. The signature goes to the bot with <code>data</code>, and the Promise resolves with the bot&#39;s answer.</td>
+</tr>
+</tbody>
+</table>
+<p>Both may be called on a tap, or within 10 seconds of the answer to a call made on a tap. One call can be in flight, shared with requests.</p>
+<h4><a class="anchor" name="widgetrequesterror" href="#widgetrequesterror"><i class="anchor-icon"></i></a>WidgetRequestError</h4>
+<p>An <code>Error</code> with <code>name</code> set to <code>WidgetRequestError</code> and one of these values of <code>code</code>:</p>
+<table class="table">
+<thead>
+<tr>
+<th>code</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NOT_ALLOWED</code></td>
+<td>This message may not ask: a widget sent without <code>allow_queries</code>, a forward of a static widget, a call outside a tap where background requests are off, a preview, an app that does not deliver requests, or a wallet call without a tap or a fresh answer.</td>
+</tr>
+<tr>
+<td><code>BUSY</code></td>
+<td>Another request or wallet call of this widget is in flight.</td>
+</tr>
+<tr>
+<td><code>RATE_LIMITED</code></td>
+<td>A background call less than 5 seconds after the last one, or the server&#39;s limit of 5 requests per 5 seconds per user and bot.</td>
+</tr>
+<tr>
+<td><code>TIMEOUT</code></td>
+<td>The bot did not answer in 15 seconds: it is down, does not receive <code>widget_query</code> and <code>shared_widget_query</code> updates, or is slow.</td>
+</tr>
+<tr>
+<td><code>FAILED</code></td>
+<td>Anything else: the bot was blocked or deleted, the message is gone, the network failed.</td>
+</tr>
+<tr>
+<td><code>INVALID_ANSWER</code></td>
+<td>The bot&#39;s answer broke the limits, so it never reaches the widget.</td>
+</tr>
+<tr>
+<td><code>REJECTED</code></td>
+<td>A wallet call: the user declined in the wallet window.</td>
+</tr>
+<tr>
+<td><code>BAD_REQUEST</code></td>
+<td>A wallet call: the wallet refused the transaction or the payload (another network or sender, an expired <code>valid_until</code>, cells it cannot parse).</td>
+</tr>
+</tbody>
+</table>
+<h4><a class="anchor" name="events-available-for-widgets" href="#events-available-for-widgets"><i class="anchor-icon"></i></a>Events available for widgets</h4>
+<table class="table">
+<thead>
+<tr>
+<th>eventType</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>themeChanged</code></td>
+<td>The chat&#39;s theme changed. <code>colorScheme</code>, <code>themeParams</code> and the CSS variables already have the new values.</td>
+</tr>
+<tr>
+<td><code>activated</code></td>
+<td>The widget became visible: scrolled into view, or the app came back to the foreground. Fires after <code>visibilitychange</code>.</td>
+</tr>
+<tr>
+<td><code>deactivated</code></td>
+<td>The widget is no longer visible. Fires after <code>visibilitychange</code>.</td>
+</tr>
+<tr>
+<td><code>chatDataChanged</code></td>
+<td>The bot changed the chat state. <code>chatData</code> already has the new state. Never fires in a forward.</td>
+</tr>
+<tr>
+<td><code>publicDataChanged</code></td>
+<td>The bot changed the shared state. For a shared widget on screen, only while it <a href="#telegramwidget">watches</a> (<code>watchPublicData()</code>). <code>publicData</code> already has the new state. Fires after <code>chatDataChanged</code> when one change touches both.</td>
+</tr>
+<tr>
+<td><code>contentSafeAreaChanged</code></td>
+<td>The part of the widget the app&#39;s time covers changed (a caption added, removed or moved by an edit, the “edited” mark). <code>contentSafeAreaInset</code> and the CSS variables already have the new values.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3><a class="anchor" name="testing" href="#testing"><i class="anchor-icon"></i></a>Testing</h3>
+<h4><a class="anchor" name="counting-the-size" href="#counting-the-size"><i class="anchor-icon"></i></a>Counting the size</h4>
+<p>The server compresses the HTML with zlib at level 9 and counts the result. Python&#39;s zlib counts exactly as the server does:</p>
+<pre><code class="lang-bash">python3 -c &#39;import sys,zlib; print(len(zlib.compress(sys.stdin.buffer.read(), 9)))&#39; &lt; widget.html</code></pre>
+<p><code>gzip -9 -n</code> counts about 12 bytes more. Other zlib builds (Node.js&#39;s, for one) can be a few dozen bytes off either way, so near 4096 trust the Python number. If the bot gets <code>INPUT_MEDIA_WIDGET_TOO_LARGE</code> for HTML under 32 KB, it hit the compressed limit.</p>
+<h4><a class="anchor" name="a-first-look-in-a-browser" href="#a-first-look-in-a-browser"><i class="anchor-icon"></i></a>A first look in a browser</h4>
+<p>A widget is HTML, so a desktop browser with the window 320-430 px wide gives a quick first look at the layout. A browser is not a Telegram app: it draws everything, including what apps remove (<a href="#what-widgets-support">What widgets support</a>), enforces none of the <a href="#limits">limits</a>, and has no <code>TelegramWidget</code>. For a local look, put a stand-in above the widget&#39;s own script, with the palette as variables, and remove both before sending:</p>
+<pre><code class="lang-html">&lt;style&gt;:root { --tg-theme-bg-color: #fff; --tg-theme-text-color: #000; --tg-theme-hint-color: #707579;
+  --tg-theme-link-color: #3390ec; --tg-theme-button-color: #3390ec; --tg-theme-button-text-color: #fff;
+  --tg-theme-secondary-bg-color: #f1f1f4; --tg-theme-destructive-text-color: #e53935; }&lt;/style&gt;
+&lt;script&gt;
+window.TelegramWidget = window.TelegramWidget || {
+  profile: 1, isProfileAtLeast: (n) =&gt; n &lt;= 1, colorScheme: &#39;light&#39;, themeParams: {}, isActive: true,
+  isPreview: false, isForward: false, chatType: &#39;private&#39;, viewer: { id: 1, first_name: &#39;Test&#39; },
+  chatData: null, publicData: null, wallet: null,
+  contentSafeAreaInset: { top: 0, right: 0, bottom: 0, left: 0, cornerLeft: 0, cornerRight: 0 },
+  HapticFeedback: { impactOccurred() { return this; }, notificationOccurred() { return this; }, selectionChanged() { return this; } },
+  onEvent() {}, offEvent() {}, ready() {}, setResizeAnchor() {}, watchPublicData() {}, unwatchPublicData() {},
+  openLink: (url) =&gt; console.log(&#39;openLink&#39;, url), openTelegramLink: (url) =&gt; console.log(&#39;openTelegramLink&#39;, url),
+  copyText: (text) =&gt; console.log(&#39;copyText&#39;, text),
+  request: (data) =&gt; { console.log(&#39;request&#39;, data); return Promise.resolve({ result: null }); },
+};
+&lt;/script&gt;</code></pre>
+<p>Set <code>chatData</code>, <code>publicData</code>, <code>viewer</code> and <code>isForward</code> to the cases you want to see, and answer <code>request</code> the way your bot would.</p>
+<h4><a class="anchor" name="testing-in-telegram" href="#testing-in-telegram"><i class="anchor-icon"></i></a>Testing in Telegram</h4>
+<p>Every place a message can go gives the widget different rights, so test each one with your bot. On the <a href="/bots/webapps#using-bots-in-the-test-environment">test server</a> every bot has all of them. In the production environment a bot currently has only the private chat (<a href="#availability">Availability</a>):</p>
+<ul>
+<li><strong>The private chat with the bot:</strong> the chat state, background requests (one when the widget appears, then one per 5 seconds), a request made in the script&#39;s first lines.</li>
+<li><strong>A group with two accounts:</strong> one chat state for everyone, <code>viewer</code> different in each account, requests on a tap only.</li>
+<li><strong>Inline mode:</strong> the <a href="#previews">preview</a> in the list of results, the message sent via the bot, its requests with <code>inline_message_id</code>.</li>
+<li><strong>Forwards:</strong> a static widget&#39;s forward is a snapshot that cannot ask. A shared widget&#39;s forward follows the shared state and, if sent with <code>allow_queries</code>, asks through <code>shared_widget_query</code>.</li>
+<li><strong>The look:</strong> both color schemes, an outgoing bubble (a widget sent via the bot), the largest text size, a narrow phone and a desktop app with a mouse, a message without a caption and with one above and below (<a href="#the-time-in-the-corner">the time in the corner</a>), a right-to-left interface language.</li>
+<li><strong>The speed:</strong> an older phone. The <a href="#limits">limits</a> are the same everywhere, but a widget that is slow on an old phone stays slow there.</li>
+</ul>
+<p>The test server also keeps experiments away from real users.</p>
+<hr>
+<h3><a class="anchor" name="writing-widgets-with-an-llm" href="#writing-widgets-with-an-llm"><i class="anchor-icon"></i></a>Writing widgets with an LLM</h3>
+<p>Models write widgets well when they are told the rules. Put this block into the model&#39;s system prompt:</p>
+<pre><code class="lang-text">You write Telegram widgets. A widget is one self-contained HTML document (or a
+fragment) with inline &lt;style&gt; and &lt;script&gt;, sent by a bot in a message and drawn
+inside the chat bubble on every Telegram client (iOS, Android, desktop, web).
+Every client silently removes what is outside the widget profile below and runs
+the rest: an out feature is a bug you will not see. Docs:
+https://core.telegram.org/bots/widgets.md
+
+SIZE
+- At most 32768 bytes of HTML and 4096 bytes after zlib level 9. The server
+  refuses anything bigger. Python&#39;s zlib.compress(html, 9) counts as the server
+  does. If you cannot measure, aim for 3800. Repeated CSS and markup compress
+  well, data: images and long unique text do not. No comments, no dead code.
+
+THE BUBBLE
+- 200-600 px wide (phones about 320-430, so design for 320), as tall as the
+  content, at most 600 px. The rest is clipped. Nothing scrolls inside a
+  widget: overflow auto/scroll becomes hidden, position: sticky becomes
+  relative. Fit long content into 600 px with pages, tabs or &quot;show more&quot;.
+- Lay out with %, flex, grid, vw/vmin. Never use vh (removed).
+- html has no background: the bubble&#39;s color shows through, and a background
+  on html or body paints the whole bubble. body has the client&#39;s text padding
+  as its margin (about 8px 12px), and body{margin:0} goes edge to edge.
+- Defaults: the client&#39;s message text (system-ui, --tg-text-font-size about
+  15px, --tg-text-line-height) in --tg-theme-text-color. Headings, lists,
+  tables and pre get native margins. An unstyled &lt;button&gt; looks like the
+  client&#39;s own button. Any CSS of yours wins.
+- Theme: CSS variables on the root, each &#39;#rrggbb&#39;: --tg-theme-bg-color,
+  --tg-theme-text-color, --tg-theme-hint-color, --tg-theme-link-color,
+  --tg-theme-button-color, --tg-theme-button-text-color,
+  --tg-theme-secondary-bg-color, --tg-theme-accent-text-color,
+  --tg-theme-subtitle-text-color, --tg-theme-destructive-text-color,
+  --tg-theme-section-bg-color, --tg-theme-section-header-text-color,
+  --tg-theme-section-separator-color. --tg-color-scheme is light or dark.
+  prefers-color-scheme, color-scheme and light-dark() follow the chat&#39;s theme,
+  live. Build colors on these so both themes work.
+- Fonts: system-ui, sans-serif, serif, monospace, ui-sans-serif, ui-serif,
+  ui-monospace, ui-rounded only. Font names and @font-face are removed.
+- Text is not selectable unless you set user-select:text and
+  -webkit-user-select:text on what a user may want to copy.
+- Unless a caption is below, the client draws the message time in the bottom
+  corner. Keep env(safe-area-inset-bottom) clear at the bottom (the defaults
+  pad an unstyled body, and if you pad for it yourself, set body{padding:0}).
+  Only --tg-content-safe-area-corner-left|right of it is covered, so content
+  may enter the band on the other side.
+More: https://core.telegram.org/bots/widgets.md#designing-widgets
+
+WHAT WORKS
+- HTML: div, span, p, h1-h6, ul/ol/li, dl, table, details/summary (toggle
+  event), figure, header/section/nav/article, b/i/em/strong/small/code/pre/
+  mark/time/abbr, a, img (data: PNG, JPEG, GIF, WebP only), canvas, button.
+- Inline SVG: svg, g, path, rect, circle, ellipse, line, polyline, polygon,
+  text, tspan, defs, symbol, use, linearGradient, radialGradient, stop.
+- CSS: flex, grid, positioning (fixed = inside the bubble), box model,
+  borders, border-radius, box-shadow, opacity, linear/radial/conic gradients
+  (and repeating), 2D transforms, filter and backdrop-filter with blur(),
+  brightness() and drop-shadow() only, transitions, @keyframes, custom
+  properties, calc/min/max/clamp, rgb()/hsl()/hex/light-dark() colors,
+  ::before/::after, :hover (mouse only), :active, :not/:is/:where, structural
+  pseudo-classes, [disabled] and :disabled on buttons, @media on width,
+  aspect-ratio, orientation, prefers-color-scheme, prefers-reduced-motion,
+  @supports, one-line text-overflow: ellipsis, touch-action, pointer-events.
+- JS: ES2023 in an interpreter (no JIT: keep per-frame work small), Promises,
+  async/await, setTimeout/setInterval, requestAnimationFrame, the DOM
+  (createElement, querySelector, innerHTML, textContent, classList, style,
+  dataset, addEventListener), MutationObserver, ResizeObserver, layout reads
+  (getBoundingClientRect, getComputedStyle, offsetWidth, clientWidth, an
+  inserted img&#39;s width: each is a round trip to the renderer, so cache them
+  and never read them every frame), matchMedia, canvas 2D (paths, rect,
+  roundRect, arc, fillText, measureText, gradients, setTransform, clip,
+  drawImage of a data: image, with the canvas scaled by devicePixelRatio for
+  sharp lines), new Image() with a data: src (load/error, then drawImage),
+  Web Animations (el.animate), Intl and toLocale*String in the user&#39;s locale
+  (navigator.language), crypto.getRandomValues, TextEncoder, URL,
+  structuredClone, localStorage, sessionStorage, CSS.supports.
+- Element ids are not global variables: use document.getElementById(&#39;x&#39;).
+
+OUT OF THE PROFILE (removed by every client, while the rest of the widget still runs)
+- HTML: ruby, rt, rp, bdi, bdo; Legacy presentational elements: center, font, big, tt, strike, nobr; &lt;img src=&quot;data:image/svg+xml&quot;&gt;; &lt;img&gt; with data: AVIF, BMP, ICO; &lt;img src=&quot;https://…&quot;&gt; (any non-data: URL); Form controls: form, input (all types), select, option, optgroup, textarea, label, fieldset, legend, datalist, output; progress, meter (native gauges); dialog (show/showModal), popover attribute; audio, video, source, track; script (as DOM), iframe, frame, object, embed, link, meta, base, portal, template, slot, math, fencedframe, …; align, valign, bgcolor, border, cellpadding, cellspacing, color, face, nowrap; contenteditable, spellcheck, inputmode, enterkeyhint, autocapitalize; draggable (HTML drag and drop); tabindex, autofocus, accesskey (keyboard focus and shortcuts).
+- SVG: clipPath, mask, pattern, marker; SVG filter primitives (fe*); SMIL animation: animate, animateTransform, animateMotion; foreignObject (HTML inside SVG); &lt;image href=&quot;data:…&quot;&gt; inside SVG.
+- CSS: display: flow-root, contents, list-item; Logical properties: margin-inline, padding-block, inset-inline, inline-size, …; Multi-column layout (columns, column-count, column-gap); position: sticky; overflow: auto / scroll (scrolling inside the widget); Colour functions: hwb(), lab(), lch(), oklab(), oklch(), color(); color-mix(); background-clip: text (gradient text); url() / image-set() with anything but a data: image or #fragment; font-family naming a font (&quot;Helvetica&quot;, &quot;Courier New&quot;, &quot;Comic Sans MS&quot;, …); @font-face (web fonts); -webkit-line-clamp / line-clamp (multi-line ellipsis); text-shadow; writing-mode, text-orientation (vertical text); 3D transforms: rotateX/Y/3d, translateZ/3d, scaleZ/3d, matrix3d, perspective, transform-style, backface-visibility; filter: grayscale(), sepia(), saturate(), contrast(), hue-rotate(), invert(), opacity(); filter: url(#svg-filter); mix-blend-mode, isolation, background-blend-mode; clip-path: inset(), circle(), ellipse(), polygon(); mask / -webkit-mask with gradients or data: images; vh / dvh / svh / vb: height-relative units.
+- Selectors: :has(); ::first-letter, ::first-line, ::marker; :focus, :focus-visible, :focus-within; :checked, :disabled, :enabled, :valid, :invalid, :placeholder-shown, ::placeholder; :host, :host-context(), ::slotted(), ::part(), :scope; :target.
+- At-rules: @media (hover: hover), (pointer: fine|coarse); @media print, resolution, other media features; @import, @namespace; @container queries (container-type in the widget); @layer cascade layers; @property (typed custom properties); @counter-style, @starting-style, @scope, @page, @font-feature-values, @font-palette-values, @position-try; CSS nesting (.a { .b { } }, &amp;).
+- Animation: Magic move (shared-element morph between renders).
+- Canvas: createConicGradient; createPattern from a canvas or image; globalCompositeOperation (source-over, destination-out, multiply, …); shadowBlur, shadowColor, shadowOffsetX/Y; ctx.filter (CSS filter on canvas drawing); getImageData / putImageData / createImageData (pixel read-back); toDataURL, toBlob, captureStream; WebGL, OffscreenCanvas, bitmaprenderer contexts.
+- JS: element.focus() / blur() / select(), document.activeElement: the widget takes keyboard focus; Bundled libraries by CDN name: Chart.js 4, D3 7 (nothing is fetched); fetch, XMLHttpRequest, WebSocket, EventSource, RTCPeerConnection, sendBeacon, importScripts, Worker, BroadcastChannel; location assignment, history, window.open (→ openLink), form submission; alert, confirm, prompt, print; clipboard, share, vibrate, geolocation, mediaDevices, Notification; attachShadow, customElements.define; Blob, FileReader, URL.createObjectURL; requestFullscreen.
+- TelegramWidget: TelegramWidget.sendMessage.
+- Input: touchstart / touchmove / touchend (touch clients only); Key events: keydown / keyup / keypress, beforeinput / input from keys, focus / blur / focusin / focusout from keys; Enter / Space activate a focused button or link (a click from the keyboard); A key press counts as a user gesture for privileged bridge calls; wheel and scroll events.
+More: https://core.telegram.org/bots/widgets.md#what-widgets-support
+
+INPUT
+- Taps (click) and pointer events (pointerdown/move/up/cancel, enter/leave,
+  setPointerCapture), with the mouse events (a coalesced move sums
+  movementX/Y). No touch events (use pointer events), no keyboard, no focus, no
+  text input, no wheel or scroll events.
+- A double tap is always the widget&#39;s: two clicks, then dblclick.
+- Vertical drags always scroll the chat: nothing can be dragged up or down (no
+  vertical sliders, wheel pickers, joysticks, drawing or map panning). Use
+  horizontal controls or buttons.
+- Holds and horizontal drags are claimed per element with CSS touch-action,
+  which covers the element&#39;s children: auto (the default): a hold opens the
+  chat&#39;s message menu, a sideways swipe is the chat&#39;s reply, and the widget
+  gets pointercancel and no click. pan-y: the widget gets horizontal drags
+  (sliders, carousels, paddles). none: horizontal drags and holds, plus
+  contextmenu (held game buttons). pan-x claims nothing. Keep auto everywhere
+  else. On pointercancel undo what pointerdown started.
+- The leading 20 px never take a claim (the system back gesture): keep
+  controls 20 px from the left edge (the right in RTL).
+- A hold is 500 ms within 10 px, and a double tap is two taps within 300 ms
+  and 40 px.
+More: https://core.telegram.org/bots/widgets.md#gestures
+
+TELEGRAMWIDGET (window.TelegramWidget, undefined outside Telegram, so check it)
+- profile (1), isProfileAtLeast(n). colorScheme: &#39;light&#39; | &#39;dark&#39;.
+  themeParams: { bg_color, text_color, hint_color, ... } (&#39;#rrggbb&#39;, the keys of
+  the CSS variables with _ for -).
+- onEvent(type, fn) / offEvent(type, fn), type: &#39;themeChanged&#39;, &#39;activated&#39; /
+  &#39;deactivated&#39; (on and off screen, isActive), &#39;chatDataChanged&#39;,
+  &#39;publicDataChanged&#39;.
+- ready(): optional, once the first state is drawn.
+- openLink(url): https only, at most 256 characters. The client shows the full
+  URL and the user confirms. openTelegramLink(url): https://t.me/..., opens
+  inside Telegram without a confirmation, as a t.me link in a message. A tapped
+  &lt;a href=&quot;https://...&quot;&gt; does the same. A bad URL throws TypeError.
+- copyText(text): 1-256 characters. The client copies it and shows a toast.
+- openLink, openTelegramLink, copyText and request need a real tap: call them
+  synchronously in a click (or pointerup) handler, not after await, a timer or
+  a promise, nor in a finger&#39;s pointerdown (it may still become the chat&#39;s
+  scroll). One of them per tap. Otherwise they are refused.
+- HapticFeedback.impactOccurred(&#39;light&#39;|&#39;medium&#39;|&#39;heavy&#39;|&#39;rigid&#39;|&#39;soft&#39;),
+  .notificationOccurred(&#39;error&#39;|&#39;success&#39;|&#39;warning&#39;), .selectionChanged():
+  only on screen, free during a touch and 5 s after it. Without a touch, one
+  short series, then nothing for 10 s (a timer cannot buzz the phone).
+- setResizeAnchor(&#39;top&#39; | &#39;bottom&#39;): the edge of the bubble that stays still
+  when your height changes (&#39;top&#39; by default, &#39;bottom&#39; for a log or thread
+  that grows at the bottom). Older clients lack it:
+  TelegramWidget.setResizeAnchor?.(&#39;bottom&#39;).
+- No sendMessage, alert/confirm/prompt, navigator.clipboard (use copyText),
+  window.open (use openLink), share or fullscreen.
+More: https://core.telegram.org/bots/widgets.md#telegramwidget
+
+THE WIDGET&#39;S STATE AND REQUESTS (only the bot writes the state)
+- The HTML never changes after sending, and the bot changes only the state.
+  chatData and publicData are strings of up to 1024 bytes, or null:
+  JSON.parse them yourself (in try/catch) and draw from them.
+  chatData is the chat state: this message in its chat, the same for every
+  member of a group (a board, whose turn). publicData is the shared state,
+  the same wherever the widget is shown, forwards included (poll results).
+  A change of either fires chatDataChanged / publicDataChanged. Redraw from
+  it, nothing restarts.
+- watchPublicData(): the client polls the shared state live while the widget
+  is on screen (a ticker, a poll others vote in). unwatchPublicData() stops.
+  A poll may bring a state older than a result gave you: keep a revision in
+  the state (the bot raises it per edit and returns it in result) and ignore
+  older ones.
+- request(data): ask the bot, like a callback button. data is 1-64 bytes.
+  Resolves with { result }: the bot&#39;s text for this user (up to 1024 bytes) or
+  null. Rejects with an error whose code is &#39;NOT_ALLOWED&#39; (no tap, requests not
+  allowed here, a forward, a preview), &#39;BUSY&#39; (one request at a time),
+  &#39;RATE_LIMITED&#39;, &#39;TIMEOUT&#39;, &#39;FAILED&#39; or &#39;INVALID_ANSWER&#39;. Show a pending state
+  and every failure. The answer does not change the state: the bot&#39;s edit
+  arrives as the change events. For the new state at once, have the bot
+  return it in result.
+- Without a tap request works only in the private chat with the bot: once
+  when the widget appears on screen, then at most once per 5 s while visible.
+  One made off screen (at start: the client creates the bubble before showing
+  it) waits and goes out when the widget appears, so ask in the first lines.
+- viewer: { id, first_name, last_name?, username?, is_premium? } of the person
+  looking, or null where the widget may not ask the bot. Compare viewer.id
+  with the ids in the state (my turn, my vote).
+- isForward: a forwarded copy. chatData is null and chatType too. It may ask
+  only if the bot allowed forwards to (otherwise viewer is null and every
+  request is NOT_ALLOWED), so show the shared state read-only. A forward of a
+  widget that is not shared never changes: draw a snapshot (&quot;as of 19:40&quot;),
+  not live progress.
+- chatType: &#39;private&#39; | &#39;group&#39; | &#39;supergroup&#39; | &#39;channel&#39;, or null.
+- isPreview: shown in the bot&#39;s inline results before it is sent: no taps, no
+  requests, links, copy or storage, viewer null. Draw the state as it will be
+  sent.
+- wallet (Telegram&#39;s Gram Wallet, TON Connect&#39;s formats): null where the
+  client has no wallet for this user, the widget may not ask the bot, or in a
+  preview. To pay, on a tap: request(&#39;pay:1&#39;, { wallet: true }) gives the bot
+  the user&#39;s wallet address. The bot answers with a fresh transaction
+  { valid_until, messages: [{ address, amount, payload?, stateInit? }] } (1-255
+  messages, address user-friendly, amount: nanotons as a decimal string). In
+  the answer&#39;s handler, wallet.sendTransaction(tx, &#39;paid:1&#39;) needs no new tap
+  (within 10 s). The client&#39;s window shows the bot and amounts, and the
+  promise resolves with the bot&#39;s answer { result }.
+  wallet.signData({ type: &#39;text&#39;, text }, data) asks for a signature, which
+  goes to the bot. One wallet call per tap or answer, never from a timer.
+  Codes: &#39;REJECTED&#39; (declined), &#39;BAD_REQUEST&#39; (the wallet refused it). A
+  malformed transaction throws TypeError. After TIMEOUT ask the bot, do not
+  pay again.
+More: https://core.telegram.org/bots/widgets.md#the-widgets-state
+
+STORAGE, LIFECYCLE, LIMITS
+- localStorage: this message on this device, 4 KB (QuotaExceededError past
+  it, so catch it). sessionStorage lasts until the app restarts. A forward
+  starts empty. Keep this user&#39;s own choices there (best score, &quot;voted&quot;).
+  What everyone sees belongs in the bot&#39;s state.
+- The widget can be destroyed and recreated at any time: restore from
+  localStorage and the state on load, and draw the first frame synchronously.
+- Off screen: document.hidden, no animation frames, timers at most 1 Hz.
+- CPU: 300 ms per second (timers and frames wait beyond it, longer after a
+  task that ran past it). One task may take 500 ms, longer stops the widget.
+  At most 128 layout reads in one task. They plus about 25 µs per DOM change
+  cost the client at most 100 ms per second (frames wait beyond it).
+- Memory 8 MB. 64 live timers and 4000 canvas commands per canvas per task
+  (RangeError past them). A data: image is at most 1024 x 1024 pixels
+  (larger: a placeholder). The widget stops on its last frame (&quot;Widget
+  stopped&quot;) past the CPU or memory limit, 2000 nodes, one text value of 32 K
+  characters, 48 K of text in all, an attribute of 8 K, 10000 DOM changes and
+  method calls per task, 400 CSS rules, 32 @keyframes, 64 script animations
+  or 2048 x 2048 canvas pixels together.
+- At most 16 elements at once with a blurred box-shadow, filter,
+  backdrop-filter or opacity below 1 (animated ones and ::before/::after
+  too), 2 of them with backdrop-filter. Past it the widget stops. Mute with
+  color (var(--tg-theme-hint-color), rgba(), fill-opacity), never opacity. A
+  shadow without blur is free.
+- Animate with CSS or requestAnimationFrame. Change only what moved, and do
+  not rebuild the DOM every frame.
+
+EXAMPLE (the patterns, not a template)
+&lt;style&gt;
+body{margin:0;padding:12px 14px}
+.opt{display:block;width:100%;margin:6px 0;text-align:left}
+.me{outline:2px solid var(--tg-theme-button-color)}
+.bar{height:4px;margin-top:4px;border-radius:2px;background:var(--tg-theme-button-color)}
+.hint{color:var(--tg-theme-hint-color);font-size:13px}
+&lt;/style&gt;
+&lt;div id=&quot;list&quot;&gt;&lt;/div&gt;&lt;div class=&quot;hint&quot; id=&quot;msg&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+const TW = window.TelegramWidget, $ = (id) =&gt; document.getElementById(id);
+const NAMES = [&#39;Pizza&#39;, &#39;Sushi&#39;];
+const votes = () =&gt; { try { return JSON.parse(TW &amp;&amp; TW.publicData).v; } catch { return [0, 0]; } };
+let mine = null; try { mine = JSON.parse(localStorage.getItem(&#39;vote&#39;)); } catch {}
+function draw() {
+  const v = votes(), total = v.reduce((a, b) =&gt; a + b, 0) || 1;
+  $(&#39;list&#39;).replaceChildren(...NAMES.map((name, i) =&gt; {
+    const b = document.createElement(&#39;button&#39;), pct = Math.round(v[i] / total * 100);
+    b.className = &#39;opt&#39; + (mine === i ? &#39; me&#39; : &#39;&#39;);
+    b.innerHTML = name + &#39; &lt;span class=&quot;hint&quot;&gt;&#39; + pct + &#39;%&lt;/span&gt;&lt;div class=&quot;bar&quot; style=&quot;width:&#39; + pct + &#39;%&quot;&gt;&lt;/div&gt;&#39;;
+    b.onclick = () =&gt; vote(i);
+    return b;
+  }));
+}
+function vote(i) {
+  if (!TW) return;
+  $(&#39;msg&#39;).textContent = &#39;Sending...&#39;;
+  TW.request(&#39;vote:&#39; + i).then(() =&gt; {
+    mine = i; try { localStorage.setItem(&#39;vote&#39;, i); } catch {}
+    $(&#39;msg&#39;).textContent = &#39;&#39;; draw();
+  }, (e) =&gt; { $(&#39;msg&#39;).textContent = e.code === &#39;NOT_ALLOWED&#39; ? &#39;Open the bot to vote&#39; : &#39;Not sent: &#39; + e.code; });
+}
+if (TW) TW.onEvent(&#39;publicDataChanged&#39;, draw);
+draw();
+&lt;/script&gt;</code></pre>
+<p>Then give the model your bot&#39;s side of the contract:</p>
+<ul>
+<li><strong>The protocol</strong>: the JSON shapes of the chat state, the shared state and the answers, the request <code>data</code> values the bot understands, and how you send the widget (static or <code>is_shared</code>, with or without <code>allow_queries</code>).</li>
+<li><strong>Live shared state</strong>: if the widget shows a shared widget&#39;s shared state that the bot keeps changing (counts, prices, scores), it calls <code>TelegramWidget.watchPublicData()</code> and keeps the newest revision. Otherwise it gets a new shared state only with the message.</li>
+<li><strong>The places</strong>: what the widget should show in a forward (no chat state, <code>chatType</code> <code>null</code>, maybe no requests), in a group (one chat state for everyone, drawn per <code>viewer.id</code>) and in a preview (<code>isPreview</code>: no taps).</li>
+<li><strong>The checks</strong>: have the model count the size as in <a href="#counting-the-size">Counting the size</a>, compare its widget with the out list in the block, and test the result in Telegram before you send it to users.</li>
+</ul>
+</div>
+  
+</div>
+          
+        </div>
+      </div>
+      <div class="footer_wrap">
+  <div class="footer_columns_wrap footer_desktop">
+    <div class="footer_column footer_column_telegram">
+      <h5>Telegram</h5>
+      <div class="footer_telegram_description"></div>
+      Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.
+    </div>
+
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+      <ul>
+        <li><a href="//telegram.org/faq">FAQ</a></li>
+        <li><a href="//telegram.org/privacy">Privacy</a></li>
+        <li><a href="//telegram.org/press">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#mobile-apps">Mobile Apps</a></h5>
+      <ul>
+        <li><a href="//telegram.org/dl/ios">iPhone/iPad</a></li>
+        <li><a href="//telegram.org/android">Android</a></li>
+        <li><a href="//telegram.org/dl/web">Mobile Web</a></li>
+      </ul>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/apps#desktop-apps">Desktop Apps</a></h5>
+      <ul>
+        <li><a href="//desktop.telegram.org/">PC/Mac/Linux</a></li>
+        <li><a href="//macos.telegram.org/">macOS</a></li>
+        <li><a href="//telegram.org/dl/web">Web-browser</a></li>
+      </ul>
+    </div>
+    <div class="footer_column footer_column_platform">
+      <h5><a href="//core.telegram.org/">Platform</a></h5>
+      <ul>
+        <li><a href="//core.telegram.org/api">API</a></li>
+        <li><a href="//translations.telegram.org/">Translations</a></li>
+        <li><a href="//instantview.telegram.org/">Instant View</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer_columns_wrap footer_mobile">
+    <div class="footer_column">
+      <h5><a href="//telegram.org/faq">About</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/blog">Blog</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/press">Press</a></h5>
+    </div>
+    <div class="footer_column">
+      <h5><a href="//telegram.org/safety">Safety</a></h5>
+    </div>
+  </div>
+</div>
+    </div>
+    <script src="/js/main.js?49"></script>
+    <script src="/js/highlight.min.js?1"></script>
+<script src="/js/tgsticker.js?32"></script>
+<script src="/js/jquery.min.js?1"></script>
+<script src="/js/bootstrap.min.js?1"></script>
+
+    <script src="/js/main-theme.js?6"></script>
+    <script>window.initDevPageNav&&initDevPageNav();
+hljs.highlightAll();
+backToTopInit("Go up");
+removePreloadInit();
+</script>
+  </body>
+</html>
+
