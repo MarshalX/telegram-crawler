@@ -568,6 +568,44 @@ var DemoApp = {
     }
     locationManager.openSettings();
   },
+  mediaAccessInit: function(el) {
+    var mediaAccessManager = Telegram.WebApp.MediaAccessManager;
+    if (!DemoApp.mediaAccessInited) {
+      DemoApp.mediaAccessInited = true;
+      Telegram.WebApp.onEvent('mediaAccessManagerUpdated', function() {
+        $('#media_inited').text(mediaAccessManager.isInited ? 'true' : 'false');
+        $('#media_camera_status').text(mediaAccessManager.cameraStatus);
+        $('#media_microphone_status').text(mediaAccessManager.microphoneStatus);
+        $('#media_reload_required').text(mediaAccessManager.isReloadRequired ? 'true' : 'false');
+        $('#media_settings').toggle(mediaAccessManager.cameraStatus == 'denied' || mediaAccessManager.microphoneStatus == 'denied');
+      });
+    }
+    mediaAccessManager.init();
+  },
+  mediaAccessRequest: function(el, camera, microphone) {
+    var mediaAccessManager = Telegram.WebApp.MediaAccessManager;
+    if (!mediaAccessManager.isInited) {
+      return DemoApp.showAlert('Media access not inited yet!');
+    }
+    mediaAccessManager.requestAccess({camera: camera, microphone: microphone}, function(access_granted) {
+      if (access_granted) {
+        $(el).next('span').text('(Access granted)').attr('class', 'ok');
+      } else {
+        $(el).next('span').text('(Request declined)').attr('class', 'err');
+      }
+    });
+  },
+  mediaAccessOpenSettings: function(el) {
+    var mediaAccessManager = Telegram.WebApp.MediaAccessManager;
+    if (!mediaAccessManager.isInited) {
+      return DemoApp.showAlert('Media access not inited yet!');
+    }
+    if (mediaAccessManager.cameraStatus != 'denied' &&
+        mediaAccessManager.microphoneStatus != 'denied') {
+      return false;
+    }
+    mediaAccessManager.openSettings();
+  },
   toggleMainButton: function(el) {
     if (DemoApp.MainButton.isVisible) {
       DemoApp.MainButton.hide();

@@ -8,7 +8,7 @@
     <meta name="MobileOptimized" content="176" />
     <meta name="HandheldFriendly" content="True" />
     <meta name="robots" content="noindex,nofollow" />
-    <script src="https://tg.dev/js/telegram-web-app-beta.js?93"></script>
+    <script src="https://tg.dev/js/telegram-web-app-beta.js?94"></script>
     <script>
       function setThemeClass() {
         document.documentElement.className = Telegram.WebApp.colorScheme;
@@ -262,6 +262,16 @@
         <li>access_granted: <span class="txt" id="loc_access_granted">false</span> <span id="loc_settings" style="display:none;">(<a href="javascript:;" onclick="return DemoApp.locationOpenSettings(this);">Open settings</a>)</span></li>
       </ul>
     </div>
+    <p>Media access:</p>
+    <div class="columns">
+      <ul>
+        <li>isInited: <span class="txt" id="media_inited">false</span></li>
+        <li>camera_status: <span class="txt" id="media_camera_status">not_requested</span> (<a href="javascript:;" onclick="return DemoApp.mediaAccessRequest(this, true, false);">Request access</a>) <span></span></li>
+        <li>microphone_status: <span class="txt" id="media_microphone_status">not_requested</span> (<a href="javascript:;" onclick="return DemoApp.mediaAccessRequest(this, false, true);">Request access</a>) <span></span></li>
+        <li>reload_required: <span class="txt" id="media_reload_required">false</span> <span id="media_settings" style="display:none;">(<a href="javascript:;" onclick="return DemoApp.mediaAccessOpenSettings(this);">Open settings</a>)</span></li>
+        <li><a href="javascript:;" onclick="return DemoApp.mediaAccessRequest(this, true, true);">Request camera+microphone access</a> <span></span></li>
+      </ul>
+    </div>
     <pre><code id="webview_data"></code></pre>
     <div class="hint">
       Data passed to webview.
@@ -288,7 +298,7 @@
   <div class="viewport-stable-border"></div>
     <script src="/js/jquery.min.js"></script>
     <script src="https://tg.dev/js/bootstrap.min.js"></script>
-    <script src="/js/webappdemo.js?51"></script>
+    <script src="/js/webappdemo.js?52"></script>
     <script>DemoApp.apiUrl = "/demo/api";
 
 Telegram.WebApp.onEvent('themeChanged', function() {
@@ -458,6 +468,9 @@ try {
 } catch(e) {}
 try {
   DemoApp.locationInit();
+} catch(e) {}
+try {
+  DemoApp.mediaAccessInit();
 } catch(e) {}
 try {
   DemoApp.homeScreenInit();
