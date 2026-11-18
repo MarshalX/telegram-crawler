@@ -155,7 +155,12 @@ async def _download_file(url: str, path: str, session: httpx.AsyncClient):
 
 
 async def track_additional_files(
-        files_to_track: List[str], input_dir_name: str, output_dir_name: str, encoding='utf-8', save_hash_only=False
+        files_to_track: List[str],
+        input_dir_name: str,
+        output_dir_name: str,
+        encoding='utf-8',
+        save_hash_only=False,
+        replace_ids=True,
 ):
     for file in files_to_track:
         input_path = os.path.join(input_dir_name, file)
@@ -176,12 +181,49 @@ async def track_additional_files(
             else:
                 text = raw.decode(encoding)
 
-            content = re.sub(r'id=".*"', 'id="tgcrawl"', text)
+            content = re.sub(r'id=".*"', 'id="tgcrawl"', text) if replace_ids else text
 
         filename = os.path.join(output_dir_name, file)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         async with aiofiles.open(filename, 'w', encoding='utf-8') as w_file:
             await w_file.write(content)
+
+
+def list_files_recursively(root: str) -> List[str]:
+    return sorted(
+        os.path.relpath(os.path.join(dir_path, file), root) for dir_path, _, files in os.walk(root) for file in files
+    )
+
+
+MACOS_INFO_PLIST_VOLATILE_KEYS = {'CFBundleVersion', 'CFBundleShortVersionString', 'BuildMachineOSBuild'}
+
+
+def convert_macos_info_plist(path: str) -> None:
+    with open(path, 'rb') as f:
+        info = plistlib.load(f)
+
+    # build number and toolchain (DT*) keys change on every build
+    info = {k: v for k, v in info.items() if k not in MACOS_INFO_PLIST_VOLATILE_KEYS and not k.startswith('DT')}
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(info, indent=4, sort_keys=True, ensure_ascii=False, default=str))
+
+
+def convert_macos_app_intents(path: str) -> None:
+    # lists of objects (like resolvableInputTypes) are serialized in random order on every build
+    def normalize(obj):
+        if isinstance(obj, dict):
+            return {k: normalize(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            items = [normalize(v) for v in obj]
+            if all(isinstance(v, dict) for v in items):
+                items.sort(key=lambda v: json.dumps(v, sort_keys=True))
+            return items
+        return obj
+
+    with open(path, encoding='utf-8') as f:
+        actions = normalize(json.load(f))
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(actions, indent=4, sort_keys=True, ensure_ascii=False))
 
 
 async def get_download_link_of_latest_macos_release(remote_updates_manifest_url: str, session: httpx.AsyncClient) -> Optional[str]:
@@ -240,13 +282,31 @@ async def download_telegram_macos_beta_and_extract_resources(session: httpx.Asyn
         f.extractall(client_folder_name)
 
     resources_path = 'Telegram.app/Contents/Resources'
-    files_to_track = [
-        f'{resources_path}/en.lproj/Localizable.strings',
-    ]
-    await track_additional_files(files_to_track, client_folder_name, crawled_data_folder, 'utf-16')
+    localizable_path = f'{resources_path}/en.lproj/Localizable.strings'
+    app_intents_path = f'{resources_path}/Metadata.appintents/extract.actionsdata'
+    info_plist_path = 'Telegram.app/Contents/Info.plist'
+    files_list_path = 'files.txt'
 
-    _, _, hash_of_files_to_track = next(os.walk(f'{client_folder_name}/{resources_path}'))
-    hash_of_files_to_track = [f'{resources_path}/{i}' for i in hash_of_files_to_track if i != assets_filename]
+    await track_additional_files([localizable_path], client_folder_name, crawled_data_folder, 'utf-16')
+
+    app_files = list_files_recursively(os.path.join(client_folder_name, 'Telegram.app'))
+    with open(os.path.join(client_folder_name, files_list_path), 'w', encoding='utf-8') as f:
+        f.write(''.join(f'{path}\n' for path in app_files))
+    convert_macos_info_plist(os.path.join(client_folder_name, info_plist_path))
+
+    text_files_to_track = [info_plist_path, files_list_path]
+    if os.path.exists(os.path.join(client_folder_name, app_intents_path)):
+        convert_macos_app_intents(os.path.join(client_folder_name, app_intents_path))
+        text_files_to_track.append(app_intents_path)
+    await track_additional_files(text_files_to_track, client_folder_name, crawled_data_folder, replace_ids=False)
+
+    hash_of_files_to_track = [
+        f'{resources_path}/{path}' for path in list_files_recursively(os.path.join(client_folder_name, resources_path))
+    ]
+    hash_of_files_to_track = [
+        path for path in hash_of_files_to_track
+        if path not in {f'{resources_path}/{assets_filename}', localizable_path, app_intents_path}
+    ]
     await track_additional_files(hash_of_files_to_track, client_folder_name, crawled_data_folder, save_hash_only=True)
 
     def cleanup1():
@@ -669,9 +729,23 @@ async def _download_telegram_android_and_extract_resources(
     files_to_track = [
         'res/values/strings.xml',
         'res/values/public.xml',
-        'assets/localization_en.txt',
     ]
     await track_additional_files(files_to_track, 'android', crawled_data_folder)
+
+    # the id rewrite would eat the first manifest line cuz of xmlns:android="..."
+    files_to_track = [
+        'AndroidManifest.xml',
+        'assets/localization_en.txt',
+    ]
+    await track_additional_files(files_to_track, 'android', crawled_data_folder, replace_ids=False)
+
+    # dexopt holds baseline profiles regenerated on every build
+    not_hashed_assets = {'localization_en.bin', 'localization_en.txt', 'string_resource_ids.bin'}
+    hash_of_files_to_track = [
+        f'assets/{path}' for path in list_files_recursively('android/assets')
+        if path not in not_hashed_assets and not path.startswith('dexopt/')
+    ]
+    await track_additional_files(hash_of_files_to_track, 'android', crawled_data_folder, save_hash_only=True)
 
     cleanup()
 
