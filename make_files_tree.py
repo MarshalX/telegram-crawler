@@ -22,6 +22,10 @@ import uvloop
 
 import ccl_bplist
 
+# macOS beta Sparkle deltas (mac-updates.telegram.org/beta/*.delta, listed in versions.xml).
+# Unknown ext makes _crawl treat the url as an html page, utf-8 decode fails and it retries forever
+mimetypes.add_type('application/octet-stream', '.delta')
+
 PROTOCOL = 'https://'
 ILLEGAL_PATH_CHARS = punctuation.replace('.', '') + whitespace
 
