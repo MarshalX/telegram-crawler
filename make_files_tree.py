@@ -9,6 +9,8 @@ import plistlib
 import random
 import re
 import shutil
+import struct
+import unicodedata
 import uuid
 import zipfile
 from string import punctuation, whitespace
@@ -412,6 +414,194 @@ async def download_telegram_ios_beta_and_extract_resources(session: httpx.AsyncC
     cleanup2()
 
 
+# since 12.10.2 the apk has no string names: assets/localization_<lang>.bin maps String.hashCode() of a name
+# to its value. the official repo lags behind betas, the translations platform usually gets new keys first
+ANDROID_STRINGS_XML_URL = (
+    'https://raw.githubusercontent.com/TelegramMessenger/Telegram-Android/master/'
+    'TMessagesProj/src/main/res/values/strings.xml'
+)
+ANDROID_TRANSLATION_KEYS_URL = (
+    'https://raw.githubusercontent.com/MarshalX/telegram-crawler/data/data/web_tr/translation_keys.json'
+)
+ANDROID_PLURAL_FORMS = {'zero', 'one', 'two', 'few', 'many', 'other'}
+
+
+def java_string_hash(value: str) -> int:
+    h = 0
+    utf16 = value.encode('utf-16-le')
+    for (code_unit,) in struct.iter_unpack('<H', utf16):
+        h = (31 * h + code_unit) & 0xFFFFFFFF
+
+    return h - (1 << 32) if h & 0x80000000 else h
+
+
+def parse_android_localization_bin(data: bytes) -> dict[int, str]:
+    # int32 count, then per entry: int32 name hash + TL string
+    count, = struct.unpack_from('<i', data, 0)
+    offset = 4
+    result = {}
+    while offset < len(data):
+        name_hash, = struct.unpack_from('<i', data, offset)
+        offset += 4
+
+        length = data[offset]
+        header_size = 1
+        if length == 254:
+            length = int.from_bytes(data[offset + 1:offset + 4], 'little')
+            header_size = 4
+
+        start = offset + header_size
+        result[name_hash] = data[start:start + length].decode('utf-8')
+        offset += (header_size + length + 3) // 4 * 4
+
+    if len(result) != count:
+        raise RuntimeError(f'localization bin declares {count} entries, parsed {len(result)}')
+
+    return result
+
+
+async def get_android_string_names(session: httpx.AsyncClient) -> dict[int, str]:
+    xml_path, json_path = 'android_strings.xml', 'android_translation_keys.json'
+    await asyncio.gather(
+        download_file(ANDROID_STRINGS_XML_URL, xml_path, session),
+        download_file(ANDROID_TRANSLATION_KEYS_URL, json_path, session),
+    )
+    # download_file skips non-200 responses; without a source names would turn into hashes
+    if not os.path.exists(xml_path) or not os.path.exists(json_path):
+        raise RuntimeError('[android] failed to download string name sources')
+
+    official_names = {e.get('name') for e in ElementTree.parse(xml_path).getroot() if e.get('name')}
+    with open(json_path, encoding='utf-8') as f:
+        translation_keys = json.load(f)
+    os.remove(xml_path)
+    os.remove(json_path)
+
+    translation_names = set(translation_keys['android']) | set(translation_keys['android_x'])
+
+    def with_plural_roots(names: set[str]) -> set[str]:
+        return names | {n.rsplit('_', 1)[0] for n in names if n.rsplit('_', 1)[-1] in ANDROID_PLURAL_FORMS}
+
+    # deterministic on hash collisions: official names win, then the smallest name
+    result = {}
+    for names in (with_plural_roots(official_names), with_plural_roots(translation_names)):
+        for name in sorted(names):
+            result.setdefault(java_string_hash(name), name)
+
+    return result
+
+
+def encode_android_xml_value(value: str) -> str:
+    # port of apktool's ResXmlEncoders.encodeAsXmlValue to keep the strings.xml history comparable
+    if not value:
+        return value
+
+    out = []
+    if value[0] in '#@?':
+        out.append('\\')
+
+    is_in_style_tag = False
+    start_pos = 0
+    enclose = False
+    was_space = True
+    for c in value:
+        if is_in_style_tag:
+            if c == '>':
+                is_in_style_tag = False
+                start_pos = len(out) + 1
+                enclose = False
+        elif c == ' ':
+            if was_space:
+                enclose = True
+            was_space = True
+        else:
+            was_space = False
+            if c in '\\"':
+                out.append('\\')
+            elif c in '\'\n':
+                enclose = True
+            elif c == '<':
+                is_in_style_tag = True
+                if enclose:
+                    out.insert(start_pos, '"')
+                    out.append('"')
+            elif unicodedata.category(c) == 'Cc' or 0xFFF0 <= ord(c) <= 0xFFFF:
+                out.append(f'\\u{ord(c):04x}')
+                continue
+        out.append(c)
+
+    if enclose or was_space:
+        out.insert(start_pos, '"')
+        out.append('"')
+
+    return ''.join(out).replace('&', '&amp;').replace('<', '&lt;')
+
+
+def has_multiple_non_positional_substitutions(value: str) -> bool:
+    # port of apktool's ResXmlEncoders.hasMultipleNonPositionalSubstitutions, it adds formatted="false"
+    non_positional, positional = 0, 0
+    pos2, length = 0, len(value)
+    while (pos := value.find('%', pos2)) != -1:
+        pos2 = pos + 1
+        if pos2 == length:
+            non_positional += 1
+            break
+
+        c = value[pos2]
+        pos2 += 1
+        if c == '%':
+            continue
+
+        if '0' <= c <= '9' and pos2 < length:
+            while True:
+                c = value[pos2]
+                pos2 += 1
+                if not ('0' <= c <= '9' and pos2 < length):
+                    break
+            if c == '$':
+                positional += 1
+                continue
+
+        non_positional += 1
+        if non_positional >= 4:
+            break
+
+    return non_positional > 0 and non_positional + positional > 1
+
+
+def build_android_strings_xml(resources_strings_xml: str, localization: dict[int, str], names: dict[int, str]) -> str:
+    lines = {}
+
+    # strings that are still android resources (AppName, androidx ones, ...) as apktool decoded them
+    resource_lines = re.findall(
+        r'^(    <string name="([^"]+)"(?:[^>]*/>|[^>]*>.*?</string>))$', resources_strings_xml, re.S | re.M
+    )
+    if len(resource_lines) != resources_strings_xml.count('<string '):
+        raise RuntimeError('[android] unexpected apktool strings.xml layout')
+    for line, name in resource_lines:
+        lines[name] = line
+
+    for name_hash, value in localization.items():
+        name = names.get(name_hash, f'#{name_hash}')
+        if name in lines:
+            continue
+
+        formatted = ' formatted="false"' if has_multiple_non_positional_substitutions(value) else ''
+        if value:
+            lines[name] = f'    <string name="{name}"{formatted}>{encode_android_xml_value(value)}</string>'
+        else:
+            lines[name] = f'    <string name="{name}"{formatted} />'
+
+    body = '\n'.join(lines[name] for name in sorted(lines))
+    return f'<?xml version="1.0" encoding="utf-8"?>\n<resources>\n{body}\n</resources>\n'
+
+
+def dump_android_localization(localization: dict[int, str]) -> str:
+    def escape(value: str) -> str:
+        return value.replace('\\', '\\\\').replace('\n', '\\n')
+
+    return ''.join(f'{name_hash}\t{escape(localization[name_hash])}\n' for name_hash in sorted(localization))
+
+
 async def download_telegram_android_and_extract_resources(session: httpx.AsyncClient) -> None:
     await download_telegram_android_stable_dl_and_extract_resources(session)
     await download_telegram_android_beta_and_extract_resources(session)
@@ -460,9 +650,26 @@ async def _download_telegram_android_and_extract_resources(
         cleanup()
         raise RuntimeError(f'[{folder_name}] apktool failed')
 
+    try:
+        with open('android/assets/localization_en.bin', 'rb') as f:
+            localization = parse_android_localization_bin(f.read())
+        names = await get_android_string_names(session)
+
+        strings_xml_path = 'android/res/values/strings.xml'
+        with open(strings_xml_path, encoding='utf-8') as f:
+            resources_strings_xml = f.read()
+        with open(strings_xml_path, 'w', encoding='utf-8') as f:
+            f.write(build_android_strings_xml(resources_strings_xml, localization, names))
+        with open('android/assets/localization_en.txt', 'w', encoding='utf-8') as f:
+            f.write(dump_android_localization(localization))
+    except Exception:
+        cleanup()
+        raise
+
     files_to_track = [
         'res/values/strings.xml',
-        'res/values/public.xml'
+        'res/values/public.xml',
+        'assets/localization_en.txt',
     ]
     await track_additional_files(files_to_track, 'android', crawled_data_folder)
 
