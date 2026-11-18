@@ -838,6 +838,10 @@ async def _crawl(url: str, session: httpx.AsyncClient, output_dir: str):
     if url.endswith('.tl'):
         page_type = 'text/plain'
 
+    if url.endswith('.delta'):
+        # unknown to mimetypes, so it would be forced to html and decoded as utf-8; keep the server's octet-stream
+        page_type = 'application/octet-stream'
+
     if page_type is None or len(url_parts) == 1:
         ext = '.html'
         content_type = 'text/html'
