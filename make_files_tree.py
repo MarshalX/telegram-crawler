@@ -5,6 +5,7 @@ import logging
 import mimetypes
 import os
 import platform
+import plistlib
 import random
 import re
 import shutil
@@ -156,8 +157,20 @@ async def track_additional_files(
             async with aiofiles.open(input_path, mode='rb') as rb_file:
                 content = get_hash(await rb_file.read())
         else:
-            async with aiofiles.open(input_path, mode='r', encoding=encoding) as r_file:
-                content = re.sub(r'id=".*"', 'id="tgcrawl"', await r_file.read())
+            async with aiofiles.open(input_path, mode='rb') as rb_file:
+                raw = await rb_file.read()
+
+            if raw.startswith(b'bplist'):
+                # newer builds ship Localizable.strings as a binary plist; dump as classic .strings, sorted
+                def esc(s):
+                    return str(s).replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+
+                strings = plistlib.loads(raw)
+                text = ''.join(f'"{esc(k)}" = "{esc(strings[k])}";\n' for k in sorted(strings))
+            else:
+                text = raw.decode(encoding)
+
+            content = re.sub(r'id=".*"', 'id="tgcrawl"', text)
 
         filename = os.path.join(output_dir_name, file)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
