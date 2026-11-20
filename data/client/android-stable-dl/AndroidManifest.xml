@@ -91,6 +91,9 @@
             <action android:name="android.intent.action.VIEW"/>
             <data android:scheme="ton"/>
         </intent>
+        <intent>
+            <action android:name="android.speech.RecognitionService"/>
+        </intent>
         <package android:name="com.google.android.gms.policy_cast_dynamite"/>
         <intent>
             <action android:name="com.android.vending.billing.InAppBillingService.BIND"/>
@@ -102,7 +105,7 @@
     </queries>
     <permission android:name="org.telegram.messenger.web.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" android:protectionLevel="signature"/>
     <uses-permission android:name="org.telegram.messenger.web.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
-    <application android:allowAudioPlaybackCapture="true" android:allowBackup="true" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:backupAgent="org.telegram.messenger.BackupAgent" android:enableOnBackInvokedCallback="true" android:extractNativeLibs="true" android:hardwareAccelerated="true" android:icon="@mipmap/ic_launcher_sa" android:label="@string/AppName" android:largeHeap="true" android:manageSpaceActivity="org.telegram.ui.ExternalActionActivity" android:name="org.telegram.messenger.ApplicationLoaderImpl" android:preserveLegacyExternalStorage="true" android:requestLegacyExternalStorage="true" android:restoreAnyVersion="true" android:roundIcon="@mipmap/ic_launcher_sa" android:supportsRtl="false" android:theme="@style/Theme.TMessages.Start" android:usesCleartextTraffic="true">
+    <application android:allowAudioPlaybackCapture="true" android:allowBackup="true" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:backupAgent="org.telegram.messenger.BackupAgent" android:enableOnBackInvokedCallback="true" android:extractNativeLibs="true" android:hardwareAccelerated="true" android:icon="@mipmap/ic_launcher_sa" android:label="@string/AppName" android:largeHeap="true" android:manageSpaceActivity="org.telegram.ui.ExternalActionActivity" android:name="org.telegram.messenger.ApplicationLoaderImpl" android:preserveLegacyExternalStorage="true" android:requestLegacyExternalStorage="true" android:restoreAnyVersion="true" android:roundIcon="@mipmap/ic_launcher_sa" android:supportsRtl="false" android:theme="@style/Theme.TMessages.Start" android:usesCleartextTraffic="true" android:zygotePreloadName="org.telegram.utils.twidget.WidgetEnginePreload">
         <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyA-t0jLPjUt2FxrA8VPK2EiYHcYcboIR6k"/>
         <service android:exported="true" android:name="org.telegram.messenger.GcmPushListenerService">
             <intent-filter>
@@ -263,6 +266,7 @@
             </intent-filter>
         </activity-alias>
         <activity android:allowEmbedded="true" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:documentLaunchMode="always" android:hardwareAccelerated="true" android:name="org.telegram.ui.BubbleActivity" android:resizeableActivity="true" android:windowSoftInputMode="adjustResize"/>
+        <activity android:exported="true" android:hardwareAccelerated="true" android:launchMode="singleTask" android:name="org.telegram.ui.WidgetConformanceActivity" android:permission="android.permission.DUMP" android:taskAffinity="org.telegram.widget.conformance"/>
         <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode" android:excludeFromRecents="true" android:exported="true" android:hardwareAccelerated="true" android:name="org.telegram.ui.ShareActivity" android:stateNotNeeded="true" android:theme="@style/Theme.TMessages.Transparent" android:windowSoftInputMode="adjustPan">
             <intent-filter android:icon="@mipmap/ic_launcher" android:priority="1" android:roundIcon="@mipmap/ic_launcher_round">
                 <action android:name="android.intent.action.VIEW"/>
@@ -318,6 +322,7 @@
             </intent-filter>
         </receiver>
         <service android:exported="false" android:isolatedProcess="true" android:name="org.telegram.utils.twidget.WidgetEngineService" android:process=":widgets"/>
+        <service android:exported="false" android:isolatedProcess="true" android:name="org.telegram.utils.twidget.WidgetEngineService$Forked" android:process=":widgets" android:useAppZygote="true"/>
         <service android:exported="true" android:foregroundServiceType="dataSync" android:name="org.telegram.messenger.AuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
