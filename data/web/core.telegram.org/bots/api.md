@@ -295,7 +295,7 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [hideGeneralForumTopic](/bots/api/methods/hidegeneralforumtopic.md): hide the 'General' topic in a forum supergroup chat.
 - [unhideGeneralForumTopic](/bots/api/methods/unhidegeneralforumtopic.md): unhide the 'General' topic in a forum supergroup chat.
 - [unpinAllGeneralForumTopicMessages](/bots/api/methods/unpinallgeneralforumtopicmessages.md): clear the list of pinned messages in a General forum topic.
-- [answerCallbackQuery](/bots/api/methods/answercallbackquery.md): send answers to callback queries sent from inline keyboards.
+- [answerCallbackQuery](/bots/api/methods/answercallbackquery.md): send answers to callback queries sent from inline keyboards or rich messages.
 - [answerWidgetQuery](/bots/api/methods/answerwidgetquery.md): send an answer to a query from a widget.
 - [answerGuestQuery](/bots/api/methods/answerguestquery.md): reply to a received guest message.
 - [getUserChatBoosts](/bots/api/methods/getuserchatboosts.md): get the list of boosts added to a chat by a user.
@@ -304,6 +304,7 @@ Each message broadcasted over the free amount of 30 messages per second incurs a
 - [replaceManagedBotToken](/bots/api/methods/replacemanagedbottoken.md): revoke the current token of a managed bot and generate a new one.
 - [getManagedBotAccessSettings](/bots/api/methods/getmanagedbotaccesssettings.md): get the access settings of a managed bot.
 - [setManagedBotAccessSettings](/bots/api/methods/setmanagedbotaccesssettings.md): change the access settings of a managed bot.
+- [setMySettings](/bots/api/methods/setmysettings.md): change settings of the bot.
 - [setMyCommands](/bots/api/methods/setmycommands.md): change the list of the bot's commands.
 - [deleteMyCommands](/bots/api/methods/deletemycommands.md): delete the list of the bot's commands for the given scope and user language.
 - [getMyCommands](/bots/api/methods/getmycommands.md): get the current list of the bot's commands for the given scope and user language.
@@ -416,7 +417,7 @@ Rich message methods, types and formatting rules are documented at [Rich message
 The following methods and objects allow your bot to work in [inline mode](/bots/inline.md).
 Please see our [Introduction to Inline bots](/bots/inline.md) for more details.
 
-To enable this option, send the `/setinline` command to [@BotFather](https://t.me/botfather) and provide the placeholder text that the user will see in the input field after typing your bot's name.
+To enable this option, send the `/setinline` command to [@BotFather](https://t.me/botfather) and provide the placeholder text that the user will see in the input field after typing your bot's name, or use the parameters *supports_inline_queries* and *inline_query_placeholder* of the method [setMySettings](/bots/api/methods/setmysettings.md).
 
 Types of this section are listed at [Bot API types](/bots/api/types.md#inline-mode).
 
